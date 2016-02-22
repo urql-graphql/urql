@@ -1,0 +1,59 @@
+{
+  "name": "spectacle-docs",
+  "version": "0.0.1",
+  "description": "Marketing/documentation site for Builder",
+  "main": "webpack.config.dev.js",
+  "scripts": {
+    "build-static": "npm run reinstall-spectacle && npm run webpack-static && npm run copy-assets",
+    "copy-assets": "cp -r static build/static",
+    "dev": "webpack-dev-server --port 3000 --config webpack.config.dev.js",
+    "lint-react": "eslint src/**/*.js src/**/*.jsx",
+    "lint-node": "eslint --config .eslint-node ./*.js",
+    "open-static": "open http://localhost:8080",
+    "push-gh-pages": "git subtree push --prefix build origin gh-pages",
+    "reinstall-spectacle": "rm -rf node_modules/spectacle && npm install",
+    "server-static": "http-server build",
+    "test": "npm run lint-react && npm run lint-node",
+    "webpack-static": "webpack --config webpack.config.static.js --progress --content-base /"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FormidableLabs/spectacle-docs.git"
+  },
+  "author": "david.davidson@formidable.com, paula.lavalle@formidable.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FormidableLabs/spectacle-docs/issues"
+  },
+  "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
+  "devDependencies": {
+    "babel-eslint": "^4.1.8",
+    "eslint": "^1.10.3",
+    "eslint-config-defaults": "^8.0.2",
+    "eslint-plugin-filenames": "^0.2.0",
+    "eslint-plugin-flow-vars": "^0.1.3",
+    "eslint-plugin-react": "^3.16.1",
+    "http-server": "^0.8.5",
+    "webpack-dev-server": "1.14.0"
+  },
+  "dependencies": {
+    "spectacle": "FormidableLabs/spectacle",
+    "clean-webpack-plugin": "0.1.5",
+    "ecology": "1.0.4",
+    "formidable-landers": "0.0.7",
+    "raw-loader": "0.5.1",
+    "react": "0.14.5",
+    "static-site-generator-webpack-plugin": "2.0.1",
+    "webpack": "1.12.9",
+    "webpack-stats-plugin": "0.1.1",
+    "babel-core": "6.3.26",
+    "babel-loader": "6.2.1",
+    "babel-preset-es2015": "6.3.13",
+    "babel-preset-react": "6.3.13",
+    "handlebars": "^4.0.5",
+    "handlebars-loader": "^1.1.4",
+    "radium": "^0.16.2",
+    "radium-grid": "^1.0.4",
+    "react-dom": "0.14.5"
+  }
+}

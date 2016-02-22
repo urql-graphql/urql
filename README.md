@@ -3,12 +3,12 @@ Spectacle Documentation
 
 [![Build Status](https://travis-ci.org/FormidableLabs/spectacle-docs.svg?branch=master)](https://travis-ci.org/FormidableLabs/spectacle-docs)
 
-Marketing/documentation site for Builder
+Marketing/documentation site for Spectacle
 
 # Publishing
-The site's documentation section is pulled in directly from the `spectacle` repo's README, which means it's only as current as your local `node_modules/spectacle`. To refresh the docs, run `npm run reinstall-spectacle`, which just nukes `builder` and reinstalls with the latest. (If you forget this step in dev, it's run automatically as part of `npm run build-static`, so you can't accidentally publish outdated docs.)
+The site’s documentation section is pulled in directly from the `spectacle` repo’s README, which means it’s only as current as your local `node_modules/spectacle`. To refresh the docs, run `npm run reinstall-spectacle`, which just nukes `spectacle` and reinstalls with the latest. (If you forget this step in dev, it’s run automatically as part of `npm run build-static`, so you can’t accidentally publish outdated docs.)
 
-When it's time to publish:
+When it’s time to publish:
 ```sh
 # On master
 npm run build-static # Builds site to static HTML/JS in `/build`
