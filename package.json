@@ -39,7 +39,7 @@
   "dependencies": {
     "spectacle": "FormidableLabs/spectacle",
     "clean-webpack-plugin": "0.1.5",
-    "ecology": "1.0.4",
+    "ecology": "1.1.0",
     "formidable-landers": "0.0.7",
     "raw-loader": "0.5.1",
     "react": "0.14.5",

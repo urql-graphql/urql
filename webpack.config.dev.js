@@ -42,6 +42,9 @@ module.exports = {
       }, {
         test: /\.md$/,
         loader: "raw-loader"
+      }, {
+        test: /\.markdown$/,
+        loader: "raw-loader"
       }
     ]
   },

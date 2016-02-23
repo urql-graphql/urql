@@ -13,17 +13,18 @@ export default {
     boxSizing: "inherit"
   },
   html: {
+    backgroundColor: settings.brown,
     textSizeAdjust: "100%",
-    fontSize: "17px"
+    fontSize: "18px"
   },
   body: {
-    backgroundColor: settings.white,
-    background: settings.jet,
-    fontFamily: settings.sansSerif,
+    backgroundColor: settings.yellow,
+    background: `linear-gradient(180deg, ${settings.yellow}, ${settings.white} 120vh)`,
+    fontFamily: settings.serif,
     fontWeight: "300",
     lineHeight: 1.625,
     margin: 0,
-    color: settings.darkerJet,
+    color: settings.text,
     boxSizing: "border-box"
   },
   "html, body": {
@@ -55,7 +56,7 @@ export default {
     verticalAlign: "middle"
   },
   "th, td": {
-    border: `1px solid ${settings.darkGray}`,
+    border: `1px solid ${settings.codeBg}`,
     padding: "0.425em 0.75em",
     verticalAlign: "top"
   },
@@ -68,7 +69,7 @@ export default {
     textAlign: "left"
   },
   "h1,h2,h3,h4,h5,h6,hgroup, ul,ol,dd, p,figure, pre,table,fieldset,hr, .highlight": {
-    marginTop: "1.5em",
+    marginTop: "1.25em",
     marginBottom: "0"
   },
   img: {
@@ -122,7 +123,7 @@ export default {
    * Headlines/Headings
    */
   ".Headline": {
-    color: settings.lighterJet,
+    color: settings.red,
     fontFamily: settings.sansSerif,
     fontSize: "2.125em",
     fontWeight: 200, // Light
@@ -142,23 +143,23 @@ export default {
     textTransform: "uppercase",
     fontSize: "0.85em",
     fontWeight: "bold",
-    color: settings.lightJet
+    color: settings.text
   },
   /*
    * Links
    */
   "a": {
-    paddingTop: "0.15em",
-    color: settings.jet,
+    color: settings.orange,
     fontWeight: "500",
     textDecoration: "none",
     backgroundColor: "transparent",
-    borderBottom: `3px solid ${settings.gold}`,
+    borderBottom: `1px solid ${settings.gold}`,
     transition: "all 0.5s ease"
   },
   "a:hover, a:focus": {
-    backgroundColor: settings.gold,
-    borderBottom: `3px solid ${settings.gold}`,
+    color: settings.orange,
+    boxShadow: `inset 0 -0.2em ${settings.yellow}`,
+    borderBottom: `1px solid ${settings.yellow}`,
     transition: "all 0.5s ease"
   },
   ".Link--unstyled": {
@@ -172,64 +173,40 @@ export default {
    */
   ".Button": {
     backgroundColor: "transparent",
-    border: `3px solid ${settings.gray}`,
+    border: `3px solid ${settings.yellow}`,
     boxShadow: "none",
-    color: settings.jet,
-    fontFamily: settings.sansSerif,
+    color: settings.text,
+    fontFamily: settings.serif,
     fontWeight: "normal",
     padding: "0.75em 1.25em",
     textAlign: "center",
     transition: "color 0.2s ease, border-color 0.7s ease"
   },
   ".Button:hover, .Button:focus": {
-    borderColor: settings.palestRed,
+    borderColor: settings.gold,
     boxShadow: "none",
-    color: settings.red,
+    color: settings.text,
     outline: "none",
     transition: "color 0.2s ease, border-color 0.7s ease"
-  },
-  ".Button--spotlight": {
-    backgroundColor: settings.jet,
-    borderColor: settings.jet,
-    color: settings.gray,
-    fontSize: "1.25rem",
-    transition: "color 0.2s ease, background-color 0.7s ease, border-color 0.7s ease"
-  },
-  ".Button--spotlight:hover, .Button--spotlight:focus": {
-    backgroundColor: settings.red,
-    borderColor: settings.red,
-    color: "#ffffff",
-    transition: "color 0.2s ease, background-color 0.7s ease, border-color 0.7s ease"
   },
   /*
    * Layout/Grid
    */
   ".Container": {
     margin: "0 auto",
-    maxWidth: "960px",
     padding: "0 16px"
-  },
-  ".Row": {
-    padding: "2rem 0"
-  },
-  ".Row .Interactive": {
-    marginTop: "-1.3334rem"
   },
   /*
    * Copy
    */
   ".Copy": {
     margin: "0 auto",
-    maxWidth: "720px",
+    maxWidth: "40em",
     padding: "0",
-    fontSmoothing: "antialiased",
     fontSize: "1rem"
   },
   ".Copy p, .Copy ul, .Ecology ul": {
     paddingRight: "0"
-  },
-  ".Tagline": {
-    textAlign: "left"
   },
   ".Copy .highlight": {
     marginLeft: "-16px",
@@ -237,7 +214,7 @@ export default {
   },
   ".Copy .highlight pre": {
     marginTop: 0,
-    background: settings.jet,
+    background: settings.yellow,
     color: "#fff",
     fontFamily: settings.monospace,
     fontSize: "1em",
@@ -263,7 +240,7 @@ export default {
     position: "absolute",
     fontSize: "8px",
     borderRadius: "50%",
-    border: "1px solid rgba(48, 48, 48, 0.5)",
+    border: "1px solid rgba(41, 28, 13, 0.5)",
     left: "-24px",
     top: "11px"
   },
@@ -271,9 +248,9 @@ export default {
     marginTop: 0,
     marginBottom: "0.25em"
   },
-  ".Copy code, .Ecology code, .Focus code": {
-    background: "rgba(135, 135, 135, 0.1)",
-    color: settings.jet,
+  ".Copy code, .Ecology code, .Focus code, td code, th code": {
+    background: settings.codeBg,
+    color: settings.text,
     fontFamily: settings.monospace,
     fontSize: "0.925em",
     borderRadius: "3px",
@@ -294,7 +271,7 @@ export default {
    * Ecology text wrangling
    */
   ".Overview pre": {
-    background: "rgba(135, 135, 135, 0.1)",
+    background: settings.codeBg,
     padding: "0.25em 0.5em",
     overflowX: "scroll" // bring back scrollbars for readme.md
   },
@@ -332,14 +309,14 @@ export default {
     lineHeight: 1.2,
     marginTop: "1.66666em",
     padding: "0.88888em 0.88888em 0 0.88888em",
-    border: "1px solid #ebe3db"
+    border: `1px solid ${settings.codeBg}`
   },
   ".Interactive .playgroundPreview": {
     flex: "0 0 100%",
     verticalAlign: "top",
     background: "#fff",
     position: "relative",
-    border: "1px solid #ebe3db"
+    border: `1px solid ${settings.codeBg}`
   },
   ".Interactive .playgroundPreview:before": {
     content: "'Live Preview'",
@@ -368,7 +345,7 @@ export default {
     fontFamily: settings.monospace
   },
   ".Prop-type": {
-    color: settings.lightJet,
+    color: settings.red,
     display: "block",
     fontStyle: "italic",
     lineHeight: "1em"
@@ -386,7 +363,7 @@ export default {
     textTransform: "uppercase",
     fontSize: "0.85em",
     fontWeight: "bold",
-    color: settings.lightJet,
+    color: settings.red,
     letterSpacing: "0.04em"
   },
   ".Prop-examples-value": {
@@ -465,11 +442,7 @@ export default {
         paddingBottom: "0"
       },
       ".Container": {
-        maxWidth: "1260px",
         padding: "0 36px"
-      },
-      ".Copy, .Tagline": {
-        padding: "0 0 0 60px"
       },
       ".Copy p, .Copy ul, .Ecology ul": {
         paddingRight: "60px"
@@ -477,17 +450,11 @@ export default {
       ".Copy, .Ecology p": {
         fontSize: "1.125rem"
       },
-      ".Copy--Big": {
-        fontSize: "1.3334em"
-      },
       ".Copy .highlight": {
         margin: "2em -1.3334em"
       },
       ".Copy .highlight pre": {
         padding: "1.3334em"
-      },
-      ".Tagline": {
-        textAlign: "center"
       },
       ".Installer": {
         padding: "1.3334em 2.6667em", //24px 48px

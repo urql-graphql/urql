@@ -3,28 +3,24 @@ module.exports = {
   // --------
   // Fonts
   // --------
-  sansSerif: "'CooperHewitt', 'Franklin Gothic', 'Trade Gothic', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  headlineFont: "'Modak', 'Helvetica Neue', Helvetica, sans-serif",
+  sansSerif: "'Franklin Gothic', 'Trade Gothic', 'Helvetica Neue', Helvetica, sans-serif",
+  serif: "'Lora', serif",
   monospace: "'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace",
   // --------
   // Colors
   // --------
-  // Blacks
-  darkerJet: "#0a0a0a",
-  darkJet: "#111111",
-  jet: "#151515",
-  lightJet: "#1f1f1f",
-  lighterJet: "#303030",
-  // Grays
-  darkGray: "#878787",
-  gray: "#d7d7d7",
-  white: "#fafafa",
-  // Accent
-  gold: "#fff982",
-  darkGold: "#ffea00",
+  text: "#291C0D",
+
+  white: "#F0E6C0", // rgb(240, 230, 192)
+  yellow: "#F5C80D", // rgb(245, 200, 13)
+  gold: "#EAA617", // rgb(234, 166, 23)
+  orange: "#D74E07",
+  red: "#912A18",
+  brown: "#291C0D", // rgb(41, 28, 13)
+  codeBg: "rgba(234, 181, 70, 0.25)",
+
   // Formidable Reds
-  palestRed: "#E5847D",
-  palerRed: "#C75B54",
-  paleRed: "#bd4139",
   red: "#bd1e13",
   // --------
   // Media Queries

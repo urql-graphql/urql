@@ -7,60 +7,65 @@ class Hero extends React.Component {
   getHeroStyles() {
     return {
       position: "relative",
-      margin: "0 auto 25% auto",
-      padding: "200px 0 0",
-      background: "#0b0b0b url('./static/bg.png') top center repeat-x"
+      margin: "0",
+      padding: "0 2vw",
+      height: "70vh",
+
+      border: `1em solid ${settings.text}`,
+
+      display: "flex",
+      alignItems: "center",
+      flexWrap: "wrap",
+      flexDirection: "column",
+      justifyContent: "center"
     };
   }
 
-  getSkewStyles() {
+  getCircleStyles() {
     return {
-      zIndex: "0",
-      position: "absolute",
-      top: "40%",
-      left: "0",
-      right: "0",
-      height: "120%",
-      transformOrigin: "top left",
-      transform: "skew(0deg, 15deg)",
-      backgroundColor: settings.jet
+      base: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+
+        zIndex: "0"
+      },
+      small: {
+        clipPath: "circle(75vmax at 100vmax 50vmax)",
+        background: `linear-gradient(45deg, ${settings.yellow}, ${settings.orange})`
+      },
+      large: {
+        clipPath: "circle(105vmax at 100vmax 0vmax)",
+        background: `linear-gradient(315deg, ${settings.yellow}, ${settings.red})`
+      }
     };
   }
 
-  getInstallerStyles() {
+  getTitleStyles() {
     return {
       zIndex: "1",
       margin: "0",
-      position: "relative",
-      textAlign: "center"
-    };
-  }
 
-  getInstallerHeadingStyles() {
-    return {
-      backgroundColor: settings.gold,
-      border: `1px solid ${settings.darkGold}`,
-      color: settings.jet,
-      display: "inline-block",
-      fontFamily: settings.monospace,
-      fontSize: "1.5rem",
-      lineHeight: 1.2,
-      margin: "0 auto",
-      padding: "1em 2em",
-      textAlign: "center"
-    };
+      color: settings.text,
+      fontFamily: settings.headlineFont,
+      fontSize: "15vw",
+      lineHeight: "1",
+      fontWeight: "100",
+      textShadow: `1vw 1vw 0 ${settings.yellow},  2vw 2vw 0 ${settings.gold}`,
+    }
   }
 
   render() {
+    const circle = this.getCircleStyles();
     return (
       <div style={this.getHeroStyles()}>
-        <div style={this.getSkewStyles()}></div>
-        <h1 style={{margin: "0 auto 2em", zIndex: "1", position: "relative", width: "65%", maxWidth: "995px"}}>
-          <img src="./static/logotype-builder.svg" alt="Builder" />
+        <div style={[circle.base, circle.large]}></div>
+        <div style={[circle.base, circle.small]}></div>
+        <h1 style={this.getTitleStyles()}>
+          Spectacle
         </h1>
-        <div style={this.getInstallerStyles()}>
-          <h2 style={this.getInstallerHeadingStyles()}>npm install builder</h2>
-        </div>
       </div>
     );
   }
