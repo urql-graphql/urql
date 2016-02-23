@@ -37,23 +37,23 @@
     "webpack-dev-server": "1.14.0"
   },
   "dependencies": {
-    "spectacle": "FormidableLabs/spectacle",
-    "clean-webpack-plugin": "0.1.5",
-    "ecology": "1.1.0",
-    "formidable-landers": "0.0.7",
-    "raw-loader": "0.5.1",
-    "react": "0.14.5",
-    "static-site-generator-webpack-plugin": "2.0.1",
-    "webpack": "1.12.9",
-    "webpack-stats-plugin": "0.1.1",
     "babel-core": "6.3.26",
     "babel-loader": "6.2.1",
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "6.3.13",
+    "clean-webpack-plugin": "0.1.5",
+    "ecology": "1.1.0",
+    "formidable-landers": "0.0.7",
     "handlebars": "^4.0.5",
     "handlebars-loader": "^1.1.4",
     "radium": "^0.16.2",
     "radium-grid": "^1.0.4",
-    "react-dom": "0.14.5"
+    "raw-loader": "0.5.1",
+    "react": "^0.14.5",
+    "react-dom": "^0.14.5",
+    "spectacle": "FormidableLabs/spectacle",
+    "static-site-generator-webpack-plugin": "2.0.1",
+    "webpack": "1.12.9",
+    "webpack-stats-plugin": "0.1.1"
   }
 }
