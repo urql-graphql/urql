@@ -1,18 +1,22 @@
 import Ecology from "ecology";
 import React from "react";
 import Radium from "radium";
+import {Grid, Cell} from "radium-grid";
 
 import settings from "../spectacle-variables";
 import SpectacleREADME from "!!raw!spectacle/README.markdown";
 
 class Docs extends React.Component {
-  getMainStyles() {
+  getSectionStyles() {
     return {
       position: "relative",
+      // display: "flex",
+      // flex: "1",
+      // flexWrap: "wrap",
 
       zIndex: "0",
       margin: "0",
-      padding: "2em 1em",
+      padding: "1em",
       width: "100%",
 
       borderTop: "0",
@@ -21,16 +25,43 @@ class Docs extends React.Component {
       borderLeft: `1em solid ${settings.text}`,
 
       [settings.mediaQueries.medium]: {
-        padding: "2em 5em"
+        padding: "1em 0"
+      }
+    };
+  }
+  getContentStyles() {
+    return {
+      flex: "0 0 100%",
+
+      [settings.mediaQueries.large]: {
+        // paddingLeft: "2em",
+        flex: "1"
+      }
+    };
+  }
+  getSidebarStyles() {
+    return {
+      padding: "0 1em",
+      flex: "0 0 100%",
+      width: "100%",
+      order: "-1",
+
+      fontSize: "16px",
+
+      [settings.mediaQueries.large]: {
+        padding: "0 0 0 2em",
+        flex: "none",
+        width: "25%"
       }
     };
   }
   render() {
+    // <nav style={this.getSidebarStyles()}>
+    //   <h1>Contents</h1>
+    // </nav>
     return (
-      <section style={this.getMainStyles()}>
-        <div className="Container">
-          <Ecology overview={SpectacleREADME} />
-        </div>
+      <section style={this.getSectionStyles()}>
+        <Ecology overview={SpectacleREADME} />
       </section>
     );
   }
