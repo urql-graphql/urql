@@ -154,13 +154,18 @@ export default {
     textDecoration: "none",
     backgroundColor: "transparent",
     borderBottom: `1px solid ${settings.gold}`,
-    transition: "all 0.5s ease"
+    transition: "border 0.5s, box-shadow 0.5s, color 2s"
+  },
+  "a:visited": {
+    color: settings.red,
+    borderBottomColor: settings.orange,
+    transition: "border 0.5s, box-shadow 0.5s, color 2s"
   },
   "a:hover, a:focus": {
-    color: settings.orange,
+    color: settings.red,
     boxShadow: `inset 0 -0.2em ${settings.yellow}`,
     borderBottom: `1px solid ${settings.yellow}`,
-    transition: "all 0.5s ease"
+    transition: "border 0.5s, box-shadow 0.5s, color 2s"
   },
   ".Link--unstyled": {
     borderBottom: "none"
@@ -195,6 +200,22 @@ export default {
   ".Container": {
     margin: "0 auto",
     padding: "0 16px"
+  },
+  ".Container p, .Container ul, .Container h1, .Container h2, .Container h3, .Container h4, .Container h5, .Container h6": {
+    marginLeft: "auto",
+    marginRight: "auto",
+    maxWidth: "40rem"
+  },
+  ".Container table": {
+    marginLeft: "auto",
+    marginRight: "auto",
+    maxWidth: "40rem"
+  },
+  ".Container p img": {
+    maxWidth: "100%"
+  },
+  ".Container pre": {
+    paddingLeft: "20rem"
   },
   /*
    * Copy
