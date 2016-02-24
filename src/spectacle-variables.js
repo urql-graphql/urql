@@ -4,7 +4,7 @@ module.exports = {
   // Fonts
   // --------
   headlineFont: "'Modak', 'Helvetica Neue', Helvetica, sans-serif",
-  sansSerif: "'Franklin Gothic', 'Trade Gothic', 'Helvetica Neue', Helvetica, sans-serif",
+  sansSerif: "'Open Sans', 'Helvetica Neue', Helvetica, sans-serif",
   serif: "'Lora', serif",
   monospace: "'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace",
   // --------
@@ -21,7 +21,7 @@ module.exports = {
   codeBg: "rgba(234, 181, 70, 0.25)",
 
   // Formidable Reds
-  red: "#bd1e13",
+  brandRed: "#bd1e13",
   // --------
   // Media Queries
   // --------

@@ -80,28 +80,30 @@ export default {
   },
   h1: {
     fontSize: "2.125em",
-    fontWeight: 200
+    fontWeight: 800
   },
   h2: {
     fontSize: "2em",
-    fontWeight: 200
+    fontWeight: 800
   },
   h3: {
     fontSize: "1.875em",
-    fontWeight: 300
+    fontWeight: 700
   },
   "h4, h5, h6": {
-    fontSize: "1em",
-    fontWeight: 500,
+    fontSize: "1.75em",
+    fontWeight: 700,
     textTransform: "uppercase",
-    letterSpacing: "0.05em"
+    letterSpacing: "0.05em",
+    color: settings.red
   },
   "h1,h2,h3,h4": {
     fontFamily: settings.sansSerif,
-    lineHeight: 1.3
+    lineHeight: 1.3,
+    color: settings.red
   },
   "strong": {
-    fontWeight: 500
+    fontWeight: 700
   },
   "em": {
     fontStyle: "italic"
@@ -201,39 +203,26 @@ export default {
     margin: "0 auto",
     padding: "0 16px"
   },
-  ".Container p, .Container ul, .Container h1, .Container h2, .Container h3, .Container h4, .Container h5, .Container h6": {
-    marginLeft: "auto",
-    marginRight: "auto",
-    maxWidth: "40rem"
-  },
-  ".Container table": {
-    marginLeft: "auto",
-    marginRight: "auto",
-    maxWidth: "40rem"
-  },
-  ".Container p img": {
-    maxWidth: "100%"
-  },
-  ".Container pre": {
-    paddingLeft: "20rem"
-  },
   /*
-   * Copy
+   * Ecology
+
+     margin: "0 auto",
+     maxWidth: "40em",
+     padding: "0",
    */
-  ".Copy": {
-    margin: "0 auto",
-    maxWidth: "40em",
-    padding: "0",
+  ".Ecology p": {
+    paddingRight: "0",
+    paddingLeft: "0",
     fontSize: "1rem"
   },
-  ".Copy p, .Copy ul, .Ecology ul": {
+  ".Ecology ul": {
     paddingRight: "0"
   },
-  ".Copy .highlight": {
+  ".Ecology .highlight": {
     marginLeft: "-16px",
     marginRight: "-16px"
   },
-  ".Copy .highlight pre": {
+  ".Ecology .highlight pre": {
     marginTop: 0,
     background: settings.yellow,
     color: "#fff",
@@ -243,17 +232,17 @@ export default {
     overflow: "auto",
     padding: "1em"
   },
-  ".Copy ul, .Ecology ul": {
+  ".Ecology ul": {
     paddingLeft: "1.5em",
     listStyle: "none"
   },
-  ".Copy ul > li, .Ecology ul > li": {
+  ".Ecology ul > li": {
     position: "relative"
   },
-  ".Copy ul > li + li, .Ecology ul > li + li": {
+  ".Ecology ul > li + li": {
     marginTop: "0.25em"
   },
-  ".Copy ul > li:before, .Ecology ul > li:before": {
+  ".Ecology ul > li:before": {
     content: "''",
     width: "1em",
     height: "1em",
@@ -265,11 +254,11 @@ export default {
     left: "-24px",
     top: "11px"
   },
-  ".Copy li > ul, .Ecology li > ul": {
+  ".Ecology li > ul": {
     marginTop: 0,
     marginBottom: "0.25em"
   },
-  ".Copy code, .Ecology code, .Focus code, td code, th code": {
+  ".Ecology code, .Focus code, td code, th code": {
     background: settings.codeBg,
     color: settings.text,
     fontFamily: settings.monospace,
@@ -281,12 +270,6 @@ export default {
   ".highlight code": {
     background: "transparent",
     padding: 0
-  },
-  /*
-   * Big Copy
-   */
-  ".Copy--Big": {
-    fontSize: "1.3334em"
   },
   /*
    * Ecology text wrangling
@@ -410,30 +393,30 @@ export default {
   mediaQueries: {
     "only screen and (min-width: 32em)": { //medium
       h1: {
-        fontSize: "2.5em"
+        fontSize: "2.5rem"
       },
       h2: {
-        fontSize: "2.125em"
+        fontSize: "2.125rem"
       },
       h3: {
-        fontSize: "2em"
+        fontSize: "2rem"
       },
       "h4, h5, h6": {
-        fontSize: "1.1em"
+        fontSize: "1.5rem"
       },
       ".Headline": {
-        fontSize: "2.5em"
+        fontSize: "2.5rem"
       },
       ".Headline--minor": {
-        fontSize: "2.125em"
+        fontSize: "2.125rem"
       },
       ".Headline--major": {
-        fontSize: "2.75em"
+        fontSize: "2.75rem"
       },
-      ".Copy, .Tagline": {
+      ".Ecology p": {
         paddingLeft: "48px"
       },
-      ".Copy p, .Copy ul, .Ecology ul": {
+      ".Ecology p, .Ecology ul": {
         paddingRight: "48px"
       }
     },
@@ -465,22 +448,17 @@ export default {
       ".Container": {
         padding: "0 36px"
       },
-      ".Copy p, .Copy ul, .Ecology ul": {
+      ".Ecology p, .Ecology ul": {
         paddingRight: "60px"
       },
-      ".Copy, .Ecology p": {
+      ".Ecology p": {
         fontSize: "1.125rem"
       },
-      ".Copy .highlight": {
+      ".Ecology .highlight": {
         margin: "2em -1.3334em"
       },
-      ".Copy .highlight pre": {
+      ".Ecology .highlight pre": {
         padding: "1.3334em"
-      },
-      ".Installer": {
-        padding: "1.3334em 2.6667em", //24px 48px
-        marginTop: "1.3334em",
-        marginBottom: "1.3334em"
       },
       ".Interactive .playground": {
         display: "flex",
