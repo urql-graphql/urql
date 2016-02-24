@@ -9,6 +9,15 @@ import settings from "../spectacle-variables";
 import theme from "../spectacle-theme";
 
 class App extends React.Component {
+  getHeaderOverrides() {
+    return {
+      backgroundColor: settings.brown,
+      borderTop: `1em solid ${settings.text}`,
+      borderRight: `1em solid ${settings.text}`,
+      borderBottom: "0",
+      borderLeft: `1em solid ${settings.text}`
+    };
+  }
   getHeaderLinkStyles() {
     return {
       color: settings.yellow,
@@ -33,11 +42,15 @@ class App extends React.Component {
   render() {
     return (
       <StyleRoot>
-        <Header backgroundColor={settings.brown} linkStyles={this.getHeaderLinkStyles()} />
+        <Header
+          styleOverrides={this.getHeaderOverrides()}
+          linkStyles={this.getHeaderLinkStyles()}
+          />
         <Hero />
         <Docs />
-        <Footer backgroundColor={settings.white} styleOverrides={this.getFooterOverrides()}>
-        </Footer>
+        <Footer
+          backgroundColor={settings.white} styleOverrides={this.getFooterOverrides()}
+          />
         <Style rules={theme} />
       </StyleRoot>
     );

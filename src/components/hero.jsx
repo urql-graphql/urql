@@ -38,7 +38,7 @@ class Hero extends React.Component {
       },
       large: {
         clipPath: "circle(105vmax at 100vmax 0vmax)",
-        background: `linear-gradient(315deg, ${settings.yellow}, ${settings.red})`
+        background: `linear-gradient(315deg, ${settings.yellow}, ${settings.brandRed})`
       }
     };
   }

@@ -148,7 +148,7 @@ export default {
   /*
    * Headlines/Headings
    */
-  ".Headline": {
+  ".Headline, p:first-child": {
     color: settings.text,
     textShadow: `0.1em 0.25em 0 ${settings.yellow}`,
     fontFamily: settings.sansSerif,
