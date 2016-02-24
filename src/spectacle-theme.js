@@ -90,26 +90,26 @@ export default {
     fontSize: "1.875em",
     fontWeight: 700
   },
+  "h1, h2": {
+    textShadow: `0.03em 0.03em 0 ${settings.yellow}, 0.1em 0.1em 0 ${settings.gold}`
+  },
   "h4, h5, h6": {
     fontSize: "1.75em",
     fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "0.05em",
-    color: settings.red
+    color: settings.text
   },
   "h1,h2,h3,h4": {
     fontFamily: settings.sansSerif,
     lineHeight: 1.3,
-    color: settings.red
+    color: settings.text
   },
   "strong": {
     fontWeight: 700
   },
   "em": {
     fontStyle: "italic"
-  },
-  "ul": {
-    padding: "0"
   },
   "ol": {
     padding: "0 0 0 1.5em"
@@ -118,14 +118,39 @@ export default {
     margin: "0",
     padding: "0"
   },
-  "ul > li": {
+  "ul": {
+    padding: "0 0 0 1.5em",
     listStyle: "none"
+  },
+  "ul > li": {
+    position: "relative",
+    listStyle: "none"
+  },
+  "ul > li + li": {
+    marginTop: "0.25em"
+  },
+  "ul > li:before": {
+    content: "''",
+    width: "1em",
+    height: "1em",
+    display: "block",
+    position: "absolute",
+    fontSize: "8px",
+    borderRadius: "50%",
+    border: "1px solid rgba(41, 28, 13, 0.5)",
+    left: "-24px",
+    top: "11px"
+  },
+  "li > ul": {
+    marginTop: 0,
+    marginBottom: "0.25em"
   },
   /*
    * Headlines/Headings
    */
   ".Headline": {
-    color: settings.red,
+    color: settings.text,
+    textShadow: `0.1em 0.25em 0 ${settings.yellow}`,
     fontFamily: settings.sansSerif,
     fontSize: "2.125em",
     fontWeight: 200, // Light
@@ -197,26 +222,17 @@ export default {
     transition: "color 0.2s ease, border-color 0.7s ease"
   },
   /*
-   * Layout/Grid
-   */
-  ".Container": {
-    margin: "0 auto",
-    padding: "0 16px"
-  },
-  /*
    * Ecology
-
-     margin: "0 auto",
-     maxWidth: "40em",
-     padding: "0",
    */
-  ".Ecology p": {
-    paddingRight: "0",
-    paddingLeft: "0",
-    fontSize: "1rem"
+  "#spectacle": {
+    display: "none" // hide second title
   },
-  ".Ecology ul": {
-    paddingRight: "0"
+  ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology table": {
+    paddingLeft: "0%",
+    paddingRight: "0%"
+  },
+  ".Ecology p": {
+    fontSize: "1rem"
   },
   ".Ecology .highlight": {
     marginLeft: "-16px",
@@ -231,32 +247,6 @@ export default {
     lineHeight: 1.2,
     overflow: "auto",
     padding: "1em"
-  },
-  ".Ecology ul": {
-    paddingLeft: "1.5em",
-    listStyle: "none"
-  },
-  ".Ecology ul > li": {
-    position: "relative"
-  },
-  ".Ecology ul > li + li": {
-    marginTop: "0.25em"
-  },
-  ".Ecology ul > li:before": {
-    content: "''",
-    width: "1em",
-    height: "1em",
-    display: "block",
-    position: "absolute",
-    fontSize: "8px",
-    borderRadius: "50%",
-    border: "1px solid rgba(41, 28, 13, 0.5)",
-    left: "-24px",
-    top: "11px"
-  },
-  ".Ecology li > ul": {
-    marginTop: 0,
-    marginBottom: "0.25em"
   },
   ".Ecology code, .Focus code, td code, th code": {
     background: settings.codeBg,
@@ -391,7 +381,7 @@ export default {
     marginTop: 0
   },
   mediaQueries: {
-    "only screen and (min-width: 32em)": { //medium
+    [settings.mediaSizes.medium]: { //medium
       h1: {
         fontSize: "2.5rem"
       },
@@ -404,26 +394,31 @@ export default {
       "h4, h5, h6": {
         fontSize: "1.5rem"
       },
-      ".Headline": {
-        fontSize: "2.5rem"
+      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+        paddingLeft: "5%",
+        paddingRight: "5%"
       },
-      ".Headline--minor": {
-        fontSize: "2.125rem"
+      ".Ecology li > ul": {
+        paddingLeft: "1.5em"
       },
-      ".Headline--major": {
-        fontSize: "2.75rem"
-      },
-      ".Ecology p": {
-        paddingLeft: "48px"
-      },
-      ".Ecology p, .Ecology ul": {
-        paddingRight: "48px"
+      ".Ecology table": {
+        paddingLeft: "5%"
       }
     },
-    "only screen and (min-width: 60em)": { //xlarge
-      html: {
-        fontSize: "18px"
+    [settings.mediaSizes.large]: {
+      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+        paddingLeft: "20%",
+        paddingRight: "20%"
       },
+      ".Ecology li > ul": {
+        paddingLeft: "1.5em"
+      },
+      ".Ecology table": {
+        paddingLeft: "20%",
+        paddingRight: "10%"
+      }
+    },
+    [settings.mediaSizes.xlarge]: { //xlarge
       h1: {
         fontSize: "3rem"
       },
@@ -433,26 +428,23 @@ export default {
       h3: {
         fontSize: "2.125rem"
       },
-      ".Headline": {
-        fontSize: "2.75em"
-      },
-      ".Headline--major": {
-        fontSize: "3.5rem",
-        lineHeight: 1.2,
-        fontStyle: "italic"
-      },
       ".Header": {
         paddingTop: "65px",
         paddingBottom: "0"
       },
-      ".Container": {
-        padding: "0 36px"
-      },
       ".Ecology p, .Ecology ul": {
-        paddingRight: "60px"
-      },
-      ".Ecology p": {
         fontSize: "1.125rem"
+      },
+      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+        paddingLeft: "25%",
+        paddingRight: "25%"
+      },
+      ".Ecology table": {
+        paddingLeft: "25%",
+        paddingRight: "10%"
+      },
+      ".Ecology li > ul": {
+        paddingLeft: "1.5em"
       },
       ".Ecology .highlight": {
         margin: "2em -1.3334em"
