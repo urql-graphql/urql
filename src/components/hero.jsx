@@ -48,12 +48,8 @@ class Hero extends React.Component {
       zIndex: "1",
       margin: "0",
 
-      color: settings.text,
-      fontFamily: settings.headlineFont,
-      fontSize: "15vw",
-      lineHeight: "1",
-      fontWeight: "100",
-      textShadow: `1vw 1vw 0 ${settings.yellow},  2vw 2vw 0 ${settings.gold}`,
+      width: "90vw",
+      height: "auto"
     }
   }
 
@@ -64,7 +60,7 @@ class Hero extends React.Component {
         <div style={[circle.base, circle.large]}></div>
         <div style={[circle.base, circle.small]}></div>
         <h1 style={this.getTitleStyles()}>
-          Spectacle
+          <img src="./static/logotype-spectacle.svg" style={{width: "100%"}}/>
         </h1>
       </div>
     );
