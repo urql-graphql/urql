@@ -28,8 +28,32 @@ class App extends React.Component {
       }
     };
   }
+  getCircleStyles() {
+    return {
+      base: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+
+        zIndex: "0"
+      },
+      small: {
+        clipPath: "circle(75vmax at 0% 100%)",
+        background: `linear-gradient(0deg, ${settings.orange}, transparent 2%)`
+      },
+      large: {
+        clipPath: "circle(105vmax at 100% 100%)",
+        background: `linear-gradient(0deg, ${settings.yellow}, ${settings.white} 5%)`
+      }
+    };
+  }
   getFooterOverrides() {
     return {
+      zIndex: "1",
+      position: "relative",
+
       margin: "0",
 
       borderTop: "0",
@@ -40,6 +64,7 @@ class App extends React.Component {
   }
 
   render() {
+    const circle = this.getCircleStyles();
     return (
       <StyleRoot>
         <Header
@@ -49,8 +74,10 @@ class App extends React.Component {
         <Hero />
         <Docs />
         <Footer
-          backgroundColor={settings.white} styleOverrides={this.getFooterOverrides()}
+          backgroundColor={"transparent"} styleOverrides={this.getFooterOverrides()}
         />
+        <div style={[circle.base, circle.large]}></div>
+        <div style={[circle.base, circle.small]}></div>
         <Style rules={theme} />
       </StyleRoot>
     );

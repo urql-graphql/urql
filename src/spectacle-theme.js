@@ -56,8 +56,10 @@ export default {
   tbody: {
     verticalAlign: "middle"
   },
+  tr: {
+    border: `1px solid ${settings.brownTint}`
+  },
   "th, td": {
-    border: `1px solid ${settings.brownTint}`,
     color: settings.text,
     fontFamily: settings.sansSerif,
     padding: "0.425em 0.75em",

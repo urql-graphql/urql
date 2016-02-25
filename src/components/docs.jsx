@@ -10,7 +10,7 @@ class Docs extends React.Component {
     return {
       position: "relative",
 
-      zIndex: "0",
+      zIndex: "1",
       margin: "0",
       padding: "1em 1em 3em",
       width: "100%",

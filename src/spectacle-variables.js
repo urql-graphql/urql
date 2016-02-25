@@ -14,12 +14,12 @@ module.exports = {
 
   white: "#F0E6C0", // rgb(240, 230, 192)
   yellow: "#F5C80D", // rgb(245, 200, 13)
+  yellowTint: "rgba(245, 200, 13, 0.25)",
   gold: "#EAA617", // rgb(234, 166, 23)
   orange: "#D74E07",
   red: "#912A18",
   brown: "#291C0D", // rgb(41, 28, 13)
-  brownTint: "#ddd2ae",
-  darkBrownTint: "rgba(41, 28, 13, 0.75)",
+  brownTint: "rgba(41, 28, 13, 0.1)",
   codeBg: "rgba(234, 181, 70, 0.25)",
   lightCodeBg: "rgba(234, 181, 70, 0.1)",
 
