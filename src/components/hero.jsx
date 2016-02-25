@@ -2,6 +2,7 @@ import React from "react";
 import Radium from "radium";
 
 import settings from "../spectacle-variables";
+import spectacleLogo from "../../static/logotype-spectacle.svg";
 
 class Hero extends React.Component {
   getHeroStyles() {
@@ -45,23 +46,27 @@ class Hero extends React.Component {
 
   getTitleStyles() {
     return {
-      zIndex: "1",
-      margin: "0",
+      h1: {
+        zIndex: "1",
+        margin: "0",
 
-      width: "90vw",
-      height: "auto"
+        width: "90vw",
+        height: "auto",
+        textAlign: "center",
+
+        borderBottom: "none"
+      }
     };
   }
 
   render() {
     const circle = this.getCircleStyles();
+    const title = this.getTitleStyles();
     return (
       <div style={this.getHeroStyles()}>
         <div style={[circle.base, circle.large]}></div>
         <div style={[circle.base, circle.small]}></div>
-        <h1 style={this.getTitleStyles()}>
-          <img src="./static/logotype-spectacle.svg" style={{width: "100%"}}/>
-        </h1>
+        <h1 dangerouslySetInnerHTML={{__html: spectacleLogo}} style={title.h1} />
       </div>
     );
   }
