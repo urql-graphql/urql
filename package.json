@@ -1,7 +1,7 @@
 {
   "name": "spectacle-docs",
   "version": "0.0.1",
-  "description": "Marketing/documentation site for Builder",
+  "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
     "build-static": "npm run reinstall-spectacle && npm run webpack-static && npm run copy-assets",
