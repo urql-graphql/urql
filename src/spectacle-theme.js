@@ -13,7 +13,7 @@ export default {
     boxSizing: "inherit"
   },
   html: {
-    backgroundColor: settings.red,
+    backgroundColor: settings.brown,
     textSizeAdjust: "100%",
     fontSize: "18px"
   },
