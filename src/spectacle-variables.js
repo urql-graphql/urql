@@ -5,7 +5,7 @@ module.exports = {
   // --------
   headlineFont: "'Modak', 'Helvetica Neue', Helvetica, sans-serif",
   sansSerif: "'Open Sans', 'Helvetica Neue', Helvetica, sans-serif",
-  serif: "'Lora', serif",
+  serif: "'Lora', Georgia, serif",
   monospace: "'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace",
   // --------
   // Colors
@@ -18,7 +18,10 @@ module.exports = {
   orange: "#D74E07",
   red: "#912A18",
   brown: "#291C0D", // rgb(41, 28, 13)
+  brownTint: "#ddd2ae",
+  darkBrownTint: "rgba(41, 28, 13, 0.75)",
   codeBg: "rgba(234, 181, 70, 0.25)",
+  lightCodeBg: "rgba(234, 181, 70, 0.1)",
 
   // Formidable Reds
   brandRed: "#bd1e13",

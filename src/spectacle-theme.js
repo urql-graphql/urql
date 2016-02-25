@@ -13,19 +13,20 @@ export default {
     boxSizing: "inherit"
   },
   html: {
-    backgroundColor: settings.brown,
+    backgroundColor: settings.red,
     textSizeAdjust: "100%",
     fontSize: "18px"
   },
   body: {
+    margin: 0,
+    boxSizing: "border-box",
+    position: "relative",
     backgroundColor: settings.yellow,
     background: `linear-gradient(180deg, ${settings.yellow}, ${settings.white} 120vh)`,
     fontFamily: settings.serif,
     fontWeight: "300",
     lineHeight: 1.625,
-    margin: 0,
-    color: settings.text,
-    boxSizing: "border-box"
+    color: settings.text
   },
   "html, body": {
     overflowX: "hidden"
@@ -56,7 +57,9 @@ export default {
     verticalAlign: "middle"
   },
   "th, td": {
-    border: `1px solid ${settings.codeBg}`,
+    border: `1px solid ${settings.brownTint}`,
+    color: settings.text,
+    fontFamily: settings.sansSerif,
     padding: "0.425em 0.75em",
     verticalAlign: "top"
   },
@@ -65,8 +68,13 @@ export default {
     color: "#111"
   },
   th: {
-    fontWeight: "bold",
+    color: settings.text,
+    borderBottom: `3px solid ${settings.codeBg}`,
+    fontWeight: 700,
     textAlign: "left"
+  },
+  "tr:nth-child(odd) td": {
+    backgroundColor: settings.lightCodeBg
   },
   "h1,h2,h3,h4,h5,h6,hgroup, ul,ol,dd, p,figure, pre,table,fieldset,hr, .highlight": {
     marginTop: "1.25em",
@@ -79,31 +87,33 @@ export default {
     fill: "currentColor"
   },
   h1: {
-    fontSize: "2.125em",
+    fontSize: "2.125rem",
     fontWeight: 800
   },
   h2: {
-    fontSize: "2em",
+    fontSize: "2rem",
     fontWeight: 800
   },
   h3: {
-    fontSize: "1.875em",
+    fontFamily: settings.sansSerif,
+    fontSize: "1.5rem",
     fontWeight: 700
   },
   "h1, h2": {
-    textShadow: `0.03em 0.03em 0 ${settings.yellow}, 0.1em 0.1em 0 ${settings.gold}`
+    color: settings.text,
+    fontFamily: settings.sansSerif,
+    lineHeight: 1.75,
+    textShadow: `0.03em 0.03em 0 ${settings.yellow}`,
+    borderBottom: `1px solid ${settings.codeBg}`
   },
   "h4, h5, h6": {
-    fontSize: "1.75em",
+    color: settings.text,
+    fontFamily: settings.sansSerif,
+    fontSize: "1.25rem",
+    lineHeight: 1.5,
     fontWeight: 700,
     textTransform: "uppercase",
-    letterSpacing: "0.05em",
-    color: settings.text
-  },
-  "h1,h2,h3,h4": {
-    fontFamily: settings.sansSerif,
-    lineHeight: 1.3,
-    color: settings.text
+    letterSpacing: "0.05em"
   },
   "strong": {
     fontWeight: 700
@@ -389,10 +399,10 @@ export default {
         fontSize: "2.125rem"
       },
       h3: {
-        fontSize: "2rem"
+        fontSize: "1.75rem"
       },
       "h4, h5, h6": {
-        fontSize: "1.5rem"
+        fontSize: "1.25rem"
       },
       ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
         paddingLeft: "5%",
@@ -423,10 +433,7 @@ export default {
         fontSize: "3rem"
       },
       h2: {
-        fontSize: "2.75rem"
-      },
-      h3: {
-        fontSize: "2.125rem"
+        fontSize: "2.25rem"
       },
       ".Header": {
         paddingTop: "65px",

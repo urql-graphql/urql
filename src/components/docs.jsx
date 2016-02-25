@@ -12,7 +12,7 @@ class Docs extends React.Component {
 
       zIndex: "0",
       margin: "0",
-      padding: "1em",
+      padding: "1em 1em 3em",
       width: "100%",
 
       borderTop: "0",
@@ -21,7 +21,7 @@ class Docs extends React.Component {
       borderLeft: `1em solid ${settings.text}`,
 
       [settings.mediaQueries.medium]: {
-        padding: "1em 0"
+        padding: "1em 0 3em"
       }
     };
   }
