@@ -45,12 +45,12 @@ class App extends React.Component {
         <Header
           styleOverrides={this.getHeaderOverrides()}
           linkStyles={this.getHeaderLinkStyles()}
-          />
+        />
         <Hero />
         <Docs />
         <Footer
           backgroundColor={settings.white} styleOverrides={this.getFooterOverrides()}
-          />
+        />
         <Style rules={theme} />
       </StyleRoot>
     );

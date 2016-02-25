@@ -1,7 +1,6 @@
 import Ecology from "ecology";
 import React from "react";
 import Radium from "radium";
-import {Grid, Cell} from "radium-grid";
 
 import settings from "../spectacle-variables";
 import SpectacleREADME from "!!raw!spectacle/README.markdown";

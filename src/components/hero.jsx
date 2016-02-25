@@ -50,7 +50,7 @@ class Hero extends React.Component {
 
       width: "90vw",
       height: "auto"
-    }
+    };
   }
 
   render() {
