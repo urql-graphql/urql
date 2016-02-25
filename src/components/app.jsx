@@ -11,7 +11,7 @@ import theme from "../spectacle-theme";
 class App extends React.Component {
   getHeaderOverrides() {
     return {
-      backgroundColor: settings.brown,
+      backgroundColor: "transparent",
       borderTop: `1em solid ${settings.text}`,
       borderRight: `1em solid ${settings.text}`,
       borderBottom: "0",
@@ -20,11 +20,11 @@ class App extends React.Component {
   }
   getHeaderLinkStyles() {
     return {
-      color: settings.yellow,
-      borderColor: settings.gold,
+      color: settings.orange,
+      borderColor: settings.orange,
       ":hover": {
         color: settings.text,
-        backgroundColor: settings.gold
+        boxShadow: `inset 0 -0.2em ${settings.orange}`
       }
     };
   }
