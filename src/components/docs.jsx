@@ -10,9 +10,6 @@ class Docs extends React.Component {
   getSectionStyles() {
     return {
       position: "relative",
-      // display: "flex",
-      // flex: "1",
-      // flexWrap: "wrap",
 
       zIndex: "0",
       margin: "0",
@@ -29,36 +26,7 @@ class Docs extends React.Component {
       }
     };
   }
-  getContentStyles() {
-    return {
-      flex: "0 0 100%",
-
-      [settings.mediaQueries.large]: {
-        // paddingLeft: "2em",
-        flex: "1"
-      }
-    };
-  }
-  getSidebarStyles() {
-    return {
-      padding: "0 1em",
-      flex: "0 0 100%",
-      width: "100%",
-      order: "-1",
-
-      fontSize: "16px",
-
-      [settings.mediaQueries.large]: {
-        padding: "0 0 0 2em",
-        flex: "none",
-        width: "25%"
-      }
-    };
-  }
   render() {
-    // <nav style={this.getSidebarStyles()}>
-    //   <h1>Contents</h1>
-    // </nav>
     return (
       <section style={this.getSectionStyles()}>
         <Ecology overview={SpectacleREADME} />
