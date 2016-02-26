@@ -28,6 +28,16 @@ class App extends React.Component {
       }
     };
   }
+  getFooterLinkStyles() {
+    return {
+      color: settings.text,
+      borderColor: settings.orange,
+      ":hover": {
+        color: settings.red,
+        boxShadow: `inset 0 -0.2em ${settings.orange}`
+      }
+    };
+  }
   getCircleStyles() {
     return {
       base: {
@@ -74,7 +84,9 @@ class App extends React.Component {
         <Hero />
         <Docs />
         <Footer
-          backgroundColor={"transparent"} styleOverrides={this.getFooterOverrides()}
+          backgroundColor={"transparent"}
+          styleOverrides={this.getFooterOverrides()}
+          linkstyles={this.getFooterLinkStyles()}
         />
         <div style={[circle.base, circle.large]}></div>
         <div style={[circle.base, circle.small]}></div>

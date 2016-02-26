@@ -48,7 +48,6 @@
     "handlebars-loader": "^1.1.4",
     "image-webpack-loader": "^1.6.3",
     "radium": "^0.16.2",
-    "radium-grid": "^1.0.4",
     "raw-loader": "0.5.1",
     "react": "^0.14.5",
     "react-dom": "^0.14.5",
