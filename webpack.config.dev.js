@@ -37,10 +37,16 @@ module.exports = {
           presets: ["react", "es2015"]
         }
       }, {
+        test: /.svg$/,
+        loaders: [
+          "raw",
+          "image-webpack"
+        ]
+      }, {
         test: /\.hbs$/,
         loader: "handlebars-loader"
       }, {
-        test: /\.md$/,
+        test: /\.(md|markdown)$/,
         loader: "raw-loader"
       }
     ]

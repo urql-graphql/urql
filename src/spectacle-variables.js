@@ -3,37 +3,42 @@ module.exports = {
   // --------
   // Fonts
   // --------
-  sansSerif: "'CooperHewitt', 'Franklin Gothic', 'Trade Gothic', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  headlineFont: "'Modak', 'Helvetica Neue', Helvetica, sans-serif",
+  sansSerif: "'Open Sans', 'Helvetica Neue', Helvetica, sans-serif",
+  serif: "'Lora', Georgia, serif",
   monospace: "'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace",
   // --------
   // Colors
   // --------
-  // Blacks
-  darkerJet: "#0a0a0a",
-  darkJet: "#111111",
-  jet: "#151515",
-  lightJet: "#1f1f1f",
-  lighterJet: "#303030",
-  // Grays
-  darkGray: "#878787",
-  gray: "#d7d7d7",
-  white: "#fafafa",
-  // Accent
-  gold: "#fff982",
-  darkGold: "#ffea00",
+  text: "#291C0D",
+
+  white: "#F0E6C0", // rgb(240, 230, 192)
+  yellow: "#F5C80D", // rgb(245, 200, 13)
+  yellowTint: "rgba(245, 200, 13, 0.25)",
+  gold: "#EAA617", // rgb(234, 166, 23)
+  orange: "#D74E07",
+  red: "#912A18",
+  brown: "#291C0D", // rgb(41, 28, 13)
+  brownTint: "rgba(41, 28, 13, 0.1)",
+  codeBg: "rgba(234, 181, 70, 0.25)",
+  lightCodeBg: "rgba(234, 181, 70, 0.1)",
+
   // Formidable Reds
-  palestRed: "#E5847D",
-  palerRed: "#C75B54",
-  paleRed: "#bd4139",
-  red: "#bd1e13",
+  brandRed: "#bd1e13",
   // --------
   // Media Queries
   // --------
   mediaQueries: {
-    small: "@media only screen and (max-width: 640px)",
+    small: "@media only screen and (min-width: 321px)",
     medium: "@media only screen and (min-width: 641px)",
     large: "@media only screen and (min-width: 1025px)",
     xlarge: "@media only screen and (min-width: 1441px)"
+  },
+  mediaSizes: {
+    small: "only screen and (min-width: 321px)",
+    medium: "only screen and (min-width: 641px)",
+    large: "only screen and (min-width: 1025px)",
+    xlarge: "only screen and (min-width: 1441px)"
   }
 };
 /* eslint-enable max-len */
