@@ -4,7 +4,8 @@ var CleanPlugin = require("clean-webpack-plugin");
 var path = require("path");
 var StaticSiteGeneratorPlugin = require("static-site-generator-webpack-plugin");
 var StatsWriterPlugin = require("webpack-stats-plugin").StatsWriterPlugin;
-var DefinePlugin = require("webpack").DefinePlugin;
+var webpack = require("webpack");
+var DefinePlugin = webpack.DefinePlugin;
 
 var base = require("./webpack.config.dev.js");
 
@@ -34,6 +35,8 @@ module.exports = {
         NODE_ENV: JSON.stringify("production")
       }
     }),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.UglifyJsPlugin(),
     new StatsWriterPlugin({
       filename: "stats.json"
     }),
