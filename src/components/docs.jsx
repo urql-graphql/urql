@@ -1,6 +1,6 @@
-import Ecology from "ecology";
 import React from "react";
 import Radium from "radium";
+import marked from "marked";
 
 import settings from "../spectacle-variables";
 import SpectacleREADME from "!!raw!spectacle/README.markdown";
@@ -26,9 +26,11 @@ class Docs extends React.Component {
     };
   }
   render() {
+    const spectacleDocs = marked(SpectacleREADME);
     return (
       <section style={this.getSectionStyles()}>
-        <Ecology overview={SpectacleREADME} />
+       <div className="Ecology" dangerouslySetInnerHTML={{__html: spectacleDocs}}>
+       </div>
       </section>
     );
   }
