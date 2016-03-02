@@ -276,12 +276,12 @@ export default {
   /*
    * Ecology text wrangling
    */
-  ".Overview pre": {
+  ".Ecology pre": {
     background: settings.codeBg,
     padding: "0.25em 0.5em",
     overflowX: "scroll" // bring back scrollbars for readme.md
   },
-  ".Overview pre code": {
+  ".Ecology pre code": {
     background: "none"
   },
   /*
