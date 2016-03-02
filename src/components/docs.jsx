@@ -65,7 +65,8 @@ class Docs extends React.Component {
               height="360"
               src="https://www.youtube-nocookie.com/embed/vvgtgnIhJ1g?rel=0&amp;showinfo=0"
               frameBorder="0"
-              allowFullScreen>
+              allowFullScreen
+            >
             </iframe>
           </div>
         </div>

@@ -9,6 +9,7 @@
     "dev": "webpack-dev-server --port 3000 --config webpack.config.dev.js",
     "lint-react": "eslint src/**/*.js src/**/*.jsx",
     "lint-node": "eslint --config .eslint-node ./*.js",
+    "lint": "npm run lint-react && npm run lint-node",
     "open-static": "open http://localhost:8080",
     "push-gh-pages": "git subtree push --prefix build origin gh-pages",
     "reinstall-spectacle": "rm -rf node_modules/spectacle && npm install",
