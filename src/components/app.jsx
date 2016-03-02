@@ -9,32 +9,22 @@ import settings from "../spectacle-variables";
 import theme from "../spectacle-theme";
 
 class App extends React.Component {
-  getHeaderOverrides() {
+  getHeaderStyles() {
     return {
-      backgroundColor: "transparent",
-      borderTop: `1em solid ${settings.text}`,
-      borderRight: `1em solid ${settings.text}`,
-      borderBottom: "0",
-      borderLeft: `1em solid ${settings.text}`
-    };
-  }
-  getHeaderLinkStyles() {
-    return {
-      color: settings.orange,
-      borderColor: settings.orange,
-      ":hover": {
-        color: settings.text,
-        boxShadow: `inset 0 -0.2em ${settings.orange}`
-      }
-    };
-  }
-  getFooterLinkStyles() {
-    return {
-      color: settings.text,
-      borderColor: settings.orange,
-      ":hover": {
-        color: settings.red,
-        boxShadow: `inset 0 -0.2em ${settings.orange}`
+      overrides: {
+        backgroundColor: "transparent",
+        borderTop: `1em solid ${settings.text}`,
+        borderRight: `1em solid ${settings.text}`,
+        borderBottom: "0",
+        borderLeft: `1em solid ${settings.text}`
+      },
+      linkStyles: {
+        color: settings.orange,
+        borderColor: settings.orange,
+        ":hover": {
+          color: settings.text,
+          boxShadow: `inset 0 -0.2em ${settings.orange}`
+        }
       }
     };
   }
@@ -59,34 +49,47 @@ class App extends React.Component {
       }
     };
   }
-  getFooterOverrides() {
+  getFooterStyles() {
     return {
-      zIndex: "1",
-      position: "relative",
+      overrides: {
+        zIndex: "1",
+        position: "relative",
 
-      margin: "0",
+        margin: "0",
 
-      borderTop: "0",
-      borderRight: `1em solid ${settings.text}`,
-      borderBottom: `1em solid ${settings.text}`,
-      borderLeft: `1em solid ${settings.text}`
+        borderTop: "0",
+        borderRight: `1em solid ${settings.text}`,
+        borderBottom: `1em solid ${settings.text}`,
+        borderLeft: `1em solid ${settings.text}`
+      },
+      linkStyles: {
+        color: settings.text,
+        borderColor: settings.red,
+        ":hover": {
+          color: settings.red,
+          boxShadow: `inset 0 -0.2em ${settings.red}`
+        }
+      }
     };
   }
 
   render() {
     const circle = this.getCircleStyles();
+    const headerStyles = this.getHeaderStyles();
+    const footerStyles = this.getFooterStyles();
     return (
       <StyleRoot>
         <Header
-          styleOverrides={this.getHeaderOverrides()}
-          linkStyles={this.getHeaderLinkStyles()}
+          styleOverrides={headerStyles.overrides}
+          linkStyles={headerStyles.linkStyles}
         />
         <Hero />
         <Docs />
         <Footer
+          logoColor="black"
           backgroundColor={"transparent"}
-          styleOverrides={this.getFooterOverrides()}
-          linkstyles={this.getFooterLinkStyles()}
+          styleOverrides={footerStyles.overrides}
+          linkStyles={footerStyles.linkStyles}
         />
         <div style={[circle.base, circle.large]}></div>
         <div style={[circle.base, circle.small]}></div>
