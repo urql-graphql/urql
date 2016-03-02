@@ -1,6 +1,6 @@
 {
   "name": "spectacle-docs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
