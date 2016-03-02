@@ -14,7 +14,8 @@
     "reinstall-spectacle": "rm -rf node_modules/spectacle && npm install",
     "server-static": "http-server build",
     "test": "npm run lint-react && npm run lint-node",
-    "webpack-static": "webpack --config webpack.config.static.js --progress --content-base /"
+    "webpack-static": "webpack --config webpack.config.static.js --progress --content-base /",
+    "postinstall": "npm run build-static"
   },
   "repository": {
     "type": "git",
