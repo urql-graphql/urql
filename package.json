@@ -1,6 +1,6 @@
 {
   "name": "spectacle-docs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "lint": "npm run lint-react && npm run lint-node",
     "open-static": "open http://localhost:8080",
     "push-gh-pages": "git subtree push --prefix build origin gh-pages",
-    "reinstall-spectacle": "rm -rf node_modules/spectacle && npm install",
+    "reinstall-spectacle": "rm -rf node_modules/spectacle && npm install spectacle",
     "server-static": "http-server build",
     "test": "npm run lint-react && npm run lint-node",
     "webpack-static": "webpack --config webpack.config.static.js --progress --content-base /"

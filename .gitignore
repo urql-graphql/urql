@@ -9,9 +9,5 @@ npm-debug\.log*
 phantomjsdriver\.log
 
 # Build
-dist
-*/dist
-build
-*/build
 coverage
 Procfile
