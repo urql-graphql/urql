@@ -59,10 +59,10 @@ class Introduction extends React.Component {
       <div style={styles.wrapper}>
         <div style={styles.banner}>
           <p style={styles.copy}>
-            A <span style={styles.strong}>React.js based</span> library for creating <span style={styles.strong}>
+            A <strong style={styles.strong}>React.js based</strong> library for creating <strong style={styles.strong}>
               sleek presentations
-            </span> using <span style={styles.smallCaps}>JSX</span> syntax
-            (with the ability to <span style={styles.strong}>live demo your&nbsp;code</span>!)
+            </strong> using <span style={styles.smallCaps}>JSX</span> syntax
+            (with the ability to <strong style={styles.strong}>live demo your&nbsp;code!</strong>)
           </p>
         </div>
       </div>
