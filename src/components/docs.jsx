@@ -70,7 +70,7 @@ class Docs extends React.Component {
             </iframe>
           </div>
         </div>
-       <div className="Ecology" dangerouslySetInnerHTML={{__html: spectacleDocs}}>
+       <div className="Docs" dangerouslySetInnerHTML={{__html: spectacleDocs}}>
        </div>
       </section>
     );

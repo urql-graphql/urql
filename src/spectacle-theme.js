@@ -239,18 +239,18 @@ export default {
   "#spectacle": {
     display: "none" // hide second title
   },
-  ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology table": {
+  ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs table": {
     paddingLeft: "0%",
     paddingRight: "0%"
   },
-  ".Ecology p": {
+  ".Docs p": {
     fontSize: "1rem"
   },
-  ".Ecology .highlight": {
+  ".Docs .highlight": {
     marginLeft: "-16px",
     marginRight: "-16px"
   },
-  ".Ecology .highlight pre": {
+  ".Docs .highlight pre": {
     marginTop: 0,
     background: settings.yellow,
     color: "#fff",
@@ -260,7 +260,7 @@ export default {
     overflow: "auto",
     padding: "1em"
   },
-  ".Ecology code, .Focus code, td code, th code": {
+  ".Docs code, .Focus code, td code, th code": {
     background: settings.codeBg,
     color: settings.text,
     fontFamily: settings.monospace,
@@ -276,12 +276,12 @@ export default {
   /*
    * Ecology text wrangling
    */
-  ".Ecology pre": {
+  ".Docs pre": {
     background: settings.codeBg,
     padding: "0.25em 0.5em",
     overflowX: "scroll" // bring back scrollbars for readme.md
   },
-  ".Ecology pre code": {
+  ".Docs pre code": {
     background: "none"
   },
   /*
@@ -406,26 +406,26 @@ export default {
       "h4, h5, h6": {
         fontSize: "1.25rem"
       },
-      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
         paddingLeft: "5%",
         paddingRight: "5%"
       },
-      ".Ecology li > ul": {
+      ".Docs li > ul": {
         paddingLeft: "1.5em"
       },
-      ".Ecology table": {
+      ".Docs table": {
         paddingLeft: "5%"
       }
     },
     [settings.mediaSizes.large]: {
-      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
         paddingLeft: "20%",
         paddingRight: "20%"
       },
-      ".Ecology li > ul": {
+      ".Docs li > ul": {
         paddingLeft: "1.5em"
       },
-      ".Ecology table": {
+      ".Docs table": {
         paddingLeft: "20%",
         paddingRight: "10%"
       }
@@ -441,24 +441,24 @@ export default {
         paddingTop: "65px",
         paddingBottom: "0"
       },
-      ".Ecology p, .Ecology ul": {
+      ".Docs p, .Docs ul": {
         fontSize: "1.125rem"
       },
-      ".Ecology p, .Ecology h1, .Ecology h2, .Ecology h3, .Ecology h4, .Ecology h5, .Ecology h6, .Ecology pre, .Ecology ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
         paddingLeft: "25%",
         paddingRight: "25%"
       },
-      ".Ecology table": {
+      ".Docs table": {
         paddingLeft: "25%",
         paddingRight: "10%"
       },
-      ".Ecology li > ul": {
+      ".Docs li > ul": {
         paddingLeft: "1.5em"
       },
-      ".Ecology .highlight": {
+      ".Docs .highlight": {
         margin: "2em -1.3334em"
       },
-      ".Ecology .highlight pre": {
+      ".Docs .highlight pre": {
         padding: "1.3334em"
       },
       ".Interactive .playground": {
