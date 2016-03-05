@@ -1,7 +1,13 @@
 import React from "react";
 import Radium from "radium";
 import marked from "marked";
+import Prism from "prismjs";
+/* eslint-disable no-unused-vars */
+// adds support for language-jsx (Prism.languages.jsx)
+import jsx from "prismjs/components/prism-jsx";
+/* eslint-enable no-unused-vars */
 
+// Variables
 import settings from "../spectacle-variables";
 import SpectacleREADME from "!!raw!spectacle/README.markdown";
 
@@ -52,6 +58,11 @@ class Docs extends React.Component {
       }
     };
   }
+
+  componentDidMount() {
+    Prism.highlightAll();
+  }
+
   render() {
     const spectacleDocs = marked(SpectacleREADME);
     const videoStyles = this.getVideoStyles();
@@ -70,8 +81,8 @@ class Docs extends React.Component {
             </iframe>
           </div>
         </div>
-       <div className="Docs" dangerouslySetInnerHTML={{__html: spectacleDocs}}>
-       </div>
+         <div className="Docs" ref="code" dangerouslySetInnerHTML={{__html: spectacleDocs}}>
+         </div>
       </section>
     );
   }
