@@ -1,10 +1,13 @@
 import React from "react";
 import Radium, { Style, StyleRoot } from "radium";
-
-import Docs from "./docs";
-import Hero from "./hero";
 import { Header, Footer } from "formidable-landers";
 
+// Child components
+import Docs from "./docs";
+import Hero from "./hero";
+import Introduction from "./introduction";
+
+// Variables and Stylesheet
 import settings from "../spectacle-variables";
 import theme from "../spectacle-theme";
 
@@ -84,6 +87,7 @@ class App extends React.Component {
           linkStyles={headerStyles.linkStyles}
         />
         <Hero />
+        <Introduction />
         <Docs />
         <Footer
           logoColor="black"

@@ -160,7 +160,7 @@ export default {
   /*
    * Headlines/Headings
    */
-  ".Headline, p:first-child": {
+  ".Headline": {
     color: settings.text,
     textShadow: `0.1em 0.25em 0 ${settings.yellow}`,
     fontFamily: settings.sansSerif,
@@ -216,22 +216,38 @@ export default {
    * Buttons!
    */
   ".Button": {
-    backgroundColor: "transparent",
-    border: `3px solid ${settings.yellow}`,
+    backgroundColor: settings.brandRed,
+    border: "none",
     boxShadow: "none",
-    color: settings.text,
-    fontFamily: settings.serif,
-    fontWeight: "normal",
-    padding: "0.75em 1.25em",
+    color: settings.white,
+    fontFamily: settings.sansSerif,
+    fontWeight: "bold",
+    padding: "1em 1.5em",
     textAlign: "center",
-    transition: "color 0.2s ease, border-color 0.7s ease"
+    transition: "all 2s ease"
+  },
+  ".Button:visited": {
+    backgroundColor: settings.brown,
+    border: "none",
+    boxShadow: "none",
+    color: settings.white,
+    outline: "none",
+    transition: "all 0.7s ease"
   },
   ".Button:hover, .Button:focus": {
-    borderColor: settings.gold,
+    backgroundColor: settings.orange,
+    border: "none",
     boxShadow: "none",
-    color: settings.text,
+    color: settings.white,
     outline: "none",
-    transition: "color 0.2s ease, border-color 0.7s ease"
+    transition: "all 0.7s ease"
+  },
+  /*
+   * Layout
+   */
+  ".Container": {
+    paddingLeft: "0",
+    paddingRight: "0"
   },
   /*
    * Ecology
@@ -406,7 +422,7 @@ export default {
       "h4, h5, h6": {
         fontSize: "1.25rem"
       },
-      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul, .Container": {
         paddingLeft: "5%",
         paddingRight: "5%"
       },
@@ -418,7 +434,7 @@ export default {
       }
     },
     [settings.mediaSizes.large]: {
-      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul, .Container": {
         paddingLeft: "20%",
         paddingRight: "20%"
       },
@@ -444,7 +460,7 @@ export default {
       ".Docs p, .Docs ul": {
         fontSize: "1.125rem"
       },
-      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul": {
+      ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul, .Container": {
         paddingLeft: "25%",
         paddingRight: "25%"
       },
