@@ -4,6 +4,7 @@
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
+    "start": "npm run dev",
     "dev": "webpack-dev-server --port 3000 --config webpack.config.dev.js",
     "lint-react": "eslint src/**/*.js src/**/*.jsx",
     "lint-node": "eslint --config .eslint-node ./*.js",
