@@ -20,8 +20,9 @@ module.exports = {
   caramel: "rgb(136,105,18)",
   brown: "#291C0D", // rgb(41, 28, 13)
   brownTint: "rgba(41, 28, 13, 0.1)",
-  codeBg: "rgba(234, 181, 70, 0.25)",
-  lightCodeBg: "rgba(234, 181, 70, 0.1)",
+  codeBg: "rgba(234,210,108, 0.25)",
+  lightCodeBg: "rgba(253, 246, 227, 0.25)",
+  whiteCodeBg: "rgba(253, 246, 227, 0.5)",
 
   // Formidable Reds
   brandRed: "#bd1e13",

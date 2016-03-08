@@ -71,7 +71,7 @@ export default {
   },
   th: {
     color: settings.text,
-    borderBottom: `3px solid ${settings.codeBg}`,
+    borderBottom: `3px solid ${settings.brownTint}`,
     fontWeight: 700,
     textAlign: "left"
   },
@@ -278,6 +278,7 @@ export default {
   },
   ".Docs code, .Focus code, td code, th code": {
     background: settings.codeBg,
+    border: `1px solid ${settings.codeBg}`,
     color: settings.text,
     fontFamily: settings.monospace,
     fontSize: "0.925em",
@@ -293,11 +294,12 @@ export default {
    * Ecology text wrangling
    */
   ".Docs pre": {
-    background: settings.codeBg,
-    padding: "0.25em 0.5em",
+    background: settings.whiteCodeBg,
+    padding: "1em 0.5em",
     overflowX: "scroll" // bring back scrollbars for readme.md
   },
   ".Docs pre code": {
+    border: "none",
     background: "none"
   },
   /*
