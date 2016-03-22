@@ -27,12 +27,16 @@ class Introduction extends React.Component {
 
         marginTop: "-100px",
         marginLeft: "auto",
-        marginRight: "auto",
+        marginRight: "1em",
         padding: "1.5rem 2.5rem",
-        maxWidth: "75vw",
         boxShadow: `1em 1em 0 ${settings.text}`,
 
-        backgroundColor: settings.brown
+        backgroundColor: settings.brown,
+        [settings.mediaQueries.medium]: {
+          marginLeft: "auto",
+          marginRight: "auto",
+          maxWidth: "75vw"
+        }
       },
       copy: {
         margin: 0,
