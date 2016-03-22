@@ -15,7 +15,7 @@ export default {
   html: {
     backgroundColor: settings.brown,
     textSizeAdjust: "100%",
-    fontSize: "18px"
+    fontSize: "14px"
   },
   body: {
     margin: 0,
@@ -220,6 +220,7 @@ export default {
     border: "none",
     boxShadow: "none",
     color: settings.white,
+    display: "inline-block",
     fontFamily: settings.sansSerif,
     fontWeight: "bold",
     padding: "1em 1.5em",
@@ -412,6 +413,9 @@ export default {
   },
   mediaQueries: {
     [settings.mediaSizes.medium]: { //medium
+      html: {
+        fontSize: "16px"
+      },
       h1: {
         fontSize: "2.5rem"
       },
@@ -436,6 +440,9 @@ export default {
       }
     },
     [settings.mediaSizes.large]: {
+      html: {
+        fontSize: "18px"
+      },
       ".Docs p, .Docs h1, .Docs h2, .Docs h3, .Docs h4, .Docs h5, .Docs h6, .Docs pre, .Docs ul, .Container": {
         paddingLeft: "20%",
         paddingRight: "20%"
