@@ -1,11 +1,2 @@
 ---
-extends:
-  - "defaults/configurations/walmart/es6-react"
-
-globals:
-  document: true
-
-rules:
-  "max-len": 0
-  "new-cap": 0
-  "no-magic-numbers": 0
+extends: ./node_modules/builder-docs-archetype/config/eslint/.eslintrc-config

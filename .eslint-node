@@ -1,3 +1,0 @@
----
-extends:
-  - "defaults/configurations/walmart/es5-node"
