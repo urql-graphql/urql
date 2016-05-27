@@ -20,7 +20,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
   - openssl aes-256-cbc -K $encrypted_dbf4ccf442cc_key -iv $encrypted_dbf4ccf442cc_iv
-    -in deploy_static.pem.enc -out ~\/.ssh/deploy_static.pem -d
+    -in deploy_static.pem.enc -out deploy_static.pem -d
 
 install:
   - npm install

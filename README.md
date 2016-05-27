@@ -32,3 +32,5 @@ Server access is possible by storing the key on travis and encrypting the file h
 gem install travis
 travis encrypt-file ~/.ssh/deploy_static.pem --add
 ```
+
+Make sure the travis config does not preserve the `~/.ssh/` filepath. 
