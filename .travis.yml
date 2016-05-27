@@ -12,7 +12,7 @@ addons:
 
 branches:
   only:
-    - task-travisDeploy
+    - master
 
 before_install:
   # GUI for real browsers.
@@ -30,7 +30,11 @@ script:
   - NODE_ENV=production node_modules/.bin/builder run build-static
 
 after_success:
+  # make sure key is permissive, but not too permissive
   - chmod 600 deploy_static.pem
+  # clean out any existing staging folder but make sure it exists
   - ssh -i deploy_static.pem formidable@192.241.218.94 "rm -rf static/spectacle-staging && mkdir static/spectacle-staging"
+  # copy the spectacle build to the staging arena; if this fails, site is still OK
   - scp -i deploy_static.pem -rp ./build/* formidable@192.241.218.94:/home/formidable/static/spectacle-staging
-  - ssh -i deploy_static.pem formidable@192.241.218.94 "rm -rf static/spectacle-test && mv static/spectacle-staging/ static/spectacle-test"
+  # rename the staging arena to the actual spectacle site
+  - ssh -i deploy_static.pem formidable@192.241.218.94 "rm -rf static/spectacle && mv static/spectacle-staging/ static/spectacle"
