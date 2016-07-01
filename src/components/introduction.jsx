@@ -39,7 +39,7 @@ class Introduction extends React.Component {
         }
       },
       copy: {
-        margin: 0,
+        margin: "0px",
 
         color: settings.caramel,
         fontSize: "1.5rem",

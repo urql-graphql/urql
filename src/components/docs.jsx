@@ -48,12 +48,12 @@ class Docs extends React.Component {
         marginTop: "1em",
         paddingBottom: "56.25%", // 16:9 ratio
         paddingTop: "25px",
-        height: 0
+        height: "0px"
       },
       iframe: {
         position: "absolute",
-        top: 0,
-        left: 0,
+        top: "0px",
+        left: "0px",
         width: "100%",
         height: "100%"
       }
@@ -70,7 +70,7 @@ class Docs extends React.Component {
     return (
       <section style={this.getSectionStyles()}>
         <div className="Docs">
-          <h2 style={{margin: 0}}>Take a tour</h2>
+          <h2 style={{margin: "0px"}}>Take a tour</h2>
         </div>
         <div className="Container">
           <div style={videoStyles.wrapper}>

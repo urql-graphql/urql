@@ -18,7 +18,7 @@ export default {
     fontSize: "14px"
   },
   body: {
-    margin: 0,
+    margin: "0px",
     boxSizing: "border-box",
     position: "relative",
     backgroundColor: settings.yellow,
@@ -44,9 +44,9 @@ export default {
     width: "100%"
   },
   "thead, tbody": {
-    border: 0,
-    margin: 0,
-    padding: 0,
+    border: "0px",
+    margin: "0px",
+    padding: "0px",
     fontSize: "100%"
   },
   thead: {
@@ -154,7 +154,7 @@ export default {
     top: "11px"
   },
   "li > ul": {
-    marginTop: 0,
+    marginTop: "0px",
     marginBottom: "0.25em"
   },
   /*
@@ -268,7 +268,7 @@ export default {
     marginRight: "-16px"
   },
   ".Docs .highlight pre": {
-    marginTop: 0,
+    marginTop: "0px",
     background: settings.yellow,
     color: "#fff",
     fontFamily: settings.monospace,
@@ -289,7 +289,7 @@ export default {
   },
   ".highlight code": {
     background: "transparent",
-    padding: 0
+    padding: "0px"
   },
   /*
    * Ecology text wrangling
@@ -409,7 +409,7 @@ export default {
     textAlign: "right"
   },
   ".u-marginModule > *:last-child": {
-    marginTop: 0
+    marginTop: "0px"
   },
   mediaQueries: {
     [settings.mediaSizes.medium]: { //medium
@@ -494,7 +494,7 @@ export default {
         display: "flex",
         flex: "1",
         marginRight: "0.6667em",
-        marginTop: 0
+        marginTop: "0px"
       },
       ".Interactive .playgroundPreview": {
         display: "flex",
