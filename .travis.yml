@@ -27,4 +27,4 @@ script:
 
   # Prune deps to just production and ensure we can build the site
   - npm prune --production
-  - npm run build-static
+  - ./node_modules/.bin/builder run build-static
