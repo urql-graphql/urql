@@ -8,5 +8,3 @@ ssh -i deploy_static.pem formidable@192.241.218.94 "rm -rf static/spectacle-stag
 scp -i deploy_static.pem -rp ./build/* formidable@192.241.218.94:/home/formidable/static/spectacle-staging
 # rename the staging arena to the actual spectacle site
 ssh -i deploy_static.pem formidable@192.241.218.94 "rm -rf static/spectacle && mv static/spectacle-staging/ static/spectacle"
-echo "DEPLOYED."
-exit 0
