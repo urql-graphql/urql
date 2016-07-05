@@ -23,6 +23,10 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_dbf4ccf442cc_key -iv $encrypted_dbf4ccf442cc_iv
     -in deploy_static.pem.enc -out deploy_static.pem -d
 
+  # Install npmv3 because of postinstall bugs in npmv2:
+  # See https://github.com/FormidableLabs/victory/issues/98
+  - npm install -g npm@3
+
 install:
   - npm install
 
