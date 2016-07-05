@@ -18,7 +18,7 @@ class Introduction extends React.Component {
         borderRight: `1em solid ${settings.text}`,
         borderLeft: `1em solid ${settings.text}`,
 
-        [settings.mediaQueries.medium]: {
+        [`@media ${settings.mediaSizes.medium}`]: {
           padding: "1em 0 3em"
         }
       },
@@ -32,7 +32,7 @@ class Introduction extends React.Component {
         boxShadow: `1em 1em 0 ${settings.text}`,
 
         backgroundColor: settings.brown,
-        [settings.mediaQueries.medium]: {
+        [`@media ${settings.mediaSizes.medium}`]: {
           marginLeft: "auto",
           marginRight: "auto",
           maxWidth: "75vw"
