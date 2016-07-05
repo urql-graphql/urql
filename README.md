@@ -26,11 +26,11 @@ Once the `build/` is committed, go to [FormidableLabs/formidable.com](https://gi
 
 # Travis
 
-Server access is possible by storing the key on travis and encrypting the file here, `deploy_static.pem.enc`. This is done with by:
+Server access is possible by storing the key on travis and encrypting the file here, `deploy_static.pem.enc`. This is done with the travis gem:
 
 ```
 gem install travis
 travis encrypt-file ~/.ssh/deploy_static.pem --add
 ```
 
-Make sure the travis config does not preserve the `~/.ssh/` filepath. 
+Make sure the travis config does not preserve the `~/.ssh/` filepath.
