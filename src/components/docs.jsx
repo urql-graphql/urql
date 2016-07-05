@@ -26,23 +26,13 @@ class Docs extends React.Component {
       borderBottom: `1em solid ${settings.text}`,
       borderLeft: `1em solid ${settings.text}`,
 
-      [settings.mediaQueries.medium]: {
+      [`@media ${settings.mediaSizes.medium}`]: {
         padding: "1em 0 3em"
       }
     };
   }
   getVideoStyles() {
     return {
-      grid: {
-        [settings.mediaQueries.medium]: {
-          paddingLeft: "5%",
-          paddingRight: "5%"
-        },
-        [settings.mediaQueries.large]: {
-          paddingLeft: "10%",
-          paddingRight: "10%"
-        }
-      },
       wrapper: {
         position: "relative",
         marginTop: "1em",
