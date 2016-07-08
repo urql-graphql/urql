@@ -20,7 +20,7 @@ class App extends React.Component {
   getHeaderStyles() {
     return {
       overrides: {
-        backgroundColor: "transparent",
+        background: "transparent",
         borderTop: `1em solid ${settings.text}`,
         borderRight: `1em solid ${settings.text}`,
         borderBottom: "0",
@@ -96,7 +96,7 @@ class App extends React.Component {
         <Docs />
         <Footer
           logoColor="black"
-          backgroundColor={"transparent"}
+          background="transparent"
           styleOverrides={footerStyles.overrides}
           linkStyles={footerStyles.linkStyles}
         />

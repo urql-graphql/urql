@@ -1,11 +1,12 @@
 {
   "name": "spectacle-docs",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
     "start": "builder run dev",
-    "test": "builder run lint"
+    "test": "builder run lint",
+    "update-project": "npm update spectacle"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,12 @@
   },
   "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
   "devDependencies": {
-    "builder-docs-archetype-dev": "^0.0.4"
+    "builder-docs-archetype-dev": "^1.0.5"
   },
   "dependencies": {
     "builder": "^2.9.1",
-    "builder-docs-archetype": "^0.0.4",
-    "formidable-landers": "^1.1.0",
+    "builder-docs-archetype": "^1.0.5",
+    "formidable-landers": "^3.0.0",
     "marked": "^0.3.5",
     "prismjs": "^1.4.1",
     "radium": "^0.17.1",
