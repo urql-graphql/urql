@@ -30,7 +30,7 @@
     "radium": "^0.17.1",
     "react": "^15.2.0",
     "react-dom": "^15.2.0",
-    "react-ga": "^1.2.1",
+    "react-ga": "^2.1.1",
     "spectacle": "FormidableLabs/spectacle"
   }
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import ga from "react-ga";
 import Radium, { Style, StyleRoot } from "radium";
 import { Header, Footer } from "formidable-landers";
 
@@ -13,10 +12,6 @@ import settings from "../spectacle-variables";
 import theme from "../spectacle-theme";
 
 class App extends React.Component {
-  componentDidMount() {
-    ga.initialize("UA-43290258-1");
-  }
-
   getHeaderStyles() {
     return {
       overrides: {
