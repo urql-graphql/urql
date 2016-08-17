@@ -1,6 +1,7 @@
 import React from "react";
 import Radium, { Style, StyleRoot } from "radium";
 import { Header, Footer } from "formidable-landers";
+import ReactGA from "react-ga";
 
 // Child components
 import Docs from "./docs";
@@ -10,8 +11,17 @@ import Introduction from "./introduction";
 // Variables and Stylesheet
 import settings from "../spectacle-variables";
 import theme from "../spectacle-theme";
+import basename from "../basename";
 
 class App extends React.Component {
+  componentDidMount() {
+    // Add Google Analytics tracking here since react-router
+    // isn’t being used in entry.js
+    ReactGA.initialize("UA-43290258-1");
+    ReactGA.set({page: basename});
+    ReactGA.pageview(basename);
+  }
+
   getHeaderStyles() {
     return {
       overrides: {
