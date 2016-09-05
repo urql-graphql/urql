@@ -8,7 +8,7 @@ import jsx from "prismjs/components/prism-jsx";
 /* eslint-enable no-unused-vars */
 
 // Variables
-import settings from "../spectacle-variables";
+import settings from "../../spectacle-variables";
 import SpectacleREADME from "!!raw!spectacle/README.markdown";
 
 class Docs extends React.Component {
@@ -31,24 +31,6 @@ class Docs extends React.Component {
       }
     };
   }
-  getVideoStyles() {
-    return {
-      wrapper: {
-        position: "relative",
-        marginTop: "1em",
-        paddingBottom: "56.25%", // 16:9 ratio
-        paddingTop: "25px",
-        height: "0px"
-      },
-      iframe: {
-        position: "absolute",
-        top: "0px",
-        left: "0px",
-        width: "100%",
-        height: "100%"
-      }
-    };
-  }
 
   componentDidMount() {
     Prism.highlightAll();
@@ -56,35 +38,8 @@ class Docs extends React.Component {
 
   render() {
     const spectacleDocs = marked(SpectacleREADME);
-    const videoStyles = this.getVideoStyles();
     return (
       <section style={this.getSectionStyles()}>
-        <div className="Docs">
-          <h2 style={{margin: "0px"}}>Take a tour</h2>
-        </div>
-        <div className="Container">
-          <div style={videoStyles.wrapper}>
-            <iframe
-              style={videoStyles.iframe}
-              width="640"
-              height="360"
-              src="https://www.youtube-nocookie.com/embed/vvgtgnIhJ1g?rel=0&amp;showinfo=0"
-              frameBorder="0"
-              allowFullScreen
-            >
-            </iframe>
-          </div>
-          <p style={{margin: "2em 0 0 0", textAlign: "center"}}>
-            <a className="Button" href="http://stack.formidable.com/spectacle/">
-              View the live example
-            </a>
-          </p>
-          <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
-            <a className="Button" href="https://github.com/FormidableLabs/spectacle-boilerplate/">
-              Create a deck with the boilerplate
-            </a>
-          </p>
-        </div>
         <div className="Docs">
           <h1>Peruse the documentation</h1>
         </div>

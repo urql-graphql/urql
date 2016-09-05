@@ -4,9 +4,8 @@ import { Header, Footer } from "formidable-landers";
 import ReactGA from "react-ga";
 
 // Child components
-import Docs from "/docs";
-import Hero from "/hero";
-import Introduction from "/introduction";
+import Hero from "./components/hero";
+import Introduction from "./components/introduction";
 
 // Variables and Stylesheet
 import settings from "../spectacle-variables";
@@ -86,10 +85,31 @@ class App extends React.Component {
     };
   }
 
+  getVideoStyles() {
+    return {
+      wrapper: {
+        position: "relative",
+        marginTop: "1em",
+        paddingBottom: "56.25%", // 16:9 ratio
+        paddingTop: "25px",
+        height: "0px"
+      },
+      iframe: {
+        position: "absolute",
+        top: "0px",
+        left: "0px",
+        width: "100%",
+        height: "100%"
+      }
+    };
+  }
+
   render() {
-    const circle = this.getCircleStyles();
+    // const circle = this.getCircleStyles();
+  {/* this needs to be separated out into app and home index */}
     const headerStyles = this.getHeaderStyles();
     const footerStyles = this.getFooterStyles();
+    const videoStyles = this.getVideoStyles();
     return (
       <StyleRoot>
         <Header
@@ -98,15 +118,50 @@ class App extends React.Component {
         />
         <Hero />
         <Introduction />
-        <Docs />
+      {/*link to source code*/}
+      {/*link to issue submission*/}
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+            <a className="Button" href="https://github.com/FormidableLabs/spectacle-boilerplate/">
+              Get Started With Spectacle
+            </a>
+          </p>
+        <div className="Docs">
+          <h2 style={{margin: "0px"}}>Take a tour</h2>
+        </div>
+        <div className="Container">
+          <div style={videoStyles.wrapper}>
+            <iframe
+              style={videoStyles.iframe}
+              width="640"
+              height="360"
+              src="https://www.youtube-nocookie.com/embed/vvgtgnIhJ1g?rel=0&amp;showinfo=0"
+              frameBorder="0"
+              allowFullScreen
+            >
+            </iframe>
+          </div>
+          {/* add a features list here*/}
+          {/* this example should get moved to docs
+          <p style={{margin: "2em 0 0 0", textAlign: "center"}}>
+                      <a className="Button" href="http://stack.formidable.com/spectacle/">
+                        View a Live Example
+                      </a>
+                    </p>*/}
+          <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+            <a className="Button" href="https://github.com/FormidableLabs/spectacle-boilerplate/">
+              Get Started With Spectacle
+            </a>
+          </p>
+        {/*source code and support links again*/}
+        </div>
         <Footer
           logoColor="black"
           background="transparent"
           styleOverrides={footerStyles.overrides}
           linkStyles={footerStyles.linkStyles}
         />
-        <div style={[circle.base, circle.large]}></div>
-        <div style={[circle.base, circle.small]}></div>
+        {/*<div style={[circle.base, circle.large]}></div>
+        <div style={[circle.base, circle.small]}></div>*/}
         <Style rules={theme} />
       </StyleRoot>
     );
