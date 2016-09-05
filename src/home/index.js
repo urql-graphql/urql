@@ -4,9 +4,9 @@ import { Header, Footer } from "formidable-landers";
 import ReactGA from "react-ga";
 
 // Child components
-import Docs from "./docs";
-import Hero from "./hero";
-import Introduction from "./introduction";
+import Docs from "/docs";
+import Hero from "/hero";
+import Introduction from "/introduction";
 
 // Variables and Stylesheet
 import settings from "../spectacle-variables";

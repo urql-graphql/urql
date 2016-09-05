@@ -2,7 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import { renderToString } from "react-dom/server";
 
-import App from "./app";
+import App from "index";
 import Index from "../../templates/index.hbs";
 
 // Client render (optional):
