@@ -25,12 +25,16 @@
     "builder": "^2.9.1",
     "builder-docs-archetype": "^2.0.0",
     "formidable-landers": "^3.0.0",
+    "history": "^3.2.1",
     "marked": "^0.3.5",
     "prismjs": "^1.4.1",
     "radium": "^0.17.1",
     "react": "^15.2.0",
+    "react-document-meta": "^2.0.3",
     "react-dom": "^15.2.0",
     "react-ga": "^2.1.1",
-    "spectacle": "FormidableLabs/spectacle"
+    "react-router": "^2.7.0",
+    "react-router-scroll": "^0.3.2",
+    "spectacle": "*"
   }
 }

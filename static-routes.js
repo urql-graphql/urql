@@ -1,3 +1,7 @@
 "use strict";
 
-module.exports = [ "/" ];
+module.exports = [
+  "/",
+  "/docs",
+  "/docs/example"
+];

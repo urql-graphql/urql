@@ -1,7 +1,7 @@
 import React from "react";
 import Radium from "radium";
 // Variables
-import settings from "../../spectacle-variables";
+import settings from "../../../spectacle-variables";
 
 class Introduction extends React.Component {
   getStyles() {

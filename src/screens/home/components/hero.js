@@ -1,8 +1,8 @@
 import React from "react";
 import Radium from "radium";
 
-import settings from "../../spectacle-variables";
-import spectacleLogo from "../../../static/logotype-spectacle.svg";
+import settings from "../../../spectacle-variables";
+import spectacleLogo from "../../../../static/logotype-spectacle.svg";
 
 class Hero extends React.Component {
   getHeroStyles() {

@@ -15,12 +15,10 @@ class Docs extends React.Component {
   getSectionStyles() {
     return {
       position: "relative",
-
       zIndex: "1",
       margin: "0",
       padding: "1em 1em 3em",
       width: "100%",
-
       borderTop: "0",
       borderRight: `1em solid ${settings.text}`,
       borderBottom: `1em solid ${settings.text}`,
