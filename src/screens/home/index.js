@@ -9,6 +9,8 @@ import TitleMeta from "../../components/title-meta";
 
 // Variables and Stylesheet
 import basename from "../../basename";
+import { Link } from "react-router";
+const RadiumLink = Radium(Link);
 
 class Home extends React.Component {
   componentDidMount() {
@@ -47,10 +49,10 @@ class Home extends React.Component {
       {/*link to source code*/}
       {/*link to issue submission*/}
         <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
-            <a className="Button" href="https://github.com/FormidableLabs/spectacle-boilerplate/">
-              Get Started With Spectacle
-            </a>
-          </p>
+          <RadiumLink className="Button" to="/docs">
+            Get Started with Spectacle
+          </RadiumLink>
+        </p>
         <div className="Docs">
           <h2 style={{margin: "0px"}}>Take a tour</h2>
         </div>
@@ -74,9 +76,9 @@ class Home extends React.Component {
                       </a>
                     </p>*/}
           <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
-            <a className="Button" href="https://github.com/FormidableLabs/spectacle-boilerplate/">
-              Get Started With Spectacle
-            </a>
+            <RadiumLink className="Button" to="/docs">
+              Get Started with Spectacle
+            </RadiumLink>
           </p>
         {/*source code and support links again*/}
         </div>
