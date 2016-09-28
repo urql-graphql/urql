@@ -19,12 +19,12 @@
   },
   "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
   "devDependencies": {
-    "builder-docs-archetype-dev": "^2.0.0"
+    "builder-docs-archetype-dev": "^2.1.1"
   },
   "dependencies": {
     "builder": "^2.9.1",
-    "builder-docs-archetype": "^2.0.0",
-    "formidable-landers": "^3.0.0",
+    "builder-docs-archetype": "^2.1.1",
+    "formidable-landers": "^3.4.1",
     "history": "^3.2.1",
     "marked": "^0.3.5",
     "prismjs": "^1.4.1",

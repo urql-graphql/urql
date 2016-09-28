@@ -46,12 +46,20 @@ class Home extends React.Component {
       <TitleMeta title="Spectacle">
         <Hero />
         <Introduction />
-      {/*link to source code*/}
-      {/*link to issue submission*/}
         <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
           <RadiumLink className="Button" to="/docs">
             Get Started with Spectacle
           </RadiumLink>
+        </p>
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+          <a href="https://www.github.com/FormidableLabs/spectacle">
+            View the Spectacle Source Code
+          </a>
+        </p>
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+          <a href="https://www.github.com/FormidableLabs/spectacle/issues">
+            Having an Issue?
+          </a>
         </p>
         <div className="Docs">
           <h2 style={{margin: "0px"}}>Take a tour</h2>
@@ -68,20 +76,32 @@ class Home extends React.Component {
             >
             </iframe>
           </div>
-          {/* add a features list here*/}
-          {/* this example should get moved to docs
-          <p style={{margin: "2em 0 0 0", textAlign: "center"}}>
-                      <a className="Button" href="http://stack.formidable.com/spectacle/">
-                        View a Live Example
-                      </a>
-                    </p>*/}
-          <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
-            <RadiumLink className="Button" to="/docs">
-              Get Started with Spectacle
-            </RadiumLink>
-          </p>
-        {/*source code and support links again*/}
         </div>
+        <div className="Docs">
+          <h2 style={{margin: "0px"}}>Features</h2>
+          <h3>Interactive Presentations</h3>
+            <p>Add clickable elements and other interactivity to make your presentations pop.</p>
+          <h3>Live-Preview Your Code</h3>
+            <p>Show people more than just a code block - demo the final project in real-time without leaving your presentation deck.</p>
+          <h3>Auto-Size Text, Image Dimming, and More</h3>
+            <p>On top of all of Spectacle's helpful features, you can also make your presentation look amazing with
+             auto-formatting, easy theming abilities, image dimming, and lots of other fun touches.</p>
+        </div>
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+          <RadiumLink className="Button" to="/docs">
+            Get Started with Spectacle
+          </RadiumLink>
+        </p>
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+          <a href="https://www.github.com/FormidableLabs/spectacle">
+            View the Spectacle Source Code
+          </a>
+        </p>
+        <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
+          <a href="https://www.github.com/FormidableLabs/spectacle/issues">
+            Having an Issue?
+          </a>
+        </p>
       </TitleMeta>
     );
   }
