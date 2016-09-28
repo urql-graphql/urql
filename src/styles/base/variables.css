@@ -1,0 +1,18 @@
+:root {
+  //
+  // FONTS
+  //
+  --fontLogo: 'Modak', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontHeading: 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontBody: 'Lora', Georgia, serif;
+  --fontCode: 'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace;
+}
+
+/*
+ * MEDIA QUERIES
+ * QURRRRRIES
+ */
+@custom-media --small-viewport only screen and (min-width: 321px);
+@custom-media --medium-viewport only screen and (min-width: 641px);
+@custom-media --large-viewport only screen and (min-width: 1025px);
+@custom-media --xlarge-viewport only screen and (min-width: 1441px);

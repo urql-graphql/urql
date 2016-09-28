@@ -7,10 +7,12 @@ import App from "./components/app";
 // import About from "./screens/about/index";
 import { BasicComponent, ApiComponent, GettingStartedComponent,
   PropsComponent, ExtensionsComponent } from "./screens/docs/index";
+import About from "./screens/about/index";
 
 module.exports = (
   <Route path="/" component={App}>
     <IndexRoute component={Home}/>
+    <Route path="/about" component={About}/>
     <Route path="/docs" component={GettingStartedComponent}/>
     <Route path="/docs/getting-started" component={GettingStartedComponent}/>
     <Route path="/docs/basic-concepts" component={BasicComponent}/>

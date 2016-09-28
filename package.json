@@ -27,6 +27,7 @@
     "formidable-landers": "^5.1.1",
     "history": "~2.1.2",
     "marked": "^0.3.5",
+    "normalize.css": "^4.2.0",
     "prismjs": "^1.4.1",
     "radium": "^0.17.1",
     "react": "^15.2.0",

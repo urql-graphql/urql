@@ -1,75 +1,43 @@
 /* global window */
 import React from "react";
-import Radium, { Style, StyleRoot } from "radium";
+import Radium, { StyleRoot } from "radium";
+import { Link } from "react-router";
 import { Header, Footer } from "formidable-landers";
 
 // Variables and Stylesheet
-import settings from "../spectacle-variables";
-import theme from "../spectacle-theme";
+import LOGO from "../../static/logo.svg";
+import "../styles/styles.css";
 
 class App extends React.Component {
-
-  getHeaderStyles() {
-    return {
-      overrides: {
-        background: "transparent",
-        borderTop: `1em solid ${settings.text}`,
-        borderRight: `1em solid ${settings.text}`,
-        borderBottom: "0",
-        borderLeft: `1em solid ${settings.text}`
-      },
-      linkStyles: {
-        color: settings.orange,
-        borderColor: settings.orange,
-        ":hover": {
-          color: settings.text,
-          boxShadow: `inset 0 -0.2em ${settings.orange}`
-        }
-      }
-    };
-  }
-  getFooterStyles() {
-    return {
-      overrides: {
-        zIndex: "1",
-        position: "relative",
-
-        margin: "0",
-
-        borderTop: "0",
-        borderRight: `1em solid ${settings.text}`,
-        borderBottom: `1em solid ${settings.text}`,
-        borderLeft: `1em solid ${settings.text}`
-      },
-      linkStyles: {
-        color: settings.text,
-        borderColor: settings.red,
-        ":hover": {
-          color: settings.red,
-          boxShadow: `inset 0 -0.2em ${settings.red}`
-        }
-      }
-    };
-  }
-
   render() {
-    const headerStyles = this.getHeaderStyles();
-    const footerStyles = this.getFooterStyles();
+    const SpectacleLogoLink = (
+      <a
+        href="/"
+        style={{display: "block", height: "125px"}}
+        dangerouslySetInnerHTML={{__html: LOGO}}
+      />
+    );
     const isBrowser = typeof window !== "undefined" && window.__STATIC_GENERATOR !== true;
+
     return (
       <StyleRoot radiumConfig={isBrowser ? { userAgent: window.navigator.userAgent } : null}>
         <Header
-          styleOverrides={headerStyles.overrides}
-          linkStyles={headerStyles.linkStyles}
-        />
+          logoProject={SpectacleLogoLink}
+          padding="40px 0 60px"
+          styleBy={{ textIndent: "44px" }}
+          styleContainer={{ margin: "0 auto", maxWidth: "640px" }}
+          theme="light"
+        >
+          <div className="default">
+            <Link to="/about">About</Link>
+            <Link to="/docs">Docs</Link>
+            <a href="https://github.com/FormidableLabs/spectacle">GitHub</a>
+          </div>
+        </Header>
           {this.props.children}
         <Footer
-          logoColor="black"
-          background="transparent"
-          styleOverrides={footerStyles.overrides}
-          linkStyles={footerStyles.linkStyles}
+          styleContainer={{ margin: "0 auto", maxWidth: "640px" }}
         />
-        <Style rules={theme} />
       </StyleRoot>
     );
   }
