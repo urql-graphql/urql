@@ -45,7 +45,6 @@ class Home extends React.Component {
     return (
       <TitleMeta title="Spectacle">
         <Hero />
-        <Introduction />
         <p style={{margin: "3em 0 0 0", textAlign: "center"}}>
           <RadiumLink className="Button" to="/docs">
             Get Started with Spectacle

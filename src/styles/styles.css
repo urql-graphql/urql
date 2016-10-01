@@ -18,9 +18,11 @@
  * Discrete components of the page: such as navigation, alert dialogs, buttons, etc.
  * Any new feature or component will be added to this section.
  *
+ * hero:         styles for .Hero section on hompage/lander
  * prism:        color theme for prism syntax highlighting (third-party)
  *
  */
+@import "./components/hero.css";
 @import "./components/prism.css";
 
 /**
@@ -41,4 +43,4 @@
  */
 
 /* Utilities must always be last, so that they can override the above */
-/*@import "./base/utilities.css";*/
+@import "./base/utilities.css";

@@ -1,17 +1,38 @@
 :root {
-  //
-  // FONTS
-  //
+  /*
+  ** COLORS
+  */
+  --white: #fff;
+  --black: #242121;
+
+  /*--red: #bd1e13;
+  --orangeRed: #D74E07;
+  --orange: #ff5800;
+  --yellow: #F5C80D;*/
+  --pink: #f06d82;
+  --pink2: #ee6d83;
+
+  --peach: #ffb787;
+  --darkPeach: #e95257;
+
+  --blue: #76c9f3;
+  --navy: #2d1a36;
+  /*
+  ** FONTS
+  */
   --fontLogo: 'Modak', 'Helvetica Neue', Helvetica, sans-serif;
-  --fontHeading: 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
-  --fontBody: 'Lora', Georgia, serif;
+  --fontHeading: 'Libre Franklin', 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontBody: 'Karla', 'Tiempos', 'Lora', Georgia, serif;
   --fontCode: 'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace;
+  /*
+  ** LAYOUT
+  */
+  --gutter: 24px
 }
 
 /*
- * MEDIA QUERIES
- * QURRRRRIES
- */
+** MEDIA QUERIES
+*/
 @custom-media --small-viewport only screen and (min-width: 321px);
 @custom-media --medium-viewport only screen and (min-width: 641px);
 @custom-media --large-viewport only screen and (min-width: 1025px);

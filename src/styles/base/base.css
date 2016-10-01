@@ -1,6 +1,11 @@
 html {
   background-color: var(--black);
   box-sizing: border-box;
+  font-size: 16px;
+
+  @media (--medium-viewport) {
+    font-size: 18px;
+  }
 }
 
 *, *:before, *:after {
@@ -8,16 +13,11 @@ html {
 }
 
 body {
-  background-color: var(--lightestGray);
+  background-color: #fff;
   color: var(--black);
   font-family: var(--fontBody);
-  font-size: 16px;
   line-height: 1.5;
   position: relative;
-
-  @media (--medium-viewport) {
-    font-size: 18px;
-  }
 }
 
 /**
@@ -86,13 +86,12 @@ ul {
 }
 
 h1,
-h2,
 h3,
 h4,
 h5,
 h6 {
   font-family: var(--fontHeading);
-  font-weight: normal;
+  font-weight: 300;
   line-height: 1.2;
 }
 
@@ -101,14 +100,16 @@ h1 {
 }
 
 h2 {
+  font-family: var(--fontHeading);
+  font-weight: normal;
+  line-height: 1.2;
   font-size: 3rem; /* 48px */
-  letter-spacing: 0.175em;
-  text-transform: uppercase;
+  /*letter-spacing: 0.05em;
+  text-transform: uppercase;*/
 }
 
 h3 {
   font-size: 1.125rem;
-  font-family: var(--fontMonospace);
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
@@ -130,10 +131,13 @@ h6 code {
   font-size: 1em;
 }
 
+strong {
+  font-weight: bold;
+}
 
 pre,
 code {
-  font-family: var(--fontMonospace);
+  font-family: var(--fontCode);
 }
 
 pre {

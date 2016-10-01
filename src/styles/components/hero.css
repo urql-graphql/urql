@@ -1,0 +1,46 @@
+.Hero {
+  margin: 0;
+  padding: 5rem 3%;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+
+  z-index: 1;
+}
+
+.Hero:before,
+.Hero:after {
+  content: " ";
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.Hero:before {
+  background: linear-gradient(315deg, var(--navy), var(--darkPeach));
+}
+
+.Hero:after {
+  clip-path: circle(75vmax at 100vmax 50vmax);
+  background: linear-gradient(45deg, var(--darkPeach), var(--navy));
+}
+
+.Hero-Heading {
+  color: var(--white);
+  max-width: 36em;
+  text-shadow: 0.05em 0.05em 0.09em var(--navy);
+}
+
+.Hero-Heading strong {
+  text-shadow:
+    0.05em 0.05em 0.09em var(--navy),
+    0.07em 0.07em 0.25em var(--darkPeach);
+}
