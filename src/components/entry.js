@@ -52,10 +52,12 @@ export default (locals, callback) => {
   const location = history.createLocation(locals.path);
   match({ routes, location, history }, (error, redirectLocation, renderProps) => {
     const content = renderToString(<RouterContext {...renderProps} />);
+    const source = JSON.parse(locals.webpackStats.compilation.assets["stats.json"].source());
     callback(null, Index({
       titleMeta: renderAsHTML(),
       content,
       bundleJs: locals.assets.main,
+      bundleCss: source.assetsByChunkName.main[1],
       baseHref: `${basename}/`
     }));
   });
