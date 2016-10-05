@@ -7,6 +7,7 @@ import App from "./components/app";
 // import About from "./screens/about/index";
 import { BasicComponent, ApiComponent, GettingStartedComponent,
   PropsComponent, ExtensionsComponent } from "./screens/docs/index";
+import Example from "./screens/example/index";
 
 module.exports = (
   <Route path="/" component={App}>
@@ -17,5 +18,6 @@ module.exports = (
     <Route path="/docs/tag-api" component={ApiComponent}/>
     <Route path="/docs/props" component={PropsComponent}/>
     <Route path="/docs/extensions" component={ExtensionsComponent}/>
+    <Route path="/docs/example" component={Example}/>
   </Route>
 );
