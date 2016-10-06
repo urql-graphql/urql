@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/FormidableLabs/spectacle-docs.git"
   },
-  "author": "david.davidson@formidable.com, paula.lavalle@formidable.com",
+  "author": "david.davidson@formidable.com, paula.lavalle@formidable.com, emma.brillhart@formidable.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/FormidableLabs/spectacle-docs/issues"
@@ -25,10 +25,14 @@
     "builder": "^2.9.1",
     "builder-docs-archetype": "^4.1.1",
     "formidable-landers": "^5.1.1",
-    "history": "~2.1.2",
-    "marked": "^0.3.5",
     "normalize.css": "^4.2.0",
-    "prismjs": "^1.4.1",
+    "formidable-landers": "^3.4.1",
+    "history": "^1.17.0",
+    "lodash": "^4.16.4",
+    "markdown-it": "^8.0.0",
+    "markdown-it-toc-and-anchor": "^4.1.1",
+    "marked": "^0.3.5",
+    "prismjs": "^1.5.1",
     "radium": "^0.17.1",
     "react": "^15.2.0",
     "react-document-meta": "^2.0.3",

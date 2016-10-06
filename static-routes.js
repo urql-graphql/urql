@@ -8,5 +8,6 @@ module.exports = [
   "/docs/basic-concepts",
   "/docs/tag-api",
   "/docs/props",
-  "/docs/extensions"
+  "/docs/extensions",
+  "/about"
 ];
