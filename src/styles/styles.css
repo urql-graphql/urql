@@ -22,6 +22,7 @@
  * prism:        color theme for prism syntax highlighting (third-party)
  *
  */
+@import "./components/button.css";
 @import "./components/hero.css";
 @import "./components/prism.css";
 

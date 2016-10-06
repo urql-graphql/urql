@@ -26,9 +26,9 @@ class App extends React.Component {
         <Header
           logoProject={SpectacleLogoLink}
           padding="40px 3vw 60px"
-          styleBy={{ textIndent: "44px" }}
+          styleBy={{ textIndent: "20px" }}
           styleContainer={{ margin: "0 auto" }}
-          theme="light"
+          theme="dark"
         >
           <div className="default">
             <Link to="/about">About</Link>

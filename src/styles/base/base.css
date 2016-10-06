@@ -13,7 +13,8 @@ html {
 }
 
 body {
-  background-color: #fff;
+  background: linear-gradient(to top, var(--gold), var(--pink));
+  background-color: var(--gold);
   color: var(--black);
   font-family: var(--fontBody);
   line-height: 1.5;

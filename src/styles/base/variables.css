@@ -3,27 +3,24 @@
   ** COLORS
   */
   --white: #fff;
-  --black: #242121;
-
-  /*--red: #bd1e13;
-  --orangeRed: #D74E07;
-  --orange: #ff5800;
-  --yellow: #F5C80D;*/
-  --pink: #f06d82;
-  --pink2: #ee6d83;
+  --nearBlack: #242121;
+  --black: #000;
 
   --peach: #ffb787;
   --darkPeach: #e95257;
 
   --blue: #76c9f3;
   --navy: #2d1a36;
+
+  --gold: #f5c80d;
+  --pink: #ff4081;
   /*
   ** FONTS
   */
   --fontLogo: 'Modak', 'Helvetica Neue', Helvetica, sans-serif;
-  --fontHeading: 'Libre Franklin', 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
-  --fontBody: 'Karla', 'Tiempos', 'Lora', Georgia, serif;
-  --fontCode: 'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace;
+  --fontHeading: 'Karla', 'Libre Franklin', 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontBody: 'Open Sans', 'Tiempos', 'Lora', Georgia, serif;
+  --fontCode: 'akkurat', 'Source Code Pro', 'Inconsolata', 'Courier New', 'Courier', monospace;
   /*
   ** LAYOUT
   */
