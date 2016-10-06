@@ -26,7 +26,7 @@
     "builder": "^2.9.1",
     "builder-docs-archetype": "^4.1.1",
     "formidable-landers": "^3.4.1",
-    "history": "^3.2.1",
+    "history": "^1.17.0",
     "lodash": "^4.16.4",
     "markdown-it": "^8.0.0",
     "markdown-it-toc-and-anchor": "^4.1.1",
@@ -38,7 +38,7 @@
     "react-dom": "^15.2.0",
     "react-ga": "^2.1.1",
     "react-router": "^2.7.0",
-    "react-router-scroll": "^0.3.2",
+    "react-router-scroll": "^0.2.0",
     "spectacle": "^1.2.4"
   }
 }

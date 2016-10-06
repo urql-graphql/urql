@@ -77,7 +77,7 @@ class Markdown extends React.Component {
     // Update anchor links to include the basename
     md.renderer.rules.link_open = function (tokens, idx, options, env, renderer) {
       const anchor = tokens[idx].attrs[1];
-      if (anchor.length > 0) {
+      if (anchor && anchor.length > 0) {
         const href = anchor[1];
         if (href.indexOf("#") === 0) {
           tokens[idx].attrs[1][1] = `${basename}${currentPath}${href}`;
@@ -91,6 +91,7 @@ class Markdown extends React.Component {
   }
 
   render() {
+    console.log("MARKDOWN");
     return (
       <article
         dangerouslySetInnerHTML={{

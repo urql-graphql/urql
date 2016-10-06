@@ -109,7 +109,7 @@ class Sidebar extends React.Component {
           <li className="NavList-item">
             <Link to="/docs/tag-api" className="btn btn--dark" activeClassName="is-active">
               <span>
-                Basic Concepts <Icon />
+                Tag API <Icon />
               </span>
             </Link>
             {this.renderToc("/docs/tag-api")}
@@ -117,7 +117,7 @@ class Sidebar extends React.Component {
           <li className="NavList-item">
             <Link to="/docs/props" className="btn btn--dark" activeClassName="is-active">
               <span>
-                Basic Concepts <Icon />
+                Props <Icon />
               </span>
             </Link>
             {this.renderToc("/docs/props")}
@@ -125,7 +125,7 @@ class Sidebar extends React.Component {
           <li className="NavList-item">
             <Link to="/docs/extensions" className="btn btn--dark" activeClassName="is-active">
               <span>
-                Basic Concepts <Icon />
+                Extensions <Icon />
               </span>
             </Link>
             {this.renderToc("/docs/extensions")}

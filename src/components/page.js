@@ -6,7 +6,6 @@ class Page extends React.Component {
     const Tag = "main";
     const mainClasses = "Main Main--internal";
     const contentClasses = "Page-content Page-content--internal";
-
     return (
       <Tag className={mainClasses}>
         <div className="Grid">
