@@ -1,6 +1,4 @@
-/* global window */
 import React from "react";
-import Radium, { StyleRoot } from "radium";
 import { Link } from "react-router";
 import { Header, Footer } from "formidable-landers";
 
@@ -14,35 +12,33 @@ class App extends React.Component {
       <h1 className="u-noMargin">
         <a
           href="/"
-          style={{display: "block", height: "125px"}}
+          className="Logo"
           dangerouslySetInnerHTML={{__html: LOGO}}
         />
       </h1>
     );
-    const isBrowser = typeof window !== "undefined" && window.__STATIC_GENERATOR !== true;
 
     return (
-      <StyleRoot radiumConfig={isBrowser ? { userAgent: window.navigator.userAgent } : null}>
+      <div className="Site">
         <Header
           logoProject={SpectacleLogoLink}
-          padding="40px 3vw 60px"
-          styleBy={{ textIndent: "20px" }}
-          styleContainer={{ margin: "0 auto" }}
+          padding="20px 6vw 30px"
           theme="dark"
         >
           <div className="default">
-            <Link to="/about">About</Link>
-            <Link to="/docs">Docs</Link>
+            <Link to="/about" activeClassName="is-active">About</Link>
+            <Link to="/docs" activeClassName="is-active">Docs</Link>
             <a href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a>
             <a href="https://github.com/FormidableLabs/spectacle">GitHub</a>
           </div>
         </Header>
-          {this.props.children}
+
+        { this.props.children }
+
         <Footer
-          padding="5rem 3vw 6rem"
-          styleContainer={{ margin: "0 auto" }}
+          padding="5rem 6vw 6rem"
         />
-      </StyleRoot>
+      </div>
     );
   }
 }
@@ -55,4 +51,4 @@ App.defaultProps = {
   children: null
 };
 
-export default Radium(App);
+export default App;

@@ -3,71 +3,64 @@ import { Link } from "react-router";
 
 // Child components
 import TitleMeta from "../../components/title-meta";
+import Sidebar from "../../components/sidebar";
 
 class Home extends React.Component {
   render() {
     return (
       <TitleMeta title="Spectacle">
+          <div className="Hero">
+            <h2 className="Hero-Heading u-noMargin">
+              A <strong>React.js based</strong> library for creating <strong>
+                sleek presentations
+              </strong>
+            </h2>
+          </div>
 
-        <div className="Hero">
-          <h2 className="Hero-Heading u-noMargin">
-            A <strong>React.js based</strong> library for creating <strong>
-              sleek presentations
-            </strong> using <span>JSX</span> syntax <span className="Hero-Subheading">
-              with the ability to <strong>live demo your&nbsp;code!</strong>
-            </span>
-          </h2>
+        <div className="Container">
+
+        <div className="Grid Grid--gutters">
+          <p className="Grid-cell Grid-cell--autoSize">
+            <Link className="btn btn--dark u-nowrap" to="/docs">
+              Get Started with Spectacle
+            </Link>
+          </p>
+          <p className="Grid-cell">
+            <a className="btn btn--pink u-nowrap" href="http://stack.formidable.com/spectacle">
+              View Live Demo
+            </a>
+          </p>
         </div>
 
-        <p>
-          <Link className="btn btn--dark" to="/docs">
-            Get Started with Spectacle
-          </Link>
-        </p>
-
-        <div className="Docs">
-          <h2>Take a tour</h2>
-        </div>
-
-        <div className="VideoWrapper">
-          <div className="Video">
-            <iframe
-              className="Video-iframe"
-              width="640"
-              height="360"
-              src="https://www.youtube-nocookie.com/embed/vvgtgnIhJ1g?rel=0&amp;showinfo=0"
-              frameBorder="0"
-            >
-            </iframe>
+          <div className="u-noMarginTop Grid Grid--guttersLg Grid--top">
+            <div className="Grid-cell Grid-cell--full large-Grid-cell--autoSize">
+              <Sidebar />
+            </div>
+            <div className="Grid-cell Copy--large">
+              <h2 className="Subheading u-noMargin">
+                Features
+              </h2>
+              <h3 className="Heading u-marginTopSm">
+                Interactive Presentations
+              </h3>
+              <p>
+                Add clickable elements and other interactivity to make your presentations pop.
+              </p>
+              <h3 className="Heading">
+                Live-Preview Your Code
+              </h3>
+              <p>
+                Show people more than just a code block - demo the final project in real-time without leaving your presentation deck.
+              </p>
+              <h3 className="Heading">
+                Auto-Size Text, Image Dimming, and More
+              </h3>
+              <p>
+                On top of all of Spectacle's helpful features, you can also make your presentation look amazing with auto-formatting, easy theming abilities, image dimming, and lots of other fun touches.
+              </p>
+            </div>
           </div>
         </div>
-
-        <div className="Docs">
-          <h2>Features</h2>
-          <h3>Interactive Presentations</h3>
-            <p>Add clickable elements and other interactivity to make your presentations pop.</p>
-          <h3>Live-Preview Your Code</h3>
-            <p>Show people more than just a code block - demo the final project in real-time without leaving your presentation deck.</p>
-          <h3>Auto-Size Text, Image Dimming, and More</h3>
-            <p>On top of all of Spectacle's helpful features, you can also make your presentation look amazing with
-             auto-formatting, easy theming abilities, image dimming, and lots of other fun touches.</p>
-        </div>
-
-        <p>
-          <Link className="btn btn--dark" to="/docs">
-            Get Started with Spectacle
-          </Link>
-        </p>
-        <p>
-          <a href="https://www.github.com/FormidableLabs/spectacle">
-            View the Spectacle Source Code
-          </a>
-        </p>
-        <p>
-          <a href="https://www.github.com/FormidableLabs/spectacle/issues">
-            Having an Issue?
-          </a>
-        </p>
 
       </TitleMeta>
     );

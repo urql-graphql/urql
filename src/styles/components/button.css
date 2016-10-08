@@ -1,11 +1,11 @@
 /** @define Button */
 
 :root {
-  --Button-border-color: currentcolor;
+  --Button-border-color: transparent;
   --Button-border-width: 0;
   --Button-color: inherit;
   --Button-disabled-opacity: 0.6;
-  --Button-font: 1rem var(--fontHeading);
+  --Button-font: 1rem var(--fontBody);
   --Button-padding: 0.75em 2em 0.75em;
 }
 
@@ -66,13 +66,19 @@
  * UI states
  */
 
+.btn:link {
+  border-bottom-width: var(--Button-border-width);
+}
+
 .btn:hover,
 .btn:focus,
 .btn:active {
   cursor: pointer;
   color: var(--Button-color);
   background-color: rgba(0,0,0,0.75);
-  transition: color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1);
+  transition:
+    color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
+    background-color 0.5s ease-in;
 }
 
 .btn:disabled,
@@ -87,6 +93,14 @@
 }
 
 /**
+* Button layout and positioning
+*/
+
+.btn--offset {
+  margin-left: calc(-1 * var(--gutterPage));
+}
+
+/**
  * Different colors
  */
 
@@ -94,9 +108,11 @@
 .btn--dark:link {
   background-color: var(--black);
   color: var(--white);
-  text-shadow: 0.05em 0.05em 0.2em var(--black);
+  text-shadow: 0.05em 0.05em 0.3em color(var(--black) alpha(-15%));
+  transition:
+    color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
+    background-color 0.5s ease-out;
 }
-
 
 .btn--dark:visited {
   background-color: var(--black);
@@ -107,31 +123,27 @@
 .btn--dark:hover {
   cursor: pointer;
   color: var(--white);
-  background-color: rgba(0,0,0,0.75);
+  background-color: color(var(--black) alpha(-20%));
+}
+
+.btn--pink,
+.btn--pink:link {
+  background-color: var(--darkPink);
+  color: var(--white);
+  text-shadow: 0.05em 0.05em 0.3em color(var(--pink) alpha(-15%));
   transition:
     color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
-    background-color 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+    background-color 0.5s ease-out;
 }
 
-/*.btn--dark:after {
-  z-index: 1;
-  content: " ";
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-
-  background-color: rgba(0, 0, 0, 0.8);
-  will-change: transform;
-  transform: translateX(0%);
-  transition: all 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+.btn--pink:visited {
+  background-color: var(--darkPink);
+  color: var(--white);
 }
 
-.btn--dark:hover:after,
-.btn--dark:focus:after {
-  z-index: 1;
-  width: 2.8em;
-  transform: translateX(0%);
-  transition: width 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-}*/
+.btn--pink:focus,
+.btn--pink:hover {
+  cursor: pointer;
+  color: var(--white);
+  background-color: color(var(--darkPink) alpha(-40%));
+}

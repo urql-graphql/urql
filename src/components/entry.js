@@ -6,6 +6,7 @@ import { createMemoryHistory, createHistory } from "history";
 import useScroll from "react-router-scroll";
 import { renderAsHTML } from "./title-meta";
 import ReactGA from "react-ga";
+import { anchorate } from "anchorate";
 
 import Index from "../../templates/index.hbs";
 import routes from "../routes";
@@ -30,6 +31,7 @@ if (typeof window !== "undefined" && window.__STATIC_GENERATOR !== true) { //esl
     const fullLocation = basename + location.pathname;
     ReactGA.set({ page: fullLocation });
     ReactGA.pageview(fullLocation);
+    anchorate();
   });
   render(
     <Router

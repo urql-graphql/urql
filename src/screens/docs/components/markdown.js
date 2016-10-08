@@ -91,9 +91,9 @@ class Markdown extends React.Component {
   }
 
   render() {
-    console.log("MARKDOWN");
     return (
       <article
+        className="Markdown"
         dangerouslySetInnerHTML={{
           __html: this.state.renderedMd
         }}

@@ -4,6 +4,7 @@
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
+    "dev": "webpack-dev-server --port 3000 --config node_modules/builder-docs-archetype/config/webpack/webpack.config.dev.js --history-api-fallback",
     "start": "builder run dev",
     "test": "builder run lint",
     "update-project": "npm update spectacle"
@@ -22,6 +23,7 @@
     "builder-docs-archetype-dev": "^4.1.1"
   },
   "dependencies": {
+    "anchorate": "^1.1.0",
     "builder": "^2.9.1",
     "builder-docs-archetype": "^4.1.1",
     "formidable-landers": "^5.1.1",

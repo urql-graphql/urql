@@ -1,10 +1,13 @@
 html {
-  background-color: var(--black);
+  background-color: var(--nearBlack);
   box-sizing: border-box;
   font-size: 16px;
+  height: 100%;
+}
 
-  @media (--medium-viewport) {
-    font-size: 18px;
+@media (--medium-viewport) {
+  html {
+    font-size: 20px;
   }
 }
 
@@ -13,14 +16,14 @@ html {
 }
 
 body {
-  background: linear-gradient(to top, var(--gold), var(--pink));
   background-color: var(--gold);
   color: var(--black);
   font-family: var(--fontBody);
-  line-height: 1.5;
+  line-height: 1.45;
   position: relative;
-}
 
+  height: 100%;
+}
 /**
  * Reset default spacing and border for appropriate elements.
  * (suitcss-base)
@@ -29,7 +32,6 @@ body {
 blockquote,
 dl,
 dd,
-h1,
 h2,
 h3,
 h4,
@@ -37,7 +39,8 @@ h5,
 h6,
 figure,
 p,
-pre {
+pre,
+table {
   margin: 1.375em 0 0 0;
 }
 
@@ -87,40 +90,38 @@ ul {
 }
 
 h1,
+h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--fontHeading);
-  font-weight: 300;
-  line-height: 1.2;
+  margin-bottom: -0.5em;
+  font-family: var(--fontBody);
+  font-weight: normal;
+  line-height: 1;
 }
 
 h1 {
-  font-size: 3.75rem; /* 60px */
+  margin: 0;
+  font-family: var(--fontHeading);
+  font-size: 3.75rem;
 }
 
 h2 {
-  font-family: var(--fontHeading);
-  font-weight: normal;
-  line-height: 1.2;
-  font-size: 3rem; /* 48px */
-  /*letter-spacing: 0.05em;
-  text-transform: uppercase;*/
+  font-size: 2rem;
 }
 
 h3 {
-  font-size: 1.125rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  font-family: var(--fontCode);
+  font-size: 1.25rem;
 }
 
 h4 {
-  font-size: 2.25rem; /* 36px */
+  font-size: 1.75rem;
 }
 
 h5, h6 {
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 h1 code,
@@ -158,29 +159,40 @@ pre code {
 }
 
 code {
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 1px;
   padding: 0.33em .333em .28em;
+}
 
-  @media (--medium-viewport) {
+@media (--medium-viewport) {
+  code {
     font-size: 0.875rem;
   }
 }
 
-a:link {
-  text-decoration: none;
-  transition: color 250ms ease-in;
-}
-
-a:focus,
-a:hover {
-  color: var(--black);
-}
-
-a:active {
-  transition: color 300ms ease-out;
+img {
+  border: 1px solid var(--black);
+  max-width: 100%;
+  height: auto;
 }
 
 svg {
   fill: currentColor;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 0.9em;
+  margin-right: -1em;
+  margin-left: -1em;
+}
+
+tr:nth-child(even) {
+  background-color: #FAF8F7;
+}
+
+th, td {
+  border: 1px solid #E0DEDC;
+  padding: 0.45em 1em;
 }
