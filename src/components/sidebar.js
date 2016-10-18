@@ -70,6 +70,10 @@ class Sidebar extends React.Component {
   }
 
   renderToc(targetLocation) {
+    if (targetLocation[targetLocation.length - 1] !== "/" && process.env.NODE_ENV === "production") {
+      targetLocation = `${targetLocation}/`;
+    }
+
     if (!this.props.location || (this.props.location.pathname !== targetLocation)) {
       return null;
     }
