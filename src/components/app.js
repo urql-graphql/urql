@@ -10,8 +10,8 @@ class App extends React.Component {
   render() {
     const SpectacleLogoLink = (
       <h1 className="u-noMargin">
-        <a
-          href="/"
+        <Link
+          to="/"
           className="Logo"
           dangerouslySetInnerHTML={{__html: LOGO}}
         />
