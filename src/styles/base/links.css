@@ -1,0 +1,52 @@
+a:link {
+  border-bottom: 1px solid var(--black);
+  position: relative;
+  color: var(--black);
+  text-decoration: none;
+  transition: color 250ms ease-in;
+}
+
+a:visited {
+  border-color: color(var(--black) alpha(-75%));
+  color: color(var(--black) alpha(-60%));
+}
+
+a:focus,
+a:hover {
+  color: var(--black);
+  transition: color 300ms ease-out;
+}
+
+a:active {
+  color: var(--white);
+  transition: color 300ms ease-out;
+}
+
+/**
+* Add an underline effect to links except for button links
+*/
+.Container a:link:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+
+  background: var(--black);
+  opacity: 0;
+  transition: height 300ms ease-in, opacity 300ms ease-in;
+}
+
+.Container a:hover:after {
+  height: 5px;
+  opacity: 1;
+  transition: height 300ms ease-out, opacity 300ms ease-out;
+}
+
+.btn:link:after,
+.btn:hover:after,
+.Anchor:after {
+  height: 0 !important;
+  transition: none !important;
+}

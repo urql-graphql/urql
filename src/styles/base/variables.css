@@ -1,0 +1,39 @@
+:root {
+  /*
+  ** COLORS
+  */
+  --white: #fff;
+  --nearBlack: #242121;
+  --black: #000;
+
+  --blue: #76c9f3;
+  --navy: #2d1a36;
+
+  --gold: #f5c80d;
+  --peach: #C7372E;
+  --pink: #ff4081;
+  --darkPink: #BD0D49;
+  /* Brand Reds */
+  --red: #c43a31;
+  --darkRed: #AD1B11;
+  /*
+  ** FONTS
+  */
+  --fontHeading: 'Modak', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontBody: 'Karla', 'Helvetica Neue', Helvetica, sans-serif;
+  --fontCode: 'akkurat', 'Inconsolata', 'Courier New', 'Courier', monospace;
+  /*
+  ** LAYOUT
+  */
+  --gutterPage: 6vw;
+  --gutter: 60px;
+  --gutterSm: 30px;
+}
+
+/*
+** MEDIA QUERIES
+*/
+@custom-media --small-viewport (min-width: 480px);
+@custom-media --medium-viewport (min-width: 720px);
+@custom-media --large-viewport (min-width: 1000px);
+@custom-media --xlarge-viewport (min-width: 1441px);

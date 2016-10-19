@@ -3,25 +3,20 @@ import Sidebar from "./sidebar";
 
 class Page extends React.Component {
   render() {
-    const Tag = "main";
-    const mainClasses = "Main Main--internal";
-    const contentClasses = "Page-content Page-content--internal";
     return (
-      <Tag className={mainClasses}>
-        <div className="Grid">
-          <section className="Page">
-            <div className="Page-sidebar Grid-col">
+      <main className="Page Site-content Site-content--flex">
+        <div className="Page-Container Container Grid Grid--guttersLg large-Grid--nowrap Site-content">
+            <div className="Grid-cell Grid-cell--full large-Grid-cell--autoSize">
               <Sidebar
                 tocArray={this.props.tocArray}
                 location={this.props.location}
               />
             </div>
-            <div className={`${contentClasses} Grid-col`}>
+            <div className="Grid-cell Page-content">
               { this.props.children }
             </div>
-          </section>
         </div>
-      </Tag>
+      </main>
     );
   }
 }

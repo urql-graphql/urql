@@ -1,0 +1,30 @@
+.Container h1,
+.Container h2,
+.Container h3,
+.Container h4,
+.Container h5,
+.Container h6 {
+  position: relative;
+}
+
+.Anchor {
+  background: url("../../static/icon-link.svg") 0 no-repeat;
+  border-bottom: 0 !important;
+  position: absolute !important;
+  right: 100%;
+
+  height: 1em;
+  line-height: 1;
+  opacity: 0;
+  width: 30px;
+  speak: none; /* Wishing for .screenreader-hidden class */
+}
+
+.Container h1:hover .Anchor,
+.Container h2:hover .Anchor,
+.Container h3:hover .Anchor,
+.Container h4:hover .Anchor,
+.Container h5:hover .Anchor,
+.Container h6:hover .Anchor {
+  opacity: 1;
+}

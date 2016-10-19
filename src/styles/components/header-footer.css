@@ -1,0 +1,39 @@
+/**
+* Formidable Header & Footer: do not override brand styles
+*/
+.formidableHeader-container .default {
+  margin-top: var(--gutterSm);
+}
+
+.formidableHeader,
+.formidableFooter {
+  flex: none;
+  margin: 0 !important;
+}
+
+.formidableHeader-container,
+.formidableFooter-container {
+  margin: 0 auto;
+}
+
+.formidableHeader-logos-oss-by {
+  text-indent: 20px;
+}
+
+.formidableHeader a,
+.formidableFooter a {
+  border-bottom: 0;
+}
+
+/**
+* Spectacle Logo
+*/
+.Logo {
+  display: block;
+  height: 80px;
+}
+@media (--small-viewport) {
+  .Logo {
+    height: 125px;
+  }
+}

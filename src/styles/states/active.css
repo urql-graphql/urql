@@ -1,0 +1,29 @@
+/*
+* Active state for Dark Button
+*/
+
+.btn--dark.is-active:after {
+  background-color: transparent !important;
+}
+
+.btn--dark.is-active,
+.btn--dark.is-active:focus,
+.btn--dark.is-active:hover {
+  background-color: var(--white) !important;
+  box-shadow: 0 0 var(--gutterSm) 0 color(var(--white) alpha(-60%));
+  color: var(--black) !important;
+  cursor: default;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+/*
+* Active state for links in Header
+*/
+
+.formidableHeader a.is-active,
+.formidableHeader a.is-active:hover {
+  border-bottom: 1px solid var(--white);
+  color: color(var(--white) alpha(-60%)) !important;
+  cursor: default;
+}

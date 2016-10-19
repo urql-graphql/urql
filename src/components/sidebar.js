@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router";
-import Icon from "./icon";
 import basename from "../basename";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
@@ -10,19 +9,19 @@ class Sidebar extends React.Component {
     const md = MarkdownIt();
 
     return (
-      <ul className="TOC">
+      <ul className="Sidebar-toc">
         {
           siblings.map((sibling, id) => {
             if (Array.isArray(sibling)) {
               return (
-                <li className="TOC-item" key={id}>
+                <li className="Sidebar-toc-item" key={id}>
                   {this.renderTransformedToc(sibling, targetLocation)}
                 </li>
               );
             }
 
             return sibling && (
-              <li key={id} className="TOC-item">
+              <li key={id} className="Sidebar-toc-item">
                 <a
                   href={`${basename}${targetLocation}#${sibling.anchor}`}
                   dangerouslySetInnerHTML={{__html: md.renderInline(sibling.content)}}
@@ -71,6 +70,10 @@ class Sidebar extends React.Component {
   }
 
   renderToc(targetLocation) {
+    if (targetLocation[targetLocation.length - 1] !== "/" && process.env.NODE_ENV === "production") {
+      targetLocation = `${targetLocation}/`;
+    }
+
     if (!this.props.location || (this.props.location.pathname !== targetLocation)) {
       return null;
     }
@@ -85,59 +88,52 @@ class Sidebar extends React.Component {
 
   render() {
     return (
-      <nav className="Nav">
-        <h3 className="u-noMarginTop">
-          Spectacle
-        </h3>
-        <ul className="NavList">
-          <li className="NavList-item">
-            <Link to="/docs/getting-started" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                Let’s Get Started <Icon />
-              </span>
+      <nav className="Sidebar">
+        <p className="Subheading u-noMargin">
+          Documentation
+        </p>
+        <div className="u-noMarginTop Grid Grid--gutters Grid--1of3--flex large-Grid--column">
+          <p className="Grid-cell u-noMarginTop">
+            <Link to="/docs/getting-started"
+              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            >
+              Let’s Get Started
             </Link>
             {this.renderToc("/docs/getting-started")}
-          </li>
-          <li className="NavList-item">
-            <Link to="/docs/basic-concepts" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                Basic Concepts <Icon />
-              </span>
+          </p>
+          <p className="Grid-cell u-noMarginTop">
+            <Link to="/docs/basic-concepts"
+              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            >
+              Basic Concepts
             </Link>
             {this.renderToc("/docs/basic-concepts")}
-          </li>
-          <li className="NavList-item">
-            <Link to="/docs/tag-api" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                Tag API <Icon />
-              </span>
+          </p>
+          <p className="Grid-cell u-noMarginTop">
+            <Link to="/docs/tag-api"
+              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            >
+              Tag API
             </Link>
             {this.renderToc("/docs/tag-api")}
-          </li>
-          <li className="NavList-item">
-            <Link to="/docs/props" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                Props <Icon />
-              </span>
+          </p>
+          <p className="Grid-cell u-noMarginTop">
+            <Link to="/docs/props"
+              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            >
+              Props
             </Link>
             {this.renderToc("/docs/props")}
-          </li>
-          <li className="NavList-item">
-            <Link to="/docs/extensions" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                Extensions <Icon />
-              </span>
+          </p>
+          <p className="Grid-cell u-noMarginTop">
+            <Link to="/docs/extensions"
+              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            >
+              Extensions
             </Link>
             {this.renderToc("/docs/extensions")}
-          </li>
-          <li className="NavList-item">
-            <Link to="/about" className="btn btn--dark" activeClassName="is-active">
-              <span>
-                About <Icon />
-              </span>
-            </Link>
-          </li>
-        </ul>
+          </p>
+        </div>
       </nav>
     );
   }

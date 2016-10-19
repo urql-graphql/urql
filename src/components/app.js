@@ -1,76 +1,44 @@
-/* global window */
 import React from "react";
-import Radium, { Style, StyleRoot } from "radium";
+import { Link } from "react-router";
 import { Header, Footer } from "formidable-landers";
 
 // Variables and Stylesheet
-import settings from "../spectacle-variables";
-import theme from "../spectacle-theme";
+import LOGO from "../../static/logo.svg";
+import "../styles/styles.css";
 
 class App extends React.Component {
-
-  getHeaderStyles() {
-    return {
-      overrides: {
-        background: "transparent",
-        borderTop: `1em solid ${settings.text}`,
-        borderRight: `1em solid ${settings.text}`,
-        borderBottom: "0",
-        borderLeft: `1em solid ${settings.text}`
-      },
-      linkStyles: {
-        color: settings.orange,
-        borderColor: settings.orange,
-        ":hover": {
-          color: settings.text,
-          boxShadow: `inset 0 -0.2em ${settings.orange}`
-        }
-      }
-    };
-  }
-  getFooterStyles() {
-    return {
-      overrides: {
-        zIndex: "1",
-        position: "relative",
-
-        margin: "0",
-
-        borderTop: "0",
-        borderRight: `1em solid ${settings.text}`,
-        borderBottom: `1em solid ${settings.text}`,
-        borderLeft: `1em solid ${settings.text}`
-      },
-      linkStyles: {
-        color: settings.text,
-        borderColor: settings.red,
-        ":hover": {
-          color: settings.red,
-          boxShadow: `inset 0 -0.2em ${settings.red}`
-        }
-      }
-    };
-  }
-
   render() {
-    const headerStyles = this.getHeaderStyles();
-    const footerStyles = this.getFooterStyles();
-    const isBrowser = typeof window !== "undefined" && window.__STATIC_GENERATOR !== true;
+    const SpectacleLogoLink = (
+      <h1 className="u-noMargin">
+        <a
+          href="/"
+          className="Logo"
+          dangerouslySetInnerHTML={{__html: LOGO}}
+        />
+      </h1>
+    );
+
     return (
-      <StyleRoot radiumConfig={isBrowser ? { userAgent: window.navigator.userAgent } : null}>
+      <div className="Site">
         <Header
-          styleOverrides={headerStyles.overrides}
-          linkStyles={headerStyles.linkStyles}
-        />
-          {this.props.children}
+          logoProject={SpectacleLogoLink}
+          padding="20px 6vw 30px"
+          theme="dark"
+        >
+          <div className="default">
+            <Link to="/about" activeClassName="is-active">About</Link>
+            <Link to="/docs" activeClassName="is-active">Docs</Link>
+            <a href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a>
+            <a href="https://github.com/FormidableLabs/spectacle">GitHub</a>
+          </div>
+        </Header>
+
+        { this.props.children }
+
         <Footer
-          logoColor="black"
-          background="transparent"
-          styleOverrides={footerStyles.overrides}
-          linkStyles={footerStyles.linkStyles}
+          padding="5rem 6vw 6rem"
         />
-        <Style rules={theme} />
-      </StyleRoot>
+      </div>
     );
   }
 }
@@ -83,4 +51,4 @@ App.defaultProps = {
   children: null
 };
 
-export default Radium(App);
+export default App;
