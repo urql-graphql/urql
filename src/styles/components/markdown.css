@@ -1,0 +1,15 @@
+.Markdown {
+  display: block;
+  padding-right: var(--gutterPage);
+  padding-bottom: var(--gutterPage);
+}
+
+.Markdown ul {
+  list-style: disc;
+  margin-left: 1em;
+}
+
+.Markdown li {
+  margin-top: 0.5em;
+  max-width: 40em;
+}

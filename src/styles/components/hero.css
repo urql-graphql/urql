@@ -1,0 +1,63 @@
+.Hero {
+  margin: 0 0 calc(-1 * var(--gutterPage));
+  padding: var(--gutterPage) 0 var(--gutter) var(--gutterPage);
+  position: relative;
+
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  min-height: 400px;
+  height: 60vw;
+  max-height: 70vh;
+
+  font-size: 1em;
+
+  z-index: 1;
+}
+
+.Hero:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  background-size: cover;
+  background-image: url("../../static/bg-demo.gif");
+
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%);
+
+  opacity: 0.333;
+  z-index: -1;
+}
+
+@media (--large-viewport) {
+  .Hero {
+    font-size: 1.25em;
+  }
+}
+
+.Hero-Heading {
+  color: var(--black);
+  font-family: var(--fontCode);
+  font-size: 1.75em;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  max-width: 14em;
+  text-transform: none;
+  text-align: left;
+}
+
+.Hero-Heading strong {
+  font-weight: bold;
+}
+
+.Hero-Subheading {
+  color: var(--white);
+  display: inline-block;
+}
