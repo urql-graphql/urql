@@ -13,6 +13,7 @@ import yaml from "prismjs/components/prism-yaml";
 
 import basename from "../../../basename";
 import { config } from "../../../components/config";
+import locationHelper from "../../../helpers/location-helper";
 
 
 class Markdown extends React.Component {
@@ -80,7 +81,7 @@ class Markdown extends React.Component {
       if (anchor && anchor.length > 0) {
         const href = anchor[1];
         if (href.indexOf("#") === 0) {
-          tokens[idx].attrs[1][1] = `${basename}${currentPath}${href}`;
+          tokens[idx].attrs[1][1] = `${locationHelper(`${basename}${currentPath}`)}${href}`;
           tokens[idx].attrs.push(["aria-hidden", "true"]);
         }
       }

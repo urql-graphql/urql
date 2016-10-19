@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import basename from "../basename";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
+import locationHelper from "../helpers/location-helper";
 
 class Sidebar extends React.Component {
   renderTransformedToc(siblings, targetLocation) {
@@ -70,11 +71,13 @@ class Sidebar extends React.Component {
   }
 
   renderToc(targetLocation) {
-    if (targetLocation[targetLocation.length - 1] !== "/" && process.env.NODE_ENV === "production") {
-      targetLocation = `${targetLocation}/`;
-    }
+    let pathname = this.props.location && locationHelper(this.props.location.pathname);
+    pathname = pathname === locationHelper("/docs")
+      ? locationHelper("/docs/getting-started")
+      : pathname;
+    targetLocation = locationHelper(targetLocation);
 
-    if (!this.props.location || (this.props.location.pathname !== targetLocation)) {
+    if (!pathname || (pathname !== targetLocation)) {
       return null;
     }
 
@@ -93,46 +96,46 @@ class Sidebar extends React.Component {
           Documentation
         </p>
         <div className="u-noMarginTop Grid Grid--gutters Grid--1of3--flex large-Grid--column">
-          <p className="Grid-cell u-noMarginTop">
+          <div className="Grid-cell u-noMarginTop">
             <Link to="/docs/getting-started"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Let’s Get Started
             </Link>
             {this.renderToc("/docs/getting-started")}
-          </p>
-          <p className="Grid-cell u-noMarginTop">
+          </div>
+          <div className="Grid-cell u-noMarginTop">
             <Link to="/docs/basic-concepts"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Basic Concepts
             </Link>
             {this.renderToc("/docs/basic-concepts")}
-          </p>
-          <p className="Grid-cell u-noMarginTop">
+          </div>
+          <div className="Grid-cell u-noMarginTop">
             <Link to="/docs/tag-api"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Tag API
             </Link>
             {this.renderToc("/docs/tag-api")}
-          </p>
-          <p className="Grid-cell u-noMarginTop">
+          </div>
+          <div className="Grid-cell u-noMarginTop">
             <Link to="/docs/props"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Props
             </Link>
             {this.renderToc("/docs/props")}
-          </p>
-          <p className="Grid-cell u-noMarginTop">
+          </div>
+          <div className="Grid-cell u-noMarginTop">
             <Link to="/docs/extensions"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Extensions
             </Link>
             {this.renderToc("/docs/extensions")}
-          </p>
+          </div>
         </div>
       </nav>
     );
