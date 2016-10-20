@@ -37,7 +37,11 @@ if (typeof window !== "undefined" && window.__STATIC_GENERATOR !== true) { //esl
     <Router
       history={history}
       routes={routes}
-      render={applyRouterMiddleware(useScroll())}
+      render={applyRouterMiddleware(
+        useScroll((prevRouterProps, { location }) => (
+          prevRouterProps && location.pathname !== prevRouterProps.location.pathname
+        ))
+      )}
     />,
     document.getElementById("content")
   );

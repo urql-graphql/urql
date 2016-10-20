@@ -1,7 +1,5 @@
 import React from "react";
 
-import Radium from "radium";
-
 import Page from "../../components/page";
 import TitleMeta from "../../components/title-meta";
 import Markdown from "./components/markdown";
@@ -46,6 +44,4 @@ Docs.defaultProps = {
   params: null
 };
 
-const DocsComponent = Radium(Docs);
-
-export default DocsComponent;
+export default Docs;

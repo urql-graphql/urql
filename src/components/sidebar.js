@@ -3,7 +3,6 @@ import { Link } from "react-router";
 import basename from "../basename";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
-import locationHelper from "../helpers/location-helper";
 
 class Sidebar extends React.Component {
   renderTransformedToc(siblings, targetLocation) {
@@ -23,11 +22,10 @@ class Sidebar extends React.Component {
 
             return sibling && (
               <li key={id} className="Sidebar-toc-item">
-                <a
-                  href={`${basename}${targetLocation}#${sibling.anchor}`}
+                <Link
+                  to={`${basename}${targetLocation}#${sibling.anchor}`}
                   dangerouslySetInnerHTML={{__html: md.renderInline(sibling.content)}}
-                >
-                </a>
+                />
               </li>
             );
           })
@@ -71,13 +69,7 @@ class Sidebar extends React.Component {
   }
 
   renderToc(targetLocation) {
-    let pathname = this.props.location && locationHelper(this.props.location.pathname);
-    pathname = pathname === locationHelper("/docs")
-      ? locationHelper("/docs/getting-started")
-      : pathname;
-    targetLocation = locationHelper(targetLocation);
-
-    if (!pathname || (pathname !== targetLocation)) {
+    if (!this.props.location || (this.props.location.pathname !== targetLocation)) {
       return null;
     }
 
@@ -90,6 +82,9 @@ class Sidebar extends React.Component {
   }
 
   render() {
+    const currentPath = this.props.location && this.props.location.pathname;
+    const gettingStartedClass = currentPath === "/docs/" ? "btn btn--dark u-displayBlock u-nowrap is-active" : "btn btn--dark u-displayBlock u-nowrap";
+
     return (
       <nav className="Sidebar">
         <p className="Subheading u-noMargin">
@@ -97,44 +92,45 @@ class Sidebar extends React.Component {
         </p>
         <div className="u-noMarginTop Grid Grid--gutters Grid--1of3--flex large-Grid--column">
           <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/getting-started"
-              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
+            <Link to="/docs/getting-started/"
+              className={gettingStartedClass} activeClassName="is-active"
             >
               Get Started
             </Link>
-            {this.renderToc("/docs/getting-started")}
+            {this.renderToc("/docs/getting-started/")}
+            {this.renderToc("/docs/")}
           </div>
           <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/basic-concepts"
+            <Link to="/docs/basic-concepts/"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Basic Concepts
             </Link>
-            {this.renderToc("/docs/basic-concepts")}
+            {this.renderToc("/docs/basic-concepts/")}
           </div>
           <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/tag-api"
+            <Link to="/docs/tag-api/"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Tag API
             </Link>
-            {this.renderToc("/docs/tag-api")}
+            {this.renderToc("/docs/tag-api/")}
           </div>
           <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/props"
+            <Link to="/docs/props/"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Props
             </Link>
-            {this.renderToc("/docs/props")}
+            {this.renderToc("/docs/props/")}
           </div>
           <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/extensions"
+            <Link to="/docs/extensions/"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
               Extensions
             </Link>
-            {this.renderToc("/docs/extensions")}
+            {this.renderToc("/docs/extensions/")}
           </div>
         </div>
       </nav>

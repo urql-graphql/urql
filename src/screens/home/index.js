@@ -26,7 +26,7 @@ class Home extends React.Component {
 
         <div className="Grid Grid--gutters">
           <p className="Grid-cell Grid-cell--autoSize">
-            <Link className="btn btn--dark u-nowrap" to="/docs">
+            <Link className="btn btn--dark u-nowrap" to="/docs/">
               Get Started with Spectacle
             </Link>
           </p>

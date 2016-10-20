@@ -26,8 +26,8 @@ class App extends React.Component {
           theme="dark"
         >
           <div className="default">
-            <Link to="/about" activeClassName="is-active">About</Link>
-            <Link to="/docs" activeClassName="is-active">Docs</Link>
+            <Link to="/about/" activeClassName="is-active">About</Link>
+            <Link to="/docs/" activeClassName="is-active">Docs</Link>
             <a href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a>
             <a href="https://github.com/FormidableLabs/spectacle">GitHub</a>
           </div>
