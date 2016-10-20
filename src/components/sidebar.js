@@ -100,7 +100,7 @@ class Sidebar extends React.Component {
             <Link to="/docs/getting-started"
               className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
             >
-              Let’s Get Started
+              Get Started
             </Link>
             {this.renderToc("/docs/getting-started")}
           </div>

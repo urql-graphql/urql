@@ -1,6 +1,6 @@
 .Hero {
   margin: 0 0 calc(-1 * var(--gutterPage));
-  padding: var(--gutterPage) 0 var(--gutter) var(--gutterPage);
+  padding: var(--gutterPage) 0 var(--gutterSm) var(--gutterPage);
   position: relative;
 
   display: flex;
@@ -8,16 +8,28 @@
   flex-wrap: nowrap;
   flex-direction: row;
   justify-content: flex-start;
-  min-height: 400px;
+  min-height: 300px;
   height: 60vw;
   max-height: 70vh;
 
   font-size: 1em;
 
-  z-index: 1;
+  z-index: 0;
 }
 
-.Hero:before {
+@media (--medium-viewport) {
+  .Hero {
+    font-size: 1.25em;
+  }
+}
+
+@media (--large-viewport) {
+  .Hero {
+    font-size: 1.5em;
+  }
+}
+
+.Hero-video {
   content: "";
   position: absolute;
   top: 0;
@@ -25,21 +37,10 @@
   bottom: 0;
   left: 0;
 
-  background-repeat: no-repeat;
-  background-position: bottom center;
-  background-size: cover;
-  background-image: url("../../static/bg-demo.gif");
-
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%);
 
   opacity: 0.333;
   z-index: -1;
-}
-
-@media (--large-viewport) {
-  .Hero {
-    font-size: 1.25em;
-  }
 }
 
 .Hero-Heading {
@@ -48,7 +49,7 @@
   font-size: 1.75em;
   letter-spacing: -0.03em;
   line-height: 1.25;
-  max-width: 14em;
+  /*max-width: 14em;*/
   text-transform: none;
   text-align: left;
 }

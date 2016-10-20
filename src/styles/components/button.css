@@ -68,6 +68,9 @@
 
 .btn:link {
   border-bottom-width: var(--Button-border-width);
+  transition:
+    color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
+    background-color 193ms ease-out;
 }
 
 .btn:hover,
@@ -75,10 +78,9 @@
 .btn:active {
   cursor: pointer;
   color: var(--Button-color);
-  background-color: rgba(0,0,0,0.75);
   transition:
     color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
-    background-color 0.5s ease-in;
+    background-color 250ms ease-in;
 }
 
 .btn:disabled,
@@ -109,9 +111,6 @@
   background-color: var(--black);
   color: var(--white);
   text-shadow: 0.05em 0.05em 0.3em color(var(--black) alpha(-15%));
-  transition:
-    color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
-    background-color 0.5s ease-out;
 }
 
 .btn--dark:visited {
@@ -121,7 +120,6 @@
 
 .btn--dark:focus,
 .btn--dark:hover {
-  cursor: pointer;
   color: var(--white);
   background-color: color(var(--black) alpha(-20%));
 }
@@ -130,10 +128,7 @@
 .btn--pink:link {
   background-color: var(--darkPink);
   color: var(--white);
-  text-shadow: 0.05em 0.05em 0.3em color(var(--pink) alpha(-15%));
-  transition:
-    color 0.3s 0.1s cubic-bezier(0.77, 0, 0.175, 1),
-    background-color 0.5s ease-out;
+  text-shadow: 0.05em 0.05em 0.3em color(var(--pink) alpha(-20%));
 }
 
 .btn--pink:visited {
@@ -143,7 +138,6 @@
 
 .btn--pink:focus,
 .btn--pink:hover {
-  cursor: pointer;
-  color: var(--white);
   background-color: color(var(--darkPink) alpha(-40%));
+  color: var(--white);
 }

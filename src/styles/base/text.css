@@ -2,6 +2,10 @@
   font-size: 1.2em;
 }
 
+.Copy--large p {
+  padding-right: var(--gutterPage);
+}
+
 .Heading {
   font-family: var(--fontHeading);
   font-size: 3rem;
