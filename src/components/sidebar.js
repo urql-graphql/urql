@@ -81,57 +81,45 @@ class Sidebar extends React.Component {
     );
   }
 
-  render() {
+  renderSidebarItem(href, name, isDocs) {
+    const defaultClass = "btn btn--dark u-displayBlock u-nowrap";
     const currentPath = this.props.location && this.props.location.pathname;
-    const gettingStartedClass = currentPath === "/docs/" ? "btn btn--dark u-displayBlock u-nowrap is-active" : "btn btn--dark u-displayBlock u-nowrap";
+    const docsClass = currentPath === "/docs/" ? `${defaultClass} is-active` : defaultClass;
 
+    return (
+      <div className="Sidebar-item Grid-cell u-noMarginTop">
+        <Link
+          to={href}
+          className={isDocs ? docsClass : defaultClass}
+          activeClassName="is-active"
+        >
+          {name}
+        </Link>
+        {this.renderToc(href)}
+        {isDocs ? this.renderToc("/docs/") : ""}
+      </div>
+    );
+  }
+
+  render() {
     return (
       <nav className="Sidebar">
         <p className="Subheading u-noMargin">
           Documentation
         </p>
-        <div className="u-noMarginTop Grid Grid--gutters Grid--1of3--flex large-Grid--column">
-          <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/getting-started/"
-              className={gettingStartedClass} activeClassName="is-active"
-            >
-              Get Started
-            </Link>
-            {this.renderToc("/docs/getting-started/")}
-            {this.renderToc("/docs/")}
-          </div>
-          <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/basic-concepts/"
-              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
-            >
-              Basic Concepts
-            </Link>
-            {this.renderToc("/docs/basic-concepts/")}
-          </div>
-          <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/tag-api/"
-              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
-            >
-              Tag API
-            </Link>
-            {this.renderToc("/docs/tag-api/")}
-          </div>
-          <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/props/"
-              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
-            >
-              Props
-            </Link>
-            {this.renderToc("/docs/props/")}
-          </div>
-          <div className="Grid-cell u-noMarginTop">
-            <Link to="/docs/extensions/"
-              className="btn btn--dark u-displayBlock u-nowrap" activeClassName="is-active"
-            >
-              Extensions
-            </Link>
-            {this.renderToc("/docs/extensions/")}
-          </div>
+        <div className="
+          u-noMarginTop
+          Grid
+          Grid--gutters
+          Grid--full
+          medium-Grid--flex--1of3
+          large-Grid--column"
+        >
+          {this.renderSidebarItem("/docs/getting-started/", "Get Started", true)}
+          {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}
+          {this.renderSidebarItem("/docs/tag-api/", "Tag API")}
+          {this.renderSidebarItem("/docs/props/", "Props")}
+          {this.renderSidebarItem("/docs/extensions/", "Extensions")}
         </div>
       </nav>
     );

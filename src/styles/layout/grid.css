@@ -1,5 +1,10 @@
 /*
-* .Site enables sticky footer
+* Site enables sticky footer
+*
+* .Site
+*   .formidableHeader
+*   .Site-content
+*   .formidableFooter
 */
 #content {
   height: 100%;
@@ -10,11 +15,6 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-}
-
-.Site-content--flex {
-  display: flex;
-  flex-direction: column;
 }
 
 .Site-content {
@@ -145,6 +145,12 @@
   .medium-Grid--full > .Grid-cell {
     flex: 0 0 100%;
   }
+  .medium-Grid--flex > .Grid-cell {
+    flex: 1 0 auto;
+  }
+  .medium-Grid--flex--1of3 > .Grid-cell {
+    flex: 1 0 33.3333%;
+  }
   .medium-Grid--1of2 > .Grid-cell {
     flex: 0 0 50%
   }
@@ -177,6 +183,9 @@
   }
   .large-Grid--column {
     flex-direction: column;
+  }
+  .large-Grid--column > .Grid-cell {
+    flex: none;
   }
   .large-Grid--nowrap {
     flex-wrap: nowrap;

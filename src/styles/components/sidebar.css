@@ -5,6 +5,7 @@
 @media (--large-viewport) {
   .Sidebar {
     padding-right: 0;
+    max-width: 250px;
   }
 }
 

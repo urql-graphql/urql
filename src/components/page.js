@@ -4,8 +4,8 @@ import Sidebar from "./sidebar";
 class Page extends React.Component {
   render() {
     return (
-      <main className="Page Site-content Site-content--flex">
-        <div className="Page-Container Container Grid Grid--guttersLg large-Grid--nowrap Site-content">
+      <main className="Site-content">
+        <div className="Container Grid Grid--guttersLg large-Grid--nowrap Site-content u-noMarginBottom">
             <div className="Grid-cell Grid-cell--full large-Grid-cell--autoSize">
               <Sidebar
                 tocArray={this.props.tocArray}

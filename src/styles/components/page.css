@@ -1,7 +1,3 @@
-.Page-Container {
-  margin-bottom: 0;
-}
-
 .Page-content {
   background-color: var(--white);
   padding-bottom: var(--gutterPage) !important;
