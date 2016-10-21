@@ -19,7 +19,6 @@ import { config } from "../../../components/config";
 class Markdown extends React.Component {
   constructor() {
     super();
-    this.onNodeClick = this.onNodeClick.bind(this);
     this.state = {
       renderedMd: ""
     };
@@ -27,9 +26,6 @@ class Markdown extends React.Component {
 
   componentDidMount() {
     Prism.highlightAll();
-    if (this.refs.html) {
-      this.refs.html.addEventListener("click", this.onNodeClick);
-    }
   }
 
   componentDidUpdate() { // is this the right one??
@@ -38,31 +34,6 @@ class Markdown extends React.Component {
 
   componentWillMount() {
     this.renderMd(this.props);
-    if (this.refs.html) {
-      this.refs.html.removeEventListener("click", this.onNodeClick);
-    }
-  }
-
-  onNodeClick(e) {
-    const node = e.target;
-
-    // Only accept links
-    if (node.tagName !== "A") {
-      return;
-    }
-
-    const href = node.getAttribute("href");
-
-    // that point to an internal page
-    if (href.indexOf("/") !== 0) {
-      return;
-    }
-
-    // Prevent browser default
-    e.preventDefault();
-
-    // let react router handle the transition
-    this.props.router.push(href);
   }
 
   componentWillReceiveProps(newProps) {
@@ -123,7 +94,6 @@ class Markdown extends React.Component {
   render() {
     return (
       <article
-        ref="html"
         className="Markdown"
         dangerouslySetInnerHTML={{
           __html: this.state.renderedMd
