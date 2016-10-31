@@ -5,6 +5,7 @@
   "main": "webpack.config.dev.js",
   "scripts": {
     "dev": "webpack-dev-server --port 3000 --config node_modules/builder-docs-archetype/config/webpack/webpack.config.dev.js --history-api-fallback",
+    "preversion": "builder run npm:preversion",
     "start": "builder run dev",
     "test": "builder run lint",
     "update-project": "npm update spectacle"
@@ -20,12 +21,12 @@
   },
   "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
   "devDependencies": {
-    "builder-docs-archetype-dev": "^4.1.1"
+    "builder-docs-archetype-dev": "^4.2.1"
   },
   "dependencies": {
     "anchorate": "^1.1.0",
-    "builder": "^2.9.1",
-    "builder-docs-archetype": "^4.1.1",
+    "builder": "^3.1.0",
+    "builder-docs-archetype": "^4.2.1",
     "formidable-landers": "^5.1.1",
     "history": "^1.17.0",
     "lodash": "^4.16.4",
