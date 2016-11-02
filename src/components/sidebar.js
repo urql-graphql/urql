@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router";
-import basename from "../basename";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
 
@@ -23,7 +22,7 @@ class Sidebar extends React.Component {
             return sibling && (
               <li key={id} className="Sidebar-toc-item">
                 <Link
-                  to={`${basename}${targetLocation}#${sibling.anchor}`}
+                  to={`${targetLocation}#${sibling.anchor}`}
                   dangerouslySetInnerHTML={{__html: md.renderInline(sibling.content)}}
                 />
               </li>
