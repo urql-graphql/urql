@@ -7,6 +7,7 @@
     "preversion": "builder run npm:preversion",
     "start": "builder run dev",
     "test": "builder run lint",
+    "test-func-static-prod": "TEST_FUNC_BASE_DIR=/open-source/spectacle builder run test-func-static",
     "update-project": "npm update spectacle"
   },
   "repository": {

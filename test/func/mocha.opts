@@ -1,0 +1,3 @@
+test/func/spec/**/*.spec.js
+--recursive
+--timeout 50000
