@@ -1,11 +1,11 @@
-const graphqlHttp = require("express-graphql");
-const express = require("express");
+const graphqlHttp = require('express-graphql');
+const express = require('express');
 const app = express();
 const cors = require('cors');
 
-app.use(cors())
+app.use(cors());
 
-const { schema, context } = require("./schema");
+const { schema, context } = require('./schema');
 
 const PORT = 3001;
 
@@ -17,7 +17,7 @@ const initializedGraphQLMiddleware = graphqlHttp({
   // Enable GraphiQL dev tool
   graphiql: true,
   // A function that returns extra data available to every resolver
-  constex: context
+  constex: context,
 });
 
 app.use(initializedGraphQLMiddleware);
