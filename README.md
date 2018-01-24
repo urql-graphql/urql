@@ -171,6 +171,7 @@ Using all or some of these arguments can give you the power to pretty accurately
 * [ ] Tests
 * [ ] Fix Lint
 * [ ] Functional fetchOptions
+* [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art
 

@@ -1,6 +1,7 @@
 {
   "plugins": [
     "@babel/syntax-object-rest-spread",
+    "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-pipeline-operator",
     [
       "module-resolver",
@@ -14,13 +15,13 @@
     "@babel/typescript",
     "@babel/react",
     "@babel/stage-3",
-    [
-      "@babel/env",
-      {
-        "targets": {
-          "browsers": "last 2 Chrome versions"
-        }
-      }
-    ]
-  ]
+    ["@babel/env", { "modules": false }]
+  ],
+  "env": {
+    "commonjs": {
+      "presets": [
+        "@babel/env"
+      ]
+    }
+  }
 }
