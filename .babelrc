@@ -20,9 +20,6 @@
   "env": {
     "commonjs": {
       "presets": [
-        "@babel/typescript",
-        "@babel/react",
-        "@babel/stage-3",
         "@babel/env"
       ]
     }
