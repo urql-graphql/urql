@@ -34,7 +34,7 @@ In my experience, existing solutions have been a bit heavy on the API side of th
 
 ## Getting Started
 
-The core of `urql` is three exports, `Provider`, `Connect` and `Client`. To get started, you simply create a `Client` instance, pass it to a `Provider` and then wrap any components you want to make queries or fire mutation from with a `Connect` component.
+The core of `urql` is three exports, `Provider`, `Connect` and `Client`. To get started, you simply create a `Client` instance, pass it to a `Provider` and then wrap any components you want to make queries or fire mutation from with a `Connect` component. We also provide a `ConnectHOC` higher order component, if you're one of those dorks that doesn't enjoy the absolutely amazing explicit nature of render props.
 
 Lets look at a root level component and how you can get it set up:
 
@@ -199,16 +199,18 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 
 #### Props
 
-| Name             | Value                                                                        | Default | Description                                                                    |
-| ---------------- | ---------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------ |
-| query            | `QueryObject or [QueryObject]`                                               | `null`  | The query/queries you want connected to your component                         |
-| mutation         | `MutationMap`                                                                | `null`  | The mutation/mutations you want connected to your component                    |
-| cache            | `boolean`                                                                    | `true`  | Whether this component's queries should be cached                              |
-| typeInvalidation | `boolean`                                                                    | `true`  | Whether this component's cache should be invalidated using typeNames           |
-| shouldInvalidate | `(changedTypes, componentTypes, mutationResponse, componentData) => boolean` | `null`  | Function used to determine whether the component's cache should be invalidated |
-| render           | `(RenderArgs)`                                                               | `true`  | Render prop used to render children                                            |
+| Name             | Value                                                                        | Default    | Description                                                                    |
+| ---------------- | ---------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------ |
+| query            | `QueryObject or [QueryObject]`                                               | `null`     | The query/queries you want connected to your component                         |
+| mutation         | `MutationMap`                                                                | `null`     | The mutation/mutations you want connected to your component                    |
+| cache            | `boolean`                                                                    | `true`     | Whether this component's queries should be cached                              |
+| typeInvalidation | `boolean`                                                                    | `true`     | Whether this component's cache should be invalidated using typeNames           |
+| shouldInvalidate | `(changedTypes, componentTypes, mutationResponse, componentData) => boolean` | `null`     | Function used to determine whether the component's cache should be invalidated |
+| render           | `({RenderArgs})`                                                             | RenderArgs | Render prop used to render children                                            |
 
 #### Render Args
+
+The following fields are present on the render functions argument object:
 
 | Name     | Value      | Default    | Description                                                     |
 | -------- | ---------- | ---------- | --------------------------------------------------------------- |
@@ -218,17 +220,46 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 | data     | `object`   | `null`     | Any data returned as the result of a query                      |
 | refetch  | `function` | `function` | Function used to refetch existing queries from the server       |
 
+In addition to these, any specified mutations are also provided as their key in the mutation map. Mutations are functions that accept an object of variables as an argument.
+
 Example:
 
 ```jsx
-return (
-  <Connect
-    query={query(MyQuery)}
-    render={(loaded, data) => {
-      return loaded ? <Loading/> : <List data={data.todos}>
-    }}
-  />
-)
+<Connect
+  query={query(MyQuery)}
+  render={({loaded, data}) => {
+    return loaded ? <Loading/> : <List data={data.todos}>
+  }}
+/>
+
+// with mutations
+
+<Connect
+  mutation={{
+    addTodo: mutation(AddTodo)
+  }}
+  render={({ addTodo }) => {
+    return <button type="button" onClick={addTodo}>Add Todo</button>
+  }}
+/>
+```
+
+### `ConnectHOC(options: object | (props) => object)(Component)`
+
+ConnectHOC is a higher order component that essentially does the same thing as the `Connect` component. All of `Connect`'s props except for `render` are valid for the `options` object. Further, you can specify a function, which will provide the component's props and return a dynamic option set. The arguments you'd see in the `render` prop in `Connect` are passed automatically to the wrapped component.
+
+Example:
+
+```javascript
+export default ConnectHOC({
+  query: query(TodoQuery)
+})(MyComponent);
+
+// or
+
+export default ConnectHOC((props) => {
+  query: query(TodoQuery, { id: props.id })
+})(MyComponent);
 ```
 
 ### `query(query: string, variables?: object) => {query: string, variables: object}`
