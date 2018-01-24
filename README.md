@@ -42,7 +42,7 @@ Lets look at a root level component and how you can get it set up:
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Provider, Client } from '../src/index';
+import { Provider, Client } from 'urql';
 import Home from './home';
 
 const client = new Client({
