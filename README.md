@@ -2,7 +2,7 @@
 
 Universal React Query Library
 
-![Urkel](https://media.giphy.com/media/Dc60NIUs12QvK/giphy.gif)
+![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
 
 ## What is `urql`
 
