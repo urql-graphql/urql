@@ -43,26 +43,44 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
   subscriptionID = null; // Change subscription ID
 
   componentDidMount() {
+    this.formatProps(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      this.props.query !== nextProps.query ||
+      this.props.mutation !== nextProps.mutation
+    ) {
+      this.formatProps(nextProps);
+    }
+  }
+
+  componentWillUnmount() {
+    // Unsub from change listener
+    this.props.client.unsubscribe(this.subscriptionID);
+  }
+
+  formatProps = props => {
     // If query exists
-    if (this.props.query) {
+    if (props.query) {
       // And is an array
-      if (Array.isArray(this.props.query)) {
+      if (Array.isArray(props.query)) {
         // Loop through and add typenames
-        this.query = this.props.query.map(formatTypeNames);
+        this.query = props.query.map(formatTypeNames);
       } else {
         // Add typenames
-        this.query = formatTypeNames(this.props.query);
+        this.query = formatTypeNames(props.query);
       }
       // Subscribe to change listener
-      this.subscriptionID = this.props.client.subscribe(this.update);
+      this.subscriptionID = props.client.subscribe(this.update);
       // Fetch initial data
       this.fetch(undefined, true);
     }
     // If mutation exists and has keys
-    if (this.props.mutation) {
+    if (props.mutation) {
       // Loop through and add typenames
-      Object.keys(this.props.mutation).forEach(key => {
-        this.mutations[key] = formatTypeNames(this.props.mutation[key]);
+      Object.keys(props.mutation).forEach(key => {
+        this.mutations[key] = formatTypeNames(props.mutation[key]);
       });
       // bind to mutate
       Object.keys(this.mutations).forEach(m => {
@@ -78,12 +96,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         };
       });
     }
-  }
-
-  componentWillUnmount() {
-    // Unsub from change listener
-    this.props.client.unsubscribe(this.subscriptionID);
-  }
+  };
 
   update = (changedTypes, response) => {
     let invalidated = false;
