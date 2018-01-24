@@ -10,7 +10,7 @@
     "build-es": "npm run clean-es && babel src -d es --extensions \".ts,.tsx\"",
     "watch-es": "watch 'npm run build-es' src/ -d",
     "build": "builder concurrent --buffer build-lib build-es",
-    "start": "webpack-dev-server --hot --inline",
+    "demo:start": "webpack-dev-server --hot --inline --config 'example/webpack.config.js'",
     "type-check": "tsc",
     "lint": "eslint src",
     "test": "jest"

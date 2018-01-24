@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Provider, Client } from '../src/index';
+import { Provider, Client } from '../../src/index';
 import Home from './home';
 
 const client = new Client({
