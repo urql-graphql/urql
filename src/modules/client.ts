@@ -1,7 +1,7 @@
 import { hashString } from './hash';
 import { ClientOptions, Query, Mutation } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid';
 
 // Response from executeQuery call
 export type QueryResponse = {
@@ -36,7 +36,7 @@ export default class Client {
 
   public subscribe(callback: (changedTypes: Array<string>, response: object) => void): string {
     // Create an identifier, add callback to subscriptions, return identifier
-    const id = uuidv4();
+    const id = uuid.v4();
     this.subscriptions[id] = callback;
     return id;
   }
