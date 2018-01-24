@@ -14,15 +14,7 @@
     "@babel/typescript",
     "@babel/react",
     "@babel/stage-3",
-    [
-      "@babel/env",
-      {
-        "modules": false,
-        "targets": {
-          "browsers": "last 2 Chrome versions"
-        }
-      }
-    ]
+    ["@babel/env", { "modules": false }]
   ],
   "env": {
     "commonjs": {
@@ -30,14 +22,7 @@
         "@babel/typescript",
         "@babel/react",
         "@babel/stage-3",
-        [
-          "@babel/env",
-          {
-            "targets": {
-              "browsers": "last 2 Chrome versions"
-            }
-          }
-        ]
+        "@babel/env"
       ]
     }
   }
