@@ -2,7 +2,7 @@
   "name": "urql",
   "version": "0.0.2",
   "description": "A naive React Graphql library",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "start": "webpack-dev-server --hot --inline",
     "type-check": "tsc",
@@ -20,14 +20,7 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.38",
@@ -58,7 +51,8 @@
     "react-test-renderer": "^16.2.0",
     "tslint": "^5.9.1",
     "tslint-react": "^3.4.0",
-    "typescript": "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
+    "typescript":
+      "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
     "typescript-eslint-parser": "^12.0.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
