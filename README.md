@@ -170,6 +170,7 @@ Using all or some of these arguments can give you the power to pretty accurately
 * [ ] Client Side GraphQL
 * [ ] Tests
 * [ ] Fix Lint
+* [ ] Functional fetchOptions
 
 ## Prior Art
 
