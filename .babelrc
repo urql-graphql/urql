@@ -1,0 +1,26 @@
+{
+  "plugins": [
+    "@babel/syntax-object-rest-spread",
+    "@babel/plugin-proposal-pipeline-operator",
+    [
+      "module-resolver",
+      {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "root": ["."]
+      }
+    ]
+  ],
+  "presets": [
+    "@babel/typescript",
+    "@babel/react",
+    "@babel/stage-3",
+    [
+      "@babel/env",
+      {
+        "targets": {
+          "browsers": "last 2 Chrome versions"
+        }
+      }
+    ]
+  ]
+}

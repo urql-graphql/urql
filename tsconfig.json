@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "rootDir": "./",
+    "jsx": "react",
+    "declaration": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "es2015",
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "pretty": true,
+    "sourceMap": true,
+    "experimentalPipelineStage1": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
