@@ -3,6 +3,8 @@
   "version": "0.0.4",
   "description": "A naive React Graphql library",
   "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
   "scripts": {
     "clean-lib": "rimraf lib",
     "build-lib": "npm run clean-lib && BABEL_ENV=commonjs babel src -d lib --extensions \".ts,.tsx\"",
