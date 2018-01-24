@@ -122,10 +122,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     }
   };
 
-  fetch = async (
-    opts: ClientFetchOpts = { skipCache: false },
-    initial?: boolean
-  ) => {
+  fetch = (opts: ClientFetchOpts = { skipCache: false }, initial?: boolean) => {
     const { client } = this.props;
     const { skipCache } = opts;
     // If query is not an array
@@ -135,36 +132,37 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         fetching: true,
         error: null,
       });
-      try {
-        // Fetch the query
-        const result = await client.executeQuery(this.query, skipCache);
-        // Store the typenames
-        if (result.typeNames) {
-          this.typeNames = result.typeNames;
-        }
-        // Update data
-        this.setState({
-          fetching: false,
-          loaded: initial ? true : this.state.loaded,
-          data: result.data,
+      // Fetch the query
+      client
+        .executeQuery(this.query, skipCache)
+        .then(result => {
+          // Store the typenames
+          if (result.typeNames) {
+            this.typeNames = result.typeNames;
+          }
+          // Update data
+          this.setState({
+            fetching: false,
+            loaded: initial ? true : this.state.loaded,
+            data: result.data,
+          });
+        })
+        .catch(e => {
+          this.setState({
+            fetching: false,
+            error: e,
+          });
         });
-      } catch (e) {
-        this.setState({
-          fetching: false,
-          error: e,
-        });
-      }
     } else {
       // Start fetching state
       this.setState({
         fetching: true,
         error: null,
       });
-      try {
-        // Iterate over and fetch queries
-        const dataResults = await Promise.all(
-          this.query.map(async query => {
-            const result = await client.executeQuery(query, skipCache);
+      // Iterate over and fetch queries
+      Promise.all(
+        this.query.map(query => {
+          return client.executeQuery(query, skipCache).then(result => {
             if (result.typeNames) {
               // Add and dedupe typenames
               this.typeNames = [...this.typeNames, ...result.typeNames].filter(
@@ -172,42 +170,45 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
               );
             }
             return result.data;
-          })
-        );
-
-        // Combine results
-        this.setState({
-          fetching: false,
-          data: dataResults,
+          });
+        })
+      )
+        .then(results => {
+          this.setState({
+            fetching: false,
+            data: results,
+          });
+        })
+        .catch(e => {
+          this.setState({
+            fetching: false,
+            error: e,
+          });
         });
-      } catch (e) {
-        this.setState({
-          fetching: false,
-          error: e,
-        });
-      }
     }
   };
 
-  mutate = async mutation => {
+  mutate = mutation => {
     const { client } = this.props;
     // Set fetching state
     this.setState({
       fetching: true,
       error: null,
     });
-    try {
-      // Execute mutation
-      await client.executeMutation(mutation);
-      this.setState({
-        fetching: false,
+    // Execute mutation
+    client
+      .executeMutation(mutation)
+      .then(() => {
+        this.setState({
+          fetching: false,
+        });
+      })
+      .catch(e => {
+        this.setState({
+          fetching: false,
+          error: e,
+        });
       });
-    } catch (e) {
-      this.setState({
-        fetching: false,
-        error: e,
-      });
-    }
   };
 
   render() {

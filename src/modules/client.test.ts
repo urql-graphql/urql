@@ -1,8 +1,15 @@
 import Client from './client';
 
-test('it can be instantiated', () => {
-  const client = new Client();
-  expect(client).toBeTruthy();
+test('it throws without options provided', () => {
+  expect(() => {
+    new Client();
+  }).toThrowError('Please provide configuration object');
+});
+
+test('it throws without a url provided', () => {
+  expect(() => {
+    new Client({});
+  }).toThrowError('Please provide a URL for your GraphQL API');
 });
 
 test('it returns a client instance', () => {

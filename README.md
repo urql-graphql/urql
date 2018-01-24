@@ -121,12 +121,16 @@ As you can see above, the `query` accepts either a single query, or an array of 
 So why do we use these `query` and `mutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
 
 ```javascript
+import { query } from 'urql';
+
 query(TodoQuery, { myVariable: 5 });
 ```
 
 Similarly, you can pass variables to your mutation. Mutation, however is a bit different, in the sense that it returns a function that you can call with a variable set:
 
 ```javascript
+import { mutation } from 'urql';
+
 mutation(AddTodo); // No initial variables
 
 // After you pass 'addTodo' from the render prop to a component:
@@ -163,16 +167,114 @@ Using all or some of these arguments can give you the power to pretty accurately
 
 ## API
 
+### `Client({url: string, fetchOptions?: object | () => object})`
+
+Client is the constructor for your GraphQL client. It takes a configuration object as an argument, which is required. Providing a GraphQL api url via the `url` property is required. `fetchOptions` are the options provided to internal `fetch` calls, which can either be in `object` format, or a `function` that returns an `object`, in case you want to provide a dynamic header for a token or something.
+
+Example:
+
+```javascript
+const client = new Client({ url: 'http://localhost:3000/graphql' });
+```
+
+### `<Provider client={UrqlClientInstance}/>`
+
+Provider is a ReactJS component that is used to provide the `urql` client throughout your application.
+
+Example:
+
+```javascript
+const client = new Client({ url: 'http://localhost:3000/graphql' });
+//...
+return (
+  <Provider client={client}>
+    <YourApp />
+  </Provider>
+);
+```
+
+### `<Connect />`
+
+Connect is a ReactJS component that is used to execute queries and mutations and render child components with the results, using a render prop.
+
+#### Props
+
+| Name             | Value                                                                        | Default | Description                                                                    |
+| ---------------- | ---------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------ |
+| query            | `QueryObject | [QueryObject]`                                                | `null`  | The query/queries you want connected to your component                         |
+| mutation         | `MutationMap`                                                                | `null`  | The mutation/mutations you want connected to your component                    |
+| cache            | `boolean`                                                                    | `true`  | Whether this component's queries should be cached                              |
+| typeInvalidation | `boolean`                                                                    | `true`  | Whether this component's cache should be invalidated using typeNames           |
+| shouldInvalidate | `(changedTypes, componentTypes, mutationResponse, componentData) => boolean` | `null`  | Function used to determine whether the component's cache should be invalidated |
+| render           | `(RenderArgs)`                                                               | `true`  | Render prop used to render children                                            |
+
+#### Render Args
+
+| Name     | Value      | Default    | Description                                                     |
+| -------- | ---------- | ---------- | --------------------------------------------------------------- |
+| fetching | `boolean`  | `false`    | Fetching is true during any pending query or mutation operation |
+| loaded   | `boolean`  | `false`    | Becomes true once the component gets data for the first time.   |
+| error    | `object`   | `null`     | Any errors thrown during a query or mutation                    |
+| data     | `object`   | `null`     | Any data returned as the result of a query                      |
+| refetch  | `function` | `function` | Function used to refetch existing queries from the server       |
+
+Example:
+
+```jsx
+return (
+  <Connect
+    query={query(MyQuery)}
+    render={(loaded, data) => {
+      return loaded ? <Loading/> : <List data={data.todos}>
+    }}
+  />
+)
+```
+
+### `query(query: string, variables?: object) => {query: string, variables: object}`
+
+`query` is a QueryObject creator.
+
+Example:
+
+```javascript
+query(
+  `
+query($id: ID!) {
+  todos(id: $id) {
+    text
+  }
+}`,
+  { id: 5 }
+);
+```
+
+### `mutation(query: string, variables?: object) => {query: string, variables: object}`
+
+`query` is a MutationObject creator.
+
+Example:
+
+```javascript
+mutation(
+  `
+mutation($id: ID!) {
+  addTodo(id: $id) {
+    text
+  }
+}`,
+  { id: 5 }
+);
+```
+
 ## TODO
 
 * [ ] Server Side Rendering
 * [ ] Client HoC
-* [ ] Client Side GraphQL
+* [ ] Client Side Resolvers
 * [ ] Tests
 * [ ] Fix Lint
-* [ ] Functional fetchOptions
 * [ ] Prefix all errors with "Did I do that?"
-* [ ] Handle prop updates
 
 ## Prior Art
 

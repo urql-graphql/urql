@@ -1,7 +1,7 @@
-const mutation = (q: string, vars = {}) => {
+const mutation = (q: string, vars?: object) => {
   return {
     query: q,
-    variables: vars,
+    variables: vars || {},
   };
 };
 
