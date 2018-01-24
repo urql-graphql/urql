@@ -2,3 +2,4 @@ node_modules
 lib
 es
 .vscode
+yarn-error.log*
