@@ -7,9 +7,10 @@
   "jsnext:main": "es/index.js",
   "scripts": {
     "clean-lib": "rimraf lib",
-    "build-lib": "npm run clean-lib && BABEL_ENV=commonjs babel src -d lib --extensions \".ts,.tsx\"",
+    "build-babel": "babel src --extensions \".ts,.tsx\"",
+    "build-lib": "npm run clean-lib && builder run --env '{\"BABEL_ENV\":\"commonjs\"}' build-babel -- -d lib",
     "clean-es": "rimraf es",
-    "build-es": "npm run clean-es && babel src -d es --extensions \".ts,.tsx\"",
+    "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch 'npm run build-es' src/ -d",
     "build": "builder concurrent --buffer build-lib build-es",
     "demo:start:graphql-server": "node example/src/server/index.js",
