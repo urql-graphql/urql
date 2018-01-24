@@ -201,7 +201,7 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 
 | Name             | Value                                                                        | Default | Description                                                                    |
 | ---------------- | ---------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------ |
-| query            | `QueryObject | [QueryObject]`                                                | `null`  | The query/queries you want connected to your component                         |
+| query            | `QueryObject or [QueryObject]`                                               | `null`  | The query/queries you want connected to your component                         |
 | mutation         | `MutationMap`                                                                | `null`  | The mutation/mutations you want connected to your component                    |
 | cache            | `boolean`                                                                    | `true`  | Whether this component's queries should be cached                              |
 | typeInvalidation | `boolean`                                                                    | `true`  | Whether this component's cache should be invalidated using typeNames           |
