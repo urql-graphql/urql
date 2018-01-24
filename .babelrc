@@ -15,12 +15,25 @@
     "@babel/typescript",
     "@babel/react",
     "@babel/stage-3",
-    ["@babel/env", { "modules": false }]
+    [
+      "@babel/env",
+      {
+        "modules": false,
+        "targets": {
+          "browsers": ["last 2 versions"]
+        }
+      }
+    ]
   ],
   "env": {
     "commonjs": {
       "presets": [
-        "@babel/env"
+        "@babel/env",
+        {
+          "targets": {
+            "browsers": ["last 2 versions"]
+          }
+        }
       ]
     }
   }

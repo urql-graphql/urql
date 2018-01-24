@@ -5,8 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "clean-lib": "rimraf lib",
-    "build-lib":
-      "npm run clean-lib && BABEL_ENV=commonjs babel src -d lib --extensions \".ts,.tsx\"",
+    "build-lib": "npm run clean-lib && BABEL_ENV=commonjs babel src -d lib --extensions \".ts,.tsx\"",
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && babel src -d es --extensions \".ts,.tsx\"",
     "watch-es": "watch 'npm run build-es' src/ -d",
@@ -26,7 +25,14 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.38",
@@ -34,6 +40,7 @@
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.38",
     "@babel/plugin-proposal-pipeline-operator": "^7.0.0-beta.38",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0-beta.38",
+    "@babel/polyfill": "^7.0.0-beta.38",
     "@babel/preset-env": "^7.0.0-beta.38",
     "@babel/preset-react": "^7.0.0-beta.38",
     "@babel/preset-stage-3": "^7.0.0-beta.38",
@@ -44,6 +51,7 @@
     "@types/react-dom": "^16.0.3",
     "@types/uuid": "^3.4.3",
     "babel-eslint": "^8.2.1",
+    "babel-jest": "^22.1.0",
     "babel-loader": "8.0.0-beta.0",
     "babel-plugin-module-resolver": "^3.0.0",
     "builder": "^3.2.3",
@@ -57,17 +65,15 @@
     "react": "^16.0.0-0",
     "react-dom": "^16.0.0-0",
     "react-test-renderer": "^16.2.0",
+    "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
+    "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
     "tslint-react": "^3.4.0",
-    "typescript":
-      "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
+    "typescript": "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
     "typescript-eslint-parser": "^12.0.0",
     "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.0",
-    "babel-jest": "^22.1.0",
-    "regenerator-runtime": "^0.11.1",
-    "ts-jest": "^22.0.1"
+    "webpack-dev-server": "^2.11.0"
   },
   "peerDependencies": {
     "prop-types": "^15.6.0",
