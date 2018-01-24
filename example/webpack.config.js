@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: ['@babel/polyfill', './demo/index.tsx'],
+  entry: ['@babel/polyfill', './src/index.tsx'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -12,8 +12,8 @@ module.exports = {
       {
         test: /\.js|.ts|.tsx?$/,
         include: [
+          path.resolve(__dirname, '../src'),
           path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'demo'),
         ],
         exclude: /node_modules/,
         loader: 'babel-loader',
@@ -24,8 +24,8 @@ module.exports = {
   resolve: {
     modules: [
       'node_modules',
+      path.resolve(__dirname, '../src'),
       path.resolve(__dirname, 'src'),
-      path.resolve(__dirname, 'demo'),
     ],
     extensions: ['.js', '.ts', '.tsx', '.json', '.jsx', '.css'],
   },
