@@ -3,16 +3,19 @@
   "version": "0.0.4",
   "description": "A naive React Graphql library",
   "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
   "scripts": {
     "clean-lib": "rimraf lib",
-    "build-lib": "npm run clean-lib && BABEL_ENV=commonjs babel src -d lib --extensions \".ts,.tsx\"",
+    "build-babel": "babel src --extensions \".ts,.tsx\"",
+    "build-lib": "npm run clean-lib && builder run --env '{\"BABEL_ENV\":\"commonjs\"}' build-babel -- -d lib",
     "clean-es": "rimraf es",
-    "build-es": "npm run clean-es && babel src -d es --extensions \".ts,.tsx\"",
+    "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch 'npm run build-es' src/ -d",
     "build": "builder concurrent --buffer build-lib build-es",
     "demo:start:graphql-server": "node example/src/server/index.js",
     "demo:start:app": "webpack-dev-server --hot --inline --config 'example/webpack.config.js'",
-    "demo:start": "concurrently \"npm run demo:start:app\" \"npm run demo:start:graphql-server\"",
+    "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "type-check": "tsc",
     "lint": "eslint src",
     "test": "jest"
@@ -26,7 +29,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -57,7 +60,6 @@
     "babel-loader": "8.0.0-beta.0",
     "babel-plugin-module-resolver": "^3.0.0",
     "builder": "^3.2.3",
-    "concurrently": "^3.5.1",
     "cors": "^2.8.4",
     "eslint": "^4.15.0",
     "eslint-config-formidable": "^3.0.0",
