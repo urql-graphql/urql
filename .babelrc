@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "@babel/syntax-object-rest-spread",
+    "@babel/plugin-syntax-object-rest-spread",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-pipeline-operator",
     "./coverage-fix.js",
