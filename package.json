@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A naive React Graphql library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -9,15 +9,13 @@
     "coverage": "jest --coverage",
     "clean-lib": "rimraf lib",
     "build-babel": "babel src --extensions \".ts,.tsx\"",
-    "build-lib":
-      "npm run clean-lib && builder run --env '{\"BABEL_ENV\":\"commonjs\"}' build-babel -- -d lib",
+    "build-lib": "npm run clean-lib && builder run --env '{\"BABEL_ENV\":\"commonjs\"}' build-babel -- -d lib",
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch 'npm run build-es' src/ -d",
     "build": "builder concurrent --buffer build-lib build-es",
     "demo:start:graphql-server": "node example/src/server/index.js",
-    "demo:start:app":
-      "webpack-dev-server --hot --inline --config 'example/webpack.config.js'",
+    "demo:start:app": "webpack-dev-server --hot --inline --config 'example/webpack.config.js'",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "type-check": "tsc",
     "lint": "eslint src",
@@ -33,7 +31,14 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.38",
@@ -76,8 +81,7 @@
     "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
     "tslint-react": "^3.4.0",
-    "typescript":
-      "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
+    "typescript": "Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired",
     "typescript-eslint-parser": "^12.0.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
