@@ -16,11 +16,16 @@
     "@babel/typescript",
     "@babel/react",
     "@babel/stage-3",
-    "@babel/env"
+    [
+      "@babel/env",
+      {
+        "modules": false
+      }
+    ]
   ],
   "env": {
-    "es6": {
-      "presets": ["@babel/env", { "modules": false }]
+    "commonjs": {
+      "presets": ["@babel/env"]
     }
   }
 }
