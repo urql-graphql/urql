@@ -14,4 +14,18 @@ describe('Connect HOC', () => {
     let tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });
+
+  it('should wrap its component argument with connect with functional options', () => {
+    const Comp = args => <div {...args} />;
+    const Wrapped = ConnectHOC(props => ({
+      cache: props.cache,
+    }))(Comp);
+    // @ts-ignore
+    const component = renderer.create(
+      // @ts-ignore
+      <Wrapped cache={false} />
+    );
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });

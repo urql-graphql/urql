@@ -9,3 +9,14 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
   refetch={[Function]}
 />
 `;
+
+exports[`Connect HOC should wrap its component argument with connect with functional options 1`] = `
+<div
+  cache={false}
+  data={null}
+  error={null}
+  fetching={false}
+  loaded={false}
+  refetch={[Function]}
+/>
+`;

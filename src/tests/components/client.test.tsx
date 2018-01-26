@@ -67,6 +67,43 @@ describe('Client Component', () => {
     }, 200);
   });
 
+  it('should return an error thrown by fetch', done => {
+    fetchMock.mockError('oh no!');
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    let { data, error, fetching, loaded, refetch } = result;
+    expect(data).toBeNull();
+    expect(error).toBeNull();
+    expect(fetching).toBe(true);
+    expect(loaded).toBe(false);
+    expect(refetch).toBeInstanceOf(Function);
+
+    setTimeout(() => {
+      let { data, error, fetching, loaded, refetch } = result;
+      expect(data).toBeNull();
+      expect(error).toMatchObject(new Error('oh no!'));
+      expect(fetching).toBe(false);
+      expect(loaded).toBe(false);
+      expect(refetch).toBeInstanceOf(Function);
+      fetchMock.restore();
+      done();
+    }, 200);
+  });
+
   it('should return the proper render prop arguments with multiple queries supplied', done => {
     fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
     const clientModule = new ClientModule({ url: 'test' });
@@ -150,5 +187,31 @@ describe('Client Component', () => {
       expect(test2).toBeTruthy();
       done();
     }, 200);
+  });
+
+  it('shouldnt return data or mutations if neither is provided', () => {
+    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(result).toMatchObject({
+      loaded: false,
+      fetching: false,
+      error: null,
+      data: null,
+      refetch: result.refetch,
+    });
   });
 });

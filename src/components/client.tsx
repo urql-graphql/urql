@@ -37,6 +37,11 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     data: null,
   };
 
+  static defaultProps = {
+    cache: true,
+    typeInvalidation: true,
+  };
+
   query = null; // Stored Query
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
