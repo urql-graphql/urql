@@ -3,7 +3,7 @@ export class FetchMock {
   constructor() {
     this.fetchCache = null;
   }
-  mockResponse(data) {
+  public mockResponse(data) {
     // @ts-ignore
     this.fetchCache = global.fetch;
     // @ts-ignore
@@ -17,7 +17,7 @@ export class FetchMock {
         });
       });
   }
-  mockError(e) {
+  public mockError(e) {
     // @ts-ignore
     this.fetchCache = global.fetch;
     // @ts-ignore
@@ -26,10 +26,10 @@ export class FetchMock {
         throw new Error(e);
       });
   }
-  restore() {
+  public restore() {
     // @ts-ignore
     global.fetch = this.fetchCache;
   }
 }
 
-export default FetchMock;
+export default new FetchMock();
