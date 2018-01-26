@@ -1,26 +1,26 @@
-const fetch = require("isomorphic-fetch");
-const { makeExecutableSchema } = require("graphql-tools");
-const uuid = require("uuid/v4");
+const fetch = require('isomorphic-fetch');
+const { makeExecutableSchema } = require('graphql-tools');
+const uuid = require('uuid/v4');
 
 const store = {
   todos: [
     {
       id: uuid(),
-      text: "test"
+      text: 'test',
     },
     {
       id: uuid(),
-      text: "test2"
+      text: 'test2',
     },
     {
       id: uuid(),
-      text: "test3"
-    }
+      text: 'test3',
+    },
   ],
   user: {
-    name: "Ken",
-    age: 32
-  }
+    name: 'Ken',
+    age: 32,
+  },
 };
 
 const typeDefs = `
@@ -58,7 +58,7 @@ const resolvers = {
     },
     user: (root, args, context) => {
       return store.user;
-    }
+    },
   },
   Mutation: {
     addTodo: (root, args, context) => {
@@ -83,21 +83,21 @@ const resolvers = {
       todo.text = text;
       return {
         text,
-        id
+        id,
       };
-    }
-  }
+    },
+  },
 };
 
 module.exports = {
   schema: makeExecutableSchema({
     typeDefs,
-    resolvers
+    resolvers,
   }),
   context: (headers, secrets) => {
     return {
       headers,
-      secrets
+      secrets,
     };
-  }
+  },
 };
