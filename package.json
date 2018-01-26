@@ -37,7 +37,7 @@
         "tsConfigFile": "tsconfig.json"
       }
     },
-    "testRegex": "(src(\\.|/)tests(\\.|/).*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
   "devDependencies": {
