@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Connect HOC should wrap its component argument with connect 1`] = `
+<div
+  data={null}
+  error={null}
+  fetching={false}
+  loaded={false}
+  refetch={[Function]}
+/>
+`;

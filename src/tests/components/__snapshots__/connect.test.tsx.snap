@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Client Component should provide a context consumer and pass through to client 1`] = `
+<div
+  data={null}
+  error={null}
+  fetching={false}
+  loaded={false}
+  refetch={[Function]}
+/>
+`;

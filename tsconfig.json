@@ -19,5 +19,5 @@
     "experimentalPipelineStage1": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["src/**/*.test.ts"]
+  "typeRoots": ["node_modules/@types"]
 }

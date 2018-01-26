@@ -94,6 +94,9 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
             },
           });
         };
+        if (!this.props.query) {
+          this.forceUpdate();
+        }
       });
     }
   };
@@ -176,6 +179,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         .then(results => {
           this.setState({
             fetching: false,
+            loaded: true,
             data: results,
           });
         })
@@ -212,10 +216,12 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
   };
 
   render() {
-    return this.props.render({
-      ...this.state,
-      ...this.mutations,
-      refetch: this.fetch,
-    });
+    return this.props.render
+      ? this.props.render({
+          ...this.state,
+          ...this.mutations,
+          refetch: this.fetch,
+        })
+      : null;
   }
 }

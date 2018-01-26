@@ -71,7 +71,8 @@ export default class Client {
 
       // Check cache for hash
       if (this.store[hash] && !skipCache) {
-        resolve({ data: this.store[hash] });
+        const typeNames = gankTypeNamesFromResponse(this.store[hash]);
+        resolve({ data: this.store[hash], typeNames });
       } else {
         const fetchOptions =
           typeof this.fetchOptions === 'function'
