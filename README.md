@@ -2,7 +2,7 @@
 
 Universal React Query Library
 
-[![Build Status](https://travis-ci.com/FormidableLabs/urql.svg?token=eGjDqfypeqevtBUpJGYD&branch=master)](https://travis-ci.com/FormidableLabs/urql) [![Build status](https://ci.appveyor.com/api/projects/status/01arsdnaxm28ogwg?svg=true)](https://ci.appveyor.com/project/kenwheeler/urql)
+[![Build Status](https://travis-ci.org/FormidableLabs/urql.svg?branch=master)](https://travis-ci.org/FormidableLabs/urql) [![Build status](https://ci.appveyor.com/api/projects/status/01arsdnaxm28ogwg?svg=true)](https://ci.appveyor.com/project/kenwheeler/urql)
 [![Coverage Status](https://coveralls.io/repos/github/FormidableLabs/urql/badge.svg?branch=master)](https://coveralls.io/github/FormidableLabs/urql?branch=master) [![npm](https://img.shields.io/npm/v/urql.svg)]()
 
 ![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
