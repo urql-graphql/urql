@@ -4,6 +4,8 @@ Universal React Query Library
 
 ![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
 
+[![Build Status](https://travis-ci.com/FormidableLabs/urql.svg?token=eGjDqfypeqevtBUpJGYD&branch=master)](https://travis-ci.com/FormidableLabs/urql)
+
 ## What is `urql`
 
 `urql` is a GraphQL client, exposed as a set of ReactJS components.
