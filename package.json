@@ -10,7 +10,7 @@
     "clean-lib": "rimraf lib",
     "build-babel": "babel src --extensions \".ts,.tsx\"",
     "build-lib":
-      "npm run clean-lib && builder run --env={\\\"BABEL_ENV\\\":\\\"commonjs\\\"} build-babel -- -d lib",
+      "npm run clean-lib && builder run --env '{\"BABEL_ENV\":\"commonjs\"}' build-babel -- -d lib",
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch 'npm run build-es' src/ -d",
