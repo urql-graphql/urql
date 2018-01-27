@@ -249,6 +249,29 @@ describe('Client', () => {
         });
     });
 
+    it('should return "No Data" if data is not present', done => {
+      client = new Client({
+        url: 'http://localhost:3000/graphql',
+      });
+
+      fetchMock.mockResponse({ test: 5 });
+
+      client
+        .executeMutation({
+          query: `{
+          todos {
+            id
+            name
+          }
+        }`,
+        })
+        .catch(e => {
+          expect(e).toMatchObject({ message: 'No data' });
+          fetchMock.restore();
+          done();
+        });
+    });
+
     it('should return an error if fetch throws', done => {
       client = new Client({
         url: 'http://localhost:3000/graphql',
