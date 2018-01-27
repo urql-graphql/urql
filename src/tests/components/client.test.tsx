@@ -105,7 +105,9 @@ describe('Client Component', () => {
   });
 
   it('should return the proper render prop arguments with multiple queries supplied', done => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -189,8 +191,98 @@ describe('Client Component', () => {
     }, 200);
   });
 
+  it('should update in response to mutations', done => {
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const spy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        mutation={{
+          addTodo: {
+            query: `mutation($id: id!) {
+              addTodo(id: $id) {
+                id
+                text
+              }
+            }`,
+            variables: { id: 1 },
+          },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+    setTimeout(() => {
+      result.addTodo().then(() => {
+        setTimeout(() => {
+          let { data } = result;
+          expect(spy).toHaveBeenCalledTimes(3);
+          expect(data).toBeTruthy();
+          spy.mockRestore();
+          done();
+        }, 200);
+      });
+    }, 0);
+  });
+
+  it('should not update in response to mutations that throw', done => {
+    fetchMock.mockError('Yoinks');
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const spy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        mutation={{
+          addTodo: {
+            query: `mutation($id: id!) {
+              addTodo(id: $id) {
+                id
+                text
+              }
+            }`,
+            variables: { id: 1 },
+          },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+    setTimeout(() => {
+      result.addTodo().catch(() => {
+        expect(spy).toHaveBeenCalledTimes(2);
+        spy.mockRestore();
+        done();
+      });
+    }, 0);
+  });
+
   it('shouldnt return data or mutations if neither is provided', () => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore

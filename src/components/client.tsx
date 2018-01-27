@@ -91,7 +91,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
       Object.keys(this.mutations).forEach(m => {
         const query = this.mutations[m].query;
         this.mutations[m] = variables => {
-          this.mutate({
+          return this.mutate({
             query,
             variables: {
               ...this.mutations[m].variables,
@@ -168,6 +168,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         error: null,
       });
       // Iterate over and fetch queries
+      const partialData = [];
       Promise.all(
         this.query.map(query => {
           return client.executeQuery(query, skipCache).then(result => {
@@ -177,6 +178,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
                 (v, i, a) => a.indexOf(v) === i
               );
             }
+            partialData.push(result.data);
             return result.data;
           });
         })
@@ -192,6 +194,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
           this.setState({
             fetching: false,
             error: e,
+            data: partialData,
           });
         });
     }
@@ -204,20 +207,32 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
       fetching: true,
       error: null,
     });
-    // Execute mutation
-    client
-      .executeMutation(mutation)
-      .then(() => {
-        this.setState({
-          fetching: false,
+    return new Promise((resolve, reject) => {
+      // Execute mutation
+      client
+        .executeMutation(mutation)
+        .then(() => {
+          this.setState(
+            {
+              fetching: false,
+            },
+            () => {
+              resolve();
+            }
+          );
+        })
+        .catch(e => {
+          this.setState(
+            {
+              fetching: false,
+              error: e,
+            },
+            () => {
+              reject(e);
+            }
+          );
         });
-      })
-      .catch(e => {
-        this.setState({
-          fetching: false,
-          error: e,
-        });
-      });
+    });
   };
 
   render() {
