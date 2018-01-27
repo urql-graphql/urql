@@ -70,6 +70,7 @@ describe('Client Component', () => {
   it('should format new props', done => {
     fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
     const clientModule = new ClientModule({ url: 'test' });
+    // @ts-ignore
     let result;
     // @ts-ignore
     const client = renderer.create(
@@ -154,6 +155,7 @@ describe('Client Component', () => {
   it('should format new mutations', () => {
     fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
     const clientModule = new ClientModule({ url: 'test' });
+    // @ts-ignore
     let result;
     // @ts-ignore
     const client = renderer.create(
