@@ -412,6 +412,52 @@ describe('Client Component', () => {
     }, 0);
   });
 
+  it('should respect the cache prop', done => {
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const spy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        cache={false}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        mutation={{
+          addTodo: {
+            query: `mutation($id: id!) {
+              addTodo(id: $id) {
+                id
+                text
+              }
+            }`,
+            variables: { id: 1 },
+          },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    client.getInstance().fetch();
+
+    setTimeout(() => {
+      expect(spy).toHaveBeenCalledTimes(2);
+      spy.mockRestore();
+      done();
+    }, 0);
+  });
+
   it('should use shouldInvalidate if present', done => {
     fetchMock.mockResponse({
       data: { todos: [{ id: 1, __typename: 'Todo' }] },

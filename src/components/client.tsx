@@ -7,7 +7,6 @@ export interface ClientProps {
   render: (object) => ReactNode; // Render prop
   query: Query | Array<Query>; // Query object or array of Query objects
   mutation?: Mutation; // Mutation object (map)
-  fetchingDelay?: number;
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
@@ -116,7 +115,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         response,
         this.state.data
       );
-    } else {
+    } else if (this.props.typeInvalidation !== false) {
       // Check connection typenames, derived from query, for presence of mutated typenames
       this.typeNames.forEach(typeName => {
         if (changedTypes.indexOf(typeName) !== -1) {
@@ -133,7 +132,11 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
 
   fetch = (opts: ClientFetchOpts = { skipCache: false }, initial?: boolean) => {
     const { client } = this.props;
-    const { skipCache } = opts;
+    let { skipCache } = opts;
+
+    if (this.props.cache === false) {
+      skipCache = true;
+    }
     // If query is not an array
     if (!Array.isArray(this.query)) {
       // Start loading state
@@ -170,7 +173,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
       });
       // Iterate over and fetch queries
       const partialData = [];
-      Promise.all(
+      return Promise.all(
         this.query.map(query => {
           return client.executeQuery(query, skipCache).then(result => {
             if (result.typeNames) {

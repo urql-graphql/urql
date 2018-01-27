@@ -7,7 +7,6 @@ export interface ConnectProps {
   render: (object) => ReactNode; // Render prop
   query?: Query | Array<Query>; // Query or queries
   mutation?: Mutation; // Mutation map
-  fetchingDelay?: number;
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
@@ -29,7 +28,6 @@ export default class Connect extends Component<ConnectProps> {
             render={this.props.render}
             query={this.props.query}
             mutation={this.props.mutation}
-            fetchingDelay={this.props.fetchingDelay}
             cache={this.props.cache}
             typeInvalidation={this.props.typeInvalidation}
             shouldInvalidate={this.props.shouldInvalidate}

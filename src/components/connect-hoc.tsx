@@ -5,7 +5,6 @@ import { Query, Mutation } from '../interfaces/index';
 export type HOCProps = {
   query?: Query | Array<Query>; // Query or queries
   mutation?: Mutation; // Mutation map
-  fetchingDelay?: number;
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
