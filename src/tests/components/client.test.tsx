@@ -417,6 +417,7 @@ describe('Client Component', () => {
       data: { todos: [{ id: 1, __typename: 'Todo' }] },
     });
     const clientModule = new ClientModule({ url: 'test' });
+    // @ts-ignore
     let result;
     // @ts-ignore
     const spy = jest.spyOn(global, 'fetch');
