@@ -67,6 +67,138 @@ describe('Client Component', () => {
     }, 200);
   });
 
+  it('should format new props', done => {
+    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        key="test"
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    client.update(
+      <Client
+        key="test"
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ posts { id } }` }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(client.getInstance().query).toMatchObject({
+      query: `{
+  posts {
+    id
+    __typename
+  }
+}
+`,
+      variables: undefined,
+    });
+
+    client.update(
+      <Client
+        key="test"
+        client={clientModule}
+        // @ts-ignore
+        query={[{ query: `{ posts { id } }` }, { query: `{ posts { id } }` }]}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(client.getInstance().query).toMatchObject([
+      {
+        query: `{
+  posts {
+    id
+    __typename
+  }
+}
+`,
+        variables: undefined,
+      },
+      {
+        query: `{
+  posts {
+    id
+    __typename
+  }
+}
+`,
+        variables: undefined,
+      },
+    ]);
+
+    done();
+  });
+
+  it('should format new mutations', () => {
+    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        key="test"
+        client={clientModule}
+        // @ts-ignore
+        mutation={{
+          addTodo: { query: `{ todos { id } }`, variables: undefined },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(Object.keys(client.getInstance().mutations)).toMatchObject([
+      'addTodo',
+    ]);
+
+    client.update(
+      <Client
+        // @ts-ignore
+        key="test"
+        client={clientModule}
+        // @ts-ignore
+        mutation={{
+          removeTodo: { query: `{ todos { id } }`, variables: undefined },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(Object.keys(client.getInstance().mutations)).toMatchObject([
+      'removeTodo',
+    ]);
+  });
+
   it('should return an error thrown by fetch', done => {
     fetchMock.mockError('oh no!');
     const clientModule = new ClientModule({ url: 'test' });

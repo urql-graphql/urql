@@ -83,6 +83,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     }
     // If mutation exists and has keys
     if (props.mutation) {
+      this.mutations = {};
       // Loop through and add typenames
       Object.keys(props.mutation).forEach(key => {
         this.mutations[key] = formatTypeNames(props.mutation[key]);
