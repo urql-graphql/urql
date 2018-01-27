@@ -208,6 +208,7 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
       fetching: true,
       error: null,
     });
+
     return new Promise((resolve, reject) => {
       // Execute mutation
       client

@@ -10,6 +10,16 @@ describe('Client Component', () => {
     const component = renderer.create(<Client />);
     let tree = component.toJSON();
     expect(tree).toBeNull();
+    component.update(
+      <Client
+        // @ts-ignore
+        render={() => {
+          return <div>hey</div>;
+        }}
+      />
+    );
+    tree = component.toJSON();
+    expect(tree).toBeTruthy();
   });
 
   it('should use the render prop when supplied and render the defaults', done => {
@@ -280,6 +290,36 @@ describe('Client Component', () => {
     }, 200);
   });
 
+  it('should return the proper render prop arguments with multiple queries supplied and an error', done => {
+    fetchMock.mockError('lol');
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        client={clientModule}
+        // @ts-ignore
+        query={[{ query: `{ todos { id } }` }, { query: `{ todos { id } }` }]}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    setTimeout(() => {
+      let { data, error, fetching, loaded, refetch } = result;
+      expect(data).toMatchObject([]);
+      expect(error).toMatchObject(new Error('lol'));
+      expect(fetching).toBe(false);
+      expect(loaded).toBe(false);
+      expect(refetch).toBeInstanceOf(Function);
+      fetchMock.restore();
+      done();
+    }, 200);
+  });
+
   it('should return mutations when mutations are provided', done => {
     fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
     const clientModule = new ClientModule({ url: 'test' });
@@ -364,6 +404,55 @@ describe('Client Component', () => {
         setTimeout(() => {
           let { data } = result;
           expect(spy).toHaveBeenCalledTimes(3);
+          expect(data).toBeTruthy();
+          spy.mockRestore();
+          done();
+        }, 200);
+      });
+    }, 0);
+  });
+
+  it('should use shouldInvalidate if present', done => {
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const spy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        shouldInvalidate={() => false}
+        // @ts-ignore
+        mutation={{
+          addTodo: {
+            query: `mutation($id: id!) {
+              addTodo(id: $id) {
+                id
+                text
+              }
+            }`,
+            variables: { id: 1 },
+          },
+        }}
+        // @ts-ignore
+        render={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+    setTimeout(() => {
+      result.addTodo().then(() => {
+        setTimeout(() => {
+          let { data } = result;
+          expect(spy).toHaveBeenCalledTimes(2);
           expect(data).toBeTruthy();
           spy.mockRestore();
           done();
