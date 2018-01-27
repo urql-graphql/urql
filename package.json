@@ -37,6 +37,15 @@
         "tsConfigFile": "tsconfig.json"
       }
     },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/tests/**/*",
+      "!src/utils/**/*",
+      "!src/interfaces/**/*",
+      "!src/index.*",
+      "!src/**/hash.*",
+      "!src/**/typenames.*"
+    ],
     "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
