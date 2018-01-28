@@ -366,6 +366,8 @@ mutation($id: ID!) {
 
 * [ ] Server Side Rendering
 * [ ] Client Side Resolvers
+* [ ] Caching tests
+* [ ] Cache update reactivity
 * [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art
