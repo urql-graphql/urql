@@ -10,6 +10,7 @@ export interface IClient {
     skipCache: boolean
   ): Promise<IQueryResponse>;
   executeMutation(mutationObject: IMutation): Promise<object[]>;
+  refreshAllFromCache(): void;
   subscribe(
     callback: (changedTypes: string[], reponse: object) => void
   ): string;

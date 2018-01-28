@@ -68,6 +68,7 @@ export default class Client {
     this.executeQuery = this.executeQuery.bind(this);
     this.executeMutation = this.executeMutation.bind(this);
     this.updateSubscribers = this.updateSubscribers.bind(this);
+    this.refreshAllFromCache = this.refreshAllFromCache.bind(this);
   }
 
   updateSubscribers(typenames, changes) {
@@ -91,6 +92,15 @@ export default class Client {
   unsubscribe(id: string) {
     // Delete from subscriptions by identifier
     delete this.subscriptions[id];
+  }
+
+  refreshAllFromCache() {
+    // On mutation, call subscribed callbacks with eligible typenames
+    for (const sub in this.subscriptions) {
+      if (this.subscriptions.hasOwnProperty(sub)) {
+        this.subscriptions[sub](null, null, true);
+      }
+    }
   }
 
   executeQuery(

@@ -134,7 +134,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update = (changedTypes, response) => {
+  update = (changedTypes, response, refresh) => {
+    if (refresh === true) {
+      this.fetch();
+    }
     let invalidated = false;
     if (this.props.shouldInvalidate) {
       invalidated = this.props.shouldInvalidate(
@@ -285,6 +288,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           ...this.mutations,
           cache,
           refetch: this.fetch,
+          refreshAllFromCache: this.props.client.refreshAllFromCache,
         })
       : null;
   }

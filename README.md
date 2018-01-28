@@ -113,7 +113,8 @@ The render prop sends a couple of fields back by default:
 
 * `loaded` - This is like `loading` but its false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
 * `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
-* `refetch` - This is a method that you can use to manually refetch your query, skipping and repopulating the cache.
+* `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch({ skipCache: true })`.
+* `refreshAllFromCache` - This is a method that you can use to manually refetch all queries from the cache.
 * `data` - This is where your data lives. Once the query returns, This would look like `{ todos: [...] }`.
 * `error` - If there is an error returned when making the query, instead of data, you get this and you can handle it or show a `refetch` button or cry or whatever you wanna do.
 
@@ -268,14 +269,15 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 
 The following fields are present on the render functions argument object:
 
-| Name     | Value      | Default    | Description                                                     |
-| -------- | ---------- | ---------- | --------------------------------------------------------------- |
-| cache    | `object`   | Cache      | Provides cache operations, defined below                        |
-| fetching | `boolean`  | `false`    | Fetching is true during any pending query or mutation operation |
-| loaded   | `boolean`  | `false`    | Becomes true once the component gets data for the first time.   |
-| error    | `object`   | `null`     | Any errors thrown during a query or mutation                    |
-| data     | `object`   | `null`     | Any data returned as the result of a query                      |
-| refetch  | `function` | `function` | Function used to refetch existing queries from the server       |
+| Name                | Value      | Default    | Description                                                                                            |
+| ------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| cache               | `object`   | Cache      | Provides cache operations, defined below                                                               |
+| fetching            | `boolean`  | `false`    | Fetching is true during any pending query or mutation operation                                        |
+| loaded              | `boolean`  | `false`    | Becomes true once the component gets data for the first time.                                          |
+| error               | `object`   | `null`     | Any errors thrown during a query or mutation                                                           |
+| data                | `object`   | `null`     | Any data returned as the result of a query                                                             |
+| refetch             | `function` | `function` | Function used to refetch existing queries, can skip cache by calling with `{skipCache: true}` argument |
+| refreshAllFromCache | `function` | `function` | Function used to refetch all queries from the cache.                                                   |
 
 The `cache` object provides several helpful cache methods that you can use to control the cache:
 
