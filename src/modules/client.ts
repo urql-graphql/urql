@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 
-import { IClientOptions, IMutation, IQuery } from '../interfaces/index';
+import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
 
@@ -10,11 +10,45 @@ export interface IQueryResponse {
   typeNames?: string[];
 }
 
+const defaultCache = store => {
+  return {
+    invalidate: hash =>
+      new Promise(resolve => {
+        delete store[hash];
+        resolve();
+      }),
+    invalidateAll: () =>
+      new Promise(resolve => {
+        store = {};
+        resolve();
+      }),
+    read: hash =>
+      new Promise(resolve => {
+        resolve(store[hash] || null);
+      }),
+    update: callback =>
+      new Promise(resolve => {
+        if (typeof callback === 'function') {
+          Object.keys(store).map(key => {
+            callback(store, key, store[key]);
+          });
+        }
+        resolve();
+      }),
+    write: (hash, data) =>
+      new Promise(resolve => {
+        store[hash] = data;
+        resolve();
+      }),
+  };
+};
+
 export default class Client {
   url?: string; // Graphql API URL
   store: object; // Internal store
   fetchOptions: object | (() => object); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
+  cache: ICache; // Cache object
 
   constructor(opts?: IClientOptions) {
     if (!opts) {
@@ -24,9 +58,11 @@ export default class Client {
     if (!opts.url) {
       throw new Error('Please provide a URL for your GraphQL API');
     }
+
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions || {};
-    this.store = {};
+    this.store = opts.initialCache || {};
+    this.cache = opts.cache || defaultCache(this.store);
     this.subscriptions = {};
     // Bind methods
     this.executeQuery = this.executeQuery.bind(this);
@@ -73,42 +109,44 @@ export default class Client {
       const hash = hashString(body);
 
       // Check cache for hash
-      if (this.store[hash] && !skipCache) {
-        const typeNames = gankTypeNamesFromResponse(this.store[hash]);
-        resolve({ data: this.store[hash], typeNames });
-      } else {
-        const fetchOptions =
-          typeof this.fetchOptions === 'function'
-            ? this.fetchOptions()
-            : this.fetchOptions;
-        // Fetch data
-        fetch(this.url, {
-          body,
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-          ...fetchOptions,
-        })
-          .then(res => res.json())
-          .then(response => {
-            if (response.data) {
-              // Grab typenames from response data
-              const typeNames = gankTypeNamesFromResponse(response.data);
-              // Store data in cache, using serialized query as key
-              this.store[hash] = response.data;
-              resolve({
-                data: response.data,
-                typeNames,
-              });
-            } else {
-              reject({
-                message: 'No data',
-              });
-            }
+      this.cache.read(hash).then(data => {
+        if (data && !skipCache) {
+          const typeNames = gankTypeNamesFromResponse(data);
+          resolve({ data, typeNames });
+        } else {
+          const fetchOptions =
+            typeof this.fetchOptions === 'function'
+              ? this.fetchOptions()
+              : this.fetchOptions;
+          // Fetch data
+          fetch(this.url, {
+            body,
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            ...fetchOptions,
           })
-          .catch(e => {
-            reject(e);
-          });
-      }
+            .then(res => res.json())
+            .then(response => {
+              if (response.data) {
+                // Grab typenames from response data
+                const typeNames = gankTypeNamesFromResponse(response.data);
+                // Store data in cache, using serialized query as key
+                this.cache.write(hash, response.data);
+                resolve({
+                  data: response.data,
+                  typeNames,
+                });
+              } else {
+                reject({
+                  message: 'No data',
+                });
+              }
+            })
+            .catch(e => {
+              reject(e);
+            });
+        }
+      });
     });
   }
 

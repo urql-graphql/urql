@@ -1,7 +1,7 @@
 {
   "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
-    "exclude": ["src/tests/**/*"]
+    "exclude": ["src/tests/**/*", "example/**/*"]
   },
   "rules": {
     "member-access": false

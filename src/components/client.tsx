@@ -1,5 +1,6 @@
 import { Component, ReactNode } from 'react';
 import { IClient, IMutation, IQuery } from '../interfaces/index';
+import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
 
 export interface IClientProps {
@@ -63,6 +64,37 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     // Unsub from change listener
     this.props.client.unsubscribe(this.subscriptionID);
   }
+
+  invalidate = queryObject => {
+    const { cache } = this.props.client;
+    if (queryObject) {
+      const stringified = JSON.stringify(formatTypeNames(queryObject));
+      const hash = hashString(stringified);
+      cache.invalidate(hash);
+    } else {
+      return Array.isArray(this.props.query)
+        ? Promise.all(
+            this.props.query.map(q =>
+              cache.invalidate(hashString(JSON.stringify(q)))
+            )
+          )
+        : cache.invalidate(hashString(JSON.stringify(this.query)));
+    }
+  };
+
+  invalidateAll = () => {
+    return this.props.client.cache.invalidateAll();
+  };
+
+  read = query => {
+    const stringified = JSON.stringify(formatTypeNames(query));
+    const hash = hashString(stringified);
+    return this.props.client.cache.read(hash);
+  };
+
+  updateCache = callback => {
+    return this.props.client.cache.update(callback);
+  };
 
   formatProps = props => {
     // If query exists
@@ -240,10 +272,18 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   render() {
+    const cache = {
+      invalidate: this.invalidate,
+      invalidateAll: this.invalidateAll,
+      read: this.read,
+      update: this.updateCache,
+    };
+
     return this.props.render
       ? this.props.render({
           ...this.state,
           ...this.mutations,
+          cache,
           refetch: this.fetch,
         })
       : null;

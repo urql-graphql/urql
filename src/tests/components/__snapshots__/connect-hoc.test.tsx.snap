@@ -2,6 +2,14 @@
 
 exports[`Connect HOC should wrap its component argument with connect 1`] = `
 <div
+  cache={
+    Object {
+      "invalidate": [Function],
+      "invalidateAll": [Function],
+      "read": [Function],
+      "update": [Function],
+    }
+  }
   data={null}
   error={null}
   fetching={false}

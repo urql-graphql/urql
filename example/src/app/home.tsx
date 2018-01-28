@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import React from 'react';
 import { Connect, query, mutation } from '../../../src/index';
 import TodoList from './todo-list';
@@ -11,7 +13,7 @@ const Home = () => (
       addTodo: mutation(AddTodo),
       removeTodo: mutation(RemoveTodo),
     }}
-    render={({ loaded, data, addTodo, removeTodo }) => {
+    render={({ loaded, data, addTodo, removeTodo, refetch }) => {
       return (
         <div>
           {!loaded ? (
@@ -20,6 +22,15 @@ const Home = () => (
             <TodoList todos={data.todos} removeTodo={removeTodo} />
           )}
           <TodoForm addTodo={addTodo} />
+          <button type="button" onClick={refetch}>
+            Refetch
+          </button>
+          <button
+            type="button"
+            onClick={refetch.bind(null, { skipCache: true })}
+          >
+            Refetch (Skip Cache)
+          </button>
         </div>
       );
     }}
