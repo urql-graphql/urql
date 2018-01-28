@@ -47,11 +47,7 @@ const typeDefs = `
 const resolvers = {
   Query: {
     todos: (root, args, context) => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(store.todos);
-        }, 500);
-      });
+      return store.todos;
     },
     todo: (root, args, context) => {
       return store.todos.find(a => (a.id = args.id));
@@ -65,15 +61,11 @@ const resolvers = {
       const id = uuid();
       const { text } = args;
       store.todos.push({ id, text });
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve({ id, text });
-        }, 500);
-      });
+      return { id, text };
     },
     removeTodo: (root, args, context) => {
       const { id } = args;
-      let todo = store.todos.some(todo => todo.id === id);
+      let todo = store.todos.find(todo => todo.id === id);
       store.todos.splice(store.todos.indexOf(todo), 1);
       return { id };
     },

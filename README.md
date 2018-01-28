@@ -168,11 +168,64 @@ The signature of `shouldComponentUpdate` is basically:
 
 Using all or some of these arguments can give you the power to pretty accurately describe whether your connection has now been invalidated.
 
+## Custom Caches
+
+The `Client` constructor accepts a `cache` setting where you can provide your own caching mechanism that will work with `urql`. By default, we use a local object store, but you can provide an adapter for whatever you want.
+
+If you want to supply your own cache, you'll want to provide an object with the following keys:
+
+* `invalidate` - `(hash) => Promise`, invalidates a cache entry.
+* `invalidateAll` - `() => Promise`, basically clears the store.
+* `read` - `(hash) => Promise`, reads and returns a cache entry
+* `update` - `(callback: (store, key, value)) => Promise`, iterates over cache entries and calls the supplied callback function to provide update functionality
+* `write` - `(hash, data) => Promise`, writes a value to the store.
+
+Don't worry about the hashes, we covert query objects(query + variables) to the hash behind the scenes. Here is an example of the cache creation function we use internally for reference:
+
+```javascript
+const defaultCache = store => {
+  return {
+    invalidate: hash =>
+      new Promise(resolve => {
+        delete store[hash];
+        resolve();
+      }),
+    invalidateAll: () =>
+      new Promise(resolve => {
+        store = {};
+        resolve();
+      }),
+    read: hash =>
+      new Promise(resolve => {
+        resolve(store[hash] || null);
+      }),
+    update: callback =>
+      new Promise(resolve => {
+        if (typeof callback === 'function') {
+          Object.keys(store).map(key => {
+            callback(store, key, store[key]);
+          });
+        }
+        resolve();
+      }),
+    write: (hash, data) =>
+      new Promise(resolve => {
+        store[hash] = data;
+        resolve();
+      }),
+  };
+};
+```
+
 ## API
 
-### `Client({url: string, fetchOptions?: object | () => object})`
+### `Client({url: string, initialCache?: object, cache?: Cache, fetchOptions?: object | () => object})`
 
 Client is the constructor for your GraphQL client. It takes a configuration object as an argument, which is required. Providing a GraphQL api url via the `url` property is required. `fetchOptions` are the options provided to internal `fetch` calls, which can either be in `object` format, or a `function` that returns an `object`, in case you want to provide a dynamic header for a token or something.
+
+`initialCache` is an initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented.
+
+`cache` accepts an instance of a cache, if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above.
 
 Example:
 
@@ -217,11 +270,19 @@ The following fields are present on the render functions argument object:
 
 | Name     | Value      | Default    | Description                                                     |
 | -------- | ---------- | ---------- | --------------------------------------------------------------- |
+| cache    | `object`   | Cache      | Provides cache operations, defined below                        |
 | fetching | `boolean`  | `false`    | Fetching is true during any pending query or mutation operation |
 | loaded   | `boolean`  | `false`    | Becomes true once the component gets data for the first time.   |
 | error    | `object`   | `null`     | Any errors thrown during a query or mutation                    |
 | data     | `object`   | `null`     | Any data returned as the result of a query                      |
 | refetch  | `function` | `function` | Function used to refetch existing queries from the server       |
+
+The `cache` object provides several helpful cache methods that you can use to control the cache:
+
+* `invalidate` - `invalidate` takes an optional QueryObject parameter, but defaults to invalidating the queries defined on the component.
+* `invalidateAll` - Basically clears your entire cache.
+* `read` - Takes a QueryObject parameter, returns cache value for that query.
+* `update` - Takes a callback function with an argument shape of `(store, key, value)`. The callback function is run against every cache entry, giving you the opportunity to update any given value based upon the context of the current data shape.
 
 In addition to these, any specified mutations are also provided as their key in the mutation map. Mutations are functions that accept an object of variables as an argument.
 
@@ -305,9 +366,6 @@ mutation($id: ID!) {
 
 * [ ] Server Side Rendering
 * [ ] Client Side Resolvers
-* [ ] External cache hooks
-* [ ] Invalidation hooks
-* [ ] Cache updates without server
 * [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art

@@ -1,8 +1,10 @@
 import { IQueryResponse } from './../modules/client';
+import { ICache } from './cache';
 import { IMutation } from './mutation';
 import { IQuery } from './query';
 
 export interface IClient {
+  cache: ICache;
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
