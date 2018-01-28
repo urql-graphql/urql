@@ -1,12 +1,15 @@
-import { QueryResponse } from './../modules/client';
-import { Query } from './query';
-import { Mutation } from './mutation';
+import { IQueryResponse } from './../modules/client';
+import { IMutation } from './mutation';
+import { IQuery } from './query';
 
-export interface Client {
-  executeQuery(queryObject: Query, skipCache: Boolean): Promise<QueryResponse>;
-  executeMutation(mutationObject: Mutation): Promise<Array<object>>;
+export interface IClient {
+  executeQuery(
+    queryObject: IQuery,
+    skipCache: boolean
+  ): Promise<IQueryResponse>;
+  executeMutation(mutationObject: IMutation): Promise<object[]>;
   subscribe(
-    callback: (changedTypes: Array<string>, reponse: object) => void
+    callback: (changedTypes: string[], reponse: object) => void
   ): string;
   unsubscribe(id: string): void;
 }

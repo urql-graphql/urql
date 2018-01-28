@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import React from 'react';
 import Connect from '../../components/connect';
 import renderer from 'react-test-renderer';

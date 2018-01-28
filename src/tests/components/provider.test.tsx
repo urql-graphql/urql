@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import React from 'react';
 import Provider from '../../components/provider';
 import renderer from 'react-test-renderer';

@@ -1,44 +1,44 @@
 import { Component, ReactNode } from 'react';
-import { Client, Query, Mutation } from '../interfaces/index';
+import { IClient, IMutation, IQuery } from '../interfaces/index';
 import { formatTypeNames } from '../modules/typenames';
 
-export interface ClientProps {
-  client: Client; // Client instance
+export interface IClientProps {
+  client: IClient; // Client instance
   render: (object) => ReactNode; // Render prop
-  query: Query | Array<Query>; // Query object or array of Query objects
-  mutation?: Mutation; // Mutation object (map)
+  query: IQuery | IQuery[]; // Query object or array of Query objects
+  mutation?: IMutation; // Mutation object (map)
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
-    changedTypes: Array<string>,
-    typeNames: Array<string>,
+    changedTypes: string[],
+    typeNames: string[],
     response: object,
     data: object
   ) => boolean;
 }
 
-export type ClientFetchOpts = {
-  skipCache: Boolean; // Should skip cache?
-};
+export interface IClientFetchOpts {
+  skipCache: boolean; // Should skip cache?
+}
 
-export interface ClientState {
+export interface IClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
   error?: Error; // Error
-  data: Array<object> | Array<ClientState>; // Data
+  data: object[] | IClientState[]; // Data
 }
 
-export default class UrqlClient extends Component<ClientProps, ClientState> {
-  state = {
-    fetching: false,
-    loaded: false,
-    error: null,
-    data: null,
-  };
-
+export default class UrqlClient extends Component<IClientProps, IClientState> {
   static defaultProps = {
     cache: true,
     typeInvalidation: true,
+  };
+
+  state = {
+    data: null,
+    error: null,
+    fetching: false,
+    loaded: false,
   };
 
   query = null; // Stored Query
@@ -67,14 +67,10 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
   formatProps = props => {
     // If query exists
     if (props.query) {
-      // And is an array
-      if (Array.isArray(props.query)) {
-        // Loop through and add typenames
-        this.query = props.query.map(formatTypeNames);
-      } else {
-        // Add typenames
-        this.query = formatTypeNames(props.query);
-      }
+      // Loop through and add typenames
+      this.query = Array.isArray(props.query)
+        ? props.query.map(formatTypeNames)
+        : formatTypeNames(props.query);
       // Subscribe to change listener
       this.subscriptionID = props.client.subscribe(this.update);
       // Fetch initial data
@@ -130,7 +126,10 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     }
   };
 
-  fetch = (opts: ClientFetchOpts = { skipCache: false }, initial?: boolean) => {
+  fetch = (
+    opts: IClientFetchOpts = { skipCache: false },
+    initial?: boolean
+  ) => {
     const { client } = this.props;
     let { skipCache } = opts;
 
@@ -141,8 +140,8 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     if (!Array.isArray(this.query)) {
       // Start loading state
       this.setState({
-        fetching: true,
         error: null,
+        fetching: true,
       });
       // Fetch the query
       client
@@ -154,22 +153,22 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
           }
           // Update data
           this.setState({
+            data: result.data,
             fetching: false,
             loaded: initial ? true : this.state.loaded,
-            data: result.data,
           });
         })
         .catch(e => {
           this.setState({
-            fetching: false,
             error: e,
+            fetching: false,
           });
         });
     } else {
       // Start fetching state
       this.setState({
-        fetching: true,
         error: null,
+        fetching: true,
       });
       // Iterate over and fetch queries
       const partialData = [];
@@ -189,16 +188,16 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
       )
         .then(results => {
           this.setState({
+            data: results,
             fetching: false,
             loaded: true,
-            data: results,
           });
         })
         .catch(e => {
           this.setState({
-            fetching: false,
-            error: e,
             data: partialData,
+            error: e,
+            fetching: false,
           });
         });
     }
@@ -208,8 +207,8 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
     const { client } = this.props;
     // Set fetching state
     this.setState({
-      fetching: true,
       error: null,
+      fetching: true,
     });
 
     return new Promise((resolve, reject) => {
@@ -229,8 +228,8 @@ export default class UrqlClient extends Component<ClientProps, ClientState> {
         .catch(e => {
           this.setState(
             {
-              fetching: false,
               error: e,
+              fetching: false,
             },
             () => {
               reject(e);

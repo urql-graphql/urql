@@ -1,28 +1,28 @@
 import React, { Component, ReactNode } from 'react';
-import { Consumer } from './context';
+import { IClient, IMutation, IQuery } from '../interfaces/index';
 import ClientWrapper from './client';
-import { Client, Query, Mutation } from '../interfaces/index';
+import { Consumer } from './context';
 
-export interface ConnectProps {
+export interface IConnectProps {
   render: (object) => ReactNode; // Render prop
-  query?: Query | Array<Query>; // Query or queries
-  mutation?: Mutation; // Mutation map
+  query?: IQuery | IQuery[]; // Query or queries
+  mutation?: IMutation; // Mutation map
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
-    changedTypes: Array<string>,
-    typeNames: Array<string>,
+    changedTypes: string[],
+    typeNames: string[],
     response: object,
     data: object
   ) => boolean;
 }
 
-export default class Connect extends Component<ConnectProps> {
+export default class Connect extends Component<IConnectProps> {
   render() {
     // Use react-create-context to provide context to ClientWrapper
     return (
       <Consumer>
-        {(client: Client) => (
+        {(client: IClient) => (
           <ClientWrapper
             client={client}
             render={this.props.render}

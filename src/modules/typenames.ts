@@ -1,14 +1,14 @@
 import {
-  SelectionSetNode,
-  FieldNode,
-  DocumentNode,
   DefinitionNode,
+  DocumentNode,
+  FieldNode,
   OperationDefinitionNode,
   parse,
   print,
+  SelectionSetNode,
 } from 'graphql';
 
-import { Query } from '../interfaces/index';
+import { IQuery } from '../interfaces/index';
 
 const TYPENAME_FIELD: FieldNode = {
   kind: 'Field',
@@ -59,7 +59,7 @@ function addTypenameToDocument(doc: DocumentNode) {
   return doc;
 }
 
-export function formatTypeNames(query: Query) {
+export function formatTypeNames(query: IQuery) {
   const doc = parse(query.query);
   return {
     query: print(addTypenameToDocument(doc)),
@@ -68,12 +68,12 @@ export function formatTypeNames(query: Query) {
 }
 
 export function gankTypeNamesFromResponse(response: object) {
-  let typeNames = [];
+  const typeNames = [];
   getTypeNameFromField(response, typeNames);
   return typeNames.filter((v, i, a) => a.indexOf(v) === i);
 }
 
-function getTypeNameFromField(obj: object, typenames: Array<string>) {
+function getTypeNameFromField(obj: object, typenames: string[]) {
   Object.keys(obj).map(item => {
     if (typeof obj[item] === 'object') {
       if ('__typename' in obj[item]) {

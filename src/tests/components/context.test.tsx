@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import * as exp from '../../components/context';
 
 describe('Context', () => {

@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import React from 'react';
 import Client from '../../components/client';
 import { default as ClientModule } from '../../modules/client';

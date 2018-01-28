@@ -16,6 +16,7 @@ test_script:
   - yarn --version
   # Run tests
   - yarn run build
+  - yarn run lint
   - yarn run type-check
   - yarn run test
 

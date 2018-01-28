@@ -308,7 +308,6 @@ mutation($id: ID!) {
 * [ ] External cache hooks
 * [ ] Invalidation hooks
 * [ ] Cache updates without server
-* [ ] Fix Lint
 * [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art

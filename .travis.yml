@@ -26,6 +26,7 @@ cache: yarn
 script:
   # Run tests
   - yarn run type-check
+  - yarn run lint
   - yarn run test
   - yarn run coverage
   # Upload to coveralls, but don't _fail_ if coveralls is down.

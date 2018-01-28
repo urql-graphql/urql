@@ -1,4 +1,4 @@
-export { Client } from './client';
-export { Mutation } from './mutation';
-export { Query } from './query';
-export { ClientOptions } from './client-options';
+export { IClient } from './client';
+export { IMutation } from './mutation';
+export { IQuery } from './query';
+export { IClientOptions } from './client-options';

@@ -1,13 +1,13 @@
 import React, { Component, ReactNode } from 'react';
+import { IClient } from '../interfaces/index';
 import { Provider as ContextProvider } from './context';
-import { Client } from '../interfaces/index';
 
-export interface ProviderProps {
+export interface IProviderProps {
   children: ReactNode;
-  client: Client;
+  client: IClient;
 }
 
-export default class Provider extends Component<ProviderProps> {
+export default class Provider extends Component<IProviderProps> {
   render() {
     // Use react-create-context to provide client over context
     return (

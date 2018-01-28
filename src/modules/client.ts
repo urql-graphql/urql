@@ -1,13 +1,14 @@
-import { hashString } from './hash';
-import { ClientOptions, Query, Mutation } from '../interfaces/index';
-import { gankTypeNamesFromResponse } from '../modules/typenames';
 import uuid from 'uuid';
 
+import { IClientOptions, IMutation, IQuery } from '../interfaces/index';
+import { gankTypeNamesFromResponse } from '../modules/typenames';
+import { hashString } from './hash';
+
 // Response from executeQuery call
-export type QueryResponse = {
-  data: Array<object>;
-  typeNames?: Array<string>;
-};
+export interface IQueryResponse {
+  data: object[];
+  typeNames?: string[];
+}
 
 export default class Client {
   url?: string; // Graphql API URL
@@ -15,7 +16,7 @@ export default class Client {
   fetchOptions: object | (() => object); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
 
-  constructor(opts?: ClientOptions) {
+  constructor(opts?: IClientOptions) {
     if (!opts) {
       throw new Error('Please provide configuration object');
     }
@@ -33,15 +34,17 @@ export default class Client {
     this.updateSubscribers = this.updateSubscribers.bind(this);
   }
 
-  private updateSubscribers(typenames, changes) {
+  updateSubscribers(typenames, changes) {
     // On mutation, call subscribed callbacks with eligible typenames
-    for (let sub in this.subscriptions) {
-      this.subscriptions[sub](typenames, changes);
+    for (const sub in this.subscriptions) {
+      if (this.subscriptions.hasOwnProperty(sub)) {
+        this.subscriptions[sub](typenames, changes);
+      }
     }
   }
 
-  public subscribe(
-    callback: (changedTypes: Array<string>, response: object) => void
+  subscribe(
+    callback: (changedTypes: string[], response: object) => void
   ): string {
     // Create an identifier, add callback to subscriptions, return identifier
     const id = uuid.v4();
@@ -49,16 +52,16 @@ export default class Client {
     return id;
   }
 
-  public unsubscribe(id: string) {
+  unsubscribe(id: string) {
     // Delete from subscriptions by identifier
     delete this.subscriptions[id];
   }
 
-  public executeQuery(
-    queryObject: Query,
-    skipCache: Boolean
-  ): Promise<QueryResponse> {
-    return new Promise<QueryResponse>((resolve, reject) => {
+  executeQuery(
+    queryObject: IQuery,
+    skipCache: boolean
+  ): Promise<IQueryResponse> {
+    return new Promise<IQueryResponse>((resolve, reject) => {
       const { query, variables } = queryObject;
       // Create query POST body
       const body = JSON.stringify({
@@ -80,9 +83,9 @@ export default class Client {
             : this.fetchOptions;
         // Fetch data
         fetch(this.url, {
-          method: 'POST',
-          body: body,
+          body,
           headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
           ...fetchOptions,
         })
           .then(res => res.json())
@@ -109,8 +112,8 @@ export default class Client {
     });
   }
 
-  public executeMutation(mutationObject: Mutation): Promise<Array<object>> {
-    return new Promise<Array<object>>((resolve, reject) => {
+  executeMutation(mutationObject: IMutation): Promise<object[]> {
+    return new Promise<object[]>((resolve, reject) => {
       const { query, variables } = mutationObject;
       // Convert POST body to string
       const body = JSON.stringify({
@@ -124,16 +127,16 @@ export default class Client {
           : this.fetchOptions;
       // Call mutation
       fetch(this.url, {
-        method: 'POST',
-        body: body,
+        body,
         headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
         ...fetchOptions,
       })
         .then(res => res.json())
         .then(response => {
           if (response.data) {
             // Retrieve typenames from response data
-            let typeNames = gankTypeNamesFromResponse(response.data);
+            const typeNames = gankTypeNamesFromResponse(response.data);
             // Notify subscribed Connect wrappers
             this.updateSubscribers(typeNames, response);
 

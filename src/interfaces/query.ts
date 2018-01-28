@@ -1,4 +1,4 @@
-export interface Query {
+export interface IQuery {
   query: string;
   variables?: object;
 }

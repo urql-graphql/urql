@@ -1,5 +1,5 @@
-import { Query } from './query';
+import { IQuery } from './query';
 
-export interface Mutation {
-  [key: string]: Query;
+export interface IMutation {
+  [key: string]: IQuery;
 }

@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import React from 'react';
 import ConnectHOC from '../../components/connect-hoc';
 import renderer from 'react-test-renderer';
