@@ -15,6 +15,7 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
   fetching={false}
   loaded={false}
   refetch={[Function]}
+  refreshAllFromCache={[Function]}
 />
 `;
 
@@ -26,5 +27,6 @@ exports[`Connect HOC should wrap its component argument with connect with functi
   fetching={false}
   loaded={false}
   refetch={[Function]}
+  refreshAllFromCache={[Function]}
 />
 `;

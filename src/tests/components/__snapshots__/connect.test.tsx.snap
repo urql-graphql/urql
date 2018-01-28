@@ -15,5 +15,6 @@ exports[`Client Component should provide a context consumer and pass through to 
   fetching={false}
   loaded={false}
   refetch={[Function]}
+  refreshAllFromCache={[Function]}
 />
 `;

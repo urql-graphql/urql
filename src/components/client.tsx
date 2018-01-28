@@ -161,6 +161,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
+  refreshAllFromCache = () => {
+    this.props.client.refreshAllFromCache();
+  };
+
   fetch = (
     opts: IClientFetchOpts = { skipCache: false },
     initial?: boolean
@@ -288,7 +292,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           ...this.mutations,
           cache,
           refetch: this.fetch,
-          refreshAllFromCache: this.props.client.refreshAllFromCache,
+          refreshAllFromCache: this.refreshAllFromCache,
         })
       : null;
   }
