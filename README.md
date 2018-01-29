@@ -160,7 +160,7 @@ const MyComponent = () => (
 );
 ```
 
-The signature of `shouldComponentUpdate` is basically:
+The signature of `shouldInvalidate` is basically:
 
 * `changedTypenames` - The typenames returned from the mutation. ex: `['Todo']`
 * `typenames` - The typenames that are included in your `Connect` component. ex: `['Todo', 'User', 'Author']`
