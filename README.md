@@ -55,6 +55,10 @@ In my experience, existing solutions have been a bit heavy on the API side of th
 
 ## Getting Started
 
+If you want to get right down to business and try a working example of `urql` in action, check out this Code Sandbox:
+
+[https://codesandbox.io/s/p5n69p23x0](https://codesandbox.io/s/p5n69p23x0)
+
 The core of `urql` is three exports, `Provider`, `Connect` and `Client`. To get started, you simply create a `Client` instance, pass it to a `Provider` and then wrap any components you want to make queries or fire mutation from with a `Connect` component. We also provide a `ConnectHOC` higher order component, if you happen to not enjoy the absolutely amazing explicit nature of render props.
 
 Lets look at a root level component and how you can get it set up:
