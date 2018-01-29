@@ -1,4 +1,4 @@
-module.exports = function hacks() {
+module.exports = function() {
   return {
     visitor: {
       Program(programPath) {
