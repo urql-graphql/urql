@@ -7,15 +7,10 @@ Universal React Query Library
 
 ![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
 
-<!-- TOC -->
-
 * [urql](#urql)
   * [What is `urql`](#what-is-urql)
   * [Why this exists](#why-this-exists)
   * [How its different](#how-its-different)
-    * [React](#react)
-    * [Render Props](#render-props)
-    * [Caching](#caching)
   * [Install](#install)
   * [Getting Started](#getting-started)
   * [Cache control](#cache-control)
@@ -29,11 +24,7 @@ Universal React Query Library
     * [ConnectHOC](#connecthoc)
     * [query](#query)
     * [mutation](#mutation)
-  * [TODO](#todo)
   * [Prior Art](#prior-art)
-    * [Apollo](#apollo)
-
-<!-- /TOC -->
 
 ## What is `urql`
 
