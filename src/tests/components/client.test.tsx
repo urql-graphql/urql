@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Client from '../../components/client';
+import { hashString } from '../../modules/hash';
+import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
 import renderer from 'react-test-renderer';
 import fetchMock from '../utils/fetch-mock';
@@ -414,6 +416,36 @@ describe('Client Component', () => {
     }, 0);
   });
 
+  it('should update from cache when called with the refresh option', done => {
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+    const clientModule = new ClientModule({ url: 'test' });
+    // @ts-ignore
+    const spy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        query={{ query: `{ todos { id } }` }}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client.getInstance().update(null, null, true);
+
+    setTimeout(() => {
+      expect(spy).toHaveBeenCalledTimes(2);
+      spy.mockRestore();
+      done();
+    }, 100);
+  });
+
   it('should respect the cache prop', done => {
     fetchMock.mockResponse({
       data: { todos: [{ id: 1, __typename: 'Todo' }] },
@@ -577,5 +609,241 @@ describe('Client Component', () => {
       data: null,
       refetch: result.refetch,
     });
+  });
+
+  it('should hash queries and read from the cache', done => {
+    const query = `
+      {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+    const formatted = formatTypeNames({ query, variables: {} });
+    const hash = hashString(JSON.stringify(formatted));
+    const clientModule = new ClientModule({ url: 'test' });
+    clientModule.store[hash] = 5;
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .read({ query, variables: {} })
+      .then(data => {
+        expect(data).toBe(5);
+        done();
+      });
+  });
+
+  it('should invalidate the entire cache when invalidateAll is called', done => {
+    const clientModule = new ClientModule({
+      url: 'test',
+      initialCache: { test: 5 },
+    });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .invalidateAll()
+      .then(() => {
+        expect(clientModule.store).toMatchObject({});
+        done();
+      });
+  });
+
+  it('should invalidate a query when invalidate is called with one', done => {
+    const query = `
+      {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+    const formatted = formatTypeNames({ query, variables: {} });
+    const hash = hashString(JSON.stringify(formatted));
+    const clientModule = new ClientModule({ url: 'test' });
+    clientModule.store[hash] = 5;
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .invalidate({ query, variables: {} })
+      .then(() => {
+        expect(clientModule.store).toMatchObject({});
+        done();
+      });
+  });
+
+  it('should invalidate component query by default when invalidate is called', done => {
+    const query = `
+      {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+
+    const clientModule = new ClientModule({ url: 'test' });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        query={{ query, variables: {} }}
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .invalidate()
+      .then(() => {
+        expect(clientModule.store).toMatchObject({});
+        fetchMock.restore();
+        done();
+      });
+  });
+
+  it('should invalidate component queries by default when invalidate is called', done => {
+    const query = `
+      {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+
+    fetchMock.mockResponse({
+      data: { todos: [{ id: 1, __typename: 'Todo' }] },
+    });
+
+    const clientModule = new ClientModule({ url: 'test' });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        query={[{ query, variables: {} }, { query, variables: {} }]}
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .invalidate()
+      .then(() => {
+        expect(clientModule.store).toMatchObject({});
+        fetchMock.restore();
+        done();
+      });
+  });
+
+  it('should update cache when updateCache is called', done => {
+    const clientModule = new ClientModule({
+      url: 'test',
+      initialCache: { test: 5 },
+    });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    client
+      .getInstance()
+      .updateCache((store, key) => {
+        if (key === 'test') {
+          store[key] = 6;
+        }
+      })
+      .then(() => {
+        expect(clientModule.store).toMatchObject({ test: 6 });
+        done();
+      });
+  });
+
+  it('should trigger a refresh when refreshAllFromCache is called', done => {
+    const clientModule = new ClientModule({
+      url: 'test',
+    });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        render={() => {
+          return null;
+        }}
+      />
+    );
+
+    const spy = jest.spyOn(clientModule, 'refreshAllFromCache');
+
+    client
+      .getInstance()
+      .refreshAllFromCache()
+      .then(() => {
+        expect(spy).toHaveBeenCalled();
+        done();
+      });
   });
 });

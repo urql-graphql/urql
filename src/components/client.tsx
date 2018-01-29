@@ -70,7 +70,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     if (queryObject) {
       const stringified = JSON.stringify(formatTypeNames(queryObject));
       const hash = hashString(stringified);
-      cache.invalidate(hash);
+      return cache.invalidate(hash);
     } else {
       return Array.isArray(this.props.query)
         ? Promise.all(
@@ -87,7 +87,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   read = query => {
-    const stringified = JSON.stringify(formatTypeNames(query));
+    const formatted = formatTypeNames(query);
+    const stringified = JSON.stringify(formatted);
     const hash = hashString(stringified);
     return this.props.client.cache.read(hash);
   };
@@ -162,7 +163,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   refreshAllFromCache = () => {
-    this.props.client.refreshAllFromCache();
+    return this.props.client.refreshAllFromCache();
   };
 
   fetch = (

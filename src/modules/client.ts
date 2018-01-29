@@ -10,12 +10,12 @@ export interface IQueryResponse {
   typeNames?: string[];
 }
 
-const defaultCache = store => {
+export const defaultCache = store => {
   return {
     invalidate: hash =>
       new Promise(resolve => {
         delete store[hash];
-        resolve();
+        resolve(hash);
       }),
     invalidateAll: () =>
       new Promise(resolve => {
@@ -29,7 +29,7 @@ const defaultCache = store => {
     update: callback =>
       new Promise(resolve => {
         if (typeof callback === 'function') {
-          Object.keys(store).map(key => {
+          Object.keys(store).forEach(key => {
             callback(store, key, store[key]);
           });
         }
@@ -38,7 +38,7 @@ const defaultCache = store => {
     write: (hash, data) =>
       new Promise(resolve => {
         store[hash] = data;
-        resolve();
+        resolve(hash);
       }),
   };
 };
@@ -96,11 +96,14 @@ export default class Client {
 
   refreshAllFromCache() {
     // On mutation, call subscribed callbacks with eligible typenames
-    for (const sub in this.subscriptions) {
-      if (this.subscriptions.hasOwnProperty(sub)) {
-        this.subscriptions[sub](null, null, true);
+    return new Promise(resolve => {
+      for (const sub in this.subscriptions) {
+        if (this.subscriptions.hasOwnProperty(sub)) {
+          this.subscriptions[sub](null, null, true);
+        }
       }
-    }
+      resolve();
+    });
   }
 
   executeQuery(

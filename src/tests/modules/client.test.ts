@@ -1,4 +1,4 @@
-import Client from '../../modules/client';
+import Client, { defaultCache } from '../../modules/client';
 
 import fetchMock from '../utils/fetch-mock';
 
@@ -25,10 +25,10 @@ describe('Client', () => {
 
   it('should set fetchOptions', () => {
     const client = new Client({
-      url: 'test',
       fetchOptions: {
         test: 5,
       },
+      url: 'test',
     });
     expect(client.fetchOptions).toMatchObject({ test: 5 });
   });
@@ -38,6 +38,75 @@ describe('Client', () => {
       url: 'test',
     });
     expect(client.fetchOptions).toMatchObject({});
+  });
+
+  it('should set intialCache if provided', () => {
+    const client = new Client({
+      url: 'test',
+      initialCache: {
+        test: 5,
+      },
+    });
+    expect(client.store).toMatchObject({ test: 5 });
+  });
+
+  it('should set cache if provided', () => {
+    const myCache = defaultCache({});
+
+    const client = new Client({
+      cache: myCache,
+      url: 'test',
+    });
+
+    expect(client.cache).toMatchObject(myCache);
+  });
+
+  describe('cache', () => {
+    it('should provide a valid cache by default', done => {
+      const store = {
+        test: 5,
+      };
+
+      const myCache = defaultCache(store);
+
+      const client = new Client({
+        cache: myCache,
+        url: 'test',
+      });
+
+      expect(client.cache.invalidate).toBeTruthy();
+      expect(client.cache.invalidateAll).toBeTruthy();
+      expect(client.cache.read).toBeTruthy();
+      expect(client.cache.update).toBeTruthy();
+      expect(client.cache.write).toBeTruthy();
+
+      Promise.all([
+        client.cache.invalidateAll(),
+        client.cache.read('test'),
+        client.cache.write('test', 5),
+        client.cache.read('test'),
+        client.cache.update((acc, key) => {
+          if (key === 'test') {
+            acc[key] = 6;
+          }
+        }),
+        client.cache.read('test'),
+        client.cache.invalidate('test'),
+        client.cache.read('test'),
+      ]).then(d => {
+        expect(d).toMatchObject([
+          undefined,
+          null,
+          'test',
+          5,
+          undefined,
+          6,
+          'test',
+          null,
+        ]);
+        done();
+      });
+    });
   });
 
   describe('updateSubscribers', () => {
@@ -56,6 +125,23 @@ describe('Client', () => {
       const changes = { a: 5 };
       client.updateSubscribers(typenames, changes);
       expect(spy).toBeCalledWith(typenames, changes);
+    });
+  });
+
+  describe('refreshAllFromCache', () => {
+    let client;
+
+    beforeAll(() => {
+      client = new Client({
+        url: 'test',
+      });
+    });
+
+    it('should call all registered subscribers with the last argument of true', () => {
+      const spy = jest.fn();
+      client.subscribe(spy);
+      client.refreshAllFromCache();
+      expect(spy).toBeCalledWith(null, null, true);
     });
   });
 
