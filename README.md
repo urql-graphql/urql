@@ -18,7 +18,6 @@ Universal React Query Library
     * [Caching](#caching)
   * [Install](#install)
   * [Getting Started](#getting-started)
-  * [HOLD UP FAM THIS IS IMPORTANT](#hold-up-fam-this-is-important)
   * [Cache control](#cache-control)
   * [Custom Caches](#custom-caches)
   * [API](#api)
