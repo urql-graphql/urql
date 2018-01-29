@@ -7,6 +7,35 @@ Universal React Query Library
 
 ![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
 
+<!-- TOC -->
+
+* [urql](#urql)
+  * [What is `urql`](#what-is-urql)
+  * [Why this exists](#why-this-exists)
+  * [How its different](#how-its-different)
+    * [React](#react)
+    * [Render Props](#render-props)
+    * [Caching](#caching)
+  * [Install](#install)
+  * [Getting Started](#getting-started)
+  * [HOLD UP FAM THIS IS IMPORTANT](#hold-up-fam-this-is-important)
+  * [Cache control](#cache-control)
+  * [Custom Caches](#custom-caches)
+  * [API](#api)
+    * [Client](#client)
+    * [Provider](#provider)
+    * [Connect](#connect)
+      * [Props](#props)
+      * [Render Args](#render-args)
+    * [ConnectHOC](#connecthoc)
+    * [query](#query)
+    * [mutation](#mutation)
+  * [TODO](#todo)
+  * [Prior Art](#prior-art)
+    * [Apollo](#apollo)
+
+<!-- /TOC -->
+
 ## What is `urql`
 
 `urql` is a GraphQL client, exposed as a set of ReactJS components.
@@ -220,7 +249,9 @@ const defaultCache = store => {
 
 ## API
 
-### `Client({url: string, initialCache?: object, cache?: Cache, fetchOptions?: object | () => object})`
+### Client
+
+_{url: string, initialCache?: object, cache?: Cache, fetchOptions?: object | () => object}_
 
 Client is the constructor for your GraphQL client. It takes a configuration object as an argument, which is required. Providing a GraphQL api url via the `url` property is required. `fetchOptions` are the options provided to internal `fetch` calls, which can either be in `object` format, or a `function` that returns an `object`, in case you want to provide a dynamic header for a token or something.
 
@@ -234,7 +265,7 @@ Example:
 const client = new Client({ url: 'http://localhost:3000/graphql' });
 ```
 
-### `<Provider client={UrqlClientInstance}/>`
+### Provider
 
 Provider is a ReactJS component that is used to provide the `urql` client throughout your application.
 
@@ -250,7 +281,7 @@ return (
 );
 ```
 
-### `<Connect />`
+### Connect
 
 Connect is a ReactJS component that is used to execute queries and mutations and render child components with the results, using a render prop.
 
@@ -310,7 +341,9 @@ Example:
 />
 ```
 
-### `ConnectHOC(options: object | (props) => object)(Component)`
+### ConnectHOC
+
+_(options: object | (props) => object) => (Component)_
 
 ConnectHOC is a higher order component that essentially does the same thing as the `Connect` component. All of `Connect`'s props except for `render` are valid for the `options` object. Further, you can specify a function, which will provide the component's props and return a dynamic option set. The arguments you'd see in the `render` prop in `Connect` are passed automatically to the wrapped component.
 
@@ -328,7 +361,9 @@ export default ConnectHOC((props) => {
 })(MyComponent);
 ```
 
-### `query(query: string, variables?: object) => {query: string, variables: object}`
+### query
+
+_(query: string, variables?: object) => {query: string, variables: object}_
 
 `query` is a QueryObject creator.
 
@@ -346,7 +381,9 @@ query($id: ID!) {
 );
 ```
 
-### `mutation(query: string, variables?: object) => {query: string, variables: object}`
+### mutation
+
+_(query: string, variables?: object) => {query: string, variables: object}_
 
 `query` is a MutationObject creator.
 
@@ -368,10 +405,11 @@ mutation($id: ID!) {
 
 * [ ] Server Side Rendering
 * [ ] Client Side Resolvers
-* [ ] Caching tests
 * [ ] Cache update reactivity
 * [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art
 
 ### Apollo
+
+This library wouldnt be possible without Apollo. Apollo was what made GraphQL click for me. I need to give big shout outs to folks like @stubailo , @jbaxleyiii and @peggyrayzis, without whom I wouldn't even know GraphQL. Enormous amounts of inspiration for this lib came from Apollo and its architecture.
