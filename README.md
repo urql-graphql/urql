@@ -405,4 +405,4 @@ mutation($id: ID!) {
 
 ### Apollo
 
-This library wouldnt be possible without Apollo. Apollo was what made GraphQL click for me. I need to give big shout outs to folks like @stubailo , @jbaxleyiii and @peggyrayzis, without whom I wouldn't even know GraphQL. Enormous amounts of inspiration for this lib came from Apollo and its architecture.
+This library wouldnt be possible without [Apollo](https://www.apollographql.com/). Apollo was what made GraphQL click for me. I need to give big shout outs to folks like [@stubailo](https://github.com/stubailo) , [@jbaxleyiii](https://github.com/jbaxleyiii) and [@peggyrayzis](https://github.com/peggyrayzis), without whom I wouldn't even know GraphQL. Enormous amounts of inspiration for this lib came from Apollo and its architecture.
