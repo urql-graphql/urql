@@ -32,4 +32,9 @@ describe('gankTypeNamesFromResponse', () => {
     });
     expect(typeNames).toMatchObject(['Todo']);
   });
+
+  it('should work when field returns null', () => {
+    let typeNames = gankTypeNamesFromResponse({ todo: null });
+    expect(typeNames).toMatchObject([]);
+  });
 });
