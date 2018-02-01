@@ -21,7 +21,10 @@
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "type-check": "tsc",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
-    "test": "jest"
+    "test": "jest",
+    "prettier":
+      "prettier --write \"{,!(node_modules|custom-typings)/**/}*.{js,jsx,ts,tsx,json,md}\"",
+    "precommit": "lint-staged"
   },
   "author": "Ken Wheeler",
   "license": "MIT",
@@ -50,6 +53,9 @@
     "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md}": ["prettier --write", "git add"]
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.38",
     "@babel/core": "^7.0.0-beta.38",
@@ -76,8 +82,11 @@
     "express": "^4.16.2",
     "express-graphql": "^0.6.11",
     "graphql-tools": "^2.18.0",
+    "husky": "^0.14.3",
     "isomorphic-fetch": "^2.2.1",
     "jest": "^22.1.4",
+    "lint-staged": "^6.0.1",
+    "prettier": "1.10.2",
     "prop-types": "^15.6.0",
     "react": "^16.0.0-0",
     "react-addons-test-utils": "^15.6.2",
