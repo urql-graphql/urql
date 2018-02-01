@@ -75,7 +75,7 @@ export function gankTypeNamesFromResponse(response: object) {
 
 function getTypeNameFromField(obj: object, typenames: string[]) {
   Object.keys(obj).map(item => {
-    if (typeof obj[item] === 'object') {
+    if (obj[item] && typeof obj[item] === 'object') {
       if ('__typename' in obj[item]) {
         typenames.push(obj[item].__typename);
       }
