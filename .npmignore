@@ -1,6 +1,7 @@
 /*
 !/lib
 !/es
+**/tests/
 **/*.test.js
 !package.json
 !LICENSE.md
