@@ -7,7 +7,8 @@ export interface IClient {
   cache: ICache;
   executeQuery(
     queryObject: IQuery,
-    skipCache: boolean
+    skipCache: boolean,
+    dedupeRequest: boolean
   ): Promise<IQueryResponse>;
   executeMutation(mutationObject: IMutation): Promise<object[]>;
   refreshAllFromCache(): void;

@@ -3,6 +3,7 @@ import uuid from 'uuid';
 import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
+import { fetchDedupe } from './fetch-dedupe';
 
 // Response from executeQuery call
 export interface IQueryResponse {
@@ -108,7 +109,8 @@ export default class Client {
 
   executeQuery(
     queryObject: IQuery,
-    skipCache: boolean
+    skipCache: boolean,
+    dedupeRequest: boolean
   ): Promise<IQueryResponse> {
     return new Promise<IQueryResponse>((resolve, reject) => {
       const { query, variables } = queryObject;
@@ -132,13 +134,16 @@ export default class Client {
               ? this.fetchOptions()
               : this.fetchOptions;
           // Fetch data
-          fetch(this.url, {
+          fetchDedupe(this.url, {
             body,
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
             ...fetchOptions,
+          }, {
+            requestKey: hash,
+            responseType: 'json',
+            dedupe: dedupeRequest
           })
-            .then(res => res.json())
             .then(response => {
               if (response.data) {
                 // Grab typenames from response data
