@@ -3,7 +3,7 @@ import uuid from 'uuid';
 import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
-import { fetchDedupe } from './fetch-dedupe';
+import { fetchDedupe } from 'fetch-dedupe';
 
 // Response from executeQuery call
 export interface IQueryResponse {
@@ -145,7 +145,7 @@ export default class Client {
             dedupe: dedupeRequest
           })
             .then(response => {
-              if (response.data) {
+              if (response.data.data) {
                 // Grab typenames from response data
                 const typeNames = gankTypeNamesFromResponse(response.data);
                 // Store data in cache, using serialized query as key
