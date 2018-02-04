@@ -1,6 +1,7 @@
 /*
 !/lib
 !/es
+!/types/**/*.d.ts
 **/tests/
 **/*.test.js
 !package.json
