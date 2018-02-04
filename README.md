@@ -51,7 +51,9 @@ In my experience, existing solutions have been a bit heavy on the API side of th
 
 ## Install
 
-`npm install urql --save`
+`npm install urql graphql --save`
+
+> Note: Yes, due to some funny errors about two instances of graphql, it's now a peer dep and needs to be installed separately. This is stupid and frustrating, so before 1.0.0, expect a lightweight parser/printer to be written and take the place of it.
 
 ## Getting Started
 
