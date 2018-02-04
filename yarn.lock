@@ -5934,9 +5934,9 @@ type-is@~1.6.15:
     media-typer "0.3.0"
     mime-types "~2.1.15"
 
-typescript@Microsoft/TypeScript#dontUseThisBranchForExperimentalPipelineInProductionOrYouWillBeFired:
-  version "2.6.0"
-  resolved "https://codeload.github.com/Microsoft/TypeScript/tar.gz/677762da07bf1d13240f1dbd15ba487361e34b14"
+typescript@~2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.1.tgz#bb3682c2c791ac90e7c6210b26478a8da085c359"
 
 ua-parser-js@^0.7.9:
   version "0.7.17"
