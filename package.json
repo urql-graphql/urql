@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "coverage": "jest --coverage",
     "clean-lib": "rimraf lib",
@@ -14,7 +15,9 @@
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch \"npm run build-es\" src/ -d",
-    "build": "builder concurrent --buffer build-lib build-es",
+    "clean-types": "rimraf types",
+    "build-types": "npm run clean-types && tsc -p ./tsconfig.dts.json",
+    "build": "builder concurrent --buffer build-lib build-es build-types",
     "demo:start:graphql-server": "node example/src/server/index.js",
     "demo:start:app":
       "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
@@ -23,7 +26,7 @@
     "lint": "tslint 'src/**/*.{ts, tsx}'",
     "test": "jest",
     "prettier":
-      "prettier --write \"{,!(node_modules|custom-typings)/**/}*.{js,jsx,ts,tsx,json,md}\"",
+      "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
     "precommit": "lint-staged"
   },
   "author": "Ken Wheeler",
