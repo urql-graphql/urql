@@ -4,7 +4,7 @@ import ClientWrapper from './client';
 import { Consumer } from './context';
 
 export interface IConnectProps {
-  render: (object) => ReactNode; // Render prop
+  render: (obj: object) => ReactNode; // Render prop
   query?: IQuery | IQuery[]; // Query or queries
   mutation?: IMutation; // Mutation map
   cache?: boolean;

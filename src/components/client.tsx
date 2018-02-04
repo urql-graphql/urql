@@ -5,7 +5,7 @@ import { formatTypeNames } from '../modules/typenames';
 
 export interface IClientProps {
   client: IClient; // Client instance
-  render: (object) => ReactNode; // Render prop
+  render: (obj: object) => ReactNode; // Render prop
   query: IQuery | IQuery[]; // Query object or array of Query objects
   mutation?: IMutation; // Mutation object (map)
   cache?: boolean;
