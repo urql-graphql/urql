@@ -20,6 +20,7 @@ export interface IClientProps {
 
 export interface IClientFetchOpts {
   skipCache: boolean; // Should skip cache?
+  dedupeRequest: boolean; // Should deduplicate the request?
 }
 
 export interface IClientState {
@@ -167,7 +168,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   fetch = (
-    opts: IClientFetchOpts = { skipCache: false },
+    opts: IClientFetchOpts = { skipCache: false, dedupeRequest: true },
     initial?: boolean
   ) => {
     const { client } = this.props;
@@ -185,7 +186,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       });
       // Fetch the query
       client
-        .executeQuery(this.query, skipCache)
+        .executeQuery(this.query, skipCache, dedupeRequest)
         .then(result => {
           // Store the typenames
           if (result.typeNames) {
@@ -214,7 +215,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       const partialData = [];
       return Promise.all(
         this.query.map(query => {
-          return client.executeQuery(query, skipCache).then(result => {
+          return client.executeQuery(query, skipCache, dedupeRequest).then(result => {
             if (result.typeNames) {
               // Add and dedupe typenames
               this.typeNames = [...this.typeNames, ...result.typeNames].filter(
