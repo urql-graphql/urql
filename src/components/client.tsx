@@ -5,7 +5,7 @@ import { formatTypeNames } from '../modules/typenames';
 
 export interface IClientProps {
   client: IClient; // Client instance
-  render: (obj: object) => ReactNode; // Render prop
+  children: (obj: object) => ReactNode; // Render prop
   query: IQuery | IQuery[]; // Query object or array of Query objects
   mutation?: IMutation; // Mutation object (map)
   cache?: boolean;
@@ -287,8 +287,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       update: this.updateCache,
     };
 
-    return this.props.render
-      ? this.props.render({
+    return typeof this.props.children === 'function'
+      ? this.props.children({
           ...this.state,
           ...this.mutations,
           cache,
