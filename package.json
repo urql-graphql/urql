@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "A naive React Graphql library",
   "main": "lib/index.js",
   "module": "es/index.js",
