@@ -124,14 +124,31 @@ const Home = () => (
     mutation={{
       addTodo: mutation(AddTodo),
     }}
-    render={({ loaded, fetching, refetch, data, error, addTodo }) => {
+    children={({ loaded, fetching, refetch, data, error, addTodo }) => {
       //...Your Component
     }}
   />
 );
 ```
 
-The render prop sends a couple of fields back by default:
+You can also use functional child style:
+
+```javascript
+const Home = () => (
+  <Connect
+    query={query(TodoQuery)}
+    mutation={{
+      addTodo: mutation(AddTodo),
+    }}
+  >
+    {({ loaded, fetching, refetch, data, error, addTodo }) => {
+      //...Your Component
+    }}
+  </Connect>
+);
+```
+
+The `children` render prop sends a couple of fields back by default:
 
 * `loaded` - This is like `loading` but its false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
 * `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
@@ -175,7 +192,7 @@ const MyComponent = () => (
     shouldInvalidate={(changedTypenames, typenames, mutationResponse, data) => {
       return data.todos.some(d => d.id === mutationResponse.id);
     }}
-    render={({ loaded, fetching, refetch, data, error, addTodo }) => {
+    children={({ loaded, fetching, refetch, data, error, addTodo }) => {
       //...Your Component
     }}
   />
@@ -287,7 +304,7 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 | cache            | `boolean`                                                                    | `true`     | Whether this component's queries should be cached                              |
 | typeInvalidation | `boolean`                                                                    | `true`     | Whether this component's cache should be invalidated using typeNames           |
 | shouldInvalidate | `(changedTypes, componentTypes, mutationResponse, componentData) => boolean` | `null`     | Function used to determine whether the component's cache should be invalidated |
-| render           | `({RenderArgs})`                                                             | RenderArgs | Render prop used to render children                                            |
+| children         | `({RenderArgs})`                                                             | RenderArgs | Render prop used to render children                                            |
 
 #### Render Args
 
@@ -317,7 +334,7 @@ Example:
 ```jsx
 <Connect
   query={query(MyQuery)}
-  render={({loaded, data}) => {
+  children={({loaded, data}) => {
     return loaded ? <Loading/> : <List data={data.todos}>
   }}
 />
@@ -328,7 +345,7 @@ Example:
   mutation={{
     addTodo: mutation(AddTodo)
   }}
-  render={({ addTodo }) => {
+  children={({ addTodo }) => {
     return <button type="button" onClick={addTodo}>Add Todo</button>
   }}
 />
