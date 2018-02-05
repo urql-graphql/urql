@@ -12,8 +12,7 @@
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-    "pretty": true,
-    "experimentalPipelineStage1": true
+    "pretty": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "typeRoots": ["node_modules/@types"]
