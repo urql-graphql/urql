@@ -30,7 +30,7 @@ function ConnectHOC(opts?: IHOCProps | ((_) => IHOCProps)) {
         const connectProps =
           typeof opts === 'function' ? opts(this.props) : opts;
 
-        return <Connect {...connectProps} render={this.renderComponent} />;
+        return <Connect {...connectProps} children={this.renderComponent} />;
       }
     };
 }

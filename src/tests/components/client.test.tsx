@@ -17,7 +17,7 @@ describe('Client Component', () => {
     component.update(
       <Client
         // @ts-ignore
-        render={() => {
+        children={() => {
           return <div>hey</div>;
         }}
       />
@@ -31,7 +31,7 @@ describe('Client Component', () => {
     const client = renderer.create(
       <Client
         // @ts-ignore
-        render={({ data, error, fetching, loaded, refetch }) => {
+        children={({ data, error, fetching, loaded, refetch }) => {
           expect(data).toBeNull();
           expect(error).toBeNull();
           expect(fetching).toBe(false);
@@ -55,7 +55,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -94,7 +94,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -108,7 +108,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={{ query: `{ posts { id } }` }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -133,7 +133,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={[{ query: `{ posts { id } }` }, { query: `{ posts { id } }` }]}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -182,7 +182,7 @@ describe('Client Component', () => {
           addTodo: { query: `{ todos { id } }`, variables: undefined },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -203,7 +203,7 @@ describe('Client Component', () => {
           removeTodo: { query: `{ todos { id } }`, variables: undefined },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -226,7 +226,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -265,7 +265,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={[{ query: `{ todos { id } }` }, { query: `{ todos { id } }` }]}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -305,7 +305,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={[{ query: `{ todos { id } }` }, { query: `{ todos { id } }` }]}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -355,7 +355,7 @@ describe('Client Component', () => {
           },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -397,7 +397,7 @@ describe('Client Component', () => {
           },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -431,7 +431,7 @@ describe('Client Component', () => {
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -477,7 +477,7 @@ describe('Client Component', () => {
           },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -523,7 +523,7 @@ describe('Client Component', () => {
           },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -568,7 +568,7 @@ describe('Client Component', () => {
           },
         }}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -595,7 +595,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={args => {
+        children={args => {
           result = args;
           return null;
         }}
@@ -631,7 +631,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -658,7 +658,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -693,7 +693,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -732,7 +732,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -772,7 +772,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -800,7 +800,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />
@@ -830,7 +830,7 @@ describe('Client Component', () => {
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
-        render={() => {
+        children={() => {
           return null;
         }}
       />

@@ -4,7 +4,7 @@ import ClientWrapper from './client';
 import { Consumer } from './context';
 
 export interface IConnectProps {
-  render: (obj: object) => ReactNode; // Render prop
+  children: (obj: object) => ReactNode; // Render prop
   query?: IQuery | IQuery[]; // Query or queries
   mutation?: IMutation; // Mutation map
   cache?: boolean;
@@ -25,7 +25,7 @@ export default class Connect extends Component<IConnectProps> {
         {(client: IClient) => (
           <ClientWrapper
             client={client}
-            render={this.props.render}
+            children={this.props.children}
             query={this.props.query}
             mutation={this.props.mutation}
             cache={this.props.cache}

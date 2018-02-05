@@ -13,7 +13,7 @@ const Home = () => (
       addTodo: mutation(AddTodo),
       removeTodo: mutation(RemoveTodo),
     }}
-    render={({ loaded, data, addTodo, removeTodo, refetch }) => {
+    children={({ loaded, data, addTodo, removeTodo, refetch }) => {
       return (
         <div>
           {!loaded ? (
