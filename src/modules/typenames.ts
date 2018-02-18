@@ -3,10 +3,11 @@ import {
   DocumentNode,
   FieldNode,
   OperationDefinitionNode,
-  parse,
-  print,
   SelectionSetNode,
 } from 'graphql';
+
+import { parse } from 'graphql/language/parser';
+import { print } from 'graphql/language/printer';
 
 import { IQuery } from '../interfaces/index';
 
