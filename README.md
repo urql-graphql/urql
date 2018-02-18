@@ -33,11 +33,11 @@ Universal React Query Library
 
 In my experience, existing solutions have been a bit heavy on the API side of things, and I see people getting discouraged or turned away from the magic that is GraphQL. This library aims to make GraphQL on the client side as simple as possible.
 
-## How its different
+## How it's different
 
 ### React
 
-`urql` is specifically for React. There have been no efforts made to abstract the core in order to work with other libaries. Usage with React was a priority from the get go, and it has been architected as such.
+`urql` is specifically for React. There have been no efforts made to abstract the core in order to work with other libraries. Usage with React was a priority from the get go, and it has been architected as such.
 
 ### Render Props
 
@@ -85,7 +85,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 As you can see above, all that's required to get started is the `url` field on `Client` which tells us where your GraphQL API lives. After the client is created, and passed to the `Provider` that wraps your app, now you can wrap any component down in the tree with a `Connect` to start issuing queries.
 
-Queries and mutations both have creation functions, which you can import. An `urql` `Connect` component can take multiple queries, and multiple mutations. The `render` prop exposes the internal logic to any component you`d like to provide it to.
+Queries and mutations both have creation functions, which you can import. An `urql` `Connect` component can take multiple queries, and multiple mutations. The `render` prop exposes the internal logic to any component you'd like to provide it to.
 
 Lets start by defining a query and a mutation:
 
@@ -150,7 +150,7 @@ const Home = () => (
 
 The `children` render prop sends a couple of fields back by default:
 
-* `loaded` - This is like `loading` but its false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
+* `loaded` - This is like `loading` but it's false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
 * `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
 * `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch({ skipCache: true })`.
 * `refreshAllFromCache` - This is a method that you can use to manually refetch all queries from the cache.
@@ -183,7 +183,7 @@ addTodo({ text: `I'm a variable!` });
 
 ## Cache control
 
-Normally in `urql`, the cache is aggressively invalidated based upon `__typename`, but if you want finer grained control over your cache, you can use the `shouldInvalidate` prop. It is a function, that returns boolean, much like `shouldComponentUpdate`, which you can use to determine whether your data needs a refresh from the server. It gets called after every mutation:
+Normally in `urql`, the cache is aggressively invalidated based upon `__typename`, but if you want finer grained control over your cache, you can use the `shouldInvalidate` prop. It is a function, that returns a boolean, much like `shouldComponentUpdate`, which you can use to determine whether your data needs a refresh from the server. It gets called after every mutation:
 
 ```javascript
 const MyComponent = () => (
@@ -220,7 +220,7 @@ If you want to supply your own cache, you'll want to provide an object with the 
 * `update` - `(callback: (store, key, value)) => Promise`, iterates over cache entries and calls the supplied callback function to provide update functionality
 * `write` - `(hash, data) => Promise`, writes a value to the store.
 
-Don't worry about the hashes, we covert query objects(query + variables) to the hash behind the scenes. Here is an example of the cache creation function we use internally for reference:
+Don't worry about the hashes, we convert query objects(query + variables) to the hash behind the scenes. Here is an example of the cache creation function we use internally for reference:
 
 ```javascript
 const defaultCache = store => {
@@ -422,4 +422,4 @@ mutation($id: ID!) {
 
 ### Apollo
 
-This library wouldnt be possible without [Apollo](https://www.apollographql.com/). Apollo was what made GraphQL click for me. I need to give big shout outs to folks like [@stubailo](https://github.com/stubailo) , [@jbaxleyiii](https://github.com/jbaxleyiii) and [@peggyrayzis](https://github.com/peggyrayzis), without whom I wouldn't even know GraphQL. Enormous amounts of inspiration for this lib came from Apollo and its architecture.
+This library wouldn't be possible without [Apollo](https://www.apollographql.com/). Apollo was what made GraphQL click for me. I need to give big shout outs to folks like [@stubailo](https://github.com/stubailo), [@jbaxleyiii](https://github.com/jbaxleyiii) and [@peggyrayzis](https://github.com/peggyrayzis), without whom I wouldn't even know GraphQL. Enormous amounts of inspiration for this lib came from Apollo and its architecture.
