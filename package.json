@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A naive React Graphql library",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -10,7 +10,8 @@
     "coverage": "jest --coverage",
     "clean-lib": "rimraf lib",
     "build-babel": "babel src --extensions \".ts,.tsx\"",
-    "build-lib": "npm run clean-lib && builder run --env \"{\\\"BABEL_ENV\\\":\\\"commonjs\\\"}\" build-babel -- -d lib",
+    "build-lib":
+      "npm run clean-lib && builder run --env \"{\\\"BABEL_ENV\\\":\\\"commonjs\\\"}\" build-babel -- -d lib",
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch \"npm run build-es\" src/ -d",
@@ -18,12 +19,14 @@
     "build-types": "npm run clean-types && tsc -p tsconfig.dts.json",
     "build": "builder concurrent --buffer build-lib build-es build-types",
     "demo:start:graphql-server": "node example/src/server/index.js",
-    "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
+    "demo:start:app":
+      "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "type-check": "tsc",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
     "test": "jest",
-    "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
+    "prettier":
+      "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
     "precommit": "lint-staged"
   },
   "author": "Ken Wheeler",
@@ -51,20 +54,10 @@
       "!src/**/typenames.*"
     ],
     "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,md}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{js,jsx,ts,tsx,json,md}": ["prettier --write", "git add"]
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.38",
