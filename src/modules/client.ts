@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import uuid from 'uuid/v4';
 
 import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
@@ -84,7 +84,7 @@ export default class Client {
     callback: (changedTypes: string[], response: object) => void
   ): string {
     // Create an identifier, add callback to subscriptions, return identifier
-    const id = uuid.v4();
+    const id = uuid();
     this.subscriptions[id] = callback;
     return id;
   }
