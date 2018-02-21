@@ -1,7 +1,7 @@
 /*
 !/lib
 !/es
-!/types/**/*.d.ts
+!/types
 **/tests/
 **/*.test.js
 !package.json
