@@ -5,3 +5,5 @@ types
 coverage
 .vscode
 yarn-error.log*
+package-lock.json
+package-lock.json.*
