@@ -17,7 +17,7 @@ const initializedGraphQLMiddleware = graphqlHttp({
   // Enable GraphiQL dev tool
   graphiql: true,
   // A function that returns extra data available to every resolver
-  constex: context,
+  context: context,
 });
 
 app.use(initializedGraphQLMiddleware);
