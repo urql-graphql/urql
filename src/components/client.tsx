@@ -294,6 +294,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           cache,
           refetch: this.fetch,
           refreshAllFromCache: this.refreshAllFromCache,
+          client: this.props.client,
         })
       : null;
   }
