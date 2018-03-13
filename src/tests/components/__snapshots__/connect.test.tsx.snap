@@ -10,6 +10,7 @@ exports[`Client Component should provide a context consumer and pass through to 
       "update": [Function],
     }
   }
+  client={Object {}}
   data={null}
   error={null}
   fetching={false}
