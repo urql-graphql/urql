@@ -10,6 +10,7 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
       "update": [Function],
     }
   }
+  client={Object {}}
   data={null}
   error={null}
   fetching={false}
@@ -22,6 +23,7 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
 exports[`Connect HOC should wrap its component argument with connect with functional options 1`] = `
 <div
   cache={false}
+  client={Object {}}
   data={null}
   error={null}
   fetching={false}
