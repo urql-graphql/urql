@@ -20,6 +20,26 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
 />
 `;
 
+exports[`Connect HOC should wrap its component argument with connect and hoist the statics 1`] = `
+<div
+  cache={
+    Object {
+      "invalidate": [Function],
+      "invalidateAll": [Function],
+      "read": [Function],
+      "update": [Function],
+    }
+  }
+  client={Object {}}
+  data={null}
+  error={null}
+  fetching={false}
+  loaded={false}
+  refetch={[Function]}
+  refreshAllFromCache={[Function]}
+/>
+`;
+
 exports[`Connect HOC should wrap its component argument with connect with functional options 1`] = `
 <div
   cache={false}
