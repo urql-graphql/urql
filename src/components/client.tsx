@@ -51,10 +51,12 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     this.formatProps(this.props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
+    const nextProps = this.props;
+
     if (
-      this.props.query !== nextProps.query ||
-      this.props.mutation !== nextProps.mutation
+      prevProps.query !== nextProps.query ||
+      prevProps.mutation !== nextProps.mutation
     ) {
       this.formatProps(nextProps);
     }
