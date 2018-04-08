@@ -327,7 +327,7 @@ The `cache` object provides several helpful cache methods that you can use to co
 * `read` - Takes a QueryObject parameter, returns cache value for that query.
 * `update` - Takes a callback function with an argument shape of `(store, key, value)`. The callback function is run against every cache entry, giving you the opportunity to update any given value based upon the context of the current data shape.
 
-In addition to these, any specified mutations are also provided as their key in the mutation map. Mutations are functions that accept an object of variables as an argument.
+In addition to these, any specified mutations are also provided as their key in the mutation map. Mutations are functions that accept an object of variables as an argument and return a `Promise` which resolves to the data the mutation asked for.
 
 Example:
 

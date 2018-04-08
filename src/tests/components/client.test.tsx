@@ -416,6 +416,56 @@ describe('Client Component', () => {
     }, 0);
   });
 
+  it('should pass mutation result in Promise', done => {
+    fetchMock.mockResponse({
+      data: {
+        addTodo: {
+          id: '1',
+          text: 'TestItem',
+          __typename: 'Todo',
+        },
+      },
+    });
+    const clientModule = new ClientModule({ url: 'test' });
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        // @ts-ignore
+        client={clientModule}
+        // @ts-ignore
+        mutation={{
+          addTodo: {
+            query: `mutation($id: id!) {
+              addTodo(id: $id) {
+                id
+                text
+              }
+            }`,
+            variables: { id: 1 },
+          },
+        }}
+        // @ts-ignore
+        children={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+    setTimeout(() => {
+      result.addTodo().then(mutationResult => {
+        expect(mutationResult).toEqual({
+          addTodo: {
+            id: '1',
+            text: 'TestItem',
+            __typename: 'Todo',
+          },
+        });
+        done();
+      });
+    }, 0);
+  });
+
   it('should update from cache when called with the refresh option', done => {
     fetchMock.mockResponse({
       data: { todos: [{ id: 1, __typename: 'Todo' }] },

@@ -257,13 +257,13 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       // Execute mutation
       client
         .executeMutation(mutation)
-        .then(() => {
+        .then((...args) => {
           this.setState(
             {
               fetching: false,
             },
             () => {
-              resolve();
+              resolve(...args);
             }
           );
         })
