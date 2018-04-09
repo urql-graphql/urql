@@ -3,7 +3,7 @@ import { ICache, IClient, IMutation, IQuery } from '../interfaces/index';
 import ClientWrapper from './client';
 import { Consumer } from './context';
 
-export interface IConnectProps<Data = {}, Mutations = {}> {
+export interface IConnectProps<Data, Mutations> {
   children: (props: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
   query?: IQuery | IQuery[]; // Query or queries
   mutation?: IMutation; // Mutation map
@@ -60,7 +60,9 @@ export type UrqlProps<Data, Mutations = {}> = {
   refreshAllFromCache: () => void;
 } & Mutations;
 
-export default class Connect extends Component<IConnectProps> {
+export default class Connect<Data = {}, Mutations = {}> extends Component<
+  IConnectProps<Data, Mutations>
+> {
   render() {
     // Use react-create-context to provide context to ClientWrapper
     return (
