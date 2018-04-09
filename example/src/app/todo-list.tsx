@@ -1,6 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 
-const TodoList = ({ todos, removeTodo }) => (
+export interface TodoListProps {
+  todos: Array<{ id: string; text: string }>;
+  removeTodo: (input: { id: string }) => void;
+}
+
+const TodoList: React.SFC<TodoListProps> = ({ todos, removeTodo }) => (
   <ul>
     {todos.map(todo => (
       <li key={todo.id}>

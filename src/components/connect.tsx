@@ -1,10 +1,10 @@
 import React, { Component, ReactNode } from 'react';
-import { IClient, IMutation, IQuery } from '../interfaces/index';
+import { ICache, IClient, IMutation, IQuery } from '../interfaces/index';
 import ClientWrapper from './client';
 import { Consumer } from './context';
 
-export interface IConnectProps {
-  children: (obj: object) => ReactNode; // Render prop
+export interface IConnectProps<Data = {}, Mutations = {}> {
+  children: (obj: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
   query?: IQuery | IQuery[]; // Query or queries
   mutation?: IMutation; // Mutation map
   cache?: boolean;
@@ -16,6 +16,20 @@ export interface IConnectProps {
     data: object
   ) => boolean;
 }
+
+// This is the type used for the Render Prop. It requires
+// one generic so that TypeScript can properly infer the shape
+// of data and an optional second generic to describe the mutations
+// that will be made available.
+export type UrqlProps<Data, Mutations = {}> = {
+  cache: ICache;
+  loaded: boolean;
+  fetching: boolean;
+  refetch: (options: { skipFetch?: boolean }, initial?: boolean) => void;
+  refreshAllFromCache: () => void;
+  data: Data | null;
+  error: any;
+} & Mutations;
 
 export default class Connect extends Component<IConnectProps> {
   render() {

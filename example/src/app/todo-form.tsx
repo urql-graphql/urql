@@ -1,14 +1,16 @@
 import React from 'react';
 
-type TodoFormProps = {
-  addTodo: (text: object) => void;
-};
+export interface TodoFormProps {
+  addTodo: (input: { text: string }) => void;
+}
 
 class TodoForm extends React.Component<TodoFormProps> {
   input: HTMLInputElement;
   addTodo = () => {
-    this.props.addTodo({ text: this.input.value });
-    this.input.value = '';
+    if (this.input !== null) {
+      this.props.addTodo({ text: this.input.value });
+      this.input.value = '';
+    }
   };
   render() {
     return (
