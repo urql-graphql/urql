@@ -1,5 +1,5 @@
-import React from 'react';
+import * as React from 'react';
 
-const Loading = () => <p>Loading...</p>;
+const Loading: React.SFC<{}> = () => <p>Loading...</p>;
 
 export default Loading;

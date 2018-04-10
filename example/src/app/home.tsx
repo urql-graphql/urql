@@ -1,19 +1,39 @@
 /* tslint:disable */
 
-import React from 'react';
-import { Connect, query, mutation } from '../../../src/index';
+import * as React from 'react';
+import { Connect, query, mutation, UrqlProps } from '../../../src/index';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
 import Loading from './loading';
+import { Url } from 'url';
 
-const Home = () => (
+export interface ITodoQuery {
+  todos: Array<{ id: string; text: string }>;
+  user: {
+    name: string;
+  };
+}
+
+export interface ITodoMutations {
+  addTodo: (input: { text: string }) => void;
+  removeTodo: (input: { id: string }) => void;
+}
+
+const Home: React.SFC<{}> = () => (
   <Connect
     query={query(TodoQuery)}
     mutation={{
       addTodo: mutation(AddTodo),
       removeTodo: mutation(RemoveTodo),
     }}
-    children={({ loaded, data, addTodo, removeTodo, refetch }) => {
+    children={({
+      cache,
+      loaded,
+      data,
+      addTodo,
+      removeTodo,
+      refetch,
+    }: UrqlProps<ITodoQuery, ITodoMutations>) => {
       return (
         <div>
           {!loaded ? (
@@ -22,7 +42,7 @@ const Home = () => (
             <TodoList todos={data.todos} removeTodo={removeTodo} />
           )}
           <TodoForm addTodo={addTodo} />
-          <button type="button" onClick={refetch}>
+          <button type="button" onClick={() => refetch({})}>
             Refetch
           </button>
           <button
