@@ -6,9 +6,14 @@ import { hashString } from '../../modules/hash';
 import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
 import renderer from 'react-test-renderer';
-import fetchMock from '../utils/fetch-mock';
 
 describe('Client Component', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
   it('should return null with no render function', () => {
     // @ts-ignore
     const component = renderer.create(<Client />);
@@ -45,7 +50,12 @@ describe('Client Component', () => {
   });
 
   it('should return the proper render prop arguments with a query supplied', done => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1 }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -76,13 +86,17 @@ describe('Client Component', () => {
       expect(fetching).toBe(false);
       expect(loaded).toBe(true);
       expect(refetch).toBeInstanceOf(Function);
-      fetchMock.restore();
       done();
     }, 200);
   });
 
   it('should format new props', done => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1 }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     // @ts-ignore
     let result;
@@ -167,7 +181,12 @@ describe('Client Component', () => {
   });
 
   it('should format new mutations', () => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1 }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     // @ts-ignore
     let result;
@@ -216,7 +235,7 @@ describe('Client Component', () => {
   });
 
   it('should return an error thrown by fetch', done => {
-    fetchMock.mockError('oh no!');
+    (global as any).fetch.mockReturnValue(Promise.reject(new Error('oh no!')));
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -247,15 +266,17 @@ describe('Client Component', () => {
       expect(fetching).toBe(false);
       expect(loaded).toBe(false);
       expect(refetch).toBeInstanceOf(Function);
-      fetchMock.restore();
       done();
     }, 200);
   });
 
   it('should return the proper render prop arguments with multiple queries supplied', done => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -289,13 +310,12 @@ describe('Client Component', () => {
       expect(fetching).toBe(false);
       expect(loaded).toBe(true);
       expect(refetch).toBeInstanceOf(Function);
-      fetchMock.restore();
       done();
     }, 200);
   });
 
   it('should return the proper render prop arguments with multiple queries supplied and an error', done => {
-    fetchMock.mockError('lol');
+    (global as any).fetch.mockReturnValue(Promise.reject(new Error('lol')));
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -319,13 +339,16 @@ describe('Client Component', () => {
       expect(fetching).toBe(false);
       expect(loaded).toBe(false);
       expect(refetch).toBeInstanceOf(Function);
-      fetchMock.restore();
       done();
     }, 200);
   });
 
   it('should return mutations when mutations are provided', done => {
-    fetchMock.mockResponse({ data: { todos: [{ id: 1 }] } });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        data: { todos: [{ id: 1 }] },
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -370,9 +393,12 @@ describe('Client Component', () => {
   });
 
   it('should update in response to mutations', done => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -409,7 +435,6 @@ describe('Client Component', () => {
           let { data } = result;
           expect(spy).toHaveBeenCalledTimes(3);
           expect(data).toBeTruthy();
-          spy.mockRestore();
           done();
         }, 200);
       });
@@ -417,15 +442,20 @@ describe('Client Component', () => {
   });
 
   it('should pass mutation result in Promise', done => {
-    fetchMock.mockResponse({
-      data: {
-        addTodo: {
-          id: '1',
-          text: 'TestItem',
-          __typename: 'Todo',
-        },
-      },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({
+          data: {
+            addTodo: {
+              id: '1',
+              text: 'TestItem',
+              __typename: 'Todo',
+            },
+          },
+        }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -467,9 +497,11 @@ describe('Client Component', () => {
   });
 
   it('should update from cache when called with the refresh option', done => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        data: { todos: [{ id: 1, __typename: 'Todo' }] },
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     // @ts-ignore
     const spy = jest.spyOn(global, 'fetch');
@@ -497,14 +529,14 @@ describe('Client Component', () => {
   });
 
   it('should respect the cache prop', done => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        data: { todos: [{ id: 1, __typename: 'Todo' }] },
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     // @ts-ignore
     let result;
-    // @ts-ignore
-    const spy = jest.spyOn(global, 'fetch');
     // @ts-ignore
     const client = renderer.create(
       <Client
@@ -537,20 +569,20 @@ describe('Client Component', () => {
     client.getInstance().fetch();
 
     setTimeout(() => {
-      expect(spy).toHaveBeenCalledTimes(2);
-      spy.mockRestore();
+      expect((global as any).fetch).toHaveBeenCalledTimes(2);
       done();
     }, 0);
   });
 
   it('should use shouldInvalidate if present', done => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
+      })
+    );
     const clientModule = new ClientModule({ url: 'test' });
     let result;
-    // @ts-ignore
-    const spy = jest.spyOn(global, 'fetch');
     // @ts-ignore
     const client = renderer.create(
       <Client
@@ -583,9 +615,8 @@ describe('Client Component', () => {
       result.addTodo().then(() => {
         setTimeout(() => {
           let { data } = result;
-          expect(spy).toHaveBeenCalledTimes(2);
+          expect((global as any).fetch).toHaveBeenCalledTimes(2);
           expect(data).toBeTruthy();
-          spy.mockRestore();
           done();
         }, 200);
       });
@@ -593,11 +624,9 @@ describe('Client Component', () => {
   });
 
   it('should not update in response to mutations that throw', done => {
-    fetchMock.mockError('Yoinks');
+    (global as any).fetch.mockReturnValue(Promise.reject(new Error('Yoinks!')));
     const clientModule = new ClientModule({ url: 'test' });
     let result;
-    // @ts-ignore
-    const spy = jest.spyOn(global, 'fetch');
     // @ts-ignore
     const client = renderer.create(
       <Client
@@ -626,17 +655,13 @@ describe('Client Component', () => {
     );
     setTimeout(() => {
       result.addTodo().catch(() => {
-        expect(spy).toHaveBeenCalledTimes(2);
-        spy.mockRestore();
+        expect((global as any).fetch).toHaveBeenCalledTimes(2);
         done();
       });
     }, 0);
   });
 
   it('shouldnt return data or mutations if neither is provided', () => {
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
@@ -661,7 +686,7 @@ describe('Client Component', () => {
     });
   });
 
-  it('should hash queries and read from the cache', done => {
+  it('should hash queries and read from the cache', () => {
     const query = `
       {
         todos {
@@ -692,11 +717,10 @@ describe('Client Component', () => {
       .read({ query, variables: {} })
       .then(data => {
         expect(data).toBe(5);
-        done();
       });
   });
 
-  it('should invalidate the entire cache when invalidateAll is called', done => {
+  it('should invalidate the entire cache when invalidateAll is called', () => {
     const clientModule = new ClientModule({
       url: 'test',
       initialCache: { test: 5 },
@@ -719,11 +743,10 @@ describe('Client Component', () => {
       .invalidateAll()
       .then(() => {
         expect(clientModule.store).toMatchObject({});
-        done();
       });
   });
 
-  it('should invalidate a query when invalidate is called with one', done => {
+  it('should invalidate a query when invalidate is called with one', () => {
     const query = `
       {
         todos {
@@ -754,11 +777,10 @@ describe('Client Component', () => {
       .invalidate({ query, variables: {} })
       .then(() => {
         expect(clientModule.store).toMatchObject({});
-        done();
       });
   });
 
-  it('should invalidate component query by default when invalidate is called', done => {
+  it('should invalidate component query by default when invalidate is called', () => {
     const query = `
       {
         todos {
@@ -768,9 +790,11 @@ describe('Client Component', () => {
       }
     `;
 
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValueOnce(
+      Promise.resolve({
+        data: { todos: [{ id: 1, __typename: 'Todo' }] },
+      })
+    );
 
     const clientModule = new ClientModule({ url: 'test' });
 
@@ -793,12 +817,10 @@ describe('Client Component', () => {
       .invalidate()
       .then(() => {
         expect(clientModule.store).toMatchObject({});
-        fetchMock.restore();
-        done();
       });
   });
 
-  it('should invalidate component queries by default when invalidate is called', done => {
+  it('should invalidate component queries by default when invalidate is called', () => {
     const query = `
       {
         todos {
@@ -808,9 +830,12 @@ describe('Client Component', () => {
       }
     `;
 
-    fetchMock.mockResponse({
-      data: { todos: [{ id: 1, __typename: 'Todo' }] },
-    });
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        data: { todos: [{ id: 1, __typename: 'Todo' }] },
+      })
+    );
 
     const clientModule = new ClientModule({ url: 'test' });
 
@@ -828,17 +853,15 @@ describe('Client Component', () => {
       />
     );
 
-    client
+    return client
       .getInstance()
       .invalidate()
       .then(() => {
         expect(clientModule.store).toMatchObject({});
-        fetchMock.restore();
-        done();
       });
   });
 
-  it('should update cache when updateCache is called', done => {
+  it('should update cache when updateCache is called', () => {
     const clientModule = new ClientModule({
       url: 'test',
       initialCache: { test: 5 },
@@ -856,7 +879,7 @@ describe('Client Component', () => {
       />
     );
 
-    client
+    return client
       .getInstance()
       .updateCache((store, key) => {
         if (key === 'test') {
@@ -865,11 +888,10 @@ describe('Client Component', () => {
       })
       .then(() => {
         expect(clientModule.store).toMatchObject({ test: 6 });
-        done();
       });
   });
 
-  it('should trigger a refresh when refreshAllFromCache is called', done => {
+  it('should trigger a refresh when refreshAllFromCache is called', () => {
     const clientModule = new ClientModule({
       url: 'test',
     });
@@ -888,12 +910,11 @@ describe('Client Component', () => {
 
     const spy = jest.spyOn(clientModule, 'refreshAllFromCache');
 
-    client
+    return client
       .getInstance()
       .refreshAllFromCache()
       .then(() => {
         expect(spy).toHaveBeenCalled();
-        done();
       });
   });
 });

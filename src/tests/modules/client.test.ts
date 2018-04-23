@@ -1,8 +1,12 @@
 import Client, { defaultCache } from '../../modules/client';
 
-import fetchMock from '../utils/fetch-mock';
-
 describe('Client', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
   it('should throw without options provided', () => {
     expect(() => {
       new Client();
@@ -191,7 +195,12 @@ describe('Client', () => {
       client = new Client({
         url: 'http://localhost:3000/graphql',
       });
-      fetchMock.mockResponse({ data: [{ id: 5 }] });
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: [{ id: 5 }] }),
+        })
+      );
 
       client
         .executeQuery({
@@ -204,13 +213,17 @@ describe('Client', () => {
         })
         .then(result => {
           expect(result).toMatchObject({ data: [{ id: 5 }], typeNames: [] });
-          fetchMock.restore();
           done();
         });
     });
 
     it('should return data from the cache if it is present', done => {
-      fetchMock.mockResponse({ data: [{ id: 12345 }] });
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: [{ id: 12345 }] }),
+        })
+      );
 
       client
         .executeQuery({
@@ -226,7 +239,6 @@ describe('Client', () => {
             data: [{ id: 5 }],
             typeNames: [],
           });
-          fetchMock.restore();
           done();
         });
     });
@@ -239,9 +251,12 @@ describe('Client', () => {
         },
       });
 
-      fetchMock.mockResponse({ data: [{ id: 5 }] });
-      // @ts-ignore
-      let spy = jest.spyOn(global, 'fetch');
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: [{ id: 5 }] }),
+        })
+      );
 
       client
         .executeQuery({
@@ -251,14 +266,16 @@ describe('Client', () => {
           const body = JSON.stringify({
             query: ``,
           });
-          expect(spy).toHaveBeenCalledWith('http://localhost:3000/graphql', {
-            body: body,
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-            test: 5,
-          });
-          fetchMock.restore();
-          spy.mockRestore();
+          expect((global as any).fetch).toHaveBeenCalledWith(
+            'http://localhost:3000/graphql',
+            {
+              body: body,
+              headers: { 'Content-Type': 'application/json' },
+              method: 'POST',
+              test: 5,
+            }
+          );
+
           done();
         });
     });
@@ -268,7 +285,12 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockResponse({ test: 5 });
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ test: 5 }),
+        })
+      );
 
       client
         .executeQuery({
@@ -281,7 +303,6 @@ describe('Client', () => {
         })
         .catch(e => {
           expect(e).toMatchObject({ message: 'No data' });
-          fetchMock.restore();
           done();
         });
     });
@@ -291,7 +312,9 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockError('Nooooo');
+      (global as any).fetch.mockReturnValue(
+        Promise.reject(new Error('Nooooo'))
+      );
 
       client
         .executeQuery({
@@ -304,7 +327,6 @@ describe('Client', () => {
         })
         .catch(e => {
           expect(e).toMatchObject(new Error('Nooooo'));
-          fetchMock.restore();
           done();
         });
     });
@@ -317,7 +339,12 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockResponse({ data: { test: 5 } });
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: { test: 5 } }),
+        })
+      );
 
       client
         .executeMutation({
@@ -330,7 +357,6 @@ describe('Client', () => {
         })
         .then(data => {
           expect(data).toMatchObject({ test: 5 });
-          fetchMock.restore();
           done();
         });
     });
@@ -340,7 +366,12 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockResponse({ test: 5 });
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ test: 5 }),
+        })
+      );
 
       client
         .executeMutation({
@@ -353,7 +384,6 @@ describe('Client', () => {
         })
         .catch(e => {
           expect(e).toMatchObject({ message: 'No data' });
-          fetchMock.restore();
           done();
         });
     });
@@ -363,7 +393,7 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockError('Noooo');
+      (global as any).fetch.mockReturnValue(Promise.reject(new Error('Noooo')));
 
       client
         .executeMutation({
@@ -376,8 +406,38 @@ describe('Client', () => {
         })
         .catch(e => {
           expect(e).toMatchObject(new Error('Noooo'));
-          fetchMock.restore();
           done();
+        });
+    });
+
+    it('should return an error with attached response if fetch throws an HTTP error', () => {
+      client = new Client({
+        url: 'http://localhost:3000/graphql',
+      });
+
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 401,
+          statusText: "I'm afraid I can't let you do that, Dave",
+        })
+      );
+
+      return client
+        .executeMutation({
+          query: `{
+          todos {
+            id
+            name
+          }
+        }`,
+        })
+        .catch(e => {
+          expect(e).toBeInstanceOf(Error);
+          expect(e).toHaveProperty(
+            'response.statusText',
+            "I'm afraid I can't let you do that, Dave"
+          );
+          expect(e).toHaveProperty('response.status', 401);
         });
     });
 
@@ -386,8 +446,14 @@ describe('Client', () => {
         url: 'http://localhost:3000/graphql',
       });
 
-      fetchMock.mockResponse({ data: { test: 5 } });
-      let spy = jest.spyOn(client, 'updateSubscribers');
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: { test: 5 } }),
+        })
+      );
+
+      const spy = jest.spyOn(client, 'updateSubscribers');
 
       client
         .executeMutation({
@@ -400,8 +466,6 @@ describe('Client', () => {
         })
         .then(() => {
           expect(spy).toHaveBeenCalledWith([], { data: { test: 5 } });
-          fetchMock.restore();
-          spy.mockRestore();
           done();
         });
     });

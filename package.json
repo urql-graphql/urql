@@ -32,6 +32,9 @@
     "babel-core": "^7.0.0-bridge.0"
   },
   "jest": {
+    "setupFiles": [
+      "./src/tests/setup.js"
+    ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
