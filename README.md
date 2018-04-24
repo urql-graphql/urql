@@ -410,6 +410,7 @@ mutation($id: ID!) {
   { id: 5 }
 );
 ```
+
 ### use urql without using components
 
 While the goal of this project is to work nicely with react, sometimes you just need to do a mutation or a query without using any components. In this case you can call [client.executeQuery](src/components/client.tsx#L188) directly.
@@ -417,12 +418,13 @@ While the goal of this project is to work nicely with react, sometimes you just 
 Example:
 
 ```javascript
-let variables = {"q": "Did I do that?"}
-let skipCache = true //set this to true if you don't need cache
+let variables = { q: 'Did I do that?' };
+let skipCache = true; //set this to true if you don't need cache
 client.executeQuery(query(myQuery, variables), skipCache).then(function(data) {
   console.log(data);
 });
 ```
+
 ## TODO
 
 * [ ] Server Side Rendering

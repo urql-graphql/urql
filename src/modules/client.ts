@@ -10,6 +10,19 @@ export interface IQueryResponse {
   typeNames?: string[];
 }
 
+const checkStatus = (redirectMode: string = 'follow') => (
+  response: Response
+) => {
+  // If using manual redirect mode, don't error on redirect!
+  const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
+  if (response.status >= 200 && response.status < statusRangeEnd) {
+    return response;
+  }
+  const err = new Error(response.statusText);
+  (err as any).response = response;
+  throw err;
+};
+
 export const defaultCache = store => {
   return {
     invalidate: hash =>
@@ -46,7 +59,7 @@ export const defaultCache = store => {
 export default class Client {
   url?: string; // Graphql API URL
   store: object; // Internal store
-  fetchOptions: object | (() => object); // Options for fetch call
+  fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
   cache: ICache; // Cache object
 
@@ -138,6 +151,7 @@ export default class Client {
             method: 'POST',
             ...fetchOptions,
           })
+            .then(checkStatus(fetchOptions.redirect))
             .then(res => res.json())
             .then(response => {
               if (response.data) {
@@ -183,6 +197,7 @@ export default class Client {
         method: 'POST',
         ...fetchOptions,
       })
+        .then(checkStatus(fetchOptions.redirect))
         .then(res => res.json())
         .then(response => {
           if (response.data) {
