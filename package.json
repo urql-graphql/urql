@@ -130,6 +130,7 @@
     "tslint-config-prettier": "^1.6.0",
     "tslint-react": "^3.4.0",
     "typescript": "~2.7.2",
+    "uuid": "^3.2.1",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
   },
