@@ -152,29 +152,30 @@ describe('Client', () => {
   describe('subscribe', () => {
     let client;
 
-    beforeAll(() => {
+    beforeEach(() => {
       client = new Client({
         url: 'test',
       });
     });
 
-    it('should return a unique id', () => {
+    it('should return an unsubscribe callback', () => {
       const callback = () => {};
-      const id = client.subscribe(callback);
-      expect(id).not.toBeNull();
+      const unsubscribe = client.subscribe(callback);
+      expect(unsubscribe).not.toBeNull();
     });
 
-    it('should add function arguments to the internal subscriptions array', () => {
+    it('should add function arguments to the internal subscriptions object', () => {
       const callback = () => {};
-      const id = client.subscribe(callback);
-      expect(client.subscriptions[id]).toBe(callback);
+      expect(Object.keys(client.subscriptions).length).toBe(0);
+      client.subscribe(callback);
+      expect(Object.keys(client.subscriptions).length).toBe(1);
     });
   });
 
   describe('unsubscribe', () => {
     let client;
 
-    beforeAll(() => {
+    beforeEach(() => {
       client = new Client({
         url: 'test',
       });
@@ -182,9 +183,10 @@ describe('Client', () => {
 
     it('should remove from subscriptions by id', () => {
       const callback = () => {};
-      const id = client.subscribe(callback);
-      client.unsubscribe(id);
-      expect(client.subscriptions[id]).toBeUndefined();
+      const unsubscribe = client.subscribe(callback);
+      expect(Object.keys(client.subscriptions).length).toBe(1);
+      unsubscribe();
+      expect(Object.keys(client.subscriptions).length).toBe(0);
     });
   });
 
