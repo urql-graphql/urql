@@ -1,5 +1,3 @@
-import uuid from 'uuid/v4';
-
 import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
@@ -61,6 +59,7 @@ export default class Client {
   store: object; // Internal store
   fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
+  subscriptionSize: number; // Used to generate IDs for subscriptions
   cache: ICache; // Cache object
 
   constructor(opts?: IClientOptions) {
@@ -77,6 +76,7 @@ export default class Client {
     this.store = opts.initialCache || {};
     this.cache = opts.cache || defaultCache(this.store);
     this.subscriptions = {};
+    this.subscriptionSize = 0;
     // Bind methods
     this.executeQuery = this.executeQuery.bind(this);
     this.executeMutation = this.executeMutation.bind(this);
@@ -95,14 +95,14 @@ export default class Client {
 
   subscribe(
     callback: (changedTypes: string[], response: object) => void
-  ): string {
+  ): number {
     // Create an identifier, add callback to subscriptions, return identifier
-    const id = uuid();
+    const id = this.subscriptionSize++;
     this.subscriptions[id] = callback;
     return id;
   }
 
-  unsubscribe(id: string) {
+  unsubscribe(id: number) {
     // Delete from subscriptions by identifier
     delete this.subscriptions[id];
   }
