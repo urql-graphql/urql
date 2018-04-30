@@ -95,16 +95,15 @@ export default class Client {
 
   subscribe(
     callback: (changedTypes: string[], response: object) => void
-  ): number {
-    // Create an identifier, add callback to subscriptions, return identifier
+  ): () => void {
+    // Create an identifier, add callback to subscriptions
     const id = this.subscriptionSize++;
     this.subscriptions[id] = callback;
-    return id;
-  }
 
-  unsubscribe(id: number) {
-    // Delete from subscriptions by identifier
-    delete this.subscriptions[id];
+    // Return unsubscription function
+    return () => {
+      delete this.subscriptions[id];
+    };
   }
 
   refreshAllFromCache() {
