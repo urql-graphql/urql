@@ -124,7 +124,8 @@
   },
   "dependencies": {
     "create-react-context": "^0.1.3",
-    "graphql": "^0.13.1"
+    "graphql": "^0.13.1",
+    "zen-observable-ts": "^0.8.9"
   },
   "sideEffects": false
 }
