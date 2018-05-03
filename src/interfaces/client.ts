@@ -1,6 +1,5 @@
 import { IQueryResponse } from './../modules/client';
 import { ICache } from './cache';
-import { IMutation } from './mutation';
 import { IQuery } from './query';
 
 export interface IClient {
@@ -9,7 +8,7 @@ export interface IClient {
     queryObject: IQuery,
     skipCache: boolean
   ): Promise<IQueryResponse>;
-  executeMutation(mutationObject: IMutation): Promise<object[]>;
+  executeMutation(mutationObject: IQuery): Promise<object>;
   refreshAllFromCache(): void;
   subscribe(
     callback: (changedTypes: string[], reponse: object) => void
