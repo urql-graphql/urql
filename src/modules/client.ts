@@ -1,4 +1,10 @@
-import { ICache, IClientOptions, IExchange, IExchangeResult, IQuery } from '../interfaces/index';
+import {
+  ICache,
+  IClientOptions,
+  IExchange,
+  IExchangeResult,
+  IQuery,
+} from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
 

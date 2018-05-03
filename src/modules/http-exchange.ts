@@ -11,9 +11,8 @@ const checkStatus = (redirectMode: string = 'follow') => (
   if (response.status >= 200 && response.status < statusRangeEnd) {
     return response;
   }
-  const err = new Error(response.statusText);
-  (err as any).response = response;
-  throw err;
+
+  throw new Error(response.statusText);
 };
 
 const createAbortController = () => {
@@ -36,6 +35,8 @@ export const httpExchange = (): IExchange => operation => {
   const abortController = createAbortController();
 
   return new Observable(observer => {
+    let response;
+
     fetch(url, {
       body,
       headers: { 'Content-Type': 'application/json' },
@@ -43,18 +44,21 @@ export const httpExchange = (): IExchange => operation => {
       signal: abortController.signal,
       ...fetchOptions,
     })
+      .then(res => (response = res))
       .then(checkStatus(fetchOptions.redirect))
       .then(res => res.json())
-      .then(response => {
+      .then(result => {
         let error;
-        if (Array.isArray(response.errors)) {
+        if (Array.isArray(result.errors)) {
           error = new CombinedError({
-            graphQLErrors: response.errors,
+            graphQLErrors: result.errors,
+            response,
           });
         }
-        if (response.data) {
+
+        if (result.data) {
           observer.next({
-            data: response.data,
+            data: result.data,
             error,
           });
           observer.complete();
@@ -71,7 +75,9 @@ export const httpExchange = (): IExchange => operation => {
 
         const error = new CombinedError({
           networkError: err,
+          response,
         });
+
         observer.error(error);
       });
 

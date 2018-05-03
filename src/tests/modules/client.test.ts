@@ -304,7 +304,7 @@ describe('Client', () => {
         }`,
         })
         .catch(e => {
-          expect(e).toMatchObject({ message: 'No data' });
+          expect(e.message).toBe('no data or error');
           done();
         });
     });
@@ -328,7 +328,7 @@ describe('Client', () => {
         }`,
         })
         .catch(e => {
-          expect(e).toMatchObject(new Error('Nooooo'));
+          expect(e.networkError).toMatchObject(new Error('Nooooo'));
           done();
         });
     });
@@ -385,7 +385,7 @@ describe('Client', () => {
         }`,
         })
         .catch(e => {
-          expect(e).toMatchObject({ message: 'No data' });
+          expect(e.message).toBe('no data or error');
           done();
         });
     });
@@ -407,7 +407,7 @@ describe('Client', () => {
         }`,
         })
         .catch(e => {
-          expect(e).toMatchObject(new Error('Noooo'));
+          expect(e.networkError).toMatchObject(new Error('Noooo'));
           done();
         });
     });

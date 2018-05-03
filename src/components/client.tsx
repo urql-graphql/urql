@@ -198,7 +198,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           }
           // Update data
           this.setState({
-            data: result.data,
+            data: result.data || null,
             error: result.error,
             fetching: false,
             loaded: initial ? true : this.state.loaded,
@@ -233,9 +233,11 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         })
       )
         .then(results => {
+          const errors = results.map(res => res.error).filter(Boolean);
+
           this.setState({
             data: results.map(res => res.data),
-            error: results.map(res => res.error),
+            error: errors.length > 0 ? errors : null,
             fetching: false,
             loaded: true,
           });
