@@ -519,12 +519,16 @@ describe('Client Component', () => {
       />
     );
 
-    client.getInstance().update(null, null, true);
-
+    // NOTE: Delay here waits for the fetch to flush and complete, since
+    // dedupExchange would deduplicate it otherwise
     setTimeout(() => {
-      expect(spy).toHaveBeenCalledTimes(2);
-      spy.mockRestore();
-      done();
+      client.getInstance().update(null, null, true);
+
+      setTimeout(() => {
+        expect(spy).toHaveBeenCalledTimes(2);
+        spy.mockRestore();
+        done();
+      }, 100);
     }, 100);
   });
 
@@ -566,12 +570,16 @@ describe('Client Component', () => {
       />
     );
 
-    client.getInstance().fetch();
-
+    // NOTE: Delay here waits for the fetch to flush and complete, since
+    // dedupExchange would deduplicate it otherwise
     setTimeout(() => {
-      expect((global as any).fetch).toHaveBeenCalledTimes(2);
-      done();
-    }, 0);
+      client.getInstance().fetch();
+
+      setTimeout(() => {
+        expect((global as any).fetch).toHaveBeenCalledTimes(2);
+        done();
+      }, 0);
+    }, 100);
   });
 
   it('should use shouldInvalidate if present', done => {
