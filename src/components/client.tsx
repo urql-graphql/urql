@@ -198,6 +198,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           // Update data
           this.setState({
             data: result.data,
+            error: result.error,
             fetching: false,
             loaded: initial ? true : this.state.loaded,
           });
@@ -225,21 +226,22 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
                 (v, i, a) => a.indexOf(v) === i
               );
             }
-            partialData.push(result.data);
-            return result.data;
+            partialData.push(result);
+            return result;
           });
         })
       )
         .then(results => {
           this.setState({
-            data: results,
+            data: results.map(res => res.data),
+            error: results.map(res => res.error),
             fetching: false,
             loaded: true,
           });
         })
         .catch(e => {
           this.setState({
-            data: partialData,
+            data: partialData.map(part => part.data),
             error: e,
             fetching: false,
           });

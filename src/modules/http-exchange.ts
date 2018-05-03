@@ -1,6 +1,7 @@
 import Observable from 'zen-observable-ts';
 
 import { IExchange } from '../interfaces/index';
+import { CombinedError } from './error';
 
 const checkStatus = (redirectMode: string = 'follow') => (
   response: Response
@@ -45,12 +46,22 @@ export const httpExchange = (): IExchange => operation => {
       .then(checkStatus(fetchOptions.redirect))
       .then(res => res.json())
       .then(response => {
+        let error;
+        if (Array.isArray(response.errors)) {
+          error = new CombinedError({
+            graphQLErrors: response.errors,
+          });
+        }
         if (response.data) {
-          observer.next(response);
+          observer.next({
+            data: response.data,
+            error,
+          });
           observer.complete();
+        } else if (error) {
+          observer.error(error);
         } else {
-          // TODO: Proper error handling
-          observer.error({ message: 'No data' });
+          observer.error(new Error('no data or error'));
         }
       })
       .catch(err => {
@@ -58,7 +69,10 @@ export const httpExchange = (): IExchange => operation => {
           return;
         }
 
-        observer.error(err);
+        const error = new CombinedError({
+          networkError: err,
+        });
+        observer.error(error);
       });
 
     return () => {

@@ -6,11 +6,7 @@ import { hashString } from './hash';
 
 import { dedupExchange } from './dedup-exchange';
 import { httpExchange } from './http-exchange';
-
-// Response from executeQuery call
-export interface IQueryResponse extends ExecutionResult {
-  typeNames?: string[];
-}
+import { IExchangeResult } from '../interfaces/exchange';
 
 export const defaultCache = store => {
   return {
@@ -145,15 +141,13 @@ export default class Client {
 
         this.exchange(operation).subscribe({
           error: reject,
-          next: response => {
+          next: (response: IExchangeResult) => {
             // Grab typenames from response data
-            const typeNames = gankTypeNamesFromResponse(response.data);
-            // Result distributes typenames and data
-            const result = { data: response.data, typeNames };
+            response.typeNames = gankTypeNamesFromResponse(response.data);
             // Store data in cache, using serialized query as key
-            this.cache.write(key, result);
+            this.cache.write(key, response);
             // Resolve result
-            resolve(result);
+            resolve(response);
           },
         });
       });
