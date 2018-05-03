@@ -14,6 +14,8 @@ export const dedupExchange = (forward: IExchange): IExchange => {
       return inFlight[key];
     }
 
+    const forwarded$ = forward(operation);
+
     // Keep around one subscription and collect observers for this observable
     const observers = [];
     let refCounter = 0;
@@ -25,10 +27,10 @@ export const dedupExchange = (forward: IExchange): IExchange => {
       observers.push(observer);
 
       if (subscription === undefined) {
-        subscription = forward(operation).subscribe({
+        subscription = forwarded$.subscribe({
           complete: () => {
-            observers.forEach(x => x.complete());
             delete inFlight[key];
+            observers.forEach(x => x.complete());
           },
           error: error => {
             observers.forEach(x => x.error(error));
