@@ -26,7 +26,7 @@ export interface IClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
   error?: Error; // Error
-  data: object[] | IClientState[]; // Data
+  data: object | object[] | IClientState[]; // Data
 }
 
 export default class UrqlClient extends Component<IClientProps, IClientState> {
