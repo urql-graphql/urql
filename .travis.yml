@@ -15,6 +15,7 @@ sudo: false
 branches:
   only:
     - master
+    - next
 
 notifications:
   email:
