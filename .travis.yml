@@ -17,7 +17,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 install:
-  - npm ci
+  - npm install
 
 script:
   - npm test
