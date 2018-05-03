@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { IExchange } from '../interfaces/exchange';
+import { IExchange } from '../interfaces/index';
 
 // Wraps an exchange and deduplicates in-flight operations by their key
 export const dedupExchange = (forward: IExchange): IExchange => {
