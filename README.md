@@ -310,15 +310,15 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 
 The following fields are present on the render functions argument object:
 
-| Name                | Value      | Default    | Description                                                                                            |
-| ------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ |
-| cache               | `object`   | Cache      | Provides cache operations, defined below                                                               |
-| fetching            | `boolean`  | `false`    | Fetching is true during any pending query or mutation operation                                        |
-| loaded              | `boolean`  | `false`    | Becomes true once the component gets data for the first time.                                          |
-| error               | `object`   | `null`     | Any errors thrown during a query or mutation                                                           |
-| data                | `object`   | `null`     | Any data returned as the result of a query                                                             |
-| refetch             | `function` | `function` | Function used to refetch existing queries, can skip cache by calling with `{skipCache: true}` argument |
-| refreshAllFromCache | `function` | `function` | Function used to refetch all queries from the cache.                                                   |
+| Name                | Value           | Default    | Description                                                                                            |
+| ------------------- | --------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| cache               | `object`        | Cache      | Provides cache operations, defined below                                                               |
+| fetching            | `boolean`       | `false`    | Fetching is true during any pending query or mutation operation                                        |
+| loaded              | `boolean`       | `false`    | Becomes true once the component gets data for the first time.                                          |
+| error               | `CombinedError` | `null`     | Any CombinedErrors thrown during a query or mutation ([see below](#combinederror))                     |
+| data                | `object`        | `null`     | Any data returned as the result of a query                                                             |
+| refetch             | `function`      | `function` | Function used to refetch existing queries, can skip cache by calling with `{skipCache: true}` argument |
+| refreshAllFromCache | `function`      | `function` | Function used to refetch all queries from the cache.                                                   |
 
 The `cache` object provides several helpful cache methods that you can use to control the cache:
 
@@ -390,6 +390,20 @@ query($id: ID!) {
   { id: 5 }
 );
 ```
+
+### CombinedError
+
+CombinedError displays a list of all network and GraphQL errors that have occured during a GraphQL request.
+
+\_No GraphQL errors will be present if a network error has occured
+
+The following fields are present within a CombinedError:
+
+| Name          | Value         | Description                          |
+| ------------- | ------------- | ------------------------------------ |
+| networkError  | Error         | Network error if fetch has failed    |
+| graphQLErrors | Error[]       | GraphQL errors from the API response |
+| reponse       | FetchResponse | Raw Response instance                |
 
 ### mutation
 
