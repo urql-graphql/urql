@@ -45,7 +45,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   query = null; // Stored Query
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
-  subscriptionID = null; // Change subscription ID
+  unsubscribe = null; // Unsubscription function calling back to the client
 
   componentDidMount() {
     this.formatProps(this.props);
@@ -64,7 +64,9 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
 
   componentWillUnmount() {
     // Unsub from change listener
-    this.props.client.unsubscribe(this.subscriptionID);
+    if (this.unsubscribe !== null) {
+      this.unsubscribe();
+    }
   }
 
   invalidate = queryObject => {
@@ -107,7 +109,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         ? props.query.map(formatTypeNames)
         : formatTypeNames(props.query);
       // Subscribe to change listener
-      this.subscriptionID = props.client.subscribe(this.update);
+      this.unsubscribe = props.client.subscribe(this.update);
       // Fetch initial data
       this.fetch(undefined, true);
     }

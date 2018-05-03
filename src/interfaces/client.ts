@@ -13,6 +13,5 @@ export interface IClient {
   refreshAllFromCache(): void;
   subscribe(
     callback: (changedTypes: string[], reponse: object) => void
-  ): string;
-  unsubscribe(id: string): void;
+  ): () => void;
 }
