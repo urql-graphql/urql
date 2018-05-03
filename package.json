@@ -27,7 +27,7 @@
     "anchorate": "^1.1.0",
     "builder": "^3.1.0",
     "builder-docs-archetype": "^4.2.2",
-    "formidable-landers": "^5.1.1",
+    "formidable-landers": "^8.0.3",
     "history": "^1.17.0",
     "lodash": "^4.16.4",
     "markdown-it": "^8.0.0",
