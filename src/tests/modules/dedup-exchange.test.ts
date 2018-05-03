@@ -12,12 +12,12 @@ describe('dedupExchange', () => {
   it('forwards operations and subscribes', done => {
     let mockOp;
 
-    const mockExchange = operation =>
+    const mockExchange = (operation =>
       new Observable(observer => {
         mockOp = operation;
         observer.next(operation);
         observer.complete();
-      });
+      }) as any) as IExchange;
 
     const testExchange = dedupExchange(mockExchange);
     const testOperation = { key: 'test' } as any;
@@ -46,11 +46,11 @@ describe('dedupExchange', () => {
   });
 
   it('deletes intermediate observable when in-flight operation completed', done => {
-    const mockExchange = () =>
+    const mockExchange = (() =>
       new Observable(observer => {
         observer.next(null);
         observer.complete();
-      });
+      }) as any) as IExchange;
 
     const testExchange = dedupExchange(mockExchange);
     const obsA = testExchange({ key: 'a' } as any);

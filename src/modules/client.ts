@@ -1,8 +1,10 @@
 import { ExecutionResult } from 'graphql';
+
 import { ICache, IClientOptions, IExchange, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
-import { dedupExchange } from './dedup-exchange';
 import { hashString } from './hash';
+
+import { dedupExchange } from './dedup-exchange';
 import { httpExchange } from './http-exchange';
 
 // Response from executeQuery call
