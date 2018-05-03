@@ -82,7 +82,7 @@ describe('Client Component', () => {
     setTimeout(() => {
       let { data, error, fetching, loaded, refetch } = result;
       expect(data).toMatchObject({ todos: [{ id: 1 }] });
-      expect(error).toBeNull();
+      expect(error).toBe(undefined);
       expect(fetching).toBe(false);
       expect(loaded).toBe(true);
       expect(refetch).toBeInstanceOf(Function);
@@ -262,7 +262,7 @@ describe('Client Component', () => {
     setTimeout(() => {
       let { data, error, fetching, loaded, refetch } = result;
       expect(data).toBeNull();
-      expect(error).toMatchObject(new Error('oh no!'));
+      expect(error.networkError).toMatchObject(new Error('oh no!'));
       expect(fetching).toBe(false);
       expect(loaded).toBe(false);
       expect(refetch).toBeInstanceOf(Function);
@@ -334,8 +334,8 @@ describe('Client Component', () => {
 
     setTimeout(() => {
       let { data, error, fetching, loaded, refetch } = result;
-      expect(data).toMatchObject([]);
-      expect(error).toMatchObject(new Error('lol'));
+      expect(data).toEqual([]);
+      expect(error.networkError.message).toBe('lol');
       expect(fetching).toBe(false);
       expect(loaded).toBe(false);
       expect(refetch).toBeInstanceOf(Function);

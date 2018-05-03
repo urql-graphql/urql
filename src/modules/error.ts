@@ -27,27 +27,32 @@ const rehydrateGraphQlError = (error: string | IGraphQLError): Error => {
   }
 };
 
-export class CombinedError extends Error {
+// Shared interface extending Error
+// tslint:disable-next-line no-empty-interface interface-name
+export interface CombinedError extends Error {}
+
+export class CombinedError {
+  public name: string;
   public message: string;
   public graphQLErrors: Error[];
   public networkError?: Error;
+  public response?: any;
 
   constructor({
     networkError,
     graphQLErrors,
+    response,
   }: {
     networkError?: Error;
     graphQLErrors?: Array<string | IGraphQLError>;
+    response?: any;
   }) {
-    const gqlErrors = (graphQLErrors || []).map(rehydrateGraphQlError);
-    const errorMessage = generateErrorMessage(networkError, gqlErrors);
-
-    super(errorMessage);
-
-    this.message = errorMessage;
-    this.graphQLErrors = gqlErrors;
+    this.name = 'CombinedError';
+    this.graphQLErrors = (graphQLErrors || []).map(rehydrateGraphQlError);
+    this.message = generateErrorMessage(networkError, this.graphQLErrors);
     this.networkError = networkError;
-
-    Object.setPrototypeOf(this, CombinedError.prototype);
+    this.response = response;
   }
 }
+
+CombinedError.prototype = Object.create(Error.prototype);
