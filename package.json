@@ -42,6 +42,6 @@
     "react-ga": "^2.1.1",
     "react-router": "^2.7.0",
     "react-router-scroll": "^0.2.0",
-    "spectacle": "FormidableLabs/spectacle"
+    "spectacle": "github:FormidableLabs/spectacle"
   }
 }
