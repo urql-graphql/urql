@@ -23,12 +23,8 @@ const createAbortController = () => {
   return new AbortController();
 };
 
-export const httpExchange = ({
-  url,
-}: {
-  url: string;
-}): IExchange => operation => {
-  const { fetchOptions } = operation.context;
+export const httpExchange = (): IExchange => operation => {
+  const { url, fetchOptions } = operation.context;
 
   const body = JSON.stringify({
     query: operation.query,
