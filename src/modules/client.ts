@@ -1,12 +1,9 @@
-import { ExecutionResult } from 'graphql';
-
-import { ICache, IClientOptions, IExchange, IQuery } from '../interfaces/index';
+import { ICache, IClientOptions, IExchange, IExchangeResult, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
 
 import { dedupExchange } from './dedup-exchange';
 import { httpExchange } from './http-exchange';
-import { IExchangeResult } from '../interfaces/exchange';
 
 export const defaultCache = store => {
   return {
@@ -119,8 +116,8 @@ export default class Client {
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IQueryResponse> {
-    return new Promise<IQueryResponse>((resolve, reject) => {
+  ): Promise<IExchangeResult> {
+    return new Promise<IExchangeResult>((resolve, reject) => {
       // Create hash key for unique query/variables
       const { query, variables } = queryObject;
       const key = hashString(JSON.stringify({ query, variables }));

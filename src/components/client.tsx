@@ -2,6 +2,7 @@ import { Component, ReactNode } from 'react';
 import { IClient, IMutation, IQuery } from '../interfaces/index';
 import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
+import { CombinedError } from '../modules/error';
 
 export interface IClientProps {
   client: IClient; // Client instance
@@ -25,7 +26,7 @@ export interface IClientFetchOpts {
 export interface IClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
-  error?: Error; // Error
+  error?: Error | CombinedError | CombinedError[]; // Error
   data: object | object[] | IClientState[]; // Data
 }
 
