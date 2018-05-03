@@ -16,10 +16,12 @@ export const dedupExchange = (forward: IExchange): IExchange => {
 
     // Keep around one subscription and collect observers for this observable
     const observers = [];
+    let refCounter = 0;
     let subscription;
 
     // Create intermediate observable and only forward to the next exchange once
     return (inFlight[key] = new Observable(observer => {
+      refCounter++;
       observers.push(observer);
 
       if (subscription === undefined) {
@@ -38,11 +40,13 @@ export const dedupExchange = (forward: IExchange): IExchange => {
       }
 
       return () => {
-        if (subscription !== undefined) {
-          subscription.unsubscribe();
+        refCounter--;
+        if (refCounter === 0) {
+          delete inFlight[key];
+          if (subscription !== undefined) {
+            subscription.unsubscribe();
+          }
         }
-
-        delete inFlight[key];
       };
     }));
   };
