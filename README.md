@@ -23,6 +23,7 @@ Universal React Query Library
   * [ConnectHOC](#connecthoc)
   * [query](#query)
   * [mutation](#mutation)
+  * [CombinedError](#combinederror)
 * [Prior Art](#prior-art)
 
 ## What is `urql`
@@ -391,20 +392,6 @@ query($id: ID!) {
 );
 ```
 
-### CombinedError
-
-CombinedError displays a list of all network and GraphQL errors that have occured during a GraphQL request.
-
-\_No GraphQL errors will be present if a network error has occured
-
-The following fields are present within a CombinedError:
-
-| Name          | Value         | Description                          |
-| ------------- | ------------- | ------------------------------------ |
-| networkError  | Error         | Network error if fetch has failed    |
-| graphQLErrors | Error[]       | GraphQL errors from the API response |
-| reponse       | FetchResponse | Raw Response instance                |
-
 ### mutation
 
 _(query: string, variables?: object) => {query: string, variables: object}_
@@ -424,6 +411,20 @@ mutation($id: ID!) {
   { id: 5 }
 );
 ```
+
+### CombinedError
+
+CombinedError displays a list of all network and GraphQL errors that have occured during a GraphQL request.
+
+_No GraphQL errors will be present if a network error has occured_
+
+The following fields are present within a CombinedError:
+
+| Name          | Value         | Description                          |
+| ------------- | ------------- | ------------------------------------ |
+| networkError  | Error         | Network error if fetch has failed    |
+| graphQLErrors | Error[]       | GraphQL errors from the API response |
+| reponse       | FetchResponse | Raw Response instance                |
 
 ### use urql without using components
 
