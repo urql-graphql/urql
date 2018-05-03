@@ -44,6 +44,7 @@ export const defaultCache = store => {
 };
 
 export default class Client {
+  url: string;
   store: object; // Internal store
   subscriptions: object; // Map of subscribed Connect components
   subscriptionSize: number; // Used to generate IDs for subscriptions
@@ -58,11 +59,12 @@ export default class Client {
       throw new Error('Please provide a URL for your GraphQL API');
     }
 
+    this.url = opts.url;
     this.store = opts.initialCache || {};
     this.subscriptions = {};
     this.subscriptionSize = 0;
     this.cache = opts.cache || defaultCache(this.store);
-    this.exchange = dedupExchange(httpExchange({ url: opts.url }));
+    this.exchange = dedupExchange(httpExchange());
     this.fetchOptions = opts.fetchOptions || {};
 
     // Bind methods
@@ -112,6 +114,7 @@ export default class Client {
         typeof this.fetchOptions === 'function'
           ? this.fetchOptions()
           : this.fetchOptions,
+      url: this.url,
     };
   }
 
