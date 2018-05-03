@@ -1,25 +1,14 @@
-import { ICache, IClientOptions, IMutation, IQuery } from '../interfaces/index';
+import { ExecutionResult } from 'graphql';
+import { ICache, IClientOptions, IExchange, IQuery } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
+import { dedupExchange } from './dedup-exchange';
 import { hashString } from './hash';
+import { httpExchange } from './http-exchange';
 
 // Response from executeQuery call
-export interface IQueryResponse {
-  data: object[];
+export interface IQueryResponse extends ExecutionResult {
   typeNames?: string[];
 }
-
-const checkStatus = (redirectMode: string = 'follow') => (
-  response: Response
-) => {
-  // If using manual redirect mode, don't error on redirect!
-  const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
-  if (response.status >= 200 && response.status < statusRangeEnd) {
-    return response;
-  }
-  const err = new Error(response.statusText);
-  (err as any).response = response;
-  throw err;
-};
 
 export const defaultCache = store => {
   return {
@@ -55,28 +44,27 @@ export const defaultCache = store => {
 };
 
 export default class Client {
-  url?: string; // Graphql API URL
   store: object; // Internal store
-  fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
   subscriptionSize: number; // Used to generate IDs for subscriptions
   cache: ICache; // Cache object
+  exchange: IExchange; // Exchange to communicate with GraphQL APIs
+  fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
 
   constructor(opts?: IClientOptions) {
     if (!opts) {
       throw new Error('Please provide configuration object');
-    }
-    // Set option/internal defaults
-    if (!opts.url) {
+    } else if (!opts.url) {
       throw new Error('Please provide a URL for your GraphQL API');
     }
 
-    this.url = opts.url;
-    this.fetchOptions = opts.fetchOptions || {};
     this.store = opts.initialCache || {};
-    this.cache = opts.cache || defaultCache(this.store);
     this.subscriptions = {};
     this.subscriptionSize = 0;
+    this.cache = opts.cache || defaultCache(this.store);
+    this.exchange = dedupExchange(httpExchange({ url: opts.url }));
+    this.fetchOptions = opts.fetchOptions || {};
+
     // Bind methods
     this.executeQuery = this.executeQuery.bind(this);
     this.executeMutation = this.executeMutation.bind(this);
@@ -118,103 +106,80 @@ export default class Client {
     });
   }
 
+  makeContext(): Record<string, any> {
+    return {
+      fetchOptions:
+        typeof this.fetchOptions === 'function'
+          ? this.fetchOptions()
+          : this.fetchOptions,
+    };
+  }
+
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
   ): Promise<IQueryResponse> {
     return new Promise<IQueryResponse>((resolve, reject) => {
+      // Create hash key for unique query/variables
       const { query, variables } = queryObject;
-      // Create query POST body
-      const body = JSON.stringify({
-        query,
-        variables,
-      });
-
-      // Create hash from serialized body
-      const hash = hashString(body);
+      const key = hashString(JSON.stringify({ query, variables }));
 
       // Check cache for hash
-      this.cache.read(hash).then(data => {
-        if (data && !skipCache) {
-          const typeNames = gankTypeNamesFromResponse(data);
-          resolve({ data, typeNames });
-        } else {
-          const fetchOptions =
-            typeof this.fetchOptions === 'function'
-              ? this.fetchOptions()
-              : this.fetchOptions;
-          // Fetch data
-          fetch(this.url, {
-            body,
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-            ...fetchOptions,
-          })
-            .then(checkStatus(fetchOptions.redirect))
-            .then(res => res.json())
-            .then(response => {
-              if (response.data) {
-                // Grab typenames from response data
-                const typeNames = gankTypeNamesFromResponse(response.data);
-                // Store data in cache, using serialized query as key
-                this.cache.write(hash, response.data);
-                resolve({
-                  data: response.data,
-                  typeNames,
-                });
-              } else {
-                reject({
-                  message: 'No data',
-                });
-              }
-            })
-            .catch(e => {
-              reject(e);
-            });
+      this.cache.read(key).then(cachedResult => {
+        if (cachedResult && !skipCache) {
+          return resolve(cachedResult);
         }
+
+        const operation = {
+          context: this.makeContext(),
+          key,
+          operationName: 'query',
+          query,
+          variables,
+        };
+
+        this.exchange(operation).subscribe({
+          error: reject,
+          next: response => {
+            // Grab typenames from response data
+            const typeNames = gankTypeNamesFromResponse(response.data);
+            // Result distributes typenames and data
+            const result = { data: response.data, typeNames };
+            // Store data in cache, using serialized query as key
+            this.cache.write(key, result);
+            // Resolve result
+            resolve(result);
+          },
+        });
       });
     });
   }
 
-  executeMutation(mutationObject: IMutation): Promise<object[]> {
-    return new Promise<object[]>((resolve, reject) => {
+  executeMutation(mutationObject: IQuery): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+      // Create hash key for unique query/variables
       const { query, variables } = mutationObject;
-      // Convert POST body to string
-      const body = JSON.stringify({
+      const key = hashString(JSON.stringify({ query, variables }));
+
+      const operation = {
+        context: this.makeContext(),
+        key,
+        operationName: 'mutation',
         query,
         variables,
+      };
+
+      this.exchange(operation).subscribe({
+        error: reject,
+        next: response => {
+          // Retrieve typenames from response data
+          const typeNames = gankTypeNamesFromResponse(response.data);
+          // Notify subscribed Connect wrappers
+          this.updateSubscribers(typeNames, response);
+          // Resolve result
+          resolve(response.data);
+        },
       });
-
-      const fetchOptions =
-        typeof this.fetchOptions === 'function'
-          ? this.fetchOptions()
-          : this.fetchOptions;
-      // Call mutation
-      fetch(this.url, {
-        body,
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-        ...fetchOptions,
-      })
-        .then(checkStatus(fetchOptions.redirect))
-        .then(res => res.json())
-        .then(response => {
-          if (response.data) {
-            // Retrieve typenames from response data
-            const typeNames = gankTypeNamesFromResponse(response.data);
-            // Notify subscribed Connect wrappers
-            this.updateSubscribers(typeNames, response);
-
-            resolve(response.data);
-          } else {
-            reject({
-              message: 'No data',
-            });
-          }
-        })
-        .catch(e => {
-          reject(e);
-        });
     });
   }
 }

@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { IExchange } from '../interfaces/exchange';
+import { IExchange } from '../interfaces/index';
 
 const checkStatus = (redirectMode: string = 'follow') => (
   response: Response
@@ -23,8 +23,12 @@ const createAbortController = () => {
   return new AbortController();
 };
 
-export const httpExchange: IExchange = operation => {
-  const { context } = operation;
+export const httpExchange = ({
+  url,
+}: {
+  url: string;
+}): IExchange => operation => {
+  const { fetchOptions } = operation.context;
 
   const body = JSON.stringify({
     query: operation.query,
@@ -34,13 +38,8 @@ export const httpExchange: IExchange = operation => {
   // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/AbortController
   const abortController = createAbortController();
 
-  const fetchOptions =
-    typeof context.fetchOptions === 'function'
-      ? context.fetchOptions()
-      : context.fetchOptions;
-
   return new Observable(observer => {
-    fetch(context.url, {
+    fetch(url, {
       body,
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
@@ -54,7 +53,8 @@ export const httpExchange: IExchange = operation => {
           observer.next(response);
           observer.complete();
         } else {
-          observer.error(new Error('No data'));
+          // TODO: Proper error handling
+          observer.error({ message: 'No data' });
         }
       })
       .catch(err => {
