@@ -1,7 +1,7 @@
 import Observable from 'zen-observable-ts';
 
-import { CombinedError } from '../modules/error';
 import { ExecutionResult } from 'graphql';
+import { CombinedError } from '../modules/error';
 import { IOperation } from './operation';
 
 export interface IExchangeResult {
