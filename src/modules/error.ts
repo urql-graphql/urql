@@ -14,7 +14,7 @@ const generateErrorMessage = (
     error += `[GraphQL] ${err.message}\n`;
   });
 
-  return error;
+  return error.trim();
 };
 
 const rehydrateGraphQlError = (error: string | IGraphQLError): Error => {
