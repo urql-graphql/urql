@@ -2,6 +2,7 @@ import { Component, ReactNode } from 'react';
 import { IClient, IMutation, IQuery } from '../interfaces/index';
 import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
+import { CombinedError } from '../modules/error';
 
 export interface IClientProps {
   client: IClient; // Client instance
@@ -25,7 +26,7 @@ export interface IClientFetchOpts {
 export interface IClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
-  error?: Error; // Error
+  error?: Error | CombinedError | CombinedError[]; // Error
   data: object | object[] | IClientState[]; // Data
 }
 
@@ -197,7 +198,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           }
           // Update data
           this.setState({
-            data: result.data,
+            data: result.data || null,
+            error: result.error,
             fetching: false,
             loaded: initial ? true : this.state.loaded,
           });
@@ -225,21 +227,24 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
                 (v, i, a) => a.indexOf(v) === i
               );
             }
-            partialData.push(result.data);
-            return result.data;
+            partialData.push(result);
+            return result;
           });
         })
       )
         .then(results => {
+          const errors = results.map(res => res.error).filter(Boolean);
+
           this.setState({
-            data: results,
+            data: results.map(res => res.data),
+            error: errors.length > 0 ? errors : null,
             fetching: false,
             loaded: true,
           });
         })
         .catch(e => {
           this.setState({
-            data: partialData,
+            data: partialData.map(part => part.data),
             error: e,
             fetching: false,
           });

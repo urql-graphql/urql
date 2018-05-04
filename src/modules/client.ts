@@ -1,16 +1,15 @@
-import { ExecutionResult } from 'graphql';
-
-import { ICache, IClientOptions, IExchange, IQuery } from '../interfaces/index';
+import {
+  ICache,
+  IClientOptions,
+  IExchange,
+  IExchangeResult,
+  IQuery,
+} from '../interfaces/index';
 import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { hashString } from './hash';
 
 import { dedupExchange } from './dedup-exchange';
 import { httpExchange } from './http-exchange';
-
-// Response from executeQuery call
-export interface IQueryResponse extends ExecutionResult {
-  typeNames?: string[];
-}
 
 export const defaultCache = store => {
   return {
@@ -123,8 +122,8 @@ export default class Client {
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IQueryResponse> {
-    return new Promise<IQueryResponse>((resolve, reject) => {
+  ): Promise<IExchangeResult> {
+    return new Promise<IExchangeResult>((resolve, reject) => {
       // Create hash key for unique query/variables
       const { query, variables } = queryObject;
       const key = hashString(JSON.stringify({ query, variables }));
@@ -145,15 +144,13 @@ export default class Client {
 
         this.exchange(operation).subscribe({
           error: reject,
-          next: response => {
+          next: (response: IExchangeResult) => {
             // Grab typenames from response data
-            const typeNames = gankTypeNamesFromResponse(response.data);
-            // Result distributes typenames and data
-            const result = { data: response.data, typeNames };
+            response.typeNames = gankTypeNamesFromResponse(response.data);
             // Store data in cache, using serialized query as key
-            this.cache.write(key, result);
+            this.cache.write(key, response);
             // Resolve result
-            resolve(result);
+            resolve(response);
           },
         });
       });

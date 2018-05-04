@@ -1,6 +1,7 @@
 import Observable from 'zen-observable-ts';
 
 import { IExchange } from '../interfaces/index';
+import { CombinedError } from './error';
 
 const checkStatus = (redirectMode: string = 'follow') => (
   response: Response
@@ -10,9 +11,8 @@ const checkStatus = (redirectMode: string = 'follow') => (
   if (response.status >= 200 && response.status < statusRangeEnd) {
     return response;
   }
-  const err = new Error(response.statusText);
-  (err as any).response = response;
-  throw err;
+
+  throw new Error(response.statusText);
 };
 
 const createAbortController = () => {
@@ -35,6 +35,8 @@ export const httpExchange = (): IExchange => operation => {
   const abortController = createAbortController();
 
   return new Observable(observer => {
+    let response;
+
     fetch(url, {
       body,
       headers: { 'Content-Type': 'application/json' },
@@ -42,15 +44,28 @@ export const httpExchange = (): IExchange => operation => {
       signal: abortController.signal,
       ...fetchOptions,
     })
+      .then(res => (response = res))
       .then(checkStatus(fetchOptions.redirect))
       .then(res => res.json())
-      .then(response => {
-        if (response.data) {
-          observer.next(response);
+      .then(result => {
+        let error;
+        if (Array.isArray(result.errors)) {
+          error = new CombinedError({
+            graphQLErrors: result.errors,
+            response,
+          });
+        }
+
+        if (result.data) {
+          observer.next({
+            data: result.data,
+            error,
+          });
           observer.complete();
+        } else if (error) {
+          observer.error(error);
         } else {
-          // TODO: Proper error handling
-          observer.error({ message: 'No data' });
+          observer.error(new Error('no data or error'));
         }
       })
       .catch(err => {
@@ -58,7 +73,12 @@ export const httpExchange = (): IExchange => operation => {
           return;
         }
 
-        observer.error(err);
+        const error = new CombinedError({
+          networkError: err,
+          response,
+        });
+
+        observer.error(error);
       });
 
     return () => {

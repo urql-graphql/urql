@@ -1,5 +1,5 @@
-import { IQueryResponse } from './../modules/client';
 import { ICache } from './cache';
+import { IExchangeResult } from './exchange';
 import { IQuery } from './query';
 
 export interface IClient {
@@ -7,7 +7,7 @@ export interface IClient {
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IQueryResponse>;
+  ): Promise<IExchangeResult>;
   executeMutation(mutationObject: IQuery): Promise<object>;
   refreshAllFromCache(): void;
   subscribe(
