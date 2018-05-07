@@ -32,9 +32,9 @@ class App extends React.Component {
             <a href="https://github.com/FormidableLabs/spectacle">GitHub</a>
           </div>
         </Header>
-
-        { this.props.children }
-
+        <main>
+          { this.props.children }
+        </main>
         <Footer
           padding="5rem 6vw 6rem"
         />
