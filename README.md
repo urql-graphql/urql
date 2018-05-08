@@ -24,6 +24,7 @@ Universal React Query Library
   * [query](#query)
   * [mutation](#mutation)
   * [CombinedError](#combinederror)
+  * [Exchanges](#exchanges)
 * [Prior Art](#prior-art)
 
 ## What is `urql`
@@ -264,12 +265,13 @@ const defaultCache = store => {
 
 #### Options
 
-| Name         | Value                      | Description                                                                                                                                                          |
-| ------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| url          | `string`                   | The URL that the Client should connect to _(required)_                                                                                                               |
-| initialCache | `object`                   | An initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented                                       |
-| cache        | `ICache`                   | Instance of an `ICache` if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above. |
-| fetchOptions | `object` or `() => object` | Options provided to the internal `fetch` calls which can either be an object or a function if you want to provide dynamic values like a token header.                |
+| Name              | Value                      | Description                                                                                                                                                          |
+| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| url               | `string`                   | The URL that the Client should connect to _(required)_                                                                                                               |
+| initialCache      | `object`                   | An initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented                                       |
+| cache             | `ICache`                   | Instance of an `ICache` if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above. |
+| fetchOptions      | `object` or `() => object` | Options provided to the internal `fetch` calls which can either be an object or a function if you want to provide dynamic values like a token header.                |
+| transformExchange | `IExchange => IExchange`   | A function that accepts the default "Exchange" and returns a new one. Use this to customise how the client handles GraphQL requests.                                 |
 
 #### Description
 
@@ -281,6 +283,9 @@ Example:
 ```javascript
 const client = new Client({ url: 'http://localhost:3000/graphql' });
 ```
+
+With `transformExchange` you can completely customise how the `urql` client handles a `GraphQL` operation.
+Read more about this in the ["Exchanges"](#exchanges) section.
 
 ### Provider
 
@@ -431,6 +436,80 @@ The following fields are present within a CombinedError:
 | networkError  | Error         | Network error if fetch has failed    |
 | graphQLErrors | Error[]       | GraphQL errors from the API response |
 | reponse       | FetchResponse | Raw Response instance                |
+
+### Exchanges
+
+An **“Exchange”** is a function that accepts an operation and returns an observable with
+the GraphQL query’s result. Any operation, like queries or mutations, flow through the exchange
+and are processed by it.
+
+The most important exchange is the `httpExchange`. It sends operations to your API and returns
+an observable with the actual result. `urql` comes with two more exchanges by default:
+
+* `dedupExchange`: Takes an exchange and returns a new one that deduplicates in-flight requests
+* `cacheExchange`: Reads query-operations from the cache and writes results to the cache
+
+By default urql will create a default exchange using all three, which looks like this:
+
+```javascript
+let exchange;
+exchange = httpExchange();
+exchange = dedupExchange(exchange);
+exchange = cacheExchange(this.cache, exchange);
+```
+
+This means that by default `urql` will try to resolve queries from the cache (if `skipCache` is `false`),
+then deduplicate in-flight requests that have the same query and variables, and then send the
+operations that come through to your API endpoint. Lastly the result for queries will be written
+to the cache.
+
+You can write your own exchanges if you wish to customise this behaviour. The [client](#client)
+accepts the `transformExchange` function. This function receives the default exchange, as described
+above. So if you'd like to wrap the default exchange and do something custom, you can, or if you'd like
+to replace the default exchange you can just return an entirely different exchange.
+
+The **“Operations”** that an exchange receives have the following properties:
+
+| Name          | Value     | Description                                              |
+| ------------- | --------- | -------------------------------------------------------- |
+| key           | `string`  | The cache key of an operation (query + variables hashed) |
+| query         | `string`  | The GraphQL query string                                 |
+| variables     | `?object` | Variables for the GraphQL query                          |
+| operationName | `string`  | The operation’s name, `query` or `mutation`              |
+| context       | `object`  | A dictionary of options                                  |
+
+The `context` property can be used for any data, but the `httpExchange` in particular uses it to
+receive the `url` and `fetchOptions`, and the `cacheExchange` uses it to receive the `skipCache`
+flag.
+
+The result that an exchange emits in an observable is like GraphQL’s `ExecutionResult`. It carries
+the `data` property, the `error` property that can be a [`CombinedError`](#combinederror), and
+the `typeNames` property, which tells `urql` which parts of the cache to invalidate.
+
+If you'd like to write your own exchange you could approach it like so:
+
+```javascript
+import Observable from 'zen-observable-ts';
+
+const funExchange = forward => operation =>
+  new Observable(observer => {
+    const subscription = forward(operation).subscribe({
+      next: result => {
+        result.fun = true;
+        observer.next(fun);
+      },
+      error: e => observer.error(e),
+      complete: () => observer.complete(),
+    });
+
+    return () => subscription.unsubscribe();
+  });
+
+const client = new Client({
+  url: 'http://localhost:3000/graphql',
+  transformExchange: exchange => funExchange(exchange),
+});
+```
 
 ### use urql without using components
 
