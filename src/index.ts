@@ -14,3 +14,8 @@ export { default as query } from './modules/query';
 export { default as mutation } from './modules/mutation';
 
 export * from './interfaces/index';
+
+export * from './modules/cache-exchange';
+export * from './modules/dedup-exchange';
+export * from './modules/http-exchange';
+export * from './modules/subscription-exchange';
