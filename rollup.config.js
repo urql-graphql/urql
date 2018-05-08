@@ -48,20 +48,18 @@ const baseConfig = {
 };
 
 export default [
-  {
-    ...baseConfig,
+  Object.assign({}, baseConfig, {
     plugins: makePlugins(false),
     output: [
       { file: 'bundles/urql.es.js', format: 'es' },
       { file: 'bundles/urql.cjs.js', format: 'cjs' },
     ],
-  },
-  {
-    ...baseConfig,
+  }),
+  Object.assign({}, baseConfig, {
     plugins: makePlugins(true),
     output: [
       { file: 'bundles/urql.es.min.js', format: 'es' },
       { file: 'bundles/urql.cjs.min.js', format: 'cjs' },
     ],
-  },
+  }),
 ];
