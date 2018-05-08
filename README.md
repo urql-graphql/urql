@@ -262,13 +262,19 @@ const defaultCache = store => {
 
 ### Client
 
-_{url: string, initialCache?: object, cache?: Cache, fetchOptions?: object | () => object}_
+#### Options
 
-Client is the constructor for your GraphQL client. It takes a configuration object as an argument, which is required. Providing a GraphQL api url via the `url` property is required. `fetchOptions` are the options provided to internal `fetch` calls, which can either be in `object` format, or a `function` that returns an `object`, in case you want to provide a dynamic header for a token or something.
+| Name         | Value                      | Description                                                                                                                                                          |
+| ------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| url          | `string`                   | The URL that the Client should connect to _(required)_                                                                                                               |
+| initialCache | `object`                   | An initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented                                       |
+| cache        | `ICache`                   | Instance of an `ICache` if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above. |
+| fetchOptions | `object` or `() => object` | Options provided to the internal `fetch` calls which can either be an object or a function if you want to provide dynamic values like a token header.                |
 
-`initialCache` is an initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented.
+#### Description
 
-`cache` accepts an instance of a cache, if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above.
+Client is the constructor for your GraphQL client. It takes a configuration object as an argument, which is required.
+You can read more about the individual options above. Please note that providing a `url` property for your GraphQL API endpoint is required.
 
 Example:
 
