@@ -1,3 +1,5 @@
+import Observable from 'zen-observable-ts';
+
 import {
   ICache,
   IClientOptions,
@@ -5,10 +7,10 @@ import {
   IExchangeResult,
   IQuery,
 } from '../interfaces/index';
-import { gankTypeNamesFromResponse } from '../modules/typenames';
-import { hashString } from './hash';
 
+import { gankTypeNamesFromResponse } from '../modules/typenames';
 import { dedupExchange } from './dedup-exchange';
+import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
 
 export const defaultCache = store => {
@@ -119,11 +121,14 @@ export default class Client {
     };
   }
 
-  executeQuery(
+  executeQuery$(
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IExchangeResult> {
-    return new Promise<IExchangeResult>((resolve, reject) => {
+  ): Observable<IExchangeResult> {
+    return new Observable<IExchangeResult>(observer => {
+      // Hold subscription for inner operation
+      let subscription;
+
       // Create hash key for unique query/variables
       const { query, variables } = queryObject;
       const key = hashString(JSON.stringify({ query, variables }));
@@ -131,7 +136,9 @@ export default class Client {
       // Check cache for hash
       this.cache.read(key).then(cachedResult => {
         if (cachedResult && !skipCache) {
-          return resolve(cachedResult);
+          observer.next(cachedResult);
+          observer.complete();
+          return;
         }
 
         const operation = {
@@ -142,45 +149,71 @@ export default class Client {
           variables,
         };
 
-        this.exchange(operation).subscribe({
-          error: reject,
+        subscription = this.exchange(operation).subscribe({
+          complete: () => observer.complete(),
+          error: err => observer.error(err),
           next: (response: IExchangeResult) => {
             // Grab typenames from response data
-            response.typeNames = gankTypeNamesFromResponse(response.data);
+            const typeNames = gankTypeNamesFromResponse(response.data);
+            const withTypenames = { ...response, typeNames };
             // Store data in cache, using serialized query as key
-            this.cache.write(key, response);
-            // Resolve result
-            resolve(response);
+            this.cache.write(key, withTypenames);
+            // Return response with typeNames
+            observer.next(withTypenames);
           },
         });
+      });
+
+      return () => {
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+      };
+    });
+  }
+
+  executeQuery(
+    queryObject: IQuery,
+    skipCache: boolean
+  ): Promise<IExchangeResult> {
+    return new Promise<IExchangeResult>((resolve, reject) => {
+      this.executeQuery$(queryObject, skipCache).subscribe({
+        error: reject,
+        next: resolve,
       });
     });
   }
 
-  executeMutation(mutationObject: IQuery): Promise<object> {
-    return new Promise<object>((resolve, reject) => {
-      // Create hash key for unique query/variables
-      const { query, variables } = mutationObject;
-      const key = hashString(JSON.stringify({ query, variables }));
+  executeMutation$(
+    mutationObject: IQuery
+  ): Observable<IExchangeResult['data']> {
+    // Create hash key for unique query/variables
+    const { query, variables } = mutationObject;
+    const key = hashString(JSON.stringify({ query, variables }));
 
-      const operation = {
-        context: this.makeContext(),
-        key,
-        operationName: 'mutation',
-        query,
-        variables,
-      };
+    const operation = {
+      context: this.makeContext(),
+      key,
+      operationName: 'mutation',
+      query,
+      variables,
+    };
 
-      this.exchange(operation).subscribe({
+    return this.exchange(operation).map((response: IExchangeResult) => {
+      // Retrieve typenames from response data
+      const typeNames = gankTypeNamesFromResponse(response.data);
+      // Notify subscribed Connect wrappers
+      this.updateSubscribers(typeNames, response);
+      // Resolve result
+      return response.data;
+    });
+  }
+
+  executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']> {
+    return new Promise<IExchangeResult>((resolve, reject) => {
+      this.executeMutation$(mutationObject).subscribe({
         error: reject,
-        next: response => {
-          // Retrieve typenames from response data
-          const typeNames = gankTypeNamesFromResponse(response.data);
-          // Notify subscribed Connect wrappers
-          this.updateSubscribers(typeNames, response);
-          // Resolve result
-          resolve(response.data);
-        },
+        next: resolve,
       });
     });
   }
