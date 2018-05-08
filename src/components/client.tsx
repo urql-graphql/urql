@@ -54,6 +54,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   typeNames = []; // Typenames that exist on current query
   unsubscribe = null; // Unsubscription function calling back to the client
   querySubscription = null; // Subscription for ongoing queries
+  mutationSubscription = null; // Subscription for ongoing mutations
 
   componentDidMount() {
     this.formatProps(this.props);
@@ -78,6 +79,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
 
     if (this.querySubscription !== null) {
       this.querySubscription.unsubscribe();
+    }
+
+    if (this.mutationSubscription !== null) {
+      this.mutationSubscription.unsubscribe();
     }
   }
 
@@ -266,27 +271,17 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
 
   mutate = mutation => {
     const { client } = this.props;
+
     // Set fetching state
     this.setState({
       error: null,
       fetching: true,
     });
 
-    return new Promise((resolve, reject) => {
+    return new Promise<IExchangeResult['data']>((resolve, reject) => {
       // Execute mutation
-      client
-        .executeMutation(mutation)
-        .then((...args) => {
-          this.setState(
-            {
-              fetching: false,
-            },
-            () => {
-              resolve(...args);
-            }
-          );
-        })
-        .catch(e => {
+      this.mutationSubscription = client.executeMutation$(mutation).subscribe({
+        error: e => {
           this.setState(
             {
               error: e,
@@ -296,7 +291,13 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
               reject(e);
             }
           );
-        });
+        },
+        next: result => {
+          this.setState({ fetching: false }, () => {
+            resolve(result);
+          });
+        },
+      });
     });
   };
 
