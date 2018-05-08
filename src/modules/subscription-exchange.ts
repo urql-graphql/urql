@@ -3,13 +3,15 @@ import Observable from 'zen-observable-ts';
 import {
   IExchange,
   IExchangeResult,
+  IOperation,
   ISubscription,
   ISubscriptionObserver,
 } from '../interfaces/index';
+
 import { CombinedError } from './error';
 
 export const subscriptionExchange = (
-  createSubscription: (ISubscriptionObserver) => ISubscription,
+  createSubscription: (IOperation, ISubscriptionObserver) => ISubscription,
   forward: IExchange
 ): IExchange => {
   return operation => {
@@ -36,7 +38,7 @@ export const subscriptionExchange = (
         },
       };
 
-      const sub = createSubscription(subObserver);
+      const sub = createSubscription(operation, subObserver);
 
       return () => {
         sub.unsubscribe();
