@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+
 import hoistStatics from 'hoist-non-react-statics';
+
 import Connect from '../components/connect';
 import { IMutation, IQuery } from '../interfaces/index';
 
@@ -16,27 +18,34 @@ export interface IHOCProps {
   ) => boolean;
 }
 
-function ConnectHOC(opts?: IHOCProps | ((_) => IHOCProps)) {
-  return (Comp: any) =>
-    hoistStatics(
-      class extends Component {
-        constructor(props) {
-          super(props);
+function connect(opts?: IHOCProps | ((_) => IHOCProps)) {
+  return (Comp: any) => {
+    const componentName = Comp.displayName || Comp.name || 'Component';
 
-          this.renderComponent = this.renderComponent.bind(this);
-        }
-        renderComponent(data) {
-          return <Comp {...data} {...this.props} />;
-        }
-        render() {
-          const connectProps =
-            typeof opts === 'function' ? opts(this.props) : opts;
+    class ConnectHOC extends Component {
+      static displayName = `Connect(${componentName})`;
+      props: any;
 
-          return <Connect {...connectProps} children={this.renderComponent} />;
-        }
-      },
-      Comp
-    );
+      constructor(props) {
+        super(props);
+
+        this.renderComponent = this.renderComponent.bind(this);
+      }
+
+      renderComponent(data) {
+        return <Comp {...data} {...this.props} />;
+      }
+
+      render() {
+        const connectProps =
+          typeof opts === 'function' ? opts(this.props) : opts;
+
+        return <Connect {...connectProps} children={this.renderComponent} />;
+      }
+    }
+
+    return hoistStatics(ConnectHOC, Comp);
+  };
 }
 
-export default ConnectHOC;
+export default connect;
