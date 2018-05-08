@@ -2,9 +2,6 @@ dist: trusty
 
 language: node_js
 
-addons:
-  chrome: stable
-
 node_js:
   - "6"
   - "8"
@@ -32,3 +29,6 @@ script:
   - yarn run coverage
   # Upload to coveralls, but don't _fail_ if coveralls is down.
   - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
+  # Build and check bundlesize
+  - yarn run build-bundles
+  - yarn run bundlesize
