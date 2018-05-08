@@ -30,4 +30,30 @@ describe('Connect HOC', () => {
     let tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });
+
+  it('should wrap its component argument with connect and hoist the statics', () => {
+    class Comp extends React.Component {
+      static foo = {
+        bar: 'foobar',
+      };
+
+      render() {
+        return <div {...this.props} />;
+      }
+    }
+
+    const Wrapped = ConnectHOC()(Comp);
+    // @ts-ignore
+    const component = renderer.create(
+      // @ts-ignore
+      <Wrapped />
+    );
+
+    expect(Wrapped).toHaveProperty('foo', {
+      bar: 'foobar',
+    });
+
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });
