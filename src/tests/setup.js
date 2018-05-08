@@ -1,5 +1,6 @@
 'use strict';
 
+global._AbortController = global.AbortController;
 global.AbortController = undefined;
 global.fetch = jest.fn();
 
