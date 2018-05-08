@@ -1,8 +1,14 @@
 import { Component, ReactNode } from 'react';
-import { IClient, IMutation, IQuery } from '../interfaces/index';
+import {
+  IClient,
+  IExchangeResult,
+  IMutation,
+  IQuery,
+} from '../interfaces/index';
+import { CombinedError } from '../modules/error';
 import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
-import { CombinedError } from '../modules/error';
+import { zipObservables } from '../utils/zip-observables';
 
 export interface IClientProps {
   client: IClient; // Client instance
@@ -47,6 +53,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
   unsubscribe = null; // Unsubscription function calling back to the client
+  querySubscription = null; // Subscription for ongoing queries
 
   componentDidMount() {
     this.formatProps(this.props);
@@ -67,6 +74,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     // Unsub from change listener
     if (this.unsubscribe !== null) {
       this.unsubscribe();
+    }
+
+    if (this.querySubscription !== null) {
+      this.querySubscription.unsubscribe();
     }
   }
 
@@ -181,58 +192,65 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     if (this.props.cache === false) {
       skipCache = true;
     }
+
+    // Start loading state
+    this.setState({
+      error: null,
+      fetching: true,
+    });
+
     // If query is not an array
     if (!Array.isArray(this.query)) {
-      // Start loading state
-      this.setState({
-        error: null,
-        fetching: true,
-      });
       // Fetch the query
-      client
-        .executeQuery(this.query, skipCache)
-        .then(result => {
-          // Store the typenames
-          if (result.typeNames) {
-            this.typeNames = result.typeNames;
-          }
-          // Update data
-          this.setState({
-            data: result.data || null,
-            error: result.error,
-            fetching: false,
-            loaded: initial ? true : this.state.loaded,
+      this.querySubscription = client
+        .executeQuery$(this.query, skipCache)
+        .subscribe({
+          error: e => {
+            this.setState({
+              error: e,
+              fetching: false,
+            });
+          },
+          next: result => {
+            // Store the typenames
+            if (result.typeNames) {
+              this.typeNames = result.typeNames;
+            }
+            // Update data
+            this.setState({
+              data: result.data || null,
+              error: result.error,
+              fetching: false,
+              loaded: initial ? true : this.state.loaded,
+            });
+          },
+        });
+    } else {
+      const partialData = [];
+      const queries$ = this.query.map(query =>
+        client.executeQuery$(query, skipCache).map(result => {
+          // Accumulate and deduplicate all typeNames
+          result.typeNames.forEach(typeName => {
+            if (this.typeNames.indexOf(typeName) === -1) {
+              this.typeNames.push(typeName);
+            }
           });
+
+          // Push to partial data and return same result
+          partialData.push(result);
+          return result;
         })
-        .catch(e => {
+      );
+
+      this.querySubscription = zipObservables(queries$).subscribe({
+        error: e => {
           this.setState({
+            data: partialData.map(part => part.data),
             error: e,
             fetching: false,
           });
-        });
-    } else {
-      // Start fetching state
-      this.setState({
-        error: null,
-        fetching: true,
-      });
-      // Iterate over and fetch queries
-      const partialData = [];
-      return Promise.all(
-        this.query.map(query => {
-          return client.executeQuery(query, skipCache).then(result => {
-            if (result.typeNames) {
-              // Add and dedupe typenames
-              this.typeNames = [...this.typeNames, ...result.typeNames].filter(
-                (v, i, a) => a.indexOf(v) === i
-              );
-            }
-            partialData.push(result);
-            return result;
-          });
-        })
-      )
-        .then(results => {
+        },
+        next: (results: IExchangeResult[]) => {
           const errors = results.map(res => res.error).filter(Boolean);
 
           this.setState({
@@ -241,14 +259,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
             fetching: false,
             loaded: true,
           });
-        })
-        .catch(e => {
-          this.setState({
-            data: partialData.map(part => part.data),
-            error: e,
-            fetching: false,
-          });
-        });
+        },
+      });
     }
   };
 
