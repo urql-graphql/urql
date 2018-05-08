@@ -92,6 +92,23 @@ export default class Client {
     };
   }
 
+  executeSubscription$(
+    subscriptionObject: IQuery
+  ): Observable<IExchangeResult> {
+    // Create hash key for unique query/variables
+    const { query, variables } = subscriptionObject;
+    const key = hashString(JSON.stringify({ query, variables }));
+    const operation = {
+      context: this.makeContext({}),
+      key,
+      operationName: 'subscription',
+      query,
+      variables,
+    };
+
+    return this.exchange(operation);
+  }
+
   executeQuery$(
     queryObject: IQuery,
     skipCache: boolean
