@@ -24,7 +24,13 @@ const createAbortController = () => {
 };
 
 export const httpExchange = (): IExchange => operation => {
-  const { url, fetchOptions } = operation.context;
+  const { url, operationName, fetchOptions } = operation.context;
+
+  if (operationName === 'subscription') {
+    throw new Error(
+      'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
+    );
+  }
 
   const body = JSON.stringify({
     query: operation.query,
