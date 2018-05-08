@@ -49,7 +49,6 @@
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/tests/**/*",
-      "!src/utils/**/*",
       "!src/interfaces/**/*",
       "!src/index.*",
       "!src/**/hash.*",

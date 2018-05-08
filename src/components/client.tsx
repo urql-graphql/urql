@@ -218,9 +218,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           },
           next: result => {
             // Store the typenames
-            if (result.typeNames) {
-              this.typeNames = result.typeNames;
-            }
+            this.typeNames = result.typeNames;
+
             // Update data
             this.setState({
               data: result.data || null,
