@@ -7,7 +7,12 @@ export const dedupExchange = (forward: IExchange): IExchange => {
   const inFlight = {};
 
   return operation => {
-    const { key } = operation;
+    const { key, operationName } = operation;
+
+    // Do not try to deduplicate mutation operations
+    if (operationName === 'mutation') {
+      return forward(operation);
+    }
 
     // Take existing intermediate observable if it has been created
     if (inFlight[key] !== undefined) {
