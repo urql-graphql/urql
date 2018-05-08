@@ -6,3 +6,4 @@ export { ICache } from './cache';
 export { IExchange, IExchangeResult } from './exchange';
 export { IGraphQLError } from './error';
 export { IOperation } from './operation';
+export { ISubscriptionObserver, ISubscription } from './subscription';
