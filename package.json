@@ -17,7 +17,7 @@
     "watch-es": "watch \"npm run build-es\" src/ -d",
     "clean-types": "rimraf types",
     "build-types": "npm run clean-types && tsc -p tsconfig.dts.json",
-    "build": "builder concurrent --buffer build-lib build-es build-types build-bundles",
+    "build": "builder concurrent --buffer build-lib build-es build-types",
     "demo:start:graphql-server": "node example/src/server/index.js",
     "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
