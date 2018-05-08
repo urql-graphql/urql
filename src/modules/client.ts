@@ -8,43 +8,11 @@ import {
   IQuery,
 } from '../interfaces/index';
 
-import { gankTypeNamesFromResponse } from '../modules/typenames';
+import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
+import { defaultCache } from './default-cache';
 import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
-
-export const defaultCache = store => {
-  return {
-    invalidate: hash =>
-      new Promise(resolve => {
-        delete store[hash];
-        resolve(hash);
-      }),
-    invalidateAll: () =>
-      new Promise(resolve => {
-        store = {};
-        resolve();
-      }),
-    read: hash =>
-      new Promise(resolve => {
-        resolve(store[hash] || null);
-      }),
-    update: callback =>
-      new Promise(resolve => {
-        if (typeof callback === 'function') {
-          Object.keys(store).forEach(key => {
-            callback(store, key, store[key]);
-          });
-        }
-        resolve();
-      }),
-    write: (hash, data) =>
-      new Promise(resolve => {
-        store[hash] = data;
-        resolve(hash);
-      }),
-  };
-};
 
 export default class Client {
   url: string;
@@ -67,7 +35,7 @@ export default class Client {
     this.subscriptions = {};
     this.subscriptionSize = 0;
     this.cache = opts.cache || defaultCache(this.store);
-    this.exchange = dedupExchange(httpExchange());
+    this.exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
     this.fetchOptions = opts.fetchOptions || {};
 
     // Bind methods
@@ -111,12 +79,13 @@ export default class Client {
     });
   }
 
-  makeContext(): Record<string, any> {
+  makeContext({ skipCache }: { skipCache?: boolean }): Record<string, any> {
     return {
       fetchOptions:
         typeof this.fetchOptions === 'function'
           ? this.fetchOptions()
           : this.fetchOptions,
+      skipCache: !!skipCache,
       url: this.url,
     };
   }
@@ -125,51 +94,18 @@ export default class Client {
     queryObject: IQuery,
     skipCache: boolean
   ): Observable<IExchangeResult> {
-    return new Observable<IExchangeResult>(observer => {
-      // Hold subscription for inner operation
-      let subscription;
+    // Create hash key for unique query/variables
+    const { query, variables } = queryObject;
+    const key = hashString(JSON.stringify({ query, variables }));
+    const operation = {
+      context: this.makeContext({ skipCache }),
+      key,
+      operationName: 'query',
+      query,
+      variables,
+    };
 
-      // Create hash key for unique query/variables
-      const { query, variables } = queryObject;
-      const key = hashString(JSON.stringify({ query, variables }));
-
-      // Check cache for hash
-      this.cache.read(key).then(cachedResult => {
-        if (cachedResult && !skipCache) {
-          observer.next(cachedResult);
-          observer.complete();
-          return;
-        }
-
-        const operation = {
-          context: this.makeContext(),
-          key,
-          operationName: 'query',
-          query,
-          variables,
-        };
-
-        subscription = this.exchange(operation).subscribe({
-          complete: () => observer.complete(),
-          error: err => observer.error(err),
-          next: (response: IExchangeResult) => {
-            // Grab typenames from response data
-            const typeNames = gankTypeNamesFromResponse(response.data);
-            const withTypenames = { ...response, typeNames };
-            // Store data in cache, using serialized query as key
-            this.cache.write(key, withTypenames);
-            // Return response with typeNames
-            observer.next(withTypenames);
-          },
-        });
-      });
-
-      return () => {
-        if (subscription) {
-          subscription.unsubscribe();
-        }
-      };
-    });
+    return this.exchange(operation);
   }
 
   executeQuery(
@@ -192,7 +128,7 @@ export default class Client {
     const key = hashString(JSON.stringify({ query, variables }));
 
     const operation = {
-      context: this.makeContext(),
+      context: this.makeContext({}),
       key,
       operationName: 'mutation',
       query,
@@ -200,10 +136,8 @@ export default class Client {
     };
 
     return this.exchange(operation).map((response: IExchangeResult) => {
-      // Retrieve typenames from response data
-      const typeNames = gankTypeNamesFromResponse(response.data);
       // Notify subscribed Connect wrappers
-      this.updateSubscribers(typeNames, response);
+      this.updateSubscribers(response.typeNames, response);
       // Resolve result
       return response.data;
     });

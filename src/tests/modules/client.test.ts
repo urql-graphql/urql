@@ -1,4 +1,5 @@
-import Client, { defaultCache } from '../../modules/client';
+import Client from '../../modules/client';
+import { defaultCache } from '../../modules/default-cache';
 
 describe('Client', () => {
   beforeEach(() => {
@@ -467,7 +468,12 @@ describe('Client', () => {
         }`,
         })
         .then(() => {
-          expect(spy).toHaveBeenCalledWith([], { data: { test: 5 } });
+          expect(spy).toHaveBeenCalledWith([], {
+            data: { test: 5 },
+            error: undefined,
+            typeNames: [],
+          });
+
           done();
         });
     });
