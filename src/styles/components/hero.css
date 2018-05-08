@@ -2,7 +2,7 @@
   margin: 0 0 calc(-1 * var(--gutterPage));
   padding: var(--gutterPage) 0 var(--gutterSm) var(--gutterPage);
   position: relative;
-
+  overflow: hidden;
   display: flex;
   align-items: flex-end;
   flex-wrap: nowrap;
@@ -11,9 +11,7 @@
   min-height: 300px;
   height: 60vw;
   max-height: 70vh;
-
   font-size: 1em;
-
   z-index: 0;
 }
 
@@ -30,9 +28,9 @@
 }
 
 .Hero-video {
-  content: "";
+  content: '';
   position: absolute;
-  top: 0;
+  top: -3em;
   right: 0;
   bottom: 0;
   left: 0;

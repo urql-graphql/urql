@@ -1,17 +1,22 @@
 html {
   background-color: var(--nearBlack);
   box-sizing: border-box;
-  font-size: 16px;
   height: 100%;
 }
 
+main {
+  font-size: 16px;
+}
+
 @media (--medium-viewport) {
-  html {
+  main {
     font-size: 20px;
   }
 }
 
-*, *:before, *:after {
+main *,
+main *:before,
+main *:after {
   box-sizing: inherit;
 }
 
@@ -21,7 +26,6 @@ body {
   font-family: var(--fontBody);
   line-height: 1.45;
   position: relative;
-
   height: 100%;
 }
 /**
@@ -68,7 +72,7 @@ button:focus {
  * (suitcss-base)
  */
 
-[tabindex="-1"]:focus {
+[tabindex='-1']:focus {
   outline: none !important;
 }
 
@@ -120,7 +124,8 @@ h4 {
   font-size: 1.75rem;
 }
 
-h5, h6 {
+h5,
+h6 {
   font-size: 1.5rem;
 }
 
@@ -148,7 +153,7 @@ pre {
   padding: 2rem 5%;
 }
 
-pre[class*="language-"] code {
+pre[class*='language-'] code {
   display: block;
   margin: 0 auto;
   max-width: 100%;
@@ -161,7 +166,7 @@ pre code {
 code {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 1px;
-  padding: 0.33em .333em .28em;
+  padding: 0.33em 0.333em 0.28em;
 }
 
 @media (--medium-viewport) {
@@ -189,10 +194,11 @@ table {
 }
 
 tr:nth-child(even) {
-  background-color: #FAF8F7;
+  background-color: #faf8f7;
 }
 
-th, td {
-  border: 1px solid #E0DEDC;
+th,
+td {
+  border: 1px solid #e0dedc;
   padding: 0.45em 1em;
 }

@@ -4,7 +4,7 @@ import Sidebar from "./sidebar";
 class Page extends React.Component {
   render() {
     return (
-      <main className="Site-content">
+      <div className="Site-content">
         <div className="Container Grid Grid--guttersLg large-Grid--nowrap Site-content u-noMarginBottom">
             <div className="Grid-cell Grid-cell--full large-Grid-cell--autoSize">
               <Sidebar
@@ -16,7 +16,7 @@ class Page extends React.Component {
               { this.props.children }
             </div>
         </div>
-      </main>
+      </div>
     );
   }
 }
