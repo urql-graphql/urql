@@ -3,7 +3,6 @@ import Observable from 'zen-observable-ts';
 import {
   IExchange,
   IExchangeResult,
-  IOperation,
   ISubscription,
   ISubscriptionObserver,
 } from '../interfaces/index';
