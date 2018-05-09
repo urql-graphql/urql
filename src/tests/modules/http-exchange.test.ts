@@ -1,5 +1,6 @@
-import { httpExchange } from '../../modules/http-exchange';
+import { IOperation } from '../../interfaces/index';
 import { CombinedError } from '../../modules/error';
+import { httpExchange } from '../../modules/http-exchange';
 
 describe('httpExchange', () => {
   beforeEach(() => {
@@ -268,5 +269,14 @@ describe('httpExchange', () => {
         throw new Error('Should not be called');
       },
     });
+  });
+
+  it('logs a warning when used for subscriptions', () => {
+    expect(() => {
+      httpExchange()(({
+        context: {},
+        operationName: 'subscription',
+      } as any) as IOperation);
+    }).toThrowErrorMatchingSnapshot();
   });
 });

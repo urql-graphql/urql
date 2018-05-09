@@ -13,7 +13,8 @@ import { zipObservables } from '../utils/zip-observables';
 export interface IClientProps {
   client: IClient; // Client instance
   children: (obj: object) => ReactNode; // Render prop
-  query: IQuery | IQuery[]; // Query object or array of Query objects
+  subscription?: IQuery; // Subscription Query object
+  query?: IQuery | IQuery[]; // Query object or array of Query objects
   mutation?: IMutation; // Mutation object (map)
   cache?: boolean;
   typeInvalidation?: boolean;
@@ -49,6 +50,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     loaded: false,
   };
 
+  subscription = null; // Stored Subscription Query
   query = null; // Stored Query
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
@@ -119,6 +121,19 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   formatProps = props => {
+    if (props.subscription && props.query) {
+      throw new Error(
+        'Passing a query and a subscription prop at the same time is invalid.'
+      );
+    }
+
+    // If subscription exists
+    if (props.subscription) {
+      // Loop through and add typenames
+      this.subscription = formatTypeNames(props.subscription);
+      // Fetch initial data
+      this.subscribeToQuery();
+    }
     // If query exists
     if (props.query) {
       // Loop through and add typenames
@@ -266,6 +281,39 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         },
       });
     }
+  };
+
+  subscribeToQuery = () => {
+    const { client } = this.props;
+
+    // Start loading state
+    this.setState({
+      error: null,
+      fetching: true,
+    });
+
+    // Fetch the query
+    this.querySubscription = client
+      .executeSubscription$(this.subscription)
+      .subscribe({
+        error: e => {
+          this.querySubscription = null;
+
+          this.setState({
+            error: e,
+            fetching: false,
+          });
+        },
+        next: result => {
+          // Update data
+          this.setState({
+            data: result.data || null,
+            error: result.error,
+            fetching: true,
+            loaded: true,
+          });
+        },
+      });
   };
 
   mutate = mutation => {

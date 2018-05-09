@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`httpExchange logs a warning when used for subscriptions 1`] = `"Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?"`;

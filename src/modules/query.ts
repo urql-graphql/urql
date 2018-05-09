@@ -1,8 +1,10 @@
-const query = (q: string, vars?: object) => {
+const createQuery = (q: string, vars?: object) => {
   return {
     query: q,
     variables: vars || {},
   };
 };
 
-export default query;
+export const query = createQuery;
+export const mutation = createQuery;
+export const subscription = createQuery;

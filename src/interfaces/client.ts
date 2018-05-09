@@ -6,6 +6,7 @@ import { IQuery } from './query';
 
 export interface IClient {
   cache: ICache;
+  executeSubscription$(subscriptionObject: IQuery): Observable<IExchangeResult>;
   executeQuery$(
     queryObject: IQuery,
     skipCache: boolean

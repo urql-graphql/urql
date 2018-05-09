@@ -2,9 +2,11 @@
 
 import React from 'react';
 import Client from '../../components/client';
+import { CombinedError } from '../../modules/error';
 import { hashString } from '../../modules/hash';
 import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
+import { subscriptionExchange } from '../../modules/subscription-exchange';
 import renderer from 'react-test-renderer';
 
 describe('Client Component', () => {
@@ -924,5 +926,75 @@ describe('Client Component', () => {
       .then(() => {
         expect(spy).toHaveBeenCalled();
       });
+  });
+
+  it('should handle subscriptions and return the proper render prop arguments', () => {
+    const unsubscribe = jest.fn();
+
+    let observer;
+    const createSubscription = (_, _observer) => {
+      observer = _observer;
+      return { unsubscribe };
+    };
+
+    const clientModule = new ClientModule({
+      url: 'test',
+      transformExchange: x => subscriptionExchange(createSubscription, x),
+    });
+
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        client={clientModule}
+        subscription={{ query: `subscription { todos { id } }` }}
+        children={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(result.data).toBe(null);
+    expect(result.error).toBe(null);
+    expect(result.loaded).toBe(false);
+
+    observer.next({ data: 'test1' });
+    expect(result.data).toBe('test1');
+    expect(result.loaded).toBe(true);
+
+    observer.next({ data: 'test2' });
+    expect(result.data).toBe('test2');
+
+    observer.next({ errors: ['testerr'] });
+    expect(result.data).toBe(null);
+    expect(result.error).toEqual(
+      new CombinedError({
+        graphQLErrors: ['testerr'],
+      })
+    );
+
+    observer.error(new Error('uhnuuuu'));
+
+    expect(result.fetching).toBe(false);
+    expect(result.error).toEqual(
+      new CombinedError({
+        networkError: new Error('uhnuuuu'),
+      })
+    );
+  });
+
+  it('should not accept query and subscription props at the same time', () => {
+    expect(() => {
+      const p = {
+        query: { query: `{ todos { id } }` },
+        subscription: { query: `subscription { todos { id } }` },
+      };
+
+      // @ts-ignore
+      const c = new Client(p as any);
+
+      c.formatProps(p);
+    }).toThrowErrorMatchingSnapshot();
   });
 });
