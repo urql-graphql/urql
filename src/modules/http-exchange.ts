@@ -24,7 +24,8 @@ const createAbortController = () => {
 };
 
 export const httpExchange = (): IExchange => operation => {
-  const { url, operationName, fetchOptions } = operation.context;
+  const { url, fetchOptions } = operation.context;
+  const { operationName } = operation;
 
   if (operationName === 'subscription') {
     throw new Error(
