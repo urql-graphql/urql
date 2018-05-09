@@ -67,11 +67,8 @@ describe('Client', () => {
   });
 
   describe('cache', () => {
-    it('should provide a valid cache by default', done => {
-      const store = {
-        test: 5,
-      };
-
+    it('should provide a valid cache by default', () => {
+      const store = { test: 5 };
       const myCache = defaultCache(store);
 
       const client = new Client({
@@ -84,33 +81,6 @@ describe('Client', () => {
       expect(client.cache.read).toBeTruthy();
       expect(client.cache.update).toBeTruthy();
       expect(client.cache.write).toBeTruthy();
-
-      Promise.all([
-        client.cache.invalidateAll(),
-        client.cache.read('test'),
-        client.cache.write('test', 5),
-        client.cache.read('test'),
-        client.cache.update((acc, key) => {
-          if (key === 'test') {
-            acc[key] = 6;
-          }
-        }),
-        client.cache.read('test'),
-        client.cache.invalidate('test'),
-        client.cache.read('test'),
-      ]).then(d => {
-        expect(d).toMatchObject([
-          undefined,
-          null,
-          'test',
-          5,
-          undefined,
-          6,
-          'test',
-          null,
-        ]);
-        done();
-      });
     });
   });
 
@@ -281,6 +251,35 @@ describe('Client', () => {
 
           done();
         });
+    });
+
+    it('should include functional fetchOptions', done => {
+      client = new Client({
+        fetchOptions: () => ({ test: 5 }),
+        url: 'http://localhost:3000/graphql',
+      });
+
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          json: () => ({ data: [{ id: 5 }] }),
+          status: 200,
+        })
+      );
+
+      client.executeQuery({ query: '' }).then(() => {
+        const body = JSON.stringify({ query: '' });
+        expect((global as any).fetch).toHaveBeenCalledWith(
+          'http://localhost:3000/graphql',
+          {
+            body,
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            test: 5,
+          }
+        );
+
+        done();
+      });
     });
 
     it('should return "No Data" if data is not present', done => {
