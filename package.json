@@ -38,13 +38,7 @@
       "./src/tests/setup.js"
     ],
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsConfigFile": "tsconfig.json",
-        "useBabelrc": true
-      }
+      "^.+\\.tsx?$": "<rootDir>/node_modules/babel-jest"
     },
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
@@ -124,7 +118,6 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.13.0",
     "rollup-plugin-uglify": "^3.0.0",
-    "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.6.0",
     "tslint-react": "^3.4.0",
