@@ -67,11 +67,8 @@ describe('Client', () => {
   });
 
   describe('cache', () => {
-    it('should provide a valid cache by default', done => {
-      const store = {
-        test: 5,
-      };
-
+    it('should provide a valid cache by default', () => {
+      const store = { test: 5 };
       const myCache = defaultCache(store);
 
       const client = new Client({
@@ -84,33 +81,6 @@ describe('Client', () => {
       expect(client.cache.read).toBeTruthy();
       expect(client.cache.update).toBeTruthy();
       expect(client.cache.write).toBeTruthy();
-
-      Promise.all([
-        client.cache.invalidateAll(),
-        client.cache.read('test'),
-        client.cache.write('test', 5),
-        client.cache.read('test'),
-        client.cache.update((acc, key) => {
-          if (key === 'test') {
-            acc[key] = 6;
-          }
-        }),
-        client.cache.read('test'),
-        client.cache.invalidate('test'),
-        client.cache.read('test'),
-      ]).then(d => {
-        expect(d).toMatchObject([
-          undefined,
-          null,
-          'test',
-          5,
-          undefined,
-          6,
-          'test',
-          null,
-        ]);
-        done();
-      });
     });
   });
 
