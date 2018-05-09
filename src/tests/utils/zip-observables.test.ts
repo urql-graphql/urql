@@ -15,6 +15,16 @@ describe('zipObservables', () => {
     });
   });
 
+  it('handles observables with multiple emissions gracefully', done => {
+    zipObservables([
+      Observable.from(['a', 'nope']),
+      Observable.from(['b', 'also nope']),
+    ]).subscribe(res => {
+      expect(res).toEqual(['a', 'b']);
+      done();
+    });
+  });
+
   it('errors with the first error it encounters', done => {
     zipObservables([
       Observable.of('a'),
