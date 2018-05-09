@@ -32,7 +32,7 @@ export default class Client {
 
     this.url = opts.url;
     this.store = opts.initialCache || {};
-    this.subscriptions = {};
+    this.subscriptions = Object.create(null);
     this.subscriptionSize = 0;
     this.cache = opts.cache || defaultCache(this.store);
     this.exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
@@ -47,10 +47,9 @@ export default class Client {
 
   updateSubscribers(typenames, changes) {
     // On mutation, call subscribed callbacks with eligible typenames
+    /* tslint:disable-next-line forin */
     for (const sub in this.subscriptions) {
-      if (this.subscriptions.hasOwnProperty(sub)) {
-        this.subscriptions[sub](typenames, changes);
-      }
+      this.subscriptions[sub](typenames, changes);
     }
   }
 
@@ -70,10 +69,9 @@ export default class Client {
   refreshAllFromCache() {
     // On mutation, call subscribed callbacks with eligible typenames
     return new Promise(resolve => {
+      /* tslint:disable-next-line forin */
       for (const sub in this.subscriptions) {
-        if (this.subscriptions.hasOwnProperty(sub)) {
-          this.subscriptions[sub](null, null, true);
-        }
+        this.subscriptions[sub](null, null, true);
       }
       resolve();
     });

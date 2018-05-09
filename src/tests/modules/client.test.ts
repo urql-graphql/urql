@@ -283,6 +283,35 @@ describe('Client', () => {
         });
     });
 
+    it('should include functional fetchOptions', done => {
+      client = new Client({
+        fetchOptions: () => ({ test: 5 }),
+        url: 'http://localhost:3000/graphql',
+      });
+
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          json: () => ({ data: [{ id: 5 }] }),
+          status: 200,
+        })
+      );
+
+      client.executeQuery({ query: '' }).then(() => {
+        const body = JSON.stringify({ query: '' });
+        expect((global as any).fetch).toHaveBeenCalledWith(
+          'http://localhost:3000/graphql',
+          {
+            body,
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            test: 5,
+          }
+        );
+
+        done();
+      });
+    });
+
     it('should return "No Data" if data is not present', done => {
       client = new Client({
         url: 'http://localhost:3000/graphql',
