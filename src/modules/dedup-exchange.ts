@@ -47,12 +47,9 @@ export const dedupExchange = (forward: IExchange): IExchange => {
       }
 
       return () => {
-        refCounter--;
-        if (refCounter === 0) {
+        if (--refCounter === 0) {
           delete inFlight[key];
-          if (subscription !== undefined) {
-            subscription.unsubscribe();
-          }
+          subscription.unsubscribe();
         }
       };
     }));
