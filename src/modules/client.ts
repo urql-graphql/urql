@@ -35,8 +35,12 @@ export default class Client {
     this.subscriptions = Object.create(null);
     this.subscriptionSize = 0;
     this.cache = opts.cache || defaultCache(this.store);
-    this.exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
     this.fetchOptions = opts.fetchOptions || {};
+
+    const exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
+    this.exchange = opts.transformExchange
+      ? opts.transformExchange(exchange)
+      : exchange;
 
     // Bind methods
     this.executeQuery = this.executeQuery.bind(this);

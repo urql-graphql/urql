@@ -28,6 +28,18 @@ describe('Client', () => {
     expect(client.url).toMatch('test');
   });
 
+  it('should apply transformExchange to the exchange', () => {
+    const client = new Client({
+      transformExchange: x => {
+        (x as any).test = true;
+        return x;
+      },
+      url: 'test',
+    });
+
+    expect((client.exchange as any).test).toBe(true);
+  });
+
   it('should set fetchOptions', () => {
     const client = new Client({
       fetchOptions: {
