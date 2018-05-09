@@ -1,12 +1,13 @@
-import query from '../../modules/query';
-describe('query', () => {
+import { query } from '../../modules/query';
+
+describe('query / mutation / subscription', () => {
   it('should return a valid query object', () => {
-    let val = query(`{ todos { id } }`);
+    const val = query(`{ todos { id } }`);
     expect(val).toMatchObject({ query: `{ todos { id } }`, variables: {} });
   });
 
   it('should return a valid query object with variables', () => {
-    let val = query(`{ todos { id } }`, { test: 5 });
+    const val = query(`{ todos { id } }`, { test: 5 });
     expect(val).toMatchObject({
       query: `{ todos { id } }`,
       variables: { test: 5 },
