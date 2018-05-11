@@ -7,6 +7,7 @@ import { hashString } from '../../modules/hash';
 import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
 import { subscriptionExchange } from '../../modules/subscription-exchange';
+import { ClientEventType } from '../../interfaces/index';
 import renderer from 'react-test-renderer';
 
 describe('Client Component', () => {
@@ -524,7 +525,9 @@ describe('Client Component', () => {
     // NOTE: Delay here waits for the fetch to flush and complete, since
     // dedupExchange would deduplicate it otherwise
     setTimeout(() => {
-      client.getInstance().update(null, null, true);
+      client.getInstance().update({
+        type: ClientEventType.RefreshAll,
+      });
 
       setTimeout(() => {
         expect(spy).toHaveBeenCalledTimes(2);

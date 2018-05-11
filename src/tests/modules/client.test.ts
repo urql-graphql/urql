@@ -1,5 +1,6 @@
 import Client from '../../modules/client';
 import { defaultCache } from '../../modules/default-cache';
+import { ClientEventType } from '../../interfaces/events';
 
 describe('Client', () => {
   beforeEach(() => {
@@ -10,6 +11,7 @@ describe('Client', () => {
 
   it('should throw without options provided', () => {
     expect(() => {
+      /* tslint:disable-next-line no-unused-expression */
       new Client();
     }).toThrowError('Please provide configuration object');
   });
@@ -17,7 +19,7 @@ describe('Client', () => {
   it('should throw without a url provided', () => {
     expect(() => {
       // @ts-ignore
-      new Client({});
+      new Client({}); /* tslint:disable-line no-unused-expression */
     }).toThrowError('Please provide a URL for your GraphQL API');
   });
 
@@ -110,8 +112,14 @@ describe('Client', () => {
       client.subscribe(spy);
       const typenames = ['a', 'b'];
       const changes = { a: 5 };
+
+      const event = {
+        payload: { typenames, changes },
+        type: ClientEventType.InvalidateTypenames,
+      };
+
       client.updateSubscribers(typenames, changes);
-      expect(spy).toBeCalledWith(typenames, changes);
+      expect(spy).toBeCalledWith(event);
     });
   });
 
@@ -128,7 +136,9 @@ describe('Client', () => {
       const spy = jest.fn();
       client.subscribe(spy);
       client.refreshAllFromCache();
-      expect(spy).toBeCalledWith(null, null, true);
+
+      const event = { type: ClientEventType.RefreshAll };
+      expect(spy).toBeCalledWith(event);
     });
   });
 

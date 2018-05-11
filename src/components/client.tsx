@@ -177,11 +177,12 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   update = (event: ClientEvent) => {
     const { type } = event;
 
-    // RefreshAll indicates that the component should refetch its queries
     if (type === ClientEventType.RefreshAll) {
+      // RefreshAll indicates that the component should refetch its queries
       this.fetch();
       return;
     } else if (type === ClientEventType.InvalidateTypenames) {
+      // InvalidateTypenames instructs us to reevaluate this component's typenames
       const { typenames, changes } = event.payload;
 
       let invalidated = false;
