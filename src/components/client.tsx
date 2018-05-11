@@ -1,14 +1,17 @@
 import { Component, ReactNode } from 'react';
+import { CombinedError } from '../modules/error';
+import { hashString } from '../modules/hash';
+import { formatTypeNames } from '../modules/typenames';
+import { zipObservables } from '../utils/zip-observables';
+
 import {
+  ClientEvent,
+  ClientEventType,
   IClient,
   IExchangeResult,
   IMutation,
   IQuery,
 } from '../interfaces/index';
-import { CombinedError } from '../modules/error';
-import { hashString } from '../modules/hash';
-import { formatTypeNames } from '../modules/typenames';
-import { zipObservables } from '../utils/zip-observables';
 
 export interface IClientProps {
   client: IClient; // Client instance
@@ -171,30 +174,37 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update = (changedTypes, response, refresh) => {
-    if (refresh === true) {
+  update = (event: ClientEvent) => {
+    const { type } = event;
+
+    if (type === ClientEventType.RefreshAll) {
+      // RefreshAll indicates that the component should refetch its queries
       this.fetch();
-    }
-    let invalidated = false;
-    if (this.props.shouldInvalidate) {
-      invalidated = this.props.shouldInvalidate(
-        changedTypes,
-        this.typeNames,
-        response,
-        this.state.data
-      );
-    } else if (this.props.typeInvalidation !== false) {
-      // Check connection typenames, derived from query, for presence of mutated typenames
-      this.typeNames.forEach(typeName => {
-        if (changedTypes.indexOf(typeName) !== -1) {
-          invalidated = true;
-        }
-      });
-    }
-    // If it has any of the type names that changed
-    if (invalidated) {
-      // Refetch the data from the server
-      this.fetch({ skipCache: true });
+      return;
+    } else if (type === ClientEventType.InvalidateTypenames) {
+      // InvalidateTypenames instructs us to reevaluate this component's typenames
+      const { typenames, changes } = event.payload;
+
+      let invalidated = false;
+      if (this.props.shouldInvalidate) {
+        invalidated = this.props.shouldInvalidate(
+          typenames,
+          this.typeNames,
+          changes,
+          this.state.data
+        );
+      } else if (this.props.typeInvalidation !== false) {
+        // Check connection typenames, derived from query, for presence of mutated typenames
+        invalidated = this.typeNames.some(
+          typeName => typenames.indexOf(typeName) !== -1
+        );
+      }
+
+      // If it has any of the type names that changed
+      if (invalidated) {
+        // Refetch the data from the server
+        this.fetch({ skipCache: true });
+      }
     }
   };
 
