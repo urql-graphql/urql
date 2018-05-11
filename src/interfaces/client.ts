@@ -1,6 +1,7 @@
 import Observable from 'zen-observable-ts';
 
 import { ICache } from './cache';
+import { ClientEvent } from './events';
 import { IExchangeResult } from './exchange';
 import { IQuery } from './query';
 
@@ -18,7 +19,5 @@ export interface IClient {
   executeMutation$(mutationObject: IQuery): Observable<IExchangeResult['data']>;
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']>;
   refreshAllFromCache(): void;
-  subscribe(
-    callback: (changedTypes: string[], reponse: object) => void
-  ): () => void;
+  subscribe(callback: (event: ClientEvent) => void): () => void;
 }
