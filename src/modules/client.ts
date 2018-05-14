@@ -41,7 +41,7 @@ export default class Client {
 
     const exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
     this.exchange = opts.transformExchange
-      ? opts.transformExchange(exchange)
+      ? opts.transformExchange(exchange, this)
       : exchange;
 
     // Bind methods

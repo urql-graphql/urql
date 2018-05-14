@@ -6,5 +6,5 @@ export interface IClientOptions {
   fetchOptions?: object | (() => object);
   cache?: ICache;
   initialCache?: object;
-  transformExchange?: (IExchange) => IExchange;
+  transformExchange?: (IExchange, IClient) => IExchange;
 }
