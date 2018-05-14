@@ -13,6 +13,7 @@ export * from './components/connect-hoc';
 export * from './modules/query';
 export * from './modules/cache-exchange';
 export * from './modules/dedup-exchange';
+export * from './modules/error';
 export * from './modules/http-exchange';
 export * from './modules/subscription-exchange';
 
