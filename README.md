@@ -265,13 +265,13 @@ const defaultCache = store => {
 
 #### Options
 
-| Name              | Value                      | Description                                                                                                                                                          |
-| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| url               | `string`                   | The URL that the Client should connect to _(required)_                                                                                                               |
-| initialCache      | `object`                   | An initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented                                       |
-| cache             | `ICache`                   | Instance of an `ICache` if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above. |
-| fetchOptions      | `object` or `() => object` | Options provided to the internal `fetch` calls which can either be an object or a function if you want to provide dynamic values like a token header.                |
-| transformExchange | `IExchange => IExchange`   | A function that accepts the default "Exchange" and returns a new one. Use this to customise how the client handles GraphQL requests.                                 |
+| Name              | Value                               | Description                                                                                                                                                          |
+| ----------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| url               | `string`                            | The URL that the Client should connect to _(required)_                                                                                                               |
+| initialCache      | `object`                            | An initial state for your cache if you are using the default cache. This probably won't get much play until SSR is implemented                                       |
+| cache             | `ICache`                            | Instance of an `ICache` if you want to build your own custom one built with something like `AsyncStorage`. You can read more about how to create one of these above. |
+| fetchOptions      | `object` or `() => object`          | Options provided to the internal `fetch` calls which can either be an object or a function if you want to provide dynamic values like a token header.                |
+| transformExchange | `(IExchange, IClient) => IExchange` | A function that receives the default "Exchange" and the client, and returns a new exchange. Use this to customise how the client handles GraphQL requests.           |
 
 #### Description
 
@@ -507,7 +507,7 @@ const funExchange = forward => operation =>
 
 const client = new Client({
   url: 'http://localhost:3000/graphql',
-  transformExchange: exchange => funExchange(exchange),
+  transformExchange: (exchange, _client) => funExchange(exchange),
 });
 ```
 
