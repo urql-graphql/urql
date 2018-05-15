@@ -87,6 +87,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       this.unsubscribe();
     }
 
+    if (this.subscriptionSub !== null) {
+      this.subscriptionSub.unsubscribe();
+    }
+
     if (this.querySub !== null) {
       this.querySub.unsubscribe();
     }
