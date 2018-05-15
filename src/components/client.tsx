@@ -340,14 +340,29 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           const nextData = result.data || null;
 
           // Update data
-          this.setState(state => ({
-            data: this.willUpdateSubscription
-              ? updateSubscription(state.data || null, nextData)
-              : nextData,
-            error: result.error,
-            fetching: true,
-            loaded: true,
-          }));
+          this.setState(
+            state => ({
+              data: this.willUpdateSubscription
+                ? updateSubscription(state.data || null, nextData)
+                : nextData,
+              error: result.error,
+              fetching: true,
+              loaded: true,
+            }),
+            () => {
+              const invalidate =
+                this.willUpdateSubscription &&
+                this.query &&
+                this.props.typeInvalidation !== false;
+              if (invalidate && Array.isArray(this.query)) {
+                this.query.forEach(query => {
+                  client.invalidateQuery(query);
+                });
+              } else if (invalidate) {
+                client.invalidateQuery(this.query);
+              }
+            }
+          );
         },
       });
   };
