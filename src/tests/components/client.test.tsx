@@ -1061,4 +1061,65 @@ describe('Client Component', () => {
       done();
     }, 100);
   });
+
+  it('should handle subscription, query array, and updateSubscription props', done => {
+    const data = { todos: [{ id: 1, __typename: 'Todo' }] };
+
+    (global as any).fetch.mockReturnValue(
+      Promise.resolve({
+        status: 200,
+        json: () => ({ data }),
+      })
+    );
+
+    const unsubscribe = jest.fn();
+
+    let observer;
+    const createSubscription = (_, _observer) => {
+      observer = _observer;
+      return { unsubscribe };
+    };
+
+    const clientModule = new ClientModule({
+      url: 'test',
+      transformExchange: x => subscriptionExchange(createSubscription, x),
+    });
+
+    const query = `{ todos { id } }`;
+    const updateSubscription = (_, next) => next;
+
+    let result;
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        client={clientModule}
+        query={[{ query }, { query }]}
+        subscription={{ query: `subscription { todos { id } }` }}
+        updateSubscription={updateSubscription}
+        children={args => {
+          result = args;
+          return null;
+        }}
+      />
+    );
+
+    expect(result.data).toBe(null);
+    expect(result.error).toBe(null);
+    expect(result.loaded).toBe(false);
+    expect(Object.keys(clientModule.store).length).toBe(0);
+
+    setTimeout(() => {
+      expect(result.data).toEqual([data, data]);
+      expect(result.loaded).toBe(true);
+      expect(Object.keys(clientModule.store).length).toBe(1);
+
+      const newData = { test: 'test1' };
+      observer.next({ data: newData });
+
+      expect(result.data).toBe(newData);
+      expect(Object.keys(clientModule.store).length).toBe(0);
+
+      done();
+    }, 100);
+  });
 });
