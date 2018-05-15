@@ -1,6 +1,6 @@
 /* tslint:disable */
 
-import React from 'react';
+import React, { Component } from 'react';
 import ConnectHOC from '../../components/connect-hoc';
 import renderer from 'react-test-renderer';
 
@@ -55,5 +55,21 @@ describe('Connect HOC', () => {
 
     let tree = component.toJSON();
     expect(tree).toMatchSnapshot();
+  });
+
+  it('should assign reasonable displayNames to components', () => {
+    class Comp extends Component {
+      static displayName = 'Test';
+      render() {
+        return null;
+      }
+    }
+
+    expect(ConnectHOC()(Comp).displayName).toBe('Connect(Test)');
+
+    const TestComp = () => null;
+    expect(ConnectHOC()(TestComp).displayName).toBe('Connect(TestComp)');
+
+    expect(ConnectHOC()({} as any).displayName).toBe('Connect(Component)');
   });
 });
