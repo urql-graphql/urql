@@ -5,8 +5,13 @@ import { Consumer } from './context';
 
 export interface IConnectProps<Data, Mutations> {
   children: (props: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
+  subscription?: IQuery;
   query?: IQuery | IQuery[]; // Query or queries
   mutation?: IMutation; // Mutation map
+  updateSubscription?: (
+    prev: object | null,
+    next: object | null
+  ) => object | null;
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
@@ -71,8 +76,10 @@ export default class Connect<Data = {}, Mutations = {}> extends Component<
           <ClientWrapper
             client={client}
             children={this.props.children}
+            subscription={this.props.subscription}
             query={this.props.query}
             mutation={this.props.mutation}
+            updateSubscription={this.props.updateSubscription}
             cache={this.props.cache}
             typeInvalidation={this.props.typeInvalidation}
             shouldInvalidate={this.props.shouldInvalidate}
