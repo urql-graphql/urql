@@ -1122,4 +1122,48 @@ describe('Client Component', () => {
       done();
     }, 100);
   });
+
+  it('should unsubscribe before starting a new query', () => {
+    (global as any).fetch.mockReturnValue(new Promise(() => {}));
+    const clientModule = new ClientModule({ url: 'test' });
+    const query = `{ todos { id } }`;
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client client={clientModule} query={{ query }} children={() => null} />
+    );
+
+    expect(client.getInstance().querySub).not.toBeNull();
+    const spy = jest.spyOn(client.getInstance().querySub, 'unsubscribe');
+
+    // Manually trigger fetch
+    client.getInstance().fetch();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should unsubscribe before starting a new subscription', () => {
+    const createSubscription = (_, _observer) => ({ unsubscribe: () => {} });
+    const clientModule = new ClientModule({
+      url: 'test',
+      transformExchange: x => subscriptionExchange(createSubscription, x),
+    });
+
+    // @ts-ignore
+    const client = renderer.create(
+      <Client
+        client={clientModule}
+        subscription={{ query: `subscription { ideas { id } }` }}
+        children={() => null}
+      />
+    );
+
+    expect(client.getInstance().subscriptionSub).not.toBeNull();
+    const spy = jest.spyOn(client.getInstance().subscriptionSub, 'unsubscribe');
+
+    // Manually trigger fetch
+    client.getInstance().subscribeToQuery();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
 });
