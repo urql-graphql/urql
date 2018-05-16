@@ -350,7 +350,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
                 ? updateSubscription(state.data || null, nextData)
                 : nextData,
               error: result.error,
-              fetching: true,
+              fetching: false,
               loaded: true,
             }),
             () => {
