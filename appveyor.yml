@@ -3,10 +3,11 @@ environment:
   matrix:
     - nodejs_version: "6"
     - nodejs_version: "8"
+    - nodejs_version: "10"
 
 # Install scripts. (runs after repo cloning)
 install:
-  - ps: Install-Product node $env:node_version
+  - ps: Install-Product node $env:nodejs_version
   - yarn install
 
 # Post-install test scripts.
