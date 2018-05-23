@@ -19,6 +19,10 @@ export interface IClientProps {
   subscription?: IQuery; // Subscription Query object
   query?: IQuery | IQuery[]; // Query object or array of Query objects
   mutation?: IMutation; // Mutation object (map)
+  updateSubscription?: (
+    prev: object | null,
+    next: object | null
+  ) => object | null; // Update query with subscription data
   cache?: boolean;
   typeInvalidation?: boolean;
   shouldInvalidate?: (
@@ -53,13 +57,14 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     loaded: false,
   };
 
+  willUpdateSubscription = false; // Flag that indicates the subscription's behaviour
   subscription = null; // Stored Subscription Query
   query = null; // Stored Query
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
   unsubscribe = null; // Unsubscription function calling back to the client
-  querySubscription = null; // Subscription for ongoing queries
-  mutationSubscription = null; // Subscription for ongoing mutations
+  subscriptionSub = null; // Subscription for ongoing subscription queries
+  querySub = null; // Subscription for ongoing queries
 
   componentDidMount() {
     this.formatProps(this.props);
@@ -82,12 +87,12 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       this.unsubscribe();
     }
 
-    if (this.querySubscription !== null) {
-      this.querySubscription.unsubscribe();
+    if (this.subscriptionSub !== null) {
+      this.subscriptionSub.unsubscribe();
     }
 
-    if (this.mutationSubscription !== null) {
-      this.mutationSubscription.unsubscribe();
+    if (this.querySub !== null) {
+      this.querySub.unsubscribe();
     }
   }
 
@@ -124,19 +129,15 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   formatProps = props => {
-    if (props.subscription && props.query) {
+    if (props.subscription && props.query && !props.updateSubscription) {
       throw new Error(
-        'Passing a query and a subscription prop at the same time is invalid.'
+        'Passing a query and a subscription prop at the same time without an updateSubscription function is invalid.'
       );
     }
 
-    // If subscription exists
-    if (props.subscription) {
-      // Loop through and add typenames
-      this.subscription = formatTypeNames(props.subscription);
-      // Fetch initial data
-      this.subscribeToQuery();
-    }
+    this.willUpdateSubscription =
+      props.subscription && props.query && props.updateSubscription;
+
     // If query exists
     if (props.query) {
       // Loop through and add typenames
@@ -148,6 +149,15 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       // Fetch initial data
       this.fetch(undefined, true);
     }
+
+    // If subscription exists
+    if (props.subscription) {
+      // Loop through and add typenames
+      this.subscription = formatTypeNames(props.subscription);
+      // Fetch initial data
+      this.subscribeToQuery();
+    }
+
     // If mutation exists and has keys
     if (props.mutation) {
       this.mutations = {};
@@ -223,6 +233,11 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       skipCache = true;
     }
 
+    if (this.querySub !== null) {
+      this.querySub.unsubscribe();
+      this.querySub = null;
+    }
+
     // Start loading state
     this.setState({
       error: null,
@@ -232,28 +247,30 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     // If query is not an array
     if (!Array.isArray(this.query)) {
       // Fetch the query
-      this.querySubscription = client
-        .executeQuery$(this.query, skipCache)
-        .subscribe({
-          error: e => {
-            this.setState({
-              error: e,
-              fetching: false,
-            });
-          },
-          next: result => {
-            // Store the typenames
-            this.typeNames = result.typeNames;
+      this.querySub = client.executeQuery$(this.query, skipCache).subscribe({
+        complete: () => {
+          this.querySub = null;
+        },
+        error: e => {
+          this.querySub = null;
+          this.setState({
+            error: e,
+            fetching: false,
+          });
+        },
+        next: result => {
+          // Store the typenames
+          this.typeNames = result.typeNames;
 
-            // Update data
-            this.setState({
-              data: result.data || null,
-              error: result.error,
-              fetching: false,
-              loaded: initial ? true : this.state.loaded,
-            });
-          },
-        });
+          // Update data
+          this.setState({
+            data: result.data || null,
+            error: result.error,
+            fetching: false,
+            loaded: initial ? true : this.state.loaded,
+          });
+        },
+      });
     } else {
       const partialData = [];
       const queries$ = this.query.map(query =>
@@ -271,7 +288,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         })
       );
 
-      this.querySubscription = zipObservables(queries$).subscribe({
+      this.querySub = zipObservables(queries$).subscribe({
         error: e => {
           this.setState({
             data: partialData.map(part => part.data),
@@ -294,34 +311,62 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   subscribeToQuery = () => {
-    const { client } = this.props;
+    const { client, updateSubscription } = this.props;
 
-    // Start loading state
-    this.setState({
-      error: null,
-      fetching: true,
-    });
+    if (this.subscriptionSub !== null) {
+      this.subscriptionSub.unsubscribe();
+      this.subscriptionSub = null;
+    }
+
+    if (!this.willUpdateSubscription) {
+      // Start loading state
+      this.setState({
+        error: null,
+        fetching: true,
+      });
+    }
 
     // Fetch the query
-    this.querySubscription = client
+    this.subscriptionSub = client
       .executeSubscription$(this.subscription)
       .subscribe({
+        complete: () => {
+          this.subscriptionSub = null;
+        },
         error: e => {
-          this.querySubscription = null;
-
+          this.subscriptionSub = null;
           this.setState({
             error: e,
             fetching: false,
           });
         },
         next: result => {
+          const nextData = result.data || null;
+
           // Update data
-          this.setState({
-            data: result.data || null,
-            error: result.error,
-            fetching: true,
-            loaded: true,
-          });
+          this.setState(
+            state => ({
+              data: this.willUpdateSubscription
+                ? updateSubscription(state.data || null, nextData)
+                : nextData,
+              error: result.error,
+              fetching: false,
+              loaded: true,
+            }),
+            () => {
+              const invalidate =
+                this.willUpdateSubscription &&
+                this.query &&
+                this.props.typeInvalidation !== false;
+              if (invalidate && Array.isArray(this.query)) {
+                this.query.forEach(query => {
+                  client.invalidateQuery(query);
+                });
+              } else if (invalidate) {
+                client.invalidateQuery(this.query);
+              }
+            }
+          );
         },
       });
   };
@@ -337,7 +382,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
 
     return new Promise<IExchangeResult['data']>((resolve, reject) => {
       // Execute mutation
-      this.mutationSubscription = client.executeMutation$(mutation).subscribe({
+      client.executeMutation$(mutation).subscribe({
         error: e => {
           this.setState(
             {

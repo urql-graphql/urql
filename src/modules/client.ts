@@ -47,6 +47,7 @@ export default class Client {
     // Bind methods
     this.executeQuery = this.executeQuery.bind(this);
     this.executeMutation = this.executeMutation.bind(this);
+    this.invalidateQuery = this.invalidateQuery.bind(this);
     this.updateSubscribers = this.updateSubscribers.bind(this);
     this.refreshAllFromCache = this.refreshAllFromCache.bind(this);
   }
@@ -174,5 +175,11 @@ export default class Client {
         next: resolve,
       });
     });
+  }
+
+  invalidateQuery(queryObject: IQuery) {
+    const { query, variables } = queryObject;
+    const key = hashString(JSON.stringify({ query, variables }));
+    return this.cache.invalidate(key);
   }
 }

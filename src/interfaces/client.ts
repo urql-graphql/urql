@@ -18,6 +18,7 @@ export interface IClient {
   ): Promise<IExchangeResult>;
   executeMutation$(mutationObject: IQuery): Observable<IExchangeResult['data']>;
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']>;
+  invalidateQuery(queryObject: IQuery): Promise<void>;
   refreshAllFromCache(): void;
   subscribe(callback: (event: ClientEvent) => void): () => void;
 }
