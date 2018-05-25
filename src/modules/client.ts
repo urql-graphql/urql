@@ -147,7 +147,7 @@ export default class Client {
 
   executeMutation$(
     mutationObject: IQuery
-  ): Observable<IExchangeResult['data']> {
+  ): Observable<IExchangeResult> {
     // Create hash key for unique query/variables
     const { query, variables } = mutationObject;
     const key = hashString(JSON.stringify({ query, variables }));
@@ -164,11 +164,11 @@ export default class Client {
       // Notify subscribed Connect wrappers
       this.updateSubscribers(response.typeNames, response);
       // Resolve result
-      return response.data;
+      return response;
     });
   }
 
-  executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']> {
+  executeMutation(mutationObject: IQuery): Promise<IExchangeResult> {
     return new Promise<IExchangeResult>((resolve, reject) => {
       this.executeMutation$(mutationObject).subscribe({
         error: reject,
