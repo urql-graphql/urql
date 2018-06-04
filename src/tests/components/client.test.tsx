@@ -487,7 +487,7 @@ describe('Client Component', () => {
     );
     setTimeout(() => {
       result.addTodo().then(mutationResult => {
-        expect(mutationResult).toEqual({
+        expect(mutationResult.data).toEqual({
           addTodo: {
             id: '1',
             text: 'TestItem',

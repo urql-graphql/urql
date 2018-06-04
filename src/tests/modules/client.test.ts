@@ -379,8 +379,40 @@ describe('Client', () => {
           }
         }`,
         })
-        .then(data => {
-          expect(data).toMatchObject({ test: 5 });
+        .then(response => {
+          expect(response.data).toMatchObject({ test: 5 });
+          done();
+        });
+    });
+
+    it('should return GraphQL errors if present', done => {
+      client = new Client({
+        url: 'http://localhost:3000/graphql',
+      });
+
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({
+            data: { todos: null },
+            errors: [{ message: 'First Error' }],
+          }),
+        })
+      );
+
+      client
+        .executeMutation({
+          query: `{
+          todos {
+            id
+            name
+          }
+        }`,
+        })
+        .then(response => {
+          expect(response.error.graphQLErrors).toMatchObject([
+            new Error('First Error'),
+          ]);
           done();
         });
     });
