@@ -10,7 +10,7 @@ class Home extends React.Component {
     return (
       <TitleMeta title="Spectacle">
         <div className="Hero">
-          <video className="Hero-video" width="100%" autoPlay loop poster="./static/bg-still.png">
+          <video className="Hero-video" width="100%" autoPlay muted loop poster="./static/bg-still.png">
             <source src="./static/bg-demo.webm" type="video/webm" />
             <source src="./static/bg-demo.mp4" type="video/mp4" />
           </video>
