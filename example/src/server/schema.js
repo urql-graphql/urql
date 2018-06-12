@@ -50,7 +50,7 @@ const resolvers = {
       return store.todos;
     },
     todo: (root, args, context) => {
-      return store.todos.find(a => (a.id = args.id));
+      return store.todos.find(a => a.id === args.id);
     },
     user: (root, args, context) => {
       return store.user;
