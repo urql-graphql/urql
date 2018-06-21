@@ -37,6 +37,13 @@ describe('Client', () => {
     expect(client.fetchOptions).toMatchObject({ test: 5 });
   });
 
+  it('should set fetch to a function if not provided', () => {
+    const client = new Client({
+      url: 'test',
+    });
+    expect(typeof client.fetch).toBe('function');
+  });
+
   it('should set fetchOptions to an object if not provided', () => {
     const client = new Client({
       url: 'test',
@@ -190,6 +197,34 @@ describe('Client', () => {
 
   describe('executeQuery', () => {
     let client;
+
+    it('should use a custom fetch function if provided', done => {
+      const customFetch = jest.fn();
+      customFetch.mockReturnValue(
+        Promise.resolve({
+          status: 200,
+          json: () => ({ data: [{ id: 5 }] }),
+        })
+      );
+      client = new Client({
+        url: 'http://localhost:3000/graphql',
+        fetch: customFetch,
+      });
+
+      client
+        .executeQuery({
+          query: `{
+          todos {
+            id
+            name
+          }
+        }`,
+        })
+        .then(result => {
+          expect(result).toMatchObject({ data: [{ id: 5 }], typeNames: [] });
+          done();
+        });
+    });
 
     it('should return data if there is data', done => {
       client = new Client({

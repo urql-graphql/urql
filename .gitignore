@@ -10,3 +10,4 @@ package-lock.json.*
 bundles
 dist
 .rpt2_cache
+.DS_Store

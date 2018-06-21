@@ -59,6 +59,7 @@ export const defaultCache = store => {
 export default class Client {
   url?: string; // Graphql API URL
   store: object; // Internal store
+  fetch: (input?: Request | string, init?: RequestInit) => Promise<Response>; // global or custom fetch implementation.
   fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
   subscriptions: object; // Map of subscribed Connect components
   cache: ICache; // Cache object
@@ -73,6 +74,7 @@ export default class Client {
     }
 
     this.url = opts.url;
+    this.fetch = opts.fetch || fetch;
     this.fetchOptions = opts.fetchOptions || {};
     this.store = opts.initialCache || {};
     this.cache = opts.cache || defaultCache(this.store);
@@ -145,7 +147,7 @@ export default class Client {
               ? this.fetchOptions()
               : this.fetchOptions;
           // Fetch data
-          fetch(this.url, {
+          this.fetch(this.url, {
             body,
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
@@ -191,7 +193,7 @@ export default class Client {
           ? this.fetchOptions()
           : this.fetchOptions;
       // Call mutation
-      fetch(this.url, {
+      this.fetch(this.url, {
         body,
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
