@@ -74,7 +74,7 @@ export default class Client {
     }
 
     this.url = opts.url;
-    this.fetch = opts.fetch || fetch;
+    this.fetch = opts.fetch || fetch.bind(undefined);
     this.fetchOptions = opts.fetchOptions || {};
     this.store = opts.initialCache || {};
     this.cache = opts.cache || defaultCache(this.store);
