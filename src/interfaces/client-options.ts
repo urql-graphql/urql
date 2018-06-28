@@ -3,7 +3,7 @@ import { IExchange } from './exchange';
 
 export interface IClientOptions {
   url: string;
-  fetchOptions?: object | (() => object);
+  fetchOptions?: object | ((defaults: object) => object);
   cache?: ICache;
   initialCache?: object;
   transformExchange?: (IExchange, IClient) => IExchange;

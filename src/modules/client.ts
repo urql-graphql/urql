@@ -14,7 +14,7 @@ import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
 import { defaultCache } from './default-cache';
 import { hashString } from './hash';
-import { httpExchange } from './http-exchange';
+import { defaultFetchOptions, httpExchange } from './http-exchange';
 
 export default class Client {
   url: string;
@@ -22,7 +22,7 @@ export default class Client {
   subscriptionSize: number; // Used to generate IDs for subscriptions
   cache: ICache; // Cache object
   exchange: IExchange; // Exchange to communicate with GraphQL APIs
-  fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
+  fetchOptions: RequestInit | ((defaults: RequestInit) => RequestInit); // Options for fetch call
   subscriptions: { [id: string]: (ClientEvent) => void }; // Map of subscribed Connect components
 
   constructor(opts?: IClientOptions) {
@@ -91,7 +91,7 @@ export default class Client {
     return {
       fetchOptions:
         typeof this.fetchOptions === 'function'
-          ? this.fetchOptions()
+          ? this.fetchOptions(defaultFetchOptions)
           : this.fetchOptions,
       skipCache: !!skipCache,
       url: this.url,

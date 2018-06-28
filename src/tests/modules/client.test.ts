@@ -44,12 +44,12 @@ describe('Client', () => {
 
   it('should set fetchOptions', () => {
     const client = new Client({
-      fetchOptions: {
-        test: 5,
-      },
+      fetchOptions: { headers: { authorization: 'test' } },
       url: 'test',
     });
-    expect(client.fetchOptions).toMatchObject({ test: 5 });
+    expect(client.fetchOptions).toMatchObject({
+      headers: { authorization: 'test' },
+    });
   });
 
   it('should set fetchOptions to an object if not provided', () => {
@@ -241,9 +241,7 @@ describe('Client', () => {
     it('should include fetchOptions', done => {
       client = new Client({
         url: 'http://localhost:3000/graphql',
-        fetchOptions: {
-          test: 5,
-        },
+        fetchOptions: { referrer: 'test' },
       });
 
       (global as any).fetch.mockReturnValue(
@@ -267,7 +265,7 @@ describe('Client', () => {
               body: body,
               headers: { 'Content-Type': 'application/json' },
               method: 'POST',
-              test: 5,
+              referrer: 'test',
             }
           );
 
@@ -297,6 +295,39 @@ describe('Client', () => {
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
             test: 5,
+          }
+        );
+
+        done();
+      });
+    });
+
+    it('should pass default to functional fetchOptions', done => {
+      client = new Client({
+        fetchOptions: defaults => ({
+          headers: { ...(defaults as any).headers, authorization: 'test' },
+        }),
+        url: 'http://localhost:3000/graphql',
+      });
+
+      (global as any).fetch.mockReturnValue(
+        Promise.resolve({
+          json: () => ({ data: [{ id: 5 }] }),
+          status: 200,
+        })
+      );
+
+      client.executeQuery({ query: '' }).then(() => {
+        const body = JSON.stringify({ query: '' });
+        expect((global as any).fetch).toHaveBeenCalledWith(
+          'http://localhost:3000/graphql',
+          {
+            body,
+            headers: {
+              'Content-Type': 'application/json',
+              authorization: 'test',
+            },
+            method: 'POST',
           }
         );
 
