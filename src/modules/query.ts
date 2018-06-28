@@ -1,7 +1,7 @@
-const query = (q: string, vars?: object) => {
+const query = (q: string, vars: object = {}) => {
   return {
     query: q,
-    variables: vars || {},
+    variables: vars,
   };
 };
 
