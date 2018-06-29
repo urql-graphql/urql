@@ -24,7 +24,7 @@ const createAbortController = () => {
 };
 
 export const defaultHeaders: {} = Object.freeze({
-  headers: { 'Content-Type': 'application/json' },
+  'Content-Type': 'application/json',
 });
 
 export const httpExchange = (): IExchange => operation => {
