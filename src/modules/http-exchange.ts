@@ -23,7 +23,7 @@ const createAbortController = () => {
   return new AbortController();
 };
 
-export const defaultFetchOptions: RequestInit = Object.freeze({
+export const defaultHeaders: {} = Object.freeze({
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -49,8 +49,8 @@ export const httpExchange = (): IExchange => operation => {
     let response;
 
     fetch(url, {
-      ...defaultFetchOptions,
       body,
+      headers: defaultHeaders,
       method: 'POST',
       signal: abortController.signal,
       ...fetchOptions,

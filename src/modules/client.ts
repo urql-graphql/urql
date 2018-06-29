@@ -14,7 +14,7 @@ import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
 import { defaultCache } from './default-cache';
 import { hashString } from './hash';
-import { defaultFetchOptions, httpExchange } from './http-exchange';
+import { defaultHeaders, httpExchange } from './http-exchange';
 
 export default class Client {
   url: string;
@@ -91,7 +91,7 @@ export default class Client {
     return {
       fetchOptions:
         typeof this.fetchOptions === 'function'
-          ? this.fetchOptions(defaultFetchOptions)
+          ? this.fetchOptions({ headers: defaultHeaders })
           : this.fetchOptions,
       skipCache: !!skipCache,
       url: this.url,
