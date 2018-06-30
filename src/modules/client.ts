@@ -43,16 +43,9 @@ export default class Client {
     this.exchange = opts.transformExchange
       ? opts.transformExchange(exchange, this)
       : exchange;
-
-    // Bind methods
-    this.executeQuery = this.executeQuery.bind(this);
-    this.executeMutation = this.executeMutation.bind(this);
-    this.invalidateQuery = this.invalidateQuery.bind(this);
-    this.updateSubscribers = this.updateSubscribers.bind(this);
-    this.refreshAllFromCache = this.refreshAllFromCache.bind(this);
   }
 
-  updateSubscribers(typenames: string[], changes: IExchangeResult) {
+  updateSubscribers = (typenames: string[], changes: IExchangeResult) => {
     // On mutation, call subscribed callbacks with eligible typenames
 
     /* tslint:disable-next-line forin */
@@ -62,7 +55,7 @@ export default class Client {
         type: ClientEventType.InvalidateTypenames,
       });
     }
-  }
+  };
 
   subscribe(callback: (event: ClientEvent) => void): () => void {
     // Create an identifier, add callback to subscriptions
@@ -75,7 +68,7 @@ export default class Client {
     };
   }
 
-  refreshAllFromCache() {
+  refreshAllFromCache = () => {
     // On mutation, call subscribed callbacks with eligible typenames
     return new Promise(resolve => {
       /* tslint:disable-next-line forin */
@@ -85,7 +78,7 @@ export default class Client {
 
       resolve();
     });
-  }
+  };
 
   makeContext({ skipCache }: { skipCache?: boolean }): Record<string, any> {
     return {
@@ -133,17 +126,17 @@ export default class Client {
     return this.exchange(operation);
   }
 
-  executeQuery(
+  executeQuery = (
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IExchangeResult> {
+  ): Promise<IExchangeResult> => {
     return new Promise<IExchangeResult>((resolve, reject) => {
       this.executeQuery$(queryObject, skipCache).subscribe({
         error: reject,
         next: resolve,
       });
     });
-  }
+  };
 
   executeMutation$(
     mutationObject: IQuery
@@ -168,18 +161,20 @@ export default class Client {
     });
   }
 
-  executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']> {
+  executeMutation = (
+    mutationObject: IQuery
+  ): Promise<IExchangeResult['data']> => {
     return new Promise<IExchangeResult>((resolve, reject) => {
       this.executeMutation$(mutationObject).subscribe({
         error: reject,
         next: resolve,
       });
     });
-  }
+  };
 
-  invalidateQuery(queryObject: IQuery) {
+  invalidateQuery = (queryObject: IQuery) => {
     const { query, variables } = queryObject;
     const key = hashString(JSON.stringify({ query, variables }));
     return this.cache.invalidate(key);
-  }
+  };
 }
