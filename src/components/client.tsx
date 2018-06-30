@@ -27,7 +27,7 @@ export interface IClientProps {
 }
 
 export interface IClientFetchOpts {
-  initial?: boolean;
+  skipCache?: boolean;
 }
 
 export interface IClientState {
@@ -108,7 +108,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       // Subscribe to change listener
       this.unsubscribe = props.client.subscribe(this.update);
       // Fetch initial data
-      this.fetch({ initial: true });
+      this.fetch();
     }
 
     // If subscription exists
@@ -168,9 +168,9 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  fetch = ({ initial }: IClientFetchOpts = {}) => {
+  fetch = (opts: IClientFetchOpts = {}) => {
     const { client } = this.props;
-    const skipCache = this.props.cache === false;
+    const skipCache = opts.skipCache || this.props.cache === false;
 
     // Cancel ongoing query if any
     if (this.querySub !== null) {
@@ -210,7 +210,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
             data: result.data || null,
             error: result.error,
             fetching: false,
-            loaded: initial ? true : this.state.loaded,
+            loaded: true,
           });
         },
       });
