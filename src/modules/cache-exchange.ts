@@ -15,7 +15,10 @@ export const cacheExchange = (
   const typenameInvalidate: ITypenameInvalidate = {};
 
   // Fills the cache given a query's response
-  const processQueryOnCache = (key: string, response: IExchangeResult) => {
+  const processQueryOnCache = (
+    key: string,
+    response: IExchangeResult
+  ): Promise<void> => {
     // Mark typenames on typenameInvalidate for early invalidation
     gankTypeNamesFromResponse(response.data).forEach(typeName => {
       const cacheKeysForType = typenameInvalidate[typeName];
@@ -28,7 +31,7 @@ export const cacheExchange = (
 
     // Store data in cache, using serialized query as key
     // This needs to be done via the client to distribute the update
-    this.client.updateCacheEntry(key, response);
+    return client.updateCacheEntry(key, response);
   };
 
   // Invalidates the cache given a mutation's response
@@ -83,11 +86,14 @@ export const cacheExchange = (
 
         // Forward response but execute processsQueryOnCache side-effect
         subscription = forwarded$.subscribe({
-          complete: () => observer.complete(),
           error: err => observer.error(err),
           next: (response: IExchangeResult) => {
-            processQueryOnCache(key, response);
-            observer.next(response);
+            // NOTE: Wait for cache to avoid updating a client component
+            // when it itself triggered this operation
+            processQueryOnCache(key, response).then(() => {
+              observer.next(response);
+              observer.complete();
+            });
           },
         });
       });
