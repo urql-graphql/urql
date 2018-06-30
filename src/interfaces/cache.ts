@@ -1,7 +1,7 @@
 export interface ICache {
-  write: (query: string, data: any) => Promise<any>;
-  read: (query: string) => Promise<any>;
-  invalidate: (query: string) => Promise<any>;
+  write: (key: string, data: any) => Promise<any>;
+  read: (key: string) => Promise<any>;
+  invalidate: (key: string) => Promise<any>;
   invalidateAll: () => Promise<any>;
   update: (callback: (...args: any[]) => void) => Promise<any>;
 }

@@ -40,7 +40,7 @@ export default class Client implements IClient {
     this.cache = opts.cache || defaultCache(this.store);
     this.fetchOptions = opts.fetchOptions || {};
 
-    const exchange = cacheExchange(this.cache, dedupExchange(httpExchange()));
+    const exchange = cacheExchange(this, dedupExchange(httpExchange()));
     this.exchange = opts.transformExchange
       ? opts.transformExchange(exchange, this)
       : exchange;
@@ -63,6 +63,24 @@ export default class Client implements IClient {
       delete this.subscriptions[id];
     };
   }
+
+  // Receives keys and invalidates them on the cache
+  // Dispatches a CacheKeysDeleted event after
+  deleteCacheKeys = (keys: string[]): Promise<void> => {
+    const batchedInvalidate = keys.map(key => this.cache.invalidate(key));
+
+    return Promise.all(batchedInvalidate).then(() => {
+      this.dispatch(ClientEventType.CacheKeysDeleted, keys);
+    });
+  };
+
+  // Receives [key, value] entry and writes it to the cache
+  // Dispatches a CacheEntryUpdated event after
+  updateCacheEntry = (key: string, value: any): Promise<void> => {
+    return this.cache.write(key, value).then(() => {
+      this.dispatch(ClientEventType.CacheEntryUpdated, [key, value]);
+    });
+  };
 
   updateSubscribers = (typenames: string[], changes: IExchangeResult) => {
     // On mutation, call subscribed callbacks with eligible typenames

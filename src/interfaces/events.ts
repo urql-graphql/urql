@@ -3,6 +3,8 @@ import { IExchangeResult } from './exchange';
 export enum ClientEventType {
   InvalidateTypenames = 'InvalidateTypenames',
   RefreshAll = 'RefreshAll',
+  CacheEntryUpdated = 'CacheEntryUpdated',
+  CacheKeysDeleted = 'CacheKeysDeleted',
 }
 
 export interface IInvalidateTypenames {
@@ -21,4 +23,6 @@ export interface IEventFn {
     payload: IInvalidateTypenames
   ): void;
   (type: ClientEventType.RefreshAll, payload: void): void;
+  (type: ClientEventType.CacheKeysDeleted, payload: string[]): void;
+  (type: ClientEventType.CacheEntryUpdated, payload: [string, any]): void;
 }

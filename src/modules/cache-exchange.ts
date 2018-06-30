@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { ICache, IExchange, IExchangeResult } from '../interfaces/index';
+import { IClient, IExchange, IExchangeResult } from '../interfaces/index';
 import { gankTypeNamesFromResponse } from './typenames';
 
 interface ITypenameInvalidate {
@@ -8,66 +8,85 @@ interface ITypenameInvalidate {
 }
 
 // Wraps an exchange and refers/updates the cache according to operations
-export const cacheExchange = (cache: ICache, forward: IExchange): IExchange => {
+export const cacheExchange = (
+  client: IClient,
+  forward: IExchange
+): IExchange => {
   const typenameInvalidate: ITypenameInvalidate = {};
 
-  return operation => {
-    const { operationName, key } = operation;
-
-    const withTypenames$ = forward(operation).map(
-      (response: IExchangeResult) => {
-        // Grab typenames from response data
-        const typeNames = gankTypeNamesFromResponse(response.data);
-
-        // For mutations, invalidate the cache early so that unmounted Client components don't mount with
-        // stale, cached responses
-        if (operationName === 'mutation') {
-          typeNames.forEach(typename => {
-            const cacheKeys = typenameInvalidate[typename];
-            typenameInvalidate[typename] = [];
-            if (cacheKeys !== undefined) {
-              cacheKeys.forEach(cacheKey => {
-                cache.invalidate(cacheKey);
-              });
-            }
-          });
-        }
-
-        return { ...response, typeNames };
+  // Fills the cache given a query's response
+  const processQueryOnCache = (key: string, response: IExchangeResult) => {
+    // Mark typenames on typenameInvalidate for early invalidation
+    gankTypeNamesFromResponse(response.data).forEach(typeName => {
+      const cacheKeysForType = typenameInvalidate[typeName];
+      if (cacheKeysForType === undefined) {
+        typenameInvalidate[typeName] = [key];
+      } else {
+        cacheKeysForType.push(key);
       }
-    );
+    });
 
-    const { context } = operation;
-    if (operationName !== 'query') {
-      return withTypenames$;
+    // Store data in cache, using serialized query as key
+    // This needs to be done via the client to distribute the update
+    this.client.updateCacheEntry(key, response);
+  };
+
+  // Invalidates the cache given a mutation's response
+  const processMutationOnCache = (response: IExchangeResult) => {
+    let cacheKeys = [];
+
+    // For each typeName on the response, all cache keys will need to
+    // be collected
+    gankTypeNamesFromResponse(response.data).forEach(typename => {
+      const cacheKeysForTypename = typenameInvalidate[typename];
+      typenameInvalidate[typename] = [];
+
+      if (cacheKeysForTypename !== undefined) {
+        cacheKeys = cacheKeys.concat(cacheKeysForTypename);
+      }
+    });
+
+    // Batch delete all collected cache keys
+    if (cacheKeys.length > 0) {
+      client.deleteCacheKeys(cacheKeys);
+    }
+  };
+
+  return operation => {
+    const { operationName } = operation;
+    const forwarded$ = forward(operation);
+
+    if (operationName === 'mutation') {
+      // Forward mutation response but execute processMutationOnCache side-effect
+      return forwarded$.map((response: IExchangeResult) => {
+        processMutationOnCache(response);
+        return response;
+      });
+    } else if (operationName !== 'query') {
+      return forwarded$;
     }
 
+    // Check whether cache can be skipped
+    const { context, key } = operation;
     const { skipCache = false } = context;
 
     return new Observable<IExchangeResult>(observer => {
       let subscription;
 
-      cache.read(key).then(cachedResult => {
+      client.cache.read(key).then(cachedResult => {
+        // Resolve a cached result if one exists
         if (cachedResult && !skipCache) {
           observer.next(cachedResult);
           observer.complete();
           return;
         }
 
-        subscription = withTypenames$.subscribe({
+        // Forward response but execute processsQueryOnCache side-effect
+        subscription = forwarded$.subscribe({
           complete: () => observer.complete(),
           error: err => observer.error(err),
           next: (response: IExchangeResult) => {
-            // Mark typenames on typenameInvalidate for early invalidation
-            response.typeNames.forEach(typename => {
-              const cacheKeys =
-                typenameInvalidate[typename] ||
-                (typenameInvalidate[typename] = []);
-              cacheKeys.push(key);
-            });
-            // Store data in cache, using serialized query as key
-            cache.write(key, response);
-            // Return response with typeNames
+            processQueryOnCache(key, response);
             observer.next(response);
           },
         });

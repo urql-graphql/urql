@@ -10,9 +10,9 @@ export interface IExecutionResult {
 }
 
 export interface IExchangeResult {
+  operation: IOperation; // Add on the original operation
   data: IExecutionResult['data'];
   error?: CombinedError;
-  typeNames?: string[];
 }
 
 export type IExchange = (operation: IOperation) => Observable<IExchangeResult>;

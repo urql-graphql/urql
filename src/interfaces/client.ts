@@ -24,4 +24,8 @@ export interface IClient {
   invalidateQuery(queryObject: IQuery): Promise<void>;
   refreshAllFromCache(): void;
   subscribe(callback: IEventFn): () => void;
+
+  // Batched cache operations
+  deleteCacheKeys(keys: string[]): Promise<void>;
+  updateCacheKeys(entries: Array<[string, any]>): Promise<void>;
 }
