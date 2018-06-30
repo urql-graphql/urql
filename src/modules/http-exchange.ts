@@ -65,6 +65,7 @@ export const httpExchange = (): IExchange => operation => {
 
         if (result.data) {
           observer.next({
+            operation,
             data: result.data,
             error,
           });

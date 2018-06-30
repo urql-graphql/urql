@@ -28,7 +28,7 @@ export const subscriptionExchange = (
           observer.error(new CombinedError({ networkError }));
         },
         next: raw => {
-          const result: IExchangeResult = { data: raw.data };
+          const result: IExchangeResult = { operation, data: raw.data };
           if (Array.isArray(raw.errors)) {
             result.error = new CombinedError({ graphQLErrors: raw.errors });
           }

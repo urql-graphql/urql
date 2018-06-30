@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from 'react';
-import { ICache, IClient, IMutation, IQuery } from '../interfaces/index';
+import { IClient, IMutation, IQuery } from '../interfaces/index';
 import ClientWrapper from './client';
 import { Consumer } from './context';
 
