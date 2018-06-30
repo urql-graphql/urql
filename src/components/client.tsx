@@ -1,6 +1,5 @@
 import { Component, ReactNode } from 'react';
 import { CombinedError } from '../modules/error';
-import { formatTypeNames } from '../modules/typenames';
 import { zipObservables } from '../utils/zip-observables';
 
 import {
@@ -101,10 +100,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
 
     // If query exists
     if (props.query) {
-      // Loop through and add typenames
-      this.query = Array.isArray(props.query)
-        ? props.query.map(formatTypeNames)
-        : formatTypeNames(props.query);
+      this.query = props.query;
       // Subscribe to change listener
       this.unsubscribe = props.client.subscribe(this.update);
       // Fetch initial data
@@ -114,7 +110,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     // If subscription exists
     if (props.subscription) {
       // Loop through and add typenames
-      this.subscription = formatTypeNames(props.subscription);
+      this.subscription = props.subscription;
       // Fetch initial data
       this.subscribeToQuery();
     }
@@ -122,22 +118,20 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     // If mutation exists and has keys
     if (props.mutation) {
       this.mutations = {};
-      // Loop through and add typenames
-      Object.keys(props.mutation).forEach(key => {
-        this.mutations[key] = formatTypeNames(props.mutation[key]);
-      });
-      // bind to mutate
-      Object.keys(this.mutations).forEach(m => {
-        const query = this.mutations[m].query;
+      // Loop and bind to mutate
+      Object.keys(props.mutation).forEach(m => {
+        const mutationQuery = props.mutation[m];
+
         this.mutations[m] = variables => {
           return this.mutate({
-            query,
+            query: mutationQuery.query,
             variables: {
-              ...this.mutations[m].variables,
+              ...mutationQuery.variables,
               ...variables,
             },
           });
         };
+
         if (!this.props.query) {
           this.forceUpdate();
         }

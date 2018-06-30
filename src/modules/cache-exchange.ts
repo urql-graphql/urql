@@ -1,7 +1,7 @@
 import Observable from 'zen-observable-ts';
 
 import { IClient, IExchange, IExchangeResult } from '../interfaces/index';
-import { gankTypeNamesFromResponse } from './typenames';
+import { gankTypeNamesFromResponse, formatTypeNames } from './typenames';
 
 interface ITypenameInvalidate {
   [typeName: string]: string[];
@@ -56,6 +56,11 @@ export const cacheExchange = (
   };
 
   return operation => {
+    // Add __typename fields to query
+    // NOTE: This is a side-effect on this exchange since it's specific and necessary
+    // to how this exchange works
+    operation.query = formatTypeNames(operation.query);
+
     const { operationName } = operation;
     const forwarded$ = forward(operation);
 

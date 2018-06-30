@@ -9,8 +9,6 @@ import {
 import { parse } from 'graphql/language/parser';
 import { print } from 'graphql/language/printer';
 
-import { IQuery } from '../interfaces/index';
-
 const TYPENAME_FIELD: FieldNode = {
   kind: 'Field',
   name: {
@@ -60,18 +58,10 @@ function addTypenameToDocument(doc: DocumentNode) {
   return doc;
 }
 
-export function formatTypeNames(query: IQuery) {
-  const doc = parse(query.query);
-  return {
-    query: print(addTypenameToDocument(doc)),
-    variables: query.variables,
-  };
-}
-
-export function gankTypeNamesFromResponse(response: object) {
-  const typeNames = [];
-  getTypeNameFromField(response, typeNames);
-  return typeNames.filter((v, i, a) => a.indexOf(v) === i);
+// Adds __typename fields to a GraphQL query string
+export function formatTypeNames(query: string): string {
+  const doc = parse(query);
+  return print(addTypenameToDocument(doc));
 }
 
 function getTypeNameFromField(obj: object, typenames: string[]) {
@@ -85,4 +75,10 @@ function getTypeNameFromField(obj: object, typenames: string[]) {
       }
     }
   });
+}
+
+export function gankTypeNamesFromResponse(response: object) {
+  const typeNames = [];
+  getTypeNameFromField(response, typeNames);
+  return typeNames.filter((v, i, a) => a.indexOf(v) === i);
 }
