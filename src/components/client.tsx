@@ -96,38 +96,6 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   }
 
-  invalidate = queryObject => {
-    const { cache } = this.props.client;
-    if (queryObject) {
-      const stringified = JSON.stringify(formatTypeNames(queryObject));
-      const hash = hashString(stringified);
-      return cache.invalidate(hash);
-    } else {
-      return Array.isArray(this.props.query)
-        ? Promise.all(
-            this.props.query.map(q =>
-              cache.invalidate(hashString(JSON.stringify(q)))
-            )
-          )
-        : cache.invalidate(hashString(JSON.stringify(this.query)));
-    }
-  };
-
-  invalidateAll = () => {
-    return this.props.client.cache.invalidateAll();
-  };
-
-  read = query => {
-    const formatted = formatTypeNames(query);
-    const stringified = JSON.stringify(formatted);
-    const hash = hashString(stringified);
-    return this.props.client.cache.read(hash);
-  };
-
-  updateCache = callback => {
-    return this.props.client.cache.update(callback);
-  };
-
   formatProps = props => {
     if (props.subscription && props.query && !props.updateSubscription) {
       throw new Error(
@@ -214,10 +182,6 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         this.fetch({ skipCache: true });
       }
     }
-  };
-
-  refreshAllFromCache = () => {
-    return this.props.client.refreshAllFromCache();
   };
 
   fetch = (
@@ -402,21 +366,12 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   render() {
-    const cache = {
-      invalidate: this.invalidate,
-      invalidateAll: this.invalidateAll,
-      read: this.read,
-      update: this.updateCache,
-    };
-
     return typeof this.props.children === 'function'
       ? this.props.children({
           ...this.state,
           ...this.mutations,
-          cache,
           client: this.props.client,
           refetch: this.fetch,
-          refreshAllFromCache: this.refreshAllFromCache,
         })
       : null;
   }

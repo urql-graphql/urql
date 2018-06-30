@@ -33,10 +33,6 @@ export interface IConnectProps<Data, Mutations> {
  */
 export type UrqlProps<Data, Mutations = {}> = {
   /**
-   * Urql cache
-   */
-  cache: ICache;
-  /**
    * The data returned by your Urql query.
    */
   data: Data | null;

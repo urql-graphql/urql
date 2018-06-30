@@ -2,20 +2,11 @@
 
 exports[`Client Component should provide a context consumer and pass through to client 1`] = `
 <div
-  cache={
-    Object {
-      "invalidate": [Function],
-      "invalidateAll": [Function],
-      "read": [Function],
-      "update": [Function],
-    }
-  }
   client={Object {}}
   data={null}
   error={null}
   fetching={false}
   loaded={false}
   refetch={[Function]}
-  refreshAllFromCache={[Function]}
 />
 `;
