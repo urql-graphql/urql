@@ -4,6 +4,7 @@
     "exclude": ["src/tests/**/*", "example/**/*"]
   },
   "rules": {
+    "ordered-imports": false,
     "member-access": false,
     "no-submodule-imports": false
   }

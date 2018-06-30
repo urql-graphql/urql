@@ -119,7 +119,7 @@ describe('Client', () => {
       };
 
       client.updateSubscribers(typenames, changes);
-      expect(spy).toBeCalledWith(event);
+      expect(spy).toBeCalledWith(event.type, event.payload);
     });
   });
 
@@ -138,7 +138,7 @@ describe('Client', () => {
       client.refreshAllFromCache();
 
       const event = { type: ClientEventType.RefreshAll };
-      expect(spy).toBeCalledWith(event);
+      expect(spy).toBeCalledWith(event.type, undefined);
     });
   });
 

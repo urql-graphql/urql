@@ -5,8 +5,8 @@ import { formatTypeNames } from '../modules/typenames';
 import { zipObservables } from '../utils/zip-observables';
 
 import {
-  ClientEvent,
   ClientEventType,
+  IEventFn,
   IClient,
   IExchangeResult,
   IMutation,
@@ -184,16 +184,14 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update = (event: ClientEvent) => {
-    const { type } = event;
-
+  update: IEventFn = (type: ClientEventType, payload) => {
     if (type === ClientEventType.RefreshAll) {
       // RefreshAll indicates that the component should refetch its queries
       this.fetch();
       return;
     } else if (type === ClientEventType.InvalidateTypenames) {
       // InvalidateTypenames instructs us to reevaluate this component's typenames
-      const { typenames, changes } = event.payload;
+      const { typenames, changes } = payload;
 
       let invalidated = false;
       if (this.props.shouldInvalidate) {

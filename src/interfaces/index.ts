@@ -5,6 +5,6 @@ export { IClientOptions } from './client-options';
 export { ICache } from './cache';
 export { IExchange, IExchangeResult } from './exchange';
 export { IGraphQLError } from './error';
-export { ClientEventType, ClientEvent } from './events';
+export { ClientEventType, IEventFn } from './events';
 export { IOperation } from './operation';
 export { ISubscriptionObserver, ISubscription } from './subscription';

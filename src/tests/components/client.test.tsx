@@ -525,9 +525,7 @@ describe('Client Component', () => {
     // NOTE: Delay here waits for the fetch to flush and complete, since
     // dedupExchange would deduplicate it otherwise
     setTimeout(() => {
-      client.getInstance().update({
-        type: ClientEventType.RefreshAll,
-      });
+      client.getInstance().update(ClientEventType.RefreshAll);
 
       setTimeout(() => {
         expect(spy).toHaveBeenCalledTimes(2);

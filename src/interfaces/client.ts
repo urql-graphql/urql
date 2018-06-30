@@ -1,13 +1,16 @@
 import Observable from 'zen-observable-ts';
 
 import { ICache } from './cache';
-import { ClientEvent } from './events';
+import { IEventFn } from './events';
 import { IExchangeResult } from './exchange';
 import { IQuery } from './query';
 
 export interface IClient {
   cache: ICache;
-  executeSubscription$(subscriptionObject: IQuery): Observable<IExchangeResult>;
+  dispatch: IEventFn;
+  executeSubscription$: (
+    subscriptionObject: IQuery
+  ) => Observable<IExchangeResult>;
   executeQuery$(
     queryObject: IQuery,
     skipCache: boolean
@@ -20,5 +23,5 @@ export interface IClient {
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']>;
   invalidateQuery(queryObject: IQuery): Promise<void>;
   refreshAllFromCache(): void;
-  subscribe(callback: (event: ClientEvent) => void): () => void;
+  subscribe(callback: IEventFn): () => void;
 }

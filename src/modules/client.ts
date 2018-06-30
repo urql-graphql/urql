@@ -1,9 +1,10 @@
 import Observable from 'zen-observable-ts';
 
 import {
-  ClientEvent,
   ClientEventType,
+  IEventFn,
   ICache,
+  IClient,
   IClientOptions,
   IExchange,
   IExchangeResult,
@@ -16,14 +17,14 @@ import { defaultCache } from './default-cache';
 import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
 
-export default class Client {
+export default class Client implements IClient {
   url: string;
   store: object; // Internal store
   subscriptionSize: number; // Used to generate IDs for subscriptions
   cache: ICache; // Cache object
   exchange: IExchange; // Exchange to communicate with GraphQL APIs
   fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
-  subscriptions: { [id: string]: (ClientEvent) => void }; // Map of subscribed Connect components
+  subscriptions: { [id: string]: IEventFn }; // Map of subscribed Connect components
 
   constructor(opts?: IClientOptions) {
     if (!opts) {
@@ -45,19 +46,14 @@ export default class Client {
       : exchange;
   }
 
-  updateSubscribers = (typenames: string[], changes: IExchangeResult) => {
-    // On mutation, call subscribed callbacks with eligible typenames
-
+  dispatch: IEventFn = (type, payload) => {
     /* tslint:disable-next-line forin */
     for (const sub in this.subscriptions) {
-      this.subscriptions[sub]({
-        payload: { typenames, changes },
-        type: ClientEventType.InvalidateTypenames,
-      });
+      this.subscriptions[sub](type, payload);
     }
   };
 
-  subscribe(callback: (event: ClientEvent) => void): () => void {
+  subscribe(callback: IEventFn): () => void {
     // Create an identifier, add callback to subscriptions
     const id = this.subscriptionSize++;
     this.subscriptions[id] = callback;
@@ -68,14 +64,16 @@ export default class Client {
     };
   }
 
+  updateSubscribers = (typenames: string[], changes: IExchangeResult) => {
+    // On mutation, call subscribed callbacks with eligible typenames
+    const payload = { typenames, changes };
+    this.dispatch(ClientEventType.InvalidateTypenames, payload);
+  };
+
   refreshAllFromCache = () => {
     // On mutation, call subscribed callbacks with eligible typenames
     return new Promise(resolve => {
-      /* tslint:disable-next-line forin */
-      for (const sub in this.subscriptions) {
-        this.subscriptions[sub]({ type: ClientEventType.RefreshAll });
-      }
-
+      this.dispatch(ClientEventType.RefreshAll, undefined);
       resolve();
     });
   };
