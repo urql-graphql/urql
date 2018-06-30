@@ -7,15 +7,14 @@ import { IMutation, IQuery } from '../interfaces/index';
 
 export interface IHOCProps {
   query?: IQuery | IQuery[]; // Query or queries
+  subscription?: IQuery; // Subscription Query object
   mutation?: IMutation; // Mutation map
+  updateSubscription?: (
+    prev: object | null,
+    next: object | null
+  ) => object | null; // Update query with subscription data
+  cacheInvalidation?: boolean;
   cache?: boolean;
-  typeInvalidation?: boolean;
-  shouldInvalidate?: (
-    changedTypes: string[],
-    typeNames: string[],
-    response: object,
-    data: object
-  ) => boolean;
 }
 
 function connect(opts?: IHOCProps | ((_) => IHOCProps)) {

@@ -7,7 +7,12 @@ import { IQuery } from './query';
 
 export interface IClient {
   cache: ICache;
+
+  // Event handler methods
   dispatch: IEventFn;
+  subscribe(callback: IEventFn): () => void;
+
+  // Execute methods
   executeSubscription$: (
     subscriptionObject: IQuery
   ) => Observable<IExchangeResult>;
@@ -21,11 +26,10 @@ export interface IClient {
   ): Promise<IExchangeResult>;
   executeMutation$(mutationObject: IQuery): Observable<IExchangeResult['data']>;
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']>;
+
+  // Batched cache operations that trigger events
   invalidateQuery(queryObject: IQuery): Promise<void>;
   refreshAllFromCache(): void;
-  subscribe(callback: IEventFn): () => void;
-
-  // Batched cache operations
   deleteCacheKeys(keys: string[]): Promise<void>;
-  updateCacheKeys(entries: Array<[string, any]>): Promise<void>;
+  updateCacheEntry(key: string, value: any): Promise<void>;
 }

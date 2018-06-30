@@ -12,14 +12,8 @@ export interface IConnectProps<Data, Mutations> {
     prev: object | null,
     next: object | null
   ) => object | null;
+  cacheInvalidation?: boolean;
   cache?: boolean;
-  typeInvalidation?: boolean;
-  shouldInvalidate?: (
-    changedTypes: string[],
-    typeNames: string[],
-    response: object,
-    data: object
-  ) => boolean;
 }
 
 // This is the type used for the Render Prop. It requires
@@ -76,9 +70,8 @@ export default class Connect<Data = {}, Mutations = {}> extends Component<
             query={this.props.query}
             mutation={this.props.mutation}
             updateSubscription={this.props.updateSubscription}
+            cacheInvalidation={this.props.cacheInvalidation}
             cache={this.props.cache}
-            typeInvalidation={this.props.typeInvalidation}
-            shouldInvalidate={this.props.shouldInvalidate}
           />
         )}
       </Consumer>

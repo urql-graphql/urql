@@ -17,6 +17,11 @@ import { defaultCache } from './default-cache';
 import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
 
+const getQueryKey = (q: IQuery) => {
+  const { query, variables } = q;
+  return hashString(JSON.stringify({ query, variables }));
+};
+
 export default class Client implements IClient {
   url: string;
   store: object; // Internal store
@@ -46,6 +51,8 @@ export default class Client implements IClient {
       : exchange;
   }
 
+  /* Event handler methods: */
+
   dispatch: IEventFn = (type, payload) => {
     /* tslint:disable-next-line forin */
     for (const sub in this.subscriptions) {
@@ -64,13 +71,15 @@ export default class Client implements IClient {
     };
   }
 
+  /* Cache methods: */
+
   // Receives keys and invalidates them on the cache
-  // Dispatches a CacheKeysDeleted event after
+  // Dispatches a CacheKeysInvalidated event after
   deleteCacheKeys = (keys: string[]): Promise<void> => {
     const batchedInvalidate = keys.map(key => this.cache.invalidate(key));
 
     return Promise.all(batchedInvalidate).then(() => {
-      this.dispatch(ClientEventType.CacheKeysDeleted, keys);
+      this.dispatch(ClientEventType.CacheKeysInvalidated, keys);
     });
   };
 
@@ -78,23 +87,22 @@ export default class Client implements IClient {
   // Dispatches a CacheEntryUpdated event after
   updateCacheEntry = (key: string, value: any): Promise<void> => {
     return this.cache.write(key, value).then(() => {
-      this.dispatch(ClientEventType.CacheEntryUpdated, [key, value]);
+      this.dispatch(ClientEventType.CacheKeysInvalidated, [key]);
     });
-  };
-
-  updateSubscribers = (typenames: string[], changes: IExchangeResult) => {
-    // On mutation, call subscribed callbacks with eligible typenames
-    const payload = { typenames, changes };
-    this.dispatch(ClientEventType.InvalidateTypenames, payload);
   };
 
   refreshAllFromCache = () => {
-    // On mutation, call subscribed callbacks with eligible typenames
-    return new Promise(resolve => {
-      this.dispatch(ClientEventType.RefreshAll, undefined);
-      resolve();
+    this.dispatch(ClientEventType.RefreshAll, undefined);
+  };
+
+  invalidateQuery = (queryObject: IQuery) => {
+    const key = getQueryKey(queryObject);
+    return this.cache.invalidate(key).then(() => {
+      this.dispatch(ClientEventType.CacheKeysInvalidated, [key]);
     });
   };
+
+  /* Execute methods: */
 
   makeContext({ skipCache }: { skipCache?: boolean }): Record<string, any> {
     return {
@@ -110,12 +118,11 @@ export default class Client implements IClient {
   executeSubscription$(
     subscriptionObject: IQuery
   ): Observable<IExchangeResult> {
-    // Create hash key for unique query/variables
     const { query, variables } = subscriptionObject;
-    const key = hashString(JSON.stringify({ query, variables }));
+
     const operation = {
       context: this.makeContext({}),
-      key,
+      key: getQueryKey(subscriptionObject),
       operationName: 'subscription',
       query,
       variables,
@@ -128,12 +135,11 @@ export default class Client implements IClient {
     queryObject: IQuery,
     skipCache: boolean
   ): Observable<IExchangeResult> {
-    // Create hash key for unique query/variables
     const { query, variables } = queryObject;
-    const key = hashString(JSON.stringify({ query, variables }));
+
     const operation = {
       context: this.makeContext({ skipCache }),
-      key,
+      key: getQueryKey(queryObject),
       operationName: 'query',
       query,
       variables,
@@ -157,24 +163,17 @@ export default class Client implements IClient {
   executeMutation$(
     mutationObject: IQuery
   ): Observable<IExchangeResult['data']> {
-    // Create hash key for unique query/variables
     const { query, variables } = mutationObject;
-    const key = hashString(JSON.stringify({ query, variables }));
 
     const operation = {
       context: this.makeContext({}),
-      key,
+      key: getQueryKey(mutationObject),
       operationName: 'mutation',
       query,
       variables,
     };
 
-    return this.exchange(operation).map((response: IExchangeResult) => {
-      // Notify subscribed Connect wrappers
-      this.updateSubscribers(response.typeNames, response);
-      // Resolve result
-      return response.data;
-    });
+    return this.exchange(operation);
   }
 
   executeMutation = (
@@ -186,11 +185,5 @@ export default class Client implements IClient {
         next: resolve,
       });
     });
-  };
-
-  invalidateQuery = (queryObject: IQuery) => {
-    const { query, variables } = queryObject;
-    const key = hashString(JSON.stringify({ query, variables }));
-    return this.cache.invalidate(key);
   };
 }

@@ -1,6 +1,5 @@
 import { Component, ReactNode } from 'react';
 import { CombinedError } from '../modules/error';
-import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
 import { zipObservables } from '../utils/zip-observables';
 
@@ -23,18 +22,12 @@ export interface IClientProps {
     prev: object | null,
     next: object | null
   ) => object | null; // Update query with subscription data
+  cacheInvalidation?: boolean;
   cache?: boolean;
-  typeInvalidation?: boolean;
-  shouldInvalidate?: (
-    changedTypes: string[],
-    typeNames: string[],
-    response: object,
-    data: object
-  ) => boolean;
 }
 
 export interface IClientFetchOpts {
-  skipCache: boolean; // Should skip cache?
+  initial?: boolean;
 }
 
 export interface IClientState {
@@ -46,8 +39,8 @@ export interface IClientState {
 
 export default class UrqlClient extends Component<IClientProps, IClientState> {
   static defaultProps = {
+    cacheInvalidation: true,
     cache: true,
-    typeInvalidation: true,
   };
 
   state = {
@@ -60,8 +53,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   willUpdateSubscription = false; // Flag that indicates the subscription's behaviour
   subscription = null; // Stored Subscription Query
   query = null; // Stored Query
+  queryKeys: { [key: string]: boolean } = {}; // Stored keys from querys' responses
   mutations = {}; // Stored Mutation
-  typeNames = []; // Typenames that exist on current query
   unsubscribe = null; // Unsubscription function calling back to the client
   subscriptionSub = null; // Subscription for ongoing subscription queries
   querySub = null; // Subscription for ongoing queries
@@ -115,7 +108,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       // Subscribe to change listener
       this.unsubscribe = props.client.subscribe(this.update);
       // Fetch initial data
-      this.fetch(undefined, true);
+      this.fetch({ initial: true });
     }
 
     // If subscription exists
@@ -153,48 +146,33 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   update: IEventFn = (type: ClientEventType, payload) => {
-    if (type === ClientEventType.RefreshAll) {
-      // RefreshAll indicates that the component should refetch its queries
-      this.fetch();
+    // This prop indicates that the Component should never update its data
+    // from the cache or refetch anything
+    if (!this.props.cacheInvalidation) {
       return;
-    } else if (type === ClientEventType.InvalidateTypenames) {
-      // InvalidateTypenames instructs us to reevaluate this component's typenames
-      const { typenames, changes } = payload;
+    }
 
-      let invalidated = false;
-      if (this.props.shouldInvalidate) {
-        invalidated = this.props.shouldInvalidate(
-          typenames,
-          this.typeNames,
-          changes,
-          this.state.data
-        );
-      } else if (this.props.typeInvalidation !== false) {
-        // Check connection typenames, derived from query, for presence of mutated typenames
-        invalidated = this.typeNames.some(
-          typeName => typenames.indexOf(typeName) !== -1
-        );
-      }
+    // Since fetch goes through all exchanges (including a cacheExchange) fetching
+    // can also just result in an update of the component's data without an actual
+    // fetch call
+    let shouldRefetch = false;
 
-      // If it has any of the type names that changed
-      if (invalidated) {
-        // Refetch the data from the server
-        this.fetch({ skipCache: true });
-      }
+    if (type === ClientEventType.RefreshAll) {
+      shouldRefetch = true;
+    } else if (type === ClientEventType.CacheKeysInvalidated) {
+      shouldRefetch = payload.some(key => this.queryKeys[key] === true);
+    }
+
+    if (shouldRefetch) {
+      this.fetch();
     }
   };
 
-  fetch = (
-    opts: IClientFetchOpts = { skipCache: false },
-    initial?: boolean
-  ) => {
+  fetch = ({ initial }: IClientFetchOpts = {}) => {
     const { client } = this.props;
-    let { skipCache } = opts;
+    const skipCache = this.props.cache === false;
 
-    if (this.props.cache === false) {
-      skipCache = true;
-    }
-
+    // Cancel ongoing query if any
     if (this.querySub !== null) {
       this.querySub.unsubscribe();
       this.querySub = null;
@@ -205,6 +183,9 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       error: null,
       fetching: true,
     });
+
+    // Reset local query keys
+    this.queryKeys = {};
 
     // If query is not an array
     if (!Array.isArray(this.query)) {
@@ -221,8 +202,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           });
         },
         next: result => {
-          // Store the typenames
-          this.typeNames = result.typeNames;
+          // Store the result's key
+          this.queryKeys[result.operation.key] = true;
 
           // Update data
           this.setState({
@@ -237,12 +218,8 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       const partialData = [];
       const queries$ = this.query.map(query =>
         client.executeQuery$(query, skipCache).map(result => {
-          // Accumulate and deduplicate all typeNames
-          result.typeNames.forEach(typeName => {
-            if (this.typeNames.indexOf(typeName) === -1) {
-              this.typeNames.push(typeName);
-            }
-          });
+          // Store the response's query key
+          this.queryKeys[result.operation.key] = true;
 
           // Push to partial data and return same result
           partialData.push(result);
@@ -319,13 +296,15 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
               const invalidate =
                 this.willUpdateSubscription &&
                 this.query &&
-                this.props.typeInvalidation !== false;
-              if (invalidate && Array.isArray(this.query)) {
-                this.query.forEach(query => {
-                  client.invalidateQuery(query);
-                });
-              } else if (invalidate) {
-                client.invalidateQuery(this.query);
+                this.props.cacheInvalidation;
+
+              if (invalidate) {
+                const cacheKeys = Object.keys(this.queryKeys);
+                // Protect this component from refetching any data that it received from its subscriptions
+                this.queryKeys = {};
+                // Invalidate all data since the subscriptions indicate a change
+                // NOTE: This assumes that query and subscription belong together
+                this.props.client.deleteCacheKeys(cacheKeys);
               }
             }
           );
