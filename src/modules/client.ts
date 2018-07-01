@@ -102,6 +102,22 @@ export default class Client implements IClient {
     });
   };
 
+  // Cache methods that are exposed on the component and will dispatch their
+  // changes
+  cacheWithEvents: ICache = {
+    write: this.updateCacheEntry,
+    read: (key: string) => this.cache.read(key),
+    invalidate: (key: string) => this.deleteCacheKeys([key]),
+    invalidateAll: () =>
+      this.cache.invalidateAll().then(() => {
+        this.dispatch(ClientEventType.RefreshAll, undefined);
+      }),
+    update: (callback: (...args: any[]) => void) =>
+      this.cache.update(callback).then(() => {
+        this.dispatch(ClientEventType.RefreshAll, undefined);
+      }),
+  };
+
   /* Execute methods: */
 
   makeContext({ skipCache }: { skipCache?: boolean }): Record<string, any> {

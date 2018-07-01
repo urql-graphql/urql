@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from 'react';
-import { IClient, IMutation, IQuery } from '../interfaces/index';
+import { ICache, IClient, IMutation, IQuery } from '../interfaces/index';
 import ClientWrapper from './client';
 import { Consumer } from './context';
 
@@ -26,6 +26,10 @@ export interface IConnectProps<Data, Mutations> {
  * Urql's render props.
  */
 export type UrqlProps<Data, Mutations = {}> = {
+  /**
+   * Urql cache
+   */
+  cache: ICache;
   /**
    * The data returned by your Urql query.
    */

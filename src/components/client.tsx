@@ -343,6 +343,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       ? this.props.children({
           ...this.state,
           ...this.mutations,
+          cache: this.props.client.cacheWithEvents,
           client: this.props.client,
           refetch: this.fetch,
         })

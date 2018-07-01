@@ -7,6 +7,7 @@ import { IQuery } from './query';
 
 export interface IClient {
   cache: ICache;
+  cacheWithEvents: ICache;
 
   // Event handler methods
   dispatch: IEventFn;
