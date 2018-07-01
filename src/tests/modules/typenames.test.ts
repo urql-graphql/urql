@@ -5,11 +5,7 @@ import {
 
 describe('formatTypeNames', () => {
   it('should add typenames to a query string', () => {
-    let newQuery = formatTypeNames({
-      query: `{ todos { id } }`,
-      variables: {},
-    });
-    expect(newQuery.query).toBe(`{
+    expect(formatTypeNames(`{ todos { id } }`)).toBe(`{
   todos {
     id
     __typename
