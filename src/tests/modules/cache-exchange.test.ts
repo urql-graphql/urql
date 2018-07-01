@@ -1,5 +1,5 @@
 import Observable from 'zen-observable-ts';
-import { IExchange, IOperation } from '../../interfaces/index';
+import { IClient, IExchange, IOperation } from '../../interfaces/index';
 import { cacheExchange } from '../../modules/cache-exchange';
 import { defaultCache } from '../../modules/default-cache';
 
@@ -19,76 +19,48 @@ describe('cacheExchange', () => {
     jest.restoreAllMocks();
   });
 
-  it('attaches typeNames to a result', done => {
-    const cache = defaultCache({});
-    const forward: IExchange = () => Observable.of(result);
-    const exchange = cacheExchange(cache, forward);
-    const operation = ({ operationName: 'x' } as any) as IOperation;
-
-    exchange(operation).subscribe(res => {
-      expect(res.typeNames).toEqual(['Item']);
-      expect(res.data).toEqual(result.data);
-      done();
-    });
-  });
-
   it('reads a query result from the passed cache first', done => {
     const testkey = 'TESTKEY';
     const cache = defaultCache({ [testkey]: result });
+    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
+    const client = ({ cache, updateCacheEntry } as any) as IClient;
     const forward: IExchange = () => Observable.of(undefined);
-    const exchange = cacheExchange(cache, forward);
+    const exchange = cacheExchange(client, forward);
 
     const operation = ({
       context: {},
       key: testkey,
       operationName: 'query',
+      query: '{ test }',
     } as any) as IOperation;
 
     exchange(operation).subscribe(res => {
       expect(res).toBe(result);
+      expect(updateCacheEntry).not.toHaveBeenCalled();
       done();
     });
   });
 
   it('skips the cache when skipCache is set on context', done => {
     const testkey = 'TESTKEY';
-    const newResult = { ...result, test: true };
-    const cache = defaultCache({ [testkey]: result });
-    const forward: IExchange = () => Observable.of(newResult);
-    const exchange = cacheExchange(cache, forward);
 
     const operation = ({
       context: { skipCache: true },
       key: testkey,
       operationName: 'query',
+      query: '{ test }',
     } as any) as IOperation;
+
+    const newResult = { ...result, operation, test: true };
+    const cache = defaultCache({ [testkey]: result });
+    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
+    const client = ({ cache, updateCacheEntry } as any) as IClient;
+    const forward: IExchange = () => Observable.of(newResult);
+    const exchange = cacheExchange(client, forward);
 
     exchange(operation).subscribe(res => {
       expect((res as any).test).toBe(true);
-      expect(res.typeNames).toEqual(['Item']);
-      done();
-    });
-  });
-
-  it('writes query results to the cache', done => {
-    const testkey = 'TESTKEY';
-    const store = {};
-    const cache = defaultCache(store);
-    const forward: IExchange = () => Observable.of(result);
-    const exchange = cacheExchange(cache, forward);
-
-    const operation = ({
-      context: {},
-      key: testkey,
-      operationName: 'query',
-    } as any) as IOperation;
-
-    expect(store[testkey]).toBeUndefined();
-
-    exchange(operation).subscribe(res => {
-      expect(res.data).toEqual(result.data);
-      expect(store[testkey]).not.toBeUndefined();
-      expect(store[testkey].data).toEqual(result.data);
+      expect(updateCacheEntry).toHaveBeenCalledWith(testkey, newResult);
       done();
     });
   });
@@ -97,30 +69,39 @@ describe('cacheExchange', () => {
     const testkey = 'TESTKEY';
     const store = { unrelated: true };
     const cache = defaultCache(store);
-    const forward: IExchange = () => Observable.of(result);
-    const exchange = cacheExchange(cache, forward);
+    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
+    const deleteCacheKeys = jest.fn().mockReturnValue(Promise.resolve());
+    const client = ({
+      cache,
+      updateCacheEntry,
+      deleteCacheKeys,
+    } as any) as IClient;
+    const forward: IExchange = operation =>
+      Observable.of({ ...result, operation });
+    const exchange = cacheExchange(client, forward);
 
     const operationA = ({
       context: {},
       key: testkey,
       operationName: 'query',
+      query: '{ test }',
     } as any) as IOperation;
 
     const operationB = ({
       context: {},
       key: 'anything',
       operationName: 'mutation',
+      query: '{ test }',
     } as any) as IOperation;
 
-    exchange(operationA).subscribe(res => {
-      expect(store[testkey]).toBe(res);
-      expect(store.unrelated).toBe(true);
-      exchange(operationB).subscribe(() => {
-        // Disappears due to typename
-        expect(store[testkey]).toBeUndefined();
-        // Remains untouched
-        expect(store.unrelated).toBe(true);
+    exchange(operationA).subscribe(() => {
+      expect(updateCacheEntry).toHaveBeenCalledWith(testkey, {
+        ...result,
+        operation: expect.any(Object),
+      });
 
+      exchange(operationB).subscribe(() => {
+        expect(deleteCacheKeys).toHaveBeenCalledWith([testkey]);
         done();
       });
     });
