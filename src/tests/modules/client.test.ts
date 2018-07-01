@@ -98,31 +98,6 @@ describe('Client', () => {
     });
   });
 
-  describe('updateSubscribers', () => {
-    let client;
-
-    beforeAll(() => {
-      client = new Client({
-        url: 'test',
-      });
-    });
-
-    it('should call all registered subscribers with typenames and changes', () => {
-      const spy = jest.fn();
-      client.subscribe(spy);
-      const typenames = ['a', 'b'];
-      const changes = { a: 5 };
-
-      const event = {
-        payload: { typenames, changes },
-        type: ClientEventType.InvalidateTypenames,
-      };
-
-      client.updateSubscribers(typenames, changes);
-      expect(spy).toBeCalledWith(event.type, event.payload);
-    });
-  });
-
   describe('refreshAllFromCache', () => {
     let client;
 
@@ -207,33 +182,7 @@ describe('Client', () => {
         }`,
         })
         .then(result => {
-          expect(result).toMatchObject({ data: [{ id: 5 }], typeNames: [] });
-          done();
-        });
-    });
-
-    it('should return data from the cache if it is present', done => {
-      (global as any).fetch.mockReturnValue(
-        Promise.resolve({
-          status: 200,
-          json: () => ({ data: [{ id: 12345 }] }),
-        })
-      );
-
-      client
-        .executeQuery({
-          query: `{
-          todos {
-            id
-            name
-          }
-        }`,
-        })
-        .then(data => {
-          expect(data).toMatchObject({
-            data: [{ id: 5 }],
-            typeNames: [],
-          });
+          expect(result.data).toEqual([{ id: 5 }]);
           done();
         });
     });
@@ -255,16 +204,13 @@ describe('Client', () => {
 
       client
         .executeQuery({
-          query: ``,
+          query: '{ test }',
         })
         .then(() => {
-          const body = JSON.stringify({
-            query: ``,
-          });
           expect((global as any).fetch).toHaveBeenCalledWith(
             'http://localhost:3000/graphql',
             {
-              body: body,
+              body: expect.any(String),
               headers: { 'Content-Type': 'application/json' },
               method: 'POST',
               test: 5,
@@ -288,12 +234,11 @@ describe('Client', () => {
         })
       );
 
-      client.executeQuery({ query: '' }).then(() => {
-        const body = JSON.stringify({ query: '' });
+      client.executeQuery({ query: '{ test }' }).then(() => {
         expect((global as any).fetch).toHaveBeenCalledWith(
           'http://localhost:3000/graphql',
           {
-            body,
+            body: expect.any(String),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
             test: 5,
@@ -462,40 +407,6 @@ describe('Client', () => {
             "I'm afraid I can't let you do that, Dave"
           );
           expect(e).toHaveProperty('response.status', 401);
-        });
-    });
-
-    it('should update subscribers', done => {
-      client = new Client({
-        url: 'http://localhost:3000/graphql',
-      });
-
-      (global as any).fetch.mockReturnValue(
-        Promise.resolve({
-          status: 200,
-          json: () => ({ data: { test: 5 } }),
-        })
-      );
-
-      const spy = jest.spyOn(client, 'updateSubscribers');
-
-      client
-        .executeMutation({
-          query: `{
-          todos {
-            id
-            name
-          }
-        }`,
-        })
-        .then(() => {
-          expect(spy).toHaveBeenCalledWith([], {
-            data: { test: 5 },
-            error: undefined,
-            typeNames: [],
-          });
-
-          done();
         });
     });
   });

@@ -173,7 +173,7 @@ export default class Client implements IClient {
       variables,
     };
 
-    return this.exchange(operation);
+    return this.exchange(operation).map(x => x.data);
   }
 
   executeMutation = (
