@@ -19,6 +19,22 @@ describe('cacheExchange', () => {
     jest.restoreAllMocks();
   });
 
+  it('ignores unrelated operations', () => {
+    const client = ({} as any) as IClient;
+    const res = Observable.of(undefined);
+    const forward: IExchange = () => res;
+    const exchange = cacheExchange(client, forward);
+
+    const operation = ({
+      context: {},
+      key: 'test',
+      operationName: 'subscription',
+      query: '{ test }',
+    } as any) as IOperation;
+
+    expect(exchange(operation)).toBe(res);
+  });
+
   it('reads a query result from the passed cache first', done => {
     const testkey = 'TESTKEY';
     const cache = defaultCache({ [testkey]: result });

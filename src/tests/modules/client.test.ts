@@ -117,6 +117,82 @@ describe('Client', () => {
     });
   });
 
+  describe('deleteCacheKeys', () => {
+    let client;
+
+    beforeAll(() => {
+      client = new Client({
+        url: 'test',
+      });
+    });
+
+    it('should invalidate key on cache and call listeners', done => {
+      const cacheSpy = jest.spyOn(client.cache, 'invalidate');
+      const listener = jest.fn();
+      client.subscribe(listener);
+      client.deleteCacheKeys(['test']);
+
+      setTimeout(() => {
+        expect(listener).toBeCalledWith(ClientEventType.CacheKeysInvalidated, [
+          'test',
+        ]);
+        expect(cacheSpy).toBeCalledWith('test');
+        done();
+      });
+    });
+  });
+
+  describe('updateCacheEntry', () => {
+    let client;
+
+    beforeAll(() => {
+      client = new Client({
+        url: 'test',
+      });
+    });
+
+    it('should update key on cache and call listeners', done => {
+      const cacheSpy = jest.spyOn(client.cache, 'write');
+      const listener = jest.fn();
+      client.subscribe(listener);
+      const val = { test: true };
+      client.updateCacheEntry('test', val);
+
+      setTimeout(() => {
+        expect(listener).toBeCalledWith(ClientEventType.CacheKeysInvalidated, [
+          'test',
+        ]);
+        expect(cacheSpy).toBeCalledWith('test', val);
+        done();
+      });
+    });
+  });
+
+  describe('invalidateQuery', () => {
+    let client;
+
+    beforeAll(() => {
+      client = new Client({
+        url: 'test',
+      });
+    });
+
+    it('should invalidate key on cache and call listeners', done => {
+      const cacheSpy = jest.spyOn(client.cache, 'invalidate');
+      const listener = jest.fn();
+      client.subscribe(listener);
+      client.invalidateQuery({ query: '{ test }', variables: {} });
+
+      setTimeout(() => {
+        expect(listener).toBeCalledWith(ClientEventType.CacheKeysInvalidated, [
+          expect.any(String),
+        ]);
+        expect(cacheSpy).toBeCalledWith(expect.any(String));
+        done();
+      });
+    });
+  });
+
   describe('subscribe', () => {
     let client;
 
