@@ -41,7 +41,7 @@ describe('httpExchange', () => {
         throw err;
       },
       next: x => {
-        expect(x).toEqual({ data: [{ id: 5 }] });
+        expect(x).toEqual({ data: [{ id: 5 }], operation });
         expect((global as any).fetch).toHaveBeenCalledWith(
           'http://localhost:3000/graphql',
           {
@@ -233,7 +233,7 @@ describe('httpExchange', () => {
         throw err;
       },
       next: x => {
-        expect(x).toEqual({ data: [{ id: 5 }] });
+        expect(x).toEqual({ data: [{ id: 5 }], operation });
         done();
       },
     });

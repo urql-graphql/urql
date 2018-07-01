@@ -339,12 +339,14 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   };
 
   render() {
-    return typeof this.props.children === 'function'
-      ? this.props.children({
+    const { children, client } = this.props;
+
+    return typeof children === 'function'
+      ? children({
           ...this.state,
           ...this.mutations,
-          cache: this.props.client.cacheWithEvents,
-          client: this.props.client,
+          cache: client ? client.cacheWithEvents : undefined,
+          client,
           refetch: this.fetch,
         })
       : null;

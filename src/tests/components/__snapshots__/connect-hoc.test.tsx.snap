@@ -2,6 +2,7 @@
 
 exports[`Connect HOC should wrap its component argument with connect 1`] = `
 <div
+  cache={undefined}
   client={Object {}}
   data={null}
   error={null}
@@ -13,6 +14,7 @@ exports[`Connect HOC should wrap its component argument with connect 1`] = `
 
 exports[`Connect HOC should wrap its component argument with connect and hoist the statics 1`] = `
 <div
+  cache={undefined}
   client={Object {}}
   data={null}
   error={null}

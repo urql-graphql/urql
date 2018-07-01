@@ -43,7 +43,10 @@ describe('subscriptionExchange', () => {
         observer.next(inputA);
 
         // Inputs are passed through with their data
-        expect(next).toHaveBeenLastCalledWith(inputA);
+        expect(next).toHaveBeenLastCalledWith({
+          ...inputA,
+          operation: expect.any(Object),
+        });
 
         const inputB = { errors: ['test error'] };
         observer.next(inputB);
@@ -52,6 +55,7 @@ describe('subscriptionExchange', () => {
         expect(next).toHaveBeenLastCalledWith({
           data: undefined,
           error: new CombinedError({ graphQLErrors: ['test error'] }),
+          operation: expect.any(Object),
         });
 
         expect(error).not.toHaveBeenCalled();
