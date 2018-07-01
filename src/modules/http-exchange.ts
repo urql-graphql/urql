@@ -23,13 +23,6 @@ const createAbortController = () => {
   return new AbortController();
 };
 
-// default headers to be used in functional fetch options in 'client.ts'
-// freezing the object so that a consumer of the library does not
-// use a mutable change on headers causing unexpected side effects on other http calls.
-export const defaultHeaders: {} = Object.freeze({
-  'Content-Type': 'application/json',
-});
-
 export const httpExchange = (): IExchange => operation => {
   const { url, fetchOptions } = operation.context;
   const { operationName } = operation;
@@ -53,10 +46,13 @@ export const httpExchange = (): IExchange => operation => {
 
     fetch(url, {
       body,
-      headers: defaultHeaders,
       method: 'POST',
       signal: abortController.signal,
       ...fetchOptions,
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions.headers,
+      },
     })
       .then(res => (response = res))
       .then(checkStatus(fetchOptions.redirect))

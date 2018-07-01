@@ -302,11 +302,11 @@ describe('Client', () => {
       });
     });
 
-    it('should pass default to functional fetchOptions', done => {
+    it('should spread default headers over returned fetch options', done => {
       client = new Client({
-        fetchOptions: defaults => ({
-          headers: { ...(defaults as any).headers, authorization: 'test' },
-        }),
+        fetchOptions: {
+          headers: { authorization: 'test' },
+        },
         url: 'http://localhost:3000/graphql',
       });
 
