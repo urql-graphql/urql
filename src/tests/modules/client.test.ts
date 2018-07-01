@@ -44,12 +44,12 @@ describe('Client', () => {
 
   it('should set fetchOptions', () => {
     const client = new Client({
-      fetchOptions: { headers: { authorization: 'test' } },
+      fetchOptions: {
+        test: 5,
+      },
       url: 'test',
     });
-    expect(client.fetchOptions).toMatchObject({
-      headers: { authorization: 'test' },
-    });
+    expect(client.fetchOptions).toMatchObject({ test: 5 });
   });
 
   it('should set fetchOptions to an object if not provided', () => {
@@ -241,7 +241,9 @@ describe('Client', () => {
     it('should include fetchOptions', done => {
       client = new Client({
         url: 'http://localhost:3000/graphql',
-        fetchOptions: { referrer: 'test' },
+        fetchOptions: {
+          test: 5,
+        },
       });
 
       (global as any).fetch.mockReturnValue(
@@ -265,7 +267,7 @@ describe('Client', () => {
               body: body,
               headers: { 'Content-Type': 'application/json' },
               method: 'POST',
-              referrer: 'test',
+              test: 5,
             }
           );
 
