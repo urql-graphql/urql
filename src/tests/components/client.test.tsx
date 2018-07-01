@@ -3,8 +3,6 @@
 import React from 'react';
 import Client from '../../components/client';
 import { CombinedError } from '../../modules/error';
-import { hashString } from '../../modules/hash';
-import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
 import { subscriptionExchange } from '../../modules/subscription-exchange';
 import { ClientEventType } from '../../interfaces/index';
@@ -101,8 +99,7 @@ describe('Client Component', () => {
       })
     );
     const clientModule = new ClientModule({ url: 'test' });
-    // @ts-ignore
-    let result;
+
     // @ts-ignore
     const client = renderer.create(
       <Client
@@ -110,75 +107,24 @@ describe('Client Component', () => {
         client={clientModule}
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
-        // @ts-ignore
-        children={args => {
-          result = args;
-          return null;
-        }}
+        children={() => null}
       />
     );
+
+    const newQuery = { query: `{ posts { id } }` };
 
     client.update(
       <Client
         key="test"
         client={clientModule}
         // @ts-ignore
-        query={{ query: `{ posts { id } }` }}
+        query={newQuery}
         // @ts-ignore
-        children={args => {
-          result = args;
-          return null;
-        }}
+        children={() => null}
       />
     );
 
-    expect(client.getInstance().query).toMatchObject({
-      query: `{
-  posts {
-    id
-    __typename
-  }
-}
-`,
-      variables: undefined,
-    });
-
-    client.update(
-      <Client
-        key="test"
-        client={clientModule}
-        // @ts-ignore
-        query={[{ query: `{ posts { id } }` }, { query: `{ posts { id } }` }]}
-        // @ts-ignore
-        children={args => {
-          result = args;
-          return null;
-        }}
-      />
-    );
-
-    expect(client.getInstance().query).toMatchObject([
-      {
-        query: `{
-  posts {
-    id
-    __typename
-  }
-}
-`,
-        variables: undefined,
-      },
-      {
-        query: `{
-  posts {
-    id
-    __typename
-  }
-}
-`,
-        variables: undefined,
-      },
-    ]);
+    expect(client.getInstance().query).toEqual(newQuery);
 
     done();
   });
@@ -585,57 +531,9 @@ describe('Client Component', () => {
     }, 100);
   });
 
-  it('should use shouldInvalidate if present', done => {
-    (global as any).fetch.mockReturnValue(
-      Promise.resolve({
-        status: 200,
-        json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
-      })
-    );
-    const clientModule = new ClientModule({ url: 'test' });
-    let result;
-    // @ts-ignore
-    const client = renderer.create(
-      <Client
-        // @ts-ignore
-        client={clientModule}
-        // @ts-ignore
-        query={{ query: `{ todos { id } }` }}
-        // @ts-ignore
-        shouldInvalidate={() => false}
-        // @ts-ignore
-        mutation={{
-          addTodo: {
-            query: `mutation($id: id!) {
-              addTodo(id: $id) {
-                id
-                text
-              }
-            }`,
-            variables: { id: 1 },
-          },
-        }}
-        // @ts-ignore
-        children={args => {
-          result = args;
-          return null;
-        }}
-      />
-    );
-    setTimeout(() => {
-      result.addTodo().then(() => {
-        setTimeout(() => {
-          let { data } = result;
-          expect((global as any).fetch).toHaveBeenCalledTimes(2);
-          expect(data).toBeTruthy();
-          done();
-        }, 200);
-      });
-    }, 0);
-  });
-
   it('should not update in response to mutations that throw', done => {
     (global as any).fetch.mockReturnValue(Promise.reject(new Error('Yoinks!')));
+
     const clientModule = new ClientModule({ url: 'test' });
     let result;
     // @ts-ignore
