@@ -46,10 +46,13 @@ export const httpExchange = (): IExchange => operation => {
 
     fetch(url, {
       body,
-      headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       signal: abortController.signal,
       ...fetchOptions,
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions.headers,
+      },
     })
       .then(res => (response = res))
       .then(checkStatus(fetchOptions.redirect))
