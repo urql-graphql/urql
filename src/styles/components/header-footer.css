@@ -26,6 +26,26 @@
 }
 
 /**
+* Cookie Banner
+*/
+.formidaCookie {
+  font-size: 1.25em;
+}
+
+.formidaCookie a {
+  color: var(--gold);
+}
+
+.formidaCookie a:hover,
+.formidaCookie a:focus {
+  color: var(--white);
+}
+
+.formidaCookie-button {
+  margin-top: 1.375em;
+}
+
+/**
 * Spectacle Logo
 */
 .Logo {
