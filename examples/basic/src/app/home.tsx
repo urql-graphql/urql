@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import * as React from 'react';
-import { Connect, query, mutation, UrqlProps } from '../../../src/index';
+import { Connect, query, mutation, UrqlProps } from '../../../../src/index';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
 import Loading from './loading';

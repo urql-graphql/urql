@@ -12,7 +12,7 @@ module.exports = {
       {
         test: /\.js|.ts|.tsx?$/,
         include: [
-          path.resolve(__dirname, '../src'),
+          path.resolve(__dirname, '../../src'),
           path.resolve(__dirname, 'src/app'),
         ],
         exclude: /node_modules/,
