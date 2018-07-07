@@ -16,5 +16,6 @@ export * from './modules/dedup-exchange';
 export * from './modules/error';
 export * from './modules/http-exchange';
 export * from './modules/subscription-exchange';
+export { formatTypeNames } from './modules/typenames';
 
 export * from './interfaces/index';
