@@ -43,12 +43,13 @@ const Home: React.SFC<{}> = () => (
           )}
           <TodoForm
             addTodo={text => {
-              addTodo(text);
-              if (data.todos.length === 0) {
-                // renew the cache as it won't be invalidated based on __typename
-                // when the existing cache contains an empty list
-                refetch({ skipCache: true });
-              }
+              addTodo(text).then(() => {
+                if (data.todos.length === 0) {
+                  // renew the cache as it won't be invalidated based on __typename
+                  // when the existing cache contains an empty list
+                  refetch({ skipCache: true });
+                }
+              });
             }}
           />
           <button type="button" onClick={() => refetch({})}>
