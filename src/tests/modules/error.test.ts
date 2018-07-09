@@ -51,6 +51,21 @@ describe('CombinedError', () => {
     expect(err.graphQLErrors).toEqual(graphQLErrors);
   });
 
+  it('rehydrates graphql errors from the server', () => {
+    const graphQLErrors = [
+      { message: 'Error Message A', extensions: {}, path: [], locations: [] },
+    ];
+
+    const err = new CombinedError({ graphQLErrors });
+    const gqlErr = err.graphQLErrors[0];
+
+    expect(gqlErr).toBeInstanceOf(Error);
+    expect(gqlErr.message).toBe(graphQLErrors[0].message);
+    expect(gqlErr.extensions).toBe(graphQLErrors[0].extensions);
+    expect(gqlErr.path).toBe(graphQLErrors[0].path);
+    expect(gqlErr.locations).toBe(graphQLErrors[0].locations);
+  });
+
   it('passes graphQLErrors through as a last resort', () => {
     const graphQLErrors = [{ x: 'y' }] as any;
     const err = new CombinedError({ graphQLErrors });
