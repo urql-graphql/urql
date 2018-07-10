@@ -7,7 +7,7 @@ import { hashString } from '../../modules/hash';
 import { formatTypeNames } from '../../modules/typenames';
 import { default as ClientModule } from '../../modules/client';
 import { subscriptionExchange } from '../../modules/subscription-exchange';
-import { ClientEventType } from '../../interfaces/index';
+import { ClientEventType } from '../../modules/events';
 import renderer from 'react-test-renderer';
 
 describe('Client Component', () => {

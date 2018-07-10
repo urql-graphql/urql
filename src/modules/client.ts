@@ -1,15 +1,14 @@
 import Observable from 'zen-observable-ts';
 
 import {
-  ClientEvent,
-  ClientEventType,
   ICache,
   IClientOptions,
   IExchange,
   IExchangeResult,
   IQuery,
-} from '../interfaces/index';
+} from '../interfaces';
 
+import { IClientEvent, ClientEventType } from './events';
 import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
 import { defaultCache } from './default-cache';
@@ -23,7 +22,7 @@ export default class Client {
   cache: ICache; // Cache object
   exchange: IExchange; // Exchange to communicate with GraphQL APIs
   fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
-  subscriptions: { [id: string]: (ClientEvent) => void }; // Map of subscribed Connect components
+  subscriptions: { [id: string]: (IClientEvent) => void }; // Map of subscribed Connect components
 
   constructor(opts?: IClientOptions) {
     if (!opts) {
@@ -64,7 +63,7 @@ export default class Client {
     }
   }
 
-  subscribe(callback: (event: ClientEvent) => void): () => void {
+  subscribe(callback: (event: IClientEvent) => void): () => void {
     // Create an identifier, add callback to subscriptions
     const id = this.subscriptionSize++;
     this.subscriptions[id] = callback;

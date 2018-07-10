@@ -1,17 +1,11 @@
 import { Component, ReactNode } from 'react';
+import { zipObservables } from '../utils/zip-observables';
 import { CombinedError } from '../modules/error';
 import { hashString } from '../modules/hash';
 import { formatTypeNames } from '../modules/typenames';
-import { zipObservables } from '../utils/zip-observables';
+import { IClientEvent, ClientEventType } from '../modules/events';
 
-import {
-  ClientEvent,
-  ClientEventType,
-  IClient,
-  IExchangeResult,
-  IMutation,
-  IQuery,
-} from '../interfaces/index';
+import { IClient, IExchangeResult, IMutation, IQuery } from '../interfaces';
 
 export interface IClientProps {
   client: IClient; // Client instance
@@ -184,7 +178,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update = (event: ClientEvent) => {
+  update = (event: IClientEvent) => {
     const { type } = event;
 
     if (type === ClientEventType.RefreshAll) {

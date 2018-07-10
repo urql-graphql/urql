@@ -1,6 +1,6 @@
 import Client from '../../modules/client';
 import { defaultCache } from '../../modules/default-cache';
-import { ClientEventType } from '../../interfaces/events';
+import { ClientEventType } from '../../modules/events';
 
 describe('Client', () => {
   beforeEach(() => {
