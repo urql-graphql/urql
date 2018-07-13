@@ -8,10 +8,10 @@ import {
   IQuery,
 } from '../interfaces';
 
-import { IClientEvent, ClientEventType } from './events';
 import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
 import { defaultCache } from './default-cache';
+import { ClientEventType, IClientEvent } from './events';
 import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
 

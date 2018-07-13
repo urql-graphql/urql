@@ -1,9 +1,9 @@
 import Observable from 'zen-observable-ts';
 
+import { IClientEvent } from '../modules/events';
 import { ICache } from './cache';
 import { IExchangeResult } from './exchange';
 import { IQuery } from './query';
-import { IClientEvent } from '../modules/events';
 
 export interface IClient {
   cache: ICache;
