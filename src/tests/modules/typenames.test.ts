@@ -17,6 +17,20 @@ describe('formatTypeNames', () => {
 }
 `);
   });
+
+  it('should not add duplicates typenames', () => {
+    let newQuery = formatTypeNames({
+      query: `{ todos { id __typename } }`,
+      variables: {},
+    });
+    expect(newQuery.query).toBe(`{
+  todos {
+    id
+    __typename
+  }
+}
+`);
+  });
 });
 
 describe('gankTypeNamesFromResponse', () => {
