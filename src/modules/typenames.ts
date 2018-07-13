@@ -3,6 +3,7 @@ import { DocumentNode, FieldNode, SelectionSetNode } from 'graphql';
 import { visit } from 'graphql/language';
 import { parse } from 'graphql/language/parser';
 import { print } from 'graphql/language/printer';
+import { IExecutionData } from '../interfaces/exchange';
 
 import { field, isField, isOperationDefinition, name } from 'graphql-ast-types';
 import { IQuery } from '../interfaces/index';
@@ -36,21 +37,24 @@ export function formatTypeNames(query: IQuery) {
   };
 }
 
-export function gankTypeNamesFromResponse(response: object) {
+export function gankTypeNamesFromResponse(response: IExecutionData) {
   const typeNames = [];
   getTypeNameFromField(response, typeNames);
   return typeNames.filter((v, i, a) => a.indexOf(v) === i);
 }
 
-function getTypeNameFromField(obj: object, typenames: string[]) {
+function isObject(obj): obj is IExecutionData {
+  return obj && typeof obj === 'object';
+}
+
+function getTypeNameFromField(obj: IExecutionData, typenames: string[]) {
   Object.keys(obj).map(item => {
-    if (typeof obj[item] === 'object') {
-      if (obj[item] && '__typename' in obj[item]) {
-        typenames.push(obj[item].__typename);
+    const value = obj[item];
+    if (isObject(value)) {
+      if (value.__typename) {
+        typenames.push(value.__typename);
       }
-      if (obj[item]) {
-        getTypeNameFromField(obj[item], typenames);
-      }
+      getTypeNameFromField(value, typenames);
     }
   });
 }
