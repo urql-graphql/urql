@@ -168,7 +168,7 @@ export default class Client {
   }
 
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']> {
-    return new Promise<IExchangeResult>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.executeMutation$(mutationObject).subscribe({
         error: reject,
         next: resolve,
