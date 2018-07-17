@@ -374,7 +374,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       fetching: true,
     });
 
-    return new Promise<IExchangeResult['data']>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       // Execute mutation
       client.executeMutation$(mutation).subscribe({
         error: e => {

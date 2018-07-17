@@ -3,10 +3,9 @@ import { DocumentNode, FieldNode, SelectionSetNode } from 'graphql';
 import { visit } from 'graphql/language';
 import { parse } from 'graphql/language/parser';
 import { print } from 'graphql/language/printer';
-import { IExecutionData } from '../interfaces/exchange';
 
 import { field, isField, isOperationDefinition, name } from 'graphql-ast-types';
-import { IQuery } from '../interfaces/index';
+import { IQuery, IExecutionData } from '../interfaces/index';
 
 const TYPENAME_FIELD: FieldNode = field(name('__typename'));
 
