@@ -8,10 +8,10 @@ import {
   IQuery,
 } from '../interfaces';
 
-import { IClientEvent, ClientEventType } from './events';
 import { cacheExchange } from './cache-exchange';
 import { dedupExchange } from './dedup-exchange';
 import { defaultCache } from './default-cache';
+import { ClientEventType, IClientEvent } from './events';
 import { hashString } from './hash';
 import { httpExchange } from './http-exchange';
 
@@ -168,7 +168,7 @@ export default class Client {
   }
 
   executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']> {
-    return new Promise<IExchangeResult>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.executeMutation$(mutationObject).subscribe({
         error: reject,
         next: resolve,

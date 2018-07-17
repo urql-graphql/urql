@@ -1,63 +1,31 @@
-import {
-  DefinitionNode,
-  DocumentNode,
-  FieldNode,
-  OperationDefinitionNode,
-  SelectionSetNode,
-} from 'graphql';
+import { DocumentNode, FieldNode, SelectionSetNode } from 'graphql';
 
+import { visit } from 'graphql/language';
 import { parse } from 'graphql/language/parser';
 import { print } from 'graphql/language/printer';
 
-import { IQuery } from '../interfaces/index';
+import { field, isField, isOperationDefinition, name } from 'graphql-ast-types';
+import { IQuery, IExecutionData } from '../interfaces/index';
 
-const TYPENAME_FIELD: FieldNode = {
-  kind: 'Field',
-  name: {
-    kind: 'Name',
-    value: '__typename',
-  },
-};
+const TYPENAME_FIELD: FieldNode = field(name('__typename'));
 
-function addTypename(selectionSet: SelectionSetNode, isRoot = false) {
-  if (selectionSet.selections) {
-    if (!isRoot) {
-      const exists = selectionSet.selections.some(selection => {
-        return (
-          selection.kind === 'Field' &&
-          (selection as FieldNode).name.value === '__typename'
-        );
-      });
-
-      if (!exists) {
-        selectionSet.selections.push(TYPENAME_FIELD);
-      }
+function hasTypename(node: SelectionSetNode): boolean {
+  return node.selections.some((fieldNode: FieldNode) => {
+    if (isField(fieldNode)) {
+      return fieldNode.name.value === '__typename';
     }
-
-    selectionSet.selections.forEach(selection => {
-      if (selection.kind === 'Field') {
-        if (
-          selection.name.value.lastIndexOf('__', 0) !== 0 &&
-          selection.selectionSet
-        ) {
-          addTypename(selection.selectionSet);
-        }
-      } else if (selection.kind === 'InlineFragment') {
-        if (selection.selectionSet) {
-          addTypename(selection.selectionSet);
-        }
-      }
-    });
-  }
+  });
 }
 
 function addTypenameToDocument(doc: DocumentNode) {
-  doc.definitions.forEach((definition: DefinitionNode) => {
-    const isRoot = definition.kind === 'OperationDefinition';
-    addTypename((definition as OperationDefinitionNode).selectionSet, isRoot);
+  return visit(doc, {
+    SelectionSet(node, _, parent) {
+      if (!isOperationDefinition(parent) && !hasTypename(node)) {
+        node.selections.push(TYPENAME_FIELD);
+        return node;
+      }
+    },
   });
-
-  return doc;
 }
 
 export function formatTypeNames(query: IQuery) {
@@ -68,21 +36,24 @@ export function formatTypeNames(query: IQuery) {
   };
 }
 
-export function gankTypeNamesFromResponse(response: object) {
+export function gankTypeNamesFromResponse(response: IExecutionData) {
   const typeNames = [];
   getTypeNameFromField(response, typeNames);
   return typeNames.filter((v, i, a) => a.indexOf(v) === i);
 }
 
-function getTypeNameFromField(obj: object, typenames: string[]) {
+function isObject(obj): obj is IExecutionData {
+  return obj && typeof obj === 'object';
+}
+
+function getTypeNameFromField(obj: IExecutionData, typenames: string[]) {
   Object.keys(obj).map(item => {
-    if (typeof obj[item] === 'object') {
-      if (obj[item] && '__typename' in obj[item]) {
-        typenames.push(obj[item].__typename);
+    const value = obj[item];
+    if (isObject(value)) {
+      if (value.__typename) {
+        typenames.push(value.__typename);
       }
-      if (obj[item]) {
-        getTypeNameFromField(obj[item], typenames);
-      }
+      getTypeNameFromField(value, typenames);
     }
   });
 }

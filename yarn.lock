@@ -2862,6 +2862,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
+graphql-ast-types@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/graphql-ast-types/-/graphql-ast-types-1.0.2.tgz#49f2ae8f52be9ae426263f95320888f0cb772711"
+
 graphql-subscriptions@^0.5.6:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/graphql-subscriptions/-/graphql-subscriptions-0.5.6.tgz#0d8e960fbaaf9ecbe7900366e86da2fc143fc5b2"
