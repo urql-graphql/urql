@@ -1,6 +1,6 @@
 {
   "name": "formidable-spectacle-docs",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Documentation site for Spectacle",
   "main": "webpack.config.dev.js",
   "scripts": {
