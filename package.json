@@ -8,7 +8,7 @@
     "start": "builder run dev",
     "test": "builder run lint",
     "test-func-static-prod": "TEST_FUNC_BASE_DIR=/open-source/spectacle builder run test-func-static",
-    "update-project": "npm update spectacle"
+    "update-project": "echo 'Skipping git update. Using npm package.'"
   },
   "repository": {
     "type": "git",
@@ -21,12 +21,10 @@
   },
   "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
   "devDependencies": {
-    "builder-docs-archetype-dev": "^4.2.2"
-  },
-  "dependencies": {
     "anchorate": "^1.1.0",
-    "builder": "^3.1.0",
+    "builder": "^4.0.0",
     "builder-docs-archetype": "^4.2.2",
+    "builder-docs-archetype-dev": "^4.2.2",
     "formidable-landers": "^8.3.2",
     "history": "^1.17.0",
     "lodash": "^4.16.4",
@@ -34,7 +32,7 @@
     "markdown-it-toc-and-anchor": "^4.1.1",
     "marked": "^0.3.5",
     "normalize.css": "^4.2.0",
-    "prismjs": "^1.5.1",
+    "prismjs": "1.6.0",
     "radium": "^0.17.1",
     "react": "^15.2.0",
     "react-document-meta": "^2.0.3",
@@ -42,6 +40,6 @@
     "react-ga": "^2.1.1",
     "react-router": "^2.7.0",
     "react-router-scroll": "^0.2.0",
-    "spectacle": "github:FormidableLabs/spectacle"
+    "spectacle": "^5.0.0"
   }
 }
