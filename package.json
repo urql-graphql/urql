@@ -32,7 +32,7 @@
     "markdown-it-toc-and-anchor": "^4.1.1",
     "marked": "^0.3.5",
     "normalize.css": "^4.2.0",
-    "prismjs": "^1.6.0",
+    "prismjs": "1.6.0",
     "radium": "^0.17.1",
     "react": "^15.2.0",
     "react-document-meta": "^2.0.3",
