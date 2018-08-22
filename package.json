@@ -22,10 +22,11 @@
   "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
   "devDependencies": {
     "anchorate": "^1.1.0",
+    "babel-preset-stage-1": "^6.24.1",
     "builder": "^4.0.0",
     "builder-docs-archetype": "^4.2.2",
     "builder-docs-archetype-dev": "^4.2.2",
-    "formidable-landers": "^8.3.2",
+    "formidable-landers": "^8.4.0",
     "history": "^1.17.0",
     "lodash": "^4.16.4",
     "markdown-it": "^8.0.0",
