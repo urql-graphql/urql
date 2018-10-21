@@ -242,7 +242,7 @@ const defaultCache = store => {
     update: callback =>
       new Promise(resolve => {
         if (typeof callback === 'function') {
-          Object.keys(store).map(key => {
+          Object.keys(store).forEach(key => {
             callback(store, key, store[key]);
           });
         }
