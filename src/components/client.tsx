@@ -191,7 +191,9 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         .then(result => {
           // Store the typenames
           if (result.typeNames) {
-            this.typeNames = result.typeNames;
+            this.typeNames = [...this.typeNames, ...result.typeNames].filter(
+              (v, i, a) => a.indexOf(v) === i
+            );
           }
           // Update data
           this.setState({
