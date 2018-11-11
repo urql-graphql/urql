@@ -46,8 +46,10 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   mutations = {}; // Stored Mutation
   typeNames = []; // Typenames that exist on current query
   subscriptionID = null; // Change subscription ID
+  _isMounted = false; // Used to avoid setState warning after unmounting
 
   componentDidMount() {
+    this._isMounted = true;
     this.formatProps(this.props);
   }
 
@@ -63,8 +65,15 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     // Unsub from change listener
     this.props.client.unsubscribe(this.subscriptionID);
+  }
+
+  setStateIfMounted(updater, callback?) {
+    if (this._isMounted) {
+      this.setState(updater, callback);
+    }
   }
 
   invalidate = queryObject => {
@@ -194,14 +203,14 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
             this.typeNames = result.typeNames;
           }
           // Update data
-          this.setState({
+          this.setStateIfMounted({
             data: result.data,
             fetching: false,
             loaded: initial ? true : this.state.loaded,
           });
         })
         .catch(e => {
-          this.setState({
+          this.setStateIfMounted({
             error: e,
             fetching: false,
           });
@@ -229,14 +238,14 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
         })
       )
         .then(results => {
-          this.setState({
+          this.setStateIfMounted({
             data: results,
             fetching: false,
             loaded: true,
           });
         })
         .catch(e => {
-          this.setState({
+          this.setStateIfMounted({
             data: partialData,
             error: e,
             fetching: false,
@@ -258,7 +267,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       client
         .executeMutation(mutation)
         .then((...args) => {
-          this.setState(
+          this.setStateIfMounted(
             {
               fetching: false,
             },
@@ -268,7 +277,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
           );
         })
         .catch(e => {
-          this.setState(
+          this.setStateIfMounted(
             {
               error: e,
               fetching: false,
