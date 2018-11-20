@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { tap, map, merge } from 'rxjs/operators';
+import { tap, merge, map, partition } from 'rxjs/operators';
 import { IExchangeResult, IOperation } from '../interfaces';
 import {
   gankTypeNamesFromResponse,
@@ -10,14 +10,11 @@ type ExchangeIO = (ops$: Observable<IOperation>) => Observable<IExchangeResult>;
 type Exchange = (forward: ExchangeIO) => ExchangeIO;
 
 export const cacheExchange = (): Exchange => forward => {
-  const cache = new Map<
-    string,
-    Observable<IExchangeResult> | IExchangeResult
-  >();
+  const cache = new Map<string, IExchangeResult>();
   const cachedTypenames = new Map<string, string[]>();
 
   // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: IOperation) => ({
+  const mapTypeNames = (operation: IOperation): IOperation => ({
     ...operation,
     query: formatTypeNames(operation.query),
   });
@@ -40,6 +37,8 @@ export const cacheExchange = (): Exchange => forward => {
 
   // Mark typenames on typenameInvalidate for early invalidation
   const afterQuery = (key: string, response: IExchangeResult) => {
+    cache.set(key, response);
+
     const typenames = gankTypeNamesFromResponse(response.data);
 
     typenames.forEach(typename => {
@@ -52,35 +51,27 @@ export const cacheExchange = (): Exchange => forward => {
     });
   };
 
-  return ops$ =>
-    ops$.pipe(
+  return ops$ => {
+    const [cacheOps$, forwardOps$] = partition<IOperation>(operation =>
+      cache.has(operation.key)
+    )(ops$);
+
+    const cachedResults$ = cacheOps$.pipe(
+      map(operation => cache.get(operation.key))
+    );
+
+    const forward$ = forwardOps$.pipe(
       map(mapTypeNames),
-      merge((operation: IOperation) => {
-        const key = JSON.stringify(operation);
-        const cached = cache.get(key);
-
-        if (operation.operationName === 'mutation') {
-          // Make HTTP request and parses mutated response
-          return forward(ops$).pipe(
-            tap((response: IExchangeResult) => {
-              afterMutation(response);
-              return response;
-            })
-          );
+      forward,
+      tap(response => {
+        if (response.operation.operationName === 'mutation') {
+          afterMutation(response);
+        } else if (response.operation.operationName === 'query') {
+          afterQuery(response.operation.key, response);
         }
-
-        if (operation.operationName !== 'query') {
-          return forward(ops$);
-        }
-
-        if (cached !== undefined) {
-          return cached;
-        }
-
-        return forward(ops$).pipe(
-          tap(result => afterQuery(key, result)),
-          tap(result => cache.set(key, result))
-        );
       })
     );
+
+    return forward$.pipe(merge(cachedResults$));
+  };
 };
