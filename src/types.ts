@@ -16,7 +16,7 @@ export interface Operation extends Query {
   /** Unique identifier of the operation */
   key: string;
   /** The type of Grapqhql operation being executed */
-  operationName: 'query' | 'mutation';
+  operationName: string;
   /** Additional metadata passed to [exchange]{@link Exchange} functions */
   options: Record<string, any>;
 }
