@@ -1,26 +1,22 @@
-import { Observable } from 'rxjs';
 import { tap, merge, map, partition } from 'rxjs/operators';
-import { IExchangeResult, IOperation } from '../interfaces';
+import { Operation, ExchangeResult, Exchange } from '../types';
 import {
   gankTypeNamesFromResponse,
   formatTypeNames,
 } from '../modules/typenames';
 
-type ExchangeIO = (ops$: Observable<IOperation>) => Observable<IExchangeResult>;
-type Exchange = (forward: ExchangeIO) => ExchangeIO;
-
-export const cacheExchange = (): Exchange => forward => {
-  const cache = new Map<string, IExchangeResult>();
+export const cacheExchange = (): Exchange => {
+  const cache = new Map<string, ExchangeResult>();
   const cachedTypenames = new Map<string, string[]>();
 
   // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: IOperation): IOperation => ({
+  const mapTypeNames = (operation: Operation): Operation => ({
     ...operation,
     query: formatTypeNames(operation.query),
   });
 
   // Invalidates the cache given a mutation's response
-  const afterMutation = (response: IExchangeResult) => {
+  const afterMutation = (response: ExchangeResult) => {
     const typenames = gankTypeNamesFromResponse(response.data);
 
     typenames.forEach(typename => {
@@ -36,7 +32,7 @@ export const cacheExchange = (): Exchange => forward => {
   };
 
   // Mark typenames on typenameInvalidate for early invalidation
-  const afterQuery = (key: string, response: IExchangeResult) => {
+  const afterQuery = (key: string, response: ExchangeResult) => {
     cache.set(key, response);
 
     const typenames = gankTypeNamesFromResponse(response.data);
@@ -51,8 +47,8 @@ export const cacheExchange = (): Exchange => forward => {
     });
   };
 
-  return ops$ => {
-    const [cacheOps$, forwardOps$] = partition<IOperation>(operation =>
+  return forward => ops$ => {
+    const [cacheOps$, forwardOps$] = partition<Operation>(operation =>
       cache.has(operation.key)
     )(ops$);
 
@@ -63,7 +59,7 @@ export const cacheExchange = (): Exchange => forward => {
     const forward$ = forwardOps$.pipe(
       map(mapTypeNames),
       forward,
-      tap(response => {
+      tap((response: any) => {
         if (response.operation.operationName === 'mutation') {
           afterMutation(response);
         } else if (response.operation.operationName === 'query') {
@@ -72,6 +68,6 @@ export const cacheExchange = (): Exchange => forward => {
       })
     );
 
-    return forward$.pipe(merge(cachedResults$));
+    return cachedResults$.pipe(merge(forward$));
   };
 };
