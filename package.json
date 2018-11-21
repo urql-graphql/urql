@@ -9,15 +9,13 @@
   "scripts": {
     "coverage": "jest --coverage",
     "clean-lib": "rimraf lib",
-    "build-babel": "babel src --extensions \".ts,.tsx\"",
-    "build-lib": "npm run clean-lib && builder run --env \"{\\\"BABEL_ENV\\\":\\\"commonjs\\\"}\" build-babel -- -d lib",
+    "build": "tsc",
     "build-bundles": "rollup -c",
     "clean-es": "rimraf es",
     "build-es": "npm run clean-es && builder run build-babel -- -d es",
     "watch-es": "watch \"npm run build-es\" src/ -d",
     "clean-types": "rimraf types",
     "build-types": "npm run clean-types && tsc -p tsconfig.dts.json",
-    "build": "builder concurrent --buffer build-lib build-es build-types",
     "demo:start:graphql-server": "node example/src/server/index.js",
     "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
@@ -33,31 +31,6 @@
   "resolutions": {
     "babel-core": "^7.0.0-bridge.0"
   },
-  "jest": {
-    "setupFiles": [
-      "./src/tests/setup.js"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "<rootDir>/node_modules/babel-jest"
-    },
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/tests/**/*",
-      "!src/interfaces/**/*",
-      "!src/index.*",
-      "!src/**/hash.*",
-      "!src/**/typenames.*"
-    ],
-    "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md}": [
       "prettier --write",
@@ -71,25 +44,11 @@
     }
   ],
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.38",
-    "@babel/core": "^7.0.0-beta.38",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.38",
-    "@babel/plugin-proposal-pipeline-operator": "^7.0.0-beta.38",
-    "@babel/plugin-syntax-object-rest-spread": "^7.0.0-beta.38",
-    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.40",
-    "@babel/polyfill": "^7.0.0-beta.38",
-    "@babel/preset-env": "^7.0.0-beta.38",
-    "@babel/preset-react": "^7.0.0-beta.38",
-    "@babel/preset-stage-3": "^7.0.0-beta.38",
-    "@babel/preset-typescript": "^7.0.0-beta.38",
-    "@types/graphql": "^0.12.1",
-    "@types/jest": "^22.0.1",
+    "@types/graphql": "^14.0.3",
+    "@types/jest": "^23.3.9",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
-    "@types/uuid": "^3.4.3",
-    "babel-jest": "^22.1.0",
-    "babel-loader": "8.0.0-beta.0",
-    "babel-plugin-module-resolver": "^3.0.0",
+    "@types/uuid": "^3.4.4",
     "builder": "^3.2.3",
     "bundlesize": "^0.17.0",
     "cors": "^2.8.4",
@@ -100,14 +59,14 @@
     "graphql-tools": "^2.18.0",
     "husky": "^0.14.3",
     "isomorphic-fetch": "^2.2.1",
-    "jest": "^22.1.4",
+    "jest": "^23.6.0",
     "lint-staged": "^6.0.1",
     "prettier": "1.10.2",
-    "prop-types": "^15.6.0",
+    "prop-types": "^15.6.2",
     "react": "^16.0.0-0",
     "react-addons-test-utils": "^15.6.2",
     "react-dom": "^16.0.0-0",
-    "react-test-renderer": "^16.2.0",
+    "react-test-renderer": "^16.6.3",
     "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.58.2",
@@ -118,10 +77,11 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.13.0",
     "rollup-plugin-uglify": "^3.0.0",
-    "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.6.0",
-    "tslint-react": "^3.4.0",
-    "typescript": "~2.7.2",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.16.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "~3.1.6",
     "uuid": "^3.2.1",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
