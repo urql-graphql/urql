@@ -23,7 +23,6 @@ export const mutationGql = {
 };
 
 export const queryOperation = {
-  // key: JSON.stringify(queryGql),
   key: '2',
   operationName: 'query',
   options: {},
@@ -42,7 +41,11 @@ export const queryResponse = {
     key: queryOperation.key,
     operationName: 'query',
   },
-  data: [],
+  data: {
+    user: {
+      name: 'Clive',
+    },
+  },
 };
 
 export const mutationResponse = {
@@ -50,5 +53,5 @@ export const mutationResponse = {
     key: queryOperation.key,
     operationName: 'mutation',
   },
-  data: [],
+  data: {},
 };

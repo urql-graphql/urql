@@ -1,5 +1,5 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  setupTestFrameworkScriptFile: './src/setupJest.ts',
+  setupTestFrameworkScriptFile: './src/util/setupJest.ts',
 };

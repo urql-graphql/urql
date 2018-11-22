@@ -5,7 +5,7 @@ import {
   queryOperation,
   mutationResponse,
   mutationOperation,
-} from '../samples';
+} from '../util/samples';
 
 let exchange = cacheExchange();
 const forwardMock = jest.fn();

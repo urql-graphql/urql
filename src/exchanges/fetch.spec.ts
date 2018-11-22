@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
 import { fetchExchange } from './fetch';
-import { queryOperation, queryResponse } from '../samples';
+import { queryOperation, queryResponse } from '../util/samples';
 
 let exchange = fetchExchange();
 const fetch = (global as any).fetch as jest.Mock;
