@@ -4,7 +4,7 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "jsx": "react",
-    "lib": ["es2015", "dom", "esnext.asynciterable"],
+    "lib": ["es2015", "dom", "esnext.asynciterable", "esnext.array"],
     "declaration": true,
     "module": "es2015",
     "moduleResolution": "node",
