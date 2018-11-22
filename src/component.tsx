@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Observable, of, Subscription } from 'rxjs';
-import { cacheExchange, fetchExchange } from './exchanges';
+import { cacheExchange, dedupeExchange, fetchExchange } from './exchanges';
 import { hashString } from './lib';
 import { Exchange, Operation, ExchangeResult, Mutation, Query } from './types';
 
@@ -144,4 +144,4 @@ export class UrqlContext extends React.Component<UrqlProps, UrqlState> {
   }
 }
 
-const defaultExchanges = [cacheExchange(), fetchExchange()];
+const defaultExchanges = [dedupeExchange(), cacheExchange(), fetchExchange()];

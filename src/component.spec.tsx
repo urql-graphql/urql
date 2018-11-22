@@ -4,19 +4,34 @@
 import * as React from 'react';
 import { shallow } from 'enzyme';
 import { UrqlContext } from './component';
-import { queryGql, mutationGql, queryResponse } from './util/samples';
+import {
+  queryGql,
+  mutationGql,
+  mutationResponse,
+  queryResponse,
+} from './util/samples';
 
 const fetch = (global as any).fetch as jest.Mock;
 const requestOptions = { url: 'http://localhost/graphql' };
+
+jest.useFakeTimers();
 
 beforeEach(() => {
   fetch.mockClear();
 });
 
 describe('onComponentDidMount', () => {
+  const json = jest.fn().mockResolvedValue(queryResponse);
+
   beforeEach(() => {
     fetch.mockClear();
-    fetch.mockReturnValue(new Promise(resolve => setTimeout(resolve, 2000)));
+    fetch.mockReturnValue(
+      new Promise(resolve => setTimeout(() => resolve({ json }), 700))
+    );
+  });
+
+  afterEach(() => {
+    jest.advanceTimersByTime(700);
   });
 
   it('fetching = true', () => {
@@ -85,11 +100,11 @@ describe('onComponentDidMount', () => {
 });
 
 describe('on mutation call', () => {
-  const response = { arg: 200 };
+  const json = jest.fn().mockResolvedValue({ json: mutationResponse });
 
   beforeEach(() => {
     fetch.mockClear();
-    fetch.mockResolvedValue(response);
+    fetch.mockResolvedValue({ json });
   });
 
   it('calls fetch with mutation', () => {
@@ -129,6 +144,10 @@ describe('on mutation call', () => {
 
 describe('on query call', () => {
   const response = { json: jest.fn().mockResolvedValue(queryResponse) };
+
+  beforeAll(() => {
+    jest.useRealTimers();
+  });
 
   beforeEach(() => {
     fetch.mockClear();
