@@ -76,14 +76,22 @@ export function formatTypeNames(query: string): string {
 }
 
 function getTypeNameFromField(obj: object) {
-  return Object.keys(obj)
-    .filter(item => typeof obj[item] === 'object')
-    .flatMap(
-      item =>
-        obj[item].__typename !== undefined
-          ? obj[item].__typename
-          : getTypeNameFromField(obj[item])
-    );
+  let typenames = [];
+
+  for (const prop in obj) {
+    if (typeof obj[prop] !== 'object') {
+      continue;
+    }
+
+    const value = obj[prop];
+
+    typenames =
+      value.__typename !== undefined
+        ? [...typenames, value.__typename]
+        : [...typenames, getTypeNameFromField(value)];
+  }
+
+  return typenames;
 }
 
 export function gankTypeNamesFromResponse(response: object) {
