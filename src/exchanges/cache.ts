@@ -1,9 +1,6 @@
 import { tap, merge, map, partition } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
-import {
-  gankTypeNamesFromResponse,
-  formatTypeNames,
-} from '../modules/typenames';
+import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
 export const cacheExchange = (): Exchange => {
   const cache = new Map<string, ExchangeResult>();
