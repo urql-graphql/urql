@@ -1,3 +1,4 @@
+import { of } from 'rxjs';
 import { tap, flatMap, merge, map, partition } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
@@ -55,7 +56,7 @@ export const cacheExchange = (): Exchange => {
 
     const forward$ = forwardOps$.pipe(
       map(mapTypeNames),
-      flatMap((op: any) => forward(op)),
+      flatMap((op: any) => forward(of(op))),
       tap((response: any) => {
         if (response.operation.operationName === 'mutation') {
           afterMutation(response);
