@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Provider Component should provide a context consumer and pass through to client 1`] = `<div />`;

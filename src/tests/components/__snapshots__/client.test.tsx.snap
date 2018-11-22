@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Client Component should not accept query and subscription props at the same time 1`] = `"Passing a query and a subscription prop at the same time without an updateSubscription function is invalid."`;
