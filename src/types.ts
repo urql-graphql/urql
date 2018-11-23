@@ -37,7 +37,7 @@ export interface ExchangeResult {
   /** The operation which has been executed */
   operation: Operation;
   /** The data returned from the Graphql server */
-  data: object;
+  data: any;
   /** Any errors resulting from the operation */
   error?: Error;
 }

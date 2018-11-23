@@ -15,7 +15,7 @@ export const cacheExchange = (): Exchange => {
 
   // Invalidates the cache given a mutation's response
   const afterMutation = (response: ExchangeResult) => {
-    const typenames = gankTypeNamesFromResponse(response.data);
+    const typenames = gankTypeNamesFromResponse(response.data.data);
 
     typenames.forEach(typename => {
       const typenameCacheKeys = cachedTypenames.get(typename);
@@ -30,16 +30,17 @@ export const cacheExchange = (): Exchange => {
   };
 
   // Mark typenames on typenameInvalidate for early invalidation
-  const afterQuery = (key: string, response: ExchangeResult) => {
+  const afterQuery = (response: ExchangeResult) => {
+    const key = response.operation.key;
     cache.set(key, response);
 
-    const typenames = gankTypeNamesFromResponse(response.data);
+    const typenames = gankTypeNamesFromResponse(response.data.data);
 
     typenames.forEach(typename => {
       const typenameCacheKeys = cachedTypenames.get(typename);
 
       cachedTypenames.set(
-        key,
+        typename,
         typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
       );
     });
@@ -61,7 +62,7 @@ export const cacheExchange = (): Exchange => {
         if (response.operation.operationName === 'mutation') {
           afterMutation(response);
         } else if (response.operation.operationName === 'query') {
-          afterQuery(response.operation.key, response);
+          afterQuery(response);
         }
       })
     );
