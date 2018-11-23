@@ -17,7 +17,7 @@ const TYPENAME_FIELD: FieldNode = {
   },
 };
 
-function addTypename(selectionSet: SelectionSetNode, isRoot = false) {
+function addTypename(selectionSet: SelectionSetNode) {
   if (selectionSet.selections === undefined) {
     return selectionSet;
   }
@@ -30,7 +30,7 @@ function addTypename(selectionSet: SelectionSetNode, isRoot = false) {
       (selection as FieldNode).name.value === '__typename'
   );
 
-  if (!isRoot && !hasTypeName) {
+  if (!hasTypeName) {
     newSet.selections = [...newSet.selections, TYPENAME_FIELD];
   }
 
@@ -60,12 +60,12 @@ function addTypename(selectionSet: SelectionSetNode, isRoot = false) {
 function addTypenameToDocument(doc: DocumentNode) {
   return {
     ...doc,
-    definitions: doc.definitions.map((definition: OperationDefinitionNode) =>
-      addTypename(
-        definition.selectionSet,
-        definition.kind === 'OperationDefinition'
-      )
-    ),
+    definitions: doc.definitions.map((definition: OperationDefinitionNode) => {
+      return {
+        ...definition,
+        selectionSet: addTypename(definition.selectionSet),
+      };
+    }),
   };
 }
 
