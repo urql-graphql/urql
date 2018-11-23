@@ -18,7 +18,7 @@ export interface Operation extends Query {
   /** The type of Grapqhql operation being executed */
   operationName: string;
   /** Additional metadata passed to [exchange]{@link Exchange} functions */
-  options: Record<string, any>;
+  context: Record<string, any>;
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
