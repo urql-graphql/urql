@@ -1,30 +1,21 @@
-import { Observable, of } from 'rxjs';
-import { partition, merge, flatMap, tap } from 'rxjs/operators';
-import { Exchange, ExchangeResult, Operation } from '../types';
+import { tap, filter } from 'rxjs/operators';
+import { Exchange } from '../types';
 
-export const dedupeExchange = (): Exchange => {
-  const inFlight = new Map<Operation, Observable<ExchangeResult>>();
+export const dedupeExchange: Exchange = forward => {
+  const inFlight = new Set<string>();
 
-  return forward => ops$ => {
-    const [inFlightOps$, forwardOps$] = partition<Operation>(
-      operation =>
-        operation.operationName !== 'mutation' && inFlight.has(operation)
-    )(ops$);
+  return ops$ =>
+    forward(
+      ops$.pipe(
+        filter(({ key }) => {
+          const hasInFlightOp = inFlight.has(key);
 
-    const inFlightResult$ = inFlightOps$.pipe(
-      flatMap(operation => inFlight.get(operation))
-    );
+          if (!hasInFlightOp) {
+            inFlight.add(key);
+          }
 
-    const forwardResult$ = forwardOps$.pipe(
-      flatMap(operation => {
-        const forward$ = forward(of(operation)).pipe(
-          tap(() => inFlight.delete(operation))
-        );
-        inFlight.set(operation, forward$);
-        return forward$;
-      })
-    );
-
-    return inFlightResult$.pipe(merge(forwardResult$));
-  };
+          return !hasInFlightOp;
+        })
+      )
+    ).pipe(tap(res => inFlight.delete(res.operation.key)));
 };
