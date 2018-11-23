@@ -1,5 +1,5 @@
 import { Observable, of } from 'rxjs';
-import { partition, merge, flatMap, take } from 'rxjs/operators';
+import { partition, merge, flatMap, tap } from 'rxjs/operators';
 import { Exchange, ExchangeResult, Operation } from '../types';
 
 export const dedupeExchange = (): Exchange => {
@@ -17,11 +17,11 @@ export const dedupeExchange = (): Exchange => {
 
     const forwardResult$ = forwardOps$.pipe(
       flatMap(operation => {
-        const next = forward(of(operation));
-        inFlight.set(operation, next);
-        next.pipe(take(1)).subscribe(() => inFlight.delete(operation));
-
-        return next;
+        const forward$ = forward(of(operation)).pipe(
+          tap(() => inFlight.delete(operation))
+        );
+        inFlight.set(operation, forward$);
+        return forward$;
       })
     );
 
