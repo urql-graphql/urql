@@ -22,7 +22,7 @@
     "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "type-check": "tsc",
-    "lint": "tslint 'src/**/*.{ts, tsx}'",
+    "lint": "tslint --project .",
     "test": "jest",
     "bundlesize": "bundlesize",
     "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
