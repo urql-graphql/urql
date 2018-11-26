@@ -50,3 +50,11 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: yarn run build
+
+workflows:
+  version: 2
+  lint_test_and_build:
+    jobs:
+      - lint
+      - test
+      - build
