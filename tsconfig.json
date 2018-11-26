@@ -1,19 +1,25 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "rootDir": "./src",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "lib": ["es2015", "dom", "esnext.asynciterable", "esnext.array"],
     "jsx": "react",
     "declaration": true,
     "module": "es2015",
     "moduleResolution": "node",
     "target": "es2015",
-    "noEmit": true,
     "noUnusedLocals": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
-    "skipLibCheck": true,
     "pretty": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "typeRoots": ["node_modules/@types"]
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
 }
