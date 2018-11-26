@@ -24,6 +24,18 @@ export const mutationGql: Mutation = {
   },
 };
 
+export const subscriptionGql: Query = {
+  query: `subscription subscribeToUser($user: String){
+    user(user: $user) {
+      name
+    }
+  }
+  `,
+  variables: {
+    user: 'colin',
+  },
+};
+
 export const queryOperation: Operation = {
   key: '2',
   operationName: 'query',
@@ -38,6 +50,13 @@ export const mutationOperation: Operation = {
   ...mutationGql,
 };
 
+export const subscriptionOperation: Operation = {
+  key: JSON.stringify(subscriptionGql),
+  operationName: 'subscription',
+  context: {},
+  ...subscriptionGql,
+};
+
 export const queryResponse: ExchangeResult = {
   operation: queryOperation,
   data: {
@@ -49,5 +68,10 @@ export const queryResponse: ExchangeResult = {
 
 export const mutationResponse: ExchangeResult = {
   operation: mutationOperation,
+  data: {},
+};
+
+export const subscriptionResponse: ExchangeResult = {
+  operation: subscriptionOperation,
   data: {},
 };
