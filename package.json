@@ -25,7 +25,7 @@
   "license": "MIT",
   "jest": {
     "setupFiles": [
-      "./src/setupTests.ts"
+      "./src/test-utils/setupTests.ts"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

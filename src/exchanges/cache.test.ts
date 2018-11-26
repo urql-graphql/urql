@@ -8,7 +8,7 @@ import {
   mutationResponse,
   subscriptionResponse,
   subscriptionOperation,
-} from '../samples';
+} from '../test-utils';
 import { Operation } from '../types';
 
 let stream = new Subject<Operation>();
