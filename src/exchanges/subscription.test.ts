@@ -1,6 +1,6 @@
-import { Operation } from '../../types';
-import { subscriptionExchange } from '../../exchanges/subscription';
-import { CombinedError } from '../../lib/error';
+import { Operation } from '../types';
+import { subscriptionExchange } from './subscription';
+import { CombinedError } from '../lib';
 
 describe('subscriptionExchange', () => {
   beforeEach(() => {

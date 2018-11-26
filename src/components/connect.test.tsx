@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import React from 'react';
-import { Connect } from '../../components/connect';
+import { Connect } from './connect';
 import renderer from 'react-test-renderer';
 
 describe('Client Component', () => {

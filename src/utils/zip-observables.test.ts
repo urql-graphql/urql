@@ -1,5 +1,5 @@
 import Observable from 'zen-observable-ts';
-import { zipObservables } from '../../utils/zip-observables';
+import { zipObservables } from './zip-observables';
 
 describe('zipObservables', () => {
   beforeEach(() => {

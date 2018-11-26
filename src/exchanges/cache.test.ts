@@ -1,7 +1,7 @@
 import Observable from 'zen-observable-ts';
-import { Exchange, Operation } from '../../types';
-import { cacheExchange } from '../../exchanges';
-import { Client, defaultCache } from '../../lib';
+import { Exchange, Operation } from '../types';
+import { cacheExchange } from '.';
+import { Client, defaultCache } from '../lib';
 
 const result = {
   data: {

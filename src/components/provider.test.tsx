@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import React from 'react';
-import { Provider } from '../../components/provider';
+import { Provider } from './provider';
 import renderer from 'react-test-renderer';
 
 describe('Provider Component', () => {
