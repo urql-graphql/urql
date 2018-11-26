@@ -1,80 +1,65 @@
-import Observable from 'zen-observable-ts';
-import { Exchange } from '../types';
-import { dedupExchange } from './dedup';
+import { Observable, Subject } from 'rxjs';
+import { map, delay } from 'rxjs/operators';
+import { dedupeExchange } from './dedup';
+import {
+  queryResponse,
+  queryOperation,
+  mutationResponse,
+  mutationOperation,
+} from '../test-utils';
+import { Operation } from '../types';
 
-describe('dedupExchange', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
-  });
+let stream = new Subject<Operation>();
+let calls = 0;
+let response = queryResponse;
 
-  it('forwards operations and subscribes', done => {
-    let mockOp;
+const forwardMock = (s: Observable<Operation>) =>
+  s.pipe(
+    map(() => {
+      calls += 1;
+      return response;
+    }),
+    delay(200)
+  );
 
-    const mockExchange = (operation =>
-      new Observable(observer => {
-        mockOp = operation;
-        observer.next(operation);
-        observer.complete();
-      }) as any) as Exchange;
+beforeEach(() => {
+  calls = 0;
+  response = queryResponse;
+  stream = new Subject<Operation>();
+});
 
-    const testExchange = dedupExchange(mockExchange);
-    const testOperation = { key: 'test' } as any;
+it('forwards to next exchange when no operation is found', async () => {
+  const exchange = dedupeExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-    testExchange(testOperation).subscribe({
-      complete: done,
-      next: op => {
-        expect(op).toBe(testOperation);
-        expect(mockOp).toBe(testOperation);
-      },
-    });
-  });
+  stream.next(queryOperation);
+  stream.complete();
+  await completed;
 
-  it('returns the same intermediate observable when called with same operation', () => {
-    const mockExchange = jest.fn() as Exchange;
-    const testExchange = dedupExchange(mockExchange);
+  expect(calls).toBe(1);
+});
 
-    const obsA = testExchange({ key: 'a' } as any);
-    expect(mockExchange).toHaveBeenLastCalledWith({ key: 'a' });
-    const obsB = testExchange({ key: 'a' } as any);
-    const obsC = testExchange({ key: 'b' } as any);
-    expect(mockExchange).toHaveBeenLastCalledWith({ key: 'b' });
-    expect(obsA).toBe(obsB);
-    expect(obsA).not.toBe(obsC);
-    expect(mockExchange).toHaveBeenCalledTimes(2);
-  });
+it('does not forward to next exchange when existing operation is found', async () => {
+  const exchange = dedupeExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-  it('deletes intermediate observable when in-flight operation completed', done => {
-    const mockExchange = (() =>
-      new Observable(observer => {
-        observer.next(null);
-        observer.complete();
-      }) as any) as Exchange;
+  stream.next(queryOperation);
+  stream.next(queryOperation);
+  stream.complete();
+  await completed;
 
-    const testExchange = dedupExchange(mockExchange);
-    const obsA = testExchange({ key: 'a' } as any);
+  expect(calls).toBe(1);
+});
 
-    obsA.subscribe({
-      complete: () => {
-        const obsB = testExchange({ key: 'a' } as any);
-        expect(obsA).not.toBe(obsB);
-        done();
-      },
-    });
-  });
+it('creates a new request when mutation call is in progress', async () => {
+  response = mutationResponse;
+  const exchange = dedupeExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-  it('invokes unsubscribe when all subscribers on the intermediate observable unsubscribed', () => {
-    const mockUnsubscription = jest.fn();
-    const testExchange = dedupExchange(
-      () => new Observable(() => mockUnsubscription)
-    );
-    const obs = testExchange({ key: 'a' } as any);
+  stream.next(mutationOperation);
+  stream.next(mutationOperation);
+  stream.complete();
+  await completed;
 
-    const sub = obs.subscribe({});
-    obs.subscribe({}).unsubscribe();
-    expect(mockUnsubscription).toHaveBeenCalledTimes(0);
-    sub.unsubscribe();
-    expect(mockUnsubscription).toHaveBeenCalledTimes(1);
-  });
+  expect(calls).toBe(2);
 });
