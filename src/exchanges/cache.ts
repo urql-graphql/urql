@@ -1,110 +1,71 @@
-import Observable from 'zen-observable-ts';
+import { tap, merge, map, partition } from 'rxjs/operators';
+import { Operation, ExchangeResult, Exchange } from '../types';
+import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
 
-import { Exchange, ExchangeResult } from '../types';
-import { Client, gankTypeNamesFromResponse, formatTypeNames } from '../lib';
+export const cacheExchange: Exchange = forward => {
+  const cache = new Map<string, ExchangeResult>();
+  const cachedTypenames = new Map<string, string[]>();
 
-interface TypenameInvalidate {
-  [typeName: string]: string[];
-}
-
-// Wraps an exchange and refers/updates the cache according to operations
-export const cacheExchange = (client: Client, forward: Exchange): Exchange => {
-  const typenameInvalidate: TypenameInvalidate = {};
-
-  // Fills the cache given a query's response
-  const processQueryOnCache = (
-    key: string,
-    response: ExchangeResult
-  ): Promise<void> => {
-    // Mark typenames on typenameInvalidate for early invalidation
-    gankTypeNamesFromResponse(response.data).forEach(typeName => {
-      const cacheKeysForType = typenameInvalidate[typeName];
-      if (cacheKeysForType === undefined) {
-        typenameInvalidate[typeName] = [key];
-      } else {
-        cacheKeysForType.push(key);
-      }
-    });
-
-    // Store data in cache, using serialized query as key
-    // This needs to be done via the client to distribute the update
-    return client.updateCacheEntry(key, response);
-  };
+  // Adds unique typenames to query (for invalidating cache entries)
+  const mapTypeNames = (operation: Operation): Operation => ({
+    ...operation,
+    query: formatTypeNames(operation.query),
+  });
 
   // Invalidates the cache given a mutation's response
-  const processMutationOnCache = (response: ExchangeResult) => {
-    let cacheKeys = [];
+  const afterMutation = (response: ExchangeResult) => {
+    const typenames = gankTypeNamesFromResponse(response.data.data);
 
-    // For each typeName on the response, all cache keys will need to
-    // be collected
-    gankTypeNamesFromResponse(response.data).forEach(typename => {
-      const cacheKeysForTypename = typenameInvalidate[typename];
-      typenameInvalidate[typename] = [];
+    typenames.forEach(typename => {
+      const typenameCacheKeys = cachedTypenames.get(typename);
 
-      if (cacheKeysForTypename !== undefined) {
-        cacheKeys = cacheKeys.concat(cacheKeysForTypename);
+      if (typenameCacheKeys === undefined) {
+        return;
       }
-    });
 
-    // Batch delete all collected cache keys
-    if (cacheKeys.length > 0) {
-      client.deleteCacheKeys(cacheKeys);
-    }
+      typenameCacheKeys.forEach(key => cache.delete(key));
+      cachedTypenames.delete(typename);
+    });
   };
 
-  return operation => {
-    // Add __typename fields to query
-    // NOTE: This is a side-effect on this exchange since it's specific and necessary
-    // to how this exchange works
-    operation.query = formatTypeNames(operation.query);
+  // Mark typenames on typenameInvalidate for early invalidation
+  const afterQuery = (response: ExchangeResult) => {
+    const key = response.operation.key;
+    cache.set(key, response);
 
-    const { operationName } = operation;
-    const forwarded$ = forward(operation);
+    const typenames = gankTypeNamesFromResponse(response.data.data);
 
-    if (operationName === 'mutation') {
-      // Forward mutation response but execute processMutationOnCache side-effect
-      return forwarded$.map((response: ExchangeResult) => {
-        processMutationOnCache(response);
-        return response;
-      });
-    } else if (operationName !== 'query') {
-      return forwarded$;
-    }
+    typenames.forEach(typename => {
+      const typenameCacheKeys = cachedTypenames.get(typename);
 
-    // Check whether cache can be skipped
-    const { context, key } = operation;
-    const { skipCache = false } = context;
-
-    return new Observable<ExchangeResult>(observer => {
-      let subscription;
-
-      client.cache.read(key).then(cachedResult => {
-        // Resolve a cached result if one exists
-        if (cachedResult && !skipCache) {
-          observer.next(cachedResult);
-          observer.complete();
-          return;
-        }
-
-        // Forward response but execute processsQueryOnCache side-effect
-        subscription = forwarded$.subscribe({
-          error: err => observer.error(err),
-          next: (response: ExchangeResult) => {
-            // NOTE: Wait for cache to avoid updating a client component
-            // when it itself triggered this operation
-            processQueryOnCache(key, response).then(() => {
-              observer.next(response);
-              observer.complete();
-            });
-          },
-        });
-      });
-
-      return () => {
-        if (subscription) {
-          subscription.unsubscribe();
-        }
-      };
+      cachedTypenames.set(
+        typename,
+        typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
+      );
     });
+  };
+
+  return ops$ => {
+    const [cacheOps$, forwardOps$] = partition<Operation>(operation =>
+      cache.has(operation.key)
+    )(ops$);
+
+    const cachedResults$ = cacheOps$.pipe(
+      map(operation => cache.get(operation.key))
+    );
+
+    const forward$ = forwardOps$.pipe(
+      map(mapTypeNames),
+      forward,
+      tap(response => {
+        if (response.operation.operationName === 'mutation') {
+          afterMutation(response);
+        } else if (response.operation.operationName === 'query') {
+          afterQuery(response);
+        }
+      })
+    );
+
+    return cachedResults$.pipe(merge(forward$));
   };
 };

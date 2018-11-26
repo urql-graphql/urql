@@ -25,7 +25,7 @@
   "license": "MIT",
   "jest": {
     "setupFiles": [
-      "./src/setupTests.ts"
+      "./src/test-utils/setupTests.ts"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
@@ -107,7 +107,7 @@
     "create-react-context": "^0.2.3",
     "graphql": "^0.13.1",
     "hoist-non-react-statics": "^2.5.0",
-    "zen-observable-ts": "^0.8.9"
+    "rxjs": "^6.3.3"
   },
   "sideEffects": false
 }

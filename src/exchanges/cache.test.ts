@@ -1,125 +1,79 @@
-import Observable from 'zen-observable-ts';
-import { Exchange, Operation } from '../types';
-import { cacheExchange } from '.';
-import { Client, defaultCache } from '../lib';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { cacheExchange } from './cache';
+import {
+  queryOperation,
+  queryResponse,
+  mutationOperation,
+  mutationResponse,
+  subscriptionResponse,
+  subscriptionOperation,
+} from '../test-utils';
+import { Operation } from '../types';
 
-const result = {
-  data: {
-    item: {
-      __typename: 'Item',
-      id: 'item',
-    },
-  },
-};
+let stream = new Subject<Operation>();
+let calls = 0;
+let response = queryResponse;
 
-describe('cacheExchange', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
-  });
+const forwardMock = (s: Observable<Operation>) =>
+  s.pipe(
+    map(() => {
+      calls += 1;
+      return response;
+    })
+  );
 
-  it('ignores unrelated operations', () => {
-    const client = ({} as any) as Client;
-    const res = Observable.of(undefined);
-    const forward: Exchange = () => res;
-    const exchange = cacheExchange(client, forward);
+beforeEach(() => {
+  calls = 0;
+  response = queryResponse;
+  stream = new Subject<Operation>();
+});
 
-    const operation = ({
-      context: {},
-      key: 'test',
-      operationName: 'subscription',
-      query: '{ test }',
-    } as any) as Operation;
+it('forwards to next exchange when no cache is found', async () => {
+  const exchange = cacheExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-    expect(exchange(operation)).toBe(res);
-  });
+  stream.next(queryOperation);
+  stream.complete();
+  await completed;
 
-  it('reads a query result from the passed cache first', done => {
-    const testkey = 'TESTKEY';
-    const cache = defaultCache({ [testkey]: result });
-    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
-    const client = ({ cache, updateCacheEntry } as any) as Client;
-    const forward: Exchange = () => Observable.of(undefined);
-    const exchange = cacheExchange(client, forward);
+  expect(calls).toBe(1);
+});
 
-    const operation = ({
-      context: {},
-      key: testkey,
-      operationName: 'query',
-      query: '{ test }',
-    } as any) as Operation;
+it('caches queries', async () => {
+  const exchange = cacheExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-    exchange(operation).subscribe(res => {
-      expect(res).toBe(result);
-      expect(updateCacheEntry).not.toHaveBeenCalled();
-      done();
-    });
-  });
+  stream.next(queryOperation);
+  stream.next(queryOperation);
+  stream.complete();
+  await completed;
 
-  it('skips the cache when skipCache is set on context', done => {
-    const testkey = 'TESTKEY';
+  expect(calls).toBe(1);
+});
 
-    const operation = ({
-      context: { skipCache: true },
-      key: testkey,
-      operationName: 'query',
-      query: '{ test }',
-    } as any) as Operation;
+it("doesn't cache mutations", async () => {
+  response = mutationResponse;
+  const exchange = cacheExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-    const newResult = { ...result, operation, test: true };
-    const cache = defaultCache({ [testkey]: result });
-    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
-    const client = ({ cache, updateCacheEntry } as any) as Client;
-    const forward: Exchange = () => Observable.of(newResult);
-    const exchange = cacheExchange(client, forward);
+  stream.next(mutationOperation);
+  stream.next(mutationOperation);
+  stream.complete();
+  await completed;
 
-    exchange(operation).subscribe(res => {
-      expect((res as any).test).toBe(true);
-      expect(updateCacheEntry).toHaveBeenCalledWith(testkey, newResult);
-      done();
-    });
-  });
+  expect(calls).toBe(2);
+});
 
-  it('records typename invalidations and invalidates parts of the cache when a mutation comes in', done => {
-    const testkey = 'TESTKEY';
-    const store = { unrelated: true };
-    const cache = defaultCache(store);
-    const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
-    const deleteCacheKeys = jest.fn().mockReturnValue(Promise.resolve());
-    const client = ({
-      cache,
-      updateCacheEntry,
-      deleteCacheKeys,
-    } as any) as Client;
-    const forward: Exchange = operation =>
-      Observable.of({ ...result, operation });
-    const exchange = cacheExchange(client, forward);
+it('forwards subscriptions', async () => {
+  response = subscriptionResponse;
+  const exchange = cacheExchange(forwardMock)(stream);
+  const completed = exchange.toPromise();
 
-    const operationA = ({
-      context: {},
-      key: testkey,
-      operationName: 'query',
-      query: '{ test }',
-    } as any) as Operation;
+  stream.next(subscriptionOperation);
+  stream.next(subscriptionOperation);
+  stream.complete();
+  await completed;
 
-    const operationB = ({
-      context: {},
-      key: 'anything',
-      operationName: 'mutation',
-      query: '{ test }',
-    } as any) as Operation;
-
-    exchange(operationA).subscribe(() => {
-      expect(updateCacheEntry).toHaveBeenCalledWith(testkey, {
-        ...result,
-        operation: expect.any(Object),
-      });
-
-      exchange(operationB).subscribe(() => {
-        expect(deleteCacheKeys).toHaveBeenCalledWith([testkey]);
-        done();
-      });
-    });
-  });
+  expect(calls).toBe(2);
 });
