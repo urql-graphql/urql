@@ -1,15 +1,15 @@
 import Observable from 'zen-observable-ts';
 
-import { IClient, Exchange, ExchangeResult } from '../interfaces/index';
-import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
+import { Exchange, ExchangeResult } from '../types';
+import { Client, gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
-interface ITypenameInvalidate {
+interface TypenameInvalidate {
   [typeName: string]: string[];
 }
 
 // Wraps an exchange and refers/updates the cache according to operations
-export const cacheExchange = (client: IClient, forward: Exchange): Exchange => {
-  const typenameInvalidate: ITypenameInvalidate = {};
+export const cacheExchange = (client: Client, forward: Exchange): Exchange => {
+  const typenameInvalidate: TypenameInvalidate = {};
 
   // Fills the cache given a query's response
   const processQueryOnCache = (

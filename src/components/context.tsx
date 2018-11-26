@@ -10,7 +10,7 @@ const context = createReactContext({});
 // --declaration emit, so we need to import ComponentClass. But if we don't
 // explicitly use ComponentClass somewhere in the code, TypeScript *also*
 // ends up issuing an error. This is dumb, but this all gets erased anyway.
-interface IContext {
+interface Context {
   Provider: ComponentClass<ProviderProps<{}>>;
   Consumer: ComponentClass<ConsumerProps<{}>>;
 }
@@ -18,4 +18,4 @@ interface IContext {
 export const {
   Provider: ContextProvider,
   Consumer: ContextConsumer,
-}: IContext = context;
+}: Context = context;

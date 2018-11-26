@@ -1,10 +1,10 @@
 import React, { Component, ReactNode } from 'react';
-import { Cache, Mutation, Query } from '../interfaces/index';
+import { Cache, Mutation, Query } from '../types';
 import { UrqlClient } from './client';
 import { ContextConsumer } from './context';
 import { Client } from '../lib';
 
-export interface IConnectProps<Data, Mutations> {
+export interface ConnectProps<Data, Mutations> {
   children: (props: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
   subscription?: Query;
   query?: Query | Query[]; // Query or queries
@@ -61,7 +61,7 @@ export type UrqlProps<Data, Mutations = {}> = {
 } & Mutations;
 
 export class Connect<Data = {}, Mutations = {}> extends Component<
-  IConnectProps<Data, Mutations>
+  ConnectProps<Data, Mutations>
 > {
   render() {
     // Use react-create-context to provide context to UrqlClient

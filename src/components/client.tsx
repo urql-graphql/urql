@@ -1,18 +1,16 @@
 import { Component, ReactNode } from 'react';
-import { CombinedError } from '../lib';
+import { CombinedError, Client } from '../lib';
 import { zipObservables } from '../utils/zip-observables';
-
 import {
   ClientEventType,
   EventFn,
-  IClient,
   ExchangeResult,
   Mutation,
   Query,
-} from '../interfaces/index';
+} from '../types';
 
-export interface IClientProps {
-  client: IClient; // Client instance
+export interface ClientProps {
+  client: Client; // Client instance
   children: (obj: object) => ReactNode; // Render prop
   subscription?: Query; // Subscription Query object
   query?: Query | Query[]; // Query object or array of Query objects
@@ -25,18 +23,18 @@ export interface IClientProps {
   cache?: boolean;
 }
 
-export interface IClientFetchOpts {
+export interface ClientFetchOpts {
   skipCache?: boolean;
 }
 
-export interface IClientState {
+export interface ClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
   error?: Error | CombinedError | CombinedError[]; // Error
-  data: object | object[] | IClientState[]; // Data
+  data: object | object[] | ClientState[]; // Data
 }
 
-export class UrqlClient extends Component<IClientProps, IClientState> {
+export class UrqlClient extends Component<ClientProps, ClientState> {
   static defaultProps = {
     cacheInvalidation: true,
     cache: true,
@@ -162,7 +160,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  fetch = (opts: IClientFetchOpts = {}) => {
+  fetch = (opts: ClientFetchOpts = {}) => {
     const { client } = this.props;
     const skipCache = opts.skipCache || this.props.cache === false;
 

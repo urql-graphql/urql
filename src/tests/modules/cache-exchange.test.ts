@@ -1,7 +1,7 @@
 import Observable from 'zen-observable-ts';
-import { IClient, IExchange, IOperation } from '../../interfaces/index';
+import { Exchange, Operation } from '../../types';
 import { cacheExchange } from '../../exchanges';
-import { defaultCache } from '../../lib';
+import { Client, defaultCache } from '../../lib';
 
 const result = {
   data: {
@@ -20,9 +20,9 @@ describe('cacheExchange', () => {
   });
 
   it('ignores unrelated operations', () => {
-    const client = ({} as any) as IClient;
+    const client = ({} as any) as Client;
     const res = Observable.of(undefined);
-    const forward: IExchange = () => res;
+    const forward: Exchange = () => res;
     const exchange = cacheExchange(client, forward);
 
     const operation = ({
@@ -30,7 +30,7 @@ describe('cacheExchange', () => {
       key: 'test',
       operationName: 'subscription',
       query: '{ test }',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     expect(exchange(operation)).toBe(res);
   });
@@ -39,8 +39,8 @@ describe('cacheExchange', () => {
     const testkey = 'TESTKEY';
     const cache = defaultCache({ [testkey]: result });
     const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
-    const client = ({ cache, updateCacheEntry } as any) as IClient;
-    const forward: IExchange = () => Observable.of(undefined);
+    const client = ({ cache, updateCacheEntry } as any) as Client;
+    const forward: Exchange = () => Observable.of(undefined);
     const exchange = cacheExchange(client, forward);
 
     const operation = ({
@@ -48,7 +48,7 @@ describe('cacheExchange', () => {
       key: testkey,
       operationName: 'query',
       query: '{ test }',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     exchange(operation).subscribe(res => {
       expect(res).toBe(result);
@@ -65,13 +65,13 @@ describe('cacheExchange', () => {
       key: testkey,
       operationName: 'query',
       query: '{ test }',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     const newResult = { ...result, operation, test: true };
     const cache = defaultCache({ [testkey]: result });
     const updateCacheEntry = jest.fn().mockReturnValue(Promise.resolve());
-    const client = ({ cache, updateCacheEntry } as any) as IClient;
-    const forward: IExchange = () => Observable.of(newResult);
+    const client = ({ cache, updateCacheEntry } as any) as Client;
+    const forward: Exchange = () => Observable.of(newResult);
     const exchange = cacheExchange(client, forward);
 
     exchange(operation).subscribe(res => {
@@ -91,8 +91,8 @@ describe('cacheExchange', () => {
       cache,
       updateCacheEntry,
       deleteCacheKeys,
-    } as any) as IClient;
-    const forward: IExchange = operation =>
+    } as any) as Client;
+    const forward: Exchange = operation =>
       Observable.of({ ...result, operation });
     const exchange = cacheExchange(client, forward);
 
@@ -101,14 +101,14 @@ describe('cacheExchange', () => {
       key: testkey,
       operationName: 'query',
       query: '{ test }',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     const operationB = ({
       context: {},
       key: 'anything',
       operationName: 'mutation',
       query: '{ test }',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     exchange(operationA).subscribe(() => {
       expect(updateCacheEntry).toHaveBeenCalledWith(testkey, {

@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 
 import { Connect } from '../components/connect';
-import { Mutation, Query } from '../interfaces/index';
+import { Mutation, Query } from '../types';
 
-export interface IHOCProps {
+export interface HOCProps {
   query?: Query | Query[]; // Query or queries
   subscription?: Query; // Subscription Query object
   mutation?: Mutation; // Mutation map
@@ -17,7 +17,7 @@ export interface IHOCProps {
   cache?: boolean;
 }
 
-function connect(opts?: IHOCProps | ((_) => IHOCProps)) {
+function connect(opts?: HOCProps | ((_) => HOCProps)) {
   return (Comp: any) => {
     const componentName = Comp.displayName || Comp.name || 'Component';
 

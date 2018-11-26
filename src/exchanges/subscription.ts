@@ -5,12 +5,16 @@ import {
   ExchangeResult,
   Subscription,
   SubscriptionObserver,
-} from '../interfaces/index';
+  Operation,
+} from '../types';
 
 import { CombinedError } from '../lib';
 
 export const subscriptionExchange = (
-  createSubscription: (IOperation, ISubscriptionObserver) => Subscription,
+  createSubscription: (
+    operation: Operation,
+    subObserver: SubscriptionObserver
+  ) => Subscription,
   forward: Exchange
 ): Exchange => {
   return operation => {

@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { Exchange } from '../interfaces/index';
+import { Exchange } from '../types';
 import { CombinedError } from '../lib';
 
 const checkStatus = (redirectMode: string = 'follow') => (
