@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should return error data from fetch 1`] = `
+Object {
+  "data": undefined,
+  "error": CombinedError {
+    "graphQLErrors": Array [],
+    "message": "[Network] ",
+    "name": "CombinedError",
+    "networkError": [Error],
+    "response": Object {
+      "json": [MockFunction],
+      "status": 400,
+    },
+  },
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": Object {
+        "test": 1,
+      },
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": "2",
+    "operationName": "query",
+    "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+    "variables": Object {
+      "name": "Clara",
+    },
+  },
+}
+`;
+
+exports[`should return response data from fetch 1`] = `
+Object {
+  "data": Object {
+    "data": Object {
+      "user": 1200,
+    },
+  },
+  "error": undefined,
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": Object {
+        "test": 1,
+      },
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": "2",
+    "operationName": "query",
+    "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+    "variables": Object {
+      "name": "Clara",
+    },
+  },
+}
+`;
+
+exports[`should throw error when operationName is subscription 1`] = `[Error: Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?]`;

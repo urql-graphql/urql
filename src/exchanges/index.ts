@@ -1,4 +1,4 @@
 export * from './cache';
 export * from './dedup';
-export * from './http';
+export * from './fetch';
 export * from './subscription';
