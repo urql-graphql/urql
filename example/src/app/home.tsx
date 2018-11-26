@@ -5,7 +5,6 @@ import { Connect, query, mutation, UrqlProps } from '../../../src/index';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
 import Loading from './loading';
-import { Url } from 'url';
 
 export interface ITodoQuery {
   todos: Array<{ id: string; text: string }>;
@@ -27,7 +26,6 @@ const Home: React.SFC<{}> = () => (
       removeTodo: mutation(RemoveTodo),
     }}
     children={({
-      cache,
       loaded,
       data,
       addTodo,

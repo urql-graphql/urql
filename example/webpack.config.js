@@ -3,10 +3,11 @@ const path = require('path');
 module.exports = {
   entry: ['./src/app/index.tsx'],
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'webpack-build'),
     filename: 'bundle.js',
     publicPath: '/assets/',
   },
+  mode: 'development',
   module: {
     rules: [
       {
@@ -16,7 +17,14 @@ module.exports = {
           path.resolve(__dirname, 'src/app'),
         ],
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        use: [
+          {
+            loader: 'awesome-typescript-loader',
+            options: {
+              configFileName: path.resolve(__dirname, 'tsconfig.json'),
+            },
+          },
+        ],
       },
     ],
   },
