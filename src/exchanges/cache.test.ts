@@ -77,15 +77,3 @@ it('forwards subscriptions', async () => {
 
   expect(calls).toBe(2);
 });
-
-// it('forwards subscriptions', async () => {
-//   const forward = jest.fn().mockReturnValue(of(subscriptionResponse));
-//   const exchange = cacheExchange(forward)(stream);
-
-//   stream.next(subscriptionOperation);
-//   stream.next(subscriptionOperation);
-//   stream.complete();
-
-//   await exchange.toPromise();
-//   expect(forwardMock).toHaveBeenCalledTimes(2);
-// });
