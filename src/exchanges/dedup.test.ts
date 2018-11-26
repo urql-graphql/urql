@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
-import { Exchange } from '../../types';
-import { dedupExchange } from '../../exchanges/dedup';
+import { Exchange } from '../types';
+import { dedupExchange } from './dedup';
 
 describe('dedupExchange', () => {
   beforeEach(() => {

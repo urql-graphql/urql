@@ -1,6 +1,6 @@
 /* tslint:disable */
 
-import * as exp from '../../components/context';
+import * as exp from './context';
 
 describe('Context', () => {
   it('should export a new react context', () => {

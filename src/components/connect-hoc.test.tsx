@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import React, { Component } from 'react';
-import ConnectHOC from '../../components/connect-hoc';
+import ConnectHOC from './connect-hoc';
 import renderer from 'react-test-renderer';
 
 describe('Connect HOC', () => {

@@ -1,6 +1,6 @@
-import { Operation } from '../../types';
-import { CombinedError } from '../../lib/error';
-import { httpExchange } from '../../exchanges/http';
+import { Operation } from '../types';
+import { CombinedError } from '../lib';
+import { httpExchange } from './http';
 
 describe('httpExchange', () => {
   beforeEach(() => {
