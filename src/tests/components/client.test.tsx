@@ -21,6 +21,7 @@ describe('Client Component', () => {
     let tree = component.toJSON();
     expect(tree).toBeNull();
     component.update(
+      // @ts-ignore
       <Client
         // @ts-ignore
         children={() => {
@@ -33,8 +34,8 @@ describe('Client Component', () => {
   });
 
   it('should use the render prop when supplied and render the defaults', done => {
-    // @ts-ignore
-    const client = renderer.create(
+    renderer.create(
+      // @ts-ignore
       <Client
         // @ts-ignore
         children={({ data, error, fetching, loaded, refetch }) => {
