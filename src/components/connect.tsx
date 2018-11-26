@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { ICache, IClient, IMutation, IQuery } from '../interfaces/index';
-import ClientWrapper from './client';
-import { Consumer } from './context';
+import { UrqlClient } from './client';
+import { ContextConsumer } from './context';
 
 export interface IConnectProps<Data, Mutations> {
   children: (props: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
@@ -59,15 +59,15 @@ export type UrqlProps<Data, Mutations = {}> = {
   refreshAllFromCache: () => void;
 } & Mutations;
 
-export default class Connect<Data = {}, Mutations = {}> extends Component<
+export class Connect<Data = {}, Mutations = {}> extends Component<
   IConnectProps<Data, Mutations>
 > {
   render() {
-    // Use react-create-context to provide context to ClientWrapper
+    // Use react-create-context to provide context to UrqlClient
     return (
-      <Consumer>
+      <ContextConsumer>
         {(client: IClient) => (
-          <ClientWrapper
+          <UrqlClient
             client={client}
             children={this.props.children}
             subscription={this.props.subscription}
@@ -78,7 +78,7 @@ export default class Connect<Data = {}, Mutations = {}> extends Component<
             cache={this.props.cache}
           />
         )}
-      </Consumer>
+      </ContextConsumer>
     );
   }
 }

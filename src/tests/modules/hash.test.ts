@@ -1,4 +1,4 @@
-import { hashString } from '../../modules/hash';
+import { hashString } from '../../lib/hash';
 
 describe('hash', () => {
   it('should returned a murmur hashed string from a query string', () => {

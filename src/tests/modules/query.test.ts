@@ -1,4 +1,4 @@
-import { query } from '../../modules/query';
+import { query } from '../../lib/query';
 
 describe('query / mutation / subscription', () => {
   it('should return a valid query object', () => {

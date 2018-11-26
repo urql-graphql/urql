@@ -1,5 +1,5 @@
 import { Component, ReactNode } from 'react';
-import { CombinedError } from '../modules/error';
+import { CombinedError } from '../lib';
 import { zipObservables } from '../utils/zip-observables';
 
 import {
@@ -36,7 +36,7 @@ export interface IClientState {
   data: object | object[] | IClientState[]; // Data
 }
 
-export default class UrqlClient extends Component<IClientProps, IClientState> {
+export class UrqlClient extends Component<IClientProps, IClientState> {
   static defaultProps = {
     cacheInvalidation: true,
     cache: true,

@@ -1,10 +1,9 @@
 /* tslint:disable */
 
 import React from 'react';
-import Client from '../../components/client';
-import { CombinedError } from '../../modules/error';
-import { default as ClientModule } from '../../modules/client';
-import { subscriptionExchange } from '../../modules/subscription-exchange';
+import { UrqlClient } from '../../components';
+import { Client, CombinedError } from '../../lib';
+import { subscriptionExchange } from '../../exchanges';
 import { ClientEventType } from '../../interfaces/index';
 import renderer from 'react-test-renderer';
 
@@ -17,13 +16,12 @@ describe('Client Component', () => {
 
   it('should return null with no render function', () => {
     // @ts-ignore
-    const component = renderer.create(<Client />);
+    const component = renderer.create(<UrqlClient />);
     let tree = component.toJSON();
     expect(tree).toBeNull();
     component.update(
       // @ts-ignore
-      <Client
-        // @ts-ignore
+      <UrqlClient
         children={() => {
           return <div>hey</div>;
         }}
@@ -36,7 +34,7 @@ describe('Client Component', () => {
   it('should use the render prop when supplied and render the defaults', done => {
     renderer.create(
       // @ts-ignore
-      <Client
+      <UrqlClient
         // @ts-ignore
         children={({ data, error, fetching, loaded, refetch }) => {
           expect(data).toBeNull();
@@ -58,11 +56,11 @@ describe('Client Component', () => {
         json: () => ({ data: { todos: [{ id: 1 }] } }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
@@ -99,11 +97,11 @@ describe('Client Component', () => {
         json: () => ({ data: { todos: [{ id: 1 }] } }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
 
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         key="test"
         client={clientModule}
         // @ts-ignore
@@ -115,7 +113,7 @@ describe('Client Component', () => {
     const newQuery = { query: `{ posts { id } }` };
 
     client.update(
-      <Client
+      <UrqlClient
         key="test"
         client={clientModule}
         // @ts-ignore
@@ -137,12 +135,12 @@ describe('Client Component', () => {
         json: () => ({ data: { todos: [{ id: 1 }] } }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     // @ts-ignore
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         key="test"
         client={clientModule}
@@ -163,7 +161,7 @@ describe('Client Component', () => {
     ]);
 
     client.update(
-      <Client
+      <UrqlClient
         // @ts-ignore
         key="test"
         client={clientModule}
@@ -186,11 +184,11 @@ describe('Client Component', () => {
 
   it('should return an error thrown by fetch', done => {
     (global as any).fetch.mockReturnValue(Promise.reject(new Error('oh no!')));
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         // @ts-ignore
         query={{ query: `{ todos { id } }` }}
@@ -227,11 +225,11 @@ describe('Client Component', () => {
         json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         // @ts-ignore
         query={[{ query: `{ todos { id } }` }, { query: `{ todos { id } }` }]}
@@ -266,11 +264,11 @@ describe('Client Component', () => {
 
   it('should return the proper render prop arguments with multiple queries supplied and an error', done => {
     (global as any).fetch.mockReturnValue(Promise.reject(new Error('lol')));
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         // @ts-ignore
         query={[{ query: `{ todos { id } }` }, { query: `{ todos { id } }` }]}
@@ -299,11 +297,11 @@ describe('Client Component', () => {
         data: { todos: [{ id: 1 }] },
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -349,13 +347,13 @@ describe('Client Component', () => {
         json: () => ({ data: { todos: [{ id: 1, __typename: 'Todo' }] } }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const spy = jest.spyOn(global, 'fetch');
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -406,11 +404,11 @@ describe('Client Component', () => {
         }),
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -452,12 +450,12 @@ describe('Client Component', () => {
         data: { todos: [{ id: 1, __typename: 'Todo' }] },
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     // @ts-ignore
     const spy = jest.spyOn(global, 'fetch');
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -488,12 +486,12 @@ describe('Client Component', () => {
         data: { todos: [{ id: 1, __typename: 'Todo' }] },
       })
     );
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     // @ts-ignore
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -535,11 +533,11 @@ describe('Client Component', () => {
   it('should not update in response to mutations that throw', done => {
     (global as any).fetch.mockReturnValue(Promise.reject(new Error('Yoinks!')));
 
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -572,11 +570,11 @@ describe('Client Component', () => {
   });
 
   it('shouldnt return data or mutations if neither is provided', () => {
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         // @ts-ignore
         client={clientModule}
         // @ts-ignore
@@ -839,7 +837,7 @@ describe('Client Component', () => {
       return { unsubscribe };
     };
 
-    const clientModule = new ClientModule({
+    const clientModule = new Client({
       url: 'test',
       transformExchange: x => subscriptionExchange(createSubscription, x),
     });
@@ -847,7 +845,7 @@ describe('Client Component', () => {
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         subscription={{ query: `subscription { todos { id } }` }}
         children={args => {
@@ -894,7 +892,7 @@ describe('Client Component', () => {
       };
 
       // @ts-ignore
-      const c = new Client(p as any);
+      const c = new UrqlClient(p as any);
 
       c.formatProps(p);
     }).toThrowErrorMatchingSnapshot();
@@ -918,7 +916,7 @@ describe('Client Component', () => {
       return { unsubscribe };
     };
 
-    const clientModule = new ClientModule({
+    const clientModule = new Client({
       url: 'test',
       transformExchange: x => subscriptionExchange(createSubscription, x),
     });
@@ -929,7 +927,7 @@ describe('Client Component', () => {
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         query={{ query }}
         subscription={{ query: `subscription { todos { id } }` }}
@@ -979,7 +977,7 @@ describe('Client Component', () => {
       return { unsubscribe };
     };
 
-    const clientModule = new ClientModule({
+    const clientModule = new Client({
       url: 'test',
       transformExchange: x => subscriptionExchange(createSubscription, x),
     });
@@ -990,7 +988,7 @@ describe('Client Component', () => {
     let result;
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         query={[{ query }, { query }]}
         subscription={{ query: `subscription { todos { id } }` }}
@@ -1024,12 +1022,16 @@ describe('Client Component', () => {
 
   it('should unsubscribe before starting a new query', () => {
     (global as any).fetch.mockReturnValue(new Promise(() => {}));
-    const clientModule = new ClientModule({ url: 'test' });
+    const clientModule = new Client({ url: 'test' });
     const query = `{ todos { id } }`;
 
     // @ts-ignore
     const client = renderer.create(
-      <Client client={clientModule} query={{ query }} children={() => null} />
+      <UrqlClient
+        client={clientModule}
+        query={{ query }}
+        children={() => null}
+      />
     );
 
     expect(client.getInstance().querySub).not.toBeNull();
@@ -1043,14 +1045,14 @@ describe('Client Component', () => {
 
   it('should unsubscribe before starting a new subscription', () => {
     const createSubscription = (_, _observer) => ({ unsubscribe: () => {} });
-    const clientModule = new ClientModule({
+    const clientModule = new Client({
       url: 'test',
       transformExchange: x => subscriptionExchange(createSubscription, x),
     });
 
     // @ts-ignore
     const client = renderer.create(
-      <Client
+      <UrqlClient
         client={clientModule}
         subscription={{ query: `subscription { ideas { id } }` }}
         children={() => null}

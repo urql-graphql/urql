@@ -1,6 +1,6 @@
 import { IOperation } from '../../interfaces/index';
-import { CombinedError } from '../../modules/error';
-import { httpExchange } from '../../modules/http-exchange';
+import { CombinedError } from '../../lib/error';
+import { httpExchange } from '../../exchanges/http';
 
 describe('httpExchange', () => {
   beforeEach(() => {

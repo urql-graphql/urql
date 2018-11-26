@@ -1,4 +1,4 @@
-import { CombinedError } from '../../modules/error';
+import { CombinedError } from '../../lib/error';
 
 describe('CombinedError', () => {
   it('can be instantiated with graphQLErrors', () => {

@@ -1,6 +1,6 @@
 import { IOperation } from '../../interfaces/index';
-import { subscriptionExchange } from '../../modules/subscription-exchange';
-import { CombinedError } from '../../modules/error';
+import { subscriptionExchange } from '../../exchanges/subscription';
+import { CombinedError } from '../../lib/error';
 
 describe('subscriptionExchange', () => {
   beforeEach(() => {

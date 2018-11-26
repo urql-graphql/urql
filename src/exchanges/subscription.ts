@@ -7,7 +7,7 @@ import {
   ISubscriptionObserver,
 } from '../interfaces/index';
 
-import { CombinedError } from './error';
+import { CombinedError } from '../lib';
 
 export const subscriptionExchange = (
   createSubscription: (IOperation, ISubscriptionObserver) => ISubscription,

@@ -1,7 +1,7 @@
 import {
   formatTypeNames,
   gankTypeNamesFromResponse,
-} from '../../modules/typenames';
+} from '../../lib/typenames';
 
 describe('formatTypeNames', () => {
   it('should add typenames to a query string', () => {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import hoistStatics from 'hoist-non-react-statics';
 
-import Connect from '../components/connect';
+import { Connect } from '../components/connect';
 import { IMutation, IQuery } from '../interfaces/index';
 
 export interface IHOCProps {
