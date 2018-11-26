@@ -477,7 +477,7 @@ describe('Client', () => {
         }`,
         })
         .catch(e => {
-          expect(e).toBeInstanceOf(Error);
+          expect(e).toHaveProperty('name', 'CombinedError');
           expect(e).toHaveProperty(
             'response.statusText',
             "I'm afraid I can't let you do that, Dave"

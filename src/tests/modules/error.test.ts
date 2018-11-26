@@ -1,13 +1,11 @@
 import { CombinedError } from '../../modules/error';
 
 describe('CombinedError', () => {
-  it('inherits from Error and is creates instances of itself', () => {
+  it('can be instantiated with graphQLErrors', () => {
     const err = new CombinedError({
       graphQLErrors: [],
     });
 
-    expect(err).toBeInstanceOf(CombinedError);
-    expect(err).toBeInstanceOf(Error);
     expect(err.name).toBe('CombinedError');
   });
 

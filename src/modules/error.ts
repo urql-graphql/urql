@@ -27,11 +27,7 @@ const rehydrateGraphQlError = (error: string | IGraphQLError): Error => {
   }
 };
 
-// Shared interface extending Error
-// tslint:disable-next-line no-empty-interface interface-name
-export interface CombinedError extends Error {}
-
-export class CombinedError {
+export class CombinedError implements Error {
   public name: string;
   public message: string;
   public graphQLErrors: Error[];
@@ -54,5 +50,3 @@ export class CombinedError {
     this.response = response;
   }
 }
-
-CombinedError.prototype = Object.create(Error.prototype);
