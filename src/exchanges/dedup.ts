@@ -1,57 +1,25 @@
-import Observable from 'zen-observable-ts';
-
+import { tap, filter } from 'rxjs/operators';
 import { Exchange } from '../types';
 
-// Wraps an exchange and deduplicates in-flight operations by their key
-export const dedupExchange = (forward: Exchange): Exchange => {
-  const inFlight = {};
+export const dedupeExchange: Exchange = forward => {
+  const inFlight = new Set<string>();
 
-  return operation => {
-    const { key, operationName } = operation;
+  return ops$ =>
+    forward(
+      ops$.pipe(
+        filter(({ operationName, key }) => {
+          if (operationName !== 'query') {
+            return true;
+          }
 
-    // Do not try to deduplicate mutation operations
-    if (operationName === 'mutation') {
-      return forward(operation);
-    }
+          const hasInFlightOp = inFlight.has(key);
 
-    // Take existing intermediate observable if it has been created
-    if (inFlight[key] !== undefined) {
-      return inFlight[key];
-    }
+          if (!hasInFlightOp) {
+            inFlight.add(key);
+          }
 
-    const forwarded$ = forward(operation);
-
-    // Keep around one subscription and collect observers for this observable
-    const observers = [];
-    let refCounter = 0;
-    let subscription;
-
-    // Create intermediate observable and only forward to the next exchange once
-    return (inFlight[key] = new Observable(observer => {
-      refCounter++;
-      observers.push(observer);
-
-      if (subscription === undefined) {
-        subscription = forwarded$.subscribe({
-          complete: () => {
-            delete inFlight[key];
-            observers.forEach(x => x.complete());
-          },
-          error: error => {
-            observers.forEach(x => x.error(error));
-          },
-          next: emission => {
-            observers.forEach(x => x.next(emission));
-          },
-        });
-      }
-
-      return () => {
-        if (--refCounter === 0) {
-          delete inFlight[key];
-          subscription.unsubscribe();
-        }
-      };
-    }));
-  };
+          return !hasInFlightOp;
+        })
+      )
+    ).pipe(tap(res => inFlight.delete(res.operation.key)));
 };
