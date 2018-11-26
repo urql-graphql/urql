@@ -17,4 +17,4 @@ export * from './lib/error';
 export * from './exchanges/http';
 export * from './exchanges/subscription';
 
-export * from './interfaces/index';
+export * from './types';

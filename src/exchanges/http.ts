@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { IExchange } from '../interfaces/index';
+import { Exchange } from '../types';
 import { CombinedError } from '../lib';
 
 const checkStatus = (redirectMode: string = 'follow') => (
@@ -23,7 +23,7 @@ const createAbortController = () => {
   return new AbortController();
 };
 
-export const httpExchange = (): IExchange => operation => {
+export const httpExchange = (): Exchange => operation => {
   const { url, fetchOptions } = operation.context;
   const { operationName } = operation;
 

@@ -1,18 +1,22 @@
 import Observable from 'zen-observable-ts';
 
 import {
-  IExchange,
-  IExchangeResult,
-  ISubscription,
-  ISubscriptionObserver,
-} from '../interfaces/index';
+  Exchange,
+  ExchangeResult,
+  Subscription,
+  SubscriptionObserver,
+  Operation,
+} from '../types';
 
 import { CombinedError } from '../lib';
 
 export const subscriptionExchange = (
-  createSubscription: (IOperation, ISubscriptionObserver) => ISubscription,
-  forward: IExchange
-): IExchange => {
+  createSubscription: (
+    operation: Operation,
+    subObserver: SubscriptionObserver
+  ) => Subscription,
+  forward: Exchange
+): Exchange => {
   return operation => {
     const { operationName } = operation;
 
@@ -22,13 +26,13 @@ export const subscriptionExchange = (
     }
 
     // Take over subscription operations and call `createSubscription`
-    return new Observable<IExchangeResult>(observer => {
-      const subObserver: ISubscriptionObserver = {
+    return new Observable<ExchangeResult>(observer => {
+      const subObserver: SubscriptionObserver = {
         error: networkError => {
           observer.error(new CombinedError({ networkError }));
         },
         next: raw => {
-          const result: IExchangeResult = { operation, data: raw.data };
+          const result: ExchangeResult = { operation, data: raw.data };
           if (Array.isArray(raw.errors)) {
             result.error = new CombinedError({ graphQLErrors: raw.errors });
           }

@@ -1,22 +1,20 @@
 import { Component, ReactNode } from 'react';
-import { CombinedError } from '../lib';
+import { CombinedError, Client } from '../lib';
 import { zipObservables } from '../utils/zip-observables';
-
 import {
   ClientEventType,
-  IEventFn,
-  IClient,
-  IExchangeResult,
-  IMutation,
-  IQuery,
-} from '../interfaces/index';
+  EventFn,
+  ExchangeResult,
+  Mutation,
+  Query,
+} from '../types';
 
-export interface IClientProps {
-  client: IClient; // Client instance
+export interface ClientProps {
+  client: Client; // Client instance
   children: (obj: object) => ReactNode; // Render prop
-  subscription?: IQuery; // Subscription Query object
-  query?: IQuery | IQuery[]; // Query object or array of Query objects
-  mutation?: IMutation; // Mutation object (map)
+  subscription?: Query; // Subscription Query object
+  query?: Query | Query[]; // Query object or array of Query objects
+  mutation?: Mutation; // Mutation object (map)
   updateSubscription?: (
     prev: object | null,
     next: object | null
@@ -25,18 +23,18 @@ export interface IClientProps {
   cache?: boolean;
 }
 
-export interface IClientFetchOpts {
+export interface ClientFetchOpts {
   skipCache?: boolean;
 }
 
-export interface IClientState {
+export interface ClientState {
   fetching: boolean; // Loading
   loaded: boolean; // Initial load
   error?: Error | CombinedError | CombinedError[]; // Error
-  data: object | object[] | IClientState[]; // Data
+  data: object | object[] | ClientState[]; // Data
 }
 
-export class UrqlClient extends Component<IClientProps, IClientState> {
+export class UrqlClient extends Component<ClientProps, ClientState> {
   static defaultProps = {
     cacheInvalidation: true,
     cache: true,
@@ -139,7 +137,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update: IEventFn = (type: ClientEventType, payload) => {
+  update: EventFn = (type: ClientEventType, payload) => {
     // This prop indicates that the Component should never update its data
     // from the cache or refetch anything
     if (!this.props.cacheInvalidation) {
@@ -162,7 +160,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  fetch = (opts: IClientFetchOpts = {}) => {
+  fetch = (opts: ClientFetchOpts = {}) => {
     const { client } = this.props;
     const skipCache = opts.skipCache || this.props.cache === false;
 
@@ -229,7 +227,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
             fetching: false,
           });
         },
-        next: (results: IExchangeResult[]) => {
+        next: (results: ExchangeResult[]) => {
           const errors = results.map(res => res.error).filter(Boolean);
 
           this.setState({
@@ -315,7 +313,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
       fetching: true,
     });
 
-    return new Promise<IExchangeResult['data']>((resolve, reject) => {
+    return new Promise<ExchangeResult['data']>((resolve, reject) => {
       // Execute mutation
       client.executeMutation$(mutation).subscribe({
         error: e => {

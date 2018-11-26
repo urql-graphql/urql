@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 
 import { Connect } from '../components/connect';
-import { IMutation, IQuery } from '../interfaces/index';
+import { Mutation, Query } from '../types';
 
-export interface IHOCProps {
-  query?: IQuery | IQuery[]; // Query or queries
-  subscription?: IQuery; // Subscription Query object
-  mutation?: IMutation; // Mutation map
+export interface HOCProps {
+  query?: Query | Query[]; // Query or queries
+  subscription?: Query; // Subscription Query object
+  mutation?: Mutation; // Mutation map
   updateSubscription?: (
     prev: object | null,
     next: object | null
@@ -17,7 +17,7 @@ export interface IHOCProps {
   cache?: boolean;
 }
 
-function connect(opts?: IHOCProps | ((_) => IHOCProps)) {
+function connect(opts?: HOCProps | ((_) => HOCProps)) {
   return (Comp: any) => {
     const componentName = Comp.displayName || Comp.name || 'Component';
 

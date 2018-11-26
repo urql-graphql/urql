@@ -1,4 +1,4 @@
-import { IOperation } from '../../interfaces/index';
+import { Operation } from '../../types';
 import { subscriptionExchange } from '../../exchanges/subscription';
 import { CombinedError } from '../../lib/error';
 
@@ -16,7 +16,7 @@ describe('subscriptionExchange', () => {
 
     exchange(({
       operationName: 'query',
-    } as any) as IOperation);
+    } as any) as Operation);
 
     expect(createSubscription).not.toHaveBeenCalled();
     expect(forward).toHaveBeenCalled();
@@ -26,7 +26,7 @@ describe('subscriptionExchange', () => {
     const exOperation = ({
       key: 'test',
       operationName: 'subscription',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     const next = jest.fn();
     const error = jest.fn();
@@ -85,7 +85,7 @@ describe('subscriptionExchange', () => {
     const exOperation = ({
       key: 'test',
       operationName: 'subscription',
-    } as any) as IOperation;
+    } as any) as Operation;
 
     const unsubscribe = jest.fn();
     const createSubscription = () => ({ unsubscribe });

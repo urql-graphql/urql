@@ -1,5 +1,5 @@
 import { Client, defaultCache } from '../../lib';
-import { ClientEventType } from '../../interfaces/events';
+import { ClientEventType } from '../../types';
 
 describe('Client', () => {
   beforeEach(() => {

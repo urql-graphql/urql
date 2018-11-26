@@ -4,7 +4,7 @@ import React from 'react';
 import { UrqlClient } from '../../components';
 import { Client, CombinedError } from '../../lib';
 import { subscriptionExchange } from '../../exchanges';
-import { ClientEventType } from '../../interfaces/index';
+import { ClientEventType } from '../../types';
 import renderer from 'react-test-renderer';
 
 describe('Client Component', () => {

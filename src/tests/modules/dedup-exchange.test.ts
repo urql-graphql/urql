@@ -1,5 +1,5 @@
 import Observable from 'zen-observable-ts';
-import { IExchange } from '../../interfaces/exchange';
+import { Exchange } from '../../types';
 import { dedupExchange } from '../../exchanges/dedup';
 
 describe('dedupExchange', () => {
@@ -17,7 +17,7 @@ describe('dedupExchange', () => {
         mockOp = operation;
         observer.next(operation);
         observer.complete();
-      }) as any) as IExchange;
+      }) as any) as Exchange;
 
     const testExchange = dedupExchange(mockExchange);
     const testOperation = { key: 'test' } as any;
@@ -32,7 +32,7 @@ describe('dedupExchange', () => {
   });
 
   it('returns the same intermediate observable when called with same operation', () => {
-    const mockExchange = jest.fn() as IExchange;
+    const mockExchange = jest.fn() as Exchange;
     const testExchange = dedupExchange(mockExchange);
 
     const obsA = testExchange({ key: 'a' } as any);
@@ -50,7 +50,7 @@ describe('dedupExchange', () => {
       new Observable(observer => {
         observer.next(null);
         observer.complete();
-      }) as any) as IExchange;
+      }) as any) as Exchange;
 
     const testExchange = dedupExchange(mockExchange);
     const obsA = testExchange({ key: 'a' } as any);

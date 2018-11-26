@@ -1,4 +1,4 @@
-import { IOperation } from '../../interfaces/index';
+import { Operation } from '../../types';
 import { CombinedError } from '../../lib/error';
 import { httpExchange } from '../../exchanges/http';
 
@@ -276,7 +276,7 @@ describe('httpExchange', () => {
       httpExchange()(({
         context: {},
         operationName: 'subscription',
-      } as any) as IOperation);
+      } as any) as Operation);
     }).toThrowErrorMatchingSnapshot();
   });
 });
