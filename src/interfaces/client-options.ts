@@ -1,10 +1,10 @@
-import { ICache } from './cache';
-import { IExchange } from './exchange';
+import { Cache } from './cache';
+import { Exchange } from './exchange';
 
-export interface IClientOptions {
+export interface ClientOptions {
   url: string;
   fetchOptions?: object | (() => object);
-  cache?: ICache;
+  cache?: Cache;
   initialCache?: object;
-  transformExchange?: (IExchange, IClient) => IExchange;
+  transformExchange?: (IExchange, IClient) => Exchange;
 }

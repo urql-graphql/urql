@@ -1,4 +1,4 @@
-import { IQuery } from './query';
+import { Query } from './query';
 
 /* This is an "enriched" Query which makes it ready to
  * go through an OperationQueue. It contains a context
@@ -7,7 +7,7 @@ import { IQuery } from './query';
  * - `operationName`: The GraphQL operation like "query" or "mutation"
  * - `context`: Any options that the Exchange should receive
  */
-export interface IOperation extends IQuery {
+export interface Operation extends Query {
   key: string;
   operationName: string;
   context: Record<string, any>;

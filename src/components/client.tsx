@@ -4,19 +4,19 @@ import { zipObservables } from '../utils/zip-observables';
 
 import {
   ClientEventType,
-  IEventFn,
+  EventFn,
   IClient,
-  IExchangeResult,
-  IMutation,
-  IQuery,
+  ExchangeResult,
+  Mutation,
+  Query,
 } from '../interfaces/index';
 
 export interface IClientProps {
   client: IClient; // Client instance
   children: (obj: object) => ReactNode; // Render prop
-  subscription?: IQuery; // Subscription Query object
-  query?: IQuery | IQuery[]; // Query object or array of Query objects
-  mutation?: IMutation; // Mutation object (map)
+  subscription?: Query; // Subscription Query object
+  query?: Query | Query[]; // Query object or array of Query objects
+  mutation?: Mutation; // Mutation object (map)
   updateSubscription?: (
     prev: object | null,
     next: object | null
@@ -139,7 +139,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
     }
   };
 
-  update: IEventFn = (type: ClientEventType, payload) => {
+  update: EventFn = (type: ClientEventType, payload) => {
     // This prop indicates that the Component should never update its data
     // from the cache or refetch anything
     if (!this.props.cacheInvalidation) {
@@ -229,7 +229,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
             fetching: false,
           });
         },
-        next: (results: IExchangeResult[]) => {
+        next: (results: ExchangeResult[]) => {
           const errors = results.map(res => res.error).filter(Boolean);
 
           this.setState({
@@ -315,7 +315,7 @@ export class UrqlClient extends Component<IClientProps, IClientState> {
       fetching: true,
     });
 
-    return new Promise<IExchangeResult['data']>((resolve, reject) => {
+    return new Promise<ExchangeResult['data']>((resolve, reject) => {
       // Execute mutation
       client.executeMutation$(mutation).subscribe({
         error: e => {

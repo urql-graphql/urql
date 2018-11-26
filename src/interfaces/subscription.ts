@@ -1,11 +1,11 @@
 // These are *not* Observable primitives, but are instead intended to
 // be used with the subscriptionExchange
 
-export interface ISubscriptionObserver {
+export interface SubscriptionObserver {
   next: (IExecutionResult) => void;
   error: (Error) => void;
 }
 
-export interface ISubscription {
+export interface Subscription {
   unsubscribe: () => void;
 }

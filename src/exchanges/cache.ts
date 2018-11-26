@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 
-import { IClient, IExchange, IExchangeResult } from '../interfaces/index';
+import { IClient, Exchange, ExchangeResult } from '../interfaces/index';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
 interface ITypenameInvalidate {
@@ -8,16 +8,13 @@ interface ITypenameInvalidate {
 }
 
 // Wraps an exchange and refers/updates the cache according to operations
-export const cacheExchange = (
-  client: IClient,
-  forward: IExchange
-): IExchange => {
+export const cacheExchange = (client: IClient, forward: Exchange): Exchange => {
   const typenameInvalidate: ITypenameInvalidate = {};
 
   // Fills the cache given a query's response
   const processQueryOnCache = (
     key: string,
-    response: IExchangeResult
+    response: ExchangeResult
   ): Promise<void> => {
     // Mark typenames on typenameInvalidate for early invalidation
     gankTypeNamesFromResponse(response.data).forEach(typeName => {
@@ -35,7 +32,7 @@ export const cacheExchange = (
   };
 
   // Invalidates the cache given a mutation's response
-  const processMutationOnCache = (response: IExchangeResult) => {
+  const processMutationOnCache = (response: ExchangeResult) => {
     let cacheKeys = [];
 
     // For each typeName on the response, all cache keys will need to
@@ -66,7 +63,7 @@ export const cacheExchange = (
 
     if (operationName === 'mutation') {
       // Forward mutation response but execute processMutationOnCache side-effect
-      return forwarded$.map((response: IExchangeResult) => {
+      return forwarded$.map((response: ExchangeResult) => {
         processMutationOnCache(response);
         return response;
       });
@@ -78,7 +75,7 @@ export const cacheExchange = (
     const { context, key } = operation;
     const { skipCache = false } = context;
 
-    return new Observable<IExchangeResult>(observer => {
+    return new Observable<ExchangeResult>(observer => {
       let subscription;
 
       client.cache.read(key).then(cachedResult => {
@@ -92,7 +89,7 @@ export const cacheExchange = (
         // Forward response but execute processsQueryOnCache side-effect
         subscription = forwarded$.subscribe({
           error: err => observer.error(err),
-          next: (response: IExchangeResult) => {
+          next: (response: ExchangeResult) => {
             // NOTE: Wait for cache to avoid updating a client component
             // when it itself triggered this operation
             processQueryOnCache(key, response).then(() => {
