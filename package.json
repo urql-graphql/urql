@@ -3,6 +3,9 @@
   "version": "0.3.0-next1",
   "description": "A naive React Graphql library",
   "main": "dist/index.js",
+  "umd:main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "source": "src/index.ts",
   "scripts": {
     "coverage": "jest --coverage",
     "build:clean": "rimraf dist",
@@ -13,6 +16,7 @@
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "lint": "tslint --project .",
     "test": "jest",
+    "bundle": "microbundle build --no-sourcemap --target web",
     "bundlesize": "bundlesize",
     "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
     "precommit": "lint-staged"
@@ -52,7 +56,7 @@
   },
   "bundlesize": [
     {
-      "path": "./bundles/urql.es.min.js",
+      "path": "./dist/index.mjs",
       "maxSize": "8 kB"
     }
   ],
@@ -75,6 +79,7 @@
     "isomorphic-fetch": "^2.2.1",
     "jest": "^23.6.0",
     "lint-staged": "^6.0.1",
+    "microbundle": "^0.7.0",
     "prettier": "1.10.2",
     "prop-types": "^15.6.0",
     "react": "^16.0.0-0",
@@ -91,10 +96,10 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.13.0",
     "rollup-plugin-uglify": "^3.0.0",
+    "ts-jest": "^23.10.5",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.16.0",
     "tslint-react": "^3.6.0",
-    "ts-jest": "^23.10.5",
     "typescript": "^3.1.6",
     "uuid": "^3.2.1",
     "webpack": "^4.26.1",
