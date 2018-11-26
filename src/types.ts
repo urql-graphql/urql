@@ -1,5 +1,47 @@
-import Observable from 'zen-observable-ts';
 import { Client, CombinedError } from '../lib';
+import { Observable } from 'rxjs';
+
+/** A Graphql query */
+export interface Query {
+  /** Graphql query string */
+  query: string;
+  /** Graphql query variables */
+  variables?: object;
+}
+
+/** A Graphql mutation */
+export type Mutation = Query;
+
+/** A Graphql [query]{@link Query} or [mutation]{@link Mutation} accompanied with metadata */
+export interface Operation extends Query {
+  /** Unique identifier of the operation */
+  key: string;
+  /** The type of Grapqhql operation being executed */
+  operationName: string;
+  /** Additional metadata passed to [exchange]{@link Exchange} functions */
+  context: Record<string, any>;
+}
+
+/** Function responsible for listening for streamed [operations]{@link Operation}. */
+export type Exchange = (
+  /** Function to call the next [exchange]{@link Exchange} in the chain */
+  forward: ExchangeIO
+) => ExchangeIO;
+
+/** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult} */
+export type ExchangeIO = (
+  ops$: Observable<Operation>
+) => Observable<ExchangeResult>;
+
+/** Resulting data from an [operation]{@link Operation} */
+export interface ExchangeResult {
+  /** The operation which has been executed */
+  operation: Operation;
+  /** The data returned from the Graphql server */
+  data: any;
+  /** Any errors resulting from the operation */
+  error?: Error;
+}
 
 export interface Cache {
   write: (key: string, data: any) => Promise<any>;
@@ -36,7 +78,7 @@ export interface EventFn {
 // Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163d2e6c124107fa0971f6d838c8a7d29f51/src/execution/execute.js#L105-L114<Paste>
 export interface ExecutionResult {
   errors?: Error[];
-  data?: object;
+  data?: any;
 }
 
 export interface ExchangeResult {
@@ -44,13 +86,6 @@ export interface ExchangeResult {
   data: ExecutionResult['data'];
   error?: CombinedError;
 }
-
-export type Exchange = (operation: Operation) => Observable<ExchangeResult>;
-
-export interface Mutation {
-  [key: string]: Query;
-}
-
 export interface Operation extends Query {
   key: string;
   operationName: string;
