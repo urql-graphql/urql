@@ -15,4 +15,7 @@ interface IContext {
   Consumer: ComponentClass<ConsumerProps<{}>>;
 }
 
-export const { Provider, Consumer }: IContext = context;
+export const {
+  Provider: ContextProvider,
+  Consumer: ContextConsumer,
+}: IContext = context;

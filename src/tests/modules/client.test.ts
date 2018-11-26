@@ -1,5 +1,4 @@
-import Client from '../../modules/client';
-import { defaultCache } from '../../modules/default-cache';
+import { Client, defaultCache } from '../../lib';
 import { ClientEventType } from '../../interfaces/events';
 
 describe('Client', () => {

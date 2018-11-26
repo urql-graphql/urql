@@ -1,5 +1,5 @@
-export { default as Client } from './modules/client';
-export * from './modules/client';
+export { Client } from './lib/client';
+export * from './lib/client';
 
 export { default as Provider } from './components/provider';
 export * from './components/provider';
@@ -10,11 +10,11 @@ export * from './components/connect';
 export { default as ConnectHOC } from './components/connect-hoc';
 export * from './components/connect-hoc';
 
-export * from './modules/query';
-export * from './modules/cache-exchange';
-export * from './modules/dedup-exchange';
-export * from './modules/error';
-export * from './modules/http-exchange';
-export * from './modules/subscription-exchange';
+export * from './lib/query';
+export * from './exchanges/cache';
+export * from './exchanges/dedup';
+export * from './lib/error';
+export * from './exchanges/http';
+export * from './exchanges/subscription';
 
 export * from './interfaces/index';

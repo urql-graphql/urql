@@ -1,4 +1,4 @@
-import { defaultCache } from '../../modules/default-cache';
+import { defaultCache } from '../../lib/default-cache';
 
 describe('defaultCache', () => {
   beforeEach(() => {

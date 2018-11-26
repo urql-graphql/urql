@@ -1,7 +1,7 @@
 import Observable from 'zen-observable-ts';
 
 import { IClient, IExchange, IExchangeResult } from '../interfaces/index';
-import { gankTypeNamesFromResponse, formatTypeNames } from './typenames';
+import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
 interface ITypenameInvalidate {
   [typeName: string]: string[];

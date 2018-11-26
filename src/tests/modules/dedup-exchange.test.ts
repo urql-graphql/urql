@@ -1,6 +1,6 @@
 import Observable from 'zen-observable-ts';
 import { IExchange } from '../../interfaces/exchange';
-import { dedupExchange } from '../../modules/dedup-exchange';
+import { dedupExchange } from '../../exchanges/dedup';
 
 describe('dedupExchange', () => {
   beforeEach(() => {
