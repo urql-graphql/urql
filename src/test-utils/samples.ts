@@ -1,4 +1,11 @@
-import { Query, Mutation, Operation, ExchangeResult } from './types';
+import { Query, Mutation, Operation, ExchangeResult } from '../types';
+
+const context = {
+  fetchOptions: {
+    test: 1,
+  },
+  url: 'http://localhost:3000/graphql',
+};
 
 export const queryGql: Query = {
   query: `query getUser($name: String){
@@ -39,21 +46,21 @@ export const subscriptionGql: Query = {
 export const queryOperation: Operation = {
   key: '2',
   operationName: 'query',
-  context: {},
+  context,
   ...queryGql,
 };
 
 export const mutationOperation: Operation = {
   key: JSON.stringify(mutationGql),
   operationName: 'mutation',
-  context: {},
+  context,
   ...mutationGql,
 };
 
 export const subscriptionOperation: Operation = {
   key: JSON.stringify(subscriptionGql),
   operationName: 'subscription',
-  context: {},
+  context,
   ...subscriptionGql,
 };
 
