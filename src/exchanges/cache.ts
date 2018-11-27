@@ -1,8 +1,11 @@
+import { Subject } from 'rxjs';
 import { tap, merge, map, partition } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
 
-export const cacheExchange: Exchange = forward => {
+export const cacheExchange = (
+  subject: Subject<Operation>
+): Exchange => forward => {
   const cache = new Map<string, ExchangeResult>();
   const cachedTypenames = new Map<string, string[]>();
 
@@ -12,38 +15,11 @@ export const cacheExchange: Exchange = forward => {
     query: formatTypeNames(operation.query),
   });
 
-  // Invalidates the cache given a mutation's response
-  const afterMutation = (response: ExchangeResult) => {
-    const typenames = gankTypeNamesFromResponse(response.data.data);
+  const handleAfterMutation = (response: ExchangeResult) =>
+    afterMutation(response, cache, cachedTypenames, subject);
 
-    typenames.forEach(typename => {
-      const typenameCacheKeys = cachedTypenames.get(typename);
-
-      if (typenameCacheKeys === undefined) {
-        return;
-      }
-
-      typenameCacheKeys.forEach(key => cache.delete(key));
-      cachedTypenames.delete(typename);
-    });
-  };
-
-  // Mark typenames on typenameInvalidate for early invalidation
-  const afterQuery = (response: ExchangeResult) => {
-    const key = response.operation.key;
-    cache.set(key, response);
-
-    const typenames = gankTypeNamesFromResponse(response.data.data);
-
-    typenames.forEach(typename => {
-      const typenameCacheKeys = cachedTypenames.get(typename);
-
-      cachedTypenames.set(
-        typename,
-        typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
-      );
-    });
-  };
+  const handleAfterQuery = (response: ExchangeResult) =>
+    afterQuery(response, cache, cachedTypenames);
 
   return ops$ => {
     const [cacheOps$, forwardOps$] = partition<Operation>(operation =>
@@ -59,13 +35,64 @@ export const cacheExchange: Exchange = forward => {
       forward,
       tap(response => {
         if (response.operation.operationName === 'mutation') {
-          afterMutation(response);
+          handleAfterMutation(response);
         } else if (response.operation.operationName === 'query') {
-          afterQuery(response);
+          handleAfterQuery(response);
         }
       })
     );
 
     return cachedResults$.pipe(merge(forward$));
   };
+};
+
+// Invalidates the cache given a mutation's response
+export const afterMutation = (
+  response: ExchangeResult,
+  cache: Map<string, ExchangeResult>,
+  cachedTypenames: Map<string, string[]>,
+  subject: Subject<Operation>
+) => {
+  let pendingOperations: Operation[] = [];
+
+  const typenames = gankTypeNamesFromResponse(response.data.data);
+
+  typenames.forEach(typename => {
+    const typenameCacheKeys = cachedTypenames.get(typename);
+
+    if (typenameCacheKeys === undefined) {
+      return;
+    }
+
+    typenameCacheKeys.forEach(key => {
+      pendingOperations = [...pendingOperations, cache.get(key).operation];
+      cache.delete(key);
+    });
+    cachedTypenames.delete(typename);
+  });
+
+  pendingOperations.forEach(op => {
+    subject.next(op);
+  });
+};
+
+// Mark typenames on typenameInvalidate for early invalidation
+const afterQuery = (
+  response: ExchangeResult,
+  cache: Map<string, ExchangeResult>,
+  cachedTypenames: Map<string, string[]>
+) => {
+  const key = response.operation.key;
+  cache.set(key, response);
+
+  const typenames = gankTypeNamesFromResponse(response.data.data);
+
+  typenames.forEach(typename => {
+    const typenameCacheKeys = cachedTypenames.get(typename);
+
+    cachedTypenames.set(
+      typename,
+      typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
+    );
+  });
 };

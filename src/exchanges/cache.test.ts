@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { cacheExchange } from './cache';
+import { cacheExchange, afterMutation } from './cache';
 import {
   queryOperation,
   queryResponse,
@@ -11,6 +11,9 @@ import {
 } from '../test-utils';
 import { Operation } from '../types';
 
+const subject = {
+  next: jest.fn(),
+};
 let stream = new Subject<Operation>();
 let calls = 0;
 let response = queryResponse;
@@ -27,10 +30,12 @@ beforeEach(() => {
   calls = 0;
   response = queryResponse;
   stream = new Subject<Operation>();
+  subject.next.mockClear();
 });
 
 it('forwards to next exchange when no cache is found', async () => {
-  const exchange = cacheExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = cacheExchange(subject)(forwardMock)(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -41,7 +46,8 @@ it('forwards to next exchange when no cache is found', async () => {
 });
 
 it('caches queries', async () => {
-  const exchange = cacheExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = cacheExchange(subject)(forwardMock)(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -54,7 +60,8 @@ it('caches queries', async () => {
 
 it("doesn't cache mutations", async () => {
   response = mutationResponse;
-  const exchange = cacheExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = cacheExchange(subject)(forwardMock)(stream);
   const completed = exchange.toPromise();
 
   stream.next(mutationOperation);
@@ -65,9 +72,37 @@ it("doesn't cache mutations", async () => {
   expect(calls).toBe(2);
 });
 
+it('retriggers query operation when mutation occurs', () => {
+  const typename = 'ToDo';
+  const cache = new Map([[1, queryResponse]]);
+  const typenames = new Map([[typename, [1]]]);
+
+  afterMutation(
+    // @ts-ignore
+    {
+      data: {
+        data: {
+          todos: [
+            {
+              id: 1,
+              __typename: typename,
+            },
+          ],
+        },
+      },
+    },
+    cache,
+    typenames,
+    subject
+  );
+
+  expect(subject.next).toBeCalledWith(queryOperation);
+});
+
 it('forwards subscriptions', async () => {
   response = subscriptionResponse;
-  const exchange = cacheExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = cacheExchange(subject)(forwardMock)(stream);
   const completed = exchange.toPromise();
 
   stream.next(subscriptionOperation);
