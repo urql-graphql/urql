@@ -34,8 +34,10 @@ beforeEach(() => {
 });
 
 it('forwards to next exchange when no cache is found', async () => {
+  const initialArgs = { forward: forwardMock, subject };
+
   // @ts-ignore
-  const exchange = cacheExchange(subject)(forwardMock)(stream);
+  const exchange = cacheExchange(initialArgs)(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -46,8 +48,10 @@ it('forwards to next exchange when no cache is found', async () => {
 });
 
 it('caches queries', async () => {
+  const initialArgs = { forward: forwardMock, subject };
+
   // @ts-ignore
-  const exchange = cacheExchange(subject)(forwardMock)(stream);
+  const exchange = cacheExchange(initialArgs)(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -60,8 +64,10 @@ it('caches queries', async () => {
 
 it("doesn't cache mutations", async () => {
   response = mutationResponse;
+  const initialArgs = { forward: forwardMock, subject };
+
   // @ts-ignore
-  const exchange = cacheExchange(subject)(forwardMock)(stream);
+  const exchange = cacheExchange(initialArgs)(stream);
   const completed = exchange.toPromise();
 
   stream.next(mutationOperation);
@@ -101,8 +107,10 @@ it('retriggers query operation when mutation occurs', () => {
 
 it('forwards subscriptions', async () => {
   response = subscriptionResponse;
+  const initialArgs = { forward: forwardMock, subject };
+
   // @ts-ignore
-  const exchange = cacheExchange(subject)(forwardMock)(stream);
+  const exchange = cacheExchange(initialArgs)(stream);
   const completed = exchange.toPromise();
 
   stream.next(subscriptionOperation);

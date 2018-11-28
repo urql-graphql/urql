@@ -13,7 +13,7 @@ let stream = new Subject<Operation>();
 let calls = 0;
 let response = queryResponse;
 
-const forwardMock = (s: Observable<Operation>) =>
+const forward = (s: Observable<Operation>) =>
   s.pipe(
     map(() => {
       calls += 1;
@@ -29,7 +29,8 @@ beforeEach(() => {
 });
 
 it('forwards to next exchange when no operation is found', async () => {
-  const exchange = dedupeExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = dedupeExchange({ forward })(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -40,7 +41,8 @@ it('forwards to next exchange when no operation is found', async () => {
 });
 
 it('does not forward to next exchange when existing operation is found', async () => {
-  const exchange = dedupeExchange(forwardMock)(stream);
+  // @ts-ignore
+  const exchange = dedupeExchange({ forward })(stream);
   const completed = exchange.toPromise();
 
   stream.next(queryOperation);
@@ -53,7 +55,9 @@ it('does not forward to next exchange when existing operation is found', async (
 
 it('creates a new request when mutation call is in progress', async () => {
   response = mutationResponse;
-  const exchange = dedupeExchange(forwardMock)(stream);
+
+  // @ts-ignore
+  const exchange = dedupeExchange({ forward })(stream);
   const completed = exchange.toPromise();
 
   stream.next(mutationOperation);

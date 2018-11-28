@@ -3,9 +3,7 @@ import { tap, merge, map, partition } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
 
-export const cacheExchange = (
-  subject: Subject<Operation>
-): Exchange => forward => {
+export const cacheExchange: Exchange = ({ forward, subject }) => {
   const cache = new Map<string, ExchangeResult>();
   const cachedTypenames = new Map<string, string[]>();
 

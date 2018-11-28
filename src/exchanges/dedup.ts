@@ -1,7 +1,7 @@
 import { tap, filter } from 'rxjs/operators';
 import { Exchange } from '../types';
 
-export const dedupeExchange: Exchange = forward => {
+export const dedupeExchange: Exchange = ({ forward }) => {
   const inFlight = new Set<string>();
 
   return ops$ =>

@@ -1,5 +1,5 @@
+import { Observable, Subject } from 'rxjs';
 import { Client, CombinedError } from '../lib';
-import { Observable } from 'rxjs';
 
 /** A Graphql query */
 export interface Query {
@@ -24,8 +24,11 @@ export interface Operation extends Query {
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
 export type Exchange = (
-  /** Function to call the next [exchange]{@link Exchange} in the chain */
-  forward: ExchangeIO
+  args: {
+    /** Function to call the next [exchange]{@link Exchange} in the chain */
+    forward: ExchangeIO;
+    subject: Subject<Operation>;
+  }
 ) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult} */
@@ -55,10 +58,13 @@ export interface Cache {
 
 export interface ClientOptions {
   url: string;
-  fetchOptions?: object | (() => object);
-  cache?: Cache;
-  initialCache?: object;
-  transformExchange?: (exchange: Exchange, client: Client) => Exchange;
+  fetchOptions?: any | (() => any);
+  exchanges?: Exchange[];
+  cacheExchangeIndex: number;
+}
+
+export interface CreateInstanceOpts {
+  onChange: (data: any) => any;
 }
 
 export interface GraphQLError {
