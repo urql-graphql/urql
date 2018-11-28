@@ -1,5 +1,5 @@
-import { Subject } from 'rxjs';
-import { tap, merge, map, partition } from 'rxjs/operators';
+import { Subject, Observable, of } from 'rxjs';
+import { tap, map, mergeMap } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
 
@@ -20,27 +20,30 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
     afterQuery(response, cache, cachedTypenames);
 
   return ops$ => {
-    const [cacheOps$, forwardOps$] = partition<Operation>(operation =>
-      cache.has(operation.key)
-    )(ops$);
+    const useCache = (stream: Observable<Operation>) =>
+      stream.pipe(map(operation => cache.get(operation.key)));
 
-    const cachedResults$ = cacheOps$.pipe(
-      map(operation => cache.get(operation.key))
+    const goForward = (stream: Observable<Operation>) =>
+      stream.pipe(
+        map(mapTypeNames),
+        forward,
+        tap(response => {
+          if (response.operation.operationName === 'mutation') {
+            handleAfterMutation(response);
+          } else if (response.operation.operationName === 'query') {
+            handleAfterQuery(response);
+          }
+        })
+      );
+
+    return ops$.pipe(
+      mergeMap(
+        operation =>
+          cache.has(operation.key) && !operation.context.force
+            ? useCache(of(operation))
+            : goForward(of(operation))
+      )
     );
-
-    const forward$ = forwardOps$.pipe(
-      map(mapTypeNames),
-      forward,
-      tap(response => {
-        if (response.operation.operationName === 'mutation') {
-          handleAfterMutation(response);
-        } else if (response.operation.operationName === 'query') {
-          handleAfterQuery(response);
-        }
-      })
-    );
-
-    return cachedResults$.pipe(merge(forward$));
   };
 };
 
