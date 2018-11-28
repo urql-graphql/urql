@@ -1,23 +1,17 @@
 import React, { Component } from 'react';
-
 import hoistStatics from 'hoist-non-react-statics';
-
 import { Connect } from '../components/connect';
-import { Mutation, Query } from '../types';
+import { Query } from '../types';
 
-export interface HOCProps {
-  query?: Query | Query[]; // Query or queries
-  subscription?: Query; // Subscription Query object
-  mutation?: Mutation; // Mutation map
-  updateSubscription?: (
-    prev: object | null,
-    next: object | null
-  ) => object | null; // Update query with subscription data
-  cacheInvalidation?: boolean;
-  cache?: boolean;
+export interface ConnectHOCProps {
+  children: (props: any) => any;
+  query?: Query;
+  mutation?: {};
 }
 
-function connect(opts?: HOCProps | ((_) => HOCProps)) {
+export const ConnectHOCWrapper = function(
+  opts?: ConnectHOCProps | ((_) => ConnectHOCProps)
+) {
   return (Comp: any) => {
     const componentName = Comp.displayName || Comp.name || 'Component';
 
@@ -45,6 +39,4 @@ function connect(opts?: HOCProps | ((_) => HOCProps)) {
 
     return hoistStatics(ConnectHOC, Comp);
   };
-}
-
-export default connect;
+};

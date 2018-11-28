@@ -1,20 +1,15 @@
-import React, { Component, ReactNode } from 'react';
-import { Cache, Mutation, Query } from '../types';
+import React, { ReactNode } from 'react';
+import { ChildArgs, Client, Cache, Query, Mutation } from '../types';
 import { UrqlClient } from './client';
 import { ContextConsumer } from './context';
-import { Client } from '../lib';
 
-export interface ConnectProps<Data, Mutations> {
-  children: (props: UrqlProps<Data, Mutations>) => ReactNode; // Render prop
-  subscription?: Query;
-  query?: Query | Query[]; // Query or queries
-  mutation?: Mutation; // Mutation map
-  updateSubscription?: (
-    prev: object | null,
-    next: object | null
-  ) => object | null;
-  cacheInvalidation?: boolean;
-  cache?: boolean;
+export interface ConnectProps<T> {
+  /** A function which receives values from the URQL client. */
+  children: (props: ChildArgs<T>) => ReactNode;
+  /** The GraphQL query to fetch */
+  query?: Query;
+  /** A collection of GrahpQL mutation queries */
+  mutation?: { [type in keyof T]: Mutation };
 }
 
 // This is the type used for the Render Prop. It requires
@@ -60,26 +55,17 @@ export type UrqlProps<Data, Mutations = {}> = {
   refreshAllFromCache: () => void;
 } & Mutations;
 
-export class Connect<Data = {}, Mutations = {}> extends Component<
-  ConnectProps<Data, Mutations>
-> {
-  render() {
-    // Use react-create-context to provide context to UrqlClient
-    return (
-      <ContextConsumer>
-        {(client: Client) => (
-          <UrqlClient
-            client={client}
-            children={this.props.children}
-            subscription={this.props.subscription}
-            query={this.props.query}
-            mutation={this.props.mutation}
-            updateSubscription={this.props.updateSubscription}
-            cacheInvalidation={this.props.cacheInvalidation}
-            cache={this.props.cache}
-          />
-        )}
-      </ContextConsumer>
-    );
-  }
-}
+export const Connect = function<T>(props: ConnectProps<T>) {
+  return (
+    <ContextConsumer>
+      {(client: Client) => (
+        <UrqlClient
+          client={client}
+          children={props.children}
+          query={props.query}
+          mutation={props.mutation}
+        />
+      )}
+    </ContextConsumer>
+  );
+};

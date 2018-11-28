@@ -1,5 +1,6 @@
 import { Observable, Subject } from 'rxjs';
-import { Client, CombinedError } from '../lib';
+import { CombinedError } from './lib';
+import { ClientState } from './components';
 
 /** A Graphql query */
 export interface Query {
@@ -43,7 +44,16 @@ export interface ExchangeResult {
   /** The data returned from the Graphql server */
   data: any;
   /** Any errors resulting from the operation */
-  error?: Error;
+  error?: Error | CombinedError;
+}
+
+/** The arguments for the child function of a connector */
+export interface ChildArgs<M> {
+  fetching: ClientState<M>['fetching'];
+  error: ClientState<M>['error'];
+  data: ClientState<M>['data'];
+  mutations: ClientState<M>['mutations'];
+  refetch: (noCache?: boolean) => void;
 }
 
 export interface Cache {
@@ -60,11 +70,26 @@ export interface ClientOptions {
   url: string;
   fetchOptions?: any | (() => any);
   exchanges?: Exchange[];
-  cacheExchangeIndex: number;
 }
 
-export interface CreateInstanceOpts {
-  onChange: (data: any) => any;
+export interface Client {
+  createInstance: (opts: CreateClientInstanceOpts) => ClientInstance;
+}
+
+export interface ClientInstance {
+  executeQuery: (query: Query, force?: boolean) => void;
+  executeMutation: (mutation: Mutation, force?: boolean) => void;
+  unsubscribe: () => void;
+}
+
+export interface StreamUpdate {
+  data?: ExchangeResult['data'];
+  error?: ExchangeResult['error'];
+  fetching: boolean;
+}
+
+export interface CreateClientInstanceOpts {
+  onChange: (data: StreamUpdate) => any;
 }
 
 export interface GraphQLError {
@@ -87,11 +112,6 @@ export interface ExecutionResult {
   data?: any;
 }
 
-export interface ExchangeResult {
-  operation: Operation; // Add on the original operation
-  data: ExecutionResult['data'];
-  error?: CombinedError;
-}
 export interface Operation extends Query {
   key: string;
   operationName: string;
