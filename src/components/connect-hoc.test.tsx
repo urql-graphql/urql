@@ -1,75 +1,61 @@
-/* tslint:disable */
+jest.mock('./connect');
+import { mount } from 'enzyme';
+import React from 'react';
+import { Connect as ConnectMock } from './connect';
+import { ConnectHOC } from './connect-hoc';
+import { mutationGql, queryGql } from '../test-utils';
 
-import React, { Component } from 'react';
-import ConnectHOC from './connect-hoc';
-import renderer from 'react-test-renderer';
+const Connect = ConnectMock as jest.Mock;
+Connect.mockReturnValue(<div />);
 
-describe('Connect HOC', () => {
-  it('should wrap its component argument with connect', () => {
-    const Comp = args => <div {...args} />;
-    const Wrapped = ConnectHOC()(Comp);
-    // @ts-ignore
-    const component = renderer.create(
-      // @ts-ignore
-      <Wrapped />
-    );
-    let tree = component.toJSON();
-    expect(tree).toMatchSnapshot();
-  });
+const connectOpts = {
+  mutation: { test: mutationGql },
+  query: queryGql,
+};
 
-  it('should wrap its component argument with connect with functional options', () => {
-    const Comp = args => <div {...args} />;
-    const Wrapped = ConnectHOC(props => ({
-      cache: props.cache,
-    }))(Comp);
-    // @ts-ignore
-    const component = renderer.create(
-      // @ts-ignore
-      <Wrapped cache={false} />
-    );
-    let tree = component.toJSON();
-    expect(tree).toMatchSnapshot();
-  });
+const TargetComponent = function() {
+  return <div />;
+};
 
-  it('should wrap its component argument with connect and hoist the statics', () => {
-    class Comp extends React.Component {
-      static foo = {
-        bar: 'foobar',
-      };
+beforeEach(() => {
+  Connect.mockClear();
+});
 
-      render() {
-        return <div {...this.props} />;
-      }
-    }
+it('passes snapshot', () => {
+  const Connected = ConnectHOC(connectOpts)(TargetComponent);
+  const wrapper = mount(<Connected />);
 
-    const Wrapped = ConnectHOC()(Comp);
-    // @ts-ignore
-    const component = renderer.create(
-      // @ts-ignore
-      <Wrapped />
-    );
+  expect(wrapper).toMatchSnapshot();
+});
 
-    expect(Wrapped).toHaveProperty('foo', {
-      bar: 'foobar',
-    });
+it('Names connected component Connect(<ChildName>)', () => {
+  const Connected = ConnectHOC(connectOpts)(TargetComponent);
+  const wrapper = mount(<Connected />);
 
-    let tree = component.toJSON();
-    expect(tree).toMatchSnapshot();
-  });
+  expect(wrapper.find('Connect(TargetComponent)').length).toBe(1);
+});
 
-  it('should assign reasonable displayNames to components', () => {
-    class Comp extends Component {
-      static displayName = 'Test';
-      render() {
-        return null;
-      }
-    }
+it('Calls Connect component', () => {
+  const Connected = ConnectHOC(connectOpts)(TargetComponent);
+  const wrapper = mount(<Connected />);
 
-    expect(ConnectHOC()(Comp).displayName).toBe('Connect(Test)');
+  expect(Connect).toBeCalled();
+});
 
-    const TestComp = () => null;
-    expect(ConnectHOC()(TestComp).displayName).toBe('Connect(TestComp)');
+it('Calls Connect component with opts', () => {
+  const Connected = ConnectHOC(connectOpts)(TargetComponent);
+  mount(<Connected />);
 
-    expect(ConnectHOC()({} as any).displayName).toBe('Connect(Component)');
-  });
+  expect(Connect.mock.calls[0][0]).toEqual(
+    expect.objectContaining(connectOpts)
+  );
+});
+
+it('Calls Connect component with children', () => {
+  const Connected = ConnectHOC(connectOpts)(TargetComponent);
+  mount(<Connected />);
+
+  expect(Connect.mock.calls[0][0].children.displayName).toEqual(
+    'TargetComponent'
+  );
 });

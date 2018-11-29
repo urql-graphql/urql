@@ -1,200 +1,154 @@
-import Observable from 'zen-observable-ts';
-
+import { Subject, Observable, Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
+import * as uuid from 'uuid';
+import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
+import { hashString } from '../lib';
 import {
-  ClientEventType,
-  EventFn,
-  Cache,
+  Client,
   ClientOptions,
-  Exchange,
+  CreateClientInstanceOpts,
+  Operation,
   ExchangeResult,
+  Exchange,
   Query,
+  Mutation,
+  ClientInstance,
 } from '../types';
 
-import { cacheExchange } from '../exchanges/cache';
-import { dedupExchange } from '../exchanges/dedup';
-import { defaultCache } from './default-cache';
-import { hashString } from './hash';
-import { httpExchange } from '../exchanges/http';
+const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
 
-const getQueryKey = (q: Query) => {
-  const { query, variables } = q;
-  return hashString(JSON.stringify({ query, variables }));
+export const createClient = (opts: ClientOptions): Client => {
+  /** Cache of all instance subscriptions */
+  const subscriptions = new Map<string, Map<string, Subscription>>();
+
+  /** Main subject for emitting operations */
+  const subject = new Subject<Operation>();
+  /** Main subject stream for listening to operation responses */
+  const subject$ = subject.pipe(
+    pipeExchanges(
+      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
+      subject
+    )
+  );
+
+  const fetchOptions =
+    typeof opts.fetchOptions === 'function'
+      ? opts.fetchOptions()
+      : opts.fetchOptions !== undefined ? opts.fetchOptions : {};
+
+  /** Convert a query to an operation type */
+  const createOperation = (
+    type: string,
+    query: Query,
+    force: boolean = false
+  ) => ({
+    ...query,
+    key: hashString(JSON.stringify(query)),
+    operationName: type,
+    context: {
+      url: opts.url,
+      fetchOptions,
+      force,
+    },
+  });
+
+  const executeOperation = (operation: Operation) => subject.next(operation);
+
+  /** Function to manage subscriptions on a Consumer by Consumer basis */
+  const createInstance = (
+    instanceOpts: CreateClientInstanceOpts
+  ): ClientInstance => {
+    const id = uuid.v4();
+
+    const getSubscriptions = () =>
+      subscriptions.has(id)
+        ? subscriptions.get(id)
+        : new Map<string, Subscription>();
+
+    const updateSubscriptions = (subs: Map<string, Subscription>) =>
+      subscriptions.set(id, subs);
+
+    const executeQuery = (query: Query, force?: boolean) => {
+      const operation = createOperation('query', query, force);
+
+      const outboundKey = `${operation.key}-out`;
+      const inboundKey = `${operation.key}-in`;
+
+      const instanceSubscriptions = getSubscriptions();
+
+      if (!instanceSubscriptions.has(outboundKey)) {
+        /** Notify component when fetching query is occurring */
+        const outboundSub = subject
+          .pipe(filter(newOp => newOp.key === operation.key))
+          .subscribe(instanceOpts.onChange({ fetching: true }));
+
+        instanceSubscriptions.set(outboundKey, outboundSub);
+      }
+
+      if (!instanceSubscriptions.has(inboundKey)) {
+        /** Notify component when query operation has returned */
+        const inboundSub = subject$
+          .pipe(
+            filter(
+              (result: ExchangeResult) => result.operation.key === operation.key
+            )
+          )
+          .subscribe(response =>
+            instanceOpts.onChange({
+              data: response.data,
+              error: response.error,
+              fetching: false,
+            })
+          );
+        instanceSubscriptions.set(inboundKey, inboundSub);
+      }
+
+      updateSubscriptions(instanceSubscriptions);
+      executeOperation(operation);
+    };
+
+    const executeMutation = (query: Mutation) => {
+      const operation = createOperation('mutation', query);
+      subject
+        .pipe(take(1), filter(incomingOp => incomingOp.key === operation.key))
+        .subscribe();
+
+      executeOperation(operation);
+    };
+
+    const unsubscribe = () => {
+      const subs = getSubscriptions();
+      [...subs.values()].forEach(sub => sub.unsubscribe());
+    };
+
+    return {
+      executeQuery,
+      executeMutation,
+      unsubscribe,
+    };
+  };
+
+  return {
+    createInstance,
+  };
 };
 
-export class Client {
-  url: string;
-  store: object; // Internal store
-  subscriptionSize: number; // Used to generate IDs for subscriptions
-  cache: Cache; // Cache object
-  exchange: Exchange; // Exchange to communicate with GraphQL APIs
-  fetchOptions: RequestInit | (() => RequestInit); // Options for fetch call
-  subscriptions: { [id: string]: EventFn }; // Map of subscribed Connect components
-
-  constructor(opts?: ClientOptions) {
-    if (!opts) {
-      throw new Error('Please provide configuration object');
-    } else if (!opts.url) {
-      throw new Error('Please provide a URL for your GraphQL API');
+/** Create pipe of exchanges */
+const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
+  operation: Observable<Operation>
+) => {
+  /** Recursively pipe to each exchange */
+  const callExchanges = (value: Observable<Operation>, index: number = 0) => {
+    if (exchanges.length < index) {
+      return value;
     }
 
-    this.url = opts.url;
-    this.store = opts.initialCache || {};
-    this.subscriptions = Object.create(null);
-    this.subscriptionSize = 0;
-    this.cache = opts.cache || defaultCache(this.store);
-    this.fetchOptions = opts.fetchOptions || {};
-
-    const exchange = cacheExchange(this, dedupExchange(httpExchange()));
-    this.exchange = opts.transformExchange
-      ? opts.transformExchange(exchange, this)
-      : exchange;
-  }
-
-  /* Event handler methods: */
-
-  dispatch: EventFn = (type, payload) => {
-    /* tslint:disable-next-line forin */
-    for (const sub in this.subscriptions) {
-      this.subscriptions[sub](type, payload);
-    }
+    const currentExchange = exchanges[index];
+    return currentExchange({
+      forward: val => callExchanges(val, index + 1),
+      subject,
+    })(value);
   };
 
-  subscribe(callback: EventFn): () => void {
-    // Create an identifier, add callback to subscriptions
-    const id = this.subscriptionSize++;
-    this.subscriptions[id] = callback;
-
-    // Return unsubscription function
-    return () => {
-      delete this.subscriptions[id];
-    };
-  }
-
-  /* Cache methods: */
-
-  // Receives keys and invalidates them on the cache
-  // Dispatches a CacheKeysInvalidated event after
-  deleteCacheKeys = (keys: string[]): Promise<void> => {
-    const batchedInvalidate = keys.map(key => this.cache.invalidate(key));
-
-    return Promise.all(batchedInvalidate).then(() => {
-      this.dispatch(ClientEventType.CacheKeysInvalidated, keys);
-    });
-  };
-
-  // Receives [key, value] entry and writes it to the cache
-  // Dispatches a CacheEntryUpdated event after
-  updateCacheEntry = (key: string, value: any): Promise<void> => {
-    return this.cache.write(key, value).then(() => {
-      this.dispatch(ClientEventType.CacheKeysInvalidated, [key]);
-    });
-  };
-
-  refreshAllFromCache = () => {
-    this.dispatch(ClientEventType.RefreshAll, undefined);
-  };
-
-  invalidateQuery = (queryObject: Query) => {
-    const key = getQueryKey(queryObject);
-    return this.cache.invalidate(key).then(() => {
-      this.dispatch(ClientEventType.CacheKeysInvalidated, [key]);
-    });
-  };
-
-  // Cache methods that are exposed on the component and will dispatch their
-  // changes
-  cacheWithEvents: Cache = {
-    write: this.updateCacheEntry,
-    read: (key: string) => this.cache.read(key),
-    invalidate: (key: string) => this.deleteCacheKeys([key]),
-    invalidateAll: () =>
-      this.cache.invalidateAll().then(() => {
-        this.dispatch(ClientEventType.RefreshAll, undefined);
-      }),
-    update: (callback: (...args: any[]) => void) =>
-      this.cache.update(callback).then(() => {
-        this.dispatch(ClientEventType.RefreshAll, undefined);
-      }),
-  };
-
-  /* Execute methods: */
-
-  makeContext({ skipCache }: { skipCache?: boolean }): Record<string, any> {
-    return {
-      fetchOptions:
-        typeof this.fetchOptions === 'function'
-          ? this.fetchOptions()
-          : this.fetchOptions,
-      skipCache: !!skipCache,
-      url: this.url,
-    };
-  }
-
-  executeSubscription$(subscriptionObject: Query): Observable<ExchangeResult> {
-    const { query, variables } = subscriptionObject;
-
-    const operation = {
-      context: this.makeContext({}),
-      key: getQueryKey(subscriptionObject),
-      operationName: 'subscription',
-      query,
-      variables,
-    };
-
-    return this.exchange(operation);
-  }
-
-  executeQuery$(
-    queryObject: Query,
-    skipCache: boolean
-  ): Observable<ExchangeResult> {
-    const { query, variables } = queryObject;
-
-    const operation = {
-      context: this.makeContext({ skipCache }),
-      key: getQueryKey(queryObject),
-      operationName: 'query',
-      query,
-      variables,
-    };
-
-    return this.exchange(operation);
-  }
-
-  executeQuery = (
-    queryObject: Query,
-    skipCache: boolean
-  ): Promise<ExchangeResult> => {
-    return new Promise<ExchangeResult>((resolve, reject) => {
-      this.executeQuery$(queryObject, skipCache).subscribe({
-        error: reject,
-        next: resolve,
-      });
-    });
-  };
-
-  executeMutation$(mutationObject: Query): Observable<ExchangeResult['data']> {
-    const { query, variables } = mutationObject;
-
-    const operation = {
-      context: this.makeContext({}),
-      key: getQueryKey(mutationObject),
-      operationName: 'mutation',
-      query,
-      variables,
-    };
-
-    return this.exchange(operation).map(x => x.data);
-  }
-
-  executeMutation = (
-    mutationObject: Query
-  ): Promise<ExchangeResult['data']> => {
-    return new Promise<ExchangeResult>((resolve, reject) => {
-      this.executeMutation$(mutationObject).subscribe({
-        error: reject,
-        next: resolve,
-      });
-    });
-  };
-}
+  return callExchanges(operation, 0);
+};

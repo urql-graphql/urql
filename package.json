@@ -61,6 +61,7 @@
     }
   ],
   "devDependencies": {
+    "@types/enzyme": "^3.1.15",
     "@types/graphql": "^0.12.1",
     "@types/jest": "^23.3.9",
     "@types/react": "^16.0.34",
@@ -71,7 +72,8 @@
     "bundlesize": "^0.17.0",
     "cors": "^2.8.4",
     "coveralls": "^3.0.0",
-    "enzyme": "^3.3.0",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.7.0",
     "express": "^4.16.2",
     "express-graphql": "^0.6.11",
     "graphql-tools": "^2.18.0",
@@ -93,7 +95,6 @@
     "tslint-config-prettier": "^1.16.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.1.6",
-    "uuid": "^3.2.1",
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10"
@@ -106,8 +107,8 @@
   "dependencies": {
     "create-react-context": "^0.2.3",
     "graphql": "^0.13.1",
-    "hoist-non-react-statics": "^2.5.0",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "uuid": "^3.3.2"
   },
   "sideEffects": false
 }

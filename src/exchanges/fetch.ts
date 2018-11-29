@@ -1,97 +1,70 @@
-import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import { Exchange } from '../types';
-import { CombinedError } from '../lib/error';
+import { CombinedError } from '../lib';
 
-export const fetchExchange: Exchange = () => ops$ =>
-  ops$.pipe(
-    flatMap(operation => {
-      const { url, fetchOptions } = operation.context;
-      const { operationName } = operation;
+export const fetchExchange: Exchange = () => {
+  return ops$ =>
+    ops$.pipe(
+      flatMap(async operation => {
+        if (operation.operationName === 'subscription') {
+          throw new Error(
+            'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
+          );
+        }
 
-      if (operationName === 'subscription') {
-        throw new Error(
-          'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
-        );
-      }
+        const body = JSON.stringify({
+          query: operation.query,
+          variables: operation.variables,
+        });
 
-      const body = JSON.stringify({
-        query: operation.query,
-        variables: operation.variables,
-      });
-      // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/AbortController
-      const abortController = createAbortController();
+        let response: Response;
+        let result: any;
 
-      return new Observable(observer => {
-        let response;
-
-        fetch(url, {
-          body,
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-          signal: abortController.signal,
-          ...fetchOptions,
-        })
-          .then(res => (response = res))
-          .then(checkStatus(fetchOptions.redirect))
-          .then(res => res.json())
-          .then(result => {
-            let error;
-            if (Array.isArray(result.errors)) {
-              error = new CombinedError({
-                graphQLErrors: result.errors,
-                response,
-              });
-            }
-
-            observer.next({
-              operation,
-              data: result.data,
-              error,
-            });
-          })
-          .catch(err => {
-            if (err.name === 'AbortError') {
-              return;
-            }
-
-            const error = new CombinedError({
-              networkError: err,
-              response,
-            });
-
-            observer.next({
-              operation,
-              data: undefined,
-              error,
-            });
+        try {
+          const { url, fetchOptions } = operation.context;
+          response = await fetch(url, {
+            body,
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            ...fetchOptions,
           });
 
-        return () => {
-          if (abortController.abort) {
-            abortController.abort();
+          checkStatus(fetchOptions.redirect, response);
+
+          result = await response.json();
+
+          return {
+            operation,
+            data: result.data,
+            error: Array.isArray(result.errors)
+              ? new CombinedError({
+                  graphQLErrors: result.errors,
+                  response,
+                })
+              : undefined,
+          };
+        } catch (err) {
+          if (err.name === 'AbortError') {
+            return;
           }
-        };
-      });
-    })
-  );
 
-const createAbortController = () => {
-  if (typeof AbortController === 'undefined') {
-    return { abort: null, signal: undefined };
-  }
-
-  return new AbortController();
+          return {
+            operation,
+            data: undefined,
+            error: new CombinedError({
+              networkError: err,
+              response,
+            }),
+          };
+        }
+      })
+    );
 };
 
-const checkStatus = (redirectMode: string = 'follow') => (
-  response: Response
-) => {
-  // If using manual redirect mode, don't error on redirect!
+const checkStatus = (redirectMode: string = 'follow', response: Response) => {
   const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
-  if (response.status >= 200 && response.status < statusRangeEnd) {
-    return response;
-  }
 
-  throw new Error(response.statusText);
+  if (response.status < 200 || response.status > statusRangeEnd) {
+    throw new Error(response.statusText);
+  }
 };

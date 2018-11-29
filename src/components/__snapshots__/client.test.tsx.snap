@@ -1,3 +1,180 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Client Component should not accept query and subscription props at the same time 1`] = `"Passing a query and a subscription prop at the same time without an updateSubscription function is invalid."`;
+exports[`on creation defaults passes snapshot 1`] = `
+Array [
+  Array [
+    Object {
+      "data": undefined,
+      "error": undefined,
+      "fetching": true,
+      "mutations": Object {
+        "addUser": [Function],
+        "removeUser": [Function],
+      },
+      "refetch": [Function],
+    },
+  ],
+]
+`;
+
+exports[`passes snapshot 1`] = `
+ShallowWrapper {
+  Symbol(enzyme.__root__): [Circular],
+  Symbol(enzyme.__unrendered__): <UrqlClient
+    client={
+      Object {
+        "createInstance": [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {
+                "onChange": [Function],
+              },
+            ],
+          ],
+          "results": Array [
+            Object {
+              "isThrow": false,
+              "value": Object {
+                "executeMutation": [MockFunction],
+                "executeQuery": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+                        "variables": Object {
+                          "name": "Clara",
+                        },
+                      },
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "isThrow": false,
+                      "value": undefined,
+                    },
+                  ],
+                },
+                "unsubscribe": [MockFunction],
+              },
+            },
+          ],
+        },
+      }
+    }
+    mutation={
+      Object {
+        "addUser": Object {
+          "query": "mutation AddUser($name: String){
+    addUser(name: $name) {
+      name
+    }
+  }",
+          "variables": Object {
+            "name": "Clara",
+          },
+        },
+        "removeUser": Object {
+          "query": "mutation removeUser() {}",
+          "variables": Object {
+            "name": "Clara",
+          },
+        },
+      }
+    }
+    query={
+      Object {
+        "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+        "variables": Object {
+          "name": "Clara",
+        },
+      }
+    }
+  >
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          Object {
+            "data": undefined,
+            "error": undefined,
+            "fetching": true,
+            "mutations": Object {
+              "addUser": [Function],
+              "removeUser": [Function],
+            },
+            "refetch": [Function],
+          },
+        ],
+      ],
+      "results": Array [
+        Object {
+          "isThrow": false,
+          "value": <h1>
+            This is a child component
+          </h1>,
+        },
+      ],
+    }
+  </UrqlClient>,
+  Symbol(enzyme.__renderer__): Object {
+    "batchedUpdates": [Function],
+    "getNode": [Function],
+    "render": [Function],
+    "simulateError": [Function],
+    "simulateEvent": [Function],
+    "unmount": [Function],
+  },
+  Symbol(enzyme.__node__): Object {
+    "instance": null,
+    "key": undefined,
+    "nodeType": "host",
+    "props": Object {
+      "children": "This is a child component",
+    },
+    "ref": null,
+    "rendered": "This is a child component",
+    "type": "h1",
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "host",
+      "props": Object {
+        "children": "This is a child component",
+      },
+      "ref": null,
+      "rendered": "This is a child component",
+      "type": "h1",
+    },
+  ],
+  Symbol(enzyme.__options__): Object {
+    "adapter": ReactSixteenAdapter {
+      "options": Object {
+        "enableComponentDidUpdateOnSetState": true,
+        "lifecycles": Object {
+          "componentDidUpdate": Object {
+            "onSetState": true,
+          },
+          "getDerivedStateFromProps": true,
+          "getSnapshotBeforeUpdate": true,
+          "setState": Object {
+            "skipsComponentDidUpdateOnNullish": true,
+          },
+        },
+      },
+    },
+  },
+}
+`;

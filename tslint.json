@@ -9,6 +9,7 @@
     "ordered-imports": false,
     "member-access": false,
     "no-submodule-imports": false,
-    "interface-name": false
+    "interface-name": false,
+    "only-arrow-functions": false
   }
 }

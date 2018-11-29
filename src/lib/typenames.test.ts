@@ -7,6 +7,7 @@ describe('formatTypeNames', () => {
     id
     __typename
   }
+  __typename
 }
 `);
   });

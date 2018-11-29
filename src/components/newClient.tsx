@@ -1,7 +1,6 @@
 import { Component, ReactNode } from 'react';
 import {
   Client,
-  ChildArgs,
   Query,
   Mutation,
   ClientInstance,
@@ -9,43 +8,45 @@ import {
 } from '../types';
 import { CombinedError } from '../lib';
 
-export interface ClientState<M> {
+export interface ClientProps {
+  client: Client;
+  children: (obj: object) => ReactNode;
+  query?: Query;
+  mutation?: {
+    [key: string]: Mutation;
+  };
+}
+
+interface ClientState {
   client: ClientInstance;
   fetching: boolean;
   error: Error | CombinedError | CombinedError[];
-  data: any | any[];
-  mutations: { [type in keyof M]: (vals: any) => void };
+  data: object | object[] | ClientState;
+  mutations: {
+    [key: string]: (vals: any) => void;
+  };
 }
 
-export interface ClientProps<M> {
-  client: Client;
-  children: (obj: ChildArgs<M>) => ReactNode;
-  query?: Query;
-  mutation?: { [type in keyof M]: Mutation };
-}
-
-export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
-  constructor(props: ClientProps<M>) {
+export class UrqlClient extends Component<ClientProps, ClientState> {
+  constructor(props: ClientProps) {
     super(props);
 
     this.state = {
       client: props.client.createInstance({
         onChange: result => this.onStreamUpdate(result),
       }),
-      data: undefined,
-      error: undefined,
-      fetching: true,
-      mutations: this.getMutatorFunctions(),
+      data: null,
+      error: null,
+      fetching: false,
+      mutations: null,
     };
-  }
 
-  public componentDidMount() {
-    this.state.client.executeQuery(this.props.query);
+    this.createMutatorFunctions();
   }
 
   public componentDidUpdate(prevProps) {
     if (prevProps.mutation !== this.props.mutation) {
-      this.setState({ mutations: this.getMutatorFunctions() });
+      this.createMutatorFunctions();
     }
 
     if (prevProps.query !== this.props.query) {
@@ -67,29 +68,28 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
       error: this.state.error,
       data: this.state.data,
       mutations: this.state.mutations,
-      refetch: (noCache: boolean = false) =>
-        this.state.client.executeQuery(this.props.query, noCache),
     });
   }
 
-  private getMutatorFunctions() {
+  private createMutatorFunctions() {
     if (this.props.mutation === undefined) {
       return;
     }
 
-    const mutations = Object.keys(this.props.mutation).reduce(
-      (prev, key) => ({
-        ...prev,
+    let mutations = {};
+
+    Object.keys(this.props.mutation).forEach(key => {
+      mutations = {
+        ...mutations,
         [key]: (variables: any) =>
           this.state.client.executeMutation({
             ...this.props.mutation[key],
             variables,
           }),
-      }),
-      {}
-    ) as ClientState<M>['mutations'];
+      };
+    });
 
-    return mutations;
+    this.setState({ mutations });
   }
 
   private onStreamUpdate(updated: StreamUpdate) {

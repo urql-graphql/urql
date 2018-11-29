@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import * as React from 'react';
-import { Connect, query, mutation, UrqlProps } from '../../../src/index';
+import { Connect, query, mutation } from '../../../src/';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
 import Loading from './loading';
@@ -25,28 +25,19 @@ const Home: React.SFC<{}> = () => (
       addTodo: mutation(AddTodo),
       removeTodo: mutation(RemoveTodo),
     }}
-    children={({
-      loaded,
-      data,
-      addTodo,
-      removeTodo,
-      refetch,
-    }: UrqlProps<ITodoQuery, ITodoMutations>) => {
+    children={({ data, mutations, fetching, refetch }) => {
       return (
         <div>
-          {!loaded ? (
+          {fetching ? (
             <Loading />
           ) : (
-            <TodoList todos={data.todos} removeTodo={removeTodo} />
+            <TodoList todos={data.todos} removeTodo={mutations.removeTodo} />
           )}
-          <TodoForm addTodo={addTodo} />
-          <button type="button" onClick={() => refetch({})}>
+          <TodoForm addTodo={mutations.addTodo} />
+          <button type="button" onClick={() => refetch()}>
             Refetch
           </button>
-          <button
-            type="button"
-            onClick={refetch.bind(null, { skipCache: true })}
-          >
+          <button type="button" onClick={() => refetch(true)}>
             Refetch (Skip Cache)
           </button>
         </div>
