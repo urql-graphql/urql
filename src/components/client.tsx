@@ -32,8 +32,8 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
       client: props.client.createInstance({
         onChange: result => this.onStreamUpdate(result),
       }),
-      data: null,
-      error: null,
+      data: undefined,
+      error: undefined,
       fetching: true,
       mutations: this.getMutatorFunctions(),
     };
