@@ -68,7 +68,7 @@ export interface Cache {
 
 export interface ClientOptions {
   url: string;
-  fetchOptions?: any | (() => any);
+  fetchOptions?: RequestInit | (() => RequestInit);
   exchanges?: Exchange[];
 }
 

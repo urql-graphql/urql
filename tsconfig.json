@@ -10,7 +10,6 @@
     "module": "es2015",
     "moduleResolution": "node",
     "target": "es2015",
-    "noUnusedLocals": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "pretty": true
