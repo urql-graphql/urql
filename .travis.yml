@@ -9,11 +9,6 @@ node_js:
 # Use container-based Travis infrastructure.
 sudo: false
 
-branches:
-  only:
-    - master
-    - next
-
 notifications:
   email:
     on_success: change
@@ -23,7 +18,6 @@ cache: yarn
 
 script:
   # Run tests
-  - yarn run type-check
   - yarn run lint
   - yarn run test
   - yarn run coverage
