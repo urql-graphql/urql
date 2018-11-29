@@ -5,7 +5,7 @@ import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
 
 export const cacheExchange: Exchange = ({ forward, subject }) => {
   const cache = new Map<string, ExchangeResult>();
-  const cachedTypenames = new Map<string, string[]>();
+  const cachedTypenames = new Map<string, Set<string>>();
 
   // Adds unique typenames to query (for invalidating cache entries)
   const mapTypeNames = (operation: Operation): Operation => ({
@@ -51,16 +51,15 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
 export const afterMutation = (
   response: ExchangeResult,
   cache: Map<string, ExchangeResult>,
-  cachedTypenames: Map<string, string[]>,
+  cachedTypenames: Map<string, Set<string>>,
   subject: Subject<Operation>
 ) => {
   let pendingOperations: Operation[] = [];
 
-  const typenames = gankTypeNamesFromResponse(response.data.data);
+  const typenames = gankTypeNamesFromResponse(response.data);
 
   typenames.forEach(typename => {
     const typenameCacheKeys = cachedTypenames.get(typename);
-
     if (typenameCacheKeys === undefined) {
       return;
     }
@@ -81,19 +80,20 @@ export const afterMutation = (
 const afterQuery = (
   response: ExchangeResult,
   cache: Map<string, ExchangeResult>,
-  cachedTypenames: Map<string, string[]>
+  cachedTypenames: Map<string, Set<string>>
 ) => {
   const key = response.operation.key;
   cache.set(key, response);
 
-  const typenames = gankTypeNamesFromResponse(response.data.data);
+  const typenames = gankTypeNamesFromResponse(response.data);
 
   typenames.forEach(typename => {
     const typenameCacheKeys = cachedTypenames.get(typename);
-
     cachedTypenames.set(
       typename,
-      typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
+      new Set(
+        typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
+      )
     );
   });
 };

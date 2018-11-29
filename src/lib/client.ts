@@ -52,22 +52,6 @@ export const createClient = (opts: ClientOptions): Client => {
     },
   });
 
-  /** Get a subject stream that only contains responses for the given operation */
-  const filterResponseByOperation = (operation: Operation) => {
-    return subject$.pipe(
-      take(1),
-      filter((result: ExchangeResult) => result.operation.key === operation.key)
-    );
-  };
-
-  /** Get a subject stream that only contains triggered operations for the given operation id */
-  const filterOperationById = (operation: Operation) => {
-    return subject.pipe(
-      take(1),
-      filter((newOp: Operation) => newOp.key === operation.key)
-    );
-  };
-
   const executeOperation = (operation: Operation) => subject.next(operation);
 
   /** Function to manage subscriptions on a Consumer by Consumer basis */
@@ -94,23 +78,28 @@ export const createClient = (opts: ClientOptions): Client => {
 
       if (!instanceSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
-        const outboundSub = filterOperationById(operation).subscribe(
-          instanceOpts.onChange({ fetching: true })
-        );
+        const outboundSub = subject
+          .pipe(filter(newOp => newOp.key === operation.key))
+          .subscribe(instanceOpts.onChange({ fetching: true }));
 
         instanceSubscriptions.set(outboundKey, outboundSub);
       }
 
       if (!instanceSubscriptions.has(inboundKey)) {
         /** Notify component when query operation has returned */
-        const inboundSub = filterResponseByOperation(operation).subscribe(
-          response =>
+        const inboundSub = subject$
+          .pipe(
+            filter(
+              (result: ExchangeResult) => result.operation.key === operation.key
+            )
+          )
+          .subscribe(response =>
             instanceOpts.onChange({
               data: response.data,
               error: response.error,
               fetching: false,
             })
-        );
+          );
         instanceSubscriptions.set(inboundKey, inboundSub);
       }
 
@@ -120,8 +109,8 @@ export const createClient = (opts: ClientOptions): Client => {
 
     const executeMutation = (query: Mutation) => {
       const operation = createOperation('mutation', query);
-      filterResponseByOperation(operation)
-        .pipe(take(2))
+      subject
+        .pipe(take(1), filter(incomingOp => incomingOp.key === operation.key))
         .subscribe();
 
       executeOperation(operation);
