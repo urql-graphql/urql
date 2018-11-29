@@ -71,7 +71,7 @@
     "bundlesize": "^0.17.0",
     "cors": "^2.8.4",
     "coveralls": "^3.0.0",
-    "enzyme": "^3.3.0",
+    "enzyme": "^3.7.0",
     "express": "^4.16.2",
     "express-graphql": "^0.6.11",
     "graphql-tools": "^2.18.0",
@@ -104,7 +104,9 @@
     "react-dom": "^16.0.0-0"
   },
   "dependencies": {
+    "@types/enzyme": "^3.1.15",
     "create-react-context": "^0.2.3",
+    "enzyme-adapter-react-16": "^1.7.0",
     "graphql": "^0.13.1",
     "hoist-non-react-statics": "^2.5.0",
     "rxjs": "^6.3.3"
