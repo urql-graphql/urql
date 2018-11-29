@@ -21,8 +21,8 @@ Universal React Query Library
     * [Props](#props)
     * [Render Args](#render-args)
   * [ConnectHOC](#connecthoc)
-  * [query](#query)
-  * [mutation](#mutation)
+  * [createQuery](#createQuery)
+  * [createMutation](#createMutation)
   * [CombinedError](#combinederror)
   * [Exchanges](#exchanges)
 * [Prior Art](#prior-art)
@@ -122,9 +122,9 @@ Now we can use the `mutation` and `query` functions to format them in the way `u
 ```javascript
 const Home = () => (
   <Connect
-    query={query(TodoQuery)}
+    query={createQuery(TodoQuery)}
     mutation={{
-      addTodo: mutation(AddTodo),
+      addTodo: createMutation(AddTodo),
     }}
     children={({ loaded, fetching, refetch, data, error, addTodo }) => {
       //...Your Component
@@ -138,9 +138,9 @@ You can also use functional child style:
 ```javascript
 const Home = () => (
   <Connect
-    query={query(TodoQuery)}
+    query={createQuery(TodoQuery)}
     mutation={{
-      addTodo: mutation(AddTodo),
+      addTodo: createMutation(AddTodo),
     }}
   >
     {({ loaded, fetching, refetch, data, error, addTodo }) => {
@@ -163,12 +163,12 @@ Also, any mutations, because they are named, are also passed into this render pr
 
 As you can see above, the `query` accepts either a single query, or an array of queries. The `mutation` prop accepts an object, with the mutation names as keys.
 
-So why do we use these `query` and `mutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
+So why do we use these `createQuery` and `createMutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
 
 ```javascript
-import { query } from 'urql';
+import { createQuery } from 'urql';
 
-query(TodoQuery, { myVariable: 5 });
+createQuery(TodoQuery, { myVariable: 5 });
 ```
 
 Similarly, you can pass variables to your mutation. Mutation, however is a bit different, in the sense that it returns a function that you can call with a variable set:
@@ -176,7 +176,7 @@ Similarly, you can pass variables to your mutation. Mutation, however is a bit d
 ```javascript
 import { mutation } from 'urql';
 
-mutation(AddTodo); // No initial variables
+createMutation(AddTodo); // No initial variables
 
 // After you pass 'addTodo' from the render prop to a component:
 
@@ -190,7 +190,7 @@ Normally in `urql`, the cache is aggressively invalidated based upon `__typename
 ```javascript
 const MyComponent = () => (
   <Connect
-    query={query(MyQuery)}
+    query={createQuery(MyQuery)}
     shouldInvalidate={(changedTypenames, typenames, mutationResponse, data) => {
       return data.todos.some(d => d.id === mutationResponse.id);
     }}
@@ -345,7 +345,7 @@ Example:
 
 ```jsx
 <Connect
-  query={query(MyQuery)}
+  query={createQuery(MyQuery)}
   children={({loaded, data}) => {
     return loaded ? <Loading/> : <List data={data.todos}>
   }}
@@ -355,7 +355,7 @@ Example:
 
 <Connect
   mutation={{
-    addTodo: mutation(AddTodo)
+    addTodo: createMutation(AddTodo)
   }}
   children={({ addTodo }) => {
     return <button type="button" onClick={addTodo}>Add Todo</button>
@@ -373,26 +373,26 @@ Example:
 
 ```javascript
 export default ConnectHOC({
-  query: query(TodoQuery)
+  query: createQuery(TodoQuery)
 })(MyComponent);
 
 // or
 
 export default ConnectHOC((props) => {
-  query: query(TodoQuery, { id: props.id })
+  query: createQuery(TodoQuery, { id: props.id })
 })(MyComponent);
 ```
 
-### query
+### createQuery
 
 _(query: string, variables?: object) => {query: string, variables: object}_
 
-`query` is a QueryObject creator.
+`createQuery` is a QueryObject creator.
 
 Example:
 
 ```javascript
-query(
+createQuery(
   `
 query($id: ID!) {
   todos(id: $id) {
@@ -403,16 +403,16 @@ query($id: ID!) {
 );
 ```
 
-### mutation
+### createMutation
 
 _(query: string, variables?: object) => {query: string, variables: object}_
 
-`query` is a MutationObject creator.
+`createMutation` is a MutationObject creator.
 
 Example:
 
 ```javascript
-mutation(
+createMutation(
   `
 mutation($id: ID!) {
   addTodo(id: $id) {

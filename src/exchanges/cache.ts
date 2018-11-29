@@ -1,7 +1,7 @@
 import { Subject, Observable, of } from 'rxjs';
 import { tap, map, mergeMap } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
-import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
+import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
 export const cacheExchange: Exchange = ({ forward, subject }) => {
   const cache = new Map<string, ExchangeResult>();

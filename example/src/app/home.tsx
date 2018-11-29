@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import * as React from 'react';
-import { Connect, query, mutation } from '../../../src/';
+import { Connect, createQuery, createMutation } from '../../../src/';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
 import Loading from './loading';
@@ -20,10 +20,10 @@ export interface ITodoMutations {
 
 const Home: React.SFC<{}> = () => (
   <Connect
-    query={query(TodoQuery)}
+    query={createQuery(TodoQuery)}
     mutation={{
-      addTodo: mutation(AddTodo),
-      removeTodo: mutation(RemoveTodo),
+      addTodo: createMutation(AddTodo),
+      removeTodo: createMutation(RemoveTodo),
     }}
     children={({ data, mutations, fetching, refetch }) => {
       return (
