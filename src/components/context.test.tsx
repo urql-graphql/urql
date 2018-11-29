@@ -1,10 +1,21 @@
-/* tslint:disable */
+import { ContextConsumer, ContextProvider } from './context';
 
-import * as exp from './context';
+describe('ContextConsumer', () => {
+  it('passes snapshot', () => {
+    expect(ContextConsumer).toMatchSnapshot();
+  });
 
-describe('Context', () => {
-  it('should export a new react context', () => {
-    expect(exp.ContextConsumer).toBeTruthy();
-    expect(exp.ContextProvider).toBeTruthy();
+  it('is exported', () => {
+    expect(typeof ContextConsumer).toBe('object');
+  });
+});
+
+describe('ContextProvider', () => {
+  it('passes snapshot', () => {
+    expect(ContextProvider).toMatchSnapshot();
+  });
+
+  it('is exported', () => {
+    expect(typeof ContextProvider).toBe('object');
   });
 });
