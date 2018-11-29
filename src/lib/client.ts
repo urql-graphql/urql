@@ -19,7 +19,7 @@ const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
 
 export const createClient = (opts: ClientOptions): Client => {
   /** Cache of all instance subscriptions */
-  const subscriptions = new Map<string, Subscription[]>();
+  const subscriptions = new Map<string, Map<string, Subscription>>();
 
   /** Main subject for emitting operations */
   const subject = new Subject<Operation>();
@@ -76,49 +76,60 @@ export const createClient = (opts: ClientOptions): Client => {
   ): ClientInstance => {
     const id = uuid.v4();
 
-    /** Add subscription to instance map */
-    const storeSubscription = (...sub: Subscription[]) => {
-      const existingSubs = subscriptions.get(id);
+    const getSubscriptions = () =>
+      subscriptions.has(id)
+        ? subscriptions.get(id)
+        : new Map<string, Subscription>();
 
-      subscriptions.set(
-        id,
-        existingSubs === undefined ? sub : [...existingSubs, ...sub]
-      );
-    };
+    const updateSubscriptions = (subs: Map<string, Subscription>) =>
+      subscriptions.set(id, subs);
 
     const executeQuery = (query: Query, force?: boolean) => {
       const operation = createOperation('query', query, force);
 
-      /** Notify component when fetching query is occurring */
-      const outboundOp$ = filterOperationById(operation).subscribe(
-        instanceOpts.onChange({ fetching: true })
-      );
+      const outboundKey = `${operation.key}-out`;
+      const inboundKey = `${operation.key}-in`;
 
-      /** Notify component when query operation has returned */
-      const inboundOp$ = filterResponseByOperation(operation).subscribe(
-        response =>
-          instanceOpts.onChange({
-            data: response.data,
-            error: response.error,
-            fetching: false,
-          })
-      );
+      const instanceSubscriptions = getSubscriptions();
 
-      storeSubscription(inboundOp$, outboundOp$);
+      if (!instanceSubscriptions.has(outboundKey)) {
+        /** Notify component when fetching query is occurring */
+        const outboundSub = filterOperationById(operation).subscribe(
+          instanceOpts.onChange({ fetching: true })
+        );
+
+        instanceSubscriptions.set(outboundKey, outboundSub);
+      }
+
+      if (!instanceSubscriptions.has(inboundKey)) {
+        /** Notify component when query operation has returned */
+        const inboundSub = filterResponseByOperation(operation).subscribe(
+          response =>
+            instanceOpts.onChange({
+              data: response.data,
+              error: response.error,
+              fetching: false,
+            })
+        );
+        instanceSubscriptions.set(inboundKey, inboundSub);
+      }
+
+      updateSubscriptions(instanceSubscriptions);
       executeOperation(operation);
     };
 
     const executeMutation = (query: Mutation) => {
       const operation = createOperation('mutation', query);
-      const subscription = filterResponseByOperation(operation).subscribe();
+      filterResponseByOperation(operation)
+        .pipe(take(2))
+        .subscribe();
 
-      storeSubscription(subscription);
       executeOperation(operation);
     };
 
     const unsubscribe = () => {
-      const subs = subscriptions.get(id);
-      subs.forEach(sub => sub.unsubscribe());
+      const subs = getSubscriptions();
+      [...subs.values()].forEach(sub => sub.unsubscribe());
     };
 
     return {
