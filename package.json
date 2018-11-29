@@ -7,7 +7,6 @@
   "module": "dist/index.mjs",
   "source": "src/index.ts",
   "scripts": {
-    "coverage": "jest --coverage",
     "build": "npm run build:clean && npm run build:bundle",
     "build:bundle": "microbundle build --no-sourcemap --target web",
     "build:clean": "rimraf dist",

@@ -3,8 +3,8 @@ dist: trusty
 language: node_js
 
 node_js:
-  - "6"
-  - "8"
+  - '6'
+  - '8'
 
 # Use container-based Travis infrastructure.
 sudo: false
@@ -19,10 +19,9 @@ cache: yarn
 script:
   # Run tests
   - yarn run lint
-  - yarn run test
-  - yarn run coverage
+  - yarn run test --coverage
   # Upload to coveralls, but don't _fail_ if coveralls is down.
   - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
   # Build and check bundlesize
-  - yarn run build 
+  - yarn run build
   - yarn run bundlesize
