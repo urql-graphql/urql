@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { ChildArgs, Client, Cache, Query, Mutation } from '../types';
+import { ChildArgs, Client, Query, Mutation } from '../types';
 import { UrqlClient } from './client';
 import { ContextConsumer } from './context';
 

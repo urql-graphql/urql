@@ -1,42 +1,22 @@
-import React, { Component } from 'react';
-import hoistStatics from 'hoist-non-react-statics';
-import { Connect } from '../components/connect';
-import { Query } from '../types';
+import React, { ComponentType } from 'react';
+import { Connect, ConnectProps } from '../components/connect';
+import { ChildArgs } from '../types';
 
-export interface ConnectHOCProps {
-  children: (props: any) => any;
-  query?: Query;
-  mutation?: {};
+export interface ConnectHOCProps<T> {
+  /** The GraphQL query to fetch */
+  query?: ConnectProps<T>['query'];
+  /** A collection of GrahpQL mutation queries */
+  mutation?: ConnectProps<T>['mutation'];
 }
 
-export const ConnectHOCWrapper = function(
-  opts?: ConnectHOCProps | ((_) => ConnectHOCProps)
-) {
-  return (Comp: any) => {
-    const componentName = Comp.displayName || Comp.name || 'Component';
+export const ConnectHOC = function<T>(opts?: ConnectHOCProps<T>) {
+  return (Comp: ComponentType<ChildArgs<T>>) => {
+    const children = (args: ChildArgs<T>) => <Comp {...args} />;
+    children.displayName = Comp.displayName || Comp.name || 'Component';
 
-    class ConnectHOC extends Component {
-      static displayName = `Connect(${componentName})`;
-      props: any;
+    const connected = () => <Connect {...opts} children={children} />;
+    connected.displayName = `Connect(${children.displayName})`;
 
-      constructor(props) {
-        super(props);
-
-        this.renderComponent = this.renderComponent.bind(this);
-      }
-
-      renderComponent(data) {
-        return <Comp {...data} {...this.props} />;
-      }
-
-      render() {
-        const connectProps =
-          typeof opts === 'function' ? opts(this.props) : opts;
-
-        return <Connect {...connectProps} children={this.renderComponent} />;
-      }
-    }
-
-    return hoistStatics(ConnectHOC, Comp);
+    return connected;
   };
 };
