@@ -14,24 +14,30 @@ jobs:
       node_js: 10
       script: yarn run lint
     - stage: Test
-      name: Jest node:8
+      name: Jest (node:8)
       node_js: 8
       script:
         - yarn run test --coverage
+      branches:
+        only:
+          - master
     - stage: Test
-      name: Jest node:10
+      name: Jest (node:10)
       node_js: 10
       script:
         - yarn run test --coverage
         - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
     - stage: Build
-      name: Build node:8
+      name: Build (node:8)
       node_js:
         - 8
       script:
         - yarn run build
+      branches:
+        only:
+          - master
     - stage: Build
-      name: Build node:10
+      name: Build (node:10)
       node_js:
         - 10
       script:
