@@ -65,7 +65,7 @@
   ],
   "devDependencies": {
     "@types/enzyme": "^3.1.15",
-    "@types/graphql": "^0.12.1",
+    "@types/graphql": "^14.0.3",
     "@types/jest": "^23.3.9",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
@@ -78,8 +78,8 @@
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.7.0",
     "express": "^4.16.2",
-    "express-graphql": "^0.6.11",
-    "graphql-tools": "^2.18.0",
+    "express-graphql": "^0.7.1",
+    "graphql-tools": "^4.0.3",
     "husky": "^1.2.0",
     "isomorphic-fetch": "^2.2.1",
     "jest": "^23.6.0",
@@ -109,7 +109,7 @@
   },
   "dependencies": {
     "create-react-context": "^0.2.3",
-    "graphql": "^0.13.1",
+    "graphql": "^14.0.2",
     "rxjs": "^6.3.3",
     "uuid": "^3.3.2"
   },
