@@ -1,15 +1,9 @@
 const defaultStore = ['test', 'test2', 'test3'];
 
 context('Integration', () => {
-  let todos;
-
-  beforeEach(async () => {
-    todos = await cy.fixture('todos.json');
-  });
-
-  describe('on page load', () => {
+  context('on page load', () => {
     it('executes/loads query', () => {
-      cy.visit('/');
+      cy.visit('http://app:3000/');
       cy.get('p').should('have.text', 'Loading...');
     });
 

@@ -41,6 +41,7 @@ module.exports = {
   target: 'web',
   stats: 'errors-only',
   devServer: {
+    allowedHosts: ['app'],
     host: '0.0.0.0',
     port: 3000,
     contentBase: path.join(__dirname, 'public'),
