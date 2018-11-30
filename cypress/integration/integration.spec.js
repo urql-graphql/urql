@@ -3,7 +3,7 @@ const defaultStore = ['test', 'test2', 'test3'];
 context('Integration', () => {
   context('on page load', () => {
     it('executes/loads query', () => {
-      cy.visit('http://app:3000/');
+      cy.visit('/');
       cy.get('p').should('have.text', 'Loading...');
     });
 
