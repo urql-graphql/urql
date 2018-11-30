@@ -43,6 +43,6 @@ jobs:
       name: Cypress
       node_js: 10
       script:
-        - npm run demo &
-        - npm i -g cypress
+        - yarn run demo &
+        - yarn global add cypress
         - cypress run
