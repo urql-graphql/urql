@@ -17,8 +17,7 @@
     "lint": "tslint --project .",
     "test": "jest",
     "bundlesize": "bundlesize",
-    "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
-    "precommit": "lint-staged"
+    "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\""
   },
   "author": "Ken Wheeler",
   "license": "MIT",
@@ -53,6 +52,11 @@
       "git add"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "bundlesize": [
     {
       "path": "./dist/index.mjs",
@@ -76,10 +80,10 @@
     "express": "^4.16.2",
     "express-graphql": "^0.7.1",
     "graphql-tools": "^4.0.3",
-    "husky": "^0.14.3",
+    "husky": "^1.2.0",
     "isomorphic-fetch": "^2.2.1",
     "jest": "^23.6.0",
-    "lint-staged": "^6.0.1",
+    "lint-staged": "^8.1.0",
     "microbundle": "^0.7.0",
     "prettier": "^1.15.2",
     "prop-types": "^15.6.0",
