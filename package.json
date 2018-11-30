@@ -7,16 +7,15 @@
   "module": "dist/index.mjs",
   "source": "src/index.ts",
   "scripts": {
-    "coverage": "jest --coverage",
+    "build": "npm run build:clean && npm run build:bundle",
+    "build:bundle": "microbundle build --no-sourcemap --target web",
     "build:clean": "rimraf dist",
     "build:ts": "tsc",
-    "build": "npm run build:clean && npm run build:ts",
     "demo:start:graphql-server": "node example/src/server/index.js",
     "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
     "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
     "lint": "tslint --project .",
     "test": "jest",
-    "bundle": "microbundle build --no-sourcemap --target web",
     "bundlesize": "bundlesize",
     "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
     "precommit": "lint-staged"

@@ -1,6 +1,5 @@
-export * from './client';
-export * from './default-cache';
-export * from './error';
-export * from './hash';
-export * from './query';
-export * from './typenames';
+export { createClient } from './client';
+export { CombinedError } from './error';
+export { hashString } from './hash';
+export { createQuery, createMutation } from './query';
+export { formatTypeNames, gankTypeNamesFromResponse } from './typenames';

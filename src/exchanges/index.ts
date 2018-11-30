@@ -1,4 +1,3 @@
 export { cacheExchange } from './cache';
-export * from './dedup';
-export * from './fetch';
-export * from './subscription';
+export { dedupeExchange } from './dedup';
+export { fetchExchange } from './fetch';
