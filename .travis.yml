@@ -40,4 +40,6 @@ jobs:
     - stage: E2E
       name: Cypress
       node_js: 10
-      script: npx cypress run
+      script:
+        - npm i -g cypress
+        - cypress run
