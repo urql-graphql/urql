@@ -1,12 +1,5 @@
 dist: trusty
 language: node_js
-node_js:
-  - '6'
-  - '8'
-  - '10'
-
-sudo: false
-
 notifications:
   email:
     on_success: change
@@ -21,19 +14,30 @@ jobs:
       node_js: 10
       script: yarn run lint
     - stage: Test
-      name: Jest
-      node_js:
-        - 6
-        - 8
-        - 10
+      name: Jest node:8
+      node_js: 8
+      script:
+        - yarn run test --coverage
+    - stage: Test
+      name: Jest node:10
+      node_js: 10
       script:
         - yarn run test --coverage
         - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
     - stage: Build
-      name: Build
+      name: Build node:8
+      node_js:
+        - 8
+      script:
+        - yarn run build
+    - stage: Build
+      name: Build node:10
+      node_js:
+        - 10
       script:
         - yarn run build
         - yarn run bundlesize
     - stage: E2E
       name: Cypress
+      node_js: 10
       script: npx cypress run
