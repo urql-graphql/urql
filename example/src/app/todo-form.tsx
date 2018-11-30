@@ -14,7 +14,7 @@ class TodoForm extends React.Component<TodoFormProps> {
   };
   render() {
     return (
-      <div>
+      <div className="form">
         <input
           type="text"
           ref={i => {

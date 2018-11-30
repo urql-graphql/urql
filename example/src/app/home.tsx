@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Connect, createQuery, createMutation } from '../../../src/';
 import TodoList from './todo-list';
 import TodoForm from './todo-form';
-import Loading from './loading';
 
 export interface ITodoQuery {
   todos: Array<{ id: string; text: string }>;
@@ -25,14 +24,18 @@ const Home: React.SFC<{}> = () => (
       addTodo: createMutation(AddTodo),
       removeTodo: createMutation(RemoveTodo),
     }}
-    children={({ data, mutations, fetching, refetch }) => {
+    children={({ data, error, mutations, fetching, refetch }) => {
+      const content = fetching ? (
+        <Loading />
+      ) : error ? (
+        <Error />
+      ) : (
+        <TodoList todos={data.todos} removeTodo={mutations.removeTodo} />
+      );
+
       return (
         <div>
-          {fetching ? (
-            <Loading />
-          ) : (
-            <TodoList todos={data.todos} removeTodo={mutations.removeTodo} />
-          )}
+          {content}
           <TodoForm addTodo={mutations.addTodo} />
           <button type="button" onClick={() => refetch()}>
             Refetch
@@ -45,6 +48,10 @@ const Home: React.SFC<{}> = () => (
     }}
   />
 );
+
+const Loading = () => <p>Loading...</p>;
+
+const Error = () => <p>Error!</p>;
 
 const AddTodo = `
 mutation($text: String!) {
