@@ -18,9 +18,14 @@ jobs:
   include:
     - stage: Test
       name: Lint
+      node_js: 10
       script: yarn run lint
     - stage: Test
-      name: Lint
+      name: Jest
+      node_js:
+        - 6
+        - 8
+        - 10
       script:
         - yarn run test --coverage
         - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
