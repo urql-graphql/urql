@@ -10,7 +10,7 @@ const TodoList: React.SFC<TodoListProps> = ({ todos, removeTodo }) => (
     {todos.map(todo => (
       <li key={todo.id}>
         {todo.text}{' '}
-        <button type="button" onClick={removeTodo.bind(null, { id: todo.id })}>
+        <button type="button" onClick={() => removeTodo({ id: todo.id })}>
           Remove
         </button>
       </li>
