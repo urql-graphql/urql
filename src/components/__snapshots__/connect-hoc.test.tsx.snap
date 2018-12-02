@@ -24,7 +24,7 @@ ReactWrapper {
       "nodeType": "function",
       "props": Object {
         "children": [Function],
-        "mutation": Object {
+        "mutations": Object {
           "test": Object {
             "query": "mutation AddUser($name: String){
     addUser(name: $name) {
@@ -66,7 +66,7 @@ ReactWrapper {
           Array [
             Object {
               "children": [Function],
-              "mutation": Object {
+              "mutations": Object {
                 "test": Object {
                   "query": "mutation AddUser($name: String){
     addUser(name: $name) {
@@ -117,7 +117,7 @@ ReactWrapper {
         "nodeType": "function",
         "props": Object {
           "children": [Function],
-          "mutation": Object {
+          "mutations": Object {
             "test": Object {
               "query": "mutation AddUser($name: String){
     addUser(name: $name) {
@@ -159,7 +159,7 @@ ReactWrapper {
             Array [
               Object {
                 "children": [Function],
-                "mutation": Object {
+                "mutations": Object {
                   "test": Object {
                     "query": "mutation AddUser($name: String){
     addUser(name: $name) {

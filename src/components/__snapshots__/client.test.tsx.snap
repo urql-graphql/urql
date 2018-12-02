@@ -67,7 +67,7 @@ ShallowWrapper {
         },
       }
     }
-    mutation={
+    mutations={
       Object {
         "addUser": Object {
           "query": "mutation AddUser($name: String){

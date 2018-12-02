@@ -9,7 +9,7 @@ const Connect = ConnectMock as jest.Mock;
 Connect.mockReturnValue(<div />);
 
 const connectOpts = {
-  mutation: { test: mutationGql },
+  mutations: { test: mutationGql },
   query: queryGql,
 };
 

@@ -6,7 +6,7 @@ import { queryGql, mutationGql } from '../test-utils';
 
 const children = jest.fn().mockReturnValue(() => <h1>Child component</h1>);
 const query = queryGql;
-const mutation = {
+const mutations = {
   addUser: mutationGql,
 };
 
@@ -16,7 +16,7 @@ beforeEach(() => {
 
 it('passes snapshot', () => {
   const wrapper = shallow(
-    <Connect children={children} mutation={mutation} query={query} />
+    <Connect children={children} mutations={mutations} query={query} />
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -46,10 +46,12 @@ describe('UrqlClient', () => {
   });
 
   it('is passed mutation', () => {
-    const wrapper = mount(<Connect children={children} mutation={mutation} />);
+    const wrapper = mount(
+      <Connect children={children} mutations={mutations} />
+    );
     expect(wrapper.find('UrqlClient').props()).toHaveProperty(
-      'mutation',
-      mutation
+      'mutations',
+      mutations
     );
   });
 
