@@ -28,14 +28,6 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/tests/**/*",
-      "!src/interfaces/**/*",
-      "!src/index.*",
-      "!src/**/hash.*",
-      "!src/**/typenames.*"
-    ],
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
@@ -44,7 +36,11 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.{ts,tsx}"
+    ],
+    "coveragePathIgnorePatterns": ["<rootDir>/src/test-utils", "<rootDir>/src.*/index.ts"]
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md}": [
