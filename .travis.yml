@@ -16,7 +16,7 @@ jobs:
     - stage: Test
       name: Jest (node:8)
       node_js: 8
-      if: branch = master
+      if: branch = master or type =  pull_request
       script:
         - yarn run test --coverage
     - stage: Test
@@ -27,21 +27,20 @@ jobs:
         - cat coverage/lcov.info | node_modules/.bin/coveralls || echo "Coveralls upload failed"
     - stage: Build
       name: Build (node:8)
-      node_js:
-        - 8
-      if: branch = master
+      node_js: 8
+      if: branch = master or type =  pull_request
       script:
         - yarn run build
     - stage: Build
       name: Build (node:10)
-      node_js:
-        - 10
+      node_js: 10
       script:
         - yarn run build
         - yarn run bundlesize
     - stage: E2E
       name: Cypress
       node_js: 10
+      if: branch = master or type =  pull_request
       script:
         - yarn run demo &
         - yarn global add cypress
