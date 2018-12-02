@@ -1,7 +1,11 @@
 const defaultStore = ['test', 'test2', 'test3'];
 
 context('Integration', () => {
-  context('on page load', () => {
+  describe('on page load', () => {
+    afterEach(() => {
+      cy.wait(100);
+    });
+
     it('executes/loads query', () => {
       cy.visit('/');
       cy.get('p').should('have.text', 'Loading...');
@@ -9,9 +13,8 @@ context('Integration', () => {
 
     it('returns query data', () => {
       cy.visit('/');
-      const items = cy.get('li');
-      items.should('have.length', defaultStore.length);
-      items.each((li, i) =>
+      cy.get('ul > li').should('have.length', defaultStore.length);
+      cy.get('ul > li').each((li, i) =>
         expect(li).to.have.text(`${defaultStore[i]} Remove`)
       );
     });
@@ -20,13 +23,13 @@ context('Integration', () => {
   describe('on mutation', () => {
     it('updates list after deletion', () => {
       cy.visit('/');
-      cy.get('li')
+      cy.get('ul > li')
         .first()
         .find('button')
         .click();
 
-      cy.get('li').should('have.length', defaultStore.length - 1);
-      cy.get('li').each((li, i) =>
+      cy.get('ul > li').should('have.length', defaultStore.length - 1);
+      cy.get('ul > li').each((li, i) =>
         expect(li).to.have.text(`${defaultStore[i + 1]} Remove`)
       );
     });
@@ -38,8 +41,8 @@ context('Integration', () => {
       cy.get('.form input').type(newText);
       cy.get('.form button').click();
 
-      cy.get('li').should('have.length', defaultStore.length);
-      cy.get('li')
+      cy.get('ul > li').should('have.length', defaultStore.length);
+      cy.get('ul > li')
         .last()
         .should('have.text', `${newText} Remove`);
     });
