@@ -11,3 +11,4 @@ bundles
 dist
 webpack-build
 .rts2_cache_cjs
+cypress/screenshots
