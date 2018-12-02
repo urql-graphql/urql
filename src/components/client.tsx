@@ -21,7 +21,7 @@ export interface ClientProps<M> {
   client: Client;
   children: (obj: ChildArgs<M>) => ReactNode;
   query?: Query;
-  mutation?: { [type in keyof M]: Mutation };
+  mutations?: { [type in keyof M]: Mutation };
 }
 
 export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
@@ -43,9 +43,10 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
     this.state.client.executeQuery(this.props.query);
   }
 
-  public componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: ClientProps<M>) {
     if (
-      JSON.stringify(prevProps.mutation) !== JSON.stringify(this.props.mutation)
+      JSON.stringify(prevProps.mutations) !==
+      JSON.stringify(this.props.mutations)
     ) {
       this.setState({ mutations: this.getMutatorFunctions() });
     }
@@ -75,16 +76,16 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
   }
 
   private getMutatorFunctions() {
-    if (this.props.mutation === undefined) {
+    if (this.props.mutations === undefined) {
       return;
     }
 
-    const mutations = Object.keys(this.props.mutation).reduce(
+    const mutations = Object.keys(this.props.mutations).reduce(
       (prev, key) => ({
         ...prev,
         [key]: (variables: any) =>
           this.state.client.executeMutation({
-            ...this.props.mutation[key],
+            ...this.props.mutations[key],
             variables,
           }),
       }),

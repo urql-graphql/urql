@@ -6,7 +6,7 @@ export interface ConnectHOCProps<T> {
   /** The GraphQL query to fetch */
   query?: ConnectProps<T>['query'];
   /** A collection of GrahpQL mutation queries */
-  mutation?: ConnectProps<T>['mutation'];
+  mutations?: ConnectProps<T>['mutations'];
 }
 
 export const ConnectHOC = function<T>(opts?: ConnectHOCProps<T>) {

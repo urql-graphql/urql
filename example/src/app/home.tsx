@@ -20,7 +20,7 @@ export interface ITodoMutations {
 const Home: React.SFC<{}> = () => (
   <Connect
     query={createQuery(TodoQuery)}
-    mutation={{
+    mutations={{
       addTodo: createMutation(AddTodo),
       removeTodo: createMutation(RemoveTodo),
     }}
