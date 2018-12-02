@@ -44,11 +44,13 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
   }
 
   public componentDidUpdate(prevProps) {
-    if (prevProps.mutation !== this.props.mutation) {
+    if (
+      JSON.stringify(prevProps.mutation) !== JSON.stringify(this.props.mutation)
+    ) {
       this.setState({ mutations: this.getMutatorFunctions() });
     }
 
-    if (prevProps.query !== this.props.query) {
+    if (JSON.stringify(prevProps.query) !== JSON.stringify(this.props.query)) {
       this.state.client.executeQuery(this.props.query);
     }
   }
