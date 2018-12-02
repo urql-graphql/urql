@@ -9,8 +9,9 @@ context('Integration', () => {
 
     it('returns query data', () => {
       cy.visit('/');
-      cy.get('li').should('have.length', defaultStore.length);
-      cy.get('li').each((li, i) =>
+      const items = cy.get('li');
+      items.should('have.length', defaultStore.length);
+      items.each((li, i) =>
         expect(li).to.have.text(`${defaultStore[i]} Remove`)
       );
     });
