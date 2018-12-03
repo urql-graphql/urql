@@ -16,7 +16,11 @@ Object {
 
 exports[`executeQuery on data calls onChange with matching snapshot 1`] = `
 Object {
-  "data": Array [],
+  "data": Object {
+    "user": Object {
+      "name": "Clive",
+    },
+  },
   "error": undefined,
   "fetching": false,
 }
