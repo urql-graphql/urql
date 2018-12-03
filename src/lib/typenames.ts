@@ -75,25 +75,19 @@ export function formatTypeNames(query: string): string {
   return print(addTypenameToDocument(doc));
 }
 
-function getTypeNameFromField(obj: object, set: Set<string> = new Set()) {
-  let typenames = new Set([...set]);
-
-  for (const prop in obj) {
-    if (typeof obj[prop] !== 'object') {
-      continue;
-    }
-
-    const value = obj[prop];
-    typenames =
-      value.__typename !== undefined
-        ? new Set([...typenames, value.__typename])
-        : getTypeNameFromField(value, typenames);
-  }
-
-  return typenames;
+function getTypeNameFromField(obj: object) {
+  return Object.values(obj).reduce(
+    (all, val) =>
+      typeof val !== 'object'
+        ? all
+        : val.__typename !== undefined
+        ? { ...all, [val.__typename]: true }
+        : { ...all, ...getTypeNameFromField(val) },
+    {}
+  );
 }
 
 export function gankTypeNamesFromResponse(response: object) {
-  const typeNames = getTypeNameFromField(response);
+  const typeNames = Object.keys(getTypeNameFromField(response));
   return [...typeNames].filter((v, i, a) => a.indexOf(v) === i);
 }

@@ -54,8 +54,11 @@ export const afterMutation = (
   cachedTypenames: Map<string, Set<string>>,
   subject: Subject<Operation>
 ) => {
-  let pendingOperations: Operation[] = [];
+  if (response.data === undefined) {
+    return;
+  }
 
+  let pendingOperations: Operation[] = [];
   const typenames = gankTypeNamesFromResponse(response.data);
 
   typenames.forEach(typename => {
@@ -82,6 +85,10 @@ const afterQuery = (
   cache: Map<string, ExchangeResult>,
   cachedTypenames: Map<string, Set<string>>
 ) => {
+  if (response.data === undefined) {
+    return;
+  }
+
   const key = response.operation.key;
   cache.set(key, response);
 

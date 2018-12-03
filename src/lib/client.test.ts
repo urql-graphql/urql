@@ -1,6 +1,6 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 import { createClient } from './client';
-import { queryGql, mutationGql } from '../test-utils';
+import { queryGql, mutationGql, queryResponse } from '../test-utils';
 import { ClientInstance } from '../types';
 
 const url = 'https://hostname.com';
@@ -39,6 +39,13 @@ describe('createClient', () => {
         fetch.mockClear();
         fetchOptions.mockClear();
         fetchOptions.mockReturnValue(options);
+        fetch.mockResolvedValue({
+          status: 200,
+          json: () => ({
+            status: 200,
+            data: queryResponse.data,
+          }),
+        });
       });
 
       it('function is executed', () => {
@@ -115,7 +122,7 @@ describe('executeQuery', () => {
       status: 200,
       json: () => ({
         status: 200,
-        data: [],
+        data: queryResponse.data,
       }),
     });
   });
