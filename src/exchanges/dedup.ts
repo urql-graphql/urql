@@ -1,6 +1,7 @@
 import { tap, filter } from 'rxjs/operators';
 import { Exchange } from '../types';
 
+/** A default exchange for debouncing GraphQL requests. */
 export const dedupeExchange: Exchange = ({ forward }) => {
   const inFlight = new Set<string>();
 

@@ -50,15 +50,15 @@ export interface ExchangeResult {
 }
 
 /** The arguments for the child function of a connector. */
-export interface ChildArgs<M> {
+export interface ChildArgs<MutationDeclarations> {
   /** Whether a dependent GraphQL request is currently being fetched. */
-  fetching: ClientState<M>['fetching'];
+  fetching: ClientState<MutationDeclarations>['fetching'];
   /** Any network or GraphQL errors. */
-  error: ClientState<M>['error'];
+  error: ClientState<MutationDeclarations>['error'];
   /** The data returned from a GraphQL [query]{@link Query} to the server. */
-  data: ClientState<M>['data'];
+  data: ClientState<MutationDeclarations>['data'];
   /** A collection of functions for executing pre-specified [mutations]{@link Mutation} */
-  mutations: ClientState<M>['mutations'];
+  mutations: ClientState<MutationDeclarations>['mutations'];
   /** Triger a fetch of the pre-specified [query]{@link Query}. */
   refetch: (noCache?: boolean) => void;
 }

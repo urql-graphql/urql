@@ -9,23 +9,27 @@ import {
 } from '../types';
 import { CombinedError } from '../lib';
 
-export interface ClientState<M> {
+export interface ClientState<MutationDeclarations> {
   client: ClientInstance;
   fetching: boolean;
   error: Error | CombinedError | CombinedError[];
   data: any | any[];
-  mutations: { [type in keyof M]: (vals: any) => void };
+  mutations: { [type in keyof MutationDeclarations]: (vals: any) => void };
 }
 
-export interface ClientProps<M> {
+export interface ClientProps<MutationDeclarations> {
   client: Client;
-  children: (obj: ChildArgs<M>) => ReactNode;
+  children: (obj: ChildArgs<MutationDeclarations>) => ReactNode;
   query?: Query;
-  mutations?: { [type in keyof M]: Mutation };
+  mutations?: { [type in keyof MutationDeclarations]: Mutation };
 }
 
-export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
-  constructor(props: ClientProps<M>) {
+/** Component responsible for implementing the [Client]{@link Client} utility in React. */
+export class UrqlClient<MutationDeclarations> extends Component<
+  ClientProps<MutationDeclarations>,
+  ClientState<MutationDeclarations>
+> {
+  constructor(props: ClientProps<MutationDeclarations>) {
     super(props);
 
     this.state = {
@@ -43,7 +47,7 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
     this.state.client.executeQuery(this.props.query);
   }
 
-  public componentDidUpdate(prevProps: ClientProps<M>) {
+  public componentDidUpdate(prevProps: ClientProps<MutationDeclarations>) {
     if (
       JSON.stringify(prevProps.mutations) !==
       JSON.stringify(this.props.mutations)
@@ -90,7 +94,7 @@ export class UrqlClient<M> extends Component<ClientProps<M>, ClientState<M>> {
           }),
       }),
       {}
-    ) as ClientState<M>['mutations'];
+    ) as ClientState<MutationDeclarations>['mutations'];
 
     return mutations;
   }
