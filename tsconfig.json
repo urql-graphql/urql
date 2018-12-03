@@ -4,7 +4,13 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "outDir": "dist",
-    "lib": ["es2015", "dom", "esnext.asynciterable", "esnext.array"],
+    "lib": [
+      "es2015",
+      "es2017.object",
+      "dom",
+      "esnext.asynciterable",
+      "esnext.array"
+    ],
     "jsx": "react",
     "declaration": true,
     "module": "es2015",
