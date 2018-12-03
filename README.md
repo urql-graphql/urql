@@ -160,7 +160,7 @@ The `children` render prop sends a couple of fields back by default:
 - `mutations` - This is a collection of functions for triggering a mutation, each key matching the mutations you just provided to the _Connect_ component. To call the _addTodo_ mutation with variables, you would do `mutations.addTodo(myVars)`.
 - `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch(true)`.
 
-So why do we use these `createQuery` and `createMutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
+So why do we use these `createQuery` and `createMutation` functions before passing them? Variables, that's why. If you wanted to pass a query with variables, you would construct it like so:
 
 ```javascript
 import { createQuery } from 'urql';
