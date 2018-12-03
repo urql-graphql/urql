@@ -1,9 +1,9 @@
 import {
   DocumentNode,
   FieldNode,
+  InlineFragmentNode,
   OperationDefinitionNode,
   SelectionSetNode,
-  InlineFragmentNode,
 } from 'graphql';
 
 import { parse } from 'graphql/language/parser';

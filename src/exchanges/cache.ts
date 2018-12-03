@@ -1,7 +1,7 @@
-import { Subject, Observable, of } from 'rxjs';
-import { tap, map, mergeMap } from 'rxjs/operators';
-import { Operation, ExchangeResult, Exchange } from '../types';
-import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
+import { Observable, of, Subject } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs/operators';
+import { formatTypeNames, gankTypeNamesFromResponse } from '../lib';
+import { Exchange, ExchangeResult, Operation } from '../types';
 
 /** A default exchange for caching GraphQL requests. */
 export const cacheExchange: Exchange = ({ forward, subject }) => {

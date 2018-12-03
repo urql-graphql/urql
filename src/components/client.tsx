@@ -1,13 +1,13 @@
 import { Component, ReactNode } from 'react';
+import { CombinedError } from '../lib';
 import {
-  Client,
   ChildArgs,
-  Query,
-  Mutation,
+  Client,
   ClientInstance,
+  Mutation,
+  Query,
   StreamUpdate,
 } from '../types';
-import { CombinedError } from '../lib';
 
 export interface ClientState<MutationDeclarations> {
   client: ClientInstance;

@@ -1,18 +1,18 @@
-import { Subject, Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import * as uuid from 'uuid';
 import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
 import { hashString } from '../lib';
 import {
   Client,
+  ClientInstance,
   ClientOptions,
   CreateClientInstanceOpts,
-  Operation,
-  ExchangeResult,
   Exchange,
-  Query,
+  ExchangeResult,
   Mutation,
-  ClientInstance,
+  Operation,
+  Query,
 } from '../types';
 
 const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];

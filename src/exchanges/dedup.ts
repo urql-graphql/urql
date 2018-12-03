@@ -1,4 +1,4 @@
-import { tap, filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { Exchange } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
