@@ -9,7 +9,7 @@ export interface ConnectProps<T> {
   /** The GraphQL query to fetch */
   query?: Query;
   /** A collection of GrahpQL mutation queries */
-  mutation?: { [type in keyof T]: Mutation };
+  mutations?: { [type in keyof T]: Mutation };
 }
 
 export const Connect = function<T>(props: ConnectProps<T>) {
@@ -20,7 +20,7 @@ export const Connect = function<T>(props: ConnectProps<T>) {
           client={client}
           children={props.children}
           query={props.query}
-          mutation={props.mutation}
+          mutations={props.mutations}
         />
       )}
     </ContextConsumer>

@@ -4,7 +4,7 @@ exports[`passes snapshot 1`] = `
 ShallowWrapper {
   Symbol(enzyme.__root__): [Circular],
   Symbol(enzyme.__unrendered__): <Unknown
-    mutation={
+    mutations={
       Object {
         "addUser": Object {
           "query": "mutation AddUser($name: String){

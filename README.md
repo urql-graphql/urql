@@ -7,25 +7,25 @@ Universal React Query Library
 
 ![Urkel](https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg)
 
-* [What is `urql`](#what-is-urql)
-* [Why this exists](#why-this-exists)
-* [How its different](#how-its-different)
-* [Install](#install)
-* [Getting Started](#getting-started)
-* [Cache control](#cache-control)
-* [Custom Caches](#custom-caches)
-* [API](#api)
-  * [Client](#client)
-  * [Provider](#provider)
-  * [Connect](#connect)
-    * [Props](#props)
-    * [Render Args](#render-args)
-  * [ConnectHOC](#connecthoc)
-  * [createQuery](#createQuery)
-  * [createMutation](#createMutation)
-  * [CombinedError](#combinederror)
-  * [Exchanges](#exchanges)
-* [Prior Art](#prior-art)
+- [What is `urql`](#what-is-urql)
+- [Why this exists](#why-this-exists)
+- [How its different](#how-its-different)
+- [Install](#install)
+- [Getting Started](#getting-started)
+- [Cache control](#cache-control)
+- [Custom Caches](#custom-caches)
+- [API](#api)
+  - [Client](#client)
+  - [Provider](#provider)
+  - [Connect](#connect)
+    - [Props](#props)
+    - [Render Args](#render-args)
+  - [ConnectHOC](#connecthoc)
+  - [createQuery](#createQuery)
+  - [createMutation](#createMutation)
+  - [CombinedError](#combinederror)
+  - [Exchanges](#exchanges)
+- [Prior Art](#prior-art)
 
 ## What is `urql`
 
@@ -123,7 +123,7 @@ Now we can use the `mutation` and `query` functions to format them in the way `u
 const Home = () => (
   <Connect
     query={createQuery(TodoQuery)}
-    mutation={{
+    mutations={{
       addTodo: createMutation(AddTodo),
     }}
     children={({ loaded, fetching, refetch, data, error, addTodo }) => {
@@ -139,7 +139,7 @@ You can also use functional child style:
 const Home = () => (
   <Connect
     query={createQuery(TodoQuery)}
-    mutation={{
+    mutations={{
       addTodo: createMutation(AddTodo),
     }}
   >
@@ -152,16 +152,16 @@ const Home = () => (
 
 The `children` render prop sends a couple of fields back by default:
 
-* `loaded` - This is like `loading` but it's false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
-* `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
-* `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch({ skipCache: true })`.
-* `refreshAllFromCache` - This is a method that you can use to manually refetch all queries from the cache.
-* `data` - This is where your data lives. Once the query returns, This would look like `{ todos: [...] }`.
-* `error` - If there is an error returned when making the query, instead of data, you get this and you can handle it or show a `refetch` button or cry or whatever you wanna do.
+- `loaded` - This is like `loading` but it's false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
+- `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
+- `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch({ skipCache: true })`.
+- `refreshAllFromCache` - This is a method that you can use to manually refetch all queries from the cache.
+- `data` - This is where your data lives. Once the query returns, This would look like `{ todos: [...] }`.
+- `error` - If there is an error returned when making the query, instead of data, you get this and you can handle it or show a `refetch` button or cry or whatever you wanna do.
 
 Also, any mutations, because they are named, are also passed into this render prop.
 
-As you can see above, the `query` accepts either a single query, or an array of queries. The `mutation` prop accepts an object, with the mutation names as keys.
+As you can see above, the `query` accepts either a single query, or an array of queries. The `mutations` prop accepts an object, with the mutation names as keys.
 
 So why do we use these `createQuery` and `createMutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
 
@@ -174,7 +174,7 @@ createQuery(TodoQuery, { myVariable: 5 });
 Similarly, you can pass variables to your mutation. Mutation, however is a bit different, in the sense that it returns a function that you can call with a variable set:
 
 ```javascript
-import { mutation } from 'urql';
+import { createMutation } from 'urql';
 
 createMutation(AddTodo); // No initial variables
 
@@ -203,10 +203,10 @@ const MyComponent = () => (
 
 The signature of `shouldInvalidate` is basically:
 
-* `changedTypenames` - The typenames returned from the mutation. ex: `['Todo']`
-* `typenames` - The typenames that are included in your `Connect` component. ex: `['Todo', 'User', 'Author']`
-* `response` - The actual data returned from the mutation. ex: `{ id: 123 }`
-* `data` - The data that is local to your `Connect` component as a result of a query. ex: `{ todos: [] }`
+- `changedTypenames` - The typenames returned from the mutation. ex: `['Todo']`
+- `typenames` - The typenames that are included in your `Connect` component. ex: `['Todo', 'User', 'Author']`
+- `response` - The actual data returned from the mutation. ex: `{ id: 123 }`
+- `data` - The data that is local to your `Connect` component as a result of a query. ex: `{ todos: [] }`
 
 Using all or some of these arguments can give you the power to pretty accurately describe whether your connection has now been invalidated.
 
@@ -216,11 +216,11 @@ The `Client` constructor accepts a `cache` setting where you can provide your ow
 
 If you want to supply your own cache, you'll want to provide an object with the following keys:
 
-* `invalidate` - `(hash) => Promise`, invalidates a cache entry.
-* `invalidateAll` - `() => Promise`, basically clears the store.
-* `read` - `(hash) => Promise`, reads and returns a cache entry
-* `update` - `(callback: (store, key, value)) => Promise`, iterates over cache entries and calls the supplied callback function to provide update functionality
-* `write` - `(hash, data) => Promise`, writes a value to the store.
+- `invalidate` - `(hash) => Promise`, invalidates a cache entry.
+- `invalidateAll` - `() => Promise`, basically clears the store.
+- `read` - `(hash) => Promise`, reads and returns a cache entry
+- `update` - `(callback: (store, key, value)) => Promise`, iterates over cache entries and calls the supplied callback function to provide update functionality
+- `write` - `(hash, data) => Promise`, writes a value to the store.
 
 Don't worry about the hashes, we convert query objects(query + variables) to the hash behind the scenes. Here is an example of the cache creation function we use internally for reference:
 
@@ -312,7 +312,7 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 | Name             | Value                                                                        | Default    | Description                                                                    |
 | ---------------- | ---------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------ |
 | query            | `QueryObject or [QueryObject]`                                               | `null`     | The query/queries you want connected to your component                         |
-| mutation         | `MutationMap`                                                                | `null`     | The mutation/mutations you want connected to your component                    |
+| mutations        | `MutationMap`                                                                | `null`     | The mutation/mutations you want connected to your component                    |
 | cache            | `boolean`                                                                    | `true`     | Whether this component's queries should be cached                              |
 | typeInvalidation | `boolean`                                                                    | `true`     | Whether this component's cache should be invalidated using typeNames           |
 | shouldInvalidate | `(changedTypes, componentTypes, mutationResponse, componentData) => boolean` | `null`     | Function used to determine whether the component's cache should be invalidated |
@@ -334,10 +334,10 @@ The following fields are present on the render functions argument object:
 
 The `cache` object provides several helpful cache methods that you can use to control the cache:
 
-* `invalidate` - `invalidate` takes an optional QueryObject parameter, but defaults to invalidating the queries defined on the component.
-* `invalidateAll` - Basically clears your entire cache.
-* `read` - Takes a QueryObject parameter, returns cache value for that query.
-* `update` - Takes a callback function with an argument shape of `(store, key, value)`. The callback function is run against every cache entry, giving you the opportunity to update any given value based upon the context of the current data shape.
+- `invalidate` - `invalidate` takes an optional QueryObject parameter, but defaults to invalidating the queries defined on the component.
+- `invalidateAll` - Basically clears your entire cache.
+- `read` - Takes a QueryObject parameter, returns cache value for that query.
+- `update` - Takes a callback function with an argument shape of `(store, key, value)`. The callback function is run against every cache entry, giving you the opportunity to update any given value based upon the context of the current data shape.
 
 In addition to these, any specified mutations are also provided as their key in the mutation map. Mutations are functions that accept an object of variables as an argument and return a `Promise` which resolves to the data the mutation asked for.
 
@@ -354,7 +354,7 @@ Example:
 // with mutations
 
 <Connect
-  mutation={{
+  mutations={{
     addTodo: createMutation(AddTodo)
   }}
   children={({ addTodo }) => {
@@ -446,8 +446,8 @@ and are processed by it.
 The most important exchange is the `httpExchange`. It sends operations to your API and returns
 an observable with the actual result. `urql` comes with two more exchanges by default:
 
-* `dedupExchange`: Takes an exchange and returns a new one that deduplicates in-flight requests
-* `cacheExchange`: Reads query-operations from the cache and writes results to the cache
+- `dedupExchange`: Takes an exchange and returns a new one that deduplicates in-flight requests
+- `cacheExchange`: Reads query-operations from the cache and writes results to the cache
 
 By default urql will create a default exchange using all three, which looks like this:
 
@@ -527,10 +527,10 @@ client.executeQuery(query(myQuery, variables), skipCache).then(function(data) {
 
 ## TODO
 
-* [ ] Server Side Rendering
-* [ ] Client Side Resolvers
-* [ ] Cache update reactivity
-* [ ] Prefix all errors with "Did I do that?"
+- [ ] Server Side Rendering
+- [ ] Client Side Resolvers
+- [ ] Cache update reactivity
+- [ ] Prefix all errors with "Did I do that?"
 
 ## Prior Art
 
