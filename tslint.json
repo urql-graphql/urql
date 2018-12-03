@@ -6,7 +6,6 @@
   "rules": {
     "object-literal-sort-keys": false,
     "member-ordering": false,
-    "ordered-imports": false,
     "member-access": false,
     "no-submodule-imports": false,
     "interface-name": false,

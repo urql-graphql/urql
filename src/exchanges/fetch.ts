@@ -1,6 +1,6 @@
 import { flatMap } from 'rxjs/operators';
-import { Exchange } from '../types';
 import { CombinedError } from '../lib';
+import { Exchange } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {

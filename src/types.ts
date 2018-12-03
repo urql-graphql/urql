@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
-import { CombinedError } from './lib';
 import { ClientState } from './components';
+import { CombinedError } from './lib';
 
 /** A Graphql query. */
 export interface Query {
