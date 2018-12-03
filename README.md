@@ -69,10 +69,10 @@ Lets look at a root level component and how you can get it set up:
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Provider, Client } from 'urql';
+import { Provider, createClient } from 'urql';
 import Home from './home';
 
-const client = new Client({
+const client = createClient({
   url: 'http://localhost:3001/graphql',
 });
 
@@ -126,7 +126,7 @@ const Home = () => (
     mutations={{
       addTodo: createMutation(AddTodo),
     }}
-    children={({ loaded, fetching, refetch, data, error, addTodo }) => {
+    children={({ fetching, error, data, mutations, refetch }) => {
       //...Your Component
     }}
   />
@@ -143,25 +143,22 @@ const Home = () => (
       addTodo: createMutation(AddTodo),
     }}
   >
-    {({ loaded, fetching, refetch, data, error, addTodo }) => {
+    {({ fetching, error, data, mutations, refetch }) => {
       //...Your Component
     }}
   </Connect>
 );
 ```
 
+As you can see above, the `query` accepts a query while the `mutations` prop accepts an object, with the mutation names as keys.
+
 The `children` render prop sends a couple of fields back by default:
 
-- `loaded` - This is like `loading` but it's false by default, and becomes true after the first time your query loads. This makes initial loading states easy and reduces flicker on subsequent fetch/refetches.
 - `fetching` - This is what you might commonly think of as `loading`. Any time a query or mutation is taking place, this puppy equals true, resolving to false when complete.
-- `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch({ skipCache: true })`.
-- `refreshAllFromCache` - This is a method that you can use to manually refetch all queries from the cache.
-- `data` - This is where your data lives. Once the query returns, This would look like `{ todos: [...] }`.
 - `error` - If there is an error returned when making the query, instead of data, you get this and you can handle it or show a `refetch` button or cry or whatever you wanna do.
-
-Also, any mutations, because they are named, are also passed into this render prop.
-
-As you can see above, the `query` accepts either a single query, or an array of queries. The `mutations` prop accepts an object, with the mutation names as keys.
+- `data` - This is where your data lives. Once the query returns, This would look like `{ todos: [...] }`.
+- `mutations` - This is a collection of functions for triggering a mutation, each key matching the mutations you just provided to the _Connect_ component. To call the _addTodo_ mutation with variables, you would do `mutations.addTodo(myVars)`.
+- `refetch` - This is a method that you can use to manually refetch your query. You can skip the cache, hit the server and repopulate the cache by calling this like `refetch(true)`.
 
 So why do we use these `createQuery` and `createMutation` functions before passing them? Variables, thats why. If you wanted to pass a query with variables, you would construct it like so:
 
@@ -180,7 +177,7 @@ createMutation(AddTodo); // No initial variables
 
 // After you pass 'addTodo' from the render prop to a component:
 
-addTodo({ text: `I'm a variable!` });
+mutations.addTodo({ text: `I'm a variable!` });
 ```
 
 ## Cache control
@@ -209,55 +206,6 @@ The signature of `shouldInvalidate` is basically:
 - `data` - The data that is local to your `Connect` component as a result of a query. ex: `{ todos: [] }`
 
 Using all or some of these arguments can give you the power to pretty accurately describe whether your connection has now been invalidated.
-
-## Custom Caches
-
-The `Client` constructor accepts a `cache` setting where you can provide your own caching mechanism that will work with `urql`. By default, we use a local object store, but you can provide an adapter for whatever you want.
-
-If you want to supply your own cache, you'll want to provide an object with the following keys:
-
-- `invalidate` - `(hash) => Promise`, invalidates a cache entry.
-- `invalidateAll` - `() => Promise`, basically clears the store.
-- `read` - `(hash) => Promise`, reads and returns a cache entry
-- `update` - `(callback: (store, key, value)) => Promise`, iterates over cache entries and calls the supplied callback function to provide update functionality
-- `write` - `(hash, data) => Promise`, writes a value to the store.
-
-Don't worry about the hashes, we convert query objects(query + variables) to the hash behind the scenes. Here is an example of the cache creation function we use internally for reference:
-
-```javascript
-const defaultCache = store => {
-  return {
-    invalidate: hash =>
-      new Promise(resolve => {
-        delete store[hash];
-        resolve();
-      }),
-    invalidateAll: () =>
-      new Promise(resolve => {
-        store = {};
-        resolve();
-      }),
-    read: hash =>
-      new Promise(resolve => {
-        resolve(store[hash] || null);
-      }),
-    update: callback =>
-      new Promise(resolve => {
-        if (typeof callback === 'function') {
-          Object.keys(store).map(key => {
-            callback(store, key, store[key]);
-          });
-        }
-        resolve();
-      }),
-    write: (hash, data) =>
-      new Promise(resolve => {
-        store[hash] = data;
-        resolve();
-      }),
-  };
-};
-```
 
 ## API
 

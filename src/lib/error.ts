@@ -27,6 +27,7 @@ const rehydrateGraphQlError = (error: string | GraphQLError): Error => {
   }
 };
 
+/** An error which can consist of GraphQL errors and Network errors. */
 export class CombinedError implements Error {
   public name: string;
   public message: string;

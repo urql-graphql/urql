@@ -3,6 +3,7 @@ import { tap, map, mergeMap } from 'rxjs/operators';
 import { Operation, ExchangeResult, Exchange } from '../types';
 import { gankTypeNamesFromResponse, formatTypeNames } from '../lib';
 
+/** A default exchange for caching GraphQL requests. */
 export const cacheExchange: Exchange = ({ forward, subject }) => {
   const cache = new Map<string, ExchangeResult>();
   const cachedTypenames = new Map<string, Set<string>>();
@@ -37,11 +38,10 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
       );
 
     return ops$.pipe(
-      mergeMap(
-        operation =>
-          cache.has(operation.key) && !operation.context.force
-            ? useCache(of(operation))
-            : goForward(of(operation))
+      mergeMap(operation =>
+        cache.has(operation.key) && !operation.context.force
+          ? useCache(of(operation))
+          : goForward(of(operation))
       )
     );
   };

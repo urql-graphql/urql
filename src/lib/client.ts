@@ -17,6 +17,7 @@ import {
 
 const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
 
+/** Function for creating an application wide [Client]{@link Client}. */
 export const createClient = (opts: ClientOptions): Client => {
   /** Cache of all instance subscriptions */
   const subscriptions = new Map<string, Map<string, Subscription>>();
@@ -34,7 +35,9 @@ export const createClient = (opts: ClientOptions): Client => {
   const fetchOptions =
     typeof opts.fetchOptions === 'function'
       ? opts.fetchOptions()
-      : opts.fetchOptions !== undefined ? opts.fetchOptions : {};
+      : opts.fetchOptions !== undefined
+      ? opts.fetchOptions
+      : {};
 
   /** Convert a query to an operation type */
   const createOperation = (
@@ -110,7 +113,10 @@ export const createClient = (opts: ClientOptions): Client => {
     const executeMutation = (query: Mutation) => {
       const operation = createOperation('mutation', query);
       subject
-        .pipe(take(1), filter(incomingOp => incomingOp.key === operation.key))
+        .pipe(
+          take(1),
+          filter(incomingOp => incomingOp.key === operation.key)
+        )
         .subscribe();
 
       executeOperation(operation);

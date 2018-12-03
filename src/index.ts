@@ -5,5 +5,5 @@ export {
   createMutation,
   createClient,
 } from './lib';
-export * from './exchanges';
+export { cacheExchange, dedupeExchange, fetchExchange } from './exchanges';
 export * from './types';
