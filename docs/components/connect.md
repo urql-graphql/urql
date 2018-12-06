@@ -4,11 +4,11 @@ Connect is a ReactJS component that is used to execute queries and mutations and
 
 ### Props
 
-| Name      | Type                                          | Default   | Description                                                        |
-| --------- | --------------------------------------------- | --------- | ------------------------------------------------------------------ |
-| query     | [Query](../Query)?                            | undefined | The query you want connected to your component                     |
-| mutations | Object { [string]: [Mutation](../Mutation) }? | undefined | The mutation/mutations you want connected to your component        |
-| children  | ([ChildArgs\<T\>](../ChildArgs)) => ReactNode | undefined | A child function to accept the connected state and render elements |
+| Name      | Type                                                         | Default   | Description                                                        |
+| --------- | ------------------------------------------------------------ | --------- | ------------------------------------------------------------------ |
+| query     | [Query](../types/mutation-query.md)?                         | undefined | The query you want connected to your component                     |
+| mutations | Object { [string]: [Mutation](../types/mutation-query.md) }? | undefined | The mutation/mutations you want connected to your component        |
+| children  | ([ChildArgs\<T\>](../types/child-args.md)) => ReactNode      | undefined | A child function to accept the connected state and render elements |
 
 ### Example
 
