@@ -2,7 +2,8 @@
 
 ### About
 
-- [Exchanges](about/exchanges.md)
+- [Using Exchanges](about/exchanges.md)
+- [Non-React Usage](about/client.md)
 
 ### Components
 
