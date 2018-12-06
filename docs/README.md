@@ -15,3 +15,9 @@
 
 - [createQuery](utils/createQuery.md)
 - [createMutation](utils/createMutation.md)
+
+### Types
+
+- [ChildArgs](types/child-args.md)
+- [CombinedError](types/combined-error.md)
+- [Mutation/Query](types/mutation-query.md)
