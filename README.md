@@ -180,33 +180,6 @@ createMutation(AddTodo); // No initial variables
 mutations.addTodo({ text: `I'm a variable!` });
 ```
 
-## Cache control
-
-Normally in `urql`, the cache is aggressively invalidated based upon `__typename`, but if you want finer grained control over your cache, you can use the `shouldInvalidate` prop. It is a function, that returns a boolean, much like `shouldComponentUpdate`, which you can use to determine whether your data needs a refresh from the server. It gets called after every mutation:
-
-```javascript
-const MyComponent = () => (
-  <Connect
-    query={createQuery(MyQuery)}
-    shouldInvalidate={(changedTypenames, typenames, mutationResponse, data) => {
-      return data.todos.some(d => d.id === mutationResponse.id);
-    }}
-    children={({ loaded, fetching, refetch, data, error, addTodo }) => {
-      //...Your Component
-    }}
-  />
-);
-```
-
-The signature of `shouldInvalidate` is basically:
-
-- `changedTypenames` - The typenames returned from the mutation. ex: `['Todo']`
-- `typenames` - The typenames that are included in your `Connect` component. ex: `['Todo', 'User', 'Author']`
-- `response` - The actual data returned from the mutation. ex: `{ id: 123 }`
-- `data` - The data that is local to your `Connect` component as a result of a query. ex: `{ todos: [] }`
-
-Using all or some of these arguments can give you the power to pretty accurately describe whether your connection has now been invalidated.
-
 ## TODO
 
 - [ ] Server Side Rendering
