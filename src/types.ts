@@ -59,7 +59,7 @@ export interface ChildArgs<MutationDeclarations> {
   data: ClientState<MutationDeclarations>['data'];
   /** A collection of functions for executing pre-specified [mutations]{@link Mutation} */
   mutations: ClientState<MutationDeclarations>['mutations'];
-  /** Triger a fetch of the pre-specified [query]{@link Query}. */
+  /** Trigger a fetch of the pre-specified [query]{@link Query}. */
   refetch: (noCache?: boolean) => void;
 }
 
