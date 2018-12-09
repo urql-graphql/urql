@@ -9,6 +9,7 @@ import {
   ClientOptions,
   CreateClientInstanceOpts,
   Exchange,
+  ExchangeData,
   ExchangeResult,
   Mutation,
   Operation,
@@ -140,12 +141,16 @@ export const createClient = (opts: ClientOptions): Client => {
 };
 
 /** Create pipe of exchanges */
-const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
-  operation: Observable<Operation>
-) => {
+const pipeExchanges = (
+  exchanges: Array<Exchange<ExchangeData, ExchangeData>>,
+  subject?: Subject<Operation>
+) => (operation: Observable<Operation>) => {
   /** Recursively pipe to each exchange */
-  const callExchanges = (value: Observable<Operation>, index: number = 0) => {
-    if (exchanges.length < index) {
+  const callExchanges = (
+    value: Observable<Operation | ExchangeResult>,
+    index: number = 0
+  ) => {
+    if (index >= exchanges.length) {
       return value;
     }
 

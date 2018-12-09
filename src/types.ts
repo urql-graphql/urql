@@ -23,20 +23,27 @@ export interface Operation extends Query {
   context: Record<string, any>;
 }
 
+export type ExchangeData = Operation | ExchangeResult;
+
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
-export type Exchange = (
+export type Exchange<
+  /** Exchange receiving type */
+  I extends ExchangeData,
+  /** Exchange returning type */
+  O extends ExchangeData
+> = (
   args: {
     /** Function to call the next [exchange]{@link Exchange} in the chain. */
-    forward: ExchangeIO;
+    forward: ExchangeIO<O>;
     /** Subject from which the stream of [operations]{@link Operation} is created. */
     subject: Subject<Operation>;
   }
-) => ExchangeIO;
+) => ExchangeIO<I>;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
-export type ExchangeIO = (
+export type ExchangeIO<T> = (
   /** A stream of operations. */
-  ops$: Observable<Operation>
+  ops$: Observable<T>
 ) => Observable<ExchangeResult>;
 
 /** Resulting data from an [operation]{@link Operation}. */
@@ -70,7 +77,7 @@ export interface ClientOptions {
   /** Any additional options to pass to fetch. */
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
-  exchanges?: Exchange[];
+  exchanges?: Array<Exchange<ExchangeData, ExchangeData>>;
 }
 
 /** The URQL applicaiton-wide client library. */

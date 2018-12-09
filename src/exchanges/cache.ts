@@ -4,7 +4,10 @@ import { formatTypeNames, gankTypeNamesFromResponse } from '../lib';
 import { Exchange, ExchangeResult, Operation } from '../types';
 
 /** A default exchange for caching GraphQL requests. */
-export const cacheExchange: Exchange = ({ forward, subject }) => {
+export const cacheExchange: Exchange<Operation, Operation> = ({
+  forward,
+  subject,
+}) => {
   const cache = new Map<string, ExchangeResult>();
   const cachedTypenames = new Map<string, Set<string>>();
 

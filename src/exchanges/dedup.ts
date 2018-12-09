@@ -1,8 +1,8 @@
 import { filter, tap } from 'rxjs/operators';
-import { Exchange } from '../types';
+import { Exchange, Operation } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
-export const dedupeExchange: Exchange = ({ forward }) => {
+export const dedupeExchange: Exchange<Operation, Operation> = ({ forward }) => {
   const inFlight = new Set<string>();
 
   return ops$ =>

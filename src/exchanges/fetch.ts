@@ -1,64 +1,68 @@
 import { flatMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
-import { Exchange } from '../types';
+import { Exchange, ExchangeResult, Operation } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = () => {
+export const fetchExchange: Exchange<Operation, ExchangeResult> = ({
+  forward,
+}) => {
   return ops$ =>
-    ops$.pipe(
-      flatMap(async operation => {
-        if (operation.operationName === 'subscription') {
-          throw new Error(
-            'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
-          );
-        }
-
-        const body = JSON.stringify({
-          query: operation.query,
-          variables: operation.variables,
-        });
-
-        let response: Response;
-        let result: any;
-
-        try {
-          const { url, fetchOptions } = operation.context;
-          response = await fetch(url, {
-            body,
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-            ...fetchOptions,
-          });
-
-          checkStatus(fetchOptions.redirect, response);
-
-          result = await response.json();
-
-          return {
-            operation,
-            data: result.data,
-            error: Array.isArray(result.errors)
-              ? new CombinedError({
-                  graphQLErrors: result.errors,
-                  response,
-                })
-              : undefined,
-          };
-        } catch (err) {
-          if (err.name === 'AbortError') {
-            return;
+    forward(
+      ops$.pipe(
+        flatMap(async operation => {
+          if (operation.operationName === 'subscription') {
+            throw new Error(
+              'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
+            );
           }
 
-          return {
-            operation,
-            data: undefined,
-            error: new CombinedError({
-              networkError: err,
-              response,
-            }),
-          };
-        }
-      })
+          const body = JSON.stringify({
+            query: operation.query,
+            variables: operation.variables,
+          });
+
+          let response: Response;
+          let result: any;
+
+          try {
+            const { url, fetchOptions } = operation.context;
+            response = await fetch(url, {
+              body,
+              headers: { 'Content-Type': 'application/json' },
+              method: 'POST',
+              ...fetchOptions,
+            });
+
+            checkStatus(fetchOptions.redirect, response);
+
+            result = await response.json();
+
+            return {
+              operation,
+              data: result.data,
+              error: Array.isArray(result.errors)
+                ? new CombinedError({
+                    graphQLErrors: result.errors,
+                    response,
+                  })
+                : undefined,
+            };
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              return;
+            }
+
+            return {
+              operation,
+              data: undefined,
+              error: new CombinedError({
+                networkError: err,
+                response,
+              }),
+            };
+          }
+        })
+      )
     );
 };
 
