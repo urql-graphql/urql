@@ -347,7 +347,7 @@ Example:
 <Connect
   query={query(MyQuery)}
   children={({loaded, data}) => {
-    return loaded ? <Loading/> : <List data={data.todos}>
+    return loaded ? <List data={data.todos}> : <Loading/>
   }}
 />
 
