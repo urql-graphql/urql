@@ -16,17 +16,21 @@ export interface IClient {
   // Execute methods
   executeSubscription$: (
     subscriptionObject: IQuery
-  ) => Observable<IExchangeResult>;
+  ) => Observable<IExchangeResult<any>>;
   executeQuery$(
     queryObject: IQuery,
     skipCache: boolean
-  ): Observable<IExchangeResult>;
+  ): Observable<IExchangeResult<any>>;
   executeQuery(
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IExchangeResult>;
-  executeMutation$(mutationObject: IQuery): Observable<IExchangeResult['data']>;
-  executeMutation(mutationObject: IQuery): Promise<IExchangeResult['data']>;
+  ): Promise<IExchangeResult<any>>;
+  executeMutation$(
+    mutationObject: IQuery
+  ): Observable<IExchangeResult<any>['data']>;
+  executeMutation(
+    mutationObject: IQuery
+  ): Promise<IExchangeResult<any>['data']>;
 
   // Batched cache operations that trigger events
   invalidateQuery(queryObject: IQuery): Promise<void>;

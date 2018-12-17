@@ -22,13 +22,13 @@ export const subscriptionExchange = (
     }
 
     // Take over subscription operations and call `createSubscription`
-    return new Observable<IExchangeResult>(observer => {
+    return new Observable<IExchangeResult<any>>(observer => {
       const subObserver: ISubscriptionObserver = {
         error: networkError => {
           observer.error(new CombinedError({ networkError }));
         },
         next: raw => {
-          const result: IExchangeResult = { operation, data: raw.data };
+          const result: IExchangeResult<any> = { operation, data: raw.data };
           if (Array.isArray(raw.errors)) {
             result.error = new CombinedError({ graphQLErrors: raw.errors });
           }

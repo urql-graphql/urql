@@ -133,7 +133,7 @@ export default class Client implements IClient {
 
   executeSubscription$(
     subscriptionObject: IQuery
-  ): Observable<IExchangeResult> {
+  ): Observable<IExchangeResult<any>> {
     const { query, variables } = subscriptionObject;
 
     const operation = {
@@ -150,7 +150,7 @@ export default class Client implements IClient {
   executeQuery$(
     queryObject: IQuery,
     skipCache: boolean
-  ): Observable<IExchangeResult> {
+  ): Observable<IExchangeResult<any>> {
     const { query, variables } = queryObject;
 
     const operation = {
@@ -167,8 +167,8 @@ export default class Client implements IClient {
   executeQuery = (
     queryObject: IQuery,
     skipCache: boolean
-  ): Promise<IExchangeResult> => {
-    return new Promise<IExchangeResult>((resolve, reject) => {
+  ): Promise<IExchangeResult<any>> => {
+    return new Promise((resolve, reject) => {
       this.executeQuery$(queryObject, skipCache).subscribe({
         error: reject,
         next: resolve,
@@ -178,7 +178,7 @@ export default class Client implements IClient {
 
   executeMutation$(
     mutationObject: IQuery
-  ): Observable<IExchangeResult['data']> {
+  ): Observable<IExchangeResult<any>['data']> {
     const { query, variables } = mutationObject;
 
     const operation = {
@@ -194,8 +194,8 @@ export default class Client implements IClient {
 
   executeMutation = (
     mutationObject: IQuery
-  ): Promise<IExchangeResult['data']> => {
-    return new Promise<IExchangeResult>((resolve, reject) => {
+  ): Promise<IExchangeResult<any>['data']> => {
+    return new Promise((resolve, reject) => {
       this.executeMutation$(mutationObject).subscribe({
         error: reject,
         next: resolve,

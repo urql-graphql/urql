@@ -229,7 +229,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
             fetching: false,
           });
         },
-        next: (results: IExchangeResult[]) => {
+        next: (results: IExchangeResult<any>[]) => {
           const errors = results.map(res => res.error).filter(Boolean);
 
           this.setState({
@@ -315,7 +315,7 @@ export default class UrqlClient extends Component<IClientProps, IClientState> {
       fetching: true,
     });
 
-    return new Promise<IExchangeResult['data']>((resolve, reject) => {
+    return new Promise<IExchangeResult<any>['data']>((resolve, reject) => {
       // Execute mutation
       client.executeMutation$(mutation).subscribe({
         error: e => {

@@ -2,9 +2,12 @@ import createReactContext, {
   ConsumerProps,
   ProviderProps,
 } from 'create-react-context';
-import { ComponentClass } from 'react';
+// @ts-ignore
+import { createContext, ComponentClass } from 'react';
 
-const context = createReactContext({});
+export const context = createContext
+  ? createContext({})
+  : createReactContext({});
 
 // TypeScript is very pedantic about re-exporting dependencies when doing
 // --declaration emit, so we need to import ComponentClass. But if we don't

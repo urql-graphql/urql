@@ -17,7 +17,7 @@ export const cacheExchange = (
   // Fills the cache given a query's response
   const processQueryOnCache = (
     key: string,
-    response: IExchangeResult
+    response: IExchangeResult<any>
   ): Promise<void> => {
     // Mark typenames on typenameInvalidate for early invalidation
     gankTypeNamesFromResponse(response.data).forEach(typeName => {
@@ -35,7 +35,7 @@ export const cacheExchange = (
   };
 
   // Invalidates the cache given a mutation's response
-  const processMutationOnCache = (response: IExchangeResult) => {
+  const processMutationOnCache = (response: IExchangeResult<any>) => {
     let cacheKeys = [];
 
     // For each typeName on the response, all cache keys will need to
@@ -66,7 +66,7 @@ export const cacheExchange = (
 
     if (operationName === 'mutation') {
       // Forward mutation response but execute processMutationOnCache side-effect
-      return forwarded$.map((response: IExchangeResult) => {
+      return forwarded$.map((response: IExchangeResult<any>) => {
         processMutationOnCache(response);
         return response;
       });
@@ -78,7 +78,7 @@ export const cacheExchange = (
     const { context, key } = operation;
     const { skipCache = false } = context;
 
-    return new Observable<IExchangeResult>(observer => {
+    return new Observable<IExchangeResult<any>>(observer => {
       let subscription;
 
       client.cache.read(key).then(cachedResult => {
@@ -92,7 +92,7 @@ export const cacheExchange = (
         // Forward response but execute processsQueryOnCache side-effect
         subscription = forwarded$.subscribe({
           error: err => observer.error(err),
-          next: (response: IExchangeResult) => {
+          next: (response: IExchangeResult<any>) => {
             // NOTE: Wait for cache to avoid updating a client component
             // when it itself triggered this operation
             processQueryOnCache(key, response).then(() => {

@@ -1,4 +1,11 @@
 export { IClient } from './client';
+export {
+  IQueryHook,
+  IQueryHookOpts,
+  IMutationHook,
+  ISubscriptionHook,
+  FetchOptions,
+} from './hooks';
 export { IMutation } from './mutation';
 export { IQuery } from './query';
 export { IClientOptions } from './client-options';

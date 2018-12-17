@@ -10,6 +10,11 @@ export * from './components/connect';
 export { default as ConnectHOC } from './components/connect-hoc';
 export * from './components/connect-hoc';
 
+export { useQuery as unstable_useQuery } from './modules/react-hooks/query';
+export {
+  useMutation as unstable_useMutation,
+} from './modules/react-hooks/mutation';
+
 export * from './modules/query';
 export * from './modules/cache-exchange';
 export * from './modules/dedup-exchange';
