@@ -2,20 +2,16 @@ import createReactContext, {
   ConsumerProps,
   ProviderProps,
 } from 'create-react-context';
-import { ComponentClass } from 'react';
+// @ts-ignore
+import { ComponentClass, Context } from 'react';
 
-const context = createReactContext({});
+const Context = createReactContext({});
 
-// TypeScript is very pedantic about re-exporting dependencies when doing
-// --declaration emit, so we need to import ComponentClass. But if we don't
-// explicitly use ComponentClass somewhere in the code, TypeScript *also*
-// ends up issuing an error. This is dumb, but this all gets erased anyway.
-interface Context {
-  Provider: ComponentClass<ProviderProps<{}>>;
-  Consumer: ComponentClass<ConsumerProps<{}>>;
-}
+export const context = (Context as any) as Context<{}>;
 
-export const {
-  Provider: ContextProvider,
-  Consumer: ContextConsumer,
-}: Context = context;
+export const ContextConsumer = Context.Consumer as ComponentClass<
+  ConsumerProps<{}>
+>;
+export const ContextProvider = Context.Provider as ComponentClass<
+  ProviderProps<{}>
+>;

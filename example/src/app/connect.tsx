@@ -17,7 +17,7 @@ export interface ITodoMutations {
   removeTodo: (input: { id: string }) => void;
 }
 
-const Home: React.SFC<{}> = () => (
+const TodoApp: React.SFC<{ path: string }> = () => (
   <Connect
     query={createQuery(TodoQuery)}
     mutations={{
@@ -82,4 +82,4 @@ query {
 }
 `;
 
-export default Home;
+export default TodoApp;

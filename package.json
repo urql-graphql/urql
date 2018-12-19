@@ -28,7 +28,9 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "snapshotSerializers": ["enzyme-to-json/serializer"],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
@@ -64,6 +66,7 @@
     }
   ],
   "devDependencies": {
+    "@reach/router": "^1.2.1",
     "@types/enzyme": "^3.1.15",
     "@types/graphql": "^14.0.3",
     "@types/jest": "^23.3.9",
@@ -88,10 +91,10 @@
     "microbundle": "^0.7.0",
     "prettier": "^1.15.2",
     "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
+    "react": "^16.7.0-alpha",
     "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.0.0-0",
-    "react-test-renderer": "^16.2.0",
+    "react-dom": "^16.7.0-alpha",
+    "react-test-renderer": "^16.7.0-alpha",
     "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.5",

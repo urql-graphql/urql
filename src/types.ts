@@ -125,3 +125,28 @@ export interface Operation extends Query {
   /** Additional request-related information. */
   context: Record<string, any>;
 }
+
+export interface HookFetchOptions {
+  skipCache?: boolean;
+}
+
+export interface QueryHookOpts {
+  variables?: object;
+}
+
+export interface QueryHook<Data> {
+  data?: Data;
+  loaded: boolean;
+  error?: Error | CombinedError;
+  fetching: boolean;
+  refetch(options: HookFetchOptions): void;
+}
+
+export interface SubscriptionHook<Data> {
+  data: Data;
+  loaded: boolean;
+  error: Error | null;
+  fetching: boolean;
+}
+
+export type MutationHook<Args> = (data: Args) => Promise<StreamUpdate>; // TODO

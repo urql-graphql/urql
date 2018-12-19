@@ -1,8 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Router } from '@reach/router';
 
 import { Provider, createClient } from '../../../src/index';
-import Home from './home';
+import ConnectTodoApp from './connect';
+import HooksTodoApp from './hooks';
 
 const client = createClient({
   url: 'http://localhost:3001/graphql',
@@ -10,7 +12,10 @@ const client = createClient({
 
 export const App: React.SFC<{}> = () => (
   <Provider client={client}>
-    <Home />
+    <Router>
+      <ConnectTodoApp path="/" />
+      <HooksTodoApp path="/hooks" />
+    </Router>
   </Provider>
 );
 
