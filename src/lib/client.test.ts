@@ -1,10 +1,17 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 import { createClient } from './client';
-import { queryGql, mutationGql, queryResponse } from '../test-utils';
+import { CombinedError } from './';
+import {
+  queryGql,
+  mutationGql,
+  queryResponse,
+  subscriptionGql,
+} from '../test-utils';
 import { ClientInstance } from '../types';
 
 const url = 'https://hostname.com';
 const fetch = (global as any).fetch as jest.Mock;
+const onSubscriptionUpdate = jest.fn();
 
 const wait = (delay: number = 90) =>
   new Promise(resolve => setTimeout(resolve, delay));
@@ -61,7 +68,7 @@ describe('createClient', () => {
         const client = createClient({
           url,
           fetchOptions: fetchOptions as any,
-        }).createInstance({ onChange });
+        }).createInstance({ onChange, onSubscriptionUpdate });
 
         client.executeQuery(queryGql);
 
@@ -84,7 +91,7 @@ describe('createClient', () => {
       it('is passed to fetch', async () => {
         const client = createClient({
           url,
-        }).createInstance({ onChange });
+        }).createInstance({ onChange, onSubscriptionUpdate });
 
         client.executeQuery(queryGql);
 
@@ -103,7 +110,7 @@ describe('createInstance', () => {
   });
 
   it('passes snapshot', () => {
-    const instance = client.createInstance({ onChange });
+    const instance = client.createInstance({ onChange, onSubscriptionUpdate });
     expect(instance).toMatchSnapshot();
   });
 });
@@ -115,7 +122,7 @@ describe('executeQuery', () => {
   beforeEach(() => {
     client = createClient({
       url,
-    }).createInstance({ onChange });
+    }).createInstance({ onChange, onSubscriptionUpdate });
     fetch.mockClear();
     onChange.mockClear();
     fetch.mockResolvedValue({
@@ -279,7 +286,7 @@ describe('execute mutation', () => {
   beforeEach(async () => {
     client = createClient({
       url,
-    }).createInstance({ onChange });
+    }).createInstance({ onChange, onSubscriptionUpdate });
 
     fetch.mockResolvedValue({
       status: 200,
@@ -307,5 +314,75 @@ describe('execute mutation', () => {
       await wait();
       expect(fetch).toBeCalled();
     });
+  });
+});
+
+describe('execute subscription', () => {
+  const forwardSubscription = jest.fn((operation, observer) =>
+    observer.next({ data: { data: 'foo' }, operation, error: null })
+  );
+
+  const client = createClient({
+    url,
+    forwardSubscription,
+  }).createInstance({ onChange: jest.fn(), onSubscriptionUpdate });
+
+  beforeEach(() => {
+    forwardSubscription.mockClear();
+    onSubscriptionUpdate.mockClear();
+  });
+
+  it('calls through the subscription exchange', () => {
+    client.executeSubscription(subscriptionGql);
+
+    expect(forwardSubscription).toHaveBeenCalled();
+  });
+
+  it('transform gql errors into CombinedError', () => {
+    forwardSubscription.mockImplementationOnce((operation, observer) =>
+      observer.next({
+        data: { data: null, errors: [{ name: 'An Error' }] },
+        operation,
+      })
+    );
+
+    client.executeSubscription(subscriptionGql);
+
+    expect(onSubscriptionUpdate.mock.calls[0][0].error).toBeInstanceOf(
+      CombinedError
+    );
+  });
+
+  it('calls through to the onSubscriptionUpdate', () => {
+    client.executeSubscription(subscriptionGql);
+
+    expect(onSubscriptionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: 'foo' })
+    );
+  });
+});
+
+describe('execute unsubscribe subscription', () => {
+  const unsubscribe = jest.fn();
+
+  const forwardSubscription = jest.fn(() => {
+    return { unsubscribe };
+  });
+
+  const client = createClient({
+    url,
+    forwardSubscription,
+  }).createInstance({ onChange: jest.fn(), onSubscriptionUpdate });
+
+  beforeEach(() => {
+    forwardSubscription.mockClear();
+    onSubscriptionUpdate.mockClear();
+    client.executeSubscription(subscriptionGql);
+  });
+
+  it('calls the unsubscribe fn from the exchange library', () => {
+    client.executeUnsubscribeSubscription(subscriptionGql);
+
+    expect(unsubscribe).toHaveBeenCalled();
   });
 });

@@ -1,7 +1,7 @@
 import { Observable, of, Subject } from 'rxjs';
 import { map, mergeMap, tap } from 'rxjs/operators';
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib';
-import { Exchange, ExchangeResult, Operation } from '../types';
+import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
 /** A default exchange for caching GraphQL requests. */
 export const cacheExchange: Exchange = ({ forward, subject }) => {
@@ -29,9 +29,9 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
         map(mapTypeNames),
         forward,
         tap(response => {
-          if (response.operation.operationName === 'mutation') {
+          if (response.operation.operationName === OperationType.Mutation) {
             handleAfterMutation(response);
-          } else if (response.operation.operationName === 'query') {
+          } else if (response.operation.operationName === OperationType.Query) {
             handleAfterQuery(response);
           }
         })

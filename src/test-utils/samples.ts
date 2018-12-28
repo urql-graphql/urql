@@ -1,4 +1,11 @@
-import { Query, Mutation, Operation, ExchangeResult } from '../types';
+import {
+  ExchangeResult,
+  Query,
+  Mutation,
+  Operation,
+  OperationType,
+  Subscription,
+} from '../types';
 
 const context = {
   fetchOptions: {
@@ -31,7 +38,7 @@ export const mutationGql: Mutation = {
   },
 };
 
-export const subscriptionGql: Query = {
+export const subscriptionGql: Subscription = {
   query: `subscription subscribeToUser($user: String){
     user(user: $user) {
       name
@@ -45,21 +52,21 @@ export const subscriptionGql: Query = {
 
 export const queryOperation: Operation = {
   key: '2',
-  operationName: 'query',
+  operationName: OperationType.Query,
   context,
   ...queryGql,
 };
 
 export const mutationOperation: Operation = {
   key: JSON.stringify(mutationGql),
-  operationName: 'mutation',
+  operationName: OperationType.Mutation,
   context,
   ...mutationGql,
 };
 
 export const subscriptionOperation: Operation = {
   key: JSON.stringify(subscriptionGql),
-  operationName: 'subscription',
+  operationName: OperationType.Subscription,
   context,
   ...subscriptionGql,
 };

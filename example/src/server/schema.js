@@ -1,6 +1,8 @@
 const fetch = require('isomorphic-fetch');
-const { makeExecutableSchema } = require('graphql-tools');
 const uuid = require('uuid/v4');
+const { PubSub } = require('graphql-subscriptions');
+
+const pubsub = new PubSub();
 
 const store = {
   todos: [
@@ -34,6 +36,11 @@ const typeDefs = `
     removeTodo(id: ID!): Todo
     editTodo(id: ID!, text: String!): Todo
   }
+  type Subscription {
+    todoAdded: Todo
+    todoRemoved: Todo
+    todoUpdated: Todo
+  }
   type Todo {
     id: ID,
     text: String,
@@ -60,18 +67,24 @@ const resolvers = {
     addTodo: (root, args, context) => {
       const id = uuid();
       const { text } = args;
-      store.todos.push({ id, text });
-      return { id, text };
+      const todo = { id, text };
+
+      store.todos.push(todo);
+      pubsub.publish('todoAdded', { todoAdded: { id, text: { text } } });
+
+      return todo;
     },
     removeTodo: (root, args, context) => {
       const { id } = args;
       let todo = store.todos.find(todo => todo.id === id);
       store.todos.splice(store.todos.indexOf(todo), 1);
+      pubsub.publish('todoRemoved', { todoRemoved: todo });
       return { id };
     },
     editTodo: (root, args, context) => {
       const { id, text } = args;
       let todo = store.todos.some(todo => todo.id === id);
+      pubsub.publish('todoUpdated', { todoUpdated: todo });
       todo.text = text;
       return {
         text,
@@ -79,13 +92,22 @@ const resolvers = {
       };
     },
   },
+  Subscription: {
+    todoAdded: {
+      subscribe: () => pubsub.asyncIterator('todoAdded'),
+    },
+    todoRemoved: {
+      subscribe: () => pubsub.asyncIterator('todoRemoved'),
+    },
+    todoUpdated: {
+      subscribe: () => pubsub.asyncIterator('todoUpdated'),
+    },
+  },
 };
 
 module.exports = {
-  schema: makeExecutableSchema({
-    typeDefs,
-    resolvers,
-  }),
+  typeDefs,
+  resolvers,
   context: (headers, secrets) => {
     return {
       headers,

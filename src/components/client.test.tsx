@@ -1,12 +1,14 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { UrqlClient } from './client';
-import { queryGql as query, mutationGql } from '../test-utils';
+import { queryGql as query, mutationGql, subscriptionGql } from '../test-utils';
 
 const children = jest.fn().mockReturnValue(<h1>This is a child component</h1>);
 const clientInstance = {
   executeQuery: jest.fn(),
   executeMutation: jest.fn(),
+  executeSubscription: jest.fn(),
+  executeUnsubscribeSubscription: jest.fn(),
   unsubscribe: jest.fn(),
 };
 const client = { createInstance: jest.fn().mockReturnValue(clientInstance) };
@@ -21,11 +23,12 @@ beforeEach(() => {
   clientInstance.executeQuery.mockClear();
   clientInstance.executeMutation.mockClear();
   clientInstance.unsubscribe.mockClear();
+  clientInstance.executeSubscription.mockClear();
+  clientInstance.executeUnsubscribeSubscription.mockClear();
 });
 
 it('passes snapshot', () => {
   const wrapper = shallow(
-    // @ts-ignore
     <UrqlClient client={client} query={query} mutations={mutations}>
       {children}
     </UrqlClient>
@@ -37,7 +40,6 @@ it('passes snapshot', () => {
 describe('on creation', () => {
   it('calls createInstance', () => {
     shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -46,10 +48,17 @@ describe('on creation', () => {
     expect(client.createInstance).toBeCalled();
   });
 
+  it('throws an error if subscriptions are passed without an updateSubscription prop', () => {
+    expect(() =>
+      shallow(
+        <UrqlClient client={client} subscriptions={[]} children={children} />
+      )
+    ).toThrow();
+  });
+
   describe('defaults', () => {
     it('passes snapshot', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -60,7 +69,6 @@ describe('on creation', () => {
 
     it('fetching = true', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -73,7 +81,6 @@ describe('on creation', () => {
 
     it('error = undefined', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -86,7 +93,6 @@ describe('on creation', () => {
 
     it('data = undefined', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -99,7 +105,6 @@ describe('on creation', () => {
 
     it('mutations = <object>', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -112,22 +117,38 @@ describe('on creation', () => {
 
 describe('componentDidMount', () => {
   it('calls executeQuery with query object', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
     );
 
-    wrapper.instance().componentDidMount();
     expect(clientInstance.executeQuery).toBeCalledWith(query);
+  });
+
+  it('calls executeSubscription for each subscription it has', () => {
+    const subscriptions = [subscriptionGql, subscriptionGql];
+
+    shallow(
+      <UrqlClient
+        client={client}
+        query={query}
+        subscriptions={subscriptions}
+        updateSubscription={jest.fn()}
+      >
+        {children}
+      </UrqlClient>
+    );
+
+    expect(clientInstance.executeSubscription).toBeCalledTimes(
+      subscriptions.length
+    );
   });
 });
 
 describe('componentDidUpdate', () => {
   it('query is refetched', () => {
     const wrapper = mount(
-      // @ts-ignore
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
@@ -142,7 +163,6 @@ describe('componentDidUpdate', () => {
 
   it('mutation functions are updated', () => {
     const wrapper = mount(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -159,12 +179,35 @@ describe('componentDidUpdate', () => {
       Object.keys(newMutations)
     );
   });
+
+  it('subscriptions are unsubscribed, and new ones are subscribed', () => {
+    const subscriptions = [subscriptionGql, subscriptionGql];
+    const wrapper = mount(
+      <UrqlClient
+        client={client}
+        subscriptions={subscriptions}
+        updateSubscription={jest.fn()}
+      >
+        {children}
+      </UrqlClient>
+    );
+
+    // remove mock calls from mounting to get predictable test results.
+    clientInstance.executeSubscription.mockClear();
+    clientInstance.executeUnsubscribeSubscription.mockClear();
+
+    const newSubscriptions = [subscriptionGql];
+
+    wrapper.setProps({ subscriptions: newSubscriptions });
+
+    expect(clientInstance.executeUnsubscribeSubscription).toBeCalledTimes(2);
+    expect(clientInstance.executeSubscription).toBeCalledTimes(1);
+  });
 });
 
 describe('componentWillUnmount', () => {
   it('unsubscribes from client lib', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
@@ -173,12 +216,26 @@ describe('componentWillUnmount', () => {
     wrapper.instance().componentWillUnmount();
     expect(clientInstance.unsubscribe).toBeCalled();
   });
+
+  it('unsubscribes from subscriptions', () => {
+    const wrapper = shallow(
+      <UrqlClient
+        client={client}
+        subscriptions={[subscriptionGql]}
+        updateSubscription={jest.fn()}
+      >
+        {children}
+      </UrqlClient>
+    );
+
+    wrapper.instance().componentWillUnmount();
+    expect(clientInstance.executeUnsubscribeSubscription).toBeCalledTimes(1);
+  });
 });
 
 describe('mutation functions', () => {
   it('have same properties as mutation argument', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -191,7 +248,6 @@ describe('mutation functions', () => {
 
   it('calls executeMutation', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -205,7 +261,6 @@ describe('mutation functions', () => {
 
   it('passes mutation query to executeMutation', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -221,7 +276,6 @@ describe('mutation functions', () => {
 
   it('passes mutation vars to executeMutation', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -240,7 +294,6 @@ describe('mutation functions', () => {
 describe('on change from client', () => {
   it('child components are updated', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -258,5 +311,46 @@ describe('on change from client', () => {
     updateFun(update);
 
     expect(children).toBeCalledWith(expect.objectContaining(update));
+  });
+});
+
+describe('on subscription change', () => {
+  it('delegates changes to the updateSubscription prop', () => {
+    const NOT_STATE_VALUE = 'NOT_STATE_VALUE';
+    const STATE_VALUE = 'STATE_VALUE';
+
+    const updateSubscription = (type, state, data) => {
+      if (type === 'test') {
+        state = data;
+      }
+
+      return state;
+    };
+
+    const wrapper = shallow(
+      <UrqlClient client={client} updateSubscription={updateSubscription}>
+        {children}
+      </UrqlClient>
+    );
+
+    // this data shape would not hit the state assignment in our updateSubscription updator
+    // so we assert that it didn't get set.
+    // @ts-ignore
+    wrapper.instance().onSubscriptionStreamUpdate({
+      data: {
+        nottest: NOT_STATE_VALUE,
+      },
+    });
+
+    expect(wrapper.state('data')).not.toBe(NOT_STATE_VALUE);
+
+    // @ts-ignore
+    wrapper.instance().onSubscriptionStreamUpdate({
+      data: {
+        test: STATE_VALUE,
+      },
+    });
+
+    expect(wrapper.state('data')).toBe(STATE_VALUE);
   });
 });

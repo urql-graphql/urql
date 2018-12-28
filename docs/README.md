@@ -20,4 +20,4 @@
 
 - [ChildArgs](types/child-args.md)
 - [CombinedError](types/combined-error.md)
-- [Mutation/Query](types/mutation-query.md)
+- [Mutation/Query/Subscription](types/mutation-query-subscription.md)

@@ -72,6 +72,7 @@ function addTypenameToDocument(doc: DocumentNode) {
 // Adds __typename fields to a GraphQL query string
 export function formatTypeNames(query: string): string {
   const doc = parse(query);
+
   return print(addTypenameToDocument(doc));
 }
 

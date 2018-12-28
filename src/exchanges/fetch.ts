@@ -1,13 +1,13 @@
 import { flatMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
-import { Exchange } from '../types';
+import { Exchange, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {
   return ops$ =>
     ops$.pipe(
       flatMap(async operation => {
-        if (operation.operationName === 'subscription') {
+        if (operation.operationName === OperationType.Subscription) {
           throw new Error(
             'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
           );
