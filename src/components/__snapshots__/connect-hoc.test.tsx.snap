@@ -1,219 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`passes snapshot 1`] = `
-ReactWrapper {
-  Symbol(enzyme.__unrendered__): <Connect(TargetComponent) />,
-  Symbol(enzyme.__renderer__): Object {
-    "batchedUpdates": [Function],
-    "getNode": [Function],
-    "render": [Function],
-    "simulateError": [Function],
-    "simulateEvent": [Function],
-    "unmount": [Function],
-  },
-  Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__node__): Object {
-    "instance": null,
-    "key": undefined,
-    "nodeType": "function",
-    "props": Object {},
-    "ref": null,
-    "rendered": Object {
-      "instance": null,
-      "key": undefined,
-      "nodeType": "function",
-      "props": Object {
-        "children": [Function],
-        "mutations": Object {
-          "test": Object {
-            "query": "mutation AddUser($name: String){
+<Connect(TargetComponent)>
+  <mockConstructor
+    mutations={
+      Object {
+        "test": Object {
+          "query": "mutation AddUser($name: String){
     addUser(name: $name) {
       name
-    }
-  }",
-            "variables": Object {
-              "name": "Clara",
-            },
-          },
-        },
-        "query": Object {
-          "query": "query getUser($name: String){
-    user(name: $name) {
-      id
-      firstName
-      lastName
     }
   }",
           "variables": Object {
             "name": "Clara",
           },
         },
-      },
-      "ref": null,
-      "rendered": Object {
-        "instance": <div />,
-        "key": undefined,
-        "nodeType": "host",
-        "props": Object {},
-        "ref": null,
-        "rendered": Array [
-          undefined,
-        ],
-        "type": "div",
-      },
-      "type": [MockFunction] {
-        "calls": Array [
-          Array [
-            Object {
-              "children": [Function],
-              "mutations": Object {
-                "test": Object {
-                  "query": "mutation AddUser($name: String){
-    addUser(name: $name) {
-      name
+      }
     }
-  }",
-                  "variables": Object {
-                    "name": "Clara",
-                  },
-                },
-              },
-              "query": Object {
-                "query": "query getUser($name: String){
+    query={
+      Object {
+        "query": "query getUser($name: String){
     user(name: $name) {
       id
       firstName
       lastName
     }
   }",
-                "variables": Object {
-                  "name": "Clara",
-                },
-              },
-            },
-            Object {},
-          ],
-        ],
-        "results": Array [
-          Object {
-            "isThrow": false,
-            "value": <div />,
-          },
-        ],
-      },
-    },
-    "type": [Function],
-  },
-  Symbol(enzyme.__nodes__): Array [
-    Object {
-      "instance": null,
-      "key": undefined,
-      "nodeType": "function",
-      "props": Object {},
-      "ref": null,
-      "rendered": Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "function",
-        "props": Object {
-          "children": [Function],
-          "mutations": Object {
-            "test": Object {
-              "query": "mutation AddUser($name: String){
-    addUser(name: $name) {
-      name
-    }
-  }",
-              "variables": Object {
-                "name": "Clara",
-              },
-            },
-          },
-          "query": Object {
-            "query": "query getUser($name: String){
-    user(name: $name) {
-      id
-      firstName
-      lastName
-    }
-  }",
-            "variables": Object {
-              "name": "Clara",
-            },
-          },
+        "variables": Object {
+          "name": "Clara",
         },
-        "ref": null,
-        "rendered": Object {
-          "instance": <div />,
-          "key": undefined,
-          "nodeType": "host",
-          "props": Object {},
-          "ref": null,
-          "rendered": Array [
-            undefined,
-          ],
-          "type": "div",
-        },
-        "type": [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {
-                "children": [Function],
-                "mutations": Object {
-                  "test": Object {
-                    "query": "mutation AddUser($name: String){
-    addUser(name: $name) {
-      name
+      }
     }
-  }",
-                    "variables": Object {
-                      "name": "Clara",
-                    },
-                  },
-                },
-                "query": Object {
-                  "query": "query getUser($name: String){
-    user(name: $name) {
-      id
-      firstName
-      lastName
-    }
-  }",
-                  "variables": Object {
-                    "name": "Clara",
-                  },
-                },
-              },
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "isThrow": false,
-              "value": <div />,
-            },
-          ],
-        },
-      },
-      "type": [Function],
-    },
-  ],
-  Symbol(enzyme.__options__): Object {
-    "adapter": ReactSixteenAdapter {
-      "options": Object {
-        "enableComponentDidUpdateOnSetState": true,
-        "lifecycles": Object {
-          "componentDidUpdate": Object {
-            "onSetState": true,
-          },
-          "getDerivedStateFromProps": true,
-          "getSnapshotBeforeUpdate": true,
-          "setState": Object {
-            "skipsComponentDidUpdateOnNullish": true,
-          },
-        },
-      },
-    },
-  },
-}
+  >
+    <div />
+  </mockConstructor>
+</Connect(TargetComponent)>
 `;

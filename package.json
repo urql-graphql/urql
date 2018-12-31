@@ -28,6 +28,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "snapshotSerializers": ["enzyme-to-json/serializer"],
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
@@ -40,7 +41,10 @@
     "collectCoverageFrom": [
       "<rootDir>/src/**/*.{ts,tsx}"
     ],
-    "coveragePathIgnorePatterns": ["<rootDir>/src/test-utils", "<rootDir>/src.*/index.ts"]
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/test-utils",
+      "<rootDir>/src.*/index.ts"
+    ]
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md}": [
@@ -73,6 +77,7 @@
     "coveralls": "^3.0.0",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.7.0",
+    "enzyme-to-json": "^3.3.5",
     "express": "^4.16.2",
     "express-graphql": "^0.7.1",
     "graphql-tools": "^4.0.3",
