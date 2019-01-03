@@ -14,6 +14,7 @@ const TodoApp: React.SFC<{ path: string }> = () => {
   const { data, loaded, refetch } = useQuery<{ todos: Todo[] }>(TodoQuery);
   const addTodo = useMutation<{ text: string }>(AddTodo);
   const removeTodo = useMutation<{ id: string }>(RemoveTodo);
+  const reset = useMutation<{}>(Reset);
 
   return (
     <div>
@@ -28,8 +29,15 @@ const TodoApp: React.SFC<{ path: string }> = () => {
       <button type="button" onClick={() => refetch({})}>
         Refetch
       </button>
-      <button type="button" onClick={refetch.bind(null, { skipCache: true })}>
+      <button
+        id="refetch"
+        type="button"
+        onClick={refetch.bind(null, { skipCache: true })}
+      >
         Refetch (Skip Cache)
+      </button>
+      <button id="reset" type="button" onClick={() => reset({})}>
+        Reset Backend Store
       </button>
     </div>
   );
@@ -38,6 +46,15 @@ const TodoApp: React.SFC<{ path: string }> = () => {
 const Loading = () => <p>Loading...</p>;
 
 const Error = () => <p>Error!</p>;
+
+const Reset = `
+mutation {
+  reset {
+    id
+    text
+  }
+}
+`;
 
 const AddTodo = `
 mutation($text: String!) {

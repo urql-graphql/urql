@@ -2,6 +2,21 @@ const fetch = require('isomorphic-fetch');
 const { makeExecutableSchema } = require('graphql-tools');
 const uuid = require('uuid/v4');
 
+let initTodos = [
+  {
+    id: uuid(),
+    text: 'test',
+  },
+  {
+    id: uuid(),
+    text: 'test2',
+  },
+  {
+    id: uuid(),
+    text: 'test3',
+  },
+];
+
 const store = {
   todos: [
     {
@@ -33,6 +48,7 @@ const typeDefs = `
     addTodo(text: String!): Todo
     removeTodo(id: ID!): Todo
     editTodo(id: ID!, text: String!): Todo
+    reset: [Todo]
   }
   type Todo {
     id: ID,
@@ -77,6 +93,10 @@ const resolvers = {
         text,
         id,
       };
+    },
+    reset: () => {
+      store.todos = [...initTodos];
+      return store.todos;
     },
   },
 };

@@ -1,7 +1,7 @@
 // @ts-ignore
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { context } from '../components/context';
-import { Client, ExchangeResult, MutationHook } from '../types';
+import { Client, MutationHook } from '../types';
 
 export function useMutation<Args>(
   mutationQuery: string,

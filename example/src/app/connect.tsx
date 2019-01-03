@@ -23,6 +23,7 @@ const TodoApp: React.SFC<{ path: string }> = () => (
     mutations={{
       addTodo: createMutation(AddTodo),
       removeTodo: createMutation(RemoveTodo),
+      reset: createMutation(Reset),
     }}
     children={({ data, error, mutations, fetching, refetch }) => {
       const content = fetching ? (
@@ -40,8 +41,11 @@ const TodoApp: React.SFC<{ path: string }> = () => (
           <button type="button" onClick={() => refetch()}>
             Refetch
           </button>
-          <button type="button" onClick={() => refetch(true)}>
+          <button id="refetch" type="button" onClick={() => refetch(true)}>
             Refetch (Skip Cache)
+          </button>
+          <button id="reset" type="button" onClick={() => mutations.reset({})}>
+            Reset Backend Store
           </button>
         </div>
       );
@@ -52,6 +56,15 @@ const TodoApp: React.SFC<{ path: string }> = () => (
 const Loading = () => <p>Loading...</p>;
 
 const Error = () => <p>Error!</p>;
+
+const Reset = `
+mutation {
+  reset {
+    id
+    text
+  }
+}
+`;
 
 const AddTodo = `
 mutation($text: String!) {

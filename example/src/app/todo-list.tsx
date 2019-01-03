@@ -9,7 +9,7 @@ const TodoList: React.SFC<TodoListProps> = ({ todos, removeTodo }) => (
   <ul>
     {todos.map(todo => (
       <li key={todo.id}>
-        {todo.text}{' '}
+        <span>{todo.text}</span>{' '}
         <button type="button" onClick={() => removeTodo({ id: todo.id })}>
           Remove
         </button>

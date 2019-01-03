@@ -1,14 +1,8 @@
 // @ts-ignore
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { context } from '../components/context';
 import { CombinedError } from '../lib';
-import {
-  Client,
-  ExchangeResult,
-  HookFetchOptions,
-  QueryHook,
-  QueryHookOpts,
-} from '../types';
+import { Client, HookFetchOptions, QueryHook } from '../types';
 
 const DEFAULT_RESPONSE = {
   fetching: true,
@@ -29,7 +23,7 @@ type ResponseState<Data> = [Response<Data>, (response: Response<Data>) => void];
 // return state of a query fetch
 export function useQuery<Data>(
   query: string,
-  { variables }: QueryHookOpts = {}
+  variables: object = {}
 ): QueryHook<Data> {
   const COMPARISON = [query, variables];
 
