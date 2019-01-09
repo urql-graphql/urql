@@ -1,0 +1,107 @@
+/** BASE
+* Common styles between <Header> & <Footer>
+*
+*/
+.formidableHeader svg,
+.formidableFooter svg {
+  fill: currentColor;
+}
+
+.formidableHeader .social {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.formidableHeader .social svg {
+  position: absolute;
+  vertical-align: middle;
+  width:100%;
+  height:100%;
+}
+
+.formidableHeader a:link,
+.formidableFooter a:link {
+  text-decoration: none;
+  transition: color 250ms ease-in, fill 300ms ease-in;
+  padding: 10px 15px;
+  position: relative;
+}
+
+.formidableHeader a:focus,
+.formidableHeader a:hover,
+.formidableFooter a:focus,
+.formidableFooter a:hover {
+  transition: color 400ms ease-out, fill 500ms ease-out;
+}
+
+.formidableHeader-container,
+.formidableFooter-container {
+  /* Looks */
+  font-family: inherit;
+  font-size: inherit;
+  /* Structure */
+  align-items: center;
+  display: flex;
+  flex: none; /* Sticky header/footer setup */
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.formidableHeader-container {
+  margin: 0 auto;
+  padding: calc(45px + 3em) 0 30px;
+}
+
+.formidableFooter-container {
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 60px auto;
+  padding: 0 3vw;
+}
+
+/** DARK THEME
+* .isDark class
+*/
+.formidableHeader.isDark a:link,
+.formidableFooter.isDark a:link {
+  color: var(--white);
+}
+
+.formidableHeader.isDark a:visited,
+.formidableFooter.isDark a:visited {
+  color: var(--lightGray);
+}
+
+.formidableHeader.isDark a:focus,
+.formidableHeader.isDark a:hover,
+.formidableFooter.isDark a:focus,
+.formidableFooter.isDark a:hover {
+  color: var(--lightRed);
+}
+
+/** LIGHT THEME
+* .isLight class
+*/
+.formidableHeader.isLight,
+.formidableFooter.isLight {
+  background: var(--white);
+  color: var(--black);
+}
+
+.formidableHeader.isLight a:link,
+.formidableFooter.isLight a:link {
+  color: var(--black);
+}
+
+.formidableHeader.isLight a:visited,
+.formidableFooter.isLight a:visited {
+  color: var(--black);
+}
+
+.formidableHeader.isLight a:focus,
+.formidableHeader.isLight a:hover,
+.formidableFooter.isLight a:focus,
+.formidableFooter.isLight a:hover {
+  color: var(--red);
+}

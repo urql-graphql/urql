@@ -7,9 +7,8 @@
  * base:        styles are applied directly to element using an element selector
  * utilities:   styles that are not reflective of the application state
  * text:        universal text and content styles reside here
- *
+ * @import "normalize.css";
  */
-@import "normalize.css";
 @import "./base/variables.css";
 @import "./base/base.css";
 @import "./base/links.css";

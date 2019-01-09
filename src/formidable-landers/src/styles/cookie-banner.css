@@ -1,0 +1,73 @@
+/** VARIABLES
+*/
+@import "base/variables.css";
+
+/** BASE
+* Common styles between <Header> & <Footer>
+*
+*/
+@import "base/base.css";
+
+.formidaCookie {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  padding: 2em 0;
+  z-index: 100;
+
+  background-color: #111;
+  border-top: 1px solid var(--white);
+  color: var(--white);
+}
+
+.formidaCookie a {
+  color: var(--lightRed);
+  text-decoration: none;
+  line-height: inherit;
+  transition: color 0.4s ease-in-out;
+}
+
+.formidaCookie a:hover,
+.formidaCookie a:focus {
+  color: var(--white);
+  transition: color 0.4s ease-in-out;
+  cursor: pointer;
+}
+
+.formidaCookie a:active {
+  color: var(--lightRed);
+}
+
+.formidaCookie-container {
+  display: block;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.formidaCookie-button[type="button"] {
+  display: block;
+  margin: 0 auto;
+  padding: 0.6em 2em 0.45em;
+
+  background-color: var(--white);
+  color: var(--black);
+  font-family: inherit;
+  font-size: 0.7em;
+  line-height: 1.9;
+  letter-spacing: 0.15em;
+  text-align: center;
+  text-transform: uppercase;
+  transition: background-color 0.4s ease-in-out;
+}
+
+.formidaCookie-button[type="button"]:hover,
+.formidaCookie-button[type="button"]:focus {
+  background-color: var(--lightGray);
+  transition: background-color 0.4s ease-in-out;
+}
+.formidaCookie-button[type="button"]:focus {
+  box-shadow: 0 0 0 3px var(--lightRed);
+}

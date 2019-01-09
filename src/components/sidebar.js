@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router";
+import PropTypes from "prop-types";
+import { Link, withRouteData, withRouter } from "react-static";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
 
@@ -9,26 +10,28 @@ class Sidebar extends React.Component {
 
     return (
       <ul className="Sidebar-toc">
-        {
-          siblings.map((sibling, id) => {
-            if (Array.isArray(sibling)) {
-              return (
-                <li className="Sidebar-toc-item" key={id}>
-                  {this.renderTransformedToc(sibling, targetLocation)}
-                </li>
-              );
-            }
+        {siblings.map((sibling, id) => {
+          if (Array.isArray(sibling)) {
+            return (
+              <li className="Sidebar-toc-item" key={id}>
+                {this.renderTransformedToc(sibling, targetLocation)}
+              </li>
+            );
+          }
 
-            return sibling && (
+          return (
+            sibling && (
               <li key={id} className="Sidebar-toc-item">
                 <Link
                   to={`${targetLocation}#${sibling.anchor}`}
-                  dangerouslySetInnerHTML={{__html: md.renderInline(sibling.content)}}
+                  dangerouslySetInnerHTML={{
+                    __html: md.renderInline(sibling.content)
+                  }}
                 />
               </li>
-            );
-          })
-        }
+            )
+          );
+        })}
       </ul>
     );
   }
@@ -68,11 +71,14 @@ class Sidebar extends React.Component {
   }
 
   renderToc(targetLocation) {
-    if (!this.props.location || (this.props.location.pathname !== targetLocation)) {
+    if (
+      !this.props.location ||
+      this.props.location.pathname !== targetLocation
+    ) {
       return null;
     }
 
-    const list = this.props.tocArray.filter((heading) => heading.level !== 1);
+    const list = this.props.tocArray.filter(heading => heading.level !== 1);
 
     return this.renderTransformedToc(
       this.transformTocArray(list),
@@ -83,7 +89,8 @@ class Sidebar extends React.Component {
   renderSidebarItem(href, name, isDocs) {
     const defaultClass = "btn btn--dark u-displayBlock u-nowrap";
     const currentPath = this.props.location && this.props.location.pathname;
-    const docsClass = currentPath === "/docs/" ? `${defaultClass} is-active` : defaultClass;
+    const docsClass =
+      currentPath === "/docs/" ? `${defaultClass} is-active` : defaultClass;
 
     return (
       <div className="Sidebar-item Grid-cell u-noMarginTop">
@@ -103,10 +110,9 @@ class Sidebar extends React.Component {
   render() {
     return (
       <nav className="Sidebar">
-        <p className="Subheading u-noMargin">
-          Documentation
-        </p>
-        <div className="
+        <p className="Subheading u-noMargin">Documentation</p>
+        <div
+          className="
           u-noMarginTop
           Grid
           Grid--gutters
@@ -114,7 +120,11 @@ class Sidebar extends React.Component {
           medium-Grid--flex--1of3
           large-Grid--column"
         >
-          {this.renderSidebarItem("/docs/getting-started/", "Get Started", true)}
+          {this.renderSidebarItem(
+            "/docs/getting-started/",
+            "Get Started",
+            true
+          )}
           {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}
           {this.renderSidebarItem("/docs/tag-api/", "Tag API")}
           {this.renderSidebarItem("/docs/props/", "Props")}
@@ -126,8 +136,8 @@ class Sidebar extends React.Component {
 }
 
 Sidebar.propTypes = {
-  location: React.PropTypes.object,
-  tocArray: React.PropTypes.array
+  location: PropTypes.object,
+  tocArray: PropTypes.array
 };
 
-export default Sidebar;
+export default withRouter(withRouteData(Sidebar));

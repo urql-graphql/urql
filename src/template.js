@@ -1,12 +1,10 @@
 import React from "react";
-import { Link } from "react-router";
-import { Header, Footer } from "formidable-landers";
+import PropTypes from "prop-types";
+import { withRouter, Link } from "react-static";
+import LOGO from "./static/logo.svg";
+import { Footer, Header } from "./formidable-landers/src";
 
-// Variables and Stylesheet
-import LOGO from "../../static/logo.svg";
-import "../styles/styles.css";
-
-class App extends React.Component {
+class Template extends React.Component {
   render() {
     const SpectacleLogoLink = (
       <h1 className="u-noMargin">
@@ -45,12 +43,12 @@ class App extends React.Component {
   }
 }
 
-App.propTypes = {
-  children: React.PropTypes.node
+Template.propTypes = {
+  children: PropTypes.node
 };
 
-App.defaultProps = {
+Template.defaultProps = {
   children: null
 };
 
-export default App;
+export default withRouter(Template);
