@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
 import { Exchange, Operation, ExchangeResult } from '../types';
 
@@ -7,7 +7,7 @@ import { Exchange, Operation, ExchangeResult } from '../types';
 export const fetchExchange: Exchange = () => {
   return ops$ =>
     ops$.pipe(
-      flatMap(operation => {
+      mergeMap(operation => {
         if (operation.operationName === 'subscription') {
           throw new Error(
             'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'

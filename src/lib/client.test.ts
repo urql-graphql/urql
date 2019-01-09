@@ -236,7 +236,7 @@ describe('executeQuery', () => {
 
     describe('calls onChange with', () => {
       beforeEach(() => {
-        fetch.mockResolvedValue({
+        fetch.mockReturnValueOnce({
           status: 200,
           json: () => ({
             errors,
@@ -256,6 +256,8 @@ describe('executeQuery', () => {
         client.executeQuery(queryGql);
 
         await wait();
+
+        expect(onChange.mock.calls[0]).toEqual([{ fetching: true }]);
         expect(onChange.mock.calls[1][0].error.graphQLErrors[0]).toHaveProperty(
           'message',
           errors[0].message

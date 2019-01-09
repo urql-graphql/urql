@@ -80,27 +80,24 @@ it("doesn't cache mutations", async () => {
 
 it('retriggers query operation when mutation occurs', () => {
   const typename = 'ToDo';
-  const cache = new Map([[1, queryResponse]]);
-  const typenames = new Map([[typename, [1]]]);
+  const resultCache = new Map([['test', queryResponse]]);
+  const operationCache = { [typename]: new Set(['test']) };
 
   afterMutation(
+    resultCache,
+    operationCache,
     // @ts-ignore
-    {
-      data: {
-        data: {
-          todos: [
-            {
-              id: 1,
-              __typename: typename,
-            },
-          ],
-        },
-      },
-    },
-    cache,
-    typenames,
     subject
-  );
+  )({
+    data: {
+      todos: [
+        {
+          id: 1,
+          __typename: typename,
+        },
+      ],
+    },
+  });
 
   expect(subject.next).toBeCalledWith(queryOperation);
 });

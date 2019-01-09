@@ -1,5 +1,5 @@
 import { Observable, Subject, Subscription } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { publish, filter, take } from 'rxjs/operators';
 import * as uuid from 'uuid';
 import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
 import { hashString } from '../lib';
@@ -24,13 +24,16 @@ export const createClient = (opts: ClientOptions): Client => {
 
   /** Main subject for emitting operations */
   const subject = new Subject<Operation>();
+
   /** Main subject stream for listening to operation responses */
-  const subject$ = subject.pipe(
+  const subject$ = publish()(
     pipeExchanges(
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
       subject
-    )
+    )(subject)
   );
+
+  subject$.connect();
 
   const fetchOptions =
     typeof opts.fetchOptions === 'function'
@@ -77,7 +80,7 @@ export const createClient = (opts: ClientOptions): Client => {
       const outboundKey = `${operation.key}-out`;
       const inboundKey = `${operation.key}-in`;
 
-      const instanceSubscriptions = getSubscriptions();
+      const instanceSubscriptions = new Map(); // getSubscriptions();
 
       if (!instanceSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
@@ -92,17 +95,17 @@ export const createClient = (opts: ClientOptions): Client => {
         /** Notify component when query operation has returned */
         const inboundSub = subject$
           .pipe(
-            filter(
-              (result: ExchangeResult) => result.operation.key === operation.key
-            )
+            filter((result: ExchangeResult) => {
+              return result.operation.key === operation.key;
+            })
           )
-          .subscribe(response =>
+          .subscribe(response => {
             instanceOpts.onChange({
               data: response.data,
               error: response.error,
               fetching: false,
-            })
-          );
+            });
+          });
         instanceSubscriptions.set(inboundKey, inboundSub);
       }
 
@@ -141,7 +144,7 @@ export const createClient = (opts: ClientOptions): Client => {
 
 /** Create pipe of exchanges */
 const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
-  operation: Observable<Operation>
+  operation$: Observable<Operation>
 ) => {
   /** Recursively pipe to each exchange */
   const callExchanges = (value: Observable<Operation>, index: number = 0) => {
@@ -156,5 +159,5 @@ const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
     })(value);
   };
 
-  return callExchanges(operation, 0);
+  return callExchanges(operation$, 0);
 };

@@ -22,5 +22,9 @@ export const dedupeExchange: Exchange = ({ forward }) => {
           return !hasInFlightOp;
         })
       )
-    ).pipe(tap(res => inFlight.delete(res.operation.key)));
+    ).pipe(
+      tap(res => {
+        inFlight.delete(res.operation.key);
+      })
+    );
 };

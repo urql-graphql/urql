@@ -73,15 +73,13 @@ it('should throw error when operationName is subscription', async () => {
   }
 });
 
-it('should call cancel when the Observable is cancelled', done => {
+it('should call cancel when the Observable is cancelled', () => {
   fetch.mockReturnValue(Promise.reject(abortError));
 
   const obs = fetchExchange(args)(of(queryOperation));
   const subscription = obs.subscribe(fail);
 
-  setTimeout(() => {
-    subscription.unsubscribe();
-    expect(abort).toHaveBeenCalledTimes(1);
-    done();
-  });
+  subscription.unsubscribe();
+  expect(abort).toHaveBeenCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });
