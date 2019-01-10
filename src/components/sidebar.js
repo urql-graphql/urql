@@ -120,15 +120,42 @@ class Sidebar extends React.Component {
           medium-Grid--flex--1of3
           large-Grid--column"
         >
-          {this.renderSidebarItem(
-            "/docs/getting-started/",
-            "Get Started",
-            true
-          )}
-          {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}
-          {this.renderSidebarItem("/docs/tag-api/", "Tag API")}
-          {this.renderSidebarItem("/docs/props/", "Props")}
-          {this.renderSidebarItem("/docs/extensions/", "Extensions")}
+          {/* proof of existence of data only, hash functionality is incidental and shouldn't be relied on.
+          Feel free to rummage through, refactor, or rewrite this component
+          and data shape as desired -- I would really recommend just appending the desired href before here (since there are rules to consider around parens)
+           and use the topmost (depth 1) heading as the title instead of hardcoding it in multiple places then intentionally filtering it out.
+          The transformTocArray method could be repurposed to be a transform pretty easily.
+
+          In general though, the idea of parsing a markdown file inside of multiple react components multiple times
+          via view layer methods that rely on special attributes of the markdown data feels like a forced decision
+          made primarily based on tooling limitations rather than a conscious architectural choice. I've found a lot
+          of value to be had in being able to predict output based on input, but it's a surprisingly unpopular idea.
+
+          */}
+          {this.props.tocArray.map(sh => (
+            <Link
+              to={`#${sh.content
+                .split(" ")
+                .join("-")
+                .toLowerCase()}`}
+              key={sh.content.split(" ").join("_")}
+            >
+              {sh.content}
+            </Link>
+          ))}
+
+          {/* This is how it was handled previously -- seems easier to just use the newly provided sidebarHeaders prop imo,
+              but
+          */}
+          {/* {this.renderSidebarItem(*/}
+          {/* "/docs/getting-started/",*/}
+          {/* "Get Started",*/}
+          {/* true*/}
+          {/* )}*/}
+          {/* {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}*/}
+          {/* {this.renderSidebarItem("/docs/tag-api/", "Tag API")}*/}
+          {/* {this.renderSidebarItem("/docs/props/", "Props")}*/}
+          {/* {this.renderSidebarItem("/docs/extensions/", "Extensions")}*/}
         </div>
       </nav>
     );

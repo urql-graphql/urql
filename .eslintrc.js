@@ -20,7 +20,7 @@ module.exports = {
     "object-curly-spacing": "off",
     "react/jsx-handler-names": "off",
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
-    "max-params": ["error", 4],
+    "max-params": ["error", 5],
     "prettier/prettier": [
       "error",
       {

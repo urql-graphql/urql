@@ -6,7 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const getMdFiles = require("./get-md-files");
 const generateRenderReadyMd = require("./md-toc-parser").default;
-const { addTocFrontmatterTransform } = require("./remark-parser");
 
 const sidebarTitleSlugMutation = (mdData, mdPath) => {
   const { name } = path.parse(mdPath);

@@ -1,5 +1,4 @@
 import { reloadRoutes } from "react-static/node";
-import jdown from "jdown";
 import chokidar from "chokidar";
 import { getSidebarItems } from "./static-config-helpers/md-data-transforms";
 const staticWebpackConfig = require("./static-config-parts/static-webpack-config");
@@ -11,8 +10,9 @@ export default {
     title: "Spectacle"
   }),
   getRoutes: async () => {
-    const { home, about } = await jdown("content");
     const sidebarItems = await getSidebarItems();
+    console.log(sidebarItems);
+    console.log(sidebarItems.length, 'LENGTH');
 
     const sidebarHeaders = sidebarItems.map(d => ({
       title: d.title,
@@ -23,46 +23,46 @@ export default {
     return [
       {
         path: "/",
-        component: "src/screens/home",
-        getData: () => ({
-          ...home
-        })
+        component: "src/screens/home"
       },
       {
         path: "/about",
-        component: "src/screens/about",
-        getData: () => ({
-          about
-        })
+        component: "src/screens/about"
       },
       {
         path: "/docs",
         component: "src/screens/docs",
-        getData: () => {
-          return {
-            title: "Spectacle | Documentation",
-            markdown: sidebarItems[0].markdown,
-            renderedMd: sidebarItems[0].renderedMd,
-            sidebarHeaders
-          };
-        },
+        getData: () => ({
+          title: "Spectacle | Documentation",
+          markdown: sidebarItems[0].markdown,
+          renderedMd: sidebarItems[0].renderedMd,
+          sidebarHeaders,
+          tocArray: sidebarItems[0].data.subHeadings.map(sh => ({
+            content: sh.value,
+            level: sh.depth
+          }))
+        }),
+        // move slug + path to data in transform, renderedMd to data, and nuke markdown prop
         children: sidebarItems.map(
-          ({ slug, path, title, markdown, renderedMd }) => ({
+          ({ slug, path, markdown, renderedMd, data }) => ({
             path,
             component: "src/screens/docs",
             getData: () => ({
-              title,
-              slug,
+              title: data.title,
               markdown,
               path: `/${slug}/`,
               renderedMd,
-              sidebarHeaders
+              sidebarHeaders,
+              tocArray: data.subHeadings.map(sh => ({
+                content: sh.value,
+                level: sh.depth
+              }))
             })
           })
         )
       }
       // we can totes add lander or project specific 404s, if we ever have call to
-      //{ path: "/404", component: "src/screens/404" }
+      // { path: "/404", component: "src/screens/404" }
     ];
   },
   webpack: staticWebpackConfig,
