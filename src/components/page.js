@@ -1,7 +1,6 @@
 import React from "react";
 import Sidebar from "./sidebar";
 import PropTypes from "prop-types";
-
 // Our troubles begin and end with the tocArray -- it's not great to pass down the markdown file and parse
 // it in one component to add tags + piggyback on existing HTML then parse it again in the sidebar component to get the
 // subheadings, all with a dependency on the location. This dovetails into our other problem, which is that

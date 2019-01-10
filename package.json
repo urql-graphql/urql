@@ -54,7 +54,8 @@
     "react-router-ga": "^1.0.0",
     "react-side-effect": "^1.1.5",
     "react-static": "^5.9.12",
-    "spectacle-editor-docs": "1.4.0"
+    "spectacle-editor-docs": "1.4.0",
+    "styled-components": "^4.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
@@ -107,6 +108,7 @@
     "unist-util-select": "^1.5.0",
     "unist-util-visit": "^1.4.0",
     "url-loader": "^1.1.1",
-    "yaml-lint": "^1.2.4"
+    "yaml-lint": "^1.2.4",
+    "react-static-plugin-styled-components": "^6.0.0-beta.28"
   }
 }
