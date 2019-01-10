@@ -3,6 +3,19 @@ import PropTypes from "prop-types";
 import { Link, withRouteData, withRouter } from "react-static";
 import MarkdownIt from "markdown-it";
 import { times } from "lodash";
+import styled from "styled-components";
+
+const Button = styled.a`
+  /* This renders the buttons above... Edit me! */
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0.5rem 0;
+  margin: 0.5rem 1rem;
+  width: 11rem;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+`
 
 class Sidebar extends React.Component {
   renderTransformedToc(siblings, targetLocation) {
@@ -111,6 +124,7 @@ class Sidebar extends React.Component {
     return (
       <nav className="Sidebar">
         <p className="Subheading u-noMargin">Documentation</p>
+        <Button>I am an example styled component!</Button>
         <div
           className="
           u-noMarginTop
@@ -132,7 +146,7 @@ class Sidebar extends React.Component {
           of value to be had in being able to predict output based on input, but it's a surprisingly unpopular idea.
 
           */}
-          {this.props.tocArray.map(sh => (
+          {this.props.tocArray && this.props.tocArray.map(sh => (
             <Link
               to={`#${sh.content
                 .split(" ")

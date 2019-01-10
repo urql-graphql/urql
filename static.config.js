@@ -6,14 +6,12 @@ const staticWebpackConfig = require("./static-config-parts/static-webpack-config
 chokidar.watch("content").on("all", () => reloadRoutes());
 
 export default {
+  plugins: ["react-static-plugin-styled-components"],
   getSiteData: () => ({
     title: "Spectacle"
   }),
   getRoutes: async () => {
     const sidebarItems = await getSidebarItems();
-    console.log(sidebarItems);
-    console.log(sidebarItems.length, 'LENGTH');
-
     const sidebarHeaders = sidebarItems.map(d => ({
       title: d.title,
       path: `/${d.slug}/`,
@@ -66,5 +64,5 @@ export default {
     ];
   },
   webpack: staticWebpackConfig,
-  document: require("./static-config-parts/document").default
+  Document: require("./static-config-parts/document").default
 };
