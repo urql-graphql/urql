@@ -20,14 +20,14 @@ class Docs extends React.Component {
   // {/*<TitleMeta title="Spectacle | Documentation">*/}
   render() {
     return (
-        <Page tocArray={this.state.tocArray} location={this.props.location}>
-          <Markdown
-            location={this.props.location}
-            params={this.props.params}
-            updateTocArray={this.updateTocArray.bind(this)}
-            {...this.props}
-          />
-        </Page>
+      <Page tocArray={this.state.tocArray} location={this.props.location}>
+        <Markdown
+          location={this.props.location}
+          params={this.props.params}
+          updateTocArray={this.updateTocArray.bind(this)}
+          {...this.props}
+        />
+      </Page>
     );
   }
 }

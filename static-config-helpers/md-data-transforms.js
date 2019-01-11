@@ -32,7 +32,6 @@ const renderedMarkdownMutation = (mdData, mdPath) => {
   }).toString();
 };
 
-
 const sidebarSort = items => _.orderBy(items, ["data.order"], "asc");
 
 function getSidebarItems(

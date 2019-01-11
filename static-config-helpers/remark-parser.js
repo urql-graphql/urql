@@ -50,7 +50,10 @@ function setYamlToFile(subHeadingRange = subHeadingRangeDefaults) {
 async function addTocFrontmatterTransform(relDir, opts = {}) {
   const renderer = opts.renderer || remark();
 
-  renderer.use(frontmatter, ["yaml", "toml"]).use(setYamlToFile).process()
+  renderer
+    .use(frontmatter, ["yaml", "toml"])
+    .use(setYamlToFile)
+    .process();
 }
 
 module.exports = {

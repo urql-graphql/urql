@@ -2,6 +2,7 @@
 title: Basic Concepts
 order: 1
 ---
+
 <a name="basic-concepts"></a>
 
 # Basic Concepts
@@ -19,7 +20,7 @@ Check it out [here](https://github.com/FormidableLabs/spectacle-boilerplate/blob
 ```jsx
 // index.js
 
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   Appear,
   BlockQuote,
@@ -38,7 +39,7 @@ import {
   Spectacle,
   Slide,
   Text
-} from 'spectacle';
+} from "spectacle";
 
 export default class extends Component {
   render() {
@@ -68,7 +69,7 @@ In Spectacle, themes are functions that return style objects for `screen` & `pri
 You can import the default theme from:
 
 ```jsx
-import createTheme from 'spectacle/lib/themes/default';
+import createTheme from "spectacle/lib/themes/default";
 ```
 
 Or create your own based upon the source.
@@ -86,10 +87,10 @@ Spectacle's functional theme system allows you to pass in color and font variabl
 ```jsx
 const theme = createTheme(
   {
-    primary: 'red'
+    primary: "red"
   },
   {
-    primary: 'Helvetica'
+    primary: "Helvetica"
   }
 );
 ```

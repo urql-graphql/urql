@@ -8,17 +8,19 @@ const Wrapper = styled.div`
   justify-content: space-between;
 `;
 
+const FeatureCard = styled.div``;
+
 class Features extends React.Component {
   render() {
     return (
       <Wrapper>
         {this.props.featureArray.map(feature => {
           return (
-            <div key={feature.title}>
+            <FeatureCard key={feature.title}>
               <img src={feature.icon} />
               <h3>{feature.title}</h3>
               <p>{feature.description}</p>
-            </div>
+            </FeatureCard>
           );
         })}
       </Wrapper>

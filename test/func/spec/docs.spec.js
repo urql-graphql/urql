@@ -3,7 +3,7 @@ var expect = require("chai").expect;
 
 var routes = require("../../../static-routes");
 
-var validateRelative = function (abs) {
+var validateRelative = function(abs) {
   // check if link belongs to our app
   if (abs.indexOf(global.TEST_FUNC_BASE_URL) === 0) {
     // strip base url out
@@ -17,38 +17,44 @@ var validateRelative = function (abs) {
   }
 };
 
-describe("About", function () {
-  it("should render a page with proper title", function () {
+describe("About", function() {
+  it("should render a page with proper title", function() {
     return adapter.client
       .url("/about/")
-      .getTitle().then(function (title) {
+      .getTitle()
+      .then(function(title) {
         expect(title).to.eq("Spectacle | About");
       });
   });
 });
 
-describe("Docs", function () {
-  it("should render a page with proper title", function () {
+describe("Docs", function() {
+  it("should render a page with proper title", function() {
     return adapter.client
       .url("/docs/")
-      .getTitle().then(function (title) {
+      .getTitle()
+      .then(function(title) {
         expect(title).to.eq("Spectacle | Documentation");
       });
   });
 
   // Render every static route
-  routes.forEach(function (r) {
-    describe("Route " + r, function () {
-      it("should render with no broken links", function () {
-        return adapter.client
-          .url(r)
-          .elements("#content").then(function (res) {
-            expect(res.value.length).to.eq(1); // Not a 404
-          })
-          // find every link
-          .getAttribute("a[href]", "href").then(function (urls) {
-            urls.forEach(validateRelative);
-          });
+  routes.forEach(function(r) {
+    describe("Route " + r, function() {
+      it("should render with no broken links", function() {
+        return (
+          adapter.client
+            .url(r)
+            .elements("#content")
+            .then(function(res) {
+              expect(res.value.length).to.eq(1); // Not a 404
+            })
+            // find every link
+            .getAttribute("a[href]", "href")
+            .then(function(urls) {
+              urls.forEach(validateRelative);
+            })
+        );
       });
     });
   });

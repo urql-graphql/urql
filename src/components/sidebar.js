@@ -127,7 +127,11 @@ class Sidebar extends React.Component {
         <Button>I am an example styled component!</Button>
         {this.props.sidebarHeaders &&
           this.props.sidebarHeaders.map(sh => (
-            <Link to={`/docs${sh.path}`} replace={true} key={sh.title.split(" ").join("_")}>
+            <Link
+              to={`/docs${sh.path}`}
+              replace={true}
+              key={sh.title.split(" ").join("_")}
+            >
               {sh.title}
             </Link>
           ))}
