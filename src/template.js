@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withRouter, Link } from "react-static";
 import LOGO from "./static/logo.svg";
-import { Footer, Header } from "./formidable-landers/src";
+import { Header, Footer } from "formidable-landers";
 
 class Template extends React.Component {
   render() {
