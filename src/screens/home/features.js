@@ -3,9 +3,9 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 
 const Wrapper = styled.div`
-  display: "flex";
-  flex-direction: "row";
-  justify-content: "space-between";
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 class Features extends React.Component {

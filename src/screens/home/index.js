@@ -1,6 +1,10 @@
 import React from "react";
 import Features from "./features";
-import Sidebar from "../../components/sidebar";
+import styled from "styled-components";
+
+const Container = styled.div`
+  max-width: 36em;
+`;
 
 class Home extends React.Component {
   render() {
@@ -26,14 +30,14 @@ class Home extends React.Component {
     ];
 
     return (
-      <div className="Container">
+      <Container>
         <div>
           <Features featureArray={featureArray} />
           {/* <Section />
           <GetStarted />
         <MoreOSS /> */}
         </div>
-      </div>
+      </Container>
     );
   }
 }
