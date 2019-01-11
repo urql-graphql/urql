@@ -1,5 +1,0 @@
-.Page-content {
-  background-color: var(--white);
-  padding-bottom: var(--gutterPage) !important;
-  margin-bottom: calc(-2 * var(--gutterPage));
-}

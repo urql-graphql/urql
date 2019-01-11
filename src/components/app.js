@@ -4,7 +4,6 @@ import { Header, Footer } from "formidable-landers";
 
 // Variables and Stylesheet
 import LOGO from "../../static/logo.svg";
-import "../styles/styles.css";
 
 class App extends React.Component {
   render() {
