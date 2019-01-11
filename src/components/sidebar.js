@@ -15,7 +15,7 @@ const Button = styled.a`
   background: transparent;
   color: white;
   border: 2px solid white;
-`
+`;
 
 class Sidebar extends React.Component {
   renderTransformedToc(siblings, targetLocation) {
@@ -125,6 +125,12 @@ class Sidebar extends React.Component {
       <nav className="Sidebar">
         <p className="Subheading u-noMargin">Documentation</p>
         <Button>I am an example styled component!</Button>
+        {this.props.sidebarHeaders &&
+          this.props.sidebarHeaders.map(sh => (
+            <Link to={sh.slug} key={sh.title.split(" ").join("_")}>
+              {sh.title}
+            </Link>
+          ))}
         <div
           className="
           u-noMarginTop
@@ -146,20 +152,21 @@ class Sidebar extends React.Component {
           of value to be had in being able to predict output based on input, but it's a surprisingly unpopular idea.
 
           */}
-          {this.props.tocArray && this.props.tocArray.map(sh => (
-            <Link
-              to={`#${sh.content
-                .split(" ")
-                .join("-")
-                .toLowerCase()}`}
-              key={sh.content.split(" ").join("_")}
-            >
-              {sh.content}
-            </Link>
-          ))}
+          {this.props.tocArray &&
+            this.props.tocArray.map(sh => (
+              <Link
+                to={`#${sh.content
+                  .split(" ")
+                  .join("-")
+                  .toLowerCase()}`}
+                key={sh.content.split(" ").join("_")}
+              >
+                {sh.content}
+              </Link>
+            ))}
 
           {/* This is how it was handled previously -- seems easier to just use the newly provided sidebarHeaders prop imo,
-              but
+              but... it's up to you
           */}
           {/* {this.renderSidebarItem(*/}
           {/* "/docs/getting-started/",*/}
