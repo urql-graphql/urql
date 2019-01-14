@@ -26,7 +26,7 @@ export const createClient = (opts: ClientOptions): Client => {
   const subject = new Subject<Operation>();
 
   /** Main subject stream for listening to operation responses */
-  const subject$ = publish()(
+  const subject$ = publish<ExchangeResult>()(
     pipeExchanges(
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
       subject
@@ -94,11 +94,7 @@ export const createClient = (opts: ClientOptions): Client => {
       if (!instanceSubscriptions.has(inboundKey)) {
         /** Notify component when query operation has returned */
         const inboundSub = subject$
-          .pipe(
-            filter((result: ExchangeResult) => {
-              return result.operation.key === operation.key;
-            })
-          )
+          .pipe(filter(result => result.operation.key === operation.key))
           .subscribe(response => {
             instanceOpts.onChange({
               data: response.data,
@@ -127,6 +123,11 @@ export const createClient = (opts: ClientOptions): Client => {
 
     const unsubscribe = () => {
       const subs = getSubscriptions();
+
+      if (subs === undefined) {
+        return;
+      }
+
       [...subs.values()].forEach(sub => sub.unsubscribe());
     };
 
@@ -143,7 +144,7 @@ export const createClient = (opts: ClientOptions): Client => {
 };
 
 /** Create pipe of exchanges */
-const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
+const pipeExchanges = (exchanges: Exchange[], subject: Subject<Operation>) => (
   operation$: Observable<Operation>
 ) => {
   /** Recursively pipe to each exchange */

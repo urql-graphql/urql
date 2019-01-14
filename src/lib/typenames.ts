@@ -3,11 +3,13 @@ import {
   FieldNode,
   InlineFragmentNode,
   OperationDefinitionNode,
+  SelectionNode,
   SelectionSetNode,
 } from 'graphql';
 
 import { parse } from 'graphql/language/parser';
 import { print } from 'graphql/language/printer';
+import { node } from 'prop-types';
 
 const TYPENAME_FIELD: FieldNode = {
   kind: 'Field',
@@ -16,6 +18,19 @@ const TYPENAME_FIELD: FieldNode = {
     value: '__typename',
   },
 };
+
+const nodeRequiresTypename = (n: FieldNode) =>
+  n.name.value.lastIndexOf('__', 0) !== 0;
+
+const fieldRequiresTypename = (
+  selection: SelectionNode
+): selection is FieldNode =>
+  selection.kind === 'Field' && nodeRequiresTypename(selection);
+
+const fragmentRequiresTypename = (
+  selection: SelectionNode
+): selection is InlineFragmentNode =>
+  selection.kind === 'InlineFragment' && selection.selectionSet !== undefined;
 
 function addTypename(selectionSet: SelectionSetNode) {
   if (selectionSet.selections === undefined) {
@@ -34,24 +49,26 @@ function addTypename(selectionSet: SelectionSetNode) {
     newSet.selections = [...newSet.selections, TYPENAME_FIELD];
   }
 
-  const nodeRequiresTypename = (node: FieldNode) =>
-    node.name.value.lastIndexOf('__', 0) !== 0 && node.selectionSet;
-
   newSet.selections = newSet.selections.map(selection => {
-    const fieldRequiresTypename =
-      selection.kind === 'Field' && nodeRequiresTypename(selection);
-    const fragmentRequiresTypename =
-      selection.kind === 'InlineFragment' &&
-      selection.selectionSet !== undefined;
+    if (selection.kind === 'InlineFragment') {
+      return {
+        ...selection,
+        selectionSet: addTypename(selection.selectionSet),
+      };
+    }
 
-    return fieldRequiresTypename || fragmentRequiresTypename
-      ? {
-          ...selection,
-          selectionSet: addTypename(
-            (selection as FieldNode | InlineFragmentNode).selectionSet
-          ),
-        }
-      : selection;
+    if (
+      selection.kind === 'Field' &&
+      nodeRequiresTypename(selection) &&
+      selection.selectionSet !== undefined
+    ) {
+      return {
+        ...selection,
+        selectionSet: addTypename(selection.selectionSet),
+      };
+    }
+
+    return selection;
   });
 
   return newSet;
@@ -60,6 +77,7 @@ function addTypename(selectionSet: SelectionSetNode) {
 function addTypenameToDocument(doc: DocumentNode) {
   return {
     ...doc,
+    // @ts-ignore - will be replaced soon
     definitions: doc.definitions.map((definition: OperationDefinitionNode) => {
       return {
         ...definition,

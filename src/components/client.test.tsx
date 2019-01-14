@@ -25,7 +25,6 @@ beforeEach(() => {
 
 it('passes snapshot', () => {
   const wrapper = shallow(
-    // @ts-ignore
     <UrqlClient client={client} query={query} mutations={mutations}>
       {children}
     </UrqlClient>
@@ -37,7 +36,6 @@ it('passes snapshot', () => {
 describe('on creation', () => {
   it('calls createInstance', () => {
     shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -49,7 +47,6 @@ describe('on creation', () => {
   describe('defaults', () => {
     it('passes snapshot', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -60,7 +57,6 @@ describe('on creation', () => {
 
     it('fetching = true', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -73,7 +69,6 @@ describe('on creation', () => {
 
     it('error = undefined', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -86,7 +81,6 @@ describe('on creation', () => {
 
     it('data = undefined', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -99,7 +93,6 @@ describe('on creation', () => {
 
     it('mutations = <object>', () => {
       shallow(
-        // @ts-ignore
         <UrqlClient client={client} query={query} mutations={mutations}>
           {children}
         </UrqlClient>
@@ -113,12 +106,12 @@ describe('on creation', () => {
 describe('componentDidMount', () => {
   it('calls executeQuery with query object', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
     );
 
+    // @ts-ignore
     wrapper.instance().componentDidMount();
     expect(clientInstance.executeQuery).toBeCalledWith(query);
   });
@@ -127,7 +120,6 @@ describe('componentDidMount', () => {
 describe('componentDidUpdate', () => {
   it('query is refetched', () => {
     const wrapper = mount(
-      // @ts-ignore
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
@@ -142,7 +134,6 @@ describe('componentDidUpdate', () => {
 
   it('mutation functions are updated', () => {
     const wrapper = mount(
-      // @ts-ignore
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -164,12 +155,12 @@ describe('componentDidUpdate', () => {
 describe('componentWillUnmount', () => {
   it('unsubscribes from client lib', () => {
     const wrapper = shallow(
-      // @ts-ignore
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
     );
 
+    // @ts-ignore
     wrapper.instance().componentWillUnmount();
     expect(clientInstance.unsubscribe).toBeCalled();
   });
@@ -177,8 +168,7 @@ describe('componentWillUnmount', () => {
 
 describe('mutation functions', () => {
   it('have same properties as mutation argument', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -190,8 +180,7 @@ describe('mutation functions', () => {
   });
 
   it('calls executeMutation', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -204,8 +193,7 @@ describe('mutation functions', () => {
   });
 
   it('passes mutation query to executeMutation', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -220,8 +208,7 @@ describe('mutation functions', () => {
   });
 
   it('passes mutation vars to executeMutation', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -239,8 +226,7 @@ describe('mutation functions', () => {
 
 describe('on change from client', () => {
   it('child components are updated', () => {
-    const wrapper = shallow(
-      // @ts-ignore
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
