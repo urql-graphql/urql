@@ -5,6 +5,7 @@
   },
   "rules": {
     "object-literal-sort-keys": false,
+    "no-console": [true, "log"],
     "member-ordering": false,
     "member-access": false,
     "no-submodule-imports": false,

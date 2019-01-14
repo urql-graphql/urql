@@ -1,5 +1,5 @@
 import { Observable, Subject, Subscription } from 'rxjs';
-import { publish, filter, take } from 'rxjs/operators';
+import { filter, publish, take } from 'rxjs/operators';
 import * as uuid from 'uuid';
 import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
 import { hashString } from '../lib';
