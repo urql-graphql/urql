@@ -1,10 +1,12 @@
 import { merge, Subject } from 'rxjs';
-import { tap, map, partition, share } from 'rxjs/operators';
-import { Operation, ExchangeResult, Exchange } from '../types';
-import { gankTypeNamesFromResponse, formatTypeNames } from '../lib/typenames';
+import { map, partition, share, tap } from 'rxjs/operators';
+import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
+import { Exchange, ExchangeResult, Operation } from '../types';
 
 type ResultCache = Map<string, ExchangeResult>;
-type OperationCache = { [key: string]: Set<string> };
+interface OperationCache {
+  [key: string]: Set<string>;
+}
 
 export const cacheExchange: Exchange = ({ forward, subject }) => {
   const resultCache: ResultCache = new Map();
@@ -33,7 +35,7 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
     })(sharedOps$);
 
     const cachedResults$ = cacheOps$.pipe(
-      map(operation => resultCache.get(operation.key))
+      map(operation => resultCache.get(operation.key) as ExchangeResult) // ExchangeResult is guaranteed to exist
     );
 
     const forward$ = forwardOps$.pipe(
@@ -68,7 +70,7 @@ export const afterMutation = (
   });
 
   pendingOperations.forEach(key => {
-    const { operation } = resultCache.get(key);
+    const operation = (resultCache.get(key) as ExchangeResult).operation; // Result is guaranteed
     resultCache.delete(key);
     subject.next(operation);
   });

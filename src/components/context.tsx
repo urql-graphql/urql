@@ -1,21 +1,7 @@
-import createReactContext, {
-  ConsumerProps,
-  ProviderProps,
-} from 'create-react-context';
-import { ComponentClass } from 'react';
+import createReactContext from 'create-react-context';
+import { Client } from '../types';
 
-const context = createReactContext({});
+const context = createReactContext<Client>({} as any); // Requires default value (which is unused)
 
-// TypeScript is very pedantic about re-exporting dependencies when doing
-// --declaration emit, so we need to import ComponentClass. But if we don't
-// explicitly use ComponentClass somewhere in the code, TypeScript *also*
-// ends up issuing an error. This is dumb, but this all gets erased anyway.
-interface Context {
-  Provider: ComponentClass<ProviderProps<{}>>;
-  Consumer: ComponentClass<ConsumerProps<{}>>;
-}
-
-export const {
-  Provider: ContextProvider,
-  Consumer: ContextConsumer,
-}: Context = context;
+export const ContextProvider = context.Provider;
+export const ContextConsumer = context.Consumer;

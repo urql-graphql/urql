@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
-import { Exchange, Operation, ExchangeResult } from '../types';
+import { Exchange, ExchangeResult, Operation } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {
@@ -58,7 +58,7 @@ export const fetchExchange: Exchange = () => {
 };
 
 const executeFetch = async (operation: Operation, opts: RequestInit) => {
-  let response: Response;
+  let response: Response | undefined;
 
   try {
     const { url } = operation.context;
