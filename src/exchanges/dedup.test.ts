@@ -1,13 +1,13 @@
 import { Observable, Subject } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
-import { dedupeExchange } from './dedup';
+import { delay, map } from 'rxjs/operators';
 import {
-  queryResponse,
-  queryOperation,
-  mutationResponse,
   mutationOperation,
+  mutationResponse,
+  queryOperation,
+  queryResponse,
 } from '../test-utils';
 import { Operation } from '../types';
+import { dedupeExchange } from './dedup';
 
 let stream = new Subject<Operation>();
 let calls = 0;

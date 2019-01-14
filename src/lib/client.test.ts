@@ -1,7 +1,7 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
-import { createClient } from './client';
-import { queryGql, mutationGql, queryResponse } from '../test-utils';
+import { mutationGql, queryGql, queryResponse } from '../test-utils';
 import { ClientInstance } from '../types';
+import { createClient } from './client';
 
 const url = 'https://hostname.com';
 const fetch = (global as any).fetch as jest.Mock;

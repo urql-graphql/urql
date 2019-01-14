@@ -1,8 +1,8 @@
 import { of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { fetchExchange } from './fetch';
-import { Exchange } from '../types';
 import { queryOperation, subscriptionOperation } from '../test-utils';
+import { Exchange } from '../types';
+import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();

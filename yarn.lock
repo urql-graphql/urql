@@ -1072,6 +1072,11 @@ bs-logger@0.x:
   dependencies:
     fast-json-stable-stringify "2.x"
 
+bs-rebel@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/bs-rebel/-/bs-rebel-0.2.3.tgz#11e1a95a4a3f16311575e8853a004cec6b9d19de"
+  integrity sha512-NTDUSkJ+KkIqmKHUE48luD2YaYh49XaU1zVSSk9lJ6KFNQzlRQnIfR+paNWYyvzxf5+TZ2inVgxBUHdCsZEiYA==
+
 bser@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/bser/-/bser-2.0.0.tgz#9ac78d3ed5d915804fd87acb158bc797147a1719"
@@ -9261,6 +9266,13 @@ wide-align@^1.1.0:
   integrity sha512-QGkOQc8XL6Bt5PwnsExKBPuMKBxnGxWWW3fU55Xt4feHozMUhdUMaBCk290qpm/wG5u/RSKzwdAC4i51YigihA==
   dependencies:
     string-width "^1.0.2 || 2"
+
+wonka@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.3.2.tgz#8c3bd354e5b89bdf5b1f0b0d1cd9195b061eeb1a"
+  integrity sha512-Yglan57EdaqiNlJ5GCvznn5uo9t3u+ox+TeYZIEgQCu9KEmaJwDE0VrCrlD1o7wS3Qh4qbW+7Em6/XWY1aNFTA==
+  dependencies:
+    bs-rebel "^0.2.3"
 
 wordwrap@~0.0.2:
   version "0.0.3"
