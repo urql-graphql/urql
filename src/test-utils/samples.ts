@@ -2,7 +2,7 @@ import { Query, Mutation, Operation, ExchangeResult } from '../types';
 
 const context = {
   fetchOptions: {
-    test: 1,
+    method: 'POST',
   },
   url: 'http://localhost:3000/graphql',
 };
