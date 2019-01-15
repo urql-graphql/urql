@@ -119,7 +119,7 @@
     "graphql": "^14.0.2",
     "rxjs": "^6.3.3",
     "uuid": "^3.3.2",
-    "wonka": "^1.3.2"
+    "wonka": "^1.4.0"
   },
   "sideEffects": false
 }
