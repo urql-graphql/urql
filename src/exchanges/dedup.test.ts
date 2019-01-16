@@ -1,5 +1,4 @@
-import { Observable, Subject } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { filter, makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
 import {
   mutationOperation,
   mutationResponse,
@@ -9,61 +8,73 @@ import {
 import { Operation } from '../types';
 import { dedupeExchange } from './dedup';
 
-let stream = new Subject<Operation>();
-let calls = 0;
-let response = queryResponse;
-
-const forward = (s: Observable<Operation>) =>
-  s.pipe(
-    map(() => {
-      calls += 1;
-      return response;
-    }),
-    delay(200)
-  );
+let shouldRespond = false;
+let exchangeArgs;
+let forwardedOperations: Operation[];
+let input: Subject<Operation>;
 
 beforeEach(() => {
-  calls = 0;
-  response = queryResponse;
-  stream = new Subject<Operation>();
+  shouldRespond = false;
+  forwardedOperations = [];
+  input = makeSubject<Operation>();
+
+  // Collect all forwarded operations
+  const forward = (s: Source<Operation>) => {
+    return pipe(
+      s,
+      map(op => {
+        forwardedOperations.push(op);
+        return queryResponse;
+      }),
+      filter(() => !!shouldRespond)
+    );
+  };
+
+  exchangeArgs = { forward, subject: makeSubject<Operation>() };
 });
 
-it('forwards to next exchange when no operation is found', async () => {
-  // @ts-ignore
-  const exchange = dedupeExchange({ forward })(stream);
-  const completed = exchange.toPromise();
+it('forwards query operations correctly', async () => {
+  const [ops$, next, complete] = input;
+  const exchange = dedupeExchange(exchangeArgs)(ops$);
 
-  stream.next(queryOperation);
-  stream.complete();
-  await completed;
-
-  expect(calls).toBe(1);
+  publish(exchange);
+  next(queryOperation);
+  complete();
+  expect(forwardedOperations.length).toBe(1);
 });
 
-it('does not forward to next exchange when existing operation is found', async () => {
-  // @ts-ignore
-  const exchange = dedupeExchange({ forward })(stream);
-  const completed = exchange.toPromise();
+it('forwards only non-pending query operations', async () => {
+  shouldRespond = false; // We filter out our mock responses
+  const [ops$, next, complete] = input;
+  const exchange = dedupeExchange(exchangeArgs)(ops$);
 
-  stream.next(queryOperation);
-  stream.next(queryOperation);
-  stream.complete();
-  await completed;
-
-  expect(calls).toBe(1);
+  publish(exchange);
+  next(queryOperation);
+  next(queryOperation);
+  complete();
+  expect(forwardedOperations.length).toBe(1);
 });
 
-it('creates a new request when mutation call is in progress', async () => {
-  response = mutationResponse;
+it('forwards duplicate query operations as usual after they respond', async () => {
+  shouldRespond = true; // Response will immediately resolve
+  const [ops$, next, complete] = input;
+  const exchange = dedupeExchange(exchangeArgs)(ops$);
 
-  // @ts-ignore
-  const exchange = dedupeExchange({ forward })(stream);
-  const completed = exchange.toPromise();
+  publish(exchange);
+  next(queryOperation);
+  next(queryOperation);
+  complete();
+  expect(forwardedOperations.length).toBe(2);
+});
 
-  stream.next(mutationOperation);
-  stream.next(mutationOperation);
-  stream.complete();
-  await completed;
+it('always forwards mutation operations without deduplicating them', async () => {
+  shouldRespond = false; // We filter out our mock responses
+  const [ops$, next, complete] = input;
+  const exchange = dedupeExchange(exchangeArgs)(ops$);
 
-  expect(calls).toBe(2);
+  publish(exchange);
+  next(mutationOperation);
+  next(mutationOperation);
+  complete();
+  expect(forwardedOperations.length).toBe(2);
 });
