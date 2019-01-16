@@ -9267,10 +9267,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.4.0.tgz#e085d2751c5532605e449186525c1bd4a52c4cbc"
-  integrity sha512-m/wGinkE68T8jytnns5Ma2XkyFCjRMzMiuUOhy6YMbFDuuEnKQarvupAf/mcQudKBmjmf2rKFIbB7svRJUO6GQ==
+wonka@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.4.1.tgz#59c6756d9fe8858cd85a680d43ce3680572aca01"
+  integrity sha512-5xpLGVbbeyRYxBX5EFwLHkb9I2H94bWZ9Zfa4CTwrIQwj2NX11Hc+3lVa+CA48T87Tp17/lRCZapVqWOgnDFlQ==
   dependencies:
     bs-rebel "^0.2.3"
 
