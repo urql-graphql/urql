@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { make, mergeMap, pipe } from 'wonka';
 import { CombinedError } from '../lib';
 import { Exchange, ExchangeResult, Operation } from '../types';
