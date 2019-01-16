@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { BodyCopy } from "../../components/body-copy";
+import { SecondaryTitle } from "../../components/secondary-title";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
@@ -9,20 +11,21 @@ const FeatureCard = styled.div`
   width: 100%;
   @media (min-width: 768px) {
     margin: 0;
+    width: calc(1/3 * 100% - (1 - 1/3) * 40px);
+  }
+  @media (min-width: 1024px) {
     width: calc(1/3 * 100% - (1 - 1/3) * 80px);
   }
 `;
 
 const FeatureSubTitle = styled.h3`
-  font-size: 2.2rem;
-  line-height: 2.6rem;
-  margin: 2rem 0 1rem;
-`;
-
-const FeatureBody = styled.p`
-  font-size: 1.5rem;
+  font-size: 2rem;
   line-height: 2.4rem;
-  margin: 0;
+  margin: 2rem auto 1rem;
+  @media (min-width: 768px) {
+    font-size: 2.2rem;
+    line-height: 2.6rem;
+  }
 `;
 
 class Features extends React.Component {
@@ -34,8 +37,8 @@ class Features extends React.Component {
           return (
             <FeatureCard key={feature.title}>
               <img src={feature.icon} />
-              <FeatureSubTitle>{feature.title}</FeatureSubTitle>
-              <FeatureBody>{feature.description}</FeatureBody>
+              <SecondaryTitle>{feature.title}</SecondaryTitle>
+              <BodyCopy>{feature.description}</BodyCopy>
             </FeatureCard>
           );
         })}

@@ -68,20 +68,6 @@ export default class CustomDocument extends React.Component {
             content="./static/favicon/browserconfig.xml"
           />
           <meta name="theme-color" content="#ffffff" />
-          <link
-            href="https://fonts.googleapis.com/css?family=Karla:400,400italic,700"
-            rel="stylesheet"
-            type="text/css"
-          />
-          <link
-            href="https://fonts.googleapis.com/css?family=Modak"
-            rel="stylesheet"
-          />
-          <link
-            href="https://formidable.com/open-source/fonts.css"
-            rel="stylesheet"
-            type="text/css"
-          />
           {renderMeta.styleTags}
           <title>Spectacle</title>
         </Head>

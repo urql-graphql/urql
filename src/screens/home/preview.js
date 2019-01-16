@@ -1,18 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { BodyCopy } from "../../components/body-copy";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
 const OutterWrapper = styled.div`
   background: #F3F3F3;
-`;
-
-const PreviewBody = styled.p`
-  font-size: 1.5rem;
-  line-height: 2.4rem;
-  margin: 0;
-  width: 100%;
 `;
 
 class Preview extends React.Component {
@@ -23,7 +17,7 @@ class Preview extends React.Component {
       <OutterWrapper>
         <Wrapper>
           <SectionTitle>Code Preview</SectionTitle>
-          <PreviewBody>{previewObj.description}</PreviewBody>
+          <BodyCopy>{previewObj.description}</BodyCopy>
         </Wrapper>
       </OutterWrapper>
     );

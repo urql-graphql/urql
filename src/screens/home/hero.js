@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../../components/button";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
@@ -37,11 +38,13 @@ const HeroBody = styled.p`
   font-size: 1.4rem;
   line-height: 2.2rem;
   margin: 0 0 6rem;
+  max-width: 30rem;
   text-align: left;
   width: 100%;
   @media (min-width: 768px) {
     font-size: 2rem;
     line-height: 2.8rem;
+    max-width: 100%;
   }
 `;
 
@@ -77,7 +80,7 @@ const HeroCopyLink = styled.p`
 `;
 
 const HeroCopyText = styled.span`
-  padding: 0 2rem;
+  padding: 0 1.6rem;
   text-align: left;
   min-width: 20rem;
 `;
@@ -111,10 +114,12 @@ export const Hero = () => {
         <HeroLogo src="./static/svgs/logo_spectacle_raised.svg" alt="Formidable Logo" />
         <HeroTitle>Spectacle</HeroTitle>
         <HeroBody>A React.js based library for creating sleek presentations using JSX syntax that gives you the ability to live demo your code.</HeroBody>
-        <HeroCopyLink>
-          <HeroCopyText>npm install spectacle</HeroCopyText>
-          <Button light noMargin href="#">Copy</Button>
-        </HeroCopyLink>
+          <CopyToClipboard text="npm install spectacle">
+            <HeroCopyLink>
+              <HeroCopyText>npm install spectacle</HeroCopyText>
+              <Button light noMargin href="#">Copy</Button>
+            </HeroCopyLink>
+          </CopyToClipboard>
         <Button light noMargin href="#">Documentation</Button>
       </HeroContent>
       <HeroNavList>

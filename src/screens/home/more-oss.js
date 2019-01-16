@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import bgImg from '../../static/bg_mountains_gray.jpg';
 import styled from "styled-components";
+import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
+import { SecondaryTitle } from "../../components/secondary-title";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
@@ -27,19 +29,6 @@ const OSSCard = styled.div`
   }
 `;
 
-const OSSBody = styled.p`
-  font-size: 1.5rem;
-  line-height: 2.4rem;
-  margin: 0;
-  width: 100%;
-`;
-
-const OSSTitle = styled.h3`
-  font-size: 2.2rem;
-  line-height: 2.6rem;
-  margin: 2rem 0 1rem;
-`;
-
 const OSSImage = styled.img`
   left:0;
   position: absolute;
@@ -59,8 +48,8 @@ class MoreOSS extends React.Component {
           {this.props.ossArray.map(card => (
             <OSSCard key={card.title}>
               <OSSImage src={card.logo} />
-              <OSSTitle>{card.title}</OSSTitle>
-              <OSSBody>{card.description}</OSSBody>
+              <SecondaryTitle>{card.title}</SecondaryTitle>
+              <BodyCopy>{card.description}</BodyCopy>
             </OSSCard>
           ))}
           <Button light href="#">View All</Button>
