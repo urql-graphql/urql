@@ -24,8 +24,10 @@ const HeroContent = styled.div`
 
 const HeroTitle = styled.h1`
   font-size: 3rem;
+  letter-spacing: 0.15em;
   margin: 0 0 2rem;
   text-align: center;
+  text-transform: uppercase;
   width: 100%;
   @media (min-width: 768px) {
     font-size: 5.8rem;
@@ -102,32 +104,58 @@ const HeroNavList = styled.ul`
     color: white;
     display: inline-block;
     font-size: 1.4rem;
+    letter-spacing: 0.05em;
     margin: 0 1rem;
+    transition: opacity 0.4s;
     text-transform: uppercase;
+  }
+  & li a:hover {
+    opacity: 0.7;
   }
 `;
 
-export const Hero = () => {
-  return(
-    <Wrapper noPadding>
-      <HeroContent>
-        <HeroLogo src="./static/svgs/logo_spectacle_raised.svg" alt="Formidable Logo" />
-        <HeroTitle>Spectacle</HeroTitle>
-        <HeroBody>A React.js based library for creating sleek presentations using JSX syntax that gives you the ability to live demo your code.</HeroBody>
-          <CopyToClipboard text="npm install spectacle">
-            <HeroCopyLink>
-              <HeroCopyText>npm install spectacle</HeroCopyText>
-              <Button light noMargin href="#">Copy</Button>
-            </HeroCopyLink>
-          </CopyToClipboard>
-        <Button light noMargin href="#">Documentation</Button>
-      </HeroContent>
-      <HeroNavList>
-        <li><Link to="/about/">About</Link></li>
-        <li><Link to="/docs/">Docs</Link></li>
-        <li><a title="Issues" href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a></li>
-        <li><a title="GitHub" href="https://github.com/FormidableLabs/spectacle">GitHub</a></li>
-      </HeroNavList>
-    </Wrapper>
-  );
+
+class Hero extends React.Component {
+  state = {
+    copied: false
+  }
+
+  handleCopy = e => {
+    e.preventDefault();
+    this.setState({ copied: true });
+    setTimeout(() => { this.setState({ copied: false }) }, 3000);
+  }
+
+  render() {
+    return(
+      <Wrapper noPadding>
+        <HeroContent>
+          <HeroLogo src="./static/svgs/logo_spectacle_raised.svg" alt="Formidable Logo" />
+          <HeroTitle>Spectacle</HeroTitle>
+          <HeroBody>A React.js based library for creating sleek presentations using JSX syntax that gives you the ability to live demo your code.</HeroBody>
+            <CopyToClipboard text="npm install spectacle">
+              <HeroCopyLink onClick={e => this.handleCopy(e)}>
+                <HeroCopyText>npm install spectacle</HeroCopyText>
+                <Button light noMargin href="#">
+                  {
+                    (this.state.copied)
+                      ? "Copied"
+                      : "Copy"
+                  }
+                </Button>
+              </HeroCopyLink>
+            </CopyToClipboard>
+          <Button light noMargin href="#">Documentation</Button>
+        </HeroContent>
+        <HeroNavList>
+          <li><Link to="/about/">About</Link></li>
+          <li><Link to="/docs/">Docs</Link></li>
+          <li><a title="Issues" href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a></li>
+          <li><a title="GitHub" href="https://github.com/FormidableLabs/spectacle">GitHub</a></li>
+        </HeroNavList>
+      </Wrapper>
+    );
+  }
 }
+
+export default Hero;

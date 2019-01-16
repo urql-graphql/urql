@@ -1,8 +1,8 @@
 import React from "react";
+import Hero from "../screens/home/hero";
 import bgImg from '../static/bg_hero_gray.jpg';
 import styled from "styled-components";
 import { Navigation, NavigationTagline } from "./navigation";
-import { Hero } from "../screens/home/hero";
 import { Wrapper } from "./wrapper";
 
 const Container = styled.header`

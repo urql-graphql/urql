@@ -6,6 +6,7 @@ export const Button = styled.a`
   display: block;
   font-size: 1.5rem;
   height: 4rem;
+  letter-spacing: 0.05em;
   line-height: 4rem;
   margin: ${props => props.noMargin ? "0" : "5rem auto 3rem"};
   max-width: 21rem;

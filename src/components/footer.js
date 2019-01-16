@@ -41,15 +41,16 @@ const FooterLinks = styled.ul`
   list-style: none;
   padding: 0;
   text-transform: uppercase;
-  transition: opacity 0.4s;
   & li {
     margin-bottom: 1.4rem;
   }
   & a {
     color: white;
+    letter-spacing: 0.05em;
+    transition: opacity 0.4s;
   }
   & a:hover {
-    opacity: 0.8;
+    opacity: 0.7;
   }
 `;
 
