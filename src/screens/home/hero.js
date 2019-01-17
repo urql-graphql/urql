@@ -148,7 +148,6 @@ class Hero extends React.Component {
           <Button light noMargin href="#">Documentation</Button>
         </HeroContent>
         <HeroNavList>
-          <li><Link to="/about/">About</Link></li>
           <li><Link to="/docs/">Docs</Link></li>
           <li><a title="Issues" href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a></li>
           <li><a title="GitHub" href="https://github.com/FormidableLabs/spectacle">GitHub</a></li>
