@@ -4,7 +4,6 @@ import { Footer } from "./components/footer";
 import { GlobalStyle } from "./global-style";
 import { Header } from "./components/header";
 import { withRouter } from "react-static";
-// import { Header, Footer } from "formidable-landers";
 
 class Template extends React.Component {
   render() {
