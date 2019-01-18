@@ -1,4 +1,5 @@
 import React from "react";
+import { BounceAnimation } from "../../components/bounce-animation";
 import { Button } from "../../components/button";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Link } from "react-static";
@@ -117,12 +118,14 @@ const HeroNavList = styled.ul`
 
 class Hero extends React.Component {
   state = {
+    animating: false,
     copied: false
   }
 
   handleCopy = e => {
     e.preventDefault();
-    this.setState({ copied: true });
+    this.setState({ animating: true, copied: true });
+    setTimeout(() => { this.setState({ animating: false }) }, 100);
     setTimeout(() => { this.setState({ copied: false }) }, 3000);
   }
 
@@ -137,11 +140,13 @@ class Hero extends React.Component {
               <HeroCopyLink onClick={e => this.handleCopy(e)}>
                 <HeroCopyText>npm install spectacle</HeroCopyText>
                 <Button light noMargin href="#">
-                  {
-                    (this.state.copied)
-                      ? "Copied"
-                      : "Copy"
-                  }
+                <BounceAnimation bouncing={this.state.animating}>
+                    {
+                      (this.state.copied)
+                        ? "Copied"
+                        : "Copy"
+                    }
+                  </BounceAnimation>
                 </Button>
               </HeroCopyLink>
             </CopyToClipboard>

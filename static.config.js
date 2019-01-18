@@ -23,6 +23,10 @@ export default {
         path: "/",
         component: "src/screens/home"
       },
+      {
+        path: "/docs",
+        component: "src/screens/docs"
+      },
     ];
   },
   webpack: staticWebpackConfig,

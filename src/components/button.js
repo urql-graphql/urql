@@ -18,4 +18,7 @@ export const Button = styled.a`
   &:hover {
     background: ${props => props.light ? "#999" : "#333"};
   }
+  &:active {
+    opacity: 0.6;
+  }
 `;
