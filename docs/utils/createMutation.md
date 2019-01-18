@@ -1,6 +1,6 @@
 ### Description
 
-Create a [Mutation](../types/mutation-query.md) from a mutation query.
+Create a [Mutation](../types/mutation-query-subscription.md) from a mutation query.
 
 ### Arguments
 

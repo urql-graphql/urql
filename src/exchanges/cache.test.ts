@@ -1,15 +1,15 @@
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { cacheExchange, afterMutation } from './cache';
 import {
-  queryOperation,
-  queryResponse,
   mutationOperation,
   mutationResponse,
-  subscriptionResponse,
+  queryOperation,
+  queryResponse,
   subscriptionOperation,
+  subscriptionResponse,
 } from '../test-utils';
 import { Operation } from '../types';
+import { afterMutation, cacheExchange } from './cache';
 
 const subject = {
   next: jest.fn(),

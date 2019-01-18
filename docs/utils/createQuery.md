@@ -1,6 +1,6 @@
 ### Description
 
-Create a [Query](../types/mutation-query.md) from a GraphQL query.
+Create a [Query](../types/mutation-query-subscription.md) from a GraphQL query.
 
 ### Arguments
 

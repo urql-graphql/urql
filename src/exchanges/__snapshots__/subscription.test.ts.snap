@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should return response data from fetch 1`] = `
+Object {
+  "data": Object {
+    "data": Object {
+      "user": 1200,
+    },
+  },
+}
+`;

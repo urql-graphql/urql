@@ -1,14 +1,14 @@
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
-import { Exchange, ExchangeResult, Operation } from '../types';
+import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {
   return ops$ =>
     ops$.pipe(
       mergeMap(operation => {
-        if (operation.operationName === 'subscription') {
+        if (operation.operationName === OperationType.Subscription) {
           throw new Error(
             'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
           );

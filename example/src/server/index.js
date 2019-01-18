@@ -1,27 +1,41 @@
-const graphqlHttp = require('express-graphql');
+const { ApolloServer, graphiqlExpress } = require('apollo-server-express');
+const { createServer } = require('http');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
+const expressPlayground = require('graphql-playground-middleware-express')
+  .default;
 const express = require('express');
 const app = express();
 const cors = require('cors');
 
-app.use(cors());
-
-const { schema, context } = require('./schema');
+const { typeDefs, resolvers } = require('./schema');
 
 const PORT = 3001;
 
-const initializedGraphQLMiddleware = graphqlHttp({
-  // GraphQL’s data schema
-  schema: schema,
-  // Pretty Print the JSON response
-  pretty: true,
-  // Enable GraphiQL dev tool
-  graphiql: true,
-  // A function that returns extra data available to every resolver
-  context: context,
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
 });
 
-app.use(initializedGraphQLMiddleware);
+server.applyMiddleware({ app });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+const webServer = createServer(app);
+server.installSubscriptionHandlers(webServer);
+
+const graphqlEndpoint = `http://localhost:${PORT}${server.graphqlPath}`;
+const subscriptionEndpoint = `ws://localhost:${PORT}${
+  server.subscriptionsPath
+}`;
+
+app.use(cors());
+app.get(
+  '/',
+  expressPlayground({
+    endpoint: graphqlEndpoint,
+    subscriptionEndpoint: subscriptionEndpoint,
+  })
+);
+
+webServer.listen(PORT, () => {
+  console.log(`🚀 Server ready at ${graphqlEndpoint}`);
+  console.log(`🚀 Subscriptions ready at ${subscriptionEndpoint}`);
 });

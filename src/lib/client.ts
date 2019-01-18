@@ -1,8 +1,13 @@
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription as RxSubscription } from 'rxjs';
 import { filter, publish, take } from 'rxjs/operators';
 import * as uuid from 'uuid';
-import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
-import { hashString } from '../lib';
+import {
+  cacheExchange,
+  dedupeExchange,
+  fetchExchange,
+  subscriptionExchange,
+} from '../exchanges';
+import { CombinedError, hashString } from '../lib';
 import {
   Client,
   ClientInstance,
@@ -12,17 +17,25 @@ import {
   ExchangeResult,
   Mutation,
   Operation,
+  OperationType,
   Query,
+  Subscription,
+  SubscriptionStreamUpdate,
 } from '../types';
 
-const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
+const defaultExchanges = [
+  subscriptionExchange,
+  dedupeExchange,
+  cacheExchange,
+  fetchExchange,
+];
 
 /** Function for creating an application wide [Client]{@link Client}. */
 export const createClient = (opts: ClientOptions): Client => {
   /** Cache of all instance subscriptions */
-  const subscriptions = new Map<string, Map<string, Subscription>>();
+  const subscriptions = new Map<string, Map<string, RxSubscription>>();
+  const querySubscriptions = new Map<string, Subject<Operation>>();
 
-  /** Main subject for emitting operations */
   const subject = new Subject<Operation>();
 
   /** Main subject stream for listening to operation responses */
@@ -42,9 +55,9 @@ export const createClient = (opts: ClientOptions): Client => {
 
   /** Convert a query to an operation type */
   const createOperation = (
-    type: string,
+    type: OperationType,
     query: Query,
-    force: boolean = false
+    options: object = {}
   ) => ({
     ...query,
     key: hashString(JSON.stringify(query)),
@@ -52,11 +65,13 @@ export const createClient = (opts: ClientOptions): Client => {
     context: {
       url: opts.url,
       fetchOptions,
-      force,
+      forwardSubscription: opts.forwardSubscription,
+      ...options,
     },
   });
 
-  const executeOperation = (operation: Operation) => subject.next(operation);
+  const executeOperation = (operation: Operation, sub: Subject<Operation>) =>
+    sub.next(operation);
 
   /** Function to manage subscriptions on a Consumer by Consumer basis */
   const createInstance = (
@@ -64,32 +79,31 @@ export const createClient = (opts: ClientOptions): Client => {
   ): ClientInstance => {
     const id = uuid.v4();
 
-    const getSubscriptions = () =>
+    const getRxSubscriptions = () =>
       subscriptions.has(id)
-        ? subscriptions.get(id)
-        : new Map<string, Subscription>();
+        ? (subscriptions.get(id) as Map<string, RxSubscription>)
+        : new Map<string, RxSubscription>();
 
-    const updateSubscriptions = (subs: Map<string, Subscription>) =>
+    const updateRxSubscriptions = (subs: Map<string, RxSubscription>) =>
       subscriptions.set(id, subs);
 
     const executeQuery = (query: Query, force?: boolean) => {
-      const operation = createOperation('query', query, force);
+      const operation = createOperation(OperationType.Query, query, { force });
 
       const outboundKey = `${operation.key}-out`;
       const inboundKey = `${operation.key}-in`;
 
-      const instanceSubscriptions = new Map(); // getSubscriptions();
-
-      if (!instanceSubscriptions.has(outboundKey)) {
+      const instanceRxSubscriptions = getRxSubscriptions();
+      if (!instanceRxSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
         const outboundSub = subject
           .pipe(filter(newOp => newOp.key === operation.key))
           .subscribe(instanceOpts.onChange({ fetching: true }));
 
-        instanceSubscriptions.set(outboundKey, outboundSub);
+        instanceRxSubscriptions.set(outboundKey, outboundSub);
       }
 
-      if (!instanceSubscriptions.has(inboundKey)) {
+      if (!instanceRxSubscriptions.has(inboundKey)) {
         /** Notify component when query operation has returned */
         const inboundSub = subject$
           .pipe(filter(result => result.operation.key === operation.key))
@@ -100,15 +114,15 @@ export const createClient = (opts: ClientOptions): Client => {
               fetching: false,
             });
           });
-        instanceSubscriptions.set(inboundKey, inboundSub);
+        instanceRxSubscriptions.set(inboundKey, inboundSub);
       }
 
-      updateSubscriptions(instanceSubscriptions);
-      executeOperation(operation);
+      updateRxSubscriptions(instanceRxSubscriptions);
+      executeOperation(operation, subject);
     };
 
     const executeMutation = (query: Mutation) => {
-      const operation = createOperation('mutation', query);
+      const operation = createOperation(OperationType.Mutation, query);
       subject
         .pipe(
           take(1),
@@ -116,12 +130,58 @@ export const createClient = (opts: ClientOptions): Client => {
         )
         .subscribe();
 
-      executeOperation(operation);
+      executeOperation(operation, subject);
+    };
+
+    const executeSubscription = (query: Subscription) => {
+      const operation = createOperation(OperationType.Subscription, query);
+      const subscriptionSubject = new Subject<Operation>();
+
+      querySubscriptions.set(query.query, subscriptionSubject);
+
+      /** Notify component when subscription operation has been given a value */
+      subscriptionSubject
+        .pipe(
+          pipeExchanges(
+            opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
+            subject
+          )
+        )
+        .subscribe((response: SubscriptionStreamUpdate) => {
+          instanceOpts.onSubscriptionUpdate({
+            data: response.data.data,
+            error: Array.isArray(response.data.errors)
+              ? new CombinedError({
+                  graphQLErrors: response.data.errors,
+                  response,
+                })
+              : response.error,
+          });
+        });
+
+      executeOperation(operation, subscriptionSubject);
+    };
+
+    const executeUnsubscribeSubscription = (query: Subscription) => {
+      const operation = createOperation(OperationType.Subscription, query, {
+        unsubscribe: true,
+      });
+
+      // remove cached rx subscription
+      const activeSubscriptionSubject = querySubscriptions.get(query.query);
+
+      if (activeSubscriptionSubject !== undefined) {
+        querySubscriptions.delete(query.query);
+        executeOperation(operation, activeSubscriptionSubject);
+
+        // This removes the previous existence of a subscription from being part of the subject
+        // without this, any unsubscribe -> subscribe will have an n^2 effect.
+        activeSubscriptionSubject.unsubscribe();
+      }
     };
 
     const unsubscribe = () => {
-      const subs = getSubscriptions();
-
+      const subs = getRxSubscriptions();
       if (subs === undefined) {
         return;
       }
@@ -132,6 +192,8 @@ export const createClient = (opts: ClientOptions): Client => {
     return {
       executeQuery,
       executeMutation,
+      executeSubscription,
+      executeUnsubscribeSubscription,
       unsubscribe,
     };
   };

@@ -6,3 +6,6 @@ export const createQuery = (q: string, vars?: any) => ({
 
 /** Create a [Mutation]{@link Mutation} from a mutation query. */
 export const createMutation = createQuery;
+
+/** Create a [Subscription]{@link Subscription} from a subscription query. */
+export const createSubscription = createQuery;

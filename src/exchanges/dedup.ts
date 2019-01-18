@@ -1,5 +1,5 @@
 import { filter, tap } from 'rxjs/operators';
-import { Exchange } from '../types';
+import { Exchange, OperationType } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
 export const dedupeExchange: Exchange = ({ forward }) => {
@@ -9,7 +9,7 @@ export const dedupeExchange: Exchange = ({ forward }) => {
     forward(
       ops$.pipe(
         filter(({ operationName, key }) => {
-          if (operationName !== 'query') {
+          if (operationName !== OperationType.Query) {
             return true;
           }
 

@@ -7,6 +7,8 @@ import {
   Mutation,
   Query,
   StreamUpdate,
+  Subscription,
+  SubscriptionStreamUpdate,
 } from '../types';
 
 export interface ClientState<MutationDeclarations> {
@@ -22,6 +24,12 @@ export interface ClientProps<MutationDeclarations> {
   children: (obj: ChildArgs<MutationDeclarations>) => ReactNode;
   query?: Query;
   mutations?: { [type in keyof MutationDeclarations]: Mutation };
+  subscriptions?: Subscription[];
+  updateSubscription?: (
+    type: string,
+    prev: object | null,
+    next: object | null
+  ) => object | null;
 }
 
 /** Component responsible for implementing the [Client]{@link Client} utility in React. */
@@ -35,18 +43,29 @@ export class UrqlClient<MutationDeclarations> extends Component<
     this.state = {
       client: props.client.createInstance({
         onChange: result => this.onStreamUpdate(result),
+        onSubscriptionUpdate: result => this.onSubscriptionStreamUpdate(result),
       }),
       data: undefined,
       error: undefined,
       fetching: true,
       mutations: this.getMutatorFunctions(),
     };
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (props.subscriptions && !props.updateSubscription) {
+        throw new Error(
+          'You instantiated an Urql Client component with a subscription but forgot an updateSubscription prop. updateSubscription callbacks are required to work with subscriptions.'
+        );
+      }
+    }
   }
 
   public componentDidMount() {
     if (this.props.query !== undefined) {
       this.state.client.executeQuery(this.props.query);
     }
+
+    this.activateSubscriptions();
   }
 
   public componentDidUpdate(prevProps: ClientProps<MutationDeclarations>) {
@@ -63,9 +82,30 @@ export class UrqlClient<MutationDeclarations> extends Component<
     ) {
       this.state.client.executeQuery(this.props.query);
     }
+
+    if (
+      JSON.stringify(prevProps.subscriptions) !==
+      JSON.stringify(this.props.subscriptions)
+    ) {
+      this.deactiveSubscriptions(prevProps.subscriptions);
+      this.activateSubscriptions();
+    }
   }
 
+  deactiveSubscriptions = (subscriptions: Subscription[] = []) => {
+    subscriptions.forEach(sub =>
+      this.state.client.executeUnsubscribeSubscription(sub)
+    );
+  };
+
+  activateSubscriptions = () => {
+    (this.props.subscriptions || []).forEach(sub =>
+      this.state.client.executeSubscription(sub)
+    );
+  };
+
   public componentWillUnmount() {
+    this.deactiveSubscriptions(this.props.subscriptions);
     this.state.client.unsubscribe();
   }
 
@@ -112,6 +152,23 @@ export class UrqlClient<MutationDeclarations> extends Component<
       fetching: updated.fetching,
       error: updated.error,
       data: updated.data,
+    });
+  }
+
+  private onSubscriptionStreamUpdate(updated: SubscriptionStreamUpdate) {
+    const [type, data] = Object.entries(updated.data)[0];
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (updated.error) {
+        throw updated.error;
+      }
+    }
+
+    this.setState({
+      error: updated.error,
+      data: this.props.updateSubscription
+        ? this.props.updateSubscription(type, this.state.data, data)
+        : this.state.data,
     });
   }
 }

@@ -3,7 +3,13 @@ export {
   CombinedError,
   createQuery,
   createMutation,
+  createSubscription,
   createClient,
 } from './lib';
-export { cacheExchange, dedupeExchange, fetchExchange } from './exchanges';
+export {
+  cacheExchange,
+  subscriptionExchange,
+  dedupeExchange,
+  fetchExchange,
+} from './exchanges';
 export * from './types';
