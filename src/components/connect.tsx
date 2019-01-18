@@ -25,7 +25,7 @@ export interface ConnectProps<T> {
 export const Connect = function<T>(props: ConnectProps<T>) {
   return (
     <ContextConsumer>
-      {(client: Client) => (
+      {client => (
         <UrqlClient
           client={client}
           children={props.children}

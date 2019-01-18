@@ -16,7 +16,7 @@ Object {
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {
-        "test": 1,
+        "method": "POST",
       },
       "url": "http://localhost:3000/graphql",
     },
@@ -47,7 +47,7 @@ Object {
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {
-        "test": 1,
+        "method": "POST",
       },
       "url": "http://localhost:3000/graphql",
     },

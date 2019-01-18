@@ -1,7 +1,7 @@
+import { mount, shallow } from 'enzyme';
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { mutationGql, queryGql as query, subscriptionGql } from '../test-utils';
 import { UrqlClient } from './client';
-import { queryGql as query, mutationGql, subscriptionGql } from '../test-utils';
 
 const children = jest.fn().mockReturnValue(<h1>This is a child component</h1>);
 const clientInstance = {
@@ -117,12 +117,14 @@ describe('on creation', () => {
 
 describe('componentDidMount', () => {
   it('calls executeQuery with query object', () => {
-    shallow(
+    const wrapper = shallow(
       <UrqlClient client={client} query={query}>
         {children}
       </UrqlClient>
     );
 
+    // @ts-ignore
+    wrapper.instance().componentDidMount();
     expect(clientInstance.executeQuery).toBeCalledWith(query);
   });
 
@@ -213,6 +215,7 @@ describe('componentWillUnmount', () => {
       </UrqlClient>
     );
 
+    // @ts-ignore
     wrapper.instance().componentWillUnmount();
     expect(clientInstance.unsubscribe).toBeCalled();
   });
@@ -228,14 +231,16 @@ describe('componentWillUnmount', () => {
       </UrqlClient>
     );
 
+    // @ts-ignore
     wrapper.instance().componentWillUnmount();
+
     expect(clientInstance.executeUnsubscribeSubscription).toBeCalledTimes(1);
   });
 });
 
 describe('mutation functions', () => {
   it('have same properties as mutation argument', () => {
-    const wrapper = shallow(
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -247,7 +252,7 @@ describe('mutation functions', () => {
   });
 
   it('calls executeMutation', () => {
-    const wrapper = shallow(
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -260,7 +265,7 @@ describe('mutation functions', () => {
   });
 
   it('passes mutation query to executeMutation', () => {
-    const wrapper = shallow(
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -275,7 +280,7 @@ describe('mutation functions', () => {
   });
 
   it('passes mutation vars to executeMutation', () => {
-    const wrapper = shallow(
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>
@@ -293,7 +298,7 @@ describe('mutation functions', () => {
 
 describe('on change from client', () => {
   it('child components are updated', () => {
-    const wrapper = shallow(
+    shallow(
       <UrqlClient client={client} query={query} mutations={mutations}>
         {children}
       </UrqlClient>

@@ -1,65 +1,96 @@
-import { flatMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { CombinedError } from '../lib';
-import { Exchange, OperationType } from '../types';
+import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {
   return ops$ =>
     ops$.pipe(
-      flatMap(async operation => {
+      mergeMap(operation => {
         if (operation.operationName === OperationType.Subscription) {
           throw new Error(
             'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
           );
         }
 
-        const body = JSON.stringify({
-          query: operation.query,
-          variables: operation.variables,
-        });
+        return new Observable<ExchangeResult>(observer => {
+          const abortController =
+            typeof AbortController !== 'undefined'
+              ? new AbortController()
+              : undefined;
 
-        let response: Response;
-        let result: any;
-
-        try {
-          const { url, fetchOptions } = operation.context;
-          response = await fetch(url, {
-            body,
+          const fetchOptions = {
+            body: JSON.stringify({
+              query: operation.query,
+              variables: operation.variables,
+            }),
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
-            ...fetchOptions,
-          });
-
-          checkStatus(fetchOptions.redirect, response);
-
-          result = await response.json();
-
-          return {
-            operation,
-            data: result.data,
-            error: Array.isArray(result.errors)
-              ? new CombinedError({
-                  graphQLErrors: result.errors,
-                  response,
-                })
-              : undefined,
+            signal:
+              abortController !== undefined
+                ? abortController.signal
+                : undefined,
+            ...operation.context.fetchOptions,
           };
-        } catch (err) {
-          if (err.name === 'AbortError') {
-            return;
-          }
 
-          return {
-            operation,
-            data: undefined,
-            error: new CombinedError({
-              networkError: err,
-              response,
-            }),
+          executeFetch(operation, fetchOptions)
+            .then(result => {
+              if (result !== undefined) {
+                observer.next(result);
+              }
+
+              observer.complete();
+            })
+            .catch(err => {
+              console.error(err);
+              observer.complete();
+            });
+
+          return () => {
+            if (abortController !== undefined) {
+              abortController.abort();
+            }
           };
-        }
+        });
       })
     );
+};
+
+const executeFetch = async (operation: Operation, opts: RequestInit) => {
+  let response: Response | undefined;
+
+  try {
+    const { url } = operation.context;
+    response = await fetch(url, opts);
+
+    checkStatus(opts.redirect, response);
+    const result = await response.json();
+
+    return {
+      operation,
+      data: result.data,
+      error: Array.isArray(result.errors)
+        ? new CombinedError({
+            graphQLErrors: result.errors,
+            response,
+          })
+        : undefined,
+    };
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return undefined;
+    }
+
+    return {
+      operation,
+      data: undefined,
+      error: new CombinedError({
+        networkError: err,
+        response,
+      }),
+    };
+  }
 };
 
 const checkStatus = (redirectMode: string = 'follow', response: Response) => {

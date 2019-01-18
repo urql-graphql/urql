@@ -1,12 +1,16 @@
-import { Observable, of, Subject } from 'rxjs';
-import { map, mergeMap, tap } from 'rxjs/operators';
-import { formatTypeNames, gankTypeNamesFromResponse } from '../lib';
+import { merge, Subject } from 'rxjs';
+import { map, partition, share, tap } from 'rxjs/operators';
+import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
 import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
-/** A default exchange for caching GraphQL requests. */
+type ResultCache = Map<string, ExchangeResult>;
+interface OperationCache {
+  [key: string]: Set<string>;
+}
+
 export const cacheExchange: Exchange = ({ forward, subject }) => {
-  const cache = new Map<string, ExchangeResult>();
-  const cachedTypenames = new Map<string, Set<string>>();
+  const resultCache: ResultCache = new Map();
+  const operationCache: OperationCache = Object.create(null);
 
   // Adds unique typenames to query (for invalidating cache entries)
   const mapTypeNames = (operation: Operation): Operation => ({
@@ -14,93 +18,82 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
     query: formatTypeNames(operation.query),
   });
 
-  const handleAfterMutation = (response: ExchangeResult) =>
-    afterMutation(response, cache, cachedTypenames, subject);
-
-  const handleAfterQuery = (response: ExchangeResult) =>
-    afterQuery(response, cache, cachedTypenames);
+  const handleAfterMutation = afterMutation(
+    resultCache,
+    operationCache,
+    subject
+  );
+  const handleAfterQuery = afterQuery(resultCache, operationCache);
 
   return ops$ => {
-    const useCache = (stream: Observable<Operation>) =>
-      stream.pipe(map(operation => cache.get(operation.key)));
+    const sharedOps$ = ops$.pipe(share());
 
-    const goForward = (stream: Observable<Operation>) =>
-      stream.pipe(
-        map(mapTypeNames),
-        forward,
-        tap(response => {
-          if (response.operation.operationName === OperationType.Mutation) {
-            handleAfterMutation(response);
-          } else if (response.operation.operationName === OperationType.Query) {
-            handleAfterQuery(response);
-          }
-        })
+    const [cacheOps$, forwardOps$] = partition<Operation>(operation => {
+      return (
+        operation.operationName === OperationType.Query && resultCache.has(operation.key)
       );
+    })(sharedOps$);
 
-    return ops$.pipe(
-      mergeMap(operation =>
-        cache.has(operation.key) && !operation.context.force
-          ? useCache(of(operation))
-          : goForward(of(operation))
-      )
+    const cachedResults$ = cacheOps$.pipe(
+      map(operation => resultCache.get(operation.key) as ExchangeResult) // ExchangeResult is guaranteed to exist
     );
+
+    const forward$ = forwardOps$.pipe(
+      map(mapTypeNames),
+      forward,
+      tap(response => {
+        if (response.operation.operationName === OperationType.Mutation) {
+          handleAfterMutation(response);
+        } else if (response.operation.operationName === OperationType.Query) {
+          handleAfterQuery(response);
+        }
+      })
+    );
+
+    return merge(cachedResults$, forward$);
   };
 };
 
 // Invalidates the cache given a mutation's response
 export const afterMutation = (
-  response: ExchangeResult,
-  cache: Map<string, ExchangeResult>,
-  cachedTypenames: Map<string, Set<string>>,
+  resultCache: ResultCache,
+  operationCache: OperationCache,
   subject: Subject<Operation>
-) => {
-  if (response.data === undefined) {
-    return;
-  }
+) => (response: ExchangeResult) => {
+  const pendingOperations = new Set<string>();
 
-  let pendingOperations: Operation[] = [];
-  const typenames = gankTypeNamesFromResponse(response.data);
-
-  typenames.forEach(typename => {
-    const typenameCacheKeys = cachedTypenames.get(typename);
-    if (typenameCacheKeys === undefined) {
-      return;
-    }
-
-    typenameCacheKeys.forEach(key => {
-      pendingOperations = [...pendingOperations, cache.get(key).operation];
-      cache.delete(key);
-    });
-    cachedTypenames.delete(typename);
+  gankTypeNamesFromResponse(response.data).forEach(typeName => {
+    const operations =
+      operationCache[typeName] || (operationCache[typeName] = new Set());
+    operations.forEach(key => pendingOperations.add(key));
+    operations.clear();
   });
 
-  pendingOperations.forEach(op => {
-    subject.next(op);
+  pendingOperations.forEach(key => {
+    const operation = (resultCache.get(key) as ExchangeResult).operation; // Result is guaranteed
+    resultCache.delete(key);
+    subject.next(operation);
   });
 };
 
 // Mark typenames on typenameInvalidate for early invalidation
 const afterQuery = (
-  response: ExchangeResult,
-  cache: Map<string, ExchangeResult>,
-  cachedTypenames: Map<string, Set<string>>
-) => {
-  if (response.data === undefined) {
+  resultCache: ResultCache,
+  operationCache: OperationCache
+) => (response: ExchangeResult) => {
+  const {
+    operation: { key },
+    data,
+  } = response;
+  if (data === undefined) {
     return;
   }
 
-  const key = response.operation.key;
-  cache.set(key, response);
+  resultCache.set(key, response);
 
-  const typenames = gankTypeNamesFromResponse(response.data);
-
-  typenames.forEach(typename => {
-    const typenameCacheKeys = cachedTypenames.get(typename);
-    cachedTypenames.set(
-      typename,
-      new Set(
-        typenameCacheKeys === undefined ? [key] : [...typenameCacheKeys, key]
-      )
-    );
+  gankTypeNamesFromResponse(response.data).forEach(typeName => {
+    const operations =
+      operationCache[typeName] || (operationCache[typeName] = new Set());
+    operations.add(key);
   });
 };

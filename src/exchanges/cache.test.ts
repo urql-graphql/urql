@@ -1,15 +1,15 @@
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { cacheExchange, afterMutation } from './cache';
 import {
-  queryOperation,
-  queryResponse,
   mutationOperation,
   mutationResponse,
-  subscriptionResponse,
+  queryOperation,
+  queryResponse,
   subscriptionOperation,
+  subscriptionResponse,
 } from '../test-utils';
 import { Operation } from '../types';
+import { afterMutation, cacheExchange } from './cache';
 
 const subject = {
   next: jest.fn(),
@@ -80,27 +80,24 @@ it("doesn't cache mutations", async () => {
 
 it('retriggers query operation when mutation occurs', () => {
   const typename = 'ToDo';
-  const cache = new Map([[1, queryResponse]]);
-  const typenames = new Map([[typename, [1]]]);
+  const resultCache = new Map([['test', queryResponse]]);
+  const operationCache = { [typename]: new Set(['test']) };
 
   afterMutation(
+    resultCache,
+    operationCache,
     // @ts-ignore
-    {
-      data: {
-        data: {
-          todos: [
-            {
-              id: 1,
-              __typename: typename,
-            },
-          ],
-        },
-      },
-    },
-    cache,
-    typenames,
     subject
-  );
+  )({
+    data: {
+      todos: [
+        {
+          id: 1,
+          __typename: typename,
+        },
+      ],
+    },
+  });
 
   expect(subject.next).toBeCalledWith(queryOperation);
 });

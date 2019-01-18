@@ -7,7 +7,6 @@ configure({ adapter: new Adapter() });
 // Setup globals
 const g = global as any;
 
-g._AbortController = g.AbortController;
 g.AbortController = undefined;
 g.fetch = jest.fn();
 

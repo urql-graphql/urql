@@ -22,14 +22,18 @@ export enum OperationType {
   Mutation = 'mutation',
 }
 
-/** A Graphql [query]{@link Query} or [mutation]{@link Mutation} accompanied with metadata. */
+/** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
 export interface Operation extends Query {
   /** Unique identifier of the operation. */
   key: string;
   /** The type of Grapqhql operation being executed. */
   operationName: OperationType;
   /** Additional metadata passed to [exchange]{@link Exchange} functions. */
-  context: Record<string, any>;
+  context: {
+    [key: string]: any;
+    fetchOptions?: RequestInit;
+    url: ClientOptions['url'];
+  };
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
@@ -143,14 +147,4 @@ export interface GraphQLError {
 export interface ExecutionResult {
   errors?: Error[];
   data?: any;
-}
-
-/** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation extends Query {
-  /** A unique identifier. */
-  key: string;
-  /** The type of operation. */
-  operationName: OperationType;
-  /** Additional request-related information. */
-  context: Record<string, any>;
 }

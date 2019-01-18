@@ -1,13 +1,29 @@
 import { of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { fetchExchange } from './fetch';
-import { Exchange } from '../types';
 import { queryOperation, subscriptionOperation } from '../test-utils';
+import { Exchange } from '../types';
+import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
+const abort = jest.fn();
+
+const abortError = new Error();
+abortError.name = 'AbortError';
+
+beforeAll(() => {
+  (global as any).AbortController = function AbortController() {
+    this.signal = undefined;
+    this.abort = abort;
+  };
+});
 
 beforeEach(() => {
   fetch.mockClear();
+  abort.mockClear();
+});
+
+afterAll(() => {
+  (global as any).AbortController = undefined;
 });
 
 const repsonse = {
@@ -55,4 +71,15 @@ it('should throw error when operationName is subscription', async () => {
   } catch (err) {
     expect(err).toMatchSnapshot();
   }
+});
+
+it('should call cancel when the Observable is cancelled', () => {
+  fetch.mockReturnValue(Promise.reject(abortError));
+
+  const obs = fetchExchange(args)(of(queryOperation));
+  const subscription = obs.subscribe(fail);
+
+  subscription.unsubscribe();
+  expect(abort).toHaveBeenCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });

@@ -14,9 +14,9 @@ import {
 export interface ClientState<MutationDeclarations> {
   client: ClientInstance;
   fetching: boolean;
-  error: Error | CombinedError | CombinedError[];
-  data: any | any[];
-  mutations: { [type in keyof MutationDeclarations]: (vals: any) => void };
+  error?: Error | CombinedError | CombinedError[];
+  data?: any | any[];
+  mutations?: { [type in keyof MutationDeclarations]: (vals: any) => void };
 }
 
 export interface ClientProps<MutationDeclarations> {
@@ -61,7 +61,10 @@ export class UrqlClient<MutationDeclarations> extends Component<
   }
 
   public componentDidMount() {
-    this.state.client.executeQuery(this.props.query);
+    if (this.props.query !== undefined) {
+      this.state.client.executeQuery(this.props.query);
+    }
+
     this.activateSubscriptions();
   }
 
@@ -73,7 +76,10 @@ export class UrqlClient<MutationDeclarations> extends Component<
       this.setState({ mutations: this.getMutatorFunctions() });
     }
 
-    if (JSON.stringify(prevProps.query) !== JSON.stringify(this.props.query)) {
+    if (
+      this.props.query !== undefined &&
+      JSON.stringify(prevProps.query) !== JSON.stringify(this.props.query)
+    ) {
       this.state.client.executeQuery(this.props.query);
     }
 
@@ -114,13 +120,15 @@ export class UrqlClient<MutationDeclarations> extends Component<
       data: this.state.data,
       mutations: this.state.mutations,
       refetch: (noCache: boolean = false) =>
-        this.state.client.executeQuery(this.props.query, noCache),
+        this.props.query !== undefined
+          ? this.state.client.executeQuery(this.props.query, noCache)
+          : undefined,
     });
   }
 
   private getMutatorFunctions() {
     if (this.props.mutations === undefined) {
-      return;
+      return undefined;
     }
 
     const mutations = Object.keys(this.props.mutations).reduce(
@@ -128,6 +136,7 @@ export class UrqlClient<MutationDeclarations> extends Component<
         ...prev,
         [key]: (variables: any) =>
           this.state.client.executeMutation({
+            // @ts-ignore -  mutation key definitely exists
             ...this.props.mutations[key],
             variables,
           }),

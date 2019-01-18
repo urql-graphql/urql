@@ -1,13 +1,13 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
-import { createClient } from './client';
-import { CombinedError } from './';
 import {
-  queryGql,
   mutationGql,
+  queryGql,
   queryResponse,
   subscriptionGql,
 } from '../test-utils';
 import { ClientInstance } from '../types';
+import { CombinedError } from './';
+import { createClient } from './client';
 
 const url = 'https://hostname.com';
 const fetch = (global as any).fetch as jest.Mock;
@@ -243,7 +243,7 @@ describe('executeQuery', () => {
 
     describe('calls onChange with', () => {
       beforeEach(() => {
-        fetch.mockResolvedValue({
+        fetch.mockReturnValueOnce({
           status: 200,
           json: () => ({
             errors,
@@ -263,6 +263,8 @@ describe('executeQuery', () => {
         client.executeQuery(queryGql);
 
         await wait();
+
+        expect(onChange.mock.calls[0]).toEqual([{ fetching: true }]);
         expect(onChange.mock.calls[1][0].error.graphQLErrors[0]).toHaveProperty(
           'message',
           errors[0].message

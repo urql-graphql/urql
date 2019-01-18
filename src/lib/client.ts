@@ -1,5 +1,5 @@
 import { Observable, Subject, Subscription as RxSubscription } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { filter, publish, take } from 'rxjs/operators';
 import * as uuid from 'uuid';
 import {
   cacheExchange,
@@ -38,19 +38,20 @@ export const createClient = (opts: ClientOptions): Client => {
 
   const subject = new Subject<Operation>();
 
-  const subject$ = subject.pipe(
+  /** Main subject stream for listening to operation responses */
+  const subject$ = publish<ExchangeResult>()(
     pipeExchanges(
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
       subject
-    )
+    )(subject)
   );
+
+  subject$.connect();
 
   const fetchOptions =
     typeof opts.fetchOptions === 'function'
       ? opts.fetchOptions()
-      : opts.fetchOptions !== undefined
-      ? opts.fetchOptions
-      : {};
+      : opts.fetchOptions;
 
   /** Convert a query to an operation type */
   const createOperation = (
@@ -80,7 +81,7 @@ export const createClient = (opts: ClientOptions): Client => {
 
     const getRxSubscriptions = () =>
       subscriptions.has(id)
-        ? subscriptions.get(id)
+        ? (subscriptions.get(id) as Map<string, RxSubscription>)
         : new Map<string, RxSubscription>();
 
     const updateRxSubscriptions = (subs: Map<string, RxSubscription>) =>
@@ -93,7 +94,6 @@ export const createClient = (opts: ClientOptions): Client => {
       const inboundKey = `${operation.key}-in`;
 
       const instanceRxSubscriptions = getRxSubscriptions();
-
       if (!instanceRxSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
         const outboundSub = subject
@@ -106,18 +106,14 @@ export const createClient = (opts: ClientOptions): Client => {
       if (!instanceRxSubscriptions.has(inboundKey)) {
         /** Notify component when query operation has returned */
         const inboundSub = subject$
-          .pipe(
-            filter(
-              (result: ExchangeResult) => result.operation.key === operation.key
-            )
-          )
-          .subscribe(response =>
+          .pipe(filter(result => result.operation.key === operation.key))
+          .subscribe(response => {
             instanceOpts.onChange({
               data: response.data,
               error: response.error,
               fetching: false,
-            })
-          );
+            });
+          });
         instanceRxSubscriptions.set(inboundKey, inboundSub);
       }
 
@@ -173,11 +169,11 @@ export const createClient = (opts: ClientOptions): Client => {
 
       // remove cached rx subscription
       const activeSubscriptionSubject = querySubscriptions.get(query.query);
-      querySubscriptions.delete(query.query);
 
-      executeOperation(operation, activeSubscriptionSubject);
+      if (activeSubscriptionSubject !== undefined) {
+        querySubscriptions.delete(query.query);
+        executeOperation(operation, activeSubscriptionSubject);
 
-      if (activeSubscriptionSubject) {
         // This removes the previous existence of a subscription from being part of the subject
         // without this, any unsubscribe -> subscribe will have an n^2 effect.
         activeSubscriptionSubject.unsubscribe();
@@ -186,6 +182,10 @@ export const createClient = (opts: ClientOptions): Client => {
 
     const unsubscribe = () => {
       const subs = getRxSubscriptions();
+      if (subs === undefined) {
+        return;
+      }
+
       [...subs.values()].forEach(sub => sub.unsubscribe());
     };
 
@@ -204,8 +204,8 @@ export const createClient = (opts: ClientOptions): Client => {
 };
 
 /** Create pipe of exchanges */
-const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
-  operation: Observable<Operation>
+const pipeExchanges = (exchanges: Exchange[], subject: Subject<Operation>) => (
+  operation$: Observable<Operation>
 ) => {
   /** Recursively pipe to each exchange */
   const callExchanges = (value: Observable<Operation>, index: number = 0) => {
@@ -220,5 +220,5 @@ const pipeExchanges = (exchanges: Exchange[], subject?: Subject<Operation>) => (
     })(value);
   };
 
-  return callExchanges(operation, 0);
+  return callExchanges(operation$, 0);
 };
