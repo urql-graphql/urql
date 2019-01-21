@@ -28,7 +28,9 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "snapshotSerializers": ["enzyme-to-json/serializer"],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
@@ -117,8 +119,8 @@
   "dependencies": {
     "create-react-context": "^0.2.3",
     "graphql": "^14.0.2",
-    "rxjs": "^6.3.3",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "wonka": "^1.4.1"
   },
   "sideEffects": false
 }

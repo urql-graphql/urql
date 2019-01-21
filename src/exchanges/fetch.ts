@@ -1,12 +1,12 @@
-import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { make, mergeMap, pipe } from 'wonka';
 import { CombinedError } from '../lib';
 import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = () => {
-  return ops$ =>
-    ops$.pipe(
+  return ops$ => {
+    return pipe(
+      ops$,
       mergeMap(operation => {
         if (operation.operationName === OperationType.Subscription) {
           throw new Error(
@@ -14,7 +14,7 @@ export const fetchExchange: Exchange = () => {
           );
         }
 
-        return new Observable<ExchangeResult>(observer => {
+        return make<ExchangeResult>(([next, complete]) => {
           const abortController =
             typeof AbortController !== 'undefined'
               ? new AbortController()
@@ -37,14 +37,14 @@ export const fetchExchange: Exchange = () => {
           executeFetch(operation, fetchOptions)
             .then(result => {
               if (result !== undefined) {
-                observer.next(result);
+                next(result);
               }
 
-              observer.complete();
+              complete();
             })
             .catch(err => {
               console.error(err);
-              observer.complete();
+              complete();
             });
 
           return () => {
@@ -55,6 +55,7 @@ export const fetchExchange: Exchange = () => {
         });
       })
     );
+  };
 };
 
 const executeFetch = async (operation: Operation, opts: RequestInit) => {

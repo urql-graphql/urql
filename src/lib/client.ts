@@ -1,5 +1,15 @@
-import { Observable, Subject, Subscription as RxSubscription } from 'rxjs';
-import { filter, publish, take } from 'rxjs/operators';
+import {
+  filter,
+  makeSubject,
+  pipe,
+  publish,
+  share,
+  Source,
+  Subject,
+  subscribe,
+  take,
+} from 'wonka';
+
 import * as uuid from 'uuid';
 import {
   cacheExchange,
@@ -23,30 +33,30 @@ import {
   SubscriptionStreamUpdate,
 } from '../types';
 
-const defaultExchanges = [
-  subscriptionExchange,
-  dedupeExchange,
-  cacheExchange,
-  fetchExchange,
-];
+type SubscriptionMap = Map<string, () => void>;
+
+const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
 
 /** Function for creating an application wide [Client]{@link Client}. */
 export const createClient = (opts: ClientOptions): Client => {
   /** Cache of all instance subscriptions */
-  const subscriptions = new Map<string, Map<string, RxSubscription>>();
-  const querySubscriptions = new Map<string, Subject<Operation>>();
+  const subscriptions = new Map<string, SubscriptionMap>();
+  const querySubscriptions = new Map<string, SubscriptionMap>();
 
-  const subject = new Subject<Operation>();
+  /** Main subject for emitting operations */
+  const subject = makeSubject<Operation>();
+
+  const exchanges =
+    opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
 
   /** Main subject stream for listening to operation responses */
-  const subject$ = publish<ExchangeResult>()(
-    pipeExchanges(
-      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
-      subject
-    )(subject)
+  const subject$ = pipe(
+    subject[0],
+    pipeExchanges(exchanges, subject),
+    share
   );
 
-  subject$.connect();
+  publish(subject$);
 
   const fetchOptions =
     typeof opts.fetchOptions === 'function'
@@ -70,8 +80,7 @@ export const createClient = (opts: ClientOptions): Client => {
     },
   });
 
-  const executeOperation = (operation: Operation, sub: Subject<Operation>) =>
-    sub.next(operation);
+  const executeOperation = (operation: Operation) => subject[1](operation);
 
   /** Function to manage subscriptions on a Consumer by Consumer basis */
   const createInstance = (
@@ -79,12 +88,10 @@ export const createClient = (opts: ClientOptions): Client => {
   ): ClientInstance => {
     const id = uuid.v4();
 
-    const getRxSubscriptions = () =>
-      subscriptions.has(id)
-        ? (subscriptions.get(id) as Map<string, RxSubscription>)
-        : new Map<string, RxSubscription>();
+    const getSubscriptions = () =>
+      subscriptions.has(id) ? subscriptions.get(id) : (new Map() as SubscriptionMap);
 
-    const updateRxSubscriptions = (subs: Map<string, RxSubscription>) =>
+    const updateSubscriptions = (subs: SubscriptionMap) =>
       subscriptions.set(id, subs);
 
     const executeQuery = (query: Query, force?: boolean) => {
@@ -93,49 +100,47 @@ export const createClient = (opts: ClientOptions): Client => {
       const outboundKey = `${operation.key}-out`;
       const inboundKey = `${operation.key}-in`;
 
-      const instanceRxSubscriptions = getRxSubscriptions();
-      if (!instanceRxSubscriptions.has(outboundKey)) {
+      const instanceSubscriptions = getSubscriptions();
+      if (!instanceSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
-        const outboundSub = subject
-          .pipe(filter(newOp => newOp.key === operation.key))
-          .subscribe(instanceOpts.onChange({ fetching: true }));
+        const [outboundSub] = pipe(
+          subject[0],
+          filter(op => op.key === operation.key),
+          subscribe(() => instanceOpts.onChange({ fetching: true }))
+        );
 
-        instanceRxSubscriptions.set(outboundKey, outboundSub);
+        instanceSubscriptions.set(outboundKey, outboundSub);
       }
 
-      if (!instanceRxSubscriptions.has(inboundKey)) {
+      if (!instanceSubscriptions.has(inboundKey)) {
         /** Notify component when query operation has returned */
-        const inboundSub = subject$
-          .pipe(filter(result => result.operation.key === operation.key))
-          .subscribe(response => {
+        const [inboundSub] = pipe(
+          subject$,
+          filter(result => result.operation.key === operation.key),
+          subscribe(response => {
             instanceOpts.onChange({
               data: response.data,
               error: response.error,
               fetching: false,
             });
-          });
-        instanceRxSubscriptions.set(inboundKey, inboundSub);
+          })
+        );
+
+        instanceSubscriptions.set(inboundKey, inboundSub);
       }
 
-      updateRxSubscriptions(instanceRxSubscriptions);
-      executeOperation(operation, subject);
+      updateSubscriptions(instanceSubscriptions);
+      executeOperation(operation);
     };
 
     const executeMutation = (query: Mutation) => {
       const operation = createOperation(OperationType.Mutation, query);
-      subject
-        .pipe(
-          take(1),
-          filter(incomingOp => incomingOp.key === operation.key)
-        )
-        .subscribe();
-
-      executeOperation(operation, subject);
+      executeOperation(operation);
     };
 
     const executeSubscription = (query: Subscription) => {
       const operation = createOperation(OperationType.Subscription, query);
-      const subscriptionSubject = new Subject<Operation>();
+      const subscriptionSubject = makeSubject<Operation>();
 
       querySubscriptions.set(query.query, subscriptionSubject);
 
@@ -159,7 +164,7 @@ export const createClient = (opts: ClientOptions): Client => {
           });
         });
 
-      executeOperation(operation, subscriptionSubject);
+      executeOperation(operation);
     };
 
     const executeUnsubscribeSubscription = (query: Subscription) => {
@@ -172,7 +177,7 @@ export const createClient = (opts: ClientOptions): Client => {
 
       if (activeSubscriptionSubject !== undefined) {
         querySubscriptions.delete(query.query);
-        executeOperation(operation, activeSubscriptionSubject);
+        executeOperation(operation);
 
         // This removes the previous existence of a subscription from being part of the subject
         // without this, any unsubscribe -> subscribe will have an n^2 effect.
@@ -186,7 +191,7 @@ export const createClient = (opts: ClientOptions): Client => {
         return;
       }
 
-      [...subs.values()].forEach(sub => sub.unsubscribe());
+      [...subs.values()].forEach(unsub => unsub());
     };
 
     return {
@@ -205,10 +210,10 @@ export const createClient = (opts: ClientOptions): Client => {
 
 /** Create pipe of exchanges */
 const pipeExchanges = (exchanges: Exchange[], subject: Subject<Operation>) => (
-  operation$: Observable<Operation>
-) => {
+  operation$: Source<Operation>
+): Source<ExchangeResult> => {
   /** Recursively pipe to each exchange */
-  const callExchanges = (value: Observable<Operation>, index: number = 0) => {
+  const callExchanges = (value: Source<Operation>, index: number = 0) => {
     if (exchanges.length < index) {
       return value;
     }

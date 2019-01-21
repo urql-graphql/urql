@@ -1,5 +1,5 @@
-import { merge, Subject } from 'rxjs';
-import { map, partition, share, tap } from 'rxjs/operators';
+import { filter, map, merge, pipe, share, Subject, tap } from 'wonka';
+
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
 import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
@@ -23,22 +23,27 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
     operationCache,
     subject
   );
+
   const handleAfterQuery = afterQuery(resultCache, operationCache);
 
+  const isOperationCached = operation =>
+    operation.operationName === OperationType.Query && resultCache.has(operation.key);
+
   return ops$ => {
-    const sharedOps$ = ops$.pipe(share());
+    const sharedOps$ = share(ops$);
 
-    const [cacheOps$, forwardOps$] = partition<Operation>(operation => {
-      return (
-        operation.operationName === OperationType.Query && resultCache.has(operation.key)
-      );
-    })(sharedOps$);
-
-    const cachedResults$ = cacheOps$.pipe(
-      map(operation => resultCache.get(operation.key) as ExchangeResult) // ExchangeResult is guaranteed to exist
+    const cachedResults$ = pipe(
+      sharedOps$,
+      filter(op => isOperationCached(op)),
+      map(operation => {
+        // ExchangeResult is guaranteed to exist
+        return resultCache.get(operation.key) as ExchangeResult;
+      })
     );
 
-    const forward$ = forwardOps$.pipe(
+    const forward$ = pipe(
+      sharedOps$,
+      filter(op => !isOperationCached(op)),
       map(mapTypeNames),
       forward,
       tap(response => {
@@ -50,7 +55,7 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
       })
     );
 
-    return merge(cachedResults$, forward$);
+    return merge([cachedResults$, forward$]);
   };
 };
 
@@ -72,7 +77,7 @@ export const afterMutation = (
   pendingOperations.forEach(key => {
     const operation = (resultCache.get(key) as ExchangeResult).operation; // Result is guaranteed
     resultCache.delete(key);
-    subject.next(operation);
+    subject[1](operation);
   });
 };
 

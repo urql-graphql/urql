@@ -6,7 +6,7 @@ import {
   subscriptionGql,
 } from '../test-utils';
 import { ClientInstance } from '../types';
-import { CombinedError } from './';
+import { CombinedError } from './error';
 import { createClient } from './client';
 
 const url = 'https://hostname.com';

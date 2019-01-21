@@ -1,4 +1,4 @@
-import { Observable, Subject, Subscriber } from 'rxjs';
+import { Source, Subject, Observer } from 'wonka';
 import { ClientState } from './components';
 import { CombinedError } from './lib';
 
@@ -49,8 +49,8 @@ export type Exchange = (
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
 export type ExchangeIO = (
   /** A stream of operations. */
-  ops$: Observable<Operation>
-) => Observable<ExchangeResult>;
+  ops$: Source<Operation>
+) => Source<ExchangeResult>;
 
 /** Resulting data from an [operation]{@link Operation}. */
 export interface ExchangeResult {
@@ -87,7 +87,7 @@ export interface ClientOptions {
   /** forwards a subscription to users transport library. Must return an unsubscribe handler */
   forwardSubscription?: (
     operation: Operation,
-    observable: Subscriber<ExchangeResult>
+    observable: Observer<ExchangeResult>
   ) => { unsubscribe: () => void };
 }
 

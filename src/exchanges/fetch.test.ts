@@ -1,5 +1,4 @@
-import { of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { fromValue, makeSubject, merge, never, pipe, subscribe, toPromise } from 'wonka';
 import { queryOperation, subscriptionOperation } from '../test-utils';
 import { Exchange } from '../types';
 import { fetchExchange } from './fetch';
@@ -26,7 +25,7 @@ afterAll(() => {
   (global as any).AbortController = undefined;
 });
 
-const repsonse = {
+const response = {
   status: 200,
   data: {
     data: {
@@ -35,38 +34,49 @@ const repsonse = {
   },
 };
 
-const args = {
+const exchangeArgs = {
   forward: jest.fn(),
-  subject: {},
+  subject: makeSubject(),
 } as any;
 
 it('should return response data from fetch', async () => {
   fetch.mockResolvedValue({
     status: 200,
-    json: jest.fn().mockResolvedValue(repsonse),
+    json: jest.fn().mockResolvedValue(response),
   });
 
-  const data = await fetchExchange(args)(of(queryOperation))
-    .pipe(take(1))
-    .toPromise();
+  const data = await pipe(
+    fromValue(queryOperation),
+    fetchExchange(exchangeArgs),
+    toPromise
+  );
+
   expect(data).toMatchSnapshot();
 });
 
 it('should return error data from fetch', async () => {
   fetch.mockResolvedValue({
     status: 400,
-    json: jest.fn().mockResolvedValue(repsonse),
+    json: jest.fn().mockResolvedValue(response),
   });
 
-  const data = await fetchExchange(args)(of(queryOperation))
-    .pipe(take(1))
-    .toPromise();
+  const data = await pipe(
+    fromValue(queryOperation),
+    fetchExchange(exchangeArgs),
+    toPromise
+  );
+
   expect(data).toMatchSnapshot();
 });
 
 it('should throw error when operationName is subscription', async () => {
   try {
-    await fetchExchange(args)(of(subscriptionOperation)).toPromise();
+    await pipe(
+      fromValue(subscriptionOperation),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
     fail();
   } catch (err) {
     expect(err).toMatchSnapshot();
@@ -76,10 +86,13 @@ it('should throw error when operationName is subscription', async () => {
 it('should call cancel when the Observable is cancelled', () => {
   fetch.mockReturnValue(Promise.reject(abortError));
 
-  const obs = fetchExchange(args)(of(queryOperation));
-  const subscription = obs.subscribe(fail);
+  const [unsubscribe] = pipe(
+    fromValue(queryOperation),
+    fetchExchange(exchangeArgs),
+    subscribe(fail)
+  );
 
-  subscription.unsubscribe();
-  expect(abort).toHaveBeenCalledTimes(1);
+  unsubscribe();
   expect(fetch).toHaveBeenCalledTimes(1);
+  expect(abort).toHaveBeenCalledTimes(1);
 });
