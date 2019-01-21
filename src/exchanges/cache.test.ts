@@ -1,4 +1,5 @@
 import { forEach, makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+
 import {
   mutationOperation,
   mutationResponse,
@@ -7,6 +8,7 @@ import {
   subscriptionOperation,
   subscriptionResponse,
 } from '../test-utils';
+
 import { Operation } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 

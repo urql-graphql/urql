@@ -1,7 +1,7 @@
 import { filter, map, merge, pipe, share, Subject, tap } from 'wonka';
 
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
-import { Exchange, ExchangeResult, Operation } from '../types';
+import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
 type ResultCache = Map<string, ExchangeResult>;
 interface OperationCache {
@@ -27,7 +27,7 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
   const handleAfterQuery = afterQuery(resultCache, operationCache);
 
   const isOperationCached = operation =>
-    operation.operationName === 'query' && resultCache.has(operation.key);
+    operation.operationName === OperationType.Query && resultCache.has(operation.key);
 
   return ops$ => {
     const sharedOps$ = share(ops$);
@@ -47,9 +47,9 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
       map(mapTypeNames),
       forward,
       tap(response => {
-        if (response.operation.operationName === 'mutation') {
+        if (response.operation.operationName === OperationType.Mutation) {
           handleAfterMutation(response);
-        } else if (response.operation.operationName === 'query') {
+        } else if (response.operation.operationName === OperationType.Query) {
           handleAfterQuery(response);
         }
       })

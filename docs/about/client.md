@@ -11,6 +11,10 @@ import { createClient, createQuery } from 'urql';
 
 const client = createClient({
   url: 'https://my-host/graphql',
+  forwardSubscription(operation, observer) => {
+    observer.next({data: {}, error: null, operation}),
+    return { unsubscribe };
+  },
 });
 ```
 
@@ -27,6 +31,10 @@ const todoClient = client.createInstance({
   onChange: changed => {
     console.log('The following values changed: ', changed);
     myState = { ...myState, ...changed };
+  },
+  onSubscriptionUpdate: update => {
+    console.log('new data pushed from the server!', update);
+    myState = { ...myState, ...update };
   },
 });
 ```
@@ -55,6 +63,26 @@ In the example below, because we are using the default _cacheExchange_, the _Add
 const mutation = createMutation(AddTodo, args);
 
 todoClient.executeMutation(mutation);
+```
+
+### Executing a subscription
+
+Executing a subscription works in a similar way to executing a query.
+
+> Notice! In order to use subscriptions, your client needs to be configured with a `forwardSubscription` option.
+
+```jsx
+const subscription = createSubscription(TodoAdded, args);
+
+todoClient.executeSubscription(subscription);
+```
+
+**Unsubscribe**
+
+To unsubscribe from a subscription with your backend, pass the same subscription to the unsubscribe function.
+
+```jsx
+todoClient.executeUnsubscribeSubscription(subscription);
 ```
 
 ### Terminating the client

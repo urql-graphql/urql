@@ -11,8 +11,13 @@ import {
 } from 'wonka';
 
 import * as uuid from 'uuid';
-import { cacheExchange, dedupeExchange, fetchExchange } from '../exchanges';
-import { hashString } from '../lib';
+import {
+  cacheExchange,
+  dedupeExchange,
+  fetchExchange,
+  subscriptionExchange,
+} from '../exchanges';
+import { CombinedError, hashString } from '../lib';
 import {
   Client,
   ClientInstance,
@@ -22,7 +27,10 @@ import {
   ExchangeResult,
   Mutation,
   Operation,
+  OperationType,
   Query,
+  Subscription,
+  SubscriptionStreamUpdate,
 } from '../types';
 
 type SubscriptionMap = Map<string, () => void>;
@@ -33,6 +41,7 @@ const defaultExchanges = [dedupeExchange, cacheExchange, fetchExchange];
 export const createClient = (opts: ClientOptions): Client => {
   /** Cache of all instance subscriptions */
   const subscriptions = new Map<string, SubscriptionMap>();
+  const querySubscriptions = new Map<string, SubscriptionMap>();
 
   /** Main subject for emitting operations */
   const subject = makeSubject<Operation>();
@@ -56,9 +65,9 @@ export const createClient = (opts: ClientOptions): Client => {
 
   /** Convert a query to an operation type */
   const createOperation = (
-    type: string,
+    type: OperationType,
     query: Query,
-    force: boolean = false
+    options: object = {}
   ) => ({
     ...query,
     key: hashString(JSON.stringify(query)),
@@ -66,7 +75,8 @@ export const createClient = (opts: ClientOptions): Client => {
     context: {
       url: opts.url,
       fetchOptions,
-      force,
+      forwardSubscription: opts.forwardSubscription,
+      ...options,
     },
   });
 
@@ -79,19 +89,18 @@ export const createClient = (opts: ClientOptions): Client => {
     const id = uuid.v4();
 
     const getSubscriptions = () =>
-      subscriptions.has(id) ? subscriptions.get(id) : new Map();
+      subscriptions.has(id) ? subscriptions.get(id) : (new Map() as SubscriptionMap);
 
     const updateSubscriptions = (subs: SubscriptionMap) =>
       subscriptions.set(id, subs);
 
     const executeQuery = (query: Query, force?: boolean) => {
-      const operation = createOperation('query', query, force);
+      const operation = createOperation(OperationType.Query, query, { force });
 
       const outboundKey = `${operation.key}-out`;
       const inboundKey = `${operation.key}-in`;
 
-      const instanceSubscriptions = new Map(); // getSubscriptions();
-
+      const instanceSubscriptions = getSubscriptions();
       if (!instanceSubscriptions.has(outboundKey)) {
         /** Notify component when fetching query is occurring */
         const [outboundSub] = pipe(
@@ -104,8 +113,6 @@ export const createClient = (opts: ClientOptions): Client => {
       }
 
       if (!instanceSubscriptions.has(inboundKey)) {
-        // const inboundSub = () => {};
-
         /** Notify component when query operation has returned */
         const [inboundSub] = pipe(
           subject$,
@@ -127,23 +134,59 @@ export const createClient = (opts: ClientOptions): Client => {
     };
 
     const executeMutation = (query: Mutation) => {
-      const operation = createOperation('mutation', query);
+      const operation = createOperation(OperationType.Mutation, query);
+      executeOperation(operation);
+    };
 
-      /*
-      pipe(
-        subject[0],
-        take(1),
-        filter(incomingOp => incomingOp.key === operation.key),
-        subscribe(() => {})
-      );
-      */
+    const executeSubscription = (query: Subscription) => {
+      const operation = createOperation(OperationType.Subscription, query);
+      const subscriptionSubject = makeSubject<Operation>();
+
+      querySubscriptions.set(query.query, subscriptionSubject);
+
+      /** Notify component when subscription operation has been given a value */
+      subscriptionSubject
+        .pipe(
+          pipeExchanges(
+            opts.exchanges !== undefined ? opts.exchanges : defaultExchanges,
+            subject
+          )
+        )
+        .subscribe((response: SubscriptionStreamUpdate) => {
+          instanceOpts.onSubscriptionUpdate({
+            data: response.data.data,
+            error: Array.isArray(response.data.errors)
+              ? new CombinedError({
+                  graphQLErrors: response.data.errors,
+                  response,
+                })
+              : response.error,
+          });
+        });
 
       executeOperation(operation);
     };
 
-    const unsubscribe = () => {
-      const subs = getSubscriptions();
+    const executeUnsubscribeSubscription = (query: Subscription) => {
+      const operation = createOperation(OperationType.Subscription, query, {
+        unsubscribe: true,
+      });
 
+      // remove cached rx subscription
+      const activeSubscriptionSubject = querySubscriptions.get(query.query);
+
+      if (activeSubscriptionSubject !== undefined) {
+        querySubscriptions.delete(query.query);
+        executeOperation(operation);
+
+        // This removes the previous existence of a subscription from being part of the subject
+        // without this, any unsubscribe -> subscribe will have an n^2 effect.
+        activeSubscriptionSubject.unsubscribe();
+      }
+    };
+
+    const unsubscribe = () => {
+      const subs = getRxSubscriptions();
       if (subs === undefined) {
         return;
       }
@@ -154,6 +197,8 @@ export const createClient = (opts: ClientOptions): Client => {
     return {
       executeQuery,
       executeMutation,
+      executeSubscription,
+      executeUnsubscribeSubscription,
       unsubscribe,
     };
   };

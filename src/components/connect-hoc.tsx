@@ -8,6 +8,10 @@ export interface ConnectHOCProps<T> {
   query?: ConnectProps<T>['query'];
   /** A collection of GrahpQL mutation queries. */
   mutations?: ConnectProps<T>['mutations'];
+  /** A collection of GrahpQL subscription queries. */
+  subscriptions?: ConnectProps<T>['subscriptions'];
+  /** A collection of GrahpQL subscription queries. */
+  updateSubscription?: ConnectProps<T>['updateSubscription'];
 }
 
 /** A HOC alternative implementation to the [Connect]{@link Connect} component. */

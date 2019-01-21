@@ -1,4 +1,4 @@
-import { Source, Subject } from 'wonka';
+import { Source, Subject, Observer } from 'wonka';
 import { ClientState } from './components';
 import { CombinedError } from './lib';
 
@@ -13,12 +13,21 @@ export interface Query {
 /** A Graphql mutation. */
 export type Mutation = Query;
 
-/** A Graphql [query]{@link Query} or [mutation]{@link Mutation} accompanied with metadata. */
+/** A Graphql subscription. */
+export type Subscription = Query;
+
+export enum OperationType {
+  Subscription = 'subscription',
+  Query = 'query',
+  Mutation = 'mutation',
+}
+
+/** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
 export interface Operation extends Query {
   /** Unique identifier of the operation. */
   key: string;
   /** The type of Grapqhql operation being executed. */
-  operationName: string;
+  operationName: OperationType;
   /** Additional metadata passed to [exchange]{@link Exchange} functions. */
   context: {
     [key: string]: any;
@@ -75,6 +84,11 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
+  /** forwards a subscription to users transport library. Must return an unsubscribe handler */
+  forwardSubscription?: (
+    operation: Operation,
+    observable: Observer<ExchangeResult>
+  ) => { unsubscribe: () => void };
 }
 
 /** The URQL applicaiton-wide client library. */
@@ -89,6 +103,10 @@ export interface ClientInstance {
   executeQuery: (query: Query, force?: boolean) => void;
   /** Executes a given mutation. */
   executeMutation: (mutation: Mutation, force?: boolean) => void;
+  /** Executes a given mutation. */
+  executeSubscription: (subscription: Subscription) => void;
+  /** Executes an unsubscribe for a subscription. */
+  executeUnsubscribeSubscription: (subscription: Subscription) => void;
   /** Removes any [subscriptions]{@link Subscription} created by the client instance. */
   unsubscribe: () => void;
 }
@@ -103,10 +121,21 @@ export interface StreamUpdate {
   fetching: boolean;
 }
 
+/** A new response/update from the [client]{@link Client} subscription stream. */
+export interface SubscriptionStreamUpdate {
+  /** Any data returned from a [GraphQL]{@link GraphQL} query. */
+  data?: ExchangeResult['data'];
+  /** Any errors returned from a [GraphQL]{@link GraphQL} query. */
+  error?: ExchangeResult['error'];
+}
+
 /** Arguments for creating a client instance. */
 export interface CreateClientInstanceOpts {
   /** A callback function for when changes occur. */
   onChange: (data: StreamUpdate) => any;
+
+  /** A callback function for when subscriptions return new data. */
+  onSubscriptionUpdate: (data: SubscriptionStreamUpdate) => any;
 }
 
 /** An error from the GraphQL client. */

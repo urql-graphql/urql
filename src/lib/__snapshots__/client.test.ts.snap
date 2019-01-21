@@ -10,6 +10,8 @@ exports[`createInstance passes snapshot 1`] = `
 Object {
   "executeMutation": [Function],
   "executeQuery": [Function],
+  "executeSubscription": [Function],
+  "executeUnsubscribeSubscription": [Function],
   "unsubscribe": [Function],
 }
 `;
