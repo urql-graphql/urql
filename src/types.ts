@@ -2,64 +2,68 @@ import { Source, Subject, Observer } from 'wonka';
 import { ClientState } from './components';
 import { CombinedError } from './lib';
 
-/** A Graphql query. */
-export interface Query {
-  /** Graphql query string. */
+/** The type of GraphQL operation being executed. */
+export type OperationType =
+  | 'subscription'
+  | 'query'
+  | 'mutation'
+  | 'teardown';
+
+/** A Graphql query, mutation, or subscription. */
+export interface GraphQLRequest {
   query: string;
-  /** Graphql query variables. */
   variables?: object;
 }
 
-/** A Graphql mutation. */
-export type Mutation = Query;
+export type Query = GraphQLRequest;
+export type Mutation = GraphQLRequest;
+export type Subscription = GraphQLRequest;
 
-/** A Graphql subscription. */
-export type Subscription = Query;
-
-export enum OperationType {
-  Subscription = 'subscription',
-  Query = 'query',
-  Mutation = 'mutation',
+/** Additional metadata passed to [exchange]{@link Exchange} functions. */
+export interface OperationContext {
+  [key: string]: any;
+  fetchOptions?: RequestInit;
+  url: ClientOptions['url'];
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation extends Query {
+export interface Operation extends GraphQLRequest {
   /** Unique identifier of the operation. */
   key: string;
-  /** The type of Grapqhql operation being executed. */
   operationName: OperationType;
-  /** Additional metadata passed to [exchange]{@link Exchange} functions. */
-  context: {
-    [key: string]: any;
-    fetchOptions?: RequestInit;
-    url: ClientOptions['url'];
-  };
+  context: OperationContext;
 }
 
-/** Function responsible for listening for streamed [operations]{@link Operation}. */
-export type Exchange = (
-  args: {
-    /** Function to call the next [exchange]{@link Exchange} in the chain. */
-    forward: ExchangeIO;
-    /** Subject from which the stream of [operations]{@link Operation} is created. */
-    subject: Subject<Operation>;
-  }
-) => ExchangeIO;
-
-/** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
-export type ExchangeIO = (
-  /** A stream of operations. */
-  ops$: Source<Operation>
-) => Source<ExchangeResult>;
+// Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163/src/execution/execute.js#L105-L114
+export interface ExecutionResult {
+  errors?: Error[];
+  data?: any;
+}
 
 /** Resulting data from an [operation]{@link Operation}. */
 export interface ExchangeResult {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation;
   /** The data returned from the Graphql server. */
-  data: any;
+  data?: any;
   /** Any errors resulting from the operation. */
-  error?: Error | CombinedError;
+  error?: CombinedError;
+}
+
+/** Input parameters for to an Exchange factory function. */
+export interface ExchangeInput {
+  forward: ExchangeIO;
+  client: Client;
+}
+
+/** Function responsible for listening for streamed [operations]{@link Operation}. */
+export interface Exchange {
+  (input: ExchangeInput): ExchangeIO;
+}
+
+/** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
+export interface ExchangeIO {
+  (ops$: Source<Operation>): Source<ExchangeResult>;
 }
 
 /** The arguments for the child function of a connector. */
@@ -84,67 +88,14 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
-  /** forwards a subscription to users transport library. Must return an unsubscribe handler */
-  forwardSubscription?: (
-    operation: Operation,
-    observable: Observer<ExchangeResult>
-  ) => { unsubscribe: () => void };
 }
 
-/** The URQL applicaiton-wide client library. */
+/** The URQL applicaiton-wide client library. Each execute method starts a GraphQL request and
+ returns a stream of results. */
 export interface Client {
-  /** Creates a client instance for usage by stateful components. */
-  createInstance: (opts: CreateClientInstanceOpts) => ClientInstance;
-}
-
-/** An instance of a [client]{@link Client}. */
-export interface ClientInstance {
-  /** Executes a given query. */
-  executeQuery: (query: Query, force?: boolean) => void;
-  /** Executes a given mutation. */
-  executeMutation: (mutation: Mutation, force?: boolean) => void;
-  /** Executes a given mutation. */
-  executeSubscription: (subscription: Subscription) => void;
-  /** Executes an unsubscribe for a subscription. */
-  executeUnsubscribeSubscription: (subscription: Subscription) => void;
-  /** Removes any [subscriptions]{@link Subscription} created by the client instance. */
-  unsubscribe: () => void;
-}
-
-/** A new response/update from the [client]{@link Client} stream. */
-export interface StreamUpdate {
-  /** Any data returned from a [GraphQL]{@link GraphQL} query. */
-  data?: ExchangeResult['data'];
-  /** Any errors returned from a [GraphQL]{@link GraphQL} query. */
-  error?: ExchangeResult['error'];
-  /** Indicator of whether a query is being executed. */
-  fetching: boolean;
-}
-
-/** A new response/update from the [client]{@link Client} subscription stream. */
-export interface SubscriptionStreamUpdate {
-  /** Any data returned from a [GraphQL]{@link GraphQL} query. */
-  data?: ExchangeResult['data'];
-  /** Any errors returned from a [GraphQL]{@link GraphQL} query. */
-  error?: ExchangeResult['error'];
-}
-
-/** Arguments for creating a client instance. */
-export interface CreateClientInstanceOpts {
-  /** A callback function for when changes occur. */
-  onChange: (data: StreamUpdate) => any;
-
-  /** A callback function for when subscriptions return new data. */
-  onSubscriptionUpdate: (data: SubscriptionStreamUpdate) => any;
-}
-
-/** An error from the GraphQL client. */
-export interface GraphQLError {
-  message?: string;
-}
-
-// Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163d2e6c124107fa0971f6d838c8a7d29f51/src/execution/execute.js#L105-L114<Paste>
-export interface ExecutionResult {
-  errors?: Error[];
-  data?: any;
+  new (options: ClientOptions);
+  executeQuery: (query: Query) => Source<ExchangeResult>;
+  executeMutation: (mutation: Mutation) => Source<ExchangeResult>;
+  executeSubscription: (subscription: Subscription) => Source<ExchangeResult>;
+  reexecuteOperation: (operation: Operation) => void;
 }
