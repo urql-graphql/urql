@@ -1,13 +1,13 @@
 import {
   filter,
   makeSubject,
+  Operator,
   pipe,
-  publish,
   share,
   Source,
   Subject,
-  subscribe,
   take,
+  tapAll
 } from 'wonka';
 
 import { defaultExchanges } from '../exchanges';
@@ -21,8 +21,9 @@ import {
   Mutation,
   Operation,
   OperationContext,
-  OperationType,
   Query,
+  RequestOperation,
+  RequestOperationType,
   Subscription,
 } from '../types';
 
@@ -36,8 +37,11 @@ export interface ClientOptions {
   exchanges?: Exchange[];
 }
 
-/** The URQL application-wide client library. Each execute method starts a GraphQL request and
- returns a stream of results. */
+interface ActiveResultSources {
+  [operationKey: string]: Source<ExchangeResult>
+}
+
+/** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client implements ClientOptions {
   // These are variables derived from ClientOptions
   url: string;
@@ -48,6 +52,7 @@ export class Client implements ClientOptions {
   dispatchOperation: (operation: Operation) => void;
   operations$: Source<Operation>;
   results$: Source<ExchangeResult>;
+  activeResultSources = (Object.create(null) as ActiveResultSources);
 
   constructor(opts: ClientOptions) {
     this.url = opts.url;
@@ -73,40 +78,74 @@ export class Client implements ClientOptions {
     this.results$ = pipeExchanges(this, this.exchanges, this.operations$);
   }
 
-  createOperation = (
-    type: OperationType,
+  private createOperationContext = (opts?: Partial<OperationContext>): OperationContext => ({
+    url: this.url,
+    fetchOptions: this.fetchOptions,
+    ...opts
+  });
+
+  private createRequestOperation = (
+    type: RequestOperationType,
     query: GraphQLRequest,
-    context: Partial<OperationContext>
-  ): Operation => ({
+    opts: Partial<OperationContext>
+  ): RequestOperation => ({
     ...query,
     key: hashString(JSON.stringify(query)),
     operationName: type,
-    context: {
-      url: this.url,
-      fetchOptions: this.fetchOptions,
-      ...context
-    }
+    context: this.createOperationContext(opts)
   });
 
-  executeOperation(operation: Operation): Source<ExchangeResult> {
-    this.dispatchOperation(operation);
-    const isSpecificExchangeResult = filter((res: ExchangeResult) => res.operation.key === operation.key);
-
-    if (operation.operationName === 'mutation') {
-      return pipe(this.results$, isSpecificExchangeResult, take(1));
-    } else {
-      return pipe(this.results$, isSpecificExchangeResult);
-    }
+  /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
+  private teardownOperation(operation: RequestOperation) {
+    delete this.activeResultSources[operation.key];
+    this.dispatchOperation({
+      operationName: 'teardown',
+      context: this.createOperationContext()
+    });
   }
 
-  executeQuery = (query: Query, opts: Partial<OperationContext>): Source<ExchangeResult> =>
-    this.executeOperation(this.createOperation('query', query, opts));
+  /** Executes a RequestOperation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
+  executeRequestOperation(operation: RequestOperation): Source<ExchangeResult> {
+    const { key, operationName } = operation;
 
-  executeSubscription = (query: Subscription, opts: Partial<OperationContext>): Source<ExchangeResult> =>
-    this.executeOperation(this.createOperation('subscription', query, opts));
+    const operationResults$ = pipe(
+      this.results$,
+      filter(res => res.operation.key === key)
+    );
 
-  executeMutation = (query: Mutation, opts: Partial<OperationContext>): Source<ExchangeResult> =>
-    this.executeOperation(this.createOperation('mutation', query, opts));
+    if (operationName === 'mutation') {
+      // A mutation is always limited to just a single result and is never shared
+      return pipe(operationResults$, take(1));
+    } else if (key in this.activeResultSources) {
+      // Reuse active result observable when it's available
+      return this.activeResultSources[key];
+    }
+
+    return (this.activeResultSources[key] = pipe(
+      operationResults$,
+      tapAll<ExchangeResult>(
+        () => this.dispatchOperation(operation),
+        () => { /* noop */ },
+        () => this.teardownOperation(operation)
+      ),
+      share
+    ));
+  }
+
+  executeQuery = (query: Query, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+    const operation = this.createRequestOperation('query', query, opts);
+    return this.executeRequestOperation(operation);
+  };
+
+  executeSubscription = (query: Subscription, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+    const operation = this.createRequestOperation('subscription', query, opts);
+    return this.executeRequestOperation(operation);
+  };
+
+  executeMutation = (query: Mutation, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+    const operation = this.createRequestOperation('mutation', query, opts);
+    return this.executeRequestOperation(operation);
+  };
 }
 
 /** Create pipe of exchanges */

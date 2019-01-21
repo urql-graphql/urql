@@ -1,18 +1,22 @@
-import { Source, Subject, Observer } from 'wonka';
+import { Observer, Source, Subject } from 'wonka';
 import { ClientState } from './components';
-import { CombinedError } from './lib/error';
 import { Client } from './lib/client';
+import { CombinedError } from './lib/error';
 
-/** The type of GraphQL operation being executed. */
-export type OperationType =
+export type RequestOperationType =
   | 'subscription'
   | 'query'
-  | 'mutation'
+  | 'mutation';
+
+export type SignalOperationType =
   | 'teardown';
+
+/** The type of GraphQL operation being executed. */
+export type OperationType = RequestOperationType | SignalOperationType;
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
-  query: string;
+  query?: string;
   variables?: object;
 }
 
@@ -28,12 +32,20 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation extends GraphQLRequest {
+export interface RequestOperation extends GraphQLRequest {
   /** Unique identifier of the operation. */
   key: string;
-  operationName: OperationType;
+  operationName: RequestOperationType;
   context: OperationContext;
 }
+
+/** A signal with additional metadata that informs exchanges about specific events during transmission. */
+export interface SignalOperation {
+  operationName: SignalOperationType;
+  context: OperationContext;
+}
+
+export type Operation = RequestOperation | SignalOperation;
 
 // Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163/src/execution/execute.js#L105-L114
 export interface ExecutionResult {
@@ -44,7 +56,7 @@ export interface ExecutionResult {
 /** Resulting data from an [operation]{@link Operation}. */
 export interface ExchangeResult {
   /** The [operation]{@link Operation} which has been executed. */
-  operation: Operation;
+  operation: RequestOperation;
   /** The data returned from the Graphql server. */
   data?: any;
   /** Any errors resulting from the operation. */
@@ -58,14 +70,10 @@ export interface ExchangeInput {
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
-export interface Exchange {
-  (input: ExchangeInput): ExchangeIO;
-}
+export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
-export interface ExchangeIO {
-  (ops$: Source<Operation>): Source<ExchangeResult>;
-}
+export type ExchangeIO = (ops$: Source<Operation>) => Source<ExchangeResult>;
 
 /** The arguments for the child function of a connector. */
 export interface ChildArgs<MutationDeclarations> {
