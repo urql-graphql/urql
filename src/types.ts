@@ -3,20 +3,16 @@ import { ClientState } from './components';
 import { Client } from './lib/client';
 import { CombinedError } from './lib/error';
 
-export type RequestOperationType =
+/** The type of GraphQL operation being executed. */
+export type OperationType =
   | 'subscription'
   | 'query'
-  | 'mutation';
-
-export type SignalOperationType =
+  | 'mutation'
   | 'teardown';
-
-/** The type of GraphQL operation being executed. */
-export type OperationType = RequestOperationType | SignalOperationType;
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
-  query?: string;
+  query: string;
   variables?: object;
 }
 
@@ -32,20 +28,12 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface RequestOperation extends GraphQLRequest {
+export interface Operation extends GraphQLRequest {
   /** Unique identifier of the operation. */
   key: string;
-  operationName: RequestOperationType;
+  operationName: OperationType;
   context: OperationContext;
 }
-
-/** A signal with additional metadata that informs exchanges about specific events during transmission. */
-export interface SignalOperation {
-  operationName: SignalOperationType;
-  context: OperationContext;
-}
-
-export type Operation = RequestOperation | SignalOperation;
 
 // Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163/src/execution/execute.js#L105-L114
 export interface ExecutionResult {
@@ -56,7 +44,7 @@ export interface ExecutionResult {
 /** Resulting data from an [operation]{@link Operation}. */
 export interface ExchangeResult {
   /** The [operation]{@link Operation} which has been executed. */
-  operation: RequestOperation;
+  operation: Operation;
   /** The data returned from the Graphql server. */
   data?: any;
   /** Any errors resulting from the operation. */

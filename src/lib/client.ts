@@ -21,9 +21,8 @@ import {
   Mutation,
   Operation,
   OperationContext,
+  OperationType,
   Query,
-  RequestOperation,
-  RequestOperationType,
   Subscription,
 } from '../types';
 
@@ -40,6 +39,8 @@ export interface ClientOptions {
 interface ActiveResultSources {
   [operationKey: string]: Source<ExchangeResult>
 }
+
+export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client implements ClientOptions {
@@ -85,10 +86,10 @@ export class Client implements ClientOptions {
   });
 
   private createRequestOperation = (
-    type: RequestOperationType,
+    type: OperationType,
     query: GraphQLRequest,
     opts: Partial<OperationContext>
-  ): RequestOperation => ({
+  ): Operation => ({
     ...query,
     key: hashString(JSON.stringify(query)),
     operationName: type,
@@ -96,16 +97,13 @@ export class Client implements ClientOptions {
   });
 
   /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
-  private teardownOperation(operation: RequestOperation) {
+  private teardownOperation(operation: Operation) {
     delete this.activeResultSources[operation.key];
-    this.dispatchOperation({
-      operationName: 'teardown',
-      context: this.createOperationContext()
-    });
+    this.dispatchOperation({ ...operation, operationName: 'teardown' });
   }
 
-  /** Executes a RequestOperation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation(operation: RequestOperation): Source<ExchangeResult> {
+  /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
+  executeRequestOperation(operation: Operation): Source<ExchangeResult> {
     const { key, operationName } = operation;
 
     const operationResults$ = pipe(
@@ -131,6 +129,14 @@ export class Client implements ClientOptions {
       share
     ));
   }
+
+  reexecuteOperation = (operation: Operation) => {
+    // Reexecute operation only if any subscribers are still subscribed to the
+    // operation's exchange results
+    if (this.activeResultSources[operation.key] !== undefined) {
+      this.dispatchOperation(operation);
+    }
+  };
 
   executeQuery = (query: Query, opts: Partial<OperationContext>): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('query', query, opts);
