@@ -1,6 +1,7 @@
 import { Source, Subject, Observer } from 'wonka';
 import { ClientState } from './components';
-import { CombinedError } from './lib';
+import { CombinedError } from './lib/error';
+import { Client } from './lib/client';
 
 /** The type of GraphQL operation being executed. */
 export type OperationType =
@@ -23,7 +24,7 @@ export type Subscription = GraphQLRequest;
 export interface OperationContext {
   [key: string]: any;
   fetchOptions?: RequestInit;
-  url: ClientOptions['url'];
+  url: string;
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
@@ -78,24 +79,4 @@ export interface ChildArgs<MutationDeclarations> {
   mutations: ClientState<MutationDeclarations>['mutations'];
   /** Trigger a fetch of the pre-specified [query]{@link Query}. */
   refetch: (noCache?: boolean) => void;
-}
-
-/** Options for configuring the URQL [client]{@link Client}. */
-export interface ClientOptions {
-  /** Target endpoint URL such as `https://my-target:8080/graphql`. */
-  url: string;
-  /** Any additional options to pass to fetch. */
-  fetchOptions?: RequestInit | (() => RequestInit);
-  /** An ordered array of Exchanges. */
-  exchanges?: Exchange[];
-}
-
-/** The URQL applicaiton-wide client library. Each execute method starts a GraphQL request and
- returns a stream of results. */
-export interface Client {
-  new (options: ClientOptions);
-  executeQuery: (query: Query) => Source<ExchangeResult>;
-  executeMutation: (mutation: Mutation) => Source<ExchangeResult>;
-  executeSubscription: (subscription: Subscription) => Source<ExchangeResult>;
-  reexecuteOperation: (operation: Operation) => void;
 }
