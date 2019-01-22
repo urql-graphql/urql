@@ -11,10 +11,10 @@ const FeatureCard = styled.div`
   width: 100%;
   @media (min-width: 768px) {
     margin: 0;
-    width: calc(1/3 * 100% - (1 - 1/3) * 40px);
+    width: calc(1 / 3 * 100% - (1 - 1 / 3) * 40px);
   }
   @media (min-width: 1024px) {
-    width: calc(1/3 * 100% - (1 - 1/3) * 80px);
+    width: calc(1 / 3 * 100% - (1 - 1 / 3) * 80px);
   }
 `;
 
@@ -33,15 +33,13 @@ class Features extends React.Component {
     return (
       <Wrapper>
         <SectionTitle>Features</SectionTitle>
-        {this.props.featureArray.map(feature => {
-          return (
-            <FeatureCard key={feature.title}>
-              <img src={feature.icon} />
-              <SecondaryTitle>{feature.title}</SecondaryTitle>
-              <BodyCopy>{feature.description}</BodyCopy>
-            </FeatureCard>
-          );
-        })}
+        {this.props.featureArray.map(feature => (
+          <FeatureCard key={feature.title}>
+            <img src={feature.icon} />
+            <SecondaryTitle>{feature.title}</SecondaryTitle>
+            <BodyCopy>{feature.description}</BodyCopy>
+          </FeatureCard>
+        ))}
       </Wrapper>
     );
   }

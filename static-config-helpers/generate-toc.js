@@ -7,7 +7,7 @@ const path = process.argv[2];
 
 remark()
   .use(toc)
-  .process(toVfile.readSync(path), function(err, file) {
+  .process(toVfile.readSync(path), (err, file) => {
     if (err) throw err;
     // toVfile also has a write method but it has a different input signature and options we don't need...
     fs.writeFile(path, String(file), err => {

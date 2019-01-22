@@ -6,8 +6,8 @@ import { Button } from "../../components/button";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
-const OutterWrapper = styled.div`
-  background: #FC6986;
+const OuterWrapper = styled.div`
+  background: #fc6986;
   border-bottom: 1rem solid rgba(0, 0, 0, 0.4);
   box-shadow: inset 0 -1rem 0 rgba(0, 0, 0, 0.2);
 `;
@@ -17,13 +17,13 @@ class GetStarted extends React.Component {
     const { getStartedObj } = this.props;
 
     return (
-      <OutterWrapper>
+      <OuterWrapper>
         <Wrapper>
           <SectionTitle>Get Started</SectionTitle>
           <BodyCopy>{getStartedObj.description}</BodyCopy>
           <Button href={getStartedObj.link}>Documentation</Button>
         </Wrapper>
-      </OutterWrapper>
+      </OuterWrapper>
     );
   }
 }

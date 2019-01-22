@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import bgImg from '../../static/bg_mountains_gray.jpg';
+import bgImg from "../../static/bg_mountains_gray.jpg";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
@@ -8,7 +8,7 @@ import { SecondaryTitle } from "../../components/secondary-title";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
-const OutterWrapper = styled.div`
+const OuterWrapper = styled.div`
   background: #414141 url(${bgImg}) no-repeat center bottom;
   background-size: cover;
   color: white;
@@ -22,7 +22,7 @@ const OSSCard = styled.div`
   text-align: left;
   width: 100%;
   @media (min-width: 768px) {
-    width: calc(1/2 * 100% - (1 - 1/2) * 80px);
+    width: calc(1 / 2 * 100% - (1 - 1 / 2) * 80px);
   }
   @media (min-width: 1024px) {
     padding-left: 17rem;
@@ -30,7 +30,7 @@ const OSSCard = styled.div`
 `;
 
 const OSSImage = styled.img`
-  left:0;
+  left: 0;
   position: absolute;
   top: 2rem;
   width: 8rem;
@@ -42,7 +42,7 @@ const OSSImage = styled.img`
 class MoreOSS extends React.Component {
   render() {
     return (
-      <OutterWrapper>
+      <OuterWrapper>
         <Wrapper>
           <SectionTitle>More Open Source from Formidable</SectionTitle>
           {this.props.ossArray.map(card => (
@@ -52,9 +52,11 @@ class MoreOSS extends React.Component {
               <BodyCopy>{card.description}</BodyCopy>
             </OSSCard>
           ))}
-          <Button light href="#">View All</Button>
+          <Button light href="#">
+            View All
+          </Button>
         </Wrapper>
-      </OutterWrapper>
+      </OuterWrapper>
     );
   }
 }

@@ -1,14 +1,14 @@
 import styled from "styled-components";
 
 export const Button = styled.a`
-  background: ${props => props.light ? "white" : "#202020"};
-  color: ${props => props.light ? "#202020" : "white"};
+  background: ${props => (props.light ? "white" : "#202020")};
+  color: ${props => (props.light ? "#202020" : "white")};
   display: block;
   font-size: 1.5rem;
   height: 4rem;
   letter-spacing: 0.05em;
   line-height: 4rem;
-  margin: ${props => props.noMargin ? "0" : "5rem auto 3rem"};
+  margin: ${props => (props.noMargin ? "0" : "5rem auto 3rem")};
   max-width: 21rem;
   min-width: 10rem;
   text-align: center;
@@ -16,7 +16,7 @@ export const Button = styled.a`
   transition: background 0.4s;
   width: 100%;
   &:hover {
-    background: ${props => props.light ? "#999" : "#333"};
+    background: ${props => (props.light ? "#999" : "#333")};
   }
   &:active {
     opacity: 0.6;

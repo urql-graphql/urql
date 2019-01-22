@@ -129,7 +129,7 @@ class Sidebar extends React.Component {
           this.props.sidebarHeaders.map(sh => (
             <Link
               to={`/docs${sh.path}`}
-              replace={true}
+              replace
               key={sh.title.split(" ").join("_")}
             >
               {sh.title}

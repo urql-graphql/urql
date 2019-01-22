@@ -3,7 +3,7 @@ import { Wrapper } from "./wrapper";
 import styled from "styled-components";
 
 const Container = styled.footer`
-  background: #1F1F1F;
+  background: #1f1f1f;
   color: white;
   display: flex;
   flex-direction: column;
@@ -58,13 +58,31 @@ export const Footer = () => (
   <Container>
     <Wrapper noPadding>
       <FooterLeft>
-        <FooterLogo src="../static/svgs/logo_formidable_white.svg" alt="Formidable Logo" />
+        <FooterLogo
+          src="../static/svgs/logo_formidable_white.svg"
+          alt="Formidable Logo"
+        />
         <FooterLinks>
-          <li><a href="#" title="Contact">Contact</a></li>
-          <li><a href="#" title="Careers">Careers</a></li>
+          <li>
+            <a href="#" title="Contact">
+              Contact
+            </a>
+          </li>
+          <li>
+            <a href="#" title="Careers">
+              Careers
+            </a>
+          </li>
         </FooterLinks>
       </FooterLeft>
-      <FooterDescription>A little blurb about Formidable. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</FooterDescription>
+      <FooterDescription>
+        A little blurb about Formidable. Lorem ipsum dolor sit amet, consectetur
+        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+        in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+        pariatur.
+      </FooterDescription>
     </Wrapper>
   </Container>
 );

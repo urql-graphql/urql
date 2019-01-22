@@ -5,8 +5,8 @@ import { BodyCopy } from "../../components/body-copy";
 import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
-const OutterWrapper = styled.div`
-  background: #F3F3F3;
+const OuterWrapper = styled.div`
+  background: #f3f3f3;
 `;
 
 class Preview extends React.Component {
@@ -14,12 +14,12 @@ class Preview extends React.Component {
     const { previewObj } = this.props;
 
     return (
-      <OutterWrapper>
+      <OuterWrapper>
         <Wrapper>
           <SectionTitle>Code Preview</SectionTitle>
           <BodyCopy>{previewObj.description}</BodyCopy>
         </Wrapper>
-      </OutterWrapper>
+      </OuterWrapper>
     );
   }
 }

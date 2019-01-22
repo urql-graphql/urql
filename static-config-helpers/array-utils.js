@@ -1,7 +1,5 @@
 function flatten(arr) {
-  return arr.reduce(function(a, b) {
-    return a.concat(b);
-  }, []);
+  return arr.reduce((a, b) => a.concat(b), []);
 }
 
 module.exports = {

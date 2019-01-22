@@ -26,3 +26,22 @@ export const NavigationTagline = styled.p`
     text-transform: uppercase;
   }
 `;
+
+export const SidebarNavItem = styled.div`
+  color: white;
+  font-size: 1.6rem;
+  margin-left: 5rem;
+  @media (min-width: 1024px) {
+    font-size: 1.8rem;
+  }
+`;
+
+export const SidebarNavSubItem = styled.div`
+  color: white;
+  font-size: 1.6rem;
+  margin-left: 7rem;
+  margin-top: 1rem;
+  @media (min-width: 1024px) {
+    font-size: 1.4rem;
+  }
+`;

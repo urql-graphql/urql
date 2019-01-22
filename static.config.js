@@ -26,7 +26,7 @@ export default {
       {
         path: "/docs",
         component: "src/screens/docs"
-      },
+      }
     ];
   },
   webpack: staticWebpackConfig,

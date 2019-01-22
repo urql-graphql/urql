@@ -1,7 +1,7 @@
 import React from "react";
 import { BounceAnimation } from "../../components/bounce-animation";
 import { Button } from "../../components/button";
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
@@ -64,7 +64,7 @@ const HeroLogo = styled.img`
 `;
 
 const HeroCopyLink = styled.p`
-  background: #D5D5D5;
+  background: #d5d5d5;
   color: #3b3b3b;
   display: flex;
   flex-direction: row;
@@ -115,47 +115,74 @@ const HeroNavList = styled.ul`
   }
 `;
 
-
 class Hero extends React.Component {
-  state = {
-    animating: false,
-    copied: false
+  constructor() {
+    super(...arguments);
+
+    this.state = {
+      animating: false,
+      copied: false
+    };
   }
 
   handleCopy = e => {
     e.preventDefault();
     this.setState({ animating: true, copied: true });
-    setTimeout(() => { this.setState({ animating: false }) }, 100);
-    setTimeout(() => { this.setState({ copied: false }) }, 3000);
-  }
+    setTimeout(() => {
+      this.setState({ animating: false });
+    }, "100");
+    setTimeout(() => {
+      this.setState({ copied: false });
+    }, "3000");
+  };
 
   render() {
-    return(
+    return (
       <Wrapper noPadding>
         <HeroContent>
-          <HeroLogo src="./static/svgs/logo_spectacle_raised.svg" alt="Formidable Logo" />
+          <HeroLogo
+            src="./static/svgs/logo_spectacle_raised.svg"
+            alt="Formidable Logo"
+          />
           <HeroTitle>Spectacle</HeroTitle>
-          <HeroBody>A React.js based library for creating sleek presentations using JSX syntax that gives you the ability to live demo your code.</HeroBody>
-            <CopyToClipboard text="npm install spectacle">
-              <HeroCopyLink onClick={e => this.handleCopy(e)}>
-                <HeroCopyText>npm install spectacle</HeroCopyText>
-                <Button light noMargin href="#">
+          <HeroBody>
+            A React.js based library for creating sleek presentations using JSX
+            syntax that gives you the ability to live demo your code.
+          </HeroBody>
+          <CopyToClipboard text="npm install spectacle">
+            <HeroCopyLink onClick={e => this.handleCopy(e)}>
+              <HeroCopyText>npm install spectacle</HeroCopyText>
+              <Button light noMargin href="#">
                 <BounceAnimation bouncing={this.state.animating}>
-                    {
-                      (this.state.copied)
-                        ? "Copied"
-                        : "Copy"
-                    }
-                  </BounceAnimation>
-                </Button>
-              </HeroCopyLink>
-            </CopyToClipboard>
-          <Button light noMargin href="#">Documentation</Button>
+                  {this.state.copied ? "Copied" : "Copy"}
+                </BounceAnimation>
+              </Button>
+            </HeroCopyLink>
+          </CopyToClipboard>
+          <Button light noMargin href="#">
+            Documentation
+          </Button>
         </HeroContent>
         <HeroNavList>
-          <li><Link to="/docs/">Docs</Link></li>
-          <li><a title="Issues" href="https://www.github.com/FormidableLabs/spectacle/issues">Issues</a></li>
-          <li><a title="GitHub" href="https://github.com/FormidableLabs/spectacle">GitHub</a></li>
+          <li>
+            <Link to="/docs/">Docs</Link>
+          </li>
+          <li>
+            <a
+              title="Issues"
+              href="https://www.github.com/FormidableLabs/spectacle/issues"
+            >
+              Issues
+            </a>
+          </li>
+          <li>
+            <a
+              title="GitHub"
+              href="https://github.com/FormidableLabs/spectacle"
+            >
+              GitHub
+            </a>
+          </li>
         </HeroNavList>
       </Wrapper>
     );

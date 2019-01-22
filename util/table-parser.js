@@ -1,5 +1,5 @@
-const _ = require("lodash");
-const parser = require("remark");
+// const _ = require("lodash");
+// const parser = require("remark");
 
 // Not worth using as it's old + misses edge cases, but an interesting reference: https://github.com/vzaccaria/mdtable2json
 // function tableToJson(t) {

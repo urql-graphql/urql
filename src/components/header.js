@@ -1,6 +1,6 @@
 import React from "react";
 import Hero from "../screens/home/hero";
-import bgImg from '../static/bg_hero_gray.jpg';
+import bgImg from "../static/bg_hero_gray.jpg";
 import styled from "styled-components";
 import { Navigation, NavigationTagline } from "./navigation";
 import { Wrapper } from "./wrapper";
@@ -14,16 +14,17 @@ const Container = styled.header`
   width: 100%;
 `;
 
-export const Header = () => {
-  return(
-    <Container>
-      <Navigation>
-        <Wrapper noPadding>
-          <NavigationTagline>Lovingly created by</NavigationTagline>
-          <img src="./static/svgs/logo_formidable_white.svg" alt="Formidable Logo" />
-        </Wrapper>
-      </Navigation>
-      <Hero />
-    </Container>
-  )
-}
+export const Header = () => (
+  <Container>
+    <Navigation>
+      <Wrapper noPadding>
+        <NavigationTagline>Lovingly created by</NavigationTagline>
+        <img
+          src="./static/svgs/logo_formidable_white.svg"
+          alt="Formidable Logo"
+        />
+      </Wrapper>
+    </Navigation>
+    <Hero />
+  </Container>
+);
