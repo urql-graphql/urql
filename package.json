@@ -1,7 +1,7 @@
 {
   "name": "urql",
   "version": "0.3.0-next1",
-  "description": "A naive React Graphql library",
+  "description": "A highly customizable and versatile GraphQL client for React",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
   "module": "dist/index.es.js",
@@ -19,7 +19,7 @@
     "bundlesize": "bundlesize",
     "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\""
   },
-  "author": "Ken Wheeler",
+  "author": "Formidable",
   "license": "MIT",
   "jest": {
     "setupFiles": [
@@ -65,16 +65,16 @@
   },
   "bundlesize": [
     {
-      "path": "./dist/index.mjs",
+      "path": "./dist/index.es.js",
       "maxSize": "8 kB"
     }
   ],
   "devDependencies": {
     "@types/enzyme": "^3.1.15",
-    "@types/graphql": "^14.0.3",
+    "@types/graphql": "^14.0.5",
     "@types/jest": "^23.3.9",
-    "@types/react": "^16.0.34",
-    "@types/react-dom": "^16.0.3",
+    "@types/react": "^16.7.20",
+    "@types/react-dom": "^16.0.11",
     "apollo-server-express": "^2.3.1",
     "awesome-typescript-loader": "^5.2.1",
     "builder": "^3.2.3",
@@ -85,19 +85,20 @@
     "enzyme-adapter-react-16": "^1.7.0",
     "enzyme-to-json": "^3.3.5",
     "express": "^4.16.2",
+    "graphql": "^14.0.2",
     "graphql-playground-middleware-express": "^1.7.8",
     "graphql-subscriptions": "^1.0.0",
     "husky": "^1.2.0",
     "isomorphic-fetch": "^2.2.1",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
-    "microbundle": "^0.7.0",
+    "microbundle": "^0.9.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.15.2",
     "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
+    "react": "^16.7.0",
     "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.0.0-0",
+    "react-dom": "^16.7.0",
     "react-test-renderer": "^16.2.0",
     "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
@@ -112,13 +113,12 @@
     "webpack-dev-server": "^3.1.10"
   },
   "peerDependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
-    "react-dom": "^16.0.0-0"
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "react": "^15.0.0 || ^16.0.0",
+    "react-dom": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
     "create-react-context": "^0.2.3",
-    "graphql": "^14.0.2",
     "wonka": "^1.4.3"
   },
   "sideEffects": false
