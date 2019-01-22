@@ -20,7 +20,7 @@ export const Header = () => (
       <Wrapper noPadding>
         <NavigationTagline>Lovingly created by</NavigationTagline>
         <img
-          src="./static/svgs/logo_formidable_white.svg"
+          src="../static/svgs/logo_formidable_white.svg"
           alt="Formidable Logo"
         />
       </Wrapper>

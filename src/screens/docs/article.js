@@ -6,20 +6,27 @@ import { H1, H2, H3, H4, H5, H6, P } from "../../components/article-typography";
 const Container = styled.article`
   max-width: 80rem;
   min-height: 100vh;
-  padding: 4rem 2rem;
+  padding: 2rem 4rem;
   width: 100%;
   @media (min-width: 768px) {
-    padding: 8rem 5rem;
+    padding: 3rem 10rem;
   }
+`;
+
+const DocsTitle = styled.h2`
+  font-size: 3.5rem;
+  flex: auto;
+  line-height: 1.3;
+  width: 100%;
+  letter-spacing: 0.5rem;
 `;
 
 class Article extends React.Component {
   render() {
-    // const { getStartedObj } = this.props;
-
     return (
       <Container>
-        <H1>Getting Started (H1)</H1>
+        <DocsTitle>SPECTACLE</DocsTitle>
+        <H1>Get Started</H1>
         <H2>Title (H2)</H2>
         <H3>Title (H3)</H3>
         <H4>Title (H4)</H4>

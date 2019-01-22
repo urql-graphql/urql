@@ -28,7 +28,7 @@ export const GlobalStyle = createGlobalStyle`
   body {
     background: #fff;
     color: #3b3b3b;
-    font-family: "akkurat", sans-serrif;
+    font-family: "akkurat", sans-serif;
     font-size: 1.3rem;
     letter-spacing: -0.03em;
     margin: 0;

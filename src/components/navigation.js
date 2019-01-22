@@ -20,7 +20,7 @@ export const NavigationTagline = styled.p`
   display: none;
   @media (min-width: 768px) {
     display: block;
-    color: white;
+    color: "white"
     line-height: 3.2rem;
     margin: 0 1rem 0 auto;
     text-transform: uppercase;
@@ -29,19 +29,19 @@ export const NavigationTagline = styled.p`
 
 export const SidebarNavItem = styled.div`
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   margin-left: 5rem;
   @media (min-width: 1024px) {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 `;
 
 export const SidebarNavSubItem = styled.div`
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   margin-left: 7rem;
   margin-top: 1rem;
   @media (min-width: 1024px) {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 `;

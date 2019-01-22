@@ -141,7 +141,7 @@ class Hero extends React.Component {
       <Wrapper noPadding>
         <HeroContent>
           <HeroLogo
-            src="./static/svgs/logo_spectacle_raised.svg"
+            src="../../static/svgs/logo_spectacle_raised.svg"
             alt="Formidable Logo"
           />
           <HeroTitle>Spectacle</HeroTitle>
