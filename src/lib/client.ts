@@ -10,7 +10,7 @@ import {
   tapAll
 } from 'wonka';
 
-import { defaultExchanges } from '../exchanges';
+import { composeExchanges, defaultExchanges } from '../exchanges';
 import { CombinedError } from './error';
 import { hashString } from './hash';
 
@@ -76,7 +76,7 @@ export class Client implements ClientOptions {
 
     // All operations run through the exchanges in a pipeline-like fashion
     // and this observable then combines all their results
-    this.results$ = pipeExchanges(this, this.exchanges, this.operations$);
+    this.results$ = share(composeExchanges(this, this.exchanges)(this.operations$));
   }
 
   private createOperationContext = (opts?: Partial<OperationContext>): OperationContext => ({
@@ -153,25 +153,3 @@ export class Client implements ClientOptions {
     return this.executeRequestOperation(operation);
   };
 }
-
-/** Create pipe of exchanges */
-const pipeExchanges = (
-  client: Client,
-  exchanges: Exchange[],
-  operation$: Source<Operation>
-): Source<ExchangeResult> => {
-  /** Recursively pipe to each exchange */
-  const callExchanges = (value: Source<Operation>, index: number = 0) => {
-    if (index >= exchanges.length) {
-      return value;
-    }
-
-    const currentExchange = exchanges[index];
-    return currentExchange({
-      forward: val => callExchanges(val, index + 1),
-      client,
-    })(value);
-  };
-
-  return share(callExchanges(operation$, 0));
-};
