@@ -83,17 +83,17 @@ const createFetchSource = (operation: Operation) => {
   });
 };
 
-const executeFetch = async (operation: Operation, opts: RequestInit) => {
+const executeFetch = (operation: Operation, opts: RequestInit) => {
   let response: Response | undefined;
+  const { url } = operation.context;
 
-  try {
-    const { url } = operation.context;
-    response = await fetch(url, opts);
-
-    checkStatus(opts.redirect, response);
-    const result = await response.json();
-
-    return {
+  return fetch(url, opts)
+    .then(res => {
+    response = res;
+      checkStatus(opts.redirect, response);
+      return response.json();
+    })
+    .then(result => ({
       operation,
       data: result.data,
       error: Array.isArray(result.errors)
@@ -102,21 +102,21 @@ const executeFetch = async (operation: Operation, opts: RequestInit) => {
             response,
           })
         : undefined,
-    };
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      return undefined;
-    }
+    }))
+    .catch(err => {
+      if (err.name === 'AbortError') {
+        return undefined;
+      }
 
-    return {
-      operation,
-      data: undefined,
-      error: new CombinedError({
-        networkError: err,
-        response,
-      }),
-    };
-  }
+      return {
+        operation,
+        data: undefined,
+        error: new CombinedError({
+          networkError: err,
+          response,
+        }),
+      };
+    });
 };
 
 const checkStatus = (redirectMode: string = 'follow', response: Response) => {
