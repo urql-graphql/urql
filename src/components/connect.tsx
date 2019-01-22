@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { ChildArgs, Client, Mutation, Query, Subscription } from '../types';
 import { UrqlClient } from './client';
-import { ContextConsumer } from './context';
+import { Consumer } from './context';
 
 /** Props for the [Connect]{@link Connect} component. */
 export interface ConnectProps<T> {
@@ -24,7 +24,7 @@ export interface ConnectProps<T> {
 /** Component for connecting to the urql client for executing queries, mutations and returning the result to child components. */
 export const Connect = function<T>(props: ConnectProps<T>) {
   return (
-    <ContextConsumer>
+    <Consumer>
       {client => (
         <UrqlClient
           client={client}
@@ -35,6 +35,6 @@ export const Connect = function<T>(props: ConnectProps<T>) {
           updateSubscription={props.updateSubscription}
         />
       )}
-    </ContextConsumer>
+    </Consumer>
   );
 };
