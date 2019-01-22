@@ -1,6 +1,8 @@
-import { fromValue, makeSubject, merge, never, pipe, subscribe, toPromise } from 'wonka';
+import { empty, fromValue, makeSubject, merge, never, pipe, Source, subscribe, toPromise } from 'wonka';
+
+import { Client } from '../lib/client';
 import { queryOperation, subscriptionOperation } from '../test-utils';
-import { Exchange } from '../types';
+import { Exchange, ExchangeResult } from '../types';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -35,9 +37,9 @@ const response = {
 };
 
 const exchangeArgs = {
-  forward: jest.fn(),
-  subject: makeSubject(),
-} as any;
+  forward: () => (empty as Source<ExchangeResult>),
+  client: ({} as Client)
+};
 
 it('should return response data from fetch', async () => {
   fetch.mockResolvedValue({
@@ -67,20 +69,6 @@ it('should return error data from fetch', async () => {
   );
 
   expect(data).toMatchSnapshot();
-});
-
-it('should throw error when operationName is subscription', async () => {
-  try {
-    await pipe(
-      fromValue(subscriptionOperation),
-      fetchExchange(exchangeArgs),
-      toPromise
-    );
-
-    fail();
-  } catch (err) {
-    expect(err).toMatchSnapshot();
-  }
 });
 
 it('should call cancel when the Observable is cancelled', () => {
