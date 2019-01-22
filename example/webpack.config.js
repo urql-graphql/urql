@@ -1,13 +1,15 @@
 const path = require('path');
 
 module.exports = {
-  entry: ['./src/app/index.tsx'],
+  entry: './src/app/index.tsx',
+  context: __dirname,
   output: {
-    path: path.resolve(__dirname, 'webpack-build'),
+    path: path.resolve(__dirname, '.build'),
     filename: 'bundle.js',
     publicPath: '/assets/',
   },
   mode: 'development',
+  target: 'web',
   module: {
     rules: [
       {
@@ -28,17 +30,12 @@ module.exports = {
       },
     ],
   },
-  context: __dirname,
   resolve: {
-    modules: [
-      'node_modules',
-      path.resolve(__dirname, '../src'),
-      path.resolve(__dirname, 'src/app'),
-    ],
-    extensions: ['.js', '.ts', '.tsx', '.json', '.jsx', '.css'],
+    alias: {
+      urql: path.resolve(__dirname, '../')
+    },
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
-  devtool: 'source-map',
-  target: 'web',
   stats: 'errors-only',
   devServer: {
     allowedHosts: ['app'],

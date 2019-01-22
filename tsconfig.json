@@ -3,7 +3,7 @@
     "esModuleInterop": true,
     "rootDir": "./src",
     "baseUrl": ".",
-    "outDir": "dist",
+    "outDir": "lib",
     "lib": [
       "es2015",
       "es2017.object",

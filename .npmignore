@@ -1,9 +1,7 @@
-/*
-!/lib
-!/es
-!/types
-**/tests/
+test-utils/
+lib/**/*.js
+lib/**/*.jsx
 **/*.test.js
-!package.json
-!LICENSE.md
-!README.md
+**/*.test.jsx
+**/*.test.ts
+**/*.test.tsx

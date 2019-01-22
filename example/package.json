@@ -1,0 +1,31 @@
+{
+  "name": "@urql/example",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start:server": "node ./src/server/index.js",
+    "start:client": "webpack-dev-server --hot --inline",
+    "start": "run-p start:server start:client"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^3.1.6",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.3.1",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "graphql": "^14.1.1",
+    "graphql-playground-middleware-express": "^1.7.8",
+    "graphql-subscriptions": "^1.0.0",
+    "isomorphic-fetch": "^2.2.1",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "subscriptions-transport-ws": "^0.9.15"
+  }
+}
