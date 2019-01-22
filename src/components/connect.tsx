@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
-import { ChildArgs, Client, Mutation, Query, Subscription } from '../types';
+import { Client } from '../lib/client';
+import { ChildArgs, Mutation, Query, Subscription } from '../types';
 import { UrqlClient } from './client';
 import { Consumer } from './context';
 
@@ -12,29 +13,16 @@ export interface ConnectProps<T> {
   /** A collection of GrahpQL mutation queries */
   mutations?: { [type in keyof T]: Mutation };
   /** An array of GrahpQL subscription queries */
-  subscriptions?: Subscription[];
+  subscription?: Subscription;
   /** An updator function for merging subscription responses */
-  updateSubscription?: (
-    type: string,
-    prev: object | null,
-    next: object | null
-  ) => object | null;
+  updateSubscription?: <Data, Update>(prev: Data, next: Update) => Data;
 }
 
 /** Component for connecting to the urql client for executing queries, mutations and returning the result to child components. */
-export const Connect = function<T>(props: ConnectProps<T>) {
+export function Connect<T>(props: ConnectProps<T>) {
   return (
     <Consumer>
-      {client => (
-        <UrqlClient
-          client={client}
-          children={props.children}
-          query={props.query}
-          mutations={props.mutations}
-          subscriptions={props.subscriptions}
-          updateSubscription={props.updateSubscription}
-        />
-      )}
+      {client => <UrqlClient {...props} client={client} />}
     </Consumer>
   );
-};
+}

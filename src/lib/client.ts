@@ -88,7 +88,7 @@ export class Client implements ClientOptions {
   private createRequestOperation = (
     type: OperationType,
     query: GraphQLRequest,
-    opts: Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): Operation => ({
     ...query,
     key: hashString(JSON.stringify(query)),
@@ -138,17 +138,17 @@ export class Client implements ClientOptions {
     }
   };
 
-  executeQuery = (query: Query, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeQuery = (query: Query, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('query', query, opts);
     return this.executeRequestOperation(operation);
   };
 
-  executeSubscription = (query: Subscription, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeSubscription = (query: Subscription, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
   };
 
-  executeMutation = (query: Mutation, opts: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeMutation = (query: Mutation, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };

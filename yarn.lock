@@ -9702,10 +9702,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.4.2.tgz#fc9e05e34c196ba140519e8f790929d1a49ef905"
-  integrity sha512-a/30MF1TEbF9FGuCRUQZuTUPz7qHNeWPuybtwKLx8qCbMqHeThMCXJbEjQho0htqJquLjTp0Nn3Obm0V+dCDmQ==
+wonka@^1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.4.3.tgz#4d7cdf341e7abcb2c80fecedee2f0839552c11f3"
+  integrity sha512-IPdJ4HlWAhZbieKPKNE+W7HPcBv/kbvNN7pkUEZMO3oo80ayuCLnU48dM8c8XohGqWE3sggaVR0jvsCLMQ1Eug==
   dependencies:
     bs-rebel "^0.2.3"
 

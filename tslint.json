@@ -10,6 +10,7 @@
     "member-access": false,
     "no-submodule-imports": false,
     "interface-name": false,
-    "only-arrow-functions": false
+    "only-arrow-functions": false,
+    "no-object-literal-type-assertion": false
   }
 }

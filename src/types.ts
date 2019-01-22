@@ -64,15 +64,4 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 export type ExchangeIO = (ops$: Source<Operation>) => Source<ExchangeResult>;
 
 /** The arguments for the child function of a connector. */
-export interface ChildArgs<MutationDeclarations> {
-  /** Whether a dependent GraphQL request is currently being fetched. */
-  fetching: ClientState<MutationDeclarations>['fetching'];
-  /** Any network or GraphQL errors. */
-  error: ClientState<MutationDeclarations>['error'];
-  /** The data returned from a GraphQL [query]{@link Query} to the server. */
-  data: ClientState<MutationDeclarations>['data'];
-  /** A collection of functions for executing pre-specified [mutations]{@link Mutation} */
-  mutations: ClientState<MutationDeclarations>['mutations'];
-  /** Trigger a fetch of the pre-specified [query]{@link Query}. */
-  refetch: (noCache?: boolean) => void;
-}
+export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;
