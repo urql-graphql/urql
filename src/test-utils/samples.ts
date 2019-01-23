@@ -1,5 +1,6 @@
 import {
   ExchangeResult,
+  ExecutionResult,
   Mutation,
   Operation,
   Query,
@@ -84,7 +85,6 @@ export const mutationResponse: ExchangeResult = {
   data: {},
 };
 
-export const subscriptionResponse: ExchangeResult = {
-  operation: subscriptionOperation,
-  data: {},
+export const subscriptionResult: ExecutionResult = {
+  data: {}
 };

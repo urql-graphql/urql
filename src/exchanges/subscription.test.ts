@@ -1,59 +1,45 @@
-import { of } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { subscriptionExchange } from './subscription';
-import { subscriptionOperation } from '../test-utils';
+import { empty, fromValue, never, pipe, publish, Source, take, toPromise } from 'wonka';
+import { Client } from '../lib/client';
+import { subscriptionOperation, subscriptionResult } from '../test-utils';
+import { ExchangeResult, Operation } from '../types';
 
-const response = {
-  data: {
-    data: {
-      user: 1200,
-    },
-  },
+import {
+  subscriptionExchange,
+  SubscriptionForwarder,
+  SubscriptionOperation
+} from './subscription';
+
+const exchangeArgs = {
+  forward: () => (empty as Source<ExchangeResult>),
+  client: ({} as Client)
 };
 
-const args = {
-  forward: jest.fn(),
-  subject: {},
-} as any;
-
-const createOperation = res => {
+it('should return response data from forwardSubscription observable', async () => {
   const unsubscribe = jest.fn();
+  const forwardSubscription: SubscriptionForwarder = operation => {
+    expect(operation.key).toBe(subscriptionOperation.key);
+    expect(operation.query).toBe(subscriptionOperation.query);
+    expect(operation.variables).toBe(subscriptionOperation.variables);
+    expect(operation.context).toEqual(subscriptionOperation.context);
 
-  const operation = { ...subscriptionOperation };
-  operation.query.replace('subscribeToUser', `${Math.random() * Date.now()}`);
-  operation.context.forwardSubscription = jest.fn();
+    return {
+      subscribe(observer) {
+        Promise.resolve().then(() => {
+          observer.next(subscriptionResult);
+        });
 
-  if (res) {
-    operation.context.forwardSubscription.mockImplementation((_, observer) => {
-      observer.next(res);
-      return { unsubscribe };
-    });
-  }
+        return { unsubscribe };
+      }
+    };
+  };
 
-  return { operation, unsubscribe };
-};
-
-it('should return response data from fetch', async () => {
-  const { operation } = createOperation(response);
-
-  const data = await subscriptionExchange(args)(of(operation))
-    .pipe(take(1))
-    .toPromise();
+  const data = await pipe(
+    fromValue(subscriptionOperation),
+    subscriptionExchange({ forwardSubscription })(exchangeArgs),
+    take(1),
+    toPromise
+  );
 
   expect(data).toMatchSnapshot();
-});
-
-it('should unsubscribe from future data', async () => {
-  const { operation, unsubscribe } = createOperation(response);
-
-  // Subscribe
-  await subscriptionExchange(args)(of(operation))
-    .pipe(take(1))
-    .toPromise();
-
-  // Unsubscribe
-  operation.context.unsubscribe = true;
-  subscriptionExchange(args)(of(operation)).subscribe(() => void 0);
-
-  expect(unsubscribe).toBeCalled();
+  expect(unsubscribe).toHaveBeenCalled();
 });

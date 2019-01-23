@@ -11,13 +11,15 @@ import {
   OperationContext
 } from '../types';
 
+export interface ObserverLike<T> {
+  next: (value: T) => void,
+  error: (err: any) => void,
+  complete: () => void
+}
+
 /** An abstract observable interface conforming to: https://github.com/tc39/proposal-observable */
 export interface ObservableLike<T> {
-  subscribe(observer: {
-    next?: (value: T) => void,
-    error?: (err: any) => void,
-    complete?: () => void
-  }): {
+  subscribe(observer: ObserverLike<T>): {
     unsubscribe: () => void
   };
 }
@@ -28,11 +30,13 @@ export interface SubscriptionOperation extends GraphQLRequest {
   context: OperationContext;
 }
 
+export type SubscriptionForwarder = (operation: SubscriptionOperation) => ObservableLike<ExecutionResult>;
+
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
 export interface SubscriptionExchangeOpts {
   // This has been modelled to work with subscription-transport-ws
   // See: https://github.com/apollographql/subscriptions-transport-ws#requestoptions--observableexecutionresult-returns-observable-to-execute-the-operation
-  forwardSubscription: <R extends ObservableLike<ExecutionResult>>(operation: SubscriptionOperation) => R
+  forwardSubscription: SubscriptionForwarder;
 }
 
 export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
@@ -55,14 +59,14 @@ export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange =
       // We can maybe extract the logic into generic GraphQL utilities
       const sub = observableish.subscribe({
         next: result => next({
-          operation,
-          data: result.data || undefined,
-          error: Array.isArray(result.errors)
-            ? new CombinedError({
-                graphQLErrors: result.errors,
-                response: undefined,
-              })
-            : undefined,
+        operation,
+        data: result.data || undefined,
+        error: Array.isArray(result.errors)
+          ? new CombinedError({
+              graphQLErrors: result.errors,
+              response: undefined,
+            })
+          : undefined,
         }),
         error: err => next({
           operation,
