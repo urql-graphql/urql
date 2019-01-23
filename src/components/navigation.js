@@ -30,7 +30,7 @@ export const NavigationTagline = styled.p`
 export const SidebarNavItem = styled.div`
   color: white;
   font-size: 1.8rem;
-  margin-left: 5rem;
+  margin-left: 4rem;
   @media (min-width: 1024px) {
     font-size: 2rem;
   }

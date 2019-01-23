@@ -50,7 +50,8 @@ class Docs extends React.Component {
           />
         </Wrapper>
         <Sidebar sidebarContent={content.sidebarContent} />
-        <Article />
+        {/* the Article component will change, we want to be able to reuse the article, so from here we want to pass in the content that specific article needs */}
+        <Article articleContent={content.articleContent} />
       </Container>
     );
   }

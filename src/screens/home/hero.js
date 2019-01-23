@@ -159,13 +159,13 @@ class Hero extends React.Component {
               </Button>
             </HeroCopyLink>
           </CopyToClipboard>
-          <Button light noMargin href="#">
+          <Button light noMargin href="/docs">
             Documentation
           </Button>
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link to="/docs/">Docs</Link>
+            <Link to="/docs">Docs</Link>
           </li>
           <li>
             <a

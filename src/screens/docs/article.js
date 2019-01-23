@@ -1,7 +1,8 @@
 import React from "react";
-// import PropTypes from "prop-types";
+import PropTypes from "prop-types";
 import styled from "styled-components";
-import { H1, H2, H3, H4, H5, H6, P } from "../../components/article-typography";
+import Markdown from "react-markdown/with-html";
+import GetStartedMD from "../../../content/docs/getting-started.md";
 
 const Container = styled.article`
   max-width: 80rem;
@@ -26,22 +27,18 @@ class Article extends React.Component {
     return (
       <Container>
         <DocsTitle>SPECTACLE</DocsTitle>
-        <H1>Get Started</H1>
-        <H2>Title (H2)</H2>
-        <H3>Title (H3)</H3>
-        <H4>Title (H4)</H4>
-        <H5>Title (H5)</H5>
-        <H6>Title (H6)</H6>
-        <P>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam dui
-          erat, vehicula eget erat nec, faucibus malesuada mi. Aliquam erat
-          volutpat. Ut facilisis metus ut rhoncus dictum.
-        </P>
+        <Markdown source={GetStartedMD} escapeHtml={false} />
+        {/* <H1 key={articleContent[0].title}>{articleContent[0].title}</H1>
+        <div>
+          {articleContent[0].subCategories.map(subCategory => (
+            <div key={subCategory.title}>{subCategory.title}</div>
+          ))}
+        </div> */}
       </Container>
     );
   }
 }
 
-Article.propTypes = {};
+Article.propTypes = { articleContent: PropTypes.array.isRequired };
 
 export default Article;

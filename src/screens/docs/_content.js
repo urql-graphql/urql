@@ -3,14 +3,16 @@
 // ----------------------------------------------------------
 
 const content = {
-  docs: [
-    { title: "", paragraphs: [], media: "" },
-    { title: "", paragraphs: [], media: "" }
-  ],
   sidebarContent: [
     {
       title: "Documentation",
-      subContent: ["Get Started", "Basic Concepts", "Tag API"]
+      subContent: [
+        "Get Started",
+        "Basic Concepts",
+        "Tag API",
+        "Props",
+        "Extensions"
+      ]
     },
     {
       title: "Guides",
@@ -31,6 +33,30 @@ const content = {
     {
       title: "FAQs",
       subContent: []
+    }
+  ],
+  articleContent: [
+    {
+      title: "Get Started",
+      description: "",
+      subCategories: [
+        { title: "Development", text: "", media: "" },
+        { title: "Build & Deployment", text: "", media: "" },
+        { title: "Presenting", text: "", media: "" },
+        { title: "Controls", text: "", media: "" },
+        { title: "Fullscreen", text: "", media: "" },
+        { title: "PDF Export", text: "", media: "" }
+      ],
+      media: ""
+    },
+    {
+      title: "Basic Concepts",
+      description: "",
+      subCategories: [
+        { title: "Main File", text: "", media: "" },
+        { title: "Themes", text: "", media: "" }
+      ],
+      media: ""
     }
   ]
 };

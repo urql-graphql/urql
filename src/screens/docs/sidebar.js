@@ -53,6 +53,8 @@ class Sidebar extends React.Component {
   }
 }
 
-Sidebar.propTypes = { sidebarContent: PropTypes.array.isRequired };
+Sidebar.propTypes = {
+  sidebarContent: PropTypes.array
+};
 
 export default Sidebar;

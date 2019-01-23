@@ -19,7 +19,7 @@ const Button = styled.a`
 
 class Sidebar extends React.Component {
   renderTransformedToc(siblings, targetLocation) {
-    const md = MarkdownIt();
+    const md = new MarkdownIt();
 
     return (
       <ul className="Sidebar-toc">
