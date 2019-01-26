@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
+import { withRouter, withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
-import content from "../docs/_content";
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +40,21 @@ const HeaderTagLine = styled.p`
 `;
 
 class Docs extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      tocArray: []
+    };
+  }
+
+  updateTocArray(tocArray) {
+    this.setState({ tocArray });
+  }
+
   render() {
+    const { location, params } = this.props;
+
     return (
       <Container>
         <Wrapper noPadding>
@@ -49,12 +64,25 @@ class Docs extends React.Component {
             alt="Formidable Logo"
           />
         </Wrapper>
-        <Sidebar sidebarContent={content.sidebarContent} />
-        {/* the Article component will change, we want to be able to reuse the article, so from here we want to pass in the content that specific article needs */}
-        <Article articleContent={content.articleContent} />
+        <Sidebar tocArray={this.state.tocArray} />
+        <Article
+          location={location}
+          params={params}
+          updateTocArray={this.updateTocArray.bind(this)}
+          {...this.props}
+        />
       </Container>
     );
   }
 }
 
-export default Docs;
+Docs.propTypes = {
+  location: PropTypes.object,
+  params: PropTypes.object
+};
+
+Docs.defaultProps = {
+  params: null
+};
+
+export default withRouter(withRouteData(Docs));

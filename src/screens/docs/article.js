@@ -2,7 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import Markdown from "react-markdown/with-html";
-import GetStartedMD from "../../../content/docs/getting-started.md";
+import { withRouteData, withRouter } from "react-static";
+import Prism from "prismjs";
+
+/* eslint-disable no-unused-vars */
+// add more language support
+import jsx from "prismjs/components/prism-jsx";
+import sh from "prismjs/components/prism-bash";
+import yaml from "prismjs/components/prism-yaml";
+/* eslint-enable no-unused-vars */
 
 const Container = styled.article`
   max-width: 80rem;
@@ -23,11 +31,26 @@ const DocsTitle = styled.h2`
 `;
 
 class Article extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      renderedMd: ""
+    };
+  }
+
+  componentDidMount() {
+    Prism.highlightAll();
+  }
+
+  componentDidUpdate() {
+    Prism.highlightAll();
+  }
+
   render() {
     return (
       <Container>
         <DocsTitle>SPECTACLE</DocsTitle>
-        <Markdown source={GetStartedMD} escapeHtml={false} />
+        <Markdown source={this.props.renderedMd} escapeHtml={false} />
         {/* <H1 key={articleContent[0].title}>{articleContent[0].title}</H1>
         <div>
           {articleContent[0].subCategories.map(subCategory => (
@@ -39,6 +62,12 @@ class Article extends React.Component {
   }
 }
 
-Article.propTypes = { articleContent: PropTypes.array.isRequired };
+Article.propTypes = {
+  renderedMd: PropTypes.string
+};
 
-export default Article;
+Article.defaultProps = {
+  params: null
+};
+
+export default withRouteData(withRouter(Markdown));

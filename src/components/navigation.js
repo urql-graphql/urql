@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-static";
 
 export const Navigation = styled.div`
   align-items: center;
@@ -27,7 +28,7 @@ export const NavigationTagline = styled.p`
   }
 `;
 
-export const SidebarNavItem = styled.div`
+export const SidebarNavItem = styled(Link)`
   color: white;
   font-size: 1.8rem;
   margin-left: 4rem;
@@ -36,12 +37,12 @@ export const SidebarNavItem = styled.div`
   }
 `;
 
-export const SidebarNavSubItem = styled.div`
+export const SidebarNavSubItem = styled(Link)`
   color: white;
-  font-size: 1.4rem;
-  margin-left: 7rem;
+  font-size: 1.6rem;
+  margin-left: 6rem;
   margin-top: 1rem;
   @media (min-width: 1024px) {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
 `;

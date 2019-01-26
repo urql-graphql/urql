@@ -172,15 +172,15 @@ class Sidebar extends React.Component {
           {/* This is how it was handled previously -- seems easier to just use the newly provided sidebarHeaders prop imo,
               but... it's up to you
           */}
-          {/* {this.renderSidebarItem(*/}
-          {/* "/docs/getting-started/",*/}
-          {/* "Get Started",*/}
-          {/* true*/}
-          {/* )}*/}
-          {/* {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}*/}
-          {/* {this.renderSidebarItem("/docs/tag-api/", "Tag API")}*/}
-          {/* {this.renderSidebarItem("/docs/props/", "Props")}*/}
-          {/* {this.renderSidebarItem("/docs/extensions/", "Extensions")}*/}
+          {this.renderSidebarItem(
+            "/docs/getting-started/",
+            "Get Started",
+            true
+          )}
+          {this.renderSidebarItem("/docs/basic-concepts/", "Basic Concepts")}
+          {this.renderSidebarItem("/docs/tag-api/", "Tag API")}
+          {this.renderSidebarItem("/docs/props/", "Props")}
+          {this.renderSidebarItem("/docs/extensions/", "Extensions")}
         </div>
       </nav>
     );

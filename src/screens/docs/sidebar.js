@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { withRouteData, withRouter } from "react-static";
+
 import { SidebarNavItem, SidebarNavSubItem } from "../../components/navigation";
 
 const Container = styled.aside`
@@ -28,33 +30,69 @@ const HeroLogo = styled.img`
   }
 `;
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-right: 6rem;
+  margin-bottom: 1rem;
+`;
+
 class Sidebar extends React.Component {
+  renderSidebarItem(item) {
+    const { tocArray } = this.props;
+    const currentPath = `/docs${item.path}` === window.location.pathname;
+    const subContent = tocArray.filter(toc => toc.level === 2);
+
+    return (
+      <div>
+        <SidebarNavItem
+          to={`/docs${item.path}`}
+          replace
+          key={item.title.split(" ").join("_")}
+        >
+          {item.title}
+        </SidebarNavItem>
+        <Wrapper>
+          {currentPath &&
+            subContent &&
+            subContent.map(sh => (
+              <SidebarNavSubItem
+                to={`#${sh.content
+                  .split(" ")
+                  .join("-")
+                  .toLowerCase()}`}
+                key={sh.content.split(" ").join("_")}
+              >
+                {sh.content}
+              </SidebarNavSubItem>
+            ))}
+        </Wrapper>
+      </div>
+    );
+  }
+
   render() {
-    const { sidebarContent } = this.props;
+    const { sidebarHeaders } = this.props;
+
     return (
       <Container>
         <HeroLogo
           src="../../static/svgs/docs_image.svg"
           alt="Formidable Logo"
         />
-        {sidebarContent.map(menuItem => (
-          <li key={menuItem.title}>
-            <SidebarNavItem onClick={() => {}}>{menuItem.title}</SidebarNavItem>
-            {menuItem.subContent.length > 0 &&
-              menuItem.subContent.map(subTitle => (
-                <SidebarNavSubItem key={subTitle} href="#">
-                  {subTitle}
-                </SidebarNavSubItem>
-              ))}
-          </li>
-        ))}
+        <Wrapper>
+          {sidebarHeaders &&
+            sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+        </Wrapper>
       </Container>
     );
   }
 }
 
 Sidebar.propTypes = {
-  sidebarContent: PropTypes.array
+  location: PropTypes.object,
+  sidebarHeaders: PropTypes.array,
+  tocArray: PropTypes.array
 };
 
-export default Sidebar;
+export default withRouter(withRouteData(Sidebar));
