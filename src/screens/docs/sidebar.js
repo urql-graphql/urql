@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { withRouteData, withRouter } from "react-static";
-
+import { withRouteData, withRouter, Link } from "react-static";
 import { SidebarNavItem, SidebarNavSubItem } from "../../components/navigation";
 
 const Container = styled.aside`
@@ -52,10 +51,9 @@ class Sidebar extends React.Component {
         >
           {item.title}
         </SidebarNavItem>
-        <Wrapper>
-          {currentPath &&
-            subContent &&
-            subContent.map(sh => (
+        {currentPath && subContent && (
+          <Wrapper>
+            {subContent.map(sh => (
               <SidebarNavSubItem
                 to={`#${sh.content
                   .split(" ")
@@ -66,7 +64,8 @@ class Sidebar extends React.Component {
                 {sh.content}
               </SidebarNavSubItem>
             ))}
-        </Wrapper>
+          </Wrapper>
+        )}
       </div>
     );
   }
@@ -76,10 +75,12 @@ class Sidebar extends React.Component {
 
     return (
       <Container>
-        <HeroLogo
-          src="../../static/svgs/docs_image.svg"
-          alt="Formidable Logo"
-        />
+        <Link to={"/"}>
+          <HeroLogo
+            src="../../static/svgs/docs_image.svg"
+            alt="Formidable Logo"
+          />
+        </Link>
         <Wrapper>
           {sidebarHeaders &&
             sidebarHeaders.map(sh => this.renderSidebarItem(sh))}

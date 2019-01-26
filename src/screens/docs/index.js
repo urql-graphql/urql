@@ -53,8 +53,6 @@ class Docs extends React.Component {
   }
 
   render() {
-    const { location, params } = this.props;
-
     return (
       <Container>
         <Wrapper noPadding>
@@ -65,19 +63,13 @@ class Docs extends React.Component {
           />
         </Wrapper>
         <Sidebar tocArray={this.state.tocArray} />
-        <Article
-          location={location}
-          params={params}
-          updateTocArray={this.updateTocArray.bind(this)}
-          {...this.props}
-        />
+        <Article {...this.props} />
       </Container>
     );
   }
 }
 
 Docs.propTypes = {
-  location: PropTypes.object,
   params: PropTypes.object
 };
 

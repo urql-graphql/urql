@@ -31,13 +31,6 @@ const DocsTitle = styled.h2`
 `;
 
 class Article extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      renderedMd: ""
-    };
-  }
-
   componentDidMount() {
     Prism.highlightAll();
   }
