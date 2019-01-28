@@ -43,7 +43,7 @@ class Sidebar extends React.Component {
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
-      <div>
+      <div key={item.path}>
         <SidebarNavItem
           to={`/docs${item.path}`}
           replace
@@ -91,7 +91,6 @@ class Sidebar extends React.Component {
 }
 
 Sidebar.propTypes = {
-  location: PropTypes.object,
   sidebarHeaders: PropTypes.array,
   tocArray: PropTypes.array
 };

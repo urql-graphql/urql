@@ -63,4 +63,4 @@ Article.defaultProps = {
   params: null
 };
 
-export default withRouteData(withRouter(Markdown));
+export default withRouteData(withRouter(Article));

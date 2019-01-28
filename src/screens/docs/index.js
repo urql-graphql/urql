@@ -40,18 +40,6 @@ const HeaderTagLine = styled.p`
 `;
 
 class Docs extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-      tocArray: []
-    };
-  }
-
-  updateTocArray(tocArray) {
-    this.setState({ tocArray });
-  }
-
   render() {
     return (
       <Container>
@@ -62,8 +50,8 @@ class Docs extends React.Component {
             alt="Formidable Logo"
           />
         </Wrapper>
-        <Sidebar tocArray={this.state.tocArray} />
-        <Article {...this.props} />
+        <Sidebar />
+        <Article />
       </Container>
     );
   }
