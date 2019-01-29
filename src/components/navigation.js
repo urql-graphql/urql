@@ -28,21 +28,37 @@ export const NavigationTagline = styled.p`
   }
 `;
 
-export const SidebarNavItem = styled(Link)`
-  color: white;
-  font-size: 1.8rem;
-  margin-left: 4rem;
+export const SidebarContainer = styled.aside`
+  background-color: #3d4247;
+  min-height: 100vh;
+  padding-top: 23rem;
+  font-family: "akkurat";
+  width: 7rem;
+
   @media (min-width: 1024px) {
-    font-size: 2rem;
+    width: 26rem;
+    min-width: 26rem;
+  }
+`;
+
+export const SidebarNavItem = styled(Link)`
+  font-family: "akkurat";
+  color: white;
+  font-size: 1.4rem;
+  margin-left: 4rem;
+
+  @media (min-width: 1024px) {
+    font-size: 1.6rem;
   }
 `;
 
 export const SidebarNavSubItem = styled(Link)`
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   margin-left: 6rem;
   margin-top: 1rem;
+
   @media (min-width: 1024px) {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
   }
 `;

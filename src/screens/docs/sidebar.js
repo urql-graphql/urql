@@ -2,38 +2,43 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { withRouteData, withRouter, Link } from "react-static";
-import { SidebarNavItem, SidebarNavSubItem } from "../../components/navigation";
-
-const Container = styled.aside`
-  background-color: #3d4247;
-  min-height: 100vh;
-  padding-top: 23rem;
-  min-width: 6rem;
-  font-family: "sharp";
-  width: 6rem;
-  @media (min-width: 768px) {
-    min-width: 26rem;
-    width: 26rem;
-  }
-`;
+import {
+  SidebarNavItem,
+  SidebarNavSubItem,
+  SidebarContainer
+} from "../../components/navigation";
 
 const HeroLogo = styled.img`
-  max-width: 14.5rem;
   position: relative;
-  @media (min-width: 768px) {
+  top: -23rem;
+  left: -2rem;
+  min-width: 9rem;
+
+  @media (min-width: 1024px) {
+    max-width: 14.5rem;
+    position: absolute;
+    top: -4rem;
     left: -3rem;
     max-width: auto;
     min-width: 29rem;
-    position: absolute;
-    top: -4rem;
   }
 `;
 
-const Wrapper = styled.div`
+const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-right: 6rem;
   margin-bottom: 1rem;
+  justify-content: space-between;
+  height: 25rem;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const SubContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 class Sidebar extends React.Component {
@@ -52,7 +57,7 @@ class Sidebar extends React.Component {
           {item.title}
         </SidebarNavItem>
         {currentPath && subContent && (
-          <Wrapper>
+          <SubContentWrapper>
             {subContent.map(sh => (
               <SidebarNavSubItem
                 to={`#${sh.content
@@ -64,7 +69,7 @@ class Sidebar extends React.Component {
                 {sh.content}
               </SidebarNavSubItem>
             ))}
-          </Wrapper>
+          </SubContentWrapper>
         )}
       </div>
     );
@@ -74,18 +79,19 @@ class Sidebar extends React.Component {
     const { sidebarHeaders } = this.props;
 
     return (
-      <Container>
+      <SidebarContainer>
         <Link to={"/"}>
           <HeroLogo
-            src="../../static/svgs/docs_image.svg"
+            src="../../static/svgs/docs_image_small.svg"
+            srcSet="../../static/svgs/docs_image.svg 1024w"
             alt="Formidable Logo"
           />
         </Link>
-        <Wrapper>
+        <ContentWrapper>
           {sidebarHeaders &&
             sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-        </Wrapper>
-      </Container>
+        </ContentWrapper>
+      </SidebarContainer>
     );
   }
 }

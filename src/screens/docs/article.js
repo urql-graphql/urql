@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { withRouteData, withRouter } from "react-static";
 import Prism from "prismjs";
+import { Markdown } from "../../components/markdown";
 
 /* eslint-disable no-unused-vars */
 // add more language support
@@ -29,16 +30,6 @@ const DocsTitle = styled.h2`
   letter-spacing: 0.5rem;
 `;
 
-const Markdown = styled.article`
-  & h1 {
-    font-size: 3.2rem;
-    margin: 0 0 2rem;
-    @media (min-width: 1024px) {
-      font-size: 4.6rem;
-    }
-  }
-`;
-
 class Article extends React.Component {
   componentDidMount() {
     Prism.highlightAll();
@@ -53,12 +44,6 @@ class Article extends React.Component {
       <Container>
         <DocsTitle>SPECTACLE</DocsTitle>
         <Markdown dangerouslySetInnerHTML={{ __html: this.props.renderedMd }} />
-        {/* <H1 key={articleContent[0].title}>{articleContent[0].title}</H1>
-        <div>
-          {articleContent[0].subCategories.map(subCategory => (
-            <div key={subCategory.title}>{subCategory.title}</div>
-          ))}
-        </div> */}
       </Container>
     );
   }
