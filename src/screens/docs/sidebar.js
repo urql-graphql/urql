@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { withRouteData, withRouter, Link } from "react-static";
@@ -9,31 +9,26 @@ import {
 } from "../../components/navigation";
 
 const HeroLogo = styled.img`
+  position: absolute;
+  top: -4rem;
+  left: -3rem;
+  max-width: auto;
+  min-width: 29rem;
+`;
+
+const ResponsiveHeroLogo = styled.img`
   position: relative;
   top: -23rem;
   left: -2rem;
   min-width: 9rem;
-
-  @media (min-width: 1024px) {
-    max-width: 14.5rem;
-    position: absolute;
-    top: -4rem;
-    left: -3rem;
-    max-width: auto;
-    min-width: 29rem;
-  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  justify-content: space-between;
-  height: 25rem;
-
-  @media (max-width: 1024px) {
-    display: none;
-  }
+  margin-top: 1rem;
+  height: auto;
 `;
 
 const SubContentWrapper = styled.div`
@@ -42,6 +37,64 @@ const SubContentWrapper = styled.div`
 `;
 
 class Sidebar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleMenuOpen = this.handleMenuOpen.bind(this);
+    this.updateWidth = this.updateWidth.bind(this);
+    this.state = { openSidebar: false, windowWidth: window.outerWidth };
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateWidth);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateWidth);
+  }
+
+  updateWidth() {
+    this.setState({ windowWidth: window.outerWidth });
+  }
+
+  handleMenuOpen() {
+    this.setState({ openSidebar: true });
+  }
+
+  renderResponsiveSidebar() {
+    return (
+      <SidebarContainer small>
+        <div onClick={this.handleMenuOpen}>
+          <ResponsiveHeroLogo
+            src="../../static/svgs/docs_image_small.svg"
+            alt="Formidable Logo"
+          />
+        </div>
+      </SidebarContainer>
+    );
+  }
+
+  renderSidebarMenu() {
+    const { sidebarHeaders } = this.props;
+    return (
+      <SidebarContainer>
+        {(this.state.openSidebar || window.outerWidth > 768) && (
+          <Fragment>
+            <Link to={"/"}>
+              <HeroLogo
+                src="../../static/svgs/docs_image.svg"
+                alt="Formidable Logo"
+              />
+            </Link>
+            <ContentWrapper>
+              {sidebarHeaders &&
+                sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+            </ContentWrapper>
+          </Fragment>
+        )}
+      </SidebarContainer>
+    );
+  }
+
   renderSidebarItem(item) {
     const { tocArray } = this.props;
     const currentPath = `/docs${item.path}` === window.location.pathname;
@@ -64,6 +117,9 @@ class Sidebar extends React.Component {
                   .split(" ")
                   .join("-")
                   .toLowerCase()}`}
+                onClick={() =>
+                  this.setState({ openSidebar: !this.state.openSidebar })
+                }
                 key={sh.content.split(" ").join("_")}
               >
                 {sh.content}
@@ -76,22 +132,14 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const { sidebarHeaders } = this.props;
-
     return (
-      <SidebarContainer>
-        <Link to={"/"}>
-          <HeroLogo
-            src="../../static/svgs/docs_image_small.svg"
-            srcSet="../../static/svgs/docs_image.svg 1024w"
-            alt="Formidable Logo"
-          />
-        </Link>
-        <ContentWrapper>
-          {sidebarHeaders &&
-            sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-        </ContentWrapper>
-      </SidebarContainer>
+      <Fragment>
+        {(this.state.openSidebar || this.state.windowWidth >= 922) &&
+          this.renderSidebarMenu()}
+        {this.state.windowWidth <= 921 &&
+          !this.state.openSidebar &&
+          this.renderResponsiveSidebar()}
+      </Fragment>
     );
   }
 }

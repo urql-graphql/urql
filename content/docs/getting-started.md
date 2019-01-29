@@ -5,7 +5,19 @@ order: 0
 
 <a name="getting-started"></a>
 
-# Getting Started
+[Development](#Development)
+
+[Build & Deployment](#Build-&-Deployment)
+
+[Presenting](#Presenting)
+
+[Controls](#Controls)
+
+[Fullscreen](#Fullscreen)
+
+[PDF Export](#PDF-Export)
+
+# Get Started
 
 The best way to get started is by using the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
 
@@ -23,7 +35,7 @@ Next run `rm -R .git` to remove the existing version control.
 
 Then, to start up the local server, run `npm start`
 
-Open a browser and hit [http://localhost:3000](http://localhost:3000), and we are ready to roll
+Open a browser and hit [http://localhost:3000](http://localhost:3000), and we are ready to roll.
 
 <a name="build--deployment"></a>
 

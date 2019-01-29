@@ -33,19 +33,15 @@ export const SidebarContainer = styled.aside`
   min-height: 100vh;
   padding-top: 23rem;
   font-family: "akkurat";
-  width: 7rem;
-
-  @media (min-width: 1024px) {
-    width: 26rem;
-    min-width: 26rem;
-  }
+  width: ${props => (props.small ? "7rem" : "26rem")};
+  min-width: ${props => (props.small ? "7rem" : "26rem")};
 `;
 
 export const SidebarNavItem = styled(Link)`
-  font-family: "akkurat";
   color: white;
   font-size: 1.4rem;
-  margin-left: 4rem;
+  margin-left: 3rem;
+  margin-bottom: 3rem;
 
   @media (min-width: 1024px) {
     font-size: 1.6rem;
