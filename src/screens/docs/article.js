@@ -28,6 +28,11 @@ const DocsTitle = styled.h2`
   line-height: 1.3;
   width: 100%;
   letter-spacing: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    margin: 0;
+  }
 `;
 
 class Article extends React.Component {

@@ -19,6 +19,10 @@ order: 0
 
 [PDF Export](#PDF-Export)
 
+<a name="boilerplate"></a>
+
+## Boilerplate
+
 The best way to get started is by using the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
 
 Alternatively, you can `npm install spectacle` and write your own build configurations.

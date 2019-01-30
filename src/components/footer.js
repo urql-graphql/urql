@@ -59,7 +59,7 @@ export const Footer = () => (
     <Wrapper noPadding>
       <FooterLeft>
         <FooterLogo
-          src="../static/svgs/logo_formidable_white.svg"
+          src="../../static/svgs/logo_formidable_white.svg"
           alt="Formidable Logo"
         />
         <FooterLinks>

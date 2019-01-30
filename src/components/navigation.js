@@ -29,15 +29,22 @@ export const NavigationTagline = styled.p`
 `;
 
 export const SidebarContainer = styled.aside`
-  font-family: "akkurat";
-  background-color: #3d4247;
+  background-image: url("../../static/svgs/pink-sidebar-background.svg");
+  background-repeat: repeat-y;
   min-height: 100vh;
-  padding-top: 23rem;
-  width: ${props => (props.small ? "7rem" : "26rem")};
-  min-width: ${props => (props.small ? "7rem" : "26rem")};
+  padding-top: 18rem;
+  min-width: 26rem;
+  width: 26rem;
+
+  @media (max-width: 768px) {
+    background-image: url("../../static/svgs/collapsed-sidebar-background.svg");
+    min-width: 3rem;
+    width: 3rem;
+  }
 `;
 
 export const SidebarNavItem = styled(Link)`
+  font-family: "Akkurat", sans-serif;
   color: white;
   margin-left: 4rem;
   margin-bottom: 1rem;

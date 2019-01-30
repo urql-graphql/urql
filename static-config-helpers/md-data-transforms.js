@@ -2,7 +2,6 @@
 // we can switch to single-function lodash deps like the cool kids once we've got feature parity,
 // keeping in mind this is naught but the build step.
 const _ = require("lodash");
-const fs = require("fs");
 const path = require("path");
 const getMdFiles = require("./get-md-files");
 const generateRenderReadyMd = require("./md-toc-parser").default;
