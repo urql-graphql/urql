@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const Markdown = styled.article`
+  font-family: "akkurat";
   & h1 {
     font-size: 3.2rem;
     margin: 0 0 2rem;

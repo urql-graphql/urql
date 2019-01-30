@@ -29,32 +29,25 @@ export const NavigationTagline = styled.p`
 `;
 
 export const SidebarContainer = styled.aside`
+  font-family: "akkurat";
   background-color: #3d4247;
   min-height: 100vh;
   padding-top: 23rem;
-  font-family: "akkurat";
   width: ${props => (props.small ? "7rem" : "26rem")};
   min-width: ${props => (props.small ? "7rem" : "26rem")};
 `;
 
 export const SidebarNavItem = styled(Link)`
   color: white;
-  font-size: 1.4rem;
-  margin-left: 3rem;
-  margin-bottom: 3rem;
-
-  @media (min-width: 1024px) {
-    font-size: 1.6rem;
-  }
+  margin-left: 4rem;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  display: inline-block;
 `;
 
 export const SidebarNavSubItem = styled(Link)`
   color: white;
-  font-size: 1.2rem;
   margin-left: 6rem;
   margin-top: 1rem;
-
-  @media (min-width: 1024px) {
-    font-size: 1.4rem;
-  }
+  font-size: 1.4rem;
 `;

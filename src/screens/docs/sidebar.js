@@ -34,6 +34,11 @@ const ContentWrapper = styled.div`
 const SubContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  margin-bottom: 2rem;
+`;
+
+const Wrapper = styled.div`
+  display: inline-block;
 `;
 
 class Sidebar extends React.Component {
@@ -77,20 +82,16 @@ class Sidebar extends React.Component {
     const { sidebarHeaders } = this.props;
     return (
       <SidebarContainer>
-        {(this.state.openSidebar || window.outerWidth > 768) && (
-          <Fragment>
-            <Link to={"/"}>
-              <HeroLogo
-                src="../../static/svgs/docs_image.svg"
-                alt="Formidable Logo"
-              />
-            </Link>
-            <ContentWrapper>
-              {sidebarHeaders &&
-                sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-            </ContentWrapper>
-          </Fragment>
-        )}
+        <Link to={"/"}>
+          <HeroLogo
+            src="../../static/svgs/docs_image.svg"
+            alt="Formidable Logo"
+          />
+        </Link>
+        <ContentWrapper>
+          {sidebarHeaders &&
+            sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+        </ContentWrapper>
       </SidebarContainer>
     );
   }
@@ -101,7 +102,7 @@ class Sidebar extends React.Component {
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
-      <div key={item.path}>
+      <Wrapper key={item.path}>
         <SidebarNavItem
           to={`/docs${item.path}`}
           replace
@@ -127,7 +128,7 @@ class Sidebar extends React.Component {
             ))}
           </SubContentWrapper>
         )}
-      </div>
+      </Wrapper>
     );
   }
 

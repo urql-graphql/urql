@@ -5,6 +5,8 @@ order: 0
 
 <a name="getting-started"></a>
 
+# Get Started
+
 [Development](#Development)
 
 [Build & Deployment](#Build-&-Deployment)
@@ -16,8 +18,6 @@ order: 0
 [Fullscreen](#Fullscreen)
 
 [PDF Export](#PDF-Export)
-
-# Get Started
 
 The best way to get started is by using the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
 
