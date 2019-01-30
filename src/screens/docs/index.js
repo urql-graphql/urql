@@ -37,6 +37,16 @@ const HeaderTagLine = styled.p`
   margin: 0 1rem 0 auto;
   text-transform: uppercase;
   font-size: 1.5rem;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+`;
+
+const HeaderLogo = styled.img`
+  @media (max-width: 600px) {
+    display: none;
+  }
 `;
 
 const CollapsedMenu = styled.div`
@@ -45,6 +55,10 @@ const CollapsedMenu = styled.div`
 
   @media (min-width: 768px) {
     display: none;
+  }
+  @media (max-width: 600px) {
+    position: absolute;
+    left: 0;
   }
 `;
 
@@ -60,8 +74,6 @@ class Docs extends React.Component {
   }
 
   closeSidebar() {
-    console.log("close sidebar");
-
     this.setState({ openSidebar: false });
   }
 
@@ -77,7 +89,7 @@ class Docs extends React.Component {
             />
           </CollapsedMenu>
           <HeaderTagLine>Lovingly created by</HeaderTagLine>
-          <img
+          <HeaderLogo
             src="../../static/svgs/logo_formidable_dark.svg"
             alt="Formidable Logo"
           />

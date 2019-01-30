@@ -41,10 +41,7 @@ const CloseButton = styled.img`
   top: 2rem;
   right: 7rem;
   position: absolute;
-
-  @media (max-width: 768px) {
-    display: ${props => (props.overlay ? "" : "none")};
-  }
+  display: ${props => (props.overlay ? "" : "none")};
 `;
 
 class Sidebar extends React.Component {
