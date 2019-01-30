@@ -35,11 +35,15 @@ export const SidebarContainer = styled.aside`
   padding-top: 18rem;
   min-width: 26rem;
   width: 26rem;
+  position: ${props => (props.overlay ? "fixed" : "")};
 
   @media (max-width: 768px) {
-    background-image: url("../../static/svgs/collapsed-sidebar-background.svg");
-    min-width: 3rem;
-    width: 3rem;
+    background-image: ${props =>
+      props.overlay
+        ? 'url("../../static/svgs/pink-sidebar-background.svg")'
+        : 'url("../../static/svgs/collapsed-sidebar-background.svg")'};
+    min-width: ${props => (props.overlay ? "26rem" : "5rem")};
+    width: ${props => (props.overlay ? "26rem" : "5rem")};
   }
 `;
 

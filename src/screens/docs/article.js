@@ -17,9 +17,6 @@ const Container = styled.div`
   min-height: 100vh;
   padding: 2rem 4rem;
   width: 100%;
-  @media (min-width: 768px) {
-    padding: 3rem 10rem;
-  }
 `;
 
 const DocsTitle = styled.h2`

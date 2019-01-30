@@ -15,7 +15,7 @@ const HeroLogo = styled.img`
   min-width: 14rem;
 
   @media (max-width: 768px) {
-    display: none;
+    display: ${props => (props.overlay ? "" : "none")};
   }
 `;
 
@@ -37,30 +37,17 @@ const Wrapper = styled.div`
   display: inline-block;
 `;
 
+const CloseButton = styled.img`
+  top: 2rem;
+  right: 7rem;
+  position: absolute;
+
+  @media (max-width: 768px) {
+    display: ${props => (props.overlay ? "" : "none")};
+  }
+`;
+
 class Sidebar extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleMenuOpen = this.handleMenuOpen.bind(this);
-    this.updateWidth = this.updateWidth.bind(this);
-    this.state = { openSidebar: false, windowWidth: window.outerWidth };
-  }
-
-  componentDidMount() {
-    window.addEventListener("resize", this.updateWidth);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateWidth);
-  }
-
-  updateWidth() {
-    this.setState({ windowWidth: window.outerWidth });
-  }
-
-  handleMenuOpen() {
-    this.setState({ openSidebar: true });
-  }
-
   renderSidebarItem(item) {
     const { tocArray } = this.props;
     const currentPath = `/docs${item.path}` === window.location.pathname;
@@ -83,9 +70,6 @@ class Sidebar extends React.Component {
                   .split(" ")
                   .join("-")
                   .toLowerCase()}`}
-                // onClick={() =>
-                //   this.setState({ openSidebar: !this.state.openSidebar })
-                // }
                 key={sh.content.split(" ").join("_")}
               >
                 {sh.content}
@@ -98,13 +82,20 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const { sidebarHeaders } = this.props;
+    const { sidebarHeaders, overlay, closeSidebar } = this.props;
     return (
-      <SidebarContainer>
+      <SidebarContainer overlay={overlay}>
+        <CloseButton
+          src="../../static/svgs/x.svg"
+          alt="X"
+          overlay={overlay}
+          onClick={() => closeSidebar()}
+        />
         <Link to={"/"}>
           <HeroLogo
             src="../../static/svgs/logo-sidebar.svg"
             alt="Formidable Logo"
+            overlay={overlay}
           />
         </Link>
         <ContentWrapper>
@@ -117,6 +108,8 @@ class Sidebar extends React.Component {
 }
 
 Sidebar.propTypes = {
+  closeSidebar: PropTypes.func,
+  overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
   tocArray: PropTypes.array
 };

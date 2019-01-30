@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   height: 6rem;
   width: 100%;
   position: absolute;
-  padding-right: 6rem;
+  padding-right: 3rem;
 }
 
 @media (max-width: 768px) {
@@ -36,20 +36,56 @@ const HeaderTagLine = styled.p`
   line-height: 3.2rem;
   margin: 0 1rem 0 auto;
   text-transform: uppercase;
+  font-size: 1.5rem;
+`;
+
+const CollapsedMenu = styled.div`
+  padding-left: 3rem;
+  display: ${props => (props.overlay ? "none" : "")};
+
+  @media (min-width: 768px) {
+    display: none;
+  }
 `;
 
 class Docs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.closeSidebar = this.closeSidebar.bind(this);
+    this.state = { openSidebar: false };
+  }
+
+  openSidebar() {
+    this.setState({ openSidebar: true });
+  }
+
+  closeSidebar() {
+    console.log("close sidebar");
+
+    this.setState({ openSidebar: false });
+  }
+
   render() {
     return (
       <Container>
         <Wrapper noPadding>
+          <CollapsedMenu overlay={this.state.openSidebar}>
+            <img
+              src="../../static/svgs/burger.svg"
+              alt="Menu"
+              onClick={() => this.openSidebar()}
+            />
+          </CollapsedMenu>
           <HeaderTagLine>Lovingly created by</HeaderTagLine>
           <img
             src="../../static/svgs/logo_formidable_dark.svg"
             alt="Formidable Logo"
           />
         </Wrapper>
-        <Sidebar />
+        <Sidebar
+          overlay={this.state.openSidebar}
+          closeSidebar={this.closeSidebar}
+        />
         <Article />
       </Container>
     );
