@@ -1,66 +1,111 @@
-import { parse } from 'graphql/language/parser';
-import { merge, Observable, Observer, of } from 'rxjs';
-import { mergeMap, partition } from 'rxjs/operators';
-import { Exchange, ExchangeResult, Operation } from '../types';
+import { filter, make, merge, mergeMap, pipe, share, Source, takeUntil } from 'wonka';
 
-function extractOperationName(operation: Operation): Operation {
-  const doc = parse(operation.query);
+import { CombinedError } from '../lib/error';
 
-  // TODO: How do we enforce this? I feel like this has to be stable given the spec?
-  // this is grabbing the first selection from the subscription query. Which is required to only be 1.
-  // and backend servers require operationName to be the subscription name
-  const operationName =
-    // @ts-ignore
-    doc.definitions[0].selectionSet.selections[0].name.value;
+import {
+  Exchange,
+  ExchangeResult,
+  ExecutionResult,
+  GraphQLRequest,
+  Operation,
+  OperationContext
+} from '../types';
 
-  return {
-    ...operation,
-    operationName,
+export interface ObserverLike<T> {
+  next: (value: T) => void,
+  error: (err: any) => void,
+  complete: () => void
+}
+
+/** An abstract observable interface conforming to: https://github.com/tc39/proposal-observable */
+export interface ObservableLike<T> {
+  subscribe(observer: ObserverLike<T>): {
+    unsubscribe: () => void
   };
 }
-const liveSubscriptions = new Map<string, () => void>();
 
-export const subscriptionExchange: Exchange = ({ forward }) => {
-  const handleSubscription = (operation: Operation) => {
-    if (operation.context.unsubscribe) {
-      return new Observable<ExchangeResult>(observer => {
-        const unsubscribe = liveSubscriptions.get(operation.query);
-        // clear away queries
-        liveSubscriptions.delete(operation.query);
+export interface SubscriptionOperation extends GraphQLRequest {
+  /** This does not indicate the type of GraphQL request but the name of the query in this case. */
+  key: string;
+  context: OperationContext;
+}
 
-        if (unsubscribe) {
-          unsubscribe();
-        }
+export type SubscriptionForwarder = (operation: SubscriptionOperation) => ObservableLike<ExecutionResult>;
 
-        observer.complete();
+/** This is called to create a subscription and needs to be hooked up to a transport client. */
+export interface SubscriptionExchangeOpts {
+  // This has been modelled to work with subscription-transport-ws
+  // See: https://github.com/apollographql/subscriptions-transport-ws#requestoptions--observableexecutionresult-returns-observable-to-execute-the-operation
+  forwardSubscription: SubscriptionForwarder;
+}
+
+export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
+  const { forwardSubscription } = opts;
+
+  const isSubscriptionOperation = (operation: Operation) =>
+    operation.operationName === 'subscription';
+
+  const createSubscriptionSource = (operation: Operation) => {
+    // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
+    const observableish = forwardSubscription({
+      key: operation.key,
+      query: operation.query,
+      variables: operation.variables,
+      context: { ...operation.context }
+    });
+
+    return make<ExchangeResult>(([next, complete]) => {
+      // TODO: The conversion of the result here is very similar to fetch;
+      // We can maybe extract the logic into generic GraphQL utilities
+      const sub = observableish.subscribe({
+        next: result => next({
+        operation,
+        data: result.data || undefined,
+        error: Array.isArray(result.errors)
+          ? new CombinedError({
+              graphQLErrors: result.errors,
+              response: undefined,
+            })
+          : undefined,
+        }),
+        error: err => next({
+          operation,
+          data: undefined,
+          error: new CombinedError({
+            networkError: err,
+            response: undefined
+          })
+        }),
+        complete
       });
-    }
 
-    return new Observable<ExchangeResult>(observer => {
-      const { unsubscribe } = operation.context.forwardSubscription(
-        extractOperationName(operation),
-        observer
-      );
-
-      liveSubscriptions.set(operation.query, unsubscribe);
+      // NOTE: Destructuring sub is avoided here to preserve its potential binding
+      return () => sub.unsubscribe();
     });
   };
 
   return ops$ => {
-    return ops$.pipe(
-      source$ =>
-        of(
-          partition<Operation>(op => op.operationName === 'subscription')(
-            source$
-          )
-        ),
-      // @ts-ignore
-      mergeMap(([subscriptions$, operations$]) =>
-        merge(
-          subscriptions$.pipe(mergeMap(handleSubscription)),
-          operations$.pipe(forward)
-        )
-      )
+    const sharedOps$ = share(ops$);
+    const subscriptionResults$ = pipe(
+      sharedOps$,
+      filter(isSubscriptionOperation),
+      mergeMap(operation => {
+        const { key } = operation;
+        const teardown$ = pipe(
+          sharedOps$,
+          filter(op => op.operationName === 'teardown' && op.key === key)
+        );
+
+        return pipe(createSubscriptionSource(operation), takeUntil(teardown$));
+      })
     );
+
+    const forward$ = pipe(
+      sharedOps$,
+      filter(op => !isSubscriptionOperation(op)),
+      forward
+    );
+
+    return merge([subscriptionResults$, forward$]);
   };
 };

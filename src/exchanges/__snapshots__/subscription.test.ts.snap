@@ -1,10 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should return response data from fetch 1`] = `
+exports[`should return response data from forwardSubscription observable 1`] = `
 Object {
-  "data": Object {
-    "data": Object {
-      "user": 1200,
+  "data": Object {},
+  "error": undefined,
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": Object {
+        "method": "POST",
+      },
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": "{\\"query\\":\\"subscription subscribeToUser($user: String){\\\\n    user(user: $user) {\\\\n      name\\\\n    }\\\\n  }\\\\n  \\",\\"variables\\":{\\"user\\":\\"colin\\"}}",
+    "operationName": "subscription",
+    "query": "subscription subscribeToUser($user: String){
+    user(user: $user) {
+      name
+    }
+  }
+  ",
+    "variables": Object {
+      "user": "colin",
     },
   },
 }

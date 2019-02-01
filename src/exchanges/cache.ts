@@ -1,5 +1,6 @@
-import { filter, map, merge, pipe, share, Subject, tap } from 'wonka';
+import { filter, map, merge, pipe, share, tap } from 'wonka';
 
+import { Client } from '../lib/client';
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
 import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
@@ -8,7 +9,7 @@ interface OperationCache {
   [key: string]: Set<string>;
 }
 
-export const cacheExchange: Exchange = ({ forward, subject }) => {
+export const cacheExchange: Exchange = ({ forward, client }) => {
   const resultCache: ResultCache = new Map();
   const operationCache: OperationCache = Object.create(null);
 
@@ -21,13 +22,13 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
   const handleAfterMutation = afterMutation(
     resultCache,
     operationCache,
-    subject
+    client
   );
 
   const handleAfterQuery = afterQuery(resultCache, operationCache);
 
   const isOperationCached = operation =>
-    operation.operationName === OperationType.Query && resultCache.has(operation.key);
+    operation.operationName === 'query' && resultCache.has(operation.key);
 
   return ops$ => {
     const sharedOps$ = share(ops$);
@@ -47,9 +48,9 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
       map(mapTypeNames),
       forward,
       tap(response => {
-        if (response.operation.operationName === OperationType.Mutation) {
+        if (response.operation.operationName === 'mutation') {
           handleAfterMutation(response);
-        } else if (response.operation.operationName === OperationType.Query) {
+        } else if (response.operation.operationName === 'query') {
           handleAfterQuery(response);
         }
       })
@@ -63,7 +64,7 @@ export const cacheExchange: Exchange = ({ forward, subject }) => {
 export const afterMutation = (
   resultCache: ResultCache,
   operationCache: OperationCache,
-  subject: Subject<Operation>
+  client: Client
 ) => (response: ExchangeResult) => {
   const pendingOperations = new Set<string>();
 
@@ -77,7 +78,7 @@ export const afterMutation = (
   pendingOperations.forEach(key => {
     const operation = (resultCache.get(key) as ExchangeResult).operation; // Result is guaranteed
     resultCache.delete(key);
-    subject[1](operation);
+    client.reexecuteOperation(operation);
   });
 };
 

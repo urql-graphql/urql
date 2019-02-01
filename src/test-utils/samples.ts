@@ -1,8 +1,8 @@
 import {
   ExchangeResult,
+  ExecutionResult,
   Mutation,
   Operation,
-  OperationType,
   Query,
   Subscription,
 } from '../types';
@@ -52,21 +52,21 @@ export const subscriptionGql: Subscription = {
 
 export const queryOperation: Operation = {
   key: '2',
-  operationName: OperationType.Query,
+  operationName: 'query',
   context,
   ...queryGql,
 };
 
 export const mutationOperation: Operation = {
   key: JSON.stringify(mutationGql),
-  operationName: OperationType.Mutation,
+  operationName: 'mutation',
   context,
   ...mutationGql,
 };
 
 export const subscriptionOperation: Operation = {
   key: JSON.stringify(subscriptionGql),
-  operationName: OperationType.Subscription,
+  operationName: 'subscription',
   context,
   ...subscriptionGql,
 };
@@ -85,7 +85,6 @@ export const mutationResponse: ExchangeResult = {
   data: {},
 };
 
-export const subscriptionResponse: ExchangeResult = {
-  operation: subscriptionOperation,
-  data: {},
+export const subscriptionResult: ExecutionResult = {
+  data: {}
 };

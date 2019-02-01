@@ -1,4 +1,6 @@
-import { GraphQLError } from '../types';
+export interface GraphQLError {
+  message?: string;
+}
 
 const generateErrorMessage = (
   networkErr?: Error,

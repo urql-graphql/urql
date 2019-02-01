@@ -9,20 +9,20 @@ import {
   subscriptionResponse,
 } from '../test-utils';
 
+import { Client } from '../lib/client';
 import { Operation } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 
 let response;
 let exchangeArgs;
 let forwardedOperations: Operation[];
-let reboundOperations: Operation[];
+let reexecuteOperation;
 let input: Subject<Operation>;
-let subject: Subject<Operation>;
 
 beforeEach(() => {
   response = queryResponse;
   forwardedOperations = [];
-  reboundOperations = [];
+  reexecuteOperation = jest.fn();
   input = makeSubject<Operation>();
 
   // Collect all forwarded operations
@@ -36,11 +36,11 @@ beforeEach(() => {
     );
   };
 
-  // Collect all operations sent to the subject
-  subject = makeSubject<Operation>();
-  pipe(subject[0], forEach(op => reboundOperations.push(op)));
+  const client = ({
+    reexecuteOperation: (reexecuteOperation as any)
+  } as Client);
 
-  exchangeArgs = { forward, subject };
+  exchangeArgs = { forward, client };
 });
 
 it('forwards to next exchange when no cache is found', () => {
@@ -51,7 +51,7 @@ it('forwards to next exchange when no cache is found', () => {
   next(queryOperation);
   complete();
   expect(forwardedOperations.length).toBe(1);
-  expect(reboundOperations.length).toBe(0);
+  expect(reexecuteOperation).not.toBeCalled();
 });
 
 it('caches queries', () => {
@@ -63,7 +63,7 @@ it('caches queries', () => {
   next(queryOperation);
   complete();
   expect(forwardedOperations.length).toBe(1);
-  expect(reboundOperations.length).toBe(0);
+  expect(reexecuteOperation).not.toBeCalled();
 });
 
 it("doesn't cache mutations", () => {
@@ -76,7 +76,7 @@ it("doesn't cache mutations", () => {
   next(mutationOperation);
   complete();
   expect(forwardedOperations.length).toBe(2);
-  expect(reboundOperations.length).toBe(0);
+  expect(reexecuteOperation).not.toBeCalled();
 });
 
 it('retriggers query operation when mutation occurs', () => {
@@ -84,7 +84,7 @@ it('retriggers query operation when mutation occurs', () => {
   const resultCache = new Map([['test', queryResponse]]);
   const operationCache = { [typename]: new Set(['test']) };
 
-  afterMutation(resultCache, operationCache, subject)({
+  afterMutation(resultCache, operationCache, exchangeArgs.client)({
     ...mutationResponse,
      data: {
       todos: [
@@ -96,7 +96,7 @@ it('retriggers query operation when mutation occurs', () => {
     },
   });
 
-  expect(reboundOperations.length).toBe(1);
+  expect(reexecuteOperation).toBeCalledTimes(1);
 });
 
 it('forwards subscriptions', () => {
@@ -109,5 +109,5 @@ it('forwards subscriptions', () => {
   next(subscriptionOperation);
   complete();
   expect(forwardedOperations.length).toBe(2);
-  expect(reboundOperations.length).toBe(0);
+  expect(reexecuteOperation).not.toBeCalled();
 });

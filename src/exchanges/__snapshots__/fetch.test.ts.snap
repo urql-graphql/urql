@@ -66,5 +66,3 @@ Object {
   },
 }
 `;
-
-exports[`should throw error when operationName is subscription 1`] = `[Error: Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?]`;

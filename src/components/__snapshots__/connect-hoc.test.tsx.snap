@@ -2,7 +2,7 @@
 
 exports[`passes snapshot 1`] = `
 <Connect(TargetComponent)>
-  <mockConstructor
+  <Connect
     mutations={
       Object {
         "test": Object {
@@ -33,6 +33,6 @@ exports[`passes snapshot 1`] = `
     }
   >
     <div />
-  </mockConstructor>
+  </Connect>
 </Connect(TargetComponent)>
 `;

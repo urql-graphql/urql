@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "rootDir": "../",
-    "baseUrl": "../"
+    "baseUrl": "../",
+    "strict": false
   }
 }

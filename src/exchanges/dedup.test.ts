@@ -1,10 +1,13 @@
 import { filter, makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+
 import {
   mutationOperation,
   mutationResponse,
   queryOperation,
   queryResponse,
 } from '../test-utils';
+
+import { Client } from '../lib/client';
 import { Operation } from '../types';
 import { dedupeExchange } from './dedup';
 
@@ -30,7 +33,7 @@ beforeEach(() => {
     );
   };
 
-  exchangeArgs = { forward, subject: makeSubject<Operation>() };
+  exchangeArgs = { forward, subject: ({} as Client) };
 });
 
 it('forwards query operations correctly', async () => {

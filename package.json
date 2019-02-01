@@ -1,29 +1,43 @@
 {
   "name": "urql",
-  "version": "0.3.0-next1",
-  "description": "A naive React Graphql library",
-  "main": "dist/index.js",
-  "umd:main": "dist/index.umd.js",
-  "module": "dist/index.mjs",
+  "version": "1.0.0-beta.1",
+  "description": "A highly customizable and versatile GraphQL client for React",
+  "main": "dist/urql.js",
+  "umd:main": "dist/urql.umd.js",
+  "module": "dist/urql.es.js",
+  "typings": "lib/index.d.ts",
   "source": "src/index.ts",
+  "files": [
+    "dist/urql.js",
+    "dist/urql.umd.js",
+    "dist/urql.es.js",
+    "lib",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "npm run build:clean && npm run build:bundle",
     "build:bundle": "microbundle build --no-sourcemap --target web",
-    "build:clean": "rimraf dist",
-    "build:ts": "tsc",
-    "demo:start:graphql-server": "node example/src/server/index.js",
-    "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
-    "demo": "builder concurrent demo:start:app demo:start:graphql-server",
-    "lint": "tslint --project .",
+    "build:clean": "rimraf dist lib",
+    "build:ts": "tsc -d --emitDeclarationOnly --outDir lib",
+    "build": "run-s build:clean build:ts build:bundle",
     "test": "jest",
     "bundlesize": "bundlesize",
-    "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\""
+    "lint:tslint": "tslint --project .",
+    "lint:prettier": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "run-s lint:tslint lint:prettier",
+    "prepublishOnly": "run-s build"
   },
-  "author": "Ken Wheeler",
+  "author": "Formidable",
   "license": "MIT",
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "jest": {
     "setupFiles": [
-      "./src/test-utils/setupTests.ts"
+      "./scripts/setupTests.js"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
@@ -31,14 +45,13 @@
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
     ],
-    "testRegex": "(src/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
-      "ts",
-      "tsx",
       "js",
       "jsx",
-      "json",
-      "node"
+      "ts",
+      "tsx",
+      "json"
     ],
     "collectCoverageFrom": [
       "<rootDir>/src/**/*.{ts,tsx}"
@@ -65,62 +78,45 @@
   },
   "bundlesize": [
     {
-      "path": "./dist/index.mjs",
+      "path": "./dist/index.es.js",
       "maxSize": "8 kB"
     }
   ],
   "devDependencies": {
-    "@types/enzyme": "^3.1.15",
-    "@types/graphql": "^14.0.3",
-    "@types/jest": "^23.3.9",
-    "@types/react": "^16.0.34",
-    "@types/react-dom": "^16.0.3",
-    "@types/uuid": "^3.4.3",
-    "apollo-server-express": "^2.3.1",
-    "awesome-typescript-loader": "^5.2.1",
-    "builder": "^3.2.3",
+    "@types/enzyme": "3.1.15",
+    "@types/graphql": "^14.0.5",
+    "@types/jest": "^23.3.13",
+    "@types/react": "16.7.10",
     "bundlesize": "^0.17.0",
-    "cors": "^2.8.4",
     "coveralls": "^3.0.0",
-    "enzyme": "^3.7.0",
-    "enzyme-adapter-react-16": "^1.7.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.7.1",
     "enzyme-to-json": "^3.3.5",
-    "express": "^4.16.2",
-    "graphql-playground-middleware-express": "^1.7.8",
-    "graphql-subscriptions": "^1.0.0",
+    "graphql": "^14.1.1",
     "husky": "^1.2.0",
-    "isomorphic-fetch": "^2.2.1",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
-    "microbundle": "^0.7.0",
+    "microbundle": "^0.9.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.15.2",
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
-    "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.0.0-0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
     "react-test-renderer": "^16.2.0",
-    "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
-    "subscriptions-transport-ws": "^0.9.15",
     "ts-jest": "^23.10.5",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.16.0",
     "tslint-react": "^3.6.0",
-    "typescript": "^3.1.6",
-    "webpack": "^4.26.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10"
+    "typescript": "^3.1.6"
   },
   "peerDependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
-    "react-dom": "^16.0.0-0"
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "react": "^15.0.0 || ^16.0.0",
+    "react-dom": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
     "create-react-context": "^0.2.3",
-    "graphql": "^14.0.2",
-    "uuid": "^3.3.2",
-    "wonka": "^1.4.1"
+    "wonka": "^1.4.4"
   },
   "sideEffects": false
 }

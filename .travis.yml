@@ -42,6 +42,9 @@ jobs:
       node_js: 10
       if: branch = master or type =  pull_request
       script:
-        - yarn run demo &
+        - cd example
+        - yarn
+        - yarn start &
         - yarn global add cypress
+        - cd ..
         - cypress run
