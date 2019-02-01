@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const Markdown = styled.article`
+  width: 60vw;
   & h1 {
     font-family: "sharp";
     font-size: 3.4rem;
@@ -78,6 +79,13 @@ export const Markdown = styled.article`
     font-family: "tiempos";
     font-size: 1.7rem;
     line-height: 1.6;
+  }
+
+  & p code {
+    border: 1px solid lightgrey;
+    opacity: 0.8;
+    padding: 0.5rem;
+    margin: 0 0.5rem 0 0.5rem;
   }
 
   & li {

@@ -22,10 +22,10 @@ const Wrapper = styled.div`
 }
 
 @media (max-width: 768px) {
+  box-shadow: 0 5px 10px -5px lightgrey;
   margin-left: 3rem;
   right: 0;
   width: calc(100% - 2rem);
-  box-shadow: 0 5px 10px -5px lightgrey;
   justify-content: flex-end;
 }
 `;

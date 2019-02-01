@@ -35,6 +35,7 @@ const SubContentWrapper = styled.div`
 
 const Wrapper = styled.div`
   display: inline-block;
+  margin-left: 2rem;
 `;
 
 const CloseButton = styled.img`
@@ -96,8 +97,32 @@ class Sidebar extends React.Component {
           />
         </Link>
         <ContentWrapper>
+          <SidebarNavItem to={`/#`} replace key={"home"}>
+            Home
+          </SidebarNavItem>
+          <SidebarNavItem
+            to={`/docs/getting-started`}
+            replace
+            key={"documentation"}
+          >
+            Documentation
+          </SidebarNavItem>
           {sidebarHeaders &&
             sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+          <SidebarNavItem
+            to={"https://www.github.com/FormidableLabs/spectacle/issues"}
+            replace
+            key={"issues"}
+          >
+            Issues
+          </SidebarNavItem>
+          <SidebarNavItem
+            to={"https://github.com/FormidableLabs/spectacle"}
+            replace
+            key={"github"}
+          >
+            Github
+          </SidebarNavItem>
         </ContentWrapper>
       </SidebarContainer>
     );
