@@ -55,8 +55,9 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
-
+  
   p {
+    font-family: "tiempos";
     letter-spacing: -0.03em;
   }
 

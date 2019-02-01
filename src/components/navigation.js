@@ -17,17 +17,6 @@ export const Navigation = styled.div`
   }
 `;
 
-export const NavigationTagline = styled.p`
-  display: none;
-  @media (min-width: 768px) {
-    display: block;
-    color: "white"
-    line-height: 3.2rem;
-    margin: 0 1rem 0 auto;
-    text-transform: uppercase;
-  }
-`;
-
 export const SidebarContainer = styled.aside`
   font-family: "akkurat";
   background-image: url("../../static/svgs/pink-sidebar-background.svg");

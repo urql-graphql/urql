@@ -39,6 +39,15 @@ const OSSImage = styled.img`
   }
 `;
 
+const OSSLink = styled.a`
+  & h3 {
+    color: white;
+  }
+  & h3:hover {
+    opacity: 0.7;
+  }
+`;
+
 class MoreOSS extends React.Component {
   render() {
     return (
@@ -47,12 +56,14 @@ class MoreOSS extends React.Component {
           <SectionTitle>More Open Source from Formidable</SectionTitle>
           {this.props.ossArray.map(card => (
             <OSSCard key={card.title}>
-              <OSSImage src={card.logo} />
-              <SecondaryTitle>{card.title}</SecondaryTitle>
+              <OSSLink href={card.link}>
+                <OSSImage src={card.logo} />
+                <SecondaryTitle>{card.title}</SecondaryTitle>
+              </OSSLink>
               <BodyCopy>{card.description}</BodyCopy>
             </OSSCard>
           ))}
-          <Button light href="#">
+          <Button light href="https://formidable.com/open-source/">
             View All
           </Button>
         </Wrapper>

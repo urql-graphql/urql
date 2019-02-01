@@ -14,6 +14,7 @@ const Container = styled.footer`
 const FooterDescription = styled.p`
   flex: 2;
   font-size: 1.4rem;
+  letter-spacing: 0.05rem;
   line-height: 1.6;
   margin: 2rem 0 0;
   max-width: 56rem;
@@ -64,24 +65,23 @@ export const Footer = () => (
         />
         <FooterLinks>
           <li>
-            <a href="#" title="Contact">
+            <a href="https://formidable.com/contact/" title="Contact">
               Contact
             </a>
           </li>
           <li>
-            <a href="#" title="Careers">
+            <a href="https://formidable.com/careers/" title="Careers">
               Careers
             </a>
           </li>
         </FooterLinks>
       </FooterLeft>
       <FooterDescription>
-        A little blurb about Formidable. Lorem ipsum dolor sit amet, consectetur
-        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-        in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-        pariatur.
+        Formidable is a Seattle, Denver, and London-based engineering
+        consultancy and open source software organization, specializing in
+        React.js, React Native, GraphQL, Node.js, and the extended JavaScript
+        ecosystem. For more information about Formidable, please visit
+        formidable.com.
       </FooterDescription>
     </Wrapper>
   </Container>

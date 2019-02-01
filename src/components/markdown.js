@@ -87,6 +87,11 @@ export const Markdown = styled.article`
   }
 
   & a {
-    color: black;
+    color: #895160;
+
+    &:hover {
+      color: black;
+      text-decoration: underline;
+    }
   }
 `;

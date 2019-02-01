@@ -38,6 +38,8 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
+  font-family: "sharp";
+  letter-spacing: 0.15em;
   font-size: 1.4rem;
   line-height: 2.2rem;
   margin: 0 0 6rem;
@@ -65,6 +67,7 @@ const HeroLogo = styled.img`
 
 const HeroCopyLink = styled.p`
   background: #d5d5d5;
+  font-family: "akkurat", sans-serif;
   color: #3b3b3b;
   display: flex;
   flex-direction: row;
@@ -111,7 +114,7 @@ const HeroNavList = styled.ul`
     text-transform: uppercase;
   }
   & li a:hover {
-    opacity: 0.7;
+    color: #fc6986;
   }
 `;
 
@@ -125,7 +128,7 @@ class Hero extends React.Component {
     };
   }
 
-  handleCopy = e => {
+  handleCopy(e) {
     e.preventDefault();
     this.setState({ animating: true, copied: true });
     setTimeout(() => {
@@ -134,7 +137,7 @@ class Hero extends React.Component {
     setTimeout(() => {
       this.setState({ copied: false });
     }, "3000");
-  };
+  }
 
   render() {
     return (

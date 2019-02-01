@@ -15,7 +15,7 @@ import yaml from "prismjs/components/prism-yaml";
 const Container = styled.div`
   max-width: 80rem;
   min-height: 100vh;
-  padding: 2rem 4rem;
+  padding: 2rem 4rem 8rem;
   width: 100%;
 `;
 

@@ -7,17 +7,17 @@ order: 0
 
 # Getting Started
 
-[Development](#Development)
+[Development](#development)
 
-[Build & Deployment](#Build-&-Deployment)
+[Build & Deployment](#build-&-deployment)
 
-[Presenting](#Presenting)
+[Presenting](#presenting)
 
-[Controls](#Controls)
+[Controls](#controls)
 
-[Fullscreen](#Fullscreen)
+[Fullscreen](#fullscreen)
 
-[PDF Export](#PDF-Export)
+[PDF Export](#pdf-export)
 
 <a name="boilerplate"></a>
 

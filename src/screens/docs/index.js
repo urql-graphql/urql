@@ -30,20 +30,11 @@ const Wrapper = styled.div`
 }
 `;
 
-const HeaderTagLine = styled.p`
-  display: block;
-  color: "rgba(0, 0, 0, 0.3)";
-  line-height: 3.2rem;
-  margin: 0 1rem 0 auto;
-  text-transform: uppercase;
-  font-size: 1.5rem;
-
-  @media (max-width: 600px) {
-    display: none;
-  }
-`;
-
 const HeaderLogo = styled.img`
+  position: absolute;
+  right: 3rem;
+  top: 1.5rem;
+
   @media (max-width: 600px) {
     display: none;
   }
@@ -88,7 +79,6 @@ class Docs extends React.Component {
               onClick={() => this.openSidebar()}
             />
           </CollapsedMenu>
-          <HeaderTagLine>Lovingly created by</HeaderTagLine>
           <HeaderLogo
             src="../../static/svgs/logo_formidable_dark.svg"
             alt="Formidable Logo"
