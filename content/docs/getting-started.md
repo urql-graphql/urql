@@ -5,7 +5,7 @@ order: 0
 
 <a name="getting-started"></a>
 
-# Get Started
+# Getting Started
 
 [Development](#Development)
 
@@ -77,14 +77,14 @@ You can toggle the presenter or overview mode by pressing respectively `alt+p` a
 
 ## Controls
 
-| Key Combination | Function              |
-| --------------- | --------------------- |
-| Right Arrow     | Next Slide            |
-| Left Arrow      | Previous Slide        |
-| Space           | Next Slide            |
-| Shift+Space     | Previous Slide        |
-| Alt/Option + O  | Toggle Overview Mode  |
-| Alt/Option + P  | Toggle Presenter Mode |
+| **Key Combination** | **Function**          |
+| ------------------- | --------------------- |
+| Right Arrow         | Next Slide            |
+| Left Arrow          | Previous Slide        |
+| Space               | Next Slide            |
+| Shift+Space         | Previous Slide        |
+| Alt/Option + O      | Toggle Overview Mode  |
+| Alt/Option + P      | Toggle Presenter Mode |
 
 <a name="fullscreen"></a>
 

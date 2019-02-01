@@ -59,7 +59,7 @@ class Sidebar extends React.Component {
         >
           {item.title}
         </SidebarNavItem>
-        {currentPath && subContent && (
+        {currentPath && !!subContent.length && (
           <SubContentWrapper>
             {subContent.map(sh => (
               <SidebarNavSubItem

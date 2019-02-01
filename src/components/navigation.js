@@ -29,6 +29,7 @@ export const NavigationTagline = styled.p`
 `;
 
 export const SidebarContainer = styled.aside`
+  font-family: "akkurat";
   background-image: url("../../static/svgs/pink-sidebar-background.svg");
   background-repeat: repeat-y;
   min-height: 100vh;
@@ -48,7 +49,6 @@ export const SidebarContainer = styled.aside`
 `;
 
 export const SidebarNavItem = styled(Link)`
-  font-family: "Akkurat", sans-serif;
   color: white;
   margin-left: 4rem;
   margin-bottom: 1rem;
