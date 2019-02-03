@@ -1,17 +1,5 @@
-import {
-  filter,
-  makeSubject,
-  Operator,
-  pipe,
-  share,
-  Source,
-  Subject,
-  take,
-  tapAll
-} from 'wonka';
-
+import { filter, makeSubject, pipe, share, Source, take, tapAll } from 'wonka';
 import { composeExchanges, defaultExchanges } from '../exchanges';
-import { CombinedError } from './error';
 import { hashString } from './hash';
 
 import {
@@ -37,7 +25,7 @@ export interface ClientOptions {
 }
 
 interface ActiveResultSources {
-  [operationKey: string]: Source<ExchangeResult>
+  [operationKey: string]: Source<ExchangeResult>;
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
@@ -53,7 +41,7 @@ export class Client implements ClientOptions {
   dispatchOperation: (operation: Operation) => void;
   operations$: Source<Operation>;
   results$: Source<ExchangeResult>;
-  activeResultSources = (Object.create(null) as ActiveResultSources);
+  activeResultSources = Object.create(null) as ActiveResultSources;
 
   constructor(opts: ClientOptions) {
     this.url = opts.url;
@@ -61,12 +49,10 @@ export class Client implements ClientOptions {
     this.fetchOptions =
       typeof opts.fetchOptions === 'function'
         ? opts.fetchOptions()
-        : (opts.fetchOptions || {});
+        : opts.fetchOptions || {};
 
     this.exchanges =
-      opts.exchanges !== undefined
-        ? opts.exchanges
-        : defaultExchanges;
+      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -76,13 +62,17 @@ export class Client implements ClientOptions {
 
     // All operations run through the exchanges in a pipeline-like fashion
     // and this observable then combines all their results
-    this.results$ = share(composeExchanges(this, this.exchanges)(this.operations$));
+    this.results$ = share(
+      composeExchanges(this, this.exchanges)(this.operations$)
+    );
   }
 
-  private createOperationContext = (opts?: Partial<OperationContext>): OperationContext => ({
+  private createOperationContext = (
+    opts?: Partial<OperationContext>
+  ): OperationContext => ({
     url: this.url,
     fetchOptions: this.fetchOptions,
-    ...opts
+    ...opts,
   });
 
   private createRequestOperation = (
@@ -93,7 +83,7 @@ export class Client implements ClientOptions {
     ...query,
     key: hashString(JSON.stringify(query)),
     operationName: type,
-    context: this.createOperationContext(opts)
+    context: this.createOperationContext(opts),
   });
 
   /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
@@ -113,8 +103,22 @@ export class Client implements ClientOptions {
 
     if (operationName === 'mutation') {
       // A mutation is always limited to just a single result and is never shared
-      return pipe(operationResults$, take(1));
-    } else if (key in this.activeResultSources) {
+      return pipe(
+        operationResults$,
+        tapAll<ExchangeResult>(
+          () => this.dispatchOperation(operation),
+          () => {
+            /* noop */
+          },
+          () => {
+            /* noop */
+          }
+        ),
+        take(1)
+      );
+    }
+
+    if (key in this.activeResultSources) {
       // Reuse active result observable when it's available
       return this.activeResultSources[key];
     }
@@ -123,7 +127,9 @@ export class Client implements ClientOptions {
       operationResults$,
       tapAll<ExchangeResult>(
         () => this.dispatchOperation(operation),
-        () => { /* noop */ },
+        () => {
+          /* noop */
+        },
         () => this.teardownOperation(operation)
       ),
       share
@@ -138,17 +144,26 @@ export class Client implements ClientOptions {
     }
   };
 
-  executeQuery = (query: Query, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeQuery = (
+    query: Query,
+    opts?: Partial<OperationContext>
+  ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('query', query, opts);
     return this.executeRequestOperation(operation);
   };
 
-  executeSubscription = (query: Subscription, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeSubscription = (
+    query: Subscription,
+    opts?: Partial<OperationContext>
+  ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
   };
 
-  executeMutation = (query: Mutation, opts?: Partial<OperationContext>): Source<ExchangeResult> => {
+  executeMutation = (
+    query: Mutation,
+    opts?: Partial<OperationContext>
+  ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };

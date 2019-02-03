@@ -1,64 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createClient passes snapshot 1`] = `
-Object {
-  "createInstance": [Function],
-}
-`;
-
-exports[`createInstance passes snapshot 1`] = `
-Object {
+Client {
+  "activeResultSources": Object {},
+  "createOperationContext": [Function],
+  "createRequestOperation": [Function],
+  "dispatchOperation": [Function],
+  "exchanges": Array [
+    [Function],
+    [Function],
+    [Function],
+  ],
   "executeMutation": [Function],
   "executeQuery": [Function],
   "executeSubscription": [Function],
-  "executeUnsubscribeSubscription": [Function],
-  "unsubscribe": [Function],
-}
-`;
-
-exports[`executeQuery on data calls onChange with matching snapshot 1`] = `
-Object {
-  "data": Object {
-    "user": Object {
-      "name": "Clive",
-    },
-  },
-  "error": undefined,
-  "fetching": false,
-}
-`;
-
-exports[`executeQuery on graphql error calls onChange with matching snapshot 1`] = `
-Object {
-  "data": undefined,
-  "error": CombinedError {
-    "graphQLErrors": Array [
-      [Error: error 1 message],
-    ],
-    "message": "[GraphQL] error 1 message",
-    "name": "CombinedError",
-    "networkError": undefined,
-    "response": Object {
-      "json": [Function],
-      "status": 200,
-    },
-  },
-  "fetching": false,
-}
-`;
-
-exports[`executeQuery on network error calls onChange with matching snapshot 1`] = `
-Object {
-  "data": undefined,
-  "error": CombinedError {
-    "graphQLErrors": Array [],
-    "message": "[Network] ",
-    "name": "CombinedError",
-    "networkError": [Error],
-    "response": Object {
-      "status": 400,
-    },
-  },
-  "fetching": false,
+  "fetchOptions": Object {},
+  "operations$": [Function],
+  "reexecuteOperation": [Function],
+  "results$": [Function],
+  "url": "https://hostname.com",
 }
 `;
