@@ -100,6 +100,16 @@ describe('executeQuery', () => {
 
     expect(receivedOps[0]).toHaveProperty('context.url', url);
   });
+
+  it('dispatches teardown', () => {
+    const [teardown] = pipe(
+      client.executeQuery(query),
+      subscribe(x => x)
+    );
+
+    teardown();
+    expect(receivedOps[1]).toHaveProperty('operationName', 'teardown');
+  });
 });
 
 describe('executeMutation', () => {
@@ -137,5 +147,44 @@ describe('executeMutation', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('context.url', url);
+  });
+});
+
+describe('executeSubscription', () => {
+  it('passes query string exchange', async () => {
+    pipe(
+      client.executeSubscription(query),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0]).toHaveProperty('query', query.query);
+  });
+
+  it('passes variables type to exchange', () => {
+    pipe(
+      client.executeSubscription(query),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0]).toHaveProperty('variables', query.variables);
+  });
+
+  it('passes operationName type to exchange', () => {
+    pipe(
+      client.executeSubscription(query),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0]).toHaveProperty('operationName', 'subscription');
+  });
+
+  it('dispatches teardown', () => {
+    const [teardown] = pipe(
+      client.executeQuery(query),
+      subscribe(x => x)
+    );
+
+    teardown();
+    expect(receivedOps[1]).toHaveProperty('operationName', 'teardown');
   });
 });
