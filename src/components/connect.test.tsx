@@ -1,8 +1,8 @@
 jest.mock('./client');
-import { shallow, mount } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import React from 'react';
+import { mutationGql, queryGql } from '../test-utils';
 import { Connect } from './connect';
-import { queryGql, mutationGql } from '../test-utils';
 
 const children = jest.fn().mockReturnValue(() => <h1>Child component</h1>);
 const query = queryGql;
@@ -57,6 +57,6 @@ describe('UrqlClient', () => {
 
   it('is passed client', () => {
     const wrapper = mount(<Connect children={children} />);
-    expect(wrapper.find('UrqlClient').props()).toHaveProperty('client', {});
+    expect(wrapper.find('UrqlClient').props()).toHaveProperty('client');
   });
 });

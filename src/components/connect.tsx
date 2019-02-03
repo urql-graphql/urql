@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { Client } from '../lib/client';
 import { ChildArgs, Mutation, Query, Subscription } from '../types';
 import { UrqlClient } from './client';
 import { Consumer } from './context';
@@ -21,8 +20,6 @@ export interface ConnectProps<T> {
 /** Component for connecting to the urql client for executing queries, mutations and returning the result to child components. */
 export function Connect<T>(props: ConnectProps<T>) {
   return (
-    <Consumer>
-      {client => <UrqlClient {...props} client={client} />}
-    </Consumer>
+    <Consumer>{client => <UrqlClient {...props} client={client} />}</Consumer>
   );
 }

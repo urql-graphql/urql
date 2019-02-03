@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContextConsumer passes snapshot 1`] = `
+Object {
+  "$$typeof": Symbol(react.context),
+  "_calculateChangedBits": null,
+  "_context": Object {
+    "$$typeof": Symbol(react.context),
+    "Consumer": [Circular],
+    "Provider": Object {
+      "$$typeof": Symbol(react.provider),
+      "_context": [Circular],
+    },
+    "_calculateChangedBits": null,
+    "_currentRenderer": null,
+    "_currentRenderer2": null,
+    "_currentValue": Client {
+      "activeResultSources": Object {},
+      "createOperationContext": [Function],
+      "createRequestOperation": [Function],
+      "dispatchOperation": [Function],
+      "exchanges": Array [
+        [Function],
+        [Function],
+        [Function],
+      ],
+      "executeMutation": [Function],
+      "executeQuery": [Function],
+      "executeSubscription": [Function],
+      "fetchOptions": Object {},
+      "operations$": [Function],
+      "reexecuteOperation": [Function],
+      "results$": [Function],
+      "url": "/graphql",
+    },
+    "_currentValue2": Client {
+      "activeResultSources": Object {},
+      "createOperationContext": [Function],
+      "createRequestOperation": [Function],
+      "dispatchOperation": [Function],
+      "exchanges": Array [
+        [Function],
+        [Function],
+        [Function],
+      ],
+      "executeMutation": [Function],
+      "executeQuery": [Function],
+      "executeSubscription": [Function],
+      "fetchOptions": Object {},
+      "operations$": [Function],
+      "reexecuteOperation": [Function],
+      "results$": [Function],
+      "url": "/graphql",
+    },
+    "_threadCount": 0,
+  },
+}
+`;
+
+exports[`ContextProvider passes snapshot 1`] = `
+Object {
+  "$$typeof": Symbol(react.provider),
+  "_context": Object {
+    "$$typeof": Symbol(react.context),
+    "Consumer": Object {
+      "$$typeof": Symbol(react.context),
+      "_calculateChangedBits": null,
+      "_context": [Circular],
+    },
+    "Provider": [Circular],
+    "_calculateChangedBits": null,
+    "_currentRenderer": null,
+    "_currentRenderer2": null,
+    "_currentValue": Client {
+      "activeResultSources": Object {},
+      "createOperationContext": [Function],
+      "createRequestOperation": [Function],
+      "dispatchOperation": [Function],
+      "exchanges": Array [
+        [Function],
+        [Function],
+        [Function],
+      ],
+      "executeMutation": [Function],
+      "executeQuery": [Function],
+      "executeSubscription": [Function],
+      "fetchOptions": Object {},
+      "operations$": [Function],
+      "reexecuteOperation": [Function],
+      "results$": [Function],
+      "url": "/graphql",
+    },
+    "_currentValue2": Client {
+      "activeResultSources": Object {},
+      "createOperationContext": [Function],
+      "createRequestOperation": [Function],
+      "dispatchOperation": [Function],
+      "exchanges": Array [
+        [Function],
+        [Function],
+        [Function],
+      ],
+      "executeMutation": [Function],
+      "executeQuery": [Function],
+      "executeSubscription": [Function],
+      "fetchOptions": Object {},
+      "operations$": [Function],
+      "reexecuteOperation": [Function],
+      "results$": [Function],
+      "url": "/graphql",
+    },
+    "_threadCount": 0,
+  },
+}
+`;

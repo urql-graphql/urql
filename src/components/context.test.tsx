@@ -1,21 +1,21 @@
-import { ContextConsumer, ContextProvider } from './context';
+import { Consumer, Provider } from './context';
 
 describe('ContextConsumer', () => {
   it('passes snapshot', () => {
-    expect(ContextConsumer).toMatchSnapshot();
+    expect(Consumer).toMatchSnapshot();
   });
 
   it('is exported', () => {
-    expect(typeof ContextConsumer).toBe('object');
+    expect(typeof Consumer).toBe('object');
   });
 });
 
 describe('ContextProvider', () => {
   it('passes snapshot', () => {
-    expect(ContextProvider).toMatchSnapshot();
+    expect(Provider).toMatchSnapshot();
   });
 
   it('is exported', () => {
-    expect(typeof ContextProvider).toBe('object');
+    expect(typeof Provider).toBe('object');
   });
 });

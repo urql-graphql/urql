@@ -1,5 +1,15 @@
 import { Component, ReactNode } from 'react';
-import { empty, filter, makeSubject, map, pipe, Source, subscribe, switchAll, toPromise } from 'wonka';
+import {
+  empty,
+  filter,
+  makeSubject,
+  map,
+  pipe,
+  Source,
+  subscribe,
+  switchAll,
+  toPromise,
+} from 'wonka';
 
 import { Client } from '../lib/client';
 import { CombinedError } from '../lib/error';
@@ -10,7 +20,7 @@ import {
   ExchangeResult,
   Mutation,
   Query,
-  Subscription
+  Subscription,
 } from '../types';
 
 export type Mutations<MutationDeclarations> = {
@@ -18,7 +28,9 @@ export type Mutations<MutationDeclarations> = {
 };
 
 export type MutationFns<MutationDeclarations> = {
-  [type in keyof MutationDeclarations]: (variables?: object) => Promise<ExchangeResult>
+  [type in keyof MutationDeclarations]: (
+    variables?: object
+  ) => Promise<ExchangeResult>
 };
 
 export interface ClientState<MutationDeclarations> {
@@ -28,7 +40,8 @@ export interface ClientState<MutationDeclarations> {
   mutations?: MutationFns<MutationDeclarations>;
 }
 
-export interface ClientProps<MutationDeclarations> extends ConnectProps<MutationDeclarations> {
+export interface ClientProps<MutationDeclarations>
+  extends ConnectProps<MutationDeclarations> {
   client: Client;
 }
 
@@ -51,22 +64,38 @@ export class UrqlClient<MutationDeclarations> extends Component<
   constructor(props) {
     super(props);
 
-    if (process.env.NODE_ENV !== 'production' && props.subscription && !props.updateSubscription) {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      props.subscription &&
+      !props.updateSubscription
+    ) {
       throw new Error(
         'You instantiated an Urql Client component with a subscription but forgot an updateSubscription prop. updateSubscription callbacks are required to work with subscriptions.'
       );
     }
 
     const [queryProp$, nextQueryProp] = makeSubject<void | Query>();
-    const [subscriptionProp$, nextSubscriptionProp] = makeSubject<void | Subscription>();
+    const [
+      subscriptionProp$,
+      nextSubscriptionProp,
+    ] = makeSubject<void | Subscription>();
     this.nextQueryProp = nextQueryProp;
     this.nextSubscriptionProp = nextSubscriptionProp;
 
     const queryResults$ = makeQueryResults$(props.client, queryProp$);
-    const subscriptionResults$ = makeSubscriptionResults$(props.client, subscriptionProp$);
+    const subscriptionResults$ = makeSubscriptionResults$(
+      props.client,
+      subscriptionProp$
+    );
 
-    const [queryTeardown] = pipe(queryResults$, subscribe(this.onQueryUpdate));
-    const [subscriptionTeardown] = pipe(queryResults$, subscribe(this.onSubscriptionUpdate));
+    const [queryTeardown] = pipe(
+      queryResults$,
+      subscribe(this.onQueryUpdate)
+    );
+    const [subscriptionTeardown] = pipe(
+      queryResults$,
+      subscribe(this.onSubscriptionUpdate)
+    );
 
     this.unsubscribe = () => {
       queryTeardown();
@@ -78,7 +107,7 @@ export class UrqlClient<MutationDeclarations> extends Component<
     this.setState({
       loaded: true,
       error: result.error,
-      data: result.data
+      data: result.data,
     });
   }
 
@@ -123,7 +152,7 @@ export class UrqlClient<MutationDeclarations> extends Component<
       loaded: this.state.loaded,
       error: this.state.error,
       data: this.state.data,
-      mutations: this.mutations || undefined
+      mutations: this.mutations || undefined,
     });
   }
 }
@@ -132,19 +161,19 @@ const makeQueryResults$ = (
   client: Client,
   queryProp$: Source<void | Query>
 ): Source<ExchangeResult> => {
-  const noopQuery = (empty as Source<ExchangeResult>);
+  const noopQuery = empty as Source<ExchangeResult>;
   let lastResults$: void | Source<ExchangeResult>;
 
   return pipe(
     queryProp$,
     map(query => {
-      return query === undefined
-        ? noopQuery
-        : client.executeQuery(query);
+      return query === undefined ? noopQuery : client.executeQuery(query);
     }),
     filter(x => {
       const isDistinct = x !== lastResults$;
-      if (isDistinct) { lastResults$ = x; }
+      if (isDistinct) {
+        lastResults$ = x;
+      }
       return isDistinct;
     }),
     switchAll
@@ -155,7 +184,7 @@ const makeSubscriptionResults$ = (
   client: Client,
   subscriptionProp$: Source<void | Subscription>
 ): Source<ExchangeResult> => {
-  const noopSubscription = (empty as Source<ExchangeResult>);
+  const noopSubscription = empty as Source<ExchangeResult>;
   let lastResults$: void | Source<ExchangeResult>;
 
   return pipe(
@@ -167,7 +196,9 @@ const makeSubscriptionResults$ = (
     }),
     filter(x => {
       const isDistinct = x !== lastResults$;
-      if (isDistinct) { lastResults$ = x; }
+      if (isDistinct) {
+        lastResults$ = x;
+      }
       return isDistinct;
     }),
     switchAll
@@ -184,16 +215,17 @@ const getMutationFns = <T>(
 
   return Object.keys(mutations).reduce(
     (acc, key) => {
-      acc[key] = (variables?: object) => pipe(
-        client.executeMutation({
-          ...mutations[key],
-          variables,
-        }),
-        toPromise
-      );
+      acc[key] = (variables?: object) =>
+        pipe(
+          client.executeMutation({
+            ...mutations[key],
+            variables,
+          }),
+          toPromise
+        );
 
       return acc;
     },
     {} as MutationFns<T>
   );
-}
+};
