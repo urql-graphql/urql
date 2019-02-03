@@ -7380,10 +7380,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^1.4.4:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-1.4.4.tgz#ac216e4028dba706b529495f58b1efa507a230e7"
-  integrity sha512-Ogjp2Hc+XhYx8ObUbetEtugAN3FmFKUiKdy3me3XsCfcCVOKIuqEXZDplz/x8/jh2dPyKcVQ8zSi9Li2eeitvw==
+wonka@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-2.0.0.tgz#c71311db41c12806f991f0e50f3c95ae7305c87f"
+  integrity sha512-25ZnFMci8KMuvkO3+h1UhGq2QXPY0Jbwq+GwF3bQbaMElVVuLHDum17HUCugHl+gAokwMflsHfTMfO5kSukbvw==
   dependencies:
     bs-rebel "^0.2.3"
 

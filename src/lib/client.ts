@@ -1,4 +1,4 @@
-import { filter, makeSubject, pipe, share, Source, take, tapAll } from 'wonka';
+import { filter, makeSubject, onEnd, onStart, pipe, share, Source, take } from 'wonka';
 import { composeExchanges, defaultExchanges } from '../exchanges';
 import { hashString } from './hash';
 
@@ -105,15 +105,7 @@ export class Client implements ClientOptions {
       // A mutation is always limited to just a single result and is never shared
       return pipe(
         operationResults$,
-        tapAll<ExchangeResult>(
-          () => this.dispatchOperation(operation),
-          () => {
-            /* noop */
-          },
-          () => {
-            /* noop */
-          }
-        ),
+        onStart<ExchangeResult>(() => this.dispatchOperation(operation)),
         take(1)
       );
     }
@@ -125,13 +117,8 @@ export class Client implements ClientOptions {
 
     return (this.activeResultSources[key] = pipe(
       operationResults$,
-      tapAll<ExchangeResult>(
-        () => this.dispatchOperation(operation),
-        () => {
-          /* noop */
-        },
-        () => this.teardownOperation(operation)
-      ),
+      onStart<ExchangeResult>(() => this.dispatchOperation(operation)),
+      onEnd<ExchangeResult>(() => this.teardownOperation(operation)),
       share
     ));
   }
