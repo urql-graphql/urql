@@ -5,7 +5,8 @@ import { withRouteData, withRouter, Link } from "react-static";
 import {
   SidebarNavItem,
   SidebarNavSubItem,
-  SidebarContainer
+  SidebarContainer,
+  SidebarWrapper
 } from "../../components/navigation";
 
 const HeroLogo = styled.img`
@@ -82,48 +83,50 @@ class Sidebar extends React.Component {
   render() {
     const { sidebarHeaders, overlay, closeSidebar } = this.props;
     return (
-      <SidebarContainer overlay={overlay}>
-        <CloseButton
-          src="../../static/svgs/x.svg"
-          alt="X"
-          overlay={overlay}
-          onClick={() => closeSidebar()}
-        />
-        <Link to={"/"}>
-          <HeroLogo
-            src="../../static/svgs/logo-sidebar.svg"
-            alt="Formidable Logo"
+      <SidebarContainer>
+        <SidebarWrapper overlay={overlay}>
+          <CloseButton
+            src="../../static/svgs/x.svg"
+            alt="X"
             overlay={overlay}
+            onClick={() => closeSidebar()}
           />
-        </Link>
-        <ContentWrapper>
-          <SidebarNavItem to={`/#`} replace key={"home"}>
-            Home
-          </SidebarNavItem>
-          <SidebarNavItem
-            to={`/docs/getting-started`}
-            replace
-            key={"documentation"}
-          >
-            Documentation
-          </SidebarNavItem>
-          {sidebarHeaders &&
-            sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-          <SidebarNavItem
-            to={"https://www.github.com/FormidableLabs/spectacle/issues"}
-            replace
-            key={"issues"}
-          >
-            Issues
-          </SidebarNavItem>
-          <SidebarNavItem
-            to={"https://github.com/FormidableLabs/spectacle"}
-            replace
-            key={"github"}
-          >
-            Github
-          </SidebarNavItem>
-        </ContentWrapper>
+          <Link to={"/"}>
+            <HeroLogo
+              src="../../static/svgs/logo-sidebar.svg"
+              alt="Formidable Logo"
+              overlay={overlay}
+            />
+          </Link>
+          <ContentWrapper>
+            <SidebarNavItem to={`/#`} replace key={"home"}>
+              Home
+            </SidebarNavItem>
+            <SidebarNavItem
+              to={`/docs/getting-started`}
+              replace
+              key={"documentation"}
+            >
+              Documentation
+            </SidebarNavItem>
+            {sidebarHeaders &&
+              sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+            <SidebarNavItem
+              to={"https://www.github.com/FormidableLabs/spectacle/issues"}
+              replace
+              key={"issues"}
+            >
+              Issues
+            </SidebarNavItem>
+            <SidebarNavItem
+              to={"https://github.com/FormidableLabs/spectacle"}
+              replace
+              key={"github"}
+            >
+              Github
+            </SidebarNavItem>
+          </ContentWrapper>
+        </SidebarWrapper>
       </SidebarContainer>
     );
   }

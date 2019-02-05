@@ -16,8 +16,17 @@ export const Navigation = styled.div`
     }
   }
 `;
+export const SidebarContainer = styled.div`
+  width: 26rem;
+  min-width: 26rem;
+  min-height: 100vh;
+  @media (max-width: 768px) {
+    min-width: 5rem;
+    width: 5rem};
+  }
+`;
 
-export const SidebarContainer = styled.aside`
+export const SidebarWrapper = styled.aside`
   font-family: "akkurat";
   background-image: url("../../static/svgs/pink-sidebar-background.svg");
   background-repeat: repeat-y;
@@ -25,7 +34,8 @@ export const SidebarContainer = styled.aside`
   padding-top: 18rem;
   min-width: 26rem;
   width: 26rem;
-  position: ${props => (props.overlay ? "fixed" : "")};
+  z-index: 900;
+  position: fixed;
 
   @media (max-width: 768px) {
     background-image: ${props =>

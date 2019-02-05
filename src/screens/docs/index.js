@@ -5,6 +5,8 @@ import { withRouter, withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
 
+const headerZIndex = 1000;
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -20,7 +22,7 @@ const Wrapper = styled.div`
   position: fixed;
   left: 21rem;
   background: white;
-  z-index: 1000;
+  z-index: ${headerZIndex};
   padding-right: 3rem;
   box-shadow: 0 5px 10px -5px lightgrey;
 }
@@ -49,9 +51,10 @@ const HeaderLogo = styled.img`
 
 const CollapsedMenu = styled.div`
   padding-left: 3rem;
-  display: ${props => (props.overlay ? "none" : "")};
-  @media (min-width: 768px) {
-    display: none;
+  display: none;
+  @media (max-width: 768px) {
+    display: block;
+    visibility: ${props => (props.overlay ? "hidden" : "visible")};
   }
   @media (max-width: 600px) {
     padding-left: 2.5rem;
