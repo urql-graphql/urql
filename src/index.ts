@@ -1,4 +1,4 @@
-export * from './types';
-export * from './components';
-export * from './lib';
 export * from './exchanges';
+export * from './lib';
+export * from './react';
+export * from './types';

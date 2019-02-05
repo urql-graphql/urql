@@ -4,11 +4,7 @@ import { Client } from './lib/client';
 import { CombinedError } from './lib/error';
 
 /** The type of GraphQL operation being executed. */
-export type OperationType =
-  | 'subscription'
-  | 'query'
-  | 'mutation'
-  | 'teardown';
+export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
@@ -16,9 +12,9 @@ export interface GraphQLRequest {
   variables?: object;
 }
 
-export type Query = GraphQLRequest;
-export type Mutation = GraphQLRequest;
-export type Subscription = GraphQLRequest;
+export type GraphqlQuery = GraphQLRequest;
+export type GraphqlMutation = GraphQLRequest;
+export type GraphqlSubscription = GraphQLRequest;
 
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
