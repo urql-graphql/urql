@@ -86,6 +86,7 @@ const HeroCopyLink = styled.p`
 `;
 
 const HeroCopyText = styled.span`
+  font-family: "tiempos";
   padding: 0 1.6rem;
   text-align: left;
   min-width: 20rem;

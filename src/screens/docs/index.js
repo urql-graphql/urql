@@ -17,24 +17,31 @@ const Wrapper = styled.div`
   flex-direction: row;
   height: 6rem;
   width: 100%;
-  position: absolute;
+  position: fixed;
+  left: 21rem;
+  background: white;
+  z-index: 1000;
   padding-right: 3rem;
+  box-shadow: 0 5px 10px -5px lightgrey;
 }
-
 @media (max-width: 768px) {
   box-shadow: 0 5px 10px -5px lightgrey;
-  margin-left: 3rem;
+  margin-left: 2.5rem;
   right: 0;
   width: calc(100% - 2rem);
-  justify-content: flex-end;
+  justify-content: flex-start;
+  left: 0;
 }
 `;
 
 const HeaderLogo = styled.img`
   position: absolute;
-  right: 3rem;
-  top: 1.5rem;
-
+  right: 25rem;
+  top: 1.2rem;
+  @media (max-width: 768px) {
+    right: 7rem;
+    padding-left: 2rem;
+  }
   @media (max-width: 600px) {
     display: none;
   }
@@ -43,13 +50,32 @@ const HeaderLogo = styled.img`
 const CollapsedMenu = styled.div`
   padding-left: 3rem;
   display: ${props => (props.overlay ? "none" : "")};
-
   @media (min-width: 768px) {
     display: none;
   }
   @media (max-width: 600px) {
+    padding-left: 2.5rem;
     position: absolute;
     left: 0;
+  }
+`;
+
+const DocsTitle = styled.h2`
+  font-size: 3rem;
+  top: 0.2rem;
+  flex: auto;
+  width: 100%;
+  letter-spacing: 0.5rem;
+  margin: 0;
+  position: relative;
+  left: 9rem;
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    left: 2rem;
+    margin: 0;
+  }
+  @media (max-width: 600px) {
+    left: 6.5rem;
   }
 `;
 
@@ -79,6 +105,7 @@ class Docs extends React.Component {
               onClick={() => this.openSidebar()}
             />
           </CollapsedMenu>
+          <DocsTitle>SPECTACLE</DocsTitle>
           <HeaderLogo
             src="../../static/svgs/logo_formidable_dark.svg"
             alt="Formidable Logo"

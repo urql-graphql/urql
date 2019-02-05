@@ -15,21 +15,15 @@ import yaml from "prismjs/components/prism-yaml";
 const Container = styled.div`
   max-width: 80rem;
   min-height: 100vh;
-  padding: 2rem 4rem 8rem;
   width: 100%;
-`;
-
-const DocsTitle = styled.h2`
-  font-size: 3.5rem;
-  flex: auto;
-  line-height: 1.3;
-  width: 100%;
-  letter-spacing: 0.5rem;
-
-  @media (max-width: 768px) {
-    font-size: 3rem;
-    margin: 0;
-  }
+  padding: 10rem 4rem 8rem;
+}
+@media (max-width: 768px) {
+  padding: 6rem 4rem 8rem 4rem;
+}
+@media (max-width: 600px) {
+  padding: 4rem 4rem 8rem 0.3rem;
+}
 `;
 
 class Article extends React.Component {
@@ -44,7 +38,6 @@ class Article extends React.Component {
   render() {
     return (
       <Container>
-        <DocsTitle>SPECTACLE</DocsTitle>
         <Markdown dangerouslySetInnerHTML={{ __html: this.props.renderedMd }} />
       </Container>
     );
