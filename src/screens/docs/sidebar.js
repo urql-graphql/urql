@@ -27,6 +27,10 @@ const ContentWrapper = styled.div`
   margin-bottom: 1rem;
   margin-top: 4rem;
   height: auto;
+
+  @media (max-width: 768px) {
+    display: ${props => (props.overlay ? "" : "none")};
+  }
 `;
 
 const SubContentWrapper = styled.div`
@@ -41,12 +45,15 @@ const Wrapper = styled.div`
 `;
 
 const CloseButton = styled.img`
+  cursor: pointer;
   top: 1rem;
   right: 7rem;
   position: absolute;
-  display: ${props => (props.overlay ? "" : "none")};
+  display: none;
+
   @media (max-width: 768px) {
     top: 7rem;
+    display: ${props => (props.overlay ? "block" : "none")};
   }
 `;
 
@@ -102,7 +109,7 @@ class Sidebar extends React.Component {
               overlay={overlay}
             />
           </Link>
-          <ContentWrapper>
+          <ContentWrapper overlay={overlay}>
             <SidebarNavItem to={`/#`} replace key={"home"}>
               Home
             </SidebarNavItem>
