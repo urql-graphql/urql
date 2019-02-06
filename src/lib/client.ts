@@ -5,13 +5,13 @@ import { hashString } from './hash';
 import {
   Exchange,
   ExchangeResult,
+  GraphqlMutation,
+  GraphqlQuery,
   GraphQLRequest,
-  Mutation,
+  GraphqlSubscription,
   Operation,
   OperationContext,
   OperationType,
-  Query,
-  Subscription,
 } from '../types';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -132,7 +132,7 @@ export class Client implements ClientOptions {
   };
 
   executeQuery = (
-    query: Query,
+    query: GraphqlQuery,
     opts?: Partial<OperationContext>
   ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('query', query, opts);
@@ -140,7 +140,7 @@ export class Client implements ClientOptions {
   };
 
   executeSubscription = (
-    query: Subscription,
+    query: GraphqlSubscription,
     opts?: Partial<OperationContext>
   ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
@@ -148,7 +148,7 @@ export class Client implements ClientOptions {
   };
 
   executeMutation = (
-    query: Mutation,
+    query: GraphqlMutation,
     opts?: Partial<OperationContext>
   ): Source<ExchangeResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
