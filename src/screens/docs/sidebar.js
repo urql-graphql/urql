@@ -11,12 +11,13 @@ import {
 
 const HeroLogo = styled.img`
   position: absolute;
-  top: 2rem;
+  top: 3rem;
   left: 4rem;
   min-width: 14rem;
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
+    position: relative;
   }
 `;
 
@@ -24,7 +25,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin-top: 4rem;
   height: auto;
 `;
 
@@ -40,10 +41,13 @@ const Wrapper = styled.div`
 `;
 
 const CloseButton = styled.img`
-  top: 2rem;
+  top: 1rem;
   right: 7rem;
   position: absolute;
   display: ${props => (props.overlay ? "" : "none")};
+  @media (max-width: 768px) {
+    top: 7rem;
+  }
 `;
 
 class Sidebar extends React.Component {

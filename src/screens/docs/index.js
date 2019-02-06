@@ -37,9 +37,9 @@ const Wrapper = styled.div`
 `;
 
 const HeaderLogo = styled.img`
-  position: absolute;
+  position: relative;
   right: 25rem;
-  top: 1.2rem;
+
   @media (max-width: 768px) {
     right: 7rem;
     padding-left: 2rem;

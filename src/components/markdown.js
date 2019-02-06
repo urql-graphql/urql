@@ -97,6 +97,12 @@ export const Markdown = styled.article`
   & a {
     color: #895160;
 
+    &:target {
+      display: block;
+      position: relative;
+      top: -60px;
+      visibility: hidden;
+    }
     &:hover {
       color: black;
       text-decoration: underline;
