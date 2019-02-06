@@ -1,4 +1,12 @@
-import { forEach, makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+import {
+  forEach,
+  makeSubject,
+  map,
+  pipe,
+  publish,
+  Source,
+  Subject,
+} from 'wonka';
 
 import {
   mutationOperation,
@@ -36,9 +44,9 @@ beforeEach(() => {
     );
   };
 
-  const client = ({
-    reexecuteOperation: (reexecuteOperation as any)
-  } as Client);
+  const client = {
+    reexecuteOperation: reexecuteOperation as any,
+  } as Client;
 
   exchangeArgs = { forward, client };
 });
@@ -86,7 +94,7 @@ it('retriggers query operation when mutation occurs', () => {
 
   afterMutation(resultCache, operationCache, exchangeArgs.client)({
     ...mutationResponse,
-     data: {
+    data: {
       todos: [
         {
           id: 1,

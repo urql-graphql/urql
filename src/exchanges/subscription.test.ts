@@ -1,4 +1,13 @@
-import { empty, fromValue, never, pipe, publish, Source, take, toPromise } from 'wonka';
+import {
+  empty,
+  fromValue,
+  never,
+  pipe,
+  publish,
+  Source,
+  take,
+  toPromise,
+} from 'wonka';
 import { Client } from '../lib/client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
 import { ExchangeResult, Operation } from '../types';
@@ -6,12 +15,12 @@ import { ExchangeResult, Operation } from '../types';
 import {
   subscriptionExchange,
   SubscriptionForwarder,
-  SubscriptionOperation
+  SubscriptionOperation,
 } from './subscription';
 
 const exchangeArgs = {
-  forward: () => (empty as Source<ExchangeResult>),
-  client: ({} as Client)
+  forward: () => empty as Source<ExchangeResult>,
+  client: {} as Client,
 };
 
 it('should return response data from forwardSubscription observable', async () => {
@@ -29,7 +38,7 @@ it('should return response data from forwardSubscription observable', async () =
         });
 
         return { unsubscribe };
-      }
+      },
     };
   };
 

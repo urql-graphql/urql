@@ -1,4 +1,13 @@
-import { filter, makeSubject, onEnd, onStart, pipe, share, Source, take } from 'wonka';
+import {
+  filter,
+  makeSubject,
+  onEnd,
+  onStart,
+  pipe,
+  share,
+  Source,
+  take,
+} from 'wonka';
 import { composeExchanges, defaultExchanges } from '../exchanges';
 import { hashString } from './hash';
 

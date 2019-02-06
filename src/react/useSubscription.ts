@@ -8,16 +8,20 @@ interface UseSubscriptionArgs {
   variables: any;
 }
 
-interface UseSubscriptionState {
+interface UseSubscriptionState<T> {
   fetching: boolean;
-  data?: any;
+  data?: T;
   error?: CombinedError;
 }
 
-export const useSubscription = (args: UseSubscriptionArgs) => {
+type UseSubscriptionResponse<T> = [UseSubscriptionState<T>, () => void];
+
+export const useSubscription = <T>(
+  args: UseSubscriptionArgs
+): UseSubscriptionResponse<T> => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
-  const [state, setState] = useState<UseSubscriptionState>({
+  const [state, setState] = useState<UseSubscriptionState<T>>({
     fetching: false,
     error: undefined,
     data: undefined,
@@ -39,13 +43,10 @@ export const useSubscription = (args: UseSubscriptionArgs) => {
     )[0];
   };
 
-  useEffect(
-    () => {
-      executeSubscription();
-      return () => executeUnsubscribe();
-    },
-    [args.query, args.variables]
-  );
+  useEffect(() => {
+    executeSubscription();
+    return () => executeUnsubscribe();
+  }, [args.query, args.variables]);
 
   // executeQuery === refetch
   return [state, executeSubscription];

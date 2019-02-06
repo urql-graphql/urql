@@ -1,4 +1,12 @@
-import { filter, makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+import {
+  filter,
+  makeSubject,
+  map,
+  pipe,
+  publish,
+  Source,
+  Subject,
+} from 'wonka';
 
 import {
   mutationOperation,
@@ -33,7 +41,7 @@ beforeEach(() => {
     );
   };
 
-  exchangeArgs = { forward, subject: ({} as Client) };
+  exchangeArgs = { forward, subject: {} as Client };
 });
 
 it('forwards query operations correctly', async () => {

@@ -1,4 +1,13 @@
-import { filter, make, merge, mergeMap, pipe, share, Source, takeUntil } from 'wonka';
+import {
+  filter,
+  make,
+  merge,
+  mergeMap,
+  pipe,
+  share,
+  Source,
+  takeUntil,
+} from 'wonka';
 import { CombinedError } from '../lib/error';
 import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
 
@@ -21,7 +30,10 @@ export const fetchExchange: Exchange = ({ forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(createFetchSource(operation), takeUntil(teardown$));
+        return pipe(
+          createFetchSource(operation),
+          takeUntil(teardown$)
+        );
       })
     );
 
@@ -56,9 +68,7 @@ const createFetchSource = (operation: Operation) => {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       signal:
-        abortController !== undefined
-          ? abortController.signal
-          : undefined,
+        abortController !== undefined ? abortController.signal : undefined,
       ...operation.context.fetchOptions,
     };
 
@@ -89,7 +99,7 @@ const executeFetch = (operation: Operation, opts: RequestInit) => {
 
   return fetch(url, opts)
     .then(res => {
-    response = res;
+      response = res;
       checkStatus(opts.redirect, response);
       return response.json();
     })

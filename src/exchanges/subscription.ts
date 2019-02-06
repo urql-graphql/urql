@@ -1,4 +1,13 @@
-import { filter, make, merge, mergeMap, pipe, share, Source, takeUntil } from 'wonka';
+import {
+  filter,
+  make,
+  merge,
+  mergeMap,
+  pipe,
+  share,
+  Source,
+  takeUntil,
+} from 'wonka';
 
 import { CombinedError } from '../lib/error';
 
@@ -8,19 +17,21 @@ import {
   ExecutionResult,
   GraphQLRequest,
   Operation,
-  OperationContext
+  OperationContext,
 } from '../types';
 
 export interface ObserverLike<T> {
-  next: (value: T) => void,
-  error: (err: any) => void,
-  complete: () => void
+  next: (value: T) => void;
+  error: (err: any) => void;
+  complete: () => void;
 }
 
 /** An abstract observable interface conforming to: https://github.com/tc39/proposal-observable */
 export interface ObservableLike<T> {
-  subscribe(observer: ObserverLike<T>): {
-    unsubscribe: () => void
+  subscribe(
+    observer: ObserverLike<T>
+  ): {
+    unsubscribe: () => void;
   };
 }
 
@@ -30,7 +41,9 @@ export interface SubscriptionOperation extends GraphQLRequest {
   context: OperationContext;
 }
 
-export type SubscriptionForwarder = (operation: SubscriptionOperation) => ObservableLike<ExecutionResult>;
+export type SubscriptionForwarder = (
+  operation: SubscriptionOperation
+) => ObservableLike<ExecutionResult>;
 
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
 export interface SubscriptionExchangeOpts {
@@ -39,7 +52,9 @@ export interface SubscriptionExchangeOpts {
   forwardSubscription: SubscriptionForwarder;
 }
 
-export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
+export const subscriptionExchange = (
+  opts: SubscriptionExchangeOpts
+): Exchange => ({ forward }) => {
   const { forwardSubscription } = opts;
 
   const isSubscriptionOperation = (operation: Operation) =>
@@ -51,32 +66,34 @@ export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange =
       key: operation.key,
       query: operation.query,
       variables: operation.variables,
-      context: { ...operation.context }
+      context: { ...operation.context },
     });
 
     return make<ExchangeResult>(([next, complete]) => {
       // TODO: The conversion of the result here is very similar to fetch;
       // We can maybe extract the logic into generic GraphQL utilities
       const sub = observableish.subscribe({
-        next: result => next({
-        operation,
-        data: result.data || undefined,
-        error: Array.isArray(result.errors)
-          ? new CombinedError({
-              graphQLErrors: result.errors,
+        next: result =>
+          next({
+            operation,
+            data: result.data || undefined,
+            error: Array.isArray(result.errors)
+              ? new CombinedError({
+                  graphQLErrors: result.errors,
+                  response: undefined,
+                })
+              : undefined,
+          }),
+        error: err =>
+          next({
+            operation,
+            data: undefined,
+            error: new CombinedError({
+              networkError: err,
               response: undefined,
-            })
-          : undefined,
-        }),
-        error: err => next({
-          operation,
-          data: undefined,
-          error: new CombinedError({
-            networkError: err,
-            response: undefined
-          })
-        }),
-        complete
+            }),
+          }),
+        complete,
       });
 
       // NOTE: Destructuring sub is avoided here to preserve its potential binding
@@ -96,7 +113,10 @@ export const subscriptionExchange = (opts: SubscriptionExchangeOpts): Exchange =
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(createSubscriptionSource(operation), takeUntil(teardown$));
+        return pipe(
+          createSubscriptionSource(operation),
+          takeUntil(teardown$)
+        );
       })
     );
 

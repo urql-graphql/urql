@@ -5,19 +5,21 @@ import { Context } from './context';
 
 interface UseQueryArgs {
   query: string;
-  variables: any;
+  variables?: any;
 }
 
-interface UseQueryState {
+interface UseQueryState<T> {
   fetching: boolean;
-  data?: any;
+  data?: T;
   error?: CombinedError;
 }
 
-export const useQuery = (args: UseQueryArgs) => {
+type UseQueryResponse<T> = [UseQueryState<T>, () => void];
+
+export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
-  const [state, setState] = useState<UseQueryState>({
+  const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
     error: undefined,
     data: undefined,
@@ -39,13 +41,10 @@ export const useQuery = (args: UseQueryArgs) => {
     )[0];
   };
 
-  useEffect(
-    () => {
-      executeQuery();
-      return () => executeUnsubscribe();
-    },
-    [args.query, args.variables]
-  );
+  useEffect(() => {
+    executeQuery();
+    return () => executeUnsubscribe();
+  }, [args.query, args.variables]);
 
   // executeQuery === refetch
   return [state, executeQuery];

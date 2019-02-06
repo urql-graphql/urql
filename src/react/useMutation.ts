@@ -3,15 +3,17 @@ import { pipe, toPromise } from 'wonka';
 import { CombinedError, createMutation } from '../lib';
 import { Context } from './context';
 
-interface UseSubscriptionState {
+interface UseMutationState<T> {
   fetching: boolean;
-  data?: any;
+  data?: T;
   error?: CombinedError;
 }
 
-export const useMutation = (query: string) => {
+type UseMutationResponse<T> = [UseMutationState<T>, (variables: any) => void];
+
+export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
   const client = useContext(Context);
-  const [state, setState] = useState<UseSubscriptionState>({
+  const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,
     error: undefined,
     data: undefined,

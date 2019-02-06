@@ -1,4 +1,14 @@
-import { empty, fromValue, makeSubject, merge, never, pipe, Source, subscribe, toPromise } from 'wonka';
+import {
+  empty,
+  fromValue,
+  makeSubject,
+  merge,
+  never,
+  pipe,
+  Source,
+  subscribe,
+  toPromise,
+} from 'wonka';
 
 import { Client } from '../lib/client';
 import { queryOperation, subscriptionOperation } from '../test-utils';
@@ -37,8 +47,8 @@ const response = {
 };
 
 const exchangeArgs = {
-  forward: () => (empty as Source<ExchangeResult>),
-  client: ({} as Client)
+  forward: () => empty as Source<ExchangeResult>,
+  client: {} as Client,
 };
 
 it('should return response data from fetch', async () => {

@@ -1,10 +1,10 @@
 import {
   ExchangeResult,
   ExecutionResult,
-  Mutation,
+  GraphqlMutation,
+  GraphqlQuery,
+  GraphqlSubscription,
   Operation,
-  Query,
-  Subscription,
 } from '../types';
 
 const context = {
@@ -14,7 +14,7 @@ const context = {
   url: 'http://localhost:3000/graphql',
 };
 
-export const queryGql: Query = {
+export const queryGql: GraphqlQuery = {
   query: `query getUser($name: String){
     user(name: $name) {
       id
@@ -27,7 +27,7 @@ export const queryGql: Query = {
   },
 };
 
-export const mutationGql: Mutation = {
+export const mutationGql: GraphqlMutation = {
   query: `mutation AddUser($name: String){
     addUser(name: $name) {
       name
@@ -38,7 +38,7 @@ export const mutationGql: Mutation = {
   },
 };
 
-export const subscriptionGql: Subscription = {
+export const subscriptionGql: GraphqlSubscription = {
   query: `subscription subscribeToUser($user: String){
     user(user: $user) {
       name
@@ -86,5 +86,5 @@ export const mutationResponse: ExchangeResult = {
 };
 
 export const subscriptionResult: ExecutionResult = {
-  data: {}
+  data: {},
 };

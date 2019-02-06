@@ -1,5 +1,5 @@
 import { Observer, Source, Subject } from 'wonka';
-import { ClientState } from './components';
+// import { ClientState } from './react';
 import { Client } from './lib/client';
 import { CombinedError } from './lib/error';
 
@@ -59,5 +59,5 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<ExchangeResult>;
 
-/** The arguments for the child function of a connector. */
-export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;
+// /** The arguments for the child function of a connector. */
+// export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;
