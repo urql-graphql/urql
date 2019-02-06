@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
-import { createQuery } from '../lib';
+import { CombinedError, createQuery } from '../lib';
 import { Context } from './context';
 
 interface UseSubscriptionArgs {
@@ -8,10 +8,16 @@ interface UseSubscriptionArgs {
   variables: any;
 }
 
+interface UseSubscriptionState {
+  fetching: boolean;
+  data?: any;
+  error?: CombinedError;
+}
+
 export const useSubscription = (args: UseSubscriptionArgs) => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
-  const [state, setState] = useState({
+  const [state, setState] = useState<UseSubscriptionState>({
     fetching: false,
     error: undefined,
     data: undefined,

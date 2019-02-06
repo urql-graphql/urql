@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
-import { createQuery } from '../lib';
+import { CombinedError, createQuery } from '../lib';
 import { Context } from './context';
 
 interface UseQueryArgs {
@@ -8,10 +8,16 @@ interface UseQueryArgs {
   variables: any;
 }
 
+interface UseQueryState {
+  fetching: boolean;
+  data?: any;
+  error?: CombinedError;
+}
+
 export const useQuery = (args: UseQueryArgs) => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
-  const [state, setState] = useState({
+  const [state, setState] = useState<UseQueryState>({
     fetching: false,
     error: undefined,
     data: undefined,

@@ -1,11 +1,17 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
-import { createMutation } from '../lib';
+import { CombinedError, createMutation } from '../lib';
 import { Context } from './context';
+
+interface UseSubscriptionState {
+  fetching: boolean;
+  data?: any;
+  error?: CombinedError;
+}
 
 export const useMutation = (query: string) => {
   const client = useContext(Context);
-  const [state, setState] = useState({
+  const [state, setState] = useState<UseSubscriptionState>({
     fetching: false,
     error: undefined,
     data: undefined,
