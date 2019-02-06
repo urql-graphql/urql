@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-static";
 
-const sidebarZIndex = 900;
+const sidebarZIndex = 800;
 
 export const Navigation = styled.div`
   align-items: center;
