@@ -5,6 +5,8 @@ import { withRouter, withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
 
+const headerZIndex = 800;
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -17,39 +19,68 @@ const Wrapper = styled.div`
   flex-direction: row;
   height: 6rem;
   width: 100%;
-  position: absolute;
+  position: fixed;
+  left: 21rem;
+  background: white;
+  z-index: ${headerZIndex};
   padding-right: 3rem;
-}
-
-@media (max-width: 768px) {
   box-shadow: 0 5px 10px -5px lightgrey;
-  margin-left: 3rem;
-  right: 0;
-  width: calc(100% - 2rem);
-  justify-content: flex-end;
-}
+
+  @media (max-width: 768px) {
+    box-shadow: 0 5px 10px -5px lightgrey;
+    margin-left: 2.5rem;
+    right: 0;
+    width: calc(100% - 2rem);
+    justify-content: flex-start;
+    left: 0;
+  }
 `;
 
 const HeaderLogo = styled.img`
-  position: absolute;
-  right: 3rem;
-  top: 1.5rem;
+  position: relative;
+  right: 25rem;
 
+  @media (max-width: 768px) {
+    right: 7rem;
+    padding-left: 2rem;
+  }
   @media (max-width: 600px) {
     display: none;
   }
 `;
 
 const CollapsedMenu = styled.div`
+  cursor: pointer;
   padding-left: 3rem;
-  display: ${props => (props.overlay ? "none" : "")};
+  display: none;
 
-  @media (min-width: 768px) {
-    display: none;
+  @media (max-width: 768px) {
+    display: block;
+    visibility: ${props => (props.overlay ? "hidden" : "visible")};
   }
   @media (max-width: 600px) {
+    padding-left: 2.5rem;
     position: absolute;
     left: 0;
+  }
+`;
+
+const DocsTitle = styled.h2`
+  font-size: 3rem;
+  top: 0.2rem;
+  flex: auto;
+  width: 100%;
+  letter-spacing: 0.5rem;
+  margin: 0;
+  position: relative;
+  left: 9rem;
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    left: 2rem;
+    margin: 0;
+  }
+  @media (max-width: 600px) {
+    left: 6.5rem;
   }
 `;
 
@@ -79,6 +110,7 @@ class Docs extends React.Component {
               onClick={() => this.openSidebar()}
             />
           </CollapsedMenu>
+          <DocsTitle>SPECTACLE</DocsTitle>
           <HeaderLogo
             src="../../static/svgs/logo_formidable_dark.svg"
             alt="Formidable Logo"
