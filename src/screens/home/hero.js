@@ -154,7 +154,9 @@ class Hero extends React.Component {
           </HeroBody>
           <CopyToClipboard text="npm install spectacle">
             <HeroCopyLink onClick={e => this.handleCopy(e)}>
-              <HeroCopyText>npm install spectacle</HeroCopyText>
+              <HeroCopyText>
+                <code>npm install spectacle</code>
+              </HeroCopyText>
               <Button light noMargin href="#">
                 <BounceAnimation bouncing={this.state.animating}>
                   {this.state.copied ? "Copied" : "Copy"}
