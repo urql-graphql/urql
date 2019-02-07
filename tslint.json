@@ -1,7 +1,7 @@
 {
   "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
-    "exclude": ["src/tests/**/*", "example/**/*"]
+    "exclude": ["src/tests/**/*", "examples/**/*"]
   },
   "rules": {
     "object-literal-sort-keys": false,

@@ -31,6 +31,18 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
+  /** Subscription handler */
+  subscriptionHandler?: (
+    operation: Operation
+  ) => {
+    subscribe: (
+      next: (data: any) => void,
+      error: (err: any) => void,
+      complete: () => void
+    ) => {
+      unsubscribe: () => void;
+    };
+  };
 }
 
 interface ActiveResultSources {
