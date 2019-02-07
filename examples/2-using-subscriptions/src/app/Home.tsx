@@ -1,29 +1,30 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { useSubscription } from 'urql';
 import { Error, NotificationResponse, Notification } from './components';
 
 export const Home: FC = () => {
-  const [notifications, setNotifications] = useState<NotificationResponse[]>(
-    []
-  );
-  const handleSubscription = (notification: NotificationResponse) =>
-    setNotifications([...notifications, notification]);
+  const handleSubscription = (
+    notifications: NotificationResponse[],
+    notification: NotificationResponse
+  ) => [...notifications, notification];
 
-  const [subscription] = useSubscription<NotificationResponse>(
-    { query: NotificationSubQuery },
-    handleSubscription
-  );
+  const [subscription] = useSubscription<
+    NotificationResponse,
+    NotificationResponse[]
+  >({ query: NotificationSubQuery }, handleSubscription);
 
   if (subscription.error) {
     return <Error>{subscription.error.message}</Error>;
   }
 
-  return notifications.map(notif => <Notification key={notif.id} {...notif} />);
+  return subscription.data.map(notif => (
+    <Notification key={notif.id} {...notif} />
+  ));
 };
 
 const NotificationSubQuery = `
-subscription neNotifications {
-  newNotification {
+subscription newNotifications {
+  notification {
     id
     message
   }

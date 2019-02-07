@@ -8,6 +8,8 @@ interface UseSubscriptionArgs {
   variables: any;
 }
 
+type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
+
 interface UseSubscriptionState<T> {
   fetching: boolean;
   data?: T;
@@ -16,12 +18,13 @@ interface UseSubscriptionState<T> {
 
 type UseSubscriptionResponse<T> = [UseSubscriptionState<T>, () => void];
 
-export const useSubscription = <T>(
-  args: UseSubscriptionArgs
+export const useSubscription = <T = any, R = T>(
+  args: UseSubscriptionArgs,
+  handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<T> => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
-  const [state, setState] = useState<UseSubscriptionState<T>>({
+  const [state, setState] = useState<UseSubscriptionState<R>>({
     fetching: false,
     error: undefined,
     data: undefined,
@@ -39,7 +42,13 @@ export const useSubscription = <T>(
 
     unsubscribe = pipe(
       client.executeQuery(createQuery(args.query, args.variables)),
-      subscribe(({ data, error }) => setState({ fetching: false, data, error }))
+      subscribe(({ data, error }) =>
+        setState({
+          fetching: false,
+          data: handler !== undefined ? handler(state.data, data) : data,
+          error,
+        })
+      )
     )[0];
   };
 
