@@ -22,10 +22,10 @@ export const SidebarContainer = styled.div`
   width: 26rem;
   min-width: 26rem;
   min-height: 100vh;
+
   @media (max-width: 768px) {
     min-width: 5rem;
-    width: 5rem
-    };
+    width: 5rem;
   }
 `;
 

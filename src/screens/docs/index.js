@@ -25,15 +25,15 @@ const Wrapper = styled.div`
   z-index: ${headerZIndex};
   padding-right: 3rem;
   box-shadow: 0 5px 10px -5px lightgrey;
-}
-@media (max-width: 768px) {
-  box-shadow: 0 5px 10px -5px lightgrey;
-  margin-left: 2.5rem;
-  right: 0;
-  width: calc(100% - 2rem);
-  justify-content: flex-start;
-  left: 0;
-}
+
+  @media (max-width: 768px) {
+    box-shadow: 0 5px 10px -5px lightgrey;
+    margin-left: 2.5rem;
+    right: 0;
+    width: calc(100% - 2rem);
+    justify-content: flex-start;
+    left: 0;
+  }
 `;
 
 const HeaderLogo = styled.img`
@@ -53,6 +53,7 @@ const CollapsedMenu = styled.div`
   cursor: pointer;
   padding-left: 3rem;
   display: none;
+
   @media (max-width: 768px) {
     display: block;
     visibility: ${props => (props.overlay ? "hidden" : "visible")};
