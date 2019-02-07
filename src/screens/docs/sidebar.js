@@ -17,7 +17,6 @@ const HeroLogo = styled.img`
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
-    position: relative;
   }
 `;
 
@@ -52,7 +51,6 @@ const CloseButton = styled.img`
   display: none;
 
   @media (max-width: 768px) {
-    top: 7rem;
     display: ${props => (props.overlay ? "block" : "none")};
   }
 `;

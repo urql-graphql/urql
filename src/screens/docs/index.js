@@ -5,7 +5,7 @@ import { withRouter, withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
 
-const headerZIndex = 900;
+const headerZIndex = 800;
 
 const Container = styled.div`
   display: flex;

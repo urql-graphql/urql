@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-static";
 
-const sidebarZIndex = 800;
+const sidebarZIndex = 900;
 
 export const Navigation = styled.div`
   align-items: center;
@@ -24,7 +24,8 @@ export const SidebarContainer = styled.div`
   min-height: 100vh;
   @media (max-width: 768px) {
     min-width: 5rem;
-    width: 5rem};
+    width: 5rem
+    };
   }
 `;
 
@@ -46,7 +47,6 @@ export const SidebarWrapper = styled.aside`
         : 'url("../../static/svgs/collapsed-sidebar-background.svg")'};
     min-width: ${props => (props.overlay ? "26rem" : "5rem")};
     width: ${props => (props.overlay ? "26rem" : "5rem")};
-    padding-top: 6rem;
   }
 `;
 
