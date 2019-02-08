@@ -19,12 +19,11 @@ const subscriptionClient = new SubscriptionClient(
 
 const client = createClient({
   url: 'http://localhost:4000/graphql',
-  subscriptionHandler: operation => subscriptionClient.request(operation),
   exchanges: [
     debugExchange,
     cacheExchange,
     fetchExchange,
-    subscriptionExchange,
+    subscriptionExchange(operation => subscriptionClient.request(operation)),
   ],
 });
 
