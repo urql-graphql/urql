@@ -30,21 +30,25 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
   const isOperationCached = operation =>
     operation.operationName === 'query' && resultCache.has(operation.key);
 
+  const shouldSkip = (operation: Operation) =>
+    operation.operationName !== 'mutation' &&
+    operation.operationName !== 'query';
+
   return ops$ => {
     const sharedOps$ = share(ops$);
 
-    const cachedResults$ = pipe(
+    const cachedOps$ = pipe(
       sharedOps$,
-      filter(op => isOperationCached(op)),
+      filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         // ExchangeResult is guaranteed to exist
         return resultCache.get(operation.key) as ExchangeResult;
       })
     );
 
-    const forward$ = pipe(
+    const newOps$ = pipe(
       sharedOps$,
-      filter(op => !isOperationCached(op)),
+      filter(op => !shouldSkip(op) && !isOperationCached(op)),
       map(mapTypeNames),
       forward,
       tap(response => {
@@ -56,7 +60,13 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       })
     );
 
-    return merge([cachedResults$, forward$]);
+    const skippedOps$ = pipe(
+      sharedOps$,
+      filter(op => shouldSkip(op)),
+      forward
+    );
+
+    return merge([cachedOps$, newOps$, skippedOps$]);
   };
 };
 

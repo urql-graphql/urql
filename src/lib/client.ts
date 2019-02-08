@@ -23,6 +23,12 @@ import {
   OperationType,
 } from '../types';
 
+interface SubscribeArgs {
+  next: (data: any) => void;
+  error: (err: any) => void;
+  complete: () => void;
+}
+
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
   /** Target endpoint URL such as `https://my-target:8080/graphql`. */
@@ -33,12 +39,10 @@ export interface ClientOptions {
   exchanges?: Exchange[];
   /** Subscription handler */
   subscriptionHandler?: (
-    operation: Operation
+    operation: Pick<Operation, Exclude<keyof Operation, 'operationName'>>
   ) => {
     subscribe: (
-      next: (data: any) => void,
-      error: (err: any) => void,
-      complete: () => void
+      SubscribeArgs
     ) => {
       unsubscribe: () => void;
     };
@@ -56,6 +60,7 @@ export class Client implements ClientOptions {
   // These are variables derived from ClientOptions
   url: string;
   fetchOptions: RequestInit;
+  subscriptionHandler: ClientOptions['subscriptionHandler'];
   exchanges: Exchange[];
 
   // These are internals to be used to keep track of operations
@@ -74,6 +79,8 @@ export class Client implements ClientOptions {
 
     this.exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
+
+    this.subscriptionHandler = opts.subscriptionHandler;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -139,7 +146,7 @@ export class Client implements ClientOptions {
     return (this.activeResultSources[key] = pipe(
       operationResults$,
       onStart<ExchangeResult>(() => this.dispatchOperation(operation)),
-      onEnd<ExchangeResult>(() => this.teardownOperation(operation)),
+      // onEnd<ExchangeResult>(() => this.teardownOperation(operation)),
       share
     ));
   }

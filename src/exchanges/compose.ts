@@ -10,7 +10,7 @@ const fallbackIO: ExchangeIO = ops$ =>
     map(operation => {
       if (process.env.NODE_ENV !== 'production') {
         const { operationName } = operation;
-        throw new Error(
+        console.warn(
           `No exchange has handled operations of type "${operationName}". Check whether you've added an exchange responsible for these operations.`
         );
       }

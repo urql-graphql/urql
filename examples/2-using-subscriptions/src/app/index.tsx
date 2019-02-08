@@ -1,22 +1,39 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
-import { createClient, Provider } from 'urql';
-import { Home } from './home';
+import {
+  createClient,
+  Provider,
+  debugExchange,
+  cacheExchange,
+  fetchExchange,
+  subscriptionExchange,
+} from 'urql';
+import './index.css';
+import { Messages } from './Messages';
 
 const subscriptionClient = new SubscriptionClient(
-  'ws://localhost:3001/graphql',
+  'ws://localhost:4001/graphql',
   {}
 );
 
 const client = createClient({
-  url: 'http://localhost:3001/graphql',
+  url: 'http://localhost:4000/graphql',
   subscriptionHandler: operation => subscriptionClient.request(operation),
+  exchanges: [
+    debugExchange,
+    cacheExchange,
+    fetchExchange,
+    subscriptionExchange,
+  ],
 });
 
 export const App: React.SFC<{}> = () => (
   <Provider value={client}>
-    <Home />
+    <main>
+      <h1>New messages</h1>
+      <Messages />
+    </main>
   </Provider>
 );
 

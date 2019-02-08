@@ -5,13 +5,12 @@ import { Context } from './context';
 
 interface UseSubscriptionArgs {
   query: string;
-  variables: any;
+  variables?: any;
 }
 
 type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
 
 interface UseSubscriptionState<T> {
-  fetching: boolean;
   data?: T;
   error?: CombinedError;
 }
@@ -21,11 +20,10 @@ type UseSubscriptionResponse<T> = [UseSubscriptionState<T>, () => void];
 export const useSubscription = <T = any, R = T>(
   args: UseSubscriptionArgs,
   handler?: SubscriptionHandler<T, R>
-): UseSubscriptionResponse<T> => {
+): UseSubscriptionResponse<R> => {
   let unsubscribe: () => void | undefined;
   const client = useContext(Context);
   const [state, setState] = useState<UseSubscriptionState<R>>({
-    fetching: false,
     error: undefined,
     data: undefined,
   });
@@ -38,17 +36,15 @@ export const useSubscription = <T = any, R = T>(
 
   const executeSubscription = () => {
     executeUnsubscribe();
-    setState({ ...state, fetching: true });
 
     unsubscribe = pipe(
-      client.executeQuery(createQuery(args.query, args.variables)),
-      subscribe(({ data, error }) =>
-        setState({
-          fetching: false,
-          data: handler !== undefined ? handler(state.data, data) : data,
+      client.executeSubscription(createQuery(args.query, args.variables)),
+      subscribe(({ data, error }) => {
+        setState(s => ({
+          data: handler !== undefined ? handler(s.data, data) : data,
           error,
-        })
-      )
+        }));
+      })
     )[0];
   };
 
