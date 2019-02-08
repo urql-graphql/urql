@@ -14,7 +14,7 @@ import {
   queryOperation,
   queryResponse,
   subscriptionOperation,
-  subscriptionResponse,
+  subscriptionResult,
 } from '../test-utils';
 
 import { Client } from '../lib/client';
@@ -108,7 +108,7 @@ it('retriggers query operation when mutation occurs', () => {
 });
 
 it('forwards subscriptions', () => {
-  response = subscriptionResponse;
+  response = subscriptionResult;
   const [ops$, next, complete] = input;
   const exchange = cacheExchange(exchangeArgs)(ops$);
 

@@ -37,16 +37,6 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
-  /** Subscription handler */
-  subscriptionHandler?: (
-    operation: Pick<Operation, Exclude<keyof Operation, 'operationName'>>
-  ) => {
-    subscribe: (
-      SubscribeArgs
-    ) => {
-      unsubscribe: () => void;
-    };
-  };
 }
 
 interface ActiveResultSources {
@@ -60,7 +50,6 @@ export class Client implements ClientOptions {
   // These are variables derived from ClientOptions
   url: string;
   fetchOptions: RequestInit;
-  subscriptionHandler: ClientOptions['subscriptionHandler'];
   exchanges: Exchange[];
 
   // These are internals to be used to keep track of operations
@@ -79,8 +68,6 @@ export class Client implements ClientOptions {
 
     this.exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
-    this.subscriptionHandler = opts.subscriptionHandler;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject

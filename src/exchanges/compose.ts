@@ -8,8 +8,11 @@ const fallbackIO: ExchangeIO = ops$ =>
   pipe(
     ops$,
     map(operation => {
-      if (process.env.NODE_ENV !== 'production') {
-        const { operationName } = operation;
+      const { operationName } = operation;
+      if (
+        operationName !== 'teardown' &&
+        process.env.NODE_ENV !== 'production'
+      ) {
         console.warn(
           `No exchange has handled operations of type "${operationName}". Check whether you've added an exchange responsible for these operations.`
         );

@@ -100,16 +100,6 @@ describe('executeQuery', () => {
 
     expect(receivedOps[0]).toHaveProperty('context.url', url);
   });
-
-  it('dispatches teardown', () => {
-    const [teardown] = pipe(
-      client.executeQuery(query),
-      subscribe(x => x)
-    );
-
-    teardown();
-    expect(receivedOps[1]).toHaveProperty('operationName', 'teardown');
-  });
 });
 
 describe('executeMutation', () => {
@@ -176,15 +166,5 @@ describe('executeSubscription', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('operationName', 'subscription');
-  });
-
-  it('dispatches teardown', () => {
-    const [teardown] = pipe(
-      client.executeQuery(query),
-      subscribe(x => x)
-    );
-
-    teardown();
-    expect(receivedOps[1]).toHaveProperty('operationName', 'teardown');
   });
 });

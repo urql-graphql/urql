@@ -52,21 +52,17 @@ export interface SubscriptionExchangeOpts {
   forwardSubscription: SubscriptionForwarder;
 }
 
-export const subscriptionExchange: Exchange = ({ forward, client }) => {
-  const isSubscriptionOperation = (operation: Operation) =>
-    operation.operationName === 'subscription';
+const isSubscriptionOperation = (operation: Operation) =>
+  operation.operationName === 'subscription';
 
+export const subscriptionExchange = ({
+  forwardSubscription,
+}: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
   const createSubscriptionSource = (
     operation: Operation
   ): Source<ExchangeResult> => {
-    if (client.subscriptionHandler === undefined) {
-      console.error('This should never happen');
-      // @ts-ignore
-      return;
-    }
-
     // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
-    const observableish = client.subscriptionHandler({
+    const observableish = forwardSubscription({
       key: operation.key,
       query: operation.query,
       variables: operation.variables,
@@ -109,14 +105,7 @@ export const subscriptionExchange: Exchange = ({ forward, client }) => {
     const sharedOps$ = share(ops$);
     const subscriptionResults$ = pipe(
       sharedOps$,
-      filter(op => {
-        if (client.subscriptionHandler === undefined) {
-          console.warn('No subscription handler specified');
-          return false;
-        }
-
-        return isSubscriptionOperation(op);
-      }),
+      filter(isSubscriptionOperation),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
