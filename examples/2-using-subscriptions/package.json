@@ -6,7 +6,7 @@
   "scripts": {
     "start:server": "node ./src/server/index.js",
     "start:client": "webpack-dev-server --hot --inline",
-    "start": "run-p start:server start:client"
+    "start": "npm run build --prefix ../../ && run-p start:server start:client"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.1",
