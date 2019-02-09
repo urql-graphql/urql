@@ -1,7 +1,7 @@
 import { empty, map, pipe, Source } from 'wonka';
 
 import { Client } from '../lib/client';
-import { Exchange, ExchangeIO, ExchangeResult } from '../types';
+import { Exchange, ExchangeIO, OperationResult } from '../types';
 
 /** This is always the last exchange in the chain; No operation should ever reach it */
 const fallbackIO: ExchangeIO = ops$ =>
@@ -18,7 +18,7 @@ const fallbackIO: ExchangeIO = ops$ =>
         );
       }
 
-      return { operation } as ExchangeResult;
+      return { operation } as OperationResult;
     })
   );
 
@@ -27,7 +27,7 @@ export const composeExchanges = (
   client: Client,
   exchanges: Exchange[]
 ): ExchangeIO => {
-  const noopForward = () => empty as Source<ExchangeResult>;
+  const noopForward = () => empty as Source<OperationResult>;
 
   return exchanges.reduceRight((forward, exchange) => {
     return exchange({ client, forward });

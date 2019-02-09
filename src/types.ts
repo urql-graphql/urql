@@ -38,7 +38,7 @@ export interface ExecutionResult {
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface ExchangeResult {
+export interface OperationResult {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation;
   /** The data returned from the Graphql server. */
@@ -56,8 +56,8 @@ export interface ExchangeInput {
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
 export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
-/** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link ExchangeResult}. */
-export type ExchangeIO = (ops$: Source<Operation>) => Source<ExchangeResult>;
+/** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
+export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
 // /** The arguments for the child function of a connector. */
 // export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;

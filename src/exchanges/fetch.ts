@@ -9,7 +9,7 @@ import {
   takeUntil,
 } from 'wonka';
 import { CombinedError } from '../lib/error';
-import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
+import { Exchange, OperationResult, Operation, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {
@@ -54,7 +54,7 @@ const createFetchSource = (operation: Operation) => {
     );
   }
 
-  return make<ExchangeResult>(([next, complete]) => {
+  return make<OperationResult>(([next, complete]) => {
     const abortController =
       typeof AbortController !== 'undefined'
         ? new AbortController()

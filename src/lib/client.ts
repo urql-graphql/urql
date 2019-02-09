@@ -13,7 +13,7 @@ import { hashString } from './hash';
 
 import {
   Exchange,
-  ExchangeResult,
+  OperationResult,
   GraphqlMutation,
   GraphqlQuery,
   GraphQLRequest,
@@ -40,7 +40,7 @@ export interface ClientOptions {
 }
 
 interface ActiveResultSources {
-  [operationKey: string]: Source<ExchangeResult>;
+  [operationKey: string]: Source<OperationResult>;
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
@@ -55,7 +55,7 @@ export class Client implements ClientOptions {
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
   operations$: Source<Operation>;
-  results$: Source<ExchangeResult>;
+  results$: Source<OperationResult>;
   activeResultSources = Object.create(null) as ActiveResultSources;
 
   constructor(opts: ClientOptions) {
@@ -108,7 +108,7 @@ export class Client implements ClientOptions {
   }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation(operation: Operation): Source<ExchangeResult> {
+  executeRequestOperation(operation: Operation): Source<OperationResult> {
     const { key, operationName } = operation;
 
     const operationResults$ = pipe(
@@ -120,7 +120,7 @@ export class Client implements ClientOptions {
       // A mutation is always limited to just a single result and is never shared
       return pipe(
         operationResults$,
-        onStart<ExchangeResult>(() => this.dispatchOperation(operation)),
+        onStart<OperationResult>(() => this.dispatchOperation(operation)),
         take(1)
       );
     }
@@ -132,8 +132,8 @@ export class Client implements ClientOptions {
 
     return (this.activeResultSources[key] = pipe(
       operationResults$,
-      onStart<ExchangeResult>(() => this.dispatchOperation(operation)),
-      // onEnd<ExchangeResult>(() => this.teardownOperation(operation)),
+      onStart<OperationResult>(() => this.dispatchOperation(operation)),
+      // onEnd<OperationResult>(() => this.teardownOperation(operation)),
       share
     ));
   }
@@ -149,7 +149,7 @@ export class Client implements ClientOptions {
   executeQuery = (
     query: GraphqlQuery,
     opts?: Partial<OperationContext>
-  ): Source<ExchangeResult> => {
+  ): Source<OperationResult> => {
     const operation = this.createRequestOperation('query', query, opts);
     return this.executeRequestOperation(operation);
   };
@@ -157,7 +157,7 @@ export class Client implements ClientOptions {
   executeSubscription = (
     query: GraphqlSubscription,
     opts?: Partial<OperationContext>
-  ): Source<ExchangeResult> => {
+  ): Source<OperationResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
   };
@@ -165,7 +165,7 @@ export class Client implements ClientOptions {
   executeMutation = (
     query: GraphqlMutation,
     opts?: Partial<OperationContext>
-  ): Source<ExchangeResult> => {
+  ): Source<OperationResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };

@@ -1,5 +1,5 @@
 import {
-  ExchangeResult,
+  OperationResult,
   ExecutionResult,
   GraphqlMutation,
   GraphqlQuery,
@@ -71,7 +71,7 @@ export const subscriptionOperation: Operation = {
   ...subscriptionGql,
 };
 
-export const queryResponse: ExchangeResult = {
+export const queryResponse: OperationResult = {
   operation: queryOperation,
   data: {
     user: {
@@ -80,7 +80,7 @@ export const queryResponse: ExchangeResult = {
   },
 };
 
-export const mutationResponse: ExchangeResult = {
+export const mutationResponse: OperationResult = {
   operation: mutationOperation,
   data: {},
 };

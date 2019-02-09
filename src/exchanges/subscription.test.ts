@@ -10,7 +10,7 @@ import {
 } from 'wonka';
 import { Client } from '../lib/client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
-import { ExchangeResult, Operation } from '../types';
+import { OperationResult, Operation } from '../types';
 
 import {
   subscriptionExchange,
@@ -19,7 +19,7 @@ import {
 } from './subscription';
 
 const exchangeArgs = {
-  forward: () => empty as Source<ExchangeResult>,
+  forward: () => empty as Source<OperationResult>,
   client: {} as Client,
 };
 

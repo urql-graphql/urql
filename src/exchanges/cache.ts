@@ -2,9 +2,9 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../lib/client';
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
-import { Exchange, ExchangeResult, Operation, OperationType } from '../types';
+import { Exchange, OperationResult, Operation, OperationType } from '../types';
 
-type ResultCache = Map<string, ExchangeResult>;
+type ResultCache = Map<string, OperationResult>;
 interface OperationCache {
   [key: string]: Set<string>;
 }
@@ -41,8 +41,8 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
-        // ExchangeResult is guaranteed to exist
-        return resultCache.get(operation.key) as ExchangeResult;
+        // OperationResult is guaranteed to exist
+        return resultCache.get(operation.key) as OperationResult;
       })
     );
 
@@ -75,7 +75,7 @@ export const afterMutation = (
   resultCache: ResultCache,
   operationCache: OperationCache,
   client: Client
-) => (response: ExchangeResult) => {
+) => (response: OperationResult) => {
   const pendingOperations = new Set<string>();
 
   gankTypeNamesFromResponse(response.data).forEach(typeName => {
@@ -86,7 +86,7 @@ export const afterMutation = (
   });
 
   pendingOperations.forEach(key => {
-    const operation = (resultCache.get(key) as ExchangeResult).operation; // Result is guaranteed
+    const operation = (resultCache.get(key) as OperationResult).operation; // Result is guaranteed
     resultCache.delete(key);
     client.reexecuteOperation(operation);
   });
@@ -96,7 +96,7 @@ export const afterMutation = (
 const afterQuery = (
   resultCache: ResultCache,
   operationCache: OperationCache
-) => (response: ExchangeResult) => {
+) => (response: OperationResult) => {
   const {
     operation: { key },
     data,

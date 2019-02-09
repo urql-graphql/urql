@@ -29,7 +29,7 @@ An exchange (as demonstrated above) will receive a single argument with two valu
 - _forward_ - The next Exchange(IO) in the list
 - _subject_ - The subject from which Operations are published
 
-The exchange will return an _ExchangeIO_ - a function which takes a stream of _Operations_ and returns an _Observable\<ExchangeResult\>_.
+The exchange will return an _ExchangeIO_ - a function which takes a stream of _Operations_ and returns an _Observable\<OperationResult\>_.
 
 ![Exchanges diagram](https://user-images.githubusercontent.com/10779424/49379718-b8ad5880-f707-11e8-874e-411e7a6486d5.png)
 

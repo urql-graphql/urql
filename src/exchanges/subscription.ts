@@ -13,7 +13,7 @@ import { CombinedError } from '../lib/error';
 
 import {
   Exchange,
-  ExchangeResult,
+  OperationResult,
   ExecutionResult,
   GraphQLRequest,
   Operation,
@@ -60,7 +60,7 @@ export const subscriptionExchange = ({
 }: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
   const createSubscriptionSource = (
     operation: Operation
-  ): Source<ExchangeResult> => {
+  ): Source<OperationResult> => {
     // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
     const observableish = forwardSubscription({
       key: operation.key,
@@ -69,7 +69,7 @@ export const subscriptionExchange = ({
       context: { ...operation.context },
     });
 
-    return make<ExchangeResult>(([next, complete]) => {
+    return make<OperationResult>(([next, complete]) => {
       // TODO: The conversion of the result here is very similar to fetch;
       // We can maybe extract the logic into generic GraphQL utilities
       const sub = observableish.subscribe({

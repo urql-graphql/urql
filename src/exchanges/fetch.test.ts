@@ -12,7 +12,7 @@ import {
 
 import { Client } from '../lib/client';
 import { queryOperation, subscriptionOperation } from '../test-utils';
-import { Exchange, ExchangeResult } from '../types';
+import { Exchange, OperationResult } from '../types';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -47,7 +47,7 @@ const response = {
 };
 
 const exchangeArgs = {
-  forward: () => empty as Source<ExchangeResult>,
+  forward: () => empty as Source<OperationResult>,
   client: {} as Client,
 };
 
