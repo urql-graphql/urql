@@ -13,13 +13,13 @@ import { hashString } from './hash';
 
 import {
   Exchange,
-  OperationResult,
   GraphqlMutation,
   GraphqlQuery,
   GraphQLRequest,
   GraphqlSubscription,
   Operation,
   OperationContext,
+  OperationResult,
   OperationType,
 } from '../types';
 

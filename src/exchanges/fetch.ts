@@ -9,7 +9,7 @@ import {
   takeUntil,
 } from 'wonka';
 import { CombinedError } from '../lib/error';
-import { Exchange, OperationResult, Operation, OperationType } from '../types';
+import { Exchange, Operation, OperationResult, OperationType } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {

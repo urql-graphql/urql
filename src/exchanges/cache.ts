@@ -2,7 +2,7 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../lib/client';
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
-import { Exchange, OperationResult, Operation, OperationType } from '../types';
+import { Exchange, Operation, OperationResult, OperationType } from '../types';
 
 type ResultCache = Map<string, OperationResult>;
 interface OperationCache {

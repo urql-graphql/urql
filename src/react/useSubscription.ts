@@ -15,7 +15,7 @@ interface UseSubscriptionState<T> {
   error?: CombinedError;
 }
 
-type UseSubscriptionResponse<T> = [UseSubscriptionState<T>, () => void];
+type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
 
 export const useSubscription = <T = any, R = T>(
   args: UseSubscriptionArgs,
@@ -53,6 +53,5 @@ export const useSubscription = <T = any, R = T>(
     return () => executeUnsubscribe();
   }, [args.query, args.variables]);
 
-  // executeQuery === refetch
-  return [state, executeSubscription];
+  return [state];
 };

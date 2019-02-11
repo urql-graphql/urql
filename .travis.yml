@@ -12,7 +12,13 @@ jobs:
     - stage: Test
       name: Lint
       node_js: 10
-      script: yarn run lint
+      script: 
+        - yarn run lint
+    - stage: Test
+      name: Formatting
+      node_js: 10
+      script: 
+        - yarn run check-formatting
     - stage: Test
       name: Jest (node:8)
       node_js: 8
