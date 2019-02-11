@@ -11,7 +11,7 @@ jest.mock('./context', () => {
 
 import { mount, shallow } from 'enzyme';
 import React from 'react';
-import { delay, fromValue, pipe, take, throttle } from 'wonka';
+import { delay, fromValue, pipe } from 'wonka';
 // @ts-ignore - client is exclusively from mock
 import { client } from './context';
 import { Query } from './Query';
@@ -25,20 +25,17 @@ const childMock = (c: any) => {
   childProps = c;
   return <h1>mock</h1>;
 };
-let activeWrapper: any;
 const mountWrapper = (p, isShallow = false) => {
   if (isShallow) {
     return shallow(<Query {...p} children={childMock} />);
   }
 
   const w = mount(<Query {...p} children={childMock} />);
-  activeWrapper = w;
   return w;
 };
 
 beforeEach(() => {
   client.executeQuery.mockClear();
-  // client.executeQuery.mockReturnValue(fromValue({ data: 1234 }));
   childProps = undefined;
 });
 
@@ -83,7 +80,7 @@ describe('on fetch', () => {
   });
 
   it('sets fetching to true', () => {
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     expect(childProps).toHaveProperty('fetching', true);
   });
 });
@@ -96,7 +93,7 @@ describe('on data', () => {
   });
 
   it('returns data', () => {
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     expect(childProps).toHaveProperty('data', data);
   });
 });
@@ -109,7 +106,7 @@ describe('on error', () => {
   });
 
   it('returns error', () => {
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     expect(childProps).toHaveProperty('error', error);
   });
 });

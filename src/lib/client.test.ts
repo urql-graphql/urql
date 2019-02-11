@@ -2,12 +2,10 @@
 jest.mock('./hash', () => ({
   hashString: () => 'hash',
 }));
-import { map, pipe, share, subscribe, switchAll, tap, toPromise } from 'wonka';
+import { map, pipe, subscribe, tap } from 'wonka';
 import { createClient } from './client';
-import { CombinedError } from './error';
 
 const url = 'https://hostname.com';
-const fetch = (global as any).fetch as jest.Mock;
 
 describe('createClient', () => {
   it('passes snapshot', () => {

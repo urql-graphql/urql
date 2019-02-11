@@ -1,18 +1,7 @@
-import {
-  empty,
-  fromValue,
-  makeSubject,
-  merge,
-  never,
-  pipe,
-  Source,
-  subscribe,
-  toPromise,
-} from 'wonka';
-
+import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 import { Client } from '../lib/client';
-import { queryOperation, subscriptionOperation } from '../test-utils';
-import { Exchange, OperationResult } from '../types';
+import { queryOperation } from '../test-utils';
+import { OperationResult } from '../types';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -51,7 +40,7 @@ const exchangeArgs = {
   client: {} as Client,
 };
 
-it('should return response data from fetch', async () => {
+it('returns response data from fetch', async () => {
   fetch.mockResolvedValue({
     status: 200,
     json: jest.fn().mockResolvedValue(response),
@@ -66,7 +55,7 @@ it('should return response data from fetch', async () => {
   expect(data).toMatchSnapshot();
 });
 
-it('should return error data from fetch', async () => {
+it('returns error data from fetch', async () => {
   fetch.mockResolvedValue({
     status: 400,
     json: jest.fn().mockResolvedValue(response),
@@ -81,7 +70,7 @@ it('should return error data from fetch', async () => {
   expect(data).toMatchSnapshot();
 });
 
-it('should call cancel when the Observable is cancelled', () => {
+it('calls cancel when the Observable is cancelled', () => {
   fetch.mockReturnValue(Promise.reject(abortError));
 
   const [unsubscribe] = pipe(

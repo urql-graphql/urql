@@ -5,7 +5,7 @@ jest.mock('../lib/client', () => {
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
-        interval(200),
+        interval(400),
         map(i => ({ data: i, error: i + 1 }))
       )
     ),
@@ -20,7 +20,7 @@ jest.mock('../lib/client', () => {
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
-import { createClient, data } from '../lib/client';
+import { createClient } from '../lib/client';
 import { useQuery } from './useQuery';
 
 // @ts-ignore
@@ -40,6 +40,14 @@ const QueryUser: FC<typeof props> = ({ query, variables }) => {
   execute = e;
   return <p>{s.data}</p>;
 };
+
+beforeAll(() => {
+  // tslint:disable-next-line
+  console.log(
+    'supressing console.error output due to react-test-renderer spam (hooks related)'
+  );
+  jest.spyOn(global.console, 'error').mockImplementation();
+});
 
 beforeEach(() => {
   client.executeQuery.mockClear();
@@ -138,7 +146,7 @@ describe('on change', () => {
 
 describe('execute query', () => {
   it('triggers query execution', () => {
-    const wrapper = renderer.create(<QueryUser {...props} />);
+    renderer.create(<QueryUser {...props} />);
     act(() => execute());
     expect(client.executeQuery).toBeCalledTimes(2);
   });

@@ -11,7 +11,7 @@ jest.mock('./context', () => {
 
 import { mount } from 'enzyme';
 import React from 'react';
-import { fromValue, pipe, take } from 'wonka';
+import { fromValue } from 'wonka';
 // @ts-ignore - client is exclusively from mock
 import { client } from './context';
 import { Mutation } from './Mutation';
@@ -44,7 +44,7 @@ afterEach(() => {
 
 describe('on init', () => {
   it('default values match snapshot', () => {
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     expect(childProps).toMatchSnapshot();
   });
 });
@@ -92,7 +92,7 @@ describe('on execute', () => {
       fromValue({ data, error: undefined })
     );
 
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     childProps.executeMutation();
 
     // This should be synchronous...
@@ -108,7 +108,7 @@ describe('on execute', () => {
       fromValue({ data: undefined, error })
     );
 
-    const wrapper = mountWrapper(props);
+    mountWrapper(props);
     childProps.executeMutation();
 
     // This should be synchronous...
