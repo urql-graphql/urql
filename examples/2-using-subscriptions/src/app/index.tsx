@@ -2,11 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {
-  createClient,
-  Provider,
-  debugExchange,
   cacheExchange,
+  createClient,
+  debugExchange,
   fetchExchange,
+  Provider,
   subscriptionExchange,
 } from 'urql';
 import './index.css';
@@ -23,7 +23,10 @@ const client = createClient({
     debugExchange,
     cacheExchange,
     fetchExchange,
-    subscriptionExchange(operation => subscriptionClient.request(operation)),
+    subscriptionExchange({
+      // @ts-ignore needs fixing
+      forwardSubscription: operation => subscriptionClient.request(operation),
+    }),
   ],
 });
 
