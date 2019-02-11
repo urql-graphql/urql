@@ -23,11 +23,11 @@ export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
     setState({ fetching: true, error: undefined, data: undefined });
 
     try {
-      const data = await pipe(
+      const { data, error } = await pipe(
         client.executeMutation(createMutation(query, variables)),
         toPromise
-      )[0];
-      setState({ ...state, fetching: false, data });
+      );
+      setState({ fetching: false, data, error });
     } catch (error) {
       setState({ ...state, fetching: false, error });
     }

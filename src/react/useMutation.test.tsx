@@ -6,8 +6,7 @@ jest.mock('../lib/client', () => {
     executeMutation: jest.fn(() =>
       pipe(
         fromValue({ data: 1, error: 2 }),
-        delay(200),
-        take(1)
+        delay(200)
       )
     ),
   };
