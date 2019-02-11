@@ -1,7 +1,9 @@
+import React from "react";
 import { reloadRoutes } from "react-static/node";
 import chokidar from "chokidar";
 import { getSidebarItems } from "./static-config-helpers/md-data-transforms";
 const staticWebpackConfig = require("./static-config-parts/static-webpack-config");
+const { ServerStyleSheet } = require("styled-components");
 
 chokidar.watch("content").on("all", () => reloadRoutes());
 
@@ -59,6 +61,21 @@ export default {
       // { path: "/404", component: "src/screens/404" }
     ];
   },
-  webpack: staticWebpackConfig,
-  Document: require("./static-config-parts/document").default
+  renderToHtml: (render, Comp, meta) => {
+    const sheet = new ServerStyleSheet();
+    const html = render(sheet.collectStyles(<Comp />));
+    // see https://github.com/nozzle/react-static/blob/v5/docs/config.md#rendertohtml
+    // you can stick whatever you want here, but it's mutable at build-time, not dynamic
+    // at run-time -- key difference!
+
+    meta.styleTags = sheet.getStyleElement();
+    return html;
+  },
+  // So this is kinda cutesy, it's the equivalent of html.js in gatsby, it defines
+  // the root html page as a react component:
+  // https://github.com/nozzle/react-static/blob/master/docs/config.md#document
+  Document: require("./static-config-parts/document").default,
+  // turn this on if it helps your local development workflow for build testing
+  bundleAnalyzer: false,
+  webpack: staticWebpackConfig
 };

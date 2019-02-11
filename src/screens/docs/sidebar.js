@@ -48,7 +48,10 @@ const CloseButton = styled.img`
 class Sidebar extends React.Component {
   renderSidebarItem(item) {
     const { tocArray } = this.props;
-    const currentPath = `/docs${item.path}` === window.location.pathname;
+    let currentPath;
+    if (typeof window !== "undefined") {
+      currentPath = `/docs${item.path}` === window.location.pathname;
+    }
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
