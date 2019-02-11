@@ -50,15 +50,17 @@ beforeEach(() => {
   receivedOps = [];
   exchangeMock.mockClear();
   receiveMock.mockClear();
-  client = createClient({ url, exchanges: [exchangeMock] });
+  client = createClient({ url, exchanges: [exchangeMock] as any[] });
 });
 
 describe('exchange args', () => {
   it('receives forward function', () => {
+    // @ts-ignore
     expect(typeof exchangeMock.mock.calls[0][0].forward).toBe('function');
   });
 
   it('recieves client', () => {
+    // @ts-ignore
     expect(exchangeMock.mock.calls[0][0]).toHaveProperty('client', client);
   });
 });
