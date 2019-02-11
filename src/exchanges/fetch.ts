@@ -1,15 +1,6 @@
-import {
-  filter,
-  make,
-  merge,
-  mergeMap,
-  pipe,
-  share,
-  Source,
-  takeUntil,
-} from 'wonka';
+import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { CombinedError } from '../lib/error';
-import { Exchange, OperationResult, Operation, OperationType } from '../types';
+import { Exchange, Operation, OperationResult } from '../types';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {

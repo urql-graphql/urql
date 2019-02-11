@@ -1,22 +1,8 @@
-import {
-  empty,
-  fromValue,
-  never,
-  pipe,
-  publish,
-  Source,
-  take,
-  toPromise,
-} from 'wonka';
+import { empty, fromValue, pipe, Source, take, toPromise } from 'wonka';
 import { Client } from '../lib/client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
-import { OperationResult, Operation } from '../types';
-
-import {
-  subscriptionExchange,
-  SubscriptionForwarder,
-  SubscriptionOperation,
-} from './subscription';
+import { OperationResult } from '../types';
+import { subscriptionExchange, SubscriptionForwarder } from './subscription';
 
 const exchangeArgs = {
   forward: () => empty as Source<OperationResult>,

@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`on init default values match snapshot 1`] = `
+Object {
+  "executeMutation": [Function],
+  "fetching": false,
+}
+`;

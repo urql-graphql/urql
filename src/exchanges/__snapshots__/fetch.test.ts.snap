@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should return error data from fetch 1`] = `
+exports[`returns error data from fetch 1`] = `
 Object {
   "data": undefined,
   "error": CombinedError {
@@ -36,7 +36,7 @@ Object {
 }
 `;
 
-exports[`should return response data from fetch 1`] = `
+exports[`returns response data from fetch 1`] = `
 Object {
   "data": Object {
     "data": Object {

@@ -13,11 +13,11 @@ import { CombinedError } from '../lib/error';
 
 import {
   Exchange,
-  OperationResult,
   ExecutionResult,
   GraphQLRequest,
   Operation,
   OperationContext,
+  OperationResult,
 } from '../types';
 
 export interface ObserverLike<T> {

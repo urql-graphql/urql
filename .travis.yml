@@ -12,7 +12,13 @@ jobs:
     - stage: Test
       name: Lint
       node_js: 10
-      script: yarn run lint
+      script:
+        - yarn run lint
+    - stage: Test
+      name: Formatting
+      node_js: 10
+      script:
+        - yarn run check-formatting
     - stage: Test
       name: Jest (node:8)
       node_js: 8
@@ -36,7 +42,7 @@ jobs:
       node_js: 10
       script:
         - yarn run build
-        - yarn run bundlesize
+        # - yarn run bundlesize
     - stage: E2E
       name: Cypress
       node_js: 10

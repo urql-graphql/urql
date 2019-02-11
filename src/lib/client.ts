@@ -1,33 +1,18 @@
-import {
-  filter,
-  makeSubject,
-  onEnd,
-  onStart,
-  pipe,
-  share,
-  Source,
-  take,
-} from 'wonka';
+import { filter, makeSubject, onStart, pipe, share, Source, take } from 'wonka';
 import { composeExchanges, defaultExchanges } from '../exchanges';
 import { hashString } from './hash';
 
 import {
   Exchange,
-  OperationResult,
   GraphqlMutation,
   GraphqlQuery,
   GraphQLRequest,
   GraphqlSubscription,
   Operation,
   OperationContext,
+  OperationResult,
   OperationType,
 } from '../types';
-
-interface SubscribeArgs {
-  next: (data: any) => void;
-  error: (err: any) => void;
-  complete: () => void;
-}
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -102,10 +87,10 @@ export class Client implements ClientOptions {
   });
 
   /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
-  private teardownOperation(operation: Operation) {
-    delete this.activeResultSources[operation.key];
-    this.dispatchOperation({ ...operation, operationName: 'teardown' });
-  }
+  // private teardownOperation(operation: Operation) {
+  //   delete this.activeResultSources[operation.key];
+  //   this.dispatchOperation({ ...operation, operationName: 'teardown' });
+  // }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {

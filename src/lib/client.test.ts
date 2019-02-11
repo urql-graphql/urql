@@ -2,12 +2,10 @@
 jest.mock('./hash', () => ({
   hashString: () => 'hash',
 }));
-import { map, pipe, share, subscribe, switchAll, tap, toPromise } from 'wonka';
+import { map, pipe, subscribe, tap } from 'wonka';
 import { createClient } from './client';
-import { CombinedError } from './error';
 
 const url = 'https://hostname.com';
-const fetch = (global as any).fetch as jest.Mock;
 
 describe('createClient', () => {
   it('passes snapshot', () => {
@@ -50,15 +48,17 @@ beforeEach(() => {
   receivedOps = [];
   exchangeMock.mockClear();
   receiveMock.mockClear();
-  client = createClient({ url, exchanges: [exchangeMock] });
+  client = createClient({ url, exchanges: [exchangeMock] as any[] });
 });
 
 describe('exchange args', () => {
   it('receives forward function', () => {
+    // @ts-ignore
     expect(typeof exchangeMock.mock.calls[0][0].forward).toBe('function');
   });
 
   it('recieves client', () => {
+    // @ts-ignore
     expect(exchangeMock.mock.calls[0][0]).toHaveProperty('client', client);
   });
 });

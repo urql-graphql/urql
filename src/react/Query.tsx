@@ -24,18 +24,18 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   };
 
   public componentDidMount() {
-    this.executeSubscription();
+    this.executeQuery();
   }
 
   public componentDidUpdate(oldProps) {
     if (
-      this.props.query === oldProps.query ||
+      this.props.query === oldProps.query &&
       this.props.variables === oldProps.variables
     ) {
       return;
     }
 
-    this.executeSubscription();
+    this.executeQuery();
   }
 
   public componentWillUnmount() {
@@ -48,7 +48,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     return this.props.children(this.state);
   }
 
-  private executeSubscription() {
+  private executeQuery() {
     if (this.unsubscribe !== undefined) {
       this.unsubscribe();
     }
@@ -62,7 +62,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     });
 
     const [unsubscribe] = pipe(
-      this.props.client.executeSubscription(
+      this.props.client.executeQuery(
         createQuery(this.props.query, this.props.variables)
       ),
       subscribe(({ data, error }) => {

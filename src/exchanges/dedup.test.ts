@@ -7,15 +7,12 @@ import {
   Source,
   Subject,
 } from 'wonka';
-
+import { Client } from '../lib/client';
 import {
   mutationOperation,
-  mutationResponse,
   queryOperation,
   queryResponse,
 } from '../test-utils';
-
-import { Client } from '../lib/client';
 import { Operation } from '../types';
 import { dedupeExchange } from './dedup';
 

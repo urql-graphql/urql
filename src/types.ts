@@ -1,4 +1,4 @@
-import { Observer, Source, Subject } from 'wonka';
+import { Source } from 'wonka';
 // import { ClientState } from './react';
 import { Client } from './lib/client';
 import { CombinedError } from './lib/error';

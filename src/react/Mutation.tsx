@@ -6,14 +6,17 @@ import { Consumer } from './context';
 interface MutationHandlerProps {
   client: Client;
   query: string;
-  variables?: object;
-  children: (arg: MutationHandlerState) => ReactNode;
+  children: (arg: MutationChildProps) => ReactNode;
 }
 
 interface MutationHandlerState {
   fetching: boolean;
   data?: any;
   error?: CombinedError;
+}
+
+interface MutationChildProps extends MutationHandlerState {
+  executeMutation: (variables: object) => void;
 }
 
 class MutationHandler extends Component<
@@ -25,25 +28,13 @@ class MutationHandler extends Component<
   };
 
   public render() {
-    return this.props.children(this.state);
+    return this.props.children({
+      ...this.state,
+      executeMutation: this.executeMutation,
+    });
   }
 
-  public componentDidMount() {
-    this.executeMutation();
-  }
-
-  public componentDidUpdate(oldProps) {
-    if (
-      this.props.query === oldProps.query ||
-      this.props.variables === oldProps.variables
-    ) {
-      return;
-    }
-
-    this.executeMutation();
-  }
-
-  private async executeMutation() {
+  private executeMutation = async (variables: object) => {
     if (this.props.query === undefined) {
       return;
     }
@@ -55,20 +46,22 @@ class MutationHandler extends Component<
     });
 
     try {
-      const data = await pipe(
+      const { data, error } = await pipe(
         this.props.client.executeMutation(
-          createMutation(this.props.query, this.props.variables)
+          createMutation(this.props.query, variables)
         ),
         toPromise
       );
 
-      this.setState({ data });
+      this.setState({ fetching: false, data, error });
     } catch (error) {
       this.setState({
+        ...this.state,
+        fetching: false,
         error,
       });
     }
-  }
+  };
 }
 
 type MutationProps = Exclude<MutationHandlerProps, 'client'>;

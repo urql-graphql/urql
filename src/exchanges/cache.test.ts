@@ -1,13 +1,5 @@
-import {
-  forEach,
-  makeSubject,
-  map,
-  pipe,
-  publish,
-  Source,
-  Subject,
-} from 'wonka';
-
+import { makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+import { Client } from '../lib/client';
 import {
   mutationOperation,
   mutationResponse,
@@ -16,8 +8,6 @@ import {
   subscriptionOperation,
   subscriptionResult,
 } from '../test-utils';
-
-import { Client } from '../lib/client';
 import { Operation } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 

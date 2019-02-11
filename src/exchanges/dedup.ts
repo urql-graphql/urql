@@ -1,5 +1,5 @@
 import { filter, pipe, tap } from 'wonka';
-import { Exchange, OperationType } from '../types';
+import { Exchange } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
 export const dedupeExchange: Exchange = ({ forward }) => {

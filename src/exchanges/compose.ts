@@ -1,4 +1,4 @@
-import { empty, map, pipe, Source } from 'wonka';
+import { map, pipe } from 'wonka';
 
 import { Client } from '../lib/client';
 import { Exchange, ExchangeIO, OperationResult } from '../types';
@@ -26,10 +26,7 @@ const fallbackIO: ExchangeIO = ops$ =>
 export const composeExchanges = (
   client: Client,
   exchanges: Exchange[]
-): ExchangeIO => {
-  const noopForward = () => empty as Source<OperationResult>;
-
-  return exchanges.reduceRight((forward, exchange) => {
+): ExchangeIO =>
+  exchanges.reduceRight((forward, exchange) => {
     return exchange({ client, forward });
   }, fallbackIO);
-};
