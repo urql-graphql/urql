@@ -13,7 +13,7 @@ jest.mock('../lib/client', () => {
 });
 
 import React, { FC } from 'react';
-import renderer from 'react-test-renderer'; // tslint:disable-line
+import renderer from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../lib/client';
 import { useSubscription } from './useSubscription';

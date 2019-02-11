@@ -9,7 +9,7 @@ jest.mock('./context', () => {
   };
 });
 
-import { mount, shallow } from 'enzyme'; // tslint:disable-line
+import { mount, shallow } from 'enzyme';
 import React from 'react';
 import { delay, fromValue, pipe, take, throttle } from 'wonka';
 // @ts-ignore - client is exclusively from mock

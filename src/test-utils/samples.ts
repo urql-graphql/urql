@@ -1,10 +1,10 @@
 import {
-  OperationResult,
   ExecutionResult,
   GraphqlMutation,
   GraphqlQuery,
   GraphqlSubscription,
   Operation,
+  OperationResult,
 } from '../types';
 
 const context = {

@@ -10,7 +10,7 @@ import {
 } from 'wonka';
 import { Client } from '../lib/client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
-import { OperationResult, Operation } from '../types';
+import { OperationResult } from '../types';
 
 import {
   subscriptionExchange,
