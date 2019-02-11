@@ -11,6 +11,7 @@
     "no-submodule-imports": false,
     "interface-name": false,
     "only-arrow-functions": false,
-    "no-object-literal-type-assertion": false
+    "no-object-literal-type-assertion": false,
+    "no-implicit-dependencies": [true, "dev"]
   }
 }

@@ -1,26 +1,21 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "noUnusedLocals": true,
     "rootDir": "./src",
     "baseUrl": ".",
-    "outDir": "lib",
+    "outDir": "dist/cjs",
     "lib": ["dom", "es2018", "esnext.asynciterable", "esnext.array"],
     "jsx": "react",
-    "declaration": true,
+    "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
-    "target": "es2017",
+    "target": "es5",
     "strict": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
+    "sourceMap": true,
     "pretty": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/test-utils"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
