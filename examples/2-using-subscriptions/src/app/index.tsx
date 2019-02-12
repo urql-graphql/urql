@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import * as ReactDOM from 'react-dom';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {
@@ -30,7 +30,7 @@ const client = createClient({
   ],
 });
 
-export const App: React.SFC<{}> = () => (
+export const App: FC = () => (
   <Provider value={client}>
     <main>
       <h1>New messages</h1>

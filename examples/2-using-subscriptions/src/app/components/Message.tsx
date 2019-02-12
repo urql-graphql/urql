@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 export interface MessageResponse {
   newMessages: MessageEntry;
@@ -10,7 +10,7 @@ export interface MessageEntry {
   message: string;
 }
 
-export const Message: React.SFC<MessageEntry> = props => (
+export const Message: FC<MessageEntry> = props => (
   <div className="notif">
     <h4>{props.from}</h4>
     <li>{props.message}</li>
