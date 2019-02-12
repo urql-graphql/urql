@@ -40,9 +40,9 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
     const cachedOps$ = pipe(
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
-      map(operation => {
+      map(op => {
         // OperationResult is guaranteed to exist
-        return resultCache.get(operation.key) as OperationResult;
+        return resultCache.get(op.key) as OperationResult;
       })
     );
 
