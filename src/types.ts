@@ -1,5 +1,4 @@
 import { Source } from 'wonka';
-// import { ClientState } from './react';
 import { Client } from './client';
 import { CombinedError } from './lib/error';
 
