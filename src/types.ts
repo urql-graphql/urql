@@ -1,6 +1,6 @@
 import { Source } from 'wonka';
 import { Client } from './client';
-import { CombinedError } from './lib/error';
+import { CombinedError } from './utils/error';
 
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';

@@ -9,7 +9,7 @@ import {
   takeUntil,
 } from 'wonka';
 
-import { CombinedError } from '../lib/error';
+import { CombinedError } from '../utils/error';
 
 import {
   Exchange,

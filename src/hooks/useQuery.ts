@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createQuery } from '../lib';
+import { CombinedError, createQuery } from '../utils';
 
 interface UseQueryArgs {
   query: string;
