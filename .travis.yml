@@ -46,11 +46,9 @@ jobs:
     - stage: E2E
       name: Cypress
       node_js: 10
-      if: branch = master or type =  pull_request
+      # if: branch = master or type =  pull_request
       script:
-        - cd example
+        - cd examples/2-using-subscriptions
         - yarn
         - yarn start &
-        - yarn global add cypress
-        - cd ..
-        - cypress run
+        - yarn run e2e 
