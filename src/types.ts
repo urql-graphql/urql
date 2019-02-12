@@ -1,6 +1,6 @@
 import { Source } from 'wonka';
 // import { ClientState } from './react';
-import { Client } from './lib/client';
+import { Client } from './client';
 import { CombinedError } from './lib/error';
 
 /** The type of GraphQL operation being executed. */

@@ -1,5 +1,5 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../lib/client', () => {
+jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
   const { fromArray } = require('wonka');
   const mock = {
@@ -15,7 +15,7 @@ jest.mock('../lib/client', () => {
 import React, { FC } from 'react';
 import renderer from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
-import { createClient, data } from '../lib/client';
+import { createClient, data } from '../client';
 import { useSubscription } from './useSubscription';
 
 // @ts-ignore
