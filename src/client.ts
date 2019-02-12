@@ -1,6 +1,6 @@
 import { filter, makeSubject, onStart, pipe, share, Source, take } from 'wonka';
 import { composeExchanges, defaultExchanges } from './exchanges';
-import { hashString } from './lib';
+import { hashString } from './utils';
 
 import {
   Exchange,

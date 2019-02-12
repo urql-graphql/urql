@@ -1,5 +1,5 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
-jest.mock('./lib/hash', () => ({
+jest.mock('./utils/hash', () => ({
   hashString: () => 'hash',
 }));
 import { map, pipe, subscribe, tap } from 'wonka';
