@@ -1,7 +1,8 @@
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, toPromise } from 'wonka';
-import { Client, CombinedError, createMutation } from '../lib';
-import { Consumer } from './context';
+import { Client } from '../client';
+import { Consumer } from '../context';
+import { CombinedError, createMutation } from '../lib';
 
 interface MutationHandlerProps {
   client: Client;

@@ -1,4 +1,4 @@
-jest.mock('./context', () => {
+jest.mock('../context', () => {
   const c = {
     executeQuery: jest.fn(),
   };
@@ -13,7 +13,7 @@ import { mount, shallow } from 'enzyme';
 import React from 'react';
 import { delay, fromValue, pipe } from 'wonka';
 // @ts-ignore - client is exclusively from mock
-import { client } from './context';
+import { client } from '../context';
 import { Query } from './Query';
 
 const props = {
