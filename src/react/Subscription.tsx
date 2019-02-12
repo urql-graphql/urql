@@ -1,7 +1,8 @@
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
-import { Client, CombinedError, createSubscription } from '../lib';
-import { Consumer } from './context';
+import { Client } from '../client';
+import { Consumer } from '../context';
+import { CombinedError, createSubscription } from '../lib';
 
 interface SubscriptionHandlerProps {
   client: Client;

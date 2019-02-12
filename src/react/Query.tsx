@@ -1,7 +1,8 @@
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
-import { Client, CombinedError, createQuery } from '../lib';
-import { Consumer } from './context';
+import { Client } from '../client';
+import { Consumer } from '../context';
+import { CombinedError, createQuery } from '../lib';
 
 interface QueryHandlerProps {
   client: Client;

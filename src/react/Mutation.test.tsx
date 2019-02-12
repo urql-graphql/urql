@@ -1,4 +1,4 @@
-jest.mock('./context', () => {
+jest.mock('../context', () => {
   const c = {
     executeMutation: jest.fn(),
   };
@@ -13,7 +13,7 @@ import { mount } from 'enzyme';
 import React from 'react';
 import { fromValue } from 'wonka';
 // @ts-ignore - client is exclusively from mock
-import { client } from './context';
+import { client } from '../context';
 import { Mutation } from './Mutation';
 
 const props = {

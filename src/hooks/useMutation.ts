@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
+import { Context } from '../context';
 import { CombinedError, createMutation } from '../lib';
-import { Context } from './context';
 
 interface UseMutationState<T> {
   fetching: boolean;

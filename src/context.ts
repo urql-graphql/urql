@@ -1,5 +1,5 @@
 import createContext from 'create-react-context';
-import { Client, createClient } from '../client';
+import { Client, createClient } from './client';
 
 // We assume some default options here; mainly not to actually be used
 // but not to error catastrophically if someone is just playing around
