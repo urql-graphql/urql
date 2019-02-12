@@ -6,7 +6,8 @@
   "scripts": {
     "start:server": "node ./src/server/index.js",
     "start:client": "webpack-dev-server --hot --inline",
-    "start": "npm run build --prefix ../../ && run-p start:server start:client"
+    "start": "npm run build --prefix ../../ && run-p start:server start:client",
+    "e2e": "npx cypress run"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.1",
@@ -31,6 +32,6 @@
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "subscriptions-transport-ws": "^0.9.15",
-    "urql": "../../"
+    "urql": "file:../../"
   }
 }

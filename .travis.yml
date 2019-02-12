@@ -44,13 +44,12 @@ jobs:
         - yarn run build
         # - yarn run bundlesize
     - stage: E2E
-      name: Cypress
+      name: Subscription Example
       node_js: 10
-      if: branch = master or type =  pull_request
+      # if: branch = master or type =  pull_request
       script:
-        - cd example
-        - yarn
-        - yarn start &
-        - yarn global add cypress
-        - cd ..
-        - cypress run
+        - npm i
+        - cd examples/2-using-subscriptions
+        - npm i
+        - npm start &
+        - npm run e2e
