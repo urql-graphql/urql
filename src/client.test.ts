@@ -1,9 +1,9 @@
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
-jest.mock('./hash', () => ({
+jest.mock('./lib/hash', () => ({
   hashString: () => 'hash',
 }));
 import { map, pipe, subscribe, tap } from 'wonka';
-import { createClient } from '../client';
+import { createClient } from './client';
 
 const url = 'https://hostname.com';
 
