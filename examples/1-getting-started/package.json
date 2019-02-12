@@ -6,11 +6,13 @@
   "scripts": {
     "start:server": "node ./src/server/index.js",
     "start:client": "webpack-dev-server --hot --inline",
-    "start": "run-p start:server start:client"
+    "start": "npm run build --prefix ../../ && run-p start:server start:client"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.1",
+    "css-loader": "^2.1.0",
     "npm-run-all": "^4.1.5",
+    "style-loader": "^0.23.1",
     "typescript": "^3.3.1",
     "webpack": "^4.29.2",
     "webpack-cli": "^3.2.3",
@@ -26,6 +28,7 @@
     "isomorphic-fetch": "^2.2.1",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
-    "subscriptions-transport-ws": "^0.9.15"
+    "subscriptions-transport-ws": "^0.9.15",
+    "urql": "file:../../"
   }
 }

@@ -33,7 +33,7 @@ export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
 
   const executeQuery = () => {
     executeUnsubscribe();
-    setState({ ...state, fetching: true });
+    setState(s => ({ ...s, fetching: true }));
 
     unsubscribe = pipe(
       client.executeQuery(createQuery(args.query, args.variables)),

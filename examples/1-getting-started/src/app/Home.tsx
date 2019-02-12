@@ -21,7 +21,13 @@ export const Home: FC = () => {
       return <Error>{query.error.message}</Error>;
     }
 
-    return query.data.todos.map(todo => <Todo key={todo.id} {...todo} />);
+    return (
+      <ul>
+        {query.data.todos.map(todo => (
+          <Todo key={todo.id} {...todo} />
+        ))}
+      </ul>
+    );
   };
 
   return (
@@ -37,9 +43,7 @@ query {
   todos {
     id
     text
-  }
-  user {
-    name
+    complete
   }
 }
 `;
