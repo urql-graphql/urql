@@ -1,6 +1,5 @@
 import { map, pipe } from 'wonka';
-
-import { Client } from '../lib/client';
+import { Client } from '../client';
 import { Exchange, ExchangeIO, OperationResult } from '../types';
 
 /** This is always the last exchange in the chain; No operation should ever reach it */

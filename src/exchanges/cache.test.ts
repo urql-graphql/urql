@@ -1,5 +1,5 @@
 import { makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
-import { Client } from '../lib/client';
+import { Client } from '../client';
 import {
   mutationOperation,
   mutationResponse,

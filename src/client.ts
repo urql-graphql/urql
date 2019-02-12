@@ -1,6 +1,6 @@
 import { filter, makeSubject, onStart, pipe, share, Source, take } from 'wonka';
-import { composeExchanges, defaultExchanges } from '../exchanges';
-import { hashString } from './hash';
+import { composeExchanges, defaultExchanges } from './exchanges';
+import { hashString } from './lib';
 
 import {
   Exchange,
@@ -12,7 +12,7 @@ import {
   OperationContext,
   OperationResult,
   OperationType,
-} from '../types';
+} from './types';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {

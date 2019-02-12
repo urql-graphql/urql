@@ -1,6 +1,6 @@
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
-import { Client } from '../lib/client';
+import { Client } from '../client';
 import { formatTypeNames, gankTypeNamesFromResponse } from '../lib/typenames';
 import { Exchange, Operation, OperationResult } from '../types';
 

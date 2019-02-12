@@ -1,5 +1,5 @@
 import { empty, fromValue, pipe, Source, take, toPromise } from 'wonka';
-import { Client } from '../lib/client';
+import { Client } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
 import { OperationResult } from '../types';
 import { subscriptionExchange, SubscriptionForwarder } from './subscription';

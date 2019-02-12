@@ -3,7 +3,7 @@ jest.mock('./hash', () => ({
   hashString: () => 'hash',
 }));
 import { map, pipe, subscribe, tap } from 'wonka';
-import { createClient } from './client';
+import { createClient } from '../client';
 
 const url = 'https://hostname.com';
 

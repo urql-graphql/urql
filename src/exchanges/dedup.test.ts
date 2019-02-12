@@ -7,7 +7,7 @@ import {
   Source,
   Subject,
 } from 'wonka';
-import { Client } from '../lib/client';
+import { Client } from '../client';
 import {
   mutationOperation,
   queryOperation,
