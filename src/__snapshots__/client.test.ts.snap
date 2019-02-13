@@ -6,11 +6,7 @@ Client {
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
   "dispatchOperation": [Function],
-  "exchanges": Array [
-    [Function],
-    [Function],
-    [Function],
-  ],
+  "exchange": [Function],
   "executeMutation": [Function],
   "executeQuery": [Function],
   "executeSubscription": [Function],

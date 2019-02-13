@@ -1,6 +1,11 @@
 import { filter, makeSubject, onStart, pipe, share, Source, take } from 'wonka';
-import { composeExchanges, defaultExchanges } from './exchanges';
 import { hashString } from './utils';
+
+import {
+  composeExchanges,
+  defaultExchanges,
+  fallbackExchangeIO,
+} from './exchanges';
 
 import {
   Exchange,
@@ -31,11 +36,11 @@ interface ActiveResultSources {
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
-export class Client implements ClientOptions {
+export class Client {
   // These are variables derived from ClientOptions
   url: string;
   fetchOptions: RequestInit;
-  exchanges: Exchange[];
+  exchange: Exchange;
 
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
@@ -51,19 +56,26 @@ export class Client implements ClientOptions {
         ? opts.fetchOptions()
         : opts.fetchOptions || {};
 
-    this.exchanges =
-      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
     const [operations$, nextOperation] = makeSubject<Operation>();
     this.operations$ = operations$;
     this.dispatchOperation = nextOperation;
 
+    const exchanges =
+      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
+
+    // All exchange are composed into a single one and are called using the constructed client
+    // and the fallback exchange stream
+    this.exchange = composeExchanges(exchanges);
+
     // All operations run through the exchanges in a pipeline-like fashion
     // and this observable then combines all their results
     this.results$ = share(
-      composeExchanges(this, this.exchanges)(this.operations$)
+      this.exchange({
+        client: this,
+        forward: fallbackExchangeIO,
+      })(this.operations$)
     );
   }
 

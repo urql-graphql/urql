@@ -3,6 +3,7 @@ export { subscriptionExchange } from './subscription';
 export { debugExchange } from './debug';
 export { dedupeExchange } from './dedup';
 export { fetchExchange } from './fetch';
+export { fallbackExchangeIO } from './fallback';
 export { composeExchanges } from './compose';
 
 import { cacheExchange } from './cache';
