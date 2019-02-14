@@ -92,6 +92,7 @@ export class Client {
     opts?: Partial<OperationContext>
   ): OperationContext => ({
     url: this.url,
+    requestPolicy: 'cache-first',
     fetchOptions: this.fetchOptions,
     ...opts,
   });

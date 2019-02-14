@@ -27,8 +27,18 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
 
   const handleAfterQuery = afterQuery(resultCache, operationCache);
 
-  const isOperationCached = operation =>
-    operation.operationName === 'query' && resultCache.has(operation.key);
+  const isOperationCached = operation => {
+    const {
+      key,
+      operationName,
+      context: { requestPolicy },
+    } = operation;
+    return (
+      operationName === 'query' &&
+      requestPolicy !== 'network-only' &&
+      (requestPolicy === 'cache-only' || resultCache.has(key))
+    );
+  };
 
   const shouldSkip = (operation: Operation) =>
     operation.operationName !== 'mutation' &&
@@ -40,9 +50,25 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
     const cachedOps$ = pipe(
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
-      map(op => {
-        // OperationResult is guaranteed to exist
-        return resultCache.get(op.key) as OperationResult;
+      map(operation => {
+        const {
+          key,
+          context: { requestPolicy },
+        } = operation;
+        const cachedResult = resultCache.get(key);
+        if (requestPolicy === 'cache-and-network') {
+          reexecuteOperation(client, operation);
+        }
+
+        if (cachedResult !== undefined) {
+          return cachedResult;
+        }
+
+        return {
+          operation,
+          data: undefined,
+          error: undefined,
+        };
       })
     );
 
@@ -70,6 +96,17 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
   };
 };
 
+// Reexecutes a given operation with the default requestPolicy
+const reexecuteOperation = (client: Client, operation: Operation) => {
+  return client.reexecuteOperation({
+    ...operation,
+    context: {
+      ...operation.context,
+      requestPolicy: 'network-only',
+    },
+  });
+};
+
 // Invalidates the cache given a mutation's response
 export const afterMutation = (
   resultCache: ResultCache,
@@ -88,7 +125,7 @@ export const afterMutation = (
   pendingOperations.forEach(key => {
     const operation = (resultCache.get(key) as OperationResult).operation; // Result is guaranteed
     resultCache.delete(key);
-    client.reexecuteOperation(operation);
+    reexecuteOperation(client, operation);
   });
 };
 
