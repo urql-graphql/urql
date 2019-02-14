@@ -112,7 +112,7 @@
   },
   "dependencies": {
     "create-react-context": "^0.2.3",
-    "wonka": "^2.0.0"
+    "wonka": "^2.0.1"
   },
   "sideEffects": false
 }
