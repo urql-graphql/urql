@@ -2,7 +2,7 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { RequestPolicy } from '../types';
+import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createQuery, noop } from '../utils';
 
 interface QueryHandlerProps {
@@ -17,39 +17,13 @@ interface QueryHandlerState {
   fetching: boolean;
   data?: any;
   error?: CombinedError;
+  executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 
 class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   private unsubscribe = noop;
 
-  public state = {
-    fetching: false,
-  };
-
-  public componentDidMount() {
-    this.executeQuery();
-  }
-
-  public componentDidUpdate(oldProps) {
-    if (
-      this.props.query === oldProps.query &&
-      this.props.variables === oldProps.variables
-    ) {
-      return;
-    }
-
-    this.executeQuery();
-  }
-
-  public componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  public render() {
-    return this.props.children(this.state);
-  }
-
-  private executeQuery() {
+  executeQuery = () => {
     if (this.unsubscribe !== undefined) {
       this.unsubscribe();
     }
@@ -78,6 +52,34 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     );
 
     this.unsubscribe = teardown;
+  };
+
+  state = {
+    executeQuery: this.executeQuery,
+    fetching: false,
+  };
+
+  componentDidMount() {
+    this.executeQuery();
+  }
+
+  componentDidUpdate(oldProps) {
+    if (
+      this.props.query === oldProps.query &&
+      this.props.variables === oldProps.variables
+    ) {
+      return;
+    }
+
+    this.executeQuery();
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  render() {
+    return this.props.children(this.state);
   }
 }
 
