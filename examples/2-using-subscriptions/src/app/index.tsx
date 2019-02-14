@@ -24,7 +24,6 @@ const client = createClient({
     cacheExchange,
     fetchExchange,
     subscriptionExchange({
-      // @ts-ignore needs fixing
       forwardSubscription: operation => subscriptionClient.request(operation),
     }),
   ],

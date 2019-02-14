@@ -2,6 +2,8 @@ import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
 
+export { ExecutionResult } from 'graphql';
+
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
@@ -28,12 +30,6 @@ export interface Operation extends GraphQLRequest {
   key: string;
   operationName: OperationType;
   context: OperationContext;
-}
-
-// Adapted from: https://github.com/graphql/graphql-js/blob/ae5b163/src/execution/execute.js#L105-L114
-export interface ExecutionResult {
-  errors?: Error[];
-  data?: any;
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
