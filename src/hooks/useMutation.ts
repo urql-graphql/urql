@@ -28,11 +28,15 @@ export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
       client.executeMutation(mutation),
       toPromise
     )
-      .then(({ data, error }) => {
+      .then(result => {
+        const { data, error } = result;
         setState({ fetching: false, data, error });
+        return result;
       })
-      .catch(error => {
+      .catch(networkError => {
+        const error = new CombinedError({ networkError });
         setState({ fetching: false, data: undefined, error });
+        return { data: undefined, error };
       });
   };
 

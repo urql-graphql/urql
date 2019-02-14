@@ -52,11 +52,15 @@ class MutationHandler extends Component<
       this.props.client.executeMutation(mutation),
       toPromise
     )
-      .then(({ data, error }) => {
+      .then(result => {
+        const { data, error } = result;
         this.setState({ fetching: false, data, error });
+        return result;
       })
-      .catch(error => {
+      .catch(networkError => {
+        const error = new CombinedError({ networkError });
         this.setState({ fetching: false, data: undefined, error });
+        return { data: undefined, error };
       });
   };
 }
