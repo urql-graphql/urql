@@ -90,12 +90,16 @@ export class Client {
 
   private createOperationContext = (
     opts?: Partial<OperationContext>
-  ): OperationContext => ({
-    url: this.url,
-    requestPolicy: 'cache-first',
-    fetchOptions: this.fetchOptions,
-    ...opts,
-  });
+  ): OperationContext => {
+    const { requestPolicy = 'cache-first' } = opts || {};
+
+    return {
+      url: this.url,
+      fetchOptions: this.fetchOptions,
+      ...opts,
+      requestPolicy,
+    };
+  };
 
   private createRequestOperation = (
     type: OperationType,

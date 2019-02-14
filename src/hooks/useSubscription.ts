@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createQuery } from '../utils';
+import { CombinedError, createQuery, noop } from '../utils';
 
 interface UseSubscriptionArgs {
   query: string;
@@ -21,23 +21,18 @@ export const useSubscription = <T = any, R = T>(
   args: UseSubscriptionArgs,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  let unsubscribe: () => void | undefined;
+  let unsubscribe = noop;
+
   const client = useContext(Context);
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
     data: undefined,
   });
 
-  const executeUnsubscribe = () => {
-    if (unsubscribe !== undefined) {
-      unsubscribe();
-    }
-  };
-
   const executeSubscription = () => {
-    executeUnsubscribe();
+    unsubscribe();
 
-    unsubscribe = pipe(
+    const [teardown] = pipe(
       client.executeSubscription(createQuery(args.query, args.variables)),
       subscribe(({ data, error }) => {
         setState(s => ({
@@ -45,12 +40,14 @@ export const useSubscription = <T = any, R = T>(
           error,
         }));
       })
-    )[0];
+    );
+
+    unsubscribe = teardown;
   };
 
   useEffect(() => {
     executeSubscription();
-    return () => executeUnsubscribe();
+    return unsubscribe;
   }, [args.query, args.variables]);
 
   return [state];

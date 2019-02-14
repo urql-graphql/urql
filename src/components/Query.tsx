@@ -2,12 +2,14 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { CombinedError, createQuery } from '../utils';
+import { RequestPolicy } from '../types';
+import { CombinedError, createQuery, noop } from '../utils';
 
 interface QueryHandlerProps {
   client: Client;
   query: string;
   variables: object;
+  requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;
 }
 
@@ -18,7 +20,7 @@ interface QueryHandlerState {
 }
 
 class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
-  private unsubscribe?: () => void;
+  private unsubscribe = noop;
 
   public state = {
     fetching: false,
@@ -40,9 +42,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   }
 
   public componentWillUnmount() {
-    if (this.unsubscribe !== undefined) {
-      this.unsubscribe();
-    }
+    this.unsubscribe();
   }
 
   public render() {
@@ -62,10 +62,12 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
       fetching: true,
     });
 
-    const [unsubscribe] = pipe(
-      this.props.client.executeQuery(
-        createQuery(this.props.query, this.props.variables)
-      ),
+    const request = createQuery(this.props.query, this.props.variables);
+
+    const [teardown] = pipe(
+      this.props.client.executeQuery(request, {
+        requestPolicy: this.props.requestPolicy,
+      }),
       subscribe(({ data, error }) => {
         this.setState({
           fetching: false,
@@ -75,7 +77,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
       })
     );
 
-    this.unsubscribe = unsubscribe;
+    this.unsubscribe = teardown;
   }
 }
 

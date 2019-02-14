@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createQuery } from '../utils';
+import { OperationContext, RequestPolicy } from '../types';
+import { CombinedError, createQuery, noop } from '../utils';
 
 interface UseQueryArgs {
   query: string;
   variables?: any;
+  requestPolicy?: RequestPolicy;
 }
 
 interface UseQueryState<T> {
@@ -14,10 +16,14 @@ interface UseQueryState<T> {
   error?: CombinedError;
 }
 
-type UseQueryResponse<T> = [UseQueryState<T>, () => void];
+type UseQueryResponse<T> = [
+  UseQueryState<T>,
+  (opts?: Partial<OperationContext>) => void
+];
 
 export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
-  let unsubscribe: () => void | undefined;
+  let unsubscribe = noop;
+
   const client = useContext(Context);
   const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
@@ -25,25 +31,22 @@ export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
     data: undefined,
   });
 
-  const executeUnsubscribe = () => {
-    if (unsubscribe !== undefined) {
-      unsubscribe();
-    }
-  };
-
-  const executeQuery = () => {
-    executeUnsubscribe();
+  const executeQuery = (opts?: Partial<OperationContext>) => {
+    unsubscribe();
     setState(s => ({ ...s, fetching: true }));
 
-    unsubscribe = pipe(
-      client.executeQuery(createQuery(args.query, args.variables)),
+    const request = createQuery(args.query, args.variables);
+    const [teardown] = pipe(
+      client.executeQuery(request, opts),
       subscribe(({ data, error }) => setState({ fetching: false, data, error }))
-    )[0];
+    );
+
+    unsubscribe = teardown;
   };
 
   useEffect(() => {
-    executeQuery();
-    return () => executeUnsubscribe();
+    executeQuery({ requestPolicy: args.requestPolicy });
+    return unsubscribe;
   }, [args.query, args.variables]);
 
   // executeQuery === refetch
