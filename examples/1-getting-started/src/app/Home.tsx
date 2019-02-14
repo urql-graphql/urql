@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useQuery } from 'urql';
 import { Error, Loading, Todo } from './components';
 
@@ -11,6 +11,10 @@ interface QueryResponse {
 
 export const Home: FC = () => {
   const [query, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
+  const refetch = useCallback(
+    () => executeQuery({ requestPolicy: 'network-only' }),
+    []
+  );
 
   const getContent = () => {
     if (query.fetching || query.data === undefined) {
@@ -33,7 +37,7 @@ export const Home: FC = () => {
   return (
     <>
       {getContent()}
-      <button onClick={executeQuery}>Refetch</button>
+      <button onClick={refetch}>Refetch</button>
     </>
   );
 };
