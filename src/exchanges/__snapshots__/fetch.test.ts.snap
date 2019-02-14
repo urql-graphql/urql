@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`returns error data from fetch 1`] = `
+Object {
+  "data": undefined,
+  "error": CombinedError {
+    "graphQLErrors": Array [],
+    "message": "[Network] ",
+    "name": "CombinedError",
+    "networkError": [Error],
+    "response": Object {
+      "json": [MockFunction],
+      "status": 400,
+    },
+  },
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": Object {
+        "method": "POST",
+      },
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": "2",
+    "operationName": "query",
+    "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+    "variables": Object {
+      "name": "Clara",
+    },
+  },
+}
+`;
+
+exports[`returns response data from fetch 1`] = `
+Object {
+  "data": Object {
+    "data": Object {
+      "user": 1200,
+    },
+  },
+  "error": undefined,
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": Object {
+        "method": "POST",
+      },
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": "2",
+    "operationName": "query",
+    "query": "query getUser($name: String){
+    user(name: $name) {
+      id
+      firstName
+      lastName
+    }
+  }",
+    "variables": Object {
+      "name": "Clara",
+    },
+  },
+}
+`;

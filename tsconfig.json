@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
     "rootDir": "./src",
+    "baseUrl": ".",
+    "outDir": "dist/cjs",
+    "lib": ["dom", "esnext"],
     "jsx": "react",
-    "declaration": true,
+    "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
-    "target": "es2015",
-    "noEmit": true,
-    "noUnusedLocals": true,
+    "target": "esnext",
+    "strict": true,
     "noImplicitAny": false,
     "noUnusedParameters": true,
-    "skipLibCheck": true,
+    "sourceMap": true,
     "pretty": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "typeRoots": ["node_modules/@types"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

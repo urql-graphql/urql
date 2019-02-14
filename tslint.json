@@ -1,13 +1,17 @@
 {
   "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
-    "exclude": ["src/tests/**/*", "example/**/*"]
+    "exclude": ["src/tests/**/*", "examples/**/*"]
   },
   "rules": {
     "object-literal-sort-keys": false,
+    "no-console": [true, "log"],
     "member-ordering": false,
-    "ordered-imports": false,
     "member-access": false,
-    "no-submodule-imports": false
+    "no-submodule-imports": false,
+    "interface-name": false,
+    "only-arrow-functions": false,
+    "no-object-literal-type-assertion": false,
+    "no-implicit-dependencies": [true, "dev"]
   }
 }

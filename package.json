@@ -1,141 +1,123 @@
 {
   "name": "urql",
-  "version": "0.3.0-next1",
-  "description": "A naive React Graphql library",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "jsnext:main": "es/index.js",
-  "types": "types/index.d.ts",
+  "version": "1.0.0",
+  "description": "A highly customizable and versatile GraphQL client for React",
+  "main": "dist/urql.js",
+  "module": "dist/urql.es.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "coverage": "jest --coverage",
-    "clean-lib": "rimraf lib",
-    "build-babel": "babel src --extensions \".ts,.tsx\"",
-    "build-lib": "npm run clean-lib && builder run --env \"{\\\"BABEL_ENV\\\":\\\"commonjs\\\"}\" build-babel -- -d lib",
-    "build-bundles": "rollup -c",
-    "clean-es": "rimraf es",
-    "build-es": "npm run clean-es && builder run build-babel -- -d es",
-    "watch-es": "watch \"npm run build-es\" src/ -d",
-    "clean-types": "rimraf types",
-    "build-types": "npm run clean-types && tsc -p tsconfig.dts.json",
-    "build": "builder concurrent --buffer build-lib build-es build-types",
-    "demo:start:graphql-server": "node example/src/server/index.js",
-    "demo:start:app": "webpack-dev-server --hot --inline --config \"example/webpack.config.js\"",
-    "demo:start": "builder concurrent demo:start:app demo:start:graphql-server",
-    "type-check": "tsc",
-    "lint": "tslint 'src/**/*.{ts, tsx}'",
+    "prebuild": "rimraf dist",
+    "build": "run-p build:types build:bundle",
+    "build:clean": "rimraf dist",
+    "build:types": "tsc -d --emitDeclarationOnly --outDir dist/types",
+    "build:bundle": "microbundle --format es,cjs --no-compress",
+    "postbuild:bundle": "terser dist/urql.es.js -o dist/urql.es.min.js",
     "test": "jest",
     "bundlesize": "bundlesize",
-    "prettier": "prettier --write \"{,!(node_modules|custom-typings|types)/**/}*.{js,jsx,ts,tsx,json,md}\"",
-    "precommit": "lint-staged"
+    "lint": "tslint --project .",
+    "check-formatting": "prettier --write src/**/*.{ts,tsx}",
+    "prepublishOnly": "run-s build"
   },
-  "author": "Ken Wheeler",
+  "author": "Formidable",
   "license": "MIT",
-  "resolutions": {
-    "babel-core": "^7.0.0-bridge.0"
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
   "jest": {
     "setupFiles": [
-      "./src/tests/setup.js"
+      "./scripts/setupTests.js"
     ],
     "transform": {
-      "^.+\\.tsx?$": "<rootDir>/node_modules/babel-jest"
+      "^.+\\.tsx?$": "ts-jest"
     },
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/tests/**/*",
-      "!src/interfaces/**/*",
-      "!src/index.*",
-      "!src/**/hash.*",
-      "!src/**/typenames.*"
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
     ],
-    "testRegex": "(src/tests/.*(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
-      "ts",
-      "tsx",
       "js",
       "jsx",
-      "json",
-      "node"
+      "ts",
+      "tsx",
+      "json"
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.{ts,tsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/test-utils",
+      "<rootDir>/src.*/index.ts"
     ]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,md}": [
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{ts,tsx}": [
+      "tslint --fix",
       "prettier --write",
       "git add"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "bundlesize": [
     {
-      "path": "./bundles/urql.es.min.js",
-      "maxSize": "8 kB"
+      "path": "./dist/*.min.js",
+      "maxSize": "10 kB"
     }
   ],
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.38",
-    "@babel/core": "^7.0.0-beta.38",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.38",
-    "@babel/plugin-proposal-pipeline-operator": "^7.0.0-beta.38",
-    "@babel/plugin-syntax-object-rest-spread": "^7.0.0-beta.38",
-    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.40",
-    "@babel/polyfill": "^7.0.0-beta.38",
-    "@babel/preset-env": "^7.0.0-beta.38",
-    "@babel/preset-react": "^7.0.0-beta.38",
-    "@babel/preset-stage-3": "^7.0.0-beta.38",
-    "@babel/preset-typescript": "^7.0.0-beta.38",
-    "@types/graphql": "^0.12.1",
-    "@types/jest": "^22.0.1",
-    "@types/react": "^16.0.34",
-    "@types/react-dom": "^16.0.3",
-    "@types/uuid": "^3.4.3",
-    "babel-jest": "^22.1.0",
-    "babel-loader": "8.0.0-beta.0",
-    "babel-plugin-module-resolver": "^3.0.0",
-    "builder": "^3.2.3",
+    "@types/enzyme": "3.1.16",
+    "@types/graphql": "^14.0.7",
+    "@types/jest": "^23.3.13",
+    "@types/react": "16.8.2",
+    "@types/react-test-renderer": "^16.8.0",
     "bundlesize": "^0.17.0",
-    "cors": "^2.8.4",
     "coveralls": "^3.0.0",
-    "enzyme": "^3.3.0",
-    "express": "^4.16.2",
-    "express-graphql": "^0.6.11",
-    "graphql-tools": "^2.18.0",
-    "husky": "^0.14.3",
-    "isomorphic-fetch": "^2.2.1",
-    "jest": "^22.1.4",
-    "lint-staged": "^6.0.1",
-    "prettier": "1.10.2",
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
-    "react-addons-test-utils": "^15.6.2",
-    "react-dom": "^16.0.0-0",
-    "react-test-renderer": "^16.2.0",
-    "regenerator-runtime": "^0.11.1",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.7.1",
+    "enzyme-to-json": "^3.3.5",
+    "graphql": "^14.1.1",
+    "husky": "^1.2.0",
+    "jest": "^23.6.0",
+    "lint-staged": "^8.1.0",
+    "microbundle": "^0.9.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.15.2",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
+    "react-test-renderer": "^16.8.1",
     "rimraf": "^2.6.2",
-    "rollup": "^0.58.2",
-    "rollup-plugin-babel": "^4.0.0-beta.4",
-    "rollup-plugin-commonjs": "^9.1.3",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.13.0",
-    "rollup-plugin-uglify": "^3.0.0",
-    "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.6.0",
-    "tslint-react": "^3.4.0",
-    "typescript": "~2.7.2",
-    "uuid": "^3.2.1",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.0"
+    "terser": "^3.16.1",
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.16.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^3.1.6"
   },
   "peerDependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0-0",
-    "react-dom": "^16.0.0-0"
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "react": "^15.0.0 || ^16.0.0",
+    "react-dom": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
-    "create-react-context": "^0.1.3",
-    "graphql": "^0.13.1",
-    "hoist-non-react-statics": "^2.5.0",
-    "zen-observable-ts": "^0.8.9"
+    "create-react-context": "^0.2.3",
+    "wonka": "^2.0.1"
   },
   "sideEffects": false
 }

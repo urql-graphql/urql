@@ -1,5 +1,5 @@
 node_modules
-lib
+/lib
 es
 types
 coverage
@@ -9,4 +9,6 @@ package-lock.json
 package-lock.json.*
 bundles
 dist
-.rpt2_cache
+webpack-build
+.rts2_cache*
+cypress/screenshots
