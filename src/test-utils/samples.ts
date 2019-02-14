@@ -50,6 +50,13 @@ export const subscriptionGql: GraphqlSubscription = {
   },
 };
 
+export const teardownOperation: Operation = {
+  key: '2',
+  operationName: 'teardown',
+  context,
+  ...queryGql,
+};
+
 export const queryOperation: Operation = {
   key: '2',
   operationName: 'query',
