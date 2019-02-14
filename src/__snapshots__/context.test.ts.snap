@@ -15,7 +15,7 @@ Object {
     "_currentRenderer": null,
     "_currentRenderer2": null,
     "_currentValue": Client {
-      "activeResultSources": Object {},
+      "activeOperations": Object {},
       "createOperationContext": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
@@ -30,7 +30,7 @@ Object {
       "url": "/graphql",
     },
     "_currentValue2": Client {
-      "activeResultSources": Object {},
+      "activeOperations": Object {},
       "createOperationContext": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
@@ -64,7 +64,7 @@ Object {
     "_currentRenderer": null,
     "_currentRenderer2": null,
     "_currentValue": Client {
-      "activeResultSources": Object {},
+      "activeOperations": Object {},
       "createOperationContext": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
@@ -79,7 +79,7 @@ Object {
       "url": "/graphql",
     },
     "_currentValue2": Client {
-      "activeResultSources": Object {},
+      "activeOperations": Object {},
       "createOperationContext": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],

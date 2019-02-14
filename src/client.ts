@@ -1,4 +1,13 @@
-import { filter, makeSubject, onStart, pipe, share, Source, take } from 'wonka';
+import {
+  filter,
+  makeSubject,
+  onEnd,
+  onStart,
+  pipe,
+  share,
+  Source,
+  take,
+} from 'wonka';
 import { hashString } from './utils';
 
 import {
@@ -29,8 +38,8 @@ export interface ClientOptions {
   exchanges?: Exchange[];
 }
 
-interface ActiveResultSources {
-  [operationKey: string]: Source<OperationResult>;
+interface ActiveOperations {
+  [operationKey: string]: number;
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
@@ -46,7 +55,7 @@ export class Client {
   dispatchOperation: (operation: Operation) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
-  activeResultSources = Object.create(null) as ActiveResultSources;
+  activeOperations = Object.create(null) as ActiveOperations;
 
   constructor(opts: ClientOptions) {
     this.url = opts.url;
@@ -98,11 +107,24 @@ export class Client {
     context: this.createOperationContext(opts),
   });
 
+  /** Counts up the active operation key and dispatches the operation */
+  private onOperationStart(operation: Operation) {
+    const { key } = operation;
+    this.activeOperations[key] = (this.activeOperations[key] || 0) + 1;
+    this.dispatchOperation(operation);
+  }
+
   /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
-  // private teardownOperation(operation: Operation) {
-  //   delete this.activeResultSources[operation.key];
-  //   this.dispatchOperation({ ...operation, operationName: 'teardown' });
-  // }
+  private onOperationEnd(operation: Operation) {
+    const { key } = operation;
+    const prevActive = this.activeOperations[key] || 0;
+    const newActive = (this.activeOperations[key] =
+      prevActive <= 0 ? 0 : prevActive - 1);
+
+    if (newActive <= 0) {
+      this.dispatchOperation({ ...operation, operationName: 'teardown' });
+    }
+  }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {
@@ -122,23 +144,17 @@ export class Client {
       );
     }
 
-    if (key in this.activeResultSources) {
-      // Reuse active result observable when it's available
-      return this.activeResultSources[key];
-    }
-
-    return (this.activeResultSources[key] = pipe(
+    return pipe(
       operationResults$,
-      onStart<OperationResult>(() => this.dispatchOperation(operation)),
-      // onEnd<OperationResult>(() => this.teardownOperation(operation)),
-      share
-    ));
+      onStart<OperationResult>(() => this.onOperationStart(operation)),
+      onEnd<OperationResult>(() => this.onOperationEnd(operation))
+    );
   }
 
   reexecuteOperation = (operation: Operation) => {
     // Reexecute operation only if any subscribers are still subscribed to the
     // operation's exchange results
-    if (this.activeResultSources[operation.key] !== undefined) {
+    if ((this.activeOperations[operation.key] || 0) > 0) {
       this.dispatchOperation(operation);
     }
   };
