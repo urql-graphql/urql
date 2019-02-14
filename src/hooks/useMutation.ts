@@ -19,18 +19,21 @@ export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
     data: undefined,
   });
 
-  const executeMutation = async (variables: object) => {
+  const executeMutation = (variables: object) => {
     setState({ fetching: true, error: undefined, data: undefined });
 
-    try {
-      const { data, error } = await pipe(
-        client.executeMutation(createMutation(query, variables)),
-        toPromise
-      );
-      setState({ fetching: false, data, error });
-    } catch (error) {
-      setState({ ...state, fetching: false, error });
-    }
+    const mutation = createMutation(query, variables);
+
+    return pipe(
+      client.executeMutation(mutation),
+      toPromise
+    )
+      .then(({ data, error }) => {
+        setState({ fetching: false, data, error });
+      })
+      .catch(error => {
+        setState({ fetching: false, data: undefined, error });
+      });
   };
 
   return [state, executeMutation];

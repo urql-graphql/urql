@@ -24,18 +24,18 @@ class MutationHandler extends Component<
   MutationHandlerProps,
   MutationHandlerState
 > {
-  public state = {
+  state = {
     fetching: false,
   };
 
-  public render() {
+  render() {
     return this.props.children({
       ...this.state,
       executeMutation: this.executeMutation,
     });
   }
 
-  private executeMutation = async (variables: object) => {
+  executeMutation = (variables: object) => {
     if (this.props.query === undefined) {
       return;
     }
@@ -46,22 +46,18 @@ class MutationHandler extends Component<
       data: undefined,
     });
 
-    try {
-      const { data, error } = await pipe(
-        this.props.client.executeMutation(
-          createMutation(this.props.query, variables)
-        ),
-        toPromise
-      );
+    const mutation = createMutation(this.props.query, variables);
 
-      this.setState({ fetching: false, data, error });
-    } catch (error) {
-      this.setState({
-        ...this.state,
-        fetching: false,
-        error,
+    return pipe(
+      this.props.client.executeMutation(mutation),
+      toPromise
+    )
+      .then(({ data, error }) => {
+        this.setState({ fetching: false, data, error });
+      })
+      .catch(error => {
+        this.setState({ fetching: false, data: undefined, error });
       });
-    }
   };
 }
 
