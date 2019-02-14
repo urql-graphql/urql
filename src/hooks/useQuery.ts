@@ -37,7 +37,10 @@ export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
 
     const request = createQuery(args.query, args.variables);
     const [teardown] = pipe(
-      client.executeQuery(request, opts),
+      client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        ...opts,
+      }),
       subscribe(({ data, error }) => setState({ fetching: false, data, error }))
     );
 
@@ -45,7 +48,7 @@ export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
   };
 
   useEffect(() => {
-    executeQuery({ requestPolicy: args.requestPolicy });
+    executeQuery();
     return unsubscribe;
   }, [args.query, args.variables]);
 
