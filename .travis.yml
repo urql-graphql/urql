@@ -48,8 +48,7 @@ jobs:
       node_js: 10
       # if: branch = master or type =  pull_request
       script:
-        - npm i
         - cd examples/2-using-subscriptions
-        - npm i
-        - npm start &
-        - npm run e2e
+        - yarn
+        - yarn start &
+        - yarn run e2e
