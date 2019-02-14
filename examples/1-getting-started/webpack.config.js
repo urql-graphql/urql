@@ -1,37 +1,46 @@
 const path = require('path');
+const context = path.resolve(__dirname, '../..');
 
 module.exports = {
-  entry: './src/app/index.tsx',
-  context: __dirname,
-  output: {
-    path: path.resolve(__dirname, '.build'),
-    filename: 'bundle.js',
-    publicPath: '/assets/',
-  },
+  entry: path.resolve(__dirname, './src/app/index.tsx'),
+  context,
   mode: 'development',
   target: 'web',
   module: {
     rules: [
       {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto',
+        test: /\.js$/,
+        use: [
+          {
+            loader: require.resolve('source-map-loader'),
+          },
+        ],
+        include: [/node_modules/, context],
+        exclude: [/node_modules\/subscriptions\-transport\-ws/],
+        enforce: 'pre',
       },
       {
         test: /\.tsx?$/,
         exclude: /\.*node_modules\/*/,
         use: [
           {
-            loader: 'awesome-typescript-loader',
+            loader: require.resolve('awesome-typescript-loader'),
             options: {
-              configFileName: path.resolve(__dirname, 'tsconfig.json'),
+              configFileName: require.resolve('./tsconfig.json'),
             },
           },
         ],
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          {
+            loader: require.resolve('style-loader'),
+          },
+          {
+            loader: require.resolve('css-loader'),
+          },
+        ],
       },
     ],
   },
@@ -40,9 +49,15 @@ module.exports = {
       react: path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
     },
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
   },
   stats: 'errors-only',
+  output: {
+    path: path.resolve(__dirname, '.build'),
+    filename: 'bundle.js',
+    publicPath: '/assets/',
+  },
+  devtool: 'eval-source-map',
   devServer: {
     allowedHosts: ['app'],
     host: '0.0.0.0',

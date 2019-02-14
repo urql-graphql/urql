@@ -42,7 +42,7 @@ jobs:
       node_js: 10
       script:
         - yarn run build
-        # - yarn run bundlesize
+        - yarn run bundlesize
     - stage: E2E
       name: Subscription Example
       node_js: 10

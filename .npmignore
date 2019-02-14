@@ -1,7 +1,6 @@
-test-utils/
-lib/**/*.js
-lib/**/*.jsx
-**/*.test.js
-**/*.test.jsx
-**/*.test.ts
-**/*.test.tsx
+__snapshots__
+test-utils
+*.test.js
+*.test.jsx
+*.test.ts
+*.test.tsx

@@ -10,5 +10,5 @@ package-lock.json.*
 bundles
 dist
 webpack-build
-.rts2_cache_cjs
+.rts2_cache*
 cypress/screenshots
