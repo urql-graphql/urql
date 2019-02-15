@@ -23,24 +23,17 @@ interface QueryHandlerState {
 class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   private unsubscribe = noop;
 
-  executeQuery = () => {
-    if (this.unsubscribe !== undefined) {
-      this.unsubscribe();
-    }
+  executeQuery = (opts?: Partial<OperationContext>) => {
+    this.unsubscribe();
 
-    if (this.props.query === undefined) {
-      return;
-    }
-
-    this.setState({
-      fetching: true,
-    });
+    this.setState({ fetching: true });
 
     const request = createQuery(this.props.query, this.props.variables);
 
     const [teardown] = pipe(
       this.props.client.executeQuery(request, {
         requestPolicy: this.props.requestPolicy,
+        ...opts,
       }),
       subscribe(({ data, error }) => {
         this.setState({

@@ -52,6 +52,5 @@ export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
     return unsubscribe;
   }, [args.query, args.variables]);
 
-  // executeQuery === refetch
   return [state, executeQuery];
 };
