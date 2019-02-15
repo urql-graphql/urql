@@ -4,13 +4,15 @@ import {
   GraphqlQuery,
   GraphqlSubscription,
   Operation,
+  OperationContext,
   OperationResult,
 } from '../types';
 
-const context = {
+const context: OperationContext = {
   fetchOptions: {
     method: 'POST',
   },
+  requestPolicy: 'cache-first',
   url: 'http://localhost:3000/graphql',
 };
 

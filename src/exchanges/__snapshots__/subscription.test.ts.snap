@@ -9,6 +9,7 @@ Object {
       "fetchOptions": Object {
         "method": "POST",
       },
+      "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
     "key": "{\\"query\\":\\"subscription subscribeToUser($user: String){\\\\n    user(user: $user) {\\\\n      name\\\\n    }\\\\n  }\\\\n  \\",\\"variables\\":{\\"user\\":\\"colin\\"}}",

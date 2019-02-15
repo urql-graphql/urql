@@ -18,6 +18,7 @@ Object {
       "fetchOptions": Object {
         "method": "POST",
       },
+      "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
     "key": "2",
@@ -49,6 +50,7 @@ Object {
       "fetchOptions": Object {
         "method": "POST",
       },
+      "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
     "key": "2",

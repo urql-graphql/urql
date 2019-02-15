@@ -68,7 +68,9 @@ describe('on initial useEffect', () => {
 
   it('passes query and vars to executeQuery', () => {
     renderer.create(<QueryUser {...props} />);
-    expect(client.executeQuery).toBeCalledWith(props);
+    expect(client.executeQuery).toBeCalledWith(props, {
+      requestPolicy: undefined,
+    });
   });
 });
 
