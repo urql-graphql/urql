@@ -15,6 +15,8 @@
   <a href="https://npmjs.com/package/urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
   </a>
+  <br />
+  <br />
 </div>
 
 <img alt="Urkel" src="https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg" />
@@ -45,7 +47,7 @@ Then try to create a client and wrap your app with a `<Provider>`:
 import { Provider, createClient } from 'urql';
 
 const client = createClient({
-  url: 'http://localhost:1234/graphql'
+  url: 'http://localhost:1234/graphql',
 });
 
 // ...
@@ -63,10 +65,10 @@ import { Connect, createQuery } from 'urql';
 // ...
 
 <Connect query={createQuery(`{ todos { id } }`)}>
-  {({ fetching, data }) => (
+  {({ fetching, data }) =>
     fetching ? <Loading /> : <List data={data.todos} />
-  )}
-</Connect>
+  }
+</Connect>;
 ```
 
 You can also send mutations, which can be passed into the same `<Connect>`

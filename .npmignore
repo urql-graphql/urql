@@ -1,6 +1,7 @@
-__snapshots__
-test-utils
+__snapshots__/
+test-utils/
 *.test.js
 *.test.jsx
 *.test.ts
+*.test.d.ts
 *.test.tsx

@@ -6,10 +6,10 @@
   "module": "dist/urql.es.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "sideEffects": false,
   "files": [
     "dist",
     "src",
-    "docs",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
@@ -20,12 +20,13 @@
     "build:clean": "rimraf dist",
     "build:types": "tsc -d --emitDeclarationOnly --outDir dist/types",
     "build:bundle": "microbundle --format es,cjs --no-compress",
+    "build:prune": "rimraf dist/types/**/*.test.d.ts dist/types/test-utils",
     "postbuild:bundle": "terser dist/urql.es.js -o dist/urql.es.min.js",
     "test": "jest",
     "bundlesize": "bundlesize",
     "lint": "tslint --project .",
     "check-formatting": "prettier --write src/**/*.{ts,tsx}",
-    "prepublishOnly": "run-s build"
+    "prepublishOnly": "run-s build build:prune"
   },
   "author": "Formidable",
   "license": "MIT",
@@ -118,6 +119,5 @@
   "dependencies": {
     "create-react-context": "^0.2.3",
     "wonka": "^2.0.1"
-  },
-  "sideEffects": false
+  }
 }
