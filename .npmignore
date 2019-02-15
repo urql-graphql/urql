@@ -1,3 +1,9 @@
+/*
+!LICENSE
+!CHANGELOG.md
+!README.md
+!/dist/**/*.{d.ts,js,js.map}
+!/src/**/*.{d.ts,ts,tsx}
 __snapshots__/
 test-utils/
 *.test.js

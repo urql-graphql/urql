@@ -7,13 +7,6 @@
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "sideEffects": false,
-  "files": [
-    "dist",
-    "src",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
-  ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "run-p build:types build:bundle",
