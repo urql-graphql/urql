@@ -152,6 +152,12 @@ interface UseSubscriptionState<T> {
 | data     | `?any`           | The GraphQL subscription's data                                 |
 | error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
 
+### Context components
+
+`urql` comes with the two context components `Consumer` and `Provider` as returned
+by React's `createContext` utility. It also exports the `Context` itself which can
+be used in combination with the `useContext` hook.
+
 ## The Client and related types
 
 ### `Client` (class)
@@ -166,6 +172,74 @@ It accepts a bunch of inputs when it's created
 | exchanges    | `Exchange[]`                      | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges` |
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
+
+#### `.executeQuery()`, `.executeSubscription()`, and `.executeMutation()`
+
+These methods are used by `<Query>` & `useQuery()`, `<Subscription>` & `useSubscription()`,
+and `<Mutation>` & `useMutation()` respectively.
+
+They accept a `GraphQLRequest` object as their first argument and optionally
+a partial `OperationContext` as their second.
+
+Internally they then create an `Operation` and call `.executeRequestOperation()` with
+the `Operation`. This then returns a `Source<OperationResult>`, i.e. a stream of
+`OperationResult`s.
+
+#### `.executeRequestOperation()`
+
+This method accepts an `Operation` and handles the flow of said `Operation`. Every `Operation`
+that is executed must pass through this method.
+
+It creates a filtered `Source<OperationResult>` that only contains the `OperationResult`s
+relevant to this `Operation` by filtering by the operation `key` and track the subscriptions
+to this `Source`.
+
+This is important as a cache exchange can call `reexecuteOperation` to inform the
+client about an invalidation. Whenever an operation needs to be updated with new
+network data, it's important to know whether any component is still interested in
+this operation.
+
+To track this, this method ensures that a mapping is updated that counts up
+for each subscription to the `Source` and counts down for each unsubscription.
+
+The `Operation` that has been passed to this method will be dispatched
+when the first subscription is started. When the last subscription unsubscribes
+from the returned source, this method will ensure that a `teardown` operation
+is dispatched.
+
+> _Note:_ This does not apply to mutations, which are one-off calls and
+> hence aren't shared, cancelled, or tracked in the cache.
+
+The return value is the filtered `Source<OperationResult>`.
+
+#### `.reexecuteOperation()`
+
+This method accepts an `Operation` and will dispatch this `Operation` if there
+are any subscriptions from `executeRequestOperation`'s `Source<OperationResult>`
+to this particular `Operation`.
+
+This is called by `cacheExchange` when an `Operation`'s `OperationResult` is
+invalidated in the cache.
+
+#### `.createRequestOperation()`
+
+This is called by the `executeQuery`, `executeSubscription` and `executeMutation`
+methods to create `Operation`s. It accepts:
+
+- `OperationType`
+- `GraphQLRequest`
+- and; the optional partial `OperationContext` (`Partial<OperationContext>`)
+
+It returns an `Operation`.
+
+#### `.dispatchOperation()`
+
+This method dispatches an `Operation` to the exchange pipeline. This is only
+used directly by the Client and shouldn't normally be called externally, except
+when the tracking logic of active `Operation`s needs to be bypassed.
+
+These `Operation`s are streamed from the `operations$: Source<Operation>` stream.
+The results of all exchanges are similarly output to `results$: Source<OperationResult>`.
 
 ### `OperationType` (type)
 

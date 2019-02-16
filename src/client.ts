@@ -101,7 +101,7 @@ export class Client {
     };
   };
 
-  private createRequestOperation = (
+  createRequestOperation = (
     type: OperationType,
     query: GraphQLRequest,
     opts?: Partial<OperationContext>

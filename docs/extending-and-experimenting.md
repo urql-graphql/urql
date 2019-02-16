@@ -11,3 +11,5 @@ maybe you're just looking to play around and experiment with GraphQL clients?
 This document contains two main sections. The first is about reusing `urql`'s
 core and build new "outward facing APIs". The second is about writing new
 exchanges and hence changing `urql`'s core behaviour.
+
+## Writing new APIs for the Client
