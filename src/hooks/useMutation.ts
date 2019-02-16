@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
+import { OperationResult } from '../types';
 import { CombinedError, createMutation } from '../utils';
 
 interface UseMutationState<T> {
@@ -9,7 +10,10 @@ interface UseMutationState<T> {
   error?: CombinedError;
 }
 
-type UseMutationResponse<T> = [UseMutationState<T>, (variables: any) => void];
+type UseMutationResponse<T> = [
+  UseMutationState<T>,
+  (variables?: object) => Promise<OperationResult>
+];
 
 export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
   const client = useContext(Context);
@@ -19,7 +23,7 @@ export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
     data: undefined,
   });
 
-  const executeMutation = (variables: object) => {
+  const executeMutation = (variables?: object) => {
     setState({ fetching: true, error: undefined, data: undefined });
 
     const mutation = createMutation(query, variables);
@@ -36,7 +40,7 @@ export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
       .catch(networkError => {
         const error = new CombinedError({ networkError });
         setState({ fetching: false, data: undefined, error });
-        return { data: undefined, error };
+        return { data: undefined, error } as OperationResult;
       });
   };
 

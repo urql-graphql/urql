@@ -8,7 +8,7 @@ import { CombinedError, createQuery, noop } from '../utils';
 interface QueryHandlerProps {
   client: Client;
   query: string;
-  variables: object;
+  variables?: object;
   requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;
 }

@@ -7,7 +7,7 @@ import { CombinedError, createSubscription } from '../utils';
 interface SubscriptionHandlerProps {
   client: Client;
   query: string;
-  variables: object;
+  variables?: object;
   children: (arg: SubscriptionHandlerState) => ReactNode;
 }
 

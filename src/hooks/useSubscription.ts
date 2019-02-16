@@ -5,7 +5,7 @@ import { CombinedError, createQuery, noop } from '../utils';
 
 interface UseSubscriptionArgs {
   query: string;
-  variables?: any;
+  variables?: object;
 }
 
 type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;

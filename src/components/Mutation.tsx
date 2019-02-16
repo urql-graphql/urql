@@ -2,6 +2,7 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
+import { OperationResult } from '../types';
 import { CombinedError, createMutation } from '../utils';
 
 interface MutationHandlerProps {
@@ -17,7 +18,7 @@ interface MutationHandlerState {
 }
 
 interface MutationChildProps extends MutationHandlerState {
-  executeMutation: (variables: object) => void;
+  executeMutation: (variables?: object) => Promise<OperationResult>;
 }
 
 class MutationHandler extends Component<
@@ -35,11 +36,7 @@ class MutationHandler extends Component<
     });
   }
 
-  executeMutation = (variables: object) => {
-    if (this.props.query === undefined) {
-      return;
-    }
-
+  executeMutation = (variables?: object): Promise<OperationResult> => {
     this.setState({
       fetching: true,
       error: undefined,
@@ -60,7 +57,7 @@ class MutationHandler extends Component<
       .catch(networkError => {
         const error = new CombinedError({ networkError });
         this.setState({ fetching: false, data: undefined, error });
-        return { data: undefined, error };
+        return { data: undefined, error } as OperationResult;
       });
   };
 }
