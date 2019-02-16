@@ -14,7 +14,7 @@ import {
   queryResponse,
 } from '../test-utils';
 import { Operation } from '../types';
-import { dedupeExchange } from './dedup';
+import { dedupExchange } from './dedup';
 
 let shouldRespond = false;
 let exchangeArgs;
@@ -43,7 +43,7 @@ beforeEach(() => {
 
 it('forwards query operations correctly', async () => {
   const [ops$, next, complete] = input;
-  const exchange = dedupeExchange(exchangeArgs)(ops$);
+  const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
   next(queryOperation);
@@ -54,7 +54,7 @@ it('forwards query operations correctly', async () => {
 it('forwards only non-pending query operations', async () => {
   shouldRespond = false; // We filter out our mock responses
   const [ops$, next, complete] = input;
-  const exchange = dedupeExchange(exchangeArgs)(ops$);
+  const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
   next(queryOperation);
@@ -66,7 +66,7 @@ it('forwards only non-pending query operations', async () => {
 it('forwards duplicate query operations as usual after they respond', async () => {
   shouldRespond = true; // Response will immediately resolve
   const [ops$, next, complete] = input;
-  const exchange = dedupeExchange(exchangeArgs)(ops$);
+  const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
   next(queryOperation);
@@ -78,7 +78,7 @@ it('forwards duplicate query operations as usual after they respond', async () =
 it('always forwards mutation operations without deduplicating them', async () => {
   shouldRespond = false; // We filter out our mock responses
   const [ops$, next, complete] = input;
-  const exchange = dedupeExchange(exchangeArgs)(ops$);
+  const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
   next(mutationOperation);
