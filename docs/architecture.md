@@ -1,4 +1,4 @@
-# Basics
+# Architecture
 
 Much of `urql` is about being flexible and customisable.
 To this extent a large chunk of this document is dedicated to
@@ -8,12 +8,10 @@ If you wish to use `urql` without any customisations, this
 document is entirely optional for you. But it's still worth
 the read. Promised.
 
-## Architecture
-
 `urql`'s core parts are separated into three concepts:
 **operations & results**, **the client**, and **exchanges**.
 
-### Requests
+## Requests
 
 Every GraphQL Request starts as a collection of just a
 query and variables, which are supposed to be sent to
@@ -46,7 +44,7 @@ the operation that is then sent.
 > but also one of the
 > [three basic operations](https://facebook.github.io/graphql/June2018/#sec-Language.Operations).
 
-### Operations
+## Operations
 
 The client will enrich every request with meta information,
 the result of which is called an **operation**. You can think
@@ -119,7 +117,7 @@ const teardownOperation = {
 };
 ```
 
-### Exchanges
+## Exchanges
 
 The next bit of `urql`'s inner workings is how these operations are handled.
 When a `new Client()` is created you may pass it `url` and `fetchOptions`.
@@ -168,7 +166,7 @@ cached results can be resolved instead and results from network requests are cac
 
 **Third,** operations are sent to the API and the result is normalised.
 
-### Operation Results
+## Operation Results
 
 Every operation that enters the exchange pipeline will receive a result, either
 immediately (read: synchronously) or eventually as the result of a network
