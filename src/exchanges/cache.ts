@@ -15,10 +15,10 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
   const operationCache = Object.create(null) as OperationCache;
 
   // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: Operation): Operation => {
-    formatDocument(operation.query);
-    return operation;
-  };
+  const mapTypeNames = (operation: Operation): Operation => ({
+    ...operation,
+    query: formatDocument(operation.query),
+  });
 
   const handleAfterMutation = afterMutation(
     resultCache,
