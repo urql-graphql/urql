@@ -157,6 +157,43 @@ as soon as it's mounted and will rerun it when the query or variables change.
 
 [Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
+### Using `graphql-tag`
+
+You're not limited to just passing in strings as queries. You can also
+pass in a fully parsed AST in the form of `DocumentNode` instead.
+For this purpose you can use `graphql-tag`.
+
+This can be extremely helpful, since it enables syntax highlighting
+in some editors. It also can be used to preparse the GraphQL query
+using `babel-plugin-graphql-tag` or the included Webpack loader.
+
+You only have to make a small adjustment. Install `graphql-tag` and
+you can immediately write tagged template literals instead:
+
+```jsx
+import React from 'react';
+import gql from 'graphql-tag';
+import { Query } from 'urql';
+
+const getTodos = gql`
+  query GetTodos($limit: Int!) {
+    todos(limit: $limit) {
+      id
+      text
+      isDone
+    }
+  }
+`;
+
+<Query query={getTodos} variables={{ limit }} />;
+```
+
+Keep in mind that it makes sense to give your queries unique
+names. In this case we've chosen `GetTodos`, since we're simply
+listing out some `Todo`s.
+
+[Find out more about `graphql-tag` on their repository.](https://github.com/apollographql/graphql-tag)
+
 ## Writing mutations
 
 There always comes a point when an app will also need to send
