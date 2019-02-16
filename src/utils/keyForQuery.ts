@@ -5,7 +5,7 @@ interface NameCache {
 }
 
 interface WithNameProperty {
-  name?: string;
+  name?: { value: string };
   [key: string]: any;
 }
 
@@ -33,7 +33,7 @@ const getKeyForDocNode = (doc: DocumentNode): number => {
   // Using print() can be expensive, so we just check the definition nodes' names
   let name = doc.definitions.reduce((acc, definition) => {
     const node = definition as WithNameProperty;
-    return acc + (node.name !== undefined ? node.name : '');
+    return acc + (node.name !== undefined ? node.name.value : '');
   }, '');
 
   // This is for inputs that are not using constant references. In such a case
