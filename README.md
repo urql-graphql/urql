@@ -21,24 +21,41 @@
 
 <img alt="Urkel" src="https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg" />
 
-`urql` is mainly a GraphQL client, but also exposes a set of React components.
+## ✨ Features
+
+- **One package** to get a working GraphQL client in React
+- Fully **customisable** behaviour via "exchanges"
+- Sane but simple default behaviour and document caching
+- Minimal React components and hooks
+
+`urql` is mainly a GraphQL client, but also exposes a set of React components and hooks.
 It's built to be highly customisable and versatile, so you can take it from building
-your first GraphQL or playing around with complex GraphQL experiments, all the
-way to building a highly sophisticated GraphQL data management library.
+your first GraphQL app, to building full and comples apps, or all the way to experimenting
+with GraphQL clients.
 
 While GraphQL is an elegant protocol that constrains and informs the data that is returned
 from APIs, this library exists because existing solutions are a bit heavy on the API side
 of things. Instead of replacing sane data management that should be easy,
 `urql` strives to make them as simple as possible.
 
+## [Documentation](docs/README.md)
+
+[The documentation contains everything you need to know about `urql`](docs/README.md)
+
+- [Getting Started guide](getting-started.md)
+- [Architecture](architecture.md)
+- [Basics](basics.md)
+- [Extending & Experimenting](extending-and-experimenting.md)
+- [API](api.md)
+
 ## Quick Start Guide
 
-First, install `urql`:
+First, install `urql` and `graphql`, which is a peer dependency:
 
 ```sh
-yarn add urql
+yarn add urql graphql
 # or
-npm intall --save urql
+npm intall --save urql graphql
 ```
 
 Then try to create a client and wrap your app with a `<Provider>`:
@@ -47,45 +64,43 @@ Then try to create a client and wrap your app with a `<Provider>`:
 import { Provider, createClient } from 'urql';
 
 const client = createClient({
-  url: 'http://localhost:1234/graphql',
+  url: 'http://localhost:1234/graphql', // Your GraphQL endpoint here
 });
 
-// ...
 <Provider value={client}>
   <YourApp />
 </Provider>;
 ```
 
-This allows you to use the `<Connect>` component, for instance,
-to query your GraphQL API:
+This allows you to use the `<Query>` component to send some first
+queries:
 
 ```js
-import { Connect, createQuery } from 'urql';
+import { Query } from 'urql';
 
-// ...
-
-<Connect query={createQuery(`{ todos { id } }`)}>
+<Query query={`{ todos { id } }`}>
   {({ fetching, data }) =>
     fetching ? <Loading /> : <List data={data.todos} />
   }
-</Connect>;
+</Query>;
 ```
 
-You can also send mutations, which can be passed into the same `<Connect>`
-component:
+Or use the hooks-based API:
 
 ```js
-import { Connect, createMutation } from 'urql';
+import { useQuery } from 'urql';
 
-// ...
-
-<Connect mutations={{
-  addTodo: createMutation(`mutation { addTodo(text: "Example") { id } }`)
-}}>
-  {({ mutations }) => (
-    /* mutations.addTodo() sends the mutation and returns a promise */
-  )}
-</Connect>
+const YourComponent = () => {
+  const [{ fetching, data }] = useQuery(`{ todos { id } }`);
+  return fetching ? <Loading /> : <List data={data.todos} />;
+};
 ```
 
-[Learn more about urql's "Usage" in the docs](./TODO.md)
+[Learn the full API in the "Getting Started" docs!](docs/getting-started.md)
+
+## Examples
+
+There are currently two examples included in this repository:
+
+- [getting-started: A basic app with queries and mutations](examples/1-getting-started/)
+- [using-subscriptions: A basic app that demos subscriptions](examples/2-using-subscriptions/)
