@@ -3,8 +3,6 @@ import {
   FieldNode,
   InlineFragmentNode,
   OperationDefinitionNode,
-  parse,
-  print,
   visit,
 } from 'graphql';
 
@@ -46,14 +44,9 @@ const formatNode = (
       }
     : false;
 
-const formatDocument = (astNode: DocumentNode) =>
+export const formatDocument = (astNode: DocumentNode) =>
   visit(astNode, {
     Field: formatNode,
     InlineFragment: formatNode,
     OperationDefinition: formatNode,
   });
-
-export const formatTypeNames = (query: string) => {
-  const typedNode = formatDocument(parse(query));
-  return print(typedNode);
-};

@@ -1,3 +1,5 @@
+import { parse } from 'graphql';
+
 import {
   filter,
   makeSubject,
@@ -8,7 +10,6 @@ import {
   Source,
   take,
 } from 'wonka';
-import { hashString } from './utils';
 
 import {
   composeExchanges,
@@ -27,6 +28,8 @@ import {
   OperationResult,
   OperationType,
 } from './types';
+
+import { getKeyForQuery } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -103,11 +106,12 @@ export class Client {
 
   createRequestOperation = (
     type: OperationType,
-    query: GraphQLRequest,
+    { query, variables }: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Operation => ({
-    ...query,
-    key: hashString(JSON.stringify(query)),
+    query: typeof query === 'string' ? parse(query) : query,
+    variables,
+    key: getKeyForQuery(query),
     operationName: type,
     context: this.createOperationContext(opts),
   });

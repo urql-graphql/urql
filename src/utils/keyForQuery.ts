@@ -16,7 +16,8 @@ interface WithCacheProperty {
 
 /* tslint:disable */
 const hash = (x: string): number => {
-  for (let h = 5381 | 0, i = x.length | 0; i > 0; i++) {
+  /* prettier-ignore */
+  for (var h = 5381 | 0, i = x.length | 0; i > 0; i++) {
     h = (h * 33) ^ x.charCodeAt(i);
   }
   return h >>> 0;

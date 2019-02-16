@@ -1,3 +1,5 @@
+import { parse } from 'graphql';
+
 import {
   ExecutionResult,
   GraphqlMutation,
@@ -53,31 +55,38 @@ export const subscriptionGql: GraphqlSubscription = {
 };
 
 export const teardownOperation: Operation = {
-  key: '2',
+  // @ts-ignore
+  query: parse(queryGql.query),
+  variables: queryGql.variables,
+  key: 2,
   operationName: 'teardown',
   context,
-  ...queryGql,
 };
 
 export const queryOperation: Operation = {
-  key: '2',
+  query: teardownOperation.query,
+  variables: teardownOperation.variables,
+  key: 2,
   operationName: 'query',
   context,
-  ...queryGql,
 };
 
 export const mutationOperation: Operation = {
-  key: JSON.stringify(mutationGql),
+  // @ts-ignore
+  query: parse(mutationGql.query),
+  variables: mutationGql.variables,
+  key: 3,
   operationName: 'mutation',
   context,
-  ...mutationGql,
 };
 
 export const subscriptionOperation: Operation = {
-  key: JSON.stringify(subscriptionGql),
+  // @ts-ignore
+  query: parse(subscriptionGql.query),
+  variables: subscriptionGql.variables,
+  key: 4,
   operationName: 'subscription',
   context,
-  ...subscriptionGql,
 };
 
 export const queryResponse: OperationResult = {

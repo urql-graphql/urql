@@ -1,7 +1,7 @@
 export { CombinedError } from './error';
-export { hashString } from './hash';
+export { getKeyForQuery } from './keyForQuery';
 export { createQuery, createMutation, createSubscription } from './query';
-export { formatTypeNames, gankTypeNamesFromResponse } from './typenames';
+export { formatDocument, gankTypeNamesFromResponse } from './typenames';
 
 export const noop = () => {
   /* noop */
