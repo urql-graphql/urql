@@ -30,6 +30,7 @@
     "graphql": "^14.1.1",
     "graphql-playground-middleware-express": "^1.7.11",
     "graphql-subscriptions": "^1.0.0",
+    "graphql-tag": "^2.10.1",
     "isomorphic-fetch": "^2.2.1",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",

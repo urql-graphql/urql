@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import gql from 'graphql-tag';
 import { useSubscription } from 'urql';
 import { Error, MessageEntry, Message, MessageResponse } from './components';
 
@@ -30,12 +31,12 @@ export const Messages: FC = () => {
   );
 };
 
-const NewMessageSubQuery = `
-subscription messageSub {
-  newMessages {
-    id
-    from
-    message
+const NewMessageSubQuery = gql`
+  subscription messageSub {
+    newMessages {
+      id
+      from
+      message
+    }
   }
-}
 `;
