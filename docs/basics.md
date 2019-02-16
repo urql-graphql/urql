@@ -117,6 +117,39 @@ a **document cache** also doesn't normalise at all, which means
 that after fetching a list of items, fetching a single item
 will never be fulfilled by this cache.
 
+### Request Policies
+
+The operation context can also contain a `requestPolicy` property
+that alters when and how the cache responds.
+By default this will be set to `'cache-first'`.
+
+When `'cache-first'`, the default behaviour, is used, the cache
+will return all cached results when they're available. When no
+cached result is available it will let the operation through, so
+that the `fetchExchange` can send a request to the API.
+
+When `'cache-only'` is passed, the cache will always return the
+cached result or default to `{ data: undefined, error: undefined },
+i.e. an empty result, when nothing is cached for a given operation.
+
+For `'network-only'` the opposite of `'cache-only'` is done.
+The `cacheExchange` will never return cached results, but will
+instead immediately forward the operation to the next exchange,
+so that the `fetchExchange` can respond with up-to-date data.
+The result will still be cached however.
+
+The last one `'cache-and-network'` is rather special
+in that it first does what `'cache-first` does, it to
+return some cached results. After returning a cached result however,
+it will forward the operation anyway. This way a temporary cached
+result may be displayed that is then updated with fresh data
+from the API.
+
+> _Note:_ `'network-only'` and `'cache-and-network'` are extremely valuable
+> given the limitations of the default cache. The can be used to ensure
+> that data skips the cache, if it's clear to you that the result will
+> need to be up-to-date.
+
 ### Customisation
 
 The idea of `urql` is that you can customise the caching behaviour amongst

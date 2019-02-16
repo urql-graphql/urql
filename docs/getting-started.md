@@ -105,9 +105,7 @@ is not the plural `errors`. `urql` wraps any network error or GraphQL
 errors in a `CombinedError` which is more convenient to handle and
 observe.
 
-[Read more about the result's API here](TODO.md)
-
-<!-- TODO: Add link to Basics: data, error, executeQuery shape -->
+[Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
 ### Using hooks
 
@@ -157,7 +155,7 @@ const TodoList = ({ limit = 10 }) => {
 Similarly to the `<Query>` component, `useQuery` will start the request
 as soon as it's mounted and will rerun it when the query or variables change.
 
-[Read more about the result's API here](TODO.md)
+[Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
 ## Writing mutations
 
@@ -309,9 +307,7 @@ cached completely. When the same query and variables are requested again,
 result is also invalidated when a mutation with similar `__typename`s was
 sent.
 
-[You can find out more about the default caching behaviour here.](TODO.md)
-
-<!-- TODO: Add link to Basics: Default caching behaviour -->
+[You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
 
 Using `urql`'s default behaviour this means we sometimes need a way to refetch
 data from the GraphQL API and skip the cache, if we need fresh data.
@@ -339,6 +335,8 @@ Including `'cache-and-network'` there are four request policies in total:
 - `network-only`: This skips the cache entirely and always sends a request.
 - `cache-and-network`: As stated above, this returns the cached result and then also
   sends a request to the API.
+
+[You can find out more about how the default cache behaves when it receives these request policies in the Basics' `cacheExchange` section.](basics.md#request-policies)
 
 Next, we can take a look at how to use `'network-only'` to force a refetch
 imperatively. In our previous example this would come in handy to refresh the
