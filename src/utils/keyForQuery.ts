@@ -68,3 +68,15 @@ export const getKeyForQuery = (doc: string | DocumentNode): number => {
     return getKeyForDocNode(doc);
   }
 };
+
+export const getKeyForRequest = (
+  query: string | DocumentNode,
+  vars?: object
+): number => {
+  const docKey = getKeyForQuery(query);
+  if (vars === undefined) {
+    return docKey;
+  }
+
+  return hash('' + docKey + JSON.stringify(vars));
+};

@@ -3,6 +3,7 @@ import { parse, print } from 'graphql';
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 jest.mock('./utils/keyForQuery', () => ({
   getKeyForQuery: () => 'hash',
+  getKeyForRequest: () => 'hash',
 }));
 
 import { map, pipe, subscribe, tap } from 'wonka';

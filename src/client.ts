@@ -29,7 +29,7 @@ import {
   OperationType,
 } from './types';
 
-import { getKeyForQuery } from './utils';
+import { getKeyForRequest } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -111,7 +111,7 @@ export class Client {
   ): Operation => ({
     query: typeof query === 'string' ? parse(query) : query,
     variables,
-    key: getKeyForQuery(query),
+    key: getKeyForRequest(query, variables),
     operationName: type,
     context: this.createOperationContext(opts),
   });
