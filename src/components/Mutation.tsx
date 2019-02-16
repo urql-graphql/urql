@@ -2,12 +2,12 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { OperationResult } from '../types';
+import { GraphQLRequest, OperationResult } from '../types';
 import { CombinedError, createMutation } from '../utils';
 
 interface MutationHandlerProps {
   client: Client;
-  query: string;
+  query: GraphQLRequest['query'];
   children: (arg: MutationChildProps) => ReactNode;
 }
 

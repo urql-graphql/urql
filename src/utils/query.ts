@@ -1,5 +1,7 @@
+import { DocumentNode } from 'graphql';
+
 /** Create a [Query]{@link Query} from a query and (optionally) variables. */
-export const createQuery = (q: string, vars?: any) => ({
+export const createQuery = (q: string | DocumentNode, vars?: object) => ({
   query: q,
   variables: vars || {},
 });
