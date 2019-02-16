@@ -2,6 +2,8 @@
 
 exports[`on init default values match snapshot 1`] = `
 Object {
+  "data": undefined,
+  "error": undefined,
   "executeMutation": [Function],
   "fetching": false,
 }
