@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { getKeyForQuery } from './keyForQuery';
+import { getKeyForQuery, getKeyForRequest } from './keyForQuery';
 
 const consoleWarn = console.warn;
 
@@ -89,4 +89,21 @@ it('warns about different queries having identical names', () => {
   expect(getKeyForQuery(query)).toBe(getKeyForQuery(different));
 
   expect(console.warn).toHaveBeenCalled();
+});
+
+it('can key variables', () => {
+  const query = gql`
+    query SameName {
+      test
+    }
+  `;
+
+  const vars = { test: true };
+
+  expect(getKeyForQuery(query)).toBe(getKeyForRequest(query, undefined));
+  expect(getKeyForRequest(query, vars)).toBe(getKeyForRequest(query, vars));
+  expect(getKeyForRequest(query)).not.toBe(getKeyForRequest(query, vars));
+  expect(getKeyForRequest(query, { test: 2 })).not.toBe(
+    getKeyForRequest(query, vars)
+  );
 });
