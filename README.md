@@ -88,4 +88,4 @@ import { Connect, createMutation } from 'urql';
 </Connect>
 ```
 
-[Learn more about urql's "Usage" in the docs](./TODO.md)
+[Learn more about urql's "Usage" in the docs](./docs/README.md)
