@@ -155,9 +155,7 @@ from the API.
 The idea of `urql` is that you can customise the caching behaviour amongst
 other things yourself, if needed.
 
-<!-- TODO: add link to "Extending & Experimenting" -->
-
-[Read more about customising `urql` here](TODO.md)
+[Read more about customising `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
 
 ## Subscriptions
 
