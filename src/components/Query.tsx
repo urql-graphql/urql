@@ -49,6 +49,8 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
   state = {
     executeQuery: this.executeQuery,
+    data: undefined,
+    error: undefined,
     fetching: false,
   };
 

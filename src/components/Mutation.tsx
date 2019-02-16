@@ -27,6 +27,8 @@ class MutationHandler extends Component<
 > {
   state = {
     fetching: false,
+    data: undefined,
+    error: undefined,
   };
 
   render() {

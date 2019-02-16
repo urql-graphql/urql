@@ -2,12 +2,13 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { CombinedError, createSubscription } from '../utils';
+import { CombinedError, createSubscription, noop } from '../utils';
 
 interface SubscriptionHandlerProps {
   client: Client;
   query: string;
   variables?: object;
+  handler?: (prev: any | void, data: any) => any;
   children: (arg: SubscriptionHandlerState) => ReactNode;
 }
 
@@ -21,17 +22,19 @@ class SubscriptionHandler extends Component<
   SubscriptionHandlerProps,
   SubscriptionHandlerState
 > {
-  private unsubscribe?: () => void;
+  private unsubscribe = noop;
 
-  public state = {
+  state = {
+    data: undefined,
+    error: undefined,
     fetching: false,
   };
 
-  public componentDidMount() {
+  componentDidMount() {
     this.executeSubscription();
   }
 
-  public componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps) {
     if (
       this.props.query === oldProps.query ||
       this.props.variables === oldProps.variables
@@ -42,44 +45,34 @@ class SubscriptionHandler extends Component<
     this.executeSubscription();
   }
 
-  public componentWillUnmount() {
-    if (this.unsubscribe !== undefined) {
-      this.unsubscribe();
-    }
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
-  public render() {
+  render() {
     return this.props.children(this.state);
   }
 
-  private executeSubscription() {
-    if (this.unsubscribe !== undefined) {
-      this.unsubscribe();
-    }
+  executeSubscription = () => {
+    this.setState({ fetching: true });
 
-    if (this.props.query === undefined) {
-      return;
-    }
-
-    this.setState({
-      fetching: true,
-    });
-
-    const [unsubscribe] = pipe(
+    const [teardown] = pipe(
       this.props.client.executeSubscription(
         createSubscription(this.props.query, this.props.variables)
       ),
       subscribe(({ data, error }) => {
+        const { handler } = this.props;
+
         this.setState({
           fetching: false,
-          data,
+          data: handler !== undefined ? handler(this.state.data, data) : data,
           error,
         });
       })
     );
 
-    this.unsubscribe = unsubscribe;
-  }
+    this.unsubscribe = teardown;
+  };
 }
 
 type SubscriptionProps = Exclude<SubscriptionHandlerProps, 'client'>;
