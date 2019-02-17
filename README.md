@@ -42,11 +42,11 @@ of things. Instead of replacing sane data management that should be easy,
 
 [The documentation contains everything you need to know about `urql`](docs/README.md)
 
-- [Getting Started guide](getting-started.md)
-- [Architecture](architecture.md)
-- [Basics](basics.md)
-- [Extending & Experimenting](extending-and-experimenting.md)
-- [API](api.md)
+- [Getting Started guide](docs/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [Basics](docs/basics.md)
+- [Extending & Experimenting](docs/extending-and-experimenting.md)
+- [API](docs/api.md)
 
 ## Quick Start Guide
 
