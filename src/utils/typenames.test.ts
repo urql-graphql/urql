@@ -1,4 +1,10 @@
-import { formatTypeNames, gankTypeNamesFromResponse } from './typenames';
+import { parse, print } from 'graphql';
+import { formatDocument, gankTypeNamesFromResponse } from './typenames';
+
+const formatTypeNames = (query: string) => {
+  const typedNode = formatDocument(parse(query));
+  return print(typedNode);
+};
 
 describe('formatTypeNames', () => {
   it('should add typenames to a query string', () => {

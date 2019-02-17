@@ -2,12 +2,11 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
+import { GraphQLRequest } from '../types';
 import { CombinedError, createSubscription, noop } from '../utils';
 
-interface SubscriptionHandlerProps {
+interface SubscriptionHandlerProps extends GraphQLRequest {
   client: Client;
-  query: string;
-  variables?: object;
   handler?: (prev: any | void, data: any) => any;
   children: (arg: SubscriptionHandlerState) => ReactNode;
 }

@@ -1,10 +1,11 @@
+import { DocumentNode } from 'graphql';
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createQuery, noop } from '../utils';
 
 interface UseSubscriptionArgs {
-  query: string;
+  query: DocumentNode | string;
   variables?: object;
 }
 

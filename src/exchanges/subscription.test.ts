@@ -1,3 +1,4 @@
+import { print } from 'graphql';
 import { empty, fromValue, pipe, Source, take, toPromise } from 'wonka';
 import { Client } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
@@ -12,8 +13,7 @@ const exchangeArgs = {
 it('should return response data from forwardSubscription observable', async () => {
   const unsubscribe = jest.fn();
   const forwardSubscription: SubscriptionForwarder = operation => {
-    expect(operation.key).toBe(subscriptionOperation.key);
-    expect(operation.query).toBe(subscriptionOperation.query);
+    expect(operation.query).toBe(print(subscriptionOperation.query));
     expect(operation.variables).toBe(subscriptionOperation.variables);
     expect(operation.context).toEqual(subscriptionOperation.context);
 

@@ -1,3 +1,5 @@
+import { print } from 'graphql';
+
 import {
   filter,
   make,
@@ -14,7 +16,6 @@ import { CombinedError } from '../utils/error';
 import {
   Exchange,
   ExecutionResult,
-  GraphQLRequest,
   Operation,
   OperationContext,
   OperationResult,
@@ -35,8 +36,9 @@ export interface ObservableLike<T> {
   };
 }
 
-export interface SubscriptionOperation extends GraphQLRequest {
-  /** This does not indicate the type of GraphQL request but the name of the query in this case. */
+export interface SubscriptionOperation {
+  query: string;
+  variables?: object;
   key: string;
   context: OperationContext;
 }
@@ -63,8 +65,8 @@ export const subscriptionExchange = ({
   ): Source<OperationResult> => {
     // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
     const observableish = forwardSubscription({
-      key: operation.key,
-      query: operation.query,
+      key: operation.key.toString(36),
+      query: print(operation.query),
       variables: operation.variables,
       context: { ...operation.context },
     });

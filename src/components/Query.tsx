@@ -2,13 +2,11 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { OperationContext, RequestPolicy } from '../types';
+import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createQuery, noop } from '../utils';
 
-interface QueryHandlerProps {
+interface QueryHandlerProps extends GraphQLRequest {
   client: Client;
-  query: string;
-  variables?: object;
   requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;
 }

@@ -1,3 +1,4 @@
+import { DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -16,7 +17,7 @@ export type RequestPolicy =
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
-  query: string;
+  query: DocumentNode | string;
   variables?: object;
 }
 
@@ -33,9 +34,11 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation extends GraphQLRequest {
+export interface Operation {
+  query: DocumentNode;
+  variables?: object;
   /** Unique identifier of the operation. */
-  key: string;
+  key: number;
   operationName: OperationType;
   context: OperationContext;
 }

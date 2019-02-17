@@ -79,8 +79,8 @@ it("doesn't cache mutations", () => {
 
 it('retriggers query operation when mutation occurs', () => {
   const typename = 'ExampleType';
-  const resultCache = new Map([['test', queryResponse]]);
-  const operationCache = { [typename]: new Set(['test']) };
+  const resultCache = new Map([[123, queryResponse]]);
+  const operationCache = { [typename]: new Set([123]) };
 
   afterMutation(resultCache, operationCache, exchangeArgs.client)({
     ...mutationResponse,

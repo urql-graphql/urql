@@ -1,4 +1,5 @@
 import React, { FC, useCallback } from 'react';
+import gql from 'graphql-tag';
 import { useQuery } from 'urql';
 import { Error, Loading, Todo } from './components';
 
@@ -42,12 +43,12 @@ export const Home: FC = () => {
   );
 };
 
-const TodoQuery = `
-query {
-  todos {
-    id
-    text
-    complete
+const TodoQuery = gql`
+  query {
+    todos {
+      id
+      text
+      complete
+    }
   }
-}
 `;

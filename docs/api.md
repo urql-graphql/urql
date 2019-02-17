@@ -295,7 +295,7 @@ it's essentially an extension of the `GraphQLRequest`.
 
 ```js
 type Operation = {
-  query: string,
+  query: DocumentNode,
   variables?: object,
   key: string,
   operationName: OperationType,

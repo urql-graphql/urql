@@ -1,3 +1,4 @@
+import { print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 import { CombinedError } from '../utils/error';
@@ -53,7 +54,7 @@ const createFetchSource = (operation: Operation) => {
 
     const fetchOptions = {
       body: JSON.stringify({
-        query: operation.query,
+        query: print(operation.query),
         variables: operation.variables,
       }),
       headers: { 'Content-Type': 'application/json' },

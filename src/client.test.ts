@@ -1,7 +1,11 @@
+import { parse, print } from 'graphql';
+
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
-jest.mock('./utils/hash', () => ({
-  hashString: () => 'hash',
+jest.mock('./utils/keyForQuery', () => ({
+  getKeyForQuery: () => 'hash',
+  getKeyForRequest: () => 'hash',
 }));
+
 import { map, pipe, subscribe, tap } from 'wonka';
 import { createClient } from './client';
 
@@ -32,7 +36,8 @@ describe('createClient', () => {
   });
 });
 
-const query = { query: 'myquery', variables: { example: 1234 } };
+const query = { query: `{ todos { id } }`, variables: { example: 1234 } };
+
 let receivedOps: any[] = [];
 let client = createClient({ url: '1234' });
 const receiveMock = jest.fn(s =>
@@ -70,8 +75,8 @@ describe('executeQuery', () => {
       subscribe(x => x)
     );
 
-    // console.log(receivedOps);
-    expect(receivedOps[0]).toHaveProperty('query', query.query);
+    const receivedQuery = receivedOps[0].query;
+    expect(print(receivedQuery)).toBe(print(parse(query.query)));
   });
 
   it('passes variables type to exchange', () => {
@@ -109,7 +114,8 @@ describe('executeMutation', () => {
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('query', query.query);
+    const receivedQuery = receivedOps[0].query;
+    expect(print(receivedQuery)).toBe(print(parse(query.query)));
   });
 
   it('passes variables type to exchange', () => {
@@ -147,7 +153,8 @@ describe('executeSubscription', () => {
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('query', query.query);
+    const receivedQuery = receivedOps[0].query;
+    expect(print(receivedQuery)).toBe(print(parse(query.query)));
   });
 
   it('passes variables type to exchange', () => {

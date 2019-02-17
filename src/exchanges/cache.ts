@@ -2,21 +2,22 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult } from '../types';
-import { formatTypeNames, gankTypeNamesFromResponse } from '../utils/typenames';
+import { formatDocument, gankTypeNamesFromResponse } from '../utils/typenames';
 
-type ResultCache = Map<string, OperationResult>;
+type ResultCache = Map<number, OperationResult>;
+
 interface OperationCache {
-  [key: string]: Set<string>;
+  [key: string]: Set<number>;
 }
 
 export const cacheExchange: Exchange = ({ forward, client }) => {
-  const resultCache: ResultCache = new Map();
-  const operationCache: OperationCache = Object.create(null);
+  const resultCache = new Map() as ResultCache;
+  const operationCache = Object.create(null) as OperationCache;
 
   // Adds unique typenames to query (for invalidating cache entries)
   const mapTypeNames = (operation: Operation): Operation => ({
     ...operation,
-    query: formatTypeNames(operation.query),
+    query: formatDocument(operation.query),
   });
 
   const handleAfterMutation = afterMutation(
@@ -113,7 +114,7 @@ export const afterMutation = (
   operationCache: OperationCache,
   client: Client
 ) => (response: OperationResult) => {
-  const pendingOperations = new Set<string>();
+  const pendingOperations = new Set<number>();
 
   gankTypeNamesFromResponse(response.data).forEach(typeName => {
     const operations =

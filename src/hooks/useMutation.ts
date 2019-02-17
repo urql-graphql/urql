@@ -1,3 +1,4 @@
+import { DocumentNode } from 'graphql';
 import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
@@ -15,7 +16,9 @@ type UseMutationResponse<T> = [
   (variables?: object) => Promise<OperationResult>
 ];
 
-export const useMutation = <T = any>(query: string): UseMutationResponse<T> => {
+export const useMutation = <T = any>(
+  query: DocumentNode | string
+): UseMutationResponse<T> => {
   const client = useContext(Context);
   const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,

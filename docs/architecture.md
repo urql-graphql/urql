@@ -20,7 +20,7 @@ tie the two together.
 
 ```js
 type GraphQLRequest = {
-  query: string,
+  query: string | DocumentNode,
   variables?: object,
 };
 ```
@@ -60,11 +60,11 @@ The shape of an operation extends the shape of a GraphQL Request:
 ```js
 type Operation = {
   // GraphQLRequest:
-  query: string,
+  query: DocumentNode,
   variables?: object
 
   // The rest:
-  key: string,
+  key: number,
   operationName: OperationType,
   context: OperationContext
 }
@@ -84,7 +84,7 @@ const exampleOperation = {
   query: '{ content }',
   variables: undefined,
 
-  key: '[KEY]',
+  key: /* KEY */,
   operationName: 'query',
   context: {},
 };

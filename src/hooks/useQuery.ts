@@ -1,3 +1,4 @@
+import { DocumentNode } from 'graphql';
 import { useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
@@ -5,8 +6,8 @@ import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createQuery, noop } from '../utils';
 
 interface UseQueryArgs {
-  query: string;
-  variables?: any;
+  query: string | DocumentNode;
+  variables?: object;
   requestPolicy?: RequestPolicy;
 }
 
