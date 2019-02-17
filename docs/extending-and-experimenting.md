@@ -272,5 +272,5 @@ export const urqlClient = createClient({
 To conclude, here's a quick recap of what we've achieved:
 
 - We created our own _Exchange_!
-- When duplicate operations come through which are already in flight we block them.
+- When duplicate operations come through, which are already in flight, we block them.
 - Both client side components will be updated when the single operation is completed (this is due to how the `urql` client subscribes to operations).
