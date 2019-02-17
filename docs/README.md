@@ -14,7 +14,7 @@ GraphQL clients!
 Let's get up and running! This section explains how to
 install `urql` and use its React components and hooks.
 This contains everything you need to know to get started
-and just use the default `urql`!
+using the default configuration!
 
 ### [Architecture](architecture.md)
 
