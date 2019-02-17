@@ -214,7 +214,7 @@ class TodoForm extends Component {
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ executeMutation }) => <TodoForm addTodo={addTodo} />
+    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />
   </Mutation>
 );
 ```
@@ -248,7 +248,7 @@ class TodoForm extends Component {
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ error, executeMutation }) => <TodoForm error={error} addTodo={addTodo} />
+    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />
   </Mutation>
 );
 ```
@@ -407,7 +407,10 @@ const getTodos = `
 `;
 
 const TodoList = ({ limit = 10 }) => {
-  const [query, executeQuery] = useQuery({ query: getTodos });
+  const [query, executeQuery] = useQuery({ 
+    query: getTodos,
+    variables: { limit }
+  });
 
   if (!query.data) {
     return null;
