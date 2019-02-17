@@ -214,7 +214,7 @@ export const dedupExchange: Exchange = ({ forward }) => {
 };
 ```
 
-Our exchange now tracks operations and their completion, but in order for this to be useful,
+Our exchange now tracks operations and their completion, but for this to be useful,
 we need to stop in flight operations being forwarded to the next exchange. In order to do this,
 we're now going to have to use the `filter` function. To simplify things further, we can group all our pre-flight logic together.
 
