@@ -8,11 +8,7 @@ export { ExecutionResult } from 'graphql';
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
 /** The strategy that is used to request results from network and/or the cache. */
-export type RequestPolicy =
-  | 'cache-first'
-  | 'cache-only'
-  | 'network-only'
-  | 'cache-and-network';
+export type RequestPolicy = 'cache-only' | 'network-only' | 'cache-and-network';
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
