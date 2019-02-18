@@ -11,24 +11,24 @@ interface QueryResponse {
 }
 
 export const Home: FC = () => {
-  const [query, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
+  const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
   const refetch = useCallback(
     () => executeQuery({ requestPolicy: 'network-only' }),
     []
   );
 
   const getContent = () => {
-    if (query.fetching || query.data === undefined) {
+    if (res.fetching || res.data === undefined) {
       return <Loading />;
     }
 
-    if (query.error) {
-      return <Error>{query.error.message}</Error>;
+    if (res.error) {
+      return <Error>{res.error.message}</Error>;
     }
 
     return (
       <ul>
-        {query.data.todos.map(todo => (
+        {res.data.todos.map(todo => (
           <Todo key={todo.id} {...todo} />
         ))}
       </ul>
