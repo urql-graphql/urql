@@ -19,7 +19,7 @@
   <br />
 </div>
 
-<img width="965" alt="screen shot 2019-02-18 at 15 07 10" src="https://user-images.githubusercontent.com/1457604/52959744-ee6cef80-338e-11e9-96fe-cf5231b8eab7.png">
+<img width="965" alt="Steve Urkel" src="https://user-images.githubusercontent.com/1457604/52959744-ee6cef80-338e-11e9-96fe-cf5231b8eab7.png">
 
 ## ✨ Features
 
@@ -28,9 +28,9 @@
 - 🗂 Sane but simple default behaviour and document caching
 - ⚛️ Minimal React components and hooks
 
-This is a GraphQL client that exposes a set of React components and hooks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
+`urql` is a GraphQL client that exposes a set of React components and hooks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
-While GraphQL is an elegant protocol that constrains and explains the shape of data that is required from the server, this library exists because current solutions come with a large API footprint and we wnated to make something easier to use.
+While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
 ## [Documentation](docs/README.md)
 
@@ -44,7 +44,7 @@ While GraphQL is an elegant protocol that constrains and explains the shape of d
 
 ## Quick Start Guide
 
-First install `urql` and `graphql` (which is a peer dependency, justification for this is explained [here](docs/getting-started.md)):
+First install `urql` and `graphql`:
 
 ```sh
 yarn add urql graphql
