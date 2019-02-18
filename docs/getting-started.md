@@ -131,20 +131,20 @@ const getTodos = `
 `;
 
 const TodoList = ({ limit = 10 }) => {
-  const [query] = useQuery({
+  const [res] = useQuery({
     query: getTodos,
     variables: { limit },
   });
 
-  if (query.fetching) {
+  if (res.fetching) {
     return 'Loading...';
-  } else if (query.error) {
+  } else if (res.error) {
     return 'Oh no!';
   }
 
   return (
     <ul>
-      {query.data.todos.map(({ id, text }) => (
+      {res.data.todos.map(({ id, text }) => (
         <li key={id}>{text}</li>
       ))}
     </ul>
@@ -317,9 +317,9 @@ const addTodo = `
 `;
 
 const TodoForm = () => {
-  const [result, executeMutation] = useMutation(addTodo);
+  const [res, executeMutation] = useMutation(addTodo);
 
-  if (result.error) {
+  if (res.error) {
     return 'Oh no!';
   }
 
@@ -444,19 +444,19 @@ const getTodos = `
 `;
 
 const TodoList = ({ limit = 10 }) => {
-  const [query, executeQuery] = useQuery({ 
+  const [res, executeQuery] = useQuery({
     query: getTodos,
     variables: { limit }
   });
 
-  if (!query.data) {
+  if (!res.data) {
     return null;
   }
 
   return (
     <div>
       <ul>
-        {query.data.todos.map(({ id, text }) => (
+        {res.data.todos.map(({ id, text }) => (
           <li key={id}>{text}</li>
         ))}
       </ul>

@@ -9,22 +9,22 @@ export const Messages: FC = () => {
     response: MessageResponse
   ) => [response.newMessages, ...messages];
 
-  const [subscription] = useSubscription(
+  const [res] = useSubscription(
     { query: NewMessageSubQuery },
     handleSubscription
   );
 
-  if (subscription.error !== undefined) {
+  if (res.error !== undefined) {
     return <Error>{subscription.error.message}</Error>;
   }
 
-  if (subscription.data === undefined) {
+  if (res.data === undefined) {
     return <p>No new messages</p>;
   }
 
   return (
     <ul>
-      {subscription.data.map(notif => (
+      {res.data.map(notif => (
         <Message key={notif.id} {...notif} />
       ))}
     </ul>

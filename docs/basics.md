@@ -264,15 +264,15 @@ const handleSubscription = (messages = [], response) => {
 };
 
 const Messages = () => {
-  const [result] = useSubscription({ query: newMessages }, handleSubscription);
+  const [res] = useSubscription({ query: newMessages }, handleSubscription);
 
-  if (!result.data) {
+  if (!res.data) {
     return <p>No new messages</p>;
   }
 
   return (
     <ul>
-      {result.data.map(message => (
+      {res.data.map(message => (
         <p key={message.id}>
           {message.from}: "{message.text}"
         </p>
