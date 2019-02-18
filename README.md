@@ -19,24 +19,18 @@
   <br />
 </div>
 
-<img alt="Urkel" src="https://images-production.global.ssl.fastly.net/uploads/posts/image/97733/jaleel-white-steve-urkel.jpg" />
+<img width="965" alt="Steve Urkel" src="https://user-images.githubusercontent.com/1457604/52959744-ee6cef80-338e-11e9-96fe-cf5231b8eab7.png">
 
 ## ✨ Features
 
-- **One package** to get a working GraphQL client in React
-- Fully **customisable** behaviour via "exchanges"
-- Sane but simple default behaviour and document caching
-- Minimal React components and hooks
+- 📦 **One package** to get a working GraphQL client in React
+- ⚙️ Fully **customisable** behaviour via "exchanges"
+- 🗂 Sane but simple default behaviour and document caching
+- ⚛️ Minimal React components and hooks
 
-`urql` is mainly a GraphQL client, but also exposes a set of React components and hooks.
-It's built to be highly customisable and versatile, so you can take it from building
-your first GraphQL app, to building full and comples apps, or all the way to experimenting
-with GraphQL clients.
+`urql` is a GraphQL client that exposes a set of React components and hooks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
-While GraphQL is an elegant protocol that constrains and informs the data that is returned
-from APIs, this library exists because existing solutions are a bit heavy on the API side
-of things. Instead of replacing sane data management that should be easy,
-`urql` strives to make them as simple as possible.
+While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
 ## [Documentation](docs/README.md)
 
@@ -50,7 +44,7 @@ of things. Instead of replacing sane data management that should be easy,
 
 ## Quick Start Guide
 
-First, install `urql` and `graphql`, which is a peer dependency:
+First install `urql` and `graphql`:
 
 ```sh
 yarn add urql graphql
@@ -58,7 +52,7 @@ yarn add urql graphql
 npm intall --save urql graphql
 ```
 
-Then try to create a client and wrap your app with a `<Provider>`:
+Create a client for your endpoint url and wrap your app with a `<Provider>` component which `urql` exposes:
 
 ```js
 import { Provider, createClient } from 'urql';
@@ -67,25 +61,27 @@ const client = createClient({
   url: 'http://localhost:1234/graphql', // Your GraphQL endpoint here
 });
 
-<Provider value={client}>
-  <YourApp />
-</Provider>;
+ReactDOM.render(
+  <Provider value={client}>
+    <YourApp />
+  </Provider>,
+  document.body
+)
 ```
 
-This allows you to use the `<Query>` component to send some first
-queries:
+This allows you to now use the `<Query>` component to fetch data from your server:
 
 ```js
 import { Query } from 'urql';
 
-<Query query={`{ todos { id } }`}>
-  {({ fetching, data }) =>
-    fetching ? <Loading /> : <List data={data.todos} />
-  }
-</Query>;
+<Query query="{ todos { id } }">{
+  ({ fetching, data }) => fetching
+    ? <Loading />
+    : <List data={data.todos} />
+}</Query>;
 ```
 
-Or use the hooks-based API:
+Alternatively you can take advantage of the `useQuery` hook in your function component:
 
 ```js
 import { useQuery } from 'urql';
