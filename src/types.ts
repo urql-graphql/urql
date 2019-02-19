@@ -17,13 +17,11 @@ export type RequestPolicy =
 
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
+  /** Unique identifier of the request. */
+  key: number;
   query: DocumentNode | string;
   variables?: object;
 }
-
-export type GraphqlQuery = GraphQLRequest;
-export type GraphqlMutation = GraphQLRequest;
-export type GraphqlSubscription = GraphQLRequest;
 
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
@@ -37,7 +35,6 @@ export interface OperationContext {
 export interface Operation {
   query: DocumentNode;
   variables?: object;
-  /** Unique identifier of the operation. */
   key: number;
   operationName: OperationType;
   context: OperationContext;

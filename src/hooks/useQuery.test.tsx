@@ -68,9 +68,16 @@ describe('on initial useEffect', () => {
 
   it('passes query and vars to executeQuery', () => {
     renderer.create(<QueryUser {...props} />);
-    expect(client.executeQuery).toBeCalledWith(props, {
-      requestPolicy: undefined,
-    });
+    expect(client.executeQuery).toBeCalledWith(
+      {
+        key: expect.any(Number),
+        query: props.query,
+        variables: props.variables,
+      },
+      {
+        requestPolicy: undefined,
+      }
+    );
   });
 });
 
@@ -142,6 +149,7 @@ describe('on change', () => {
      */
     wrapper.update(<QueryUser {...props} query={q} />);
     wrapper.update(<QueryUser {...props} query={q} />);
+
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 });

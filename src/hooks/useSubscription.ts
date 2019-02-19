@@ -1,8 +1,8 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createQuery, noop } from '../utils';
+import { CombinedError, createRequest, noop } from '../utils';
 
 interface UseSubscriptionArgs {
   query: DocumentNode | string;
@@ -25,16 +25,18 @@ export const useSubscription = <T = any, R = T>(
   let unsubscribe = noop;
 
   const client = useContext(Context);
+  const request = createRequest(args.query, args.variables);
+
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
     data: undefined,
   });
 
-  const executeSubscription = () => {
+  const executeSubscription = useCallback(() => {
     unsubscribe();
 
     const [teardown] = pipe(
-      client.executeSubscription(createQuery(args.query, args.variables)),
+      client.executeSubscription(request),
       subscribe(({ data, error }) => {
         setState(s => ({
           data: handler !== undefined ? handler(s.data, data) : data,
@@ -44,12 +46,12 @@ export const useSubscription = <T = any, R = T>(
     );
 
     unsubscribe = teardown;
-  };
+  }, [request.key]);
 
   useEffect(() => {
     executeSubscription();
     return unsubscribe;
-  }, [args.query, args.variables]);
+  }, [request.key]);
 
   return [state];
 };

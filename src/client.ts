@@ -19,17 +19,12 @@ import {
 
 import {
   Exchange,
-  GraphqlMutation,
-  GraphqlQuery,
   GraphQLRequest,
-  GraphqlSubscription,
   Operation,
   OperationContext,
   OperationResult,
   OperationType,
 } from './types';
-
-import { getKeyForRequest } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -106,12 +101,12 @@ export class Client {
 
   createRequestOperation = (
     type: OperationType,
-    { query, variables }: GraphQLRequest,
+    { key, query, variables }: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Operation => ({
+    key,
     query: typeof query === 'string' ? parse(query) : query,
     variables,
-    key: getKeyForRequest(query, variables),
     operationName: type,
     context: this.createOperationContext(opts),
   });
@@ -169,7 +164,7 @@ export class Client {
   };
 
   executeQuery = (
-    query: GraphqlQuery,
+    query: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('query', query, opts);
@@ -177,7 +172,7 @@ export class Client {
   };
 
   executeSubscription = (
-    query: GraphqlSubscription,
+    query: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
@@ -185,7 +180,7 @@ export class Client {
   };
 
   executeMutation = (
-    query: GraphqlMutation,
+    query: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);

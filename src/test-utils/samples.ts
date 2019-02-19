@@ -2,9 +2,7 @@ import { parse } from 'graphql';
 
 import {
   ExecutionResult,
-  GraphqlMutation,
-  GraphqlQuery,
-  GraphqlSubscription,
+  GraphQLRequest,
   Operation,
   OperationContext,
   OperationResult,
@@ -18,7 +16,8 @@ const context: OperationContext = {
   url: 'http://localhost:3000/graphql',
 };
 
-export const queryGql: GraphqlQuery = {
+export const queryGql: GraphQLRequest = {
+  key: 2,
   query: `query getUser($name: String){
     user(name: $name) {
       id
@@ -31,7 +30,8 @@ export const queryGql: GraphqlQuery = {
   },
 };
 
-export const mutationGql: GraphqlMutation = {
+export const mutationGql: GraphQLRequest = {
+  key: 3,
   query: `mutation AddUser($name: String){
     addUser(name: $name) {
       name
@@ -42,7 +42,8 @@ export const mutationGql: GraphqlMutation = {
   },
 };
 
-export const subscriptionGql: GraphqlSubscription = {
+export const subscriptionGql: GraphQLRequest = {
+  key: 4,
   query: `subscription subscribeToUser($user: String){
     user(user: $user) {
       name
@@ -58,7 +59,7 @@ export const teardownOperation: Operation = {
   // @ts-ignore
   query: parse(queryGql.query),
   variables: queryGql.variables,
-  key: 2,
+  key: queryGql.key,
   operationName: 'teardown',
   context,
 };
@@ -66,7 +67,7 @@ export const teardownOperation: Operation = {
 export const queryOperation: Operation = {
   query: teardownOperation.query,
   variables: teardownOperation.variables,
-  key: 2,
+  key: teardownOperation.key,
   operationName: 'query',
   context,
 };
@@ -75,7 +76,7 @@ export const mutationOperation: Operation = {
   // @ts-ignore
   query: parse(mutationGql.query),
   variables: mutationGql.variables,
-  key: 3,
+  key: mutationGql.key,
   operationName: 'mutation',
   context,
 };
@@ -84,7 +85,7 @@ export const subscriptionOperation: Operation = {
   // @ts-ignore
   query: parse(subscriptionGql.query),
   variables: subscriptionGql.variables,
-  key: 4,
+  key: subscriptionGql.key,
   operationName: 'subscription',
   context,
 };

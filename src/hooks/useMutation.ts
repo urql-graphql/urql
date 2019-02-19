@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
 import { OperationResult } from '../types';
-import { CombinedError, createMutation } from '../utils';
+import { CombinedError, createRequest } from '../utils';
 
 interface UseMutationState<T> {
   fetching: boolean;
@@ -29,10 +29,10 @@ export const useMutation = <T = any>(
   const executeMutation = (variables?: object) => {
     setState({ fetching: true, error: undefined, data: undefined });
 
-    const mutation = createMutation(query, variables);
+    const request = createRequest(query, variables);
 
     return pipe(
-      client.executeMutation(mutation),
+      client.executeMutation(request),
       toPromise
     )
       .then(result => {

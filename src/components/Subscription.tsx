@@ -3,7 +3,7 @@ import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
 import { GraphQLRequest } from '../types';
-import { CombinedError, createSubscription, noop } from '../utils';
+import { CombinedError, createRequest, noop } from '../utils';
 
 interface SubscriptionHandlerProps extends GraphQLRequest {
   client: Client;
@@ -22,43 +22,13 @@ class SubscriptionHandler extends Component<
   SubscriptionHandlerState
 > {
   private unsubscribe = noop;
-
-  state = {
-    data: undefined,
-    error: undefined,
-    fetching: false,
-  };
-
-  componentDidMount() {
-    this.executeSubscription();
-  }
-
-  componentDidUpdate(oldProps) {
-    if (
-      this.props.query === oldProps.query ||
-      this.props.variables === oldProps.variables
-    ) {
-      return;
-    }
-
-    this.executeSubscription();
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  render() {
-    return this.props.children(this.state);
-  }
+  private request = createRequest(this.props.query, this.props.variables);
 
   executeSubscription = () => {
     this.setState({ fetching: true });
 
     const [teardown] = pipe(
-      this.props.client.executeSubscription(
-        createSubscription(this.props.query, this.props.variables)
-      ),
+      this.props.client.executeSubscription(this.request),
       subscribe(({ data, error }) => {
         const { handler } = this.props;
 
@@ -72,6 +42,32 @@ class SubscriptionHandler extends Component<
 
     this.unsubscribe = teardown;
   };
+
+  state = {
+    data: undefined,
+    error: undefined,
+    fetching: false,
+  };
+
+  componentDidMount() {
+    this.executeSubscription();
+  }
+
+  componentDidUpdate() {
+    const newRequest = createRequest(this.props.query, this.props.variables);
+    if (newRequest.key !== this.request.key) {
+      this.request = newRequest;
+      this.executeSubscription();
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  render() {
+    return this.props.children(this.state);
+  }
 }
 
 type SubscriptionProps = Exclude<SubscriptionHandlerProps, 'client'>;
