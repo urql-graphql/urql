@@ -11,14 +11,14 @@ interface UseMutationState<T> {
   error?: CombinedError;
 }
 
-type UseMutationResponse<T> = [
+type UseMutationResponse<T, V> = [
   UseMutationState<T>,
-  (variables?: object) => Promise<OperationResult>
+  (variables?: V) => Promise<OperationResult>
 ];
 
-export const useMutation = <T = any>(
+export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
-): UseMutationResponse<T> => {
+): UseMutationResponse<T, V> => {
   const client = useContext(Context);
   const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,
@@ -26,10 +26,10 @@ export const useMutation = <T = any>(
     data: undefined,
   });
 
-  const executeMutation = (variables?: object) => {
+  const executeMutation = (variables?: V) => {
     setState({ fetching: true, error: undefined, data: undefined });
 
-    const request = createRequest(query, variables);
+    const request = createRequest(query, variables as any);
 
     return pipe(
       client.executeMutation(request),

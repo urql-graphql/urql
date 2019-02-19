@@ -4,9 +4,9 @@ import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseSubscriptionArgs {
+interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
-  variables?: object;
+  variables?: V;
 }
 
 type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
@@ -18,14 +18,14 @@ interface UseSubscriptionState<T> {
 
 type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
 
-export const useSubscription = <T = any, R = T>(
-  args: UseSubscriptionArgs,
+export const useSubscription = <T = any, R = T, V = object>(
+  args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
   let unsubscribe = noop;
 
   const client = useContext(Context);
-  const request = createRequest(args.query, args.variables);
+  const request = createRequest(args.query, args.variables as any);
 
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
