@@ -49,17 +49,18 @@ and execute a query.
 
 ```js
 import { useContext } from 'react';
-import { Context, createQuery } from 'urql';
+import { Context, createRequest } from 'urql';
 
 export const useQuery = ({ query, variables }) => {
   const client = useContext(Context);
-  const request = createQuery(query, variables);
+  const request = createRequest(query, variables);
   const source = client.executeQuery(request);
 };
 ```
 
-The `createQuery` helpers is used to create a `GraphQLRequest` object.
-It's very simple and simply a convenience helper. We then pass this
+The `createRequest` helpers is used to create a `GraphQLRequest` object.
+It's very simple and apart from putting the `query` and `variables` onto
+an object, it also hashes them and adds a `key` property. We then pass this
 request to `client.executeQuery` and receive a `Source`.
 
 The `Source` is a type from [Wonka](https://github.com/kitten/wonka) and

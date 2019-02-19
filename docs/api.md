@@ -271,6 +271,18 @@ handled.
 This often comes up as the **input** for every GraphQL request.
 It consists of `query` and optional `variables`.
 
+```js
+type Operation = {
+  query: string | DocumentNode,
+  variables?: object,
+  key: number,
+};
+```
+
+As can be seen it also carries a `key` property. This property
+is a hash of both the `query` and the `variables`, to uniquely
+identify the request.
+
 ### `OperationContext` (type)
 
 This type is used to give an operation additional metadata and information.
@@ -297,7 +309,7 @@ it's essentially an extension of the `GraphQLRequest`.
 type Operation = {
   query: DocumentNode,
   variables?: object,
-  key: string,
+  key: number,
   operationName: OperationType,
   context: OperationContext,
 };
