@@ -15,7 +15,7 @@ export const Messages: FC = () => {
   );
 
   if (res.error !== undefined) {
-    return <Error>{subscription.error.message}</Error>;
+    return <Error>{res.error.message}</Error>;
   }
 
   if (res.data === undefined) {
