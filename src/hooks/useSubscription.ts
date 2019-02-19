@@ -1,12 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createQuery, noop } from '../utils';
+import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseSubscriptionArgs {
+interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
-  variables?: object;
+  variables?: V;
 }
 
 type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
@@ -18,23 +18,25 @@ interface UseSubscriptionState<T> {
 
 type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
 
-export const useSubscription = <T = any, R = T>(
-  args: UseSubscriptionArgs,
+export const useSubscription = <T = any, R = T, V = object>(
+  args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
   let unsubscribe = noop;
 
   const client = useContext(Context);
+  const request = createRequest(args.query, args.variables as any);
+
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
     data: undefined,
   });
 
-  const executeSubscription = () => {
+  const executeSubscription = useCallback(() => {
     unsubscribe();
 
     const [teardown] = pipe(
-      client.executeSubscription(createQuery(args.query, args.variables)),
+      client.executeSubscription(request),
       subscribe(({ data, error }) => {
         setState(s => ({
           data: handler !== undefined ? handler(s.data, data) : data,
@@ -44,12 +46,12 @@ export const useSubscription = <T = any, R = T>(
     );
 
     unsubscribe = teardown;
-  };
+  }, [request.key]);
 
   useEffect(() => {
     executeSubscription();
     return unsubscribe;
-  }, [args.query, args.variables]);
+  }, [request.key]);
 
   return [state];
 };

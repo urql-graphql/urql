@@ -47,7 +47,11 @@ describe('on initial useEffect', () => {
 
   it('passes query to executeSubscription', () => {
     renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith({ query, variables: {} });
+    expect(client.executeSubscription).toBeCalledWith({
+      key: expect.any(Number),
+      query,
+      variables: {},
+    });
   });
 });
 
@@ -76,6 +80,7 @@ describe('on change', () => {
      */
     wrapper.update(<SubscriptionUser q={q} />);
     wrapper.update(<SubscriptionUser q={q} />);
+    wrapper.update(<SubscriptionUser q={q + 'diff'} />);
     expect(client.executeSubscription).toBeCalledTimes(2);
   });
 });

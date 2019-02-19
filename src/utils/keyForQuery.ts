@@ -74,7 +74,7 @@ export const getKeyForRequest = (
   vars?: object
 ): number => {
   const docKey = getKeyForQuery(query);
-  if (vars === undefined) {
+  if (vars === undefined || vars === null) {
     return docKey;
   }
 

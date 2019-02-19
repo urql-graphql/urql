@@ -3,7 +3,7 @@ import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
 import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
-import { CombinedError, createQuery, noop } from '../utils';
+import { CombinedError, createRequest, noop } from '../utils';
 
 interface QueryHandlerProps extends GraphQLRequest {
   client: Client;
@@ -20,16 +20,15 @@ interface QueryHandlerState {
 
 class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   private unsubscribe = noop;
+  private request = createRequest(this.props.query, this.props.variables);
 
   executeQuery = (opts?: Partial<OperationContext>) => {
     this.unsubscribe();
 
     this.setState({ fetching: true });
 
-    const request = createQuery(this.props.query, this.props.variables);
-
     const [teardown] = pipe(
-      this.props.client.executeQuery(request, {
+      this.props.client.executeQuery(this.request, {
         requestPolicy: this.props.requestPolicy,
         ...opts,
       }),
@@ -56,15 +55,12 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     this.executeQuery();
   }
 
-  componentDidUpdate(oldProps) {
-    if (
-      this.props.query === oldProps.query &&
-      this.props.variables === oldProps.variables
-    ) {
-      return;
+  componentDidUpdate() {
+    const newRequest = createRequest(this.props.query, this.props.variables);
+    if (newRequest.key !== this.request.key) {
+      this.request = newRequest;
+      this.executeQuery();
     }
-
-    this.executeQuery();
   }
 
   componentWillUnmount() {

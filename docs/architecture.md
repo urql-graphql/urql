@@ -20,10 +20,16 @@ tie the two together.
 
 ```js
 type GraphQLRequest = {
+  key: number,
   query: string | DocumentNode,
   variables?: object,
 };
 ```
+
+The `key` property will become a unique identifier of the GraphQL Request.
+It's a hash of the exact `query` and `variables` combination, i.e. a
+unique string for this request. It's used to keep track of
+what request the client is dealing with at any given time.
 
 To begin sending a GraphQL request the **client** has
 [three main methods](https://github.com/FormidableLabs/urql/blob/master/src/client.ts)
@@ -60,11 +66,11 @@ The shape of an operation extends the shape of a GraphQL Request:
 ```js
 type Operation = {
   // GraphQLRequest:
+  key: number,
   query: DocumentNode,
   variables?: object
 
   // The rest:
-  key: number,
   operationName: OperationType,
   context: OperationContext
 }
@@ -89,10 +95,6 @@ const exampleOperation = {
   context: {},
 };
 ```
-
-The `key` property will become a unique identifier of the GraphQL Request.
-It's a hash of the exact `query` and `variables` combination, i.e. a
-unique string for this request.
 
 The `context` contains some more information and can be extended with
 the second argument to `executeQuery`. By default it contains:

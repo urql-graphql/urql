@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
 import { OperationResult } from '../types';
-import { CombinedError, createMutation } from '../utils';
+import { CombinedError, createRequest } from '../utils';
 
 interface UseMutationState<T> {
   fetching: boolean;
@@ -11,14 +11,14 @@ interface UseMutationState<T> {
   error?: CombinedError;
 }
 
-type UseMutationResponse<T> = [
+type UseMutationResponse<T, V> = [
   UseMutationState<T>,
-  (variables?: object) => Promise<OperationResult>
+  (variables?: V) => Promise<OperationResult>
 ];
 
-export const useMutation = <T = any>(
+export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
-): UseMutationResponse<T> => {
+): UseMutationResponse<T, V> => {
   const client = useContext(Context);
   const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,
@@ -26,25 +26,19 @@ export const useMutation = <T = any>(
     data: undefined,
   });
 
-  const executeMutation = (variables?: object) => {
+  const executeMutation = (variables?: V) => {
     setState({ fetching: true, error: undefined, data: undefined });
 
-    const mutation = createMutation(query, variables);
+    const request = createRequest(query, variables as any);
 
     return pipe(
-      client.executeMutation(mutation),
+      client.executeMutation(request),
       toPromise
-    )
-      .then(result => {
-        const { data, error } = result;
-        setState({ fetching: false, data, error });
-        return result;
-      })
-      .catch(networkError => {
-        const error = new CombinedError({ networkError });
-        setState({ fetching: false, data: undefined, error });
-        return { data: undefined, error } as OperationResult;
-      });
+    ).then(result => {
+      const { data, error } = result;
+      setState({ fetching: false, data, error });
+      return result;
+    });
   };
 
   return [state, executeMutation];

@@ -1,13 +1,13 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
-import { CombinedError, createQuery, noop } from '../utils';
+import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseQueryArgs {
+interface UseQueryArgs<V> {
   query: string | DocumentNode;
-  variables?: object;
+  variables?: V;
   requestPolicy?: RequestPolicy;
 }
 
@@ -22,36 +22,44 @@ type UseQueryResponse<T> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-export const useQuery = <T = any>(args: UseQueryArgs): UseQueryResponse<T> => {
+export const useQuery = <T = any, V = object>(
+  args: UseQueryArgs<V>
+): UseQueryResponse<T> => {
   let unsubscribe = noop;
 
   const client = useContext(Context);
+  const request = createRequest(args.query, args.variables as any);
+
   const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
     error: undefined,
     data: undefined,
   });
 
-  const executeQuery = (opts?: Partial<OperationContext>) => {
-    unsubscribe();
-    setState(s => ({ ...s, fetching: true }));
+  const executeQuery = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      unsubscribe();
+      setState(s => ({ ...s, fetching: true }));
 
-    const request = createQuery(args.query, args.variables);
-    const [teardown] = pipe(
-      client.executeQuery(request, {
-        requestPolicy: args.requestPolicy,
-        ...opts,
-      }),
-      subscribe(({ data, error }) => setState({ fetching: false, data, error }))
-    );
+      const [teardown] = pipe(
+        client.executeQuery(request, {
+          requestPolicy: args.requestPolicy,
+          ...opts,
+        }),
+        subscribe(({ data, error }) =>
+          setState({ fetching: false, data, error })
+        )
+      );
 
-    unsubscribe = teardown;
-  };
+      unsubscribe = teardown;
+    },
+    [request.key]
+  );
 
   useEffect(() => {
     executeQuery();
     return unsubscribe;
-  }, [args.query, args.variables]);
+  }, [request.key]);
 
   return [state, executeQuery];
 };

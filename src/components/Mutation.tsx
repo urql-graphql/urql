@@ -3,7 +3,7 @@ import { pipe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
 import { GraphQLRequest, OperationResult } from '../types';
-import { CombinedError, createMutation } from '../utils';
+import { CombinedError, createRequest } from '../utils';
 
 interface MutationHandlerProps {
   client: Client;
@@ -45,10 +45,10 @@ class MutationHandler extends Component<
       data: undefined,
     });
 
-    const mutation = createMutation(this.props.query, variables);
+    const request = createRequest(this.props.query, variables);
 
     return pipe(
-      this.props.client.executeMutation(mutation),
+      this.props.client.executeMutation(request),
       toPromise
     )
       .then(result => {
