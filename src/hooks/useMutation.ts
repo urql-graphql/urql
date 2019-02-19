@@ -34,17 +34,11 @@ export const useMutation = <T = any>(
     return pipe(
       client.executeMutation(request),
       toPromise
-    )
-      .then(result => {
-        const { data, error } = result;
-        setState({ fetching: false, data, error });
-        return result;
-      })
-      .catch(networkError => {
-        const error = new CombinedError({ networkError });
-        setState({ fetching: false, data: undefined, error });
-        return { data: undefined, error } as OperationResult;
-      });
+    ).then(result => {
+      const { data, error } = result;
+      setState({ fetching: false, data, error });
+      return result;
+    });
   };
 
   return [state, executeMutation];

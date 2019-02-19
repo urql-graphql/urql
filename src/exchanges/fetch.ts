@@ -64,18 +64,13 @@ const createFetchSource = (operation: Operation) => {
       ...operation.context.fetchOptions,
     };
 
-    executeFetch(operation, fetchOptions)
-      .then(result => {
-        if (result !== undefined) {
-          next(result);
-        }
+    executeFetch(operation, fetchOptions).then(result => {
+      if (result !== undefined) {
+        next(result);
+      }
 
-        complete();
-      })
-      .catch(err => {
-        console.error(err);
-        complete();
-      });
+      complete();
+    });
 
     return () => {
       if (abortController !== undefined) {
