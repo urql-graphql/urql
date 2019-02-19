@@ -9,7 +9,7 @@ import {
 const getTypeNameFromField = (obj: object) =>
   Object.values(obj).reduce(
     (all, val) =>
-      typeof val !== 'object'
+      typeof val !== 'object' || val === null
         ? all
         : val.__typename !== undefined
         ? { ...all, [val.__typename]: true }
