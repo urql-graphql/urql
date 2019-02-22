@@ -26,7 +26,7 @@ export interface GraphQLRequest {
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
   [key: string]: any;
-  fetchOptions?: RequestInit;
+  fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;
 }
