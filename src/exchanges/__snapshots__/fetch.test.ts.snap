@@ -3,16 +3,7 @@
 exports[`returns error data from fetch 1`] = `
 Object {
   "data": undefined,
-  "error": CombinedError {
-    "graphQLErrors": Array [],
-    "message": "[Network] ",
-    "name": "CombinedError",
-    "networkError": [Error],
-    "response": Object {
-      "json": [MockFunction],
-      "status": 400,
-    },
-  },
+  "error": [CombinedError: [Network] ],
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {

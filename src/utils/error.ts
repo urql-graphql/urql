@@ -1,6 +1,4 @@
-export interface GraphQLError {
-  message?: string;
-}
+import { GraphQLError } from 'graphql';
 
 const generateErrorMessage = (
   networkErr?: Error,
@@ -21,21 +19,29 @@ const generateErrorMessage = (
   return error.trim();
 };
 
-const rehydrateGraphQlError = (error: string | GraphQLError): Error => {
+const rehydrateGraphQlError = (error: any): GraphQLError => {
   if (typeof error === 'string') {
-    return new Error(error);
-  } else if (error.message) {
-    return new Error(error.message);
+    return new GraphQLError(error);
+  } else if (typeof error === 'object' && error.message) {
+    return new GraphQLError(
+      error.message,
+      error.nodes,
+      error.source,
+      error.positions,
+      error.path,
+      error.originalError,
+      error.extensions || {}
+    );
   } else {
     return error as any;
   }
 };
 
 /** An error which can consist of GraphQL errors and Network errors. */
-export class CombinedError implements Error {
+export class CombinedError extends Error {
   public name: string;
   public message: string;
-  public graphQLErrors: Error[];
+  public graphQLErrors: GraphQLError[];
   public networkError?: Error;
   public response?: any;
 
@@ -45,13 +51,24 @@ export class CombinedError implements Error {
     response,
   }: {
     networkError?: Error;
-    graphQLErrors?: Array<string | GraphQLError>;
+    graphQLErrors?: Array<string | GraphQLError | Error>;
     response?: any;
   }) {
+    const normalisedGraphQLErrors = (graphQLErrors || []).map(
+      rehydrateGraphQlError
+    );
+    const message = generateErrorMessage(networkError, normalisedGraphQLErrors);
+
+    super(message);
+
     this.name = 'CombinedError';
-    this.graphQLErrors = (graphQLErrors || []).map(rehydrateGraphQlError);
-    this.message = generateErrorMessage(networkError, this.graphQLErrors);
+    this.message = message;
+    this.graphQLErrors = normalisedGraphQLErrors;
     this.networkError = networkError;
     this.response = response;
+  }
+
+  toString() {
+    return this.message;
   }
 }

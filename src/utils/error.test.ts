@@ -9,6 +9,17 @@ describe('CombinedError', () => {
     expect(err.name).toBe('CombinedError');
   });
 
+  it('behaves like a normal Error', () => {
+    const err = new CombinedError({
+      networkError: new Error('test'),
+    });
+
+    expect(err instanceof CombinedError).toBe(true);
+    expect(err instanceof Error).toBe(true);
+    expect(Error.prototype.isPrototypeOf(err)).toBe(true);
+    expect('' + err).toMatchSnapshot();
+  });
+
   it('accepts graphQLError messages and generates a single message from them', () => {
     const graphQLErrors = ['Error Message A', 'Error Message B'];
 
