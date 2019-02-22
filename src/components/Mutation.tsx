@@ -18,7 +18,9 @@ interface MutationHandlerState {
 }
 
 interface MutationChildProps extends MutationHandlerState {
-  executeMutation: (variables?: object) => Promise<OperationResult>;
+  executeMutation: <Data = any>(
+    variables?: object
+  ) => Promise<OperationResult<Data>>;
 }
 
 class MutationHandler extends Component<

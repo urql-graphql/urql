@@ -13,7 +13,7 @@ interface UseMutationState<T> {
 
 type UseMutationResponse<T, V> = [
   UseMutationState<T>,
-  (variables?: V) => Promise<OperationResult>
+  (variables?: V) => Promise<OperationResult<T>>
 ];
 
 export const useMutation = <T = any, V = object>(

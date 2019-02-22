@@ -41,11 +41,11 @@ export interface Operation {
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface OperationResult {
+export interface OperationResult<Data = any> {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation;
   /** The data returned from the Graphql server. */
-  data?: any;
+  data?: Data;
   /** Any errors resulting from the operation. */
   error?: CombinedError;
 }
