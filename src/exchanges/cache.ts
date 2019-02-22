@@ -2,7 +2,7 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult } from '../types';
-import { formatDocument, gankTypeNamesFromResponse } from '../utils/typenames';
+import { collectTypesFromResponse, formatDocument } from '../utils/typenames';
 
 type ResultCache = Map<number, OperationResult>;
 
@@ -116,7 +116,7 @@ export const afterMutation = (
 ) => (response: OperationResult) => {
   const pendingOperations = new Set<number>();
 
-  gankTypeNamesFromResponse(response.data).forEach(typeName => {
+  collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => pendingOperations.add(key));
@@ -145,7 +145,7 @@ const afterQuery = (
 
   resultCache.set(key, response);
 
-  gankTypeNamesFromResponse(response.data).forEach(typeName => {
+  collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.add(key);
