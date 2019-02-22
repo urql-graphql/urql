@@ -18,9 +18,9 @@ interface MutationHandlerState {
 }
 
 interface MutationChildProps extends MutationHandlerState {
-  executeMutation: <Data = any>(
-    variables?: object
-  ) => Promise<OperationResult<Data>>;
+  executeMutation: <T = any, V = object>(
+    variables?: V
+  ) => Promise<OperationResult<T>>;
 }
 
 class MutationHandler extends Component<
@@ -40,14 +40,14 @@ class MutationHandler extends Component<
     });
   }
 
-  executeMutation = (variables?: object): Promise<OperationResult> => {
+  executeMutation: MutationChildProps['executeMutation'] = variables => {
     this.setState({
       fetching: true,
       error: undefined,
       data: undefined,
     });
 
-    const request = createRequest(this.props.query, variables);
+    const request = createRequest(this.props.query, variables as any);
 
     return pipe(
       this.props.client.executeMutation(request),
