@@ -38,7 +38,7 @@ const rehydrateGraphQlError = (error: any): GraphQLError => {
 };
 
 /** An error which can consist of GraphQL errors and Network errors. */
-export class CombinedError implements Error {
+export class CombinedError extends Error {
   public name: string;
   public message: string;
   public graphQLErrors: GraphQLError[];
@@ -54,10 +54,21 @@ export class CombinedError implements Error {
     graphQLErrors?: Array<string | GraphQLError | Error>;
     response?: any;
   }) {
+    const normalisedGraphQLErrors = (graphQLErrors || []).map(
+      rehydrateGraphQlError
+    );
+    const message = generateErrorMessage(networkError, normalisedGraphQLErrors);
+
+    super(message);
+
     this.name = 'CombinedError';
-    this.graphQLErrors = (graphQLErrors || []).map(rehydrateGraphQlError);
-    this.message = generateErrorMessage(networkError, this.graphQLErrors);
+    this.message = message;
+    this.graphQLErrors = normalisedGraphQLErrors;
     this.networkError = networkError;
     this.response = response;
+  }
+
+  toString() {
+    return this.message;
   }
 }
