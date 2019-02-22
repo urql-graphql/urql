@@ -11,7 +11,7 @@ interface EntityLike {
   __typename: string | null | void;
 }
 
-const collectTypes = (obj: EntityLike | EntityLike[], types: string[]) => {
+const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
   if (Array.isArray(obj)) {
     obj.forEach(inner => collectTypes(inner, types));
   } else if (typeof obj === 'object' && obj !== null) {
@@ -31,9 +31,7 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[]) => {
 };
 
 export const collectTypesFromResponse = (response: object) =>
-  collectTypes(response as EntityLike, []).filter(
-    (v, i, a) => a.indexOf(v) === i
-  );
+  collectTypes(response as EntityLike).filter((v, i, a) => a.indexOf(v) === i);
 
 const formatNode = (
   n: FieldNode | InlineFragmentNode | OperationDefinitionNode
