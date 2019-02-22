@@ -46,13 +46,22 @@ it('returns response data from fetch', async () => {
     json: jest.fn().mockResolvedValue(response),
   });
 
+  const fetchOptions = jest.fn().mockReturnValue({});
+
   const data = await pipe(
-    fromValue(queryOperation),
+    fromValue({
+      ...queryOperation,
+      context: {
+        ...queryOperation.context,
+        fetchOptions,
+      },
+    }),
     fetchExchange(exchangeArgs),
     toPromise
   );
 
   expect(data).toMatchSnapshot();
+  expect(fetchOptions).toHaveBeenCalled();
 });
 
 it('returns error data from fetch', async () => {
