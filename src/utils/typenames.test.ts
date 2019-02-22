@@ -82,4 +82,21 @@ describe('gankTypeNamesFromResponse', () => {
     });
     expect(typeNames).toEqual(['Todo', 'SubTask']);
   });
+
+  it('traverses nested typenames', () => {
+    const typenames = gankTypeNamesFromResponse({
+      todos: [
+        {
+          id: 1,
+          author: {
+            name: 'Phil',
+            __typename: 'Author',
+          },
+          __typename: 'Todo',
+        },
+      ],
+    });
+
+    expect(typenames).toEqual(['Todo', 'Author']);
+  });
 });
