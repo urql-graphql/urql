@@ -67,7 +67,7 @@ const createFetchSource = (operation: Operation) => {
       method: 'POST',
       ...extraOptions,
       headers: {
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
         ...extraOptions.headers,
       },
       signal:
