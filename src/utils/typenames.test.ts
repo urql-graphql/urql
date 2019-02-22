@@ -1,5 +1,5 @@
 import { parse, print } from 'graphql';
-import { formatDocument, gankTypeNamesFromResponse } from './typenames';
+import { collectTypesFromResponse, formatDocument } from './typenames';
 
 const formatTypeNames = (query: string) => {
   const typedNode = formatDocument(parse(query));
@@ -19,9 +19,9 @@ describe('formatTypeNames', () => {
   });
 });
 
-describe('gankTypeNamesFromResponse', () => {
+describe('collectTypesFromResponse', () => {
   it('returns all typenames included in a response as an array', () => {
-    const typeNames = gankTypeNamesFromResponse({
+    const typeNames = collectTypesFromResponse({
       todos: [
         {
           id: 1,
@@ -33,7 +33,7 @@ describe('gankTypeNamesFromResponse', () => {
   });
 
   it('does not duplicate typenames', () => {
-    const typeNames = gankTypeNamesFromResponse({
+    const typeNames = collectTypesFromResponse({
       todos: [
         {
           id: 1,
@@ -49,7 +49,7 @@ describe('gankTypeNamesFromResponse', () => {
   });
 
   it('returns multiple different typenames', () => {
-    const typeNames = gankTypeNamesFromResponse({
+    const typeNames = collectTypesFromResponse({
       todos: [
         {
           id: 1,
@@ -65,7 +65,7 @@ describe('gankTypeNamesFromResponse', () => {
   });
 
   it('works on nested objects', () => {
-    const typeNames = gankTypeNamesFromResponse({
+    const typeNames = collectTypesFromResponse({
       todos: [
         {
           id: 1,
@@ -83,20 +83,24 @@ describe('gankTypeNamesFromResponse', () => {
     expect(typeNames).toEqual(['Todo', 'SubTask']);
   });
 
-  it('traverses nested typenames', () => {
-    const typenames = gankTypeNamesFromResponse({
+  it('traverses nested arrays of objects', () => {
+    const typenames = collectTypesFromResponse({
       todos: [
         {
           id: 1,
-          author: {
-            name: 'Phil',
-            __typename: 'Author',
-          },
+          authors: [
+            [
+              {
+                name: 'Phil',
+                __typename: 'Author',
+              },
+            ],
+          ],
           __typename: 'Todo',
         },
       ],
     });
 
-    expect(typenames).toEqual(['Todo', 'Author']);
+    expect(typenames).toEqual(['Author', 'Todo']);
   });
 });
