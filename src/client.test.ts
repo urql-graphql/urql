@@ -20,21 +20,6 @@ describe('createClient', () => {
 
     expect(c).toMatchSnapshot();
   });
-
-  describe('args', () => {
-    describe('fetchOptions', () => {
-      const fetchOptions = jest.fn(() => ({}));
-
-      it('function is executed', () => {
-        createClient({
-          url,
-          fetchOptions: fetchOptions as any,
-        });
-
-        expect(fetchOptions).toBeCalled();
-      });
-    });
-  });
 });
 
 const query = {

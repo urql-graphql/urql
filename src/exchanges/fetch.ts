@@ -52,16 +52,26 @@ const createFetchSource = (operation: Operation) => {
         ? new AbortController()
         : undefined;
 
+    const { context } = operation;
+
+    const extraOptions =
+      typeof context.fetchOptions === 'function'
+        ? context.fetchOptions()
+        : context.fetchOptions || {};
+
     const fetchOptions = {
       body: JSON.stringify({
         query: print(operation.query),
         variables: operation.variables,
       }),
-      headers: { 'Content-Type': 'application/json' },
       method: 'POST',
+      ...extraOptions,
+      headers: {
+        'content-type': 'application/json',
+        ...extraOptions.headers,
+      },
       signal:
         abortController !== undefined ? abortController.signal : undefined,
-      ...operation.context.fetchOptions,
     };
 
     executeFetch(operation, fetchOptions).then(result => {

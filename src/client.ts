@@ -46,7 +46,7 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 export class Client {
   // These are variables derived from ClientOptions
   url: string;
-  fetchOptions: RequestInit;
+  fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
 
   // These are internals to be used to keep track of operations
@@ -57,11 +57,7 @@ export class Client {
 
   constructor(opts: ClientOptions) {
     this.url = opts.url;
-
-    this.fetchOptions =
-      typeof opts.fetchOptions === 'function'
-        ? opts.fetchOptions()
-        : opts.fetchOptions || {};
+    this.fetchOptions = opts.fetchOptions;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject

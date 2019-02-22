@@ -231,8 +231,16 @@ Object {
   "error": undefined,
   "operation": Object {
     "context": Object {
-      "fetchOptions": Object {
-        "method": "POST",
+      "fetchOptions": [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": Object {},
+          },
+        ],
       },
       "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
