@@ -1,24 +1,11 @@
 import graphql, { ExecInfo } from 'graphql-anywhere';
-import { keyForLink, keyOfEntity } from './keys';
+import Cache from '../cache';
+import { keyForLink, keyOfEntity } from '../keys';
 
-import {
-  deleteFieldValue,
-  getOrCreateEntity,
-  writeFieldValue,
-  writeLink,
-} from './cacheUtils';
-
-import {
-  Cache,
-  Context,
-  Entity,
-  GqlValue,
-  GraphQLRequest,
-  Link,
-} from './types';
+import { Entity, GraphQLRequest, Link, Scalar } from '../types';
 
 // Determines whether a fieldValue consists of only entities
-const isLinkableEntity = (x: GqlValue | Entity | Array<Entity | GqlValue>) => {
+const isLinkableEntity = (x: Scalar | Entity | Array<Entity | Scalar>) => {
   if (Array.isArray(x)) {
     // @ts-ignore
     return x.every(isLinkableEntity);
@@ -28,9 +15,7 @@ const isLinkableEntity = (x: GqlValue | Entity | Array<Entity | GqlValue>) => {
 };
 
 // Transforms a fieldValue to keys of entities
-const linkOfEntity = (
-  x: GqlValue | Entity | Array<Entity | GqlValue>
-): Link => {
+const linkOfEntity = (x: Scalar | Entity | Array<Entity | Scalar>): Link => {
   if (Array.isArray(x)) {
     // @ts-ignore
     return x.map(linkOfEntity);
@@ -41,11 +26,11 @@ const linkOfEntity = (
   return keyOfEntity(x);
 };
 
-export const responseResolver = (
+const writeResolver = (
   fieldName: string,
   rootValue: Entity,
   args: null | object,
-  { cache }: Context,
+  cache: Cache,
   info: ExecInfo
 ) => {
   const fieldValue = rootValue[fieldName];
@@ -56,16 +41,13 @@ export const responseResolver = (
   } else if (parentKey === 'Mutation' || parentKey === 'Subscription') {
     // We do traverse but we don't cache Mutation & Subscription themselves
     return fieldValue;
-  }
-
-  const parentEntity = getOrCreateEntity(cache, parentKey);
-  if (fieldValue === null || fieldValue === undefined) {
+  } else if (fieldValue === null || fieldValue === undefined) {
     // Clear cached field since value is null
-    deleteFieldValue(parentEntity, fieldName);
+    cache.writeEntityValue(parentKey, fieldName, null);
     return null;
   } else if (info.isLeaf || typeof fieldValue !== 'object') {
     // Write leaf / scalar value to parent
-    writeFieldValue(parentEntity, fieldName, fieldValue);
+    cache.writeEntityValue(parentKey, fieldName, fieldValue);
     return null;
   }
 
@@ -73,37 +55,31 @@ export const responseResolver = (
   const shouldCreateLink = isLinkableEntity(fieldValue);
   if (!shouldCreateLink) {
     // Write object-like scalar to parent
-    writeFieldValue(parentEntity, fieldName, fieldValue);
+    cache.writeEntityValue(parentKey, fieldName, fieldValue);
     return null;
   }
 
   // Clear cached field since it's not a scalar
-  deleteFieldValue(parentEntity, fieldName);
-
-  const link = linkOfEntity(fieldValue);
-  if (link === null) {
-    return null;
-  }
+  cache.writeEntityValue(parentKey, fieldName, null);
 
   // Write link to cache and keep traversing
-  writeLink(cache, keyForLink(parentKey, fieldName, args), link);
+  const link = linkOfEntity(fieldValue);
+  cache.writeLink(keyForLink(parentKey, fieldName, args), link);
   return fieldValue;
 };
 
-const responseToCache = (
+const write = (
   cache: Cache,
   request: GraphQLRequest,
   response: Entity
 ): Entity => {
-  const context = { cache };
-
   return graphql(
-    responseResolver,
+    writeResolver,
     request.query,
     response,
-    context,
+    cache,
     request.variables
   );
 };
 
-export default responseToCache;
+export default write;

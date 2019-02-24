@@ -5,16 +5,16 @@ export interface GraphQLRequest {
   variables?: object;
 }
 
-export type GqlValue = string | number | null;
+export type Scalar = string | number | null;
 
 export interface SystemFields {
   __typename?: string | null;
-  _id?: GqlValue;
-  id?: GqlValue;
+  _id?: Scalar;
+  id?: Scalar;
 }
 
 export interface EntityFields {
-  [property: string]: Entity | GqlValue | Array<Entity | GqlValue>;
+  [property: string]: Entity | Scalar | Array<Entity | Scalar>;
 }
 
 export type Entity = SystemFields & EntityFields;
@@ -26,13 +26,4 @@ export interface EntityMap {
 
 export interface LinkMap {
   [key: string]: Link;
-}
-
-export interface Cache {
-  records: EntityMap;
-  links: LinkMap;
-}
-
-export interface Context {
-  cache: Cache;
 }

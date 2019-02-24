@@ -5,6 +5,7 @@
 !/dist/**/*.{d.ts,js,js.map}
 !/src/**/*.{d.ts,ts,tsx}
 __snapshots__/
+__tests__/
 test-utils/
 *.test.js
 *.test.jsx
