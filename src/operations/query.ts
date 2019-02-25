@@ -1,8 +1,7 @@
-import graphql, { ExecInfo } from 'graphql-anywhere';
-
 import Cache from '../cache';
+import graphql from '../exec';
 import { keyForLink, keyOfEntity } from '../keys';
-import { CacheResult, Entity, Link, Request } from '../types';
+import { CacheResult, FieldResolver, Link, Request } from '../types';
 
 const entityOfLink = (cache: Cache, link: Link) => {
   if (Array.isArray(link)) {
@@ -15,12 +14,12 @@ const entityOfLink = (cache: Cache, link: Link) => {
   return cache.getEntity(link);
 };
 
-const queryResolver = (
-  fieldName: string,
-  rootValue: Entity,
-  args: null | object,
-  cache: Cache,
-  info: ExecInfo
+const queryResolver: FieldResolver = (
+  fieldName,
+  rootValue,
+  args,
+  cache,
+  info
 ) => {
   if (info.isLeaf) {
     return rootValue[fieldName];
@@ -42,10 +41,9 @@ const queryResolver = (
 const query = (cache: Cache, request: Request): CacheResult => {
   const response = graphql(
     queryResolver,
-    request.query,
+    request,
     cache.getEntity('Query'),
-    cache,
-    request.variables
+    cache
   );
 
   return {

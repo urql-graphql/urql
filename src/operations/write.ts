@@ -1,11 +1,18 @@
-import graphql, { ExecInfo } from 'graphql-anywhere';
-
 import Cache from '../cache';
+import graphql from '../exec';
 import { keyForLink, keyOfEntity } from '../keys';
-import { CacheResult, Entity, Link, Request, Scalar } from '../types';
+
+import {
+  CacheResult,
+  Entity,
+  FieldResolver,
+  FieldValue,
+  Link,
+  Request,
+} from '../types';
 
 // Determines whether a fieldValue consists of only entities
-const isLinkableEntity = (x: Scalar | Entity | Array<Entity | Scalar>) => {
+const isLinkableEntity = (x: FieldValue) => {
   if (Array.isArray(x)) {
     // @ts-ignore
     return x.every(isLinkableEntity);
@@ -15,7 +22,7 @@ const isLinkableEntity = (x: Scalar | Entity | Array<Entity | Scalar>) => {
 };
 
 // Transforms a fieldValue to keys of entities
-const linkOfEntity = (x: Scalar | Entity | Array<Entity | Scalar>): Link => {
+const linkOfEntity = (x: FieldValue): Link => {
   if (Array.isArray(x)) {
     // @ts-ignore
     return x.map(linkOfEntity);
@@ -26,12 +33,12 @@ const linkOfEntity = (x: Scalar | Entity | Array<Entity | Scalar>): Link => {
   return keyOfEntity(x);
 };
 
-const writeResolver = (
-  fieldName: string,
-  rootValue: Entity,
-  args: null | object,
-  cache: Cache,
-  info: ExecInfo
+const writeResolver: FieldResolver = (
+  fieldName,
+  rootValue,
+  args,
+  cache,
+  info
 ) => {
   const fieldValue = rootValue[info.resultKey || fieldName];
   const parentKey = keyOfEntity(rootValue);
@@ -73,7 +80,7 @@ const write = (
   request: Request,
   response: Entity
 ): CacheResult => {
-  graphql(writeResolver, request.query, response, cache, request.variables);
+  graphql(writeResolver, request, response, cache);
   const dependencies = cache.flushTouched();
   return { dependencies };
 };

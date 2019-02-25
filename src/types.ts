@@ -1,4 +1,6 @@
 import { DocumentNode } from 'graphql';
+import { ExecInfo } from 'graphql-anywhere';
+import Cache from './cache';
 
 export interface Request {
   query: DocumentNode;
@@ -13,8 +15,10 @@ export interface SystemFields {
   id?: Scalar;
 }
 
+export type FieldValue = Entity | Scalar | Array<Entity | Scalar>;
+
 export interface EntityFields {
-  [property: string]: Entity | Scalar | Array<Entity | Scalar>;
+  [property: string]: FieldValue;
 }
 
 export type Entity = SystemFields & EntityFields;
@@ -32,3 +36,11 @@ export interface CacheResult {
   dependencies: string[];
   response?: Entity;
 }
+
+export type FieldResolver = (
+  fieldName: string,
+  rootValue: Entity,
+  args: null | object,
+  cache: Cache,
+  info: ExecInfo
+) => FieldValue;
