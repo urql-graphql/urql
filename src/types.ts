@@ -34,7 +34,7 @@ export interface Context {
 
 export interface Result {
   dependencies: string[];
-  isComplete?: boolean;
+  isComplete: boolean;
   response?: Entity;
 }
 
