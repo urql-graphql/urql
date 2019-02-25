@@ -1,14 +1,14 @@
 import graphql from 'graphql-anywhere';
-import Cache from './cache';
+import Store from './store';
 import { Entity, FieldResolver, Request } from './types';
 
 const typedGraphQL = (
   resolver: FieldResolver,
   { query, variables }: Request,
   root: Entity,
-  cache: Cache
+  store: Store
 ): Entity => {
-  return graphql(resolver, query, root, cache, variables);
+  return graphql(resolver, query, root, store, variables);
 };
 
 export default typedGraphQL;

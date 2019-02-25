@@ -1,12 +1,12 @@
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
-import { CacheData } from '../cache';
+import { StoreData } from '../store';
 import { Entity } from '../types';
 
 export interface CacheTestCase {
   it: string;
   doc: DocumentNode;
-  cache: CacheData;
+  cache: StoreData;
   response: Entity;
 }
 

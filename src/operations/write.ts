@@ -1,14 +1,14 @@
-import Cache from '../cache';
 import graphql from '../exec';
 import { keyForLink, keyOfEntity } from '../keys';
+import Store from '../store';
 
 import {
-  CacheResult,
   Entity,
   FieldResolver,
   FieldValue,
   Link,
   Request,
+  Result,
 } from '../types';
 
 // Determines whether a fieldValue consists of only entities
@@ -37,7 +37,7 @@ const writeResolver: FieldResolver = (
   fieldName,
   rootValue,
   args,
-  cache,
+  store,
   info
 ) => {
   const fieldValue = rootValue[info.resultKey || fieldName];
@@ -46,15 +46,15 @@ const writeResolver: FieldResolver = (
   if (parentKey === null) {
     return null;
   } else if (parentKey === 'Mutation' || parentKey === 'Subscription') {
-    // We do traverse but we don't cache Mutation & Subscription themselves
+    // We do traverse but we don't store Mutation & Subscription themselves
     return fieldValue;
   } else if (fieldValue === null || fieldValue === undefined) {
-    // Clear cached field since value is null
-    cache.writeEntityValue(parentKey, fieldName, null);
+    // Clear stored field since value is null
+    store.writeEntityValue(parentKey, fieldName, null);
     return null;
   } else if (info.isLeaf || typeof fieldValue !== 'object') {
     // Write leaf / scalar value to parent
-    cache.writeEntityValue(parentKey, fieldName, fieldValue);
+    store.writeEntityValue(parentKey, fieldName, fieldValue);
     return null;
   }
 
@@ -62,26 +62,22 @@ const writeResolver: FieldResolver = (
   const shouldCreateLink = isLinkableEntity(fieldValue);
   if (!shouldCreateLink) {
     // Write object-like scalar to parent
-    cache.writeEntityValue(parentKey, fieldName, fieldValue);
+    store.writeEntityValue(parentKey, fieldName, fieldValue);
     return null;
   }
 
-  // Clear cached field since it's not a scalar
-  cache.writeEntityValue(parentKey, fieldName, null);
+  // Clear stored field since it's not a scalar
+  store.writeEntityValue(parentKey, fieldName, null);
 
-  // Write link to cache and keep traversing
+  // Write link to store and keep traversing
   const link = linkOfEntity(fieldValue);
-  cache.writeLink(keyForLink(parentKey, fieldName, args), link);
+  store.writeLink(keyForLink(parentKey, fieldName, args), link);
   return fieldValue;
 };
 
-const write = (
-  cache: Cache,
-  request: Request,
-  response: Entity
-): CacheResult => {
-  graphql(writeResolver, request, response, cache);
-  const dependencies = cache.flushTouched();
+const write = (store: Store, request: Request, response: Entity): Result => {
+  graphql(writeResolver, request, response, store);
+  const dependencies = store.flushTouched();
   return { dependencies };
 };
 

@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { ExecInfo } from 'graphql-anywhere';
-import Cache from './cache';
+import Store from './store';
 
 export interface Request {
   query: DocumentNode;
@@ -32,7 +32,7 @@ export interface LinkMap {
   [key: string]: Link;
 }
 
-export interface CacheResult {
+export interface Result {
   dependencies: string[];
   response?: Entity;
 }
@@ -41,6 +41,6 @@ export type FieldResolver = (
   fieldName: string,
   rootValue: Entity,
   args: null | object,
-  cache: Cache,
+  store: Store,
   info: ExecInfo
 ) => FieldValue;

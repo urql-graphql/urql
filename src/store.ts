@@ -1,17 +1,17 @@
 import { isOperation } from './keys';
 import { Entity, EntityMap, Link, LinkMap } from './types';
 
-export interface CacheData {
+export interface StoreData {
   records: EntityMap;
   links: LinkMap;
 }
 
-class Cache {
+class Store {
   private touched: string[];
   private records: EntityMap;
   private links: LinkMap;
 
-  constructor(initial?: CacheData) {
+  constructor(initial?: StoreData) {
     this.touched = [];
     this.records = Object.create(null);
     this.links = Object.create(null);
@@ -63,7 +63,7 @@ class Cache {
     }
   }
 
-  toJSON(): CacheData {
+  toJSON(): StoreData {
     return { records: this.records, links: this.links };
   }
 
@@ -76,4 +76,4 @@ class Cache {
   }
 }
 
-export default Cache;
+export default Store;

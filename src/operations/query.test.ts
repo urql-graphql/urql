@@ -1,11 +1,11 @@
-import Cache from '../cache';
+import Store from '../store';
 import { cacheFixtures } from '../test-utils';
 import query from './query';
 
 cacheFixtures.forEach(fixture => {
   it(`queries ${fixture.it}`, () => {
-    const cache = new Cache(fixture.cache);
-    const { response } = query(cache, { query: fixture.doc });
+    const store = new Store(fixture.cache);
+    const { response } = query(store, { query: fixture.doc });
     expect(response).toEqual(fixture.response);
   });
 });
