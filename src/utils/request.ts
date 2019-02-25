@@ -10,10 +10,10 @@ export function createRequest<Q extends QueryType, T extends object>(
   query: Q,
   vars: T
 ): { key: number; query: Q; variables: T };
-export function createRequest<Q extends QueryType, T extends object>(
-  q: Q,
-  vars?: T
-) {
+export function createRequest<
+  Q extends QueryType,
+  T extends object | undefined
+>(q: Q, vars?: T) {
   return {
     key: getKeyForRequest(q, vars),
     query: q,
