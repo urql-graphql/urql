@@ -112,6 +112,7 @@
   },
   "dependencies": {
     "create-react-context": "^0.2.3",
+    "prop-types": "^15.6.0",
     "wonka": "^2.0.1"
   }
 }
