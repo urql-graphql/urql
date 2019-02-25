@@ -139,7 +139,7 @@ so that the `fetchExchange` can respond with up-to-date data.
 The result will still be cached however.
 
 The last one `'cache-and-network'` is rather special
-in that it first does what `'cache-first` does, it to
+in that it first does what `'cache-first'` does, it will
 return some cached results. After returning a cached result however,
 it will forward the operation anyway. This way a temporary cached
 result may be displayed that is then updated with fresh data
@@ -236,11 +236,11 @@ Additionally the second argument for this hook can be a "reducer function".
 This function is similar to what you would pass to `Array.prototype.reduce`.
 
 It receives the previous set of data that this function has returned or `undefined`.
-As the second argument is receives the event that has come in from the subscription.
+As the second argument, it receives the event that has come in from the subscription.
 You can use this to accumulate the data over time, which is useful for a
 list for example.
 
-In the following example we create a subscription that informs us of
+In the following example, we create a subscription that informs us of
 new messages. We will concatenate the incoming messages, so that we
 can display all messages that have come in over the subscription across
 events.
