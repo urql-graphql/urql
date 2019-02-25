@@ -33,7 +33,7 @@ const writeResolver = (
   cache: Cache,
   info: ExecInfo
 ) => {
-  const fieldValue = rootValue[fieldName];
+  const fieldValue = rootValue[info.resultKey || fieldName];
   const parentKey = keyOfEntity(rootValue);
 
   if (parentKey === null) {

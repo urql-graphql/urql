@@ -123,4 +123,60 @@ export const cases: CacheTestCase[] = [
       ],
     },
   },
+  {
+    it: 'entity lists with arguments and aliases',
+    doc: gql`
+      {
+        __typename
+        first: todos(first: 2) {
+          __typename
+          id
+        }
+        last: todos(last: 1) {
+          __typename
+          id
+        }
+      }
+    `,
+    cache: {
+      records: {
+        Query: { __typename: 'Query' },
+        'Todo:1': {
+          __typename: 'Todo',
+          id: '1',
+        },
+        'Todo:2': {
+          __typename: 'Todo',
+          id: '2',
+        },
+        'Todo:99': {
+          __typename: 'Todo',
+          id: '99',
+        },
+      },
+      links: {
+        'Query->todos({"first":2})': ['Todo:1', 'Todo:2'],
+        'Query->todos({"last":1})': ['Todo:99'],
+      },
+    },
+    response: {
+      __typename: 'Query',
+      first: [
+        {
+          __typename: 'Todo',
+          id: '1',
+        },
+        {
+          __typename: 'Todo',
+          id: '2',
+        },
+      ],
+      last: [
+        {
+          __typename: 'Todo',
+          id: '99',
+        },
+      ],
+    },
+  },
 ];
