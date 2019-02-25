@@ -35,10 +35,14 @@ export const SidebarWrapper = styled.aside`
   background-repeat: repeat-y;
   min-height: 100vh;
   padding-top: 18rem;
-  min-width: 26rem;
-  width: 26rem;
+  min-width: 20rem;
+  width: 20rem;
   z-index: ${sidebarZIndex};
   position: fixed;
+  overflow-y: scroll;
+  top: 0;
+  bottom: 0;
+  width: 20rem;
 
   @media (max-width: 768px) {
     background-image: ${props =>

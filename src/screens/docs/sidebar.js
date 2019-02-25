@@ -6,7 +6,7 @@ import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
-  SidebarWrapper
+  SidebarWrapper,
 } from "../../components/navigation";
 
 const HeroLogo = styled.img`
@@ -58,10 +58,8 @@ const CloseButton = styled.img`
 class Sidebar extends React.Component {
   renderSidebarItem(item) {
     const { tocArray } = this.props;
-    let currentPath;
-    if (typeof window !== "undefined") {
-      currentPath = `/docs${item.path}` === window.location.pathname;
-    }
+    const currentPath =
+      `/docs${item.path}` === this.props.history.location.pathname;
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
@@ -125,14 +123,12 @@ class Sidebar extends React.Component {
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
             <SidebarNavItem
               to={"https://www.github.com/FormidableLabs/spectacle/issues"}
-              replace
               key={"issues"}
             >
               Issues
             </SidebarNavItem>
             <SidebarNavItem
               to={"https://github.com/FormidableLabs/spectacle"}
-              replace
               key={"github"}
             >
               Github

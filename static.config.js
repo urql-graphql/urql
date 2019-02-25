@@ -8,7 +8,7 @@ const { ServerStyleSheet } = require("styled-components");
 chokidar.watch("content").on("all", () => reloadRoutes());
 
 export default {
-  plugins: ["react-static-plugin-styled-components"],
+  // plugins: ["react-static-plugin-styled-components"],
   getSiteData: () => ({
     title: "Spectacle"
   }),

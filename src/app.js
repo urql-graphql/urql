@@ -1,20 +1,68 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link, withRouter, Router, Route } from "react-static";
 import { hot } from "react-hot-loader";
 import Template from "./template";
 import Analytics from "./google-analytics";
-
 // Routes generated at build-time
 import Routes from "react-static-routes";
 
+const scrollSidebar = async (location, activeItemClass = ".active") => {
+  const actives = document.querySelectorAll(activeItemClass);
+  const last = actives[actives.length - 1];
+  last.scrollIntoView();
+};
+
+const checkScrollRoutes = (pathname, routes = ["docs"]) =>
+  routes.some(r => pathname.includes(r));
+
+class ScrollToTop extends Component {
+  componentDidMount() {
+    if (
+      typeof window !== "undefined" &&
+      checkScrollRoutes(this.props.location.pathname)
+    ) {
+      scrollSidebar(this.props.location);
+    }
+  }
+
+  componentDidUpdate() {
+    if (
+      typeof window !== "undefined" &&
+      checkScrollRoutes(this.props.location.pathname)
+    ) {
+      scrollSidebar(this.props.location);
+    }
+  }
+
+  render() {
+    return <div>{this.props.children}</div>;
+  }
+}
+
+const WrappedScrollToTop = withRouter(ScrollToTop);
+
+let history;
+if (typeof window !== "undefined") {
+  const createBrowserHistory = require("history/createBrowserHistory").default;
+  history = createBrowserHistory();
+}
+
 const App = () => (
-  <Router>
-    <Analytics id="UA-43290258-1">
-      <Template>
-        <Routes />
-      </Template>
-    </Analytics>
+  <Router
+    showErrorsInProduction={false}
+    autoScrollToHash={false}
+    scrollToHashDuration={100}
+    autoScrollToTop
+    history={history}
+  >
+    <WrappedScrollToTop>
+      <Analytics id="UA-43290258-1">
+        <Template>
+          <Routes />
+        </Template>
+      </Analytics>
+    </WrappedScrollToTop>
   </Router>
 );
 
