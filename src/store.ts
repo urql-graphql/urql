@@ -71,7 +71,7 @@ class Store {
     }
 
     const entity = this.getOrCreateEntity(key);
-    if (val === null || val === undefined) {
+    if (val === undefined) {
       delete entity[prop];
     } else {
       entity[prop] = val;

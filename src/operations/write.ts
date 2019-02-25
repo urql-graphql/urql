@@ -67,7 +67,7 @@ const writeResolver: FieldResolver = (
   }
 
   // Clear stored field since it's not a scalar
-  store.writeEntityValue(parentKey, fieldName, null);
+  store.writeEntityValue(parentKey, fieldName, undefined);
 
   // Write link to store and keep traversing
   const link = linkOfEntity(fieldValue);
