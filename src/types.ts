@@ -24,13 +24,8 @@ export interface EntityFields {
 export type Entity = SystemFields & EntityFields;
 export type Link = null | string | Array<string | null>;
 
-export interface EntityMap {
-  [key: string]: Entity;
-}
-
-export interface LinkMap {
-  [key: string]: Link;
-}
+export type EntityMap = Map<string, Entity>;
+export type LinkMap = Map<string, Link>;
 
 export interface Result {
   dependencies: string[];
