@@ -1,8 +1,9 @@
 import graphql, { ExecInfo } from 'graphql-anywhere';
-import Cache from '../cache';
-import { keyForLink, keyOfEntity } from '../keys';
 
-import { Entity, GraphQLRequest, Link, Scalar } from '../types';
+import Cache from '../cache';
+import DepsCache from '../deps';
+import { keyForLink, keyOfEntity } from '../keys';
+import { CacheResult, Entity, Link, Request, Scalar } from '../types';
 
 // Determines whether a fieldValue consists of only entities
 const isLinkableEntity = (x: Scalar | Entity | Array<Entity | Scalar>) => {
@@ -70,16 +71,14 @@ const writeResolver = (
 
 const write = (
   cache: Cache,
-  request: GraphQLRequest,
+  request: Request,
   response: Entity
-): Entity => {
-  return graphql(
-    writeResolver,
-    request.query,
-    response,
-    cache,
-    request.variables
-  );
+): CacheResult => {
+  const depsCache = new DepsCache(cache);
+
+  graphql(writeResolver, request.query, response, depsCache, request.variables);
+
+  return { dependencies: depsCache.getDependencies() };
 };
 
 export default write;

@@ -5,9 +5,9 @@ export interface CacheData {
   links: LinkMap;
 }
 
-class Cache implements CacheData {
-  records: EntityMap;
-  links: LinkMap;
+class Cache {
+  private records: EntityMap;
+  private links: LinkMap;
 
   constructor(initial?: CacheData) {
     this.records = Object.create(null);
@@ -49,7 +49,7 @@ class Cache implements CacheData {
     }
   }
 
-  toJSON() {
+  toJSON(): CacheData {
     return { records: this.records, links: this.links };
   }
 }

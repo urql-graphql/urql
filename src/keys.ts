@@ -1,6 +1,6 @@
 import { Entity } from './types';
 
-const isOperation = (typeName: string) =>
+export const isOperation = (typeName: string) =>
   typeName === 'Query' ||
   typeName === 'Mutation' ||
   typeName === 'Subscription';
