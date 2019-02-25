@@ -1,3 +1,4 @@
+import stringify from 'fast-json-stable-stringify';
 import { Entity } from './types';
 
 export const isOperation = (typeName: string) =>
@@ -26,5 +27,5 @@ export const keyForLink = (
   args: null | object
 ) => {
   const key = `${parentKey}->${fieldName}`;
-  return args ? `${key}(${JSON.stringify(args)})` : key;
+  return args ? `${key}(${stringify(args)})` : key;
 };
