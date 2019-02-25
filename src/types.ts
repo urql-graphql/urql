@@ -1,5 +1,4 @@
 import { DocumentNode } from 'graphql';
-import { Dependencies } from './deps';
 
 export interface Request {
   query: DocumentNode;
@@ -30,6 +29,6 @@ export interface LinkMap {
 }
 
 export interface CacheResult {
-  dependencies: Dependencies;
+  dependencies: string[];
   response?: Entity;
 }

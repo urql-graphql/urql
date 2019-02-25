@@ -1,7 +1,6 @@
 import graphql, { ExecInfo } from 'graphql-anywhere';
 
 import Cache from '../cache';
-import DepsCache from '../deps';
 import { keyForLink, keyOfEntity } from '../keys';
 import { CacheResult, Entity, Link, Request } from '../types';
 
@@ -41,17 +40,16 @@ const queryResolver = (
 };
 
 const query = (cache: Cache, request: Request): CacheResult => {
-  const depsCache = new DepsCache(cache);
   const response = graphql(
     queryResolver,
     request.query,
     cache.getEntity('Query'),
-    depsCache,
+    cache,
     request.variables
   );
 
   return {
-    dependencies: depsCache.getDependencies(),
+    dependencies: cache.flushTouched(),
     response,
   };
 };

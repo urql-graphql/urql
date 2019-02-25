@@ -1,7 +1,6 @@
 import graphql, { ExecInfo } from 'graphql-anywhere';
 
 import Cache from '../cache';
-import DepsCache from '../deps';
 import { keyForLink, keyOfEntity } from '../keys';
 import { CacheResult, Entity, Link, Request, Scalar } from '../types';
 
@@ -74,11 +73,9 @@ const write = (
   request: Request,
   response: Entity
 ): CacheResult => {
-  const depsCache = new DepsCache(cache);
-
-  graphql(writeResolver, request.query, response, depsCache, request.variables);
-
-  return { dependencies: depsCache.getDependencies() };
+  graphql(writeResolver, request.query, response, cache, request.variables);
+  const dependencies = cache.flushTouched();
+  return { dependencies };
 };
 
 export default write;
