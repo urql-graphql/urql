@@ -42,7 +42,7 @@ const query = (store: Store, request: Request): Result => {
   const response = graphql(
     queryResolver,
     request,
-    store.getEntity('Query'),
+    store.getOrCreateEntity('Query'),
     store
   );
 

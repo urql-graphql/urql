@@ -21,17 +21,22 @@ class Store {
     }
   }
 
-  getEntity(key: string): Entity {
+  getEntity(key: string): null | Entity {
     if (!isOperation(key)) {
       this.touched.push(key);
     }
 
-    let entity = this.records[key];
-    if (entity === undefined) {
-      entity = this.records[key] = Object.create(null);
+    const entity = this.records[key];
+    return entity !== undefined ? entity : null;
+  }
+
+  getOrCreateEntity(key: string): Entity {
+    const entity = this.getEntity(key);
+    if (entity !== null) {
+      return entity;
     }
 
-    return entity;
+    return (this.records[key] = Object.create(null));
   }
 
   writeEntityValue(key: string, prop: string, val: any) {
@@ -39,7 +44,7 @@ class Store {
       this.touched.push(key);
     }
 
-    const entity = this.getEntity(key);
+    const entity = this.getOrCreateEntity(key);
     if (val === null || val === undefined) {
       delete entity[prop];
     } else {
