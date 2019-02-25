@@ -37,7 +37,7 @@ const writeResolver: FieldResolver = (
   fieldName,
   rootValue,
   args,
-  store,
+  { store },
   info
 ) => {
   const fieldValue = rootValue[info.resultKey || fieldName];
@@ -76,9 +76,10 @@ const writeResolver: FieldResolver = (
 };
 
 const write = (store: Store, request: Request, response: Entity): Result => {
-  graphql(writeResolver, request, response, store);
+  const context = { isComplete: true, store };
+  graphql(writeResolver, request, response, context);
   const dependencies = store.flushTouched();
-  return { dependencies };
+  return { isComplete: true, dependencies };
 };
 
 export default write;

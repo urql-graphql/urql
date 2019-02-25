@@ -18,7 +18,7 @@ const queryResolver: FieldResolver = (
   fieldName,
   rootValue,
   args,
-  store,
+  { store },
   info
 ) => {
   if (info.isLeaf) {
@@ -32,22 +32,40 @@ const queryResolver: FieldResolver = (
 
   const link = store.getLink(keyForLink(parentKey, fieldName, args));
   if (link === null || link === undefined) {
-    return rootValue[fieldName];
+    const fieldValue = rootValue[fieldName];
+    return fieldValue !== undefined ? fieldValue : null;
   }
 
   return entityOfLink(store, link);
 };
 
+const isCompleteResolver: FieldResolver = (
+  fieldName,
+  rootValue,
+  args,
+  context,
+  info
+) => {
+  const result = queryResolver(fieldName, rootValue, args, context, info);
+  if (context.isComplete && !info.isLeaf && result === null) {
+    context.isComplete = false;
+  }
+
+  return result;
+};
+
 const query = (store: Store, request: Request): Result => {
+  const context = { isComplete: true, store };
   const response = graphql(
-    queryResolver,
+    isCompleteResolver,
     request,
     store.getOrCreateEntity('Query'),
-    store
+    context
   );
 
   return {
     dependencies: store.flushTouched(),
+    isComplete: context.isComplete,
     response,
   };
 };

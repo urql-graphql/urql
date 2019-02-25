@@ -27,8 +27,14 @@ export type Link = null | string | Array<string | null>;
 export type EntityMap = Map<string, Entity>;
 export type LinkMap = Map<string, Link>;
 
+export interface Context {
+  store: Store;
+  isComplete?: boolean;
+}
+
 export interface Result {
   dependencies: string[];
+  isComplete?: boolean;
   response?: Entity;
 }
 
@@ -36,6 +42,6 @@ export type FieldResolver = (
   fieldName: string,
   rootValue: Entity,
   args: null | object,
-  store: Store,
+  context: Context,
   info: ExecInfo
 ) => FieldValue;
