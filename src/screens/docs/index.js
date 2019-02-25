@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { withRouter, withRouteData } from "react-static";
+import { withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
 
@@ -134,4 +134,4 @@ Docs.defaultProps = {
   params: null
 };
 
-export default withRouter(withRouteData(Docs));
+export default withRouteData(Docs);

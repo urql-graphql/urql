@@ -109,12 +109,11 @@ class Sidebar extends React.Component {
             />
           </Link>
           <ContentWrapper overlay={overlay}>
-            <SidebarNavItem to={`/#`} replace key={"home"}>
+            <SidebarNavItem to={`/#`} key={"home"}>
               Home
             </SidebarNavItem>
             <SidebarNavItem
               to={`/docs/getting-started`}
-              replace
               key={"documentation"}
             >
               Documentation

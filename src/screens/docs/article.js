@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { withRouteData, withRouter } from "react-static";
+import { withRouteData } from "react-static";
 import Prism from "prismjs";
 import { Markdown } from "../../components/markdown";
 
@@ -52,4 +52,4 @@ Article.defaultProps = {
   params: null
 };
 
-export default withRouteData(withRouter(Article));
+export default withRouteData(Article);

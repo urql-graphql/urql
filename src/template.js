@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Footer } from "./components/footer";
 import { GlobalStyle } from "./global-style";
-import { withRouter } from "react-static";
 
 class Template extends React.Component {
   render() {
@@ -24,4 +23,4 @@ Template.defaultProps = {
   children: null
 };
 
-export default withRouter(Template);
+export default Template;
