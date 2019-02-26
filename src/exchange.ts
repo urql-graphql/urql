@@ -4,9 +4,9 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 import { query, write } from './operations';
 import Store, { StoreData } from './store';
 
-interface CacheOpts {
-  initial?: StoreData;
-}
+type OperationResultWithMeta = OperationResult & {
+  isComplete: boolean;
+};
 
 type OperationMap = Map<number, Operation>;
 
@@ -33,6 +33,10 @@ const isQueryOperation = (op: Operation): boolean => {
       policy === 'cache-only')
   );
 };
+
+interface CacheOpts {
+  initial?: StoreData;
+}
 
 export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
   forward,
@@ -63,7 +67,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
     dependencies.forEach(dep => {
       const keys = deps[dep];
       if (keys !== undefined) {
-        delete deps[dep];
+        deps[dep] = [];
         keys.forEach(key => pendingOperations.add(key));
       }
     });
@@ -84,6 +88,23 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       ops.set(op.key, op);
       keys.push(op.key);
     });
+  };
+
+  const operationResultFromCache = (
+    operation: Operation
+  ): OperationResultWithMeta => {
+    const policy = getRequestPolicy(operation);
+    const res = query(store, operation);
+    const isComplete = policy === 'cache-only' || res.isComplete;
+    if (isComplete) {
+      updateDependencies(operation, res.dependencies);
+    }
+
+    return {
+      operation,
+      isComplete,
+      data: res.response,
+    };
   };
 
   const updateCacheWithResult = ({
@@ -110,53 +131,22 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       share
     );
 
-    const query$ = pipe(
+    const cache$ = pipe(
       sharedOps$,
       filter(op => isQueryOperation(op)),
+      map(operationResultFromCache),
       share
     );
 
-    const cacheOnlyResult$ = pipe(
-      query$,
-      filter(op => getRequestPolicy(op) === 'cache-only'),
-      map(
-        (operation): OperationResult => {
-          const { dependencies, response } = query(store, operation);
-          updateDependencies(operation, dependencies);
-          return { operation, data: response };
-        }
-      )
-    );
-
-    const cacheFirst$ = pipe(
-      query$,
-      filter(op => {
-        const policy = getRequestPolicy(op);
-        return policy === 'cache-first' || policy === 'cache-and-network';
-      }),
-      map(
-        (operation): OperationResult => {
-          const res = query(store, operation);
-          if (!res.isComplete) {
-            return { operation };
-          }
-
-          updateDependencies(operation, res.dependencies);
-          return { operation, data: res.response };
-        }
-      ),
-      share
-    );
-
-    const cacheFirstOps$ = pipe(
-      cacheFirst$,
-      filter(res => res.data === undefined && res.error === undefined),
+    const cacheOps$ = pipe(
+      cache$,
+      filter(res => !res.isComplete),
       map(res => res.operation)
     );
 
-    const cacheFirstResult$ = pipe(
-      cacheFirst$,
-      filter(res => res.data !== undefined),
+    const cacheResult$ = pipe(
+      cache$,
+      filter(res => res.isComplete),
       tap(({ operation }) => {
         const policy = getRequestPolicy(operation);
         if (policy === 'cache-and-network') {
@@ -172,10 +162,10 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
     );
 
     const result$ = pipe(
-      forward(merge([forwardOps$, cacheFirstOps$])),
+      forward(merge([forwardOps$, cacheOps$])),
       tap(updateCacheWithResult)
     );
 
-    return merge([result$, cacheOnlyResult$, cacheFirstResult$]);
+    return merge([result$, cacheResult$]);
   };
 };
