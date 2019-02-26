@@ -23,7 +23,7 @@ const addTypeNames = (op: Operation): Operation => ({
 // Retrieves the requestPolicy from an operation
 const getRequestPolicy = (op: Operation) => op.context.requestPolicy;
 
-// Returns whether an operation is handled by this exchange
+// Returns whether an operation is a query
 const isQueryOperation = (op: Operation): boolean => {
   const policy = getRequestPolicy(op);
   return (
@@ -34,6 +34,26 @@ const isQueryOperation = (op: Operation): boolean => {
   );
 };
 
+// Returns whether an operation is handled by this exchange
+const isCacheableQuery = (op: Operation): boolean => {
+  const policy = getRequestPolicy(op);
+  return (
+    isQueryOperation(op) &&
+    (policy === 'cache-and-network' ||
+      policy === 'cache-first' ||
+      policy === 'cache-only')
+  );
+};
+
+// Copy an operation and change the requestPolicy to skip the cache
+const toNetworkOnly = (operation: Operation): Operation => ({
+  ...operation,
+  context: {
+    ...operation.context,
+    requestPolicy: 'network-only',
+  },
+});
+
 export const cacheExchange = (opts: StoreOpts): Exchange => ({
   forward,
   client,
@@ -41,15 +61,6 @@ export const cacheExchange = (opts: StoreOpts): Exchange => ({
   const store = new Store(opts);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
-
-  // Copy an operation and change the requestPolicy to skip the cache
-  const toNetworkOnly = (operation: Operation): Operation => ({
-    ...operation,
-    context: {
-      ...operation.context,
-      requestPolicy: 'network-only',
-    },
-  });
 
   // This accepts an array of dependencies and reexecutes all known operations
   // against the mapping of dependencies to operations
@@ -125,8 +136,10 @@ export const cacheExchange = (opts: StoreOpts): Exchange => ({
 
       // Update operations that depend on the updated data (except the current one)
       processDependencies(operation, dependencies);
-      // Update this operation's dependencies
-      updateDependencies(operation, dependencies);
+      // Update this operation's dependencies if it's a query
+      if (isQueryOperation(operation)) {
+        updateDependencies(operation, dependencies);
+      }
     }
   };
 
@@ -140,7 +153,7 @@ export const cacheExchange = (opts: StoreOpts): Exchange => ({
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
       sharedOps$,
-      filter(op => isQueryOperation(op)),
+      filter(op => isCacheableQuery(op)),
       map(operationResultFromCache),
       share
     );
@@ -173,7 +186,7 @@ export const cacheExchange = (opts: StoreOpts): Exchange => ({
         merge([
           pipe(
             sharedOps$,
-            filter(op => !isQueryOperation(op))
+            filter(op => !isCacheableQuery(op))
           ),
           cacheOps$,
         ])
