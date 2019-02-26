@@ -1,3 +1,4 @@
+import stringify from 'fast-json-stable-stringify';
 import { DocumentNode, print } from 'graphql';
 
 interface NameCache {
@@ -78,5 +79,5 @@ export const getKeyForRequest = (
     return docKey;
   }
 
-  return hash('' + docKey + JSON.stringify(vars));
+  return hash('' + docKey + stringify(vars));
 };
