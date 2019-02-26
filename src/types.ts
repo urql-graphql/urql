@@ -15,6 +15,8 @@ export interface SystemFields {
   id?: Scalar;
 }
 
+export type KeyExtractor = (entity: Entity) => void | null | string;
+
 export type FieldValue = Entity | Scalar | Array<Entity | Scalar>;
 
 export interface EntityFields {
@@ -26,10 +28,12 @@ export type Link = null | string | Array<string | null>;
 
 export type EntityMap = Map<string, Entity>;
 export type LinkMap = Map<string, Link>;
+export type CacheOperation = 'query' | 'write';
 
 export interface Context {
   store: Store;
-  isComplete?: boolean;
+  operation: CacheOperation;
+  isComplete: boolean;
 }
 
 export interface Result {
@@ -46,4 +50,14 @@ export type FieldResolver = (
   info: ExecInfo
 ) => FieldValue;
 
-export type KeyExtractor = (entity: Entity) => void | null | string;
+export type CacheResolver = (
+  args: null | object,
+  context: Context,
+  info: ExecInfo
+) => FieldValue | void;
+
+export interface CacheResolvers {
+  [typeName: string]: {
+    [fieldName: string]: CacheResolver;
+  };
+}

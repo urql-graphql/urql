@@ -1,5 +1,6 @@
 import Store from '../store';
 import { graphql, keyForLink } from '../utils';
+import { makeCustomResolver } from './custom';
 
 import {
   Entity,
@@ -74,9 +75,15 @@ const writeResolver: FieldResolver = (
   return fieldValue;
 };
 
+const resolver = makeCustomResolver(writeResolver);
+
 const write = (store: Store, request: Request, response: Entity): Result => {
-  const context = { isComplete: true, store };
-  graphql(writeResolver, request, response, context);
+  graphql(resolver, request, response, {
+    isComplete: true,
+    store,
+    operation: 'write',
+  });
+
   const dependencies = store.flushTouched();
   return { isComplete: true, dependencies };
 };

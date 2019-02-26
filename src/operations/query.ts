@@ -1,6 +1,7 @@
 import Store from '../store';
-import { FieldResolver, Link, Request, Result } from '../types';
+import { Context, FieldResolver, Link, Request, Result } from '../types';
 import { graphql, keyForLink } from '../utils';
+import { makeCustomResolver } from './custom';
 
 const entityOfLink = (store: Store, link: Link) => {
   if (Array.isArray(link)) {
@@ -50,10 +51,13 @@ const queryResolver: FieldResolver = (
   return entity;
 };
 
+const resolver = makeCustomResolver(queryResolver);
+
 const query = (store: Store, request: Request): Result => {
-  const context = { isComplete: true, store };
+  const context: Context = { isComplete: true, store, operation: 'query' };
+
   const response = graphql(
-    queryResolver,
+    resolver,
     request,
     store.getOrCreateEntity('Query'),
     context

@@ -1,4 +1,13 @@
-import { Entity, EntityMap, KeyExtractor, Link, LinkMap } from './types';
+import {
+  CacheResolver,
+  CacheResolvers,
+  Entity,
+  EntityMap,
+  KeyExtractor,
+  Link,
+  LinkMap,
+} from './types';
+
 import {
   assignObjectToMap,
   isOperation,
@@ -18,19 +27,22 @@ export interface StoreData {
 export interface StoreOpts {
   initial?: StoreData;
   keyExtractor?: KeyExtractor;
+  resolvers?: CacheResolvers;
 }
 
 class Store {
   private touched: string[];
   private records: EntityMap;
   private links: LinkMap;
+  private resolvers: CacheResolvers;
 
   public keyOfEntity: (entity: Entity) => null | string;
 
-  constructor({ initial, keyExtractor }: StoreOpts) {
+  constructor({ initial, keyExtractor, resolvers }: StoreOpts) {
     this.touched = [];
     this.records = new Map();
     this.links = new Map();
+    this.resolvers = resolvers || {};
 
     if (keyExtractor !== undefined) {
       this.keyOfEntity = (entity: Entity) => {
@@ -45,6 +57,18 @@ class Store {
       assignObjectToMap(this.records, initial.records);
       assignObjectToMap(this.links, initial.links);
     }
+  }
+
+  getResolver(
+    typeName: string | null | void,
+    fieldName: string
+  ): CacheResolver | void {
+    if (typeName === null || typeName === undefined) {
+      return undefined;
+    }
+
+    const typeResolvers = this.resolvers[typeName];
+    return typeResolvers !== undefined ? typeResolvers[fieldName] : undefined;
   }
 
   getEntity(key: string): null | Entity {
