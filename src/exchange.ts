@@ -83,8 +83,11 @@ export const cacheExchange = (opts: StoreOpts): Exchange => ({
   const updateDependencies = (op: Operation, dependencies: string[]) => {
     dependencies.forEach(dep => {
       const keys = deps[dep] || (deps[dep] = []);
-      ops.set(op.key, op);
       keys.push(op.key);
+
+      if (!ops.has(op.key)) {
+        ops.set(op.key, op);
+      }
     });
   };
 
