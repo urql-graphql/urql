@@ -47,6 +47,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 
+  // Copy an operation and change the requestPolicy to skip the cache
   const toNetworkOnly = (operation: Operation): Operation => ({
     ...operation,
     context: {
@@ -64,6 +65,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
   ) => {
     const pendingOperations = new Set<number>();
 
+    // Collect operations that will be updated due to cache changes
     dependencies.forEach(dep => {
       const keys = deps[dep];
       if (keys !== undefined) {
@@ -72,6 +74,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       }
     });
 
+    // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
       if (key !== triggerOp.key) {
         const op = ops.get(key) as Operation;
@@ -90,6 +93,8 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
     });
   };
 
+  // Retrieves a query result from cache and adds an `isComplete` hint
+  // This hint indicates whether the result is "complete" or not
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
@@ -107,6 +112,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
     };
   };
 
+  // Take any OperationResult and update the cache with it
   const updateCacheWithResult = ({
     error,
     data,
@@ -119,7 +125,9 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
     ) {
       const { dependencies } = write(store, operation, data);
 
+      // Update operations that depend on the updated data (except the current one)
       processDependencies(operation, dependencies);
+      // Update this operation's dependencies
       updateDependencies(operation, dependencies);
     }
   };
@@ -131,6 +139,7 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       share
     );
 
+    // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
       sharedOps$,
       filter(op => isQueryOperation(op)),
@@ -138,12 +147,15 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       share
     );
 
+    // Rebound operations that are incomplete, i.e. couldn't be queried just from the cache
     const cacheOps$ = pipe(
       cache$,
       filter(res => !res.isComplete),
       map(res => res.operation)
     );
 
+    // Resolve OperationResults that the cache was able to assemble completely and trigger
+    // a network request if the current operation's policy is cache-and-network
     const cacheResult$ = pipe(
       cache$,
       filter(res => res.isComplete),
@@ -156,13 +168,18 @@ export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
       })
     );
 
-    const forwardOps$ = pipe(
-      sharedOps$,
-      filter(op => !isQueryOperation(op))
-    );
-
+    // Forward operations that aren't cacheable and rebound operations
+    // Also update the cache with any network results
     const result$ = pipe(
-      forward(merge([forwardOps$, cacheOps$])),
+      forward(
+        merge([
+          pipe(
+            sharedOps$,
+            filter(op => !isQueryOperation(op))
+          ),
+          cacheOps$,
+        ])
+      ),
       tap(updateCacheWithResult)
     );
 
