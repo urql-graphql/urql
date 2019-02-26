@@ -1,6 +1,6 @@
 import Store from '../store';
 import { FieldResolver, Link, Request, Result } from '../types';
-import { graphql, keyForLink, keyOfEntity } from '../utils';
+import { graphql, keyForLink } from '../utils';
 
 const entityOfLink = (store: Store, link: Link) => {
   if (Array.isArray(link)) {
@@ -24,13 +24,13 @@ const queryResolver: FieldResolver = (
     return rootValue[fieldName];
   }
 
-  const parentKey = keyOfEntity(rootValue);
+  const { store } = context;
+  const parentKey = store.keyOfEntity(rootValue);
   if (parentKey === null) {
     context.isComplete = false;
     return null;
   }
 
-  const { store } = context;
   const link = store.getLink(keyForLink(parentKey, fieldName, args));
   if (link === null || link === undefined) {
     const fieldValue = rootValue[fieldName];

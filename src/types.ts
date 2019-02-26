@@ -45,3 +45,5 @@ export type FieldResolver = (
   context: Context,
   info: ExecInfo
 ) => FieldValue;
+
+export type KeyExtractor = (entity: Entity) => void | null | string;

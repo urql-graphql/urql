@@ -1,24 +1,10 @@
-import { Entity, EntityMap, Link, LinkMap } from './types';
-import { isOperation } from './utils';
-
-const assignObjectToMap = <T>(
-  map: Map<string, T>,
-  obj: { [key: string]: T }
-) => {
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      map.set(key, obj[key]);
-    }
-  }
-};
-
-const objectOfMap = <T>(map: Map<string, T>): { [key: string]: T } => {
-  const res = Object.create(null);
-  map.forEach((value, key) => {
-    res[key] = value;
-  });
-  return res;
-};
+import { Entity, EntityMap, KeyExtractor, Link, LinkMap } from './types';
+import {
+  assignObjectToMap,
+  isOperation,
+  keyOfEntity,
+  objectOfMap,
+} from './utils';
 
 export interface StoreData {
   records: {
@@ -29,15 +15,31 @@ export interface StoreData {
   };
 }
 
+export interface StoreOpts {
+  initial?: StoreData;
+  keyExtractor?: KeyExtractor;
+}
+
 class Store {
   private touched: string[];
   private records: EntityMap;
   private links: LinkMap;
 
-  constructor(initial?: StoreData) {
+  public keyOfEntity: (entity: Entity) => null | string;
+
+  constructor({ initial, keyExtractor }: StoreOpts) {
     this.touched = [];
     this.records = new Map();
     this.links = new Map();
+
+    if (keyExtractor !== undefined) {
+      this.keyOfEntity = (entity: Entity) => {
+        const key = keyExtractor(entity);
+        return key !== undefined ? key : keyOfEntity(entity);
+      };
+    } else {
+      this.keyOfEntity = keyOfEntity;
+    }
 
     if (initial !== undefined) {
       assignObjectToMap(this.records, initial.records);

@@ -1,5 +1,5 @@
 import Store from '../store';
-import { graphql, keyForLink, keyOfEntity } from '../utils';
+import { graphql, keyForLink } from '../utils';
 
 import {
   Entity,
@@ -11,25 +11,25 @@ import {
 } from '../types';
 
 // Determines whether a fieldValue consists of only entities
-const isLinkableEntity = (x: FieldValue) => {
+const isLinkableEntity = (store: Store, x: FieldValue) => {
   if (Array.isArray(x)) {
     // @ts-ignore
-    return x.every(isLinkableEntity);
+    return x.every(inner => isLinkableEntity(store, inner));
   }
 
-  return x === null || (typeof x === 'object' && keyOfEntity(x) !== null);
+  return x === null || (typeof x === 'object' && store.keyOfEntity(x) !== null);
 };
 
 // Transforms a fieldValue to keys of entities
-const linkOfEntity = (x: FieldValue): Link => {
+const linkOfEntity = (store: Store, x: FieldValue): Link => {
   if (Array.isArray(x)) {
     // @ts-ignore
-    return x.map(linkOfEntity);
+    return x.map(inner => linkOfEntity(store, inner));
   } else if (x === null || typeof x !== 'object') {
     return null;
   }
 
-  return keyOfEntity(x);
+  return store.keyOfEntity(x);
 };
 
 const writeResolver: FieldResolver = (
@@ -40,7 +40,7 @@ const writeResolver: FieldResolver = (
   info
 ) => {
   const fieldValue = rootValue[info.resultKey || fieldName];
-  const parentKey = keyOfEntity(rootValue);
+  const parentKey = store.keyOfEntity(rootValue);
 
   if (parentKey === null) {
     return null;
@@ -58,7 +58,7 @@ const writeResolver: FieldResolver = (
   }
 
   // Determine if this is a link and not a scalar
-  const shouldCreateLink = isLinkableEntity(fieldValue);
+  const shouldCreateLink = isLinkableEntity(store, fieldValue);
   if (!shouldCreateLink) {
     // Write object-like scalar to parent
     store.writeEntityValue(parentKey, fieldName, fieldValue);
@@ -69,7 +69,7 @@ const writeResolver: FieldResolver = (
   store.writeEntityValue(parentKey, fieldName, undefined);
 
   // Write link to store and keep traversing
-  const link = linkOfEntity(fieldValue);
+  const link = linkOfEntity(store, fieldValue);
   store.writeLink(keyForLink(parentKey, fieldName, args), link);
   return fieldValue;
 };

@@ -2,7 +2,7 @@ import { Exchange, formatDocument, Operation, OperationResult } from 'urql';
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write } from './operations';
-import Store, { StoreData } from './store';
+import Store, { StoreOpts } from './store';
 
 type OperationResultWithMeta = OperationResult & {
   isComplete: boolean;
@@ -34,16 +34,11 @@ const isQueryOperation = (op: Operation): boolean => {
   );
 };
 
-interface CacheOpts {
-  initial?: StoreData;
-}
-
-export const cacheExchange = ({ initial }: CacheOpts): Exchange => ({
+export const cacheExchange = (opts: StoreOpts): Exchange => ({
   forward,
   client,
 }) => {
-  const store = new Store(initial);
-
+  const store = new Store(opts);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 
