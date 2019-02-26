@@ -1,6 +1,5 @@
-import graphql from '../exec';
-import { keyForLink, keyOfEntity } from '../keys';
 import Store from '../store';
+import { graphql, keyForLink, keyOfEntity } from '../utils';
 
 import {
   Entity,

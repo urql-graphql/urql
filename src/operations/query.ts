@@ -1,7 +1,6 @@
-import graphql from '../exec';
-import { keyForLink, keyOfEntity } from '../keys';
 import Store from '../store';
 import { FieldResolver, Link, Request, Result } from '../types';
+import { graphql, keyForLink, keyOfEntity } from '../utils';
 
 const entityOfLink = (store: Store, link: Link) => {
   if (Array.isArray(link)) {

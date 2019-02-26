@@ -1,5 +1,5 @@
 import stringify from 'fast-json-stable-stringify';
-import { Entity } from './types';
+import { Entity } from '../types';
 
 export const isOperation = (typeName: string) =>
   typeName === 'Query' ||

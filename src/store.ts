@@ -1,5 +1,5 @@
-import { isOperation } from './keys';
 import { Entity, EntityMap, Link, LinkMap } from './types';
+import { isOperation } from './utils';
 
 const assignObjectToMap = <T>(
   map: Map<string, T>,
