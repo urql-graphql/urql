@@ -1,18 +1,7 @@
 import Store from '../store';
-import { Context, FieldResolver, Link, Request, Result } from '../types';
+import { Context, FieldResolver, Request, Result } from '../types';
 import { graphql, keyForLink } from '../utils';
 import { makeCustomResolver } from './custom';
-
-const entityOfLink = (store: Store, link: Link) => {
-  if (Array.isArray(link)) {
-    // @ts-ignore
-    return link.map(inner => entityOfLink(store, inner));
-  } else if (link === null || typeof link !== 'string') {
-    return null;
-  }
-
-  return store.getEntity(link);
-};
 
 const queryResolver: FieldResolver = (
   fieldName,
@@ -43,7 +32,7 @@ const queryResolver: FieldResolver = (
     return fieldValue;
   }
 
-  const entity = entityOfLink(store, link);
+  const entity = store.getEntityFromLink(link);
   if (entity === null) {
     context.isComplete = false;
   }

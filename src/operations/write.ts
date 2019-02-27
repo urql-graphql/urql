@@ -1,37 +1,7 @@
 import Store from '../store';
+import { Entity, FieldResolver, Request, Result } from '../types';
 import { graphql, keyForLink } from '../utils';
 import { makeCustomResolver } from './custom';
-
-import {
-  Entity,
-  FieldResolver,
-  FieldValue,
-  Link,
-  Request,
-  Result,
-} from '../types';
-
-// Determines whether a fieldValue consists of only entities
-const isLinkableEntity = (store: Store, x: FieldValue) => {
-  if (Array.isArray(x)) {
-    // @ts-ignore
-    return x.every(inner => isLinkableEntity(store, inner));
-  }
-
-  return x === null || (typeof x === 'object' && store.keyOfEntity(x) !== null);
-};
-
-// Transforms a fieldValue to keys of entities
-const linkOfEntity = (store: Store, x: FieldValue): Link => {
-  if (Array.isArray(x)) {
-    // @ts-ignore
-    return x.map(inner => linkOfEntity(store, inner));
-  } else if (x === null || typeof x !== 'object') {
-    return null;
-  }
-
-  return store.keyOfEntity(x);
-};
 
 const writeResolver: FieldResolver = (
   fieldName,
@@ -59,7 +29,7 @@ const writeResolver: FieldResolver = (
   }
 
   // Determine if this is a link and not a scalar
-  const shouldCreateLink = isLinkableEntity(store, fieldValue);
+  const shouldCreateLink = store.isLinkableEntity(fieldValue);
   if (!shouldCreateLink) {
     // Write object-like scalar to parent
     store.writeEntityValue(parentKey, fieldName, fieldValue);
@@ -70,7 +40,7 @@ const writeResolver: FieldResolver = (
   store.writeEntityValue(parentKey, fieldName, undefined);
 
   // Write link to store and keep traversing
-  const link = linkOfEntity(store, fieldValue);
+  const link = store.linkOfEntity(fieldValue);
   store.writeLink(keyForLink(parentKey, fieldName, args), link);
   return fieldValue;
 };

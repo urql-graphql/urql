@@ -3,6 +3,7 @@ import {
   CacheResolvers,
   Entity,
   EntityMap,
+  FieldValue,
   KeyExtractor,
   Link,
   LinkMap,
@@ -71,6 +72,28 @@ class Store {
     return typeResolvers !== undefined ? typeResolvers[fieldName] : undefined;
   }
 
+  isLinkableEntity = (x: FieldValue): boolean => {
+    if (Array.isArray(x)) {
+      // @ts-ignore
+      return x.every(this.isLinkableEntity);
+    }
+
+    return (
+      x === null || (typeof x === 'object' && this.keyOfEntity(x) !== null)
+    );
+  };
+
+  linkOfEntity = (x: FieldValue): Link => {
+    if (Array.isArray(x)) {
+      // @ts-ignore
+      return x.map(this.linkOfEntity);
+    } else if (x === null || typeof x !== 'object') {
+      return null;
+    }
+
+    return this.keyOfEntity(x);
+  };
+
   getEntity(key: string): null | Entity {
     if (!isOperation(key)) {
       this.touched.push(key);
@@ -109,6 +132,17 @@ class Store {
     const link = this.links.get(key);
     return link !== undefined ? link : null;
   }
+
+  getEntityFromLink = (link: Link): FieldValue => {
+    if (Array.isArray(link)) {
+      // @ts-ignore
+      return link.map(this.getEntityFromLink);
+    } else if (link === null || typeof link !== 'string') {
+      return null;
+    }
+
+    return this.getEntity(link);
+  };
 
   writeLink(key: string, link: Link) {
     this.touched.push(key);
