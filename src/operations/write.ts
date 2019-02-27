@@ -13,12 +13,12 @@ const writeResolver: FieldResolver = (
   const fieldValue = rootValue[info.resultKey || fieldName];
   const parentKey = store.keyOfEntity(rootValue);
 
-  if (parentKey === null) {
+  if (parentKey === null || fieldValue === undefined) {
     return null;
   } else if (parentKey === 'Mutation' || parentKey === 'Subscription') {
     // We do traverse but we don't store Mutation & Subscription themselves
     return fieldValue;
-  } else if (fieldValue === null || fieldValue === undefined) {
+  } else if (fieldValue === null) {
     // Clear stored field since value is null
     store.writeEntityValue(parentKey, fieldName, null);
     return null;
