@@ -49,7 +49,7 @@ First install `urql` and `graphql`:
 ```sh
 yarn add urql graphql
 # or
-npm intall --save urql graphql
+npm install --save urql graphql
 ```
 
 Create a client for your endpoint url and wrap your app with a `<Provider>` component which `urql` exposes:
@@ -66,7 +66,7 @@ ReactDOM.render(
     <YourApp />
   </Provider>,
   document.body
-)
+);
 ```
 
 This allows you to now use the `<Query>` component to fetch data from your server:
@@ -74,11 +74,11 @@ This allows you to now use the `<Query>` component to fetch data from your serve
 ```js
 import { Query } from 'urql';
 
-<Query query="{ todos { id } }">{
-  ({ fetching, data }) => fetching
-    ? <Loading />
-    : <List data={data.todos} />
-}</Query>;
+<Query query="{ todos { id } }">
+  {({ fetching, data }) =>
+    fetching ? <Loading /> : <List data={data.todos} />
+  }
+</Query>;
 ```
 
 Alternatively you can take advantage of the `useQuery` hook in your function component:
@@ -87,7 +87,7 @@ Alternatively you can take advantage of the `useQuery` hook in your function com
 import { useQuery } from 'urql';
 
 const YourComponent = () => {
-  const [{ fetching, data }] = useQuery(`{ todos { id } }`);
+  const [{ fetching, data }] = useQuery({ query: `{ todos { id } }` });
   return fetching ? <Loading /> : <List data={data.todos} />;
 };
 ```
