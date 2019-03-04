@@ -18,7 +18,7 @@ export const getSelectionSet = (node: {
 
 export const isOperationNode = (
   node: DefinitionNode
-): node is OperationDefinitionNode => node.kind === 'FragmentDefinition';
+): node is OperationDefinitionNode => node.kind === 'OperationDefinition';
 
 export const isFragmentNode = (
   node: DefinitionNode

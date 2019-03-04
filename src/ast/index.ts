@@ -16,6 +16,7 @@ import {
   isFragmentNode,
   isOperationNode,
 } from './node';
+
 import { FragmentSelectionSets, VarsMap } from './types';
 import { evaluateValueNode } from './value';
 
