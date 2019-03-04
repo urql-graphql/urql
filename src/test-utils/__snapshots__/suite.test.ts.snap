@@ -1,0 +1,325 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`embedded object on entity 1`] = `
+Object {
+  "links": Object {
+    "Item:1.author": "Item:1.author",
+    "query.item": "Item:1",
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "author": null,
+      "id": 1,
+    },
+    "Item:1.author": Object {
+      "__typename": "Author",
+      "name": "Stanley",
+    },
+    "query": Object {
+      "item": null,
+    },
+  },
+}
+`;
+
+exports[`embedded object on entity 2`] = `
+Array [
+  "query",
+  "Item:1",
+  "Item:1.author",
+]
+`;
+
+exports[`embedded object on entity 3`] = `
+Object {
+  "links": Object {
+    "Item:1.author": "Author:1",
+    "query.item": "Item:1",
+  },
+  "records": Object {
+    "Author:1": Object {
+      "__typename": "Author",
+      "id": 1,
+      "name": "Stanley",
+    },
+    "Item:1": Object {
+      "__typename": "Item",
+      "author": null,
+      "id": 1,
+    },
+    "query": Object {
+      "item": null,
+    },
+  },
+}
+`;
+
+exports[`embedded object on entity 4`] = `
+Array [
+  "query",
+  "Item:1",
+  "Author:1",
+]
+`;
+
+exports[`entity list on query 1`] = `
+Object {
+  "links": Object {
+    "query.items": Array [
+      "Item:1",
+      "Item:2",
+    ],
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": 1,
+    },
+    "Item:2": Object {
+      "__typename": "Item",
+      "id": 2,
+    },
+    "query": Object {
+      "items": null,
+    },
+  },
+}
+`;
+
+exports[`entity list on query 2`] = `
+Array [
+  "query",
+  "Item:1",
+  "Item:2",
+]
+`;
+
+exports[`entity on query 1`] = `
+Object {
+  "links": Object {
+    "query.item": "Item:1",
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": "1",
+      "name": "Test",
+    },
+    "query": Object {
+      "item": null,
+    },
+  },
+}
+`;
+
+exports[`entity on query 2`] = `
+Array [
+  "query",
+  "Item:1",
+]
+`;
+
+exports[`entity with Int-like ID on query 1`] = `
+Object {
+  "links": Object {
+    "query.item": "Item:1",
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": 1,
+      "name": "Test",
+    },
+    "query": Object {
+      "item": null,
+    },
+  },
+}
+`;
+
+exports[`entity with Int-like ID on query 2`] = `
+Array [
+  "query",
+  "Item:1",
+]
+`;
+
+exports[`entity with arguments on query 1`] = `
+Object {
+  "links": Object {
+    "query.item({\\"test\\":true})": "Item:1",
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": "1",
+      "name": "Test",
+    },
+    "query": Object {
+      "item({\\"test\\":true})": null,
+    },
+  },
+}
+`;
+
+exports[`entity with arguments on query 2`] = `
+Array [
+  "query",
+  "Item:1",
+]
+`;
+
+exports[`int field with arguments on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "query": Object {
+      "int({\\"test\\":true})": 42,
+    },
+  },
+}
+`;
+
+exports[`int field with arguments on query 2`] = `
+Array [
+  "query",
+]
+`;
+
+exports[`int on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "query": Object {
+      "int": 42,
+    },
+  },
+}
+`;
+
+exports[`int on query 2`] = `
+Array [
+  "query",
+]
+`;
+
+exports[`json on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "query": Object {
+      "json": Object {
+        "__typename": "Misleading",
+        "test": true,
+      },
+    },
+  },
+}
+`;
+
+exports[`json on query 2`] = `
+Array [
+  "query",
+]
+`;
+
+exports[`nested entity list on query 1`] = `
+Object {
+  "links": Object {
+    "query.items": Array [
+      "Item:1",
+      Array [
+        "Item:2",
+        null,
+      ],
+      null,
+    ],
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": 1,
+    },
+    "Item:2": Object {
+      "__typename": "Item",
+      "id": 2,
+    },
+    "query": Object {
+      "items": null,
+    },
+  },
+}
+`;
+
+exports[`nested entity list on query 2`] = `
+Array [
+  "query",
+  "Item:1",
+  "Item:2",
+]
+`;
+
+exports[`non-IDable entity on query 1`] = `
+Object {
+  "links": Object {
+    "query.item": "query.item",
+  },
+  "records": Object {
+    "query": Object {
+      "item": null,
+    },
+    "query.item": Object {
+      "__typename": "Item",
+      "name": "Test",
+    },
+  },
+}
+`;
+
+exports[`non-IDable entity on query 2`] = `
+Array [
+  "query",
+  "query.item",
+]
+`;
+
+exports[`non-keyable entity on query 1`] = `
+Object {
+  "links": Object {
+    "query.item": "query.item",
+  },
+  "records": Object {
+    "query": Object {
+      "item": null,
+    },
+    "query.item": Object {
+      "name": "Test",
+    },
+  },
+}
+`;
+
+exports[`non-keyable entity on query 2`] = `
+Array [
+  "query",
+  "query.item",
+]
+`;
+
+exports[`nullable field on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "query": Object {
+      "missing": null,
+    },
+  },
+}
+`;
+
+exports[`nullable field on query 2`] = `
+Array [
+  "query",
+]
+`;
