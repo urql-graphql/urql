@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`passes the "getting-started" example 1`] = `
+Object {
+  "links": Object {
+    "query.todos": Array [
+      "Todo:0",
+      "Todo:1",
+      "Todo:2",
+    ],
+  },
+  "records": Object {
+    "Todo:0": Object {
+      "__typename": "Todo",
+      "complete": false,
+      "id": "0",
+      "text": "Go to the shops",
+    },
+    "Todo:1": Object {
+      "__typename": "Todo",
+      "complete": true,
+      "id": "1",
+      "text": "Pick up the kids",
+    },
+    "Todo:2": Object {
+      "__typename": "Todo",
+      "complete": false,
+      "id": "2",
+      "text": "Install urql",
+    },
+    "query": Object {
+      "todos": null,
+    },
+  },
+}
+`;
+
+exports[`passes the "getting-started" example 2`] = `
+Object {
+  "links": Object {
+    "query.todos": Array [
+      "Todo:0",
+      "Todo:1",
+      "Todo:2",
+    ],
+  },
+  "records": Object {
+    "Todo:0": Object {
+      "__typename": "Todo",
+      "complete": false,
+      "id": "0",
+      "text": "Go to the shops",
+    },
+    "Todo:1": Object {
+      "__typename": "Todo",
+      "complete": true,
+      "id": "1",
+      "text": "Pick up the kids",
+    },
+    "Todo:2": Object {
+      "__typename": "Todo",
+      "complete": true,
+      "id": "2",
+      "text": "Install urql",
+    },
+    "query": Object {
+      "todos": null,
+    },
+  },
+}
+`;
