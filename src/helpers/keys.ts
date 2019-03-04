@@ -1,12 +1,13 @@
 import stringify from 'fast-json-stable-stringify';
-import { Entity } from '../types';
+import { VarsMap } from '../ast';
+import { SystemFields } from '../types';
 
 export const isOperation = (typeName: string) =>
   typeName === 'Query' ||
   typeName === 'Mutation' ||
   typeName === 'Subscription';
 
-export const keyOfEntity = (entity: Entity): null | string => {
+export const keyOfEntity = (entity: SystemFields): null | string => {
   const { __typename: typeName } = entity;
   const id = entity.id === undefined ? entity._id : entity.id;
 
@@ -21,11 +22,8 @@ export const keyOfEntity = (entity: Entity): null | string => {
   return `${typeName}:${id}`;
 };
 
-export const keyForLink = (
-  parentKey: string,
-  fieldName: string,
-  args: null | object
-) => {
-  const key = `${parentKey}->${fieldName}`;
-  return args ? `${key}(${stringify(args)})` : key;
-};
+export const keyOfField = (fieldName: string, args: null | VarsMap) =>
+  args !== null ? `${fieldName}(${stringify(args)})` : fieldName;
+
+export const joinKeys = (parentKey: string, key: string) =>
+  `${parentKey}.${key}`;

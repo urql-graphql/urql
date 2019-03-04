@@ -10,7 +10,7 @@ export const assignObjectToMap = <T>(
 };
 
 export const objectOfMap = <T>(map: Map<string, T>): { [key: string]: T } => {
-  const res = Object.create(null);
+  const res = {};
   map.forEach((value, key) => {
     res[key] = value;
   });

@@ -1,63 +1,27 @@
-import { DocumentNode } from 'graphql';
-import { ExecInfo } from 'graphql-anywhere';
-import Store from './store';
+/** A scalar is any fieldValue without a type. It can also include lists of scalars and embedded objects, which are simply represented as empty object type. */
+export type Scalar = {} | string | number | null;
 
-export interface Request {
-  query: DocumentNode;
-  variables?: object;
-}
-
-export type Scalar = string | number | null;
+export type NullPrototype = { [K in keyof ObjectConstructor]: never };
 
 export interface SystemFields {
-  __typename?: string | null;
-  _id?: Scalar;
-  id?: Scalar;
+  __typename?: string;
+  _id?: string | number | null;
+  id?: string | number | null;
 }
-
-export type KeyExtractor = (entity: Entity) => void | null | string;
-
-export type FieldValue = Entity | Scalar | Array<Entity | Scalar>;
 
 export interface EntityFields {
-  [property: string]: FieldValue;
+  [fieldName: string]: Scalar;
 }
 
-export type Entity = SystemFields & EntityFields;
+/** Every Entity must have a typeName. It might have some ID fields of which `id` and `_id` are recognised by default. Every other fieldValue is a scalar. */
+export type Entity = NullPrototype & SystemFields & EntityFields;
+
+/** A link is a key or array of keys referencing other entities in the Records Map. It may be or contain `null`. */
 export type Link = null | string | Array<string | null>;
 
-export type EntityMap = Map<string, Entity>;
-export type LinkMap = Map<string, Link>;
-export type CacheOperation = 'query' | 'write';
+/** A link can be resolved into the entities it points to. The resulting structure is a ResolvedLink */
+export type ResolvedLink = null | Entity | Array<Entity | null>;
 
-export interface Context {
-  store: Store;
-  operation: CacheOperation;
-  isComplete: boolean;
-}
-
-export interface Result {
-  dependencies: string[];
-  isComplete: boolean;
-  response?: Entity;
-}
-
-export type FieldResolver = (
-  fieldName: string,
-  rootValue: Entity,
-  args: null | object,
-  context: Context,
-  info: ExecInfo
-) => FieldValue;
-
-export type CacheResolver = (
-  args: null | object,
-  context: Context,
-  info: ExecInfo
-) => FieldValue | void;
-
-export interface CacheResolvers {
-  [typeName: string]: {
-    [fieldName: string]: CacheResolver;
-  };
-}
+export type Records = Map<string, Entity>;
+export type Links = Map<string, Link>;
+export type Embedded = Map<string, Scalar>;

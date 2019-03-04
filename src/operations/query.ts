@@ -1,62 +1,102 @@
-import Store from '../store';
-import { Context, FieldResolver, Request, Result } from '../types';
-import { graphql, keyForLink } from '../utils';
-import { makeCustomResolver } from './custom';
+import {
+  getFieldAlias,
+  getFieldArguments,
+  getName,
+  getSelectionSet,
+  SelectionSet,
+} from '../ast';
 
-const queryResolver: FieldResolver = (
-  fieldName,
-  rootValue,
-  args,
-  context,
-  info
-) => {
-  if (info.isLeaf) {
-    return rootValue[fieldName];
+import { joinKeys, keyOfField } from '../helpers';
+import { find, readLink, Store } from '../store';
+import { Entity, Link } from '../types';
+
+import { forEachFieldNode, makeContext } from './shared';
+import { Context, Data, Request, Result } from './types';
+
+/** Reads a request entirely from the store */
+export const query = (store: Store, request: Request): Result => {
+  const ctx = makeContext(store, request);
+  if (ctx === undefined) {
+    return { isComplete: false, dependencies: [] };
   }
 
-  const { store } = context;
-  const parentKey = store.keyOfEntity(rootValue);
-  if (parentKey === null) {
-    context.isComplete = false;
-    return null;
-  }
-
-  const link = store.getLink(keyForLink(parentKey, fieldName, args));
-  if (link === null || link === undefined) {
-    const fieldValue = rootValue[fieldName];
-    if (fieldValue === undefined) {
-      context.isComplete = false;
-      return null;
-    }
-
-    return fieldValue;
-  }
-
-  const entity = store.getEntityFromLink(link);
-  if (entity === null) {
-    context.isComplete = false;
-  }
-
-  return entity;
-};
-
-const resolver = makeCustomResolver(queryResolver);
-
-const query = (store: Store, request: Request): Result => {
-  const context: Context = { isComplete: true, store, operation: 'query' };
-
-  const response = graphql(
-    resolver,
-    request,
-    store.getOrCreateEntity('Query'),
-    context
-  );
+  const select = getSelectionSet(ctx.operation);
+  const data = readEntity(ctx, 'query', select);
 
   return {
-    dependencies: store.flushTouched(),
-    isComplete: context.isComplete,
-    response,
+    data,
+    isComplete: ctx.isComplete,
+    dependencies: ctx.dependencies,
   };
 };
 
-export default query;
+const readEntity = (
+  ctx: Context,
+  key: string,
+  select: SelectionSet
+): Data | null => {
+  const { store } = ctx;
+  const entity = find(store, key);
+  if (entity === null) {
+    // Cache Incomplete: A missing entity for a key means it wasn't cached
+    ctx.isComplete = false;
+    return null;
+  }
+
+  const data = Object.create(null);
+  ctx.dependencies.push(key);
+  readSelection(ctx, entity, key, data, select);
+  return data;
+};
+
+const readSelection = (
+  ctx: Context,
+  entity: Entity,
+  key: string,
+  data: Data,
+  select: SelectionSet
+): void => {
+  const { store, vars } = ctx;
+
+  forEachFieldNode(ctx, select, node => {
+    const fieldName = getName(node);
+    // The field's key can include arguments if it has any
+    const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
+    const fieldValue = entity[fieldKey];
+    const fieldAlias = getFieldAlias(node);
+
+    if (node.selectionSet === undefined || fieldValue !== null) {
+      // Cache Incomplete: An undefined field value means it wasn't cached
+      ctx.isComplete = fieldValue === undefined;
+      data[fieldAlias] = fieldValue === undefined ? null : fieldValue;
+    } else {
+      // null values mean that a field might be linked to other entities
+      const { selections: fieldSelect } = node.selectionSet;
+      const childFieldKey = joinKeys(key, fieldKey);
+      const link = readLink(store, childFieldKey);
+
+      // Cache Incomplete: A missing link for a field means it's not cached
+      if (link === undefined) {
+        ctx.isComplete = false;
+        data[fieldAlias] = null;
+      } else {
+        data[fieldAlias] = readField(ctx, link, fieldSelect);
+      }
+    }
+  });
+};
+
+const readField = (
+  ctx: Context,
+  link: Link,
+  select: SelectionSet
+): null | Data | Data[] => {
+  if (Array.isArray(link)) {
+    // @ts-ignore: Link cannot be expressed as a recursive type
+    return link.map(childLink => readField(ctx, childLink, select));
+  } else if (link === null) {
+    return null;
+  }
+
+  return readEntity(ctx, link, select);
+};

@@ -74,7 +74,6 @@
   ],
   "dependencies": {
     "fast-json-stable-stringify": "^2.0.0",
-    "graphql-anywhere": "^4.1.28",
     "wonka": "^2.0.1"
   },
   "peerDependencies": {

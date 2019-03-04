@@ -1,2 +1,2 @@
-export { default as query } from './query';
-export { default as write } from './write';
+export { query } from './query';
+export { write } from './write';
