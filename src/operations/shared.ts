@@ -46,23 +46,13 @@ export const forEachFieldNode = (
       const fragmentSelect = isInlineFragment(node)
         ? getSelectionSet(node)
         : fragments[getName(node)];
-      // Recursively process the fragments' selection sets
-      forEachFieldNode(ctx, fragmentSelect, cb);
+
+      if (fragmentSelect !== undefined) {
+        // Recursively process the fragments' selection sets
+        forEachFieldNode(ctx, fragmentSelect, cb);
+      }
     } else {
       cb(node);
     }
   });
-};
-
-export const merge = (dest, src) => {
-  if (src !== null && typeof src === 'object') {
-    for (const key in src) {
-      const srcVal = src[key];
-      if (!(key in dest)) {
-        dest[key] = srcVal;
-      } else {
-        merge(dest[key], srcVal);
-      }
-    }
-  }
 };

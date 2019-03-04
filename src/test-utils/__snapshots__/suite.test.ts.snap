@@ -95,6 +95,70 @@ Array [
 ]
 `;
 
+exports[`entity list on query and inline fragment 1`] = `
+Object {
+  "links": Object {
+    "query.items": Array [
+      "Item:1",
+      null,
+    ],
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": 1,
+      "test": true,
+    },
+    "query": Object {
+      "__typename": "Query",
+      "items": null,
+    },
+  },
+}
+`;
+
+exports[`entity list on query and inline fragment 2`] = `
+Array [
+  "query.__typename",
+  "query.items",
+  "Item:1",
+  "query.items",
+  "Item:1",
+]
+`;
+
+exports[`entity list on query and spread fragment 1`] = `
+Object {
+  "links": Object {
+    "query.items": Array [
+      "Item:1",
+      null,
+    ],
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": 1,
+      "test": true,
+    },
+    "query": Object {
+      "__typename": "Query",
+      "items": null,
+    },
+  },
+}
+`;
+
+exports[`entity list on query and spread fragment 2`] = `
+Array [
+  "query.__typename",
+  "query.items",
+  "Item:1",
+  "query.items",
+  "Item:1",
+]
+`;
+
 exports[`entity on query 1`] = `
 Object {
   "links": Object {

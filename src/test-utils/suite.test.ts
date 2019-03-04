@@ -243,6 +243,76 @@ it('nested entity list on query', () => {
   });
 });
 
+it('entity list on query and inline fragment', () => {
+  const store = expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        items {
+          __typename
+          id
+        }
+        ... on Query {
+          items {
+            test
+          }
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      items: [{ __typename: 'Item', id: 1, test: true }, null],
+    },
+  });
+
+  expect(store.links['query.items']).toEqual(['Item:1', null]);
+
+  expect(store.records.query.__typename).toBe('Query');
+  expect(store.records.query.items).toBe(null);
+
+  expect(store.records['Item:1']).toMatchObject({
+    __typename: 'Item',
+    id: 1,
+    test: true,
+  });
+});
+
+it('entity list on query and spread fragment', () => {
+  const store = expectCacheIntegrity({
+    query: gql`
+      query Test {
+        __typename
+        items {
+          __typename
+          id
+        }
+        ...TestFragment
+      }
+
+      fragment TestFragment on Query {
+        items {
+          test
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      items: [{ __typename: 'Item', id: 1, test: true }, null],
+    },
+  });
+
+  expect(store.links['query.items']).toEqual(['Item:1', null]);
+
+  expect(store.records.query.__typename).toBe('Query');
+  expect(store.records.query.items).toBe(null);
+
+  expect(store.records['Item:1']).toMatchObject({
+    __typename: 'Item',
+    id: 1,
+    test: true,
+  });
+});
+
 it('embedded object on entity', () => {
   const store = expectCacheIntegrity({
     query: gql`

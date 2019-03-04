@@ -8,5 +8,5 @@ export interface VarsMap {
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 
 export interface FragmentSelectionSets {
-  [fragmentName: string]: SelectionSet;
+  [fragmentName: string]: void | SelectionSet;
 }
