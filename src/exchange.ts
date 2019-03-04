@@ -64,7 +64,7 @@ const toRequestPolicy = (
 });
 
 export interface CacheExchangeOpts {
-  initial: SerializedStore;
+  initial?: SerializedStore;
 }
 
 export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
