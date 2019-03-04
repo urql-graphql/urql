@@ -47,12 +47,12 @@ export const findOrCreate = (store: Store, key: string): Entity => {
   return record;
 };
 
-export const writeLink = (store: Store, key: string, link: Link): void => {
-  if (link === null) {
-    store.links.delete(key);
-  } else {
-    store.links.set(key, link);
-  }
+export const setLink = (store: Store, key: string, link: Link): void => {
+  store.links.set(key, link);
+};
+
+export const deleteLink = (store: Store, key: string): void => {
+  store.links.delete(key);
 };
 
 export const readLink = (store: Store, key: string): void | Link =>
