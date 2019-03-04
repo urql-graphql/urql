@@ -3,14 +3,17 @@ import {
   getFieldArguments,
   getName,
   getSelectionSet,
+  isFieldNode,
+  isInlineFragment,
   SelectionSet,
+  shouldInclude,
 } from '../ast';
 
 import { joinKeys, keyOfField } from '../helpers';
 import { find, readLink, Store } from '../store';
 import { Entity, Link } from '../types';
 
-import { forEachFieldNode, makeContext } from './shared';
+import { makeContext, merge } from './shared';
 import { Context, Data, Request, Result } from './types';
 
 /** Reads a request entirely from the store */
@@ -57,34 +60,49 @@ const readSelection = (
   data: Data,
   select: SelectionSet
 ): void => {
-  const { store, vars } = ctx;
+  const { store, vars, fragments } = ctx;
 
-  forEachFieldNode(ctx, select, node => {
-    const fieldName = getName(node);
-    // The field's key can include arguments if it has any
-    const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
-    const fieldValue = entity[fieldKey];
-    const fieldAlias = getFieldAlias(node);
-    const childFieldKey = joinKeys(key, fieldKey);
-    if (key === 'query') {
-      ctx.dependencies.push(childFieldKey);
-    }
+  select.forEach(node => {
+    if (!shouldInclude(node, vars)) {
+      // Directives instruct this node to be skipped
+      return;
+    } else if (!isFieldNode(node)) {
+      // This is a fragment (either inline or spread)
+      const fragmentSelect = isInlineFragment(node)
+        ? getSelectionSet(node)
+        : fragments[getName(node)];
 
-    if (node.selectionSet === undefined || fieldValue !== null) {
-      // Cache Incomplete: An undefined field value means it wasn't cached
-      ctx.isComplete = fieldValue !== undefined;
-      data[fieldAlias] = fieldValue === undefined ? null : fieldValue;
+      // Recursively process the fragments' selection sets
+      const fragmentData = Object.create(null);
+      readSelection(ctx, entity, key, fragmentData, fragmentSelect);
+      merge(data, fragmentData);
     } else {
-      // null values mean that a field might be linked to other entities
-      const { selections: fieldSelect } = node.selectionSet;
-      const link = readLink(store, childFieldKey);
+      const fieldName = getName(node);
+      // The field's key can include arguments if it has any
+      const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
+      const fieldValue = entity[fieldKey];
+      const fieldAlias = getFieldAlias(node);
+      const childFieldKey = joinKeys(key, fieldKey);
+      if (key === 'query') {
+        ctx.dependencies.push(childFieldKey);
+      }
 
-      // Cache Incomplete: A missing link for a field means it's not cached
-      if (link === undefined) {
-        ctx.isComplete = false;
-        data[fieldAlias] = null;
+      if (node.selectionSet === undefined || fieldValue !== null) {
+        // Cache Incomplete: An undefined field value means it wasn't cached
+        ctx.isComplete = fieldValue !== undefined;
+        data[fieldAlias] = fieldValue === undefined ? null : fieldValue;
       } else {
-        data[fieldAlias] = readField(ctx, link, fieldSelect);
+        // null values mean that a field might be linked to other entities
+        const { selections: fieldSelect } = node.selectionSet;
+        const link = readLink(store, childFieldKey);
+
+        // Cache Incomplete: A missing link for a field means it's not cached
+        if (link === undefined) {
+          ctx.isComplete = false;
+          data[fieldAlias] = null;
+        } else {
+          data[fieldAlias] = readField(ctx, link, fieldSelect);
+        }
       }
     }
   });

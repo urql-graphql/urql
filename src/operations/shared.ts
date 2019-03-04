@@ -53,3 +53,16 @@ export const forEachFieldNode = (
     }
   });
 };
+
+export const merge = (dest, src) => {
+  if (src !== null && typeof src === 'object') {
+    for (const key in src) {
+      const srcVal = src[key];
+      if (!(key in dest)) {
+        dest[key] = srcVal;
+      } else {
+        merge(dest[key], srcVal);
+      }
+    }
+  }
+};
