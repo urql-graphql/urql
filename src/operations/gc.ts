@@ -36,7 +36,7 @@ const walkEntity = (ctx: Context, key: string) => {
     visitedRecords.add(key);
 
     for (const fieldKey in entity) {
-      const value = entity[key];
+      const value = entity[fieldKey];
       if (value === null) {
         const childFieldKey = joinKeys(key, fieldKey);
         const link = readLink(store, childFieldKey);

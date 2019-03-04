@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`cleans up unreachable records and links 1`] = `
+Object {
+  "links": Object {
+    "Todo:2.author": "Todo:2.author",
+    "query.todo": "Todo:2",
+  },
+  "records": Object {
+    "Todo:2": Object {
+      "__typename": "Todo",
+      "author": null,
+      "complete": false,
+      "id": "2",
+      "text": "Install urql",
+    },
+    "Todo:2.author": Object {
+      "__typename": "Author",
+      "name": "Thomas",
+    },
+    "query": Object {
+      "todo": null,
+      "todos": null,
+    },
+  },
+}
+`;
