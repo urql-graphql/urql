@@ -4,6 +4,7 @@
     "exclude": ["src/tests/**/*", "examples/**/*"]
   },
   "rules": {
+    "forin": false,
     "variable-name": false,
     "object-literal-sort-keys": false,
     "no-console": [true, "log"],

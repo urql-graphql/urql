@@ -7,7 +7,7 @@ import {
 } from '../ast';
 
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
-import { deleteLink, findOrCreate, setLink, Store } from '../store';
+import { findOrCreate, removeLink, setLink, Store } from '../store';
 import { Entity, Link } from '../types';
 
 import { forEachFieldNode, makeContext } from './shared';
@@ -61,6 +61,7 @@ const writeSelection = (
     const fieldValue = data[getFieldAlias(node)];
     // The field's key can include arguments if it has any
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
+    const childFieldKey = joinKeys(key, fieldKey);
 
     if (
       node.selectionSet === undefined ||
@@ -70,16 +71,15 @@ const writeSelection = (
       // This is a leaf node, so we're setting the field's value directly
       entity[fieldKey] = fieldValue;
       // Remove any links that might've existed before for this field
-      deleteLink(store, key);
+      removeLink(store, childFieldKey);
     } else {
       // Ensure that this key exists on the entity and that previous values are thrown away
       entity[fieldKey] = null;
 
       // Process the field and write links for the child entities that have been written
       const { selections: fieldSelect } = node.selectionSet;
-      const childFieldKey = joinKeys(key, fieldKey);
       const link = writeField(ctx, childFieldKey, fieldValue, fieldSelect);
-      setLink(store, key, link);
+      setLink(store, childFieldKey, link);
     }
   });
 };
