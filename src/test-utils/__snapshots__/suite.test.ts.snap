@@ -25,7 +25,7 @@ Object {
 
 exports[`embedded object on entity 2`] = `
 Array [
-  "query",
+  "query.item",
   "Item:1",
   "Item:1.author",
 ]
@@ -57,7 +57,7 @@ Object {
 
 exports[`embedded object on entity 4`] = `
 Array [
-  "query",
+  "query.item",
   "Item:1",
   "Author:1",
 ]
@@ -89,7 +89,7 @@ Object {
 
 exports[`entity list on query 2`] = `
 Array [
-  "query",
+  "query.items",
   "Item:1",
   "Item:2",
 ]
@@ -115,7 +115,7 @@ Object {
 
 exports[`entity on query 2`] = `
 Array [
-  "query",
+  "query.item",
   "Item:1",
 ]
 `;
@@ -140,7 +140,7 @@ Object {
 
 exports[`entity with Int-like ID on query 2`] = `
 Array [
-  "query",
+  "query.item",
   "Item:1",
 ]
 `;
@@ -165,7 +165,7 @@ Object {
 
 exports[`entity with arguments on query 2`] = `
 Array [
-  "query",
+  "query.item({\\"test\\":true})",
   "Item:1",
 ]
 `;
@@ -183,7 +183,7 @@ Object {
 
 exports[`int field with arguments on query 2`] = `
 Array [
-  "query",
+  "query.int({\\"test\\":true})",
 ]
 `;
 
@@ -200,7 +200,7 @@ Object {
 
 exports[`int on query 2`] = `
 Array [
-  "query",
+  "query.int",
 ]
 `;
 
@@ -220,7 +220,7 @@ Object {
 
 exports[`json on query 2`] = `
 Array [
-  "query",
+  "query.json",
 ]
 `;
 
@@ -254,7 +254,7 @@ Object {
 
 exports[`nested entity list on query 2`] = `
 Array [
-  "query",
+  "query.items",
   "Item:1",
   "Item:2",
 ]
@@ -279,7 +279,7 @@ Object {
 
 exports[`non-IDable entity on query 2`] = `
 Array [
-  "query",
+  "query.item",
   "query.item",
 ]
 `;
@@ -302,7 +302,7 @@ Object {
 
 exports[`non-keyable entity on query 2`] = `
 Array [
-  "query",
+  "query.item",
   "query.item",
 ]
 `;
@@ -320,6 +320,6 @@ Object {
 
 exports[`nullable field on query 2`] = `
 Array [
-  "query",
+  "query.missing",
 ]
 `;

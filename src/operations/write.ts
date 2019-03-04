@@ -44,7 +44,10 @@ const writeEntity = (
 ) => {
   const { store } = ctx;
   const entity = findOrCreate(store, key);
-  ctx.dependencies.push(key);
+  if (key !== 'query') {
+    ctx.dependencies.push(key);
+  }
+
   writeSelection(ctx, entity, key, data, select);
 };
 
@@ -62,6 +65,9 @@ const writeSelection = (
     // The field's key can include arguments if it has any
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
     const childFieldKey = joinKeys(key, fieldKey);
+    if (key === 'query') {
+      ctx.dependencies.push(childFieldKey);
+    }
 
     if (
       node.selectionSet === undefined ||

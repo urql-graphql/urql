@@ -41,10 +41,11 @@ const readEntity = (
     // Cache Incomplete: A missing entity for a key means it wasn't cached
     ctx.isComplete = false;
     return null;
+  } else if (key !== 'query') {
+    ctx.dependencies.push(key);
   }
 
   const data = Object.create(null);
-  ctx.dependencies.push(key);
   readSelection(ctx, entity, key, data, select);
   return data;
 };
@@ -64,6 +65,10 @@ const readSelection = (
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
     const fieldValue = entity[fieldKey];
     const fieldAlias = getFieldAlias(node);
+    const childFieldKey = joinKeys(key, fieldKey);
+    if (key === 'query') {
+      ctx.dependencies.push(childFieldKey);
+    }
 
     if (node.selectionSet === undefined || fieldValue !== null) {
       // Cache Incomplete: An undefined field value means it wasn't cached
@@ -72,7 +77,6 @@ const readSelection = (
     } else {
       // null values mean that a field might be linked to other entities
       const { selections: fieldSelect } = node.selectionSet;
-      const childFieldKey = joinKeys(key, fieldKey);
       const link = readLink(store, childFieldKey);
 
       // Cache Incomplete: A missing link for a field means it's not cached
