@@ -1,4 +1,10 @@
-import { Exchange, formatDocument, Operation, OperationResult } from 'urql';
+import {
+  Exchange,
+  formatDocument,
+  Operation,
+  OperationResult,
+  RequestPolicy,
+} from 'urql';
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write } from './operations';
@@ -46,11 +52,14 @@ const isCacheableQuery = (op: Operation): boolean => {
 };
 
 // Copy an operation and change the requestPolicy to skip the cache
-const toNetworkOnly = (operation: Operation): Operation => ({
+const toRequestPolicy = (
+  operation: Operation,
+  requestPolicy: RequestPolicy
+): Operation => ({
   ...operation,
   context: {
     ...operation.context,
-    requestPolicy: 'network-only',
+    requestPolicy,
   },
 });
 
@@ -101,7 +110,11 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
       keys.push(op.key);
 
       if (!ops.has(op.key)) {
-        ops.set(op.key, op);
+        const isNetworkOnly = op.context.requestPolicy === 'network-only';
+        ops.set(
+          op.key,
+          isNetworkOnly ? toRequestPolicy(op, 'cache-and-network') : op
+        );
       }
     });
   };
@@ -177,7 +190,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
       tap(({ operation }) => {
         const policy = getRequestPolicy(operation);
         if (policy === 'cache-and-network') {
-          const networkOnly = toNetworkOnly(operation);
+          const networkOnly = toRequestPolicy(operation, 'network-only');
           client.reexecuteOperation(networkOnly);
         }
       })
