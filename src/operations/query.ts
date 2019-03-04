@@ -67,7 +67,7 @@ const readSelection = (
 
     if (node.selectionSet === undefined || fieldValue !== null) {
       // Cache Incomplete: An undefined field value means it wasn't cached
-      ctx.isComplete = fieldValue === undefined;
+      ctx.isComplete = fieldValue !== undefined;
       data[fieldAlias] = fieldValue === undefined ? null : fieldValue;
     } else {
       // null values mean that a field might be linked to other entities
