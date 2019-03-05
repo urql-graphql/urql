@@ -27,10 +27,11 @@ it('int on query', () => {
   expectCacheIntegrity({
     query: gql`
       {
+        __typename
         int
       }
     `,
-    data: { int: 42 },
+    data: { __typename: 'Query', int: 42 },
   });
 });
 
@@ -38,11 +39,15 @@ it('json on query', () => {
   expectCacheIntegrity({
     query: gql`
       {
+        __typename
         json
       }
     `,
     // The `__typename` field should not mislead the cache
-    data: { json: { __typename: 'Misleading', test: true } },
+    data: {
+      __typename: 'Query',
+      json: { __typename: 'Misleading', test: true },
+    },
   });
 });
 
@@ -50,10 +55,11 @@ it('nullable field on query', () => {
   expectCacheIntegrity({
     query: gql`
       {
+        __typename
         missing
       }
     `,
-    data: { missing: null },
+    data: { __typename: 'Query', missing: null },
   });
 });
 
@@ -61,13 +67,15 @@ it('int field with arguments on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         int(test: true)
       }
     `,
-    data: { int: 42 },
+    data: { __typename: 'Query', int: 42 },
   });
 
   expect(store.records.query).toMatchObject({
+    __typename: 'Query',
     'int({"test":true})': 42,
   });
 });
@@ -76,23 +84,56 @@ it('non-keyable entity on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
+          __typename
           name
         }
       }
     `,
-    // This entity has no `__typename` field
-    data: { item: { name: 'Test' } },
+    // This entity has no `id` or `_id` field
+    data: { __typename: 'Query', item: { __typename: 'Item', name: 'Test' } },
   });
 
   expect(store.links['query.item']).toBe('query.item');
-  expect(store.records['query.item']).toMatchObject({ name: 'Test' });
+  expect(store.records['query.item']).toMatchObject({
+    __typename: 'Item',
+    name: 'Test',
+  });
+});
+
+it('invalid entity on query', () => {
+  const store = expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        item {
+          __typename
+          id
+          name
+        }
+      }
+    `,
+    // This entity comes back with an invalid typename (for some reason or another)
+    data: {
+      __typename: 'Query',
+      item: { __typename: null, id: '123', name: 'Test' },
+    },
+  });
+
+  expect(store.links['query.item']).toBe(undefined);
+  expect(store.records['query.item']).toBe(undefined);
+  expect(store.records.query).toMatchObject({
+    __typename: 'Query',
+    item: { __typename: null, id: '123', name: 'Test' },
+  });
 });
 
 it('non-IDable entity on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
           __typename
           name
@@ -100,7 +141,7 @@ it('non-IDable entity on query', () => {
       }
     `,
     // This entity has a `__typename` but no ID fields
-    data: { item: { __typename: 'Item', name: 'Test' } },
+    data: { __typename: 'Query', item: { __typename: 'Item', name: 'Test' } },
   });
 
   expect(store.links['query.item']).toBe('query.item');
@@ -114,6 +155,7 @@ it('entity on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
           __typename
           id
@@ -121,7 +163,10 @@ it('entity on query', () => {
         }
       }
     `,
-    data: { item: { __typename: 'Item', id: '1', name: 'Test' } },
+    data: {
+      __typename: 'Query',
+      item: { __typename: 'Item', id: '1', name: 'Test' },
+    },
   });
 
   expect(store.links['query.item']).toBe('Item:1');
@@ -136,6 +181,7 @@ it('entity with arguments on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item(test: true) {
           __typename
           id
@@ -143,7 +189,10 @@ it('entity with arguments on query', () => {
         }
       }
     `,
-    data: { item: { __typename: 'Item', id: '1', name: 'Test' } },
+    data: {
+      __typename: 'Query',
+      item: { __typename: 'Item', id: '1', name: 'Test' },
+    },
   });
 
   expect(store.links['query.item({"test":true})']).toBe('Item:1');
@@ -154,6 +203,7 @@ it('entity with Int-like ID on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
           __typename
           id
@@ -162,7 +212,10 @@ it('entity with Int-like ID on query', () => {
       }
     `,
     // This is the same as above, but with a number on `id`
-    data: { item: { __typename: 'Item', id: 1, name: 'Test' } },
+    data: {
+      __typename: 'Query',
+      item: { __typename: 'Item', id: 1, name: 'Test' },
+    },
   });
 
   expect(store.links['query.item']).toBe('Item:1');
@@ -180,6 +233,7 @@ it('entity list on query', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         items {
           __typename
           id
@@ -187,6 +241,7 @@ it('entity list on query', () => {
       }
     `,
     data: {
+      __typename: 'Query',
       items: [{ __typename: 'Item', id: 1 }, { __typename: 'Item', id: 2 }],
     },
   });
@@ -317,6 +372,7 @@ it('embedded object on entity', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
           __typename
           id
@@ -328,6 +384,7 @@ it('embedded object on entity', () => {
       }
     `,
     data: {
+      __typename: 'Query',
       item: {
         __typename: 'Item',
         id: 1,
@@ -359,6 +416,7 @@ it('embedded object on entity', () => {
   const store = expectCacheIntegrity({
     query: gql`
       {
+        __typename
         item {
           __typename
           id
@@ -371,6 +429,7 @@ it('embedded object on entity', () => {
       }
     `,
     data: {
+      __typename: 'Query',
       item: {
         __typename: 'Item',
         id: 1,

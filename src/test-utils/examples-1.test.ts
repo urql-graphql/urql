@@ -4,6 +4,7 @@ import { create, serialize } from '../store';
 
 const Todos = gql`
   query {
+    __typename
     todos {
       __typename
       id
@@ -15,6 +16,7 @@ const Todos = gql`
 
 const ToggleTodo = gql`
   mutation($id: ID!) {
+    __typename
     toggleTodo(id: $id) {
       __typename
       id
@@ -27,6 +29,7 @@ const ToggleTodo = gql`
 it('passes the "getting-started" example', () => {
   const store = create();
   const todosData = {
+    __typename: 'Query',
     todos: [
       { id: '0', text: 'Go to the shops', complete: false, __typename: 'Todo' },
       { id: '1', text: 'Pick up the kids', complete: true, __typename: 'Todo' },
@@ -42,6 +45,7 @@ it('passes the "getting-started" example', () => {
     'Todo:1',
     'Todo:2',
   ]);
+
   expect(serialize(store)).toMatchSnapshot();
 
   let queryRes = query(store, { query: Todos });
@@ -59,6 +63,7 @@ it('passes the "getting-started" example', () => {
     store,
     { query: ToggleTodo, variables: { id: '2' } },
     {
+      __typename: 'Mutation',
       toggleTodo: mutatedTodo,
     }
   );

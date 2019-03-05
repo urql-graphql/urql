@@ -4,7 +4,7 @@ export type Scalar = {} | string | number | null;
 export type NullPrototype = { [K in keyof ObjectConstructor]: never };
 
 export interface SystemFields {
-  __typename?: string;
+  __typename: string;
   _id?: string | number | null;
   id?: string | number | null;
 }

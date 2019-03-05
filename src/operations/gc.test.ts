@@ -4,6 +4,7 @@ import { gc, write } from './index';
 
 const gqlQuery = gql`
   {
+    __typename
     todos {
       __typename
       id
@@ -30,6 +31,7 @@ it('cleans up unreachable records and links', () => {
     store,
     { query: gqlQuery },
     {
+      __typename: 'Query',
       todos: [
         {
           id: '0',
@@ -68,6 +70,7 @@ it('cleans up unreachable records and links', () => {
     store,
     { query: gqlQuery },
     {
+      __typename: 'Query',
       todos: null,
       todo: {
         __typename: 'Todo',
@@ -103,6 +106,7 @@ it('cleans up unreachable records and links', () => {
     store,
     { query: gqlQuery },
     {
+      __typename: 'Query',
       todos: null,
       todo: null,
     }
@@ -114,6 +118,7 @@ it('cleans up unreachable records and links', () => {
   expect(json).toEqual({
     records: {
       query: {
+        __typename: 'Query',
         todos: null,
         todo: null,
       },

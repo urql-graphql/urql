@@ -29,6 +29,7 @@ Object {
       "text": "Install urql",
     },
     "query": Object {
+      "__typename": "Query",
       "todos": null,
     },
   },
@@ -64,6 +65,7 @@ Object {
       "text": "Install urql",
     },
     "query": Object {
+      "__typename": "Query",
       "todos": null,
     },
   },

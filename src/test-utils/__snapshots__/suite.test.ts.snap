@@ -17,6 +17,7 @@ Object {
       "name": "Stanley",
     },
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
   },
@@ -49,6 +50,7 @@ Object {
       "id": 1,
     },
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
   },
@@ -81,6 +83,7 @@ Object {
       "id": 2,
     },
     "query": Object {
+      "__typename": "Query",
       "items": null,
     },
   },
@@ -119,7 +122,6 @@ Object {
 
 exports[`entity list on query and inline fragment 2`] = `
 Array [
-  "query.__typename",
   "query.items",
   "Item:1",
   "query.items",
@@ -151,7 +153,6 @@ Object {
 
 exports[`entity list on query and spread fragment 2`] = `
 Array [
-  "query.__typename",
   "query.items",
   "Item:1",
   "query.items",
@@ -171,6 +172,7 @@ Object {
       "name": "Test",
     },
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
   },
@@ -196,6 +198,7 @@ Object {
       "name": "Test",
     },
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
   },
@@ -221,6 +224,7 @@ Object {
       "name": "Test",
     },
     "query": Object {
+      "__typename": "Query",
       "item({\\"test\\":true})": null,
     },
   },
@@ -239,6 +243,7 @@ Object {
   "links": Object {},
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "int({\\"test\\":true})": 42,
     },
   },
@@ -256,6 +261,7 @@ Object {
   "links": Object {},
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "int": 42,
     },
   },
@@ -268,11 +274,34 @@ Array [
 ]
 `;
 
+exports[`invalid entity on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "query": Object {
+      "__typename": "Query",
+      "item": Object {
+        "__typename": null,
+        "id": "123",
+        "name": "Test",
+      },
+    },
+  },
+}
+`;
+
+exports[`invalid entity on query 2`] = `
+Array [
+  "query.item",
+]
+`;
+
 exports[`json on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "json": Object {
         "__typename": "Misleading",
         "test": true,
@@ -331,6 +360,7 @@ Object {
   },
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
     "query.item": Object {
@@ -355,9 +385,11 @@ Object {
   },
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "item": null,
     },
     "query.item": Object {
+      "__typename": "Item",
       "name": "Test",
     },
   },
@@ -376,6 +408,7 @@ Object {
   "links": Object {},
   "records": Object {
     "query": Object {
+      "__typename": "Query",
       "missing": null,
     },
   },

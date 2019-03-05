@@ -65,7 +65,7 @@ const readSelection = (
     const fieldValue = entity[fieldKey];
     const fieldAlias = getFieldAlias(node);
     const childFieldKey = joinKeys(key, fieldKey);
-    if (key === 'query') {
+    if (key === 'query' && fieldName !== '__typename') {
       ctx.dependencies.push(childFieldKey);
     }
 

@@ -8,7 +8,7 @@ import {
 
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
 import { findOrCreate, removeLink, setLink, Store } from '../store';
-import { Entity, Link } from '../types';
+import { Entity, Link, Scalar } from '../types';
 
 import { forEachFieldNode, makeContext } from './shared';
 import { Context, Data, Request, Result } from './types';
@@ -65,14 +65,14 @@ const writeSelection = (
     // The field's key can include arguments if it has any
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
     const childFieldKey = joinKeys(key, fieldKey);
-    if (key === 'query') {
+    if (key === 'query' && fieldName !== '__typename') {
       ctx.dependencies.push(childFieldKey);
     }
 
     if (
       node.selectionSet === undefined ||
       fieldValue === null ||
-      typeof fieldValue !== 'object'
+      isScalar(fieldValue)
     ) {
       // This is a leaf node, so we're setting the field's value directly
       entity[fieldKey] = fieldValue;
@@ -120,14 +120,19 @@ const writeField = (
 const writeRoot = (ctx: Context, data: Data, select: SelectionSet) => {
   forEachFieldNode(ctx, select, node => {
     const fieldValue = data[getFieldAlias(node)];
-    if (node.selectionSet !== undefined && typeof fieldValue === 'object') {
+
+    if (
+      node.selectionSet !== undefined &&
+      fieldValue !== null &&
+      !isScalar(fieldValue)
+    ) {
       const { selections: fieldSelect } = node.selectionSet;
       writeRootField(ctx, fieldValue, fieldSelect);
     }
   });
 };
 
-// This is like wroteField but doesn't fall back to a generated key
+// This is like writeField but doesn't fall back to a generated key
 const writeRootField = (
   ctx: Context,
   data: Data | Data[] | null,
@@ -144,4 +149,18 @@ const writeRootField = (
   if (entityKey !== null) {
     writeEntity(ctx, entityKey, data, select);
   }
+};
+
+// Without a typename field on Data or Data[] the result must be a scalar
+// This effectively prevents us from writing Data into the store that
+// doesn't have a __typename field
+const isScalar = (x: Scalar | Data | Array<Scalar | Data>): x is Scalar => {
+  if (Array.isArray(x)) {
+    return x.some(isScalar);
+  }
+
+  return (
+    typeof x !== 'object' ||
+    (x !== null && typeof (x as any).__typename !== 'string')
+  );
 };

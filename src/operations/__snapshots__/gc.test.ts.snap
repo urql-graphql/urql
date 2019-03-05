@@ -19,6 +19,7 @@ Object {
       "name": "Thomas",
     },
     "query": Object {
+      "__typename": "Query",
       "todo": null,
       "todos": null,
     },
