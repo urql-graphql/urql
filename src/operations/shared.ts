@@ -1,7 +1,7 @@
 import { FieldNode } from 'graphql';
 
 import {
-  getFragmentSelectionSets,
+  getFragments,
   getMainOperation,
   getName,
   getNormalizedVars,
@@ -23,7 +23,7 @@ export const makeContext = (store: Store, request: Request): void | Context => {
   }
 
   const dependencies = [];
-  const fragments = getFragmentSelectionSets(query);
+  const fragments = getFragments(query);
   const vars = getNormalizedVars(operation, variables);
   const isComplete = true;
 
@@ -42,12 +42,12 @@ export const forEachFieldNode = (
       // Directives instruct this node to be skipped
       return;
     } else if (!isFieldNode(node)) {
-      // This is a fragment (either inline or spread)
-      const fragmentSelect = isInlineFragment(node)
-        ? getSelectionSet(node)
-        : fragments[getName(node)];
+      // A fragment is either referred to by FragmentSpread or inline
+      const def = isInlineFragment(node) ? node : fragments[getName(node)];
 
-      if (fragmentSelect !== undefined) {
+      if (def !== undefined) {
+        const fragmentSelect = getSelectionSet(def);
+        // TODO: Check for getTypeCondition(def) to match
         // Recursively process the fragments' selection sets
         forEachFieldNode(ctx, fragmentSelect, cb);
       }

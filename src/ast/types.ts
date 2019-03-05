@@ -1,4 +1,4 @@
-import { SelectionNode } from 'graphql';
+import { FragmentDefinitionNode, SelectionNode } from 'graphql';
 import { Scalar } from '../types';
 
 export interface VarsMap {
@@ -7,6 +7,6 @@ export interface VarsMap {
 
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 
-export interface FragmentSelectionSets {
-  [fragmentName: string]: void | SelectionSet;
+export interface Fragments {
+  [fragmentName: string]: void | FragmentDefinitionNode;
 }

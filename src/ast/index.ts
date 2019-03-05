@@ -10,14 +10,9 @@ import {
   SelectionNode,
 } from 'graphql';
 
-import {
-  getName,
-  getSelectionSet,
-  isFragmentNode,
-  isOperationNode,
-} from './node';
+import { getName, isFragmentNode, isOperationNode } from './node';
 
-import { FragmentSelectionSets, VarsMap } from './types';
+import { Fragments, VarsMap } from './types';
 import { evaluateValueNode } from './value';
 
 /** Checks whether a SelectionNode is a FieldNode */
@@ -70,15 +65,11 @@ export const getNormalizedVars = (
 };
 
 /** Returns a mapping from fragment names to their selections */
-export const getFragmentSelectionSets = (
-  doc: DocumentNode
-): FragmentSelectionSets =>
-  doc.definitions
-    .filter(isFragmentNode)
-    .reduce((map: FragmentSelectionSets, node) => {
-      map[getName(node)] = getSelectionSet(node);
-      return map;
-    }, {});
+export const getFragments = (doc: DocumentNode): Fragments =>
+  doc.definitions.filter(isFragmentNode).reduce((map: Fragments, node) => {
+    map[getName(node)] = node;
+    return map;
+  }, {});
 
 /** Returns either the field's name or the field's alias */
 export const getFieldAlias = (node: FieldNode): string =>

@@ -1,5 +1,5 @@
 import { DocumentNode, OperationDefinitionNode } from 'graphql';
-import { FragmentSelectionSets, VarsMap } from '../ast';
+import { Fragments, VarsMap } from '../ast';
 import { Store } from '../store';
 import { Scalar, SystemFields } from '../types';
 
@@ -27,6 +27,6 @@ export interface Context {
   isComplete: boolean;
   operation: OperationDefinitionNode;
   store: Store;
-  fragments: FragmentSelectionSets;
+  fragments: Fragments;
   vars: VarsMap;
 }

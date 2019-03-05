@@ -1,6 +1,7 @@
 import {
   DefinitionNode,
   FragmentDefinitionNode,
+  NamedTypeNode,
   NameNode,
   OperationDefinitionNode,
   SelectionSetNode,
@@ -15,6 +16,13 @@ export const getName = (node: { name: NameNode }): string => node.name.value;
 export const getSelectionSet = (node: {
   selectionSet: SelectionSetNode;
 }): SelectionSet => node.selectionSet.selections;
+
+export const getTypeCondition = ({
+  typeCondition,
+}: {
+  typeCondition?: NamedTypeNode;
+}): string | null =>
+  typeCondition !== undefined ? getName(typeCondition) : null;
 
 export const isOperationNode = (
   node: DefinitionNode
