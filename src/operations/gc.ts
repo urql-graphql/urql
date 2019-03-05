@@ -13,7 +13,7 @@ export const gc = (store: Store) => {
   const visitedRecords = new Set<string>();
   const ctx = { store, visitedLinks, visitedRecords };
 
-  walkEntity(ctx, 'query');
+  walkEntity(ctx, 'Query');
 
   store.records.forEach((_entity, key) => {
     if (!visitedRecords.has(key)) {

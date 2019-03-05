@@ -3,13 +3,17 @@
 exports[`passes the "getting-started" example 1`] = `
 Object {
   "links": Object {
-    "query.todos": Array [
+    "Query.todos": Array [
       "Todo:0",
       "Todo:1",
       "Todo:2",
     ],
   },
   "records": Object {
+    "Query": Object {
+      "__typename": "Query",
+      "todos": null,
+    },
     "Todo:0": Object {
       "__typename": "Todo",
       "complete": false,
@@ -27,10 +31,6 @@ Object {
       "complete": false,
       "id": "2",
       "text": "Install urql",
-    },
-    "query": Object {
-      "__typename": "Query",
-      "todos": null,
     },
   },
 }
@@ -39,13 +39,17 @@ Object {
 exports[`passes the "getting-started" example 2`] = `
 Object {
   "links": Object {
-    "query.todos": Array [
+    "Query.todos": Array [
       "Todo:0",
       "Todo:1",
       "Todo:2",
     ],
   },
   "records": Object {
+    "Query": Object {
+      "__typename": "Query",
+      "todos": null,
+    },
     "Todo:0": Object {
       "__typename": "Todo",
       "complete": false,
@@ -63,10 +67,6 @@ Object {
       "complete": true,
       "id": "2",
       "text": "Install urql",
-    },
-    "query": Object {
-      "__typename": "Query",
-      "todos": null,
     },
   },
 }

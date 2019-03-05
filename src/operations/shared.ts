@@ -51,7 +51,7 @@ export const forEachFieldNode = (
         // Recursively process the fragments' selection sets
         forEachFieldNode(ctx, fragmentSelect, cb);
       }
-    } else {
+    } else if (getName(node) !== '__typename') {
       cb(node);
     }
   });

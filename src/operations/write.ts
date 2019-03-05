@@ -2,6 +2,7 @@ import {
   getFieldAlias,
   getFieldArguments,
   getName,
+  getOperationType,
   getSelectionSet,
   SelectionSet,
 } from '../ast';
@@ -26,11 +27,16 @@ export const write = (store: Store, request: Request, data: Data): Result => {
 
   const { operation } = ctx;
   const select = getSelectionSet(operation);
-  const { operation: operationName } = operation;
-  if (operationName === 'subscription' || operationName === 'mutation') {
-    writeRoot(ctx, data, select);
+  const operationType = getOperationType(operation);
+
+  if (typeof data.__typename !== 'string') {
+    data.__typename = operationType;
+  }
+
+  if (operationType === 'Query') {
+    writeEntity(ctx, operationType, data, select);
   } else {
-    writeEntity(ctx, operationName, data, select);
+    writeRoot(ctx, data, select);
   }
 
   return { isComplete: true, dependencies: ctx.dependencies };
@@ -44,7 +50,7 @@ const writeEntity = (
 ) => {
   const { store } = ctx;
   const entity = findOrCreate(store, key);
-  if (key !== 'query') {
+  if (key !== 'Query') {
     ctx.dependencies.push(key);
   }
 
@@ -58,14 +64,17 @@ const writeSelection = (
   data: Data,
   select: SelectionSet
 ) => {
+  entity.__typename = data.__typename;
+
   forEachFieldNode(ctx, select, node => {
     const { store, vars } = ctx;
+
     const fieldName = getName(node);
     const fieldValue = data[getFieldAlias(node)];
     // The field's key can include arguments if it has any
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
     const childFieldKey = joinKeys(key, fieldKey);
-    if (key === 'query' && fieldName !== '__typename') {
+    if (key === 'Query' && fieldName !== '__typename') {
       ctx.dependencies.push(childFieldKey);
     }
 

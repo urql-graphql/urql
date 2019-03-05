@@ -62,7 +62,7 @@ it('cleans up unreachable records and links', () => {
 
   let json = serialize(store);
 
-  expect(json.links['query.todos']).toEqual(['Todo:0', 'Todo:1', 'Todo:2']);
+  expect(json.links['Query.todos']).toEqual(['Todo:0', 'Todo:1', 'Todo:2']);
   expect(json.records['Todo:1']).toMatchObject({ __typename: 'Todo' });
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
 
@@ -88,7 +88,7 @@ it('cleans up unreachable records and links', () => {
   json = serialize(store);
 
   // Same as above; everything is still reachable but `query.todos` is gone
-  expect(json.links['query.todos']).toBe(undefined);
+  expect(json.links['Query.todos']).toBe(undefined);
   expect(json.records['Todo:1']).toMatchObject({ __typename: 'Todo' });
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
 
@@ -96,7 +96,7 @@ it('cleans up unreachable records and links', () => {
   json = serialize(store);
 
   expect(json).toMatchSnapshot();
-  expect(json.links['query.todos']).toBe(undefined);
+  expect(json.links['Query.todos']).toBe(undefined);
   expect(json.records['Todo:1']).toBe(undefined);
   expect(json.records['Todo:2']).not.toBe(undefined);
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
@@ -117,7 +117,7 @@ it('cleans up unreachable records and links', () => {
 
   expect(json).toEqual({
     records: {
-      query: {
+      Query: {
         __typename: 'Query',
         todos: null,
         todo: null,

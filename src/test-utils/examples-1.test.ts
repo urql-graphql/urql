@@ -40,7 +40,7 @@ it('passes the "getting-started" example', () => {
   const writeRes = write(store, { query: Todos }, todosData);
 
   expect(writeRes.dependencies).toEqual([
-    'query.todos',
+    'Query.todos',
     'Todo:0',
     'Todo:1',
     'Todo:2',

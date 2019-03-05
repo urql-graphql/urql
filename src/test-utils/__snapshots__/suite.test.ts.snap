@@ -4,7 +4,7 @@ exports[`embedded object on entity 1`] = `
 Object {
   "links": Object {
     "Item:1.author": "Item:1.author",
-    "query.item": "Item:1",
+    "Query.item": "Item:1",
   },
   "records": Object {
     "Item:1": Object {
@@ -16,7 +16,7 @@ Object {
       "__typename": "Author",
       "name": "Stanley",
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
@@ -26,7 +26,7 @@ Object {
 
 exports[`embedded object on entity 2`] = `
 Array [
-  "query.item",
+  "Query.item",
   "Item:1",
   "Item:1.author",
 ]
@@ -36,7 +36,7 @@ exports[`embedded object on entity 3`] = `
 Object {
   "links": Object {
     "Item:1.author": "Author:1",
-    "query.item": "Item:1",
+    "Query.item": "Item:1",
   },
   "records": Object {
     "Author:1": Object {
@@ -49,7 +49,7 @@ Object {
       "author": null,
       "id": 1,
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
@@ -59,7 +59,7 @@ Object {
 
 exports[`embedded object on entity 4`] = `
 Array [
-  "query.item",
+  "Query.item",
   "Item:1",
   "Author:1",
 ]
@@ -68,7 +68,7 @@ Array [
 exports[`entity list on query 1`] = `
 Object {
   "links": Object {
-    "query.items": Array [
+    "Query.items": Array [
       "Item:1",
       "Item:2",
     ],
@@ -82,7 +82,7 @@ Object {
       "__typename": "Item",
       "id": 2,
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "items": null,
     },
@@ -92,7 +92,7 @@ Object {
 
 exports[`entity list on query 2`] = `
 Array [
-  "query.items",
+  "Query.items",
   "Item:1",
   "Item:2",
 ]
@@ -101,7 +101,7 @@ Array [
 exports[`entity list on query and inline fragment 1`] = `
 Object {
   "links": Object {
-    "query.items": Array [
+    "Query.items": Array [
       "Item:1",
       null,
     ],
@@ -112,7 +112,7 @@ Object {
       "id": 1,
       "test": true,
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "items": null,
     },
@@ -122,9 +122,9 @@ Object {
 
 exports[`entity list on query and inline fragment 2`] = `
 Array [
-  "query.items",
+  "Query.items",
   "Item:1",
-  "query.items",
+  "Query.items",
   "Item:1",
 ]
 `;
@@ -132,7 +132,7 @@ Array [
 exports[`entity list on query and spread fragment 1`] = `
 Object {
   "links": Object {
-    "query.items": Array [
+    "Query.items": Array [
       "Item:1",
       null,
     ],
@@ -143,7 +143,7 @@ Object {
       "id": 1,
       "test": true,
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "items": null,
     },
@@ -153,9 +153,9 @@ Object {
 
 exports[`entity list on query and spread fragment 2`] = `
 Array [
-  "query.items",
+  "Query.items",
   "Item:1",
-  "query.items",
+  "Query.items",
   "Item:1",
 ]
 `;
@@ -163,7 +163,7 @@ Array [
 exports[`entity on query 1`] = `
 Object {
   "links": Object {
-    "query.item": "Item:1",
+    "Query.item": "Item:1",
   },
   "records": Object {
     "Item:1": Object {
@@ -171,7 +171,7 @@ Object {
       "id": "1",
       "name": "Test",
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
@@ -181,7 +181,7 @@ Object {
 
 exports[`entity on query 2`] = `
 Array [
-  "query.item",
+  "Query.item",
   "Item:1",
 ]
 `;
@@ -189,7 +189,7 @@ Array [
 exports[`entity with Int-like ID on query 1`] = `
 Object {
   "links": Object {
-    "query.item": "Item:1",
+    "Query.item": "Item:1",
   },
   "records": Object {
     "Item:1": Object {
@@ -197,7 +197,7 @@ Object {
       "id": 1,
       "name": "Test",
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
@@ -207,7 +207,7 @@ Object {
 
 exports[`entity with Int-like ID on query 2`] = `
 Array [
-  "query.item",
+  "Query.item",
   "Item:1",
 ]
 `;
@@ -215,7 +215,7 @@ Array [
 exports[`entity with arguments on query 1`] = `
 Object {
   "links": Object {
-    "query.item({\\"test\\":true})": "Item:1",
+    "Query.item({\\"test\\":true})": "Item:1",
   },
   "records": Object {
     "Item:1": Object {
@@ -223,7 +223,7 @@ Object {
       "id": "1",
       "name": "Test",
     },
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item({\\"test\\":true})": null,
     },
@@ -233,7 +233,7 @@ Object {
 
 exports[`entity with arguments on query 2`] = `
 Array [
-  "query.item({\\"test\\":true})",
+  "Query.item({\\"test\\":true})",
   "Item:1",
 ]
 `;
@@ -242,7 +242,7 @@ exports[`int field with arguments on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "int({\\"test\\":true})": 42,
     },
@@ -252,7 +252,7 @@ Object {
 
 exports[`int field with arguments on query 2`] = `
 Array [
-  "query.int({\\"test\\":true})",
+  "Query.int({\\"test\\":true})",
 ]
 `;
 
@@ -260,7 +260,7 @@ exports[`int on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "int": 42,
     },
@@ -270,7 +270,7 @@ Object {
 
 exports[`int on query 2`] = `
 Array [
-  "query.int",
+  "Query.int",
 ]
 `;
 
@@ -278,7 +278,7 @@ exports[`invalid entity on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": Object {
         "__typename": null,
@@ -292,7 +292,7 @@ Object {
 
 exports[`invalid entity on query 2`] = `
 Array [
-  "query.item",
+  "Query.item",
 ]
 `;
 
@@ -300,7 +300,7 @@ exports[`json on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "json": Object {
         "__typename": "Misleading",
@@ -313,14 +313,14 @@ Object {
 
 exports[`json on query 2`] = `
 Array [
-  "query.json",
+  "Query.json",
 ]
 `;
 
 exports[`nested entity list on query 1`] = `
 Object {
   "links": Object {
-    "query.items": Array [
+    "Query.items": Array [
       "Item:1",
       Array [
         "Item:2",
@@ -338,7 +338,8 @@ Object {
       "__typename": "Item",
       "id": 2,
     },
-    "query": Object {
+    "Query": Object {
+      "__typename": "Query",
       "items": null,
     },
   },
@@ -347,7 +348,7 @@ Object {
 
 exports[`nested entity list on query 2`] = `
 Array [
-  "query.items",
+  "Query.items",
   "Item:1",
   "Item:2",
 ]
@@ -356,14 +357,14 @@ Array [
 exports[`non-IDable entity on query 1`] = `
 Object {
   "links": Object {
-    "query.item": "query.item",
+    "Query.item": "Query.item",
   },
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
-    "query.item": Object {
+    "Query.item": Object {
       "__typename": "Item",
       "name": "Test",
     },
@@ -373,22 +374,22 @@ Object {
 
 exports[`non-IDable entity on query 2`] = `
 Array [
-  "query.item",
-  "query.item",
+  "Query.item",
+  "Query.item",
 ]
 `;
 
 exports[`non-keyable entity on query 1`] = `
 Object {
   "links": Object {
-    "query.item": "query.item",
+    "Query.item": "Query.item",
   },
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "item": null,
     },
-    "query.item": Object {
+    "Query.item": Object {
       "__typename": "Item",
       "name": "Test",
     },
@@ -398,8 +399,8 @@ Object {
 
 exports[`non-keyable entity on query 2`] = `
 Array [
-  "query.item",
-  "query.item",
+  "Query.item",
+  "Query.item",
 ]
 `;
 
@@ -407,7 +408,7 @@ exports[`nullable field on query 1`] = `
 Object {
   "links": Object {},
   "records": Object {
-    "query": Object {
+    "Query": Object {
       "__typename": "Query",
       "missing": null,
     },
@@ -417,6 +418,6 @@ Object {
 
 exports[`nullable field on query 2`] = `
 Array [
-  "query.missing",
+  "Query.missing",
 ]
 `;

@@ -21,7 +21,7 @@ export const query = (store: Store, request: Request): Result => {
   }
 
   const select = getSelectionSet(ctx.operation);
-  const data = readEntity(ctx, 'query', select, Object.create(null));
+  const data = readEntity(ctx, 'Query', select, Object.create(null));
 
   return {
     data,
@@ -42,7 +42,7 @@ const readEntity = (
     // Cache Incomplete: A missing entity for a key means it wasn't cached
     ctx.isComplete = false;
     return null;
-  } else if (key !== 'query') {
+  } else if (key !== 'Query') {
     ctx.dependencies.push(key);
   }
 
@@ -56,28 +56,30 @@ const readSelection = (
   select: SelectionSet,
   data: Data
 ): Data => {
-  const { store, vars } = ctx;
+  data.__typename = entity.__typename as string;
 
   forEachFieldNode(ctx, select, node => {
+    const { store, vars } = ctx;
+
     const fieldName = getName(node);
     // The field's key can include arguments if it has any
     const fieldKey = keyOfField(fieldName, getFieldArguments(node, vars));
     const fieldValue = entity[fieldKey];
     const fieldAlias = getFieldAlias(node);
     const childFieldKey = joinKeys(key, fieldKey);
-    if (key === 'query' && fieldName !== '__typename') {
+    if (key === 'Query') {
       ctx.dependencies.push(childFieldKey);
     }
 
-    if (node.selectionSet === undefined || fieldValue !== null) {
-      if (!(fieldAlias in data)) {
-        // Cache Incomplete: An undefined field value means it wasn't cached
-        ctx.isComplete = fieldValue !== undefined;
-        data[fieldAlias] = fieldValue === undefined ? null : fieldValue;
-      }
+    if (fieldValue === undefined) {
+      // Cache Incomplete: A missing field means it wasn't cached
+      ctx.isComplete = false;
+      data[fieldAlias] = null;
+    } else if (node.selectionSet === undefined || fieldValue !== null) {
+      data[fieldAlias] = fieldValue;
     } else {
       // null values mean that a field might be linked to other entities
-      const { selections: fieldSelect } = node.selectionSet;
+      const fieldSelect = getSelectionSet(node);
       const link = readLink(store, childFieldKey);
 
       // Cache Incomplete: A missing link for a field means it's not cached

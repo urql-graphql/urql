@@ -7,15 +7,16 @@ import {
   SelectionSetNode,
 } from 'graphql';
 
-import { SelectionSet } from './types';
+import { OperationType, SelectionSet } from './types';
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;
 
 /** Returns the SelectionSet for a given inline or defined fragment node */
 export const getSelectionSet = (node: {
-  selectionSet: SelectionSetNode;
-}): SelectionSet => node.selectionSet.selections;
+  selectionSet?: SelectionSetNode;
+}): SelectionSet =>
+  node.selectionSet !== undefined ? node.selectionSet.selections : [];
 
 export const getTypeCondition = ({
   typeCondition,
@@ -31,3 +32,16 @@ export const isOperationNode = (
 export const isFragmentNode = (
   node: DefinitionNode
 ): node is FragmentDefinitionNode => node.kind === 'FragmentDefinition';
+
+export const getOperationType = (
+  node: OperationDefinitionNode
+): OperationType => {
+  switch (node.operation) {
+    case 'query':
+      return 'Query';
+    case 'mutation':
+      return 'Mutation';
+    case 'subscription':
+      return 'Subscription';
+  }
+};

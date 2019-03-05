@@ -3,10 +3,15 @@
 exports[`cleans up unreachable records and links 1`] = `
 Object {
   "links": Object {
+    "Query.todo": "Todo:2",
     "Todo:2.author": "Todo:2.author",
-    "query.todo": "Todo:2",
   },
   "records": Object {
+    "Query": Object {
+      "__typename": "Query",
+      "todo": null,
+      "todos": null,
+    },
     "Todo:2": Object {
       "__typename": "Todo",
       "author": null,
@@ -17,11 +22,6 @@ Object {
     "Todo:2.author": Object {
       "__typename": "Author",
       "name": "Thomas",
-    },
-    "query": Object {
-      "__typename": "Query",
-      "todo": null,
-      "todos": null,
     },
   },
 }
