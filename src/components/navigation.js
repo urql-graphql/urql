@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-static";
+import pinkSidebarBackground from "../static/svgs/pink-sidebar-background.svg";
+import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
 const sidebarZIndex = 900;
 
@@ -31,7 +33,7 @@ export const SidebarContainer = styled.div`
 
 export const SidebarWrapper = styled.aside`
   font-family: "akkurat";
-  background-image: url("../../static/svgs/pink-sidebar-background.svg");
+  background-image: url(${pinkSidebarBackground});
   background-repeat: repeat-y;
   min-height: 100vh;
   padding-top: 18rem;
@@ -47,8 +49,8 @@ export const SidebarWrapper = styled.aside`
   @media (max-width: 768px) {
     background-image: ${props =>
       props.overlay
-        ? 'url("../../static/svgs/pink-sidebar-background.svg")'
-        : 'url("../../static/svgs/collapsed-sidebar-background.svg")'};
+        ? `url(${pinkSidebarBackground})`
+        : `url(${collapsedSidebarBackground})`};
     min-width: ${props => (props.overlay ? "26rem" : "5rem")};
     width: ${props => (props.overlay ? "26rem" : "5rem")};
   }

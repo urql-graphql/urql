@@ -4,7 +4,7 @@ import bgImg from "../static/bg_hero_gray.jpg";
 import styled from "styled-components";
 import { Navigation } from "./navigation";
 import { Wrapper } from "./wrapper";
-
+import logoFormidableWhite from "../static/svgs/logo_formidable_white.svg";
 const Container = styled.header`
   background: #3b3b3b url(${bgImg});
   background-size: cover;
@@ -24,10 +24,7 @@ export const Header = () => (
   <Container>
     <Navigation>
       <Wrapper noPadding>
-        <HeaderLogo
-          src="../static/svgs/logo_formidable_white.svg"
-          alt="Formidable Logo"
-        />
+        <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
       </Wrapper>
     </Navigation>
     <Hero />

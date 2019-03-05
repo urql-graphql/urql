@@ -16,6 +16,7 @@
     "start": "react-static start",
     "stage": "react-static build --staging",
     "build": "react-static build",
+    "stage-debug": "react-static build --staging --debug",
     "serve": "serve dist -p 3000",
     "prettier-all": "npx prettier '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
     "yamllint": "npx yamllint ./static-public/admin/config.yml",
@@ -102,12 +103,11 @@
     "spectacle": "^5.0.0",
     "style-loader": "^0.23.1",
     "surge": "^0.20.1",
-    "svg-inline-loader": "^0.8.0",
     "to-vfile": "^5.0.2",
     "toml-js": "0.0.8",
     "unist-util-select": "^1.5.0",
     "unist-util-visit": "^1.4.0",
-    "url-loader": "^1.1.1",
+    "url-loader": "^1.1.2",
     "yaml-lint": "^1.2.4"
   }
 }

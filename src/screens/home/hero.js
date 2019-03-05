@@ -5,6 +5,9 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
+import spectacleLogoRaised from "../../static/svgs/logo_spectacle_raised.svg";
+
+
 
 const HeroContent = styled.div`
   align-items: center;
@@ -144,7 +147,7 @@ class Hero extends React.Component {
       <Wrapper noPadding>
         <HeroContent>
           <HeroLogo
-            src="../../static/svgs/logo_spectacle_raised.svg"
+            src={spectacleLogoRaised}
             alt="Formidable Logo"
           />
           <HeroTitle>Spectacle</HeroTitle>
@@ -170,7 +173,7 @@ class Hero extends React.Component {
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link to="/docs">Docs</Link>
+            <Link prefetch={true} to="/docs">Docs</Link>
           </li>
           <li>
             <a

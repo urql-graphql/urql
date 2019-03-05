@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import { withRouteData } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
+import burger from "../../static/svgs/burger.svg";
+import logoFormidableDark from "../../static/svgs/logo_formidable_dark.svg";
 
 const headerZIndex = 800;
 
@@ -98,21 +100,20 @@ class Docs extends React.Component {
   closeSidebar() {
     this.setState({ openSidebar: false });
   }
-
   render() {
     return (
       <Container>
         <Wrapper noPadding>
           <CollapsedMenu overlay={this.state.openSidebar}>
             <img
-              src="../../static/svgs/burger.svg"
+              src={burger}
               alt="Menu"
               onClick={() => this.openSidebar()}
             />
           </CollapsedMenu>
           <DocsTitle>SPECTACLE</DocsTitle>
           <HeaderLogo
-            src="../../static/svgs/logo_formidable_dark.svg"
+            src={logoFormidableDark}
             alt="Formidable Logo"
           />
         </Wrapper>

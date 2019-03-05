@@ -8,6 +8,8 @@ import {
   SidebarContainer,
   SidebarWrapper,
 } from "../../components/navigation";
+import closeButton from "../../static/svgs/x.svg";
+import logoSidebar from "../../static/svgs/logo-sidebar.svg";
 
 const HeroLogo = styled.img`
   position: absolute;
@@ -96,14 +98,14 @@ class Sidebar extends React.Component {
       <SidebarContainer>
         <SidebarWrapper overlay={overlay}>
           <CloseButton
-            src="../../static/svgs/x.svg"
+            src={closeButton}
             alt="X"
             overlay={overlay}
             onClick={() => closeSidebar()}
           />
           <Link to={"/"}>
             <HeroLogo
-              src="../../static/svgs/logo-sidebar.svg"
+              src={logoSidebar}
               alt="Formidable Logo"
               overlay={overlay}
             />

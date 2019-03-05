@@ -52,7 +52,14 @@ const staticWebpackConfig = (config, { defaultLoaders, stage }) => {
         },
         {
           test: /\.svg$/,
-          loader: "svg-inline-loader"
+          use: [
+            {
+              loader: "url-loader",
+              options: {
+                limit: Number.MAX_SAFE_INTEGER
+              }
+            }
+          ]
         },
         {
           test: /\.md$/,
