@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`aliased field on query 1`] = `
+Object {
+  "links": Object {},
+  "records": Object {
+    "Query": Object {
+      "__typename": "Query",
+      "int": 42,
+    },
+  },
+}
+`;
+
+exports[`aliased field on query 2`] = `
+Array [
+  "Query.int",
+]
+`;
+
 exports[`embedded object on entity 1`] = `
 Object {
   "links": Object {
@@ -156,6 +174,32 @@ Array [
   "Query.items",
   "Item:1",
   "Query.items",
+  "Item:1",
+]
+`;
+
+exports[`entity on aliased field on query 1`] = `
+Object {
+  "links": Object {
+    "Query.item": "Item:1",
+  },
+  "records": Object {
+    "Item:1": Object {
+      "__typename": "Item",
+      "id": "1",
+      "name": "Test",
+    },
+    "Query": Object {
+      "__typename": "Query",
+      "item": null,
+    },
+  },
+}
+`;
+
+exports[`entity on aliased field on query 2`] = `
+Array [
+  "Query.item",
   "Item:1",
 ]
 `;

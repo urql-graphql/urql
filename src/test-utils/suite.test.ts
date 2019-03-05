@@ -35,6 +35,23 @@ it('int on query', () => {
   });
 });
 
+it('aliased field on query', () => {
+  const store = expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        anotherName: int
+      }
+    `,
+    data: { __typename: 'Query', anotherName: 42 },
+  });
+
+  expect(store.records.Query).toMatchObject({
+    __typename: 'Query',
+    int: 42,
+  });
+});
+
 it('json on query', () => {
   expectCacheIntegrity({
     query: gql`
@@ -175,6 +192,27 @@ it('entity on query', () => {
     id: '1',
     name: 'Test',
   });
+});
+
+it('entity on aliased field on query', () => {
+  const store = expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        anotherName: item {
+          __typename
+          id
+          name
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      anotherName: { __typename: 'Item', id: '1', name: 'Test' },
+    },
+  });
+
+  expect(store.links['Query.item']).toBe('Item:1');
 });
 
 it('entity with arguments on query', () => {
