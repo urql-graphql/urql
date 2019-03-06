@@ -157,6 +157,12 @@ as soon as it's mounted and will rerun it when the query or variables change.
 
 [Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
+#### Watch `useQuery` React hook screencast on egghead
+
+[Query Graphql Data With Urql Using React Hooks][egghead]
+
+[egghead]: https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks
+
 ### Using `graphql-tag`
 
 You're not limited to just passing in strings as queries. You can also
