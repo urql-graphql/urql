@@ -155,6 +155,9 @@ const TodoList = ({ limit = 10 }) => {
 Similarly to the `<Query>` component, `useQuery` will start the request
 as soon as it's mounted and will rerun it when the query or variables change.
 
+> A tutorial on the `useQuery` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks).
+
 [Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
 ### Using `graphql-tag`
