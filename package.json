@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "description": "A normalizing GraphQL cache configurable by defining exceptions to the rule",
   "main": "dist/graphcache.js",
   "module": "dist/graphcache.es.js",
