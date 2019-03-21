@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { withRouteData } from "react-static";
+import { withRouteData, Link } from "react-static";
 import Article from "./article";
 import Sidebar from "./sidebar";
 import burger from "../../static/svgs/burger.svg";
@@ -23,7 +23,7 @@ const Wrapper = styled.div`
   height: 6rem;
   width: 100%;
   position: fixed;
-  left: 21rem;
+  left: 19rem;
   background: white;
   z-index: ${headerZIndex};
   padding-right: 3rem;
@@ -76,7 +76,8 @@ const DocsTitle = styled.h2`
   letter-spacing: 0.5rem;
   margin: 0;
   position: relative;
-  left: 9rem;
+  left: 10rem;
+
   @media (max-width: 768px) {
     font-size: 3rem;
     left: 2rem;
@@ -109,7 +110,11 @@ class Docs extends React.Component {
           <CollapsedMenu overlay={this.state.openSidebar}>
             <img src={burger} alt="Menu" onClick={() => this.openSidebar()} />
           </CollapsedMenu>
-          <DocsTitle>{constants.docsTitle}</DocsTitle>
+          <DocsTitle>
+            <Link to={"/"} style={{ color: "#3b3b3b" }}>
+              {constants.docsTitle}
+            </Link>
+          </DocsTitle>
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Wrapper>
         <Sidebar

@@ -35,6 +35,7 @@ export const SidebarWrapper = styled.aside`
   font-family: "akkurat";
   background-image: url(${sidebarBackground});
   background-repeat: repeat-y;
+  background-size: 100%;
   min-height: 100vh;
   padding-top: 18rem;
   min-width: 20rem;

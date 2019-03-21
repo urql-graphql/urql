@@ -6,6 +6,7 @@ import Preview from "./preview";
 import content from "./_content";
 import styled from "styled-components";
 import { Header } from "../../components/header";
+import { Footer } from "../../components/footer";
 
 const Container = styled.div`
   width: 100%;
@@ -20,6 +21,7 @@ class Home extends React.Component {
         <Preview previewObj={content.preview} />
         <GetStarted getStartedObj={content.getStarted} />
         <MoreOSS ossArray={content.oss} />
+        <Footer />
       </Container>
     );
   }
