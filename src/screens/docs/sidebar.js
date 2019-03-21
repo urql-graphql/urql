@@ -62,6 +62,7 @@ class Sidebar extends React.Component {
     const { tocArray } = this.props;
     const currentPath =
       `/docs${item.path}` === this.props.history.location.pathname;
+    // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
@@ -140,6 +141,7 @@ class Sidebar extends React.Component {
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
+  history: PropTypes.object,
   overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
   tocArray: PropTypes.array

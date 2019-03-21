@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link, withRouter, Router, Route } from "react-static";
+import { withRouter, Router } from "react-static";
 import { hot } from "react-hot-loader";
 import Template from "./template";
 import Analytics from "./google-analytics";
 // Routes generated at build-time
+// eslint-disable-next-line import/no-unresolved
 import Routes from "react-static-routes";
+// import default prism theme styles
 import "prismjs/themes/prism.css";
 
 const scrollSidebar = async (location, activeItemClass = ".active") => {
@@ -41,6 +43,11 @@ class ScrollToTop extends Component {
   }
 }
 
+ScrollToTop.propTypes = {
+  children: PropTypes.object,
+  location: PropTypes.object
+};
+
 const WrappedScrollToTop = withRouter(ScrollToTop);
 
 let history;
@@ -53,6 +60,7 @@ if (typeof window !== "undefined") {
       : createBrowserHistory({ basename: `/${landerBasePath}` });
 }
 
+// eslint-disable-next-line react/no-multi-comp
 const App = () => (
   <Router
     showErrorsInProduction={false}

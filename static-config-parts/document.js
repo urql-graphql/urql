@@ -1,8 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-export default class CustomDocument extends React.Component {
+class CustomDocument extends React.Component {
   render() {
-    const { Html, Head, Body, children, routeInfo, renderMeta } = this.props;
+    const { Html, Head, Body, children, renderMeta } = this.props;
     return (
       <Html>
         <Head>
@@ -78,3 +79,13 @@ export default class CustomDocument extends React.Component {
     );
   }
 }
+
+CustomDocument.propTypes = {
+  Body: PropTypes.func,
+  Head: PropTypes.func,
+  Html: PropTypes.func,
+  children: PropTypes.object,
+  renderMeta: PropTypes.object
+};
+
+export default CustomDocument;

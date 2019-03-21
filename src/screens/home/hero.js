@@ -168,7 +168,7 @@ class Hero extends React.Component {
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link prefetch={true} to="/docs">
+            <Link prefetch to="/docs">
               Docs
             </Link>
           </li>
