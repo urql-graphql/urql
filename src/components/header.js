@@ -24,7 +24,7 @@ export const Header = () => (
   <Container>
     <Navigation>
       <Wrapper noPadding>
-        <a href="https://formidable.com">
+        <a href="https://formidable.com" title="Formidable">
           <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
         </a>
       </Wrapper>

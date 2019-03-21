@@ -60,7 +60,9 @@ export const Footer = () => (
   <Container>
     <Wrapper noPadding>
       <FooterLeft>
-        <FooterLogo src={logoFormidableWhite} alt="Formidable Logo" />
+        <a href="https://formidable.com" title="Formidable">
+          <FooterLogo src={logoFormidableWhite} alt="Formidable Logo" />
+        </a>
         <FooterLinks>
           <li>
             <a href="https://formidable.com/contact/" title="Contact">
