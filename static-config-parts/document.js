@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { metaData } from "./constants";
 
 class CustomDocument extends React.Component {
   render() {
@@ -14,22 +15,13 @@ class CustomDocument extends React.Component {
             content="width=device-width, initial-scale=1.0"
           />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-          <meta
-            name="description"
-            content="A React.js based library for creating sleek presentations using JSX syntax (with the ability to live demo your code!)"
-          />
-          <meta property="og:title" content="Spectacle" />
-          <meta property="og:site_name" content="Spectacle" />
+          <meta name="description" content={metaData.description} />
+          <meta property="og:title" content={metaData.title} />
+          <meta property="og:site_name" content={metaData.title} />
           <meta property="og:type" content="website" />
-          <meta
-            property="og:url"
-            content="http://www.formidable.com/open-source/spectacle/"
-          />
+          <meta property="og:url" content={metaData.url} />
           <meta property="og:image" content="./static/og-image.png" />
-          <meta
-            property="og:description"
-            content="A React.js based library for creating sleek presentations using JSX syntax (with the ability to live demo your code!)"
-          />
+          <meta property="og:description" content={metaData.description} />
           <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0"
@@ -70,7 +62,7 @@ class CustomDocument extends React.Component {
           />
           <meta name="theme-color" content="#ffffff" />
           {renderMeta.styleTags}
-          <title>Spectacle</title>
+          <title>{metaData.title}</title>
         </Head>
         <Body>
           <div id="content">{children}</div>

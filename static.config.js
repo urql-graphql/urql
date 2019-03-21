@@ -6,7 +6,7 @@ const staticWebpackConfig = require("./static-config-parts/static-webpack-config
 const { ServerStyleSheet } = require("styled-components");
 const { stage, landerBasePath } = require("./static-config-parts/constants");
 
-chokidar.watch("content").on("all", () => reloadRoutes());
+chokidar.watch("src/content").on("all", () => reloadRoutes());
 
 export default {
   // plugins: ["react-static-plugin-styled-components"],

@@ -10,6 +10,7 @@ import {
 } from "../../components/navigation";
 import closeButton from "../../static/svgs/x.svg";
 import logoSidebar from "../../static/svgs/logo-sidebar.svg";
+import constants from "../../constants";
 
 const HeroLogo = styled.img`
   position: absolute;
@@ -120,16 +121,10 @@ class Sidebar extends React.Component {
             </SidebarNavItem>
             {sidebarHeaders &&
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-            <SidebarNavItem
-              to={"https://www.github.com/FormidableLabs/spectacle/issues"}
-              key={"issues"}
-            >
+            <SidebarNavItem to={constants.githubIssues} key={"issues"}>
               Issues
             </SidebarNavItem>
-            <SidebarNavItem
-              to={"https://github.com/FormidableLabs/spectacle"}
-              key={"github"}
-            >
+            <SidebarNavItem to={constants.github} key={"github"}>
               Github
             </SidebarNavItem>
           </ContentWrapper>

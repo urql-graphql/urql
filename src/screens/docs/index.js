@@ -6,6 +6,7 @@ import Article from "./article";
 import Sidebar from "./sidebar";
 import burger from "../../static/svgs/burger.svg";
 import logoFormidableDark from "../../static/svgs/logo_formidable_dark.svg";
+import constants from "../../constants";
 
 const headerZIndex = 800;
 
@@ -100,6 +101,7 @@ class Docs extends React.Component {
   closeSidebar() {
     this.setState({ openSidebar: false });
   }
+
   render() {
     return (
       <Container>
@@ -107,7 +109,7 @@ class Docs extends React.Component {
           <CollapsedMenu overlay={this.state.openSidebar}>
             <img src={burger} alt="Menu" onClick={() => this.openSidebar()} />
           </CollapsedMenu>
-          <DocsTitle>SPECTACLE</DocsTitle>
+          <DocsTitle>{constants.docsTitle}</DocsTitle>
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Wrapper>
         <Sidebar

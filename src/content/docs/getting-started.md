@@ -9,7 +9,7 @@ order: 0
 
 [Development](#development)
 
-[Build & Deployment](#build-&-deployment)
+[Build and Deployment](#build-and-deployment)
 
 [Presenting](#presenting)
 
@@ -43,7 +43,7 @@ Open a browser and hit [http://localhost:3000](http://localhost:3000), and we ar
 
 <a name="build--deployment"></a>
 
-## Build & Deployment
+## Build and Deployment
 
 Building the dist version of the project is as easy as running `npm run build`
 

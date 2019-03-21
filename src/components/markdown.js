@@ -105,7 +105,6 @@ export const Markdown = styled.article`
     }
     &:hover {
       color: black;
-      text-decoration: underline;
     }
   }
 `;
