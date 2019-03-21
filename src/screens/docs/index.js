@@ -105,17 +105,10 @@ class Docs extends React.Component {
       <Container>
         <Wrapper noPadding>
           <CollapsedMenu overlay={this.state.openSidebar}>
-            <img
-              src={burger}
-              alt="Menu"
-              onClick={() => this.openSidebar()}
-            />
+            <img src={burger} alt="Menu" onClick={() => this.openSidebar()} />
           </CollapsedMenu>
           <DocsTitle>SPECTACLE</DocsTitle>
-          <HeaderLogo
-            src={logoFormidableDark}
-            alt="Formidable Logo"
-          />
+          <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Wrapper>
         <Sidebar
           overlay={this.state.openSidebar}

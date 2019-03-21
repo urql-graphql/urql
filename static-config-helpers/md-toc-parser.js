@@ -11,7 +11,6 @@ import yaml from "prismjs/components/prism-yaml";
 
 import Highlight, { defaultProps } from "prism-react-renderer";
 
-
 import basename from "../src/constants/basename";
 
 const setMarkdownRenderer = currentPath => {
@@ -55,7 +54,8 @@ const setMarkdownRenderer = currentPath => {
   // store the original rule
   const defaultRender =
     md.renderer.rules.link_open ||
-    function(tokens, idx, options, env, renderer) {  // eslint-disable-line max-params
+    function(tokens, idx, options, env, renderer) {
+      // eslint-disable-line max-params
       return renderer.renderToken(tokens, idx, options);
     };
   //

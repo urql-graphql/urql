@@ -18,7 +18,7 @@
     "build": "react-static build",
     "stage-debug": "react-static build --staging --debug",
     "serve": "serve dist -p 3000",
-    "prettier-all": "npx prettier '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
+    "prettier-all": "npx prettier --write '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
     "yamllint": "npx yamllint ./static-public/admin/config.yml",
     "preversion": "yarn run lint && yarn run build",
     "format": "yarn run lint:fix",

@@ -6,7 +6,7 @@ import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
-  SidebarWrapper,
+  SidebarWrapper
 } from "../../components/navigation";
 import closeButton from "../../static/svgs/x.svg";
 import logoSidebar from "../../static/svgs/logo-sidebar.svg";
@@ -114,10 +114,7 @@ class Sidebar extends React.Component {
             <SidebarNavItem to={`/#`} key={"home"}>
               Home
             </SidebarNavItem>
-            <SidebarNavItem
-              to={`/docs/getting-started`}
-              key={"documentation"}
-            >
+            <SidebarNavItem to={`/docs/getting-started`} key={"documentation"}>
               Documentation
             </SidebarNavItem>
             {sidebarHeaders &&
