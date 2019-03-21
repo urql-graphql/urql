@@ -4,7 +4,11 @@ import chokidar from "chokidar";
 import { getSidebarItems } from "./static-config-helpers/md-data-transforms";
 const staticWebpackConfig = require("./static-config-parts/static-webpack-config");
 const { ServerStyleSheet } = require("styled-components");
-const { stage, landerBasePath } = require("./static-config-parts/constants");
+const {
+  stage,
+  landerBasePath,
+  metaData
+} = require("./static-config-parts/constants");
 
 chokidar.watch("src/content").on("all", () => reloadRoutes());
 
@@ -22,7 +26,7 @@ export default {
   stagingBasePath: landerBasePath,
   devBasePath: "",
   getSiteData: () => ({
-    title: "Spectacle"
+    title: metaData.title
   }),
   getRoutes: async () => {
     const sidebarItems = await getSidebarItems();
@@ -41,7 +45,7 @@ export default {
         path: "/docs",
         component: "src/screens/docs",
         getData: () => ({
-          title: "Spectacle | Documentation",
+          title: `${metaData.title} | Documentation`,
           markdown: sidebarItems[0].markdown,
           renderedMd: sidebarItems[0].content,
           sidebarHeaders,

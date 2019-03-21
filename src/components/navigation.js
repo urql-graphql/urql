@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-static";
-import sidebarBackground from "../static/svgs/pink-sidebar-background.svg";
+import sidebarBackground from "../static/svgs/sidebar-background.svg";
 import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
 const sidebarZIndex = 900;

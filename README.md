@@ -83,3 +83,16 @@ or the local dev server as 1:1 with production output!
     * Interestingly, some webpack v4 loaders still work with v3, while some webpack v3 loaders _don't_ work with webpack v3.
     Version-twiddling or using a different loader for reasons that are unclear may be required. When tweaking webpack,
     it's extra-important to validate both PWA and static html output and clear out cached files.
+
+## Using this project as a template:
+
+This lander is designed to be easily re-used as a template for other projects.
+
+What to change:
+
+- Docs Content: markdown content lives in `src/content/docs`. Any markdown files placed here will be rendered as separate pages, and header tags will be rendered into a hierarchical sidebar. (Please make sure header tags do not include any special symbols as they will be used to create anchor tags and hashes)
+- Main page content
+    - `src/screens/home/_content.js` includes section titles, descriptions, and assets urls
+    - `src/screens/home/hero.js`
+- Constants: client and static constants live in `src/constants.js` and `static-config-parts/constants.js` respectively
+- Assets: logos, sidebar svgs and favicons (TODO: These are all very similar svgs, and could some day live in a separate repo, and take props like color, name etc)
