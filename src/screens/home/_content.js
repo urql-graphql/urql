@@ -1,12 +1,3 @@
-// github.com/FormidableLabs/dogs/blob/master/dogs.json// ----------------------------------------------------------
-// Home Page Dynamic content: replace these values for re-use
-// ----------------------------------------------------------
-import bucketClick from "../../static/svgs/bucket_click.svg";
-import bucketCode from "../../static/svgs/bucket_code.svg";
-import bucketAmazing from "../../static/svgs/bucket_amazing.svg";
-import logoVictory from "../../static/svgs/logo_victory.svg";
-import logoDevelopmentDashboards from "../../static/svgs/logo_development-dashboards.svg";
-
 const content = {
   features: [
     {
