@@ -43,7 +43,7 @@ export default {
         getData: () => ({
           title: "Spectacle | Documentation",
           markdown: sidebarItems[0].markdown,
-          renderedMd: sidebarItems[0].renderedMd,
+          renderedMd: sidebarItems[0].content,
           sidebarHeaders,
           tocArray: sidebarItems[0].data.subHeadings.map(sh => ({
             content: sh.value,
@@ -52,14 +52,14 @@ export default {
         }),
         // move slug + path to data in transform, renderedMd to data, and nuke markdown prop
         children: sidebarItems.map(
-          ({ slug, path, markdown, renderedMd, data }) => ({
+          ({ slug, path, markdown, content, data }) => ({
             path,
             component: "src/screens/docs",
             getData: () => ({
               title: data.title,
               markdown,
               path: `/${slug}/`,
-              renderedMd,
+              renderedMd: content,
               sidebarHeaders,
               tocArray: data.subHeadings.map(sh => ({
                 content: sh.value,

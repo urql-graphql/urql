@@ -4,7 +4,6 @@
 const _ = require("lodash");
 const path = require("path");
 const getMdFiles = require("./get-md-files");
-const generateRenderReadyMd = require("./md-toc-parser").default;
 
 const sidebarTitleSlugMutation = (mdData, mdPath) => {
   const { name } = path.parse(mdPath);
@@ -23,20 +22,12 @@ const sidebarTitleSlugMutation = (mdData, mdPath) => {
   }
 };
 
-const renderedMarkdownMutation = (mdData, mdPath) => {
-  const { name } = path.parse(mdPath);
-  mdData.renderedMd = generateRenderReadyMd({
-    markdown: mdData.content,
-    path: `/${name}/`
-  }).toString();
-};
-
 const sidebarSort = items => _.orderBy(items, ["data.order"], "asc");
 
 function getSidebarItems(
   mdPath = "content/docs/",
   items = [],
-  mutations = [sidebarTitleSlugMutation, renderedMarkdownMutation],
+  mutations = [sidebarTitleSlugMutation],
   sort = sidebarSort
 ) {
   return getMdFiles(mdPath, items, mutations, sort);

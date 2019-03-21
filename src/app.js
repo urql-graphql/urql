@@ -6,6 +6,7 @@ import Template from "./template";
 import Analytics from "./google-analytics";
 // Routes generated at build-time
 import Routes from "react-static-routes";
+import "prismjs/themes/prism.css";
 
 const scrollSidebar = async (location, activeItemClass = ".active") => {
   const actives = document.querySelectorAll(activeItemClass);
@@ -44,7 +45,7 @@ const WrappedScrollToTop = withRouter(ScrollToTop);
 
 let history;
 if (typeof window !== "undefined") {
-  const createBrowserHistory = require("history/createBrowserHistory").default;
+  const createBrowserHistory = require("history").createBrowserHistory;
   const { stage, landerBasePath } = require("../static-config-parts/constants");
   history =
     stage === "development"
