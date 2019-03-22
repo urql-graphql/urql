@@ -21,7 +21,9 @@
     "prettier-all": "npx prettier --write '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
     "preversion": "yarn run lint && yarn run build",
     "format": "yarn run lint:fix",
-    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js'static.config.js"
+    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js'static.config.js",
+    "stage-and-serve": "yarn stage && yarn serve",
+    "test-local": "node test/spectacle-integration.js"
   },
   "dependencies": {
     "@babel/node": "^7.2.0",
@@ -56,7 +58,6 @@
     "@babel/core": "^7.2.0",
     "anchorate": "^1.1.0",
     "babel-preset-stage-1": "^6.24.1",
-    "chai": "^4.1.2",
     "chalk": "^2.4.1",
     "change-case": "^3.0.2",
     "config": "^3.0.0",
@@ -71,9 +72,9 @@
     "js-yaml": "^3.12.0",
     "json-to-frontmatter-markdown": "^1.0.0",
     "lodash": "^4.17.11",
-    "mocha": "^5.2.0",
     "node-dir": "^0.1.17",
     "prettier": "^1.15.1",
+    "puppeteer": "^1.13.0",
     "react-document-meta": "^2.0.3",
     "react-router-scroll": "^0.2.0",
     "react-static-plugin-styled-components": "^6.0.0-beta.28",

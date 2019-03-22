@@ -26,3 +26,5 @@ coverage
 Procfile
 build
 package-lock.json
+
+test/screenshots
