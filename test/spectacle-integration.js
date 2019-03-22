@@ -20,15 +20,6 @@ try {
     if (!article) {
       throw new Error(`Docs route did not render as expected!`);
     }
-
-    // we can do these too, but really validating that they exist is probably sufficient, lemme know!
-    // const externalLinks = ["https://gitter.im/FormidableLabs/victory", "https://github.com/FormidableLabs/victory"];
-    // for (let i = 0; i < externalLinks.length; i++) {
-    //   const l = links[i];
-    //   await page.click(`[href='${l}']`);
-    //   await page.waitFor(2000);
-    //   await page.goBack();
-    // }
     await browser.close();
   })();
 } catch (err) {
