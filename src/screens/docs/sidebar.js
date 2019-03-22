@@ -6,10 +6,11 @@ import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
-  SidebarWrapper,
+  SidebarWrapper
 } from "../../components/navigation";
 import closeButton from "../../static/svgs/x.svg";
 import logoSidebar from "../../static/svgs/logo-sidebar.svg";
+import constants from "../../constants";
 
 const HeroLogo = styled.img`
   position: absolute;
@@ -62,6 +63,7 @@ class Sidebar extends React.Component {
     const { tocArray } = this.props;
     const currentPath =
       `/docs${item.path}` === this.props.history.location.pathname;
+    // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
@@ -114,24 +116,15 @@ class Sidebar extends React.Component {
             <SidebarNavItem to={`/#`} key={"home"}>
               Home
             </SidebarNavItem>
-            <SidebarNavItem
-              to={`/docs/getting-started`}
-              key={"documentation"}
-            >
+            <SidebarNavItem to={`/docs/getting-started`} key={"documentation"}>
               Documentation
             </SidebarNavItem>
             {sidebarHeaders &&
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-            <SidebarNavItem
-              to={"https://www.github.com/FormidableLabs/spectacle/issues"}
-              key={"issues"}
-            >
+            <SidebarNavItem to={constants.githubIssues} key={"issues"}>
               Issues
             </SidebarNavItem>
-            <SidebarNavItem
-              to={"https://github.com/FormidableLabs/spectacle"}
-              key={"github"}
-            >
+            <SidebarNavItem to={constants.github} key={"github"}>
               Github
             </SidebarNavItem>
           </ContentWrapper>
@@ -143,6 +136,7 @@ class Sidebar extends React.Component {
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
+  history: PropTypes.object,
   overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
   tocArray: PropTypes.array

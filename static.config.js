@@ -4,9 +4,13 @@ import chokidar from "chokidar";
 import { getSidebarItems } from "./static-config-helpers/md-data-transforms";
 const staticWebpackConfig = require("./static-config-parts/static-webpack-config");
 const { ServerStyleSheet } = require("styled-components");
-const { stage, landerBasePath } = require("./static-config-parts/constants");
+const {
+  stage,
+  landerBasePath,
+  metaData
+} = require("./static-config-parts/constants");
 
-chokidar.watch("content").on("all", () => reloadRoutes());
+chokidar.watch("src/content").on("all", () => reloadRoutes());
 
 export default {
   // plugins: ["react-static-plugin-styled-components"],
@@ -22,7 +26,7 @@ export default {
   stagingBasePath: landerBasePath,
   devBasePath: "",
   getSiteData: () => ({
-    title: "Spectacle"
+    title: metaData.title
   }),
   getRoutes: async () => {
     const sidebarItems = await getSidebarItems();
@@ -41,9 +45,9 @@ export default {
         path: "/docs",
         component: "src/screens/docs",
         getData: () => ({
-          title: "Spectacle | Documentation",
+          title: `${metaData.title} | Documentation`,
           markdown: sidebarItems[0].markdown,
-          renderedMd: sidebarItems[0].renderedMd,
+          renderedMd: sidebarItems[0].content,
           sidebarHeaders,
           tocArray: sidebarItems[0].data.subHeadings.map(sh => ({
             content: sh.value,
@@ -52,14 +56,14 @@ export default {
         }),
         // move slug + path to data in transform, renderedMd to data, and nuke markdown prop
         children: sidebarItems.map(
-          ({ slug, path, markdown, renderedMd, data }) => ({
+          ({ slug, path, markdown, content, data }) => ({
             path,
             component: "src/screens/docs",
             getData: () => ({
               title: data.title,
               markdown,
               path: `/${slug}/`,
-              renderedMd,
+              renderedMd: content,
               sidebarHeaders,
               tocArray: data.subHeadings.map(sh => ({
                 content: sh.value,

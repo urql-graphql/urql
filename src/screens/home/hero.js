@@ -7,8 +7,6 @@ import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
 import spectacleLogoRaised from "../../static/svgs/logo_spectacle_raised.svg";
 
-
-
 const HeroContent = styled.div`
   align-items: center;
   display: flex;
@@ -146,10 +144,7 @@ class Hero extends React.Component {
     return (
       <Wrapper noPadding>
         <HeroContent>
-          <HeroLogo
-            src={spectacleLogoRaised}
-            alt="Formidable Logo"
-          />
+          <HeroLogo src={spectacleLogoRaised} alt="Formidable Logo" />
           <HeroTitle>Spectacle</HeroTitle>
           <HeroBody>
             A React.js based library for creating sleek presentations using JSX
@@ -173,7 +168,9 @@ class Hero extends React.Component {
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link prefetch={true} to="/docs">Docs</Link>
+            <Link prefetch to="/docs">
+              Docs
+            </Link>
           </li>
           <li>
             <a

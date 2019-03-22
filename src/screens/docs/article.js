@@ -2,15 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { withRouteData } from "react-static";
-import Prism from "prismjs";
 import { Markdown } from "../../components/markdown";
-
-/* eslint-disable no-unused-vars */
-// add more language support
-import jsx from "prismjs/components/prism-jsx";
-import sh from "prismjs/components/prism-bash";
-import yaml from "prismjs/components/prism-yaml";
-/* eslint-enable no-unused-vars */
 
 const Container = styled.div`
   max-width: 80rem;
@@ -27,14 +19,6 @@ const Container = styled.div`
 `;
 
 class Article extends React.Component {
-  componentDidMount() {
-    Prism.highlightAll();
-  }
-
-  componentDidUpdate() {
-    Prism.highlightAll();
-  }
-
   render() {
     return (
       <Container>

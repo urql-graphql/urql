@@ -8,5 +8,11 @@ const stage =
     ? "staging"
     : process.env.REACT_STATIC_ENV;
 const landerBasePath = "open-source/spectacle";
+const metaData = {
+  title: "Spectacle",
+  description:
+    "A React.js based library for creating sleek presentations using JSX syntax (with the ability to live demo your code!)",
+  url: "http://www.formidable.com/open-source/spectacle/"
+};
 
-module.exports = { stage, landerBasePath };
+module.exports = { stage, landerBasePath, metaData };
