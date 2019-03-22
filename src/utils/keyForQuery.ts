@@ -26,7 +26,7 @@ const hash = (x: string): number => {
 
 const docNameCache = Object.create(null) as NameCache;
 
-const getKeyForDocNode = (doc: DocumentNode): number => {
+export const getKeyForQuery = (doc: DocumentNode): number => {
   if ((doc as WithCacheProperty).__key !== undefined) {
     return (doc as WithCacheProperty).__key as number;
   }
@@ -60,18 +60,8 @@ const getKeyForDocNode = (doc: DocumentNode): number => {
   return key;
 };
 
-const getKeyForDocString = (doc: string): number => hash(doc);
-
-export const getKeyForQuery = (doc: string | DocumentNode): number => {
-  if (typeof doc === 'string') {
-    return getKeyForDocString(doc);
-  } else {
-    return getKeyForDocNode(doc);
-  }
-};
-
 export const getKeyForRequest = (
-  query: string | DocumentNode,
+  query: DocumentNode,
   vars?: object
 ): number => {
   const docKey = getKeyForQuery(query);

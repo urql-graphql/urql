@@ -20,7 +20,7 @@ import { useSubscription } from './useSubscription';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
-const query = `example query`;
+const query = 'subscription Example { example }';
 let state: any;
 
 const SubscriptionUser: FC<{ q: string }> = ({ q }) => {
@@ -49,7 +49,7 @@ describe('on initial useEffect', () => {
     renderer.create(<SubscriptionUser q={query} />);
     expect(client.executeSubscription).toBeCalledWith({
       key: expect.any(Number),
-      query,
+      query: expect.any(Object),
       variables: {},
     });
   });
@@ -68,7 +68,8 @@ describe('on subscription', () => {
 });
 
 describe('on change', () => {
-  const q = 'new query';
+  const qa = 'subscription NewSubA { exampleA }';
+  const qb = 'subscription NewSubB { exampleB }';
 
   it('executes subscription', () => {
     const wrapper = renderer.create(<SubscriptionUser q={query} />);
@@ -78,9 +79,9 @@ describe('on change', () => {
      * Only a single change is detected (updating 5 times still only calls
      * execute subscription twice).
      */
-    wrapper.update(<SubscriptionUser q={q} />);
-    wrapper.update(<SubscriptionUser q={q} />);
-    wrapper.update(<SubscriptionUser q={q + 'diff'} />);
+    wrapper.update(<SubscriptionUser q={qa} />);
+    wrapper.update(<SubscriptionUser q={qa} />);
+    wrapper.update(<SubscriptionUser q={qb} />);
     expect(client.executeSubscription).toBeCalledTimes(2);
   });
 });

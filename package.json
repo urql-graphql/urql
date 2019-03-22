@@ -114,6 +114,7 @@
     "@types/fast-json-stable-stringify": "^2.0.0",
     "create-react-context": "^0.2.3",
     "fast-json-stable-stringify": "^2.0.0",
+    "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
     "wonka": "^2.0.1"
   }

@@ -19,55 +19,27 @@ Object {
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
-          "loc": Object {
-            "end": 103,
-            "start": 0,
-          },
           "name": Object {
             "kind": "Name",
-            "loc": Object {
-              "end": 13,
-              "start": 6,
-            },
             "value": "getUser",
           },
           "operation": "query",
           "selectionSet": Object {
             "kind": "SelectionSet",
-            "loc": Object {
-              "end": 103,
-              "start": 28,
-            },
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
-                    "loc": Object {
-                      "end": 50,
-                      "start": 39,
-                    },
                     "name": Object {
                       "kind": "Name",
-                      "loc": Object {
-                        "end": 43,
-                        "start": 39,
-                      },
                       "value": "name",
                     },
                     "value": Object {
                       "kind": "Variable",
-                      "loc": Object {
-                        "end": 50,
-                        "start": 45,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 50,
-                          "start": 46,
-                        },
                         "value": "name",
                       },
                     },
@@ -75,40 +47,20 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
-                "loc": Object {
-                  "end": 99,
-                  "start": 34,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 38,
-                    "start": 34,
-                  },
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
-                  "loc": Object {
-                    "end": 99,
-                    "start": 52,
-                  },
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 62,
-                        "start": 60,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 62,
-                          "start": 60,
-                        },
                         "value": "id",
                       },
                       "selectionSet": undefined,
@@ -118,16 +70,8 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 78,
-                        "start": 69,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 78,
-                          "start": 69,
-                        },
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
@@ -137,16 +81,8 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 93,
-                        "start": 85,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 93,
-                          "start": 85,
-                        },
                         "value": "lastName",
                       },
                       "selectionSet": undefined,
@@ -161,37 +97,17 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
-              "loc": Object {
-                "end": 27,
-                "start": 14,
-              },
               "type": Object {
                 "kind": "NamedType",
-                "loc": Object {
-                  "end": 27,
-                  "start": 21,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 27,
-                    "start": 21,
-                  },
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
-                "loc": Object {
-                  "end": 19,
-                  "start": 14,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 19,
-                    "start": 15,
-                  },
                   "value": "name",
                 },
               },
@@ -243,55 +159,27 @@ Object {
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
-          "loc": Object {
-            "end": 103,
-            "start": 0,
-          },
           "name": Object {
             "kind": "Name",
-            "loc": Object {
-              "end": 13,
-              "start": 6,
-            },
             "value": "getUser",
           },
           "operation": "query",
           "selectionSet": Object {
             "kind": "SelectionSet",
-            "loc": Object {
-              "end": 103,
-              "start": 28,
-            },
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
-                    "loc": Object {
-                      "end": 50,
-                      "start": 39,
-                    },
                     "name": Object {
                       "kind": "Name",
-                      "loc": Object {
-                        "end": 43,
-                        "start": 39,
-                      },
                       "value": "name",
                     },
                     "value": Object {
                       "kind": "Variable",
-                      "loc": Object {
-                        "end": 50,
-                        "start": 45,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 50,
-                          "start": 46,
-                        },
                         "value": "name",
                       },
                     },
@@ -299,40 +187,20 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
-                "loc": Object {
-                  "end": 99,
-                  "start": 34,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 38,
-                    "start": 34,
-                  },
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
-                  "loc": Object {
-                    "end": 99,
-                    "start": 52,
-                  },
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 62,
-                        "start": 60,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 62,
-                          "start": 60,
-                        },
                         "value": "id",
                       },
                       "selectionSet": undefined,
@@ -342,16 +210,8 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 78,
-                        "start": 69,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 78,
-                          "start": 69,
-                        },
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
@@ -361,16 +221,8 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
-                      "loc": Object {
-                        "end": 93,
-                        "start": 85,
-                      },
                       "name": Object {
                         "kind": "Name",
-                        "loc": Object {
-                          "end": 93,
-                          "start": 85,
-                        },
                         "value": "lastName",
                       },
                       "selectionSet": undefined,
@@ -385,37 +237,17 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
-              "loc": Object {
-                "end": 27,
-                "start": 14,
-              },
               "type": Object {
                 "kind": "NamedType",
-                "loc": Object {
-                  "end": 27,
-                  "start": 21,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 27,
-                    "start": 21,
-                  },
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
-                "loc": Object {
-                  "end": 19,
-                  "start": 14,
-                },
                 "name": Object {
                   "kind": "Name",
-                  "loc": Object {
-                    "end": 19,
-                    "start": 15,
-                  },
                   "value": "name",
                 },
               },

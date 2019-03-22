@@ -19,7 +19,7 @@ export type RequestPolicy =
 export interface GraphQLRequest {
   /** Unique identifier of the request. */
   key: number;
-  query: DocumentNode | string;
+  query: DocumentNode;
   variables?: object;
 }
 
@@ -32,10 +32,7 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation {
-  query: DocumentNode;
-  variables?: object;
-  key: number;
+export interface Operation extends GraphQLRequest {
   operationName: OperationType;
   context: OperationContext;
 }
