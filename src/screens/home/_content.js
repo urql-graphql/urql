@@ -19,13 +19,14 @@ const content = {
       icon: require("../../static/svgs/bucket_amazing.svg")
     }
   ],
-  getStarted: {
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    link: "/docs"
-  },
   preview: {
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     media: ""
+  },
+  getStarted: {
+    description:
+      "There are several flexible options for getting started with Spectacle, using either JSX or MDX syntax - dive into the documentation to see all the ways you can get a presentation up and running.",
+    link: "/docs"
   },
   oss: [
     {
