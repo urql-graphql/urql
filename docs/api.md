@@ -137,12 +137,12 @@ interface UseSubscriptionState<T> {
 
 #### Props
 
-| Prop      | Type                                    | Description                                                                                           |
-| --------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query     | `string`                                | The GraphQL subscription's query                                                                      |
-| variables | `object`                                | The GraphQL subscriptions' variables                                                                  |
-| handler   | `void | (prev: R | void, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
-| children  | `RenderProps => ReactNode`              | A function that follows the typical render props pattern. The shape of the render props is as follows |
+| Prop      | Type                                      | Description                                                                                           |
+| --------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| query     | `string`                                  | The GraphQL subscription's query                                                                      |
+| variables | `object`                                  | The GraphQL subscriptions' variables                                                                  |
+| handler   | `void \| (prev: R \| void, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
+| children  | `RenderProps => ReactNode`                | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
 
@@ -165,11 +165,11 @@ be used in combination with the `useContext` hook.
 The client manages all operations and ongoing requests to the exchange pipeline.
 It accepts a bunch of inputs when it's created
 
-| Input        | Type                              | Description                                                                                  |
-| ------------ | --------------------------------- | -------------------------------------------------------------------------------------------- |
-| url          | `string`                          | The GraphQL API URL as used by `fetchExchange`                                               |
-| fetchOptions | `RequestInit | () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request       |
-| exchanges    | `Exchange[]`                      | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges` |
+| Input        | Type                               | Description                                                                                  |
+| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------------- |
+| url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                               |
+| fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request       |
+| exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges` |
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
@@ -334,11 +334,11 @@ type OperationResult = {
 
 ### `CombinedError` (class)
 
-| Input         | Type                            | Description                                                                       |
-| ------------- | ------------------------------- | --------------------------------------------------------------------------------- |
-| networkError  | `?Error`                        | An unexpected error that might've occured when trying to send the GraphQL request |
-| graphQLErrors | `?Array<string | GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                     |
-| response      | `?any`                          | The raw response object (if any) from the `fetch` call                            |
+| Input         | Type                             | Description                                                                       |
+| ------------- | -------------------------------- | --------------------------------------------------------------------------------- |
+| networkError  | `?Error`                         | An unexpected error that might've occured when trying to send the GraphQL request |
+| graphQLErrors | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                     |
+| response      | `?any`                           | The raw response object (if any) from the `fetch` call                            |
 
 These are both inputs and properties on the `CombinedError`. Additionally it exposes a default `message`
 that combines all errors it has received.
