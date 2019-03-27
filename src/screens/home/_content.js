@@ -20,7 +20,7 @@ const content = {
     }
   ],
   preview: {
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    description: "",
     media: ""
   },
   getStarted: {
