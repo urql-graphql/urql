@@ -1,7 +1,4 @@
 import React from "react";
-import { BounceAnimation } from "../../components/bounce-animation";
-import { Button } from "../../components/button";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
@@ -66,32 +63,6 @@ const HeroLogo = styled.img`
   }
 `;
 
-const HeroCopyLink = styled.p`
-  background: #d5d5d5;
-  font-family: "akkurat", sans-serif;
-  color: #3b3b3b;
-  display: flex;
-  flex-direction: row;
-  line-height: 4rem;
-  min-width: 28rem;
-  white-space: nowrap;
-  @media (min-width: 1024px) {
-    margin-right: 2rem;
-  }
-  & + a {
-    min-width: 30rem;
-    @media (min-width: 1024px) {
-      min-width: 10rem;
-    }
-  }
-`;
-
-const HeroCopyText = styled.span`
-  padding: 0 1.6rem;
-  text-align: left;
-  min-width: 20rem;
-`;
-
 const HeroNavList = styled.ul`
   border-top: 0.2rem solid #707070;
   display: flex;
@@ -150,21 +121,6 @@ class Hero extends React.Component {
             A React.js based library for creating sleek presentations using JSX
             syntax that gives you the ability to live demo your code.
           </HeroBody>
-          <CopyToClipboard text="npm install spectacle">
-            <HeroCopyLink onClick={e => this.handleCopy(e)}>
-              <HeroCopyText>
-                <code>npm install spectacle</code>
-              </HeroCopyText>
-              <Button light noMargin href="#">
-                <BounceAnimation bouncing={this.state.animating}>
-                  {this.state.copied ? "Copied" : "Copy"}
-                </BounceAnimation>
-              </Button>
-            </HeroCopyLink>
-          </CopyToClipboard>
-          <Button light noMargin href="/docs">
-            Documentation
-          </Button>
         </HeroContent>
         <HeroNavList>
           <li>
