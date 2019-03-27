@@ -20,6 +20,7 @@ const HeroLogo = styled.img`
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
+    left: 7rem;
   }
 `;
 
@@ -55,6 +56,7 @@ const CloseButton = styled.img`
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "block" : "none")};
+    right: 1rem;
   }
 `;
 
