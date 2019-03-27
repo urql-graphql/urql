@@ -4,19 +4,19 @@ const content = {
       title: "Interactive Presentations",
       description:
         "Add clickable elements and other interactivity to make your presentations pop.",
-      icon: require("../../static/svgs/bucket_click.svg")
+      icon: require("../../static/svgs/button.svg")
     },
     {
       title: "Live-Preview Your Code",
       description:
         "Show people more than just a code block - demo the final project in real-time without leaving your presentation deck.",
-      icon: require("../../static/svgs/bucket_code.svg")
+      icon: require("../../static/svgs/code-preview.svg")
     },
     {
       title: "Auto-Size Text, Image Dimming, and More",
       description:
         "On top of all of Spectacle's helpful features, you can also make your presentation look amazing with auto-formatting, easy themeing abilities, image dimming, and lots of other fun touches",
-      icon: require("../../static/svgs/bucket_amazing.svg")
+      icon: require("../../static/svgs/amazing.svg")
     }
   ],
   preview: {
