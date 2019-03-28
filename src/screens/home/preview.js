@@ -18,6 +18,16 @@ class Preview extends React.Component {
         <Wrapper>
           <SectionTitle>Code Preview</SectionTitle>
           <BodyCopy>{previewObj.description}</BodyCopy>
+          <video
+            width="100%"
+            autoPlay
+            muted
+            loop
+            poster="./static/bg-still.png"
+          >
+            <source src="./static/bg-demo.webm" type="video/webm" />
+            <source src="./static/bg-demo.mp4" type="video/mp4" />
+          </video>
         </Wrapper>
       </OuterWrapper>
     );
