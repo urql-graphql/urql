@@ -1,14 +1,6 @@
-\.git
-\.hg
-
-\.DS_Store
-\.project
-bower_components
-node_modules
-npm-debug\.log*
-phantomjsdriver\.log
-
-# Build
-coverage
-Procfile
-yarn.lock
+/*
+!/dist
+dist/client-stats.json
+*.map
+!README.md
+!package.json

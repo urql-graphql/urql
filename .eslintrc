@@ -1,2 +1,0 @@
----
-extends: ./node_modules/builder-docs-archetype/config/eslint/.eslintrc-config

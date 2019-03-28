@@ -1,25 +1,21 @@
 language: node_js
 
+dist: trusty
+
 node_js:
   - "8"
-  - "10"
 
-# Use container-based Travis infrastructure.
 sudo: false
-
-cache: yarn
 
 branches:
   only:
     - master
 
-before_install:
-  # GUI for real browsers.
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+install:
+  # Fail if lockfile outdated.
+  # https://yarnpkg.com/lang/en/docs/cli/install/#toc-yarn-install-frozen-lockfile
+  - yarn install --frozen-lockfile
 
 script:
-  - yarn test --log-level=info
-  - NODE_ENV=production node_modules/.bin/builder run build-static --log-level=info
-  # TODO: Re-enable tests. (Ancient existing ones are broken).
-  # https://github.com/FormidableLabs/spectacle-docs/issues/46
+  - yarn run lint
+  - yarn run build
