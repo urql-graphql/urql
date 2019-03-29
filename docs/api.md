@@ -15,7 +15,7 @@ interface UseQueryArgs {
 ```
 
 And returns a tuple of the current query's state and
-an `excuteQuery` function.
+an `executeQuery` function.
 
 The current state's shape is:
 
