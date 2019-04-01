@@ -9,6 +9,13 @@ const OuterWrapper = styled.div`
   background: #f3f3f3;
 `;
 
+const Video = styled.video`
+  width: 100%;
+  @media (max-width: 768px) {
+    margin: 0 0 2rem 0;
+  }
+`;
+
 class Preview extends React.Component {
   render() {
     const { previewObj } = this.props;
@@ -18,16 +25,10 @@ class Preview extends React.Component {
         <Wrapper>
           <SectionTitle>Code Preview</SectionTitle>
           <BodyCopy>{previewObj.description}</BodyCopy>
-          <video
-            width="100%"
-            autoPlay
-            muted
-            loop
-            poster="./static/bg-still.png"
-          >
+          <Video autoPlay muted loop poster="./static/bg-still.png">
             <source src="./static/bg-demo.webm" type="video/webm" />
             <source src="./static/bg-demo.mp4" type="video/mp4" />
-          </video>
+          </Video>
         </Wrapper>
       </OuterWrapper>
     );
