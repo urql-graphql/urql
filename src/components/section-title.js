@@ -9,4 +9,7 @@ export const SectionTitle = styled.h2`
   @media (min-width: 768px) {
     margin: 0 0 6rem;
   }
+  @media (max-width: 768px) {
+    margin: 2rem 0;
+  }
 `;

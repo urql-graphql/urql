@@ -69,66 +69,66 @@ We can start with this project's sample at [`one-page.html`](./one-page.html). I
 
 2.  The presentation must include exactly **one** script tag with the type `text/spectacle` that is a function. Presently, that function is directly inserted inline into a wrapper code boilerplate as a React Component `render` function. The wrapper is transpiled. There should not be any extraneous content around it like outer variables or comments.
 
-    **Good** examples:
+**Good** examples:
 
-    ```html
-    <script type="text/spectacle">
-      () => (
-        <Deck>{/* SLIDES */}</Deck>
-      )
-    </script>
-    ```
+```html
+<script type="text/spectacle">
+  () => (
+    <Deck>{/* SLIDES */}</Deck>
+  )
+</script>
+```
 
-    ```html
-    <script type="text/spectacle">
-      () => {
-        // Code-y code stuff in JS...
+```html
+<script type="text/spectacle">
+  () => {
+    // Code-y code stuff in JS...
 
-        return (
-          <Deck>{/* SLIDES */}</Deck>
-        );
-      }
-    </script>
-    ```
+    return (
+      <Deck>{/* SLIDES */}</Deck>
+    );
+  }
+</script>
+```
 
-    **Bad** examples of what not to do:
+**Bad** examples of what not to do:
 
-    ```html
-    <script type="text/spectacle">
-      // Outer comment (BAD)
-      const outerVariable = "BAD";
+```html
+<script type="text/spectacle">
+  // Outer comment (BAD)
+  const outerVariable = "BAD";
 
-      () => (
-        <Deck>{/* SLIDES */}</Deck>
-      )
-    </script>
-    ```
+  () => (
+    <Deck>{/* SLIDES */}</Deck>
+  )
+</script>
+```
 
 3.  If you want to create your own theme settings, you can use the following code snippet to change the [themes](#createthemecolors-fonts) default settings.
 
-    ```html
-    <script type="text/spectacle">
-      () => {
-        const { themes: { defaultTheme } } = Spectacle;
-        const theme = defaultTheme({
-          // Change default settings
-          primary: "blue",
-          secondary: "red"
-        },
-        {
-          primary: "Helvetica",
-        });
+```html
+<script type="text/spectacle">
+  () => {
+    const { themes: { defaultTheme } } = Spectacle;
+    const theme = defaultTheme({
+      // Change default settings
+      primary: "blue",
+      secondary: "red"
+    },
+    {
+      primary: "Helvetica",
+    });
 
-        return (
-          <Deck transition={['zoom']} theme={theme}>
-            <Slide>some stuff</Slide>
-            <Slide>other stuff</Slide>
-            <Slide>some more stuff</Slide>
-          </Deck>
-        );
-      }
-    </script>
-    ```
+    return (
+      <Deck transition={['zoom']} theme={theme}>
+        <Slide>some stuff</Slide>
+        <Slide>other stuff</Slide>
+        <Slide>some more stuff</Slide>
+      </Deck>
+    );
+  }
+</script>
+```
 
 ... with those guidelines in mind, here's the boilerplate that you can copy-and-paste into an HTML file and start a Spectacle presentation that works from the get go!
 
