@@ -13,7 +13,7 @@ const Container = styled.div`
     padding: 6rem 4rem 8rem 3.5rem;
   }
   .gatsby-highlight {
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       margin-left: -2rem;
     }
     code {

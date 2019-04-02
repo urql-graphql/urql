@@ -95,7 +95,7 @@ export const Markdown = styled.article`
     font-family: "tiempos";
     font-size: 1.6rem;
     padding: 0.5rem;
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       margin-left: -2rem;
     }
   }
