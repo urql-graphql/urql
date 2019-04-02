@@ -54,7 +54,7 @@ const HeaderLogo = styled.img`
 
 const CollapsedMenu = styled.div`
   cursor: pointer;
-  padding-left: 3rem;
+  padding-left: 4rem;
   display: none;
 
   @media (max-width: 768px) {
@@ -62,7 +62,7 @@ const CollapsedMenu = styled.div`
     visibility: ${props => (props.overlay ? "hidden" : "visible")};
   }
   @media (max-width: 600px) {
-    padding-left: 2.5rem;
+    padding-left: 3.5rem;
     position: absolute;
     left: 0;
   }

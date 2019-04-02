@@ -2,6 +2,9 @@ import styled from "styled-components";
 
 export const Markdown = styled.article`
   width: 60vw;
+  @media (max-width: 768px) {
+    width: 75vw;
+  }
   & h1 {
     font-family: "sharp";
     font-size: 3.4rem;
@@ -92,6 +95,9 @@ export const Markdown = styled.article`
     font-family: "tiempos";
     font-size: 1.6rem;
     padding: 0.5rem;
+    @media (max-width: 600px) {
+      margin-left: -2rem;
+    }
   }
 
   & a {
