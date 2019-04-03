@@ -69,7 +69,6 @@ const HeroNavList = styled.ul`
   flex-direction: row;
   justify-content: center;
   list-style: none;
-  margin: 4rem 0 0;
   padding: 2rem 0 0;
   text-align: center;
   width: 100%;
@@ -79,9 +78,9 @@ const HeroNavList = styled.ul`
   & li a {
     color: white;
     display: inline-block;
-    font-size: 1.4rem;
+    font-size: 1.7rem;
     letter-spacing: 0.05em;
-    margin: 0 1rem;
+    margin: 0 2rem;
     transition: opacity 0.4s;
     text-transform: uppercase;
   }
