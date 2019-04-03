@@ -1,5 +1,9 @@
 Spectacle Docs Changelog
 
+## 5.0.3 (2019-04-03)
+
+- [#79](https://github.com/FormidableLabs/spectacle-docs/pull/79) Correct anchor tags with ampersands
+
 ## 5.0.2 (2019-04-03)
 
 - [#78](https://github.com/FormidableLabs/spectacle-docs/pull/78) Additional style tweaks
