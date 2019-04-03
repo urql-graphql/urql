@@ -36,8 +36,8 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: "sharp";
-  letter-spacing: 0.15em;
+  font-family: "akkurat";
+  letter-spacing: 0.08em;
   font-size: 1.4rem;
   line-height: 2.2rem;
   margin: 0 0 6rem;
