@@ -37,7 +37,9 @@ There are four ways to get started building your presentation using the classic 
 
 1. **Option #1:** Run the following command in your terminal:
 
-   `npx create-react-app my-presentation --scripts-version spectacle-scripts`
+```bash
+npx create-react-app my-presentation --scripts-version spectacle-scripts
+```
 
 2. **Option #2:** Using the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
 
@@ -45,7 +47,7 @@ There are four ways to get started building your presentation using the classic 
 
 All three of the above ways will give you everything you'll need to get started, including a sample presentation in the `presentation` folder. You can change the props and tags as needed for your presentation or delete everything in `presentation/index.js` to start from scratch. From here you can go to [Development](#development) to get started.
 
-3. **Option #4:** Run `npm install spectacle` in your terminal and writing your own build configurations. We also provide full UMD builds (with a `Spectacle` global variable) of the library at `dist/spectacle.js` and `dist/spectacle.min.js` for more general use cases. You could, for example, include the library via a script tag with: `https://unpkg.com/spectacle@VERSION/dist/spectacle.min.js`.
+4. **Option #4:** Run `npm install spectacle` in your terminal and writing your own build configurations. We also provide full UMD builds (with a `Spectacle` global variable) of the library at `dist/spectacle.js` and `dist/spectacle.min.js` for more general use cases. You could, for example, include the library via a script tag with: `https://unpkg.com/spectacle@VERSION/dist/spectacle.min.js`.
 
 <a name="spectacle-mdx"></a>
 

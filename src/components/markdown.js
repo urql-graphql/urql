@@ -21,10 +21,10 @@ export const Markdown = styled.article`
 
   & h2 {
     font-family: "sharp";
-    font-size: 2.4rem;
+    font-size: 2.8rem;
     margin: 6rem 0 2rem;
     @media (min-width: 1024px) {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
     }
   }
 
@@ -88,16 +88,26 @@ export const Markdown = styled.article`
     border: 1px solid lightgrey;
     opacity: 0.8;
     padding: 0.5rem;
+    font-size: 1.5rem;
     margin: 0 0.5rem 0 0.5rem;
   }
 
   & li {
     font-family: "tiempos";
-    font-size: 1.6rem;
+    font-size: 1.7rem;
+    line-height: 1.6;
     padding: 0.5rem;
     @media (max-width: 768px) {
       margin-left: -2rem;
     }
+  }
+
+  & li code {
+    border: 1px solid lightgrey;
+    opacity: 0.8;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    margin: 0 0.5rem 0 0.5rem;
   }
 
   & a {
