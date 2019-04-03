@@ -1,5 +1,9 @@
 Spectacle Docs Changelog
 
+## 5.0.2 (2019-04-03)
+
+- [#78](https://github.com/FormidableLabs/spectacle-docs/pull/78) Additional style tweaks
+
 ## 5.0.1 (2019-04-01)
 
 - [#77](https://github.com/FormidableLabs/spectacle-docs/pull/77) Fix mobile styles
