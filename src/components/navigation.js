@@ -21,13 +21,13 @@ export const Navigation = styled.div`
   }
 `;
 export const SidebarContainer = styled.div`
-  width: 26rem;
-  min-width: 26rem;
+  width: 24rem;
+  min-width: 24rem;
   min-height: 100vh;
 
   @media (max-width: 768px) {
-    min-width: 5rem;
-    width: 5rem;
+    min-width: 2.5rem;
+    width: 2.5rem;
   }
 `;
 
@@ -38,28 +38,27 @@ export const SidebarWrapper = styled.aside`
   background-size: 100%;
   min-height: 100vh;
   padding-top: 18rem;
-  min-width: 20rem;
-  width: 20rem;
+  min-width: 24rem;
+  width: 24rem;
   z-index: ${sidebarZIndex};
   position: fixed;
   overflow-y: scroll;
   top: 0;
   bottom: 0;
-  width: 20rem;
 
   @media (max-width: 768px) {
     background-image: ${props =>
       props.overlay
         ? `url(${sidebarBackground})`
         : `url(${collapsedSidebarBackground})`};
-    min-width: ${props => (props.overlay ? "26rem" : "5rem")};
-    width: ${props => (props.overlay ? "26rem" : "5rem")};
+    min-width: ${props => (props.overlay ? "24rem" : "2.5rem")};
+    width: ${props => (props.overlay ? "24rem" : "2.5rem")};
   }
 `;
 
 export const SidebarNavItem = styled(Link)`
   color: white;
-  margin-left: 4rem;
+  margin-left: 1rem;
   margin-bottom: 1rem;
   font-size: 1.6rem;
   display: inline-block;
@@ -67,7 +66,7 @@ export const SidebarNavItem = styled(Link)`
 
 export const SidebarNavSubItem = styled(Link)`
   color: white;
-  margin-left: 6rem;
+  margin-left: 3rem;
   margin-top: 1rem;
   font-size: 1.4rem;
 `;

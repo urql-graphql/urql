@@ -15,20 +15,18 @@ import constants from "../../constants";
 const HeroLogo = styled.img`
   position: absolute;
   top: 3rem;
-  left: 4rem;
+  left: 6rem;
   min-width: 14rem;
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
-    left: 7rem;
   }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
-  margin-top: 4rem;
+  margin: 4rem 1rem 1rem 4rem;
   height: auto;
 
   @media (max-width: 768px) {

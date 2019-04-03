@@ -36,8 +36,8 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: "sharp";
-  letter-spacing: 0.15em;
+  font-family: "akkurat";
+  letter-spacing: 0.08em;
   font-size: 1.4rem;
   line-height: 2.2rem;
   margin: 0 0 6rem;
@@ -69,7 +69,6 @@ const HeroNavList = styled.ul`
   flex-direction: row;
   justify-content: center;
   list-style: none;
-  margin: 4rem 0 0;
   padding: 2rem 0 0;
   text-align: center;
   width: 100%;
@@ -79,9 +78,9 @@ const HeroNavList = styled.ul`
   & li a {
     color: white;
     display: inline-block;
-    font-size: 1.4rem;
+    font-size: 1.7rem;
     letter-spacing: 0.05em;
-    margin: 0 1rem;
+    margin: 0 2rem;
     transition: opacity 0.4s;
     text-transform: uppercase;
   }

@@ -54,15 +54,18 @@ const HeaderLogo = styled.img`
 
 const CollapsedMenu = styled.div`
   cursor: pointer;
-  padding-left: 4rem;
+  padding-left: 2.5rem;
   display: none;
 
   @media (max-width: 768px) {
     display: block;
     visibility: ${props => (props.overlay ? "hidden" : "visible")};
+    padding-left: 2.5rem;
+    position: absolute;
+    left: 0;
   }
   @media (max-width: 600px) {
-    padding-left: 3.5rem;
+    padding-left: 2.5rem;
     position: absolute;
     left: 0;
   }
@@ -80,7 +83,7 @@ const DocsTitle = styled.h2`
 
   @media (max-width: 768px) {
     font-size: 3rem;
-    left: 2rem;
+    left: 6.5rem;
     margin: 0;
   }
   @media (max-width: 600px) {
