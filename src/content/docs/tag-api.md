@@ -415,9 +415,9 @@ The link tag is used to render `<a>` tags. It accepts an `href` prop:
 | href   | PropTypes.string | String of url for `href` attribute |         |
 | target | PropTypes.string | Set the `target` attribute         | `_self` |
 
-<a name="list--listitem-base"></a>
+<a name="list-and-listitem-base"></a>
 
-### List & ListItem (Base)
+### List and ListItem (Base)
 
 | Name        | PropType         | Description                                                                                                                                                                                                                                                                                                                                                                | Default |
 | ----------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |

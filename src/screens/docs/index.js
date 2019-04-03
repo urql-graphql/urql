@@ -118,7 +118,9 @@ class Docs extends React.Component {
               {constants.docsTitle}
             </Link>
           </DocsTitle>
-          <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
+          <Link to={"https://formidable.com"}>
+            <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
+          </Link>
         </Wrapper>
         <Sidebar
           overlay={this.state.openSidebar}

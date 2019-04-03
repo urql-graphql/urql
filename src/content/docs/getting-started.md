@@ -195,9 +195,9 @@ After downloading the boilerplate, run the following commands on the project's r
 
 ... and we are ready to roll
 
-<a name="build--deployment"></a>
+<a name="build-and-deployment"></a>
 
-## Build & Deployment
+## Build and Deployment
 
 Building the dist version of the slides is as easy as running `npm run build:dist`
 
