@@ -63,7 +63,7 @@ class MoreOSS extends React.Component {
               <BodyCopy>{card.description}</BodyCopy>
             </OSSCard>
           ))}
-          <Button light href="https://formidable.com/open-source/">
+          <Button light="true" to="https://formidable.com/open-source/">
             View All
           </Button>
         </Wrapper>
