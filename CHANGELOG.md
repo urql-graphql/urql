@@ -1,4 +1,8 @@
-Spectacle Docs Changelog
+Spectacle Docs
+
+## 5.0.5 (2019-04-04)
+
+- [#81](https://github.com/FormidableLabs/spectacle-docs/pull/81) Docs addition
 
 ## 5.0.4 (2019-04-04)
 
