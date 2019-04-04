@@ -254,6 +254,8 @@ You can toggle the presenter or overview mode by pressing respectively `alt+p` a
 
 Fullscreen can be toggled via browser options, <kbd>Alt/Option</kbd> + <kbd>F</kbd>, or by pressing the button in the bottom right corner of your window.
 
+Note: Right now, this works well when browser window itself is not full screen. When the browser is in fullscreen, there is an issue [#654](https://github.com/FormidableLabs/spectacle/issues/654). This is because we use the browser's FullScreen API methods. It still works but has some inconstiency (if you reveal the browser window, it will again work as expected).
+
 <a name="pdf-export"></a>
 
 ## PDF Export
