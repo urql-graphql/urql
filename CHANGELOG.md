@@ -1,5 +1,9 @@
 Spectacle Docs Changelog
 
+## 5.0.4 (2019-04-04)
+
+- [#80](https://github.com/FormidableLabs/spectacle-docs/pull/80) Fixes broken button
+
 ## 5.0.3 (2019-04-03)
 
 - [#79](https://github.com/FormidableLabs/spectacle-docs/pull/79) Correct anchor tags with ampersands
