@@ -22,7 +22,7 @@ class GetStarted extends React.Component {
         <Wrapper>
           <SectionTitle>Get Started</SectionTitle>
           <BodyCopy>{getStartedObj.description}</BodyCopy>
-          <Button href={getStartedObj.link}>Documentation</Button>
+          <Button to={getStartedObj.link}>Documentation</Button>
         </Wrapper>
       </OuterWrapper>
     );

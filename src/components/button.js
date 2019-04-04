@@ -1,6 +1,7 @@
 import styled from "styled-components";
+import { Link } from "react-static";
 
-export const Button = styled.a`
+export const Button = styled(Link)`
   background: ${props => (props.light ? "white" : "#202020")};
   color: ${props => (props.light ? "#202020" : "white")};
   display: block;
