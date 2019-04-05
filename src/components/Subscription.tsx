@@ -3,6 +3,7 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
+import { Omit } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
 interface SubscriptionHandlerProps {
@@ -72,7 +73,7 @@ class SubscriptionHandler extends Component<
   }
 }
 
-type SubscriptionProps = Exclude<SubscriptionHandlerProps, 'client'>;
+type SubscriptionProps = Omit<SubscriptionHandlerProps, 'client'>;
 
 export const Subscription: FC<SubscriptionProps> = props => (
   <Consumer>

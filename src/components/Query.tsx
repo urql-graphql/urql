@@ -3,7 +3,7 @@ import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { OperationContext, RequestPolicy } from '../types';
+import { Omit, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
 interface QueryHandlerProps {

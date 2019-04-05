@@ -5,6 +5,9 @@ import { CombinedError } from './utils/error';
 
 export { ExecutionResult } from 'graphql';
 
+/** Utility type to Omit keys from an interface/object type */
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
@@ -58,6 +61,3 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
-
-// /** The arguments for the child function of a connector. */
-// export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;
