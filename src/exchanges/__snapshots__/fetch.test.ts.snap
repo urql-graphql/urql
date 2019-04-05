@@ -117,7 +117,7 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 103,
+        "end": 124,
         "start": 0,
       },
     },
@@ -257,7 +257,7 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 103,
+        "end": 124,
         "start": 0,
       },
     },

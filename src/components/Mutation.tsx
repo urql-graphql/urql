@@ -1,13 +1,14 @@
+import { DocumentNode } from 'graphql';
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { GraphQLRequest, OperationResult } from '../types';
+import { OperationResult } from '../types';
 import { CombinedError, createRequest } from '../utils';
 
 interface MutationHandlerProps {
   client: Client;
-  query: GraphQLRequest['query'];
+  query: string | DocumentNode;
   children: (arg: MutationChildProps) => ReactNode;
 }
 

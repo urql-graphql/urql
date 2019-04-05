@@ -1,11 +1,13 @@
+import { DocumentNode } from 'graphql';
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { GraphQLRequest } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface SubscriptionHandlerProps extends GraphQLRequest {
+interface SubscriptionHandlerProps {
+  query: string | DocumentNode;
+  variables?: object;
   client: Client;
   handler?: (prev: any | void, data: any) => any;
   children: (arg: SubscriptionHandlerState) => ReactNode;
