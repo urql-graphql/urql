@@ -5,7 +5,7 @@ import { Consumer } from '../context';
 import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface QueryHandlerProps extends GraphQLRequest {
+interface QueryHandlerProps extends Omit<GraphQLRequest, 'key'> {
   client: Client;
   requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;
@@ -72,7 +72,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   }
 }
 
-type QueryProps = Exclude<QueryHandlerProps, 'client'>;
+type QueryProps = Omit<QueryHandlerProps, 'client'>;
 
 export const Query: FC<QueryProps> = props => (
   <Consumer>{client => <QueryHandler {...props} client={client} />}</Consumer>
