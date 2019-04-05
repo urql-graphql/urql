@@ -1,11 +1,14 @@
+import { DocumentNode } from 'graphql';
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
+import { Omit, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface QueryHandlerProps extends Omit<GraphQLRequest, 'key'> {
+interface QueryHandlerProps {
+  query: string | DocumentNode;
+  variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;

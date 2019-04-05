@@ -1,13 +1,14 @@
+import { DocumentNode } from 'graphql';
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { GraphQLRequest, OperationResult } from '../types';
+import { Omit, OperationResult } from '../types';
 import { CombinedError, createRequest } from '../utils';
 
 interface MutationHandlerProps {
   client: Client;
-  query: GraphQLRequest['query'];
+  query: string | DocumentNode;
   children: (arg: MutationChildProps) => ReactNode;
 }
 
@@ -66,7 +67,7 @@ class MutationHandler extends Component<
   };
 }
 
-type MutationProps = Exclude<MutationHandlerProps, 'client'>;
+type MutationProps = Omit<MutationHandlerProps, 'client'>;
 
 export const Mutation: FC<MutationProps> = props => (
   <Consumer>

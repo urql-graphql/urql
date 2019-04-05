@@ -1,4 +1,5 @@
-import { parse, print } from 'graphql';
+import { print } from 'graphql';
+import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 
@@ -24,7 +25,13 @@ describe('createClient', () => {
 
 const query = {
   key: 1,
-  query: `{ todos { id } }`,
+  query: gql`
+    {
+      todos {
+        id
+      }
+    }
+  `,
   variables: { example: 1234 },
 };
 
@@ -66,7 +73,7 @@ describe('executeQuery', () => {
     );
 
     const receivedQuery = receivedOps[0].query;
-    expect(print(receivedQuery)).toBe(print(parse(query.query)));
+    expect(print(receivedQuery)).toBe(print(query.query));
   });
 
   it('passes variables type to exchange', () => {
@@ -105,7 +112,7 @@ describe('executeMutation', () => {
     );
 
     const receivedQuery = receivedOps[0].query;
-    expect(print(receivedQuery)).toBe(print(parse(query.query)));
+    expect(print(receivedQuery)).toBe(print(query.query));
   });
 
   it('passes variables type to exchange', () => {
@@ -144,7 +151,7 @@ describe('executeSubscription', () => {
     );
 
     const receivedQuery = receivedOps[0].query;
-    expect(print(receivedQuery)).toBe(print(parse(query.query)));
+    expect(print(receivedQuery)).toBe(print(query.query));
   });
 
   it('passes variables type to exchange', () => {

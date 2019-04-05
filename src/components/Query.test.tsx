@@ -17,7 +17,7 @@ import { client } from '../context';
 import { Query } from './Query';
 
 const props = {
-  query: 'examplequery',
+  query: '{ example }',
 };
 let childProps: any;
 
@@ -64,7 +64,7 @@ describe('on change', () => {
     const wrapper = mountWrapper(props);
 
     // @ts-ignore
-    wrapper.setProps({ ...props, query: 'new query' });
+    wrapper.setProps({ ...props, query: '{ newQuery }' });
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 });

@@ -26,7 +26,7 @@ import { useQuery } from './useQuery';
 // @ts-ignore
 const client = createClient() as { executeQuery: jest.Mock };
 const props = {
-  query: 'example query',
+  query: '{ example }',
   variables: {
     myVar: 1234,
   },
@@ -68,10 +68,11 @@ describe('on initial useEffect', () => {
 
   it('passes query and vars to executeQuery', () => {
     renderer.create(<QueryUser {...props} />);
+
     expect(client.executeQuery).toBeCalledWith(
       {
         key: expect.any(Number),
-        query: props.query,
+        query: expect.any(Object),
         variables: props.variables,
       },
       {
@@ -137,7 +138,7 @@ describe('on subscription update', () => {
 });
 
 describe('on change', () => {
-  const q = 'new query';
+  const q = 'query NewQuery { example }';
 
   it('new query executes subscription', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);

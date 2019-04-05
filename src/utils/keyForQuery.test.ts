@@ -11,12 +11,6 @@ afterAll(() => {
   console.warn = consoleWarn;
 });
 
-it('returns consistent hashes for strings', () => {
-  expect(getKeyForQuery('test')).toBe(getKeyForQuery('test'));
-  expect(getKeyForQuery('test')).not.toBe(getKeyForQuery('test2'));
-  expect(getKeyForQuery('test')).toMatchSnapshot();
-});
-
 it('returns consistent hashes for DocumentNodes', () => {
   const query = gql`
     query Test {

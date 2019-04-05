@@ -1,5 +1,3 @@
-import { parse } from 'graphql';
-
 import {
   filter,
   makeSubject,
@@ -101,7 +99,7 @@ export class Client {
     opts?: Partial<OperationContext>
   ): Operation => ({
     key,
-    query: typeof query === 'string' ? parse(query) : query,
+    query,
     variables,
     operationName: type,
     context: this.createOperationContext(opts),

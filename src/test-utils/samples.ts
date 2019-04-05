@@ -1,4 +1,4 @@
-import { parse } from 'graphql';
+import gql from 'graphql-tag';
 
 import {
   ExecutionResult,
@@ -18,13 +18,15 @@ const context: OperationContext = {
 
 export const queryGql: GraphQLRequest = {
   key: 2,
-  query: `query getUser($name: String){
-    user(name: $name) {
-      id
-      firstName
-      lastName
+  query: gql`
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
     }
-  }`,
+  `,
   variables: {
     name: 'Clara',
   },
@@ -32,11 +34,13 @@ export const queryGql: GraphQLRequest = {
 
 export const mutationGql: GraphQLRequest = {
   key: 3,
-  query: `mutation AddUser($name: String){
-    addUser(name: $name) {
-      name
+  query: gql`
+    mutation AddUser($name: String) {
+      addUser(name: $name) {
+        name
+      }
     }
-  }`,
+  `,
   variables: {
     name: 'Clara',
   },
@@ -44,11 +48,12 @@ export const mutationGql: GraphQLRequest = {
 
 export const subscriptionGql: GraphQLRequest = {
   key: 4,
-  query: `subscription subscribeToUser($user: String){
-    user(user: $user) {
-      name
+  query: gql`
+    subscription subscribeToUser($user: String) {
+      user(user: $user) {
+        name
+      }
     }
-  }
   `,
   variables: {
     user: 'colin',
@@ -56,8 +61,7 @@ export const subscriptionGql: GraphQLRequest = {
 };
 
 export const teardownOperation: Operation = {
-  // @ts-ignore
-  query: parse(queryGql.query),
+  query: queryGql.query,
   variables: queryGql.variables,
   key: queryGql.key,
   operationName: 'teardown',
@@ -73,8 +77,7 @@ export const queryOperation: Operation = {
 };
 
 export const mutationOperation: Operation = {
-  // @ts-ignore
-  query: parse(mutationGql.query),
+  query: mutationGql.query,
   variables: mutationGql.variables,
   key: mutationGql.key,
   operationName: 'mutation',
@@ -82,8 +85,7 @@ export const mutationOperation: Operation = {
 };
 
 export const subscriptionOperation: Operation = {
-  // @ts-ignore
-  query: parse(subscriptionGql.query),
+  query: subscriptionGql.query,
   variables: subscriptionGql.variables,
   key: subscriptionGql.key,
   operationName: 'subscription',
