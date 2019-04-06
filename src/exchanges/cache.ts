@@ -73,27 +73,35 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       })
     );
 
-    const newOps$ = pipe(
-      sharedOps$,
-      filter(op => !shouldSkip(op) && !isOperationCached(op)),
-      map(mapTypeNames),
+    const forwardedOps$ = pipe(
+      merge([
+        pipe(
+          sharedOps$,
+          filter(op => !shouldSkip(op) && !isOperationCached(op)),
+          map(mapTypeNames)
+        ),
+        pipe(
+          sharedOps$,
+          filter(op => shouldSkip(op))
+        ),
+      ]),
       forward,
       tap(response => {
-        if (response.operation.operationName === 'mutation') {
+        if (
+          response.operation &&
+          response.operation.operationName === 'mutation'
+        ) {
           handleAfterMutation(response);
-        } else if (response.operation.operationName === 'query') {
+        } else if (
+          response.operation &&
+          response.operation.operationName === 'query'
+        ) {
           handleAfterQuery(response);
         }
       })
     );
 
-    const skippedOps$ = pipe(
-      sharedOps$,
-      filter(op => shouldSkip(op)),
-      forward
-    );
-
-    return merge([cachedOps$, newOps$, skippedOps$]);
+    return merge([cachedOps$, forwardedOps$]);
   };
 };
 
