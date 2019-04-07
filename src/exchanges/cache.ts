@@ -132,9 +132,11 @@ export const afterMutation = (
   });
 
   pendingOperations.forEach(key => {
-    const operation = (resultCache.get(key) as OperationResult).operation; // Result is guaranteed
-    resultCache.delete(key);
-    reexecuteOperation(client, operation);
+    if (resultCache.has(key)) {
+      const operation = (resultCache.get(key) as OperationResult).operation;
+      resultCache.delete(key);
+      reexecuteOperation(client, operation);
+    }
   });
 };
 
