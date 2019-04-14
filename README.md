@@ -1,3 +1,5 @@
+[![Maintenance Status][maintenance-image]](#maintenance-status)
+
 # urql
 
 <div align="center">
@@ -21,9 +23,6 @@
 
 <img width="965" alt="Steve Urkel" src="https://user-images.githubusercontent.com/1457604/52959744-ee6cef80-338e-11e9-96fe-cf5231b8eab7.png">
 
-## Maintenance Status: Active
-
-Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome. 
 
 ## ✨ Features
 
@@ -104,3 +103,9 @@ There are currently two examples included in this repository:
 
 - [getting-started: A basic app with queries and mutations](examples/1-getting-started/)
 - [using-subscriptions: A basic app that demos subscriptions](examples/2-using-subscriptions/)
+
+## Maintenance Status
+
+**Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
+
+[maintenance-image]: https://img.shields.io/badge/maintenance-active-green.svg
