@@ -1,4 +1,3 @@
-[![Maintenance Status][maintenance-image]](#maintenance-status)
 
 # urql
 
@@ -16,6 +15,9 @@
   </a>
   <a href="https://npmjs.com/package/urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
+  </a>
+  <a href="https://github.com/FormidableLabs/urql#maintenance-status">
+    <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
   </a>
   <br />
   <br />
@@ -107,5 +109,3 @@ There are currently two examples included in this repository:
 ## Maintenance Status
 
 **Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
-
-[maintenance-image]: https://img.shields.io/badge/maintenance-active-green.svg
