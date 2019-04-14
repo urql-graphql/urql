@@ -21,6 +21,10 @@
 
 <img width="965" alt="Steve Urkel" src="https://user-images.githubusercontent.com/1457604/52959744-ee6cef80-338e-11e9-96fe-cf5231b8eab7.png">
 
+## Maintenance Status: Active
+
+Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome. 
+
 ## ✨ Features
 
 - 📦 **One package** to get a working GraphQL client in React
