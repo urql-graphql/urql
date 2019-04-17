@@ -34,27 +34,34 @@ const content = {
       description:
         "An ecosystem of modular data visualization components for React. Friendly and flexible.",
       logo: require("../../static/svgs/logo_victory.svg"),
-      link: "https://formidable.com/open-source/victory"
+      link: "https://formidable.com/open-source/victory",
+      hasOwnLogo: true
     },
     {
       title: "Development Dashboards",
       description:
         "Dashboards to organize and intuitively display your dev server and tooling output.",
-      logo: require("../../static/svgs/logo_development-dashboards.svg"),
+      abbreviation: "Dd",
+      color: "#8bd48b",
+      number: "17",
       link: "https://formidable.com/open-source/development-dashboards/"
     },
     {
       title: "React Animations",
       description:
         "A collection of animations that can be used with many inline style libraries, such as Radium or Aphrodite.",
-      logo: require("../../static/svgs/logo_react-animation.svg"),
+      abbreviation: "Ra",
+      color: "#86b9e6",
+      number: "03",
       link: "https://formidable.com/open-source/react-animations"
     },
     {
       title: "Enzyme Matchers",
       description:
         "Run common assertions on your React components using Enzyme in a Jest or Jasmine environment.",
-      logo: require("../../static/svgs/logo_enzyme-matchers.svg"),
+      abbreviation: "Em",
+      color: "#e48055",
+      number: "09",
       link: "https://formidable.com/open-source/jest-enzyme/"
     }
   ]

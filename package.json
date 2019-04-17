@@ -40,6 +40,7 @@
     "klaw": "^2.1.1",
     "mdast": "^3.0.0",
     "prismjs": "^1.15.0",
+    "formidable-oss-badges": "0.1.0",
     "prop-types": "^15.6.2",
     "raw-loader": "^1.0.0",
     "react": "^16.7.0",
