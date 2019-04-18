@@ -32,7 +32,6 @@
     "chokidar": "2.0.3",
     "classnames": "^2.2.6",
     "exenv": "^1.2.2",
-    "formidable-landers": "^8.4.0",
     "gray-matter": "^3.1.1",
     "history": "^4.7.2",
     "htmr": "0.6.3",
