@@ -1,5 +1,9 @@
 Spectacle Docs
 
+## 5.0.6 (2019-04-17)
+
+-[#85](https://github.com/FormidableLabs/spectacle-docs/pull/85) Update formidable wordmark
+
 ## 5.0.5 (2019-04-04)
 
 - [#81](https://github.com/FormidableLabs/spectacle-docs/pull/81) Docs addition
