@@ -8,6 +8,7 @@ import { CombinedError, createRequest, noop } from '../utils';
 interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
+  skip?: boolean;
   requestPolicy?: RequestPolicy;
 }
 
@@ -38,6 +39,8 @@ export const useQuery = <T = any, V = object>(
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
+      if (args.skip) return;
+
       unsubscribe();
       setState(s => ({ ...s, fetching: true }));
 

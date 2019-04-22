@@ -20,7 +20,8 @@ interface MutationHandlerState {
 
 interface MutationChildProps extends MutationHandlerState {
   executeMutation: <T = any, V = object>(
-    variables?: V
+    variables?: V,
+    skip?: boolean
   ) => Promise<OperationResult<T>>;
 }
 
@@ -41,7 +42,9 @@ class MutationHandler extends Component<
     });
   }
 
-  executeMutation: MutationChildProps['executeMutation'] = variables => {
+  executeMutation: MutationChildProps['executeMutation'] = (variables, skip) => {
+    if (skip) return;
+    
     this.setState({
       fetching: true,
       error: undefined,

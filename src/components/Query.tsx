@@ -9,6 +9,7 @@ import { CombinedError, createRequest, noop } from '../utils';
 interface QueryHandlerProps {
   query: string | DocumentNode;
   variables?: object;
+  skip?: boolean;
   client: Client;
   requestPolicy?: RequestPolicy;
   children: (arg: QueryHandlerState) => ReactNode;
@@ -26,6 +27,8 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   private request = createRequest(this.props.query, this.props.variables);
 
   executeQuery = (opts?: Partial<OperationContext>) => {
+    if (this.props.skip) return;
+    
     this.unsubscribe();
 
     this.setState({ fetching: true });

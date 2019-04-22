@@ -26,7 +26,9 @@ export const useMutation = <T = any, V = object>(
     data: undefined,
   });
 
-  const executeMutation = (variables?: V) => {
+  const executeMutation = (variables?: V, skip?: boolean) => {
+    if (skip) return;
+    
     setState({ fetching: true, error: undefined, data: undefined });
 
     const request = createRequest(query, variables as any);
