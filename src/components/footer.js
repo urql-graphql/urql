@@ -41,7 +41,7 @@ const FooterLogo = styled.img`
 const FooterLinks = styled.ul`
   font-size: 1.4rem;
   list-style: none;
-  padding: 0;
+  padding: 0px 8px;
   text-transform: uppercase;
   & li {
     margin-bottom: 1.4rem;
