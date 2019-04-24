@@ -21,7 +21,7 @@
     "prettier-all": "npx prettier --write '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
     "preversion": "yarn run lint && yarn run build",
     "format": "yarn run lint:fix",
-    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js'static.config.js",
+    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js' 'static.config.js'",
     "stage-and-serve": "yarn stage && yarn serve",
     "test-local": "node test/spectacle-integration.js"
   },

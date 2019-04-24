@@ -1,5 +1,9 @@
 Spectacle Docs
 
+## 5.0.9
+
+- Use logo badges
+
 ## 5.0.8
 
 - [#84](https://github.com/FormidableLabs/spectacle-docs/pull/84)
