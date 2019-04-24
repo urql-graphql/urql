@@ -4796,10 +4796,10 @@ formidable-landers@^8.4.0:
     react "^15.6.1"
     react-side-effect "^1.1.5"
 
-formidable-oss-badges@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/formidable-oss-badges/-/formidable-oss-badges-0.1.0.tgz#183f6caeee30f9ec2d849d473ab7da269f898aa4"
-  integrity sha512-5PT1TK4hRjOjJW4aD4m+m00ld/YJW9HobYuh8yq9kggUy0ksOqN5NdWB3ryxDQSrbN3+yGWrObiUnJvwVERtkA==
+formidable-oss-badges@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/formidable-oss-badges/-/formidable-oss-badges-0.2.0.tgz#9ec2f5e8cd501a91624938538cc517d243e80a46"
+  integrity sha512-H5q3VREnKz50CZgVDC34V2lQpQ0GmEyPQ4UJMSQvoYiQtNMoxXS2EB5SEd9RhMa1xliqJAgljaRZ+bakt0BPZA==
   dependencies:
     buble "0.19.6"
 
