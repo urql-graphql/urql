@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { ProjectBadge } from "formidable-oss-badges";
 import bgImg from "../../static/bg_mountains_gray.jpg";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
@@ -34,7 +35,9 @@ const OSSImage = styled.img`
   position: absolute;
   top: 2rem;
   width: 8rem;
+  padding: 7px;
   @media (min-width: 1024px) {
+    padding: 14px;
     width: 14rem;
   }
 `;
@@ -48,6 +51,16 @@ const OSSLink = styled.a`
   }
 `;
 
+const StyledProjectBadge = styled(ProjectBadge)`
+  left: 0;
+  position: absolute;
+  top: 2rem;
+  width: 8rem;
+  @media (min-width: 1024px) {
+    width: 14rem;
+  }
+`;
+
 class MoreOSS extends React.Component {
   render() {
     return (
@@ -57,7 +70,16 @@ class MoreOSS extends React.Component {
           {this.props.ossArray.map(card => (
             <OSSCard key={card.title}>
               <OSSLink href={card.link}>
-                <OSSImage src={card.logo} />
+                {card.hasOwnLogo ? (
+                  <OSSImage src={card.logo} />
+                ) : (
+                  <StyledProjectBadge
+                    color={card.color}
+                    number={card.number}
+                    abbreviation={card.abbreviation}
+                    description={card.title}
+                  />
+                )}
                 <SecondaryTitle>{card.title}</SecondaryTitle>
               </OSSLink>
               <BodyCopy>{card.description}</BodyCopy>

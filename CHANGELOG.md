@@ -1,5 +1,9 @@
 Spectacle Docs
 
+## 5.0.8
+
+- [#84](https://github.com/FormidableLabs/spectacle-docs/pull/84)
+
 ## 5.0.7
 
 - [#86](https://github.com/FormidableLabs/spectacle-docs/pull/86) fix formidable wordmark padding

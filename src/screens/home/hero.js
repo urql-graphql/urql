@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
-import spectacleLogoRaised from "../../static/svgs/logo_spectacle_raised.svg";
+import { ProjectBadge } from "formidable-oss-badges";
 
 const HeroContent = styled.div`
   align-items: center;
@@ -51,7 +51,7 @@ const HeroBody = styled.p`
   }
 `;
 
-const HeroLogo = styled.img`
+const HeroLogo = styled(ProjectBadge)`
   max-width: 16rem;
   position: relative;
   @media (min-width: 768px) {
@@ -114,7 +114,12 @@ class Hero extends React.Component {
     return (
       <Wrapper noPadding>
         <HeroContent>
-          <HeroLogo src={spectacleLogoRaised} alt="Formidable Logo" />
+          <HeroLogo
+            description="Spectacle"
+            abbreviation="S"
+            color="#eb7287"
+            number="03"
+          />
           <HeroTitle>Spectacle</HeroTitle>
           <HeroBody>
             A React.js based library for creating sleek presentations using JSX
