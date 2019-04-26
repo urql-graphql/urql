@@ -17,7 +17,7 @@ interface UseQueryState<T> {
   error?: CombinedError;
 }
 
-type UseQueryResponse<T> = [
+export type UseQueryResponse<T> = [
   UseQueryState<T>,
   (opts?: Partial<OperationContext>) => void
 ];

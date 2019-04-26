@@ -16,7 +16,7 @@ interface UseSubscriptionState<T> {
   error?: CombinedError;
 }
 
-type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
+export type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
 
 export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
