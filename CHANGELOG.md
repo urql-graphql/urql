@@ -1,5 +1,9 @@
 Spectacle Docs
 
+## 5.0.10
+
+- update `formidable-oss-badges`
+
 ## 5.0.9
 
 - Use logo badges
