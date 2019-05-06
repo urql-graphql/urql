@@ -5,7 +5,7 @@ import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseQueryArgs<V> {
+export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;

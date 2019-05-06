@@ -4,7 +4,7 @@ import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseSubscriptionArgs<V> {
+export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
   variables?: V;
 }
