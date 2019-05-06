@@ -73,7 +73,7 @@ class SubscriptionHandler extends Component<
   }
 }
 
-type SubscriptionProps = Omit<SubscriptionHandlerProps, 'client'>;
+export type SubscriptionProps = Omit<SubscriptionHandlerProps, 'client'>;
 
 export const Subscription: FC<SubscriptionProps> = props => (
   <Consumer>
