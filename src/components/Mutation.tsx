@@ -67,7 +67,7 @@ class MutationHandler extends Component<
   };
 }
 
-type MutationProps = Omit<MutationHandlerProps, 'client'>;
+export type MutationProps = Omit<MutationHandlerProps, 'client'>;
 
 export const Mutation: FC<MutationProps> = props => (
   <Consumer>

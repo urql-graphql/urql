@@ -75,7 +75,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   }
 }
 
-type QueryProps = Omit<QueryHandlerProps, 'client'>;
+export type QueryProps = Omit<QueryHandlerProps, 'client'>;
 
 export const Query: FC<QueryProps> = props => (
   <Consumer>{client => <QueryHandler {...props} client={client} />}</Consumer>
