@@ -65,6 +65,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
   componentDidUpdate(prevProps: QueryHandlerProps) {
     if (this.props.skip && prevProps.skip !== this.props.skip) {
+      this.unsubscribe();
       return;
     }
 
