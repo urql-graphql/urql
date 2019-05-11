@@ -19,30 +19,36 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-// @ts-ignore - data is imported from mock only
 import { createClient } from '../client';
-import { useQuery } from './useQuery';
+import { OperationContext } from '../types';
+import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 
 // @ts-ignore
 const client = createClient() as { executeQuery: jest.Mock };
-const props = {
+const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
     myVar: 1234,
   },
+  skip: false,
 };
-let state: any;
-let execute: any;
 
-const QueryUser: FC<typeof props> = ({ query, variables }) => {
-  const [s, e] = useQuery({ query, variables });
+let state: UseQueryState<any> | undefined;
+let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
+
+const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
+  query,
+  variables,
+  skip,
+}) => {
+  const [s, e] = useQuery({ query, variables, skip });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line
+  // tslint:disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );
@@ -158,7 +164,21 @@ describe('on change', () => {
 describe('execute query', () => {
   it('triggers query execution', () => {
     renderer.create(<QueryUser {...props} />);
-    act(() => execute());
+    act(() => execute!());
     expect(client.executeQuery).toBeCalledTimes(2);
+  });
+});
+
+describe('skip', () => {
+  it('skips executing the query if skip is true', () => {
+    renderer.create(<QueryUser {...props} skip={true} />);
+    expect(client.executeQuery).not.toBeCalled();
+  });
+
+  it('skips executing queries if skip updates to true', () => {
+    const wrapper = renderer.create(<QueryUser {...props} />);
+
+    wrapper.update(<QueryUser {...props} skip={true} />);
+    expect(client.executeQuery).toBeCalledTimes(1);
   });
 });

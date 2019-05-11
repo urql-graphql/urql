@@ -110,3 +110,23 @@ describe('on error', () => {
     expect(childProps).toHaveProperty('error', error);
   });
 });
+
+describe('skip', () => {
+  beforeEach(() => {
+    client.executeQuery.mockReturnValue(fromValue({ data: 1234 }));
+  });
+
+  it('should skip executing the query if skip is true', () => {
+    mountWrapper({ ...props, skip: true });
+    expect(client.executeQuery).not.toHaveBeenCalled();
+  });
+
+  it('should not call executeQuery if skip changes to true', () => {
+    const wrapper = mountWrapper(props);
+    expect(client.executeQuery).toHaveBeenCalledTimes(1);
+
+    // @ts-ignore
+    wrapper.setProps({ ...props, query: '{ newQuery }', skip: true });
+    expect(client.executeQuery).toHaveBeenCalledTimes(1);
+  });
+});

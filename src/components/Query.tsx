@@ -11,6 +11,7 @@ interface QueryHandlerProps {
   variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
+  skip?: boolean;
   children: (arg: QueryHandlerState) => ReactNode;
 }
 
@@ -27,6 +28,10 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
   executeQuery = (opts?: Partial<OperationContext>) => {
     this.unsubscribe();
+
+    if (this.props.skip) {
+      return;
+    }
 
     this.setState({ fetching: true });
 
@@ -58,7 +63,11 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     this.executeQuery();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: QueryHandlerProps) {
+    if (this.props.skip && prevProps.skip !== this.props.skip) {
+      return;
+    }
+
     const newRequest = createRequest(this.props.query, this.props.variables);
     if (newRequest.key !== this.request.key) {
       this.request = newRequest;
