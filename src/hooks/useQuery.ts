@@ -41,21 +41,23 @@ export const useQuery = <T = any, V = object>(
     (opts?: Partial<OperationContext>) => {
       unsubscribe();
 
-      if (args.skip) {
-        return;
-      }
-
       setState(s => ({ ...s, fetching: true }));
 
-      const [teardown] = pipe(
-        client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          ...opts,
-        }),
-        subscribe(({ data, error }) =>
-          setState({ fetching: false, data, error })
-        )
-      );
+      let teardown = noop;
+
+      if (!args.skip) {
+        [teardown] = pipe(
+          client.executeQuery(request, {
+            requestPolicy: args.requestPolicy,
+            ...opts,
+          }),
+          subscribe(({ data, error }) =>
+            setState({ fetching: false, data, error })
+          )
+        );
+      } else {
+        setState(s => ({ ...s, fetching: false }));
+      }
 
       unsubscribe = teardown;
     },
@@ -63,9 +65,7 @@ export const useQuery = <T = any, V = object>(
   );
 
   useEffect(() => {
-    if (!args.skip) {
-      executeQuery();
-    }
+    executeQuery();
     return unsubscribe;
   }, [request.key, args.skip]);
 

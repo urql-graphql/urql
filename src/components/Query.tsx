@@ -29,25 +29,29 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   executeQuery = (opts?: Partial<OperationContext>) => {
     this.unsubscribe();
 
-    if (this.props.skip) {
-      return;
-    }
-
     this.setState({ fetching: true });
 
-    const [teardown] = pipe(
-      this.props.client.executeQuery(this.request, {
-        requestPolicy: this.props.requestPolicy,
-        ...opts,
-      }),
-      subscribe(({ data, error }) => {
-        this.setState({
-          fetching: false,
-          data,
-          error,
-        });
-      })
-    );
+    let teardown = noop;
+
+    if (!this.props.skip) {
+      [teardown] = pipe(
+        this.props.client.executeQuery(this.request, {
+          requestPolicy: this.props.requestPolicy,
+          ...opts,
+        }),
+        subscribe(({ data, error }) => {
+          this.setState({
+            fetching: false,
+            data,
+            error,
+          });
+        })
+      );
+    } else {
+      this.setState({
+        fetching: false,
+      });
+    }
 
     this.unsubscribe = teardown;
   };
@@ -63,12 +67,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     this.executeQuery();
   }
 
-  componentDidUpdate(prevProps: QueryHandlerProps) {
-    if (this.props.skip && prevProps.skip !== this.props.skip) {
-      this.unsubscribe();
-      return;
-    }
-
+  componentDidUpdate() {
     const newRequest = createRequest(this.props.query, this.props.variables);
     if (newRequest.key !== this.request.key) {
       this.request = newRequest;

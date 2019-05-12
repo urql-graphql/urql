@@ -178,6 +178,10 @@ describe('skip', () => {
   it('skips executing queries if skip updates to true', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
 
+    /**
+     * Call update twice for the change to be detected.
+     */
+    wrapper.update(<QueryUser {...props} skip={true} />);
     wrapper.update(<QueryUser {...props} skip={true} />);
     expect(client.executeQuery).toBeCalledTimes(1);
   });
