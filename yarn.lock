@@ -4946,10 +4946,10 @@ format@^0.2.2:
   resolved "https://registry.yarnpkg.com/format/-/format-0.2.2.tgz#d6170107e9efdc4ed30c9dc39016df942b5cb58b"
   integrity sha1-1hcBB+nv3E7TDJ3DkBbflCtctYs=
 
-formidable-oss-badges@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/formidable-oss-badges/-/formidable-oss-badges-0.1.1.tgz#aebe9b5163b6f19ae0481b84e476706c9d4be7aa"
-  integrity sha512-umIDTNNNzAYmnyQ+sYJ96b+Z8s12ues5uyfpjzE2sofXzIjinKy/6GfCZhZyNFWWw4bN6WfXp6XQkDjwyrb33Q==
+formidable-oss-badges@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/formidable-oss-badges/-/formidable-oss-badges-0.2.1.tgz#f380dc3effb1b780e44c632943cc9d1a451dd6a2"
+  integrity sha512-g1ZJKHzVUQzIO9jB4pN6ba37ubnhrgz+EXaMjbQq+euFW53an+tR0+hNyHuibt2HVzSoIhekXlcEYzknh/ycvA==
   dependencies:
     buble "0.19.6"
 
