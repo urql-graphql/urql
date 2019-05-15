@@ -164,12 +164,12 @@ from the API.
 The idea of `urql` is that you can customise the caching behaviour amongst
 other things yourself, if needed.
 
-[Read more about customising `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
+[Read more about customising `urql` in the "Extending & Experimenting" section.](/docs/extending-and-experimenting)
 
 ## Subscriptions
 
 One feature of `urql` that was not mentioned in the
-["Getting Started" section](getting-started.md) is `urql`'s
+["Getting Started" section](/docs/getting-started) is `urql`'s
 APIs and ability to handle subscriptions.
 
 To add support for subscriptions there's the `subscriptionExchange`.
