@@ -61,7 +61,7 @@ export const useQuery = <T = any, V = object>(
 
       unsubscribe = teardown;
     },
-    [request.key, args.skip]
+    [request.key, args.skip, args.requestPolicy]
   );
 
   useEffect(() => {
