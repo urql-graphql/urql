@@ -7,298 +7,481 @@ order: 0
 
 # Getting Started
 
-[Setup](#setup)
+## Installation
 
-[Development](#development)
+Installing `urql` is as quick as you'd expect. Firstly, install it
+with your package manager of choice:
 
-[Build and Deployment](#build-and-deployment)
-
-[Presenting](#presenting)
-
-[Controls](#controls)
-
-[Fullscreen](#fullscreen)
-
-[PDF Export](#pdf-export)
-
-[Query Parameters](#query-parameters)
-
-<a name="setup"></a>
-
-## Setup
-
-First, decide whether you want to use [classic Spectacle](#classic-spectacle), [Spectacle MDX](#spectacle-mdx), which has all the same functionality but allows you to write your Spectacle presentation in markdown, or using only [one HTML page](#one-page).
-
-<a name="classic-spectacle"></a>
-
-### Classic Spectacle
-
-There are four ways to get started building your presentation using the classic JSX Spectacle syntax.
-
-1. **Option #1:** Run the following command in your terminal:
-
-```bash
-npx create-react-app my-presentation --scripts-version spectacle-scripts
+```sh
+yarn add urql
+# or
+npm install --save urql
 ```
 
-2. **Option #2:** Using the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
+Then, if you haven't already, make sure that all peer dependencies
+are installed as well:
 
-3. **Option #3:** Following along the [Spectacle Tutorial](./docs/tutorial.md), which also involves downloading the [Spectacle Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate).
-
-All three of the above ways will give you everything you'll need to get started, including a sample presentation in the `presentation` folder. You can change the props and tags as needed for your presentation or delete everything in `presentation/index.js` to start from scratch. From here you can go to [Development](#development) to get started.
-
-4. **Option #4:** Run `npm install spectacle` in your terminal and writing your own build configurations. We also provide full UMD builds (with a `Spectacle` global variable) of the library at `dist/spectacle.js` and `dist/spectacle.min.js` for more general use cases. You could, for example, include the library via a script tag with: `https://unpkg.com/spectacle@VERSION/dist/spectacle.min.js`.
-
-<a name="spectacle-mdx"></a>
-
-### Spectacle MDX
-
-Download the [Spectacle MDX Boilerplate](https://github.com/FormidableLabs/spectacle-boilerplate-mdx).
-
-This repository will give you everything you'll need to get started, including a sample presentation in the `presentation` folder. You can change the props and tags as needed for your presentation or delete everything in the `index.mdx` file to start from scratch. From here you can go to [Development](#development) to get started.
-
-_NOTE: We have webpack externals for `react`, `react-dom`, and `prop-types`, so you will need to provide them in your upstream build or something like linking in via `script` tags in your HTML page for all three libraries. This comports with our project dependencies which place these three libraries in `peerDependencies`._
-
-<a name="one-page"></a>
-
-### One Page
-
-To aid with speedy development we've provided a simple boilerplate HTML page with a bespoke script tag that contains your entire presentation. The rest of the setup will take care of transpiling your React/ESnext code, providing Spectacle, React, and ReactDOM libraries, and being raring to go with a minimum of effort.
-
-We can start with this project's sample at [`one-page.html`](./one-page.html). It's the same presentation as the fully-built-from-source version, with a few notable exceptions:
-
-1.  There are no `import`s or `require`s. Everything must come from the global namespace. This includes `Spectacle`, `React`, `ReactDOM` and all the Spectacle exports from [`./src/index.js`](./src/index.js) -- `Deck`, `Slide`, `themes`, etc.
-
-2.  The presentation must include exactly **one** script tag with the type `text/spectacle` that is a function. Presently, that function is directly inserted inline into a wrapper code boilerplate as a React Component `render` function. The wrapper is transpiled. There should not be any extraneous content around it like outer variables or comments.
-
-**Good** examples:
-
-```html
-<script type="text/spectacle">
-  () => (
-    <Deck>{/* SLIDES */}</Deck>
-  )
-</script>
+```sh
+yarn add react react-dom graphql
+# or
+npm install --save react react-dom graphql
 ```
 
-```html
-<script type="text/spectacle">
-  () => {
-    // Code-y code stuff in JS...
+> _Note:_ Most libraries related to GraphQL specify `graphql` as their peer
+> dependency so that they can adapt to your specific versioning
+> requirements.
+> The library is updated frequently and remains very backwards compatible,
+> but make sure it will work with other GraphQL tooling you might have installed.
 
-    return (
-      <Deck>{/* SLIDES */}</Deck>
-    );
+## Writing queries
+
+Like similar libraries that manage state and data, you will need to wrap your
+app with `urql`'s `<Provider>`. This `<Provider>` holds the `Client` that is
+used to manage data, requests, the cache, and other things. It's the "heart"
+of `urql` and holds all of its core logic.
+
+This example creates a `Client`, passes it a GraphQL API's URL, and provides it
+using the `<Provider>`.
+
+```jsx
+import { Provider, createClient } from 'urql';
+
+const client = createClient({
+  url: 'http://localhost:4000/graphql',
+});
+
+const YourApp = () => (
+  <Provider value={client}>
+    {/* ... */}
+  </Provider>;
+);
+```
+
+Every component and query underneath the `<Provider>` in the tree now has access
+to the client and will call the client when it needs to execute GraphQL requests.
+
+To illustrate how this works, the next example will use `urql`'s `<Query>`
+component to fetch some GraphQL data.
+
+```jsx
+import React from 'react';
+import { Query } from 'urql';
+
+const getTodos = `
+  query GetTodos($limit: Int!) {
+    todos(limit: $limit) {
+      id
+      text
+      isDone
+    }
   }
-</script>
-```
+`;
 
-**Bad** examples of what not to do:
-
-```html
-<script type="text/spectacle">
-  // Outer comment (BAD)
-  const outerVariable = "BAD";
-
-  () => (
-    <Deck>{/* SLIDES */}</Deck>
-  )
-</script>
-```
-
-3.  If you want to create your own theme settings, you can use the following code snippet to change the [themes](#createthemecolors-fonts) default settings.
-
-```html
-<script type="text/spectacle">
-  () => {
-    const { themes: { defaultTheme } } = Spectacle;
-    const theme = defaultTheme({
-      // Change default settings
-      primary: "blue",
-      secondary: "red"
-    },
-    {
-      primary: "Helvetica",
-    });
-
-    return (
-      <Deck transition={['zoom']} theme={theme}>
-        <Slide>some stuff</Slide>
-        <Slide>other stuff</Slide>
-        <Slide>some more stuff</Slide>
-      </Deck>
-    );
-  }
-</script>
-```
-
-... with those guidelines in mind, here's the boilerplate that you can copy-and-paste into an HTML file and start a Spectacle presentation that works from the get go!
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width initial-scale=1 user-scalable=no"
-    />
-    <title>Spectacle</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Lobster+Two:400,700"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <link
-      href="https://unpkg.com/normalize.css@7/normalize.css"
-      rel="stylesheet"
-      type="text/css"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="https://unpkg.com/prop-types@15/prop-types.js"></script>
-    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.js"></script>
-    <script src="https://unpkg.com/spectacle@^4/dist/spectacle.js"></script>
-    <script src="https://unpkg.com/spectacle@^4/lib/one-page.js"></script>
-    <script type="text/spectacle">
-      () => {
-        // Your JS Code goes here
-
-        return (
-          <Deck>
-          {/* Throw in some slides here! */}
-          </Deck>
-        );
+const TodoList = ({ limit = 10 }) => {
+  <Query query={getTodos} variables={{ limit }}>
+    {({ fetching, data, error }) => {
+      if (fetching) {
+        return 'Loading...';
+      } else if (error) {
+        return 'Oh no!';
       }
-    </script>
-  </body>
-</html>
+
+      return (
+        <ul>
+          {data.todos.map(({ id, text }) => (
+            <li key={id}>{text}</li>
+          ))}
+        </ul>
+      );
+    }}
+  </Query>;
+};
 ```
 
-<a name="development"></a>
+When this component is mounted it will send the `query` and `variables`
+to your GraphQL API. Here we're using `fetching` to see whether the
+request is still being sent and is loading, `error` to see whether any
+errors have come back, and finally `data` to get the result.
 
-## Development
+Whenever the query or variables props change, the `<Query>` component will
+send a new request and go back into the `fetching` state.
 
-After downloading the boilerplate, run the following commands on the project's root directory...
+The shape of the result include `data` and `error` which is rather similar
+to the response a GraphQL API sends back by default. However, the `error`
+is not the plural `errors`. `urql` wraps any network error or GraphQL
+errors in a `CombinedError` which is more convenient to handle and
+observe.
 
-- `npm install` (you can also use `yarn`)
-- `rm -R .git` to remove the existing version control
-- `npm start` to start up the local server or visit [http://localhost:3000/#/](http://localhost:3000/#/)
+[Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
-... and we are ready to roll
+### Using hooks
 
-<a name="build-and-deployment"></a>
+> _Note:_ Hooks are only availabe in React 16.8 and onwards
 
-## Build and Deployment
+Instead of using `<Query>` and a render prop API, you can also use the
+hooks API by switching to `useQuery()`.
 
-Building the dist version of the slides is as easy as running `npm run build:dist`
+We can rewrite the above example as follows.
 
-If you want to deploy the slideshow to [surge](https://surge.sh/), run `npm run deploy`
+```jsx
+import React from 'react';
+import { useQuery } from 'urql';
 
-_<span role="img" aria-label="Warning Sign">⚠️ </span> WARNING: If you are deploying the dist version to [GitHub Pages](https://pages.github.com/ 'GitHub Pages'), note that the built bundle uses an absolute path to the `/dist/` directory while GitHub Pages requires the relative `./dist/` to find any embedded assets and/or images. A very hacky way to fix this is to edit one place in the produced bundle, as shown [in this GitHub issue](https://github.com/FormidableLabs/spectacle/issues/326#issue-233283633 'GitHub: spectacle issue #326')._
+const getTodos = `
+  query GetTodos($limit: Int!) {
+    todos(limit: $limit) {
+      id
+      text
+      isDone
+    }
+  }
+`;
 
-<a name="presenting"></a>
+const TodoList = ({ limit = 10 }) => {
+  const [res] = useQuery({
+    query: getTodos,
+    variables: { limit },
+  });
 
-## Presenting
+  if (res.fetching) {
+    return 'Loading...';
+  } else if (res.error) {
+    return 'Oh no!';
+  }
 
-Spectacle comes with a built in presenter mode. It shows you a slide lookahead, current time and your current slide:
+  return (
+    <ul>
+      {res.data.todos.map(({ id, text }) => (
+        <li key={id}>{text}</li>
+      ))}
+    </ul>
+  );
+};
+```
 
-![http://i.imgur.com/jW8uMYY.png](http://i.imgur.com/jW8uMYY.png)
+Similarly to the `<Query>` component, `useQuery` will start the request
+as soon as it's mounted and will rerun it when the query or variables change.
 
-You also have the option of a stopwatch to count the elapsed time:
+> A tutorial on the `useQuery` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks).
 
-![http://i.imgur.com/VDltgmZ.png](http://i.imgur.com/VDltgmZ.png)
+[Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
-To present:
+### Using `graphql-tag`
 
-- Run `npm start`. You will be redirected to a URL containing your presentation or visit [http://localhost:3000/#/](http://localhost:3000/#/)
-- Open a second browser window on a different screen
-- Add `?presenter` or `?presenter&timer` immediately after the `/`, e.g.: [http://localhost:3000/#/0?presenter](http://localhost:3000/#/0?presenter) or [http://localhost:3000/#/?presenter&timer](http://localhost:3000/#/?presenter&timer)
-- Give an amazingly stylish presentation
+You're not limited to just passing in strings as queries. You can also
+pass in a fully parsed AST in the form of `DocumentNode` instead.
+For this purpose you can use `graphql-tag`.
 
-_NOTE: Any windows/tabs in the same browser that are running Spectacle will sync to one another, even if you don't want to use presentation mode_
+This can be extremely helpful, since it enables syntax highlighting
+in some editors. It also can be used to preparse the GraphQL query
+using `babel-plugin-graphql-tag` or the included Webpack loader.
 
-Check it out:
+You only have to make a small adjustment. Install `graphql-tag` and
+you can immediately write tagged template literals instead:
 
-![http://i.imgur.com/H7o2qHI.gif](http://i.imgur.com/H7o2qHI.gif_)
+```jsx
+import React from 'react';
+import gql from 'graphql-tag';
+import { Query } from 'urql';
 
-You can toggle the presenter or overview mode by pressing respectively `alt+p` and `alt+o`.
+const getTodos = gql`
+  query GetTodos($limit: Int!) {
+    todos(limit: $limit) {
+      id
+      text
+      isDone
+    }
+  }
+`;
 
-<a name="controls"></a>
+<Query query={getTodos} variables={{ limit }} />;
+```
 
-## Controls
+Keep in mind that it makes sense to give your queries unique
+names. In this case we've chosen `GetTodos`, since we're simply
+listing out some `Todo`s.
 
-| Key Combination | Function                       |
-| --------------- | ------------------------------ |
-| Right Arrow     | Next Slide                     |
-| Left Arrow      | Previous Slide                 |
-| Space           | Next Slide                     |
-| Shift+Space     | Previous Slide                 |
-| Alt/Option + O  | Toggle Overview Mode           |
-| Alt/Option + P  | Toggle Presenter Mode          |
-| Alt/Option + T  | Toggle Timer in Presenter Mode |
-| Alt/Option + A  | Toggle autoplay (if enabled)   |
-| Alt/Option + F  | Toggle Fullscreen Mode         |
+[Find out more about `graphql-tag` on their repository.](https://github.com/apollographql/graphql-tag)
 
-<a name="fullscreen"></a>
+## Writing mutations
 
-## Fullscreen
+There always comes a point when an app will also need to send
+mutations to the GraphQL API. A mutation's response is very similar
+to a query's response, but often they're used in multiple use cases.
 
-Fullscreen can be toggled via browser options, <kbd>Alt/Option</kbd> + <kbd>F</kbd>, or by pressing the button in the bottom right corner of your window.
+Sometimes you care about the response, sometimes you don't, sometimes
+it might make more sense to imperatively use the mutations' result.
 
-Note: Right now, this works well when browser window itself is not full screen. When the browser is in fullscreen, there is an issue [#654](https://github.com/FormidableLabs/spectacle/issues/654). This is because we use the browser's FullScreen API methods. It still works but has some inconstiency (if you reveal the browser window, it will again work as expected).
+To support all these use cases `urql`'s `<Mutation>` component
+is quite flexible. The render prop API passes down an object that
+contains the `executeMutation` method that accepts variables
+as its first argument. When called it will return a Promise with
+the mutations result.
 
-<a name="pdf-export"></a>
+However, the render prop API will expose the result as well, like
+the `<Query>` component exposes it, with a `fetching`, `data`,
+and an `error` property.
 
-## PDF Export
+Here's an example of an imperative use case where we create a todo.
 
-You can export a PDF from your Spectacle presentation either from the command line or browser:
+```js
+import React, { Component } from 'react';
+import { Mutation } from 'urql';
 
-### CLI
+const addTodo = `
+  mutation AddTodo($text: String!) {
+    addTodo(text: $text) {
+      id
+      text
+    }
+  }
+`;
 
-- Run `npm install spectacle-renderer -g`
-- Run `npm start` on your project and wait for it to build and be available
-- Run `spectacle-renderer`
+class TodoForm extends Component {
+  state = {
+    error: null
+  };
 
-A PDF is created in your project directory. For more options and configuration of this tool, check out:
+  add = () => {
+    this.props.addTodo({ text: 'something!' })
+      .catch(error => {
+        this.setState({ error });
+      });
+  };
 
-[https://github.com/FormidableLabs/spectacle-renderer](https://github.com/FormidableLabs/spectacle-renderer)
+  render() {
+    if (this.state.error) {
+      return 'Oh no!';
+    }
 
-### Browser
+    return <button onClick={this.add}>Add something!</button>
+  }
+}
 
-After running `npm start` and opening [http://localhost:3000/#/](http://localhost:3000/#/) in your browser...
+const WithMutation = () => (
+  <Mutation query={addTodo}>
+    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />
+  </Mutation>
+);
+```
 
-- Add `?export` after the `/` on the URL of the page you are redirected to, e.g.: [http://localhost:3000/#/?export](http://localhost:3000/#/?export)
-- Bring up the print dialog `(ctrl or cmd + p)`
-- Change destination to "Save as PDF", as shown below:
+In this example, when the button is clicked, the component will call
+the passed in `executeMutation` method, i.e. the `addTodo` prop.
+When an error occurs it changes it states to reflect that in the UI
+and it displays an error message.
 
-![https://i.imgur.com/fLeYrZC.png](https://i.imgur.com/fLeYrZC.png)
+While this is a common use case, `urql` offers an alternative
+approach to this, by using the result directly from the render props.
+So let's look at another example.
 
-If you want a printer friendly version, repeat the above process but instead print from [http://localhost:3000/#/?export&print](http://localhost:3000/#/?export&print).
+```js
+import React, { Component } from 'react';
+import { Mutation } from 'urql';
 
-If you want to export your slides with your [notes](#notes) included, repeat the above process but instead print from [http://localhost:3000/#/?export&notes](http://localhost:3000/#/?export&notes).
+const addTodo = /* ... */;
 
-## Query Parameters
+class TodoForm extends Component {
+  add = () => this.props.addTodo({ text: 'something!' });
 
-Here is a list of all valid query parameters that can be placed after `/#/` on the URL.
+  render() {
+    if (this.props.error) {
+      return 'Oh no!';
+    }
 
-| Query               | Description                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 0, 1, 2, 3... etc.  | Will take you to the corresponding slide, with `0` being the first slide in the presentation.                        |
-| ?export             | Creates a single-page overview of your slides, that you can then print.                                              |
-| ?export&notes       | Creates a single-page overview of your slides, including any [notes](#notes), that you can then print.               |
-| ?export&print       | Creates a black & white single-page overview of your slides.                                                         |
-| ?export&print&notes | Creates a black & white single-page overview of your slides, including any [notes](#notes), that you can then print. |
-| ?presenter          | Takes you to presenter mode where you’ll see current slide, next slide, current time, and your [notes](#notes).      |
-| ?presenter&timer    | Takes you to presenter mode where you’ll see current slide, next slide, timer, and your [notes](#notes).             |
-| ?overview           | Take you to overview mode where you’ll see all your slides.                                                          |
+    return <button onClick={this.add}>Add something!</button>
+  }
+}
 
-_NOTE: If you add a non-valid query parameter, you will be taken to a blank page. Removing or replacing the query parameter with a valid query parameter and refreshing the page will return you to the correct destination._
+const WithMutation = () => (
+  <Mutation query={addTodo}>
+    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />
+  </Mutation>
+);
+```
+
+This example looks very similar, but as we can see there's sometimes
+no need to maintain state to handle a mutation's result, when it's
+not used as a fire-and-forget.
+
+### Using hooks
+
+> _Note:_ Hooks are only availabe in React 16.8 and onwards
+
+Like the `<Query>` component the `<Mutation>` component has an alternative hook
+that can be used instead, which is the `useMutation()` hook.
+
+We can rewrite the second example from above as follows.
+
+```jsx
+import React, { useCallback } from 'react';
+import { useMutation } from 'urql';
+
+const addTodo = `
+  mutation AddTodo($text: String!) {
+    addTodo(text: $text) {
+      id
+      text
+    }
+  }
+`;
+
+const TodoForm = () => {
+  const [res, executeMutation] = useMutation(addTodo);
+
+  if (res.error) {
+    return 'Oh no!';
+  }
+
+  return (
+    <button onClick={() => executeMutation({ text: 'something!' })}>
+      Add something!
+    </button>
+  );
+};
+```
+
+This is functionally the same as the second example, but `executeMutation`
+also returns a promise with `useMutation` as it does with `<Mutation>` so
+the first example could also be written using hooks.
+
+## Refetching data
+
+`urql` will by default come with a simple "document" cache. Each query
+with variables that is requested from a GraphQL API, the result will be
+cached completely. When the same query and variables are requested again,
+`urql`'s default cache will then return the cached result. This
+result is also invalidated when a mutation with similar `__typename`s was
+sent.
+
+[You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
+
+Using `urql`'s default behaviour this means we sometimes need a way to refetch
+data from the GraphQL API and skip the cache, if we need fresh data.
+
+The easiest way to always display up-to-date data is to set the `requestPolicy`
+to `'cache-and-network'`. Using this policy `urql` will first return a cached
+result if it has one, and subsequently it will send a new request to the API
+to get the up-to-date result.
+
+A `requestPolicy` can be passed as a prop:
+
+```jsx
+<Query query={q} requestPolicy="cache-and-network" />;
+
+/* or with hooks: */
+
+useQuery({ query: q, requestPolicy: 'cache-and-network' });
+```
+
+Including `'cache-and-network'` there are four request policies in total:
+
+- `cache-first`: The default policy. It doesn't send a request to the API when a result
+  can be retrieved from the cache.
+- `cache-only`: It never sends a request and always uses the cached or an empty result.
+- `network-only`: This skips the cache entirely and always sends a request.
+- `cache-and-network`: As stated above, this returns the cached result and then also
+  sends a request to the API.
+
+[You can find out more about how the default cache behaves when it receives these request policies in the Basics' `cacheExchange` section.](basics.md#request-policies)
+
+Next, we can take a look at how to use `'network-only'` to force a refetch
+imperatively. In our previous example this would come in handy to refresh the
+list of todos.
+
+```jsx
+import React from 'react';
+import { Query } from 'urql';
+
+const getTodos = `
+  query GetTodos {
+    todos(limit: 10) {
+      id
+      text
+      isDone
+    }
+  }
+`;
+
+const TodoList = () => {
+  <Query query={getTodos}>
+    {({ executeQuery, data }) => {
+      if (!data) {
+        return null;
+      }
+
+      return (
+        <div>
+          <ul>
+            {data.todos.map(({ id, text }) => (
+              <li key={id}>{text}</li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => executeQuery({ requestPolicy: 'network-only' })}
+          >
+            Refresh
+          </button>
+        </div>
+      );
+    }}
+  </Query>;
+};
+```
+
+As can be seen, the `<Query>` render props also expose an `executeQuery` method, which
+isn't unlike the `<Mutation>` component's `executeMutation` method.
+
+We can call this method to rerun the query and pass it a `requestPolicy` different. In this
+case we'll pass `'network-only'` which will skip the cache and make sure we actually refresh
+our todo list.
+
+The same example can again also be implemented using hooks:
+
+```jsx
+import React from 'react';
+import { useQuery } from 'urql';
+
+const getTodos = `
+  query GetTodos($limit: Int!) {
+    todos(limit: $limit) {
+      id
+      text
+      isDone
+    }
+  }
+`;
+
+const TodoList = ({ limit = 10 }) => {
+  const [res, executeQuery] = useQuery({
+    query: getTodos,
+    variables: { limit }
+  });
+
+  if (!res.data) {
+    return null;
+  }
+
+  return (
+    <div>
+      <ul>
+        {res.data.todos.map(({ id, text }) => (
+          <li key={id}>{text}</li>
+        ))}
+      </ul>
+
+      <button onClick={() => executeQuery({ requestPolicy: 'network-only' })}
+        Refresh
+      </button>
+    </div>
+  );
+};
+```
+
+Which again looks a lot like `useMutation`'s tuple that contains the `executeMutation` function.
+
+## More examples
+
+More examples on how to use `urql`
+[can be found in the repository's `examples/` folder](https://github.com/FormidableLabs/urql/tree/master/examples).

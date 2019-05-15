@@ -7,7 +7,7 @@ const sidebarZIndex = 900;
 
 export const Navigation = styled.div`
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: #8196ff;
   display: flex;
   flex-direction: row;
   height: 6rem;
