@@ -7,12 +7,12 @@ const stage =
   process.env.REACT_STATIC_STAGING === "true"
     ? "staging"
     : process.env.REACT_STATIC_ENV;
-const landerBasePath = "open-source/spectacle";
+const landerBasePath = "open-source/urql";
 const metaData = {
-  title: "Spectacle",
+  title: "urql",
   description:
-    "A React.js based library for creating sleek presentations using JSX syntax (with the ability to live demo your code!)",
-  url: "http://www.formidable.com/open-source/spectacle/"
+    "A GraphQL client that exposes a set of React components and hooks.",
+  url: "http://www.formidable.com/open-source/urql/"
 };
 
 module.exports = { stage, landerBasePath, metaData };
