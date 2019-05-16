@@ -1,21 +1,26 @@
 const content = {
   features: [
     {
-      title: "Interactive Presentations",
-      description:
-        "Add clickable elements and other interactivity to make your presentations pop.",
+      title: "One package for a working GraphQL client in React",
+      description: "Add urql and get your client side GraphQL going.",
       icon: require("../../static/svgs/button.svg")
     },
     {
-      title: "Live-Preview Your Code",
+      title: "Logical default behaviour and caching",
       description:
-        "Show people more than just a code block - demo the final project in real-time without leaving your presentation deck.",
+        "urql is set up to allow you to quickly produce client side GraphQL without large API overhead.",
+      icon: require("../../static/svgs/amazing.svg")
+    },
+    {
+      title: "Fully customisable via 'exchanges'",
+      description:
+        "Want to change how your client fetches, caches, or subscribes to your data, this is easily customised through the use of 'exchanges'!",
       icon: require("../../static/svgs/code-preview.svg")
     },
     {
-      title: "Auto-Size Text, Image Dimming, and More",
+      title: "Minimal React components and hooks",
       description:
-        "On top of all of Spectacle's helpful features, you can also make your presentation look amazing with auto-formatting, easy themeing abilities, image dimming, and lots of other fun touches",
+        "On top of all of urql's helpful features, you have access to a number of React components and hooks that you can use to leverage urql.",
       icon: require("../../static/svgs/amazing.svg")
     }
   ],
@@ -25,7 +30,7 @@ const content = {
   },
   getStarted: {
     description:
-      "There are several flexible options for getting started with Spectacle, using either JSX or MDX syntax - dive into the documentation to see all the ways you can get a presentation up and running.",
+      "Dive into the documentation to see how you can get your urql client up and running.",
     link: "/docs"
   },
   oss: [

@@ -185,10 +185,11 @@ class Hero extends React.Component {
               </g>
             </svg>
           </HeroLogo>
-          <HeroTitle>Urql</HeroTitle>
+          <HeroTitle>urql</HeroTitle>
           <HeroBody>
-            urql is a GraphQL client that exposes a set of React components and
-            hooks.
+            urql is a highly customisable and flexible GraphQL client, that
+            happens to come with some default core behaviour and some React
+            component and hooks APIs.
           </HeroBody>
         </HeroContent>
         <HeroNavList>
