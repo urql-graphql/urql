@@ -17,7 +17,7 @@ const HeroLogo = styled.img`
   position: absolute;
   top: 3rem;
   left: 6rem;
-  min-width: 14rem;
+  width: 14rem;
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
