@@ -10,9 +10,9 @@
                         <use xlink:href="#path-1"></use>
                     </mask>
                     <use id="Mask" fill="#3D4247" xlink:href="#path-1"></use>
-                    <rect id="Rectangle" fill="#FC6986" x="0" y="0" width="12" height="1047"></rect>
-                    <rect id="Rectangle-Copy-4" fill="#FC6986" opacity="0.7" x="12" y="0" width="12" height="1047"></rect>
-                    <rect id="Rectangle-Copy-5" fill="#FC6986" opacity="0.4" x="24" y="0" width="186" height="1047"></rect>
+                    <rect id="Rectangle" fill="#1969DD" x="0" y="0" width="12" height="1047"></rect>
+                    <rect id="Rectangle-Copy-4" fill="#1969DD" opacity="0.7" x="12" y="0" width="12" height="1047"></rect>
+                    <rect id="Rectangle-Copy-5" fill="#1969DD" opacity="0.4" x="24" y="0" width="186" height="1047"></rect>
                 </g>
             </g>
         </g>

@@ -1,6 +1,6 @@
 {
   "name": "formidable-spectacle-docs",
-  "version": "5.0.5",
+  "version": "5.0.10",
   "description": "Documentation site for Spectacle",
   "main": "static.config.js",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "prettier-all": "npx prettier --write '{src,static-config-helpers,static-config-parts,static.config,scripts,lib}/**/*.{js,jsx}'",
     "preversion": "yarn run lint && yarn run build",
     "format": "yarn run lint:fix",
-    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js'static.config.js",
+    "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js' 'static.config.js'",
     "stage-and-serve": "yarn stage && yarn serve",
     "test-local": "node test/spectacle-integration.js"
   },
@@ -32,7 +32,7 @@
     "chokidar": "2.0.3",
     "classnames": "^2.2.6",
     "exenv": "^1.2.2",
-    "formidable-landers": "^8.4.0",
+    "formidable-oss-badges": "0.2.1",
     "gray-matter": "^3.1.1",
     "history": "^4.7.2",
     "htmr": "0.6.3",
@@ -61,6 +61,7 @@
     "change-case": "^3.0.2",
     "config": "^3.0.0",
     "eslint-config-formidable": "^4.0.0",
+    "eslint-config-prettier": "^4.1.0",
     "eslint-config-react-tools": "1.x.x",
     "eslint-plugin-filenames": "^1.3.2",
     "eslint-plugin-prettier": "^3.0.0",

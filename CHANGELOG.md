@@ -1,5 +1,25 @@
 Spectacle Docs
 
+## 5.0.10
+
+- update `formidable-oss-badges`
+
+## 5.0.9
+
+- Use logo badges
+
+## 5.0.8
+
+- [#84](https://github.com/FormidableLabs/spectacle-docs/pull/84)
+
+## 5.0.7
+
+- [#86](https://github.com/FormidableLabs/spectacle-docs/pull/86) fix formidable wordmark padding
+
+## 5.0.6 (2019-04-17)
+
+- [#85](https://github.com/FormidableLabs/spectacle-docs/pull/85) Update formidable wordmark
+
 ## 5.0.5 (2019-04-04)
 
 - [#81](https://github.com/FormidableLabs/spectacle-docs/pull/81) Docs addition

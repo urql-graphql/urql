@@ -11,12 +11,13 @@ import {
 import closeButton from "../../static/svgs/x.svg";
 import logoSidebar from "../../static/svgs/logo-sidebar.svg";
 import constants from "../../constants";
+// import Hero from "../../screens/home/hero";
 
 const HeroLogo = styled.img`
   position: absolute;
   top: 3rem;
   left: 6rem;
-  min-width: 14rem;
+  width: 14rem;
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
@@ -107,6 +108,7 @@ class Sidebar extends React.Component {
           />
           <Link to={"/"}>
             <HeroLogo
+              // TODO: add urql logo
               src={logoSidebar}
               alt="Formidable Logo"
               overlay={overlay}

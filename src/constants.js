@@ -1,8 +1,8 @@
 const constants = {
-  docsTitle: "SPECTACLE",
-  githubIssues: "https://www.github.com/FormidableLabs/spectacle/issues",
-  github: "https://www.github.com/FormidableLabs/spectacle",
-  color: "#fc6986"
+  docsTitle: "URQL",
+  githubIssues: "https://www.github.com/FormidableLabs/urql/issues",
+  github: "https://www.github.com/FormidableLabs/urql",
+  color: "#8196FF"
 };
 
 export default constants;

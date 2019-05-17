@@ -9,119 +9,289 @@ order: 1
 
 <a name="main-file"></a>
 
-## Main file
+As mentioned before, `urql`'s core logic is split into exchanges.
+To that end, `urql`'s behaviour is completely defined by the exchanges
+you pass to it or that are the default ones.
 
-Your presentation files & assets will live in the `presentation` folder.
+This document goes through the exchanges that `urql` adds by default.
+When you create a client and pass no `exchanges` array some are added
+automatically, which is the same as creating a client using the following
+exchanges:
 
-The main `.js` file you write your deck in is `/presentation/index.js`
+```js
+import { Client, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
-Check it out [here](https://github.com/FormidableLabs/spectacle-boilerplate/blob/master/presentation/index.js) in the boilerplate.
+const client = new Client({
+  url: '/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+});
+```
 
-```jsx
-// index.js
+This list of default exchanges is also exported as `defaultExchanges`
+however.
 
-import React, { Component } from 'react';
-import {
-  Appear,
-  BlockQuote,
-  Cite,
-  CodePane,
-  Code,
-  Deck,
-  Fill,
-  Fit,
-  Heading,
-  Image,
-  Layout,
-  ListItem,
-  List,
-  Quote,
-  Slide,
-  Text
-} from 'spectacle';
+## `fetchExchange`
 
-export default class extends Component {
-  render() {
-    return (
-      <Deck>
-        <Slide>
-          <Text>Hello</Text>
-        </Slide>
-      </Deck>
-    );
-  }
+The `fetchExchange` handles `query` and `mutation` operations and uses `fetch`
+to send GraphQL API requests.
+
+> _Note:_ Depending on your browser support, you might want to add a fetch
+> polyfill to your app.
+
+It also supports cancellation. When an operation becomes "stale", meaning a
+component that requested it has unmounted for instance, a `teardown`
+operation is sent which can cause `fetch` to abort ongoing requests
+when necessary.
+
+Generally there's a couple of things to know about `fetch`.
+
+### Fetch Options
+
+You might have noticed that `fetchOptions` is an option on the
+client that can be `RequestInit` or `() => RequestInit`. The
+`RequestInit` is just passed on to the `OperationContext`, meaning
+that you can also pass it to `executeQuery`.
+
+This is then spread onto the `fetchOptions` that `fetch` will use.
+The defaults are as follows.
+
+```js
+{
+  body: /* ... */,
+  headers: { 'Content-Type': 'application/json' },
+  method: 'POST',
+  signal: /* ... */
 }
 ```
 
-Here is where you can use the library's tags to compose your presentation. While you can use any JSX syntax here, building your presentation with the supplied tags allows for theming to work properly.
+The `signal` is the property that is used for the `abort-controller`.
 
-The bare minimum you need to start is a `Deck` element and a `Slide` element. Each `Slide` element represents a slide inside of your slideshow.
+The `fetchExchange` will also handle `response.status` correctly and
+allow `response.status >= 300` when `redirect` is set to `'manual'`.
 
-<a name="themes"></a>
+**In summary:** `fetchExchange` is a simple request handler that takes
+operations and sends `POST` requests using `fetch`.
 
-## Themes
+## `cacheExchange`
 
-In Spectacle, themes are functions that return style objects for `screen` & `print`.
+The default caching behaviour that `urql` uses is defined by the `cacheExchange`
+unlike Apollo's `Cache` or `InMemoryCache`, caching behaviour is handled as
+part of the request pipeline, which makes customisation a lot easier as
+there's no extra API to learn.
 
-You can import the default theme from:
+By default however, `urql`'s caching behaviour is not that of a _"normalising
+cache"_ but more of a _"document cache"_.
 
-```jsx
-import createTheme from 'spectacle/lib/themes/default';
+### The document cache
+
+When an **operation** is sent it is identifier via its `key` which is a hash
+of the `query` and `variables`. A document cache makes the assumption
+that there's **no overlap** between any two given queries.
+
+When a query is sent and succeeds, the entire operation result is
+cached. This is a simple map of `key` to `OperationResult`.
+
+The **document cache** does not cache by distinct GraphQL types via
+`__typename`. Instead it caches whole results.
+
+When a mutation is sent and comes back the document cache invalidates
+parts of the cache. It makes the assumption that a mutation's
+`__typename` fields indicate that all these types in the cache
+are now invalid.
+
+For example, when we fetch a list of `TodoItem`s the response will
+contain fields of `__typename: 'TodoItem'`. The document cache
+then caches the result and also keeps a map of type names to
+operation keys.
+
+When a mutation result comes back that contains `__typename: 'TodoItem'`
+as well, the document cache invalidates all previous query results
+that also contained these types.
+
+### Limitations
+
+This is a very primitive approach to caching, but works out well
+for a lot of content-driven sites.
+
+It might lead to more requests similar to a relatively simple
+content app that just sends RESTful requests.
+
+The only assumption that `urql` makes is that your mutations
+respond with the types that are invalidated.
+
+Given an `addTodo` mutation for example, you will need to send
+back at least one `TodoItem` for the invalidation to happen.
+
+a **document cache** also doesn't normalise at all, which means
+that after fetching a list of items, fetching a single item
+will never be fulfilled by this cache.
+
+### Request Policies
+
+The operation context can also contain a `requestPolicy` property
+that alters when and how the cache responds.
+By default this will be set to `'cache-first'`.
+
+When `'cache-first'`, the default behaviour, is used, the cache
+will return all cached results when they're available. When no
+cached result is available it will let the operation through, so
+that the `fetchExchange` can send a request to the API.
+
+When `'cache-only'` is passed, the cache will always return the
+cached result or default to `{ data: undefined, error: undefined },
+i.e. an empty result, when nothing is cached for a given operation.
+
+For `'network-only'` the opposite of `'cache-only'` is done.
+The `cacheExchange` will never return cached results, but will
+instead immediately forward the operation to the next exchange,
+so that the `fetchExchange` can respond with up-to-date data.
+The result will still be cached however.
+
+The last one `'cache-and-network'` is rather special
+in that it first does what `'cache-first'` does, it will
+return some cached results. After returning a cached result however,
+it will forward the operation anyway. This way a temporary cached
+result may be displayed that is then updated with fresh data
+from the API.
+
+> _Note:_ `'network-only'` and `'cache-and-network'` are extremely valuable
+> given the limitations of the default cache. The can be used to ensure
+> that data skips the cache, if it's clear to you that the result will
+> need to be up-to-date.
+
+### Customisation
+
+The idea of `urql` is that you can customise the caching behaviour amongst
+other things yourself, if needed.
+
+[Read more about customising `urql` in the "Extending & Experimenting" section.](/docs/extending-and-experimenting)
+
+## Subscriptions
+
+One feature of `urql` that was not mentioned in the
+["Getting Started" section](/docs/getting-started) is `urql`'s
+APIs and ability to handle subscriptions.
+
+To add support for subscriptions there's the `subscriptionExchange`.
+When you first setup subscriptions you will need to add it.
+
+```js
+import { Client, defaultExchanges, subscriptionExchange } from 'urql';
+
+const client = new Client({
+  url: '/graphql',
+  exchanges: [
+    ...defaultExchanges,
+    subscriptionExchange({
+      forwardSubscription,
+    }),
+  ],
+});
 ```
 
-Or create your own based upon the source.
+In the above example, we add the `subscriptionExchange`, which needs
+to be called with some additional options, to the client.
 
-`index.js` is what you would edit in order to create a custom theme of your own, using object based styles.
+The `subscriptionExchange` does not make any assumption over the
+transport protocol and scheme that is used. Instead the `forwardSubscription`
+function will be called with an enriched operation, which can then be
+passed to your subscription client. It expects an "Observable-like"
+object to be returned, which needs to follow the
+[Observable spec](https://github.com/tc39/proposal-observable).
 
-You will want to edit `index.html` to include any web fonts or additional CSS that your theme requires.
+If you're set up with `apollo-server` or another server that uses
+the `subscriptions-transport-ws` package,
+[have a look at our subscriptions example project](https://github.com/FormidableLabs/urql/tree/master/examples/2-using-subscriptions).
 
-<a name="createthemecolors-fonts"></a>
+Once you've set up the `subscriptionExchange` and your
+`forwardSubscription` function, you can start using
+the `<Subscription>` component and/or the `useSubscription()` hook.
 
-### createTheme(colors, fonts)
+### Usage with components
 
-Spectacle's functional theme system allows you to pass in color and font variables that you can use on your elements. The fonts configuration object can take a string for a system font or an object that specifies it‘s a Google Font. If you use a Google Font you can provide a styles array for loading different weights and variations. Google Font tags will be automatically created. See the example below:
+The `<Subscription>` component is extremely similar to the `<Query>`
+component. You can pass it a query and variables, and it will serve
+you render props with `data`, `error`, and `fetching`.
 
-```jsx
-const theme = createTheme(
-  {
-    primary: 'red',
-    secondary: 'blue'
-  },
-  {
-    primary: 'Helvetica',
-    secondary: {
-      name: 'Droid Serif',
-      googleFont: true,
-      styles: ['400', '700i']
+```js
+import { Subscription } from 'urql';
+
+const newMessages = `
+  subscription MessageSub {
+    newMessages {
+      id
+      from
+      message
     }
   }
-);
-```
-
-The returned theme object can then be passed to the `Deck` tag via the `theme` prop, and will override the default styles.
-
-<a name="faq"></a>
-
-## FAQ
-
-**_How can I easily style the base components for my presentation?_**
-
-Historically, custom styling in Spectacle has meant screwing with a theme file, or using `!important` overrides. We fixed that. Spectacle is now driven by [emotion](https://github.com/emotion-js/emotion), so you can bring your own styling library, whether it's emotion itself, or something like styled-components or glamorous. For example, if you want to create a custom Heading style:
-
-```javascript
-import styled from 'react-emotion';
-import { Heading } from 'spectacle';
-
-const CustomHeading = styled(Heading)`
-  font-size: 1.2em;
-  color: papayawhip;
 `;
+
+<Subscription query={newMessages}>
+  {({ data }) => /* ... */}
+</Subscription>
 ```
 
-<a name="tag-api"></a>
+The `data` and `error` of the render props will change every time
+a new event is received by the server. When you're accumulating and
+collecting events over time, it makes sense to pass this data
+into another component and combine it.
 
-**_Can I write my presentation in TypeScript?_**
+### Usage with hooks
 
-Yes, you can! Type definitions are shipped with the library, so you can import Spectacle components into any `.tsx` presentation without additional installation steps.
+The `useSubscription` hooks comes with a similar API to `useQuery`.
+It will accept `query` and `variables` as options.
 
-Updated type definitions for the Spectacle API can be found [at the root of this repository](./index.d.ts).
+Additionally the second argument for this hook can be a "reducer function".
+This function is similar to what you would pass to `Array.prototype.reduce`.
+
+It receives the previous set of data that this function has returned or `undefined`.
+As the second argument, it receives the event that has come in from the subscription.
+You can use this to accumulate the data over time, which is useful for a
+list for example.
+
+In the following example, we create a subscription that informs us of
+new messages. We will concatenate the incoming messages, so that we
+can display all messages that have come in over the subscription across
+events.
+
+```js
+import React from 'react';
+import { useSubscription } from 'urql';
+
+const newMessages = `
+  subscription MessageSub {
+    newMessages {
+      id
+      from
+      text
+    }
+  }
+`;
+
+const handleSubscription = (messages = [], response) => {
+  return [response.newMessages, ...messages];
+};
+
+const Messages = () => {
+  const [res] = useSubscription({ query: newMessages }, handleSubscription);
+
+  if (!res.data) {
+    return <p>No new messages</p>;
+  }
+
+  return (
+    <ul>
+      {res.data.map(message => (
+        <p key={message.id}>
+          {message.from}: "{message.text}"
+        </p>
+      ))}
+    </ul>
+  );
+};
+```
+
+As we can see, the `result.data` is being updated and transformed by
+the `handleSubscription` function. This works over time, so as
+new messages come in, we will append them to the list of previous
+messages.

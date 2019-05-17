@@ -1,6 +1,6 @@
 import React from "react";
 import Hero from "../screens/home/hero";
-import bgImg from "../static/bg_hero_gray.jpg";
+import bgImg from "../../public/static/svgs/urqlbackground.svg";
 import styled from "styled-components";
 import { Navigation } from "./navigation";
 import { Wrapper } from "./wrapper";
