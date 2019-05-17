@@ -2,7 +2,6 @@ import React from "react";
 import Features from "./features";
 import GetStarted from "./get-started";
 import MoreOSS from "./more-oss";
-import Preview from "./preview";
 import content from "./_content";
 import styled from "styled-components";
 import { Header } from "../../components/header";
@@ -18,7 +17,6 @@ class Home extends React.Component {
       <Container>
         <Header />
         <Features featureArray={content.features} />
-        <Preview previewObj={content.preview} />
         <GetStarted getStartedObj={content.getStarted} />
         <MoreOSS ossArray={content.oss} />
         <Footer />
