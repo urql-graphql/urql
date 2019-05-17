@@ -13,6 +13,10 @@ const OuterWrapper = styled.div`
   box-shadow: inset 0 -1rem 0 rgba(0, 0, 0, 0.2);
 `;
 
+const GetStartedBody = styled(BodyCopy)`
+  text-align: center;
+`;
+
 class GetStarted extends React.Component {
   render() {
     const { getStartedObj } = this.props;
@@ -21,7 +25,7 @@ class GetStarted extends React.Component {
       <OuterWrapper>
         <Wrapper>
           <SectionTitle>Get Started</SectionTitle>
-          <BodyCopy>{getStartedObj.description}</BodyCopy>
+          <GetStartedBody>{getStartedObj.description}</GetStartedBody>
           <Button to={getStartedObj.link}>Documentation</Button>
         </Wrapper>
       </OuterWrapper>
