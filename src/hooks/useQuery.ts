@@ -9,9 +9,10 @@ export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
+  skip?: boolean;
 }
 
-interface UseQueryState<T> {
+export interface UseQueryState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
@@ -39,27 +40,34 @@ export const useQuery = <T = any, V = object>(
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe();
+
       setState(s => ({ ...s, fetching: true }));
 
-      const [teardown] = pipe(
-        client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          ...opts,
-        }),
-        subscribe(({ data, error }) =>
-          setState({ fetching: false, data, error })
-        )
-      );
+      let teardown = noop;
+
+      if (!args.skip) {
+        [teardown] = pipe(
+          client.executeQuery(request, {
+            requestPolicy: args.requestPolicy,
+            ...opts,
+          }),
+          subscribe(({ data, error }) =>
+            setState({ fetching: false, data, error })
+          )
+        );
+      } else {
+        setState(s => ({ ...s, fetching: false }));
+      }
 
       unsubscribe = teardown;
     },
-    [request.key]
+    [request.key, args.skip, args.requestPolicy]
   );
 
   useEffect(() => {
     executeQuery();
     return unsubscribe;
-  }, [request.key]);
+  }, [request.key, args.skip]);
 
   return [state, executeQuery];
 };

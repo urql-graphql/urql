@@ -11,6 +11,7 @@ interface QueryHandlerProps {
   variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
+  skip?: boolean;
   children: (arg: QueryHandlerState) => ReactNode;
 }
 
@@ -30,19 +31,27 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
     this.setState({ fetching: true });
 
-    const [teardown] = pipe(
-      this.props.client.executeQuery(this.request, {
-        requestPolicy: this.props.requestPolicy,
-        ...opts,
-      }),
-      subscribe(({ data, error }) => {
-        this.setState({
-          fetching: false,
-          data,
-          error,
-        });
-      })
-    );
+    let teardown = noop;
+
+    if (!this.props.skip) {
+      [teardown] = pipe(
+        this.props.client.executeQuery(this.request, {
+          requestPolicy: this.props.requestPolicy,
+          ...opts,
+        }),
+        subscribe(({ data, error }) => {
+          this.setState({
+            fetching: false,
+            data,
+            error,
+          });
+        })
+      );
+    } else {
+      this.setState({
+        fetching: false,
+      });
+    }
 
     this.unsubscribe = teardown;
   };
