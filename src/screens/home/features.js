@@ -4,11 +4,28 @@ import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { SecondaryTitle } from "../../components/secondary-title";
 import { SectionTitle } from "../../components/section-title";
-import { Wrapper } from "../../components/wrapper";
 
+const FeaturesWrapper = styled.div`
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+  background-color: #0d1129;
+  color: #a3abd4;
+  width: 100%;
+  padding: 8rem;
+`;
+
+const FeatureWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
 const FeatureCard = styled.div`
   margin: 0 0 4rem;
   width: 100%;
+  > img {
+    width: 100%;
+  }
   @media (min-width: 768px) {
     margin: 0;
     width: calc(1 / 3 * 100% - (1 - 1 / 3) * 40px);
@@ -18,24 +35,44 @@ const FeatureCard = styled.div`
   }
 `;
 
+const ComponentWrapper = styled.div`
+  margin: 0 0 4rem;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 3em;
+  > img {
+    width: 20%;
+  }
+`;
+
 class Features extends React.Component {
   render() {
     return (
-      <Wrapper>
+      <FeaturesWrapper>
         <SectionTitle>Features</SectionTitle>
-        {this.props.featureArray.map(feature => (
-          <FeatureCard key={feature.title}>
-            <img src={feature.icon} />
-            <SecondaryTitle>{feature.title}</SecondaryTitle>
-            <BodyCopy>{feature.description}</BodyCopy>
-          </FeatureCard>
-        ))}
-      </Wrapper>
+        <FeatureWrapper>
+          {this.props.featureArray.map(feature => (
+            <FeatureCard key={feature.title}>
+              <img src={feature.icon} />
+              <SecondaryTitle>{feature.title}</SecondaryTitle>
+              <BodyCopy>{feature.description}</BodyCopy>
+            </FeatureCard>
+          ))}
+        </FeatureWrapper>
+        <ComponentWrapper>
+          <img src={this.props.components.icon} />
+          <SecondaryTitle>{this.props.components.title}</SecondaryTitle>
+          <BodyCopy>{this.props.components.description}</BodyCopy>
+        </ComponentWrapper>
+      </FeaturesWrapper>
     );
   }
 }
 
 Features.propTypes = {
+  components: PropTypes.object,
   featureArray: PropTypes.array
 };
 

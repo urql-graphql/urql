@@ -3,27 +3,27 @@ const content = {
     {
       title: "One package for a working GraphQL client in React",
       description: "Add urql and get your client side GraphQL going.",
-      icon: require("../../static/svgs/button.svg")
+      icon: require("../../static/svgs/gql-tile.svg")
     },
     {
       title: "Logical default behaviour and caching",
       description:
         "urql is set up to allow you to quickly produce client side GraphQL without large API overhead.",
-      icon: require("../../static/svgs/amazing.svg")
+      icon: require("../../static/svgs/clock-tile.svg")
     },
     {
       title: "Fully customisable via 'exchanges'",
       description:
         "Want to change how your client fetches, caches, or subscribes to your data, this is easily customised through the use of 'exchanges'!",
-      icon: require("../../static/svgs/code-preview.svg")
-    },
-    {
-      title: "Minimal React components and hooks",
-      description:
-        "On top of all of urql's helpful features, you have access to a number of React components and hooks that you can use to leverage urql.",
-      icon: require("../../static/svgs/amazing.svg")
+      icon: require("../../static/svgs/eagle-tile.svg")
     }
   ],
+  components: {
+    title: "Plus, minimal React components and hooks",
+    description:
+      "On top of all of URQL’s helpful features, you have access to a number of React components and hooks that you can use to leverage URQL.",
+    icon: require("../../static/svgs/React-icon.svg")
+  },
   preview: {
     description: "",
     media: ""

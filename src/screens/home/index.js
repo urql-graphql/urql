@@ -16,7 +16,10 @@ class Home extends React.Component {
     return (
       <Container>
         <Header />
-        <Features featureArray={content.features} />
+        <Features
+          featureArray={content.features}
+          components={content.components}
+        />
         <GetStarted getStartedObj={content.getStarted} />
         <MoreOSS ossArray={content.oss} />
         <Footer />
