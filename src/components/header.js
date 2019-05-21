@@ -17,23 +17,34 @@ const Container = styled.header`
   }
 `;
 
-const HeaderLogo = styled.img`
+const HeaderContainer = styled.a`
+  display: flex;
   position: absolute;
   left: 0.5rem;
   top: 0.5rem;
-  width: 70px;
-  @media (min-width: 768px) {
-    left: 1.5rem;
-    top: 1.5rem;
-    width: 100px;
+  width: 13rem;
+  flex-direction: column;
+  color: #ffffff;
+  p {
   }
+`;
+
+const HeaderText = styled.p`
+  text-transform: uppercase;
+  margin-left: 14px;
+  line-height: 1.9rem;
+`;
+
+const HeaderLogo = styled.img`
+  width: 70px;
 `;
 
 export const Header = () => (
   <Container>
-    <a href="https://formidable.com" title="Formidable">
+    <HeaderContainer href="https://formidable.com" title="Formidable">
+      <HeaderText>Another oss project by </HeaderText>
       <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
-    </a>
+    </HeaderContainer>
     <Hero />
   </Container>
 );
