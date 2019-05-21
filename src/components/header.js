@@ -12,8 +12,11 @@ const Container = styled.header`
   height: 100%;
   padding: 0 0 4rem;
   width: 100%;
+  display: flex;
+  justify-content: center;
   @media (min-width: 768px) {
     background-image: url(${bgImg});
+    padding: 0 4rem 8rem 0;
   }
 `;
 
@@ -33,6 +36,7 @@ const HeaderText = styled.p`
   text-transform: uppercase;
   margin-left: 14px;
   line-height: 1.9rem;
+  margin-bottom: 0;
 `;
 
 const HeaderLogo = styled.img`

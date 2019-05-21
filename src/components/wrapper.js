@@ -6,22 +6,19 @@ export const Wrapper = styled.div`
   flex-wrap: wrap;
   justify-content: space-between;
   margin: 0;
-  padding: ${props => (props.noPadding ? "0 4rem" : "4rem")}
+  padding: ${props => (props.noPadding ? "0 4rem" : "4rem")};
   text-align: center;
   width: 100%;
   @media (min-width: 768px) {
     flex-direction: row;
     max-width: 116rem;
-    padding: ${props => (props.noPadding ? "0 8rem" : "8rem")}
+    padding: ${props => (props.noPadding ? "0 4rem" : "4rem 8rem")};
   }
   @media (max-width: 768px) {
     padding: 0 3rem;
     text-align: center;
     img {
       max-width: 240px;
-    }
-    p {
-      text-align: left;
     }
   }
 `;

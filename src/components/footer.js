@@ -10,6 +10,7 @@ const Container = styled.footer`
   flex-direction: column;
   height: auto;
   padding: 9rem 0;
+  align-items: center;
 `;
 
 const FooterDescription = styled.p`
