@@ -12,6 +12,9 @@ const OuterWrapper = styled.div`
   background-color: #000000;
   background-size: 100% 100%;
   color: white;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `;
 
 const OSSCard = styled.div`
@@ -86,6 +89,9 @@ const SectionWrapper = styled(Wrapper)`
     p {
       text-align: center;
     }
+  }
+  @media (max-width: 900px) {
+    padding: 4rem;
   }
 `;
 

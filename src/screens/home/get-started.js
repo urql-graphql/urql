@@ -11,11 +11,17 @@ const OuterWrapper = styled.div`
   background: ${constants.color};
   border-bottom: 1rem solid rgba(0, 0, 0, 0.4);
   box-shadow: inset 0 -1rem 0 rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
 `;
 
-const GetStartedBody = styled(BodyCopy)`
-  text-align: center;
+const GetStartedWrapper = styled(Wrapper)`
+  p {
+    text-align: center;
+  }
 `;
+
+const GetStartedBody = styled(BodyCopy)``;
 
 class GetStarted extends React.Component {
   render() {
@@ -23,11 +29,11 @@ class GetStarted extends React.Component {
 
     return (
       <OuterWrapper>
-        <Wrapper>
+        <GetStartedWrapper>
           <SectionTitle>Get Started</SectionTitle>
           <GetStartedBody>{getStartedObj.description}</GetStartedBody>
           <Button to={getStartedObj.link}>Documentation</Button>
-        </Wrapper>
+        </GetStartedWrapper>
       </OuterWrapper>
     );
   }

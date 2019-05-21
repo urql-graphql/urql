@@ -4,15 +4,24 @@ import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { SecondaryTitle } from "../../components/secondary-title";
 import { SectionTitle } from "../../components/section-title";
+import { Wrapper } from "../../components/wrapper";
 
-const FeaturesWrapper = styled.div`
+const FullWidthContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  background-color: #0d1129;
+`;
+
+const FeaturesWrapper = styled(Wrapper)`
   flex-direction: column;
   align-items: center;
   display: flex;
   background-color: #0d1129;
   color: #a3abd4;
   width: 100%;
-  padding: 0 4rem 4rem 4rem;
+  @media (min-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const FeatureWrapper = styled.div`
@@ -24,14 +33,20 @@ const FeatureWrapper = styled.div`
   }
 `;
 const FeatureCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 0 0 4rem;
   width: 100%;
   > img {
     width: 100%;
+    max-width: 28rem;
   }
   @media (min-width: 768px) {
     margin: 0;
     width: calc(1 / 3 * 100% - (1 - 1 / 3) * 40px);
+    align-items: flex-start;
+    text-align: left;
   }
   @media (min-width: 1024px) {
     width: calc(1 / 3 * 100% - (1 - 1 / 3) * 80px);
@@ -45,9 +60,9 @@ const ComponentWrapper = styled.div`
   align-items: center;
   > img {
     width: 100%;
+    max-width: 28rem;
   }
   @media (min-width: 768px) {
-    width: 50%;
     padding-top: 3em;
     > img {
       width: 20%;
@@ -70,25 +85,29 @@ const SecondaryTitleCentred = styled(SecondaryTitle)`
 class Features extends React.Component {
   render() {
     return (
-      <FeaturesWrapper>
-        <SectionTitle>Features</SectionTitle>
-        <FeatureWrapper>
-          {this.props.featureArray.map(feature => (
-            <FeatureCard key={feature.title}>
-              <img src={feature.icon} />
-              <SecondaryTitle>{feature.title}</SecondaryTitle>
-              <BodyCopy>{feature.description}</BodyCopy>
-            </FeatureCard>
-          ))}
-        </FeatureWrapper>
-        <ComponentWrapper>
-          <img src={this.props.components.icon} />
-          <SecondaryTitleCentred>
-            {this.props.components.title}
-          </SecondaryTitleCentred>
-          <BodyCopyCentred>{this.props.components.description}</BodyCopyCentred>
-        </ComponentWrapper>
-      </FeaturesWrapper>
+      <FullWidthContainer>
+        <FeaturesWrapper>
+          <SectionTitle>Features</SectionTitle>
+          <FeatureWrapper>
+            {this.props.featureArray.map(feature => (
+              <FeatureCard key={feature.title}>
+                <img src={feature.icon} />
+                <SecondaryTitle>{feature.title}</SecondaryTitle>
+                <BodyCopy>{feature.description}</BodyCopy>
+              </FeatureCard>
+            ))}
+          </FeatureWrapper>
+          <ComponentWrapper>
+            <img src={this.props.components.icon} />
+            <SecondaryTitleCentred>
+              {this.props.components.title}
+            </SecondaryTitleCentred>
+            <BodyCopyCentred>
+              {this.props.components.description}
+            </BodyCopyCentred>
+          </ComponentWrapper>
+        </FeaturesWrapper>
+      </FullWidthContainer>
     );
   }
 }
