@@ -37,6 +37,7 @@ const HeaderText = styled.p`
 
 const HeaderLogo = styled.img`
   width: 70px;
+  z-index: 1;
 `;
 
 export const Header = () => (
