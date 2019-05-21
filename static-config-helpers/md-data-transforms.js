@@ -5,21 +5,28 @@ const _ = require("lodash");
 const path = require("path");
 const getMdFiles = require("./get-md-files");
 
+const capitalizeSlugComponent = word => {
+  // this is suboptimal, we should be able to define page
+  // titles as we want them instead of relying on the slug
+  switch (word) {
+    case "and":
+      return "and";
+    case "api":
+      return "API";
+    default:
+      return _.upperFirst(word);
+  }
+};
+
 const sidebarTitleSlugMutation = (mdData, mdPath) => {
   const { name } = path.parse(mdPath);
 
   mdData.slug = name.toLowerCase();
   mdData.path = `/${name.toLowerCase()}/`;
-  const spacedCappedName = name
+  mdData.title = name
     .split("-")
-    .map(n => _.upperFirst(n))
+    .map(capitalizeSlugComponent)
     .join(" ");
-
-  mdData.title = spacedCappedName;
-
-  if (spacedCappedName.includes("api")) {
-    mdData.title = spacedCappedName.replace(/(api)/, v => v.toUpperCase());
-  }
 };
 
 const sidebarSort = items => _.orderBy(items, ["data.order"], "asc");
