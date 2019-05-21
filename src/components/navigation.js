@@ -30,7 +30,7 @@ export const SidebarContainer = styled.div`
 `;
 
 export const SidebarWrapper = styled.aside`
-  font-family: "akkurat";
+  font-family: "Helvetica";
   background-image: url(${sidebarBackground});
   background-repeat: repeat-y;
   background-size: 100%;

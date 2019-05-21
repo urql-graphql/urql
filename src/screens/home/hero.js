@@ -36,7 +36,7 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: "akkurat";
+  font-family: "Helvetica";
   letter-spacing: 0.08em;
   font-size: 1.4rem;
   line-height: 2.2rem;
