@@ -9,7 +9,7 @@ const Container = styled.header`
   background: #3b3b3b url(${bgImg});
   background-size: 100% 100%;
   color: white;
-  height: 100vh;
+  height: 100%;
   padding: 0 0 9rem;
   width: 100%;
 `;

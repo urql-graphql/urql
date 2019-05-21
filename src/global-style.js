@@ -16,7 +16,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background: #8196ff;
+    background: #ffffff;
     color: #3b3b3b;
     font-family: "Helvetica", sans-serif;
     font-size: 1.3rem;
