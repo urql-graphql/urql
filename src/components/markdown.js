@@ -6,7 +6,7 @@ export const Markdown = styled.article`
     width: 75vw;
   }
   & h1 {
-    font-family: "sharp";
+    font-family: "Helvetica";
     font-size: 3.4rem;
     margin: 0 0 2rem;
 
@@ -20,7 +20,7 @@ export const Markdown = styled.article`
   }
 
   & h2 {
-    font-family: "sharp";
+    font-family: "Helvetica";
     font-size: 2.8rem;
     margin: 6rem 0 2rem;
     @media (min-width: 1024px) {
@@ -29,7 +29,7 @@ export const Markdown = styled.article`
   }
 
   & h3 {
-    font-family: "sharp";
+    font-family: "Helvetica";
     font-size: 1.8rem;
     margin: 2rem 0;
     @media (min-width: 1024px) {
@@ -59,7 +59,7 @@ export const Markdown = styled.article`
   th,
   td {
     font-size: 1.7rem;
-    font-family: "tiempos";
+    font-family: "Helvetica";
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
@@ -79,7 +79,7 @@ export const Markdown = styled.article`
   }
 
   & p {
-    font-family: "tiempos";
+    font-family: "Helvetica";
     font-size: 1.7rem;
     line-height: 1.6;
   }
@@ -93,7 +93,7 @@ export const Markdown = styled.article`
   }
 
   & li {
-    font-family: "tiempos";
+    font-family: "Helvetica";
     font-size: 1.7rem;
     line-height: 1.6;
     padding: 0.5rem;
