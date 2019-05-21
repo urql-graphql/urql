@@ -19,7 +19,6 @@ const FooterDescription = styled.p`
   line-height: 1.6;
   margin: 2rem 0 0;
   max-width: 56rem;
-  min-width: 100%;
   text-align: left;
   @media (min-width: 768px) {
     font-size: 1.5rem;
@@ -29,6 +28,7 @@ const FooterDescription = styled.p`
 `;
 
 const FooterLeft = styled.div`
+  display: flex;
   flex: 1;
   padding: 0 4rem 0 0;
   text-align: left;
