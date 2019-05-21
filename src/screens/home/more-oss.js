@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ProjectBadge } from "formidable-oss-badges";
-import bgImg from "../../static/bg_mountains_gray.jpg";
+import bgImg from "../../static/section-3-bg.svg";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
@@ -10,8 +10,8 @@ import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
 const OuterWrapper = styled.div`
-  background: #414141 url(${bgImg}) no-repeat center bottom;
-  background-size: cover;
+  background: #8196ff url(${bgImg}) no-repeat center bottom;
+  background-size: 100% 100%;
   color: white;
 `;
 
@@ -61,6 +61,7 @@ const StyledProjectBadge = styled(ProjectBadge)`
   }
 `;
 
+// TODO: should the background of this section be #000000 ? Check designs again
 class MoreOSS extends React.Component {
   render() {
     return (

@@ -47,6 +47,10 @@ const ComponentWrapper = styled.div`
   }
 `;
 
+const BodyCopyCentre = styled(BodyCopy)`
+  text-align: center;
+`;
+
 class Features extends React.Component {
   render() {
     return (
@@ -64,7 +68,7 @@ class Features extends React.Component {
         <ComponentWrapper>
           <img src={this.props.components.icon} />
           <SecondaryTitle>{this.props.components.title}</SecondaryTitle>
-          <BodyCopy>{this.props.components.description}</BodyCopy>
+          <BodyCopyCentre>{this.props.components.description}</BodyCopyCentre>
         </ComponentWrapper>
       </FeaturesWrapper>
     );

@@ -33,7 +33,7 @@ class CustomDocument extends React.Component {
             href="./static/favicon/favicon-32.png"
           />
           <link rel="manifest" href="./static/favicon/site.webmanifest" />
-          <meta name="msapplication-TileColor" content="#ff4081" />
+          <meta name="msapplication-TileColor" content="#8196ff" />
           <meta
             name="msapplication-config"
             content="./static/favicon/browserconfig.xml"

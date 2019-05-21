@@ -47,7 +47,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background: #fff;
+    background: #8196ff;
     color: #3b3b3b;
     font-family: "akkurat", sans-serif;
     font-size: 1.3rem;

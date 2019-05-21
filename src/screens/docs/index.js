@@ -8,8 +8,6 @@ import burger from "../../static/svgs/burger.svg";
 import logoFormidableDark from "../../static/svgs/logo_formidable_dark.svg";
 import constants from "../../constants";
 
-const headerZIndex = 800;
-
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -25,7 +23,7 @@ const Wrapper = styled.div`
   position: fixed;
   left: 19rem;
   background: white;
-  z-index: ${headerZIndex};
+  z-index: 1;
   padding-right: 3rem;
   box-shadow: 0 5px 10px -5px lightgrey;
 

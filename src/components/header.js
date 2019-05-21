@@ -7,28 +7,34 @@ import { Wrapper } from "./wrapper";
 import logoFormidableWhite from "../static/svgs/logo_formidable_white.svg";
 const Container = styled.header`
   background: #3b3b3b url(${bgImg});
-  background-size: cover;
+  background-size: 100% 100%;
   color: white;
-  height: auto;
+  height: 100vh;
   padding: 0 0 9rem;
   width: 100%;
 `;
 
 const HeaderLogo = styled.img`
   position: absolute;
-  right: 3rem;
+  left: 1.5rem;
   top: 1.5rem;
+  width: 100px;
 `;
 
 export const Header = () => (
   <Container>
-    <Navigation>
+    <a href="https://formidable.com" title="Formidable">
+      <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
+    </a>
+    <Hero />
+  </Container>
+);
+
+/** <Navigation>
       <Wrapper noPadding>
         <a href="https://formidable.com" title="Formidable">
           <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
         </a>
       </Wrapper>
-    </Navigation>
-    <Hero />
-  </Container>
-);
+</Navigation> 
+*/

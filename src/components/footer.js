@@ -35,7 +35,7 @@ const FooterLeft = styled.div`
 `;
 
 const FooterLogo = styled.img`
-  min-width: 21rem;
+  width: 100px;
 `;
 
 const FooterLinks = styled.ul`

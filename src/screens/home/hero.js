@@ -85,7 +85,7 @@ const HeroNavList = styled.ul`
     text-transform: uppercase;
   }
   & li a:hover {
-    color: #fc6986;
+    color: #8196ff;
   }
 `;
 
@@ -99,6 +99,7 @@ class Hero extends React.Component {
     };
   }
 
+  // Can use for copying option... or delete since it's not being used?
   handleCopy(e) {
     e.preventDefault();
     this.setState({ animating: true, copied: true });

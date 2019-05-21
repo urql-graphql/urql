@@ -3,8 +3,6 @@ import { Link } from "react-static";
 import sidebarBackground from "../static/svgs/sidebar-background.svg";
 import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
-const sidebarZIndex = 900;
-
 export const Navigation = styled.div`
   align-items: center;
   background: #8196ff;
@@ -40,7 +38,7 @@ export const SidebarWrapper = styled.aside`
   padding-top: 18rem;
   min-width: 24rem;
   width: 24rem;
-  z-index: ${sidebarZIndex};
+  z-index: 2;
   position: fixed;
   overflow-y: scroll;
   top: 0;
