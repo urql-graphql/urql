@@ -5,8 +5,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin: auto;
-  max-width: 40rem;
+  margin: 0;
   padding: ${props => (props.noPadding ? "0 4rem" : "4rem")}
   text-align: center;
   width: 100%;

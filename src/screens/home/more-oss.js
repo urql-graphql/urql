@@ -1,8 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ProjectBadge } from "formidable-oss-badges";
-import bgImg from "../../static/section-3-bg.svg";
-import bgImgMobile from "../../static/section-3-bg-mobile.svg";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
@@ -11,14 +9,9 @@ import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
 const OuterWrapper = styled.div`
-  background-color: #8196ff;
-  background-image: url(${bgImgMobile});
-  background-repeat: no-repeat;
+  background-color: #000000;
   background-size: 100% 100%;
   color: white;
-  @media (min-width: 768px) {
-    background-image: url(${bgImg});
-  }
 `;
 
 const OSSCard = styled.div`
@@ -66,8 +59,6 @@ const StyledProjectBadge = styled(ProjectBadge)`
     width: 14rem;
   }
 `;
-
-// TODO: should the background of this section be #000000 ? Check designs again
 class MoreOSS extends React.Component {
   render() {
     return (

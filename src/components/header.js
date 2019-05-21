@@ -10,7 +10,7 @@ const Container = styled.header`
   background-size: 100% 100%;
   color: white;
   height: 100%;
-  padding: 0 0 9rem;
+  padding: 0 0 4rem;
   width: 100%;
   @media (min-width: 768px) {
     background-image: url(${bgImg});

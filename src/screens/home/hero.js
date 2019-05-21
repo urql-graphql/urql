@@ -22,7 +22,7 @@ const HeroContent = styled.div`
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 3rem;
+  font-size: 5rem;
   letter-spacing: 0.15em;
   margin: 0 0 2rem;
   text-align: center;
@@ -38,34 +38,35 @@ const HeroTitle = styled.h1`
 const HeroBody = styled.p`
   font-family: "Helvetica";
   letter-spacing: 0.08em;
-  font-size: 1.4rem;
-  line-height: 2.2rem;
-  margin: 0 0 6rem;
-  max-width: 30rem;
+  font-size: 2rem;
+  line-height: 3rem;
   text-align: left;
   width: 100%;
+  margin-top: 0;
   @media (min-width: 768px) {
-    font-size: 2rem;
-    line-height: 2.8rem;
+    margin: 0 0 6rem;
+    max-width: 30rem;
     max-width: 100%;
   }
 `;
 
 const HeroLogoContainer = styled.div`
   @media (max-width: 768px) {
-    display: inline;
+    display: flex;
     width: 100%;
-    margin: 1rem 0;
+    margin: 8rem 0;
   }
 `;
 
 const HeroLogo = styled(ProjectBadge)`
-  width: 100%;
+  width: 20rem;
+  margin: auto;
   @media (min-width: 768px) {
     left: -3rem;
     max-width: 32rem;
     position: absolute;
     top: 0;
+    width: 100%;
   }
 `;
 

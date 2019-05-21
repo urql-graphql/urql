@@ -12,7 +12,11 @@ const FeaturesWrapper = styled.div`
   background-color: #0d1129;
   color: #a3abd4;
   width: 100%;
-  padding: 8rem;
+  padding: 4rem;
+`;
+
+const FeaturesTitle = styled(SectionTitle)`
+  margin: 0 0 4rem;
 `;
 
 const FeatureWrapper = styled.div`
@@ -71,7 +75,7 @@ class Features extends React.Component {
   render() {
     return (
       <FeaturesWrapper>
-        <SectionTitle>Features</SectionTitle>
+        <FeaturesTitle>Features</FeaturesTitle>
         <FeatureWrapper>
           {this.props.featureArray.map(feature => (
             <FeatureCard key={feature.title}>
