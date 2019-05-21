@@ -16,7 +16,7 @@ export const Wrapper = styled.div`
     padding: ${props => (props.noPadding ? "0 8rem" : "8rem")}
   }
   @media (max-width: 768px) {
-    width: 65%;
+    padding: 0 3rem;
     text-align: center;
     img {
       max-width: 240px;

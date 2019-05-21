@@ -12,8 +12,10 @@
             <use xlink:href="#a"/>
         </mask>
         <use fill="url(#b)" xlink:href="#a"/>
+        <!-- These paths don't stretch well to mobile view currently
         <path fill="#555D85" d="M689 87h79l-79 89z" mask="url(#c)" transform="matrix(-1 0 0 1 1457 0)"/>
         <path fill="#6B78B7" d="M689 179h79l-79 76z" mask="url(#c)" transform="matrix(-1 0 0 1 1457 0)"/>
         <path fill="#484F70" d="M768 2l-79 84V2z" mask="url(#c)" transform="matrix(-1 0 0 1 1457 0)"/>
+        -->
     </g>
 </svg>

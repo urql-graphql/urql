@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { ProjectBadge } from "formidable-oss-badges";
 import bgImg from "../../static/section-3-bg.svg";
+import bgImgMobile from "../../static/section-3-bg-mobile.svg";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
@@ -10,9 +11,14 @@ import { SectionTitle } from "../../components/section-title";
 import { Wrapper } from "../../components/wrapper";
 
 const OuterWrapper = styled.div`
-  background: #8196ff url(${bgImg}) no-repeat center bottom;
-  background-size: 100% 100%;
+  background-color: #8196ff;
+  background-image: url(${bgImgMobile});
+  background-repeat: no-repeat;
+  background-size: 100%;
   color: white;
+  @media (min-width: 768px) {
+    background-image: url(${bgImg});
+  }
 `;
 
 const OSSCard = styled.div`

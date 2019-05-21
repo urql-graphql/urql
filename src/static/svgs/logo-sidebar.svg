@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="360px" height="357px" viewBox="0 0 360 357" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="360px" height="357px" viewBox="0 0 360 357" version="1.1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
-    <title>Badge Copy 22</title>
-    <desc>Created with Sketch.</desc>
+    <title>urql logo badge</title>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Badge-Copy-22" transform="translate(0.000000, -5.000000)">
             <path d="M205.102023,11.2363535 L322.488896,63.3395595 C345.038295,73.3483105 359.573748,95.7029453 359.573748,120.373788 L359.573748,246.826212 C359.573748,271.497055 345.038295,293.85169 322.488896,303.86044 L205.102023,355.963647 C188.983472,363.118008 170.590276,363.118008 154.471725,355.963647 L37.0848513,303.86044 C14.5354522,293.85169 1.10198545e-13,271.497055 8.52651283e-14,246.826212 L0,120.373788 C-1.3977362e-14,95.7029453 14.5354522,73.3483105 37.0848513,63.3395595 L154.471725,11.2363535 C170.590276,4.08199178 188.983472,4.08199178 205.102023,11.2363535 Z" id="Polygon-Copy-4" fill="#202020"></path>
