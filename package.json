@@ -1,17 +1,17 @@
 {
-  "name": "formidable-spectacle-docs",
+  "name": "urql-docs",
   "version": "5.0.10",
-  "description": "Documentation site for Spectacle",
+  "description": "Documentation site for urql",
   "main": "static.config.js",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/FormidableLabs/spectacle-docs/issues"
+    "url": "https://github.com/FormidableLabs/urql-docs/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FormidableLabs/spectacle-docs.git"
+    "url": "git+https://github.com/FormidableLabs/urql-docs.git"
   },
-  "homepage": "https://github.com/FormidableLabs/spectacle-docs#readme",
+  "homepage": "https://github.com/FormidableLabs/urql-docs#readme",
   "scripts": {
     "start": "react-static start",
     "stage": "react-static build --staging",
@@ -23,7 +23,7 @@
     "format": "yarn run lint:fix",
     "lint": "eslint 'src/**/*.js' 'static-config-*/*.js' 'src/**/*.js' 'static.config.js'",
     "stage-and-serve": "yarn stage && yarn serve",
-    "test-local": "node test/spectacle-integration.js"
+    "test-local": "node test/urql-integration.js"
   },
   "dependencies": {
     "@babel/node": "^7.2.0",

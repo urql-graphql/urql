@@ -17,8 +17,11 @@ const FeaturesWrapper = styled.div`
 
 const FeatureWrapper = styled.div`
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  flex-direction: column;
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
 `;
 const FeatureCard = styled.div`
   margin: 0 0 4rem;
@@ -37,18 +40,31 @@ const FeatureCard = styled.div`
 
 const ComponentWrapper = styled.div`
   margin: 0 0 4rem;
-  width: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 3em;
   > img {
-    width: 20%;
+    width: 100%;
+  }
+  @media (min-width: 768px) {
+    width: 50%;
+    padding-top: 3em;
+    > img {
+      width: 20%;
+    }
   }
 `;
 
-const BodyCopyCentre = styled(BodyCopy)`
-  text-align: center;
+const BodyCopyCentred = styled(BodyCopy)`
+  @media (min-width: 768px) {
+    text-align: center;
+  }
+`;
+
+const SecondaryTitleCentred = styled(SecondaryTitle)`
+  @media (min-width: 768px) {
+    text-align: center;
+  }
 `;
 
 class Features extends React.Component {
@@ -67,8 +83,10 @@ class Features extends React.Component {
         </FeatureWrapper>
         <ComponentWrapper>
           <img src={this.props.components.icon} />
-          <SecondaryTitle>{this.props.components.title}</SecondaryTitle>
-          <BodyCopyCentre>{this.props.components.description}</BodyCopyCentre>
+          <SecondaryTitleCentred>
+            {this.props.components.title}
+          </SecondaryTitleCentred>
+          <BodyCopyCentred>{this.props.components.description}</BodyCopyCentred>
         </ComponentWrapper>
       </FeaturesWrapper>
     );
