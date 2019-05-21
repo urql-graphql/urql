@@ -52,7 +52,7 @@ const HeroBody = styled.p`
 `;
 
 const HeroLogoContainer = styled.div`
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
     display: inline;
     width: 100%;
     margin: 1rem 0;
@@ -196,9 +196,8 @@ class Hero extends React.Component {
           </HeroLogoContainer>
           <HeroTitle>urql</HeroTitle>
           <HeroBody>
-            urql is a highly customisable and flexible GraphQL client, that
-            happens to come with some default core behaviour and some React
-            component and hooks APIs.
+            Universal React Query Library is a blazing fast GraphQL client,
+            exposed as a set of ReactJS components.
           </HeroBody>
         </HeroContent>
         <HeroNavList>

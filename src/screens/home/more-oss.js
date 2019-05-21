@@ -14,7 +14,7 @@ const OuterWrapper = styled.div`
   background-color: #8196ff;
   background-image: url(${bgImgMobile});
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: 100% 100%;
   color: white;
   @media (min-width: 768px) {
     background-image: url(${bgImg});
