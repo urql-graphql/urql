@@ -75,7 +75,6 @@ const HeroLogo = styled(ProjectBadge)`
 
 const HeroButtonsWrapper = styled.div`
   max-width: 100%;
-  align-items: center;
   flex-direction: column;
   justify-content: center;
   display: flex;
@@ -151,23 +150,27 @@ const HeroDocsButton = styled(Link)`
 `;
 
 const HeroNavList = styled.ul`
-  border-top: 0.2rem solid #707070;
+  border-top: 2px solid #707070;
+  margin-top: 2rem;
   display: flex;
   flex-direction: row;
-  justify-content: center;
   list-style: none;
   padding: 2rem 0 0;
   text-align: center;
   width: 100%;
+  justify-content: space-around;
   @media (min-width: 768px) {
-    margin: 10rem 0 0;
+    justify-content: space-between;
+    border-top: 2px solid #ffffff;
+    padding-top: 4rem;
+    margin: 4rem 0 0 32rem;
+    flex-direction: row;
   }
   & li a {
     color: white;
     display: inline-block;
     font-size: 1.7rem;
     letter-spacing: 0.05em;
-    margin: 0 2rem;
     transition: opacity 0.4s;
     text-transform: uppercase;
   }
