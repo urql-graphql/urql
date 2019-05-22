@@ -1,27 +1,28 @@
 const content = {
   features: [
     {
-      title: "One package for a working GraphQL client in React",
-      description: "Add urql and get your client side GraphQL going.",
+      title: "Fully functional GraphQL client with a single import",
+      description:
+        "Urql is a lightweight, powerful, and easy to use alternative to bulky GraphQL clients.",
       icon: require("../../static/svgs/gql-tile.svg")
     },
     {
-      title: "Logical default behaviour and caching",
+      title: "Logical default behavior and caching",
       description:
-        "urql is set up to allow you to quickly produce client side GraphQL without large API overhead.",
+        "Urql helps you to rapidly use GraphQL in your apps without complex configuration or large API overhead.",
       icon: require("../../static/svgs/clock-tile.svg")
     },
     {
-      title: "Fully customisable via 'exchanges'",
+      title: "Extensible library that grows with you",
       description:
-        "Want to change how your client fetches, caches, or subscribes to your data, this is easily customised through the use of 'exchanges'!",
+        "Want to change how you fetch, cache, or subscribe to data? Urql Exchanges allow you to customize your data layer to suit your needs.",
       icon: require("../../static/svgs/eagle-tile.svg")
     }
   ],
   components: {
-    title: "Plus, minimal React components and hooks",
+    title: "Minimal React Components and Hooks",
     description:
-      "On top of all of URQL’s helpful features, you have access to a number of React components and hooks that you can use to leverage URQL.",
+      "Whether you prefer a <Query> component or useQuery Hook, urql's API is intuitive to use, with full support for GraphQL Queries, Mutations and Subscriptions in both styles!",
     icon: require("../../static/svgs/React-icon.svg")
   },
   preview: {

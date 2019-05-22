@@ -73,6 +73,11 @@ const ComponentWrapper = styled.div`
 const BodyCopyCentred = styled(BodyCopy)`
   @media (min-width: 768px) {
     text-align: center;
+    padding: 0 10vw;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 20vw;
   }
 `;
 
