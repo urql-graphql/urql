@@ -91,14 +91,14 @@ class Features extends React.Component {
             {this.props.featureArray.map(feature => (
               <FeatureCard key={feature.title}>
                 <img src={feature.icon} />
-                <SecondaryTitle>{feature.title}</SecondaryTitle>
+                <SecondaryTitle pop>{feature.title}</SecondaryTitle>
                 <BodyCopy>{feature.description}</BodyCopy>
               </FeatureCard>
             ))}
           </FeatureWrapper>
           <ComponentWrapper>
             <img src={this.props.components.icon} />
-            <SecondaryTitleCentred>
+            <SecondaryTitleCentred pop>
               {this.props.components.title}
             </SecondaryTitleCentred>
             <BodyCopyCentred>

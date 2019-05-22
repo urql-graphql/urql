@@ -30,7 +30,7 @@ export const SidebarContainer = styled.div`
 `;
 
 export const SidebarWrapper = styled.aside`
-  font-family: "Helvetica";
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-image: url(${sidebarBackground});
   background-size: 100% 100%;
   min-height: 100vh;

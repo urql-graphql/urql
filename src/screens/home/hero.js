@@ -36,7 +36,7 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: "Helvetica";
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: 0.08em;
   font-size: 2rem;
   line-height: 3rem;

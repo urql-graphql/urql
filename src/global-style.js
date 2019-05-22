@@ -18,7 +18,7 @@ export const GlobalStyle = createGlobalStyle`
   body {
     background: #ffffff;
     color: #3b3b3b;
-    font-family: "Helvetica", sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1.3rem;
     letter-spacing: -0.03em;
     margin: 0;
@@ -26,12 +26,12 @@ export const GlobalStyle = createGlobalStyle`
   }
   
   p {
-    font-family: "Helvetica";
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     letter-spacing: -0.03em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Helvetica";
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     letter-spacing: 0;
     font-weight: 500;
   }
