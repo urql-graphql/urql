@@ -277,7 +277,7 @@ class Hero extends React.Component {
           </HeroLogoContainer>
           <HeroTitle>urql</HeroTitle>
           <HeroBody>
-            Universal React Query Library is a blazing fast GraphQL client,
+            Universal React Query Library is a blazing-fast GraphQL client,
             exposed as a set of ReactJS components.
           </HeroBody>
           <HeroButtonsWrapper>
