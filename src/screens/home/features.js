@@ -36,7 +36,7 @@ const FeatureCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 0 4rem;
+  margin: 0 0 8rem;
   width: 100%;
   > img {
     width: 100%;
@@ -56,7 +56,7 @@ const FeatureCard = styled.div`
 `;
 
 const ComponentWrapper = styled.div`
-  margin: 0 0 4rem;
+  margin: 0 0 8rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,6 +66,7 @@ const ComponentWrapper = styled.div`
   }
   @media (min-width: 768px) {
     padding-top: 10rem;
+    margin: 0 0 4rem;
   }
 `;
 

@@ -90,8 +90,8 @@ const SectionWrapper = styled(Wrapper)`
       text-align: center;
     }
   }
-  @media (max-width: 900px) {
-    padding: 4rem;
+  @media (max-width: 900px) and (min-width: 769px) {
+    padding: 0 4rem;
   }
 `;
 
