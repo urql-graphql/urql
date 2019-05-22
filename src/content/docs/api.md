@@ -1,6 +1,6 @@
 ---
 title: API
-order: 2
+order: 4
 ---
 
 <a name="api"></a>

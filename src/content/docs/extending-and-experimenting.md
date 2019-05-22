@@ -1,6 +1,6 @@
 ---
 title: extending-and-experimenting
-order: 6
+order: 3
 ---
 
 <a name="extending-and-experimenting"></a>
