@@ -8,7 +8,7 @@ order: 3
 # Extending & Experimenting
 
 Hopefully you have read the sections on `urql`'s [Architecture](/docs/architecture/)
-and its [Basics](/docs/basic-concepts/). This section will introduce you to hacking
+and its [Basics](/docs/basics/). This section will introduce you to hacking
 with `urql`.
 
 `urql` comes with some very functional defaults, but its standard component APIs,
