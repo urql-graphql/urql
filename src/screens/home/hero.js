@@ -126,7 +126,7 @@ const HeroNPMButton = styled.button`
   text-transform: uppercase;
 `;
 
-const HeroDocsButton = styled(Link)`
+export const HeroDocsButton = styled(Link)`
   width: 30rem;
   max-width: 80%;
   margin-left: 0rem;

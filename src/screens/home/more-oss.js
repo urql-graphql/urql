@@ -30,6 +30,7 @@ const OSSCard = styled.div`
     width: calc(1 / 2 * 100% - (1 - 1 / 2) * 80px);
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 6rem;
   }
 `;
 
@@ -85,14 +86,21 @@ const SecondaryTitleStyled = styled(SecondaryTitle)`
 `;
 
 const SectionWrapper = styled(Wrapper)`
+  padding: 8rem 8rem;
+  h2 {
+    margin-top: 0rem;
+  }
   @media (max-width: 768px) {
+    padding: 8rem 8rem;
     p {
       text-align: center;
     }
   }
-  @media (max-width: 900px) and (min-width: 769px) {
-    padding: 0 4rem;
-  }
+`;
+
+const ButtonStyled = styled(Button)`
+  margin-bottom: 0;
+  margin-top: 0;
 `;
 
 class MoreOSS extends React.Component {
@@ -123,9 +131,9 @@ class MoreOSS extends React.Component {
               </OSSCopyContainer>
             </OSSCard>
           ))}
-          <Button light="true" to="https://formidable.com/open-source/">
+          <ButtonStyled light="true" to="https://formidable.com/open-source/">
             View All
-          </Button>
+          </ButtonStyled>
         </SectionWrapper>
       </OuterWrapper>
     );

@@ -8,10 +8,8 @@ export const SectionTitle = styled.h2`
   margin: 2rem 0 3rem;
   width: 100%;
   text-align: center;
+  margin: 4rem 0;
   @media (min-width: 768px) {
     margin: 2rem 0 6rem;
-  }
-  @media (max-width: 768px) {
-    margin: 4rem 0;
   }
 `;
