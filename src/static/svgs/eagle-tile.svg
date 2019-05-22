@@ -1,19 +1,18 @@
 
 <svg width="281px" height="280px" viewBox="0 0 281 280" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="EagleTile_2" fill-rule="nonzero">
+        <g id="EagleTile_2-(1)" fill-rule="nonzero">
             <g id="Group">
                 <g>
-                    <g id="Mask" transform="translate(1.000000, 0.000000)">
-                        <rect id="Rectangle" fill="#000000" x="0" y="0" width="280" height="280"></rect>
-                        <rect id="Rectangle" fill="#8196FF" x="0" y="0" width="280" height="280"></rect>
+                    <g id="Mask" transform="translate(1.000000, 0.000000)" fill="#8196FF">
+                        <rect id="Rectangle" x="0" y="0" width="280" height="280"></rect>
                     </g>
                     <polygon id="Path-7-Copy-2" fill="#45518C" points="1 21 1 70 109 176 150 167.4"></polygon>
                     <path d="M32,0 C16,4.04768811e-16 5.66666667,1.41669084e-15 1,3.03576608e-15 C1,6.66666667 0.899134649,14.1830283 0.697403948,22.549085 L154,175 L154,124.9 L32,0 Z" id="Path-7-Copy" fill="#5260A9"></path>
                     <polygon id="Path-7" fill="#6675C1" points="155.8 132 176 110 75 0 27 0"></polygon>
                 </g>
-            </g>
-            <g id="Eagle" transform="translate(49.000000, 83.000000)" fill="#262D51">
+          </g>
+          <g id="Eagle" transform="translate(51.000000, 83.000000)" fill="#262D51">
                 <g id="Group">
                     <path d="M122.4,91.7 C122.4,92.9 123.4,93.8 124.6,93.8 C125.8,93.8 126.8,92.8 126.8,91.7 C126.8,90.5 125.8,89.6 124.6,89.6 L122.4,89.6 L122.4,91.7 Z" id="Fill-7"></path>
                     <path d="M80.2,94.5 L107,119.8 L107,128 L116,119.7 L96,100.8 L96,90.7 L105.2,99.4 L129.5,99.5 L144.3,113.4 L144.3,98.6 C144.3,93.6 142.2,88.8 138.4,85.2 L96.2,45.4 L53.8,5.4 C50.1,1.9 45.2,0 40.1,0 C35,0 30,1.9 26.4,5.3 L0,30.2 L15.8,30.2 C20.1,26.1 27.1,26.1 31.4,30.2 L31.6,30.4 L63.9,60.8 L48,60.8 L31.6,45.4 L31.6,52.4 C31.6,57.4 33.7,62.2 37.5,65.8 L48.2,75.9 L64,90.8 C64,93.9 65.3,96.9 67.7,99.2 L80.2,111 L88.2,118.6 L88.1,125.6 L95.7,119.4 L95.7,127.5 L104.4,119.7 L80.2,96.8" id="Fill-1"></path>
