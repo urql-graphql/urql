@@ -159,12 +159,16 @@ const HeroNavList = styled.ul`
   text-align: center;
   width: 100%;
   justify-content: space-around;
+
   @media (min-width: 768px) {
     justify-content: space-between;
     border-top: 2px solid #ffffff;
     padding-top: 4rem;
     margin: 4rem 0 0 32rem;
     flex-direction: row;
+  }
+  @media (min-width: 1024px) {
+    justify-content: space-around;
   }
   & li a {
     color: white;
