@@ -60,13 +60,10 @@ const ComponentWrapper = styled.div`
   align-items: center;
   > img {
     width: 100%;
-    max-width: 28rem;
+    max-width: 10rem;
   }
   @media (min-width: 768px) {
-    padding-top: 3em;
-    > img {
-      width: 20%;
-    }
+    padding-top: 10rem;
   }
 `;
 
@@ -81,7 +78,6 @@ const SecondaryTitleCentred = styled(SecondaryTitle)`
     text-align: center;
   }
 `;
-
 class Features extends React.Component {
   render() {
     return (
