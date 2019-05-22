@@ -1,6 +1,7 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { fromArray } = require('wonka');
   const mock = {
     executeSubscription: jest.fn(() => fromArray([d])),

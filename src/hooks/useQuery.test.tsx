@@ -1,12 +1,13 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
         interval(400),
-        map(i => ({ data: i, error: i + 1 }))
+        map((i: number) => ({ data: i, error: i + 1 }))
       )
     ),
   };
@@ -48,7 +49,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line no-console
+  // eslint-disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );
@@ -164,6 +165,7 @@ describe('on change', () => {
 describe('execute query', () => {
   it('triggers query execution', () => {
     renderer.create(<QueryUser {...props} />);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     act(() => execute!());
     expect(client.executeQuery).toBeCalledTimes(2);
   });

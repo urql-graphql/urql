@@ -1,5 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
@@ -26,10 +33,13 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  let unsubscribe = noop;
+  const unsubscribe = useRef(noop);
 
   const client = useContext(Context);
-  const request = createRequest(args.query, args.variables as any);
+  const request = useMemo(
+    () => createRequest(args.query, args.variables as any),
+    [args.query, args.variables]
+  );
 
   const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
@@ -39,7 +49,7 @@ export const useQuery = <T = any, V = object>(
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
-      unsubscribe();
+      unsubscribe.current();
 
       setState(s => ({ ...s, fetching: true }));
 
@@ -51,23 +61,24 @@ export const useQuery = <T = any, V = object>(
             requestPolicy: args.requestPolicy,
             ...opts,
           }),
-          subscribe(({ data, error }) =>
-            setState({ fetching: false, data, error })
-          )
+          subscribe(({ data, error }) => {
+            setState({ fetching: false, data, error });
+          })
         );
       } else {
         setState(s => ({ ...s, fetching: false }));
       }
 
-      unsubscribe = teardown;
+      unsubscribe.current = teardown;
     },
-    [request.key, args.skip, args.requestPolicy]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [request.key, client, args.skip, args.requestPolicy]
   );
 
   useEffect(() => {
     executeQuery();
-    return unsubscribe;
-  }, [request.key, args.skip]);
+    return unsubscribe.current;
+  }, [executeQuery]);
 
   return [state, executeQuery];
 };

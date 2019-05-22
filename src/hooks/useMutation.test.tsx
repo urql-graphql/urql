@@ -1,6 +1,7 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
     executeMutation: jest.fn(() =>
@@ -41,7 +42,7 @@ const MutationUser: FC<typeof props> = ({ query }) => {
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line
+  // eslint-disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );

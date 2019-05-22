@@ -1,3 +1,10 @@
+import { mount, shallow } from 'enzyme';
+import React from 'react';
+import { delay, fromValue, pipe } from 'wonka';
+// @ts-ignore - client is exclusively from mock
+import { client } from '../context';
+import { Query } from './Query';
+
 jest.mock('../context', () => {
   const c = {
     executeQuery: jest.fn(),
@@ -8,13 +15,6 @@ jest.mock('../context', () => {
     Consumer: (p: any) => p.children(client),
   };
 });
-
-import { mount, shallow } from 'enzyme';
-import React from 'react';
-import { delay, fromValue, pipe } from 'wonka';
-// @ts-ignore - client is exclusively from mock
-import { client } from '../context';
-import { Query } from './Query';
 
 const props = {
   query: '{ example }',
