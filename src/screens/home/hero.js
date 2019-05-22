@@ -51,10 +51,13 @@ const HeroBody = styled.p`
 `;
 
 const HeroLogoContainer = styled.div`
-  @media (max-width: 768px) {
-    display: flex;
-    width: 100%;
-    margin: 8rem 0;
+  display: flex;
+  width: 100%;
+  margin: 8rem 0;
+  @media (min-width: 768px) {
+    display: block;
+    width: inherit;
+    margin: 0;
   }
 `;
 
@@ -67,6 +70,80 @@ const HeroLogo = styled(ProjectBadge)`
     position: absolute;
     top: 0;
     width: 100%;
+  }
+`;
+
+const HeroButtonsWrapper = styled.div`
+  max-width: 100%;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  display: flex;
+  @media (min-width: 1024px) {
+    flex-direction: row;
+  }
+`;
+const HeroNPMWrapper = styled.div`
+  flex-direction: row;
+  justify-content: center;
+  display: none;
+  width: 30rem;
+  @media (min-width: 768px) {
+    display: flex;
+  }
+  @media (min-width: 1024px) {
+    width: 28rem;
+  }
+`;
+
+const HeroNPMCopy = styled.p`
+  width: 22rem;
+  height: 4rem;
+  color: #383838;
+  background-color: #d5d5d5;
+  color: black;
+  text-align: left;
+  padding: 0.33rem 1.5rem;
+  line-height: 3.44rem;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  margin: 0;
+`;
+const HeroNPMButton = styled.button`
+  width: 8rem;
+  height: 4rem;
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: 1px;
+  color: #383838;
+  border: 0;
+  text-transform: uppercase;
+`;
+
+const HeroDocsButton = styled(Link)`
+  width: 30rem;
+  max-width: 80%;
+  margin-left: 0rem;
+  height: 4rem;
+  font-size: 14px;
+  background-color: #ffffff;
+  line-height: 4rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #383838;
+  border: 0;
+  @media (min-width: 768px) {
+    margin-top: 2rem;
+  }
+  @media (min-width: 1024px) {
+    margin-top: 0;
+    margin-left: 2rem;
+    width: 18rem;
   }
 `;
 
@@ -106,16 +183,9 @@ class Hero extends React.Component {
     };
   }
 
-  // Can use for copying option... or delete since it's not being used?
   handleCopy(e) {
+    navigator.clipboard.writeText("npm install urql");
     e.preventDefault();
-    this.setState({ animating: true, copied: true });
-    setTimeout(() => {
-      this.setState({ animating: false });
-    }, "100");
-    setTimeout(() => {
-      this.setState({ copied: false });
-    }, "3000");
   }
 
   render() {
@@ -200,6 +270,15 @@ class Hero extends React.Component {
             Universal React Query Library is a blazing fast GraphQL client,
             exposed as a set of ReactJS components.
           </HeroBody>
+          <HeroButtonsWrapper>
+            <HeroNPMWrapper>
+              <HeroNPMCopy>npm install urql</HeroNPMCopy>
+              <HeroNPMButton onClick={this.handleCopy}>copy</HeroNPMButton>
+            </HeroNPMWrapper>
+            <HeroDocsButton prefetch to="/docs">
+              Documentation
+            </HeroDocsButton>
+          </HeroButtonsWrapper>
         </HeroContent>
         <HeroNavList>
           <li>
