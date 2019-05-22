@@ -75,7 +75,7 @@ class GetStarted extends React.Component {
           <Button to={getStartedObj.link}>Documentation</Button>
           <GithubButton href="https://github.com/FormidableLabs/urql">
             <img src={octoCat} />
-            <p>Github</p>
+            <p>GitHub</p>
           </GithubButton>
         </GetStartedWrapper>
       </OuterWrapper>
