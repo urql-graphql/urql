@@ -41,6 +41,8 @@ const FeatureCard = styled.div`
   > img {
     width: 100%;
     max-width: 28rem;
+    box-shadow: -20px 20px 0 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
   }
   @media (min-width: 768px) {
     margin: 0;
