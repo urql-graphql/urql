@@ -12,12 +12,12 @@ and its [Basics](/docs/basic-concepts/). This section will introduce you to hack
 with `urql`.
 
 `urql` comes with some very functional defaults, but its standard component APIs,
-hook APIs, or its core behaviour might not be enough for your complex app. Or
+hook APIs, or its core behavior might not be enough for your complex app. Or
 maybe you're just looking to play around and experiment with GraphQL clients?
 
 This document contains two main sections. The first is about reusing `urql`'s
 core and build new "outward facing APIs". The second is about writing new
-exchanges and hence changing `urql`'s core behaviour.
+exchanges and hence changing `urql`'s core behavior.
 
 ## Writing new APIs for the Client
 
@@ -145,7 +145,7 @@ We have now:
 - Added the second `useEffect` argument to tell it when to rerun
 - Added state to set `fetching: true` and to update the result
 
-In the actual implementation of the hook we also generalise this
+In the actual implementation of the hook we also generalize this
 execution and expose the `executeQuery` function in the returned tuple.
 This is left out here as the implementation can be found in the source code.
 

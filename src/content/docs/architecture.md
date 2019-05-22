@@ -5,13 +5,13 @@ order: 5
 
 # Architecture
 
-Much of `urql` is about being flexible and customisable.
+Much of `urql` is about being flexible and customizable.
 To this extent a large chunk of this document is dedicated to
 how `urql` works and how to adapt it to different use cases.
 
-If you wish to use `urql` without any customisations, this
+If you wish to use `urql` without any customizations, this
 document is entirely optional for you. But it's still worth
-the read. Promised.
+the read. Promise.
 
 `urql`'s core parts are separated into three concepts:
 **operations & results**, **the client**, and **exchanges**.
@@ -171,7 +171,7 @@ same operation / request twice at the same time.
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`
 cached results can be resolved instead and results from network requests are cached.
 
-**Third,** operations are sent to the API and the result is normalised.
+**Third,** operations are sent to the API and the result is normalized.
 
 ## Operation Results
 
@@ -186,7 +186,7 @@ The [`CombinedError` is a very simple wrapper](https://github.com/FormidableLabs
 that has either a `networkError` property with any unexpected errors that might occur,
 or a `graphQLErrors` array with the list of errors that have been returned by the API.
 
-This is a convenience wrapper that helps when the specific _kind of error_ that has occured
+This is a convenience wrapper that helps when the specific _kind of error_ that has occurred
 does not matter.
 
 Additionally `urql`'s operation results will also have the `operation` property, which

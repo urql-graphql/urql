@@ -74,7 +74,6 @@ export const Markdown = styled.article`
   }
 
   & pre code {
-    padding: 10px;
     color: #333;
   }
 
@@ -90,6 +89,18 @@ export const Markdown = styled.article`
     padding: 0.5rem;
     font-size: 1.5rem;
     margin: 0 0.5rem 0 0.5rem;
+  }
+
+  & div.gatsby-highlight {
+    @media (max-width: 768px) {
+      margin-left: 0;
+    }
+  }
+
+  & blockquote {
+    margin: 0 0.2rem;
+    padding: 0 1.8rem;
+    border-left: 3px solid #255db0;
   }
 
   & li {

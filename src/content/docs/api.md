@@ -115,7 +115,7 @@ interface UseSubscriptionState<T> {
 | ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | fetching     | `boolean`                           | Whether the `Query` is currently waiting for a GraphQL result                                           |
 | data         | `?any`                              | The GraphQL request's result                                                                            |
-| error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
+| error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occurred                                         |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
 
 ### `Mutation` (component)

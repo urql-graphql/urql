@@ -10,7 +10,7 @@ order: 1
 <a name="main-file"></a>
 
 As mentioned before, `urql`'s core logic is split into exchanges.
-To that end, `urql`'s behaviour is completely defined by the exchanges
+To that end, `urql`'s behavior is completely defined by the exchanges
 you pass to it or that are the default ones.
 
 This document goes through the exchanges that `urql` adds by default.
@@ -74,12 +74,12 @@ operations and sends `POST` requests using `fetch`.
 
 ## `cacheExchange`
 
-The default caching behaviour that `urql` uses is defined by the `cacheExchange`
-unlike Apollo's `Cache` or `InMemoryCache`, caching behaviour is handled as
-part of the request pipeline, which makes customisation a lot easier as
+The default caching behavior that `urql` uses is defined by the `cacheExchange`
+unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as
+part of the request pipeline, which makes customization a lot easier as
 there's no extra API to learn.
 
-By default however, `urql`'s caching behaviour is not that of a _"normalising
+By default however, `urql`'s caching behavior is not that of a _"normalizing
 cache"_ but more of a _"document cache"_.
 
 ### The document cache
@@ -122,7 +122,7 @@ respond with the types that are invalidated.
 Given an `addTodo` mutation for example, you will need to send
 back at least one `TodoItem` for the invalidation to happen.
 
-a **document cache** also doesn't normalise at all, which means
+a **document cache** also doesn't normalize at all, which means
 that after fetching a list of items, fetching a single item
 will never be fulfilled by this cache.
 
@@ -132,7 +132,7 @@ The operation context can also contain a `requestPolicy` property
 that alters when and how the cache responds.
 By default this will be set to `'cache-first'`.
 
-When `'cache-first'`, the default behaviour, is used, the cache
+When `'cache-first'`, the default behavior, is used, the cache
 will return all cached results when they're available. When no
 cached result is available it will let the operation through, so
 that the `fetchExchange` can send a request to the API.
@@ -159,12 +159,12 @@ from the API.
 > that data skips the cache, if it's clear to you that the result will
 > need to be up-to-date.
 
-### Customisation
+### Customization
 
-The idea of `urql` is that you can customise the caching behaviour amongst
+The idea of `urql` is that you can customize the caching behavior amongst
 other things yourself, if needed.
 
-[Read more about customising `urql` in the "Extending & Experimenting" section.](/docs/extending-and-experimenting)
+[Read more about customizing `urql` in the "Extending & Experimenting" section.](/docs/extending-and-experimenting)
 
 ## Subscriptions
 

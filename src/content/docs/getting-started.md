@@ -40,7 +40,7 @@ app with `urql`'s `<Provider>`. This `<Provider>` holds the `Client` that is
 used to manage data, requests, the cache, and other things. It's the "heart"
 of `urql` and holds all of its core logic.
 
-This example creates a `Client`, passes it a GraphQL API's URL, and provides it
+This example creates a `Client`, passes it the URL of a GraphQL API, and provides it
 using the `<Provider>`.
 
 ```jsx
@@ -116,7 +116,7 @@ observe.
 
 ### Using hooks
 
-> _Note:_ Hooks are only availabe in React 16.8 and onwards
+> _Note:_ Hooks are only available in React 16.8 and onwards
 
 Instead of using `<Query>` and a render prop API, you can also use the
 hooks API by switching to `useQuery()`.
@@ -174,7 +174,7 @@ pass in a fully parsed AST in the form of `DocumentNode` instead.
 For this purpose you can use `graphql-tag`.
 
 This can be extremely helpful, since it enables syntax highlighting
-in some editors. It also can be used to preparse the GraphQL query
+in some editors. It also can be used to pre-parse the GraphQL query
 using `babel-plugin-graphql-tag` or the included Webpack loader.
 
 You only have to make a small adjustment. Install `graphql-tag` and
@@ -306,7 +306,7 @@ not used as a fire-and-forget.
 
 ### Using hooks
 
-> _Note:_ Hooks are only availabe in React 16.8 and onwards
+> _Note:_ Hooks are only available in React 16.8 and onwards
 
 Like the `<Query>` component the `<Mutation>` component has an alternative hook
 that can be used instead, which is the `useMutation()` hook.
@@ -356,7 +356,7 @@ sent.
 
 [You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](/docs/basics/#cacheexchange)
 
-Using `urql`'s default behaviour this means we sometimes need a way to refetch
+Using `urql`'s default behavior this means we sometimes need a way to refetch
 data from the GraphQL API and skip the cache, if we need fresh data.
 
 The easiest way to always display up-to-date data is to set the `requestPolicy`
