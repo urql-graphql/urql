@@ -1,11 +1,11 @@
 ---
-title: Basic Concepts
-order: 1
+title: Basics
+order: 2
 ---
 
-<a name="basic-concepts"></a>
+<a name="basics"></a>
 
-# Basic Concepts
+# Basics
 
 <a name="main-file"></a>
 
@@ -31,6 +31,8 @@ This list of default exchanges is also exported as `defaultExchanges`
 however.
 
 ## `fetchExchange`
+
+<a name="fetchexchange"></a>
 
 The `fetchExchange` handles `query` and `mutation` operations and uses `fetch`
 to send GraphQL API requests.
@@ -73,6 +75,8 @@ allow `response.status >= 300` when `redirect` is set to `'manual'`.
 operations and sends `POST` requests using `fetch`.
 
 ## `cacheExchange`
+
+<a name="cacheexchange"></a>
 
 The default caching behavior that `urql` uses is defined by the `cacheExchange`
 unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as

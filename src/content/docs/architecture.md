@@ -1,6 +1,6 @@
 ---
 title: architecture
-order: 5
+order: 1
 ---
 
 # Architecture
