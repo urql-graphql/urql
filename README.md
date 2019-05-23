@@ -1,6 +1,6 @@
-# Spectacle documentation site
+# Urql documentation site
 
-[![Build Status](https://travis-ci.org/FormidableLabs/spectacle-docs.svg?branch=master)](https://travis-ci.org/FormidableLabs/spectacle-docs)
+[![Build Status](https://travis-ci.org/FormidableLabs/urql-docs.svg?branch=master)](https://travis-ci.org/FormidableLabs/urql-docs)
 
 Now built with react-static!
 
@@ -13,7 +13,7 @@ yarn install
 yarn start
 ```
 Note that paths in local development are based on a root of "/" but be careful when defining relative and absolute paths
-inline or doing url parsing, as the production output root will be "open-source/spectacle."
+inline or doing url parsing, as the production output root will be "open-source/urql."
 
 ## Want to see if you're ready to :shipit:?
 To build the staging build output and serve it with the canonical path it'll have when built as a lander for formidable.com:

@@ -1,6 +1,6 @@
 {
   "name": "urql-docs",
-  "version": "6.0.0-beta.0",
+  "version": "6.0.1",
   "description": "Documentation site for urql",
   "main": "static.config.js",
   "license": "MIT",
@@ -85,7 +85,6 @@
     "remark-slug": "^5.1.1",
     "remark-toc": "^5.1.0",
     "serve": "^10.0.0",
-    "spectacle": "^5.0.0",
     "style-loader": "^0.23.1",
     "surge": "^0.20.1",
     "to-vfile": "^5.0.2",
