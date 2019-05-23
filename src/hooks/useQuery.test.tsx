@@ -31,7 +31,7 @@ const props: UseQueryArgs<{ myVar: number }> = {
   variables: {
     myVar: 1234,
   },
-  skip: false,
+  pause: false,
 };
 
 let state: UseQueryState<any> | undefined;
@@ -40,9 +40,9 @@ let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   query,
   variables,
-  skip,
+  pause,
 }) => {
-  const [s, e] = useQuery({ query, variables, skip });
+  const [s, e] = useQuery({ query, variables, pause });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
@@ -171,20 +171,20 @@ describe('execute query', () => {
   });
 });
 
-describe('skip', () => {
-  it('skips executing the query if skip is true', () => {
-    renderer.create(<QueryUser {...props} skip={true} />);
+describe('pause', () => {
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).not.toBeCalled();
   });
 
-  it('skips executing queries if skip updates to true', () => {
+  it('skips executing queries if pause updates to true', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
 
     /**
      * Call update twice for the change to be detected.
      */
-    wrapper.update(<QueryUser {...props} skip={true} />);
-    wrapper.update(<QueryUser {...props} skip={true} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).toBeCalledTimes(1);
   });
 });

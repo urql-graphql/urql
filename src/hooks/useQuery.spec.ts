@@ -254,14 +254,14 @@ describe('useQuery', () => {
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 
-  it('should skip executing the query if skip is true', () => {
+  it('should pause executing the query if pause is true', () => {
     renderHook(
-      ({ query, variables, skip }) => useQuery({ query, variables, skip }),
+      ({ query, variables, pause }) => useQuery({ query, variables, pause }),
       {
         initialProps: {
           query: mockQuery,
           variables: mockVariables,
-          skip: true,
+          pause: true,
         },
       }
     );
@@ -269,14 +269,14 @@ describe('useQuery', () => {
     expect(client.executeQuery).not.toBeCalled();
   });
 
-  it('should skip executing the query if skip updates to true', async () => {
+  it('should pause executing the query if pause updates to true', async () => {
     const { rerender, waitForNextUpdate } = renderHook(
-      ({ query, variables, skip }) => useQuery({ query, variables, skip }),
+      ({ query, variables, pause }) => useQuery({ query, variables, pause }),
       {
         initialProps: {
           query: mockQuery,
           variables: mockVariables,
-          skip: false,
+          pause: false,
         },
       }
     );
@@ -284,7 +284,7 @@ describe('useQuery', () => {
     await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(1);
 
-    rerender({ query: mockQuery, variables: mockVariables, skip: true });
+    rerender({ query: mockQuery, variables: mockVariables, pause: true });
     expect(client.executeQuery).toBeCalledTimes(1);
   });
 });

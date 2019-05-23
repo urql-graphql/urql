@@ -16,7 +16,7 @@ export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
-  skip?: boolean;
+  pause?: boolean;
 }
 
 export interface UseQueryState<T> {
@@ -55,7 +55,7 @@ export const useQuery = <T = any, V = object>(
 
       let teardown = noop;
 
-      if (!args.skip) {
+      if (!args.pause) {
         [teardown] = pipe(
           client.executeQuery(request, {
             requestPolicy: args.requestPolicy,
@@ -72,7 +72,7 @@ export const useQuery = <T = any, V = object>(
       unsubscribe.current = teardown;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [request.key, client, args.skip, args.requestPolicy]
+    [request.key, client, args.pause, args.requestPolicy]
   );
 
   useEffect(() => {

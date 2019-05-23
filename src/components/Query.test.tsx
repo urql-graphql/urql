@@ -111,22 +111,22 @@ describe('on error', () => {
   });
 });
 
-describe('skip', () => {
+describe('pause', () => {
   beforeEach(() => {
     client.executeQuery.mockReturnValue(fromValue({ data: 1234 }));
   });
 
-  it('should skip executing the query if skip is true', () => {
-    mountWrapper({ ...props, skip: true });
+  it('should pause executing the query if pause is true', () => {
+    mountWrapper({ ...props, pause: true });
     expect(client.executeQuery).not.toHaveBeenCalled();
   });
 
-  it('should not call executeQuery if skip changes to true', () => {
+  it('should not call executeQuery if pause changes to true', () => {
     const wrapper = mountWrapper(props);
     expect(client.executeQuery).toHaveBeenCalledTimes(1);
 
     // @ts-ignore
-    wrapper.setProps({ ...props, query: '{ newQuery }', skip: true });
+    wrapper.setProps({ ...props, query: '{ newQuery }', pause: true });
     expect(client.executeQuery).toHaveBeenCalledTimes(1);
   });
 });
