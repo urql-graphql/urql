@@ -1,12 +1,13 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
         interval(400),
-        map(i => ({ data: i, error: i + 1 }))
+        map((i: number) => ({ data: i, error: i + 1 }))
       )
     ),
   };
@@ -30,7 +31,7 @@ const props: UseQueryArgs<{ myVar: number }> = {
   variables: {
     myVar: 1234,
   },
-  skip: false,
+  pause: false,
 };
 
 let state: UseQueryState<any> | undefined;
@@ -39,16 +40,16 @@ let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   query,
   variables,
-  skip,
+  pause,
 }) => {
-  const [s, e] = useQuery({ query, variables, skip });
+  const [s, e] = useQuery({ query, variables, pause });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line no-console
+  // eslint-disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );
@@ -164,25 +165,26 @@ describe('on change', () => {
 describe('execute query', () => {
   it('triggers query execution', () => {
     renderer.create(<QueryUser {...props} />);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     act(() => execute!());
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 });
 
-describe('skip', () => {
-  it('skips executing the query if skip is true', () => {
-    renderer.create(<QueryUser {...props} skip={true} />);
+describe('pause', () => {
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).not.toBeCalled();
   });
 
-  it('skips executing queries if skip updates to true', () => {
+  it('skips executing queries if pause updates to true', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
 
     /**
      * Call update twice for the change to be detected.
      */
-    wrapper.update(<QueryUser {...props} skip={true} />);
-    wrapper.update(<QueryUser {...props} skip={true} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).toBeCalledTimes(1);
   });
 });

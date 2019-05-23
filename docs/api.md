@@ -11,7 +11,7 @@ interface UseQueryArgs {
   query: string;
   variables?: any;
   requestPolicy?: RequestPolicy;
-  skip?: boolean;
+  pause?: boolean;
 }
 ```
 
@@ -101,7 +101,7 @@ interface UseSubscriptionState<T> {
 | query         | `string`                   | The GraphQL request's query                                                                           |
 | variables     | `object`                   | The GraphQL request's variables                                                                       |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
-| skip          | `?boolean`                 | A boolean flag instructing `Query` to skip executing the subsequent query operation                   |
+| pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
 | children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props

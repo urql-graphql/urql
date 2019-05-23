@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';

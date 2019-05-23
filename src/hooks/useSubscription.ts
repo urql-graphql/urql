@@ -1,5 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+} from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createRequest, noop } from '../utils';
@@ -22,10 +29,13 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  let unsubscribe = noop;
+  const unsubscribe = useRef(noop);
 
   const client = useContext(Context);
-  const request = createRequest(args.query, args.variables as any);
+  const request = useMemo(
+    () => createRequest(args.query, args.variables as any),
+    [args.query, args.variables]
+  );
 
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
@@ -33,7 +43,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   });
 
   const executeSubscription = useCallback(() => {
-    unsubscribe();
+    unsubscribe.current();
 
     const [teardown] = pipe(
       client.executeSubscription(request),
@@ -45,13 +55,14 @@ export const useSubscription = <T = any, R = T, V = object>(
       })
     );
 
-    unsubscribe = teardown;
-  }, [request.key]);
+    unsubscribe.current = teardown;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request.key, handler, client]);
 
   useEffect(() => {
     executeSubscription();
-    return unsubscribe;
-  }, [request.key]);
+    return unsubscribe.current;
+  }, [executeSubscription]);
 
   return [state];
 };

@@ -11,7 +11,7 @@ interface QueryHandlerProps {
   variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
-  skip?: boolean;
+  pause?: boolean;
   children: (arg: QueryHandlerState) => ReactNode;
 }
 
@@ -33,7 +33,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
     let teardown = noop;
 
-    if (!this.props.skip) {
+    if (!this.props.pause) {
       [teardown] = pipe(
         this.props.client.executeQuery(this.request, {
           requestPolicy: this.props.requestPolicy,

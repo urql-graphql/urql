@@ -1,3 +1,13 @@
+import { mount } from 'enzyme';
+import { print } from 'graphql';
+import gql from 'graphql-tag';
+import React from 'react';
+import { fromValue } from 'wonka';
+
+// @ts-ignore - client is exclusively from mock
+import { client } from '../context';
+import { Mutation } from './Mutation';
+
 jest.mock('../context', () => {
   const c = {
     executeMutation: jest.fn(),
@@ -8,16 +18,6 @@ jest.mock('../context', () => {
     Consumer: (p: any) => p.children(client),
   };
 });
-
-import { mount } from 'enzyme';
-import { print } from 'graphql';
-import gql from 'graphql-tag';
-import React from 'react';
-import { fromValue } from 'wonka';
-
-// @ts-ignore - client is exclusively from mock
-import { client } from '../context';
-import { Mutation } from './Mutation';
 
 const props = {
   query: 'mutation Example { example }',
