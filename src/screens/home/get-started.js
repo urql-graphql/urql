@@ -60,6 +60,9 @@ const GithubButton = styled.a`
       color: black;
     }
   }
+  &:hover {
+    background-color: #f6f6f6;
+  }
 `;
 
 const GetStartedTitle = styled(SectionTitle)`
@@ -94,6 +97,9 @@ const DocButton = styled(Link)`
     margin-left: 2rem;
     width: 18rem;
     margin-top: 0;
+  }
+  &:hover {
+    background-color: #f6f6f6;
   }
 `;
 

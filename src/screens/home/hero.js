@@ -124,6 +124,10 @@ const HeroNPMButton = styled.button`
   color: #383838;
   border: 0;
   text-transform: uppercase;
+  cursor: copy;
+  &:hover {
+    background-color: #f6f6f6;
+  }
 `;
 
 export const HeroDocsButton = styled(Link)`
@@ -146,6 +150,9 @@ export const HeroDocsButton = styled(Link)`
     margin-top: 0;
     margin-left: 2rem;
     width: 18rem;
+  }
+  &:hover {
+    background-color: #f6f6f6;
   }
 `;
 
