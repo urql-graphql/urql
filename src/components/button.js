@@ -17,7 +17,7 @@ export const Button = styled(Link)`
   transition: background 0.4s;
   width: 100%;
   &:hover {
-    background: ${props => (props.light ? "#8196FF" : "#333")};
+    background: ${props => (props.light ? "#f6f6f6" : "#333")};
   }
   &:active {
     opacity: 0.6;
