@@ -8,7 +8,10 @@ import {
   share,
   Source,
   take,
+  subscribe,
 } from 'wonka';
+
+import { DocumentNode } from 'graphql';
 
 import {
   composeExchanges,
@@ -25,6 +28,7 @@ import {
   OperationType,
 } from './types';
 
+import { createRequest } from './utils/request';
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
   /** Target endpoint URL such as `https://my-target:8080/graphql`. */
@@ -37,6 +41,13 @@ export interface ClientOptions {
 
 interface ActiveOperations {
   [operationKey: string]: number;
+}
+
+/** Types for createQuery, createSubscription, createMutation */
+
+interface CreateQueryInput {
+  query: DocumentNode | string;
+  variables?: object;
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
@@ -181,4 +192,45 @@ export class Client {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
+
+  createQuery = <ExpectedResult = any>({
+    query,
+    variables: initialVariables,
+  }: CreateQueryInput) => ({
+    variables: newVariables,
+  }: {
+    variables?: object;
+  } = {}): Promise<OperationResult<ExpectedResult>> =>
+    new Promise(resolve => {
+      const variables = newVariables || initialVariables || {};
+      const request = createRequest(query, variables);
+      pipe(
+        this.executeQuery(request),
+        subscribe(resolve)
+      );
+    });
+
+  createMutation = <ExpectedResult = any>(query: DocumentNode | string) => (
+    variables: object = {}
+  ): Promise<OperationResult<ExpectedResult>> =>
+    new Promise(resolve => {
+      const request = createRequest(query, variables);
+      pipe(
+        this.executeMutation(request),
+        subscribe(resolve)
+      );
+    });
+
+  // const queryFn = (newVariables?: object): Promise<any> =>
+  // new Promise(resolve => {
+  // const variables = newVariables || initialVariables;
+  // const request = createRequest(query, variables);
+  // pipe(
+  // client.executeQuery(request),
+  // subscribe(resolve)
+  // );
+  // });
+
+  // return queryFn;
+  // };
 }

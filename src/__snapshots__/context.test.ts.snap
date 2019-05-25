@@ -16,7 +16,9 @@ Object {
     "_currentRenderer2": null,
     "_currentValue": Client {
       "activeOperations": Object {},
+      "createMutation": [Function],
       "createOperationContext": [Function],
+      "createQuery": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
       "exchange": [Function],
@@ -31,7 +33,9 @@ Object {
     },
     "_currentValue2": Client {
       "activeOperations": Object {},
+      "createMutation": [Function],
       "createOperationContext": [Function],
+      "createQuery": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
       "exchange": [Function],
@@ -65,7 +69,9 @@ Object {
     "_currentRenderer2": null,
     "_currentValue": Client {
       "activeOperations": Object {},
+      "createMutation": [Function],
       "createOperationContext": [Function],
+      "createQuery": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
       "exchange": [Function],
@@ -80,7 +86,9 @@ Object {
     },
     "_currentValue2": Client {
       "activeOperations": Object {},
+      "createMutation": [Function],
       "createOperationContext": [Function],
+      "createQuery": [Function],
       "createRequestOperation": [Function],
       "dispatchOperation": [Function],
       "exchange": [Function],

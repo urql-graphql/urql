@@ -8,7 +8,7 @@ jest.mock('./utils/keyForQuery', () => ({
   getKeyForRequest: () => 123,
 }));
 
-import { map, pipe, subscribe, tap } from 'wonka';
+import { map, pipe, subscribe, tap, interval } from 'wonka';
 import { createClient } from './client';
 
 const url = 'https://hostname.com';
@@ -170,5 +170,83 @@ describe('executeSubscription', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('operationName', 'subscription');
+  });
+});
+
+describe('createQuery', () => {
+  const queryString = query.query;
+
+  beforeEach(() => {
+    // @ts-ignore
+    client.executeQuery = jest.fn(() =>
+      pipe(
+        interval(400),
+        map((i: number) => ({ data: i, error: i + 1 }))
+      )
+    );
+  });
+
+  afterAll(() => {
+    //@ts-ignore
+    client.executeQuery.mockClear();
+  });
+
+  it('should return a query function', () => {
+    const myQuery = client.createQuery({ query: queryString });
+    expect(myQuery().then).toBeInstanceOf(Function);
+  });
+
+  it('should call executeQuery with the initial variables', async () => {
+    const myQuery = client.createQuery({
+      query: queryString,
+      variables: { foo: 'bar' },
+    });
+
+    await myQuery();
+    //@ts-ignore
+    expect(client.executeQuery.mock.calls[0][0].variables.foo).toBe('bar');
+  });
+
+  it('should call executeQuery with the new variables', async () => {
+    const myQuery = client.createQuery({
+      query: queryString,
+      variables: { foo: 'bar' },
+    });
+
+    await myQuery({ variables: { foo: 'baz' } });
+    // @ts-ignore
+    expect(client.executeQuery.mock.calls[0][0].variables.foo).toBe('baz');
+  });
+});
+
+describe('createMutation', () => {
+  const queryString = query.query;
+
+  beforeEach(() => {
+    // @ts-ignore
+    client.executeMutation = jest.fn(() =>
+      pipe(
+        interval(400),
+        map((i: number) => ({ data: i, error: i + 1 }))
+      )
+    );
+  });
+
+  afterAll(() => {
+    //@ts-ignore
+    client.executeMutation.mockClear();
+  });
+
+  it('should return a query function', () => {
+    const myMutation = client.createMutation(queryString);
+    expect(myMutation().then).toBeInstanceOf(Function);
+  });
+
+  it('should call executeQuery with the supplied variables', async () => {
+    const myMutation = client.createMutation(queryString);
+
+    await myMutation({ foo: 'bar' });
+    //@ts-ignore
+    expect(client.executeMutation.mock.calls[0][0].variables.foo).toBe('bar');
   });
 });
