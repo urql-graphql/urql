@@ -213,7 +213,7 @@ describe('createQuery', () => {
       variables: { foo: 'bar' },
     });
 
-    await myQuery({ variables: { foo: 'baz' } });
+    await myQuery({ foo: 'baz' });
     // @ts-ignore
     expect(client.executeQuery.mock.calls[0][0].variables.foo).toBe('baz');
   });

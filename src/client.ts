@@ -196,11 +196,9 @@ export class Client {
   createQuery = <ExpectedResult = any>({
     query,
     variables: initialVariables,
-  }: CreateQueryInput) => ({
-    variables: newVariables,
-  }: {
-    variables?: object;
-  } = {}): Promise<OperationResult<ExpectedResult>> =>
+  }: CreateQueryInput) => (
+    newVariables?: object
+  ): Promise<OperationResult<ExpectedResult>> =>
     new Promise(resolve => {
       const variables = newVariables || initialVariables || {};
       const request = createRequest(query, variables);
