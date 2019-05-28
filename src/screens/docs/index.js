@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { withRouteData, Link } from "react-static";
@@ -89,11 +89,21 @@ const DocsTitle = styled.h2`
   }
 `;
 
+const SideBarWithRef = forwardRef((props, ref) => {
+  return (
+    <div ref={ref}>
+      <Sidebar {...props} />
+    </div>
+  );
+});
+
+/* eslint-disable react/no-multi-comp */
 class Docs extends React.Component {
   constructor(props) {
     super(props);
     this.closeSidebar = this.closeSidebar.bind(this);
     this.state = { openSidebar: false };
+    this.sidebarRef = React.createRef();
   }
 
   openSidebar() {
@@ -106,7 +116,14 @@ class Docs extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Container
+        onClick={event => {
+          return !this.sidebarRef.current.contains(event.target) &&
+            this.state.openSidebar
+            ? this.closeSidebar()
+            : null;
+        }}
+      >
         <Wrapper noPadding>
           <CollapsedMenu overlay={this.state.openSidebar}>
             <img src={burger} alt="Menu" onClick={() => this.openSidebar()} />
@@ -120,9 +137,10 @@ class Docs extends React.Component {
             <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
           </Link>
         </Wrapper>
-        <Sidebar
+        <SideBarWithRef
           overlay={this.state.openSidebar}
           closeSidebar={this.closeSidebar}
+          ref={this.sidebarRef}
         />
         <Article />
       </Container>
