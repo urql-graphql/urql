@@ -1,12 +1,17 @@
 import React from "react";
 import Hero from "../screens/home/hero";
-import bgImg from "../../public/static/svgs/urqlbackground.svg";
-import bgImgMobile from "../../public/static/svgs/urqlbackground-mobile.svg";
 import styled from "styled-components";
 import logoFormidableWhite from "../static/svgs/logo_formidable_white.svg";
+import LeftTriangles from "../static/svgs/left-triangles.svg";
+import RightTriangles from "../static/svgs/right-triangles.svg";
+
 const Container = styled.header`
-  background-color: #3b3b3b;
-  background-image: url(${bgImgMobile});
+  background: rgb(109, 117, 153);
+  background: linear-gradient(
+    225deg,
+    rgba(109, 117, 153, 1) 0%,
+    rgba(41, 45, 55, 1) 100%
+  );
   background-size: 100% 100%;
   color: white;
   height: 100%;
@@ -14,18 +19,15 @@ const Container = styled.header`
   width: 100%;
   display: flex;
   justify-content: center;
-  @media (min-width: 768px) {
-    background-image: url(${bgImg});
-    padding: 0 4rem 8rem 0;
-  }
+  position: relative;
 `;
 
 const HeaderContainer = styled.a`
   display: flex;
   position: absolute;
-  left: 0.5rem;
-  top: 0.5rem;
-  width: 13rem;
+  left: 0.25rem;
+  top: 0.25rem;
+  width: 12rem;
   flex-direction: column;
   color: #ffffff;
   p {
@@ -44,8 +46,33 @@ const HeaderLogo = styled.img`
   z-index: 1;
 `;
 
+const LeftTrianglesImg = styled.img`
+  position: absolute;
+  display: none;
+  left: 0;
+  top: 0;
+  height: 70%;
+  @media (min-width: 400px) {
+    display: block;
+  }
+`;
+
+const RightTrianglesImg = styled.img`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: none;
+  height: 38%;
+  @media (min-width: 768px) {
+    display: block;
+  }
+`;
+
 export const Header = () => (
   <Container>
+    <LeftTrianglesImg src={LeftTriangles} />
+    <RightTrianglesImg src={RightTriangles} />
+
     <HeaderContainer href="https://formidable.com" title="Formidable">
       <HeaderText>Another oss project by </HeaderText>
       <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />

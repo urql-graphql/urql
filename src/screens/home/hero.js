@@ -4,6 +4,10 @@ import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
 import { ProjectBadge } from "formidable-oss-badges";
 
+const WrapperStyled = styled(Wrapper)`
+  z-index: 1;
+`;
+
 const HeroContent = styled.div`
   align-items: center;
   display: flex;
@@ -45,8 +49,7 @@ const HeroBody = styled.p`
   margin-top: 0;
   @media (min-width: 768px) {
     margin: 0 0 6rem;
-    max-width: 30rem;
-    max-width: 100%;
+    max-width: 50rem;
   }
 `;
 
@@ -132,7 +135,6 @@ const HeroNPMButton = styled.button`
 
 export const HeroDocsButton = styled(Link)`
   width: 30rem;
-  max-width: 80%;
   margin-left: 0rem;
   height: 4rem;
   font-size: 14px;
@@ -145,6 +147,7 @@ export const HeroDocsButton = styled(Link)`
   border: 0;
   @media (min-width: 768px) {
     margin-top: 2rem;
+    width: 30rem;
   }
   @media (min-width: 1024px) {
     margin-top: 0;
@@ -168,14 +171,21 @@ const HeroNavList = styled.ul`
   justify-content: space-around;
 
   @media (min-width: 768px) {
-    justify-content: space-between;
+    display: inline-block;
     border-top: 2px solid #ffffff;
     padding-top: 4rem;
-    margin: 4rem 0 0 32rem;
-    flex-direction: row;
+    margin: 4rem 0 0 0;
   }
   @media (min-width: 1024px) {
-    justify-content: space-around;
+    width: 48rem;
+    margin: 4rem 0 0 32rem;
+  }
+  & li {
+    display: inline-block;
+    margin-right: 66px;
+  }
+  & li:last-child {
+    margin-right: 0;
   }
   & li a {
     color: white;
@@ -190,6 +200,18 @@ const HeroNavList = styled.ul`
   }
 `;
 
+const copyFallBack = () => {
+  const copyTextArea = document.createElement("textArea");
+  copyTextArea.value = "npm install urql";
+
+  document.body.appendChild(copyTextArea);
+
+  copyTextArea.focus();
+  copyTextArea.select();
+  document.execCommand("copy");
+  copyTextArea.remove();
+};
+
 class Hero extends React.Component {
   constructor() {
     super(...arguments);
@@ -201,13 +223,17 @@ class Hero extends React.Component {
   }
 
   handleCopy(e) {
+    if (!navigator.clipboard) {
+      copyFallBack();
+      e.preventDefault();
+      return;
+    }
     navigator.clipboard.writeText("npm install urql");
-    e.preventDefault();
   }
 
   render() {
     return (
-      <Wrapper noPadding>
+      <WrapperStyled noPadding>
         <HeroContent>
           <HeroLogoContainer>
             <HeroLogo
@@ -317,7 +343,7 @@ class Hero extends React.Component {
             </a>
           </li>
         </HeroNavList>
-      </Wrapper>
+      </WrapperStyled>
     );
   }
 }

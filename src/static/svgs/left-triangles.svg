@@ -1,0 +1,41 @@
+
+<svg width="500px" height="640px" viewBox="0 0 500 640" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <polygon id="path-1" points="0 0 1440 0 1440 781 0 781"></polygon>
+        <polygon id="path-3" points="0 0 1440 0 1440 781 0 781"></polygon>
+        <polygon id="path-5" points="0 0 1440 0 1440 781 0 781"></polygon>
+        <polygon id="path-7" points="0 0 1440 0 1440 781 0 781"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hero-background">
+            <g id="Clipped">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="a"></g>
+                <polygon id="Path" fill="#6B78B7" fill-rule="nonzero" mask="url(#mask-2)" points="310 50 450 50 -50 550 -50 410"></polygon>
+            </g>
+            <g id="Clipped">
+                <mask id="mask-4" fill="white">
+                    <use xlink:href="#path-3"></use>
+                </mask>
+                <g id="a"></g>
+                <polygon id="Path" fill="#7689E4" fill-rule="nonzero" mask="url(#mask-4)" points="220 0 360 0 0 360 0 220"></polygon>
+            </g>
+            <g id="Clipped">
+                <mask id="mask-6" fill="white">
+                    <use xlink:href="#path-5"></use>
+                </mask>
+                <g id="a"></g>
+                <polygon id="Path" fill="#555D85" fill-rule="nonzero" mask="url(#mask-6)" points="360 140 500 140 -140 780 -140 640"></polygon>
+            </g>
+            <g id="Clipped">
+                <mask id="mask-8" fill="white">
+                    <use xlink:href="#path-7"></use>
+                </mask>
+                <g id="a"></g>
+                <polygon id="Path" fill="#8196FF" fill-rule="nonzero" mask="url(#mask-8)" points="220 0 0 220 0 0"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
