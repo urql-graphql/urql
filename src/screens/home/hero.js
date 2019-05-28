@@ -47,6 +47,7 @@ const HeroBody = styled.p`
   text-align: left;
   width: 100%;
   margin-top: 0;
+  margin-bottom: 0;
   @media (min-width: 768px) {
     margin: 0 0 6rem;
     max-width: 50rem;
@@ -145,6 +146,7 @@ export const HeroDocsButton = styled(Link)`
   letter-spacing: 1px;
   color: #383838;
   border: 0;
+  margin-top: 5rem;
   @media (min-width: 768px) {
     margin-top: 2rem;
     width: 30rem;
