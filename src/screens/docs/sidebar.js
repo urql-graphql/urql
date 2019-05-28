@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { withRouteData, withRouter, Link } from "react-static";
@@ -6,10 +6,11 @@ import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
-  SidebarWrapper
+  SidebarWrapper,
+  SideBarSvg
 } from "../../components/navigation";
 import closeButton from "../../static/svgs/x.svg";
-import logoSidebar from "../../static/svgs/logo-sidebar.svg";
+import logoSidebar from "../../static/sidebar-badge.png";
 import constants from "../../constants";
 
 const HeroLogo = styled.img`
@@ -26,9 +27,8 @@ const HeroLogo = styled.img`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 4rem 1rem 1rem 4rem;
+  margin: 3rem 0rem 0rem 2.5rem;
   height: auto;
-
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? "" : "none")};
   }
@@ -38,11 +38,6 @@ const SubContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 2rem;
-`;
-
-const Wrapper = styled.div`
-  display: inline-block;
-  margin-left: 2rem;
 `;
 
 const CloseButton = styled.img`
@@ -58,6 +53,15 @@ const CloseButton = styled.img`
   }
 `;
 
+const HorizontalLine = styled.hr`
+  width: 100%;
+  height: 2px;
+  background-color: #2e2e2e;
+  opacity: 0.1;
+  border: none;
+  margin: 1rem 0;
+`;
+
 class Sidebar extends React.Component {
   renderSidebarItem(item) {
     const { tocArray } = this.props;
@@ -67,11 +71,12 @@ class Sidebar extends React.Component {
     const subContent = tocArray.filter(toc => toc.level === 2);
 
     return (
-      <Wrapper key={item.path}>
+      <Fragment>
         <SidebarNavItem
           to={`/docs${item.path}`}
           replace
           key={item.title.split(" ").join("_")}
+          currentPath={currentPath}
         >
           {item.title}
         </SidebarNavItem>
@@ -90,7 +95,7 @@ class Sidebar extends React.Component {
             ))}
           </SubContentWrapper>
         )}
-      </Wrapper>
+      </Fragment>
     );
   }
 
@@ -98,6 +103,7 @@ class Sidebar extends React.Component {
     const { sidebarHeaders, overlay, closeSidebar } = this.props;
     return (
       <SidebarContainer>
+        <SideBarSvg />
         <SidebarWrapper overlay={overlay}>
           <CloseButton
             src={closeButton}
@@ -113,14 +119,13 @@ class Sidebar extends React.Component {
             />
           </Link>
           <ContentWrapper overlay={overlay}>
-            <SidebarNavItem to={`/#`} key={"home"}>
-              Home
-            </SidebarNavItem>
-            <SidebarNavItem to={`/docs/getting-started`} key={"documentation"}>
-              Documentation
+            <SidebarNavItem to={constants.readme} key={"readme"}>
+              Readme
             </SidebarNavItem>
             {sidebarHeaders &&
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+
+            <HorizontalLine />
             <SidebarNavItem to={constants.githubIssues} key={"issues"}>
               Issues
             </SidebarNavItem>
