@@ -1,6 +1,5 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Link } from "react-static";
-import sidebarBackground from "../static/svgs/sidebar-background.svg";
 import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
 export const Navigation = styled.div`
@@ -29,10 +28,22 @@ export const SidebarContainer = styled.div`
   }
 `;
 
+export const SideBarSvg = styled.div`
+  width: 2.5rem;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  background-image: url(${collapsedSidebarBackground});
+  background-size: cover;
+  background-repeat: repeat-y;
+`;
+
 export const SidebarWrapper = styled.aside`
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-image: url(${sidebarBackground});
   background-size: 100% 100%;
+  background: rgba(223, 223, 223, 0.4);
   min-height: 100vh;
   padding-top: 18rem;
   min-width: 24rem;
@@ -44,26 +55,37 @@ export const SidebarWrapper = styled.aside`
   bottom: 0;
 
   @media (max-width: 768px) {
-    background-image: ${props =>
-      props.overlay
-        ? `url(${sidebarBackground})`
-        : `url(${collapsedSidebarBackground})`};
+    background: #dfdfdf;
     min-width: ${props => (props.overlay ? "24rem" : "2.5rem")};
     width: ${props => (props.overlay ? "24rem" : "2.5rem")};
+    background-size: cover;
   }
 `;
 
 export const SidebarNavItem = styled(Link)`
-  color: white;
-  margin-left: 1rem;
-  margin-bottom: 1rem;
+  padding-left: 2rem;
+  padding-right: 1rem;
+  margin-bottom: 0.7rem;
   font-size: 1.6rem;
   display: inline-block;
+  line-height: 1.64;
+  letter-spacing: 0.5px;
+  color: #4c5db0;
+  text-transform: uppercase;
+  font-weight: bold;
+  width: 100%;
+  background-color: ${props =>
+    props.currentPath ? css`rgba(46, 46, 46, 0.1)` : ""};
 `;
 
 export const SidebarNavSubItem = styled(Link)`
   color: white;
-  margin-left: 3rem;
-  margin-top: 1rem;
+  margin-left: 4rem;
+  margin-right: 1rem;
+  margin-top: 0.7rem;
   font-size: 1.4rem;
+  line-height: 1.64;
+  letter-spacing: normal;
+  color: #505050;
+  font-weight: bold;
 `;
