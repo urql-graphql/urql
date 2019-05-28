@@ -43,7 +43,11 @@ export const SideBarSvg = styled.div`
 export const SidebarWrapper = styled.aside`
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-size: 100% 100%;
-  background: rgba(223, 223, 223, 0.4);
+  background: linear-gradient(
+      rgba(223, 223, 223, 0.4),
+      rgba(223, 223, 223, 0.4)
+    ),
+    #ffffff;
   min-height: 100vh;
   padding-top: 18rem;
   min-width: 24rem;
