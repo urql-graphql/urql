@@ -26,6 +26,17 @@ const FooterDescription = styled.p`
     margin: 0;
     min-width: auto;
   }
+  & a {
+    color: white;
+    letter-spacing: 0.05em;
+    transition: opacity 0.4s;
+  }
+  & a:hover {
+    opacity: 0.7;
+  }
+  & a:visited {
+    color: white;
+  }
 `;
 
 const FooterLeft = styled.div`
@@ -55,6 +66,9 @@ const FooterLinks = styled.ul`
   & a:hover {
     opacity: 0.7;
   }
+  & a:visited {
+    color: white;
+  }
 `;
 
 export const Footer = () => (
@@ -81,8 +95,8 @@ export const Footer = () => (
         Formidable is a Seattle, Denver, and London-based engineering
         consultancy and open source software organization, specializing in
         React.js, React Native, GraphQL, Node.js, and the extended JavaScript
-        ecosystem. For more information about Formidable, please visit
-        formidable.com.
+        ecosystem. For more information about Formidable, please visit{" "}
+        <a href="https://www.formidable.com">formidable.com</a>.
       </FooterDescription>
     </Wrapper>
   </Container>
