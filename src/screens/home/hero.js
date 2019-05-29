@@ -174,19 +174,9 @@ const HeroNavList = styled.ul`
   width: 100%;
   justify-content: space-around;
 
-  @media (min-width: 768px) {
-    display: inline-block;
-    border-top: 2px solid #ffffff;
-    padding-top: 4rem;
-    margin: 4rem 0 0 0;
-  }
-  @media (min-width: 1024px) {
-    width: 48rem;
-    margin: 4rem 0 0 32rem;
-  }
   & li {
     display: inline-block;
-    margin-right: 66px;
+    margin-right: 33px;
   }
   & li:last-child {
     margin-right: 0;
@@ -201,6 +191,19 @@ const HeroNavList = styled.ul`
   }
   & li a:hover {
     color: #8196ff;
+  }
+  @media (min-width: 768px) {
+    display: inline-block;
+    border-top: 2px solid #ffffff;
+    padding-top: 4rem;
+    margin: 4rem 0 0 0;
+    & li {
+      margin-right: 66px;
+    }
+  }
+  @media (min-width: 1024px) {
+    width: 48rem;
+    margin: 4rem 0 0 32rem;
   }
 `;
 

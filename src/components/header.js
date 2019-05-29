@@ -20,6 +20,7 @@ const Container = styled.header`
   display: flex;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 `;
 
 const HeaderContainer = styled.a`
@@ -48,13 +49,11 @@ const HeaderLogo = styled.img`
 
 const LeftTrianglesImg = styled.img`
   position: absolute;
-  display: none;
+  display: block;
   left: 0;
   top: 0;
-  height: 70%;
-  @media (min-width: 400px) {
-    display: block;
-  }
+  height: 80%;
+  max-width: none;
 `;
 
 const RightTrianglesImg = styled.img`
@@ -62,7 +61,7 @@ const RightTrianglesImg = styled.img`
   right: 0;
   bottom: 0;
   display: none;
-  height: 38%;
+  height: 45%;
   @media (min-width: 768px) {
     display: block;
   }
