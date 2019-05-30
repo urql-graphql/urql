@@ -15,18 +15,16 @@ interface WithCacheProperty {
   [key: string]: any;
 }
 
-/* tslint:disable */
 const hash = (x: string): number => {
   /* prettier-ignore */
   for (var h = 5381 | 0, i = 0, l = x.length | 0; i < l; i++)
     h = ((h << 5) + h) + x.charCodeAt(i);
   return h >>> 0;
 };
-/* tslint:enable */
 
 const docNameCache = Object.create(null) as NameCache;
 
-const getKeyForDocNode = (doc: DocumentNode): number => {
+export const getKeyForQuery = (doc: DocumentNode): number => {
   if ((doc as WithCacheProperty).__key !== undefined) {
     return (doc as WithCacheProperty).__key as number;
   }
@@ -60,18 +58,8 @@ const getKeyForDocNode = (doc: DocumentNode): number => {
   return key;
 };
 
-const getKeyForDocString = (doc: string): number => hash(doc);
-
-export const getKeyForQuery = (doc: string | DocumentNode): number => {
-  if (typeof doc === 'string') {
-    return getKeyForDocString(doc);
-  } else {
-    return getKeyForDocNode(doc);
-  }
-};
-
 export const getKeyForRequest = (
-  query: string | DocumentNode,
+  query: DocumentNode,
   vars?: object
 ): number => {
   const docKey = getKeyForQuery(query);

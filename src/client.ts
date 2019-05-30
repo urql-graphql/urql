@@ -1,5 +1,4 @@
-import { parse } from 'graphql';
-
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import {
   filter,
   makeSubject,
@@ -101,7 +100,7 @@ export class Client {
     opts?: Partial<OperationContext>
   ): Operation => ({
     key,
-    query: typeof query === 'string' ? parse(query) : query,
+    query,
     variables,
     operationName: type,
     context: this.createOperationContext(opts),

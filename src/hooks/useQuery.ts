@@ -12,19 +12,20 @@ import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseQueryArgs<V> {
+export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
+  pause?: boolean;
 }
 
-interface UseQueryState<T> {
+export interface UseQueryState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
 }
 
-type UseQueryResponse<T> = [
+export type UseQueryResponse<T> = [
   UseQueryState<T>,
   (opts?: Partial<OperationContext>) => void
 ];
@@ -38,7 +39,7 @@ export const useQuery = <T = any, V = object>(
   const client = useContext(Context);
   const request = useMemo(
     () => createRequest(args.query, args.variables as any),
-    [args]
+    [args.query, args.variables]
   );
 
   const [state, setState] = useState<UseQueryState<T>>({
@@ -50,6 +51,12 @@ export const useQuery = <T = any, V = object>(
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
+
+      if (args.pause) {
+        unsubscribe.current = noop;
+        return;
+      }
+
       setState(s => ({ ...s, fetching: true }));
 
       const [teardown] = pipe(
@@ -65,7 +72,8 @@ export const useQuery = <T = any, V = object>(
 
       unsubscribe.current = teardown;
     },
-    [request.key]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [request.key, client, args.pause, args.requestPolicy]
   );
 
   useEffect(() => {
@@ -75,7 +83,7 @@ export const useQuery = <T = any, V = object>(
       isMounted.current = false;
       unsubscribe.current();
     };
-  }, [request.key]);
+  }, [executeQuery, request.key]);
 
   return [state, executeQuery];
 };

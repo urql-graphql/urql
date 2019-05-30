@@ -8,7 +8,7 @@ with your package manager of choice:
 ```sh
 yarn add urql
 # or
-npm intall --save urql
+npm install --save urql
 ```
 
 Then, if you haven't already, make sure that all peer dependencies
@@ -17,7 +17,7 @@ are installed as well:
 ```sh
 yarn add react react-dom graphql
 # or
-npm intall --save react react-dom graphql
+npm install --save react react-dom graphql
 ```
 
 > _Note:_ Most libraries related to GraphQL specify `graphql` as their peer

@@ -1,12 +1,13 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
         interval(400),
-        map(i => ({ data: i, error: i + 1 }))
+        map((i: number) => ({ data: i, error: i + 1 }))
       )
     ),
   };
@@ -19,30 +20,36 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-// @ts-ignore - data is imported from mock only
 import { createClient } from '../client';
-import { useQuery } from './useQuery';
+import { OperationContext } from '../types';
+import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 
 // @ts-ignore
 const client = createClient() as { executeQuery: jest.Mock };
-const props = {
-  query: 'example query',
+const props: UseQueryArgs<{ myVar: number }> = {
+  query: '{ example }',
   variables: {
     myVar: 1234,
   },
+  pause: false,
 };
-let state: any;
-let execute: any;
 
-const QueryUser: FC<typeof props> = ({ query, variables }) => {
-  const [s, e] = useQuery({ query, variables });
+let state: UseQueryState<any> | undefined;
+let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
+
+const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
+  query,
+  variables,
+  pause,
+}) => {
+  const [s, e] = useQuery({ query, variables, pause });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line
+  // eslint-disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );
@@ -68,10 +75,11 @@ describe('on initial useEffect', () => {
 
   it('passes query and vars to executeQuery', () => {
     renderer.create(<QueryUser {...props} />);
+
     expect(client.executeQuery).toBeCalledWith(
       {
         key: expect.any(Number),
-        query: props.query,
+        query: expect.any(Object),
         variables: props.variables,
       },
       {
@@ -137,7 +145,7 @@ describe('on subscription update', () => {
 });
 
 describe('on change', () => {
-  const q = 'new query';
+  const q = 'query NewQuery { example }';
 
   it('new query executes subscription', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
@@ -157,7 +165,26 @@ describe('on change', () => {
 describe('execute query', () => {
   it('triggers query execution', () => {
     renderer.create(<QueryUser {...props} />);
-    act(() => execute());
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    act(() => execute!());
     expect(client.executeQuery).toBeCalledTimes(2);
+  });
+});
+
+describe('pause', () => {
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<QueryUser {...props} pause={true} />);
+    expect(client.executeQuery).not.toBeCalled();
+  });
+
+  it('skips executing queries if pause updates to true', () => {
+    const wrapper = renderer.create(<QueryUser {...props} />);
+
+    /**
+     * Call update twice for the change to be detected.
+     */
+    wrapper.update(<QueryUser {...props} pause={true} />);
+    wrapper.update(<QueryUser {...props} pause={true} />);
+    expect(client.executeQuery).toBeCalledTimes(1);
   });
 });

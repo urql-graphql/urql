@@ -1,6 +1,7 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
     executeMutation: jest.fn(() =>
@@ -17,6 +18,8 @@ jest.mock('../client', () => {
   };
 });
 
+import { print } from 'graphql';
+import gql from 'graphql-tag';
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
@@ -26,7 +29,7 @@ import { useMutation } from './useMutation';
 // @ts-ignore
 const client = createClient() as { executeMutation: jest.Mock };
 const props = {
-  query: 'example query',
+  query: 'mutation Example { example }',
 };
 let state: any;
 let execute: any;
@@ -39,7 +42,7 @@ const MutationUser: FC<typeof props> = ({ query }) => {
 };
 
 beforeAll(() => {
-  // tslint:disable-next-line
+  // eslint-disable-next-line no-console
   console.log(
     'supressing console.error output due to react-test-renderer spam (hooks related)'
   );
@@ -88,10 +91,9 @@ describe('on execute', () => {
     act(() => {
       execute(vars);
     });
-    expect(client.executeMutation.mock.calls[0][0]).toHaveProperty(
-      'query',
-      props.query
-    );
+
+    const call = client.executeMutation.mock.calls[0][0];
+    expect(print(call.query)).toBe(print(gql([props.query])));
   });
 
   it('calls executeMutation with variables', () => {

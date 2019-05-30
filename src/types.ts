@@ -5,6 +5,9 @@ import { CombinedError } from './utils/error';
 
 export { ExecutionResult } from 'graphql';
 
+/** Utility type to Omit keys from an interface/object type */
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
@@ -19,7 +22,7 @@ export type RequestPolicy =
 export interface GraphQLRequest {
   /** Unique identifier of the request. */
   key: number;
-  query: DocumentNode | string;
+  query: DocumentNode;
   variables?: object;
 }
 
@@ -32,10 +35,7 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation {
-  query: DocumentNode;
-  variables?: object;
-  key: number;
+export interface Operation extends GraphQLRequest {
   operationName: OperationType;
   context: OperationContext;
 }
@@ -61,6 +61,3 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
-
-// /** The arguments for the child function of a connector. */
-// export type ChildArgs<MutationDeclarations> = ClientState<MutationDeclarations>;

@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A highly customizable and versatile GraphQL client for React",
   "main": "dist/urql.js",
   "module": "dist/urql.es.js",
@@ -17,7 +17,7 @@
     "postbuild:bundle": "terser dist/urql.es.js -o dist/urql.es.min.js",
     "test": "jest",
     "bundlesize": "bundlesize",
-    "lint": "tslint --project .",
+    "lint": "eslint . --ext .ts,.tsx",
     "check-formatting": "prettier --write src/**/*.{ts,tsx}",
     "prepublishOnly": "run-s build build:prune"
   },
@@ -59,7 +59,7 @@
       "git add"
     ],
     "*.{ts,tsx}": [
-      "tslint --fix",
+      "eslint --fix",
       "prettier --write",
       "git add"
     ]
@@ -81,11 +81,18 @@
     "@types/jest": "^23.3.13",
     "@types/react": "16.8.2",
     "@types/react-test-renderer": "^16.8.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "bundlesize": "^0.17.0",
     "coveralls": "^3.0.0",
-    "enzyme": "^3.8.0",
+    "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.7.1",
     "enzyme-to-json": "^3.3.5",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-react": "^7.13.0",
+    "eslint-plugin-react-hooks": "^1.6.0",
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "husky": "^1.2.0",
@@ -94,15 +101,13 @@
     "microbundle": "^0.9.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.15.2",
-    "react": "^16.8.1",
-    "react-dom": "^16.8.1",
-    "react-test-renderer": "^16.8.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-hooks-testing-library": "^0.5.0",
+    "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.2",
     "terser": "^3.16.1",
     "ts-jest": "^23.10.5",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.16.0",
-    "tslint-react": "^3.6.0",
     "typescript": "^3.1.6"
   },
   "peerDependencies": {
@@ -114,6 +119,7 @@
     "@types/fast-json-stable-stringify": "^2.0.0",
     "create-react-context": "^0.2.3",
     "fast-json-stable-stringify": "^2.0.0",
+    "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
     "wonka": "^2.0.1"
   }

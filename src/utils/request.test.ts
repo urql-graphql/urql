@@ -1,14 +1,35 @@
+import { print } from 'graphql';
+import gql from 'graphql-tag';
 import { createRequest } from './request';
 
+const doc = print(
+  gql`
+    {
+      todos {
+        id
+      }
+    }
+  `
+);
+
 it('should return a valid query object', () => {
-  const val = createRequest(`{ todos { id } }`);
-  expect(val).toMatchObject({ query: `{ todos { id } }`, variables: {} });
+  const val = createRequest(doc);
+
+  expect(print(val.query)).toBe(doc);
+  expect(val).toMatchObject({
+    key: expect.any(Number),
+    query: expect.any(Object),
+    variables: {},
+  });
 });
 
 it('should return a valid query object with variables', () => {
-  const val = createRequest(`{ todos { id } }`, { test: 5 });
+  const val = createRequest(doc, { test: 5 });
 
-  expect(val.query).toBe(`{ todos { id } }`);
-  expect(val.variables).toMatchObject({ test: 5 });
-  expect(typeof val.key).toBe('number');
+  expect(print(val.query)).toBe(doc);
+  expect(val).toMatchObject({
+    key: expect.any(Number),
+    query: expect.any(Object),
+    variables: { test: 5 },
+  });
 });

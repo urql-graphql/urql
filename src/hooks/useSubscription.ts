@@ -1,10 +1,17 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface UseSubscriptionArgs<V> {
+export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
   variables?: V;
 }
@@ -16,7 +23,7 @@ interface UseSubscriptionState<T> {
   error?: CombinedError;
 }
 
-type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
+export type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
 
 export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
@@ -26,7 +33,10 @@ export const useSubscription = <T = any, R = T, V = object>(
   const unsubscribe = useRef(noop);
 
   const client = useContext(Context);
-  const request = createRequest(args.query, args.variables as any);
+  const request = useMemo(
+    () => createRequest(args.query, args.variables as any),
+    [args.query, args.variables]
+  );
 
   const [state, setState] = useState<UseSubscriptionState<R>>({
     error: undefined,
@@ -49,7 +59,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     );
 
     unsubscribe.current = teardown;
-  }, [request.key]);
+  }, [client, handler, request]);
 
   useEffect(() => {
     executeSubscription();
@@ -57,7 +67,7 @@ export const useSubscription = <T = any, R = T, V = object>(
       unsubscribe.current();
       isMounted.current = false;
     };
-  }, [request.key]);
+  }, [executeSubscription, request.key]);
 
   return [state];
 };

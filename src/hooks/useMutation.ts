@@ -11,7 +11,7 @@ interface UseMutationState<T> {
   error?: CombinedError;
 }
 
-type UseMutationResponse<T, V> = [
+export type UseMutationResponse<T, V> = [
   UseMutationState<T>,
   (variables?: V) => Promise<OperationResult<T>>
 ];

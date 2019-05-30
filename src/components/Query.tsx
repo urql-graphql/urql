@@ -1,13 +1,17 @@
+import { DocumentNode } from 'graphql';
 import React, { Component, FC, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
-import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
+import { Omit, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface QueryHandlerProps extends GraphQLRequest {
+interface QueryHandlerProps {
+  query: string | DocumentNode;
+  variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
+  pause?: boolean;
   children: (arg: QueryHandlerState) => ReactNode;
 }
 
@@ -27,19 +31,27 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
 
     this.setState({ fetching: true });
 
-    const [teardown] = pipe(
-      this.props.client.executeQuery(this.request, {
-        requestPolicy: this.props.requestPolicy,
-        ...opts,
-      }),
-      subscribe(({ data, error }) => {
-        this.setState({
-          fetching: false,
-          data,
-          error,
-        });
-      })
-    );
+    let teardown = noop;
+
+    if (!this.props.pause) {
+      [teardown] = pipe(
+        this.props.client.executeQuery(this.request, {
+          requestPolicy: this.props.requestPolicy,
+          ...opts,
+        }),
+        subscribe(({ data, error }) => {
+          this.setState({
+            fetching: false,
+            data,
+            error,
+          });
+        })
+      );
+    } else {
+      this.setState({
+        fetching: false,
+      });
+    }
 
     this.unsubscribe = teardown;
   };
@@ -72,7 +84,7 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   }
 }
 
-type QueryProps = Exclude<QueryHandlerProps, 'client'>;
+export type QueryProps = Omit<QueryHandlerProps, 'client'>;
 
 export const Query: FC<QueryProps> = props => (
   <Consumer>{client => <QueryHandler {...props} client={client} />}</Consumer>

@@ -59,7 +59,7 @@ example. However, most examples will do so automatically.
 
 ## How do I lint my code?
 
-We ensure consistency in `urql`'s codebase using `tslint` and `prettier`.
+We ensure consistency in `urql`'s codebase using [`typescript-eslint`](https://github.com/typescript-eslint/typescript-eslint) and `prettier`.
 They are run on a `precommit` hook, so if something's off they'll try
 to automatically fix up your code, or display an error.
 

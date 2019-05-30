@@ -1,3 +1,10 @@
+import { mount, shallow } from 'enzyme';
+import React from 'react';
+import { delay, fromValue, pipe } from 'wonka';
+// @ts-ignore - client is exclusively from mock
+import { client } from '../context';
+import { Query } from './Query';
+
 jest.mock('../context', () => {
   const c = {
     executeQuery: jest.fn(),
@@ -9,15 +16,8 @@ jest.mock('../context', () => {
   };
 });
 
-import { mount, shallow } from 'enzyme';
-import React from 'react';
-import { delay, fromValue, pipe } from 'wonka';
-// @ts-ignore - client is exclusively from mock
-import { client } from '../context';
-import { Query } from './Query';
-
 const props = {
-  query: 'examplequery',
+  query: '{ example }',
 };
 let childProps: any;
 
@@ -64,7 +64,7 @@ describe('on change', () => {
     const wrapper = mountWrapper(props);
 
     // @ts-ignore
-    wrapper.setProps({ ...props, query: 'new query' });
+    wrapper.setProps({ ...props, query: '{ newQuery }' });
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 });
@@ -108,5 +108,25 @@ describe('on error', () => {
   it('returns error', () => {
     mountWrapper(props);
     expect(childProps).toHaveProperty('error', error);
+  });
+});
+
+describe('pause', () => {
+  beforeEach(() => {
+    client.executeQuery.mockReturnValue(fromValue({ data: 1234 }));
+  });
+
+  it('should pause executing the query if pause is true', () => {
+    mountWrapper({ ...props, pause: true });
+    expect(client.executeQuery).not.toHaveBeenCalled();
+  });
+
+  it('should not call executeQuery if pause changes to true', () => {
+    const wrapper = mountWrapper(props);
+    expect(client.executeQuery).toHaveBeenCalledTimes(1);
+
+    // @ts-ignore
+    wrapper.setProps({ ...props, query: '{ newQuery }', pause: true });
+    expect(client.executeQuery).toHaveBeenCalledTimes(1);
   });
 });
