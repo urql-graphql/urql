@@ -1,5 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
@@ -25,10 +32,14 @@ type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  let unsubscribe = noop;
+  const isMounted = useRef(true);
+  const unsubscribe = useRef<() => void>(noop);
 
   const client = useContext(Context);
-  const request = createRequest(args.query, args.variables as any);
+  const request = useMemo(
+    () => createRequest(args.query, args.variables as any),
+    [args]
+  );
 
   const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
@@ -38,7 +49,7 @@ export const useQuery = <T = any, V = object>(
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
-      unsubscribe();
+      unsubscribe.current();
       setState(s => ({ ...s, fetching: true }));
 
       const [teardown] = pipe(
@@ -46,19 +57,24 @@ export const useQuery = <T = any, V = object>(
           requestPolicy: args.requestPolicy,
           ...opts,
         }),
-        subscribe(({ data, error }) =>
-          setState({ fetching: false, data, error })
+        subscribe(
+          ({ data, error }) =>
+            isMounted.current && setState({ fetching: false, data, error })
         )
       );
 
-      unsubscribe = teardown;
+      unsubscribe.current = teardown;
     },
     [request.key]
   );
 
   useEffect(() => {
     executeQuery();
-    return unsubscribe;
+
+    return () => {
+      isMounted.current = false;
+      unsubscribe.current();
+    };
   }, [request.key]);
 
   return [state, executeQuery];
