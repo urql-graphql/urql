@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, createRequest, noop } from '../utils';
@@ -22,7 +22,8 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  let unsubscribe = noop;
+  const isMounted = useRef(true);
+  const unsubscribe = useRef(noop);
 
   const client = useContext(Context);
   const request = createRequest(args.query, args.variables as any);
@@ -33,24 +34,29 @@ export const useSubscription = <T = any, R = T, V = object>(
   });
 
   const executeSubscription = useCallback(() => {
-    unsubscribe();
+    unsubscribe.current();
 
     const [teardown] = pipe(
       client.executeSubscription(request),
-      subscribe(({ data, error }) => {
-        setState(s => ({
-          data: handler !== undefined ? handler(s.data, data) : data,
-          error,
-        }));
-      })
+      subscribe(
+        ({ data, error }) =>
+          isMounted.current &&
+          setState(s => ({
+            data: handler !== undefined ? handler(s.data, data) : data,
+            error,
+          }))
+      )
     );
 
-    unsubscribe = teardown;
+    unsubscribe.current = teardown;
   }, [request.key]);
 
   useEffect(() => {
     executeSubscription();
-    return unsubscribe;
+    return () => {
+      unsubscribe.current();
+      isMounted.current = false;
+    };
   }, [request.key]);
 
   return [state];
