@@ -109,7 +109,7 @@ observe.
 
 ### Using hooks
 
-> _Note:_ Hooks are only availabe in React 16.8 and onwards
+> _Note:_ Hooks are only available in React 16.8 and onwards
 
 Instead of using `<Query>` and a render prop API, you can also use the
 hooks API by switching to `useQuery()`.
@@ -299,7 +299,7 @@ not used as a fire-and-forget.
 
 ### Using hooks
 
-> _Note:_ Hooks are only availabe in React 16.8 and onwards
+> _Note:_ Hooks are only available in React 16.8 and onwards
 
 Like the `<Query>` component the `<Mutation>` component has an alternative hook
 that can be used instead, which is the `useMutation()` hook.
