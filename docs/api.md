@@ -150,7 +150,7 @@ interface UseSubscriptionState<T> {
 
 | Prop     | Type             | Description                                                     |
 | -------- | ---------------- | --------------------------------------------------------------- |
-| fetching | `boolean`        | Whether the `Subsription` is currently ongoing                  |
+| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                  |
 | data     | `?any`           | The GraphQL subscription's data                                 |
 | error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
 
