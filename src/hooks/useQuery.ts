@@ -90,18 +90,18 @@ export const useQuery = <T = any, V = object>(
   );
 
   useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
     if (isMounted.current) {
       executeQuery();
     }
     return unsubscribe.current;
   }, [executeQuery]);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return [state, executeQuery];
 };
