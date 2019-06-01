@@ -130,7 +130,6 @@ describe('useQuery', () => {
     `;
 
     rerender({ query: newQuery });
-    await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(2);
     expect(client.executeQuery).toHaveBeenNthCalledWith(
       2,
@@ -161,7 +160,6 @@ describe('useQuery', () => {
     };
 
     rerender({ query: mockQuery, variables: newVariables });
-    await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(2);
     expect(client.executeQuery).toHaveBeenNthCalledWith(
       2,
@@ -188,7 +186,6 @@ describe('useQuery', () => {
     expect(client.executeQuery).toBeCalledTimes(1);
 
     rerender({ query: mockQuery, variables: mockVariables });
-    await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(1);
   });
 
@@ -224,7 +221,6 @@ describe('useQuery', () => {
       variables: mockVariables,
       requestPolicy: 'network-only',
     });
-    await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(2);
     expect(client.executeQuery).toHaveBeenNthCalledWith(
       2,
