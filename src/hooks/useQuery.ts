@@ -35,9 +35,10 @@ export const useQuery = <T = any, V = object>(
 ): UseQueryResponse<T> => {
   const isMounted = useRef(false);
   const unsubscribe = useRef(noop);
-  const initialState = useRef({ fetching: true });
-  const updateState = useRef(update => {
-    initialState.current = update;
+  const initialState = useRef<UseQueryState<T>>({
+    data: undefined,
+    error: undefined,
+    fetching: true,
   });
 
   const client = useContext(Context);
@@ -53,7 +54,7 @@ export const useQuery = <T = any, V = object>(
         requestPolicy: args.requestPolicy,
       }),
       subscribe(({ data, error }) => {
-        updateState.current({ data, error, fetching: false });
+        initialState.current = { data, error, fetching: false };
       })
     );
     unsubscribe.current = teardown;
