@@ -63,11 +63,12 @@ export const useSubscription = <T = any, R = T, V = object>(
 
   useEffect(() => {
     executeSubscription();
+
     return () => {
       unsubscribe.current();
       isMounted.current = false;
     };
-  }, [executeSubscription, request.key]);
+  }, [executeSubscription]);
 
   return [state];
 };
