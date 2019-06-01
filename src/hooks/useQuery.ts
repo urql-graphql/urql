@@ -33,19 +33,33 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
+  const isMounted = useRef(false);
   const unsubscribe = useRef(noop);
+  const initialState = useRef({ fetching: true });
+  const updateState = useRef(update => {
+    initialState.current = update;
+  });
 
   const client = useContext(Context);
+
   const request = useMemo(
     () => createRequest(args.query, args.variables as any),
     [args.query, args.variables]
   );
 
-  const [state, setState] = useState<UseQueryState<T>>({
-    fetching: !args.pause,
-    error: undefined,
-    data: undefined,
-  });
+  if (!isMounted.current) {
+    const [teardown] = pipe(
+      client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+      }),
+      subscribe(({ data, error }) => {
+        updateState.current({ data, error, isFetching: false });
+      })
+    );
+    teardown();
+  }
+
+  const [state, setState] = useState<UseQueryState<T>>(initialState.current);
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
@@ -76,7 +90,16 @@ export const useQuery = <T = any, V = object>(
   );
 
   useEffect(() => {
-    executeQuery();
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      executeQuery();
+    }
     return unsubscribe.current;
   }, [executeQuery]);
 
