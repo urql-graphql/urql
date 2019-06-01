@@ -53,7 +53,7 @@ export const useQuery = <T = any, V = object>(
         requestPolicy: args.requestPolicy,
       }),
       subscribe(({ data, error }) => {
-        updateState.current({ data, error, isFetching: false });
+        updateState.current({ data, error, fetching: false });
       })
     );
     unsubscribe.current = teardown;
