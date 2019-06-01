@@ -83,7 +83,7 @@ export const useQuery = <T = any, V = object>(
       isMounted.current = false;
       unsubscribe.current();
     };
-  }, [executeQuery, request.key]);
+  }, [executeQuery]);
 
   return [state, executeQuery];
 };
