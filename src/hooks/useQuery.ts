@@ -56,7 +56,7 @@ export const useQuery = <T = any, V = object>(
         updateState.current({ data, error, isFetching: false });
       })
     );
-    teardown();
+    unsubscribe.current = teardown;
   }
 
   const [state, setState] = useState<UseQueryState<T>>(initialState.current);
