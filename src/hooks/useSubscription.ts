@@ -43,6 +43,14 @@ export const useSubscription = <T = any, R = T, V = object>(
     data: undefined,
   });
 
+  /** Unmount handler */
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
+
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
 
@@ -61,13 +69,11 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current = teardown;
   }, [client, handler, request]);
 
+  /** Trigger subscription on query change. */
   useEffect(() => {
     executeSubscription();
 
-    return () => {
-      unsubscribe.current();
-      isMounted.current = false;
-    };
+    return unsubscribe.current;
   }, [executeSubscription]);
 
   return [state];

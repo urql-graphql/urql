@@ -48,6 +48,14 @@ export const useQuery = <T = any, V = object>(
     data: undefined,
   });
 
+  /** Unmount handler */
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
+
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
@@ -76,13 +84,11 @@ export const useQuery = <T = any, V = object>(
     [request.key, client, args.pause, args.requestPolicy]
   );
 
+  /** Trigger query on arg change. */
   useEffect(() => {
     executeQuery();
 
-    return () => {
-      isMounted.current = false;
-      unsubscribe.current();
-    };
+    return unsubscribe.current;
   }, [executeQuery]);
 
   return [state, executeQuery];
