@@ -42,7 +42,7 @@ export const useQuery = <T = any, V = object>(
   );
 
   const [state, setState] = useState<UseQueryState<T>>({
-    fetching: true,
+    fetching: !args.pause,
     error: undefined,
     data: undefined,
   });
