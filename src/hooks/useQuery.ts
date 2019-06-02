@@ -40,6 +40,7 @@ export const useQuery = <T = any, V = object>(
     error: undefined,
     fetching: true,
   });
+  const updateRef = useRef(update => (initialState.current = update));
 
   const client = useContext(Context);
 
@@ -54,13 +55,14 @@ export const useQuery = <T = any, V = object>(
         requestPolicy: args.requestPolicy,
       }),
       subscribe(({ data, error }) => {
-        initialState.current = { data, error, fetching: false };
+        updateRef.current({ data, error, fetching: false });
       })
     );
     unsubscribe.current = teardown;
   }
 
   const [state, setState] = useState<UseQueryState<T>>(initialState.current);
+  updateRef.current = setState;
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {

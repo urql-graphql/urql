@@ -5,6 +5,6 @@ Object {
   "data": 1234,
   "error": undefined,
   "executeQuery": [Function],
-  "fetching": true,
+  "fetching": false,
 }
 `;

@@ -56,12 +56,15 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
     this.unsubscribe = teardown;
   };
 
-  state = {
-    executeQuery: this.executeQuery,
-    data: undefined,
-    error: undefined,
-    fetching: this.props.pause !== true,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      executeQuery: this.executeQuery,
+      data: undefined,
+      error: undefined,
+      fetching: props.pause !== true,
+    };
+  }
 
   componentDidMount() {
     this.executeQuery();
