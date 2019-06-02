@@ -48,7 +48,7 @@ export const useQuery = <T = any, V = object>(
     [args.query, args.variables]
   );
 
-  if (!isMounted.current) {
+  if (!isMounted.current && !args.pause) {
     const [teardown] = pipe(
       client.executeQuery(request, {
         requestPolicy: args.requestPolicy,
