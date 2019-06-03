@@ -36,13 +36,6 @@ export const useSubscription = <T = any, R = T, V = object>(
     data: undefined,
   });
 
-  useEffect(
-    () => () => {
-      isMounted.current = false;
-    },
-    []
-  );
-
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
 
@@ -63,8 +56,13 @@ export const useSubscription = <T = any, R = T, V = object>(
 
   // Trigger subscription on query change
   useEffect(() => {
+    isMounted.current = true;
     executeSubscription();
-    return () => unsubscribe.current();
+
+    return () => {
+      isMounted.current = false;
+      unsubscribe.current();
+    };
   }, [executeSubscription]);
 
   return [state];

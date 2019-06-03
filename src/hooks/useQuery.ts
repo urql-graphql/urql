@@ -73,6 +73,7 @@ export const useQuery = <T = any, V = object>(
   // Calls executeQuery on initial render immediately, then
   // treats it as a normal effect
   useImmediateEffect(() => {
+    isMounted.current = true;
     executeQuery();
 
     return () => {
