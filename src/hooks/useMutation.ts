@@ -5,7 +5,7 @@ import { Context } from '../context';
 import { OperationResult } from '../types';
 import { CombinedError, createRequest } from '../utils';
 
-interface UseMutationState<T> {
+export interface UseMutationState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
