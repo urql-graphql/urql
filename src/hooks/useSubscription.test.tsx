@@ -64,7 +64,7 @@ describe('on subscription', () => {
      * result of the state change.
      */
     wrapper.update(<SubscriptionUser q={query} />);
-    expect(state).toEqual(data);
+    expect(state).toEqual({ ...data, fetching: true });
   });
 });
 

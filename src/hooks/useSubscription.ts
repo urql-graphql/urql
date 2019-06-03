@@ -16,9 +16,10 @@ export interface UseSubscriptionArgs<V> {
   variables?: V;
 }
 
-type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
+export type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
 
-interface UseSubscriptionState<T> {
+export interface UseSubscriptionState<T> {
+  fetching: boolean;
   data?: T;
   error?: CombinedError;
 }
@@ -39,6 +40,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   );
 
   const [state, setState] = useState<UseSubscriptionState<R>>({
+    fetching: true,
     error: undefined,
     data: undefined,
   });
@@ -57,12 +59,15 @@ export const useSubscription = <T = any, R = T, V = object>(
     const [teardown] = pipe(
       client.executeSubscription(request),
       subscribe(
-        ({ data, error }) =>
-          isMounted.current &&
-          setState(s => ({
-            data: handler !== undefined ? handler(s.data, data) : data,
-            error,
-          }))
+        ({ data, error }) => {
+          if (isMounted.current) {
+            setState(s => ({
+              fetching: true,
+              data: handler !== undefined ? handler(s.data, data) : data,
+              error,
+            }));
+          }
+        }
       )
     );
 

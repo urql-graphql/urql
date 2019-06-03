@@ -73,8 +73,11 @@ export const useQuery = <T = any, V = object>(
           ...opts,
         }),
         subscribe(
-          ({ data, error }) =>
-            isMounted.current && setState({ fetching: false, data, error })
+          ({ data, error }) => {
+            if (isMounted.current) {
+              setState({ fetching: false, data, error });
+            }
+          }
         )
       );
 
