@@ -3,8 +3,8 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
   useRef,
+  useState,
   useMemo,
 } from 'react';
 import { pipe, subscribe } from 'wonka';
@@ -29,6 +29,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
+  const isMounted = useRef(true);
   const unsubscribe = useRef(noop);
 
   const client = useContext(Context);
@@ -42,25 +43,36 @@ export const useSubscription = <T = any, R = T, V = object>(
     data: undefined,
   });
 
+  /** Unmount handler */
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
+
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
 
     const [teardown] = pipe(
       client.executeSubscription(request),
-      subscribe(({ data, error }) => {
-        setState(s => ({
-          data: handler !== undefined ? handler(s.data, data) : data,
-          error,
-        }));
-      })
+      subscribe(
+        ({ data, error }) =>
+          isMounted.current &&
+          setState(s => ({
+            data: handler !== undefined ? handler(s.data, data) : data,
+            error,
+          }))
+      )
     );
 
     unsubscribe.current = teardown;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [request.key, handler, client]);
+  }, [client, handler, request]);
 
+  /** Trigger subscription on query change. */
   useEffect(() => {
     executeSubscription();
+
     return unsubscribe.current;
   }, [executeSubscription]);
 

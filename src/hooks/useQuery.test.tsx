@@ -20,6 +20,7 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import { pipe, onEnd, interval } from 'wonka';
 import { createClient } from '../client';
 import { OperationContext } from '../types';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
@@ -159,6 +160,26 @@ describe('on change', () => {
     wrapper.update(<QueryUser {...props} query={q} />);
 
     expect(client.executeQuery).toBeCalledTimes(2);
+  });
+});
+
+describe('on unmount', () => {
+  const unsubscribe = jest.fn();
+
+  beforeEach(() => {
+    client.executeQuery.mockReturnValueOnce(
+      pipe(
+        interval(400),
+        onEnd(unsubscribe)
+      )
+    );
+  });
+
+  it('unsubscribe is called', () => {
+    const wrapper = renderer.create(<QueryUser {...props} />);
+    wrapper.unmount();
+
+    expect(unsubscribe).toBeCalledTimes(1);
   });
 });
 
