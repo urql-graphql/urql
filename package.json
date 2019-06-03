@@ -112,12 +112,11 @@
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
-    "react": "^15.0.0 || ^16.0.0",
-    "react-dom": "^15.0.0 || ^16.0.0"
+    "react": ">= 16.6.1",
+    "react-dom": ">= 16.6.1"
   },
   "dependencies": {
     "@types/fast-json-stable-stringify": "^2.0.0",
-    "create-react-context": "^0.2.3",
     "fast-json-stable-stringify": "^2.0.0",
     "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
