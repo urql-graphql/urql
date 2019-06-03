@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 enum EffectState {
   BeforeMount = 0,
@@ -9,22 +9,23 @@ enum EffectState {
 type Effect = () => void | (() => void);
 
 /** This executes an effect immediately on initial render and then treats it as a normal effect */
-export const useImmediateEffect = (effect: Effect) => {
+export const useImmediateEffect = (effect: Effect, changes?: any[]) => {
   const state = useRef(EffectState.BeforeMount);
+  const execute = useCallback(effect, changes);
 
   useEffect(() => {
     // Initially we skip executing the effect since we've already done so on
     // initial render, then we execute it as usual
     if (state.current === EffectState.Render) {
-      return effect();
+      return execute();
     } else {
       state.current = EffectState.Render;
     }
-  }, [effect]);
+  }, [execute]);
 
   // On initial render we just execute the effect
   if (state.current === EffectState.BeforeMount) {
     state.current = EffectState.AfterMount;
-    effect();
+    execute();
   }
 };
