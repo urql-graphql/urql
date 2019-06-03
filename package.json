@@ -112,8 +112,8 @@
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
-    "react": ">= 16.6.1",
-    "react-dom": ">= 16.6.1"
+    "react": ">= 16.8.0",
+    "react-dom": ">= 16.8.0"
   },
   "dependencies": {
     "@types/fast-json-stable-stringify": "^2.0.0",
