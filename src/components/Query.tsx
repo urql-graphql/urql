@@ -1,28 +1,31 @@
 import { DocumentNode } from 'graphql';
-import React, { Component, FC, ReactNode } from 'react';
+import React, { Component, ReactNode } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Client } from '../client';
 import { Consumer } from '../context';
 import { Omit, OperationContext, RequestPolicy } from '../types';
 import { CombinedError, createRequest, noop } from '../utils';
 
-interface QueryHandlerProps {
+interface QueryHandlerProps<T> {
   query: string | DocumentNode;
   variables?: object;
   client: Client;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
-  children: (arg: QueryHandlerState) => ReactNode;
+  children: (arg: QueryHandlerState<T>) => ReactNode;
 }
 
-interface QueryHandlerState {
+interface QueryHandlerState<T> {
   fetching: boolean;
-  data?: any;
+  data?: T;
   error?: CombinedError;
   executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 
-class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
+class QueryHandler<T> extends Component<
+  QueryHandlerProps<T>,
+  QueryHandlerState<T>
+> {
   private unsubscribe = noop;
   private request = createRequest(this.props.query, this.props.variables);
 
@@ -84,8 +87,10 @@ class QueryHandler extends Component<QueryHandlerProps, QueryHandlerState> {
   }
 }
 
-export type QueryProps = Omit<QueryHandlerProps, 'client'>;
+export type QueryProps<T> = Omit<QueryHandlerProps<T>, 'client'>;
 
-export const Query: FC<QueryProps> = props => (
-  <Consumer>{client => <QueryHandler {...props} client={client} />}</Consumer>
-);
+export function Query<T = any>(props: QueryProps<T>) {
+  return (
+    <Consumer>{client => <QueryHandler {...props} client={client} />}</Consumer>
+  );
+}
