@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useEffect, useCallback, useContext, useRef, useState } from 'react';
+import { useCallback, useContext, useRef, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
@@ -42,12 +42,6 @@ export const useQuery = <T = any, V = object>(
     data: undefined,
   });
 
-  useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    }
-  }, []);
-
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
@@ -55,22 +49,23 @@ export const useQuery = <T = any, V = object>(
       if (args.pause) {
         setState(s => ({ ...s, fetching: false }));
         unsubscribe.current = noop;
-      } else {
-        setState(s => ({ ...s, fetching: true }));
-
-        const [teardown] = pipe(
-          client.executeQuery(request, {
-            requestPolicy: args.requestPolicy,
-            ...opts,
-          }),
-          subscribe(
-            ({ data, error }) =>
-              isMounted.current && setState({ fetching: false, data, error })
-          )
-        );
-
-        unsubscribe.current = teardown;
+        return;
       }
+
+      setState(s => ({ ...s, fetching: true }));
+
+      const [teardown] = pipe(
+        client.executeQuery(request, {
+          requestPolicy: args.requestPolicy,
+          ...opts,
+        }),
+        subscribe(
+          ({ data, error }) =>
+            isMounted.current && setState({ fetching: false, data, error })
+        )
+      );
+
+      unsubscribe.current = teardown;
     },
     [request, client, args.pause, args.requestPolicy]
   );
@@ -79,7 +74,11 @@ export const useQuery = <T = any, V = object>(
   // treats it as a normal effect
   useImmediateEffect(() => {
     executeQuery();
-    return () => unsubscribe.current();
+
+    return () => {
+      isMounted.current = false;
+      unsubscribe.current();
+    };
   }, [executeQuery]);
 
   return [state, executeQuery];
