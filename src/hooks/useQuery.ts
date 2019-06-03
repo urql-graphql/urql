@@ -1,16 +1,11 @@
 import { DocumentNode } from 'graphql';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useCallback, useContext, useRef, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
-import { CombinedError, createRequest, noop } from '../utils';
+import { CombinedError, noop } from '../utils';
+import { useRequest } from './useRequest';
+import { useImmediateEffect } from './useImmediateEffect';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -34,13 +29,12 @@ export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
   const isMounted = useRef(true);
-  const unsubscribe = useRef<() => void>(noop);
-
+  const unsubscribe = useRef(noop);
   const client = useContext(Context);
-  const request = useMemo(
-    () => createRequest(args.query, args.variables as any),
-    [args.query, args.variables]
-  );
+
+  // This creates a request which will keep a stable reference
+  // if request.key doesn't change
+  const request = useRequest(args.query, args.variables);
 
   const [state, setState] = useState<UseQueryState<T>>({
     fetching: false,
@@ -48,48 +42,42 @@ export const useQuery = <T = any, V = object>(
     data: undefined,
   });
 
-  /** Unmount handler */
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       isMounted.current = false;
-    },
-    []
-  );
+    }
+  }, []);
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
 
       if (args.pause) {
+        setState(s => ({ ...s, fetching: false }));
         unsubscribe.current = noop;
-        return;
+      } else {
+        setState(s => ({ ...s, fetching: true }));
+
+        const [teardown] = pipe(
+          client.executeQuery(request, {
+            requestPolicy: args.requestPolicy,
+            ...opts,
+          }),
+          subscribe(
+            ({ data, error }) =>
+              isMounted.current && setState({ fetching: false, data, error })
+          )
+        );
+
+        unsubscribe.current = teardown;
       }
-
-      setState(s => ({ ...s, fetching: true }));
-
-      const [teardown] = pipe(
-        client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          ...opts,
-        }),
-        subscribe(
-          ({ data, error }) =>
-            isMounted.current && setState({ fetching: false, data, error })
-        )
-      );
-
-      unsubscribe.current = teardown;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [request.key, client, args.pause, args.requestPolicy]
+    [request, client, args.pause, args.requestPolicy]
   );
 
-  /** Trigger query on arg change. */
-  useEffect(() => {
-    executeQuery();
-
-    return unsubscribe.current;
-  }, [executeQuery]);
+  // Calls executeQuery on initial render immediately, then
+  // treats it as a normal effect
+  useImmediateEffect(executeQuery);
 
   return [state, executeQuery];
 };
