@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+
+import { DocumentNode } from 'graphql';
+
 import {
   filter,
   makeSubject,
+  toPromise,
   onEnd,
   onStart,
   pipe,
@@ -25,6 +29,8 @@ import {
   OperationType,
 } from './types';
 
+import { createRequest } from './utils';
+
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
   /** Target endpoint URL such as `https://my-target:8080/graphql`. */
@@ -33,6 +39,11 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
+}
+
+export interface MakeOperation extends OperationContext {
+  query: string | DocumentNode;
+  variables?: object;
 }
 
 interface ActiveOperations {
@@ -158,6 +169,7 @@ export class Client {
     }
   };
 
+  /** Returns a stream executing a GraphQL query given a request */
   executeQuery = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
@@ -166,6 +178,7 @@ export class Client {
     return this.executeRequestOperation(operation);
   };
 
+  /** Returns a stream executing a GraphQL subscription given a request */
   executeSubscription = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
@@ -174,11 +187,40 @@ export class Client {
     return this.executeRequestOperation(operation);
   };
 
+  /** Returns a stream executing a GraphQL mutation given a request */
   executeMutation = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
+  };
+
+  /** Executes a GraphQL query and returns the result as a promise */
+  query = <T = any>({
+    query,
+    variables,
+    ...opts
+  }: MakeOperation): Promise<OperationResult<T>> => {
+    const request = createRequest(query, variables);
+    const operation = this.createRequestOperation('query', request, opts);
+    return pipe(
+      this.executeRequestOperation(operation),
+      toPromise
+    );
+  };
+
+  /** Executes a GraphQL mutation and returns the result as a promise */
+  mutation = <T = any>({
+    query,
+    variables,
+    ...opts
+  }: MakeOperation): Promise<OperationResult<T>> => {
+    const request = createRequest(query, variables);
+    const operation = this.createRequestOperation('mutation', request, opts);
+    return pipe(
+      this.executeRequestOperation(operation),
+      toPromise
+    );
   };
 }
