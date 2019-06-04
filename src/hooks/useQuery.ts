@@ -1,11 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useRef, useState } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
+import { useImmediateState } from './useImmediateState';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -28,61 +29,54 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  const isMounted = useRef(true);
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
+
+  // This is like useState but updates the state object
+  // immediately, when we're still before the initial mount
+  const [state, setState] = useImmediateState<UseQueryState<T>>({
+    fetching: false,
+    data: undefined,
+    error: undefined,
+  });
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  const [state, setState] = useState<UseQueryState<T>>({
-    fetching: false,
-    error: undefined,
-    data: undefined,
-  });
-
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
 
+      // If useQuery is currently paused, set fetching to
+      // false and abort; otherwise start the query
       if (args.pause) {
         setState(s => ({ ...s, fetching: false }));
         unsubscribe.current = noop;
         return;
+      } else {
+        setState(s => ({ ...s, fetching: true }));
       }
 
-      setState(s => ({ ...s, fetching: true }));
-
-      const [teardown] = pipe(
+      [unsubscribe.current] = pipe(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
           ...opts,
         }),
-        subscribe(
-          ({ data, error }) => {
-            if (isMounted.current) {
-              setState({ fetching: false, data, error });
-            }
-          }
-        )
+        subscribe(({ data, error }) => {
+          setState({ fetching: false, data, error });
+        })
       );
-
-      unsubscribe.current = teardown;
     },
-    [request, client, args.pause, args.requestPolicy]
+    [args.pause, args.requestPolicy, client, request, setState]
   );
 
-  // Calls executeQuery on initial render immediately, then
-  // treats it as a normal effect
+  // This calls executeQuery immediately during the initial mount and
+  // otherwise behaves like a normal useEffect; We call executeQuery
+  // everytime it, i.e. its input like request, changes
   useImmediateEffect(() => {
-    isMounted.current = true;
     executeQuery();
-
-    return () => {
-      isMounted.current = false;
-      unsubscribe.current();
-    };
+    return () => unsubscribe.current();
   }, [executeQuery]);
 
   return [state, executeQuery];
