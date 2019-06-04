@@ -1,9 +1,10 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
 import { OperationResult } from '../types';
 import { CombinedError, createRequest } from '../utils';
+import { useImmediateState } from './useImmediateState';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -19,20 +20,12 @@ export type UseMutationResponse<T, V> = [
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
-  const isMounted = useRef(true);
   const client = useContext(Context);
-  const [state, setState] = useState<UseMutationState<T>>({
+  const [state, setState] = useImmediateState<UseMutationState<T>>({
     fetching: false,
     error: undefined,
     data: undefined,
   });
-
-  useEffect(
-    () => () => {
-      isMounted.current = false;
-    },
-    []
-  );
 
   const executeMutation = (variables?: V) => {
     setState({ fetching: true, error: undefined, data: undefined });
@@ -44,11 +37,7 @@ export const useMutation = <T = any, V = object>(
       toPromise
     ).then(result => {
       const { data, error } = result;
-
-      if (isMounted.current) {
-        setState({ fetching: false, data, error });
-      }
-
+      setState({ fetching: false, data, error });
       return result;
     });
   };

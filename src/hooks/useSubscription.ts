@@ -1,9 +1,10 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
+import { useImmediateState } from './useImmediateState';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -24,50 +25,40 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const isMounted = useRef(true);
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
-  // This creates a request which will keep a stable reference
-  // if request.key doesn't change
-  const request = useRequest(args.query, args.variables);
-
-  const [state, setState] = useState<UseSubscriptionState<R>>({
+  const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
     fetching: true,
     error: undefined,
     data: undefined,
   });
 
+  // This creates a request which will keep a stable reference
+  // if request.key doesn't change
+  const request = useRequest(args.query, args.variables);
+
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
 
-    const [teardown] = pipe(
+    [unsubscribe.current] = pipe(
       client.executeSubscription(request),
-      subscribe(
-        ({ data, error }) => {
-          if (isMounted.current) {
-            setState(s => ({
-              fetching: true,
-              data: handler !== undefined ? handler(s.data, data) : data,
-              error,
-            }));
-          }
-        }
-      )
+      subscribe(({ data, error }) => {
+        setState(s => ({
+          fetching: true,
+          data: handler !== undefined ? handler(s.data, data) : data,
+          error,
+        }));
+      })
     );
-
-    unsubscribe.current = teardown;
-  }, [client, handler, request]);
+  }, [client, handler, request, setState]);
 
   // Trigger subscription on query change
+  // We don't use useImmediateEffect here as we have no way of
+  // unsubscribing from subscriptions during SSR
   useEffect(() => {
-    isMounted.current = true;
     executeSubscription();
-
-    return () => {
-      isMounted.current = false;
-      unsubscribe.current();
-    };
+    return () => unsubscribe.current();
   }, [executeSubscription]);
 
   return [state];
