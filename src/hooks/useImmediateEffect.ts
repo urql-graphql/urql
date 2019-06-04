@@ -9,7 +9,7 @@ enum LifecycleState {
 
 type Effect = () => () => void;
 
-/** This executes an effect immediately on initial render and then treats it as a normal effect */
+/** This is a drop-in replacement for useEffect that will execute the first effect that happens during initial mount synchronously */
 export const useImmediateEffect = (
   effect: Effect,
   changes: ReadonlyArray<any>
