@@ -25,7 +25,12 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/array-type": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "useImmediateEffect"
+      }
+    ],
     "react/prop-types": "off",
     "react/no-children-prop": "off",
     "sort-keys": "off",
