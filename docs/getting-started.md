@@ -50,6 +50,9 @@ const YourApp = () => (
 );
 ```
 
+> A tutorial on how to set up a `client` and `Provider`
+> is [available as screencast on egghead](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
+
 Every component and query underneath the `<Provider>` in the tree now has access
 to the client and will call the client when it needs to execute GraphQL requests.
 
@@ -156,7 +159,7 @@ Similarly to the `<Query>` component, `useQuery` will start the request
 as soon as it's mounted and will rerun it when the query or variables change.
 
 > A tutorial on the `useQuery` hook is also available as a
-> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks).
+> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
 [Read more about the result's API in the Architecture's Results section.](architecture.md#operation-results)
 
@@ -337,6 +340,9 @@ const TodoForm = () => {
 This is functionally the same as the second example, but `executeMutation`
 also returns a promise with `useMutation` as it does with `<Mutation>` so
 the first example could also be written using hooks.
+
+> A tutorial on the `useMutation` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-mutation-using-react-hooks-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
 ## Refetching data
 
