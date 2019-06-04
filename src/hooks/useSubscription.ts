@@ -1,15 +1,9 @@
 import { DocumentNode } from 'graphql';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, createRequest, noop } from '../utils';
+import { CombinedError, noop } from '../utils';
+import { useRequest } from './useRequest';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -32,26 +26,17 @@ export const useSubscription = <T = any, R = T, V = object>(
 ): UseSubscriptionResponse<R> => {
   const isMounted = useRef(true);
   const unsubscribe = useRef(noop);
-
   const client = useContext(Context);
-  const request = useMemo(
-    () => createRequest(args.query, args.variables as any),
-    [args.query, args.variables]
-  );
+
+  // This creates a request which will keep a stable reference
+  // if request.key doesn't change
+  const request = useRequest(args.query, args.variables);
 
   const [state, setState] = useState<UseSubscriptionState<R>>({
     fetching: true,
     error: undefined,
     data: undefined,
   });
-
-  /** Unmount handler */
-  useEffect(
-    () => () => {
-      isMounted.current = false;
-    },
-    []
-  );
 
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
@@ -74,11 +59,15 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current = teardown;
   }, [client, handler, request]);
 
-  /** Trigger subscription on query change. */
+  // Trigger subscription on query change
   useEffect(() => {
+    isMounted.current = true;
     executeSubscription();
 
-    return unsubscribe.current;
+    return () => {
+      isMounted.current = false;
+      unsubscribe.current();
+    };
   }, [executeSubscription]);
 
   return [state];
