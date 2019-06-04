@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useContext } from 'react';
+import { useContext, useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
 import { OperationResult } from '../types';
@@ -27,20 +27,23 @@ export const useMutation = <T = any, V = object>(
     data: undefined,
   });
 
-  const executeMutation = (variables?: V) => {
-    setState({ fetching: true, error: undefined, data: undefined });
+  const executeMutation = useCallback(
+    (variables?: V) => {
+      setState({ fetching: true, error: undefined, data: undefined });
 
-    const request = createRequest(query, variables as any);
+      const request = createRequest(query, variables as any);
 
-    return pipe(
-      client.executeMutation(request),
-      toPromise
-    ).then(result => {
-      const { data, error } = result;
-      setState({ fetching: false, data, error });
-      return result;
-    });
-  };
+      return pipe(
+        client.executeMutation(request),
+        toPromise
+      ).then(result => {
+        const { data, error } = result;
+        setState({ fetching: false, data, error });
+        return result;
+      });
+    },
+    [client, query, setState]
+  );
 
   return [state, executeMutation];
 };
