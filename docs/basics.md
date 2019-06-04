@@ -198,6 +198,9 @@ Once you've set up the `subscriptionExchange` and your
 `forwardSubscription` function, you can start using
 the `<Subscription>` component and/or the `useSubscription()` hook.
 
+> A tutorial on setting up the `subscriptionExchange` is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-set-up-graphql-subscriptions-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
+
 ### Usage with components
 
 The `<Subscription>` component is extremely similar to the `<Query>`
@@ -286,3 +289,6 @@ As we can see, the `result.data` is being updated and transformed by
 the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
+
+> A tutorial on the `useSubscription` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-subscription-with-react-hooks-using-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
