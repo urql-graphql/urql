@@ -20,7 +20,7 @@ const shouldSkip = ({ operationName }: Operation) =>
   operationName !== 'subscription' && operationName !== 'query';
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
-export const ssrExchange = (params: SSRExchangeParams): SSRExchange => {
+export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   const data: SSRData = {};
 
   const isCached = (operation: Operation) => {
@@ -71,7 +71,7 @@ export const ssrExchange = (params: SSRExchangeParams): SSRExchange => {
   ssr.restoreData = (restore: SSRData) => Object.assign(data, restore);
   ssr.extractData = () => Object.assign({}, data);
 
-  if (params.initialState !== undefined) {
+  if (params && params.initialState) {
     ssr.restoreData(params.initialState);
   }
 
