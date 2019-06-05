@@ -11,6 +11,9 @@ interface OperationCache {
   [key: string]: Set<number>;
 }
 
+const shouldSkip = ({ operationName }: Operation) =>
+  operationName !== 'mutation' && operationName !== 'query';
+
 export const cacheExchange: Exchange = ({ forward, client }) => {
   const resultCache = new Map() as ResultCache;
   const operationCache = Object.create(null) as OperationCache;
@@ -41,10 +44,6 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       (requestPolicy === 'cache-only' || resultCache.has(key))
     );
   };
-
-  const shouldSkip = (operation: Operation) =>
-    operation.operationName !== 'mutation' &&
-    operation.operationName !== 'query';
 
   return ops$ => {
     const sharedOps$ = share(ops$);
