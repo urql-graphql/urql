@@ -94,18 +94,6 @@ export class Client {
     };
   };
 
-  createRequestOperation = (
-    type: OperationType,
-    { key, query, variables }: GraphQLRequest,
-    opts?: Partial<OperationContext>
-  ): Operation => ({
-    key,
-    query,
-    variables,
-    operationName: type,
-    context: this.createOperationContext(opts),
-  });
-
   /** Counts up the active operation key and dispatches the operation */
   private onOperationStart(operation: Operation) {
     const { key } = operation;
@@ -124,6 +112,18 @@ export class Client {
       this.dispatchOperation({ ...operation, operationName: 'teardown' });
     }
   }
+
+  createRequestOperation = (
+    type: OperationType,
+    { key, query, variables }: GraphQLRequest,
+    opts?: Partial<OperationContext>
+  ): Operation => ({
+    key,
+    query,
+    variables,
+    operationName: type,
+    context: this.createOperationContext(opts),
+  });
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {
@@ -180,5 +180,9 @@ export class Client {
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
+  };
+
+  setFetchOptions = (fetchOpts: Exclude<Client['fetchOptions'], undefined>) => {
+    this.fetchOptions = fetchOpts;
   };
 }
