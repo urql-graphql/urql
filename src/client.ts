@@ -25,6 +25,8 @@ import {
   OperationType,
 } from './types';
 
+import { toSuspenseSource } from './utils';
+
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
   /** Target endpoint URL such as `https://my-target:8080/graphql`. */
@@ -33,6 +35,8 @@ export interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
+  /** Activates support for Suspense. */
+  suspense?: boolean;
 }
 
 interface ActiveOperations {
@@ -47,6 +51,7 @@ export class Client {
   url: string;
   fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
+  suspense: boolean;
 
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
@@ -57,6 +62,7 @@ export class Client {
   constructor(opts: ClientOptions) {
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions;
+    this.suspense = !!opts.suspense;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -129,7 +135,7 @@ export class Client {
   executeRequestOperation(operation: Operation): Source<OperationResult> {
     const { key, operationName } = operation;
 
-    const operationResults$ = pipe(
+    let operationResults$ = pipe(
       this.results$,
       filter(res => res.operation.key === key)
     );
@@ -141,6 +147,8 @@ export class Client {
         onStart<OperationResult>(() => this.dispatchOperation(operation)),
         take(1)
       );
+    } else if (this.suspense) {
+      operationResults$ = toSuspenseSource(operationResults$);
     }
 
     return pipe(
