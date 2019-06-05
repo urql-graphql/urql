@@ -1,4 +1,6 @@
-import { useRef, useEffect, useCallback } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import { useRef, useEffect } from 'react';
 import { noop } from '../utils';
 
 enum LifecycleState {
@@ -9,29 +11,28 @@ enum LifecycleState {
 
 type Effect = () => () => void;
 
-/** This executes an effect immediately on initial render and then treats it as a normal effect */
+/** This is a drop-in replacement for useEffect that will execute the first effect that happens during initial mount synchronously */
 export const useImmediateEffect = (
   effect: Effect,
   changes: ReadonlyArray<any>
 ) => {
   const teardown = useRef(noop);
   const state = useRef(LifecycleState.WillMount);
-  const execute = useCallback(effect, changes);
 
   // On initial render we just execute the effect
   if (state.current === LifecycleState.WillMount) {
     state.current = LifecycleState.DidMount;
-    teardown.current = execute();
+    teardown.current = effect();
   }
 
   useEffect(() => {
     // Initially we skip executing the effect since we've already done so on
     // initial render, then we execute it as usual
     if (state.current === LifecycleState.Update) {
-      return (teardown.current = execute());
+      return (teardown.current = effect());
     } else {
       state.current = LifecycleState.Update;
       return teardown.current;
     }
-  }, [execute]);
+  }, changes);
 };
