@@ -147,15 +147,15 @@ export class Client {
         onStart<OperationResult>(() => this.dispatchOperation(operation)),
         take(1)
       );
-    } else if (this.suspense) {
-      operationResults$ = toSuspenseSource(operationResults$);
     }
 
-    return pipe(
+    const result$ = pipe(
       operationResults$,
       onStart<OperationResult>(() => this.onOperationStart(operation)),
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
+
+    return this.suspense ? toSuspenseSource(result$) : result$;
   }
 
   reexecuteOperation = (operation: Operation) => {
