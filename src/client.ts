@@ -134,8 +134,7 @@ export class Client {
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {
     const { key, operationName } = operation;
-
-    let operationResults$ = pipe(
+    const operationResults$ = pipe(
       this.results$,
       filter(res => res.operation.key === key)
     );
