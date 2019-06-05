@@ -35,14 +35,20 @@ it('caches query results correctly', () => {
 
   const data = ssr.extractData();
   expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
-  expect(data).toEqual({ [queryOperation.key]: queryResponse });
+
+  expect(data).toEqual({
+    [queryOperation.key]: {
+      data: queryResponse.data,
+      error: undefined,
+    },
+  });
 });
 
 it('resolves cached query results correctly', () => {
   const onPush = jest.fn();
 
   const ssr = ssrExchange({
-    initialState: { [queryOperation.key]: queryResponse },
+    initialState: { [queryOperation.key]: queryResponse as any },
   });
 
   const [ops$, next] = input;
@@ -65,7 +71,7 @@ it('deletes cached results in non-suspense environments', () => {
   const onPush = jest.fn();
   const ssr = ssrExchange();
 
-  ssr.restoreData({ [queryOperation.key]: queryResponse });
+  ssr.restoreData({ [queryOperation.key]: queryResponse as any });
   expect(Object.keys(ssr.extractData()).length).toBe(1);
 
   const [ops$, next] = input;

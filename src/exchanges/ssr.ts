@@ -1,8 +1,17 @@
 import { pipe, share, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
+import { CombinedError } from '../utils';
+
+export interface SerializedResult {
+  data?: any;
+  error?: {
+    networkError?: string;
+    graphQLErrors: string[];
+  };
+}
 
 export interface SSRData {
-  [key: string]: OperationResult;
+  [key: string]: SerializedResult;
 }
 
 export interface SSRExchangeParams {
@@ -18,6 +27,39 @@ export interface SSRExchange extends Exchange {
 
 const shouldSkip = ({ operationName }: Operation) =>
   operationName !== 'subscription' && operationName !== 'query';
+
+/** Serialize an OperationResult to plain JSON */
+const serializeResult = ({
+  data,
+  error,
+}: OperationResult): SerializedResult => {
+  const result: SerializedResult = { data, error: undefined };
+  if (error !== undefined) {
+    result.error = {
+      networkError: '' + error.networkError,
+      graphQLErrors: error.graphQLErrors.map(x => '' + x),
+    };
+  }
+
+  return result;
+};
+
+/** Deserialize plain JSON to an OperationResult */
+const deserializeResult = (
+  operation: Operation,
+  result: SerializedResult
+): OperationResult => {
+  const { error, data } = result;
+  const deserialized: OperationResult = { operation, data, error: undefined };
+  if (error !== undefined) {
+    deserialized.error = new CombinedError({
+      networkError: new Error(error.networkError),
+      graphQLErrors: error.graphQLErrors,
+    });
+  }
+
+  return deserialized;
+};
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
@@ -35,7 +77,10 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     let cachedOps$ = pipe(
       sharedOps$,
       filter(op => isCached(op)),
-      map(op => data[op.key])
+      map(op => {
+        const serialized = data[op.key];
+        return deserializeResult(op, serialized);
+      })
     );
 
     let forwardedOps$ = pipe(
@@ -59,7 +104,8 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
         tap((result: OperationResult) => {
           const { operation } = result;
           if (!shouldSkip(operation)) {
-            data[operation.key] = result;
+            const serialized = serializeResult(result);
+            data[operation.key] = serialized;
           }
         })
       );
