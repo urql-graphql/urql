@@ -415,7 +415,7 @@ The `ssrExchange` as [described in the Basics section](basics.md#server-side-ren
 It's of type `Options => Exchange`.
 
 It accepts a single input, `{ initialState }`, which is completely
-optional, which populates the server-side rendered data with
+optional and populates the server-side rendered data with
 a rehydrated cache.
 
 This can be used to extract data that has been queried on
@@ -423,7 +423,7 @@ the server-side, which is also described in the Basics section,
 and is also used on the client-side to restore server-side
 rendered data.
 
-When called this function creates an `Exchange`, which also has
+When called, this function creates an `Exchange`, which also has
 two methods on it:
 
 - `.restoreData(data)` which can be used to inject data, typically

@@ -165,19 +165,19 @@ the [`react-dom/server` package](https://reactjs.org/docs/react-dom-server.html)
 
 `urql` can be set up to fetch data on the server and rehydrate this data
 on the client, so that the user's browser does not need to refetch it and
-can seemlessly rehydrate your React page.
+can seamlessly rehydrate your React page.
 
-There's two parts in `urql` that enable server-side rendering to work:
+There are two parts in `urql` that enable server-side rendering:
 
 - The `Client` has a `suspense` option, which enables support for React's
   experimental Suspense API for data fetching, which allows us to prefetch
   data before calling `renderToString` or `renderToNodeStream`.
-- The `ssrExchange` which is a small operation cache that works together
+- The `ssrExchange`, which is a small operation cache that works together
   with Suspense to save data on the server and rehydrate it on the client.
 
 Since Suspense is still an experimental API there's no official way to use
 it to prefetch data on the server-side. For this reason we have a companion
-library, [`react-ssr-prepass`](it currently doesn't hav), which can be used to run a "prepass"
+library, [`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which can be used to run a "prepass"
 that fetches all suspended data it finds in a React element tree.
 
 ### Setting up the `Client`
@@ -194,7 +194,7 @@ const client = new Client({
 });
 ```
 
-You can often achieve this with `process.browser` in most settings if
+You can often achieve this with `process.browser` in most environments if
 you're using a single universal file to create a client on the server
 and on the client.
 
@@ -231,10 +231,10 @@ like the `fetchExchange`.
 ### Prefetching on the server
 
 In your request handler on the server-side, you'll have to add some
-code handling suspense. Typically this is done using a "prepass" that
+code for handling suspense. Typically this is done using a "prepass" that
 walks your element tree and awaits suspended promises.
 
-So for suspense to now be executed on the server you may install
+In order to execute suspense on the server, you may install
 `react-ssr-prepass` (which has a peer dependency on `react-is`)
 
 ```sh
