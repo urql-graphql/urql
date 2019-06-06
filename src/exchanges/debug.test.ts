@@ -27,7 +27,7 @@ beforeEach(() => {
 });
 
 it('forwards query operations correctly', async () => {
-  jest.spyOn(global.console, 'log');
+  jest.spyOn(global.console, 'log').mockImplementation();
   const [ops$, next, complete] = input;
   const exchange = debugExchange(exchangeArgs)(ops$);
 
