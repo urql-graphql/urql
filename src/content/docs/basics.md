@@ -168,12 +168,171 @@ from the API.
 The idea of `urql` is that you can customize the caching behavior amongst
 other things yourself, if needed.
 
-[Read more about customizing `urql` in the "Extending & Experimenting" section.](/docs/extending-and-experimenting)
+[Read more about customizing `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
+
+## Server-side rendering
+
+Server-side rendering is a common method to reduce the time it takes for
+a user to see a React page's content. Typically this is implemented using
+the [`react-dom/server` package](https://reactjs.org/docs/react-dom-server.html).
+
+`urql` can be set up to fetch data on the server and rehydrate this data
+on the client, so that the user's browser does not need to refetch it and
+can seamlessly rehydrate your React page.
+
+There are two parts in `urql` that enable server-side rendering:
+
+- The `Client` has a `suspense` option, which enables support for React's
+  experimental Suspense API for data fetching, which allows us to prefetch
+  data before calling `renderToString` or `renderToNodeStream`.
+- The `ssrExchange`, which is a small operation cache that works together
+  with Suspense to save data on the server and rehydrate it on the client.
+
+Since Suspense is still an experimental API there's no official way to use
+it to prefetch data on the server-side. For this reason we have a companion
+library, [`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which can be used to run a "prepass"
+that fetches all suspended data it finds in a React element tree.
+
+### Setting up the `Client`
+
+When you set up the `Client` for server-side rendering, on the server
+you will need to set `suspense` to `true` and on the client to `false`,
+
+```js
+import { Client } from 'urql';
+
+const client = new Client({
+  suspense: !process.browser,
+  // ...
+});
+```
+
+You can often achieve this with `process.browser` in most environments if
+you're using a single universal file to create a client on the server
+and on the client.
+
+Next up, the `ssrExchange` needs to be set up. It's a factory, since
+it has some methods for extracting and rehydrating data.
+
+```js
+import {
+  Client,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  ssrExchange,
+} from 'urql';
+
+const ssrCache = ssrExchange();
+
+const client = new Client({
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    // Put the exchange returned by calling ssrExchange after your cacheExchange,
+    // but before any asynchronous exchanges like the fetchExchange:
+    ssrCache,
+    fetchExchange,
+  ],
+  // ...
+  suspense: !process.browser,
+});
+```
+
+The exchange returned by `ssrExchange()` should be added after the `cacheExchange`
+(or any other custom cache exchange you've defined), and before any
+asynchronous exchanges like the `fetchExchange`.
+
+### Prefetching on the server
+
+In your request handler on the server-side, you'll have to add some
+code for handling suspense. Typically this is done using a "prepass" that
+walks your element tree and awaits suspended promises.
+
+In order to execute suspense on the server, you may install
+[`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which is a partial server-side rendering library,
+that can be used to execute a prepass on a React element tree.
+It supports React's experimental Suspense API and awaits thrown
+promises during the server-side prepass, which we'll use to prefetch
+all queries in your React app.
+
+```sh
+# react-is is a peer dependency of react-ssr-prepass
+yarn add react-ssr-prepass react-is
+# or
+npm install --save react-ssr-prepass react-is
+```
+
+Add `react-ssr-prepass` to your server-side rendering code _before_
+calling `renderToString` or `renderToNodeStream`. This will fetch
+all suspended promises, including `urql`'s queries. And after
+you can use the `ssrExchange()`'s `extractData` method to
+get `urql`'s data:
+
+```js
+import ssrPrepass from 'react-ssr-prepass';
+
+const handler = (req, res) => {
+  // ...
+  // We assume you've already set up the urql Client and have
+  // the `ssrCache = ssrExchange()` variable from somewhere
+
+  await ssrPrepass(<App />);
+
+  // Extract the data from urql's SSR cache
+  const urqlData = ssrCache.extractData();
+
+  // Then you can run your rendering code for which the ssrCache
+  // should remain unchanged
+  const reactHtml = renderToString(<App />);
+
+  // Make sure to send urql's data down to the client somehow
+  const urqlHtml = `<script>window.URQL_DATA = ${JSON.stringify(urqlData)};</script>`;
+
+  // And send everything down to the client
+  // ...
+};
+```
+
+### Rehydrating on the client
+
+Now you have server-side rendered the page and sent down data
+collected during the render pass. As a next step, you should
+rehydrate the data on the client-side.
+
+This is necessary since the same data needs to be available
+during React's rehydration so that the client-side renders the
+exact same data and UI state.
+
+You can either do so when creating `ssrExchange`, by passing it `initialState`
+as a parameter or calling `restoreData` on it:
+
+```js
+import { ssrExchange } from 'urql';
+
+const ssrCache = ssrExchange({
+  initialState: window.URQL_DATA,
+});
+
+// or:
+
+ssrCache.restoreData(window.URQL_DATA);
+
+// Assuming this follows the client setup and is added to the `exchanges` list
+// ...
+```
+
+Your setup may vary depending on whether your client initialization code
+is universal (single file that executes on client and server-side, such as Next.js'
+`async getInitialProps`), or two separate files for client and server.
+
+If you're using [next.js](https://nextjs.org/) or need some more details on how to set this
+up [have a look at our SSR + next.js example project](https://github.com/FormidableLabs/urql/tree/master/examples/3-ssr-with-nextjs).
 
 ## Subscriptions
 
 One feature of `urql` that was not mentioned in the
-["Getting Started" section](/docs/getting-started) is `urql`'s
+["Getting Started" section](getting-started.md) is `urql`'s
 APIs and ability to handle subscriptions.
 
 To add support for subscriptions there's the `subscriptionExchange`.
@@ -210,6 +369,9 @@ the `subscriptions-transport-ws` package,
 Once you've set up the `subscriptionExchange` and your
 `forwardSubscription` function, you can start using
 the `<Subscription>` component and/or the `useSubscription()` hook.
+
+> A tutorial on setting up the `subscriptionExchange` is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-set-up-graphql-subscriptions-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
 ### Usage with components
 
@@ -299,3 +461,6 @@ As we can see, the `result.data` is being updated and transformed by
 the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
+
+> A tutorial on the `useSubscription` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-subscription-with-react-hooks-using-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
