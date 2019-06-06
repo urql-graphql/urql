@@ -8,9 +8,10 @@ export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
     let resolveSuspense;
     let synchronousResult;
 
-    // Subscribe to the source and wait for the first result only
     const [teardown] = pipe(
       source,
+      // The onPush and onEnd forward the underlying results as usual, so that when no
+      // suspense promise is thrown, the source behaves as it normally would
       onPush(push),
       onEnd(end),
       subscribe(value => {
@@ -19,8 +20,10 @@ export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
         if (resolveSuspense === undefined) {
           synchronousResult = value;
         } else if (!isCancelled) {
-          // Otherwise we resolve this source and the thrown promise
+          // Otherwise resolve the thrown promise,
           resolveSuspense(value);
+          // And end and teardown both sources, since suspense will abort the
+          // underlying rendering component anyway
           end();
           teardown();
         }
