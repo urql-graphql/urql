@@ -431,9 +431,9 @@ two methods on it:
 - `.extractData()` which is typically used on the server-side to
   extract the server-side rendered data.
 
-This is basically a small cache that collects data on the server
-and is used on the client to "repeat" the results of queries on
-the client that have been generated on the server.
+Basically, the `ssrExchange` is a small cache that collects data
+during the server-side rendering pass, and allows you to populate
+the cache on the client-side with the same data.
 
 During React rehydration this cache will be emptied and it will
 become inactive and won't change the results of queries after

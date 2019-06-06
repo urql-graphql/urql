@@ -216,7 +216,9 @@ const client = new Client({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    ssrCache, // Added here after calling ssrExchange
+    // Put the exchange returned by calling ssrExchange after your cacheExchange,
+    // but before any asynchronous exchanges like the fetchExchange:
+    ssrCache,
     fetchExchange,
   ],
   // ...
@@ -224,9 +226,9 @@ const client = new Client({
 });
 ```
 
-The exchange from `ssrExchange()` should be added after the default
-or your custom `cacheExchange` and before any asynchronous exchanges
-like the `fetchExchange`.
+The exchange returned by `ssrExchange()` should be added after the `cacheExchange`
+(or any other custom cache exchange you've defined), and before any
+asynchronous exchanges like the `fetchExchange`.
 
 ### Prefetching on the server
 
@@ -235,15 +237,20 @@ code for handling suspense. Typically this is done using a "prepass" that
 walks your element tree and awaits suspended promises.
 
 In order to execute suspense on the server, you may install
-`react-ssr-prepass` (which has a peer dependency on `react-is`)
+[`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which is a partial server-side rendering library,
+that can be used to execute a prepass on a React element tree.
+It supports React's experimental Suspense API and awaits thrown
+promises during the server-side prepass, which we'll use to prefetch
+all queries in your React app.
 
 ```sh
+# react-is is a peer dependency of react-ssr-prepass
 yarn add react-ssr-prepass react-is
 # or
 npm install --save react-ssr-prepass react-is
 ```
 
-Then you can add it to your server-side rendering code _before_
+Add `react-ssr-prepass` to your server-side rendering code _before_
 calling `renderToString` or `renderToNodeStream`. This will fetch
 all suspended promises, including `urql`'s queries. And after
 you can use the `ssrExchange()`'s `extractData` method to
@@ -276,9 +283,13 @@ const handler = (req, res) => {
 
 ### Rehydrating on the client
 
-Assuming you now have server-side rendered and have sent down `urql`'s
-data from that render pass to the client, you should make sure that you
-rehydrate that data.
+Now you have server-side rendered the page and sent down data
+collected during the render pass. As a next step, you should
+rehydrate the data on the client-side.
+
+This is necessary since the same data needs to be available
+during React's rehydration so that the client-side renders the
+exact same data and UI state.
 
 You can either do so when creating `ssrExchange`, by passing it `initialState`
 as a parameter or calling `restoreData` on it:
@@ -298,8 +309,9 @@ ssrCache.restoreData(window.URQL_DATA);
 // ...
 ```
 
-Your setup may vary depending on whether you set up the same file to be
-used to create an `urql` client for the server and the client-side or not.
+Your setup may vary depending on whether your client initialization code
+is universal (single file that executes on client and server-side, such as Next.js'
+`async getInitialProps`), or two separate files for client and server.
 
 If you're using [next.js](https://nextjs.org/) or need some more details on how to set this
 up [have a look at our SSR + next.js example project](https://github.com/FormidableLabs/urql/tree/master/examples/3-ssr-with-nextjs).
