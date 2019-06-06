@@ -1,7 +1,7 @@
-import { useQuery } from 'urql'
-import gql from 'graphql-tag'
-import ErrorMessage from './ErrorMessage'
-import PostUpvoter from './PostUpvoter'
+import { useQuery } from 'urql';
+import gql from 'graphql-tag';
+import ErrorMessage from './ErrorMessage';
+import PostUpvoter from './PostUpvoter';
 
 const allPostsQuery = gql`
   query allPosts($first: Int!, $skip: Int!) {
@@ -16,21 +16,21 @@ const allPostsQuery = gql`
       count
     }
   }
-`
+`;
 
 const allPostsQueryVars = {
   skip: 0,
-  first: 10
-}
+  first: 10,
+};
 
-export default function PostList () {
+export default function PostList() {
   const [{ loading, error, data }] = useQuery({
     query: allPostsQuery,
-    variables: allPostsQueryVars
+    variables: allPostsQueryVars,
   });
 
-  if (error) return <ErrorMessage message='Error loading posts.' />
-  if (loading || !data) return <div>Loading</div>
+  if (error) return <ErrorMessage message="Error loading posts." />;
+  if (loading || !data) return <div>Loading</div>;
 
   const { allPosts, _allPostsMeta } = data;
 
@@ -87,5 +87,5 @@ export default function PostList () {
         }
       `}</style>
     </section>
-  )
+  );
 }

@@ -9,6 +9,10 @@
     "build": "next build",
     "start": "next start"
   },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "dependencies": {
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",

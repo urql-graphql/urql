@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react'
-import { useMutation } from 'urql'
-import gql from 'graphql-tag'
+import React, { useCallback } from 'react';
+import { useMutation } from 'urql';
+import gql from 'graphql-tag';
 
 const createPostMutation = gql`
   mutation createPost($title: String!, $url: String!) {
@@ -14,28 +14,31 @@ const createPostMutation = gql`
   }
 `;
 
-export default function Submit () {
-  const [_, executeMutation] = useMutation(createPostMutation)
+export default function Submit() {
+  const [_, executeMutation] = useMutation(createPostMutation);
 
-  const handleSubmit = useCallback(event => {
-    event.preventDefault()
-    const form = event.target
-    const formData = new window.FormData(form)
-    const title = formData.get('title')
-    const url = formData.get('url')
-    form.reset()
+  const handleSubmit = useCallback(
+    event => {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new window.FormData(form);
+      const title = formData.get('title');
+      const url = formData.get('url');
+      form.reset();
 
-    executeMutation({
-      variables: { title, url }
-    });
-  }, [executeMutation]);
+      executeMutation({
+        variables: { title, url },
+      });
+    },
+    [executeMutation]
+  );
 
   return (
     <form onSubmit={handleSubmit}>
       <h1>Submit</h1>
-      <input placeholder='title' name='title' type='text' required />
-      <input placeholder='url' name='url' type='url' required />
-      <button type='submit'>Submit</button>
+      <input placeholder="title" name="title" type="text" required />
+      <input placeholder="url" name="url" type="url" required />
+      <button type="submit">Submit</button>
 
       <style jsx>{`
         form {
@@ -52,5 +55,5 @@ export default function Submit () {
         }
       `}</style>
     </form>
-  )
+  );
 }

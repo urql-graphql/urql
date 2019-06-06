@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react'
-import { useMutation } from 'urql'
-import gql from 'graphql-tag'
+import React, { useCallback } from 'react';
+import { useMutation } from 'urql';
+import gql from 'graphql-tag';
 
 const updatePostMutation = gql`
   mutation updatePost($id: ID!, $votes: Int) {
@@ -10,18 +10,18 @@ const updatePostMutation = gql`
       votes
     }
   }
-`
+`;
 
-export default function PostUpvoter ({ votes, id }) {
+export default function PostUpvoter({ votes, id }) {
   const [_, executeMutation] = useMutation(updatePostMutation);
 
   const upvotePost = useCallback(() => {
     executeMutation({
       variables: {
         id,
-        votes: votes + 1
-      }
-    })
+        votes: votes + 1,
+      },
+    });
   }, [votes, id, executeMutation]);
 
   return (
@@ -49,5 +49,5 @@ export default function PostUpvoter ({ votes, id }) {
         }
       `}</style>
     </button>
-  )
+  );
 }
