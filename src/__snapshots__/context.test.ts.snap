@@ -27,6 +27,7 @@ Object {
       "operations$": [Function],
       "reexecuteOperation": [Function],
       "results$": [Function],
+      "suspense": false,
       "url": "/graphql",
     },
     "_currentValue2": Client {
@@ -42,6 +43,7 @@ Object {
       "operations$": [Function],
       "reexecuteOperation": [Function],
       "results$": [Function],
+      "suspense": false,
       "url": "/graphql",
     },
     "_threadCount": 0,
@@ -76,6 +78,7 @@ Object {
       "operations$": [Function],
       "reexecuteOperation": [Function],
       "results$": [Function],
+      "suspense": false,
       "url": "/graphql",
     },
     "_currentValue2": Client {
@@ -91,6 +94,7 @@ Object {
       "operations$": [Function],
       "reexecuteOperation": [Function],
       "results$": [Function],
+      "suspense": false,
       "url": "/graphql",
     },
     "_threadCount": 0,
