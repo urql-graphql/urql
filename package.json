@@ -4,6 +4,7 @@
   "description": "A highly customizable and versatile GraphQL client for React",
   "private": false,
   "repository": "https://www.github.com/FormidableLabs/urql",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
   "main": "dist/urql.js",
   "module": "dist/urql.es.js",
   "types": "dist/types/index.d.ts",
@@ -13,7 +14,8 @@
     "react",
     "graphql",
     "state-management",
-    "cache"
+    "cache",
+    "formidablelabs"
   ],
   "scripts": {
     "prebuild": "rimraf dist",
