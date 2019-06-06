@@ -167,11 +167,12 @@ be used in combination with the `useContext` hook.
 The client manages all operations and ongoing requests to the exchange pipeline.
 It accepts a bunch of inputs when it's created
 
-| Input        | Type                               | Description                                                                                  |
-| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                               |
-| fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request       |
-| exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges` |
+| Input        | Type                               | Description                                                                                                     |
+| ------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                  |
+| fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                          |
+| suspense     | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data |
+| exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                    |
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
