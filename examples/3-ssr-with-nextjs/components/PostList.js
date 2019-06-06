@@ -24,15 +24,18 @@ const allPostsQueryVars = {
 };
 
 export default function PostList() {
-  const [{ loading, error, data }] = useQuery({
+  const [allPostsResult] = useQuery({
     query: allPostsQuery,
     variables: allPostsQueryVars,
   });
 
-  if (error) return <ErrorMessage message="Error loading posts." />;
-  if (loading || !data) return <div>Loading</div>;
+  if (allPostsResult.error) {
+    return <ErrorMessage message="Error loading posts." />;
+  } else if (allPostsResult.loading || !allPostsResult.data) {
+    return <div>Loading</div>;
+  }
 
-  const { allPosts, _allPostsMeta } = data;
+  const { allPosts, _allPostsMeta } = allPostsResult.data;
 
   return (
     <section>
