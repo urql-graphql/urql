@@ -435,8 +435,8 @@ Basically, the `ssrExchange` is a small cache that collects data
 during the server-side rendering pass, and allows you to populate
 the cache on the client-side with the same data.
 
-During React rehydration this cache will be emptied and it will
-become inactive and won't change the results of queries after
+During React rehydration this cache will be emptied,
+becomes inactive, and won't change the results of queries after
 rehydration.
 
 It needs to be used _after_ other caching Exchanges like the
