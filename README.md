@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="540" alt="urql" src="https://raw.githubusercontent.com/FormidableLabs/urql/docs/ssr/docs/urql-banner.gif" />
+  <img width="540" alt="urql" src="https://raw.githubusercontent.com/FormidableLabs/urql/master/docs/urql-banner.gif" />
 
   <br />
   <br />
