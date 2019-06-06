@@ -150,7 +150,7 @@ interface UseSubscriptionState<T> {
 
 | Prop     | Type             | Description                                                     |
 | -------- | ---------------- | --------------------------------------------------------------- |
-| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                  |
+| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                 |
 | data     | `?any`           | The GraphQL subscription's data                                 |
 | error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
 
@@ -407,6 +407,40 @@ It's of type `Options => Exchange`.
 It accepts a single input: `{ forwardSubscription }`. This is a function that
 receives an enriched operation and must return an Observable-like object that
 streams `GraphQLResult`s with `data` and `errors`.
+
+### `ssrExchange` (Exchange factory)
+
+The `ssrExchange` as [described in the Basics section](basics.md#server-side-rendering).
+It's of type `Options => Exchange`.
+
+It accepts a single input, `{ initialState }`, which is completely
+optional, which populates the server-side rendered data with
+a rehydrated cache.
+
+This can be used to extract data that has been queried on
+the server-side, which is also described in the Basics section,
+and is also used on the client-side to restore server-side
+rendered data.
+
+When called this function creates an `Exchange`, which also has
+two methods on it:
+
+- `.restoreData(data)` which can be used to inject data, typically
+  on the client-side.
+- `.extractData()` which is typically used on the server-side to
+  extract the server-side rendered data.
+
+This is basically a small cache that collects data on the server
+and is used on the client to "repeat" the results of queries on
+the client that have been generated on the server.
+
+During React rehydration this cache will be emptied and it will
+become inactive and won't change the results of queries after
+rehydration.
+
+It needs to be used _after_ other caching Exchanges like the
+`cacheExchange`, but before any _asynchronous_ Exchange like
+the `fetchExchange`.
 
 ### `debugExchange` (Exchange)
 
