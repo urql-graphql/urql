@@ -11,7 +11,7 @@ how `urql` works and how to adapt it to different use cases.
 
 If you wish to use `urql` without any customizations, this
 document is entirely optional for you. But it's still worth
-the read. Promise.
+the read. Promised.
 
 `urql`'s core parts are separated into three concepts:
 **operations & results**, **the client**, and **exchanges**.
@@ -106,7 +106,7 @@ the second argument to `executeQuery`. By default it contains:
 
 - `fetchOptions` for the `fetch` call's options
 - `url` for the `fetch` call's API endpoint
-- `requestPolicy` to determine the cache's behaviour
+- `requestPolicy` to determine the cache's behavior
 
 The `executeQuery` call will return a [Wonka](https://github.com/kitten/wonka)
 stream. This is just an observable (not following the Observable spec)
@@ -186,7 +186,7 @@ The [`CombinedError` is a very simple wrapper](https://github.com/FormidableLabs
 that has either a `networkError` property with any unexpected errors that might occur,
 or a `graphQLErrors` array with the list of errors that have been returned by the API.
 
-This is a convenience wrapper that helps when the specific _kind of error_ that has occurred
+This is a convenience wrapper that helps when the specific _kind of error_ that has occured
 does not matter.
 
 Additionally `urql`'s operation results will also have the `operation` property, which

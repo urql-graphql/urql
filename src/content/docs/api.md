@@ -18,6 +18,7 @@ interface UseQueryArgs {
   query: string;
   variables?: any;
   requestPolicy?: RequestPolicy;
+  pause?: boolean;
 }
 ```
 
@@ -37,7 +38,7 @@ interface UseQueryState<T> {
 And the `executeQuery` function optionally
 accepts a partial `OperationContext`.
 
-[More information on how to use this hook can be found in the Getting Started section.](/docs/getting-started/#writing-queries)
+[More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
 ### `useMutation` (hook)
 
@@ -60,7 +61,7 @@ interface UseMutationState<T> {
 
 The `executeMutation` function accepts the `variables` of type `object`.
 
-[More information on how to use this hook can be found in the Getting Started section.](/docs/getting-started/#writing-mutations)
+[More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
 ### `useSubscription` (hook)
 
@@ -94,11 +95,11 @@ interface UseSubscriptionState<T> {
 }
 ```
 
-[More information on how to use this hook can be found in the Basics section.](/docs/basics/#subscriptions)
+[More information on how to use this hook can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
 ### `Query` (component)
 
-[More information on how to use this component can be found in the Getting Started section.](/docs/getting-started/#writing-queries)
+[More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
 #### Props
 
@@ -107,6 +108,7 @@ interface UseSubscriptionState<T> {
 | query         | `string`                   | The GraphQL request's query                                                                           |
 | variables     | `object`                   | The GraphQL request's variables                                                                       |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
+| pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
 | children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
@@ -115,12 +117,12 @@ interface UseSubscriptionState<T> {
 | ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | fetching     | `boolean`                           | Whether the `Query` is currently waiting for a GraphQL result                                           |
 | data         | `?any`                              | The GraphQL request's result                                                                            |
-| error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occurred                                         |
+| error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
 
 ### `Mutation` (component)
 
-[More information on how to use this component can be found in the Getting Started section.](/docs/getting-started/#writing-mutations)
+[More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
 #### Props
 
@@ -140,7 +142,7 @@ interface UseSubscriptionState<T> {
 
 ### `Subscription` (component)
 
-[More information on how to use this component can be found in the Basics section.](/docs/basics/#subscriptions)
+[More information on how to use this component can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
 #### Props
 
@@ -155,7 +157,7 @@ interface UseSubscriptionState<T> {
 
 | Prop     | Type             | Description                                                     |
 | -------- | ---------------- | --------------------------------------------------------------- |
-| fetching | `boolean`        | Whether the `Subsription` is currently ongoing                  |
+| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                 |
 | data     | `?any`           | The GraphQL subscription's data                                 |
 | error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
 
@@ -172,11 +174,12 @@ be used in combination with the `useContext` hook.
 The client manages all operations and ongoing requests to the exchange pipeline.
 It accepts a bunch of inputs when it's created
 
-| Input        | Type                               | Description                                                                                  |
-| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                               |
-| fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request       |
-| exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges` |
+| Input        | Type                               | Description                                                                                                     |
+| ------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                  |
+| fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                          |
+| suspense     | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data |
+| exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                    |
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
@@ -401,17 +404,51 @@ to handle the `exchanges` input.
 
 ### `cacheExchange` (Exchange)
 
-The `cacheExchange` as [described in the Basics section](/docs/basics/#cacheexchange).
+The `cacheExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#cacheexchange).
 It's of type `Exchange`.
 
 ### `subscriptionExchange` (Exchange factory)
 
-The `subscriptionExchange` as [described in the Basics section](/docs/basics/#subscriptions).
+The `subscriptionExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#subscriptions).
 It's of type `Options => Exchange`.
 
 It accepts a single input: `{ forwardSubscription }`. This is a function that
 receives an enriched operation and must return an Observable-like object that
 streams `GraphQLResult`s with `data` and `errors`.
+
+### `ssrExchange` (Exchange factory)
+
+The `ssrExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#server-side-rendering).
+It's of type `Options => Exchange`.
+
+It accepts a single input, `{ initialState }`, which is completely
+optional and populates the server-side rendered data with
+a rehydrated cache.
+
+This can be used to extract data that has been queried on
+the server-side, which is also described in the Basics section,
+and is also used on the client-side to restore server-side
+rendered data.
+
+When called, this function creates an `Exchange`, which also has
+two methods on it:
+
+- `.restoreData(data)` which can be used to inject data, typically
+  on the client-side.
+- `.extractData()` which is typically used on the server-side to
+  extract the server-side rendered data.
+
+Basically, the `ssrExchange` is a small cache that collects data
+during the server-side rendering pass, and allows you to populate
+the cache on the client-side with the same data.
+
+During React rehydration this cache will be emptied and it will
+become inactive and won't change the results of queries after
+rehydration.
+
+It needs to be used _after_ other caching Exchanges like the
+`cacheExchange`, but before any _asynchronous_ Exchange like
+the `fetchExchange`.
 
 ### `debugExchange` (Exchange)
 
@@ -434,7 +471,7 @@ can occur when a subscription is used without adding a `subscriptionExchange`.
 
 ### `fetchExchange` (Exchange)
 
-The `fetchExchange` as [described in the Basics section](/docs/basics/#fetchexchange).
+The `fetchExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#fetchexchange).
 It's of type `Exchange`.
 
 ### `defaultExchanges` (Exchange[])

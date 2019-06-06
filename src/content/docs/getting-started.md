@@ -40,7 +40,7 @@ app with `urql`'s `<Provider>`. This `<Provider>` holds the `Client` that is
 used to manage data, requests, the cache, and other things. It's the "heart"
 of `urql` and holds all of its core logic.
 
-This example creates a `Client`, passes it the URL of a GraphQL API, and provides it
+This example creates a `Client`, passes it a GraphQL API's URL, and provides it
 using the `<Provider>`.
 
 ```jsx
@@ -56,6 +56,9 @@ const YourApp = () => (
   </Provider>;
 );
 ```
+
+> A tutorial on how to set up a `client` and `Provider`
+> is [available as screencast on egghead](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
 Every component and query underneath the `<Provider>` in the tree now has access
 to the client and will call the client when it needs to execute GraphQL requests.
@@ -112,7 +115,7 @@ is not the plural `errors`. `urql` wraps any network error or GraphQL
 errors in a `CombinedError` which is more convenient to handle and
 observe.
 
-[Read more about the result's API in the Architecture's Results section.](/docs/architecture/#operation-results)
+[Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
 
 ### Using hooks
 
@@ -163,9 +166,9 @@ Similarly to the `<Query>` component, `useQuery` will start the request
 as soon as it's mounted and will rerun it when the query or variables change.
 
 > A tutorial on the `useQuery` hook is also available as a
-> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks).
+> [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
-[Read more about the result's API in the Architecture's Results section.](/docs/architecture/#operation-results)
+[Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
 
 ### Using `graphql-tag`
 
@@ -174,7 +177,7 @@ pass in a fully parsed AST in the form of `DocumentNode` instead.
 For this purpose you can use `graphql-tag`.
 
 This can be extremely helpful, since it enables syntax highlighting
-in some editors. It also can be used to pre-parse the GraphQL query
+in some editors. It also can be used to preparse the GraphQL query
 using `babel-plugin-graphql-tag` or the included Webpack loader.
 
 You only have to make a small adjustment. Install `graphql-tag` and
@@ -345,6 +348,9 @@ This is functionally the same as the second example, but `executeMutation`
 also returns a promise with `useMutation` as it does with `<Mutation>` so
 the first example could also be written using hooks.
 
+> A tutorial on the `useMutation` hook is also available as a
+> [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-mutation-using-react-hooks-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
+
 ## Refetching data
 
 `urql` will by default come with a simple "document" cache. Each query
@@ -354,7 +360,7 @@ cached completely. When the same query and variables are requested again,
 result is also invalidated when a mutation with similar `__typename`s was
 sent.
 
-[You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](/docs/basics/#cacheexchange)
+[You can find out more about the default caching behavior in the Basics' `cacheExchange` section.](https://formidable.com/open-source/urql/docs/basics#cacheexchange)
 
 Using `urql`'s default behavior this means we sometimes need a way to refetch
 data from the GraphQL API and skip the cache, if we need fresh data.
@@ -383,7 +389,7 @@ Including `'cache-and-network'` there are four request policies in total:
 - `cache-and-network`: As stated above, this returns the cached result and then also
   sends a request to the API.
 
-[You can find out more about how the default cache behaves when it receives these request policies in the Basics' `cacheExchange` section.](/docs/basics/#request-policies)
+[You can find out more about how the default cache behaves when it receives these request policies in the Basics' `cacheExchange` section.](https://formidable.com/open-source/urql/docs/basics#request-policies)
 
 Next, we can take a look at how to use `'network-only'` to force a refetch
 imperatively. In our previous example this would come in handy to refresh the
