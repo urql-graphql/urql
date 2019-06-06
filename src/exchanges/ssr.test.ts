@@ -85,4 +85,7 @@ it('deletes cached results in non-suspense environments', () => {
 
   expect(Object.keys(ssr.extractData()).length).toBe(0);
   expect(onPush).toHaveBeenCalledWith(queryResponse);
+
+  // NOTE: The operation should not be duplicated
+  expect(output).not.toHaveBeenCalled();
 });
