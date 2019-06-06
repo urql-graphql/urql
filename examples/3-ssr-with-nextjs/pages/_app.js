@@ -1,7 +1,7 @@
 import App, { Container } from 'next/app'
 import React from 'react'
 
-import withUrqlClient from '../lib/with-urql-client'
+import withUrqlClient from '../src/with-urql-client'
 import { Provider } from 'urql'
 
 class MyApp extends App {
