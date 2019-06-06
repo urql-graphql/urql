@@ -27,6 +27,14 @@ const client = createClient() as { executeMutation: jest.Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
+  beforeEach(() => {
+    // eslint-disable-next-line no-console
+    console.log(
+      'supressing console.error output due to react-test-renderer spam (hooks related)'
+    );
+    jest.spyOn(global.console, 'error').mockImplementation();
+  });
+
   afterEach(() => {
     cleanup();
   });
