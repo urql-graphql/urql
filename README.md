@@ -78,7 +78,23 @@ ReactDOM.render(
 );
 ```
 
-This allows you to now use the `<Query>` component to fetch data from your server:
+This allows you to use the `useQuery` hook in your function component to
+fetch data from your server:
+
+```js
+import { useQuery } from 'urql';
+
+const YourComponent = () => {
+  const [result] = useQuery({
+    query: `{ todos { id } }`,
+  });
+
+  const { fetching, data } = result;
+  return fetching ? <Loading /> : <List data={data.todos} />;
+};
+```
+
+Alternatively you can take advantage of the `<Query>` component:
 
 ```js
 import { Query } from 'urql';
@@ -88,17 +104,6 @@ import { Query } from 'urql';
     fetching ? <Loading /> : <List data={data.todos} />
   }
 </Query>;
-```
-
-Alternatively you can take advantage of the `useQuery` hook in your function component:
-
-```js
-import { useQuery } from 'urql';
-
-const YourComponent = () => {
-  const [{ fetching, data }] = useQuery({ query: `{ todos { id } }` });
-  return fetching ? <Loading /> : <List data={data.todos} />;
-};
 ```
 
 [Learn the full API in the "Getting Started" docs!](https://formidable.com/open-source/urql/docs/getting-started/)
