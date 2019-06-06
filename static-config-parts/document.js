@@ -2,6 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import { metaData } from "./constants";
 
+const base =
+  process.env.REACT_STATIC_ENV === "development" &&
+  process.env.REACT_STATIC_STAGING === undefined
+    ? "http://localhost:3000"
+    : "https://formidable.com/open-source/urql/";
+
 class CustomDocument extends React.Component {
   render() {
     const { Html, Head, Body, children, renderMeta } = this.props;
@@ -32,6 +38,7 @@ class CustomDocument extends React.Component {
             sizes="32x32"
             href="./static/favicon/favicon-32.png"
           />
+          <base href={base} />
           <link rel="manifest" href="./static/favicon/site.webmanifest" />
           <meta name="msapplication-TileColor" content="#8196ff" />
           <meta
