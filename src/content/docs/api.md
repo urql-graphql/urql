@@ -38,7 +38,7 @@ interface UseQueryState<T> {
 And the `executeQuery` function optionally
 accepts a partial `OperationContext`.
 
-[More information on how to use this hook can be found in the Getting Started section.](getting-started.md#writing-queries)
+[More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
 ### `useMutation` (hook)
 
@@ -61,7 +61,7 @@ interface UseMutationState<T> {
 
 The `executeMutation` function accepts the `variables` of type `object`.
 
-[More information on how to use this hook can be found in the Getting Started section.](getting-started.md#writing-mutations)
+[More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
 ### `useSubscription` (hook)
 
@@ -95,11 +95,11 @@ interface UseSubscriptionState<T> {
 }
 ```
 
-[More information on how to use this hook can be found in the Basics section.](basics.md#subscriptions)
+[More information on how to use this hook can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
 ### `Query` (component)
 
-[More information on how to use this component can be found in the Getting Started section.](getting-started.md#writing-queries)
+[More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
 #### Props
 
@@ -122,7 +122,7 @@ interface UseSubscriptionState<T> {
 
 ### `Mutation` (component)
 
-[More information on how to use this component can be found in the Getting Started section.](getting-started.md#writing-mutations)
+[More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
 #### Props
 
@@ -142,7 +142,7 @@ interface UseSubscriptionState<T> {
 
 ### `Subscription` (component)
 
-[More information on how to use this component can be found in the Basics section.](basics.md#subscriptions)
+[More information on how to use this component can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
 #### Props
 
@@ -404,12 +404,12 @@ to handle the `exchanges` input.
 
 ### `cacheExchange` (Exchange)
 
-The `cacheExchange` as [described in the Basics section](basics.md#cacheexchange).
+The `cacheExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#cacheexchange).
 It's of type `Exchange`.
 
 ### `subscriptionExchange` (Exchange factory)
 
-The `subscriptionExchange` as [described in the Basics section](basics.md#subscriptions).
+The `subscriptionExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#subscriptions).
 It's of type `Options => Exchange`.
 
 It accepts a single input: `{ forwardSubscription }`. This is a function that
@@ -418,7 +418,7 @@ streams `GraphQLResult`s with `data` and `errors`.
 
 ### `ssrExchange` (Exchange factory)
 
-The `ssrExchange` as [described in the Basics section](basics.md#server-side-rendering).
+The `ssrExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#server-side-rendering).
 It's of type `Options => Exchange`.
 
 It accepts a single input, `{ initialState }`, which is completely
@@ -471,7 +471,7 @@ can occur when a subscription is used without adding a `subscriptionExchange`.
 
 ### `fetchExchange` (Exchange)
 
-The `fetchExchange` as [described in the Basics section](basics.md#fetchexchange).
+The `fetchExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#fetchexchange).
 It's of type `Exchange`.
 
 ### `defaultExchanges` (Exchange[])

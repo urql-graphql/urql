@@ -168,7 +168,7 @@ from the API.
 The idea of `urql` is that you can customize the caching behavior amongst
 other things yourself, if needed.
 
-[Read more about customizing `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
+[Read more about customizing `urql` in the "Extending & Experimenting" section.](https://formidable.com/open-source/urql/docs/extending-and-experimenting)
 
 ## Server-side rendering
 
@@ -332,7 +332,7 @@ up [have a look at our SSR + next.js example project](https://github.com/Formida
 ## Subscriptions
 
 One feature of `urql` that was not mentioned in the
-["Getting Started" section](getting-started.md) is `urql`'s
+["Getting Started" section](https://formidable.com/open-source/urql/docs/getting-started) is `urql`'s
 APIs and ability to handle subscriptions.
 
 To add support for subscriptions there's the `subscriptionExchange`.
