@@ -74,6 +74,14 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   const ssr: SSRExchange = ({ client, forward }) => ops$ => {
     const sharedOps$ = share(ops$);
 
+    let forwardedOps$ = pipe(
+      sharedOps$,
+      filter(op => !isCached(op)),
+      forward
+    );
+
+    // NOTE: Since below we might delete the cached entry after accessing
+    // it once, cachedOps$ needs to be merged after forwardedOps$
     let cachedOps$ = pipe(
       sharedOps$,
       filter(op => isCached(op)),
@@ -83,21 +91,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       })
     );
 
-    let forwardedOps$ = pipe(
-      sharedOps$,
-      filter(op => !isCached(op)),
-      forward
-    );
-
-    if (!client.suspense) {
-      // Outside of suspense-mode we delete results from the cache as they're resolved
-      cachedOps$ = pipe(
-        cachedOps$,
-        tap((result: OperationResult) => {
-          delete data[result.operation.key];
-        })
-      );
-    } else {
+    if (client.suspense) {
       // Inside suspense-mode we cache results in the cache as they're resolved
       forwardedOps$ = pipe(
         forwardedOps$,
@@ -109,9 +103,17 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
           }
         })
       );
+    } else {
+      // Outside of suspense-mode we delete results from the cache as they're resolved
+      cachedOps$ = pipe(
+        cachedOps$,
+        tap((result: OperationResult) => {
+          delete data[result.operation.key];
+        })
+      );
     }
 
-    return merge([cachedOps$, forwardedOps$]);
+    return merge([forwardedOps$, cachedOps$]);
   };
 
   ssr.restoreData = (restore: SSRData) => Object.assign(data, restore);
