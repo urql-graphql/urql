@@ -1,6 +1,4 @@
-import json from 'rollup-plugin-json';
-import sourcemaps from 'rollup-plugin-sourcemaps';
-import alias from 'rollup-plugin-alias';
+import { DEFAULT_EXTENSIONS } from '@babel/core';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
@@ -8,9 +6,7 @@ import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 
-const EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.es6', '.es', '.mjs'];
 const pkgInfo = require('./package.json');
-
 const external = ['dns', 'fs', 'path', 'url'];
 
 if (pkgInfo.peerDependencies) {
@@ -30,12 +26,50 @@ const externalTest = id => {
   return externalPredicate.test(id);
 };
 
+const terserPretty = terser({
+  sourcemap: true,
+  warnings: true,
+  ecma: 5,
+  keep_fnames: true,
+  ie8: false,
+  compress: {
+    pure_getters: true,
+    toplevel: true,
+    booleans_as_integers: false,
+    keep_fnames: true,
+    keep_fargs: true,
+    if_return: false,
+    ie8: false,
+    sequences: false,
+    loops: false,
+    conditionals: false,
+    join_vars: false
+  },
+  mangle: false,
+  output: {
+    beautify: true,
+    braces: true,
+    indent_level: 2
+  }
+});
+
+const terserMinified = terser({
+  sourcemap: true,
+  warnings: true,
+  ecma: 5,
+  ie8: false,
+  toplevel: true,
+  compress: {
+    keep_infinity: true,
+    pure_getters: true,
+    passes: 10
+  },
+  output: {
+    comments: false
+  }
+});
+
 const plugins = [
-  sourcemaps(),
-  json(),
-  alias({
-    resolve: EXTENSIONS
-  }),
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
     browser: true
@@ -58,14 +92,13 @@ const plugins = [
     },
     tsconfigOverride: {
       compilerOptions: {
-        target: 'esnext',
+        target: 'es6',
       },
     },
   }),
   buble({
     transforms: {
       unicodeRegExp: false,
-      spreadRest: false,
       dangerousForOf: true,
       dangerousTaggedTemplateString: true
     },
@@ -74,22 +107,12 @@ const plugins = [
   }),
   babel({
     babelrc: false,
-    extensions: EXTENSIONS,
+    extensions: [...DEFAULT_EXTENSIONS, 'ts', 'tsx'],
     exclude: 'node_modules/**',
-    passPerPreset: true,
-    presets: [
-      ['@babel/preset-env', {
-        loose: true,
-        modules: false,
-        exclude: ['transform-async-to-generator']
-      }]
-    ],
+    presets: [],
     plugins: [
-      '@babel/plugin-external-helpers',
-      ['@babel/plugin-proposal-object-rest-spread', {
-        loose: true,
-        useBuiltIns: true
-      }],
+      ['babel-plugin-closure-elimination', {}],
+      ['@babel/plugin-transform-object-assign', {}],
       ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
         pragmaFrag: 'React.Fragment',
@@ -98,65 +121,59 @@ const plugins = [
       ['babel-plugin-transform-async-to-promises', {
         inlineHelpers: true,
         externalHelpers: true
-      }],
-      ['@babel/plugin-proposal-class-properties', {
-        loose: true
       }]
     ]
-  }),
-  terser({
-    sourcemap: true,
-    warnings: true,
-    ecma: 5,
-    keep_fnames: true,
-    ie8: false,
-    compress: {
-      pure_getters: true,
-      toplevel: true,
-      booleans_as_integers: false,
-      keep_fnames: true,
-      keep_fargs: true,
-      if_return: false,
-      ie8: false,
-      sequences: false,
-      loops: false,
-      conditionals: false,
-      join_vars: false
-    },
-    mangle: false,
-    output: {
-      beautify: true,
-      braces: true,
-      indent_level: 2
-    }
   })
 ];
 
 const config = {
   input: './src/index.ts',
   external: externalTest,
-  plugins,
   treeshake: {
     propertyReadSideEffects: false
-  },
-  output: [
-    {
-      sourcemap: true,
-      legacy: true,
-      freeze: false,
-      esModule: false,
-      file: './dist/urql.js',
-      format: 'cjs'
-    },
-    {
-      sourcemap: true,
-      legacy: true,
-      freeze: false,
-      esModule: false,
-      file: './dist/urql.es.js',
-      format: 'esm'
-    }
-  ]
+  }
 };
 
-export default config;
+export default [
+  {
+    ...config,
+    plugins: [...plugins, terserPretty],
+    output: [
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        esModule: false,
+        file: './dist/urql.js',
+        format: 'cjs'
+      },
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        esModule: false,
+        file: './dist/urql.es.js',
+        format: 'esm'
+      }
+    ]
+  }, {
+    ...config,
+    plugins: [...plugins, terserMinified],
+    output: [
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        file: './dist/urql.min.js',
+        format: 'cjs'
+      },
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        file: './dist/urql.es.min.js',
+        format: 'esm'
+      }
+    ]
+  }
+];
