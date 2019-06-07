@@ -60,7 +60,7 @@ describe('Subscription', () => {
       error: undefined,
     });
     setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
+      expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
       done();
     }, 200);
   });
