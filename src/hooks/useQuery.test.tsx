@@ -177,7 +177,7 @@ describe('on unmount', () => {
     );
   });
 
-  it.only('unsubscribe is called', () => {
+  it('unsubscribe is called', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     wrapper.unmount();
     expect(start).toBeCalledTimes(1);
