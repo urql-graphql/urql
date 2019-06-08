@@ -8,6 +8,19 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.1.1](https://github.com/FormidableLabs/urql/compare/v1.1.0...v1.1.1)
+
+This release comes with two small patches. One being a crticial fix,
+where cancelled requests would be erroneously deduped, which meant
+a previously cancelled query would never be fetched.
+
+It also refactors our bundling process to transpile `Object.assign` to
+restore IE11 support and reduce the amount of duplicate helper in our bundles.
+
+- ⚠️ Fix torn-down requests being deduped forever (see [#281](https://github.com/FormidableLabs/urql/pull/281))
+- Fix `useQuery`'s `pause` argument blocking explicit `executeQuery` calls (see [#278](https://github.com/FormidableLabs/urql/pull/278))
+- Add `Object.assign` transpilation for IE11 and refactor bundling (see [#274](https://github.com/FormidableLabs/urql/pull/274))
+
 ## [v1.1.0](https://github.com/FormidableLabs/urql/compare/v1.0.5...v1.1.0)
 
 This release introduces support for **server-side rendering**.
