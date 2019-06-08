@@ -1,32 +1,36 @@
 import { filter, pipe, tap } from 'wonka';
-import { Exchange } from '../types';
+import { Exchange, Operation, OperationResult } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
 export const dedupExchange: Exchange = ({ forward }) => {
-  const inFlight = new Set<number>();
+  const inFlightKeys = new Set<number>();
 
-  return ops$ =>
-    pipe(
-      forward(
-        pipe(
-          ops$,
-          filter(({ operationName, key }) => {
-            if (operationName !== 'query') {
-              return true;
-            }
+  const filterIncomingOperation = (operation: Operation) => {
+    const { key, operationName } = operation;
+    if (operationName === 'teardown') {
+      inFlightKeys.delete(key);
+      return true;
+    } else if (operationName !== 'query') {
+      return true;
+    }
 
-            const hasInFlightOp = inFlight.has(key);
+    const isInFlight = inFlightKeys.has(key);
+    inFlightKeys.add(key);
+    return !isInFlight;
+  };
 
-            if (!hasInFlightOp) {
-              inFlight.add(key);
-            }
+  const afterOperationResult = ({ operation }: OperationResult) => {
+    inFlightKeys.delete(operation.key);
+  };
 
-            return !hasInFlightOp;
-          })
-        )
-      ),
-      tap(res => {
-        inFlight.delete(res.operation.key);
-      })
+  return ops$ => {
+    const forward$ = pipe(
+      ops$,
+      filter(filterIncomingOperation)
     );
+    return pipe(
+      forward(forward$),
+      tap(afterOperationResult)
+    );
+  };
 };
