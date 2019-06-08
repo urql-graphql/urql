@@ -10,15 +10,14 @@
 
   <br />
   <br />
-
-  <a href="https://travis-ci.org/FormidableLabs/urql">
-    <img alt="Build Status" src="https://travis-ci.org/FormidableLabs/urql.svg?branch=master" />
-  </a>
-  <a href="https://coveralls.io/github/FormidableLabs/urql?branch=master">
-    <img alt="Test Coverage" src="https://coveralls.io/repos/github/FormidableLabs/urql/badge.svg?branch=master" />
-  </a>
   <a href="https://npmjs.com/package/urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
+  </a>
+  <a href="https://codecov.io/gh/FormidableLabs/urql">
+    <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql/branch/master/graph/badge.svg" />
+  </a>
+  <a href="https://bundlephobia.com/result?p=urql">
+    <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/urql.svg?label=gzip%20size" />
   </a>
   <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
