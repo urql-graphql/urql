@@ -48,15 +48,7 @@ export const useQuery = <T = any, V = object>(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
 
-      // If useQuery is currently paused, set fetching to
-      // false and abort; otherwise start the query
-      if (args.pause) {
-        setState(s => ({ ...s, fetching: false }));
-        unsubscribe.current = noop;
-        return;
-      } else {
-        setState(s => ({ ...s, fetching: true }));
-      }
+      setState(s => ({ ...s, fetching: true }));
 
       [unsubscribe.current] = pipe(
         client.executeQuery(request, {
@@ -68,16 +60,18 @@ export const useQuery = <T = any, V = object>(
         })
       );
     },
-    [args.pause, args.requestPolicy, client, request, setState]
+    [args.requestPolicy, client, request, setState]
   );
 
-  // This calls executeQuery immediately during the initial mount and
-  // otherwise behaves like a normal useEffect; We call executeQuery
-  // everytime it, i.e. its input like request, changes
   useImmediateEffect(() => {
+    if (args.pause) {
+      unsubscribe.current();
+      return setState(s => ({ ...s, fetching: false }));
+    }
+
     executeQuery();
     return () => unsubscribe.current();
-  }, [executeQuery]);
+  }, [executeQuery, args.pause, setState]);
 
   return [state, executeQuery];
 };
