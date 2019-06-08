@@ -111,7 +111,7 @@ export const useQuery = ({ query, variables }) => {
   const client = useContext(Context);
 
   useEffect(() => {
-    setState(prev => ({ ...prev, fetching: true }));
+    setResult(prev => ({ ...prev, fetching: true }));
 
     const request = createQuery(query, variables);
 
