@@ -17,10 +17,8 @@ export default function PostUpvoter({ votes, id }) {
 
   const upvotePost = useCallback(() => {
     executeMutation({
-      variables: {
-        id,
-        votes: votes + 1,
-      },
+      id,
+      votes: votes + 1,
     });
   }, [votes, id, executeMutation]);
 
