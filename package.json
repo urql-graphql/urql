@@ -32,7 +32,6 @@
     "lint": "eslint . --ext .ts,.tsx",
     "check-formatting": "prettier --write src/**/*.{ts,tsx}",
     "prepublishOnly": "run-s build build:prune",
-    "bundlesize": "bundlesize",
     "codecov": "codecov"
   },
   "author": "Formidable",
@@ -83,12 +82,6 @@
       "pre-commit": "lint-staged"
     }
   },
-  "bundlesize": [
-    {
-      "path": "./dist/*.min.js",
-      "maxSize": "10 kB"
-    }
-  ],
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-transform-object-assign": "^7.2.0",
@@ -102,7 +95,6 @@
     "@typescript-eslint/parser": "^1.9.0",
     "babel-plugin-closure-elimination": "^1.3.0",
     "babel-plugin-transform-async-to-promises": "^0.8.11",
-    "bundlesize": "^0.17.0",
     "codecov": "^3.5.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",

@@ -32,15 +32,10 @@ tasks:
       - codecov
   build:
     image: node:10
-    env:
-      - BUNDLESIZE_GITHUB_TOKEN
     command:
       - yarn
     args:
-      - run
-      - run-s
       - build
-      - bundlesize
   e2e:
     image: cypress/browsers:node10.2.1-chrome74
     command:
