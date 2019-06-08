@@ -27,7 +27,8 @@ export default function Submit() {
       form.reset();
 
       executeMutation({
-        variables: { title, url },
+        title, 
+        url 
       });
     },
     [executeMutation]
