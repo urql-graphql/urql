@@ -75,6 +75,19 @@ it('forwards duplicate query operations as usual after they respond', async () =
   expect(forwardedOperations.length).toBe(2);
 });
 
+it('forwards duplicate query operations after one was torn down', async () => {
+  shouldRespond = false; // We filter out our mock responses
+  const [ops$, next, complete] = input;
+  const exchange = dedupExchange(exchangeArgs)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+  next({ ...queryOperation, operationName: 'teardown' });
+  next(queryOperation);
+  complete();
+  expect(forwardedOperations.length).toBe(3);
+});
+
 it('always forwards mutation operations without deduplicating them', async () => {
   shouldRespond = false; // We filter out our mock responses
   const [ops$, next, complete] = input;
