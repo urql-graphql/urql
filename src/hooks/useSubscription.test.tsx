@@ -95,11 +95,7 @@ it('calls handler', () => {
   const wrapper = renderer.create(
     <SubscriptionUser q={query} handler={handler} />
   );
-  /**
-   * Have to call update (without changes) in order to see the
-   * result of the state change.
-   */
-  wrapper.update(<SubscriptionUser q={query} />);
+  wrapper.update(<SubscriptionUser q={query} handler={handler} />);
   expect(handler).toBeCalledTimes(1);
   expect(handler).toBeCalledWith(undefined, 1234);
 });
