@@ -1,7 +1,7 @@
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { queryOperation } from '../test-utils';
-import { OperationResult } from '../types';
+import { OperationResult, OperationType } from '../types';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -91,4 +91,18 @@ it('calls cancel when the Observable is cancelled', () => {
   unsubscribe();
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(abort).toHaveBeenCalledTimes(1);
+});
+
+it('should not start the operation when teardown gets passed', () => {
+  pipe(
+    fromValue({
+      ...queryOperation,
+      operationName: 'teardown' as OperationType,
+    }),
+    fetchExchange(exchangeArgs),
+    subscribe(fail)
+  );
+
+  expect(fetch).toHaveBeenCalledTimes(0);
+  expect(abort).toHaveBeenCalledTimes(0);
 });
