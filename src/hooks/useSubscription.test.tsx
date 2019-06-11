@@ -24,8 +24,11 @@ const client = createClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
 let state: any;
 
-const SubscriptionUser: FC<{ q: string }> = ({ q }) => {
-  const [s] = useSubscription({ query: q });
+const SubscriptionUser: FC<{
+  q: string;
+  handler?: (prev: any, data: any) => any;
+}> = ({ q, handler }) => {
+  const [s] = useSubscription({ query: q }, handler);
   state = s;
   return <p>{s.data}</p>;
 };
@@ -85,4 +88,14 @@ describe('on change', () => {
     wrapper.update(<SubscriptionUser q={qb} />);
     expect(client.executeSubscription).toBeCalledTimes(2);
   });
+});
+
+it('calls handler', () => {
+  const handler = jest.fn();
+  const wrapper = renderer.create(
+    <SubscriptionUser q={query} handler={handler} />
+  );
+  wrapper.update(<SubscriptionUser q={query} handler={handler} />);
+  expect(handler).toBeCalledTimes(1);
+  expect(handler).toBeCalledWith(undefined, 1234);
 });

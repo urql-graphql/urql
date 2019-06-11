@@ -7,6 +7,7 @@ import {
   queryResponse,
   subscriptionOperation,
   subscriptionResult,
+  undefinedQueryResponse,
 } from '../test-utils';
 import { Operation } from '../types';
 import { afterMutation, cacheExchange } from './cache';
@@ -108,4 +109,43 @@ it('forwards subscriptions', () => {
   complete();
   expect(forwardedOperations.length).toBe(2);
   expect(reexecuteOperation).not.toBeCalled();
+});
+
+describe('undefined data', () => {
+  beforeEach(() => {
+    response = undefinedQueryResponse;
+    forwardedOperations = [];
+    reexecuteOperation = jest.fn();
+    input = makeSubject<Operation>();
+
+    // Collect all forwarded operations
+    const forward = (s: Source<Operation>) => {
+      return pipe(
+        s,
+        map(op => {
+          forwardedOperations.push(op);
+          return response;
+        })
+      );
+    };
+
+    const client = {
+      reexecuteOperation: reexecuteOperation as any,
+    } as Client;
+
+    exchangeArgs = { forward, client };
+  });
+
+  it('should not cache on undefined result', () => {
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+
+    publish(exchange);
+    next(queryOperation);
+    next(queryOperation);
+    complete();
+    // 2 indicates it's not cached.
+    expect(forwardedOperations.length).toBe(2);
+    expect(reexecuteOperation).not.toBeCalled();
+  });
 });

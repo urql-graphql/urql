@@ -92,6 +92,10 @@ export const subscriptionOperation: Operation = {
   context,
 };
 
+export const undefinedQueryResponse: OperationResult = {
+  operation: queryOperation,
+};
+
 export const queryResponse: OperationResult = {
   operation: queryOperation,
   data: {
