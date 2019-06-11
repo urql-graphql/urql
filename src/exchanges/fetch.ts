@@ -4,133 +4,148 @@ import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 import { CombinedError } from '../utils/error';
 
-/** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward }) => {
-  const isOperationFetchable = (operation: Operation) => {
-    const { operationName } = operation;
-    return operationName === 'query' || operationName === 'mutation';
-  };
+export type PreProcessor = (
+  url: string,
+  opts: RequestInit
+) => (response: Response) => Response | PromiseLike<Response>;
 
-  return ops$ => {
-    const sharedOps$ = share(ops$);
-    const fetchResults$ = pipe(
-      sharedOps$,
-      filter(isOperationFetchable),
-      mergeMap(operation => {
-        const { key } = operation;
-        const teardown$ = pipe(
-          sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
-        );
-
-        return pipe(
-          createFetchSource(operation),
-          takeUntil(teardown$)
-        );
-      })
-    );
-
-    const forward$ = pipe(
-      sharedOps$,
-      filter(op => !isOperationFetchable(op)),
-      forward
-    );
-
-    return merge([fetchResults$, forward$]);
-  };
-};
-
-const createFetchSource = (operation: Operation) => {
-  if (operation.operationName === 'subscription') {
-    throw new Error(
-      'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
-    );
-  }
-
-  return make<OperationResult>(([next, complete]) => {
-    const abortController =
-      typeof AbortController !== 'undefined'
-        ? new AbortController()
-        : undefined;
-
-    const { context } = operation;
-
-    const extraOptions =
-      typeof context.fetchOptions === 'function'
-        ? context.fetchOptions()
-        : context.fetchOptions || {};
-
-    const fetchOptions = {
-      body: JSON.stringify({
-        query: print(operation.query),
-        variables: operation.variables,
-      }),
-      method: 'POST',
-      ...extraOptions,
-      headers: {
-        'content-type': 'application/json',
-        ...extraOptions.headers,
-      },
-      signal:
-        abortController !== undefined ? abortController.signal : undefined,
+/** createFetchExchange creates a fetch exchnage with a response preprocessor */
+export const createFetchExchange = (
+  preProcessor: PreProcessor = () => response => response
+): Exchange => {
+  /** A default exchange for fetching GraphQL requests. */
+  const fetchExchange: Exchange = ({ forward }) => {
+    const isOperationFetchable = (operation: Operation) => {
+      const { operationName } = operation;
+      return operationName === 'query' || operationName === 'mutation';
     };
 
-    executeFetch(operation, fetchOptions).then(result => {
-      if (result !== undefined) {
-        next(result);
-      }
+    return ops$ => {
+      const sharedOps$ = share(ops$);
+      const fetchResults$ = pipe(
+        sharedOps$,
+        filter(isOperationFetchable),
+        mergeMap(operation => {
+          const { key } = operation;
+          const teardown$ = pipe(
+            sharedOps$,
+            filter(op => op.operationName === 'teardown' && op.key === key)
+          );
 
-      complete();
-    });
+          return pipe(
+            createFetchSource(operation),
+            takeUntil(teardown$)
+          );
+        })
+      );
 
-    return () => {
-      if (abortController !== undefined) {
-        abortController.abort();
-      }
+      const forward$ = pipe(
+        sharedOps$,
+        filter(op => !isOperationFetchable(op)),
+        forward
+      );
+
+      return merge([fetchResults$, forward$]);
     };
-  });
-};
+  };
 
-const executeFetch = (operation: Operation, opts: RequestInit) => {
-  let response: Response | undefined;
-  const { url } = operation.context;
+  const createFetchSource = (operation: Operation) => {
+    if (operation.operationName === 'subscription') {
+      throw new Error(
+        'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
+      );
+    }
 
-  return fetch(url, opts)
-    .then(res => {
-      response = res;
-      checkStatus(opts.redirect, response);
-      return response.json();
-    })
-    .then(result => ({
-      operation,
-      data: result.data,
-      error: Array.isArray(result.errors)
-        ? new CombinedError({
-            graphQLErrors: result.errors,
-            response,
-          })
-        : undefined,
-    }))
-    .catch(err => {
-      if (err.name === 'AbortError') {
-        return undefined;
-      }
+    return make<OperationResult>(([next, complete]) => {
+      const abortController =
+        typeof AbortController !== 'undefined'
+          ? new AbortController()
+          : undefined;
 
-      return {
-        operation,
-        data: undefined,
-        error: new CombinedError({
-          networkError: err,
-          response,
+      const { context } = operation;
+
+      const extraOptions =
+        typeof context.fetchOptions === 'function'
+          ? context.fetchOptions()
+          : context.fetchOptions || {};
+
+      const fetchOptions = {
+        body: JSON.stringify({
+          query: print(operation.query),
+          variables: operation.variables,
         }),
+        method: 'POST',
+        ...extraOptions,
+        headers: {
+          'content-type': 'application/json',
+          ...extraOptions.headers,
+        },
+        signal:
+          abortController !== undefined ? abortController.signal : undefined,
+      };
+
+      executeFetch(operation, fetchOptions).then(result => {
+        if (result !== undefined) {
+          next(result);
+        }
+
+        complete();
+      });
+
+      return () => {
+        if (abortController !== undefined) {
+          abortController.abort();
+        }
       };
     });
+  };
+
+  const executeFetch = (operation: Operation, opts: RequestInit) => {
+    let response: Response | undefined;
+    const { url } = operation.context;
+
+    return fetch(url, opts)
+      .then(preProcessor(url, opts))
+      .then(res => {
+        response = res;
+        checkStatus(opts.redirect, response);
+        return response.json();
+      })
+      .then(result => ({
+        operation,
+        data: result.data,
+        error: Array.isArray(result.errors)
+          ? new CombinedError({
+              graphQLErrors: result.errors,
+              response,
+            })
+          : undefined,
+      }))
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          return undefined;
+        }
+
+        return {
+          operation,
+          data: undefined,
+          error: new CombinedError({
+            networkError: err,
+            response,
+          }),
+        };
+      });
+  };
+
+  const checkStatus = (redirectMode: string = 'follow', response: Response) => {
+    const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
+
+    if (response.status < 200 || response.status > statusRangeEnd) {
+      throw new Error(response.statusText);
+    }
+  };
+  return fetchExchange;
 };
 
-const checkStatus = (redirectMode: string = 'follow', response: Response) => {
-  const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
-
-  if (response.status < 200 || response.status > statusRangeEnd) {
-    throw new Error(response.statusText);
-  }
-};
+/** A default exchange for fetching GraphQL requests. */
+export const fetchExchange: Exchange = createFetchExchange();
