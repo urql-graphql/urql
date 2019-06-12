@@ -18,7 +18,13 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
       const update = (action as any)(initialState.current);
       Object.assign(initialState.current, update);
     } else {
-      Object.assign(initialState.current, action as any);
+      // There are scenario's where we are in-between mounts.
+      // The reason we need both is because we COULD still be mounting
+      // and we could be in the process of being mounted.
+      // Scenario 1 needs the initialState.current mutation.
+      // Scenario 2 needs the setState.
+      // See https://github.com/FormidableLabs/urql/issues/287
+      setState(() => Object.assign(initialState.current, action as any));
     }
   }, []);
 
