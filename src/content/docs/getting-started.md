@@ -67,8 +67,8 @@ To illustrate how this works, the next example will use `urql`'s `<Query>`
 component to fetch some GraphQL data.
 
 ```jsx
-import React from 'react';
-import { Query } from 'urql';
+import React from "react";
+import { Query } from "urql";
 
 const getTodos = `
   query GetTodos($limit: Int!) {
@@ -84,9 +84,9 @@ const TodoList = ({ limit = 10 }) => {
   <Query query={getTodos} variables={{ limit }}>
     {({ fetching, data, error }) => {
       if (fetching) {
-        return 'Loading...';
+        return "Loading...";
       } else if (error) {
-        return 'Oh no!';
+        return "Oh no!";
       }
 
       return (
@@ -127,8 +127,8 @@ hooks API by switching to `useQuery()`.
 We can rewrite the above example as follows.
 
 ```jsx
-import React from 'react';
-import { useQuery } from 'urql';
+import React from "react";
+import { useQuery } from "urql";
 
 const getTodos = `
   query GetTodos($limit: Int!) {
@@ -143,13 +143,13 @@ const getTodos = `
 const TodoList = ({ limit = 10 }) => {
   const [res] = useQuery({
     query: getTodos,
-    variables: { limit },
+    variables: { limit }
   });
 
   if (res.fetching) {
-    return 'Loading...';
+    return "Loading...";
   } else if (res.error) {
-    return 'Oh no!';
+    return "Oh no!";
   }
 
   return (
@@ -170,7 +170,7 @@ as soon as it's mounted and will rerun it when the query or variables change.
 
 [Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
 
-### Using `graphql-tag`
+### Using graphql-tag
 
 You're not limited to just passing in strings as queries. You can also
 pass in a fully parsed AST in the form of `DocumentNode` instead.
@@ -184,9 +184,9 @@ You only have to make a small adjustment. Install `graphql-tag` and
 you can immediately write tagged template literals instead:
 
 ```jsx
-import React from 'react';
-import gql from 'graphql-tag';
-import { Query } from 'urql';
+import React from "react";
+import gql from "graphql-tag";
+import { Query } from "urql";
 
 const getTodos = gql`
   query GetTodos($limit: Int!) {
@@ -317,8 +317,8 @@ that can be used instead, which is the `useMutation()` hook.
 We can rewrite the second example from above as follows.
 
 ```jsx
-import React, { useCallback } from 'react';
-import { useMutation } from 'urql';
+import React, { useCallback } from "react";
+import { useMutation } from "urql";
 
 const addTodo = `
   mutation AddTodo($text: String!) {
@@ -333,11 +333,11 @@ const TodoForm = () => {
   const [res, executeMutation] = useMutation(addTodo);
 
   if (res.error) {
-    return 'Oh no!';
+    return "Oh no!";
   }
 
   return (
-    <button onClick={() => executeMutation({ text: 'something!' })}>
+    <button onClick={() => executeMutation({ text: "something!" })}>
       Add something!
     </button>
   );
@@ -377,7 +377,7 @@ A `requestPolicy` can be passed as a prop:
 
 /* or with hooks: */
 
-useQuery({ query: q, requestPolicy: 'cache-and-network' });
+useQuery({ query: q, requestPolicy: "cache-and-network" });
 ```
 
 Including `'cache-and-network'` there are four request policies in total:
@@ -396,8 +396,8 @@ imperatively. In our previous example this would come in handy to refresh the
 list of todos.
 
 ```jsx
-import React from 'react';
-import { Query } from 'urql';
+import React from "react";
+import { Query } from "urql";
 
 const getTodos = `
   query GetTodos {
@@ -425,7 +425,7 @@ const TodoList = () => {
           </ul>
 
           <button
-            onClick={() => executeQuery({ requestPolicy: 'network-only' })}
+            onClick={() => executeQuery({ requestPolicy: "network-only" })}
           >
             Refresh
           </button>

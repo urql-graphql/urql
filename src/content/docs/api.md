@@ -9,7 +9,7 @@ order: 4
 
 ## React components and hooks
 
-### `useQuery` (hook)
+### useQuery (hook)
 
 Accepts a single options object as input:
 
@@ -40,7 +40,7 @@ accepts a partial `OperationContext`.
 
 [More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
-### `useMutation` (hook)
+### useMutation (hook)
 
 Accepts a single `query` argument of type `string`. And returns the
 current mutation's state and an `executeMutation` function in a tuple. The
@@ -63,7 +63,7 @@ The `executeMutation` function accepts the `variables` of type `object`.
 
 [More information on how to use this hook can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
-### `useSubscription` (hook)
+### useSubscription (hook)
 
 Accepts an options argument as its first input, and a second optional argument that is
 the subscription handler function.
@@ -97,7 +97,7 @@ interface UseSubscriptionState<T> {
 
 [More information on how to use this hook can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
-### `Query` (component)
+### Query (component)
 
 [More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-queries)
 
@@ -120,7 +120,7 @@ interface UseSubscriptionState<T> {
 | error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
 
-### `Mutation` (component)
+### Mutation (component)
 
 [More information on how to use this component can be found in the Getting Started section.](https://formidable.com/open-source/urql/docs/getting-started#writing-mutations)
 
@@ -140,7 +140,7 @@ interface UseSubscriptionState<T> {
 | error           | `?CombinedError`              | The `CombinedError` containing any errors that might've occured  |
 | executeMutation | `(variables: object) => void` | A function that accepts variables and starts the mutation        |
 
-### `Subscription` (component)
+### Subscription (component)
 
 [More information on how to use this component can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
 
@@ -169,7 +169,7 @@ be used in combination with the `useContext` hook.
 
 ## The Client and related types
 
-### `Client` (class)
+### Client (class)
 
 The client manages all operations and ongoing requests to the exchange pipeline.
 It accepts a bunch of inputs when it's created
@@ -183,7 +183,7 @@ It accepts a bunch of inputs when it's created
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-#### `.executeQuery()`, `.executeSubscription()`, and `.executeMutation()`
+#### .executeQuery(), `.executeSubscription()`, and `.executeMutation()`
 
 These methods are used by `<Query>` & `useQuery()`, `<Subscription>` & `useSubscription()`,
 and `<Mutation>` & `useMutation()` respectively.
@@ -195,7 +195,7 @@ Internally they then create an `Operation` and call `.executeRequestOperation()`
 the `Operation`. This then returns a `Source<OperationResult>`, i.e. a stream of
 `OperationResult`s.
 
-#### `.executeRequestOperation()`
+#### .executeRequestOperation()
 
 This method accepts an `Operation` and handles the flow of said `Operation`. Every `Operation`
 that is executed must pass through this method.
@@ -222,7 +222,7 @@ is dispatched.
 
 The return value is the filtered `Source<OperationResult>`.
 
-#### `.reexecuteOperation()`
+#### .reexecuteOperation()
 
 This method accepts an `Operation` and will dispatch this `Operation` if there
 are any subscriptions from `executeRequestOperation`'s `Source<OperationResult>`
@@ -231,7 +231,7 @@ to this particular `Operation`.
 This is called by `cacheExchange` when an `Operation`'s `OperationResult` is
 invalidated in the cache.
 
-#### `.createRequestOperation()`
+#### .createRequestOperation()
 
 This is called by the `executeQuery`, `executeSubscription` and `executeMutation`
 methods to create `Operation`s. It accepts:
@@ -242,7 +242,7 @@ methods to create `Operation`s. It accepts:
 
 It returns an `Operation`.
 
-#### `.dispatchOperation()`
+#### .dispatchOperation()
 
 This method dispatches an `Operation` to the exchange pipeline. This is only
 used directly by the Client and shouldn't normally be called externally, except
@@ -251,7 +251,7 @@ when the tracking logic of active `Operation`s needs to be bypassed.
 These `Operation`s are streamed from the `operations$: Source<Operation>` stream.
 The results of all exchanges are similarly output to `results$: Source<OperationResult>`.
 
-### `OperationType` (type)
+### OperationType (type)
 
 This determines what _kind of operation_ the exchanges need to perform.
 This can either be:
@@ -265,7 +265,7 @@ The `'teardown'` operation is special in that it instructs exchanges to cancel
 any ongoing operations with the same key as the `'teardown'` operation that is
 received.
 
-### `RequestPolicy` (type)
+### RequestPolicy (type)
 
 This determines the strategy that a cache exchange should use to fulfill an operation.
 When you implement a custom cache exchange it's recommended that these policies are
@@ -276,7 +276,7 @@ handled.
 - `'network-only'`
 - `'cache-and-network'`
 
-### `GraphQLRequest` (type)
+### GraphQLRequest (type)
 
 This often comes up as the **input** for every GraphQL request.
 It consists of `query` and optional `variables`.
@@ -293,7 +293,7 @@ As can be seen it also carries a `key` property. This property
 is a hash of both the `query` and the `variables`, to uniquely
 identify the request.
 
-### `OperationContext` (type)
+### OperationContext (type)
 
 This type is used to give an operation additional metadata and information.
 
@@ -310,7 +310,7 @@ It contains a lot of the above mentioned Client options and also `requestPolicy`
 It accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.
 
-### `Operation` (type)
+### Operation (type)
 
 The input for every exchange that informs GraphQL requests.
 it's essentially an extension of the `GraphQLRequest`.
@@ -328,7 +328,7 @@ type Operation = {
 The `key` value is a "hash" of `query` and `variables` or another string that
 unique identifies the combination of the two.
 
-### `OperationResult` (type)
+### OperationResult (type)
 
 The result of every GraphQL request, i.e. an `Operation`.
 It's very similar to what comes back from a typical GraphQL API, but
@@ -342,7 +342,7 @@ type OperationResult = {
 };
 ```
 
-### `CombinedError` (class)
+### CombinedError (class)
 
 | Input         | Type                             | Description                                                                       |
 | ------------- | -------------------------------- | --------------------------------------------------------------------------------- |
@@ -358,7 +358,7 @@ that a GraphQL result might have normally.
 
 ## Exchanges and their utilities
 
-### `ExchangeInput` (type)
+### ExchangeInput (type)
 
 ```js
 type ExchangeInput = {
@@ -367,7 +367,7 @@ type ExchangeInput = {
 };
 ```
 
-### `ExchangeIO` (type)
+### ExchangeIO (type)
 
 A function that receives a stream of operations and must return a stream
 of results.
@@ -376,7 +376,7 @@ of results.
 type ExchangeIO = (Source<Operation>) => Source<OperationResult>;
 ```
 
-### `Exchange` (type)
+### Exchange (type)
 
 Similar to `redux-observable`'s epics, kind of related to Apollo's links,
 also somehow similar to Express' middleware.
@@ -390,7 +390,7 @@ Exchanges can therefore be chained. They can alter and filter `Operation`s
 that go into the next exchange, and they can alter, filter, or return
 `OperationResult`s that are returned.
 
-### `composeExchanges` (function)
+### composeExchanges (function)
 
 This utility accepts multiple exchanges and composes them into a single one.
 It chains them in the order that they're given, left to right.
@@ -402,12 +402,12 @@ function composeExchanges(Exchange[]): Exchange;
 This can be used to combine some exchanges and is also used by `Client`
 to handle the `exchanges` input.
 
-### `cacheExchange` (Exchange)
+### cacheExchange (Exchange)
 
 The `cacheExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#cacheexchange).
 It's of type `Exchange`.
 
-### `subscriptionExchange` (Exchange factory)
+### subscriptionExchange (Exchange factory)
 
 The `subscriptionExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#subscriptions).
 It's of type `Options => Exchange`.
@@ -416,7 +416,7 @@ It accepts a single input: `{ forwardSubscription }`. This is a function that
 receives an enriched operation and must return an Observable-like object that
 streams `GraphQLResult`s with `data` and `errors`.
 
-### `ssrExchange` (Exchange factory)
+### ssrExchange (Exchange factory)
 
 The `ssrExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#server-side-rendering).
 It's of type `Options => Exchange`.
@@ -450,31 +450,31 @@ It needs to be used _after_ other caching Exchanges like the
 `cacheExchange`, but before any _asynchronous_ Exchange like
 the `fetchExchange`.
 
-### `debugExchange` (Exchange)
+### debugExchange (Exchange)
 
 An exchange that writes incoming `Operation`s to `console.log` and
 writes completed `OperationResult`s to `console.log`.
 
-### `dedupExchange` (Exchange)
+### dedupExchange (Exchange)
 
 An exchange that keeps track of ongoing `Operation`s that haven't returned had
 a corresponding `OperationResult` yet. Any duplicate `Operation` that it
 receives is filtered out if the same `Operation` has already been received
 and is still waiting for a result.
 
-### `fallbackExchangeIO` (ExchangeIO)
+### fallbackExchangeIO (ExchangeIO)
 
 This is an `ExchangeIO` function that the `Client` adds on after all
 exchanges. This function is responsible from filtering `teardown` operations
 out of the output and also warns you of unhandled `operationName`s which
 can occur when a subscription is used without adding a `subscriptionExchange`.
 
-### `fetchExchange` (Exchange)
+### fetchExchange (Exchange)
 
 The `fetchExchange` as [described in the Basics section](https://formidable.com/open-source/urql/docs/basics#fetchexchange).
 It's of type `Exchange`.
 
-### `defaultExchanges` (Exchange[])
+### defaultExchanges (Exchange[])
 
 An array of the default exchanges that the `Client` uses when it wasn't passed
 an `exchanges` option.

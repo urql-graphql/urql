@@ -19,18 +19,18 @@ automatically, which is the same as creating a client using the following
 exchanges:
 
 ```js
-import { Client, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Client, dedupExchange, cacheExchange, fetchExchange } from "urql";
 
 const client = new Client({
-  url: '/graphql',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  url: "/graphql",
+  exchanges: [dedupExchange, cacheExchange, fetchExchange]
 });
 ```
 
 This list of default exchanges is also exported as `defaultExchanges`
 however.
 
-## `fetchExchange`
+## fetchExchange
 
 <a name="fetchexchange"></a>
 
@@ -74,7 +74,7 @@ allow `response.status >= 300` when `redirect` is set to `'manual'`.
 **In summary:** `fetchExchange` is a simple request handler that takes
 operations and sends `POST` requests using `fetch`.
 
-## `cacheExchange`
+## cacheExchange
 
 <a name="cacheexchange"></a>
 
@@ -193,16 +193,16 @@ it to prefetch data on the server-side. For this reason we have a companion
 library, [`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which can be used to run a "prepass"
 that fetches all suspended data it finds in a React element tree.
 
-### Setting up the `Client`
+### Setting up the Client
 
 When you set up the `Client` for server-side rendering, on the server
 you will need to set `suspense` to `true` and on the client to `false`,
 
 ```js
-import { Client } from 'urql';
+import { Client } from "urql";
 
 const client = new Client({
-  suspense: !process.browser,
+  suspense: !process.browser
   // ...
 });
 ```
@@ -220,8 +220,8 @@ import {
   dedupExchange,
   cacheExchange,
   fetchExchange,
-  ssrExchange,
-} from 'urql';
+  ssrExchange
+} from "urql";
 
 const ssrCache = ssrExchange();
 
@@ -232,10 +232,10 @@ const client = new Client({
     // Put the exchange returned by calling ssrExchange after your cacheExchange,
     // but before any asynchronous exchanges like the fetchExchange:
     ssrCache,
-    fetchExchange,
+    fetchExchange
   ],
   // ...
-  suspense: !process.browser,
+  suspense: !process.browser
 });
 ```
 
@@ -308,10 +308,10 @@ You can either do so when creating `ssrExchange`, by passing it `initialState`
 as a parameter or calling `restoreData` on it:
 
 ```js
-import { ssrExchange } from 'urql';
+import { ssrExchange } from "urql";
 
 const ssrCache = ssrExchange({
-  initialState: window.URQL_DATA,
+  initialState: window.URQL_DATA
 });
 
 // or:
@@ -339,16 +339,16 @@ To add support for subscriptions there's the `subscriptionExchange`.
 When you first setup subscriptions you will need to add it.
 
 ```js
-import { Client, defaultExchanges, subscriptionExchange } from 'urql';
+import { Client, defaultExchanges, subscriptionExchange } from "urql";
 
 const client = new Client({
-  url: '/graphql',
+  url: "/graphql",
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
-      forwardSubscription,
-    }),
-  ],
+      forwardSubscription
+    })
+  ]
 });
 ```
 
@@ -421,8 +421,8 @@ can display all messages that have come in over the subscription across
 events.
 
 ```js
-import React from 'react';
-import { useSubscription } from 'urql';
+import React from "react";
+import { useSubscription } from "urql";
 
 const newMessages = `
   subscription MessageSub {

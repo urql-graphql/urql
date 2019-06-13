@@ -32,7 +32,7 @@ While it's possible to write new APIs outside of React or new components
 quite easily, this section will only focus on hooks, for illustrative
 purposes.
 
-### Writing `useQuery` from scratch
+### Writing useQuery from scratch
 
 There's a couple of outward facing APIs that `urql` comes with, but none
 illustrate how to write new APIs better than
@@ -43,8 +43,8 @@ the context API. Every GraphQL request must pass through the client to make
 use of `urql`'s `Operation` management and exchange pipeline.
 
 ```js
-import { useContext } from 'react';
-import { Context } from 'urql';
+import { useContext } from "react";
+import { Context } from "urql";
 
 export const useQuery = () => {
   const client = useContext(Context);
@@ -55,8 +55,8 @@ At this point we have the client. Next we'll want to accept a request
 and execute a query.
 
 ```js
-import { useContext } from 'react';
-import { Context, createRequest } from 'urql';
+import { useContext } from "react";
+import { Context, createRequest } from "urql";
 
 export const useQuery = ({ query, variables }) => {
   const client = useContext(Context);
@@ -81,9 +81,9 @@ to just subscribe to `source` and get the data out. In fact,
 we'll only need `subscribe`.
 
 ```js
-import { useContext } from 'react';
-import { pipe, subscribe } from 'wonka';
-import { Context, createQuery } from 'urql';
+import { useContext } from "react";
+import { pipe, subscribe } from "wonka";
+import { Context, createQuery } from "urql";
 
 export const useQuery = ({ query, variables }) => {
   const client = useContext(Context);
@@ -104,15 +104,15 @@ to wrap the query in `useEffect` so we can trigger it when
 the hook's inputs change.
 
 ```js
-import { useContext, useState, useEffect } from 'react';
-import { pipe, subscribe } from 'wonka';
-import { Context, createQuery } from 'urql';
+import { useContext, useState, useEffect } from "react";
+import { pipe, subscribe } from "wonka";
+import { Context, createQuery } from "urql";
 
 export const useQuery = ({ query, variables }) => {
   const [result, setResult] = useState({
     fetching: false,
     error: undefined,
-    data: undefined,
+    data: undefined
   });
 
   const client = useContext(Context);
