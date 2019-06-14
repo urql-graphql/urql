@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import * as ReactDOM from 'react-dom';
 import { createClient, Provider } from 'urql';
-import { Home } from './home';
+import { Home } from './Home';
 import './index.css';
 
 const client = createClient({
