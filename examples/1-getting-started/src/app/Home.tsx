@@ -1,13 +1,16 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from 'urql';
 import { Error, Loading, Todo } from './components';
 
+interface ITodo {
+  id: string;
+  text: string;
+  complete: boolean;
+}
+
 interface QueryResponse {
-  todos: Array<{
-    id: number;
-    text: string;
-  }>;
+  todos: ITodo[];
 }
 
 export const Home: FC = () => {
@@ -17,7 +20,7 @@ export const Home: FC = () => {
     []
   );
 
-  const getContent = () => {
+  const todos = useMemo(() => {
     if (res.fetching || res.data === undefined) {
       return <Loading />;
     }
@@ -28,16 +31,16 @@ export const Home: FC = () => {
 
     return (
       <ul>
-        {res.data.todos.map(todo => (
+        {res.data.todos.map((todo: ITodo) => (
           <Todo key={todo.id} {...todo} />
         ))}
       </ul>
     );
-  };
+  }, [res]);
 
   return (
     <>
-      {getContent()}
+      {todos}
       <button onClick={refetch}>Refetch</button>
     </>
   );
