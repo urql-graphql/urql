@@ -20,10 +20,7 @@ jest.mock('../client', () => {
 import * as React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { Subscription } from './Subscription';
-import { createClient } from '../client';
 
-// @ts-ignore
-const client = createClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
 
 describe('Subscription', () => {

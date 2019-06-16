@@ -60,7 +60,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   // unsubscribing from subscriptions during SSR
   useEffect(() => {
     executeSubscription();
-    return () => unsubscribe.current();
+    return () => unsubscribe.current(); // eslint-disable-line
   }, [executeSubscription]);
 
   return [state];

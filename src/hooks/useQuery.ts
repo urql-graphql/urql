@@ -73,7 +73,7 @@ export const useQuery = <T = any, V = object>(
     }
 
     executeQuery();
-    return () => unsubscribe.current();
+    return () => unsubscribe.current(); // eslint-disable-line
   }, [executeQuery, args.pause, setState]);
 
   return [state, executeQuery];

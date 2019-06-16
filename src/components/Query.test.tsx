@@ -20,10 +20,8 @@ jest.mock('../client', () => {
 import * as React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { Query } from './Query';
-import { createClient } from '../client';
 
 // @ts-ignore
-const client = createClient();
 const query = '{ example }';
 const variables = {
   myVar: 1234,
