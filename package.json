@@ -21,17 +21,13 @@
     "exchanges"
   ],
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "run-p build:types build:bundle",
-    "build:clean": "rimraf dist",
-    "build:types": "tsc -d --emitDeclarationOnly --outDir dist/types",
-    "build:bundle": "rollup -c rollup.config.js",
-    "build:prune": "rimraf dist/types/**/*.test.d.ts dist/types/test-utils",
+    "clean": "rimraf ./dist ./node_modules/.cache",
+    "build": "rollup -c rollup.config.js",
+    "watch": "rollup -w -c rollup.config.js",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "check-formatting": "prettier --write src/**/*.{ts,tsx}",
-    "prepublishOnly": "run-s build build:prune",
+    "prepublishOnly": "run-s clean build",
     "codecov": "codecov"
   },
   "author": "Formidable",
