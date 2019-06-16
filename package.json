@@ -88,6 +88,7 @@
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@testing-library/react": "^8.0.1",
     "@types/enzyme": "3.1.16",
+    "@types/fast-json-stable-stringify": "^2.0.0",
     "@types/graphql": "^14.0.7",
     "@types/jest": "^23.3.13",
     "@types/react": "16.8.2",
@@ -136,7 +137,6 @@
     "react-dom": ">= 16.8.0"
   },
   "dependencies": {
-    "@types/fast-json-stable-stringify": "^2.0.0",
     "fast-json-stable-stringify": "^2.0.0",
     "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
