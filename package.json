@@ -27,7 +27,7 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s clean build",
+    "prepublishOnly": "run-s clean test build",
     "codecov": "codecov"
   },
   "author": "Formidable",
