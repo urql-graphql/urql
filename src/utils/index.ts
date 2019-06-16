@@ -1,3 +1,4 @@
+export * from './debug';
 export { CombinedError } from './error';
 export { getKeyForRequest } from './keyForQuery';
 export { createRequest } from './request';

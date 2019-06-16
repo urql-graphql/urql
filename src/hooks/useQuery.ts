@@ -3,7 +3,7 @@ import { useCallback, useContext, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
-import { CombinedError, noop } from '../utils';
+import { CombinedError, noop, getHookParent } from '../utils';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
@@ -29,6 +29,7 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
+  const devtoolsContext = useRef({ source: getHookParent() });
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -54,6 +55,7 @@ export const useQuery = <T = any, V = object>(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
           ...opts,
+          devtools: devtoolsContext.current,
         }),
         subscribe(({ data, error }) => {
           setState({ fetching: false, data, error });
