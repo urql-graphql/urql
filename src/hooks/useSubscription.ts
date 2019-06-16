@@ -2,7 +2,8 @@ import { DocumentNode } from 'graphql';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, noop, getHookParent } from '../utils';
+import { CombinedError, noop } from '../utils';
+import { useDevtoolsContext } from './useDevtoolsContext';
 import { useRequest } from './useRequest';
 import { useImmediateState } from './useImmediateState';
 
@@ -25,7 +26,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const devtoolsContext = useRef({ source: getHookParent() });
+  const [devtoolsContext] = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -43,9 +44,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current();
 
     [unsubscribe.current] = pipe(
-      client.executeSubscription(request, {
-        devtools: devtoolsContext.current,
-      }),
+      client.executeSubscription(request, devtoolsContext),
       subscribe(({ data, error }) => {
         setState(s => ({
           fetching: true,
@@ -54,7 +53,7 @@ export const useSubscription = <T = any, R = T, V = object>(
         }));
       })
     );
-  }, [client, handler, request, setState]);
+  }, [client, devtoolsContext, handler, request, setState]);
 
   // Trigger subscription on query change
   // We don't use useImmediateEffect here as we have no way of

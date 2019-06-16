@@ -1,10 +1,11 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useCallback, useRef } from 'react';
+import { useContext, useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
 import { OperationResult } from '../types';
-import { CombinedError, createRequest, getHookParent } from '../utils';
+import { CombinedError, createRequest } from '../utils';
 import { useImmediateState } from './useImmediateState';
+import { useDevtoolsContext } from './useDevtoolsContext';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -20,7 +21,7 @@ export type UseMutationResponse<T, V> = [
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
-  const devtoolsContext = useRef({ source: getHookParent() });
+  const [devtoolsContext] = useDevtoolsContext();
   const client = useContext(Context);
   const [state, setState] = useImmediateState<UseMutationState<T>>({
     fetching: false,
@@ -35,7 +36,7 @@ export const useMutation = <T = any, V = object>(
       const request = createRequest(query, variables as any);
 
       return pipe(
-        client.executeMutation(request, { devtools: devtoolsContext.current }),
+        client.executeMutation(request, devtoolsContext),
         toPromise
       ).then(result => {
         const { data, error } = result;
@@ -43,7 +44,7 @@ export const useMutation = <T = any, V = object>(
         return result;
       });
     },
-    [client, query, setState]
+    [client, devtoolsContext, query, setState]
   );
 
   return [state, executeMutation];

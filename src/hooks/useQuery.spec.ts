@@ -90,9 +90,9 @@ describe('useQuery', () => {
         query: expect.any(Object),
         variables: mockVariables,
       },
-      {
+      expect.objectContaining({
         requestPolicy: undefined,
-      }
+      })
     );
   });
 
@@ -138,9 +138,9 @@ describe('useQuery', () => {
         query: expect.any(Object),
         variables: {},
       },
-      {
+      expect.objectContaining({
         requestPolicy: undefined,
-      }
+      })
     );
   });
 
@@ -168,9 +168,9 @@ describe('useQuery', () => {
         query: expect.any(Object),
         variables: newVariables,
       },
-      {
+      expect.objectContaining({
         requestPolicy: undefined,
-      }
+      })
     );
   });
 
@@ -211,9 +211,9 @@ describe('useQuery', () => {
         query: expect.any(Object),
         variables: mockVariables,
       },
-      {
+      expect.objectContaining({
         requestPolicy: 'cache-first',
-      }
+      })
     );
 
     rerender({
@@ -229,9 +229,9 @@ describe('useQuery', () => {
         query: expect.any(Object),
         variables: mockVariables,
       },
-      {
+      expect.objectContaining({
         requestPolicy: 'network-only',
-      }
+      })
     );
   });
 
