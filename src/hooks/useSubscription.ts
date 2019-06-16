@@ -2,7 +2,7 @@ import { DocumentNode } from 'graphql';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
-import { CombinedError, noop } from '../utils';
+import { CombinedError, noop, getHookParent } from '../utils';
 import { useRequest } from './useRequest';
 import { useImmediateState } from './useImmediateState';
 
@@ -25,6 +25,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
+  const devtoolsContext = useRef({ source: getHookParent() });
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -42,7 +43,9 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current();
 
     [unsubscribe.current] = pipe(
-      client.executeSubscription(request),
+      client.executeSubscription(request, {
+        devtools: devtoolsContext.current,
+      }),
       subscribe(({ data, error }) => {
         setState(s => ({
           fetching: true,

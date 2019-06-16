@@ -51,11 +51,22 @@ describe('on initial useEffect', () => {
 
   it('passes query to executeSubscription', () => {
     renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith({
-      key: expect.any(Number),
-      query: expect.any(Object),
-      variables: {},
-    });
+    expect(client.executeSubscription).toBeCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: {},
+      },
+      expect.any(Object)
+    );
+  });
+
+  it('passes source component info to executeSubscription', () => {
+    renderer.create(<SubscriptionUser q={query} />);
+    expect(client.executeSubscription).toBeCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ devtools: { source: 'SubscriptionUser' } })
+    );
   });
 });
 

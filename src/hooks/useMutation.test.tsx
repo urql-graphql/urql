@@ -106,6 +106,16 @@ describe('on execute', () => {
       vars
     );
   });
+
+  it('calls executeMutation with source component info', () => {
+    renderer.create(<MutationUser {...props} />);
+    act(() => {
+      execute(vars);
+    });
+    expect(client.executeMutation.mock.calls[0][1]).toHaveProperty('devtools', {
+      source: 'MutationUser',
+    });
+  });
 });
 
 describe('on subscription update', () => {
