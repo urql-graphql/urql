@@ -24,6 +24,7 @@
     "clean": "rimraf ./dist ./node_modules/.cache",
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -w -c rollup.config.js",
+    "check": "tsc --noEmit",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
