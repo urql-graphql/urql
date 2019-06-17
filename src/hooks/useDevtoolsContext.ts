@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo } from 'react';
 
 /** Find the name of the calling component. */
 const getHookParent = () => {
@@ -16,9 +16,10 @@ const getHookParent = () => {
 };
 
 const useDevtoolsContextHook = () => {
-  const source = useRef(getHookParent());
-
-  return [{ devtools: { source: source.current } }];
+  return useMemo(() => {
+    const source = getHookParent();
+    return [{ devtools: { source } }];
+  }, []);
 };
 
 /** Creates additional context values for serving metadata to devtools. */
