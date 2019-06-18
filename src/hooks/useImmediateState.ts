@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useLayoutEffect } from 'react';
+import { isSSR } from '../utils';
 
 type SetStateAction<S> = S | ((prevState: S) => S);
 type SetState<S> = (action: SetStateAction<S>) => void;
@@ -26,12 +27,13 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
     setState(action);
   }, []);
 
-  useLayoutEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
+  !isSSR && // eslint-disable-next-line react-hooks/rules-of-hooks
+    useLayoutEffect(() => {
+      isMounted.current = true;
+      return () => {
+        isMounted.current = false;
+      };
+    }, []);
 
   return [state, updateState];
 };
