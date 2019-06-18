@@ -8,6 +8,13 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.1.3](https://github.com/FormidableLabs/urql/compare/v1.1.2...v1.1.3)
+
+This is a hotfix that patches a small regression from `1.1.2` where
+`useQuery` would crash due to an incorrect teardown function from pause.
+
+- Fix `executeQuery` dispose function when `pause` is set, by[@JoviDeCroock](https://github.com/JoviDeCroock) (see [#315](https://github.com/FormidableLabs/urql/pull/315))
+
 ## [v1.1.2](https://github.com/FormidableLabs/urql/compare/v1.1.1...v1.1.2)
 
 This patch fixes a small bug that usually manifests in development,
