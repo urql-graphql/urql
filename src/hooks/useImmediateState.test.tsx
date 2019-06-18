@@ -9,12 +9,13 @@ const initialState = { someObject: 1234 };
 const updateState = { someObject: 5678 };
 let state;
 let setState;
+let returnVal;
 
 const Fixture = ({ update }: { update?: boolean }) => {
   const [a, set] = useImmediateState<object>(initialState);
 
   if (update) {
-    set(updateState);
+    returnVal = set(updateState);
   }
 
   state = a;
@@ -35,6 +36,7 @@ describe('on initial mount', () => {
     renderer.create(<Fixture update={true} />);
     expect(setStateMock).toBeCalledTimes(0);
     expect(state).toEqual(updateState);
+    expect(returnVal).toBe(undefined);
   });
 });
 
@@ -43,5 +45,6 @@ describe('on later mounts', () => {
     renderer.create(<Fixture />);
     setState(updateState);
     expect(setStateMock).toBeCalledTimes(1);
+    expect(returnVal).toBe(undefined);
   });
 });
