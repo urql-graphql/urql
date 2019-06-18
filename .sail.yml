@@ -2,6 +2,7 @@ workflow:
   - install
   - sail:parallel:
     - build
+    - check
     - lint
     - test
     - e2e
@@ -36,6 +37,12 @@ tasks:
       - yarn
     args:
       - build
+  check:
+    image: node:10
+    command:
+      - yarn
+    args:
+      - check
   e2e:
     image: cypress/browsers:node10.2.1-chrome74
     command:
