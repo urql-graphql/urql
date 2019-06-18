@@ -66,7 +66,8 @@ export const useQuery = <T = any, V = object>(
   useImmediateEffect(() => {
     if (args.pause) {
       unsubscribe.current();
-      return setState(s => ({ ...s, fetching: false }));
+      setState(s => ({ ...s, fetching: false }));
+      return noop;
     }
 
     executeQuery();
