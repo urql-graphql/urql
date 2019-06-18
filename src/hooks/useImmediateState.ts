@@ -1,5 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
-import { isSSR } from '../utils';
+import { useRef, useState, useCallback, useLayoutEffect } from 'react';
 
 type SetStateAction<S> = S | ((prevState: S) => S);
 type SetState<S> = (action: SetStateAction<S>) => void;
@@ -10,12 +9,13 @@ type SetState<S> = (action: SetStateAction<S>) => void;
  * a React update using setState
  */
 export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
+  const isMounted = useRef(false);
   const initialState = useRef<S>({ ...init });
   const [state, setState] = useState<S>(initialState.current);
 
   // This wraps setState and updates the state mutably on initial mount
   const updateState: SetState<S> = useCallback((action: SetStateAction<S>) => {
-    if (isSSR()) {
+    if (!isMounted.current) {
       const newValue =
         typeof action === 'function'
           ? (action as (arg: S) => S)(initialState.current)
@@ -24,6 +24,13 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
     }
 
     setState(action);
+  }, []);
+
+  useLayoutEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   return [state, updateState];

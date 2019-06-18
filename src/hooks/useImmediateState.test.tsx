@@ -1,11 +1,6 @@
-jest.mock('../utils/ssr', () => ({
-  isSSR: jest.fn(),
-}));
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mocked } from 'ts-jest/utils';
 import { useImmediateState } from './useImmediateState';
-import { isSSR } from '../utils/ssr';
 
 const setStateMock = jest.fn();
 jest.spyOn(React, 'useState').mockImplementation(arg => [arg, setStateMock]);
@@ -13,26 +8,24 @@ jest.spyOn(React, 'useState').mockImplementation(arg => [arg, setStateMock]);
 const initialState = { someObject: 1234 };
 const updateState = { someObject: 5678 };
 let state;
+let setState;
 
 const Fixture = ({ update }: { update?: boolean }) => {
-  const [a, setState] = useImmediateState<object>(initialState);
+  const [a, set] = useImmediateState<object>(initialState);
 
   if (update) {
-    setState(updateState);
+    set(updateState);
   }
 
   state = a;
+  setState = set;
 
   return null;
 };
 
 beforeEach(jest.clearAllMocks);
 
-describe('in ssr', () => {
-  beforeEach(() => {
-    mocked(isSSR).mockReturnValue(true);
-  });
-
+describe('on initial mount', () => {
   it('sets initial state', () => {
     renderer.create(<Fixture />);
     expect(state).toEqual(initialState);
@@ -45,18 +38,10 @@ describe('in ssr', () => {
   });
 });
 
-describe('in browser', () => {
-  beforeEach(() => {
-    mocked(isSSR).mockReturnValue(false);
-  });
-
-  it('sets initial state', () => {
+describe('on later mounts', () => {
+  it('sets state via setState', () => {
     renderer.create(<Fixture />);
-    expect(state).toEqual(initialState);
-  });
-
-  it('calls setState on update', () => {
-    renderer.create(<Fixture update={true} />);
+    setState(updateState);
     expect(setStateMock).toBeCalledTimes(1);
   });
 });
