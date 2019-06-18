@@ -8,6 +8,18 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.1.2](https://github.com/FormidableLabs/urql/compare/v1.1.1...v1.1.2)
+
+This patch fixes a small bug that usually manifests in development,
+where the initial state would be incorrect after a fast response from
+the GraphQL API. This used to lock the state into `fetching: true`
+indefinitely in some cases.
+
+- Export all TS types for components (see [#312](https://github.com/FormidableLabs/urql/pull/312))
+- ⚠️ Fix state getting stuck on initial mount for fast responses (see [#310](https://github.com/FormidableLabs/urql/pull/310))
+- Refactor build tooling to be driven only by Rollup (see [#306](https://github.com/FormidableLabs/urql/pull/306))
+- Remove dev-only dependencies from `dependencies` (see [#304](https://github.com/FormidableLabs/urql/pull/304))
+
 ## [v1.1.1](https://github.com/FormidableLabs/urql/compare/v1.1.0...v1.1.1)
 
 This release comes with two small patches. One being a crticial fix,
