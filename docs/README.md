@@ -28,11 +28,6 @@ Everything about the basic & default `urql` behaviour
 that comes with explanations of the `fetchExchange`,
 the `cacheExchange`, and how to use _Subscriptions_.
 
-### [Exchanges](exchanges.md)
-
-Exchanges written by the community, these enhance
-the behavior of your urql-client.
-
 ### [Extending & Experimenting](extending-and-experimenting.md)
 
 Here's everything you need to know to extend,
