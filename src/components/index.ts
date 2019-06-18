@@ -1,3 +1,3 @@
-export { Mutation } from './Mutation';
-export { Query } from './Query';
-export { Subscription } from './Subscription';
+export * from './Mutation';
+export * from './Query';
+export * from './Subscription';
