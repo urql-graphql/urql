@@ -69,7 +69,7 @@ const terserMinified = terser({
   }
 });
 
-const plugins = [
+const makePlugins = (isProduction = false) => [
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
     browser: true
@@ -84,14 +84,21 @@ const plugins = [
   typescript({
     typescript: require('typescript'),
     cacheRoot: './node_modules/.cache/.rts2_cache',
+    useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
       compilerOptions: {
-        sourceMap: true,
-        declaration: true
+        sourceMap: true
       },
     },
     tsconfigOverride: {
-      compilerOptions: {
+     exclude: [
+       'src/**/*.test.ts',
+       'src/**/*.test.tsx',
+       'src/**/test-utils/*'
+     ],
+     compilerOptions: {
+        declaration: !isProduction,
+        declarationDir: './dist/types/',
         target: 'es6',
       },
     },
@@ -123,7 +130,8 @@ const plugins = [
         externalHelpers: true
       }]
     ]
-  })
+  }),
+  isProduction ? terserMinified : terserPretty
 ];
 
 const config = {
@@ -137,7 +145,7 @@ const config = {
 export default [
   {
     ...config,
-    plugins: [...plugins, terserPretty],
+    plugins: makePlugins(false),
     output: [
       {
         sourcemap: true,
@@ -158,7 +166,7 @@ export default [
     ]
   }, {
     ...config,
-    plugins: [...plugins, terserMinified],
+    plugins: makePlugins(true),
     output: [
       {
         sourcemap: true,
