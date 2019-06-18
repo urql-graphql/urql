@@ -73,6 +73,6 @@ describe('Mutation', () => {
     setTimeout(() => {
       expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
       done();
-    }, 200);
+    }, 400);
   });
 });
