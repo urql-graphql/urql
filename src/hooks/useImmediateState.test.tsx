@@ -10,15 +10,19 @@ import { isSSR } from '../utils/ssr';
 const setStateMock = jest.fn();
 jest.spyOn(React, 'useState').mockImplementation(arg => [arg, setStateMock]);
 
-let initialState: any;
+const initialState = { someObject: 1234 };
+const updateState = { someObject: 5678 };
 let state;
-let setState;
 
-const Fixture = () => {
-  const [a, b] = useImmediateState(initialState);
+const Fixture = ({ update }: { update?: boolean }) => {
+  const [a, setState] = useImmediateState<object>(initialState);
+
+  if (update) {
+    setState(updateState);
+  }
 
   state = a;
-  setState = b;
+
   return null;
 };
 
@@ -27,7 +31,6 @@ beforeEach(jest.clearAllMocks);
 describe('in ssr', () => {
   beforeEach(() => {
     mocked(isSSR).mockReturnValue(true);
-    initialState = { arg: 1234 };
   });
 
   it('sets initial state', () => {
@@ -36,16 +39,15 @@ describe('in ssr', () => {
   });
 
   it('only mutates on setState call', () => {
-    renderer.create(<Fixture />);
-    setState({ newValue: 1234 });
+    renderer.create(<Fixture update={true} />);
     expect(setStateMock).toBeCalledTimes(0);
+    expect(state).toEqual(updateState);
   });
 });
 
 describe('in browser', () => {
   beforeEach(() => {
     mocked(isSSR).mockReturnValue(false);
-    initialState = { arg: 1234 };
   });
 
   it('sets initial state', () => {
@@ -54,8 +56,7 @@ describe('in browser', () => {
   });
 
   it('calls setState on update', () => {
-    renderer.create(<Fixture />);
-    setState({ newValue: 1234 });
+    renderer.create(<Fixture update={true} />);
     expect(setStateMock).toBeCalledTimes(1);
   });
 });

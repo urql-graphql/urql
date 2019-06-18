@@ -9,8 +9,8 @@ type SetState<S> = (action: SetStateAction<S>) => void;
  * During initial mount it will mutably update the state, instead of scheduling
  * a React update using setState
  */
-export const useImmediateState = <S extends any>(init: S): [S, SetState<S>] => {
-  const initialState = useRef<S>(init);
+export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
+  const initialState = useRef<S>({ ...init });
   const [state, setState] = useState<S>(initialState.current);
 
   // This wraps setState and updates the state mutably on initial mount
