@@ -37,13 +37,7 @@ const getRequestPolicy = (op: Operation) => op.context.requestPolicy;
 
 // Returns whether an operation is a query
 const isQueryOperation = (op: Operation): boolean => {
-  const policy = getRequestPolicy(op);
-  return (
-    op.operationName === 'query' &&
-    (policy === 'cache-and-network' ||
-      policy === 'cache-first' ||
-      policy === 'cache-only')
-  );
+  return op.operationName === 'query';
 };
 
 // Returns whether an operation is handled by this exchange
@@ -169,6 +163,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
 
       // Update operations that depend on the updated data (except the current one)
       processDependencies(operation, dependencies);
+
       // Update this operation's dependencies if it's a query
       if (isQueryOperation(operation)) {
         updateDependencies(operation, dependencies);
