@@ -1,0 +1,45 @@
+workflow:
+  - install
+  - sail:parallel:
+    - build
+    - check
+    - lint
+    - test
+tasks:
+  install:
+    image: node:10
+    command:
+      - yarn
+    args:
+      - install
+      - --frozen-lockfile
+  lint:
+    image: node:10
+    command:
+      - yarn
+    args:
+      - lint
+  test:
+    image: node:10
+    env:
+      - CODECOV_TOKEN
+    command:
+      - yarn
+    args:
+      - run
+      - run-s
+      - coverage
+      - codecov
+  build:
+    image: node:10
+    command:
+      - yarn
+    args:
+      - build
+  check:
+    image: node:10
+    command:
+      - yarn
+    args:
+      - run
+      - check
