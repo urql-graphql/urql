@@ -1,7 +1,7 @@
 {
   "name": "@urql/exchange-graphcache",
   "version": "0.1.0-alpha.5",
-  "description": "A normalizing GraphQL cache configurable by defining exceptions to the rule",
+  "description": "A normalized and configurable cache exchange for urql",
   "repository": "https://github.com/kitten/urql-exchange-graphcache",
   "bugs": {
     "url": "https://github.com/kitten/urql-exchange-graphcache/issues"
