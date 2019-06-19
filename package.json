@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "fast-json-stable-stringify": "^2.0.0",
+    "scheduler": "^0.14.0",
     "wonka": "^3.0.0"
   },
   "peerDependencies": {
