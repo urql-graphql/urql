@@ -1,5 +1,5 @@
 import { joinKeys } from '../helpers';
-import { find, readLink, remove, removeLink, Store } from '../store';
+import { Store } from '../store';
 import { Link } from '../types';
 
 interface Context {
@@ -17,20 +17,20 @@ export const gc = (store: Store) => {
 
   store.records.forEach((_entity, key) => {
     if (!visitedRecords.has(key)) {
-      remove(store, key);
+      store.remove(key);
     }
   });
 
   store.links.forEach((_link, key) => {
     if (!visitedLinks.has(key)) {
-      removeLink(store, key);
+      store.removeLink(key);
     }
   });
 };
 
 const walkEntity = (ctx: Context, key: string) => {
   const { store, visitedRecords, visitedLinks } = ctx;
-  const entity = find(store, key);
+  const entity = store.find(key);
 
   if (entity !== null && !visitedRecords.has(key)) {
     visitedRecords.add(key);
@@ -39,7 +39,7 @@ const walkEntity = (ctx: Context, key: string) => {
       const value = entity[fieldKey];
       if (value === null) {
         const childFieldKey = joinKeys(key, fieldKey);
-        const link = readLink(store, childFieldKey);
+        const link = store.readLink(childFieldKey);
         if (link !== undefined && !visitedLinks.has(childFieldKey)) {
           visitedLinks.add(childFieldKey);
           walkLink(ctx, link);

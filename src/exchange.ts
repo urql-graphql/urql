@@ -14,7 +14,7 @@ import {
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write, gc } from './operations';
-import { create, SerializedStore } from './store';
+import { Store, SerializedStore } from './store';
 
 type OperationResultWithMeta = OperationResult & {
   isComplete: boolean;
@@ -73,7 +73,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
 }) => {
   let gcScheduled = false;
 
-  const store = create(opts.initial);
+  const store = new Store(opts.initial);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 

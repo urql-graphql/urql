@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { query, write } from '../operations';
-import { create, serialize } from '../store';
+import { Store } from '../store';
 
 interface TestCase {
   query: DocumentNode;
@@ -10,14 +10,14 @@ interface TestCase {
 }
 
 const expectCacheIntegrity = (testcase: TestCase) => {
-  const store = create();
+  const store = new Store();
   const request = { query: testcase.query, variables: testcase.variables };
   const writeRes = write(store, request, testcase.data);
   const queryRes = query(store, request);
   expect(queryRes.data).toEqual(testcase.data);
   expect(queryRes.isComplete).toBe(true);
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
-  const json = serialize(store);
+  const json = store.serialize();
   expect(json).toMatchSnapshot();
   expect(queryRes.dependencies).toMatchSnapshot();
   return json;

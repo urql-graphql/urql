@@ -8,7 +8,7 @@ import {
 } from '../ast';
 
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
-import { findOrCreate, removeLink, setLink, Store } from '../store';
+import { Store } from '../store';
 import { Entity, Link, Scalar } from '../types';
 
 import { forEachFieldNode, makeContext } from './shared';
@@ -49,7 +49,7 @@ const writeEntity = (
   select: SelectionSet
 ) => {
   const { store } = ctx;
-  const entity = findOrCreate(store, key);
+  const entity = store.findOrCreate(key);
   if (key !== 'Query') {
     ctx.dependencies.push(key);
   }
@@ -86,7 +86,7 @@ const writeSelection = (
       // This is a leaf node, so we're setting the field's value directly
       entity[fieldKey] = fieldValue;
       // Remove any links that might've existed before for this field
-      removeLink(store, childFieldKey);
+      store.removeLink(childFieldKey);
     } else {
       // Ensure that this key exists on the entity and that previous values are thrown away
       entity[fieldKey] = null;
@@ -94,7 +94,7 @@ const writeSelection = (
       // Process the field and write links for the child entities that have been written
       const { selections: fieldSelect } = node.selectionSet;
       const link = writeField(ctx, childFieldKey, fieldValue, fieldSelect);
-      setLink(store, childFieldKey, link);
+      store.setLink(childFieldKey, link);
     }
   });
 };

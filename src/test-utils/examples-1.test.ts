@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { query, write } from '../operations';
-import { create, serialize } from '../store';
+import { Store } from '../store';
 
 const Todos = gql`
   query {
@@ -27,7 +27,7 @@ const ToggleTodo = gql`
 `;
 
 it('passes the "getting-started" example', () => {
-  const store = create();
+  const store = new Store();
   const todosData = {
     __typename: 'Query',
     todos: [
@@ -46,7 +46,7 @@ it('passes the "getting-started" example', () => {
     'Todo:2',
   ]);
 
-  expect(serialize(store)).toMatchSnapshot();
+  expect(store.serialize()).toMatchSnapshot();
 
   let queryRes = query(store, { query: Todos });
 
@@ -69,7 +69,7 @@ it('passes the "getting-started" example', () => {
   );
 
   expect(mutationRes.dependencies).toEqual(['Todo:2']);
-  expect(serialize(store)).toMatchSnapshot();
+  expect(store.serialize()).toMatchSnapshot();
 
   queryRes = query(store, { query: Todos });
 

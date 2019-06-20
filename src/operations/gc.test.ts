@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { create, serialize } from '../store';
+import { Store } from '../store';
 import { gc, write } from './index';
 
 const gqlQuery = gql`
@@ -25,7 +25,7 @@ const gqlQuery = gql`
 `;
 
 it('cleans up unreachable records and links', () => {
-  const store = create();
+  const store = new Store();
 
   write(
     store,
@@ -60,7 +60,7 @@ it('cleans up unreachable records and links', () => {
     }
   );
 
-  let json = serialize(store);
+  let json = store.serialize();
 
   expect(json.links['Query.todos']).toEqual(['Todo:0', 'Todo:1', 'Todo:2']);
   expect(json.records['Todo:1']).toMatchObject({ __typename: 'Todo' });
@@ -85,7 +85,7 @@ it('cleans up unreachable records and links', () => {
     }
   );
 
-  json = serialize(store);
+  json = store.serialize();
 
   // Same as above; everything is still reachable but `query.todos` is gone
   expect(json.links['Query.todos']).toBe(undefined);
@@ -93,7 +93,7 @@ it('cleans up unreachable records and links', () => {
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
 
   gc(store);
-  json = serialize(store);
+  json = store.serialize();
 
   expect(json).toMatchSnapshot();
   expect(json.links['Query.todos']).toBe(undefined);
@@ -113,7 +113,7 @@ it('cleans up unreachable records and links', () => {
   );
 
   gc(store);
-  json = serialize(store);
+  json = store.serialize();
 
   expect(json).toEqual({
     records: {

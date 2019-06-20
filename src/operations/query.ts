@@ -7,7 +7,7 @@ import {
 } from '../ast';
 
 import { joinKeys, keyOfField } from '../helpers';
-import { find, readLink, Store } from '../store';
+import { Store } from '../store';
 import { Entity, Link } from '../types';
 
 import { forEachFieldNode, makeContext } from './shared';
@@ -37,7 +37,7 @@ const readEntity = (
   data: Data
 ): Data | null => {
   const { store } = ctx;
-  const entity = find(store, key);
+  const entity = store.find(key);
   if (entity === null) {
     // Cache Incomplete: A missing entity for a key means it wasn't cached
     ctx.isComplete = false;
@@ -80,7 +80,7 @@ const readSelection = (
     } else {
       // null values mean that a field might be linked to other entities
       const fieldSelect = getSelectionSet(node);
-      const link = readLink(store, childFieldKey);
+      const link = store.readLink(childFieldKey);
 
       // Cache Incomplete: A missing link for a field means it's not cached
       if (link === undefined) {
