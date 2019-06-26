@@ -36,13 +36,16 @@ export const collectTypesFromResponse = (response: object) =>
 const formatNode = (
   n: FieldNode | InlineFragmentNode | OperationDefinitionNode
 ) => {
+  if (n.selectionSet === undefined) {
+    return false;
+  }
+
   if (
-    n.selectionSet === undefined ||
     n.selectionSet.selections.some(
       s => s.kind === 'Field' && s.name.value === '__typename'
     )
   ) {
-    return false;
+    return n;
   }
 
   return {
