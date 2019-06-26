@@ -35,10 +35,8 @@ the behavior of your urql-client.
 
 ### [Extending & Experimenting](extending-and-experimenting.md)
 
-Here's everything you need to know to extend,
-customise and experiment with `urql`. This section
-shows you how to use the `Client` to write new
-APIs (Be it for React or not) and how to write
-new "Exchanges" to customise `urql`'s core behaviour!
+Here's everything you need to know to customize and augment
+every aspect of the GraphQL client from how data is cached
+to how components receive their data.
 
 ### [API](api.md)
