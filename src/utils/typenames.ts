@@ -35,25 +35,33 @@ export const collectTypesFromResponse = (response: object) =>
 
 const formatNode = (
   n: FieldNode | InlineFragmentNode | OperationDefinitionNode
-) =>
-  n.selectionSet !== undefined && n.selectionSet.selections !== undefined
-    ? {
-        ...n,
-        selectionSet: {
-          ...n.selectionSet,
-          selections: [
-            ...n.selectionSet.selections,
-            {
-              kind: 'Field',
-              name: {
-                kind: 'Name',
-                value: '__typename',
-              },
-            },
-          ],
+) => {
+  if (
+    n.selectionSet === undefined ||
+    n.selectionSet.selections.some(
+      s => s.kind === 'Field' && s.name.value === '__typename'
+    )
+  ) {
+    return false;
+  }
+
+  return {
+    ...n,
+    selectionSet: {
+      ...n.selectionSet,
+      selections: [
+        ...n.selectionSet.selections,
+        {
+          kind: 'Field',
+          name: {
+            kind: 'Name',
+            value: '__typename',
+          },
         },
-      }
-    : false;
+      ],
+    },
+  };
+};
 
 export const formatDocument = (astNode: DocumentNode) =>
   visit(astNode, {
