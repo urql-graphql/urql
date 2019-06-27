@@ -76,7 +76,7 @@ describe('on query', () => {
   });
 
   describe('cache hit', () => {
-    it('is false when operation is forwarded', () => {
+    it('is miss when operation is forwarded', () => {
       const [ops$, next, complete] = input;
       const exchange = cacheExchange(exchangeArgs)(ops$);
 
@@ -84,7 +84,10 @@ describe('on query', () => {
       next(queryOperation);
       complete();
 
-      expect(forwardedOperations[0].context).toHaveProperty('cacheHit', false);
+      expect(forwardedOperations[0].context).toHaveProperty(
+        'meta.cacheOutcome',
+        'miss'
+      );
     });
 
     it('is true when cached response is returned', async () => {
@@ -103,7 +106,10 @@ describe('on query', () => {
       complete();
 
       const results = await results$;
-      expect(results[1].operation.context).toHaveProperty('cacheHit', true);
+      expect(results[1].operation.context).toHaveProperty(
+        'meta.cacheOutcome',
+        'hit'
+      );
     });
   });
 });

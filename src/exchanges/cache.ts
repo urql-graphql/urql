@@ -3,7 +3,11 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult } from '../types';
-import { collectTypesFromResponse, formatDocument } from '../utils/typenames';
+import {
+  addMetadata,
+  collectTypesFromResponse,
+  formatDocument,
+} from '../utils';
 
 type ResultCache = Map<number, OperationResult>;
 
@@ -52,17 +56,19 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
-        const {
-          key,
-          context: { requestPolicy },
-        } = operation;
+        const { key, context } = operation;
         const cachedResult = resultCache.get(key);
-        if (requestPolicy === 'cache-and-network') {
+        if (context.requestPolicy === 'cache-and-network') {
           reexecuteOperation(client, operation);
         }
 
         if (cachedResult !== undefined) {
-          return cachedResult;
+          return {
+            ...cachedResult,
+            operation: addMetadata(cachedResult.operation, {
+              cacheOutcome: 'hit',
+            }),
+          };
         }
 
         return {
@@ -85,7 +91,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
           filter(op => shouldSkip(op))
         ),
       ]),
-      map(op => ({ ...op, context: { ...op.context, cacheHit: false } })),
+      map(op => addMetadata(op, { cacheOutcome: 'miss' })),
       forward,
       tap(response => {
         if (
@@ -154,10 +160,7 @@ const afterQuery = (
 
   resultCache.set(operation.key, {
     ...response,
-    operation: {
-      ...operation,
-      context: { ...operation.context, cacheHit: true },
-    },
+    operation,
   });
 
   collectTypesFromResponse(response.data).forEach(typeName => {

@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { getKeyForRequest } from './keyForQuery';
-import { GraphQLRequest } from '../types';
+import { GraphQLRequest, Operation, OperationContext } from '../types';
 
 export const createRequest = (
   q: string | DocumentNode,
@@ -15,3 +15,18 @@ export const createRequest = (
     variables: vars || {},
   };
 };
+
+/** Spreads the provided metadata to the source operation's meta property in context.  */
+export const addMetadata = (
+  source: Operation,
+  meta: Exclude<OperationContext['meta'], undefined>
+) => ({
+  ...source,
+  context: {
+    ...source.context,
+    meta: {
+      ...source.context.meta,
+      ...meta,
+    },
+  },
+});

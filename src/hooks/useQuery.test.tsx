@@ -95,7 +95,7 @@ describe('on initial useEffect', () => {
     expect(client.executeQuery).toBeCalledWith(
       expect.any(Object),
       expect.objectContaining({
-        devtools: {
+        meta: {
           source: 'QueryUser',
         },
       })

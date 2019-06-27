@@ -65,7 +65,7 @@ describe('on initial useEffect', () => {
     renderer.create(<SubscriptionUser q={query} />);
     expect(client.executeSubscription).toBeCalledWith(
       expect.any(Object),
-      expect.objectContaining({ devtools: { source: 'SubscriptionUser' } })
+      expect.objectContaining({ meta: { source: 'SubscriptionUser' } })
     );
   });
 });
