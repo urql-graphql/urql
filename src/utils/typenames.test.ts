@@ -7,15 +7,37 @@ const formatTypeNames = (query: string) => {
 };
 
 describe('formatTypeNames', () => {
-  it('should add typenames to a query string', () => {
-    expect(formatTypeNames(`{ todos { id } }`)).toBe(`{
-  todos {
-    id
-    __typename
-  }
-  __typename
-}
-`);
+  it('adds typenames to a query string', () => {
+    expect(formatTypeNames(`{ todos { id } }`)).toMatchInlineSnapshot(`
+      "{
+        todos {
+          id
+          __typename
+        }
+        __typename
+      }
+      "
+    `);
+  });
+
+  it('does not duplicate typenames', () => {
+    expect(
+      formatTypeNames(`{ 
+      todos { 
+        id
+      }
+      __typename
+    }`)
+    ).toMatchInlineSnapshot(`
+            "{
+              todos {
+                id
+                __typename
+              }
+              __typename
+            }
+            "
+        `);
   });
 });
 
