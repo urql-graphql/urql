@@ -168,7 +168,7 @@ from the API.
 The idea of `urql` is that you can customize the caching behavior amongst
 other things yourself, if needed.
 
-[Read more about customizing `urql` in the "Extending & Experimenting" section.](https://formidable.com/open-source/urql/docs/extending-and-experimenting)
+[Read more about customizing `urql` in the "Extending & Experimenting" section.](https://formidable.com/open-source/urql/docs/extending-&-experimenting)
 
 ## Server-side rendering
 
