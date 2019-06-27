@@ -18,7 +18,7 @@ const getHookParent = () => {
 const useDevtoolsContextHook = () => {
   const source = useRef(getHookParent());
 
-  return useMemo(() => [{ devtools: { source: source.current } }], []);
+  return useMemo(() => [{ meta: { source: source.current } }], []);
 };
 
 /** Creates additional context values for serving metadata to devtools. */
