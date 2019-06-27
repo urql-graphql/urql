@@ -1,4 +1,13 @@
-import { makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+import {
+  makeSubject,
+  map,
+  pipe,
+  publish,
+  Source,
+  Subject,
+  scan,
+  toPromise,
+} from 'wonka';
 import { Client } from '../client';
 import {
   mutationOperation,
@@ -9,7 +18,7 @@ import {
   subscriptionResult,
   undefinedQueryResponse,
 } from '../test-utils';
-import { Operation } from '../types';
+import { Operation, OperationResult } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 
 let response;
@@ -42,76 +51,115 @@ beforeEach(() => {
   exchangeArgs = { forward, client };
 });
 
-it('forwards to next exchange when no cache is found', () => {
-  const [ops$, next, complete] = input;
-  const exchange = cacheExchange(exchangeArgs)(ops$);
+describe('on query', () => {
+  it('forwards to next exchange when no cache hit', () => {
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
 
-  publish(exchange);
-  next(queryOperation);
-  complete();
-  expect(forwardedOperations.length).toBe(1);
-  expect(reexecuteOperation).not.toBeCalled();
-});
-
-it('caches queries', () => {
-  const [ops$, next, complete] = input;
-  const exchange = cacheExchange(exchangeArgs)(ops$);
-
-  publish(exchange);
-  next(queryOperation);
-  next(queryOperation);
-  complete();
-  expect(forwardedOperations.length).toBe(1);
-  expect(reexecuteOperation).not.toBeCalled();
-});
-
-it("doesn't cache mutations", () => {
-  response = mutationResponse;
-  const [ops$, next, complete] = input;
-  const exchange = cacheExchange(exchangeArgs)(ops$);
-
-  publish(exchange);
-  next(mutationOperation);
-  next(mutationOperation);
-  complete();
-  expect(forwardedOperations.length).toBe(2);
-  expect(reexecuteOperation).not.toBeCalled();
-});
-
-it('retriggers query operation when mutation occurs', () => {
-  const typename = 'ExampleType';
-  const resultCache = new Map([[123, queryResponse]]);
-  const operationCache = { [typename]: new Set([123]) };
-
-  afterMutation(resultCache, operationCache, exchangeArgs.client)({
-    ...mutationResponse,
-    data: {
-      todos: [
-        {
-          id: 1,
-          __typename: typename,
-        },
-      ],
-    },
+    publish(exchange);
+    next(queryOperation);
+    complete();
+    expect(forwardedOperations.length).toBe(1);
+    expect(reexecuteOperation).not.toBeCalled();
   });
 
-  expect(reexecuteOperation).toBeCalledTimes(1);
+  it('caches results', () => {
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+
+    publish(exchange);
+    next(queryOperation);
+    next(queryOperation);
+    complete();
+    expect(forwardedOperations.length).toBe(1);
+    expect(reexecuteOperation).not.toBeCalled();
+  });
+
+  describe('cache hit', () => {
+    it('is false when operation is forwarded', () => {
+      const [ops$, next, complete] = input;
+      const exchange = cacheExchange(exchangeArgs)(ops$);
+
+      publish(exchange);
+      next(queryOperation);
+      complete();
+
+      expect(forwardedOperations[0].context).toHaveProperty('cacheHit', false);
+    });
+
+    it('is true when cached response is returned', async () => {
+      const [ops$, next, complete] = input;
+      const exchange = cacheExchange(exchangeArgs)(ops$);
+
+      const results$ = pipe(
+        exchange,
+        scan((acc, x) => [...acc, x], [] as OperationResult[]),
+        toPromise
+      );
+
+      publish(exchange);
+      next(queryOperation);
+      next(queryOperation);
+      complete();
+
+      const results = await results$;
+      expect(results[1].operation.context).toHaveProperty('cacheHit', true);
+    });
+  });
 });
 
-it('forwards subscriptions', () => {
-  response = subscriptionResult;
-  const [ops$, next, complete] = input;
-  const exchange = cacheExchange(exchangeArgs)(ops$);
+describe('on mutation', () => {
+  it('does not cache', () => {
+    response = mutationResponse;
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
 
-  publish(exchange);
-  next(subscriptionOperation);
-  next(subscriptionOperation);
-  complete();
-  expect(forwardedOperations.length).toBe(2);
-  expect(reexecuteOperation).not.toBeCalled();
+    publish(exchange);
+    next(mutationOperation);
+    next(mutationOperation);
+    complete();
+    expect(forwardedOperations.length).toBe(2);
+    expect(reexecuteOperation).not.toBeCalled();
+  });
+
+  it('retriggers query operation', () => {
+    const typename = 'ExampleType';
+    const resultCache = new Map([[123, queryResponse]]);
+    const operationCache = { [typename]: new Set([123]) };
+
+    afterMutation(resultCache, operationCache, exchangeArgs.client)({
+      ...mutationResponse,
+      data: {
+        todos: [
+          {
+            id: 1,
+            __typename: typename,
+          },
+        ],
+      },
+    });
+
+    expect(reexecuteOperation).toBeCalledTimes(1);
+  });
 });
 
-describe('undefined data', () => {
+describe('on subscription', () => {
+  it('forwards subscriptions', () => {
+    response = subscriptionResult;
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+
+    publish(exchange);
+    next(subscriptionOperation);
+    next(subscriptionOperation);
+    complete();
+    expect(forwardedOperations.length).toBe(2);
+    expect(reexecuteOperation).not.toBeCalled();
+  });
+});
+
+// Empty query response implies the data propertys is undefined
+describe('on empty query response', () => {
   beforeEach(() => {
     response = undefinedQueryResponse;
     forwardedOperations = [];
@@ -136,7 +184,7 @@ describe('undefined data', () => {
     exchangeArgs = { forward, client };
   });
 
-  it('should not cache on undefined result', () => {
+  it('does not cache response', () => {
     const [ops$, next, complete] = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 

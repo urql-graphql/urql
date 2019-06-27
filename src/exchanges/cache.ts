@@ -85,6 +85,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
           filter(op => shouldSkip(op))
         ),
       ]),
+      map(op => ({ ...op, context: { ...op.context, cacheHit: false } })),
       forward,
       tap(response => {
         if (
@@ -145,19 +146,23 @@ const afterQuery = (
   resultCache: ResultCache,
   operationCache: OperationCache
 ) => (response: OperationResult) => {
-  const {
-    operation: { key },
-    data,
-  } = response;
+  const { operation, data } = response;
+
   if (data === undefined) {
     return;
   }
 
-  resultCache.set(key, response);
+  resultCache.set(operation.key, {
+    ...response,
+    operation: {
+      ...operation,
+      context: { ...operation.context, cacheHit: true },
+    },
+  });
 
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
-    operations.add(key);
+    operations.add(operation.key);
   });
 };
