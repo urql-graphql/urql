@@ -72,9 +72,9 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         }
 
         return {
-          operation,
           data: undefined,
           error: undefined,
+          operation: addMetadata(operation, { cacheOutcome: 'miss' }),
         };
       })
     );
@@ -158,10 +158,7 @@ const afterQuery = (
     return;
   }
 
-  resultCache.set(operation.key, {
-    ...response,
-    operation,
-  });
+  resultCache.set(operation.key, response);
 
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
