@@ -2,7 +2,7 @@
 import { print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
-import { CombinedError } from '../utils/error';
+import { addMetadata, CombinedError } from '../utils';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {
@@ -75,9 +75,15 @@ const createFetchSource = (operation: Operation) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
+    const startTime = Date.now();
     executeFetch(operation, fetchOptions).then(result => {
       if (result !== undefined) {
-        next(result);
+        next({
+          ...result,
+          operation: addMetadata(result.operation, {
+            networkLatency: Date.now() - startTime,
+          }),
+        });
       }
 
       complete();
