@@ -75,9 +75,19 @@ const createFetchSource = (operation: Operation) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
+    const startTime = Date.now();
     executeFetch(operation, fetchOptions).then(result => {
       if (result !== undefined) {
-        next(result);
+        next({
+          ...result,
+          operation: {
+            ...result.operation,
+            context: {
+              ...result.operation.context,
+              latency: Date.now() - startTime,
+            },
+          },
+        });
       }
 
       complete();

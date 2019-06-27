@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`returns error data from fetch 1`] = `
+exports[`on error returns error data 1`] = `
 Object {
   "data": undefined,
   "error": [CombinedError: [Network] ],
@@ -9,6 +9,7 @@ Object {
       "fetchOptions": Object {
         "method": "POST",
       },
+      "latency": 0,
       "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
@@ -128,7 +129,7 @@ Object {
 }
 `;
 
-exports[`returns response data from fetch 1`] = `
+exports[`on success returns response data 1`] = `
 Object {
   "data": Object {
     "data": Object {
@@ -149,6 +150,7 @@ Object {
           },
         ],
       },
+      "latency": 0,
       "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
