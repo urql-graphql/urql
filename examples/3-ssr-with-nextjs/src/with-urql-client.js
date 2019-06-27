@@ -16,7 +16,8 @@ const withUrqlClient = App => {
 
       // getInitialProps is universal, but we only want
       // to run server-side rendered suspense on the server
-      if (process.browser) {
+      const isBrowser = typeof window !== "undefined";
+      if (isBrowser) {
         return appProps;
       }
 
