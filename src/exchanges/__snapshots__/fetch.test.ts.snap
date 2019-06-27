@@ -9,7 +9,9 @@ Object {
       "fetchOptions": Object {
         "method": "POST",
       },
-      "latency": 0,
+      "meta": Object {
+        "networkLatency": 100,
+      },
       "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },
@@ -150,7 +152,9 @@ Object {
           },
         ],
       },
-      "latency": 0,
+      "meta": Object {
+        "networkLatency": 100,
+      },
       "requestPolicy": "cache-first",
       "url": "http://localhost:3000/graphql",
     },

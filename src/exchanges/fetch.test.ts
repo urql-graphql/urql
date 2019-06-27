@@ -42,6 +42,11 @@ const exchangeArgs = {
 
 describe('on success', () => {
   beforeEach(() => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => 100)
+      .mockImplementationOnce(() => 200);
+
     fetch.mockResolvedValue({
       status: 200,
       json: jest.fn().mockResolvedValue(response),
@@ -68,11 +73,6 @@ describe('on success', () => {
   });
 
   it('adds latency info to the context', async () => {
-    jest
-      .spyOn(Date, 'now')
-      .mockImplementationOnce(() => 100)
-      .mockImplementationOnce(() => 200);
-
     const data = await pipe(
       fromValue({
         ...queryOperation,
@@ -84,17 +84,24 @@ describe('on success', () => {
       toPromise
     );
 
-    expect(data.operation.context).toHaveProperty('latency', 100);
+    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
   });
 });
 
 describe('on error', () => {
-  it('returns error data', async () => {
+  beforeEach(() => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => 100)
+      .mockImplementationOnce(() => 200);
+
     fetch.mockResolvedValue({
       status: 400,
       json: jest.fn().mockResolvedValue(response),
     });
+  });
 
+  it('returns error data', async () => {
     const data = await pipe(
       fromValue(queryOperation),
       fetchExchange(exchangeArgs),
@@ -102,6 +109,16 @@ describe('on error', () => {
     );
 
     expect(data).toMatchSnapshot();
+  });
+
+  it('returns error data', async () => {
+    const data = await pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
   });
 });
 
