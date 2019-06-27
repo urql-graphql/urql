@@ -1,6 +1,6 @@
 {
   "name": "urql-docs",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "description": "Documentation site for urql",
   "main": "static.config.js",
   "license": "MIT",
