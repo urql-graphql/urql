@@ -10,7 +10,7 @@ These exchanges can be imported from the `urql` package.
 - fetchExchange - used to manage the outgoing graphql requests
 - subscriptionExchange - used to support subscriptions
 
-## Thirth-party
+## Third-party
 
 - [Persisted Queries](https://github.com/Daniel15/urql-persisted-queries) -
   Uses persisted query hashes to send graphql-queries if possible
