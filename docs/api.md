@@ -73,7 +73,7 @@ interface UseSubscriptionArgs {
 And the handler has the signature:
 
 ```js
-type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
+type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 ```
 
 Meaning that the subscription handler receives the previous data or undefined
@@ -139,12 +139,12 @@ interface UseSubscriptionState<T> {
 
 #### Props
 
-| Prop      | Type                                      | Description                                                                                           |
-| --------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query     | `string`                                  | The GraphQL subscription's query                                                                      |
-| variables | `object`                                  | The GraphQL subscriptions' variables                                                                  |
-| handler   | `void \| (prev: R \| void, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
-| children  | `RenderProps => ReactNode`                | A function that follows the typical render props pattern. The shape of the render props is as follows |
+| Prop      | Type                                                | Description                                                                                           |
+| --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| query     | `string`                                            | The GraphQL subscription's query                                                                      |
+| variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
+| handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
+| children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
 

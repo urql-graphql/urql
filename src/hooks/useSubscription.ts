@@ -12,7 +12,7 @@ export interface UseSubscriptionArgs<V> {
   variables?: V;
 }
 
-export type SubscriptionHandler<T, R> = (prev: R | void, data: T) => R;
+export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export interface UseSubscriptionState<T> {
   fetching: boolean;
