@@ -84,7 +84,7 @@ it('retrieves the component name for class components using Query', () => {
   });
 });
 
-it('leaves a default name for unknown fibers', () => {
+it('looks at the parent component, not the parent fiber', () => {
   let hookResult;
 
   // A context consumer/provider has a different Fiber type
@@ -98,6 +98,7 @@ it('leaves a default name for unknown fibers', () => {
 
   class OuterClassComponent extends Component {
     render() {
+      // Basically put one element "in the middle" of OuterClassComponent and Query
       return React.createElement(
         TestContext.Provider,
         { value: 'test' },
@@ -110,7 +111,7 @@ it('leaves a default name for unknown fibers', () => {
 
   expect(hookResult).toEqual({
     meta: {
-      source: 'Query', // the devtool hook didn't walk up the fiber tree
+      source: 'OuterClassComponent',
     },
   });
 });
