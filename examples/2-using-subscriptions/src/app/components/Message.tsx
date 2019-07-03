@@ -16,3 +16,5 @@ export const Message: FC<MessageEntry> = props => (
     <li>{props.message}</li>
   </div>
 );
+
+Message.displayName = 'Message';

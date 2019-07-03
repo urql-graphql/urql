@@ -7,3 +7,5 @@ export const Error: FC = props => (
     <p>Message: {props.children}</p>
   </>
 );
+
+Error.displayName = 'Error';
