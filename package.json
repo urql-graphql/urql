@@ -134,6 +134,7 @@
     "react-dom": ">= 16.8.0"
   },
   "dependencies": {
+    "extract-files": "^5.0.1",
     "fast-json-stable-stringify": "^2.0.0",
     "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
