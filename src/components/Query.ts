@@ -1,9 +1,9 @@
-import { ReactNode } from 'react';
+import { ReactElement } from 'react';
 import { OperationContext } from '../types';
 import { useQuery, UseQueryArgs, UseQueryState } from '../hooks';
 
 export interface QueryProps<T, V> extends UseQueryArgs<V> {
-  children: (arg: QueryState<T>) => ReactNode;
+  children: (arg: QueryState<T>) => ReactElement<any>;
 }
 
 export interface QueryState<T> extends UseQueryState<T> {
@@ -13,7 +13,7 @@ export interface QueryState<T> extends UseQueryState<T> {
 export function Query<T = any, V = any>({
   children,
   ...args
-}: QueryProps<T, V>): ReactNode {
+}: QueryProps<T, V>): ReactElement<any> {
   const [state, executeQuery] = useQuery<T, V>(args);
   return children({ ...state, executeQuery });
 }
