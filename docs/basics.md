@@ -75,7 +75,7 @@ cache"_ but more of a _"document cache"_.
 
 ### The document cache
 
-When an **operation** is sent it is identifier via its `key` which is a hash
+When an **operation** is sent it is identified by its `key` which is a hash
 of the `query` and `variables`. A document cache makes the assumption
 that there's **no overlap** between any two given queries.
 
@@ -113,7 +113,7 @@ respond with the types that are invalidated.
 Given an `addTodo` mutation for example, you will need to send
 back at least one `TodoItem` for the invalidation to happen.
 
-a **document cache** also doesn't normalise at all, which means
+A **document cache** also doesn't normalise at all, which means
 that after fetching a list of items, fetching a single item
 will never be fulfilled by this cache.
 
@@ -129,7 +129,7 @@ cached result is available it will let the operation through, so
 that the `fetchExchange` can send a request to the API.
 
 When `'cache-only'` is passed, the cache will always return the
-cached result or default to `{ data: undefined, error: undefined },
+cached result or default to `{ data: undefined, error: undefined }`,
 i.e. an empty result, when nothing is cached for a given operation.
 
 For `'network-only'` the opposite of `'cache-only'` is done.
@@ -139,7 +139,7 @@ so that the `fetchExchange` can respond with up-to-date data.
 The result will still be cached however.
 
 The last one `'cache-and-network'` is rather special
-in that it first does what `'cache-first'` does, it will
+in that it first does what `'cache-first'` does: it will
 return some cached results. After returning a cached result however,
 it will forward the operation anyway. This way a temporary cached
 result may be displayed that is then updated with fresh data
