@@ -236,14 +236,13 @@ const addTodo = `
 
 class TodoForm extends Component {
   state = {
-    error: null
+    error: null,
   };
 
   add = () => {
-    this.props.addTodo({ text: 'something!' })
-      .catch(error => {
-        this.setState({ error });
-      });
+    this.props.addTodo({ text: 'something!' }).catch(error => {
+      this.setState({ error });
+    });
   };
 
   render() {
@@ -251,13 +250,13 @@ class TodoForm extends Component {
       return 'Oh no!';
     }
 
-    return <button onClick={this.add}>Add something!</button>
+    return <button onClick={this.add}>Add something!</button>;
   }
 }
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />
+    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />}
   </Mutation>
 );
 ```
@@ -291,7 +290,7 @@ class TodoForm extends Component {
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />
+    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />}
   </Mutation>
 );
 ```
