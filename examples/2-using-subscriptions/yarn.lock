@@ -514,6 +514,7 @@ array-uniq@^1.0.1:
 array-unique@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/array-unique/-/array-unique-0.3.2.tgz#a894b75d4bc4f6cd679ef3244a9fd8f46ae2d428"
+  integrity sha1-qJS3XUvE9s1nnvMkSp/Y9Gri1Cg=
 
 asn1.js@^4.0.0:
   version "4.10.1"
@@ -986,6 +987,7 @@ copy-descriptor@^0.1.0:
 core-js@3.0.0-beta.13:
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.0.0-beta.13.tgz#7732c69be5e4758887917235fe7c0352c4cb42a1"
+  integrity sha512-16Q43c/3LT9NyePUJKL8nRIQgYWjcBhjJSMWg96PVSxoS0PeE0NHitPI3opBrs9MGGHjte1KoEVr9W63YKlTXQ==
 
 core-util-is@~1.0.0:
   version "1.0.2"
@@ -3040,6 +3042,7 @@ process@^0.11.10:
 promise-inflight@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
+  integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
 
 prop-types@^15.6.0, prop-types@^15.6.2:
   version "15.7.2"
@@ -3874,6 +3877,7 @@ typedarray@^0.0.6:
 typescript@^3.3.1:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
+  integrity sha512-Y21Xqe54TBVp+VDSNbuDYdGw0BpoR/Q6wo/+35M8PAU0vipahnyduJWirxxdxjsAkS7hue53x2zp8gz7F05u0A==
 
 union-value@^1.0.0:
   version "1.0.0"
@@ -4155,6 +4159,7 @@ wide-align@^1.1.0:
 wonka@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.0.0.tgz#4f32a6a30e3229bae5944f002ce32d05b0423ba8"
+  integrity sha512-eDDzMU1gv1OgZG0fYom/0xi3WO4s2ILt6QvZzjcnSvFM+nzpgX4sux1+Z+LDYWhknJA9agpDADVtATZtajMtLA==
 
 worker-farm@^1.5.2:
   version "1.6.0"
