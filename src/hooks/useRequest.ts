@@ -8,7 +8,7 @@ export const useRequest = (
   query: string | DocumentNode,
   variables?: any
 ): GraphQLRequest => {
-  const prev = useRef<void | GraphQLRequest>(undefined);
+  const prev = useRef<undefined | GraphQLRequest>(undefined);
 
   return useMemo(() => {
     const request = createRequest(query, variables);
