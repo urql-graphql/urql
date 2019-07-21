@@ -4,6 +4,7 @@ import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
+import { useDevtoolsContext } from './useDevtoolsContext';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
@@ -29,6 +30,7 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
+  const [devtoolsContext] = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -54,23 +56,25 @@ export const useQuery = <T = any, V = object>(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
           ...opts,
+          ...devtoolsContext,
         }),
         subscribe(({ data, error }) => {
           setState({ fetching: false, data, error });
         })
       );
     },
-    [args.requestPolicy, client, request, setState]
+    [args.requestPolicy, client, devtoolsContext, request, setState]
   );
 
   useImmediateEffect(() => {
     if (args.pause) {
       unsubscribe.current();
-      return setState(s => ({ ...s, fetching: false }));
+      setState(s => ({ ...s, fetching: false }));
+      return noop;
     }
 
     executeQuery();
-    return () => unsubscribe.current();
+    return () => unsubscribe.current(); // eslint-disable-line
   }, [executeQuery, args.pause, setState]);
 
   return [state, executeQuery];

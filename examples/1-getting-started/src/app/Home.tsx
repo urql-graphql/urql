@@ -46,6 +46,8 @@ export const Home: FC = () => {
   );
 };
 
+Home.displayName = 'Home';
+
 const TodoQuery = gql`
   query {
     todos {

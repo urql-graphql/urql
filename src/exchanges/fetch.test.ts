@@ -40,69 +40,132 @@ const exchangeArgs = {
   client: {} as Client,
 };
 
-it('returns response data from fetch', async () => {
-  fetch.mockResolvedValue({
-    status: 200,
-    json: jest.fn().mockResolvedValue(response),
+describe('on success', () => {
+  beforeEach(() => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => 100)
+      .mockImplementationOnce(() => 200);
+
+    fetch.mockResolvedValue({
+      status: 200,
+      json: jest.fn().mockResolvedValue(response),
+    });
   });
 
-  const fetchOptions = jest.fn().mockReturnValue({});
+  it('returns response data', async () => {
+    const fetchOptions = jest.fn().mockReturnValue({});
 
-  const data = await pipe(
-    fromValue({
-      ...queryOperation,
-      context: {
-        ...queryOperation.context,
-        fetchOptions,
-      },
-    }),
-    fetchExchange(exchangeArgs),
-    toPromise
-  );
+    const data = await pipe(
+      fromValue({
+        ...queryOperation,
+        context: {
+          ...queryOperation.context,
+          fetchOptions,
+        },
+      }),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
 
-  expect(data).toMatchSnapshot();
-  expect(fetchOptions).toHaveBeenCalled();
-});
-
-it('returns error data from fetch', async () => {
-  fetch.mockResolvedValue({
-    status: 400,
-    json: jest.fn().mockResolvedValue(response),
+    expect(data).toMatchSnapshot();
+    expect(fetchOptions).toHaveBeenCalled();
   });
 
-  const data = await pipe(
-    fromValue(queryOperation),
-    fetchExchange(exchangeArgs),
-    toPromise
-  );
+  it('adds latency info to the context', async () => {
+    const data = await pipe(
+      fromValue({
+        ...queryOperation,
+        context: {
+          ...queryOperation.context,
+        },
+      }),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
 
-  expect(data).toMatchSnapshot();
+    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
+  });
 });
 
-it('calls cancel when the Observable is cancelled', () => {
-  fetch.mockReturnValue(Promise.reject(abortError));
+describe('on error', () => {
+  beforeEach(() => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => 100)
+      .mockImplementationOnce(() => 200);
 
-  const [unsubscribe] = pipe(
-    fromValue(queryOperation),
-    fetchExchange(exchangeArgs),
-    subscribe(fail)
-  );
+    fetch.mockResolvedValue({
+      status: 400,
+      json: jest.fn().mockResolvedValue(response),
+    });
+  });
 
-  unsubscribe();
-  expect(fetch).toHaveBeenCalledTimes(1);
-  expect(abort).toHaveBeenCalledTimes(1);
+  it('returns error data', async () => {
+    const data = await pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+  });
+
+  it('returns error data', async () => {
+    const data = await pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
+  });
+
+  it('returns error data with status 400 and manual redirect mode', async () => {
+    const fetchOptions = jest.fn().mockReturnValue({ redirect: 'manual' });
+
+    const data = await pipe(
+      fromValue({
+        ...queryOperation,
+        context: {
+          ...queryOperation.context,
+          fetchOptions,
+        },
+      }),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+  });
 });
 
-it('should not start the operation when teardown gets passed', () => {
-  pipe(
-    fromValue({
-      ...queryOperation,
-      operationName: 'teardown' as OperationType,
-    }),
-    fetchExchange(exchangeArgs),
-    subscribe(fail)
-  );
+describe('on teardown', () => {
+  it('aborts the outgoing request', () => {
+    fetch.mockReturnValue(Promise.reject(abortError));
 
-  expect(fetch).toHaveBeenCalledTimes(0);
-  expect(abort).toHaveBeenCalledTimes(0);
+    const [unsubscribe] = pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      subscribe(fail)
+    );
+
+    unsubscribe();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(abort).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call the query', () => {
+    pipe(
+      fromValue({
+        ...queryOperation,
+        operationName: 'teardown' as OperationType,
+      }),
+      fetchExchange(exchangeArgs),
+      subscribe(fail)
+    );
+
+    expect(fetch).toHaveBeenCalledTimes(0);
+    expect(abort).toHaveBeenCalledTimes(0);
+  });
 });

@@ -28,6 +28,12 @@ Everything about the basic & default `urql` behaviour
 that comes with explanations of the `fetchExchange`,
 the `cacheExchange`, and how to use _Subscriptions_.
 
+### [Exchanges](exchanges.md)
+
+Here's everything you need to know to customize and augment
+every aspect of the GraphQL client from how data is cached
+to how components receive their data.
+
 ### [Extending & Experimenting](extending-and-experimenting.md)
 
 Here's everything you need to know to extend,

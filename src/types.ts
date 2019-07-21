@@ -18,6 +18,9 @@ export type RequestPolicy =
   | 'network-only'
   | 'cache-and-network';
 
+/** How the operation has */
+export type CacheOutcome = 'miss' | 'partial' | 'hit';
+
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
   /** Unique identifier of the request. */
@@ -32,6 +35,11 @@ export interface OperationContext {
   fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;
+  meta?: {
+    source?: string;
+    cacheOutcome?: CacheOutcome;
+    networkLatency?: number;
+  };
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */

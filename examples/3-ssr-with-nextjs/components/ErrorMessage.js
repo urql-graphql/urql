@@ -1,4 +1,4 @@
-export default ({ message }) => (
+const ErrorMessage = ({ message }) => (
   <aside>
     {message}
     <style jsx>{`
@@ -11,3 +11,5 @@ export default ({ message }) => (
     `}</style>
   </aside>
 );
+
+export default ErrorMessage;

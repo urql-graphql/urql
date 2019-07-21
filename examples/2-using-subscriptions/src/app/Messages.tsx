@@ -31,6 +31,8 @@ export const Messages: FC = () => {
   );
 };
 
+Messages.displayName = 'Messages';
+
 const NewMessageSubQuery = gql`
   subscription messageSub {
     newMessages {

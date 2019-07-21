@@ -42,6 +42,7 @@ tasks:
     command:
       - yarn
     args:
+      - run
       - check
   e2e:
     image: cypress/browsers:node10.2.1-chrome74

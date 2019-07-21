@@ -15,17 +15,20 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
   const [state, setState] = useState<S>(initialState.current);
 
   // This wraps setState and updates the state mutably on initial mount
-  const updateState: SetState<S> = useCallback((action: SetStateAction<S>) => {
-    if (!isMounted.current) {
-      const newValue =
-        typeof action === 'function'
-          ? (action as (arg: S) => S)(initialState.current)
-          : action;
-      return Object.assign(initialState.current, newValue);
-    }
-
-    setState(action);
-  }, []);
+  const updateState: SetState<S> = useCallback(
+    (action: SetStateAction<S>): void => {
+      if (!isMounted.current) {
+        const newValue =
+          typeof action === 'function'
+            ? (action as (arg: S) => S)(initialState.current)
+            : action;
+        Object.assign(initialState.current, newValue);
+      } else {
+        setState(action);
+      }
+    },
+    []
+  );
 
   !isSSR && // eslint-disable-next-line react-hooks/rules-of-hooks
     useLayoutEffect(() => {

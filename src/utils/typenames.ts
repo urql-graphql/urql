@@ -16,7 +16,7 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
     obj.forEach(inner => collectTypes(inner, types));
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const val = obj[key];
         if (key === '__typename' && typeof val === 'string') {
           types.push(val);
@@ -35,25 +35,36 @@ export const collectTypesFromResponse = (response: object) =>
 
 const formatNode = (
   n: FieldNode | InlineFragmentNode | OperationDefinitionNode
-) =>
-  n.selectionSet !== undefined && n.selectionSet.selections !== undefined
-    ? {
-        ...n,
-        selectionSet: {
-          ...n.selectionSet,
-          selections: [
-            ...n.selectionSet.selections,
-            {
-              kind: 'Field',
-              name: {
-                kind: 'Name',
-                value: '__typename',
-              },
-            },
-          ],
+) => {
+  if (n.selectionSet === undefined) {
+    return false;
+  }
+
+  if (
+    n.selectionSet.selections.some(
+      s => s.kind === 'Field' && s.name.value === '__typename'
+    )
+  ) {
+    return n;
+  }
+
+  return {
+    ...n,
+    selectionSet: {
+      ...n.selectionSet,
+      selections: [
+        ...n.selectionSet.selections,
+        {
+          kind: 'Field',
+          name: {
+            kind: 'Name',
+            value: '__typename',
+          },
         },
-      }
-    : false;
+      ],
+    },
+  };
+};
 
 export const formatDocument = (astNode: DocumentNode) =>
   visit(astNode, {

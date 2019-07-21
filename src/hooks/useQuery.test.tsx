@@ -83,9 +83,22 @@ describe('on initial useEffect', () => {
         query: expect.any(Object),
         variables: props.variables,
       },
-      {
+      expect.objectContaining({
         requestPolicy: undefined,
-      }
+      })
+    );
+  });
+
+  it('passes source component name to executeQuery', () => {
+    renderer.create(<QueryUser {...props} />);
+
+    expect(client.executeQuery).toBeCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        meta: {
+          source: 'Object',
+        },
+      })
     );
   });
 });
