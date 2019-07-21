@@ -17,4 +17,6 @@ export const App: FC = () => (
   </Provider>
 );
 
+App.displayName = 'App';
+
 ReactDOM.render(<App />, document.getElementById('root'));

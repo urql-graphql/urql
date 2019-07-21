@@ -23,9 +23,9 @@ export const Todo: FC<Props> = props => {
 Todo.displayName = 'Todo';
 
 const RemoveTodo = `
-mutation($id: ID!) {
-  toggleTodo(id: $id) {
-    id
+  mutation($id: ID!) {
+    toggleTodo(id: $id) {
+      id
+    }
   }
-}
 `;
