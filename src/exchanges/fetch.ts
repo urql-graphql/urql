@@ -136,7 +136,7 @@ const executeFetch = (operation: Operation, opts: RequestInit) => {
 const checkStatus = (redirectMode: string = 'follow', response: Response) => {
   const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
 
-  if (response.status < 200 || response.status > statusRangeEnd) {
+  if (response.status < 200 || response.status >= statusRangeEnd) {
     throw new Error(response.statusText);
   }
 };

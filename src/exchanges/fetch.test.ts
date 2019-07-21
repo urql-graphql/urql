@@ -120,6 +120,24 @@ describe('on error', () => {
 
     expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
   });
+
+  it('returns error data with status 400 and manual redirect mode', async () => {
+    const fetchOptions = jest.fn().mockReturnValue({ redirect: 'manual' });
+
+    const data = await pipe(
+      fromValue({
+        ...queryOperation,
+        context: {
+          ...queryOperation.context,
+          fetchOptions,
+        },
+      }),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+  });
 });
 
 describe('on teardown', () => {
