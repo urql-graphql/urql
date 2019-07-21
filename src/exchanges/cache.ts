@@ -45,6 +45,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
     return (
       operationName === 'query' &&
       requestPolicy !== 'network-only' &&
+      requestPolicy !== 'cache-and-network' &&
       (requestPolicy === 'cache-only' || resultCache.has(key))
     );
   };

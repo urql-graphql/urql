@@ -18,7 +18,7 @@ import {
   subscriptionResult,
   undefinedQueryResponse,
 } from '../test-utils';
-import { Operation, OperationResult } from '../types';
+import { Operation, OperationResult, RequestPolicy } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 
 let response;
@@ -73,6 +73,23 @@ describe('on query', () => {
     complete();
     expect(forwardedOperations.length).toBe(1);
     expect(reexecuteOperation).not.toBeCalled();
+  });
+
+  it('should reexecute with cache-and-network policy', () => {
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+    const cacheAndNetworkQueryOperation = {
+      ...queryOperation,
+      context: {
+        ...queryOperation.context,
+        requestPolicy: 'cache-and-network' as RequestPolicy,
+      },
+    };
+    publish(exchange);
+    next(queryOperation);
+    next(cacheAndNetworkQueryOperation);
+    complete();
+    expect(forwardedOperations.length).toBe(2);
   });
 
   describe('cache hit', () => {
