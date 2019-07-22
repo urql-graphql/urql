@@ -88,7 +88,7 @@ export class Client {
   }
 
   private createOperationContext = (
-    opts?: void | Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): OperationContext => {
     const { requestPolicy = 'cache-first' } = opts || {};
 
@@ -103,7 +103,7 @@ export class Client {
   createRequestOperation = (
     type: OperationType,
     { key, query, variables }: GraphQLRequest,
-    opts?: void | Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): Operation => ({
     key,
     query,
@@ -167,7 +167,7 @@ export class Client {
 
   executeQuery = (
     query: GraphQLRequest,
-    opts?: void | Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('query', query, opts);
     return this.executeRequestOperation(operation);
@@ -175,7 +175,7 @@ export class Client {
 
   executeSubscription = (
     query: GraphQLRequest,
-    opts?: void | Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
@@ -183,7 +183,7 @@ export class Client {
 
   executeMutation = (
     query: GraphQLRequest,
-    opts?: void | Partial<OperationContext>
+    opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);

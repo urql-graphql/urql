@@ -43,7 +43,7 @@ const useDevtoolsContextImpl = (): Partial<OperationContext> => {
 };
 
 /** Creates additional context values for serving metadata to devtools. */
-export const useDevtoolsContext: () => Partial<OperationContext> | void =
+export const useDevtoolsContext: () => Partial<OperationContext> | undefined =
   // NOTE: We check for CurrentOwner in case it'll be unexpectedly changed in React's source
   process.env.NODE_ENV !== 'production' && !!CurrentOwner
     ? useDevtoolsContextImpl
