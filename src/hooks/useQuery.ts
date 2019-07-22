@@ -30,7 +30,7 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  const [devtoolsContext] = useDevtoolsContext();
+  const devtoolsContext = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 

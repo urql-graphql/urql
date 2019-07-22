@@ -29,17 +29,20 @@ export interface GraphQLRequest {
   variables?: object;
 }
 
+/** Metadata that is only available in development for devtools. */
+export interface OperationDebugMeta {
+  source?: string;
+  cacheOutcome?: CacheOutcome;
+  networkLatency?: number;
+}
+
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
   [key: string]: any;
   fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;
-  meta?: {
-    source?: string;
-    cacheOutcome?: CacheOutcome;
-    networkLatency?: number;
-  };
+  meta?: OperationDebugMeta;
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
