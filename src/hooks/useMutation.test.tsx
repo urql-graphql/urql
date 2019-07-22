@@ -113,7 +113,7 @@ describe('on execute', () => {
       execute(vars);
     });
     expect(client.executeMutation.mock.calls[0][1]).toHaveProperty('meta', {
-      source: 'Object',
+      source: 'MutationUser',
     });
   });
 });
