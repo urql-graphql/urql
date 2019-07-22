@@ -15,6 +15,7 @@ upcoming devtools) as well as minor documentation improvements and bug fixes.
 
 - Add metadata to operation context in development (see [#305](https://github.com/FormidableLabs/urql/pull/305), [#324](https://github.com/FormidableLabs/urql/pull/324), [#325](https://github.com/FormidableLabs/urql/pull/325) and [#329](https://github.com/FormidableLabs/urql/pull/329))
 - Fix minor typename memory leak (see [#321](https://github.com/FormidableLabs/urql/pull/321))
+- Fix types for react subscription components (see [#328](https://github.com/FormidableLabs/urql/pull/328))
 - Fix displayName attributes not populated in examples (see [#330](https://github.com/FormidableLabs/urql/pull/330))
 - Fix error in `collectTypes` method (see [#343](https://github.com/FormidableLabs/urql/pull/343))
 - Fix HTTP status bounds check error (see [#348](https://github.com/FormidableLabs/urql/pull/348/files))
