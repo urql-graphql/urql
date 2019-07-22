@@ -96,7 +96,7 @@ describe('on initial useEffect', () => {
       expect.any(Object),
       expect.objectContaining({
         meta: {
-          source: 'Object',
+          source: 'QueryUser',
         },
       })
     );
