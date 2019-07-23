@@ -8,6 +8,18 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.2.0](https://github.com/FormidableLabs/urql/compare/v1.1.3...v1.2.0)
+
+A release focused on improving developer experience (in preparation for the
+upcoming devtools) as well as minor documentation improvements and bug fixes.
+
+- Add metadata to operation context in development (see [#305](https://github.com/FormidableLabs/urql/pull/305), [#324](https://github.com/FormidableLabs/urql/pull/324), [#325](https://github.com/FormidableLabs/urql/pull/325) and [#329](https://github.com/FormidableLabs/urql/pull/329))
+- Fix minor typename memory leak (see [#321](https://github.com/FormidableLabs/urql/pull/321))
+- Fix types for react subscription components (see [#328](https://github.com/FormidableLabs/urql/pull/328))
+- Fix displayName attributes not populated in examples (see [#330](https://github.com/FormidableLabs/urql/pull/330))
+- Fix error in `collectTypes` method (see [#343](https://github.com/FormidableLabs/urql/pull/343))
+- Fix HTTP status bounds check error (see [#348](https://github.com/FormidableLabs/urql/pull/348/files))
+
 ## [v1.1.3](https://github.com/FormidableLabs/urql/compare/v1.1.2...v1.1.3)
 
 This is a hotfix that patches a small regression from `1.1.2` where

@@ -26,7 +26,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const [devtoolsContext] = useDevtoolsContext();
+  const devtoolsContext = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 

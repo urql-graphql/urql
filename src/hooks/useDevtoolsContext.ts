@@ -1,28 +1,50 @@
-import { useMemo, useRef } from 'react';
+import * as React from 'react';
+import { OperationContext } from '../types';
 
-/** Find the name of the calling component. */
-const getHookParent = () => {
-  /**
-   * Line values could be:
-   * - named export             " at exports.Home (Home.tsx?9b1b:17)"
-   * - default export / inline  " at Home (Home.tsx?9b1b:17)"
-   */
-  const stackLine = (new Error().stack as string).split('\n')[3];
-  const parsedLine = /.*at (exports\.)?(\w+)/.exec(stackLine);
+const {
+  ReactCurrentOwner: CurrentOwner,
+} = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 
-  return parsedLine === null || typeof parsedLine[2] !== 'string'
-    ? 'Unknown'
-    : parsedLine[2];
-};
+// Is the Fiber a FunctionComponent, ClassComponent, or IndeterminateComponent
+const isComponentFiber = (fiber: void | { tag: number }) =>
+  fiber && (fiber.tag === 0 || fiber.tag === 1 || fiber.tag === 2);
 
-const useDevtoolsContextHook = () => {
-  const source = useRef(getHookParent());
+// Is the component one of ours (just a heuristic to avoid circular dependencies or flags)
+const isInternalComponent = (Component: { name: string }) =>
+  Component.name === 'Query' ||
+  Component.name === 'Mutation' ||
+  Component.name === 'Subscription';
 
-  return useMemo(() => [{ meta: { source: source.current } }], []);
+const useDevtoolsContextImpl = (): Partial<OperationContext> => {
+  return React.useMemo(() => {
+    let source = 'Component';
+
+    // Check whether the CurrentOwner is set
+    const owner = CurrentOwner.current;
+    if (owner !== null && isComponentFiber(owner)) {
+      let Component = owner.type;
+
+      // If this is one of our own components then check the parent
+      if (
+        isInternalComponent(Component) &&
+        isComponentFiber(owner._debugOwner)
+      ) {
+        Component = owner._debugOwner.type;
+      }
+
+      // Get the Component's name if it has one
+      if (typeof Component === 'function') {
+        source = Component.displayName || Component.name || source;
+      }
+    }
+
+    return { meta: { source } };
+  }, []);
 };
 
 /** Creates additional context values for serving metadata to devtools. */
-export const useDevtoolsContext =
-  process.env.NODE_ENV === 'production'
-    ? () => [undefined]
-    : useDevtoolsContextHook;
+export const useDevtoolsContext: () => Partial<OperationContext> | undefined =
+  // NOTE: We check for CurrentOwner in case it'll be unexpectedly changed in React's source
+  process.env.NODE_ENV !== 'production' && !!CurrentOwner
+    ? useDevtoolsContextImpl
+    : () => undefined;

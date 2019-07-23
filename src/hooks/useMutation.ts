@@ -21,7 +21,7 @@ export type UseMutationResponse<T, V> = [
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
-  const [devtoolsContext] = useDevtoolsContext();
+  const devtoolsContext = useDevtoolsContext();
   const client = useContext(Context);
   const [state, setState] = useImmediateState<UseMutationState<T>>({
     fetching: false,
