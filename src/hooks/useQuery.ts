@@ -13,6 +13,7 @@ export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
+  operationContext?: Partial<OperationContext>;
   pause?: boolean;
 }
 
@@ -55,6 +56,7 @@ export const useQuery = <T = any, V = object>(
       [unsubscribe.current] = pipe(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
+          ...args.operationContext,
           ...opts,
           ...devtoolsContext,
         }),
@@ -63,7 +65,14 @@ export const useQuery = <T = any, V = object>(
         })
       );
     },
-    [args.requestPolicy, client, devtoolsContext, request, setState]
+    [
+      args.operationContext,
+      args.requestPolicy,
+      client,
+      devtoolsContext,
+      request,
+      setState,
+    ]
   );
 
   useImmediateEffect(() => {

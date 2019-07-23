@@ -66,6 +66,27 @@ describe('useQuery', () => {
     });
   });
 
+  it('should set fetching to true and run effect on first mount', () => {
+    renderHook(
+      ({ query, variables }) =>
+        useQuery({ query, variables, operationContext: { url: 'test' } }),
+      { initialProps: { query: mockQuery, variables: mockVariables } }
+    );
+
+    expect(client.executeQuery).toBeCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: mockVariables,
+      },
+      {
+        meta: { source: 'TestHook' },
+        requestPolicy: undefined,
+        url: 'test',
+      }
+    );
+  });
+
   it('should execute the subscription', async () => {
     const { waitForNextUpdate } = renderHook(
       ({ query, variables }) => useQuery({ query, variables }),
