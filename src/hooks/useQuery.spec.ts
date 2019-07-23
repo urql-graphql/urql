@@ -67,9 +67,9 @@ describe('useQuery', () => {
   });
 
   it('should set fetching to true and run effect on first mount', () => {
+    const context = { url: 'test' };
     renderHook(
-      ({ query, variables }) =>
-        useQuery({ query, variables, context: { url: 'test' } }),
+      ({ query, variables }) => useQuery({ query, variables, context }),
       { initialProps: { query: mockQuery, variables: mockVariables } }
     );
 
