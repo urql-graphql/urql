@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from 'react-hooks-testing-library';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { useImmediateEffect } from './useImmediateEffect';
 
 it('calls effects immediately on mount', () => {
