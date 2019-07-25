@@ -6247,10 +6247,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.1.0.tgz#5e9894d1aa653b55e9a738e942ff2e0f4cfc0324"
-  integrity sha512-i+1twiLbuPBnsLmm0xy2UefeC2OPO5wXaGQHEN4/3Gp7QguoEieuSNZt2+gEU6UVJq/GecFkdAzGDFH60WpUAw==
+wonka@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.1.1.tgz#c948e8299468dd87eb0d6fc9b5647f7848a85af2"
+  integrity sha512-UT65glpq1Bl9DaLwMJp6/EvsL+juqdkvJpAb2xsmUqmWLPkwIGB0/kIh8DHr3dem0UXHcgIDBizmH3xnnScguA==
 
 wordwrap@~0.0.2:
   version "0.0.3"
