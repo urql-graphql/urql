@@ -19,7 +19,7 @@
   "rules": {
     "@typescript-eslint/member-ordering": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
-    "@typescript-eslint/no-object-literal-type-assertion": "false",
+    "@typescript-eslint/no-object-literal-type-assertion": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/no-explicit-any": "off",
