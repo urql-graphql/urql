@@ -7,7 +7,7 @@ jest.mock('../client', () => {
     executeQuery: jest.fn(() =>
       pipe(
         interval(400),
-        map((i: number) => ({ data: i, error: i + 1, extensions: i + 2 }))
+        map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
       )
     ),
   };
@@ -152,7 +152,7 @@ describe('on subscription update', () => {
 
     setTimeout(() => {
       wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('extensions', 2);
+      expect(state).toHaveProperty('extensions', { i: 1 });
       done();
     }, 400);
   });
