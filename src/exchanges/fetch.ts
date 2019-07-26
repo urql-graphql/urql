@@ -116,6 +116,10 @@ const executeFetch = (operation: Operation, opts: RequestInit) => {
             response,
           })
         : undefined,
+      extensions:
+        typeof result.extensions === 'object' && result.extensions !== null
+          ? result.extensions
+          : undefined,
     }))
     .catch(err => {
       if (err.name === 'AbortError') {
@@ -129,6 +133,7 @@ const executeFetch = (operation: Operation, opts: RequestInit) => {
           networkError: err,
           response,
         }),
+        extensions: undefined,
       };
     });
 };

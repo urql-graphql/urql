@@ -74,6 +74,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         return {
           data: undefined,
           error: undefined,
+          extensions: undefined,
           operation: addMetadata(operation, { cacheOutcome: 'miss' }),
         };
       })
