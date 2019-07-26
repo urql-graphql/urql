@@ -8,7 +8,6 @@ export interface SerializedResult {
     networkError?: string;
     graphQLErrors: string[];
   };
-  extensions?: Record<string, any>;
 }
 
 export interface SSRData {
@@ -33,9 +32,8 @@ const shouldSkip = ({ operationName }: Operation) =>
 const serializeResult = ({
   data,
   error,
-  extensions,
 }: OperationResult): SerializedResult => {
-  const result: SerializedResult = { data, extensions, error: undefined };
+  const result: SerializedResult = { data, error: undefined };
   if (error !== undefined) {
     result.error = {
       networkError: '' + error.networkError,
@@ -51,11 +49,11 @@ const deserializeResult = (
   operation: Operation,
   result: SerializedResult
 ): OperationResult => {
-  const { error, data, extensions } = result;
+  const { error, data } = result;
   const deserialized: OperationResult = {
     operation,
     data,
-    extensions,
+    extensions: undefined,
     error: undefined,
   };
   if (error !== undefined) {

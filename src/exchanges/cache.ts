@@ -153,13 +153,13 @@ const afterQuery = (
   resultCache: ResultCache,
   operationCache: OperationCache
 ) => (response: OperationResult) => {
-  const { operation, data } = response;
+  const { operation, data, error } = response;
 
   if (data === undefined) {
     return;
   }
 
-  resultCache.set(operation.key, response);
+  resultCache.set(operation.key, { operation, data, error });
 
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
