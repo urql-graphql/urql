@@ -174,7 +174,7 @@ Every operation that enters the exchange pipeline will receive a result, either
 immediately (read: synchronously) or eventually as the result of a network
 request comes in.
 
-The raw GraphQL result from an API is typically: `{ data?: T, errors?: GraphQLError[], extensions?: Record<string, any> }`.
+The raw GraphQL result from an API is: `{ data?: T, errors?: GraphQLError[], extensions?: Record<string, any> }`.
 And `urql`'s operation results are very similar: `{ data?: T, error?: CombinedError, extensions?: Record<string, any>}`.
 
 The [`CombinedError` is a very simple wrapper](https://github.com/FormidableLabs/urql/blob/master/src/utils/error.ts)
