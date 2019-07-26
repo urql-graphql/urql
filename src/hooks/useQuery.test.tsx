@@ -7,7 +7,7 @@ jest.mock('../client', () => {
     executeQuery: jest.fn(() =>
       pipe(
         interval(400),
-        map((i: number) => ({ data: i, error: i + 1 }))
+        map((i: number) => ({ data: i, error: i + 1, extensions: i + 2 }))
       )
     ),
   };
@@ -138,6 +138,21 @@ describe('on subscription update', () => {
     setTimeout(() => {
       wrapper.update(<QueryUser {...props} />);
       expect(state).toHaveProperty('error', 1);
+      done();
+    }, 400);
+  });
+
+  it('forwards extensions response', done => {
+    const wrapper = renderer.create(<QueryUser {...props} />);
+    /**
+     * Have to call update (without changes) in order to see the
+     * result of the state change.
+     */
+    wrapper.update(<QueryUser {...props} />);
+
+    setTimeout(() => {
+      wrapper.update(<QueryUser {...props} />);
+      expect(state).toHaveProperty('extensions', 2);
       done();
     }, 400);
   });

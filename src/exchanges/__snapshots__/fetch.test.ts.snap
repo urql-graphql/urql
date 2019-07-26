@@ -4,6 +4,7 @@ exports[`on error returns error data 1`] = `
 Object {
   "data": undefined,
   "error": [CombinedError: [Network] ],
+  "extensions": undefined,
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {
@@ -135,6 +136,7 @@ exports[`on error returns error data with status 400 and manual redirect mode 1`
 Object {
   "data": undefined,
   "error": [CombinedError: [Network] ],
+  "extensions": undefined,
   "operation": Object {
     "context": Object {
       "fetchOptions": [MockFunction] {
@@ -280,6 +282,7 @@ Object {
     },
   },
   "error": undefined,
+  "extensions": undefined,
   "operation": Object {
     "context": Object {
       "fetchOptions": [MockFunction] {

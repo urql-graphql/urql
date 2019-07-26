@@ -25,6 +25,7 @@ interface UseQueryState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
@@ -49,6 +50,7 @@ interface UseMutationState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
@@ -85,6 +87,7 @@ The hook returns a tuple of only its state:
 interface UseSubscriptionState<T> {
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
@@ -111,6 +114,7 @@ interface UseSubscriptionState<T> {
 | fetching     | `boolean`                           | Whether the `Query` is currently waiting for a GraphQL result                                           |
 | data         | `?any`                              | The GraphQL request's result                                                                            |
 | error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
+| extensions   | `?Record<string, any>`              | Optional extensions that the GraphQL server may have returned.                                          |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
 
 ### `Mutation` (component)
@@ -131,6 +135,7 @@ interface UseSubscriptionState<T> {
 | fetching        | `boolean`                     | Whether the `Mutation` is currently waiting for a GraphQL result |
 | data            | `?any`                        | The GraphQL request's result                                     |
 | error           | `?CombinedError`              | The `CombinedError` containing any errors that might've occured  |
+| extensions      | `?Record<string, any>`        | Optional extensions that the GraphQL server may have returned.   |
 | executeMutation | `(variables: object) => void` | A function that accepts variables and starts the mutation        |
 
 ### `Subscription` (component)
@@ -148,11 +153,12 @@ interface UseSubscriptionState<T> {
 
 #### Render Props
 
-| Prop     | Type             | Description                                                     |
-| -------- | ---------------- | --------------------------------------------------------------- |
-| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                 |
-| data     | `?any`           | The GraphQL subscription's data                                 |
-| error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
+| Prop       | Type                   | Description                                                     |
+| ---------- | ---------------------- | --------------------------------------------------------------- |
+| fetching   | `boolean`              | Whether the `Subscription` is currently ongoing                 |
+| data       | `?any`                 | The GraphQL subscription's data                                 |
+| error      | `?CombinedError`       | The `CombinedError` containing any errors that might've occured |
+| extensions | `?Record<string, any>` | Optional extensions that the GraphQL server may have returned.  |
 
 ### Context components
 
@@ -332,6 +338,7 @@ type OperationResult = {
   operation: Operation, // The operation that this result is a response for
   data?: any,
   error?: CombinedError,
+  extensions?: Record<string, any>,
 };
 ```
 
