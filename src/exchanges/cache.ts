@@ -74,6 +74,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         return {
           data: undefined,
           error: undefined,
+          extensions: undefined,
           operation: addMetadata(operation, { cacheOutcome: 'miss' }),
         };
       })
@@ -152,13 +153,13 @@ const afterQuery = (
   resultCache: ResultCache,
   operationCache: OperationCache
 ) => (response: OperationResult) => {
-  const { operation, data } = response;
+  const { operation, data, error } = response;
 
   if (data === undefined) {
     return;
   }
 
-  resultCache.set(operation.key, response);
+  resultCache.set(operation.key, { operation, data, error });
 
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =

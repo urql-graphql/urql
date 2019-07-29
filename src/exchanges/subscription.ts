@@ -45,7 +45,7 @@ export interface SubscriptionOperation {
 
 export type SubscriptionForwarder = (
   operation: SubscriptionOperation
-) => ObservableLike<ExecutionResult>;
+) => ObservableLike<ExecutionResult & { extensions?: Record<string, any> }>;
 
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
 export interface SubscriptionExchangeOpts {
@@ -85,11 +85,17 @@ export const subscriptionExchange = ({
                   response: undefined,
                 })
               : undefined,
+            extensions:
+              typeof result.extensions === 'object' &&
+              result.extensions !== null
+                ? result.extensions
+                : undefined,
           }),
         error: err =>
           next({
             operation,
             data: undefined,
+            extensions: undefined,
             error: new CombinedError({
               networkError: err,
               response: undefined,

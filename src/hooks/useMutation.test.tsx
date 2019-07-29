@@ -6,7 +6,7 @@ jest.mock('../client', () => {
   const mock = {
     executeMutation: jest.fn(() =>
       pipe(
-        fromValue({ data: 1, error: 2 }),
+        fromValue({ data: 1, error: 2, extensions: { i: 1 } }),
         delay(200)
       )
     ),
@@ -133,6 +133,14 @@ describe('on subscription update', () => {
     wrapper.update(<MutationUser {...props} />);
 
     expect(state).toHaveProperty('error', 2);
+  });
+
+  it('forwards extensions response', async () => {
+    const wrapper = renderer.create(<MutationUser {...props} />);
+    await execute();
+    wrapper.update(<MutationUser {...props} />);
+
+    expect(state).toHaveProperty('extensions', { i: 1 });
   });
 
   it('sets fetching to false', async () => {
