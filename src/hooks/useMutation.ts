@@ -2,7 +2,7 @@ import { DocumentNode } from 'graphql';
 import { useContext, useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
 import { Context } from '../context';
-import { OperationResult } from '../types';
+import { OperationResult, OperationContext } from '../types';
 import { CombinedError, createRequest } from '../utils';
 import { useImmediateState } from './useImmediateState';
 import { useDevtoolsContext } from './useDevtoolsContext';
@@ -30,13 +30,13 @@ export const useMutation = <T = any, V = object>(
   });
 
   const executeMutation = useCallback(
-    (variables?: V) => {
+    (variables?: V, context?: Partial<OperationContext>) => {
       setState({ fetching: true, error: undefined, data: undefined });
 
       const request = createRequest(query, variables as any);
 
       return pipe(
-        client.executeMutation(request, devtoolsContext),
+        client.executeMutation(request, { ...devtoolsContext, ...context }),
         toPromise
       ).then(result => {
         const { data, error } = result;

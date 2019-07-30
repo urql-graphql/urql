@@ -116,6 +116,14 @@ describe('on execute', () => {
       source: 'MutationUser',
     });
   });
+
+  it('can adjust context in executeMutation', () => {
+    renderer.create(<MutationUser {...props} />);
+    act(() => {
+      execute(vars, { url: 'test' });
+    });
+    expect(client.executeMutation.mock.calls[0][1].url).toBe('test');
+  });
 });
 
 describe('on subscription update', () => {
