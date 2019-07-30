@@ -28,7 +28,12 @@ You'll then need to add the `suspenseExchange`, that this package exposes, to yo
 `urql` Client and set the `suspense` mode to `true`:
 
 ```js
-import { createClient } from 'urql';
+import {
+  createClient,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+} from 'urql';
 import { suspenseExchange } from '@urql/exchange-suspense';
 
 const client = createClient({
@@ -80,3 +85,5 @@ const YourContent = () => {
   <YourContent />
 </SuspenseBoundary>;
 ```
+
+[You can also find a fully working demo on CodeSandbox.](https://codesandbox.io/s/urql-client-side-suspense-demo-81obe)
