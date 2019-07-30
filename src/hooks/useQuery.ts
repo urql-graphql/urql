@@ -21,6 +21,7 @@ export interface UseQueryState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 
 export type UseQueryResponse<T> = [
@@ -41,6 +42,7 @@ export const useQuery = <T = any, V = object>(
     fetching: false,
     data: undefined,
     error: undefined,
+    extensions: undefined,
   });
 
   // This creates a request which will keep a stable reference
@@ -60,8 +62,8 @@ export const useQuery = <T = any, V = object>(
           ...opts,
           ...devtoolsContext,
         }),
-        subscribe(({ data, error }) => {
-          setState({ fetching: false, data, error });
+        subscribe(({ data, error, extensions }) => {
+          setState({ fetching: false, data, error, extensions });
         })
       );
     },

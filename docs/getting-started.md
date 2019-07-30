@@ -75,7 +75,7 @@ const getTodos = `
 
 const TodoList = ({ limit = 10 }) => {
   <Query query={getTodos} variables={{ limit }}>
-    {({ fetching, data, error }) => {
+    {({ fetching, data, error, extensions }) => {
       if (fetching) {
         return 'Loading...';
       } else if (error) {
@@ -97,7 +97,8 @@ const TodoList = ({ limit = 10 }) => {
 When this component is mounted it will send the `query` and `variables`
 to your GraphQL API. Here we're using `fetching` to see whether the
 request is still being sent and is loading, `error` to see whether any
-errors have come back, and finally `data` to get the result.
+errors have come back, `data` to get the result, and finally `extensions`
+to get any arbitrary extensions data the server may have optionally returned.
 
 Whenever the query or variables props change, the `<Query>` component will
 send a new request and go back into the `fetching` state.

@@ -11,6 +11,7 @@ export interface UseMutationState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 
 export type UseMutationResponse<T, V> = [
@@ -27,11 +28,17 @@ export const useMutation = <T = any, V = object>(
     fetching: false,
     error: undefined,
     data: undefined,
+    extensions: undefined,
   });
 
   const executeMutation = useCallback(
     (variables?: V, context?: Partial<OperationContext>) => {
-      setState({ fetching: true, error: undefined, data: undefined });
+      setState({
+        fetching: true,
+        error: undefined,
+        data: undefined,
+        extensions: undefined,
+      });
 
       const request = createRequest(query, variables as any);
 
@@ -39,8 +46,8 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, { ...devtoolsContext, ...context }),
         toPromise
       ).then(result => {
-        const { data, error } = result;
-        setState({ fetching: false, data, error });
+        const { data, error, extensions } = result;
+        setState({ fetching: false, data, error, extensions });
         return result;
       });
     },

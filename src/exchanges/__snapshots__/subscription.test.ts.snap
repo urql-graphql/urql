@@ -4,6 +4,7 @@ exports[`should return response data from forwardSubscription observable 1`] = `
 Object {
   "data": Object {},
   "error": undefined,
+  "extensions": undefined,
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {

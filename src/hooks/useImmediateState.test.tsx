@@ -3,7 +3,10 @@ import renderer from 'react-test-renderer';
 import { useImmediateState } from './useImmediateState';
 
 const setStateMock = jest.fn();
-jest.spyOn(React, 'useState').mockImplementation(arg => [arg, setStateMock]);
+
+jest
+  .spyOn(React, 'useState')
+  .mockImplementation((arg => [arg, setStateMock]) as any);
 
 const initialState = { someObject: 1234 };
 const updateState = { someObject: 5678 };

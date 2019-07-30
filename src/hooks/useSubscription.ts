@@ -20,6 +20,7 @@ export interface UseSubscriptionState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 
 export type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
@@ -36,6 +37,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     fetching: true,
     error: undefined,
     data: undefined,
+    extensions: undefined,
   });
 
   // This creates a request which will keep a stable reference
@@ -50,11 +52,12 @@ export const useSubscription = <T = any, R = T, V = object>(
         ...devtoolsContext,
         ...args.context,
       }),
-      subscribe(({ data, error }) => {
+      subscribe(({ data, error, extensions }) => {
         setState(s => ({
           fetching: true,
           data: handler !== undefined ? handler(s.data, data) : data,
           error,
+          extensions,
         }));
       })
     );

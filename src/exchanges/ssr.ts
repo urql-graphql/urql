@@ -50,7 +50,12 @@ const deserializeResult = (
   result: SerializedResult
 ): OperationResult => {
   const { error, data } = result;
-  const deserialized: OperationResult = { operation, data, error: undefined };
+  const deserialized: OperationResult = {
+    operation,
+    data,
+    extensions: undefined,
+    error: undefined,
+  };
   if (error !== undefined) {
     deserialized.error = new CombinedError({
       networkError: new Error(error.networkError),

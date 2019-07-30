@@ -59,6 +59,8 @@ export interface OperationResult<Data = any> {
   data?: Data;
   /** Any errors resulting from the operation. */
   error?: CombinedError;
+  /** Optional extensions return by the Graphql server. */
+  extensions?: Record<string, any>;
 }
 
 /** Input parameters for to an Exchange factory function. */
