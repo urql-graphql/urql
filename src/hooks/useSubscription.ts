@@ -44,6 +44,7 @@ export const useSubscription = <T = any, R = T, V = object>(
 
   const executeSubscription = useCallback(() => {
     unsubscribe.current();
+
     [unsubscribe.current] = pipe(
       client.executeSubscription(request, {
         ...devtoolsContext,
