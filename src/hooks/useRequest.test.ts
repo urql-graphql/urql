@@ -1,4 +1,4 @@
-import { renderHook } from 'react-hooks-testing-library';
+import { renderHook } from '@testing-library/react-hooks';
 import { queryGql } from '../test-utils';
 import { useRequest } from './useRequest';
 

@@ -68,7 +68,24 @@ export class Client {
     // called to dispatch a new operation on the subject
     const [operations$, nextOperation] = makeSubject<Operation>();
     this.operations$ = operations$;
-    this.dispatchOperation = nextOperation;
+
+    // Internally operations aren't always dispatched immediately
+    // Since exchanges can dispatch and reexecute operations themselves,
+    // if we're inside an exchange we instead queue the operation and flush
+    // them in order after
+    const queuedOperations: Operation[] = [];
+    let isDispatching = false;
+
+    this.dispatchOperation = (operation: Operation) => {
+      queuedOperations.push(operation);
+      if (!isDispatching) {
+        isDispatching = true;
+        let queued;
+        while ((queued = queuedOperations.shift()) !== undefined)
+          nextOperation(queued);
+        isDispatching = false;
+      }
+    };
 
     const exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;

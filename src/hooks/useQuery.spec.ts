@@ -1,4 +1,4 @@
-import { renderHook, act } from 'react-hooks-testing-library';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 
 import { createClient } from '../client';

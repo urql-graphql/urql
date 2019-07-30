@@ -364,7 +364,7 @@ the `<Subscription>` component and/or the `useSubscription()` hook.
 
 The `<Subscription>` component is extremely similar to the `<Query>`
 component. You can pass it a query and variables, and it will serve
-you render props with `data`, `error`, and `fetching`.
+you render props with `data`, `error`, `extensions`, and `fetching`.
 
 ```js
 import { Subscription } from 'urql';
