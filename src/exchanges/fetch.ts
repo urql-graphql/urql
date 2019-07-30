@@ -102,7 +102,7 @@ const executeFetch = (operation: Operation, opts: RequestInit) => {
   let response: Response | undefined;
   const { url, fetch: fetcher } = operation.context;
 
-  return fetcher(url, opts)
+  return (fetcher || fetch)(url, opts)
     .then(res => {
       response = res;
       checkStatus(opts.redirect, res);

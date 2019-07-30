@@ -51,7 +51,7 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 export class Client {
   // These are variables derived from ClientOptions
   url: string;
-  fetch: typeof fetch;
+  fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
   suspense: boolean;
@@ -65,7 +65,7 @@ export class Client {
   constructor(opts: ClientOptions) {
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions;
-    this.fetch = opts.fetch || fetch;
+    this.fetch = opts.fetch;
     this.suspense = !!opts.suspense;
 
     // This subject forms the input of operations; executeOperation may be
