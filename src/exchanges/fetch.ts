@@ -76,6 +76,7 @@ const createFetchSource = (operation: Operation) => {
     };
 
     const startTime = Date.now();
+
     executeFetch(operation, fetchOptions).then(result => {
       if (result !== undefined) {
         next({
@@ -99,13 +100,13 @@ const createFetchSource = (operation: Operation) => {
 
 const executeFetch = (operation: Operation, opts: RequestInit) => {
   let response: Response | undefined;
-  const { url } = operation.context;
+  const { url, fetch: fetcher } = operation.context;
 
-  return fetch(url, opts)
+  return fetcher(url, opts)
     .then(res => {
       response = res;
-      checkStatus(opts.redirect, response);
-      return response.json();
+      checkStatus(opts.redirect, res);
+      return res.json();
     })
     .then(result => ({
       operation,
