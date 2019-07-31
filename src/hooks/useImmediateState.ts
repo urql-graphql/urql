@@ -1,8 +1,17 @@
-import { useRef, useState, useCallback, useLayoutEffect } from 'react';
-import { isSSR } from '../utils';
+import {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 
 type SetStateAction<S> = S | ((prevState: S) => S);
 type SetState<S> = (action: SetStateAction<S>) => void;
+
+// See https://github.com/reduxjs/react-redux/blob/316467a/src/hooks/useSelector.js#L6-L15
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 /**
  * This is a drop-in replacement for useState, limited to object-based state.
@@ -30,13 +39,12 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
     []
   );
 
-  !isSSR && // eslint-disable-next-line react-hooks/rules-of-hooks
-    useLayoutEffect(() => {
-      isMounted.current = true;
-      return () => {
-        isMounted.current = false;
-      };
-    }, []);
+  useIsomorphicLayoutEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return [state, updateState];
 };
