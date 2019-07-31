@@ -110,6 +110,18 @@ Note that in React Suspense, the thrown promises bubble up the component tree un
 
 [You can also find a fully working demo on CodeSandbox.](https://codesandbox.io/s/urql-client-side-suspense-demo-81obe)
 
+## Limitations
+
+The suspense exchange is not intended to work for server-side rendering suspense! This is
+what the `ssrExchange` is intended for and it's built into the main `urql` package. The
+`suspenseExchange` however is just intended for client-side suspense and use with
+`<React.Suspense>`.
+
+The `<React.Suspense>` element currently won't even be rendered during server-side rendering,
+and has been disabled in `react-dom/server`. So if you use `suspenseExchange` and
+`<React.Suspense>` in your server-side code you may see some unexpected behaviour and
+errors.
+
 ## Maintenance Status
 
-**Experimental:** This project is quite new. We're not sure what our ongoing maintenance plan for this project will be. Bug reports, feature requests and pull requests are welcome. If you like this project, let us know!
+**Experimental:** This project is quite new. We're not sure what our ongoing maintenance plan for this project will be. Bug reports, feature requests and pull requests are welcome. If you like this project, let us know by starring the repo!
