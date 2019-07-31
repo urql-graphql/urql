@@ -5,7 +5,6 @@ workflow:
     - check
     - lint
     - test
-    - e2e
 tasks:
   install:
     image: node:10
@@ -44,9 +43,3 @@ tasks:
     args:
       - run
       - check
-  e2e:
-    image: cypress/browsers:node10.2.1-chrome74
-    command:
-      - bash
-    args:
-      - ./scripts/run-e2e.sh
