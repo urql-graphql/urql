@@ -20,22 +20,22 @@ const useIsomorphicLayoutEffect =
  */
 export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
   const isMounted = useRef(false);
-  const initialState = useRef<S>({ ...init });
-  const [state, setState] = useState<S>(initialState.current);
+  const [state, setState] = useState<S>(init);
 
   // This wraps setState and updates the state mutably on initial mount
   const updateState: SetState<S> = useCallback(
     (action: SetStateAction<S>): void => {
       if (!isMounted.current) {
-        const newValue =
+        const newState =
           typeof action === 'function'
-            ? (action as (arg: S) => S)(initialState.current)
+            ? (action as (arg: S) => S)(state)
             : action;
-        Object.assign(initialState.current, newValue);
+        Object.assign(state, newState);
       } else {
         setState(action);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
