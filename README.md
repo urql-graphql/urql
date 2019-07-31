@@ -1,4 +1,18 @@
-# @urql/exchange-suspense
+<p align="center"><img width="340" alt="urql-exchange-suspense" src="https://user-images.githubusercontent.com/2041385/62209781-73265580-b392-11e9-9145-318d46f64f53.gif" /></p>
+<h2 align="center">@urql/exchange-suspense</h2>
+<p align="center">
+<strong>An exchange for client-side React Suspense support in <code>urql</code></strong>
+<br /><br />
+<a href="https://npmjs.com/package/@urql/exchange-suspense">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-suspense.svg" />
+</a>
+<a href="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense">
+  <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense/branch/master/graph/badge.svg" />
+</a>
+<a href="https://github.com/FormidableLabs/urql-exchange-suspense#maintenance-status">
+  <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-experimental-blueviolet.svg" />
+</a>
+</p>
 
 `@urql/exchange-suspense` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client that allows the use of React Suspense on the client-side with `urql`'s built-in suspense mode.
 
@@ -68,9 +82,7 @@ element.
 import React from 'react';
 import { useQuery } from 'urql';
 
-const LoadingIndicator = () => (
-  <h1>Loading...</h1>
-);
+const LoadingIndicator = () => <h1>Loading...</h1>;
 
 const YourContent = () => {
   const [result] = useQuery({ query: allPostsQuery });
@@ -81,7 +93,7 @@ const YourContent = () => {
 
 <React.Suspense fallback={<LoadingIndicator />}>
   <YourContent />
-</React.Suspense>
+</React.Suspense>;
 ```
 
 Note that in React Suspense, the thrown promises bubble up the component tree until the first `React.Suspense` boundary. This means that the Suspense boundary does not need to be the immediate parent of the component that does the fetching! You should place it in the component hierarchy wherever you want to see the fallback loading indicator, e.g.
@@ -97,3 +109,7 @@ Note that in React Suspense, the thrown promises bubble up the component tree un
 ```
 
 [You can also find a fully working demo on CodeSandbox.](https://codesandbox.io/s/urql-client-side-suspense-demo-81obe)
+
+## Maintenance Status
+
+**Experimental:** This project is quite new. We're not sure what our ongoing maintenance plan for this project will be. Bug reports, feature requests and pull requests are welcome. If you like this project, let us know!
