@@ -177,6 +177,7 @@ It accepts a bunch of inputs when it's created
 | ------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                  |
 | fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                          |
+| fetch        | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`     |
 | suspense     | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data |
 | exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                    |
 

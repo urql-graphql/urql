@@ -10,6 +10,7 @@ Client {
   "executeMutation": [Function],
   "executeQuery": [Function],
   "executeSubscription": [Function],
+  "fetch": undefined,
   "fetchOptions": undefined,
   "operations$": [Function],
   "reexecuteOperation": [Function],
