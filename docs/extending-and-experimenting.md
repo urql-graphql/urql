@@ -148,3 +148,10 @@ subscribe to the result of `executeQuery`, keep track
 of the unsubscription (`teardown`) and update
 some state. This all can be reapplied when you write your
 own APIs.
+
+## FAQ
+
+My component/hooks keeps triggering rerenders when passing in `context`
+
+- When not memoizing `context` this will always trigger refetches,
+  this can be done through the `useMemo` hook.
