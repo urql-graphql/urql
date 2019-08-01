@@ -116,6 +116,7 @@ export class Client {
     return {
       url: this.url,
       fetchOptions: this.fetchOptions,
+      fetch: this.fetch,
       ...opts,
       requestPolicy,
     };
