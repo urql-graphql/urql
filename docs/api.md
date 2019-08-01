@@ -12,6 +12,7 @@ interface UseQueryArgs {
   variables?: any;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
+  context?: Partial<OperationContext>;
 }
 ```
 
@@ -69,6 +70,7 @@ The options argument shape is:
 interface UseSubscriptionArgs {
   query: string;
   variables?: any;
+  context?: Partial<OperationContext>;
 }
 ```
 
@@ -103,6 +105,7 @@ interface UseSubscriptionState<T> {
 | ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query         | `string`                   | The GraphQL request's query                                                                           |
 | variables     | `object`                   | The GraphQL request's variables                                                                       |
+| context       | `?object`                  | The GraphQL request's context                                                                         |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
 | pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
 | children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
@@ -148,6 +151,7 @@ interface UseSubscriptionState<T> {
 | --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query     | `string`                                            | The GraphQL subscription's query                                                                      |
 | variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
+| context   | `?object`                                           | The GraphQL subscriptions' context                                                                    |
 | handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
 | children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
 

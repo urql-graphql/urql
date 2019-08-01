@@ -14,10 +14,11 @@ jest.mock('../client', () => {
 });
 
 import React, { FC } from 'react';
-import renderer from 'react-test-renderer';
+import renderer, { act } from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
 import { useSubscription } from './useSubscription';
+import { OperationContext } from '../types';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
@@ -27,8 +28,9 @@ let state: any;
 const SubscriptionUser: FC<{
   q: string;
   handler?: (prev: any, data: any) => any;
-}> = ({ q, handler }) => {
-  const [s] = useSubscription({ query: q }, handler);
+  context?: Partial<OperationContext>;
+}> = ({ q, handler, context }) => {
+  const [s] = useSubscription({ query: q, context }, handler);
   state = s;
   return <p>{s.data}</p>;
 };
@@ -68,6 +70,24 @@ describe('on initial useEffect', () => {
       expect.objectContaining({ meta: { source: 'SubscriptionUser' } })
     );
   });
+});
+
+it('should support setting context in useSubscription params', () => {
+  const context = { url: 'test' };
+  act(() => {
+    renderer.create(<SubscriptionUser q={query} context={context} />);
+  });
+  expect(client.executeSubscription).toBeCalledWith(
+    {
+      key: expect.any(Number),
+      query: expect.any(Object),
+      variables: {},
+    },
+    {
+      url: 'test',
+      meta: { source: 'SubscriptionUser' },
+    }
+  );
 });
 
 describe('on subscription', () => {

@@ -6,10 +6,12 @@ import { CombinedError, noop } from '../utils';
 import { useDevtoolsContext } from './useDevtoolsContext';
 import { useRequest } from './useRequest';
 import { useImmediateState } from './useImmediateState';
+import { OperationContext } from '../types';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
   variables?: V;
+  context?: Partial<OperationContext>;
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
@@ -46,7 +48,10 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current();
 
     [unsubscribe.current] = pipe(
-      client.executeSubscription(request, devtoolsContext),
+      client.executeSubscription(request, {
+        ...devtoolsContext,
+        ...args.context,
+      }),
       subscribe(({ data, error, extensions }) => {
         setState(s => ({
           fetching: true,
@@ -56,7 +61,7 @@ export const useSubscription = <T = any, R = T, V = object>(
         }));
       })
     );
-  }, [client, devtoolsContext, handler, request, setState]);
+  }, [client, devtoolsContext, handler, request, setState, args.context]);
 
   // Trigger subscription on query change
   // We don't use useImmediateEffect here as we have no way of
