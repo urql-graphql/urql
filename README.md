@@ -120,10 +120,11 @@ more about in our docs](https://formidable.com/open-source/urql/docs/architectur
 
 ## 💡 Examples
 
-There are currently two examples included in this repository:
+There are currently three examples included in this repository:
 
-- [getting-started: A basic app with queries and mutations](examples/1-getting-started/)
-- [using-subscriptions: A basic app that demos subscriptions](examples/2-using-subscriptions/)
+- [Getting Started: A basic app with queries and mutations](examples/1-getting-started/)
+- [Using Subscriptions: An app that demos subscriptions](examples/2-using-subscriptions/)
+- [SSR with Next: A Next.js app showing server-side-rendering support](examples/3-ssr-with-nextjs/)
 
 ## Maintenance Status
 
