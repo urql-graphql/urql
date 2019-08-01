@@ -184,28 +184,18 @@ the following method:
 > note that these methods should be replaced with your own logic.
 
 ```js
-const query = gql`
-  query refreshToken (refreshToken: String) {
-    refreshToken (refreshToken: $refreshToken)
-  }
-`;
-
 const refreshToken = () => {
   return Promise.resolve(
-    fetch('http://localhost:3001/graphql', {
-      body: JSON.stringify({
-        query: print(query),
-        variables: {
-          refreshToken: window.localStorage.getItem('refreshToken'),
-        },
-      }),
-      method: 'POST',
-      headers: { 'application-type': 'application/json' },
+    fetch('/refreshToken', {
+      headers: {
+        'application-type': 'application/json',
+        refreshToken: window.localStorage.get('refreshToken'),
+      },
     })
       .then(res => res.json())
       .then(res => {
-        window.localStorage.setItem('token', res.data.refreshToken);
-        return res.data.refreshToken;
+        window.localStorage.setItem('token', res.data.token);
+        return res.data.token;
       })
       .catch(console.error)
   );
@@ -294,6 +284,7 @@ export const refreshTokenExchange = () => {
         mergeMap(op => {
           if (isTokenExpired()) {
             return pipe(
+              // note that promise is being set in refreshToken now.
               fromPromise(promise ? promise : refreshToken(promise)),
               map(newToken => {
                 promise = undefined;
