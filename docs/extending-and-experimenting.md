@@ -161,15 +161,18 @@ this exchange from scratch.
 
 So let's start with the basic template for an exchange
 
-```js
+```js
 import { pipe } from 'wonka';
 
 export const refreshTokenExchange = ({ forward }) => {
-return operations$ => {
-    return pipe(operations$, forward)
-}
-}
-```
+  return operations$ => {
+    return pipe(
+      operations$,
+      forward
+    );
+  };
+};
+```
 
 As of now it enters the exchange and tells it to continue due
 to forward being invoked.
