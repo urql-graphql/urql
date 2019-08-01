@@ -275,6 +275,8 @@ Let's transform our exchange into a higher order function to solve this
 issue.
 
 ```js
+import { pipe, fromPromise, map, mergeMap, fromValue } from 'wonka';
+
 export const refreshTokenExchange = () => {
   let promise;
   return ({ forward }) => {
