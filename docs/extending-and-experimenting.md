@@ -175,10 +175,13 @@ export const refreshTokenExchange = ({ forward }) => {
 ```
 
 As of now it enters the exchange and tells it to continue due
-to forward being invoked.
+to forward being invoked. So this is basically an empty
+exchange.
 
 Next up is writing some code that refreshes our token, so imagine
 the following method:
+
+> note that these methods should be replaced with your own logic.
 
 ```js
 const query = gql`
@@ -209,7 +212,9 @@ const refreshToken = () => {
 };
 ```
 
-so now we can transform the previous exchange to handle this promise.
+so now that we have the methods to refresh our token
+we can transform the previous exchange to handle the
+returned promise.
 
 ```js
 import { pipe, fromPromise, map } from 'wonka';
@@ -232,8 +237,11 @@ With this change our refreshToken will be invoked every time this pipeline
 gets called. Since we have a nested pipe that takes a promise and enriches
 our operation with the new token.
 
-This can be made better by not triggering the refreshToken mechanism when the token
-is still valid.
+> Here we see that we can alter our operation that finally gets
+> passed to the `fetchExchange`
+
+This can be made better by not triggering the refreshToken mechanism when
+the token is still valid.
 
 ```js
 import { pipe, fromPromise, map, mergeMap } from 'wonka';
