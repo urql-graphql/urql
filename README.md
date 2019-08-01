@@ -30,7 +30,7 @@
 ## ✨ Features
 
 - 📦 **One package** to get a working GraphQL client in React
-- ⚙️ Fully **customisable** behaviour via "exchanges"
+- ⚙️ Fully **customisable** behaviour [via "exchanges"](#-add-on-exchanges)
 - 🗂 Logical but simple default behaviour and document caching
 - ⚛️ Minimal React components and hooks
 
