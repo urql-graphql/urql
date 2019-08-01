@@ -107,6 +107,17 @@ import { Query } from 'urql';
 
 [Learn the full API in the "Getting Started" docs!](https://formidable.com/open-source/urql/docs/getting-started/)
 
+## Add on Exchanges
+
+`urql` can be extended by adding "Exchanges" to it, [which you can read
+more about in our docs](https://formidable.com/open-source/urql/docs/architecture/#exchanges)! Here's just a couple of them.
+
+- [`@urql/devtools`](https://github.com/FormidableLabs/urql-devtools): A Chrome extension for monitoring and debugging
+- [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense): An experimental exchange for using `<React.Suspense>`
+- [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support
+
+[You can find the full list of exchanges in the docs.](./docs/exchanges.md)
+
 ## Examples
 
 There are currently two examples included in this repository:
