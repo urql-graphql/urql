@@ -38,7 +38,7 @@
 
 While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
-## [Documentation](https://formidable.com/open-source/urql/docs)
+## 📃 [Documentation](https://formidable.com/open-source/urql/docs)
 
 [The documentation contains everything you need to know about `urql`](https://formidable.com/open-source/urql/docs)
 
@@ -50,7 +50,7 @@ While GraphQL is an elegant protocol and schema language, client libraries today
 
 _You can find the raw markdown files inside this repository's `docs` folder._
 
-## Quick Start Guide
+## 🏎️ Quick Start Guide
 
 First install `urql` and `graphql`:
 
@@ -107,7 +107,7 @@ import { Query } from 'urql';
 
 [Learn the full API in the "Getting Started" docs!](https://formidable.com/open-source/urql/docs/getting-started/)
 
-## Add on Exchanges
+## 📦 Add on Exchanges
 
 `urql` can be extended by adding "Exchanges" to it, [which you can read
 more about in our docs](https://formidable.com/open-source/urql/docs/architecture/#exchanges)! Here's just a couple of them.
@@ -118,7 +118,7 @@ more about in our docs](https://formidable.com/open-source/urql/docs/architectur
 
 [You can find the full list of exchanges in the docs.](./docs/exchanges.md)
 
-## Examples
+## 💡 Examples
 
 There are currently two examples included in this repository:
 
