@@ -42,4 +42,8 @@ shows you how to use the `Client` to write new
 APIs (Be it for React or not) and how to write
 new "Exchanges" to customise `urql`'s core behaviour!
 
+### [Guides](guides.md)
+
+Here are some guides on how to make common exchanges.
+
 ### [API](api.md)
