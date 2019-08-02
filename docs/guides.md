@@ -5,6 +5,8 @@ how to get started on creating your own exchange.
 Setting up a full-scale authentication exchange for example
 would be out of scope here.
 
+> All wonka operators used can be found [here](https://wonka.kitten.sh/api/)
+
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
@@ -16,7 +18,7 @@ this exchange from scratch.
 > how to wait for an asynchronous request to complete when
 > necessary before letting operations through.
 
-So let's start with a basic template for an exchange
+So let's start with the basic template for an exchange
 
 ```js
 import { pipe } from 'wonka';
@@ -156,7 +158,7 @@ export const refreshTokenExchange = () => {
         })
         forward,
         // Inserting an operator here will make it run after the operation
-        // has completed.ve the exchange example from extending and experimenting to guides
+        // has completed.
       )
     }
   }
