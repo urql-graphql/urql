@@ -5,13 +5,13 @@ how to get started on creating your own exchange.
 Setting up a full-scale authentication exchange for example
 would be out of scope here.
 
+> All wonka operators used can be found [here](https://wonka.kitten.sh/api/)
+
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
 modern application development. In this part we'll build
 this exchange from scratch.
-
-> All wonka operators used can be found [here](https://wonka.kitten.sh/api/)
 
 So let's start with the basic template for an exchange
 
@@ -152,6 +152,8 @@ export const refreshTokenExchange = () => {
           }
         })
         forward,
+        // Inserting an operator here will make it run after the operation
+        // has completed.
       )
     }
   }
