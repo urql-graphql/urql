@@ -1,5 +1,10 @@
 # Exchanges
 
+These examples are not the best practices but rather show you
+how to get started on creating your own exchange.
+Setting up a full-scale authentication exchange for example
+would be out of scope here.
+
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
@@ -74,13 +79,16 @@ export const refreshTokenExchange = ({ forward }) => {
 
 With this change our refreshToken will be invoked every time this pipeline
 gets called. Since we have a nested pipe that takes a promise and enriches
-our operation with the new token.
+our operation with the new token. The `map` will trigger when `fromPromise`
+completes.
 
 > Here we see that we can alter our operation that finally gets
 > passed to the `fetchExchange`
 
 This can be made better by not triggering the refreshToken mechanism when
-the token is still valid.
+the token is still valid, we don't want to block our exchange pipeline
+on every request. It's blocked since we are waiting from an async action
+in `fromPromise`.
 
 ```js
 import { pipe, fromPromise, map, mergeMap } from 'wonka';
