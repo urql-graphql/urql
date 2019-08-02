@@ -55,7 +55,8 @@ interface UseMutationState<T> {
 }
 ```
 
-The `executeMutation` function accepts the `variables` of type `object`.
+The `executeMutation` function accepts the `variables` of type `object` and
+an optional `context` variable of type `Partial<OperationContext>`.
 
 [More information on how to use this hook can be found in the Getting Started section.](getting-started.md#writing-mutations)
 
@@ -133,13 +134,13 @@ interface UseSubscriptionState<T> {
 
 #### Render Props
 
-| Prop            | Type                          | Description                                                      |
-| --------------- | ----------------------------- | ---------------------------------------------------------------- |
-| fetching        | `boolean`                     | Whether the `Mutation` is currently waiting for a GraphQL result |
-| data            | `?any`                        | The GraphQL request's result                                     |
-| error           | `?CombinedError`              | The `CombinedError` containing any errors that might've occured  |
-| extensions      | `?Record<string, any>`        | Optional extensions that the GraphQL server may have returned.   |
-| executeMutation | `(variables: object) => void` | A function that accepts variables and starts the mutation        |
+| Prop            | Type                                                               | Description                                                      |
+| --------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| fetching        | `boolean`                                                          | Whether the `Mutation` is currently waiting for a GraphQL result |
+| data            | `?any`                                                             | The GraphQL request's result                                     |
+| error           | `?CombinedError`                                                   | The `CombinedError` containing any errors that might've occured  |
+| extensions      | `?Record<string, any>`                                             | Optional extensions that the GraphQL server may have returned.   |
+| executeMutation | `(variables: object, context?: Partial<OperationContext>) => void` | A function that accepts variables and starts the mutation        |
 
 ### `Subscription` (component)
 
@@ -151,7 +152,7 @@ interface UseSubscriptionState<T> {
 | --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query     | `string`                                            | The GraphQL subscription's query                                                                      |
 | variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
-| context   | `?object`                                           | The GraphQL subscriptions' context                                                                    |
+| context   | `?Partial<OperationContext`                         | The GraphQL subscriptions' context                                                                    |
 | handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
 | children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
