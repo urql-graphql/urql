@@ -4,4 +4,4 @@ export * from './components';
 export * from './exchanges';
 export * from './hooks';
 export * from './types';
-export { CombinedError, createRequest } from './utils';
+export { CombinedError, createRequest, formatDocument } from './utils';
