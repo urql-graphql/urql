@@ -139,7 +139,7 @@ export const refreshTokenExchange = () => {
         mergeMap(op => {
           if (isTokenExpired()) {
             return pipe(
-              fromPromise(promise ? promise : promise = refreshToken()), the exchange example from extending and experimenting to guides
+              fromPromise(promise ? promise : promise = refreshToken()),
               map(newToken => {
                 promise = undefined;
                 return { ...op, context: { ...op.context, token: newToken } }
