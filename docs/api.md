@@ -152,7 +152,7 @@ interface UseSubscriptionState<T> {
 | --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query     | `string`                                            | The GraphQL subscription's query                                                                      |
 | variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
-| context   | `?Partial<OperationContext`                         | The GraphQL subscriptions' context                                                                    |
+| context   | `?Partial<OperationContext>`                        | The GraphQL subscriptions' context                                                                    |
 | handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
 | children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
