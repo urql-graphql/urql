@@ -15,6 +15,56 @@ These guides are not intended as best practices or specific instructions for
 writing exchanges. Rather they teach you how to get started on creating
 your own exchanges by learning how we write ours.
 
+## Introduction
+
+All exchanges are written in [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
+observable streaming library. It's in use in `urql` because its behaviour
+is extremely predictable and built to be treeshakeable.
+
+[You can read more about how to use it on the Wonka site.](https://wonka.kitten.sh/basics/)
+
+The basic usage comes down to creating sources, observable-like
+functions that _stream_ values over time.
+
+They're similar to iterables or arrays in that they're used immutably
+and with utilities like `map` and `filter` that transform their output,
+but they work with values that come in asynchronously over time.
+
+These utilities are called "operators" and there's a lot of them to
+enable you to express any asynchronous or iterable behaviour that
+you need.
+
+For instance you can convert an array into a Wonka source,
+then filter and map their content, delay their values by a
+certain timeout, and finally output the values by subscribing
+to the stream:
+
+```js
+import { pipe, fromArray, delay, filter, map, subscribe } from 'wonka';
+
+// pipe applies operators to sources, but operators are just
+// functions that accept a source and return a source
+const values = pipe(
+  fromArray([1, 2, 3]), // this is the source
+  map(x => x * 2),
+  filter(x => x > 2), // a lot of operators look like Array methods
+  delay(200) // this delays values by 200ms
+);
+
+// you can use pipe as many times as you need
+const [unsubscribe] = pipe(
+  values,
+  // this is cancellable by calling unsubscribe
+  subscribe(x => console.log(x))
+);
+```
+
+There are more operators, sources, and sinks, which you'll see
+across these guides, but they're all documented on the
+[Wonka API Reference page](https://wonka.kitten.sh/api/). So it's easy to learn by
+example on this page, but you can also read more on how Wonka
+works over on its site.
+
 ## The Rules of Exchanges
 
 Before we jump into writing some exchanges, there are a couple of
