@@ -1,5 +1,10 @@
 # Exchanges
 
+These examples are not the best practices but rather show you
+how to get started on creating your own exchange.
+Setting up a full-scale authentication exchange for example
+would be out of scope here.
+
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
