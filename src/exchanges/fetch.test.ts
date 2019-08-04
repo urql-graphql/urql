@@ -2,7 +2,7 @@ import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 import { Client } from '../client';
 import { queryOperation } from '../test-utils';
 import { OperationResult, OperationType } from '../types';
-import { fetchExchange } from './fetch';
+import { fetchExchange, createFetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -167,5 +167,27 @@ describe('on teardown', () => {
 
     expect(fetch).toHaveBeenCalledTimes(0);
     expect(abort).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe('createFetchExchange', () => {
+  it('creates a new exchange', async () => {
+    const headers = { foo: 'bar' };
+    const buildRequest = jest.fn(() => ({ headers }));
+    const customExchange = createFetchExchange(buildRequest);
+
+    fetch.mockResolvedValue({});
+
+    await pipe(
+      fromValue(queryOperation),
+      customExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(buildRequest).toHaveBeenCalledWith(queryOperation);
+    expect(fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ headers })
+    );
   });
 });

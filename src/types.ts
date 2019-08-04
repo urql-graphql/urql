@@ -74,3 +74,6 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
+
+/** Function responsible for reciving an operation and returning configuration for fetch */
+export type RequestBuilder = (operation: Operation) => RequestInit;

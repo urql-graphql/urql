@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation, OperationResult, RequestBuilder } from '../types';
 import { addMetadata, CombinedError } from '../utils';
 
-/** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward }) => {
+/** A higher-order function to create a custom exchange for fetching */
+export const createFetchExchange = (
+  buildRequest: RequestBuilder
+): Exchange => ({ forward }) => {
   const isOperationFetchable = (operation: Operation) => {
     const { operationName } = operation;
     return operationName === 'query' || operationName === 'mutation';
@@ -24,7 +26,7 @@ export const fetchExchange: Exchange = ({ forward }) => {
         );
 
         return pipe(
-          createFetchSource(operation),
+          createFetchSource(operation, buildRequest),
           takeUntil(teardown$)
         );
       })
@@ -40,7 +42,33 @@ export const fetchExchange: Exchange = ({ forward }) => {
   };
 };
 
-const createFetchSource = (operation: Operation) => {
+/** A default exchange for fetching GraphQL requests. */
+export const fetchExchange = createFetchExchange(operation => {
+  const { context } = operation;
+
+  const extraOptions =
+    typeof context.fetchOptions === 'function'
+      ? context.fetchOptions()
+      : context.fetchOptions || {};
+
+  return {
+    body: JSON.stringify({
+      query: print(operation.query),
+      variables: operation.variables,
+    }),
+    method: 'POST',
+    ...extraOptions,
+    headers: {
+      'content-type': 'application/json',
+      ...extraOptions.headers,
+    },
+  };
+});
+
+const createFetchSource = (
+  operation: Operation,
+  buildRequest: RequestBuilder
+) => {
   if (operation.operationName === 'subscription') {
     throw new Error(
       'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
@@ -53,24 +81,8 @@ const createFetchSource = (operation: Operation) => {
         ? new AbortController()
         : undefined;
 
-    const { context } = operation;
-
-    const extraOptions =
-      typeof context.fetchOptions === 'function'
-        ? context.fetchOptions()
-        : context.fetchOptions || {};
-
     const fetchOptions = {
-      body: JSON.stringify({
-        query: print(operation.query),
-        variables: operation.variables,
-      }),
-      method: 'POST',
-      ...extraOptions,
-      headers: {
-        'content-type': 'application/json',
-        ...extraOptions.headers,
-      },
+      ...buildRequest(operation),
       signal:
         abortController !== undefined ? abortController.signal : undefined,
     };
