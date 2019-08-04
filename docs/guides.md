@@ -17,8 +17,8 @@ your own exchanges by learning how we write ours.
 
 ## Introduction
 
-All exchanges are written in [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
-observable streaming library. It's in use in `urql` because its behaviour
+All exchanges are written with [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
+observable streaming library. Wonka is used `urql` because its behaviour
 is extremely predictable and built to be treeshakeable.
 
 [You can read more about how to use it on the Wonka site.](https://wonka.kitten.sh/basics/)
@@ -59,11 +59,11 @@ const [unsubscribe] = pipe(
 );
 ```
 
-There are more operators, sources, and sinks, which you'll see
+There are more operators, sources and sinks, which you'll see
 across these guides, but they're all documented on the
-[Wonka API Reference page](https://wonka.kitten.sh/api/). So it's easy to learn by
-example on this page, but you can also read more on how Wonka
-works over on its site.
+[Wonka API Reference page](https://wonka.kitten.sh/api/).
+So it's easy to learn by example on this page,
+but you can also read more on how Wonka works over on its site.
 
 ## The Rules of Exchanges
 
@@ -153,8 +153,8 @@ import { pipe, filter, merge, share } from 'wonka';
 ```
 
 So if you see the `operations$` stream twice in your exchange code, make sure to
-use Wonka's [`share`](https://wonka.kitten.sh/api/operators#share) operator, to share the underlying subscription between
-all your streams.
+use Wonka's [`share`](https://wonka.kitten.sh/api/operators#share) operator,
+to share the underlying subscription between all your streams.
 
 ### Don't accidentally drop operations
 
@@ -207,9 +207,9 @@ Every operator in Wonka runs synchronously until you actually introduce
 asynchronicity.
 
 This may happen when you use a timing utility from Wonka, like
-[`delay`](https://wonka.kitten.sh/api/operators#delay) or [`throttle`](https://wonka.kitten.sh/api/operators#throttle). Or this could happen because
-your exchange inherently does something asynchronous, like fetch
-some data or use a promise.
+[`delay`](https://wonka.kitten.sh/api/operators#delay) or [`throttle`](https://wonka.kitten.sh/api/operators#throttle)
+Or this could happen because your exchange inherently does somethingasynchronous,
+like fetch some data or use a promise.
 
 When you write exchanges, some will inevitably be asynchronous, if
 they're fetching results, performing authentication, or other tasks
@@ -246,8 +246,6 @@ the initialization of our hooks, it's vital to order your exchanges
 so that synchronous exchanges come first and asynchronous ones
 come last.
 
-> All wonka operators used can be found [here](https://wonka.kitten.sh/api/)
-
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
@@ -259,7 +257,7 @@ this exchange from scratch.
 > how to wait for an asynchronous request to complete when
 > necessary before letting operations through.
 
-So let's start with the basic template for an exchange
+So let's start with a basic template for an exchange
 
 ```js
 import { pipe } from 'wonka';
@@ -303,7 +301,7 @@ const refreshToken = () => {
 
 Now that we have a way to refresh our token
 we can transform the previous exchange to handle the
-promise that the `refreshToken` function will return.move the exchange example from extending and experimenting to guides
+promise that the `refreshToken` function will return.
 
 ```js
 import { pipe, fromPromise, map } from 'wonka';
@@ -409,11 +407,7 @@ export const refreshTokenExchange = () => {
 All that's left to do is use your own brand new exchange
 by adding it into your exchanges array as `refreshTokenExchange()`.
 
-<<<<<<< HEAD
 [Check out the full, working example in a CodeSandbox](https://codesandbox.io/s/refetch-token-exchange-t8b6g)
 to run the example you'll have to open the server template.
 
 [Server template](https://codesandbox.io/s/urql-issue-template-server-0ufyz)factor) - move the exchange example from extending and experimenting to guides
-=======
-[Check out the full, working example in a CodeSandbox](https://codesandbox.io/s/recursing-shadow-t8b6g)
->>>>>>> Add "The Rules of Exchanges" section
