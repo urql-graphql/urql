@@ -17,8 +17,8 @@ your own exchanges by learning how we write ours.
 
 ## Introduction
 
-All exchanges are written in [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
-observable streaming library. It's in use in `urql` because its behaviour
+All exchanges are written with [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
+observable streaming library. Wonka is used `urql` because its behaviour
 is extremely predictable and built to be treeshakeable.
 
 [You can read more about how to use it on the Wonka site.](https://wonka.kitten.sh/basics/)
@@ -59,11 +59,11 @@ const [unsubscribe] = pipe(
 );
 ```
 
-There are more operators, sources, and sinks, which you'll see
+There are more operators, sources and sinks, which you'll see
 across these guides, but they're all documented on the
-[Wonka API Reference page](https://wonka.kitten.sh/api/). So it's easy to learn by
-example on this page, but you can also read more on how Wonka
-works over on its site.
+[Wonka API Reference page](https://wonka.kitten.sh/api/).
+So it's easy to learn by example on this page,
+but you can also read more on how Wonka works over on its site.
 
 ## The Rules of Exchanges
 
@@ -153,8 +153,8 @@ import { pipe, filter, merge, share } from 'wonka';
 ```
 
 So if you see the `operations$` stream twice in your exchange code, make sure to
-use Wonka's [`share`](https://wonka.kitten.sh/api/operators#share) operator, to share the underlying subscription between
-all your streams.
+use Wonka's [`share`](https://wonka.kitten.sh/api/operators#share) operator,
+to share the underlying subscription between all your streams.
 
 ### Don't accidentally drop operations
 
@@ -207,9 +207,9 @@ Every operator in Wonka runs synchronously until you actually introduce
 asynchronicity.
 
 This may happen when you use a timing utility from Wonka, like
-[`delay`](https://wonka.kitten.sh/api/operators#delay) or [`throttle`](https://wonka.kitten.sh/api/operators#throttle). Or this could happen because
-your exchange inherently does something asynchronous, like fetch
-some data or use a promise.
+[`delay`](https://wonka.kitten.sh/api/operators#delay) or [`throttle`](https://wonka.kitten.sh/api/operators#throttle)
+Or this could happen because your exchange inherently does somethingasynchronous,
+like fetch some data or use a promise.
 
 When you write exchanges, some will inevitably be asynchronous, if
 they're fetching results, performing authentication, or other tasks
@@ -246,8 +246,6 @@ the initialization of our hooks, it's vital to order your exchanges
 so that synchronous exchanges come first and asynchronous ones
 come last.
 
-> All wonka operators used can be found [here](https://wonka.kitten.sh/api/)
-
 ## Authentication
 
 Managing and refreshing tokens is a very common case in
@@ -259,7 +257,7 @@ this exchange from scratch.
 > how to wait for an asynchronous request to complete when
 > necessary before letting operations through.
 
-So let's start with the basic template for an exchange
+So let's start with a basic template for an exchange
 
 ```js
 import { pipe } from 'wonka';
@@ -275,8 +273,7 @@ export const refreshTokenExchange = ({ forward }) => {
 ```
 
 As of now it enters the exchange and tells it to continue due
-to forward being invoked. So this is basically an empty
-exchange.
+to forward being invoked. So this is basically a noop exchange.
 
 Next up is writing some code that refreshes our token, so imagine
 the following method:
@@ -302,9 +299,9 @@ const refreshToken = () => {
 };
 ```
 
-so now that we have the methods to refresh our token
+Now that we have a way to refresh our token
 we can transform the previous exchange to handle the
-returned promise.
+promise that the `refreshToken` function will return.
 
 ```js
 import { pipe, fromPromise, map } from 'wonka';
@@ -323,7 +320,7 @@ export const refreshTokenExchange = ({ forward }) => {
 }
 ```
 
-With this change our refreshToken will be invoked every time this pipeline
+With this change our `refreshToken` function will be invoked every time this pipeline
 gets called. Since we have a nested pipe that takes a promise and enriches
 our operation with the new token. The `map` will trigger when `fromPromise`
 completes.
@@ -367,11 +364,12 @@ export const refreshTokenExchange = ({ forward }) => {
 }
 ```
 
-We use mergeMap to see if our token is expired and return our previously
+We use `mergeMap` to see if our token is expired and return our previously
 made `pipe` that refreshes our token or use the still valid token.
 
 Now we face one last problem, what if we dispatch multiple queries
-while our token is invalid?
+while our token is invalid? This would mean that we invoke several
+instances of `refreshToken`, these would be redundant.
 Let's transform our exchange into a higher order function to solve this
 issue.
 
