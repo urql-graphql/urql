@@ -171,7 +171,7 @@ pass in a fully parsed AST in the form of `DocumentNode` instead.
 For this purpose you can use `graphql-tag`.
 
 This can be extremely helpful, since it enables syntax highlighting
-in some editors. It also can be used to preparse the GraphQL query
+in some editors. It also can be used to pre-parse the GraphQL query
 using `babel-plugin-graphql-tag` or the included Webpack loader.
 
 You only have to make a small adjustment. Install `graphql-tag` and

@@ -1,6 +1,6 @@
 # Architecture
 
-Much of `urql` is about being flexible and customisable.
+Much of `urql` is about being flexible and customizable.
 To this extent a large chunk of this document is dedicated to
 how `urql` works and how to adapt it to different use cases.
 

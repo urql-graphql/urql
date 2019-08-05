@@ -1,6 +1,6 @@
 # Documentation
 
-`urql` is a highly customisable and flexible GraphQL client, that
+`urql` is a highly customizable and flexible GraphQL client, that
 happens to come with some default core behavior and some React
 component and hooks APIs.
 
