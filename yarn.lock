@@ -4920,10 +4920,10 @@ react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
-react-ssr-prepass@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.0.5.tgz#63ce763b2deb81949b20ccb2c64503ca53c562ba"
-  integrity sha512-A8QXXIHBpzr5/bnG3rwFgJWU6gLo7/dcW1bBIluoBI2hMyC+uuMRO+rXEtUpX6AVDhWfdFVi2I7kvWUDIRgDtA==
+react-ssr-prepass@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.0.6.tgz#5d4bcf210d7d59ea486f3567bd2df42c634a4dd7"
+  integrity sha512-UDY0nMboZ7kBM4IMQ8N0i8QlhY2s5oLgw0oZjA1znKPo6ep9U62pxPjSl1st0zMf2fwhb/GBw5snYqp/svuZSA==
   dependencies:
     object-is "^1.0.1"
 
@@ -6247,10 +6247,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.1.1.tgz#c948e8299468dd87eb0d6fc9b5647f7848a85af2"
-  integrity sha512-UT65glpq1Bl9DaLwMJp6/EvsL+juqdkvJpAb2xsmUqmWLPkwIGB0/kIh8DHr3dem0UXHcgIDBizmH3xnnScguA==
+wonka@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.0.tgz#40b9ce8e0c375127437661290e98e5d9e5278440"
+  integrity sha512-sHCLouGzTclUlp1sdXAhuTqGMIoAQfpBit9puepaINPVqDBRtC8DPWtTUHC0DJIdFSO+DsO86AFBFCDor7Sn0g==
 
 wordwrap@~0.0.2:
   version "0.0.3"

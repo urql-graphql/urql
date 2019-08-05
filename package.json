@@ -114,7 +114,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-is": "^16.8.6",
-    "react-ssr-prepass": "^1.0.5",
+    "react-ssr-prepass": "^1.0.6",
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.2",
     "rollup": "^1.17.0",
@@ -137,6 +137,6 @@
     "fast-json-stable-stringify": "^2.0.0",
     "graphql-tag": "^2.10.1",
     "prop-types": "^15.6.0",
-    "wonka": "^3.1.1"
+    "wonka": "^3.2.0"
   }
 }
