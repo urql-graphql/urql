@@ -411,3 +411,100 @@ by adding it into your exchanges array as `refreshTokenExchange()`.
 to run the example you'll have to open the server template.
 
 [Server template](https://codesandbox.io/s/urql-issue-template-server-0ufyz)factor) - move the exchange example from extending and experimenting to guides
+
+## Adjusting an exchange
+
+Let's say the `fetchExchange` doesn't cut it for you and you want to be able to upload files,
+the first thing to do is go to the [urql exchanges](https://github.com/FormidableLabs/urql/tree/master/src/exchanges)
+find the exchange you want to change and copy it over.
+
+In our case we want to alter the `fetchExchange` to handle file uploads.
+To accomplish this we'll use an [external dependency](https://www.npmjs.com/package/extract-files)
+to extract the files from our variables.
+
+First things first, we'll need to check if the operation passed into our exchange
+contains any files. Here we'll need to alter somethings in the `createFetchSource`.
+
+```js
+import { extractFiles } from 'extract-files';
+
+...
+const createFetchSource = (operation) => {
+  return make(([next, complete]) => {
+    const { context } = operation;
+    const { clone, files } = extractFiles(operation.variables);
+    const isFileUpload = !!files.size;
+  })
+}
+...
+
+```
+
+Now we know when it's a file upload, this enables us to alter
+the request when this is true or false.
+When it's an upload we don't need to send our request as `application/json`
+but as `FormData`.
+
+```js
+...
+const isFileUpload = !!files.size;
+
+const extraOptions =
+  typeof context.fetchOptions === 'function'
+    ? context.fetchOptions()
+    : context.fetchOptions || {};
+
+const fetchOptions = {
+  method: 'POST',
+  ...extraOptions,
+};
+
+if (isFileUpload) {
+  fetchOptions.body = new FormData()
+
+  fetchOptions.body.append(
+    'operations',
+    JSON.stringify({
+      query: print(operation.query),
+      variables: Object.assign({}, operation.variables),
+    }),
+  )
+
+  const map = {}
+  let i = 0
+  files.forEach(paths => {
+    map[++i] = paths
+  });
+
+  fetchOptions.body.append('map', JSON.stringify(map));
+
+  i = 0
+  files.forEach((paths, file) => {
+    fetchOptions.body.append(`${++i}`, file, file.name)
+  });
+} else {
+  fetchOptions.headers['content-type'] = 'application/json';
+  fetchOptions.body = JSON.stringify({
+    query: print(operation.query),
+    variables: operation.variables,
+  });
+}
+...
+```
+
+This way we have altered the `fetchOptions` variable to include the
+`File` or `FileList` and send it to the server in the right format.
+
+The only thing left to do is to include this new exchange by doing:
+
+```js
+import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { myFetchExchange } from './fetchExchange';
+
+const client = createClient({
+  exchanges: [dedupExchange, cacheExchange, myFetchExchange],
+});
+```
+
+Now we are all set to use our new `fetchExchange` to upload files as
+well as do normal `JSON` requests.
