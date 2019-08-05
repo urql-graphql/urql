@@ -230,6 +230,15 @@ The exchange returned by `ssrExchange()` should be added after the `cacheExchang
 (or any other custom cache exchange you've defined), and before any
 asynchronous exchanges like the `fetchExchange`.
 
+If you're also using suspense mode on the client, you can
+additionally set the `isClient` option, which tells the `ssrExchange` manually
+whether it's on the server or client, so that you can enable the `suspense`
+mode on the client-side as well.
+
+```js
+const ssrCache = ssrExchange({ isClient: !!process.browser });
+```
+
 ### Prefetching on the server
 
 In your request handler on the server-side, you'll have to add some
