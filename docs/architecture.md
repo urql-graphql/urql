@@ -166,7 +166,7 @@ same operation / request twice at the same time.
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`
 cached results can be resolved instead and results from network requests are cached.
 
-**Third,** operations are sent to the API and the result is normalised.
+**Third,** operations are sent to the API and the result is normalized.
 
 ## Operation Results
 
