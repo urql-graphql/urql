@@ -353,9 +353,9 @@ cached completely. When the same query and variables are requested again,
 result is also invalidated when a mutation with similar `__typename`s was
 sent.
 
-[You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
+[You can find out more about the default caching behavior in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
 
-Using `urql`'s default behaviour this means we sometimes need a way to refetch
+Using `urql`'s default behavior this means we sometimes need a way to refetch
 data from the GraphQL API and skip the cache, if we need fresh data.
 
 The easiest way to always display up-to-date data is to set the `requestPolicy`

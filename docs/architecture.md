@@ -101,7 +101,7 @@ the second argument to `executeQuery`. By default it contains:
 
 - `fetchOptions` for the `fetch` call's options
 - `url` for the `fetch` call's API endpoint
-- `requestPolicy` to determine the cache's behaviour
+- `requestPolicy` to determine the cache's behavior
 
 The `executeQuery` call will return a [Wonka](https://github.com/kitten/wonka)
 stream. This is just an observable (not following the Observable spec)

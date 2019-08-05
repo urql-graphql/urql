@@ -1,7 +1,7 @@
 # Basics
 
 As mentioned before, `urql`'s core logic is split into exchanges.
-To that end, `urql`'s behaviour is completely defined by the exchanges
+To that end, `urql`'s behavior is completely defined by the exchanges
 you pass to it or that are the default ones.
 
 This document goes through the exchanges that `urql` adds by default.
@@ -65,12 +65,12 @@ operations and sends `POST` requests using `fetch`.
 
 ## `cacheExchange`
 
-The default caching behaviour that `urql` uses is defined by the `cacheExchange`
-unlike Apollo's `Cache` or `InMemoryCache`, caching behaviour is handled as
+The default caching behavior that `urql` uses is defined by the `cacheExchange`
+unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as
 part of the request pipeline, which makes customisation a lot easier as
 there's no extra API to learn.
 
-By default however, `urql`'s caching behaviour is not that of a _"normalising
+By default however, `urql`'s caching behavior is not that of a _"normalising
 cache"_ but more of a _"document cache"_.
 
 ### The document cache
@@ -123,7 +123,7 @@ The operation context can also contain a `requestPolicy` property
 that alters when and how the cache responds.
 By default this will be set to `'cache-first'`.
 
-When `'cache-first'`, the default behaviour, is used, the cache
+When `'cache-first'`, the default behavior, is used, the cache
 will return all cached results when they're available. When no
 cached result is available it will let the operation through, so
 that the `fetchExchange` can send a request to the API.
@@ -152,7 +152,7 @@ from the API.
 
 ### Customisation
 
-The idea of `urql` is that you can customise the caching behaviour amongst
+The idea of `urql` is that you can customise the caching behavior amongst
 other things yourself, if needed.
 
 [Read more about customising `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
