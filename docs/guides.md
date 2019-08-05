@@ -326,7 +326,7 @@ our operation with the new token. The `map` will trigger when `fromPromise`
 completes.
 
 > Here we see that we can alter our operation that finally gets
-> passed to the `fetchExchange`
+> passed to the `fetchExchange`
 
 This can be made better by not triggering the refreshToken mechanism when
 the token is still valid, we don't want to block our exchange pipeline
