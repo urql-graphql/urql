@@ -18,7 +18,7 @@ your own exchanges by learning how we write ours.
 ## Introduction
 
 All exchanges are written with [Wonka](https://wonka.kitten.sh/), a ligtweight iterable and
-observable streaming library. Wonka is used `urql` because its behaviour
+observable streaming library. Wonka is used `urql` because its behavior
 is extremely predictable and built to be treeshakeable.
 
 [You can read more about how to use it on the Wonka site.](https://wonka.kitten.sh/basics/)
@@ -31,7 +31,7 @@ and with utilities like `map` and `filter` that transform their output,
 but they work with values that come in asynchronously over time.
 
 These utilities are called "operators" and there's a lot of them to
-enable you to express any asynchronous or iterable behaviour that
+enable you to express any asynchronous or iterable behavior that
 you need.
 
 For instance you can convert an array into a Wonka source,
@@ -215,7 +215,7 @@ When you write exchanges, some will inevitably be asynchronous, if
 they're fetching results, performing authentication, or other tasks
 that you have to wait for.
 
-This can cause problems, because the behaviour in `urql` is built
+This can cause problems, because the behavior in `urql` is built
 to be _synchronous_ first. This helps us build our suspense mode,
 and it helps your components receive cached data on their initial
 mount without rerendering.
@@ -241,7 +241,7 @@ to put them in a specific order. For instance, an authentication exchange
 needs to go before the `fetchExchange`. And a secondary cache would
 maybe go in front of the default cache exchange.
 
-But to ensure the correct behaviour of suspense mode and
+But to ensure the correct behavior of suspense mode and
 the initialization of our hooks, it's vital to order your exchanges
 so that synchronous exchanges come first and asynchronous ones
 come last.

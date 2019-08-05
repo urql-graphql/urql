@@ -54,16 +54,16 @@ export class CombinedError extends Error {
     graphQLErrors?: Array<string | GraphQLError | Error>;
     response?: any;
   }) {
-    const normalisedGraphQLErrors = (graphQLErrors || []).map(
+    const normalizedGraphQLErrors = (graphQLErrors || []).map(
       rehydrateGraphQlError
     );
-    const message = generateErrorMessage(networkError, normalisedGraphQLErrors);
+    const message = generateErrorMessage(networkError, normalizedGraphQLErrors);
 
     super(message);
 
     this.name = 'CombinedError';
     this.message = message;
-    this.graphQLErrors = normalisedGraphQLErrors;
+    this.graphQLErrors = normalizedGraphQLErrors;
     this.networkError = networkError;
     this.response = response;
   }
