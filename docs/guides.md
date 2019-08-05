@@ -410,7 +410,7 @@ by adding it into your exchanges array as `refreshTokenExchange()`.
 [Check out the full, working example in a CodeSandbox](https://codesandbox.io/s/refetch-token-exchange-t8b6g)
 to run the example you'll have to open the server template.
 
-[Server template](https://codesandbox.io/s/urql-issue-template-server-0ufyz)factor) - move the exchange example from extending and experimenting to guides
+[Server template](https://codesandbox.io/s/urql-issue-template-server-0ufyz)
 
 ## Adjusting an exchange
 
