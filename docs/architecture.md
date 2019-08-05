@@ -4,7 +4,7 @@ Much of `urql` is about being flexible and customizable.
 To this extent a large chunk of this document is dedicated to
 how `urql` works and how to adapt it to different use cases.
 
-If you wish to use `urql` without any customisations, this
+If you wish to use `urql` without any customizations, this
 document is entirely optional for you. But it's still worth
 the read. Promised.
 

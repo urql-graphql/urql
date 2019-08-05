@@ -67,10 +67,10 @@ operations and sends `POST` requests using `fetch`.
 
 The default caching behavior that `urql` uses is defined by the `cacheExchange`
 unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as
-part of the request pipeline, which makes customisation a lot easier as
+part of the request pipeline, which makes customization a lot easier as
 there's no extra API to learn.
 
-By default however, `urql`'s caching behavior is not that of a _"normalising
+By default however, `urql`'s caching behavior is not that of a _"normalizing
 cache"_ but more of a _"document cache"_.
 
 ### The document cache
@@ -150,7 +150,7 @@ from the API.
 > that data skips the cache, if it's clear to you that the result will
 > need to be up-to-date.
 
-### Customisation
+### Customization
 
 The idea of `urql` is that you can customise the caching behavior amongst
 other things yourself, if needed.
