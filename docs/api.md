@@ -427,9 +427,15 @@ streams `GraphQLResult`s with `data` and `errors`.
 The `ssrExchange` as [described in the Basics section](basics.md#server-side-rendering).
 It's of type `Options => Exchange`.
 
-It accepts a single input, `{ initialState }`, which is completely
+It accepts two inputs, `initialState` which is completely
 optional and populates the server-side rendered data with
-a rehydrated cache.
+a rehydrated cache, and `isClient` which can be set to
+`true` or `false` to tell the `ssrExchange` whether to
+write to (server-side) or read from (client-side) the cache.
+
+By default `isClient` defaults to `true` when the `Client.suspense`
+mode is disabled and to `false` when the `Client.suspense` mode
+is enabled.
 
 This can be used to extract data that has been queried on
 the server-side, which is also described in the Basics section,
