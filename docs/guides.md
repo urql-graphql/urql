@@ -407,4 +407,7 @@ export const refreshTokenExchange = () => {
 All that's left to do is use your own brand new exchange
 by adding it into your exchanges array as `refreshTokenExchange()`.
 
-[Check out the full, working example in a CodeSandbox](https://codesandbox.io/s/recursing-shadow-t8b6g)
+[Check out the full, working example in a CodeSandbox](https://codesandbox.io/s/refetch-token-exchange-t8b6g)
+to run the example you'll have to open the server template.
+
+[Server template](https://codesandbox.io/s/urql-issue-template-server-0ufyz)
