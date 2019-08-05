@@ -110,7 +110,9 @@ Note that in React Suspense, the thrown promises bubble up the component tree un
 
 [You can also find a fully working demo on CodeSandbox.](https://codesandbox.io/s/urql-client-side-suspense-demo-81obe)
 
-## Limitations
+## Caveats
+
+### About server-side usage
 
 The suspense exchange is not intended to work for server-side rendering suspense! This is
 what the `ssrExchange` is intended for and it's built into the main `urql` package. The
@@ -121,6 +123,44 @@ The `<React.Suspense>` element currently won't even be rendered during server-si
 and has been disabled in `react-dom/server`. So if you use `suspenseExchange` and
 `<React.Suspense>` in your server-side code you may see some unexpected behaviour and
 errors.
+
+### Usage with `ssrExchange`
+
+If you're also using the `ssrExchange` for server-side rendered data, you will have to use
+an additonal flag to indicate to it when it's running on the server-side and when it's running
+on the client-side.
+
+By default, the `ssrExchange` will look at `client.suspense`. If the `urql` Client is in suspense
+mode then the `ssrExchange` assumes that it's running on the server-side. When it's not
+in suspense mode (`!client.suspense`) it assumes that it's running on the client-side.
+
+When you're using `@urql/exchange-suspense` you'll enable the suspense mode on the
+client-side as well, which means that you'll have to tell the `ssrExchange` manually
+when it's running on the client-side.
+
+Most of the time you can achieve this by checking `process.browser` in any Webpack
+environment. The `ssrExchange` accepts an `isClient` flag that you can set to
+true on the client-side.
+
+```js
+const isClient = !!process.browser;
+
+const client = createClient({
+  url: 'http://localhost:1234/graphql',
+  suspense: true,
+  exchanges: [
+    dedupExchange,
+    isClient && suspenseExchange,
+    ssrExchange({
+      initialData: isClient ? window.URQL_DATA : undefined,
+      // This will need to be passed explicitly to ssrExchange:
+      isClient: !!isClient
+    })
+    cacheExchange,
+    fetchExchange,
+  ].filter(Boolean),
+});
+```
 
 ## Maintenance Status
 
