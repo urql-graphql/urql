@@ -138,7 +138,7 @@ We have now:
 - Added the second `useEffect` argument to tell it when to rerun
 - Added state to set `fetching: true` and to update the result
 
-In the actual implementation of the hook we also generalise this
+In the actual implementation of the hook we also generalize this
 execution and expose the `executeQuery` function in the returned tuple.
 This is left out here as the implementation can be found in the source code.
 
