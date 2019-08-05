@@ -6,6 +6,7 @@ This is a basic todo app built with `urql`. It demonstrates some of the core pri
 - Wrapping your app with `Provider`.
 - Using the `useQuery` hook to execute and refetch queries.
 - Using the `useMutation` hook to execute mutations.
+- Showing the [devtools](https://chrome.google.com/webstore/detail/urql-devtools/mcfphkbpmkbeofnkjehahlmidmceblmm)
 
 ## Usage
 
@@ -33,4 +34,5 @@ yarn start
 
 #### 4. Open your browser
 
-Navigate to example at [http://localhost:3000/](http://localhost:3000/).
+Navigate to example at [http://localhost:3000/](http://localhost:3000/). You can use the urql devtools by
+opening your console and navigating to the `urql` tab.
