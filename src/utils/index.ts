@@ -1,6 +1,7 @@
 export * from './error';
 export * from './keyForQuery';
 export * from './request';
+export * from './result';
 export * from './typenames';
 export * from './toSuspenseSource';
 
