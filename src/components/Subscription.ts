@@ -12,11 +12,9 @@ export interface SubscriptionProps<T, R, V> extends UseSubscriptionArgs<V> {
   children: (arg: UseSubscriptionState<R>) => ReactElement<any>;
 }
 
-export function Subscription<T = any, R = T, V = any>({
-  children,
-  handler,
-  ...args
-}: SubscriptionProps<T, R, V>): ReactElement<any> {
-  const [state] = useSubscription<T, R, V>(args, handler);
-  return children(state);
+export function Subscription<T = any, R = T, V = any>(
+  props: SubscriptionProps<T, R, V>
+): ReactElement<any> {
+  const [state] = useSubscription<T, R, V>(props, props.handler);
+  return props.children(state);
 }

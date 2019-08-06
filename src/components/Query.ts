@@ -10,10 +10,9 @@ export interface QueryState<T> extends UseQueryState<T> {
   executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 
-export function Query<T = any, V = any>({
-  children,
-  ...args
-}: QueryProps<T, V>): ReactElement<any> {
-  const [state, executeQuery] = useQuery<T, V>(args);
-  return children({ ...state, executeQuery });
+export function Query<T = any, V = any>(
+  props: QueryProps<T, V>
+): ReactElement<any> {
+  const [state, executeQuery] = useQuery<T, V>(props);
+  return props.children({ ...state, executeQuery });
 }
