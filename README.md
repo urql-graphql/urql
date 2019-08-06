@@ -47,7 +47,7 @@ While GraphQL is an elegant protocol and schema language, client libraries today
 - [Basics](https://formidable.com/open-source/urql/docs/basics/)
 - [Extending & Experimenting](https://formidable.com/open-source/urql/docs/extending-&-experimenting/)
 - [API](https://formidable.com/open-source/urql/docs/api/)
-- [Guides](https://github.com/FormidableLabs/urql/blob/docs/customExchanges/docs/guides.md)
+- [Guides](./docs/guides.md)
 
 _You can find the raw markdown files inside this repository's `docs` folder._
 
