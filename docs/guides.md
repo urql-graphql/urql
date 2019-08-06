@@ -208,7 +208,7 @@ asynchronicity.
 
 This may happen when you use a timing utility from Wonka, like
 [`delay`](https://wonka.kitten.sh/api/operators#delay) or [`throttle`](https://wonka.kitten.sh/api/operators#throttle)
-Or this could happen because your exchange inherently does somethingasynchronous,
+Or this could happen because your exchange inherently does something asynchronous,
 like fetch some data or use a promise.
 
 When you write exchanges, some will inevitably be asynchronous, if
