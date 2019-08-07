@@ -4,7 +4,7 @@ import { OperationResult, OperationContext } from '../types';
 import { useMutation, UseMutationState } from '../hooks';
 
 export interface MutationProps<T, V> {
-  query: DocumentNode | string;
+  query: DocumentNode;
   children: (arg: MutationState<T, V>) => ReactElement<any>;
 }
 

@@ -20,6 +20,7 @@ import gql from 'graphql-tag';
 import { createClient, data } from '../client';
 import { useSubscription } from './useSubscription';
 import { OperationContext } from '../types';
+import { DocumentNode } from 'graphql';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
@@ -31,7 +32,7 @@ const query = gql`
 let state: any;
 
 const SubscriptionUser: FC<{
-  q: string;
+  q: DocumentNode;
   handler?: (prev: any, data: any) => any;
   context?: Partial<OperationContext>;
 }> = ({ q, handler, context }) => {

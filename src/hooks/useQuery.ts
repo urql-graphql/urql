@@ -10,7 +10,7 @@ import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
 
 export interface UseQueryArgs<V> {
-  query: string | DocumentNode;
+  query: DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
   context?: Partial<OperationContext>;

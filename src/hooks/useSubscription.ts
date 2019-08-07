@@ -9,7 +9,7 @@ import { useImmediateState } from './useImmediateState';
 import { OperationContext } from '../types';
 
 export interface UseSubscriptionArgs<V> {
-  query: DocumentNode | string;
+  query: DocumentNode;
   variables?: V;
   context?: Partial<OperationContext>;
 }

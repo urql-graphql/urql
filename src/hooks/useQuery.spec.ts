@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import { createClient } from '../client';
 import { useQuery } from './useQuery';
 import { RequestPolicy } from 'src/types';
+import { DocumentNode } from 'graphql';
 
 jest.mock('../client', () => {
   const d = { data: 'data', error: 'error' };
@@ -135,7 +136,7 @@ describe('useQuery', () => {
 
   it('should update if a new query is received', async () => {
     const { rerender, waitForNextUpdate } = renderHook<
-      { query: string; variables?: object },
+      { query: DocumentNode; variables?: object },
       {}
     >(({ query, variables }) => useQuery({ query, variables }), {
       initialProps: { query: mockQuery, variables: mockVariables },
@@ -168,7 +169,7 @@ describe('useQuery', () => {
 
   it('should update if new variables are received', async () => {
     const { rerender, waitForNextUpdate } = renderHook<
-      { query: string; variables: object },
+      { query: DocumentNode; variables: object },
       {}
     >(({ query, variables }) => useQuery({ query, variables }), {
       initialProps: { query: mockQuery, variables: mockVariables },
