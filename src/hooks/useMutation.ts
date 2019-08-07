@@ -20,7 +20,7 @@ export type UseMutationResponse<T, V> = [
 ];
 
 export const useMutation = <T = any, V = object>(
-  query: DocumentNode | string
+  query: DocumentNode
 ): UseMutationResponse<T, V> => {
   const devtoolsContext = useDevtoolsContext();
   const client = useContext(Context);

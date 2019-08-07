@@ -5,7 +5,7 @@ import { createRequest } from '../utils';
 
 /** Creates a request from a query and variables but preserves reference equality if the key isn't changing */
 export const useRequest = (
-  query: string | DocumentNode,
+  query: DocumentNode,
   variables?: any
 ): GraphQLRequest => {
   const prev = useRef<undefined | GraphQLRequest>(undefined);

@@ -29,7 +29,11 @@ import { useMutation } from './useMutation';
 // @ts-ignore
 const client = createClient() as { executeMutation: jest.Mock };
 const props = {
-  query: 'mutation Example { example }',
+  query: gql`
+    mutation Example {
+      example
+    }
+  `,
 };
 let state: any;
 let execute: any;
@@ -93,7 +97,7 @@ describe('on execute', () => {
     });
 
     const call = client.executeMutation.mock.calls[0][0];
-    expect(print(call.query)).toBe(print(gql([props.query])));
+    expect(print(call.query)).toBe(print(props.query));
   });
 
   it('calls executeMutation with variables', () => {

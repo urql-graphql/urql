@@ -20,6 +20,7 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import gql from 'graphql-tag';
 import { pipe, onStart, onEnd, interval } from 'wonka';
 import { createClient } from '../client';
 import { OperationContext } from '../types';
@@ -28,7 +29,11 @@ import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 // @ts-ignore
 const client = createClient() as { executeQuery: jest.Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
-  query: '{ example }',
+  query: gql`
+    {
+      example
+    }
+  `,
   variables: {
     myVar: 1234,
   },
@@ -174,7 +179,11 @@ describe('on subscription update', () => {
 });
 
 describe('on change', () => {
-  const q = 'query NewQuery { example }';
+  const q = gql`
+    query NewQuery {
+      example
+    }
+  `;
 
   it('new query executes subscription', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);

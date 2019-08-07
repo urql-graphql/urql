@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
+import gql from 'graphql-tag';
 
 import { createClient } from '../client';
 import { useQuery } from './useQuery';
@@ -25,7 +26,7 @@ jest.mock('../client', () => {
 // @ts-ignore
 const client = createClient() as { executeQuery: jest.Mock };
 
-const mockQuery = `
+const mockQuery = gql`
   query todo($id: ID!) {
     todo(id: $id) {
       id
@@ -143,7 +144,7 @@ describe('useQuery', () => {
     await waitForNextUpdate();
     expect(client.executeQuery).toBeCalledTimes(1);
 
-    const newQuery = `
+    const newQuery = gql`
       query places {
         id
         address

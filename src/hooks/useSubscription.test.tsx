@@ -15,6 +15,7 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import gql from 'graphql-tag';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
 import { useSubscription } from './useSubscription';
@@ -22,7 +23,11 @@ import { OperationContext } from '../types';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
-const query = 'subscription Example { example }';
+const query = gql`
+  subscription Example {
+    example
+  }
+`;
 let state: any;
 
 const SubscriptionUser: FC<{
@@ -103,8 +108,16 @@ describe('on subscription', () => {
 });
 
 describe('on change', () => {
-  const qa = 'subscription NewSubA { exampleA }';
-  const qb = 'subscription NewSubB { exampleB }';
+  const qa = gql`
+    subscription NewSubA {
+      exampleA
+    }
+  `;
+  const qb = gql`
+    subscription NewSubB {
+      exampleB
+    }
+  `;
 
   it('executes subscription', () => {
     const wrapper = renderer.create(<SubscriptionUser q={query} />);
