@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { useMutation } from 'urql';
+import gql from 'graphql-tag';
 
 interface Props {
   complete: boolean;
@@ -22,7 +23,7 @@ export const Todo: FC<Props> = props => {
 
 Todo.displayName = 'Todo';
 
-const RemoveTodo = `
+const RemoveTodo = gql`
   mutation($id: ID!) {
     toggleTodo(id: $id) {
       id
