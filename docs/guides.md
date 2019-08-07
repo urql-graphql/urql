@@ -508,3 +508,6 @@ const client = createClient({
 
 Now we are all set to use our new `fetchExchange` to upload files as
 well as do normal `JSON` requests.
+
+[Client with uploadFetchExchange](https://codesandbox.io/s/urql-upload-client-d0ozh)
+[Server to go with client](https://codesandbox.io/s/urql-upload-server-p49r8)
