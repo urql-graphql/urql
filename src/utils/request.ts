@@ -1,5 +1,4 @@
-import { DocumentNode } from 'graphql';
-import gql from 'graphql-tag';
+import { DocumentNode, parse } from 'graphql';
 import { getKeyForRequest } from './keyForQuery';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
 
@@ -7,7 +6,7 @@ export const createRequest = (
   q: string | DocumentNode,
   vars?: object
 ): GraphQLRequest => {
-  const query = typeof q === 'string' ? gql([q]) : q;
+  const query = typeof q === 'string' ? parse(q) : q;
 
   return {
     key: getKeyForRequest(query, vars),
