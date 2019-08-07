@@ -37,6 +37,8 @@ export interface ObservableLike<T> {
 }
 
 export interface SubscriptionOperation {
+  // TODO: why does this work?
+  // And why doesn't it work with DocumentNode
   query: string;
   variables?: object;
   key: string;
