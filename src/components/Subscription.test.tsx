@@ -20,8 +20,13 @@ jest.mock('../client', () => {
 import * as React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { Subscription } from './Subscription';
+import gql from 'graphql-tag';
 
-const query = 'subscription Example { example }';
+const query = gql`
+  subscription Example {
+    example
+  }
+`;
 
 describe('Subscription', () => {
   beforeEach(() => {

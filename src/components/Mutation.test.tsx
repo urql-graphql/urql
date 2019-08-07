@@ -21,10 +21,15 @@ import * as React from 'react';
 import { act, cleanup, render } from '@testing-library/react';
 import { Mutation } from './Mutation';
 import { createClient } from '../client';
+import gql from 'graphql-tag';
 
 // @ts-ignore
 const client = createClient() as { executeMutation: jest.Mock };
-const query = 'mutation Example { example }';
+const query = gql`
+  mutation Example {
+    example
+  }
+`;
 
 describe('Mutation', () => {
   beforeEach(() => {

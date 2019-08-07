@@ -20,9 +20,14 @@ jest.mock('../client', () => {
 import * as React from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { Query } from './Query';
+import gql from 'graphql-tag';
 
 // @ts-ignore
-const query = '{ example }';
+const query = gql`
+  {
+    example
+  }
+`;
 const variables = {
   myVar: 1234,
 };
