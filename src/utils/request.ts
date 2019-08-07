@@ -1,20 +1,15 @@
 import { DocumentNode } from 'graphql';
-import gql from 'graphql-tag';
 import { getKeyForRequest } from './keyForQuery';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
 
 export const createRequest = (
-  q: string | DocumentNode,
+  q: DocumentNode,
   vars?: object
-): GraphQLRequest => {
-  const query = typeof q === 'string' ? gql([q]) : q;
-
-  return {
-    key: getKeyForRequest(query, vars),
-    query,
-    variables: vars || {},
-  };
-};
+): GraphQLRequest => ({
+  key: getKeyForRequest(q, vars),
+  query: q,
+  variables: vars || {},
+});
 
 /** Spreads the provided metadata to the source operation's meta property in context.  */
 export const addMetadata = (
