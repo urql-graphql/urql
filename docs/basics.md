@@ -376,9 +376,10 @@ component. You can pass it a query and variables, and it will serve
 you render props with `data`, `error`, `extensions`, and `fetching`.
 
 ```js
+import gql from 'graphql-tag';
 import { Subscription } from 'urql';
 
-const newMessages = `
+const newMessages = gql`
   subscription MessageSub {
     newMessages {
       id
@@ -418,9 +419,10 @@ events.
 
 ```js
 import React from 'react';
+import gql from 'graphql-tag';
 import { useSubscription } from 'urql';
 
-const newMessages = `
+const newMessages = gql`
   subscription MessageSub {
     newMessages {
       id

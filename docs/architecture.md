@@ -21,7 +21,7 @@ tie the two together.
 ```js
 type GraphQLRequest = {
   key: number,
-  query: string | DocumentNode,
+  query: DocumentNode,
   variables?: object,
 };
 ```

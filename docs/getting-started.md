@@ -61,9 +61,10 @@ component to fetch some GraphQL data.
 
 ```jsx
 import React from 'react';
+import gql from 'graphql-tag';
 import { Query } from 'urql';
 
-const getTodos = `
+const getTodos = gql`
   query GetTodos($limit: Int!) {
     todos(limit: $limit) {
       id
@@ -122,9 +123,10 @@ We can rewrite the above example as follows.
 
 ```jsx
 import React from 'react';
+import gql from 'graphql-tag';
 import { useQuery } from 'urql';
 
-const getTodos = `
+const getTodos = gql`
   query GetTodos($limit: Int!) {
     todos(limit: $limit) {
       id
@@ -166,9 +168,8 @@ as soon as it's mounted and will rerun it when the query or variables change.
 
 ### Using `graphql-tag`
 
-You're not limited to just passing in strings as queries. You can also
-pass in a fully parsed AST in the form of `DocumentNode` instead.
-For this purpose you can use `graphql-tag`.
+For passing in queries you're expected to use `graphql-tag`, this allows
+you to pass a fully parsed AST to `urql`.
 
 This can be extremely helpful, since it enables syntax highlighting
 in some editors. It also can be used to pre-parse the GraphQL query
@@ -224,9 +225,10 @@ Here's an example of an imperative use case where we create a todo.
 
 ```js
 import React, { Component } from 'react';
+import gql from 'graphql-tag';
 import { Mutation } from 'urql';
 
-const addTodo = `
+const addTodo = gql`
   mutation AddTodo($text: String!) {
     addTodo(text: $text) {
       id
@@ -311,9 +313,10 @@ We can rewrite the second example from above as follows.
 
 ```jsx
 import React, { useCallback } from 'react';
+import gql from 'graphql-tag';
 import { useMutation } from 'urql';
 
-const addTodo = `
+const addTodo = gql`
   mutation AddTodo($text: String!) {
     addTodo(text: $text) {
       id
@@ -390,9 +393,10 @@ list of todos.
 
 ```jsx
 import React from 'react';
+import gql from 'graphql-tag';
 import { Query } from 'urql';
 
-const getTodos = `
+const getTodos = gql`
   query GetTodos {
     todos(limit: 10) {
       id
@@ -440,9 +444,10 @@ The same example can again also be implemented using hooks:
 
 ```jsx
 import React from 'react';
+import gql from 'graphql-tag';
 import { useQuery } from 'urql';
 
-const getTodos = `
+const getTodos = gql`
   query GetTodos($limit: Int!) {
     todos(limit: $limit) {
       id

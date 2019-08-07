@@ -8,7 +8,7 @@ Accepts a single options object as input:
 
 ```js
 interface UseQueryArgs {
-  query: string;
+  query: DocumentNode;
   variables?: any;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
@@ -37,7 +37,7 @@ accepts a partial `OperationContext`.
 
 ### `useMutation` (hook)
 
-Accepts a single `query` argument of type `string`. And returns the
+Accepts a single `query` argument of type `DocumentNode`. And returns the
 current mutation's state and an `executeMutation` function in a tuple. The
 mutation is not started unless `executeMutation` has been called.
 
@@ -69,7 +69,7 @@ The options argument shape is:
 
 ```js
 interface UseSubscriptionArgs {
-  query: string;
+  query: DocumentNode;
   variables?: any;
   context?: Partial<OperationContext>;
 }
@@ -104,7 +104,7 @@ interface UseSubscriptionState<T> {
 
 | Prop          | Type                       | Description                                                                                           |
 | ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query         | `string`                   | The GraphQL request's query                                                                           |
+| query         | `DocumentNode`             | The GraphQL request's query                                                                           |
 | variables     | `object`                   | The GraphQL request's variables                                                                       |
 | context       | `?object`                  | The GraphQL request's context                                                                         |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
@@ -129,7 +129,7 @@ interface UseSubscriptionState<T> {
 
 | Prop     | Type                       | Description                                                                                           |
 | -------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query    | `string`                   | The GraphQL request's query                                                                           |
+| query    | `DocumentNode`             | The GraphQL request's query                                                                           |
 | children | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
@@ -150,7 +150,7 @@ interface UseSubscriptionState<T> {
 
 | Prop      | Type                                                | Description                                                                                           |
 | --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query     | `string`                                            | The GraphQL subscription's query                                                                      |
+| query     | `DocumentNode`                                      | The GraphQL subscription's query                                                                      |
 | variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
 | context   | `?Partial<OperationContext>`                        | The GraphQL subscriptions' context                                                                    |
 | handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
@@ -288,7 +288,7 @@ It consists of `query` and optional `variables`.
 
 ```js
 type Operation = {
-  query: string | DocumentNode,
+  query: DocumentNode,
   variables?: object,
   key: number,
 };
