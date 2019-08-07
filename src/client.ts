@@ -23,6 +23,7 @@ import {
   OperationContext,
   OperationResult,
   OperationType,
+  RequestPolicy,
 } from './types';
 
 import { toSuspenseSource } from './utils';
@@ -39,6 +40,8 @@ export interface ClientOptions {
   exchanges?: Exchange[];
   /** Activates support for Suspense. */
   suspense?: boolean;
+  /** The default request policy for requests. */
+  requestPolicy?: RequestPolicy;
 }
 
 interface ActiveOperations {
@@ -55,6 +58,7 @@ export class Client {
   fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
   suspense: boolean;
+  requestPolicy: RequestPolicy;
 
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
@@ -67,6 +71,7 @@ export class Client {
     this.fetchOptions = opts.fetchOptions;
     this.fetch = opts.fetch;
     this.suspense = !!opts.suspense;
+    this.requestPolicy = opts.requestPolicy || 'cache-first';
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -111,7 +116,7 @@ export class Client {
   private createOperationContext = (
     opts?: Partial<OperationContext>
   ): OperationContext => {
-    const { requestPolicy = 'cache-first' } = opts || {};
+    const { requestPolicy = this.requestPolicy } = opts || {};
 
     return {
       url: this.url,
