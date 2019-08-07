@@ -50,7 +50,11 @@ beforeEach(() => {
   receivedOps = [];
   exchangeMock.mockClear();
   receiveMock.mockClear();
-  client = createClient({ url, exchanges: [exchangeMock] as any[] });
+  client = createClient({
+    url,
+    exchanges: [exchangeMock] as any[],
+    requestPolicy: 'cache-and-network',
+  });
 });
 
 describe('exchange args', () => {
@@ -83,6 +87,30 @@ describe('executeQuery', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('variables', query.variables);
+  });
+
+  it('passes requestPolicy to exchange', () => {
+    pipe(
+      client.executeQuery(query),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0].context).toHaveProperty(
+      'requestPolicy',
+      'cache-and-network'
+    );
+  });
+
+  it('allows overriding the requestPolicy', () => {
+    pipe(
+      client.executeQuery(query, { requestPolicy: 'cache-first' }),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0].context).toHaveProperty(
+      'requestPolicy',
+      'cache-first'
+    );
   });
 
   it('passes operationName type to exchange', () => {
