@@ -1,4 +1,4 @@
-import { FieldNode, ValueNode, OperationDefinitionNode } from 'graphql';
+import { FieldNode, ValueNode, OperationDefinitionNode, Kind } from 'graphql';
 
 import { getName } from './node';
 import { Variables } from '../types';
@@ -6,20 +6,20 @@ import { Variables } from '../types';
 /** Evaluates a given ValueNode to a JSON value taking vars into account */
 export const evaluateValueNode = (node: ValueNode, vars: Variables) => {
   switch (node.kind) {
-    case 'NullValue':
+    case Kind.NULL:
       return null;
-    case 'IntValue':
+    case Kind.INT:
       return parseInt(node.value, 10);
-    case 'FloatValue':
+    case Kind.FLOAT:
       return parseFloat(node.value);
-    case 'ListValue':
+    case Kind.LIST:
       return node.values.map(v => evaluateValueNode(v, vars));
-    case 'ObjectValue':
+    case Kind.OBJECT:
       return node.fields.reduce((obj, field) => {
         obj[getName(field)] = evaluateValueNode(field.value, vars);
         return obj;
       }, Object.create(null));
-    case 'Variable':
+    case Kind.VARIABLE:
       const varValue = vars[getName(node)];
       return varValue !== undefined ? varValue : null;
     default:

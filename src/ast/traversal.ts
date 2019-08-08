@@ -6,6 +6,7 @@ import {
   InlineFragmentNode,
   FragmentDefinitionNode,
   OperationDefinitionNode,
+  Kind,
 } from 'graphql';
 
 import { getName, getSelectionSet } from './node';
@@ -15,21 +16,21 @@ import { Fragments, Variables, SelectionSet } from '../types';
 const isFragmentNode = (
   node: DefinitionNode
 ): node is FragmentDefinitionNode => {
-  return node.kind === 'FragmentDefinition';
+  return node.kind === Kind.FRAGMENT_DEFINITION;
 };
 
 const isFieldNode = (node: SelectionNode): node is FieldNode =>
-  node.kind === 'Field';
+  node.kind === Kind.FIELD;
 
 const isInlineFragment = (node: SelectionNode): node is InlineFragmentNode =>
-  node.kind === 'InlineFragment';
+  node.kind === Kind.INLINE_FRAGMENT;
 
 /** Returns the main operation's definition */
 export const getMainOperation = (
   doc: DocumentNode
 ): OperationDefinitionNode => {
   const operation = doc.definitions.find(
-    node => node.kind === 'OperationDefinition'
+    node => node.kind === Kind.OPERATION_DEFINITION
   ) as OperationDefinitionNode;
 
   if (!operation) {
