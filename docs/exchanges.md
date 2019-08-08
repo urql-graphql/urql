@@ -8,6 +8,7 @@ These exchanges can be imported from the `urql` package.
 - `debugExchange`: logs information about ongoing operations and results
 - `dedupExchange`: deduplicates ongoing operations
 - `fetchExchange`: sends operations to GraphQL HTTP endpoints and resolves results
+- `ssrExchange`: used to cache results during SSR and rehydrate them on the client-side
 - `subscriptionExchange`: used to support GraphQL subscriptions
 
 ## Addons
