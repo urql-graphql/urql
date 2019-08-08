@@ -39,12 +39,8 @@ it('passes the "getting-started" example', () => {
 
   const writeRes = write(store, { query: Todos }, todosData);
 
-  expect(writeRes.dependencies).toEqual([
-    'Query.todos',
-    'Todo:0',
-    'Todo:1',
-    'Todo:2',
-  ]);
+  const expectedSet = new Set(['Query.todos', 'Todo:0', 'Todo:1', 'Todo:2']);
+  expect(writeRes.dependencies).toEqual(expectedSet);
 
   expect(store.serialize()).toMatchSnapshot();
 
@@ -52,7 +48,7 @@ it('passes the "getting-started" example', () => {
 
   expect(queryRes.data).toEqual(todosData);
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
-  expect(queryRes.isComplete).toBe(true);
+  expect(queryRes.completeness).toBe('FULL');
 
   const mutatedTodo = {
     ...todosData.todos[2],
@@ -68,12 +64,12 @@ it('passes the "getting-started" example', () => {
     }
   );
 
-  expect(mutationRes.dependencies).toEqual(['Todo:2']);
+  expect(mutationRes.dependencies).toEqual(new Set(['Todo:2']));
   expect(store.serialize()).toMatchSnapshot();
 
   queryRes = query(store, { query: Todos });
 
-  expect(queryRes.isComplete).toBe(true);
+  expect(queryRes.completeness).toBe('FULL');
   expect(queryRes.data).toEqual({
     ...todosData,
     todos: [...todosData.todos.slice(0, 2), mutatedTodo],

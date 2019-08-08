@@ -15,9 +15,10 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write, gc } from './operations';
 import { Store, SerializedStore } from './store';
+import { Completeness } from './types';
 
 type OperationResultWithMeta = OperationResult & {
-  isComplete: boolean;
+  completeness: Completeness;
 };
 
 type OperationMap = Map<number, Operation>;
@@ -90,7 +91,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
   // The passed triggerOp is ignored however
   const processDependencies = (
     triggerOp: Operation,
-    dependencies: string[]
+    dependencies: Set<string>
   ) => {
     const pendingOperations = new Set<number>();
 
@@ -114,7 +115,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
   };
 
   // This updates the known dependencies for the passed operation
-  const updateDependencies = (op: Operation, dependencies: string[]) => {
+  const updateDependencies = (op: Operation, dependencies: Set<string>) => {
     dependencies.forEach(dep => {
       const keys = deps[dep] || (deps[dep] = []);
       keys.push(op.key);
@@ -136,14 +137,14 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
   ): OperationResultWithMeta => {
     const policy = getRequestPolicy(operation);
     const res = query(store, operation);
-    const isComplete = policy === 'cache-only' || res.isComplete;
+    const isComplete = policy === 'cache-only' || res.completeness === 'FULL';
     if (isComplete) {
       updateDependencies(operation, res.dependencies);
     }
 
     return {
       operation,
-      isComplete,
+      completeness: isComplete ? 'FULL' : 'EMPTY',
       data: res.data,
     };
   };
@@ -194,7 +195,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
     // Rebound operations that are incomplete, i.e. couldn't be queried just from the cache
     const cacheOps$ = pipe(
       cache$,
-      filter(res => !res.isComplete),
+      filter(res => res.completeness !== 'FULL'),
       map(res => res.operation)
     );
 
@@ -202,7 +203,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
     // a network request if the current operation's policy is cache-and-network
     const cacheResult$ = pipe(
       cache$,
-      filter(res => res.isComplete),
+      filter(res => res.completeness === 'FULL'),
       tap(({ operation }) => {
         const policy = getRequestPolicy(operation);
         if (policy === 'cache-and-network') {

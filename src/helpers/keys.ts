@@ -1,6 +1,5 @@
 import stringify from 'fast-json-stable-stringify';
-import { VarsMap } from '../ast';
-import { SystemFields } from '../types';
+import { Variables, SystemFields } from '../types';
 
 export const isOperation = (typeName: string) =>
   typeName === 'Query' ||
@@ -22,7 +21,7 @@ export const keyOfEntity = (entity: SystemFields): null | string => {
   return `${typeName}:${id}`;
 };
 
-export const keyOfField = (fieldName: string, args: null | VarsMap) =>
+export const keyOfField = (fieldName: string, args: null | Variables) =>
   args !== null ? `${fieldName}(${stringify(args)})` : fieldName;
 
 export const joinKeys = (parentKey: string, key: string) =>

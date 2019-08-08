@@ -15,7 +15,7 @@ const expectCacheIntegrity = (testcase: TestCase) => {
   const writeRes = write(store, request, testcase.data);
   const queryRes = query(store, request);
   expect(queryRes.data).toEqual(testcase.data);
-  expect(queryRes.isComplete).toBe(true);
+  expect(queryRes.completeness).toBe('FULL');
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
   const json = store.serialize();
   expect(json).toMatchSnapshot();
@@ -310,6 +310,7 @@ it('nested entity list on query', () => {
     `,
     data: {
       // This is the same as above, but with a nested array and added null values
+      __typename: 'Query',
       items: [
         { __typename: 'Item', id: 1 },
         [{ __typename: 'Item', id: 2 }, null],

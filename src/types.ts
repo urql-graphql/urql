@@ -1,7 +1,22 @@
-/** A scalar is any fieldValue without a type. It can also include lists of scalars and embedded objects, which are simply represented as empty object type. */
-export type Scalar = {} | string | number | null;
+import { DocumentNode, FragmentDefinitionNode, SelectionNode } from 'graphql';
 
+// Helper types
 export type NullPrototype = { [K in keyof ObjectConstructor]: never };
+export type NullArray<T> = Array<null | T>;
+
+// GraphQL helper types
+export type SelectionSet = ReadonlyArray<SelectionNode>;
+export interface Fragments {
+  [fragmentName: string]: void | FragmentDefinitionNode;
+}
+
+// Scalar types are not entities as part of response data
+export type Primitive = null | number | boolean | string;
+export interface ScalarObject {
+  __typename?: never;
+  [key: string]: any;
+}
+export type Scalar = Primitive | ScalarObject;
 
 export interface SystemFields {
   __typename: string;
@@ -10,18 +25,52 @@ export interface SystemFields {
 }
 
 export interface EntityFields {
-  [fieldName: string]: Scalar;
+  [fieldName: string]: Scalar | Scalar[];
 }
 
-/** Every Entity must have a typeName. It might have some ID fields of which `id` and `_id` are recognised by default. Every other fieldValue is a scalar. */
+// Entities are objects from the response data which are full GraphQL types
 export type Entity = NullPrototype & SystemFields & EntityFields;
 
-/** A link is a key or array of keys referencing other entities in the Records Map. It may be or contain `null`. */
-export type Link = null | string | Array<string | null>;
+export interface DataFields {
+  [fieldName: string]: Scalar | Scalar[] | Data | NullArray<Data>;
+}
 
-/** A link can be resolved into the entities it points to. The resulting structure is a ResolvedLink */
-export type ResolvedLink = null | Entity | Array<Entity | null>;
+export type Data = SystemFields & DataFields;
 
-export type Records = Map<string, Entity>;
-export type Links = Map<string, Link>;
-export type Embedded = Map<string, Scalar>;
+// Links are relations between entities
+export type Link<Key = string> = null | Key | NullArray<Key>;
+export type ResolvedLink = Link<Entity>;
+
+// These are our caching structures
+export type EntitiesMap = Map<string, Entity>;
+export type LinksMap = Map<string, Link>;
+
+export interface Variables {
+  [name: string]: Scalar | Scalar[] | Variables | NullArray<Variables>;
+}
+
+// This is an input operation
+export interface OperationRequest {
+  query: DocumentNode;
+  variables?: object;
+}
+
+// This can be any field read from the cache
+export type ResolverResult = Scalar | Scalar[] | Entity | NullArray<Entity>;
+
+// Cache resolvers are user-defined to overwrite an entity field result
+export type Resolver = (
+  parent: Entity,
+  args: Variables,
+  cache: {},
+  info: {}
+) => ResolverResult;
+
+export interface ResolverConfig {
+  [typeName: string]: {
+    [fieldName: string]: Resolver;
+  };
+}
+
+// Completeness of the query result
+export type Completeness = 'EMPTY' | 'PARTIAL' | 'FULL';

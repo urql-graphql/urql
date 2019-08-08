@@ -1,4 +1,4 @@
-import { Entity, Link, Links, Records } from '../types';
+import { Entity, Link, LinksMap, EntitiesMap } from '../types';
 import { assignObjectToMap, objectOfMap } from './utils';
 
 export interface SerializedStore {
@@ -7,8 +7,8 @@ export interface SerializedStore {
 }
 
 export class Store {
-  records: Records;
-  links: Links;
+  records: EntitiesMap;
+  links: LinksMap;
 
   constructor(initial?: SerializedStore) {
     this.records = new Map();

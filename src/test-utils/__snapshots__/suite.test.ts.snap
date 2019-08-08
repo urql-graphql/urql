@@ -13,9 +13,9 @@ Object {
 `;
 
 exports[`aliased field on query 2`] = `
-Array [
+Set {
   "Query.int",
-]
+}
 `;
 
 exports[`embedded object on entity 1`] = `
@@ -43,11 +43,11 @@ Object {
 `;
 
 exports[`embedded object on entity 2`] = `
-Array [
+Set {
   "Query.item",
   "Item:1",
   "Item:1.author",
-]
+}
 `;
 
 exports[`embedded object on entity 3`] = `
@@ -76,11 +76,11 @@ Object {
 `;
 
 exports[`embedded object on entity 4`] = `
-Array [
+Set {
   "Query.item",
   "Item:1",
   "Author:1",
-]
+}
 `;
 
 exports[`entity list on query 1`] = `
@@ -109,11 +109,11 @@ Object {
 `;
 
 exports[`entity list on query 2`] = `
-Array [
+Set {
   "Query.items",
   "Item:1",
   "Item:2",
-]
+}
 `;
 
 exports[`entity list on query and inline fragment 1`] = `
@@ -139,12 +139,10 @@ Object {
 `;
 
 exports[`entity list on query and inline fragment 2`] = `
-Array [
+Set {
   "Query.items",
   "Item:1",
-  "Query.items",
-  "Item:1",
-]
+}
 `;
 
 exports[`entity list on query and spread fragment 1`] = `
@@ -170,12 +168,10 @@ Object {
 `;
 
 exports[`entity list on query and spread fragment 2`] = `
-Array [
+Set {
   "Query.items",
   "Item:1",
-  "Query.items",
-  "Item:1",
-]
+}
 `;
 
 exports[`entity on aliased field on query 1`] = `
@@ -198,10 +194,10 @@ Object {
 `;
 
 exports[`entity on aliased field on query 2`] = `
-Array [
+Set {
   "Query.item",
   "Item:1",
-]
+}
 `;
 
 exports[`entity on query 1`] = `
@@ -224,10 +220,10 @@ Object {
 `;
 
 exports[`entity on query 2`] = `
-Array [
+Set {
   "Query.item",
   "Item:1",
-]
+}
 `;
 
 exports[`entity with Int-like ID on query 1`] = `
@@ -250,10 +246,10 @@ Object {
 `;
 
 exports[`entity with Int-like ID on query 2`] = `
-Array [
+Set {
   "Query.item",
   "Item:1",
-]
+}
 `;
 
 exports[`entity with arguments on query 1`] = `
@@ -276,10 +272,10 @@ Object {
 `;
 
 exports[`entity with arguments on query 2`] = `
-Array [
+Set {
   "Query.item({\\"test\\":true})",
   "Item:1",
-]
+}
 `;
 
 exports[`int field with arguments on query 1`] = `
@@ -295,9 +291,9 @@ Object {
 `;
 
 exports[`int field with arguments on query 2`] = `
-Array [
+Set {
   "Query.int({\\"test\\":true})",
-]
+}
 `;
 
 exports[`int on query 1`] = `
@@ -313,9 +309,9 @@ Object {
 `;
 
 exports[`int on query 2`] = `
-Array [
+Set {
   "Query.int",
-]
+}
 `;
 
 exports[`invalid entity on query 1`] = `
@@ -335,9 +331,9 @@ Object {
 `;
 
 exports[`invalid entity on query 2`] = `
-Array [
+Set {
   "Query.item",
-]
+}
 `;
 
 exports[`json on query 1`] = `
@@ -356,9 +352,9 @@ Object {
 `;
 
 exports[`json on query 2`] = `
-Array [
+Set {
   "Query.json",
-]
+}
 `;
 
 exports[`nested entity list on query 1`] = `
@@ -391,11 +387,11 @@ Object {
 `;
 
 exports[`nested entity list on query 2`] = `
-Array [
+Set {
   "Query.items",
   "Item:1",
   "Item:2",
-]
+}
 `;
 
 exports[`non-IDable entity on query 1`] = `
@@ -417,10 +413,9 @@ Object {
 `;
 
 exports[`non-IDable entity on query 2`] = `
-Array [
+Set {
   "Query.item",
-  "Query.item",
-]
+}
 `;
 
 exports[`non-keyable entity on query 1`] = `
@@ -442,10 +437,9 @@ Object {
 `;
 
 exports[`non-keyable entity on query 2`] = `
-Array [
+Set {
   "Query.item",
-  "Query.item",
-]
+}
 `;
 
 exports[`nullable field on query 1`] = `
@@ -461,7 +455,7 @@ Object {
 `;
 
 exports[`nullable field on query 2`] = `
-Array [
+Set {
   "Query.missing",
-]
+}
 `;
