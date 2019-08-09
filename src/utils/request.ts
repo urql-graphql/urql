@@ -2,10 +2,8 @@ import { DocumentNode, parse } from 'graphql';
 import { getKeyForRequest } from './keyForQuery';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
 
-const parseQuery = (queryString: string) => {
-  const trimmedQuery = queryString.replace(/[\s,]+/g, ' ').trim();
-  return parse(trimmedQuery);
-};
+const parseQuery = (queryString: string) =>
+  parse(queryString.replace(/[\s,]+/g, ' ').trim());
 
 export const createRequest = (
   q: string | DocumentNode,
