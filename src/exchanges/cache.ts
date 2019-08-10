@@ -56,9 +56,8 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
-        const { key, context } = operation;
-        const cachedResult = resultCache.get(key);
-        if (context.requestPolicy === 'cache-and-network') {
+        const cachedResult = resultCache.get(operation.key);
+        if (operation.context.requestPolicy === 'cache-and-network') {
           reexecuteOperation(client, operation);
         }
 
