@@ -30,19 +30,11 @@ export const createRequest = (
   docs[key] = query;
   (query as any)[keyProp] = key;
 
-  if (typeof vars === 'object' && vars !== null) {
-    return {
-      key: phash(key, stringify(vars)) >>> 0,
-      query,
-      variables: vars || {},
-    };
-  } else {
-    return {
-      key,
-      query,
-      variables: {},
-    };
-  }
+  return {
+    key: vars ? phash(key, stringify(vars)) >>> 0 : key,
+    query,
+    variables: vars || {},
+  };
 };
 
 /** Spreads the provided metadata to the source operation's meta property in context.  */
