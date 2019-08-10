@@ -13,7 +13,9 @@ interface EntityLike {
 
 const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
   if (Array.isArray(obj)) {
-    obj.forEach(inner => collectTypes(inner, types));
+    obj.forEach(inner => {
+      collectTypes(inner, types);
+    });
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
