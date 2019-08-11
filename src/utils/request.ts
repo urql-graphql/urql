@@ -7,6 +7,8 @@ interface Documents {
   [key: number]: DocumentNode;
 }
 
+const hashQuery = (q: string): number => hash(q.replace(/[\s,]+/, ' ').trim());
+
 const docs: Documents = Object.create(null);
 const keyProp = '__key';
 
@@ -17,13 +19,13 @@ export const createRequest = (
   let key: number;
   let query: DocumentNode;
   if (typeof q === 'string') {
-    key = hash(q.replace(/[\s,]+/, ' ').trim());
+    key = hashQuery(q);
     query = docs[key] !== undefined ? docs[key] : parse(q);
   } else if ((q as any)[keyProp] !== undefined) {
     key = (q as any)[keyProp];
     query = q;
   } else {
-    key = hash(print(q));
+    key = hashQuery(print(q));
     query = docs[key] !== undefined ? docs[key] : q;
   }
 

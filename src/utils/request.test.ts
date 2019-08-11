@@ -12,6 +12,7 @@ it('should hash identical DocumentNodes identically', () => {
   const reqA = createRequest(parse('{ testB }'));
   const reqB = createRequest(parse('{ testB }'));
   expect(reqA.key).toBe(reqB.key);
+  expect(reqA.query).toBe(reqB.query);
 });
 
 it('should use the hash from a key if available', () => {
@@ -19,6 +20,15 @@ it('should use the hash from a key if available', () => {
   (doc as any).__key = 1234;
   const req = createRequest(doc);
   expect(req.key).toBe(1234);
+});
+
+it('should hash DocumentNodes and strings identically', () => {
+  const docA = parse('{ field }');
+  const docB = print(docA);
+  const reqA = createRequest(docA);
+  const reqB = createRequest(docB);
+  expect(reqA.key).toBe(reqB.key);
+  expect(reqA.query).toBe(reqB.query);
 });
 
 it('should hash graphql-tag documents correctly', () => {
