@@ -7,7 +7,7 @@ interface Documents {
   [key: number]: DocumentNode;
 }
 
-const hashQuery = (q: string): number => hash(q.replace(/[\s,]+/, ' ').trim());
+const hashQuery = (q: string): number => hash(q.replace(/[\s,]+/g, ' ').trim());
 
 const docs: Documents = Object.create(null);
 const keyProp = '__key';

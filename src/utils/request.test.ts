@@ -24,7 +24,7 @@ it('should use the hash from a key if available', () => {
 
 it('should hash DocumentNodes and strings identically', () => {
   const docA = parse('{ field }');
-  const docB = print(docA);
+  const docB = print(docA).replace(/\s/g, ' ');
   const reqA = createRequest(docA);
   const reqB = createRequest(docB);
   expect(reqA.key).toBe(reqB.key);
