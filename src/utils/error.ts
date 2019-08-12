@@ -6,8 +6,7 @@ const generateErrorMessage = (
 ) => {
   let error = '';
   if (networkErr !== undefined) {
-    error = `[Network] ${networkErr.message}`;
-    return error;
+    return (error = `[Network] ${networkErr.message}`);
   }
 
   if (graphQlErrs !== undefined) {

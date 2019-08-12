@@ -11,7 +11,7 @@ import {
   takeUntil,
 } from 'wonka';
 
-import { CombinedError } from '../utils/error';
+import { makeResult, makeErrorResult } from '../utils';
 
 import {
   Exchange,
@@ -72,39 +72,12 @@ export const subscriptionExchange = ({
     });
 
     return make<OperationResult>(([next, complete]) => {
-      // TODO: The conversion of the result here is very similar to fetch;
-      // We can maybe extract the logic into generic GraphQL utilities
       const sub = observableish.subscribe({
-        next: result =>
-          next({
-            operation,
-            data: result.data || undefined,
-            error: Array.isArray(result.errors)
-              ? new CombinedError({
-                  graphQLErrors: result.errors,
-                  response: undefined,
-                })
-              : undefined,
-            extensions:
-              typeof result.extensions === 'object' &&
-              result.extensions !== null
-                ? result.extensions
-                : undefined,
-          }),
-        error: err =>
-          next({
-            operation,
-            data: undefined,
-            extensions: undefined,
-            error: new CombinedError({
-              networkError: err,
-              response: undefined,
-            }),
-          }),
+        next: result => next(makeResult(operation, result)),
+        error: err => next(makeErrorResult(operation, err)),
         complete,
       });
 
-      // NOTE: Destructuring sub is avoided here to preserve its potential binding
       return () => sub.unsubscribe();
     });
   };

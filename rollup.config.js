@@ -4,6 +4,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
 import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
+import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 
 const pkgInfo = require('./package.json');
@@ -131,8 +132,11 @@ const makePlugins = (isProduction = false) => [
       }]
     ]
   }),
+  isProduction && replace({
+    'process.env.NODE_ENV': JSON.stringify('production')
+  }),
   isProduction ? terserMinified : terserPretty
-];
+].filter(Boolean);
 
 const config = {
   input: './src/index.ts',
@@ -167,16 +171,17 @@ export default [
   }, {
     ...config,
     plugins: makePlugins(true),
+    onwarn: () => {},
     output: [
       {
-        sourcemap: true,
+        sourcemap: false,
         legacy: true,
         freeze: false,
         file: './dist/urql.min.js',
         format: 'cjs'
       },
       {
-        sourcemap: true,
+        sourcemap: false,
         legacy: true,
         freeze: false,
         file: './dist/urql.es.min.js',
