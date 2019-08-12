@@ -6,7 +6,7 @@ import initUrqlClient from './init-urql-client';
 const withUrqlClient = App => {
   return class WithUrql extends React.Component {
     static async getInitialProps(ctx) {
-      const { Component, router } = ctx;
+      const { AppTree } = ctx;
 
       // Run the wrapped component's getInitialProps function
       let appProps = {};
@@ -25,10 +25,8 @@ const withUrqlClient = App => {
 
       // Run suspense and hence all urql queries
       await ssrPrepass(
-        <App
+        <AppTree
           {...appProps}
-          Component={Component}
-          router={router}
           urqlClient={urqlClient}
         />
       );
