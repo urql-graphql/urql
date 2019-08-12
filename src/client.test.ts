@@ -3,11 +3,6 @@ import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 
-jest.mock('./utils/keyForQuery', () => ({
-  getKeyForQuery: () => 123,
-  getKeyForRequest: () => 123,
-}));
-
 import { map, pipe, subscribe, tap } from 'wonka';
 import { createClient } from './client';
 
