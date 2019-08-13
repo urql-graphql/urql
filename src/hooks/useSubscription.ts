@@ -3,7 +3,6 @@ import { useCallback, useContext, useEffect, useRef } from 'react';
 import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, noop } from '../utils';
-import { useDevtoolsContext } from './useDevtoolsContext';
 import { useRequest } from './useRequest';
 import { useImmediateState } from './useImmediateState';
 import { OperationContext } from '../types';
@@ -29,7 +28,6 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const devtoolsContext = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -49,7 +47,6 @@ export const useSubscription = <T = any, R = T, V = object>(
 
     [unsubscribe.current] = pipe(
       client.executeSubscription(request, {
-        ...devtoolsContext,
         ...args.context,
       }),
       subscribe(({ data, error, extensions }) => {
@@ -61,7 +58,7 @@ export const useSubscription = <T = any, R = T, V = object>(
         }));
       })
     );
-  }, [client, devtoolsContext, handler, request, setState, args.context]);
+  }, [client, handler, request, setState, args.context]);
 
   // Trigger subscription on query change
   // We don't use useImmediateEffect here as we have no way of

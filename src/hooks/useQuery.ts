@@ -4,7 +4,6 @@ import { pipe, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
-import { useDevtoolsContext } from './useDevtoolsContext';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
@@ -33,7 +32,6 @@ export type UseQueryResponse<T> = [
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  const devtoolsContext = useDevtoolsContext();
   const unsubscribe = useRef(noop);
   const client = useContext(Context);
 
@@ -62,7 +60,6 @@ export const useQuery = <T = any, V = object>(
           pollInterval: args.pollInterval,
           ...args.context,
           ...opts,
-          ...devtoolsContext,
         }),
         subscribe(({ data, error, extensions }) => {
           setState({ fetching: false, data, error, extensions });
@@ -74,7 +71,6 @@ export const useQuery = <T = any, V = object>(
       args.requestPolicy,
       args.pollInterval,
       client,
-      devtoolsContext,
       request,
       setState,
     ]
