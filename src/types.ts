@@ -34,6 +34,7 @@ export interface OperationDebugMeta {
   source?: string;
   cacheOutcome?: CacheOutcome;
   networkLatency?: number;
+  startTime?: number;
 }
 
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
