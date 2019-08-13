@@ -84,25 +84,24 @@ export class Store {
   ): ResolverResult {
     const fieldKey = keyOfField(field, args || null);
     const fieldValue = parent[fieldKey];
-    if (fieldValue === undefined) {
-      return null;
-    } else if (fieldValue !== null) {
-      return fieldValue;
-    }
 
-    const entityKey = keyOfEntity(parent);
-    if (entityKey === null) {
-      return null;
-    }
+    if (fieldValue === undefined && fieldKey in parent) {
+      // The field is present but set to undefined, which indicates a link
+      const entityKey = keyOfEntity(parent);
+      if (entityKey === null) {
+        return null;
+      }
 
-    const link = this.readLink(joinKeys(entityKey, fieldKey));
-    if (!link) {
+      const link = this.readLink(joinKeys(entityKey, fieldKey));
+      if (Array.isArray(link)) {
+        return link.map(key => (key !== null ? this.find(key) : null));
+      } else {
+        return link ? this.find(link) : null;
+      }
+    } else if (fieldValue === undefined) {
       return null;
-    } else if (Array.isArray(link)) {
-      // @ts-ignore: Link cannot be expressed as a recursive type
-      return link.map(key => this.find(key));
     } else {
-      return this.find(link);
+      return fieldValue;
     }
   }
 }

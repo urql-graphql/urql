@@ -151,12 +151,15 @@ const readSelection = (
           prevData
         );
       }
-    } else if (fieldValue === undefined) {
-      // Cache Incomplete: A missing field means it wasn't cached
-      ctx.result.completeness = 'EMPTY';
-      data[fieldAlias] = null;
-    } else if (node.selectionSet === undefined || fieldValue !== null) {
-      data[fieldAlias] = fieldValue;
+    } else if (node.selectionSet === undefined) {
+      // The field is a scalar and can be retrieved directly
+      if (fieldValue === undefined) {
+        // Cache Incomplete: A missing field means it wasn't cached
+        ctx.result.completeness = 'EMPTY';
+        data[fieldAlias] = null;
+      } else {
+        data[fieldAlias] = fieldValue;
+      }
     } else {
       // null values mean that a field might be linked to other entities
       const fieldSelect = getSelectionSet(node);
@@ -164,8 +167,13 @@ const readSelection = (
 
       // Cache Incomplete: A missing link for a field means it's not cached
       if (link === undefined) {
-        ctx.result.completeness = 'EMPTY';
-        data[fieldAlias] = null;
+        if (typeof fieldValue === 'object' && fieldValue !== null) {
+          // The entity on the field was invalid and can still be recovered
+          data[fieldAlias] = fieldValue;
+        } else {
+          ctx.result.completeness = 'EMPTY';
+          data[fieldAlias] = null;
+        }
       } else {
         const prevData = data[fieldAlias] as Data;
         data[fieldAlias] = readField(ctx, link, fieldSelect, prevData);

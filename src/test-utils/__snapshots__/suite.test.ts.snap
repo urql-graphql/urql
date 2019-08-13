@@ -27,7 +27,7 @@ Object {
   "records": Object {
     "Item:1": Object {
       "__typename": "Item",
-      "author": null,
+      "author": undefined,
       "id": 1,
     },
     "Item:1.author": Object {
@@ -36,7 +36,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
   },
 }
@@ -64,12 +64,12 @@ Object {
     },
     "Item:1": Object {
       "__typename": "Item",
-      "author": null,
+      "author": undefined,
       "id": 1,
     },
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
   },
 }
@@ -102,7 +102,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "items": null,
+      "items": undefined,
     },
   },
 }
@@ -132,7 +132,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "items": null,
+      "items": undefined,
     },
   },
 }
@@ -161,7 +161,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "items": null,
+      "items": undefined,
     },
   },
 }
@@ -187,7 +187,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
   },
 }
@@ -213,7 +213,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
   },
 }
@@ -239,7 +239,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
   },
 }
@@ -265,7 +265,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "item({\\"test\\":true})": null,
+      "item({\\"test\\":true})": undefined,
     },
   },
 }
@@ -380,7 +380,7 @@ Object {
     },
     "Query": Object {
       "__typename": "Query",
-      "items": null,
+      "items": undefined,
     },
   },
 }
@@ -402,7 +402,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
     "Query.item": Object {
       "__typename": "Item",
@@ -426,7 +426,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "item": null,
+      "item": undefined,
     },
     "Query.item": Object {
       "__typename": "Item",

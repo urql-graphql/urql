@@ -234,7 +234,6 @@ it('entity with arguments on query', () => {
   });
 
   expect(store.links['Query.item({"test":true})']).toBe('Item:1');
-  expect(store.records.Query).toMatchObject({ 'item({"test":true})': null });
 });
 
 it('entity with Int-like ID on query', () => {
@@ -258,7 +257,7 @@ it('entity with Int-like ID on query', () => {
 
   expect(store.links['Query.item']).toBe('Item:1');
   expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.records.Query.item).toBe(null);
+  expect(store.records.Query.item).toBe(undefined);
 
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
@@ -285,7 +284,7 @@ it('entity list on query', () => {
   });
 
   expect(store.links['Query.items']).toEqual(['Item:1', 'Item:2']);
-  expect(store.records.Query.items).toBe(null);
+  expect(store.records.Query.items).toBe(undefined);
 
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
@@ -324,7 +323,8 @@ it('nested entity list on query', () => {
     ['Item:2', null],
     null,
   ]);
-  expect(store.records.Query.items).toBe(null);
+
+  expect(store.records.Query.items).toBe(undefined);
 
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
@@ -362,7 +362,7 @@ it('entity list on query and inline fragment', () => {
   expect(store.links['Query.items']).toEqual(['Item:1', null]);
 
   expect(store.records.Query.__typename).toBe('Query');
-  expect(store.records.Query.items).toBe(null);
+  expect(store.records.Query.items).toBe(undefined);
 
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
@@ -398,7 +398,7 @@ it('entity list on query and spread fragment', () => {
   expect(store.links['Query.items']).toEqual(['Item:1', null]);
 
   expect(store.records.Query.__typename).toBe('Query');
-  expect(store.records.Query.items).toBe(null);
+  expect(store.records.Query.items).toBe(undefined);
 
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
@@ -438,11 +438,10 @@ it('embedded object on entity', () => {
   expect(store.links['Query.item']).toBe('Item:1');
   expect(store.links['Item:1.author']).toBe('Item:1.author');
 
-  expect(store.records.Query.item).toBe(null);
+  expect(store.records.Query.item).toBe(undefined);
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
     id: 1,
-    author: null,
   });
 
   expect(store.records['Item:1.author']).toMatchObject({
@@ -484,11 +483,10 @@ it('embedded object on entity', () => {
   expect(store.links['Query.item']).toBe('Item:1');
   expect(store.links['Item:1.author']).toBe('Author:1');
 
-  expect(store.records.Query.item).toBe(null);
+  expect(store.records.Query.item).toBe(undefined);
   expect(store.records['Item:1']).toMatchObject({
     __typename: 'Item',
     id: 1,
-    author: null,
   });
 
   expect(store.records['Author:1']).toMatchObject({

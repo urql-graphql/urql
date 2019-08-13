@@ -27,7 +27,7 @@ export interface SystemFields {
 }
 
 export interface EntityFields {
-  [fieldName: string]: Scalar | Scalar[];
+  [fieldName: string]: undefined | Scalar | Scalar[];
 }
 
 // Entities are objects from the response data which are full GraphQL types

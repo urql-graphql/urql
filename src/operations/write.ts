@@ -96,23 +96,19 @@ const writeSelection = (
       ctx.result.dependencies.add(childFieldKey);
     }
 
-    if (
-      node.selectionSet === undefined ||
-      fieldValue === null ||
-      isScalar(fieldValue)
-    ) {
+    if (node.selectionSet === undefined) {
       // This is a leaf node, so we're setting the field's value directly
       entity[fieldKey] = fieldValue;
-      // Remove any links that might've existed before for this field
-      store.removeLink(childFieldKey);
-    } else {
-      // Ensure that this key exists on the entity and that previous values are thrown away
-      entity[fieldKey] = null;
-
+    } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
       const { selections: fieldSelect } = node.selectionSet;
       const link = writeField(ctx, childFieldKey, fieldValue, fieldSelect);
       store.setLink(childFieldKey, link);
+      // We still have to mark the field for the GC operation
+      entity[fieldKey] = undefined;
+    } else {
+      // This is a rare case for invalid entities
+      entity[fieldKey] = fieldValue;
     }
   });
 };

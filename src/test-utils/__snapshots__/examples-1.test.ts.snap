@@ -12,7 +12,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "todos": null,
+      "todos": undefined,
     },
     "Todo:0": Object {
       "__typename": "Todo",
@@ -48,7 +48,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "todos": null,
+      "todos": undefined,
     },
     "Todo:0": Object {
       "__typename": "Todo",
@@ -84,7 +84,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "todos": null,
+      "todos": undefined,
     },
     "Todo:0": Object {
       "__typename": "Todo",
@@ -120,7 +120,7 @@ Object {
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "todos": null,
+      "todos": undefined,
     },
     "Todo:0": Object {
       "__typename": "Todo",

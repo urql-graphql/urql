@@ -88,7 +88,6 @@ it('cleans up unreachable records and links', () => {
   json = store.serialize();
 
   // Same as above; everything is still reachable but `query.todos` is gone
-  expect(json.links['Query.todos']).toBe(undefined);
   expect(json.records['Todo:1']).toMatchObject({ __typename: 'Todo' });
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
 
@@ -96,7 +95,6 @@ it('cleans up unreachable records and links', () => {
   json = store.serialize();
 
   expect(json).toMatchSnapshot();
-  expect(json.links['Query.todos']).toBe(undefined);
   expect(json.records['Todo:1']).toBe(undefined);
   expect(json.records['Todo:2']).not.toBe(undefined);
   expect(json.records['Todo:2.author']).toMatchObject({ __typename: 'Author' });
@@ -119,10 +117,13 @@ it('cleans up unreachable records and links', () => {
     records: {
       Query: {
         __typename: 'Query',
-        todos: null,
-        todo: null,
+        todos: undefined,
+        todo: undefined,
       },
     },
-    links: {},
+    links: {
+      'Query.todo': null,
+      'Query.todos': null,
+    },
   });
 });

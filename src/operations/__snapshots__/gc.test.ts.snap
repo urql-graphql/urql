@@ -4,17 +4,18 @@ exports[`cleans up unreachable records and links 1`] = `
 Object {
   "links": Object {
     "Query.todo": "Todo:2",
+    "Query.todos": null,
     "Todo:2.author": "Todo:2.author",
   },
   "records": Object {
     "Query": Object {
       "__typename": "Query",
-      "todo": null,
-      "todos": null,
+      "todo": undefined,
+      "todos": undefined,
     },
     "Todo:2": Object {
       "__typename": "Todo",
-      "author": null,
+      "author": undefined,
       "complete": false,
       "id": "2",
       "text": "Install urql",
