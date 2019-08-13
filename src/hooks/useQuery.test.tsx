@@ -88,19 +88,6 @@ describe('on initial useEffect', () => {
       })
     );
   });
-
-  it('passes source component name to executeQuery', () => {
-    renderer.create(<QueryUser {...props} />);
-
-    expect(client.executeQuery).toBeCalledWith(
-      expect.any(Object),
-      expect.objectContaining({
-        meta: {
-          source: 'QueryUser',
-        },
-      })
-    );
-  });
 });
 
 describe('on subscription', () => {

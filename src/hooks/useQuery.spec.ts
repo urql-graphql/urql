@@ -80,7 +80,6 @@ describe('useQuery', () => {
         variables: mockVariables,
       },
       {
-        meta: { source: 'TestHook' },
         requestPolicy: undefined,
         url: 'test',
       }

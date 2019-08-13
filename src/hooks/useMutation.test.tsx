@@ -107,16 +107,6 @@ describe('on execute', () => {
     );
   });
 
-  it('calls executeMutation with source component info', () => {
-    renderer.create(<MutationUser {...props} />);
-    act(() => {
-      execute(vars);
-    });
-    expect(client.executeMutation.mock.calls[0][1]).toHaveProperty('meta', {
-      source: 'MutationUser',
-    });
-  });
-
   it('can adjust context in executeMutation', () => {
     renderer.create(<MutationUser {...props} />);
     act(() => {
