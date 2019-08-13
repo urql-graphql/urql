@@ -41,7 +41,7 @@ export const useMutation = <T = any, V = object>(
       const request = createRequest(query, variables as any);
 
       return pipe(
-        client.executeMutation(request, context),
+        client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
         const { data, error, extensions } = result;
