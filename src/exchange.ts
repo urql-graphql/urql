@@ -15,7 +15,7 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write, gc } from './operations';
 import { Store, SerializedStore } from './store';
-import { Completeness } from './types';
+import { Completeness, ResolverConfig } from './types';
 
 type OperationResultWithMeta = OperationResult & {
   completeness: Completeness;
@@ -65,6 +65,7 @@ const toRequestPolicy = (
 });
 
 export interface CacheExchangeOpts {
+  resolvers?: ResolverConfig;
   initial?: SerializedStore;
 }
 
@@ -74,7 +75,7 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
 }) => {
   let gcScheduled = false;
 
-  const store = new Store(opts.initial);
+  const store = new Store(opts.initial, opts.resolvers);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 

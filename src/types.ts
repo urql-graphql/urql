@@ -1,4 +1,5 @@
 import { DocumentNode, FragmentDefinitionNode, SelectionNode } from 'graphql';
+import { Store } from './store';
 
 // Helper types
 export type NullPrototype = { [K in keyof ObjectConstructor]: never };
@@ -12,6 +13,7 @@ export interface Fragments {
 
 // Scalar types are not entities as part of response data
 export type Primitive = null | number | boolean | string;
+
 export interface ScalarObject {
   __typename?: never;
   [key: string]: any;
@@ -58,12 +60,17 @@ export interface OperationRequest {
 // This can be any field read from the cache
 export type ResolverResult = Scalar | Scalar[] | Entity | NullArray<Entity>;
 
+export interface ResolveInfo {
+  fragments: Fragments;
+  variables: Variables;
+}
+
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver = (
   parent: Entity,
   args: Variables,
-  cache: {},
-  info: {}
+  cache: Store,
+  info: ResolveInfo
 ) => ResolverResult;
 
 export interface ResolverConfig {

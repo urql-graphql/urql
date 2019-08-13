@@ -1,4 +1,15 @@
-import { Entity, Link, LinksMap, EntitiesMap } from '../types';
+import {
+  Entity,
+  Link,
+  LinksMap,
+  EntitiesMap,
+  ResolverConfig,
+  ResolverResult,
+  SystemFields,
+  Variables,
+} from '../types';
+
+import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
 import { assignObjectToMap, objectOfMap } from './utils';
 
 export interface SerializedStore {
@@ -10,9 +21,12 @@ export class Store {
   records: EntitiesMap;
   links: LinksMap;
 
-  constructor(initial?: SerializedStore) {
+  resolvers: ResolverConfig;
+
+  constructor(initial?: SerializedStore, resolvers?: ResolverConfig) {
     this.records = new Map();
     this.links = new Map();
+    this.resolvers = resolvers || {};
 
     if (initial !== undefined) {
       assignObjectToMap(this.records, initial.records);
@@ -56,5 +70,39 @@ export class Store {
 
   removeLink(key: string): void {
     this.links.delete(key);
+  }
+
+  resolveEntity(entity: SystemFields): Entity | null {
+    const key = keyOfEntity(entity);
+    return key !== null ? this.find(key) : null;
+  }
+
+  resolveProperty(
+    parent: Entity,
+    field: string,
+    args?: null | Variables
+  ): ResolverResult {
+    const fieldKey = keyOfField(field, args || null);
+    const fieldValue = parent[fieldKey];
+    if (fieldValue === undefined) {
+      return null;
+    } else if (fieldValue !== null) {
+      return fieldValue;
+    }
+
+    const entityKey = keyOfEntity(parent);
+    if (entityKey === null) {
+      return null;
+    }
+
+    const link = this.readLink(joinKeys(entityKey, fieldKey));
+    if (!link) {
+      return null;
+    } else if (Array.isArray(link)) {
+      // @ts-ignore: Link cannot be expressed as a recursive type
+      return link.map(key => this.find(key));
+    } else {
+      return this.find(link);
+    }
   }
 }

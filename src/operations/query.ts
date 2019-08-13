@@ -18,9 +18,10 @@ import {
   SelectionSet,
   Completeness,
   OperationRequest,
+  NullArray,
 } from '../types';
 
-import { joinKeys, keyOfField } from '../helpers';
+import { joinKeys, keyOfField, keyOfEntity } from '../helpers';
 import { Store } from '../store';
 
 export interface QueryResult {
@@ -68,17 +69,38 @@ const readEntity = (
   select: SelectionSet,
   data: Data
 ): Data | null => {
-  const { store } = ctx;
-  const entity = store.find(key);
+  let entity = ctx.store.find(key);
   if (entity === null) {
     // Cache Incomplete: A missing entity for a key means it wasn't cached
     ctx.result.completeness = 'EMPTY';
     return null;
-  } else if (key !== 'Query') {
-    ctx.result.dependencies.add(key);
   }
 
   return readSelection(ctx, entity, key, select, data);
+};
+
+const readResolverSelection = (
+  ctx: Context,
+  entity: null | Entity | NullArray<Entity>,
+  key: string,
+  select: SelectionSet,
+  prevData: void | Data | Data[]
+) => {
+  if (Array.isArray(entity)) {
+    // @ts-ignore: Link cannot be expressed as a recursive type
+    return entity.map((childEntity, index) => {
+      const data = prevData !== undefined ? prevData[index] : undefined;
+      const indexKey = joinKeys(key, `${index}`);
+      return readResolverSelection(ctx, childEntity, indexKey, select, data);
+    });
+  } else if (entity === null) {
+    return null;
+  } else {
+    const data = prevData === undefined ? Object.create(null) : prevData;
+    const entityKey = keyOfEntity(entity);
+    const childKey = entityKey !== null ? entityKey : key;
+    return readSelection(ctx, entity, childKey, select, data);
+  }
 };
 
 const readSelection = (
@@ -88,7 +110,11 @@ const readSelection = (
   select: SelectionSet,
   data: Data
 ): Data => {
-  data.__typename = entity.__typename;
+  if (key !== 'Query') {
+    ctx.result.dependencies.add(key);
+  }
+
+  const typename = (data.__typename = entity.__typename);
   const { store, fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     const fieldName = getName(node);
@@ -101,7 +127,31 @@ const readSelection = (
       ctx.result.dependencies.add(childFieldKey);
     }
 
-    if (fieldValue === undefined) {
+    const resolvers = store.resolvers[typename];
+    if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
+      const resolverValue = resolvers[fieldName](
+        entity,
+        fieldArgs || {},
+        store,
+        ctx
+      );
+
+      if (node.selectionSet === undefined) {
+        data[fieldAlias] = resolverValue !== undefined ? resolverValue : null;
+      } else {
+        const childEntity = resolverValue as Entity;
+        const fieldSelect = getSelectionSet(node);
+        const prevData = data[fieldAlias] as Data;
+
+        data[fieldAlias] = readResolverSelection(
+          ctx,
+          childEntity,
+          childFieldKey,
+          fieldSelect,
+          prevData
+        );
+      }
+    } else if (fieldValue === undefined) {
       // Cache Incomplete: A missing field means it wasn't cached
       ctx.result.completeness = 'EMPTY';
       data[fieldAlias] = null;
@@ -128,7 +178,7 @@ const readSelection = (
 
 const readField = (
   ctx: Context,
-  link: Link,
+  link: Link | Link[],
   select: SelectionSet,
   prevData: void | Data | Data[]
 ): null | Data | Data[] => {
