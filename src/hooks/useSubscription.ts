@@ -46,7 +46,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     unsubscribe.current();
 
     [unsubscribe.current] = pipe(
-      client.executeSubscription(request, args.context),
+      client.executeSubscription(request, args.context || {}),
       subscribe(({ data, error, extensions }) => {
         setState(s => ({
           fetching: true,
