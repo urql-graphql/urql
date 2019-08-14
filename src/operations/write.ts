@@ -1,12 +1,12 @@
 import {
   forEachFieldNode,
   getFieldAlias,
-  getFieldArguments,
   getFragments,
   getMainOperation,
-  getName,
   getSelectionSet,
   normalizeVariables,
+  getName,
+  getFieldArguments,
 } from '../ast';
 
 import {
@@ -53,9 +53,9 @@ export const write = (
 
   const select = getSelectionSet(operation);
   if (operation.operation === 'query') {
-    writeEntity(ctx, 'Query', data, select);
+    writeEntity(ctx, 'Query', select, data);
   } else {
-    writeRoot(ctx, data, select);
+    writeRoot(ctx, select, data);
   }
 
   return result;
@@ -64,34 +64,32 @@ export const write = (
 const writeEntity = (
   ctx: Context,
   key: string,
-  data: Data,
-  select: SelectionSet
+  select: SelectionSet,
+  data: Data
 ) => {
-  const { store } = ctx;
-  const entity = store.findOrCreate(key);
-  if (key !== 'Query') {
-    ctx.result.dependencies.add(key);
-  }
-
-  writeSelection(ctx, entity, key, data, select);
+  writeSelection(ctx, ctx.store.findOrCreate(key), key, select, data);
 };
 
 const writeSelection = (
   ctx: Context,
   entity: Entity,
   key: string,
-  data: Data,
-  select: SelectionSet
+  select: SelectionSet,
+  data: Data
 ) => {
-  entity.__typename = data.__typename as string;
+  if (key !== 'Query') {
+    ctx.result.dependencies.add(key);
+  }
 
+  entity.__typename = data.__typename as string;
   const { store, fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     const fieldName = getName(node);
-    const fieldValue = data[getFieldAlias(node)];
     const fieldArgs = getFieldArguments(node, variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
+    const fieldValue = data[getFieldAlias(node)];
     const childFieldKey = joinKeys(key, fieldKey);
+
     if (key === 'Query' && fieldName !== '__typename') {
       ctx.result.dependencies.add(childFieldKey);
     }
@@ -102,7 +100,7 @@ const writeSelection = (
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
       const { selections: fieldSelect } = node.selectionSet;
-      const link = writeField(ctx, childFieldKey, fieldValue, fieldSelect);
+      const link = writeField(ctx, childFieldKey, fieldSelect, fieldValue);
       store.setLink(childFieldKey, link);
       // We still have to mark the field for the GC operation
       entity[fieldKey] = undefined;
@@ -116,15 +114,15 @@ const writeSelection = (
 const writeField = (
   ctx: Context,
   parentFieldKey: string,
-  data: null | Data | NullArray<Data>,
-  select: SelectionSet
+  select: SelectionSet,
+  data: null | Data | NullArray<Data>
 ): Link => {
   if (Array.isArray(data)) {
     return data.map((item, index) => {
       // Append the current index to the parentFieldKey fallback
       const indexKey = joinKeys(parentFieldKey, `${index}`);
       // Recursively write array data
-      const links = writeField(ctx, indexKey, item, select);
+      const links = writeField(ctx, indexKey, select, item);
       // Link cannot be expressed as a recursive type
       return links as string | null;
     });
@@ -134,12 +132,12 @@ const writeField = (
 
   const entityKey = keyOfEntity(data);
   const key = entityKey !== null ? entityKey : parentFieldKey;
-  writeEntity(ctx, key, data, select);
+  writeEntity(ctx, key, select, data);
   return key;
 };
 
 // This is like writeSelection but assumes no parent entity exists
-const writeRoot = (ctx: Context, data: Data, select: SelectionSet) => {
+const writeRoot = (ctx: Context, select: SelectionSet, data: Data) => {
   const { fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     const fieldValue = data[getFieldAlias(node)];
@@ -170,7 +168,7 @@ const writeRootField = (
   // Write entity to key that falls back to the given parentFieldKey
   const entityKey = keyOfEntity(data);
   if (entityKey !== null) {
-    writeEntity(ctx, entityKey, data, select);
+    writeEntity(ctx, entityKey, select, data);
   }
 };
 
