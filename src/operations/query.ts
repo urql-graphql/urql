@@ -114,7 +114,7 @@ const readSelection = (
     ctx.result.dependencies.add(key);
   }
 
-  const typename = (data.__typename = entity.__typename);
+  data.__typename = entity.__typename;
   const { store, fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     const fieldName = getName(node);
@@ -127,7 +127,7 @@ const readSelection = (
       ctx.result.dependencies.add(childFieldKey);
     }
 
-    const resolvers = store.resolvers[typename];
+    const resolvers = store.resolvers[entity.__typename];
     if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
       const resolverValue = resolvers[fieldName](
         entity,

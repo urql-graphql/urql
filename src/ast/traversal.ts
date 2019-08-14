@@ -33,7 +33,7 @@ export const getMainOperation = (
     node => node.kind === Kind.OPERATION_DEFINITION
   ) as OperationDefinitionNode;
 
-  if (!operation) {
+  if (process.env.NODE_ENV !== 'production' && !operation) {
     throw new TypeError(
       'OperationDefinition is missing from GraphQL DocumentNode'
     );

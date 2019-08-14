@@ -51,7 +51,9 @@ const walkEntity = (ctx: Context, key: string) => {
 
 const walkLink = (ctx: Context, link: Link) => {
   if (Array.isArray(link)) {
-    link.forEach(childLink => walkLink(ctx, childLink));
+    link.forEach(childLink => {
+      walkLink(ctx, childLink);
+    });
   } else if (link !== null) {
     walkEntity(ctx, link);
   }

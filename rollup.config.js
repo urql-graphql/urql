@@ -6,6 +6,7 @@ import typescript from 'rollup-plugin-typescript2';
 import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import replace from 'rollup-plugin-replace';
 
 const pkgInfo = require('./package.json');
 const { main, peerDependencies, dependencies } = pkgInfo;
@@ -134,6 +135,9 @@ const makePlugins = (isProduction = false) => [
         externalHelpers: true
       }]
     ]
+  }),
+  isProduction && replace({
+    'process.env.NODE_ENV': JSON.stringify('production')
   }),
   isProduction ? terserMinified : terserPretty
 ];
