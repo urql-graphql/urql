@@ -13,7 +13,7 @@ import {
 } from '../types';
 import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
 import { query, write, writeFragment } from '../operations';
-import { assignObjectToMap, objectOfMap } from './utils';
+import { objectOfMap } from './utils';
 
 export interface SerializedStore {
   records: { [link: string]: Entity };
@@ -27,20 +27,11 @@ export class Store {
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
 
-  constructor(
-    initial?: SerializedStore,
-    resolvers?: ResolverConfig,
-    updates?: UpdatesConfig
-  ) {
+  constructor(resolvers?: ResolverConfig, updates?: UpdatesConfig) {
     this.records = new Map();
     this.links = new Map();
     this.resolvers = resolvers || {};
     this.updates = updates || {};
-
-    if (initial !== undefined) {
-      assignObjectToMap(this.records, initial.records);
-      assignObjectToMap(this.links, initial.links);
-    }
   }
 
   serialize(): SerializedStore {

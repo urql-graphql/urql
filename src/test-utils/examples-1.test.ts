@@ -78,7 +78,7 @@ it('passes the "getting-started" example', () => {
 });
 
 it('Respects property-level resolvers when given', () => {
-  const store = new Store(undefined, { Todo: { text: () => 'hi' } });
+  const store = new Store({ Todo: { text: () => 'hi' } });
   const todosData = {
     __typename: 'Query',
     todos: [
@@ -139,7 +139,7 @@ it('Respects property-level resolvers when given', () => {
 });
 
 it('Respects property-level resolvers when given', () => {
-  const store = new Store(undefined, undefined, {
+  const store = new Store(undefined, {
     toggleTodo: function toggleTodo(result, _, cache) {
       cache.updateQuery(Todos, data => {
         if (
@@ -225,7 +225,7 @@ it('Respects property-level resolvers when given', () => {
 });
 
 it('Respects entity-level resolvers when given', () => {
-  const store = new Store(undefined, {
+  const store = new Store({
     Query: {
       todos: () => [
         // NOTE: In user-land, entities should never be created manually
