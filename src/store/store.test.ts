@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { Store } from '.';
-import { write } from '../operations';
+import { write, query } from '../operations';
 
 const Todos = gql`
   query {
@@ -19,11 +19,11 @@ const Todos = gql`
 `;
 
 describe('store', () => {
-  let store;
+  let store, todosData;
 
-  beforeAll(() => {
+  beforeEach(() => {
     store = new Store(undefined);
-    const todosData = {
+    todosData = {
       __typename: 'Query',
       todos: [
         {
@@ -75,5 +75,73 @@ describe('store', () => {
     };
     const result = store.resolveProperty(parent, 'author');
     expect(result).toEqual({ __typename: 'Author', id: '0', name: 'Jovi' });
+  });
+
+  it('should be able to update a fragment', () => {
+    store.writeFragment(
+      gql`
+        fragment _ on Todo {
+          id
+          text
+          complete
+        }
+      `,
+      {
+        id: '0',
+        text: 'update',
+        complete: true,
+      }
+    );
+
+    const { data } = query(store, { query: Todos });
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: [
+        {
+          ...todosData.todos[0],
+          text: 'update',
+          complete: true,
+        },
+        todosData.todos[1],
+        todosData.todos[2],
+      ],
+    });
+  });
+
+  it('should be able to update a query', () => {
+    store.updateQuery(Todos, data => ({
+      ...data,
+      todos: [
+        ...data.todos,
+        {
+          __typename: 'Todo',
+          id: '4',
+          text: 'Test updateQuery',
+          complete: false,
+          author: {
+            id: '3',
+            name: 'Andy',
+          },
+        },
+      ],
+    }));
+
+    const { data: result } = query(store, { query: Todos });
+    expect(result).toEqual({
+      __typename: 'Query',
+      todos: [
+        ...todosData.todos,
+        {
+          __typename: 'Todo',
+          id: '4',
+          text: 'Test updateQuery',
+          complete: false,
+          author: {
+            id: '3',
+            name: 'Andy',
+          },
+        },
+      ],
+    });
   });
 });

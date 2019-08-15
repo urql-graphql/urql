@@ -79,5 +79,16 @@ export interface ResolverConfig {
   };
 }
 
+export type UpdateResolver<T = any> = (
+  result: T,
+  args: Variables,
+  cache: Store,
+  info: ResolveInfo
+) => void;
+
+export interface UpdatesConfig {
+  [fieldName: string]: UpdateResolver;
+}
+
 // Completeness of the query result
 export type Completeness = 'EMPTY' | 'PARTIAL' | 'FULL';

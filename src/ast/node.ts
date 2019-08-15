@@ -1,9 +1,18 @@
-import { NamedTypeNode, NameNode, SelectionSetNode, FieldNode } from 'graphql';
+import {
+  NamedTypeNode,
+  NameNode,
+  SelectionSetNode,
+  FieldNode,
+  FragmentDefinitionNode,
+} from 'graphql';
 
 import { SelectionSet } from '../types';
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;
+
+export const getFragmentTypeName = (node: FragmentDefinitionNode): string =>
+  node.typeCondition.name.value;
 
 /** Returns either the field's name or the field's alias */
 export const getFieldAlias = (node: FieldNode): string =>

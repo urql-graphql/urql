@@ -1,3 +1,4 @@
+import { DocumentNode } from 'graphql';
 import {
   Entity,
   Link,
@@ -7,9 +8,11 @@ import {
   ResolverResult,
   SystemFields,
   Variables,
+  Data,
+  UpdatesConfig,
 } from '../types';
-
 import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
+import { query, write, writeFragment } from '../operations';
 import { assignObjectToMap, objectOfMap } from './utils';
 
 export interface SerializedStore {
@@ -22,11 +25,17 @@ export class Store {
   links: LinksMap;
 
   resolvers: ResolverConfig;
+  updates: UpdatesConfig;
 
-  constructor(initial?: SerializedStore, resolvers?: ResolverConfig) {
+  constructor(
+    initial?: SerializedStore,
+    resolvers?: ResolverConfig,
+    updates?: UpdatesConfig
+  ) {
     this.records = new Map();
     this.links = new Map();
     this.resolvers = resolvers || {};
+    this.updates = updates || {};
 
     if (initial !== undefined) {
       assignObjectToMap(this.records, initial.records);
@@ -103,5 +112,17 @@ export class Store {
     } else {
       return fieldValue;
     }
+  }
+
+  updateQuery(
+    dataQuery: DocumentNode,
+    updater: (data: Data | null) => Data
+  ): void {
+    const { data } = query(this, { query: dataQuery });
+    write(this, { query: dataQuery }, updater(data));
+  }
+
+  writeFragment(dataFragment: DocumentNode, data: Data): void {
+    writeFragment(this, dataFragment, data);
   }
 }

@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
 import { query, write } from '../operations';
 import { Store } from '../store';
+import { Data } from '../types';
 
 const Todos = gql`
   query {
@@ -133,6 +134,92 @@ it('Respects property-level resolvers when given', () => {
       { id: '0', text: 'hi', complete: false, __typename: 'Todo' },
       { id: '1', text: 'hi', complete: true, __typename: 'Todo' },
       { id: '2', text: 'hi', complete: true, __typename: 'Todo' },
+    ],
+  });
+});
+
+it('Respects property-level resolvers when given', () => {
+  const store = new Store(undefined, undefined, {
+    toggleTodo: function toggleTodo(result, _, cache) {
+      cache.updateQuery(Todos, data => {
+        if (
+          data &&
+          data.todos &&
+          result &&
+          result.toggleTodo &&
+          result.toggleTodo.id === '1'
+        ) {
+          data.todos[1] = {
+            id: '1',
+            text: `${data.todos[1].text} (Updated)`,
+            complete: result.toggleTodo.complete,
+            __typename: 'Todo',
+          };
+        } else if (data && data.todos) {
+          data.todos[Number(result.toggleTodo.id)] = {
+            ...data.todos[Number(result.toggleTodo.id)],
+            complete: result.toggleTodo.complete,
+          };
+        }
+        return data as Data;
+      });
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', text: 'Go to the shops', complete: false, __typename: 'Todo' },
+      {
+        id: '1',
+        text: 'Pick up the kids',
+        complete: false,
+        __typename: 'Todo',
+      },
+      { id: '2', text: 'Install urql', complete: false, __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+
+  write(
+    store,
+    { query: ToggleTodo, variables: { id: '1' } },
+    {
+      __typename: 'Mutation',
+      toggleTodo: {
+        ...todosData.todos[1],
+        complete: true,
+      },
+    }
+  );
+
+  write(
+    store,
+    { query: ToggleTodo, variables: { id: '2' } },
+    {
+      __typename: 'Mutation',
+      toggleTodo: {
+        ...todosData.todos[2],
+        complete: true,
+      },
+    }
+  );
+
+  const queryRes = query(store, { query: Todos });
+
+  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.data).toEqual({
+    ...todosData,
+    todos: [
+      todosData.todos[0],
+      {
+        id: '1',
+        text: 'Pick up the kids (Updated)',
+        complete: true,
+        __typename: 'Todo',
+      },
+      { id: '2', text: 'Install urql', complete: true, __typename: 'Todo' },
     ],
   });
 });

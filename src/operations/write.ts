@@ -5,6 +5,7 @@ import {
   getMainOperation,
   getSelectionSet,
   normalizeVariables,
+  getFragmentTypeName,
   getName,
   getFieldArguments,
 } from '../ast';
@@ -23,6 +24,7 @@ import {
 
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
 import { Store } from '../store';
+import { DocumentNode, FragmentDefinitionNode, Kind } from 'graphql';
 
 export interface WriteResult {
   dependencies: Set<string>;
@@ -59,6 +61,48 @@ export const write = (
   }
 
   return result;
+};
+
+export const writeFragment = (
+  store: Store,
+  query: DocumentNode,
+  data: Data
+) => {
+  const fragment = query.definitions[0] as FragmentDefinitionNode;
+
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    (query.definitions.length > 1 || fragment.kind !== Kind.FRAGMENT_DEFINITION)
+  ) {
+    throw new Error(
+      'You can only pass one fragment when writing to a fragment.'
+    );
+  }
+
+  const select = getSelectionSet(fragment);
+  const fieldName = getFragmentTypeName(fragment);
+  const writeData = { ...data, __typename: fieldName } as Data;
+  const key = keyOfEntity(writeData) as string;
+
+  if (process.env.NODE_ENV !== 'production' && !key) {
+    throw new Error(
+      `You have to pass an "id" or "_id" with your writeFragment data.`
+    );
+  }
+
+  const entity = store.findOrCreate(key);
+  writeSelection(
+    {
+      store,
+      variables: {},
+      fragments: {},
+      result: { dependencies: new Set() },
+    },
+    entity,
+    key,
+    select,
+    writeData
+  );
 };
 
 const writeEntity = (
@@ -140,7 +184,19 @@ const writeField = (
 const writeRoot = (ctx: Context, select: SelectionSet, data: Data) => {
   const { fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
-    const fieldValue = data[getFieldAlias(node)];
+    const fieldName = getName(node);
+    const fieldAlias = getFieldAlias(node);
+    const fieldArgs = getFieldArguments(node, variables);
+    const fieldValue = data[fieldAlias];
+
+    if (ctx.store.updates[fieldName]) {
+      return ctx.store.updates[fieldName](
+        data,
+        fieldArgs || {},
+        ctx.store,
+        ctx
+      );
+    }
 
     if (
       node.selectionSet !== undefined &&

@@ -1,3 +1,3 @@
 export { query } from './query';
-export { write } from './write';
+export { write, writeFragment } from './write';
 export { gc } from './gc';
