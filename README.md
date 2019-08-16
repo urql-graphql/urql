@@ -22,7 +22,7 @@
   <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
   </a>
-  <a href="https://spectrum.chat/apollo">
+  <a href="https://spectrum.chat/urql">
     <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
   </a>
 
