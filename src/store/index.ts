@@ -10,6 +10,7 @@ import {
   Variables,
   Data,
   UpdatesConfig,
+  OptimisticMutationConfig,
 } from '../types';
 
 import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
@@ -21,12 +22,18 @@ export class Store {
 
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
+  optimisticMutations: OptimisticMutationConfig;
 
-  constructor(resolvers?: ResolverConfig, updates?: UpdatesConfig) {
+  constructor(
+    resolvers?: ResolverConfig,
+    updates?: UpdatesConfig,
+    optimisticMutations?: OptimisticMutationConfig
+  ) {
     this.records = make();
     this.links = make();
     this.resolvers = resolvers || {};
     this.updates = updates || {};
+    this.optimisticMutations = optimisticMutations || {};
   }
 
   getRecord(fieldKey: string): EntityField {

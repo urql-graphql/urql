@@ -77,5 +77,15 @@ export interface UpdatesConfig {
   [fieldName: string]: UpdateResolver;
 }
 
+export type OptimisticMutationResolver = (
+  vars: Variables,
+  cache: Store,
+  info: ResolveInfo
+) => Data;
+
+export interface OptimisticMutationConfig {
+  [mutationFieldName: string]: OptimisticMutationResolver;
+}
+
 // Completeness of the query result
 export type Completeness = 'EMPTY' | 'PARTIAL' | 'FULL';

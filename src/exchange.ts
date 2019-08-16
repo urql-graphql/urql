@@ -10,7 +10,12 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { query, write } from './operations';
 import { Store } from './store';
-import { Completeness, UpdatesConfig, ResolverConfig } from './types';
+import {
+  Completeness,
+  UpdatesConfig,
+  ResolverConfig,
+  OptimisticMutationConfig,
+} from './types';
 
 type OperationResultWithMeta = OperationResult & {
   completeness: Completeness;
@@ -62,13 +67,14 @@ const toRequestPolicy = (
 export interface CacheExchangeOpts {
   updates?: UpdatesConfig;
   resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
 }
 
 export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
   forward,
   client,
 }) => {
-  const store = new Store(opts.resolvers, opts.updates);
+  const store = new Store(opts.resolvers, opts.updates, opts.optimistic);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 
