@@ -6,14 +6,9 @@ import {
   RequestPolicy,
 } from 'urql';
 
-import {
-  unstable_LowPriority as SchedulerLowPriority,
-  unstable_scheduleCallback as scheduleCallback,
-} from 'scheduler';
-
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
-import { query, write, gc } from './operations';
+import { query, write } from './operations';
 import { Store } from './store';
 import { Completeness, UpdatesConfig, ResolverConfig } from './types';
 
@@ -73,19 +68,9 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
   forward,
   client,
 }) => {
-  let gcScheduled = false;
-
   const store = new Store(opts.resolvers, opts.updates);
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
-
-  // This triggers a garbage collection run on the store's data
-  const gcStore = () => {
-    if (gcScheduled) {
-      gcScheduled = false;
-      gc(store);
-    }
-  };
 
   // This accepts an array of dependencies and reexecutes all known operations
   // against the mapping of dependencies to operations
@@ -169,11 +154,6 @@ export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
       // Update this operation's dependencies if it's a query
       if (isQueryOperation(operation)) {
         updateDependencies(operation, dependencies);
-      }
-
-      if (!gcScheduled) {
-        gcScheduled = true;
-        scheduleCallback(SchedulerLowPriority, gcStore);
       }
     }
   };

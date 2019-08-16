@@ -1,9 +1,9 @@
 import { DocumentNode } from 'graphql';
+import { Map, make, get, set, remove } from 'pessimism';
+
 import {
-  Entity,
+  EntityField,
   Link,
-  LinksMap,
-  EntitiesMap,
   ResolverConfig,
   ResolverResult,
   SystemFields,
@@ -11,97 +11,92 @@ import {
   Data,
   UpdatesConfig,
 } from '../types';
+
 import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
 import { query, write, writeFragment } from '../operations';
-import { objectOfMap } from './utils';
-
-export interface SerializedStore {
-  records: { [link: string]: Entity };
-  links: { [link: string]: Link };
-}
 
 export class Store {
-  records: EntitiesMap;
-  links: LinksMap;
+  records: Map<EntityField>;
+  links: Map<Link>;
 
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
 
   constructor(resolvers?: ResolverConfig, updates?: UpdatesConfig) {
-    this.records = new Map();
-    this.links = new Map();
+    this.records = make();
+    this.links = make();
     this.resolvers = resolvers || {};
     this.updates = updates || {};
   }
 
-  serialize(): SerializedStore {
-    const records = objectOfMap(this.records);
-    const links = objectOfMap(this.links);
-    return { records, links };
+  getRecord(fieldKey: string): EntityField {
+    return get(this.records, fieldKey);
   }
 
-  find(key: string): Entity | null {
-    const entity = this.records.get(key);
-    return entity !== undefined ? entity : null;
+  removeRecord(fieldKey: string) {
+    return (this.records = remove(this.records, fieldKey));
   }
 
-  findOrCreate(key: string): Entity {
-    const entity = this.find(key);
-    if (entity !== null) {
-      return entity;
-    }
-
-    const record: Entity = Object.create(null);
-    this.records.set(key, record);
-    return record;
+  writeRecord(field: EntityField, fieldKey: string) {
+    return (this.records = set(this.records, fieldKey, field));
   }
 
-  readLink(key: string): void | Link {
-    return this.links.get(key);
+  getField(
+    entityKey: string,
+    fieldName: string,
+    args?: Variables
+  ): EntityField {
+    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, args));
+    return this.getRecord(fieldKey);
   }
 
-  remove(key: string): void {
-    this.records.delete(key);
+  writeField(
+    field: EntityField,
+    entityKey: string,
+    fieldName: string,
+    args?: Variables
+  ) {
+    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, args));
+    return (this.records = set(this.records, fieldKey, field));
   }
 
-  setLink(key: string, link: Link): void {
-    this.links.set(key, link);
+  getLink(key: string): undefined | Link {
+    return get(this.links, key);
   }
 
-  removeLink(key: string): void {
-    this.links.delete(key);
+  removeLink(key: string) {
+    return (this.links = remove(this.links, key));
   }
 
-  resolveEntity(entity: SystemFields): Entity | null {
-    const key = keyOfEntity(entity);
-    return key !== null ? this.find(key) : null;
+  writeLink(link: Link, key: string) {
+    return (this.links = set(this.links, key, link));
   }
 
-  resolveProperty(
-    parent: Entity,
+  resolveValueOrLink(fieldKey: string): ResolverResult {
+    const fieldValue = this.getRecord(fieldKey);
+    // Undefined implies a link OR incomplete data.
+    // A value will imply that we are just fetching a field like date.
+    if (fieldValue !== undefined) return fieldValue;
+
+    // This can be an array OR a string OR undefined again
+    const link = this.getLink(fieldKey);
+    return link ? link : null;
+  }
+
+  resolve(
+    entity: SystemFields,
     field: string,
-    args?: null | Variables
+    args?: Variables
   ): ResolverResult {
-    const fieldKey = keyOfField(field, args || null);
-    const fieldValue = parent[fieldKey];
-
-    if (fieldValue === undefined && fieldKey in parent) {
-      // The field is present but set to undefined, which indicates a link
-      const entityKey = keyOfEntity(parent);
-      if (entityKey === null) {
-        return null;
-      }
-
-      const link = this.readLink(joinKeys(entityKey, fieldKey));
-      if (Array.isArray(link)) {
-        return link.map(key => (key !== null ? this.find(key) : null));
-      } else {
-        return link ? this.find(link) : null;
-      }
-    } else if (fieldValue === undefined) {
-      return null;
+    if (typeof entity === 'string') {
+      return this.resolveValueOrLink(joinKeys(entity, keyOfField(field, args)));
     } else {
-      return fieldValue;
+      // This gives us __typename:key
+      const entityKey = keyOfEntity(entity);
+      if (entityKey === null) return null;
+      return this.resolveValueOrLink(
+        joinKeys(entityKey, keyOfField(field, args))
+      );
     }
   }
 

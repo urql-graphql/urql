@@ -26,8 +26,10 @@ export interface SystemFields {
   id?: string | number | null;
 }
 
+export type EntityField = undefined | Scalar | Scalar[];
+
 export interface EntityFields {
-  [fieldName: string]: undefined | Scalar | Scalar[];
+  [fieldName: string]: EntityField;
 }
 
 // Entities are objects from the response data which are full GraphQL types
@@ -42,10 +44,6 @@ export type Data = SystemFields & DataFields;
 // Links are relations between entities
 export type Link<Key = string> = null | Key | NullArray<Key>;
 export type ResolvedLink = Link<Entity>;
-
-// These are our caching structures
-export type EntitiesMap = Map<string, Entity>;
-export type LinksMap = Map<string, Link>;
 
 export interface Variables {
   [name: string]: Scalar | Scalar[] | Variables | NullArray<Variables>;

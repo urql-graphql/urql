@@ -21,8 +21,8 @@ export const keyOfEntity = (entity: SystemFields): null | string => {
   return `${typeName}:${id}`;
 };
 
-export const keyOfField = (fieldName: string, args: null | Variables) =>
-  args !== null ? `${fieldName}(${stringify(args)})` : fieldName;
+export const keyOfField = (fieldName: string, args?: null | Variables) =>
+  args ? `${fieldName}(${stringify(args)})` : fieldName;
 
 export const joinKeys = (parentKey: string, key: string) =>
   `${parentKey}.${key}`;

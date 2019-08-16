@@ -17,10 +17,6 @@ const expectCacheIntegrity = (testcase: TestCase) => {
   expect(queryRes.data).toEqual(testcase.data);
   expect(queryRes.completeness).toBe('FULL');
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
-  const json = store.serialize();
-  expect(json).toMatchSnapshot();
-  expect(queryRes.dependencies).toMatchSnapshot();
-  return json;
 };
 
 it('int on query', () => {
@@ -36,7 +32,7 @@ it('int on query', () => {
 });
 
 it('aliased field on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -44,11 +40,6 @@ it('aliased field on query', () => {
       }
     `,
     data: { __typename: 'Query', anotherName: 42 },
-  });
-
-  expect(store.records.Query).toMatchObject({
-    __typename: 'Query',
-    int: 42,
   });
 });
 
@@ -81,7 +72,7 @@ it('nullable field on query', () => {
 });
 
 it('int field with arguments on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -90,15 +81,10 @@ it('int field with arguments on query', () => {
     `,
     data: { __typename: 'Query', int: 42 },
   });
-
-  expect(store.records.Query).toMatchObject({
-    __typename: 'Query',
-    'int({"test":true})': 42,
-  });
 });
 
 it('non-keyable entity on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -111,16 +97,10 @@ it('non-keyable entity on query', () => {
     // This entity has no `id` or `_id` field
     data: { __typename: 'Query', item: { __typename: 'Item', name: 'Test' } },
   });
-
-  expect(store.links['Query.item']).toBe('Query.item');
-  expect(store.records['Query.item']).toMatchObject({
-    __typename: 'Item',
-    name: 'Test',
-  });
 });
 
 it('invalid entity on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -137,17 +117,10 @@ it('invalid entity on query', () => {
       item: { __typename: null, id: '123', name: 'Test' },
     },
   });
-
-  expect(store.links['Query.item']).toBe(undefined);
-  expect(store.records['Query.item']).toBe(undefined);
-  expect(store.records.Query).toMatchObject({
-    __typename: 'Query',
-    item: { __typename: null, id: '123', name: 'Test' },
-  });
 });
 
 it('non-IDable entity on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -160,16 +133,10 @@ it('non-IDable entity on query', () => {
     // This entity has a `__typename` but no ID fields
     data: { __typename: 'Query', item: { __typename: 'Item', name: 'Test' } },
   });
-
-  expect(store.links['Query.item']).toBe('Query.item');
-  expect(store.records['Query.item']).toMatchObject({
-    __typename: 'Item',
-    name: 'Test',
-  });
 });
 
 it('entity on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -185,17 +152,10 @@ it('entity on query', () => {
       item: { __typename: 'Item', id: '1', name: 'Test' },
     },
   });
-
-  expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: '1',
-    name: 'Test',
-  });
 });
 
 it('entity on aliased field on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -211,12 +171,10 @@ it('entity on aliased field on query', () => {
       anotherName: { __typename: 'Item', id: '1', name: 'Test' },
     },
   });
-
-  expect(store.links['Query.item']).toBe('Item:1');
 });
 
 it('entity with arguments on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -232,12 +190,10 @@ it('entity with arguments on query', () => {
       item: { __typename: 'Item', id: '1', name: 'Test' },
     },
   });
-
-  expect(store.links['Query.item({"test":true})']).toBe('Item:1');
 });
 
 it('entity with Int-like ID on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -254,20 +210,10 @@ it('entity with Int-like ID on query', () => {
       item: { __typename: 'Item', id: 1, name: 'Test' },
     },
   });
-
-  expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.records.Query.item).toBe(undefined);
-
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-    name: 'Test',
-  });
 });
 
 it('entity list on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -282,23 +228,10 @@ it('entity list on query', () => {
       items: [{ __typename: 'Item', id: 1 }, { __typename: 'Item', id: 2 }],
     },
   });
-
-  expect(store.links['Query.items']).toEqual(['Item:1', 'Item:2']);
-  expect(store.records.Query.items).toBe(undefined);
-
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-  });
-
-  expect(store.records['Item:2']).toMatchObject({
-    __typename: 'Item',
-    id: 2,
-  });
 });
 
 it('nested entity list on query', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         items {
@@ -317,28 +250,10 @@ it('nested entity list on query', () => {
       ],
     },
   });
-
-  expect(store.links['Query.items']).toEqual([
-    'Item:1',
-    ['Item:2', null],
-    null,
-  ]);
-
-  expect(store.records.Query.items).toBe(undefined);
-
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-  });
-
-  expect(store.records['Item:2']).toMatchObject({
-    __typename: 'Item',
-    id: 2,
-  });
 });
 
 it('entity list on query and inline fragment', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -358,21 +273,10 @@ it('entity list on query and inline fragment', () => {
       items: [{ __typename: 'Item', id: 1, test: true }, null],
     },
   });
-
-  expect(store.links['Query.items']).toEqual(['Item:1', null]);
-
-  expect(store.records.Query.__typename).toBe('Query');
-  expect(store.records.Query.items).toBe(undefined);
-
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-    test: true,
-  });
 });
 
 it('entity list on query and spread fragment', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       query Test {
         __typename
@@ -394,21 +298,10 @@ it('entity list on query and spread fragment', () => {
       items: [{ __typename: 'Item', id: 1, test: true }, null],
     },
   });
-
-  expect(store.links['Query.items']).toEqual(['Item:1', null]);
-
-  expect(store.records.Query.__typename).toBe('Query');
-  expect(store.records.Query.items).toBe(undefined);
-
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-    test: true,
-  });
 });
 
 it('embedded object on entity', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -434,24 +327,10 @@ it('embedded object on entity', () => {
       },
     },
   });
-
-  expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.links['Item:1.author']).toBe('Item:1.author');
-
-  expect(store.records.Query.item).toBe(undefined);
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-  });
-
-  expect(store.records['Item:1.author']).toMatchObject({
-    __typename: 'Author',
-    name: 'Stanley',
-  });
 });
 
 it('embedded object on entity', () => {
-  const store = expectCacheIntegrity({
+  expectCacheIntegrity({
     query: gql`
       {
         __typename
@@ -478,20 +357,5 @@ it('embedded object on entity', () => {
         },
       },
     },
-  });
-
-  expect(store.links['Query.item']).toBe('Item:1');
-  expect(store.links['Item:1.author']).toBe('Author:1');
-
-  expect(store.records.Query.item).toBe(undefined);
-  expect(store.records['Item:1']).toMatchObject({
-    __typename: 'Item',
-    id: 1,
-  });
-
-  expect(store.records['Author:1']).toMatchObject({
-    __typename: 'Author',
-    id: 1,
-    name: 'Stanley',
   });
 });

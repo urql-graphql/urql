@@ -53,17 +53,21 @@ describe('store', () => {
     write(store, { query: Todos }, todosData);
   });
 
-  it('Should resolve an entitty', () => {
-    const todoResult = store.resolveEntity({ __typename: 'Todo', id: '0' });
-    expect(todoResult.text).toEqual('Go to the shops');
-    const authorResult = store.resolveEntity({ __typename: 'Author', id: '0' });
-    expect(authorResult.name).toBe('Jovi');
+  it('Should resolve a property', () => {
+    const todoResult = store.resolve({ __typename: 'Todo', id: '0' }, 'text');
+    expect(todoResult).toEqual('Go to the shops');
+    const authorResult = store.resolve(
+      { __typename: 'Author', id: '0' },
+      'name'
+    );
+    expect(authorResult).toBe('Jovi');
+    const result = store.resolve({ id: 0, __typename: 'Todo' }, 'text');
+    expect(result).toEqual('Go to the shops');
   });
 
-  it('Should resolve a property', () => {
-    const parent = { text: 'test' };
-    const result = store.resolveProperty(parent, 'text');
-    expect(result).toEqual('test');
+  it('should resolve witha key as first argument', () => {
+    const authorResult = store.resolve('Author:0', 'name');
+    expect(authorResult).toBe('Jovi');
   });
 
   it('Should resolve a link property', () => {
@@ -73,8 +77,8 @@ describe('store', () => {
       author: undefined,
       __typename: 'Todo',
     };
-    const result = store.resolveProperty(parent, 'author');
-    expect(result).toEqual({ __typename: 'Author', id: '0', name: 'Jovi' });
+    const result = store.resolve(parent, 'author');
+    expect(result).toEqual('Author:0');
   });
 
   it('should be able to update a fragment', () => {

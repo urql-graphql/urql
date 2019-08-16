@@ -55,7 +55,7 @@ export const query = (store: Store, request: OperationRequest): QueryResult => {
     store,
   };
 
-  result.data = readEntity(ctx, 'Query', getSelectionSet(operation), root);
+  result.data = readSelection(ctx, 'Query', getSelectionSet(operation), root);
   if (result.completeness === 'EMPTY') {
     result.data = null;
   }
@@ -63,62 +63,45 @@ export const query = (store: Store, request: OperationRequest): QueryResult => {
   return result;
 };
 
-const readEntity = (
+const readSelection = (
   ctx: Context,
-  key: string,
+  entityKey: string,
   select: SelectionSet,
   data: Data
 ): Data | null => {
-  // Get the entity from the store for given key.
-  // This will start out as Query and evolve to <__typeName>:<id>
-  let entity = ctx.store.find(key);
+  const isQuery = entityKey === 'Query';
+  if (!isQuery) {
+    ctx.result.dependencies.add(entityKey);
+  }
 
-  if (entity === null) {
-    // Cache Incomplete: A missing entity for a key means it wasn't cached
+  const { store, fragments, variables } = ctx;
+
+  // Get the __typename field for a given entity to check that it exists
+  const typename = store.getField(entityKey, '__typename');
+  if (typeof typename !== 'string') {
     ctx.result.completeness = 'EMPTY';
     return null;
   }
-  // When we have an entity we want to resolve all properties selected.
-  return readSelection(ctx, entity, key, select, data);
-};
 
-const readSelection = (
-  ctx: Context,
-  entity: Entity,
-  key: string,
-  select: SelectionSet,
-  data: Data
-): Data => {
-  if (key !== 'Query') {
-    // When we aren't dealing with a Query, example: Todo:1
-    // We want to ensure the key is added to the dependencies,
-    // in case a mutation alters this entity we need to refetch.
-    ctx.result.dependencies.add(key);
-  }
+  data.__typename = typename;
 
-  data.__typename = entity.__typename;
-  const { store, fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);
     const fieldAlias = getFieldAlias(node);
-    const fieldKey = keyOfField(fieldName, fieldArgs);
-    const fieldValue = entity[fieldKey];
-    const childFieldKey = joinKeys(key, fieldKey);
+    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
+    const fieldValue = store.getRecord(fieldKey);
 
-    if (key === 'Query') {
-      // When we are dealing with a Query we know the children
-      // are actual entities so we should add these to our
-      // dependencies.
-      ctx.result.dependencies.add(childFieldKey);
+    if (isQuery) {
+      ctx.result.dependencies.add(fieldKey);
     }
 
-    const resolvers = store.resolvers[entity.__typename];
+    const resolvers = store.resolvers[typename];
     if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
       // We have a resolver for this field.
       const resolverValue = resolvers[fieldName](
-        entity,
+        {} as any, // TODO: Implement stand-in entities
         fieldArgs || {},
         store,
         ctx
@@ -126,6 +109,7 @@ const readSelection = (
 
       if (node.selectionSet === undefined) {
         // If it doesn't have a selection set we have resolved a property.
+        // TODO: Completeness for scalar fields
         data[fieldAlias] = resolverValue !== undefined ? resolverValue : null;
       } else {
         // When it has a selection set we are resolving an entity with a
@@ -137,7 +121,7 @@ const readSelection = (
         data[fieldAlias] = readResolverSelection(
           ctx,
           childEntity,
-          childFieldKey,
+          fieldKey,
           fieldSelect,
           prevData
         );
@@ -155,7 +139,7 @@ const readSelection = (
     } else {
       // null values mean that a field might be linked to other entities
       const fieldSelect = getSelectionSet(node);
-      const link = store.readLink(childFieldKey);
+      const link = store.getLink(fieldKey);
 
       // Cache Incomplete: A missing link for a field means it's not cached
       if (link === undefined) {
@@ -199,7 +183,7 @@ const readResolverSelection = (
     const childKey = entityKey !== null ? entityKey : key;
     // We don't need to read the entity after exiting a resolver
     // we can just go on and read the selection further.
-    return readSelection(ctx, entity, childKey, select, data);
+    return readSelection(ctx, childKey, select, data);
   }
 };
 
@@ -219,6 +203,6 @@ const readField = (
     return null;
   } else {
     const data = prevData === undefined ? Object.create(null) : prevData;
-    return readEntity(ctx, link, select, data);
+    return readSelection(ctx, link, select, data);
   }
 };
