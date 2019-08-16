@@ -20,6 +20,7 @@ and hooks or even React at all.
 The Client is structured so that it can easily be reused to create different
 APIs or integrate `urql` with other libraries and frameworks than React.
 [Have a look at the API docs to see a full list of the client's methods.](api.md#client-class)
+Also take a look at [how to use `urql` outside of a React context.](url-outside-react.md)
 
 While it's possible to write new APIs outside of React or new components
 quite easily, this section will only focus on hooks, for illustrative
