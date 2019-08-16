@@ -5,7 +5,7 @@ import {
   EntityField,
   Link,
   ResolverConfig,
-  ResolverResult,
+  DataField,
   SystemFields,
   Variables,
   Data,
@@ -72,7 +72,7 @@ export class Store {
     return (this.links = set(this.links, key, link));
   }
 
-  resolveValueOrLink(fieldKey: string): ResolverResult {
+  resolveValueOrLink(fieldKey: string): DataField {
     const fieldValue = this.getRecord(fieldKey);
     // Undefined implies a link OR incomplete data.
     // A value will imply that we are just fetching a field like date.
@@ -83,11 +83,7 @@ export class Store {
     return link ? link : null;
   }
 
-  resolve(
-    entity: SystemFields,
-    field: string,
-    args?: Variables
-  ): ResolverResult {
+  resolve(entity: SystemFields, field: string, args?: Variables): DataField {
     if (typeof entity === 'string') {
       return this.resolveValueOrLink(joinKeys(entity, keyOfField(field, args)));
     } else {
