@@ -80,14 +80,7 @@ const createFetchSource = (operation: Operation) => {
 
     executeFetch(operation, fetchOptions).then(result => {
       if (result !== undefined) {
-        if (process.env.NODE_ENV !== 'production') {
-          next({
-            ...result,
-            operation: result.operation,
-          });
-        } else {
-          next(result);
-        }
+        next(result);
       }
 
       complete();
