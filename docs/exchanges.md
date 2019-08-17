@@ -1,16 +1,18 @@
 # Exchanges
 
-## Packaged
+## Packages
 
 These exchanges can be imported from the `urql` package.
 
-- cacheExchange - caches all incoming data
-- debugExchange - gives information about outgoing graphql requests in log format
-- dedupExchange - deduplicates outgoing queries
-- fetchExchange - used to manage the outgoing graphql requests
-- subscriptionExchange - used to support subscriptions
+- `cacheExchange`: the default document cache implementation
+- `debugExchange`: logs information about ongoing operations and results
+- `dedupExchange`: deduplicates ongoing operations
+- `fetchExchange`: sends operations to GraphQL HTTP endpoints and resolves results
+- `ssrExchange`: used to cache results during SSR and rehydrate them on the client-side
+- `subscriptionExchange`: used to support GraphQL subscriptions
 
-## Third-party
+## Addons
 
-- [Persisted Queries](https://github.com/Daniel15/urql-persisted-queries) -
-  Uses persisted query hashes to send graphql-queries if possible
+- [`@urql/devtools`](https://github.com/FormidableLabs/urql-devtools): A Chrome extension for monitoring and debugging
+- [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense): An experimental exchange for using `<React.Suspense>`
+- [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support

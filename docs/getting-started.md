@@ -75,7 +75,7 @@ const getTodos = `
 
 const TodoList = ({ limit = 10 }) => {
   <Query query={getTodos} variables={{ limit }}>
-    {({ fetching, data, error }) => {
+    {({ fetching, data, error, extensions }) => {
       if (fetching) {
         return 'Loading...';
       } else if (error) {
@@ -97,7 +97,8 @@ const TodoList = ({ limit = 10 }) => {
 When this component is mounted it will send the `query` and `variables`
 to your GraphQL API. Here we're using `fetching` to see whether the
 request is still being sent and is loading, `error` to see whether any
-errors have come back, and finally `data` to get the result.
+errors have come back, `data` to get the result, and finally `extensions`
+to get any arbitrary extensions data the server may have optionally returned.
 
 Whenever the query or variables props change, the `<Query>` component will
 send a new request and go back into the `fetching` state.
@@ -170,7 +171,7 @@ pass in a fully parsed AST in the form of `DocumentNode` instead.
 For this purpose you can use `graphql-tag`.
 
 This can be extremely helpful, since it enables syntax highlighting
-in some editors. It also can be used to preparse the GraphQL query
+in some editors. It also can be used to pre-parse the GraphQL query
 using `babel-plugin-graphql-tag` or the included Webpack loader.
 
 You only have to make a small adjustment. Install `graphql-tag` and
@@ -352,9 +353,9 @@ cached completely. When the same query and variables are requested again,
 result is also invalidated when a mutation with similar `__typename`s was
 sent.
 
-[You can find out more about the default caching behaviour in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
+[You can find out more about the default caching behavior in the Basics' `cacheExchange` section.](basics.md#cacheexchange)
 
-Using `urql`'s default behaviour this means we sometimes need a way to refetch
+Using `urql`'s default behavior this means we sometimes need a way to refetch
 data from the GraphQL API and skip the cache, if we need fresh data.
 
 The easiest way to always display up-to-date data is to set the `requestPolicy`

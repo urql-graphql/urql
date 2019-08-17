@@ -5,12 +5,12 @@ and its [Basics](basics.md). This section will introduce you to hacking
 with `urql`.
 
 `urql` comes with some very functional defaults, but its standard component APIs,
-hook APIs, or its core behaviour might not be enough for your complex app. Or
+hook APIs, or its core behavior might not be enough for your complex app. Or
 maybe you're just looking to play around and experiment with GraphQL clients?
 
 This document contains two main sections. The first is about reusing `urql`'s
 core and build new "outward facing APIs". The second is about writing new
-exchanges and hence changing `urql`'s core behaviour.
+exchanges and hence changing `urql`'s core behavior.
 
 ## Writing new APIs for the Client
 
@@ -20,6 +20,7 @@ and hooks or even React at all.
 The Client is structured so that it can easily be reused to create different
 APIs or integrate `urql` with other libraries and frameworks than React.
 [Have a look at the API docs to see a full list of the client's methods.](api.md#client-class)
+Also take a look at [how to use `urql` outside of a React context.](url-outside-react.md)
 
 While it's possible to write new APIs outside of React or new components
 quite easily, this section will only focus on hooks, for illustrative
@@ -138,7 +139,7 @@ We have now:
 - Added the second `useEffect` argument to tell it when to rerun
 - Added state to set `fetching: true` and to update the result
 
-In the actual implementation of the hook we also generalise this
+In the actual implementation of the hook we also generalize this
 execution and expose the `executeQuery` function in the returned tuple.
 This is left out here as the implementation can be found in the source code.
 
@@ -148,3 +149,10 @@ subscribe to the result of `executeQuery`, keep track
 of the unsubscription (`teardown`) and update
 some state. This all can be reapplied when you write your
 own APIs.
+
+## FAQ
+
+My component/hooks keeps triggering rerenders when passing in `context`
+
+- When not memoizing `context` this will always trigger refetches,
+  this can be done through the `useMemo` hook.

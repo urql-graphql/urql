@@ -56,9 +56,8 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       sharedOps$,
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
-        const { key, context } = operation;
-        const cachedResult = resultCache.get(key);
-        if (context.requestPolicy === 'cache-and-network') {
+        const cachedResult = resultCache.get(operation.key);
+        if (operation.context.requestPolicy === 'cache-and-network') {
           reexecuteOperation(client, operation);
         }
 
@@ -74,6 +73,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         return {
           data: undefined,
           error: undefined,
+          extensions: undefined,
           operation: addMetadata(operation, { cacheOutcome: 'miss' }),
         };
       })
@@ -134,7 +134,9 @@ export const afterMutation = (
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
-    operations.forEach(key => pendingOperations.add(key));
+    operations.forEach(key => {
+      pendingOperations.add(key);
+    });
     operations.clear();
   });
 
@@ -152,13 +154,13 @@ const afterQuery = (
   resultCache: ResultCache,
   operationCache: OperationCache
 ) => (response: OperationResult) => {
-  const { operation, data } = response;
+  const { operation, data, error } = response;
 
   if (data === undefined) {
     return;
   }
 
-  resultCache.set(operation.key, response);
+  resultCache.set(operation.key, { operation, data, error });
 
   collectTypesFromResponse(response.data).forEach(typeName => {
     const operations =

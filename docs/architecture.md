@@ -1,10 +1,10 @@
 # Architecture
 
-Much of `urql` is about being flexible and customisable.
+Much of `urql` is about being flexible and customizable.
 To this extent a large chunk of this document is dedicated to
 how `urql` works and how to adapt it to different use cases.
 
-If you wish to use `urql` without any customisations, this
+If you wish to use `urql` without any customizations, this
 document is entirely optional for you. But it's still worth
 the read. Promised.
 
@@ -101,7 +101,7 @@ the second argument to `executeQuery`. By default it contains:
 
 - `fetchOptions` for the `fetch` call's options
 - `url` for the `fetch` call's API endpoint
-- `requestPolicy` to determine the cache's behaviour
+- `requestPolicy` to determine the cache's behavior
 
 The `executeQuery` call will return a [Wonka](https://github.com/kitten/wonka)
 stream. This is just an observable (not following the Observable spec)
@@ -166,7 +166,7 @@ same operation / request twice at the same time.
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`
 cached results can be resolved instead and results from network requests are cached.
 
-**Third,** operations are sent to the API and the result is normalised.
+**Third,** operations are sent to the API and the result is normalized.
 
 ## Operation Results
 
@@ -174,8 +174,8 @@ Every operation that enters the exchange pipeline will receive a result, either
 immediately (read: synchronously) or eventually as the result of a network
 request comes in.
 
-The raw GraphQL result from an API is typically: `{ data?: T, errors?: GraphQLError[] }`.
-And `urql`'s operation results are very similar: `{ data?: T, error?: CombinedError }`.
+The raw GraphQL result from an API is: `{ data?: T, errors?: GraphQLError[], extensions?: Record<string, any> }`.
+And `urql`'s operation results are very similar: `{ data?: T, error?: CombinedError, extensions?: Record<string, any>}`.
 
 The [`CombinedError` is a very simple wrapper](https://github.com/FormidableLabs/urql/blob/master/src/utils/error.ts)
 that has either a `networkError` property with any unexpected errors that might occur,

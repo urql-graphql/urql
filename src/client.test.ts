@@ -3,11 +3,6 @@ import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 
-jest.mock('./utils/keyForQuery', () => ({
-  getKeyForQuery: () => 123,
-  getKeyForRequest: () => 123,
-}));
-
 import { map, pipe, subscribe, tap } from 'wonka';
 import { createClient } from './client';
 
@@ -50,7 +45,11 @@ beforeEach(() => {
   receivedOps = [];
   exchangeMock.mockClear();
   receiveMock.mockClear();
-  client = createClient({ url, exchanges: [exchangeMock] as any[] });
+  client = createClient({
+    url,
+    exchanges: [exchangeMock] as any[],
+    requestPolicy: 'cache-and-network',
+  });
 });
 
 describe('exchange args', () => {
@@ -83,6 +82,30 @@ describe('executeQuery', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('variables', query.variables);
+  });
+
+  it('passes requestPolicy to exchange', () => {
+    pipe(
+      client.executeQuery(query),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0].context).toHaveProperty(
+      'requestPolicy',
+      'cache-and-network'
+    );
+  });
+
+  it('allows overriding the requestPolicy', () => {
+    pipe(
+      client.executeQuery(query, { requestPolicy: 'cache-first' }),
+      subscribe(x => x)
+    );
+
+    expect(receivedOps[0].context).toHaveProperty(
+      'requestPolicy',
+      'cache-first'
+    );
   });
 
   it('passes operationName type to exchange', () => {

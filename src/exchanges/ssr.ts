@@ -15,6 +15,7 @@ export interface SSRData {
 }
 
 export interface SSRExchangeParams {
+  isClient?: boolean;
   initialState?: SSRData;
 }
 
@@ -50,7 +51,12 @@ const deserializeResult = (
   result: SerializedResult
 ): OperationResult => {
   const { error, data } = result;
-  const deserialized: OperationResult = { operation, data, error: undefined };
+  const deserialized: OperationResult = {
+    operation,
+    data,
+    extensions: undefined,
+    error: undefined,
+  };
   if (error !== undefined) {
     deserialized.error = new CombinedError({
       networkError: new Error(error.networkError),
@@ -72,6 +78,13 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   // The SSR Exchange is a temporary cache that can populate results into data for suspense
   // On the client it can be used to retrieve these temporary results from a rehydrated cache
   const ssr: SSRExchange = ({ client, forward }) => ops$ => {
+    // params.isClient tells us whether we're on the client-side
+    // By default we assume that we're on the client if suspense-mode is disabled
+    const isClient =
+      params && typeof params.isClient === 'boolean'
+        ? !!params.isClient
+        : !client.suspense;
+
     const sharedOps$ = share(ops$);
 
     let forwardedOps$ = pipe(
@@ -91,8 +104,8 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       })
     );
 
-    if (client.suspense) {
-      // Inside suspense-mode we cache results in the cache as they're resolved
+    if (!isClient) {
+      // On the server we cache results in the cache as they're resolved
       forwardedOps$ = pipe(
         forwardedOps$,
         tap((result: OperationResult) => {
@@ -104,7 +117,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
         })
       );
     } else {
-      // Outside of suspense-mode we delete results from the cache as they're resolved
+      // On the client we delete results from the cache as they're resolved
       cachedOps$ = pipe(
         cachedOps$,
         tap((result: OperationResult) => {

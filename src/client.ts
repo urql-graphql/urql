@@ -23,6 +23,7 @@ import {
   OperationContext,
   OperationResult,
   OperationType,
+  RequestPolicy,
 } from './types';
 
 import { toSuspenseSource } from './utils';
@@ -33,10 +34,14 @@ export interface ClientOptions {
   url: string;
   /** Any additional options to pass to fetch. */
   fetchOptions?: RequestInit | (() => RequestInit);
+  /** An alternative fetch implementation. */
+  fetch?: typeof fetch;
   /** An ordered array of Exchanges. */
   exchanges?: Exchange[];
   /** Activates support for Suspense. */
   suspense?: boolean;
+  /** The default request policy for requests. */
+  requestPolicy?: RequestPolicy;
 }
 
 interface ActiveOperations {
@@ -49,9 +54,11 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 export class Client {
   // These are variables derived from ClientOptions
   url: string;
+  fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
   suspense: boolean;
+  requestPolicy: RequestPolicy;
 
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
@@ -62,13 +69,32 @@ export class Client {
   constructor(opts: ClientOptions) {
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions;
+    this.fetch = opts.fetch;
     this.suspense = !!opts.suspense;
+    this.requestPolicy = opts.requestPolicy || 'cache-first';
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
     const [operations$, nextOperation] = makeSubject<Operation>();
     this.operations$ = operations$;
-    this.dispatchOperation = nextOperation;
+
+    // Internally operations aren't always dispatched immediately
+    // Since exchanges can dispatch and reexecute operations themselves,
+    // if we're inside an exchange we instead queue the operation and flush
+    // them in order after
+    const queuedOperations: Operation[] = [];
+    let isDispatching = false;
+
+    this.dispatchOperation = (operation: Operation) => {
+      queuedOperations.push(operation);
+      if (!isDispatching) {
+        isDispatching = true;
+        let queued;
+        while ((queued = queuedOperations.shift()) !== undefined)
+          nextOperation(queued);
+        isDispatching = false;
+      }
+    };
 
     const exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
@@ -90,11 +116,12 @@ export class Client {
   private createOperationContext = (
     opts?: Partial<OperationContext>
   ): OperationContext => {
-    const { requestPolicy = 'cache-first' } = opts || {};
+    const { requestPolicy = this.requestPolicy } = opts || {};
 
     return {
       url: this.url,
       fetchOptions: this.fetchOptions,
+      fetch: this.fetch,
       ...opts,
       requestPolicy,
     };

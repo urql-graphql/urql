@@ -1,4 +1,4 @@
-import { renderHook, act } from 'react-hooks-testing-library';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 
 import { createClient } from '../client';
@@ -64,6 +64,27 @@ describe('useQuery', () => {
       error: undefined,
       data: undefined,
     });
+  });
+
+  it('should support setting context in useQuery params', () => {
+    const context = { url: 'test' };
+    renderHook(
+      ({ query, variables }) => useQuery({ query, variables, context }),
+      { initialProps: { query: mockQuery, variables: mockVariables } }
+    );
+
+    expect(client.executeQuery).toBeCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: mockVariables,
+      },
+      {
+        meta: { source: 'TestHook' },
+        requestPolicy: undefined,
+        url: 'test',
+      }
+    );
   });
 
   it('should execute the subscription', async () => {

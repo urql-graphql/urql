@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import { DocumentNode } from 'graphql';
-import { OperationResult } from '../types';
+import { OperationResult, OperationContext } from '../types';
 import { useMutation, UseMutationState } from '../hooks';
 
 export interface MutationProps<T, V> {
@@ -9,7 +9,10 @@ export interface MutationProps<T, V> {
 }
 
 export interface MutationState<T, V> extends UseMutationState<T> {
-  executeMutation: (variables?: V) => Promise<OperationResult<T>>;
+  executeMutation: (
+    variables?: V,
+    context?: Partial<OperationContext>
+  ) => Promise<OperationResult<T>>;
 }
 
 export function Mutation<T = any, V = any>({

@@ -2,7 +2,7 @@
 import { print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
-import { addMetadata, CombinedError } from '../utils';
+import { addMetadata, makeResult, makeErrorResult } from '../utils';
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {
@@ -41,7 +41,10 @@ export const fetchExchange: Exchange = ({ forward }) => {
 };
 
 const createFetchSource = (operation: Operation) => {
-  if (operation.operationName === 'subscription') {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    operation.operationName === 'subscription'
+  ) {
     throw new Error(
       'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
     );
@@ -76,14 +79,19 @@ const createFetchSource = (operation: Operation) => {
     };
 
     const startTime = Date.now();
+
     executeFetch(operation, fetchOptions).then(result => {
       if (result !== undefined) {
-        next({
-          ...result,
-          operation: addMetadata(result.operation, {
-            networkLatency: Date.now() - startTime,
-          }),
-        });
+        if (process.env.NODE_ENV !== 'production') {
+          next({
+            ...result,
+            operation: addMetadata(result.operation, {
+              networkLatency: Date.now() - startTime,
+            }),
+          });
+        } else {
+          next(result);
+        }
       }
 
       complete();
@@ -98,45 +106,26 @@ const createFetchSource = (operation: Operation) => {
 };
 
 const executeFetch = (operation: Operation, opts: RequestInit) => {
+  const { url, fetch: fetcher } = operation.context;
+
   let response: Response | undefined;
-  const { url } = operation.context;
 
-  return fetch(url, opts)
+  return (fetcher || fetch)(url, opts)
     .then(res => {
+      const { status } = res;
+      const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
       response = res;
-      checkStatus(opts.redirect, response);
-      return response.json();
-    })
-    .then(result => ({
-      operation,
-      data: result.data,
-      error: Array.isArray(result.errors)
-        ? new CombinedError({
-            graphQLErrors: result.errors,
-            response,
-          })
-        : undefined,
-    }))
-    .catch(err => {
-      if (err.name === 'AbortError') {
-        return undefined;
+
+      if (status < 200 || status >= statusRangeEnd) {
+        throw new Error(res.statusText);
+      } else {
+        return res.json();
       }
-
-      return {
-        operation,
-        data: undefined,
-        error: new CombinedError({
-          networkError: err,
-          response,
-        }),
-      };
+    })
+    .then(result => makeResult(operation, result, response))
+    .catch(err => {
+      if (err.name !== 'AbortError') {
+        return makeErrorResult(operation, err, response);
+      }
     });
-};
-
-const checkStatus = (redirectMode: string = 'follow', response: Response) => {
-  const statusRangeEnd = redirectMode === 'manual' ? 400 : 300;
-
-  if (response.status < 200 || response.status >= statusRangeEnd) {
-    throw new Error(response.statusText);
-  }
 };

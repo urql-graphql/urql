@@ -8,6 +8,20 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.3.0](https://github.com/FormidableLabs/urql/compare/v1.2.0...v1.3.0)
+
+This release comes with some important fixes and enhancements, which all address
+certain edge-cases when using `urql`.
+
+It fixes the `cache-and-network` request policy, which wouldn't always work correctly and issue another network request after resolving a response from the default cache. We also had a major bug in React Native environments where responses wouldn't ever be reflected in the `useQuery` hook's state. Lastly, you can now use `extensions` from your GraphQL servers and modify the `OperationContext` from the hooks options.
+
+- ✨ Add support for `extensions` key in GraphQL responses, by [@adamscybot](https://github.com/adamscybot) (see [#355](https://github.com/FormidableLabs/urql/pull/355))
+- ⚠ Fix `cache-and-network` request policy by adding operation flushing to the client (see [#356](https://github.com/FormidableLabs/urql/pull/356))
+- Add `fetch` option to the Client so it doesn't have to be polyfilled globally (see [#357](https://github.com/FormidableLabs/urql/pull/357) and [#359](https://github.com/FormidableLabs/urql/pull/359))
+- ⚠ Fix `useImmediateState` for React Native environments (see [#358](https://github.com/FormidableLabs/urql/pull/358))
+- ✨ Add `context` option to all hooks to allow `OperationContext` to be changed dynamically (see [#351](https://github.com/FormidableLabs/urql/pull/351))
+- Add `isClient` option to `ssrExchange` in case `suspense` is activated on the client-side (see [#369](https://github.com/FormidableLabs/urql/pull/369))
+
 ## [v1.2.0](https://github.com/FormidableLabs/urql/compare/v1.1.3...v1.2.0)
 
 A release focused on improving developer experience (in preparation for the

@@ -12,6 +12,7 @@ interface UseQueryArgs {
   variables?: any;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
+  context?: Partial<OperationContext>;
 }
 ```
 
@@ -25,6 +26,7 @@ interface UseQueryState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
@@ -49,10 +51,12 @@ interface UseMutationState<T> {
   fetching: boolean;
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
-The `executeMutation` function accepts the `variables` of type `object`.
+The `executeMutation` function accepts the `variables` of type `object` and
+an optional `context` variable of type `Partial<OperationContext>`.
 
 [More information on how to use this hook can be found in the Getting Started section.](getting-started.md#writing-mutations)
 
@@ -67,6 +71,7 @@ The options argument shape is:
 interface UseSubscriptionArgs {
   query: string;
   variables?: any;
+  context?: Partial<OperationContext>;
 }
 ```
 
@@ -85,6 +90,7 @@ The hook returns a tuple of only its state:
 interface UseSubscriptionState<T> {
   data?: T;
   error?: CombinedError;
+  extensions?: Record<string, any>;
 }
 ```
 
@@ -100,6 +106,7 @@ interface UseSubscriptionState<T> {
 | ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query         | `string`                   | The GraphQL request's query                                                                           |
 | variables     | `object`                   | The GraphQL request's variables                                                                       |
+| context       | `?object`                  | The GraphQL request's context                                                                         |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
 | pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
 | children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
@@ -111,6 +118,7 @@ interface UseSubscriptionState<T> {
 | fetching     | `boolean`                           | Whether the `Query` is currently waiting for a GraphQL result                                           |
 | data         | `?any`                              | The GraphQL request's result                                                                            |
 | error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
+| extensions   | `?Record<string, any>`              | Optional extensions that the GraphQL server may have returned.                                          |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
 
 ### `Mutation` (component)
@@ -126,12 +134,13 @@ interface UseSubscriptionState<T> {
 
 #### Render Props
 
-| Prop            | Type                          | Description                                                      |
-| --------------- | ----------------------------- | ---------------------------------------------------------------- |
-| fetching        | `boolean`                     | Whether the `Mutation` is currently waiting for a GraphQL result |
-| data            | `?any`                        | The GraphQL request's result                                     |
-| error           | `?CombinedError`              | The `CombinedError` containing any errors that might've occured  |
-| executeMutation | `(variables: object) => void` | A function that accepts variables and starts the mutation        |
+| Prop            | Type                                                               | Description                                                      |
+| --------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| fetching        | `boolean`                                                          | Whether the `Mutation` is currently waiting for a GraphQL result |
+| data            | `?any`                                                             | The GraphQL request's result                                     |
+| error           | `?CombinedError`                                                   | The `CombinedError` containing any errors that might've occured  |
+| extensions      | `?Record<string, any>`                                             | Optional extensions that the GraphQL server may have returned.   |
+| executeMutation | `(variables: object, context?: Partial<OperationContext>) => void` | A function that accepts variables and starts the mutation        |
 
 ### `Subscription` (component)
 
@@ -143,16 +152,18 @@ interface UseSubscriptionState<T> {
 | --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | query     | `string`                                            | The GraphQL subscription's query                                                                      |
 | variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
+| context   | `?Partial<OperationContext>`                        | The GraphQL subscriptions' context                                                                    |
 | handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
 | children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
 
-| Prop     | Type             | Description                                                     |
-| -------- | ---------------- | --------------------------------------------------------------- |
-| fetching | `boolean`        | Whether the `Subscription` is currently ongoing                 |
-| data     | `?any`           | The GraphQL subscription's data                                 |
-| error    | `?CombinedError` | The `CombinedError` containing any errors that might've occured |
+| Prop       | Type                   | Description                                                     |
+| ---------- | ---------------------- | --------------------------------------------------------------- |
+| fetching   | `boolean`              | Whether the `Subscription` is currently ongoing                 |
+| data       | `?any`                 | The GraphQL subscription's data                                 |
+| error      | `?CombinedError`       | The `CombinedError` containing any errors that might've occured |
+| extensions | `?Record<string, any>` | Optional extensions that the GraphQL server may have returned.  |
 
 ### Context components
 
@@ -171,6 +182,7 @@ It accepts a bunch of inputs when it's created
 | ------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | url          | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                  |
 | fetchOptions | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                          |
+| fetch        | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`     |
 | suspense     | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data |
 | exchanges    | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                    |
 
@@ -332,6 +344,7 @@ type OperationResult = {
   operation: Operation, // The operation that this result is a response for
   data?: any,
   error?: CombinedError,
+  extensions?: Record<string, any>,
 };
 ```
 
@@ -414,9 +427,15 @@ streams `GraphQLResult`s with `data` and `errors`.
 The `ssrExchange` as [described in the Basics section](basics.md#server-side-rendering).
 It's of type `Options => Exchange`.
 
-It accepts a single input, `{ initialState }`, which is completely
+It accepts two inputs, `initialState` which is completely
 optional and populates the server-side rendered data with
-a rehydrated cache.
+a rehydrated cache, and `isClient` which can be set to
+`true` or `false` to tell the `ssrExchange` whether to
+write to (server-side) or read from (client-side) the cache.
+
+By default `isClient` defaults to `true` when the `Client.suspense`
+mode is disabled and to `false` when the `Client.suspense` mode
+is enabled.
 
 This can be used to extract data that has been queried on
 the server-side, which is also described in the Basics section,

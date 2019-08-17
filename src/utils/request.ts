@@ -1,16 +1,39 @@
-import { DocumentNode } from 'graphql';
-import gql from 'graphql-tag';
-import { getKeyForRequest } from './keyForQuery';
+import { DocumentNode, parse, print } from 'graphql';
+import { hash, phash } from './hash';
+import stringify from 'fast-json-stable-stringify';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
+
+interface Documents {
+  [key: number]: DocumentNode;
+}
+
+const hashQuery = (q: string): number => hash(q.replace(/[\s,]+/g, ' ').trim());
+
+const docs: Documents = Object.create(null);
+const keyProp = '__key';
 
 export const createRequest = (
   q: string | DocumentNode,
   vars?: object
 ): GraphQLRequest => {
-  const query = typeof q === 'string' ? gql([q]) : q;
+  let key: number;
+  let query: DocumentNode;
+  if (typeof q === 'string') {
+    key = hashQuery(q);
+    query = docs[key] !== undefined ? docs[key] : parse(q);
+  } else if ((q as any)[keyProp] !== undefined) {
+    key = (q as any)[keyProp];
+    query = q;
+  } else {
+    key = hashQuery(print(q));
+    query = docs[key] !== undefined ? docs[key] : q;
+  }
+
+  docs[key] = query;
+  (query as any)[keyProp] = key;
 
   return {
-    key: getKeyForRequest(query, vars),
+    key: vars ? phash(key, stringify(vars)) >>> 0 : key,
     query,
     variables: vars || {},
   };

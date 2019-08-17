@@ -30,7 +30,7 @@
 ## ✨ Features
 
 - 📦 **One package** to get a working GraphQL client in React
-- ⚙️ Fully **customisable** behaviour via "exchanges"
+- ⚙️ Fully **customisable** behaviour [via "exchanges"](#-add-on-exchanges)
 - 🗂 Logical but simple default behaviour and document caching
 - ⚛️ Minimal React components and hooks
 
@@ -38,7 +38,7 @@
 
 While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
-## [Documentation](https://formidable.com/open-source/urql/docs)
+## 📃 [Documentation](https://formidable.com/open-source/urql/docs)
 
 [The documentation contains everything you need to know about `urql`](https://formidable.com/open-source/urql/docs)
 
@@ -47,10 +47,11 @@ While GraphQL is an elegant protocol and schema language, client libraries today
 - [Basics](https://formidable.com/open-source/urql/docs/basics/)
 - [Extending & Experimenting](https://formidable.com/open-source/urql/docs/extending-&-experimenting/)
 - [API](https://formidable.com/open-source/urql/docs/api/)
+- [Guides](./docs/guides.md)
 
 _You can find the raw markdown files inside this repository's `docs` folder._
 
-## Quick Start Guide
+## 🏎️ Quick Start Guide
 
 First install `urql` and `graphql`:
 
@@ -107,12 +108,24 @@ import { Query } from 'urql';
 
 [Learn the full API in the "Getting Started" docs!](https://formidable.com/open-source/urql/docs/getting-started/)
 
-## Examples
+## 📦 Add on Exchanges
 
-There are currently two examples included in this repository:
+`urql` can be extended by adding "Exchanges" to it, [which you can read
+more about in our docs](https://formidable.com/open-source/urql/docs/architecture/#exchanges)! Here's just a couple of them.
 
-- [getting-started: A basic app with queries and mutations](examples/1-getting-started/)
-- [using-subscriptions: A basic app that demos subscriptions](examples/2-using-subscriptions/)
+- [`@urql/devtools`](https://github.com/FormidableLabs/urql-devtools): A Chrome extension for monitoring and debugging
+- [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense): An experimental exchange for using `<React.Suspense>`
+- [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support
+
+[You can find the full list of exchanges in the docs.](./docs/exchanges.md)
+
+## 💡 Examples
+
+There are currently three examples included in this repository:
+
+- [Getting Started: A basic app with queries and mutations](examples/1-getting-started/)
+- [Using Subscriptions: An app that demos subscriptions](examples/2-using-subscriptions/)
+- [SSR with Next: A Next.js app showing server-side-rendering support](examples/3-ssr-with-nextjs/)
 
 ## Maintenance Status
 

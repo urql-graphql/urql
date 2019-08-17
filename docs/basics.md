@@ -1,7 +1,7 @@
 # Basics
 
 As mentioned before, `urql`'s core logic is split into exchanges.
-To that end, `urql`'s behaviour is completely defined by the exchanges
+To that end, `urql`'s behavior is completely defined by the exchanges
 you pass to it or that are the default ones.
 
 This document goes through the exchanges that `urql` adds by default.
@@ -65,12 +65,12 @@ operations and sends `POST` requests using `fetch`.
 
 ## `cacheExchange`
 
-The default caching behaviour that `urql` uses is defined by the `cacheExchange`
-unlike Apollo's `Cache` or `InMemoryCache`, caching behaviour is handled as
-part of the request pipeline, which makes customisation a lot easier as
+The default caching behavior that `urql` uses is defined by the `cacheExchange`
+unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as
+part of the request pipeline, which makes customization a lot easier as
 there's no extra API to learn.
 
-By default however, `urql`'s caching behaviour is not that of a _"normalising
+By default however, `urql`'s caching behavior is not that of a _"normalizing
 cache"_ but more of a _"document cache"_.
 
 ### The document cache
@@ -123,7 +123,7 @@ The operation context can also contain a `requestPolicy` property
 that alters when and how the cache responds.
 By default this will be set to `'cache-first'`.
 
-When `'cache-first'`, the default behaviour, is used, the cache
+When `'cache-first'`, the default behavior, is used, the cache
 will return all cached results when they're available. When no
 cached result is available it will let the operation through, so
 that the `fetchExchange` can send a request to the API.
@@ -150,9 +150,9 @@ from the API.
 > that data skips the cache, if it's clear to you that the result will
 > need to be up-to-date.
 
-### Customisation
+### Customization
 
-The idea of `urql` is that you can customise the caching behaviour amongst
+The idea of `urql` is that you can customise the caching behavior amongst
 other things yourself, if needed.
 
 [Read more about customising `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
@@ -229,6 +229,15 @@ const client = new Client({
 The exchange returned by `ssrExchange()` should be added after the `cacheExchange`
 (or any other custom cache exchange you've defined), and before any
 asynchronous exchanges like the `fetchExchange`.
+
+If you're also using suspense mode on the client, you can
+additionally set the `isClient` option, which tells the `ssrExchange` manually
+whether it's on the server or client, so that you can enable the `suspense`
+mode on the client-side as well.
+
+```js
+const ssrCache = ssrExchange({ isClient: !!process.browser });
+```
 
 ### Prefetching on the server
 
@@ -364,7 +373,7 @@ the `<Subscription>` component and/or the `useSubscription()` hook.
 
 The `<Subscription>` component is extremely similar to the `<Query>`
 component. You can pass it a query and variables, and it will serve
-you render props with `data`, `error`, and `fetching`.
+you render props with `data`, `error`, `extensions`, and `fetching`.
 
 ```js
 import { Subscription } from 'urql';

@@ -1,7 +1,7 @@
 # Documentation
 
-`urql` is a highly customisable and flexible GraphQL client, that
-happens to come with some default core behaviour and some React
+`urql` is a highly customizable and flexible GraphQL client, that
+happens to come with some default core behavior and some React
 component and hooks APIs.
 
 You can take `urql` from writing your first GraphQL app, to
@@ -24,7 +24,7 @@ exchange pipeline to your GraphQL API.
 
 ### [Basics](basics.md)
 
-Everything about the basic & default `urql` behaviour
+Everything about the basic & default `urql` behavior
 that comes with explanations of the `fetchExchange`,
 the `cacheExchange`, and how to use _Subscriptions_.
 
@@ -40,6 +40,10 @@ Here's everything you need to know to extend,
 customise and experiment with `urql`. This section
 shows you how to use the `Client` to write new
 APIs (Be it for React or not) and how to write
-new "Exchanges" to customise `urql`'s core behaviour!
+new "Exchanges" to customise `urql`'s core behavior!
+
+### [Guides](guides.md)
+
+Here are some guides on how to make common exchanges.
 
 ### [API](api.md)
