@@ -73,7 +73,7 @@ const getTodos = `
   }
 `;
 
-const TodoList = ({ limit = 10 }) => {
+const TodoList = ({ limit = 10 }) => (
   <Query query={getTodos} variables={{ limit }}>
     {({ fetching, data, error, extensions }) => {
       if (fetching) {
@@ -91,7 +91,7 @@ const TodoList = ({ limit = 10 }) => {
       );
     }}
   </Query>;
-};
+);
 ```
 
 When this component is mounted it will send the `query` and `variables`

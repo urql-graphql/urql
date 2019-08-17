@@ -146,7 +146,7 @@ result may be displayed that is then updated with fresh data
 from the API.
 
 > _Note:_ `'network-only'` and `'cache-and-network'` are extremely valuable
-> given the limitations of the default cache. The can be used to ensure
+> given the limitations of the default cache. They can be used to ensure
 > that data skips the cache, if it's clear to you that the result will
 > need to be up-to-date.
 
