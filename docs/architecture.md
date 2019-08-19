@@ -1,3 +1,10 @@
+---
+title: architecture
+order: 1
+---
+
+<a name="architecture"></a>
+
 # Architecture
 
 Much of `urql` is about being flexible and customizable.

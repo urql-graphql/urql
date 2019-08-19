@@ -1,3 +1,10 @@
+---
+title: guides
+order: 4
+---
+
+<a name="guides"></a>
+
 # Guides
 
 In `urql`, all queries and requests start as "operations". A stream
@@ -9,7 +16,7 @@ They're not unlike middleware in an HTTP server implementation like
 Express. They have the ability to forward operations to the next
 exchange and to return the stream of results from the next exchange.
 
-[You can read more about this structure in our "Architecture" section](./architecture.md)
+[You can read more about this structure in our "Architecture" section](https://formidable.com/open-source/urql/docs/architecture)
 
 These guides are not intended as best practices or specific instructions for
 writing exchanges. Rather they teach you how to get started on creating
@@ -81,7 +88,7 @@ const noopExchange = ({ client, forward }) => {
 };
 ```
 
-In this form it doesn't do anything yet.
+In this form the exchange doesn't do anything yet.
 When you create a client and pass it an array of exchanges, all exchanges
 will be composed together into a single one. They will each be called with
 an object that contains the `client` itself, and a `forward` function which

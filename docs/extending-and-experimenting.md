@@ -1,7 +1,14 @@
+---
+title: extending-&-experimenting
+order: 4
+---
+
+<a name="extending-&-experimenting"></a>
+
 # Extending & Experimenting
 
-Hopefully you have read the sections on `urql`'s [Architecture](architecture.md)
-and its [Basics](basics.md). This section will introduce you to hacking
+Hopefully you have read the sections on `urql`'s [Architecture](https://formidable.com/open-source/urql/docs/architecture)
+and its [Basics](https://formidable.com/open-source/urql/docs/basics). This section will introduce you to hacking
 with `urql`.
 
 `urql` comes with some very functional defaults, but its standard component APIs,
@@ -19,8 +26,7 @@ and hooks or even React at all.
 
 The Client is structured so that it can easily be reused to create different
 APIs or integrate `urql` with other libraries and frameworks than React.
-[Have a look at the API docs to see a full list of the client's methods.](api.md#client-class)
-Also take a look at [how to use `urql` outside of a React context.](url-outside-react.md)
+[Have a look at the API docs to see a full list of the client's methods.](https://formidable.com/open-source/urql/docs/api#client-class)
 
 While it's possible to write new APIs outside of React or new components
 quite easily, this section will only focus on hooks, for illustrative
