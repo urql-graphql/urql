@@ -195,7 +195,7 @@ It accepts a bunch of inputs when it's created
 
 `urql` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-#### `.executeQuery()`, `.executeSubscription()`, and `.executeMutation()`
+#### .executeQuery(), .executeSubscription(), and .executeMutation()
 
 These methods are used by `<Query>` & `useQuery()`, `<Subscription>` & `useSubscription()`,
 and `<Mutation>` & `useMutation()` respectively.
