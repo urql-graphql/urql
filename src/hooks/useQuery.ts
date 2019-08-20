@@ -13,9 +13,9 @@ export interface UseQueryArgs<V> {
   query: string | DocumentNode;
   variables?: V;
   requestPolicy?: RequestPolicy;
+  pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
-  pollInterval?: number;
 }
 
 export interface UseQueryState<T> {
@@ -59,6 +59,7 @@ export const useQuery = <T = any, V = object>(
       [unsubscribe.current] = pipe(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
           ...args.context,
           ...opts,
           ...devtoolsContext,
@@ -71,6 +72,7 @@ export const useQuery = <T = any, V = object>(
     [
       args.context,
       args.requestPolicy,
+      args.pollInterval,
       client,
       devtoolsContext,
       request,
@@ -86,34 +88,8 @@ export const useQuery = <T = any, V = object>(
     }
 
     executeQuery();
-
-    let interval: NodeJS.Timeout | null = null;
-    if (args.pollInterval) {
-      interval = setInterval(() => {
-        const operation = client.createRequestOperation('query', request, {
-          requestPolicy: args.requestPolicy,
-          ...args.context,
-          ...devtoolsContext,
-        });
-        client.reexecuteOperation(operation);
-      }, args.pollInterval);
-    }
-
-    return () => {
-      unsubscribe.current(); // eslint-disable-line
-      if (interval) clearInterval(interval);
-    };
-  }, [
-    executeQuery,
-    args.pause,
-    setState,
-    args.pollInterval,
-    args.requestPolicy,
-    args.context,
-    client,
-    request,
-    devtoolsContext,
-  ]);
+    return () => unsubscribe.current(); // eslint-disable-line
+  }, [executeQuery, args.pause, setState]);
 
   return [state, executeQuery];
 };
