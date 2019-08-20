@@ -1,6 +1,8 @@
 comment: off
 coverage:
   status:
-    project: yes
+    project:
+      default:
+        target: 90%
     patch: no
     changes: no
