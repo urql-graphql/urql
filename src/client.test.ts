@@ -136,6 +136,9 @@ describe('executeQuery', () => {
     expect(receivedOps.length).toEqual(1);
     jest.runOnlyPendingTimers();
     expect(receivedOps.length).toEqual(3);
+    expect(receivedOps[0].operationName).toEqual('query');
+    expect(receivedOps[1].operationName).toEqual('teardown');
+    expect(receivedOps[2].operationName).toEqual('query');
   });
 });
 
