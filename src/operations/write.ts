@@ -65,7 +65,8 @@ export const write = (
   if (operation.operation === 'query') {
     writeSelection(ctx, 'Query', select, data);
   } else {
-    writeRoot(ctx, select, data);
+    const isMutation = operation.operation === 'mutation';
+    writeRoot(ctx, isMutation, select, data);
   }
 
   clearStoreState();
@@ -206,25 +207,18 @@ const writeField = (
 };
 
 // This is like writeSelection but assumes no parent entity exists
-const writeRoot = (ctx: Context, select: SelectionSet, data: Data) => {
+const writeRoot = (
+  ctx: Context,
+  isMutation: boolean,
+  select: SelectionSet,
+  data: Data
+) => {
   const { fragments, variables } = ctx;
   forEachFieldNode(select, fragments, variables, node => {
     const fieldName = getName(node);
     const fieldAlias = getFieldAlias(node);
     const fieldArgs = getFieldArguments(node, variables);
     const fieldValue = data[fieldAlias];
-
-    if (ctx.store.updates[fieldName]) {
-      // TODO: Should this really always replace the default logic?
-      // If it does, there's no way for the user to write everything else to the store
-      // It should probably run after the default writeRootField
-      return ctx.store.updates[fieldName](
-        data,
-        fieldArgs || {},
-        ctx.store,
-        ctx
-      );
-    }
 
     if (
       node.selectionSet !== undefined &&
@@ -233,6 +227,15 @@ const writeRoot = (ctx: Context, select: SelectionSet, data: Data) => {
     ) {
       const { selections: fieldSelect } = node.selectionSet;
       writeRootField(ctx, fieldValue, fieldSelect);
+    }
+
+    if (isMutation) {
+      // We run side-effect updates after the default, normalized updates
+      // so that the data is already available in-store if necessary
+      const updater = ctx.store.updates[fieldName];
+      if (updater !== undefined) {
+        updater(data, fieldArgs || {}, ctx.store, ctx);
+      }
     }
   });
 };

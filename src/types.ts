@@ -74,7 +74,7 @@ export type UpdateResolver<T = any> = (
 ) => void;
 
 export interface UpdatesConfig {
-  [fieldName: string]: UpdateResolver;
+  [mutationFieldName: string]: UpdateResolver;
 }
 
 export type OptimisticMutationResolver = (
