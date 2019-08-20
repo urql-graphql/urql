@@ -30,7 +30,7 @@ import {
 } from '../store';
 
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
-import { DocumentNode, FragmentDefinitionNode, Kind } from 'graphql';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 export interface WriteResult {
   dependencies: Set<string>;
@@ -118,40 +118,32 @@ export const writeFragment = (
   query: DocumentNode,
   data: Data
 ) => {
-  const fragment = query.definitions[0] as FragmentDefinitionNode;
-
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    (query.definitions.length > 1 || fragment.kind !== Kind.FRAGMENT_DEFINITION)
-  ) {
-    throw new Error(
-      'You can only pass one fragment when writing to a fragment.'
-    );
+  const fragments = getFragments(query);
+  const names = Object.keys(fragments);
+  const fragment = fragments[names[0]] as FragmentDefinitionNode;
+  if (process.env.NODE_ENV !== 'production' && fragment === undefined) {
+    throw new Error('At least one fragment must be passed to writeFragment.');
   }
 
   const select = getSelectionSet(fragment);
   const fieldName = getFragmentTypeName(fragment);
   const writeData = { ...data, __typename: fieldName } as Data;
-  const entityKey = keyOfEntity(writeData) as string;
 
+  const entityKey = keyOfEntity(writeData) as string;
   if (process.env.NODE_ENV !== 'production' && !entityKey) {
     throw new Error(
       `You have to pass an "id" or "_id" with your writeFragment data.`
     );
   }
 
-  writeSelection(
-    // TODO: Create real context here
-    {
-      store,
-      variables: {},
-      fragments: {},
-      result: { dependencies: getCurrentDependencies() },
-    },
-    entityKey,
-    select,
-    writeData
-  );
+  const ctx: Context = {
+    variables: {}, // TODO: Should we support variables?
+    fragments,
+    result: { dependencies: getCurrentDependencies() },
+    store,
+  };
+
+  writeSelection(ctx, entityKey, select, writeData);
 };
 
 const writeSelection = (
