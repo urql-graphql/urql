@@ -8,6 +8,10 @@ import {
   share,
   Source,
   take,
+  merge,
+  interval,
+  fromValue,
+  switchMap,
 } from 'wonka';
 
 import {
@@ -197,7 +201,17 @@ export class Client {
     opts?: Partial<OperationContext>
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('query', query, opts);
-    return this.executeRequestOperation(operation);
+    const response$ = this.executeRequestOperation(operation);
+    const { pollInterval } = operation.context;
+
+    if (pollInterval) {
+      return pipe(
+        merge([fromValue(0), interval(pollInterval)]),
+        switchMap(() => response$)
+      );
+    } else {
+      return response$;
+    }
   };
 
   executeSubscription = (
