@@ -1,4 +1,13 @@
+---
+title: Basics
+order: 2
+---
+
+<a name="basics"></a>
+
 # Basics
+
+<a name="main-file"></a>
 
 As mentioned before, `urql`'s core logic is split into exchanges.
 To that end, `urql`'s behavior is completely defined by the exchanges
@@ -21,7 +30,9 @@ const client = new Client({
 This list of default exchanges is also exported as `defaultExchanges`
 however.
 
-## `fetchExchange`
+## fetchExchange
+
+<a name="fetchexchange"></a>
 
 The `fetchExchange` handles `query` and `mutation` operations and uses `fetch`
 to send GraphQL API requests.
@@ -63,7 +74,9 @@ allow `response.status >= 300` when `redirect` is set to `'manual'`.
 **In summary:** `fetchExchange` is a simple request handler that takes
 operations and sends `POST` requests using `fetch`.
 
-## `cacheExchange`
+## cacheExchange
+
+<a name="cacheexchange"></a>
 
 The default caching behavior that `urql` uses is defined by the `cacheExchange`
 unlike Apollo's `Cache` or `InMemoryCache`, caching behavior is handled as
@@ -113,7 +126,7 @@ respond with the types that are invalidated.
 Given an `addTodo` mutation for example, you will need to send
 back at least one `TodoItem` for the invalidation to happen.
 
-A **document cache** also doesn't normalise at all, which means
+A **document cache** also doesn't normalize at all, which means
 that after fetching a list of items, fetching a single item
 will never be fulfilled by this cache.
 
@@ -152,10 +165,10 @@ from the API.
 
 ### Customization
 
-The idea of `urql` is that you can customise the caching behavior amongst
+The idea of `urql` is that you can customize the caching behavior amongst
 other things yourself, if needed.
 
-[Read more about customising `urql` in the "Extending & Experimenting" section.](extending-and-experimenting.md)
+[Read more about customizing `urql` in the "Extending & Experimenting" section.](https://formidable.com/open-source/urql/docs/extending-&-experimenting)
 
 ## Server-side rendering
 
@@ -180,7 +193,7 @@ it to prefetch data on the server-side. For this reason we have a companion
 library, [`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass), which can be used to run a "prepass"
 that fetches all suspended data it finds in a React element tree.
 
-### Setting up the `Client`
+### Setting up the Client
 
 When you set up the `Client` for server-side rendering, on the server
 you will need to set `suspense` to `true` and on the client to `false`,
@@ -328,7 +341,7 @@ up [have a look at our SSR + next.js example project](https://github.com/Formida
 ## Subscriptions
 
 One feature of `urql` that was not mentioned in the
-["Getting Started" section](getting-started.md) is `urql`'s
+["Getting Started" section](https://formidable.com/open-source/urql/docs/getting-started) is `urql`'s
 APIs and ability to handle subscriptions.
 
 To add support for subscriptions there's the `subscriptionExchange`.

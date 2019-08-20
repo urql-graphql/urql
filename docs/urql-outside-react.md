@@ -1,4 +1,11 @@
-# `urql` Outside of React
+---
+title: urql outside of react
+order: 5
+---
+
+<a name="urql-outside-of-react"></a>
+
+# urql Outside of React
 
 While `urql` is a GraphQL client that's mainly targeting React, apart from our React-specific APIs (i.e. the hooks and components), all other elements of the library function the same outside of a React context. In this guide, we'll take a look at using `urql` in environments other than React, including NodeJS and Vue.
 
