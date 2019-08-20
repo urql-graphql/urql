@@ -1,15 +1,30 @@
 import {
   NamedTypeNode,
   NameNode,
+  SelectionNode,
   SelectionSetNode,
+  InlineFragmentNode,
   FieldNode,
+  OperationDefinitionNode,
   FragmentDefinitionNode,
+  Kind,
 } from 'graphql';
 
 import { SelectionSet } from '../types';
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;
+
+export const getOperationName = (node: OperationDefinitionNode) => {
+  switch (node.operation) {
+    case 'query':
+      return 'Query';
+    case 'mutation':
+      return 'Mutation';
+    case 'subscription':
+      return 'Subscription';
+  }
+};
 
 export const getFragmentTypeName = (node: FragmentDefinitionNode): string =>
   node.typeCondition.name.value;
@@ -30,3 +45,10 @@ export const getTypeCondition = ({
   typeCondition?: NamedTypeNode;
 }): string | null =>
   typeCondition !== undefined ? getName(typeCondition) : null;
+
+export const isFieldNode = (node: SelectionNode): node is FieldNode =>
+  node.kind === Kind.FIELD;
+
+export const isInlineFragment = (
+  node: SelectionNode
+): node is InlineFragmentNode => node.kind === Kind.INLINE_FRAGMENT;

@@ -1,5 +1,4 @@
 import {
-  forEachFieldNode,
   getFieldAlias,
   getFragments,
   getMainOperation,
@@ -7,6 +6,7 @@ import {
   normalizeVariables,
   getFragmentTypeName,
   getName,
+  getOperationName,
   getFieldArguments,
 } from '../ast';
 
@@ -29,6 +29,7 @@ import {
   clearStoreState,
 } from '../store';
 
+import { forEachFieldNode } from './shared';
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
 import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
@@ -62,11 +63,12 @@ export const write = (
   };
 
   const select = getSelectionSet(operation);
-  if (operation.operation === 'query') {
-    writeSelection(ctx, 'Query', select, data);
+  const operationName = getOperationName(operation);
+
+  if (operationName === 'Query') {
+    writeSelection(ctx, operationName, select, data);
   } else {
-    const isMutation = operation.operation === 'mutation';
-    writeRoot(ctx, isMutation, select, data);
+    writeRoot(ctx, operationName, select, data);
   }
 
   clearStoreState();
@@ -90,11 +92,10 @@ export const writeOptimistic = (
     store,
   };
 
-  if (operation.operation === 'mutation') {
+  const operationName = getOperationName(operation);
+  if (operationName === 'Mutation') {
     const select = getSelectionSet(operation);
-
-    // TODO: This is very similar to writeRoot & writeRootField
-    forEachFieldNode(select, ctx.fragments, ctx.variables, node => {
+    forEachFieldNode(operationName, operationName, select, ctx, node => {
       if (node.selectionSet !== undefined) {
         const fieldName = getName(node);
         const resolver = ctx.store.optimisticMutations[fieldName];
@@ -156,9 +157,10 @@ const writeSelection = (
   const isQuery = entityKey === 'Query';
   if (!isQuery) addDependency(entityKey);
 
-  const { store, fragments, variables } = ctx;
-  store.writeField(data.__typename, entityKey, '__typename');
-  forEachFieldNode(select, fragments, variables, node => {
+  const { store, variables } = ctx;
+  const typename = data.__typename;
+  store.writeField(typename, entityKey, '__typename');
+  forEachFieldNode(typename, entityKey, select, ctx, node => {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
@@ -209,15 +211,14 @@ const writeField = (
 // This is like writeSelection but assumes no parent entity exists
 const writeRoot = (
   ctx: Context,
-  isMutation: boolean,
+  typename: string,
   select: SelectionSet,
   data: Data
 ) => {
-  const { fragments, variables } = ctx;
-  forEachFieldNode(select, fragments, variables, node => {
+  forEachFieldNode(typename, typename, select, ctx, node => {
     const fieldName = getName(node);
     const fieldAlias = getFieldAlias(node);
-    const fieldArgs = getFieldArguments(node, variables);
+    const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldValue = data[fieldAlias];
 
     if (
@@ -229,7 +230,7 @@ const writeRoot = (
       writeRootField(ctx, fieldValue, fieldSelect);
     }
 
-    if (isMutation) {
+    if (typename === 'Mutation') {
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[fieldName];

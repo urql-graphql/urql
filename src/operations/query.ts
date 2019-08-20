@@ -1,5 +1,4 @@
 import {
-  forEachFieldNode,
   getFragments,
   getMainOperation,
   getSelectionSet,
@@ -28,6 +27,7 @@ import {
   clearStoreState,
 } from '../store';
 
+import { forEachFieldNode } from './shared';
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
 
 export interface QueryResult {
@@ -76,7 +76,7 @@ const readSelection = (
   const isQuery = entityKey === 'Query';
   if (!isQuery) addDependency(entityKey);
 
-  const { store, fragments, variables } = ctx;
+  const { store, variables } = ctx;
 
   // Get the __typename field for a given entity to check that it exists
   const typename = store.getField(entityKey, '__typename');
@@ -87,7 +87,7 @@ const readSelection = (
 
   data.__typename = typename;
 
-  forEachFieldNode(select, fragments, variables, node => {
+  forEachFieldNode(typename, entityKey, select, ctx, node => {
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);

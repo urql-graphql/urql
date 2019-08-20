@@ -161,6 +161,10 @@ export class Store {
     }
   }
 
+  hasField(key: string): boolean {
+    return this.getRecord(key) !== undefined || this.getLink(key) !== undefined;
+  }
+
   updateQuery(
     dataQuery: DocumentNode,
     updater: (data: Data | null) => Data

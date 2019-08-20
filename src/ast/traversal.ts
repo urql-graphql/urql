@@ -1,29 +1,21 @@
 import {
-  FieldNode,
   SelectionNode,
   DefinitionNode,
   DocumentNode,
-  InlineFragmentNode,
   FragmentDefinitionNode,
   OperationDefinitionNode,
   Kind,
 } from 'graphql';
 
-import { getName, getSelectionSet } from './node';
+import { getName } from './node';
 import { evaluateValueNode } from './variables';
-import { Fragments, Variables, SelectionSet } from '../types';
+import { Fragments, Variables } from '../types';
 
 const isFragmentNode = (
   node: DefinitionNode
 ): node is FragmentDefinitionNode => {
   return node.kind === Kind.FRAGMENT_DEFINITION;
 };
-
-const isFieldNode = (node: SelectionNode): node is FieldNode =>
-  node.kind === Kind.FIELD;
-
-const isInlineFragment = (node: SelectionNode): node is InlineFragmentNode =>
-  node.kind === Kind.INLINE_FRAGMENT;
 
 /** Returns the main operation's definition */
 export const getMainOperation = (
@@ -49,7 +41,10 @@ export const getFragments = (doc: DocumentNode): Fragments =>
     return map;
   }, {});
 
-const shouldInclude = (node: SelectionNode, vars: Variables): boolean => {
+export const shouldInclude = (
+  node: SelectionNode,
+  vars: Variables
+): boolean => {
   if (node.directives === undefined) {
     return true;
   }
@@ -80,30 +75,4 @@ const shouldInclude = (node: SelectionNode, vars: Variables): boolean => {
   });
 
   return !isSkipped;
-};
-
-export const forEachFieldNode = (
-  select: SelectionSet,
-  fragments: Fragments,
-  vars: Variables,
-  cb: (node: FieldNode) => void
-) => {
-  select.forEach(node => {
-    if (!shouldInclude(node, vars)) {
-      // Directives instruct this node to be skipped
-      return;
-    } else if (!isFieldNode(node)) {
-      // A fragment is either referred to by FragmentSpread or inline
-      const def = isInlineFragment(node) ? node : fragments[getName(node)];
-
-      if (def !== undefined) {
-        const fragmentSelect = getSelectionSet(def);
-        // TODO: Check for getTypeCondition(def) to match
-        // Recursively process the fragments' selection sets
-        forEachFieldNode(fragmentSelect, fragments, vars, cb);
-      }
-    } else if (getName(node) !== '__typename') {
-      cb(node);
-    }
-  });
 };
