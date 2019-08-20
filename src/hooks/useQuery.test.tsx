@@ -10,6 +10,8 @@ jest.mock('../client', () => {
         map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
       )
     ),
+    reexecuteOperation: jest.fn(() => undefined),
+    createRequestOperation: jest.fn(() => undefined),
   };
 
   return {
@@ -26,7 +28,11 @@ import { OperationContext } from '../types';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 
 // @ts-ignore
-const client = createClient() as { executeQuery: jest.Mock };
+const client = createClient() as {
+  executeQuery: jest.Mock;
+  reexecuteOperation: jest.Mock;
+  createRequestOperation: jest.Mock;
+};
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -246,14 +252,11 @@ describe('pollInterval', () => {
     jest.useFakeTimers();
     renderer.create(<QueryUser {...props} pollInterval={100} />);
     expect(client.executeQuery).toBeCalled();
-    expect(client.executeQuery).toHaveBeenCalledTimes(1);
 
     jest.runOnlyPendingTimers();
-    expect(client.executeQuery).toBeCalled();
-    expect(client.executeQuery).toHaveBeenCalledTimes(2);
+    expect(client.reexecuteOperation).toBeCalled();
 
     jest.runOnlyPendingTimers();
-    expect(client.executeQuery).toBeCalled();
-    expect(client.executeQuery).toHaveBeenCalledTimes(3);
+    expect(client.reexecuteOperation).toBeCalled();
   });
 });

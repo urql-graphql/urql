@@ -14,6 +14,8 @@ jest.mock('../client', () => {
         map(i => ({ data: i, error: i + 1 }))
       )
     ),
+    reexecuteOperation: jest.fn(() => undefined),
+    createRequestOperation: jest.fn(() => undefined),
   };
 
   return {
@@ -23,7 +25,11 @@ jest.mock('../client', () => {
 });
 
 // @ts-ignore
-const client = createClient() as { executeQuery: jest.Mock };
+const client = createClient() as {
+  executeQuery: jest.Mock;
+  reexecuteOperation: jest.Mock;
+  createRequestOperation: jest.Mock;
+};
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -323,11 +329,9 @@ describe('useQuery', () => {
     expect(client.executeQuery).toBeCalledTimes(1);
 
     jest.runOnlyPendingTimers();
-    expect(client.executeQuery).toBeCalled();
-    expect(client.executeQuery).toHaveBeenCalledTimes(2);
+    expect(client.reexecuteOperation).toBeCalled();
 
     jest.runOnlyPendingTimers();
-    expect(client.executeQuery).toBeCalled();
-    expect(client.executeQuery).toHaveBeenCalledTimes(3);
+    expect(client.reexecuteOperation).toBeCalled();
   });
 });

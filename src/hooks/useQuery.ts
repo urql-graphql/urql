@@ -90,7 +90,12 @@ export const useQuery = <T = any, V = object>(
     let interval: NodeJS.Timeout | null = null;
     if (args.pollInterval) {
       interval = setInterval(() => {
-        executeQuery();
+        const operation = client.createRequestOperation('query', request, {
+          requestPolicy: args.requestPolicy,
+          ...args.context,
+          ...devtoolsContext,
+        });
+        client.reexecuteOperation(operation);
       }, args.pollInterval);
     }
 
@@ -98,7 +103,17 @@ export const useQuery = <T = any, V = object>(
       unsubscribe.current(); // eslint-disable-line
       if (interval) clearInterval(interval);
     };
-  }, [executeQuery, args.pause, setState, args.pollInterval]);
+  }, [
+    executeQuery,
+    args.pause,
+    setState,
+    args.pollInterval,
+    args.requestPolicy,
+    args.context,
+    client,
+    request,
+    devtoolsContext,
+  ]);
 
   return [state, executeQuery];
 };
