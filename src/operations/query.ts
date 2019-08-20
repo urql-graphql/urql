@@ -109,7 +109,8 @@ const readSelection = (
 
       if (node.selectionSet === undefined) {
         // If it doesn't have a selection set we have resolved a property.
-        // TODO: Completeness for scalar fields
+        // We assume that a resolver for scalar values implies that this
+        // field is always present, so completeness won't be set to EMPTY here
         data[fieldAlias] = resolverValue !== undefined ? resolverValue : null;
       } else {
         // When it has a selection set we are resolving an entity with a
