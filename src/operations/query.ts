@@ -20,8 +20,15 @@ import {
   OperationRequest,
 } from '../types';
 
+import {
+  Store,
+  addDependency,
+  getCurrentDependencies,
+  initStoreState,
+  clearStoreState,
+} from '../store';
+
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
-import { Store } from '../store';
 
 export interface QueryResult {
   completeness: Completeness;
@@ -38,12 +45,13 @@ interface Context {
 
 /** Reads a request entirely from the store */
 export const query = (store: Store, request: OperationRequest): QueryResult => {
+  initStoreState(0);
+
   const operation = getMainOperation(request.query);
   const root: Data = Object.create(null);
-
   const result: QueryResult = {
     completeness: 'FULL',
-    dependencies: new Set(),
+    dependencies: getCurrentDependencies(),
     data: root,
   };
 
@@ -55,10 +63,7 @@ export const query = (store: Store, request: OperationRequest): QueryResult => {
   };
 
   result.data = readSelection(ctx, 'Query', getSelectionSet(operation), root);
-  if (result.completeness === 'EMPTY') {
-    result.data = null;
-  }
-
+  clearStoreState();
   return result;
 };
 
@@ -69,9 +74,7 @@ const readSelection = (
   data: Data
 ): Data | null => {
   const isQuery = entityKey === 'Query';
-  if (!isQuery) {
-    ctx.result.dependencies.add(entityKey);
-  }
+  if (!isQuery) addDependency(entityKey);
 
   const { store, fragments, variables } = ctx;
 
@@ -92,9 +95,7 @@ const readSelection = (
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
     const fieldValue = store.getRecord(fieldKey);
 
-    if (isQuery) {
-      ctx.result.dependencies.add(fieldKey);
-    }
+    if (isQuery) addDependency(fieldKey);
 
     const resolvers = store.resolvers[typename];
     if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {

@@ -1,2 +1,2 @@
 export { query } from './query';
-export { write, writeFragment } from './write';
+export { write, writeOptimistic, writeFragment } from './write';

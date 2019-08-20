@@ -81,7 +81,7 @@ export type OptimisticMutationResolver = (
   vars: Variables,
   cache: Store,
   info: ResolveInfo
-) => Data;
+) => null | Data | NullArray<Data>;
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;

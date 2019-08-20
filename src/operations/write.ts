@@ -21,8 +21,15 @@ import {
   OperationRequest,
 } from '../types';
 
+import {
+  Store,
+  addDependency,
+  getCurrentDependencies,
+  initStoreState,
+  clearStoreState,
+} from '../store';
+
 import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
-import { Store } from '../store';
 import { DocumentNode, FragmentDefinitionNode, Kind } from 'graphql';
 
 export interface WriteResult {
@@ -42,8 +49,10 @@ export const write = (
   request: OperationRequest,
   data: Data
 ): WriteResult => {
+  initStoreState(0);
+
   const operation = getMainOperation(request.query);
-  const result: WriteResult = { dependencies: new Set() };
+  const result: WriteResult = { dependencies: getCurrentDependencies() };
 
   const ctx: Context = {
     variables: normalizeVariables(operation, request.variables),
@@ -59,6 +68,48 @@ export const write = (
     writeRoot(ctx, select, data);
   }
 
+  clearStoreState();
+  return result;
+};
+
+export const writeOptimistic = (
+  store: Store,
+  request: OperationRequest,
+  optimisticKey: number
+): WriteResult => {
+  initStoreState(optimisticKey);
+
+  const operation = getMainOperation(request.query);
+  const result: WriteResult = { dependencies: getCurrentDependencies() };
+
+  const ctx: Context = {
+    variables: normalizeVariables(operation, request.variables),
+    fragments: getFragments(request.query),
+    result,
+    store,
+  };
+
+  if (operation.operation === 'mutation') {
+    const select = getSelectionSet(operation);
+
+    // TODO: This is very similar to writeRoot & writeRootField
+    forEachFieldNode(select, ctx.fragments, ctx.variables, node => {
+      if (node.selectionSet !== undefined) {
+        const fieldName = getName(node);
+        const resolver = ctx.store.optimisticMutations[fieldName];
+        if (resolver !== undefined) {
+          const fieldArgs = getFieldArguments(node, ctx.variables);
+          const fieldSelect = getSelectionSet(node);
+          const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
+          if (!isScalar(resolverValue)) {
+            writeRootField(ctx, resolverValue, fieldSelect);
+          }
+        }
+      }
+    });
+  }
+
+  clearStoreState();
   return result;
 };
 
@@ -95,7 +146,7 @@ export const writeFragment = (
       store,
       variables: {},
       fragments: {},
-      result: { dependencies: new Set() },
+      result: { dependencies: getCurrentDependencies() },
     },
     entityKey,
     select,
@@ -110,23 +161,17 @@ const writeSelection = (
   data: Data
 ) => {
   const isQuery = entityKey === 'Query';
-  if (!isQuery) {
-    ctx.result.dependencies.add(entityKey);
-  }
+  if (!isQuery) addDependency(entityKey);
 
   const { store, fragments, variables } = ctx;
   store.writeField(data.__typename, entityKey, '__typename');
-
   forEachFieldNode(select, fragments, variables, node => {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
     const fieldValue = data[getFieldAlias(node)];
 
-    if (isQuery) {
-      ctx.result.dependencies.add(fieldKey);
-    }
-
+    if (isQuery) addDependency(fieldKey);
     if (node.selectionSet === undefined) {
       // This is a leaf node, so we're setting the field's value directly
       store.writeRecord(fieldValue, fieldKey);
@@ -178,6 +223,9 @@ const writeRoot = (ctx: Context, select: SelectionSet, data: Data) => {
     const fieldValue = data[fieldAlias];
 
     if (ctx.store.updates[fieldName]) {
+      // TODO: Should this really always replace the default logic?
+      // If it does, there's no way for the user to write everything else to the store
+      // It should probably run after the default writeRootField
       return ctx.store.updates[fieldName](
         data,
         fieldArgs || {},
