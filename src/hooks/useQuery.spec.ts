@@ -14,8 +14,6 @@ jest.mock('../client', () => {
         map(i => ({ data: i, error: i + 1 }))
       )
     ),
-    reexecuteOperation: jest.fn(() => undefined),
-    createRequestOperation: jest.fn(() => undefined),
   };
 
   return {
@@ -25,11 +23,7 @@ jest.mock('../client', () => {
 });
 
 // @ts-ignore
-const client = createClient() as {
-  executeQuery: jest.Mock;
-  reexecuteOperation: jest.Mock;
-  createRequestOperation: jest.Mock;
-};
+const client = createClient() as { executeQuery: jest.Mock };
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -309,29 +303,5 @@ describe('useQuery', () => {
 
     rerender({ query: mockQuery, variables: mockVariables, pause: true });
     expect(client.executeQuery).toBeCalledTimes(1);
-  });
-
-  it('should reexecute in intervals if pollInterval is true', async () => {
-    jest.useFakeTimers();
-    renderHook(
-      ({ query, variables, pause, pollInterval }) =>
-        useQuery({ query, variables, pause, pollInterval }),
-      {
-        initialProps: {
-          query: mockQuery,
-          variables: mockVariables,
-          pause: false,
-          pollInterval: 100,
-        },
-      }
-    );
-
-    expect(client.executeQuery).toBeCalledTimes(1);
-
-    jest.runOnlyPendingTimers();
-    expect(client.reexecuteOperation).toBeCalled();
-
-    jest.runOnlyPendingTimers();
-    expect(client.reexecuteOperation).toBeCalled();
   });
 });

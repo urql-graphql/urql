@@ -10,8 +10,6 @@ jest.mock('../client', () => {
         map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
       )
     ),
-    reexecuteOperation: jest.fn(() => undefined),
-    createRequestOperation: jest.fn(() => undefined),
   };
 
   return {
@@ -28,11 +26,7 @@ import { OperationContext } from '../types';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 
 // @ts-ignore
-const client = createClient() as {
-  executeQuery: jest.Mock;
-  reexecuteOperation: jest.Mock;
-  createRequestOperation: jest.Mock;
-};
+const client = createClient() as { executeQuery: jest.Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -48,9 +42,8 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   query,
   variables,
   pause,
-  pollInterval,
 }) => {
-  const [s, e] = useQuery({ query, variables, pause, pollInterval });
+  const [s, e] = useQuery({ query, variables, pause });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
@@ -244,19 +237,5 @@ describe('pause', () => {
     wrapper.update(<QueryUser {...props} pause={true} />);
     wrapper.update(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).toBeCalledTimes(1);
-  });
-});
-
-describe('pollInterval', () => {
-  it('reexecutes the query every pollInterval ms', () => {
-    jest.useFakeTimers();
-    renderer.create(<QueryUser {...props} pollInterval={100} />);
-    expect(client.executeQuery).toBeCalled();
-
-    jest.runOnlyPendingTimers();
-    expect(client.reexecuteOperation).toBeCalled();
-
-    jest.runOnlyPendingTimers();
-    expect(client.reexecuteOperation).toBeCalled();
   });
 });
