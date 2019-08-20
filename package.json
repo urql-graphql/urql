@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "0.1.0-alpha.5",
+  "version": "1.0.0-beta.1",
   "description": "A normalized and configurable cache exchange for urql",
   "repository": "https://github.com/kitten/urql-exchange-graphcache",
   "bugs": {
