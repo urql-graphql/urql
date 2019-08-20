@@ -25,7 +25,22 @@ const Todos = gql`
   }
 `;
 
-describe('store', () => {
+describe('Store with KeyingConfig', () => {
+  it('generates keys from custom keying function', () => {
+    const store = new Store(undefined, undefined, undefined, {
+      User: () => 'me',
+    });
+
+    expect(store.keyOfEntity({ __typename: 'Any', id: '123' })).toBe('Any:123');
+    expect(store.keyOfEntity({ __typename: 'Any', _id: '123' })).toBe(
+      'Any:123'
+    );
+    expect(store.keyOfEntity({ __typename: 'Any' })).toBe(null);
+    expect(store.keyOfEntity({ __typename: 'User' })).toBe('me');
+  });
+});
+
+describe('Store with OptimisticMutationConfig', () => {
   let store, todosData;
 
   beforeEach(() => {

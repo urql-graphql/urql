@@ -28,7 +28,7 @@ import {
 } from '../store';
 
 import { forEachFieldNode } from './shared';
-import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
+import { joinKeys, keyOfField } from '../helpers';
 
 export interface QueryResult {
   completeness: Completeness;
@@ -181,7 +181,8 @@ const resolveResolverResult = (
     // we can just go on and read the selection further.
     const data = prevData === undefined ? Object.create(null) : prevData;
     const childKey =
-      (typeof result === 'string' ? result : keyOfEntity(result)) || key;
+      (typeof result === 'string' ? result : ctx.store.keyOfEntity(result)) ||
+      key;
     const selectionResult = readSelection(ctx, childKey, select, data);
 
     if (selectionResult !== null && typeof result === 'object') {

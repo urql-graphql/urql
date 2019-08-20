@@ -73,6 +73,8 @@ export type UpdateResolver<T = any> = (
   info: ResolveInfo
 ) => void;
 
+export type KeyGenerator = (data: Data) => null | string;
+
 export interface UpdatesConfig {
   [mutationFieldName: string]: UpdateResolver;
 }
@@ -85,6 +87,10 @@ export type OptimisticMutationResolver = (
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;
+}
+
+export interface KeyingConfig {
+  [typename: string]: KeyGenerator;
 }
 
 // Completeness of the query result

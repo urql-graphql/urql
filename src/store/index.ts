@@ -6,11 +6,11 @@ import {
   Link,
   ResolverConfig,
   DataField,
-  SystemFields,
   Variables,
   Data,
   UpdatesConfig,
   OptimisticMutationConfig,
+  KeyingConfig,
 } from '../types';
 
 import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
@@ -74,17 +74,29 @@ export class Store {
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
+  keys: KeyingConfig;
 
   constructor(
     resolvers?: ResolverConfig,
     updates?: UpdatesConfig,
-    optimisticMutations?: OptimisticMutationConfig
+    optimisticMutations?: OptimisticMutationConfig,
+    keys?: KeyingConfig
   ) {
     this.records = Pessimism.make();
     this.links = Pessimism.make();
     this.resolvers = resolvers || {};
     this.updates = updates || {};
     this.optimisticMutations = optimisticMutations || {};
+    this.keys = keys || {};
+  }
+
+  keyOfEntity(data: Data) {
+    const { __typename: typename } = data;
+    if (typename !== undefined && this.keys[typename] !== undefined) {
+      return this.keys[typename](data);
+    } else {
+      return keyOfEntity(data);
+    }
   }
 
   clearOptimistic(optimisticKey: number) {
@@ -146,13 +158,13 @@ export class Store {
     return link ? link : null;
   }
 
-  resolve(entity: SystemFields, field: string, args?: Variables): DataField {
+  resolve(entity: Data | string, field: string, args?: Variables): DataField {
     if (typeof entity === 'string') {
       addDependency(entity);
       return this.resolveValueOrLink(joinKeys(entity, keyOfField(field, args)));
     } else {
       // This gives us __typename:key
-      const entityKey = keyOfEntity(entity);
+      const entityKey = this.keyOfEntity(entity);
       if (entityKey === null) return null;
       addDependency(entityKey);
       return this.resolveValueOrLink(

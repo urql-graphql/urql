@@ -1,14 +1,14 @@
 import stringify from 'fast-json-stable-stringify';
-import { Variables, SystemFields } from '../types';
+import { Variables, KeyGenerator, Data } from '../types';
 
 export const isOperation = (typeName: string) =>
   typeName === 'Query' ||
   typeName === 'Mutation' ||
   typeName === 'Subscription';
 
-export const keyOfEntity = (entity: SystemFields): null | string => {
-  const { __typename: typeName } = entity;
-  const id = entity.id === undefined ? entity._id : entity.id;
+export const keyOfEntity: KeyGenerator = (data: Data): null | string => {
+  const { __typename: typeName } = data;
+  const id = data.id === undefined ? data._id : data.id;
 
   if (typeName === undefined || typeName === null) {
     return null;

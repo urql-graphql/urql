@@ -15,6 +15,7 @@ import {
   UpdatesConfig,
   ResolverConfig,
   OptimisticMutationConfig,
+  KeyingConfig,
 } from './types';
 
 type OperationResultWithMeta = OperationResult & {
@@ -72,6 +73,7 @@ export interface CacheExchangeOpts {
   updates?: UpdatesConfig;
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
 }
 
 export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({

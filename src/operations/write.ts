@@ -30,7 +30,7 @@ import {
 } from '../store';
 
 import { forEachFieldNode } from './shared';
-import { joinKeys, keyOfEntity, keyOfField } from '../helpers';
+import { joinKeys, keyOfField } from '../helpers';
 import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 export interface WriteResult {
@@ -131,7 +131,7 @@ export const writeFragment = (
   const fieldName = getFragmentTypeName(fragment);
   const writeData = { ...data, __typename: fieldName } as Data;
 
-  const entityKey = keyOfEntity(writeData) as string;
+  const entityKey = store.keyOfEntity(writeData) as string;
   if (process.env.NODE_ENV !== 'production' && !entityKey) {
     throw new Error(
       `You have to pass an "id" or "_id" with your writeFragment data.`
@@ -202,7 +202,7 @@ const writeField = (
     return null;
   }
 
-  const entityKey = keyOfEntity(data);
+  const entityKey = ctx.store.keyOfEntity(data);
   const key = entityKey !== null ? entityKey : parentFieldKey;
   writeSelection(ctx, key, select, data);
   return key;
@@ -254,7 +254,7 @@ const writeRootField = (
   }
 
   // Write entity to key that falls back to the given parentFieldKey
-  const entityKey = keyOfEntity(data);
+  const entityKey = ctx.store.keyOfEntity(data);
   if (entityKey !== null) {
     writeSelection(ctx, entityKey, select, data);
   }

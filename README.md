@@ -71,14 +71,9 @@ const client = createClient({
 
 ## Future Features
 
-- [ ] Custom keying for entities instead of `__typename + id`
 - [ ] Schema awareness and deterministic fragment matching
 - [ ] Basic offline and persistence support
 - [ ] Partial query results with `cache-only` and `cache-and-network` policies
-
-Currently the keying of data happens by reading the `__typename` and `id` (or `_id`)
-fields. This will in the future be configurable so that no key (`null`) or a custom
-key may be returned.
 
 Schema awareness is important so that we can offer safe offline results that
 are partially cached instead of fully. The schema is also necessary to know
@@ -92,13 +87,26 @@ You can currently configure:
 - `resolvers`: A nested `['__typename'][fieldName]` map to resolve results from cache
 - `updates`: A mutation field map to apply side-effect updates to the cache
 - `optimistic`: A mutation field map to supply optimistic mutation responses
-- **Future!** `keys`: A `__typename` map of functions to generate keys with
+- `keys`: A `__typename` map of functions to generate keys with
 
 The documentation contains more information on how to set up some of these
 confguration options. More documentation is in progress.
 
 - [Getting Started guide](./docs/getting-started.md)
 - [Architecture information](./docs/architecture.md)
+
+## API
+
+The `cacheExchange` accepts an object with three optional configuration items.
+
+```typescript
+{
+  keys?: KeyingConfig;
+  resolvers?: ResolverConfig;
+  updates?: UpdatesConfig;
+  optimistic?: OptimisticMutationConfig;
+}
+```
 
 ## Maintenance Status
 
