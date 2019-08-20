@@ -42,8 +42,9 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   query,
   variables,
   pause,
+  pollInterval,
 }) => {
-  const [s, e] = useQuery({ query, variables, pause });
+  const [s, e] = useQuery({ query, variables, pause, pollInterval });
   state = s;
   execute = e;
   return <p>{s.data}</p>;
@@ -237,5 +238,22 @@ describe('pause', () => {
     wrapper.update(<QueryUser {...props} pause={true} />);
     wrapper.update(<QueryUser {...props} pause={true} />);
     expect(client.executeQuery).toBeCalledTimes(1);
+  });
+});
+
+describe('pollInterval', () => {
+  it('reexecutes the query every pollInterval ms', () => {
+    jest.useFakeTimers();
+    renderer.create(<QueryUser {...props} pollInterval={100} />);
+    expect(client.executeQuery).toBeCalled();
+    expect(client.executeQuery).toHaveBeenCalledTimes(1);
+
+    jest.runOnlyPendingTimers();
+    expect(client.executeQuery).toBeCalled();
+    expect(client.executeQuery).toHaveBeenCalledTimes(2);
+
+    jest.runOnlyPendingTimers();
+    expect(client.executeQuery).toBeCalled();
+    expect(client.executeQuery).toHaveBeenCalledTimes(3);
   });
 });

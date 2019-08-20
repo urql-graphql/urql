@@ -15,6 +15,7 @@ export interface UseQueryArgs<V> {
   requestPolicy?: RequestPolicy;
   context?: Partial<OperationContext>;
   pause?: boolean;
+  pollInterval?: number;
 }
 
 export interface UseQueryState<T> {
@@ -85,8 +86,19 @@ export const useQuery = <T = any, V = object>(
     }
 
     executeQuery();
-    return () => unsubscribe.current(); // eslint-disable-line
-  }, [executeQuery, args.pause, setState]);
+
+    let interval: NodeJS.Timeout | null = null;
+    if (args.pollInterval) {
+      interval = setInterval(() => {
+        executeQuery();
+      }, args.pollInterval);
+    }
+
+    return () => {
+      unsubscribe.current(); // eslint-disable-line
+      if (interval) clearInterval(interval);
+    };
+  }, [executeQuery, args.pause, setState, args.pollInterval]);
 
   return [state, executeQuery];
 };

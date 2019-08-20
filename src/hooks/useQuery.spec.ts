@@ -304,4 +304,30 @@ describe('useQuery', () => {
     rerender({ query: mockQuery, variables: mockVariables, pause: true });
     expect(client.executeQuery).toBeCalledTimes(1);
   });
+
+  it('should reexecute in intervals if pollInterval is true', async () => {
+    jest.useFakeTimers();
+    renderHook(
+      ({ query, variables, pause, pollInterval }) =>
+        useQuery({ query, variables, pause, pollInterval }),
+      {
+        initialProps: {
+          query: mockQuery,
+          variables: mockVariables,
+          pause: false,
+          pollInterval: 100,
+        },
+      }
+    );
+
+    expect(client.executeQuery).toBeCalledTimes(1);
+
+    jest.runOnlyPendingTimers();
+    expect(client.executeQuery).toBeCalled();
+    expect(client.executeQuery).toHaveBeenCalledTimes(2);
+
+    jest.runOnlyPendingTimers();
+    expect(client.executeQuery).toBeCalled();
+    expect(client.executeQuery).toHaveBeenCalledTimes(3);
+  });
 });
