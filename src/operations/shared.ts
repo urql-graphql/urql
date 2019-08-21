@@ -21,11 +21,13 @@ interface Context {
 
 const isFragmentMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,
-  typename: string,
+  typename: void | string,
   entityKey: string,
   ctx: Context
 ) => {
-  if (typename === getTypeCondition(node)) {
+  if (!typename) {
+    return false;
+  } else if (typename === getTypeCondition(node)) {
     return true;
   }
 
@@ -40,7 +42,7 @@ const isFragmentMatching = (
 };
 
 export const forEachFieldNode = (
-  typename: string,
+  typename: void | string,
   entityKey: string,
   select: SelectionSet,
   ctx: Context,
