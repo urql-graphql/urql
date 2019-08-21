@@ -41,6 +41,8 @@
 
 While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
+Some of the available exchanges that extend `urql` are listed below in the ["Add on Exchanges" list](https://github.com/FormidableLabs/urql#-add-on-exchanges) including a normalized cache and a Chrome devtools extension.
+
 ## 📃 [Documentation](https://formidable.com/open-source/urql/docs)
 
 [The documentation contains everything you need to know about `urql`](https://formidable.com/open-source/urql/docs)
@@ -117,6 +119,7 @@ import { Query } from 'urql';
 more about in our docs](https://formidable.com/open-source/urql/docs/architecture/#exchanges)! Here's just a couple of them.
 
 - [`@urql/devtools`](https://github.com/FormidableLabs/urql-devtools): A Chrome extension for monitoring and debugging
+- [`@urql/exchange-graphcache`](https://github.com/FormidableLabs/urql-exchange-graphcache): A full normalized cache implementation (beta)
 - [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense): An experimental exchange for using `<React.Suspense>`
 - [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support
 
