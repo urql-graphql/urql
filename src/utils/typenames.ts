@@ -2,7 +2,7 @@ import {
   DocumentNode,
   FieldNode,
   InlineFragmentNode,
-  OperationDefinitionNode,
+  Kind,
   visit,
 } from 'graphql';
 
@@ -35,9 +35,7 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
 export const collectTypesFromResponse = (response: object) =>
   collectTypes(response as EntityLike).filter((v, i, a) => a.indexOf(v) === i);
 
-const formatNode = (
-  n: FieldNode | InlineFragmentNode | OperationDefinitionNode
-) => {
+const formatNode = (n: FieldNode | InlineFragmentNode) => {
   if (n.selectionSet === undefined) {
     return false;
   }
@@ -57,9 +55,9 @@ const formatNode = (
       selections: [
         ...n.selectionSet.selections,
         {
-          kind: 'Field',
+          kind: Kind.FIELD,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: '__typename',
           },
         },
@@ -72,5 +70,4 @@ export const formatDocument = (astNode: DocumentNode) =>
   visit(astNode, {
     Field: formatNode,
     InlineFragment: formatNode,
-    OperationDefinition: formatNode,
   });

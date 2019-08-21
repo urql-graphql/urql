@@ -14,7 +14,6 @@ describe('formatTypeNames', () => {
           id
           __typename
         }
-        __typename
       }
       "
     `);
@@ -29,15 +28,15 @@ describe('formatTypeNames', () => {
       __typename
     }`)
     ).toMatchInlineSnapshot(`
-            "{
-              todos {
-                id
-                __typename
-              }
-              __typename
-            }
-            "
-        `);
+                  "{
+                    todos {
+                      id
+                      __typename
+                    }
+                    __typename
+                  }
+                  "
+            `);
   });
 });
 
