@@ -41,9 +41,9 @@ known pieces of data. This cache also provides configurable APIs to:
 First install `@urql/exchange-graphcache` alongside `urql`:
 
 ```sh
-yarn add @urql/exchange-suspense
+yarn add @urql/exchange-graphcache
 # or
-npm install --save @urql/exchange-suspense
+npm install --save @urql/exchange-graphcache
 ```
 
 You'll then need to add the `cacheExchange`, that this package exposes, to your `urql` Client,
