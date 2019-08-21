@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { print } from 'graphql';
+import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
+
+interface Body {
+  query: string;
+  variables: void | object;
+  operationName?: string;
+}
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {
@@ -40,6 +46,16 @@ export const fetchExchange: Exchange = ({ forward }) => {
   };
 };
 
+const getOperationName = (query: DocumentNode): string | null => {
+  const node = query.definitions.find(
+    (node: any): node is OperationDefinitionNode => {
+      return node.kind === Kind.OPERATION_DEFINITION && node.name;
+    }
+  );
+
+  return node !== undefined && node.name ? node.name.value : null;
+};
+
 const createFetchSource = (operation: Operation) => {
   if (
     process.env.NODE_ENV !== 'production' &&
@@ -63,11 +79,19 @@ const createFetchSource = (operation: Operation) => {
         ? context.fetchOptions()
         : context.fetchOptions || {};
 
+    const operationName = getOperationName(operation.query);
+
+    const body: Body = {
+      query: print(operation.query),
+      variables: operation.variables,
+    };
+
+    if (operationName !== null) {
+      body.operationName = operationName;
+    }
+
     const fetchOptions = {
-      body: JSON.stringify({
-        query: print(operation.query),
-        variables: operation.variables,
-      }),
+      body: JSON.stringify(body),
       method: 'POST',
       ...extraOptions,
       headers: {
