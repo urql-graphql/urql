@@ -154,12 +154,13 @@ const writeSelection = (
   select: SelectionSet,
   data: Data
 ) => {
+  const { store, variables } = ctx;
   const isQuery = entityKey === 'Query';
+  const typename = data.__typename;
   if (!isQuery) addDependency(entityKey);
 
-  const { store, variables } = ctx;
-  const typename = data.__typename;
-  store.writeField(typename, entityKey, '__typename');
+  store.writeField(isQuery ? entityKey : typename, entityKey, '__typename');
+
   forEachFieldNode(typename, entityKey, select, ctx, node => {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);
