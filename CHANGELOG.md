@@ -8,6 +8,28 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.4.0](https://github.com/FormidableLabs/urql/compare/v1.3.0...v1.4.0)
+
+This release removes all metadata for the `@urql/devtools` extension from the core
+`urql` package. This data will now be generated internally in the devtools exchange
+itself. [Please also upgrade to the latest `@urql/devtools` version if you're using
+the extension.](https://github.com/FormidableLabs/urql-devtools/releases/tag/v0.0.3)
+
+This release has mainly been focused on minor refactors to keep the bundlesize low.
+But it also introduces new features, like specifying a default `requestPolicy` and
+a new polling option on `useQuery`!
+
+This release also exports `makeResult` and `makeErrorResult`, which will reduce the
+boilerplate code that you need for custom fetch exchanges.
+
+- Minor bundlesize optimizations and remove `debugExchange` in production (see [#375](https://github.com/FormidableLabs/urql/pull/375))
+- ✨ Add `requestPolicy` option to `Client` to change the default request policy (see [#376](https://github.com/FormidableLabs/urql/pull/376))
+- ⚠ Remove dependency on `graphql-tag` and improve `Operation.key` hashing (see [#383](https://github.com/FormidableLabs/urql/pull/383))
+- Remove `networkLatency` and `source` metadata from context, and delete `useDevtoolsContext` (see [#387](https://github.com/FormidableLabs/urql/pull/387) and [#388](https://github.com/FormidableLabs/urql/pull/388))
+- ✨ Add support for polling with `pollInterval` argument to `useQuery`, by [@mxstbr](https://github.com/mxstbr) (see [#397](https://github.com/FormidableLabs/urql/pull/397))
+- ⚠ Prevent `__typename` from being added to the toplevel GraphQL documents (see [#399](https://github.com/FormidableLabs/urql/pull/399))
+- Add `operationName` field to `fetch` request body (see [#401](https://github.com/FormidableLabs/urql/pull/401))
+
 ## [v1.3.0](https://github.com/FormidableLabs/urql/compare/v1.2.0...v1.3.0)
 
 This release comes with some important fixes and enhancements, which all address
