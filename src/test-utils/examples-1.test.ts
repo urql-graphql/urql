@@ -27,6 +27,21 @@ const ToggleTodo = gql`
   }
 `;
 
+const NestedClearNameTodo = gql`
+  mutation($id: ID!) {
+    __typename
+    clearName(id: $id) {
+      __typename
+      todo {
+        __typename
+        id
+        text
+        complete
+      }
+    }
+  }
+`;
+
 it('passes the "getting-started" example', () => {
   const store = new Store();
   const todosData = {
@@ -72,9 +87,36 @@ it('passes the "getting-started" example', () => {
     ...todosData,
     todos: [...todosData.todos.slice(0, 2), mutatedTodo],
   });
+
+  const newMutatedTodo = {
+    ...mutatedTodo,
+    text: '',
+  };
+
+  const newMutationRes = write(
+    store,
+    { query: NestedClearNameTodo, variables: { id: '2' } },
+    {
+      __typename: 'Mutation',
+      clearName: {
+        __typename: 'ClearName',
+        todo: newMutatedTodo,
+      },
+    }
+  );
+
+  expect(newMutationRes.dependencies).toEqual(new Set(['Todo:2']));
+
+  queryRes = query(store, { query: Todos });
+
+  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.data).toEqual({
+    ...todosData,
+    todos: [...todosData.todos.slice(0, 2), newMutatedTodo],
+  });
 });
 
-it('Respects property-level resolvers when given', () => {
+it('respects property-level resolvers when given', () => {
   const store = new Store({ Todo: { text: () => 'hi' } });
   const todosData = {
     __typename: 'Query',

@@ -258,6 +258,9 @@ const writeRootField = (
   const entityKey = ctx.store.keyOfEntity(data);
   if (entityKey !== null) {
     writeSelection(ctx, entityKey, select, data);
+  } else {
+    const typename = data.__typename;
+    writeRoot(ctx, typename, select, data);
   }
 };
 
