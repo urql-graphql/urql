@@ -62,14 +62,6 @@ describe('on initial useEffect', () => {
       expect.any(Object)
     );
   });
-
-  it('passes source component info to executeSubscription', () => {
-    renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith(
-      expect.any(Object),
-      expect.objectContaining({ meta: { source: 'SubscriptionUser' } })
-    );
-  });
 });
 
 it('should support setting context in useSubscription params', () => {
@@ -85,7 +77,6 @@ it('should support setting context in useSubscription params', () => {
     },
     {
       url: 'test',
-      meta: { source: 'SubscriptionUser' },
     }
   );
 });
