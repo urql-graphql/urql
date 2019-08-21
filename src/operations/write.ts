@@ -222,6 +222,22 @@ const writeField = (
 
   const entityKey = ctx.store.keyOfEntity(data);
   const key = entityKey !== null ? entityKey : parentFieldKey;
+
+  warning(
+    typeof data.__typename !== 'string' ||
+      ctx.store.keys[data.__typename] !== undefined ||
+      entityKey !== null,
+    'Invalid key: The GraphQL query at the field at `%s` has a selection set, ' +
+      'but no key could be generated for the data at this field.\n' +
+      'You have to request `id` or `_id` fields for all selection sets or create ' +
+      'a custom `keys` config for `%s`.\n' +
+      'Entities without keys will be embedded directly on the parent entity. ' +
+      'If this is intentional, create a `keys` config for `%s` that always returns null.',
+    parentFieldKey,
+    data.__typename,
+    data.__typename
+  );
+
   writeSelection(ctx, key, select, data);
   return key;
 };
