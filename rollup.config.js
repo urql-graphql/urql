@@ -12,7 +12,7 @@ const pkgInfo = require('./package.json');
 const { main, peerDependencies, dependencies } = pkgInfo;
 const name = basename(main, '.js');
 
-const external = ['dns', 'fs', 'path', 'url'];
+let external = ['dns', 'fs', 'path', 'url'];
 
 if (pkgInfo.peerDependencies) {
   external.push(...Object.keys(peerDependencies));
@@ -21,6 +21,8 @@ if (pkgInfo.peerDependencies) {
 if (pkgInfo.dependencies) {
   external.push(...Object.keys(dependencies));
 }
+
+external = external.filter(x => x !== 'tiny-invariant');
 
 const externalPredicate = new RegExp(`^(${external.join('|')})($|/)`);
 const externalTest = id => {
@@ -123,6 +125,8 @@ const makePlugins = (isProduction = false) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
+      ['babel-plugin-transform-dev-warning', {}],
+      ['babel-plugin-strip-invariant', {}],
       ['babel-plugin-closure-elimination', {}],
       ['@babel/plugin-transform-object-assign', {}],
       ['@babel/plugin-transform-react-jsx', {

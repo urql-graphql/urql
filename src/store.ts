@@ -1,3 +1,4 @@
+import invariant from 'invariant';
 import { DocumentNode } from 'graphql';
 import * as Pessimism from 'pessimism';
 
@@ -26,14 +27,14 @@ const currentOptimisticKey: Ref<number> = { current: null };
 
 // Resolve a ref value or throw when we're outside of a store run
 const refValue = <T>(ref: Ref<T>): T => {
-  if (ref.current === null) {
-    // TODO: Add invariant and warning with some production transpilation
-    throw new Error(
-      'The cache may only be mutated during operations or as part of its config.'
-    );
-  }
+  invariant(
+    ref.current !== null,
+    'Invalid Cache call: The cache may only be accessed or mutated during' +
+      'operations like write or query, or as part of its resolvers, updaters, ' +
+      'or optimistic configs.'
+  );
 
-  return ref.current;
+  return ref.current as T;
 };
 
 // Initialise a store run by resetting its internal state

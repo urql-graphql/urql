@@ -1,3 +1,5 @@
+import invariant from 'invariant';
+
 import {
   SelectionNode,
   DefinitionNode,
@@ -25,11 +27,11 @@ export const getMainOperation = (
     node => node.kind === Kind.OPERATION_DEFINITION
   ) as OperationDefinitionNode;
 
-  if (process.env.NODE_ENV !== 'production' && !operation) {
-    throw new TypeError(
-      'OperationDefinition is missing from GraphQL DocumentNode'
-    );
-  }
+  invariant(
+    !!operation,
+    'Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition' +
+      'node for a query, subscription, or mutation.'
+  );
 
   return operation;
 };

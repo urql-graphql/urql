@@ -1,3 +1,5 @@
+import warning from 'warning';
+
 import {
   getFragments,
   getMainOperation,
@@ -132,7 +134,7 @@ const readSelection = (
         ctx.result.completeness = 'EMPTY';
         data[fieldAlias] = null;
       } else {
-        // Not dealing with null means it's a regular property.
+        // Not dealing with undefined means it's a cached field
         data[fieldAlias] = fieldValue;
       }
     } else {
@@ -196,11 +198,13 @@ const resolveResolverResult = (
     return selectionResult;
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.warn(
-      'Expected to receive a Link or an Entity from a Resolver but got a Scalar.'
-    );
-  }
+  warning(
+    false,
+    'Invalid resolver value: The resolver at `%s` returned a scalar (number, boolean, etc)' +
+      ', but the GraphQL query expects a selection set for this field.\n' +
+      'If necessary, use Cache.resolve() to resolve a link or entity from the cache.',
+    key
+  );
 
   ctx.result.completeness = 'EMPTY';
   return null;

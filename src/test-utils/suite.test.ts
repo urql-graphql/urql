@@ -300,7 +300,7 @@ it('entity list on query and spread fragment', () => {
   });
 });
 
-it('embedded object on entity', () => {
+it('embedded invalid object on entity', () => {
   expectCacheIntegrity({
     query: gql`
       {

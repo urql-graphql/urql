@@ -1,3 +1,6 @@
+import warning from 'warning';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
+
 import {
   getFieldAlias,
   getFragments,
@@ -31,7 +34,6 @@ import {
 
 import { forEachFieldNode } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
-import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 export interface WriteResult {
   dependencies: Set<string>;
@@ -123,18 +125,25 @@ export const writeFragment = (
   const fragments = getFragments(query);
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
-  if (process.env.NODE_ENV !== 'production' && fragment === undefined) {
-    throw new Error('At least one fragment must be passed to writeFragment.');
+  if (fragment === undefined) {
+    return warning(
+      false,
+      'writeFragment(...) was called with an empty fragment.\n' +
+        'You have to call it with at least one fragment in your GraphQL document.'
+    );
   }
 
   const select = getSelectionSet(fragment);
-  const fieldName = getFragmentTypeName(fragment);
-  const writeData = { ...data, __typename: fieldName } as Data;
+  const typeName = getFragmentTypeName(fragment);
+  const writeData = { ...data, __typename: typeName } as Data;
 
   const entityKey = store.keyOfEntity(writeData) as string;
-  if (process.env.NODE_ENV !== 'production' && !entityKey) {
-    throw new Error(
-      `You have to pass an "id" or "_id" with your writeFragment data.`
+  if (!entityKey) {
+    return warning(
+      false,
+      "Can't generate a key for writeFragment(...) data.\n" +
+        'You have to pass an `id` or `_id` field or create a custom `keys` config for `%s`.',
+      typeName
     );
   }
 
@@ -178,6 +187,14 @@ const writeSelection = (
       store.writeLink(link, fieldKey);
       store.removeRecord(fieldKey);
     } else {
+      warning(
+        false,
+        'Invalid value: The field at `%s` is a scalar (number, boolean, etc)' +
+          ', but the GraphQL query expects a selection set for this field.\n' +
+          'The value will still be cached, however this may lead to undefined behavior!',
+        fieldKey
+      );
+
       // This is a rare case for invalid entities
       store.writeRecord(fieldValue, fieldKey);
     }
