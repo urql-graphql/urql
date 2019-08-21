@@ -89,24 +89,37 @@ You can currently configure:
 - `optimistic`: A mutation field map to supply optimistic mutation responses
 - `keys`: A `__typename` map of functions to generate keys with
 
-The documentation contains more information on how to set up some of these
-confguration options. More documentation is in progress.
+> Note that you don't need any of these options to get started
 
-- [Getting Started guide](./docs/getting-started.md)
-- [Architecture information](./docs/architecture.md)
+### Keys
 
-## API
+Keys are used when you need a slight alteration to the value of your identifier or
+when the identifier is a non-traditional property.
 
-The `cacheExchange` accepts an object with three optional configuration items.
+[Read more](./docs/keys.md)
 
-```typescript
-{
-  keys?: KeyingConfig;
-  resolvers?: ResolverConfig;
-  updates?: UpdatesConfig;
-  optimistic?: OptimisticMutationConfig;
-}
-```
+### Resolvers
+
+Resolvers are needed when you want to do additional resolving, for example do some
+custom date formatting.
+
+[Read more](./docs/resolvers.md)
+
+### Updates
+
+The graph cache will automatically handle updates but some things are quite hard to
+incorporate. Let's say you delete/add an item, it's hard for us to know you wanted to
+delete or where to add an item in a list.
+
+[Read more](./docs/updates.md)
+
+### Optimistic
+
+Here you can configure optimistic responses, this means that we don't wait for the server
+to respond but offer the user to instantly replace the data with the variables from the
+mutation.
+
+[Read more](./docs/optimistic.md)
 
 ## Maintenance Status
 
