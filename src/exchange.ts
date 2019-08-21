@@ -4,6 +4,7 @@ import {
   Operation,
   OperationResult,
   RequestPolicy,
+  CacheOutcome,
 } from 'urql';
 
 import { filter, map, merge, pipe, share, tap } from 'wonka';
@@ -27,6 +28,23 @@ type OperationMap = Map<number, Operation>;
 interface DependentOperations {
   [key: string]: number[];
 }
+
+// Returns the given operation result with added cacheOutcome meta field
+const addCacheOutcome = (outcome: CacheOutcome) => (res: OperationResult) => ({
+  data: res.data,
+  error: res.error,
+  extensions: res.extensions,
+  operation: {
+    ...res.operation,
+    context: {
+      ...res.operation.context,
+      meta: {
+        ...res.operation.context.meta,
+        cacheOutcome: outcome,
+      },
+    },
+  },
+});
 
 // Returns the given operation with added __typename fields on its query
 const addTypeNames = (op: Operation): Operation => ({
@@ -225,7 +243,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           const networkOnly = toRequestPolicy(operation, 'network-only');
           client.reexecuteOperation(networkOnly);
         }
-      })
+      }),
+      map(addCacheOutcome('hit'))
     );
 
     // Forward operations that aren't cacheable and rebound operations
@@ -240,7 +259,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           cacheOps$,
         ])
       ),
-      tap(updateCacheWithResult)
+      tap(updateCacheWithResult),
+      map(addCacheOutcome('miss'))
     );
 
     return merge([result$, cacheResult$]);

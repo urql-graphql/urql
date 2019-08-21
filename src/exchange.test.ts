@@ -53,6 +53,15 @@ it('writes queries to the cache', () => {
   next(op);
   expect(response).toHaveBeenCalledTimes(1);
   expect(result).toHaveBeenCalledTimes(2);
+
+  expect(result.mock.calls[0][0]).toHaveProperty(
+    'operation.context.meta.cacheOutcome',
+    'miss'
+  );
+  expect(result.mock.calls[1][0]).toHaveProperty(
+    'operation.context.meta.cacheOutcome',
+    'hit'
+  );
 });
 
 it('updates related queries when their data changes', () => {
