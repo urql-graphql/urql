@@ -76,11 +76,17 @@ export interface CacheExchangeOpts {
   keys?: KeyingConfig;
 }
 
-export const cacheExchange = (opts: CacheExchangeOpts): Exchange => ({
+export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   forward,
   client,
 }) => {
-  const store = new Store(opts.resolvers, opts.updates, opts.optimistic);
+  if (!opts) opts = {};
+  const store = new Store(
+    opts.resolvers,
+    opts.updates,
+    opts.optimistic,
+    opts.keys
+  );
   const optimisticKeys = new Set();
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
