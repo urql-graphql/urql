@@ -71,21 +71,6 @@ describe('on success', () => {
     expect(data).toMatchSnapshot();
     expect(fetchOptions).toHaveBeenCalled();
   });
-
-  it('adds latency info to the context', async () => {
-    const data = await pipe(
-      fromValue({
-        ...queryOperation,
-        context: {
-          ...queryOperation.context,
-        },
-      }),
-      fetchExchange(exchangeArgs),
-      toPromise
-    );
-
-    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
-  });
 });
 
 describe('on error', () => {
@@ -109,16 +94,6 @@ describe('on error', () => {
     );
 
     expect(data).toMatchSnapshot();
-  });
-
-  it('returns error data', async () => {
-    const data = await pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
-      toPromise
-    );
-
-    expect(data.operation.context).toHaveProperty('meta.networkLatency', 100);
   });
 
   it('returns error data with status 400 and manual redirect mode', async () => {
