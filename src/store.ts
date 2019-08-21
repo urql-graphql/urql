@@ -11,10 +11,11 @@ import {
   UpdatesConfig,
   OptimisticMutationConfig,
   KeyingConfig,
-} from '../types';
+} from './types';
 
-import { keyOfEntity, joinKeys, keyOfField } from '../helpers';
-import { query, write, writeFragment } from '../operations';
+import { keyOfEntity, joinKeys, keyOfField } from './helpers';
+import { query } from './operations/query';
+import { write, writeFragment } from './operations/write';
 
 interface Ref<T> {
   current: null | T;

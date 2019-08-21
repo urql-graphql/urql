@@ -144,6 +144,7 @@ const makePlugins = (isProduction = false) => [
 
 const config = {
   input: './src/index.ts',
+  onwarn: () => {},
   external: externalTest,
   treeshake: {
     propertyReadSideEffects: false

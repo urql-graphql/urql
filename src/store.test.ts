@@ -1,13 +1,15 @@
 import gql from 'graphql-tag';
+
 import {
   Store,
   initStoreState,
   clearStoreState,
   getCurrentDependencies,
-} from '.';
-import { write, query } from '../operations';
-import { Data } from '../types';
-import { writeOptimistic } from '../operations/write';
+} from './store';
+
+import { Data } from './types';
+import { query } from './operations/query';
+import { write, writeOptimistic } from './operations/write';
 
 const Todos = gql`
   query {
