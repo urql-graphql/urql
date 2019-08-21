@@ -408,3 +408,5 @@ Object {
   },
 }
 `;
+
+exports[`on success returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\\\n\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"operationName\\":\\"getUser\\"}"`;
