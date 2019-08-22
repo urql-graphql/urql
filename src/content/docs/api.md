@@ -19,6 +19,7 @@ interface UseQueryArgs {
   variables?: any;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
+  pollInterval?: number;
   context?: Partial<OperationContext>;
 }
 ```
@@ -116,6 +117,7 @@ interface UseSubscriptionState<T> {
 | context       | `?object`                  | The GraphQL request's context                                                                         |
 | requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
 | pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
+| pollInterval  | `?number`                  | Every `pollInterval` milliseconds the query will be refetched                                         |
 | children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
