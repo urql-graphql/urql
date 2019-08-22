@@ -88,7 +88,7 @@ const toRequestPolicy = (
 });
 
 export interface CacheExchangeOpts {
-  updates?: UpdatesConfig;
+  updates?: Partial<UpdatesConfig>;
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;

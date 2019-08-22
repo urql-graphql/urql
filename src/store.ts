@@ -15,8 +15,8 @@ import {
 } from './types';
 
 import { keyOfEntity, joinKeys, keyOfField } from './helpers';
-import { query } from './operations/query';
-import { write, writeFragment } from './operations/write';
+import { startQuery } from './operations/query';
+import { writeFragment, startWrite } from './operations/write';
 
 interface Ref<T> {
   current: null | T;
@@ -80,14 +80,17 @@ export class Store {
 
   constructor(
     resolvers?: ResolverConfig,
-    updates?: UpdatesConfig,
+    updates?: Partial<UpdatesConfig>,
     optimisticMutations?: OptimisticMutationConfig,
     keys?: KeyingConfig
   ) {
     this.records = Pessimism.make();
     this.links = Pessimism.make();
     this.resolvers = resolvers || {};
-    this.updates = updates || {};
+    this.updates = {
+      Mutation: (updates && updates.Mutation) || {},
+      Subscription: (updates && updates.Subscription) || {},
+    } as UpdatesConfig;
     this.optimisticMutations = optimisticMutations || {};
     this.keys = keys || {};
   }
@@ -183,8 +186,8 @@ export class Store {
     dataQuery: DocumentNode,
     updater: (data: Data | null) => Data
   ): void {
-    const { data } = query(this, { query: dataQuery });
-    write(this, { query: dataQuery }, updater(data));
+    const { data } = startQuery(this, { query: dataQuery });
+    startWrite(this, { query: dataQuery }, updater(data));
   }
 
   writeFragment(dataFragment: DocumentNode, data: Data): void {

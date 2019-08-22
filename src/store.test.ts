@@ -159,6 +159,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to update a query', () => {
+    initStoreState(0);
     store.updateQuery(Todos, data => ({
       ...data,
       todos: [
@@ -175,6 +176,7 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       ],
     }));
+    clearStoreState();
 
     const { data: result } = query(store, { query: Todos });
     expect(result).toEqual({

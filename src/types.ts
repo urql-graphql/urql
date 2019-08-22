@@ -76,7 +76,12 @@ export type UpdateResolver<T = any> = (
 export type KeyGenerator = (data: Data) => null | string;
 
 export interface UpdatesConfig {
-  [mutationFieldName: string]: UpdateResolver;
+  Mutation: {
+    [fieldName: string]: UpdateResolver;
+  };
+  Subscription: {
+    [fieldName: string]: UpdateResolver;
+  };
 }
 
 export type OptimisticMutationResolver = (

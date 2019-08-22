@@ -176,29 +176,31 @@ it('respects property-level resolvers when given', () => {
 
 it('Respects property-level resolvers when given', () => {
   const store = new Store(undefined, {
-    toggleTodo: function toggleTodo(result, _, cache) {
-      cache.updateQuery(Todos, data => {
-        if (
-          data &&
-          data.todos &&
-          result &&
-          result.toggleTodo &&
-          result.toggleTodo.id === '1'
-        ) {
-          data.todos[1] = {
-            id: '1',
-            text: `${data.todos[1].text} (Updated)`,
-            complete: result.toggleTodo.complete,
-            __typename: 'Todo',
-          };
-        } else if (data && data.todos) {
-          data.todos[Number(result.toggleTodo.id)] = {
-            ...data.todos[Number(result.toggleTodo.id)],
-            complete: result.toggleTodo.complete,
-          };
-        }
-        return data as Data;
-      });
+    Mutation: {
+      toggleTodo: function toggleTodo(result, _, cache) {
+        cache.updateQuery(Todos, data => {
+          if (
+            data &&
+            data.todos &&
+            result &&
+            result.toggleTodo &&
+            result.toggleTodo.id === '1'
+          ) {
+            data.todos[1] = {
+              id: '1',
+              text: `${data.todos[1].text} (Updated)`,
+              complete: result.toggleTodo.complete,
+              __typename: 'Todo',
+            };
+          } else if (data && data.todos) {
+            data.todos[Number(result.toggleTodo.id)] = {
+              ...data.todos[Number(result.toggleTodo.id)],
+              complete: result.toggleTodo.complete,
+            };
+          }
+          return data as Data;
+        });
+      },
     },
   });
 

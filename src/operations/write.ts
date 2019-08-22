@@ -54,6 +54,18 @@ export const write = (
 ): WriteResult => {
   initStoreState(0);
 
+  const result = startWrite(store, request, data);
+
+  clearStoreState();
+
+  return result;
+};
+
+export const startWrite = (
+  store: Store,
+  request: OperationRequest,
+  data: Data
+) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
 
@@ -73,7 +85,6 @@ export const write = (
     writeRoot(ctx, operationName, select, data);
   }
 
-  clearStoreState();
   return result;
 };
 
@@ -264,10 +275,10 @@ const writeRoot = (
       writeRootField(ctx, fieldValue, fieldSelect);
     }
 
-    if (typename === 'Mutation') {
+    if (typename === 'Mutation' || typename === 'Subscription') {
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
-      const updater = ctx.store.updates[fieldName];
+      const updater = ctx.store.updates[typename][fieldName];
       if (updater !== undefined) {
         updater(data, fieldArgs || {}, ctx.store, ctx);
       }

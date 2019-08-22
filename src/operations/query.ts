@@ -49,6 +49,12 @@ interface Context {
 export const query = (store: Store, request: OperationRequest): QueryResult => {
   initStoreState(0);
 
+  const result = startQuery(store, request);
+  clearStoreState();
+  return result;
+};
+
+export const startQuery = (store: Store, request: OperationRequest) => {
   const operation = getMainOperation(request.query);
   const root: Data = Object.create(null);
   const result: QueryResult = {
@@ -65,7 +71,6 @@ export const query = (store: Store, request: OperationRequest): QueryResult => {
   };
 
   result.data = readSelection(ctx, 'Query', getSelectionSet(operation), root);
-  clearStoreState();
   return result;
 };
 
