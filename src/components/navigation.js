@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Link } from "react-static";
 import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
@@ -78,8 +78,10 @@ export const SidebarNavItem = styled(Link)`
   text-transform: uppercase;
   font-weight: bold;
   width: 100%;
-  background-color: ${props =>
-    props.currentPath ? css`rgba(46, 46, 46, 0.1)` : ""};
+
+  &.active {
+    background-color: rgba(46, 46, 46, 0.1);
+  }
 `;
 
 export const SidebarNavSubItem = styled(Link)`

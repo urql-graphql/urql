@@ -69,19 +69,20 @@ class Sidebar extends React.Component {
       `/docs${item.path}` === this.props.history.location.pathname;
     // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
+    const key = item.title.split(" ").join("_");
 
     return (
-      <Fragment>
+      <Fragment key={`${key}-group`}>
         <SidebarNavItem
           to={`/docs${item.path}`}
           replace
-          key={item.title.split(" ").join("_")}
-          currentPath={currentPath}
+          key={key}
+          className={currentPath ? "is-current" : ""}
         >
           {item.title}
         </SidebarNavItem>
         {currentPath && !!subContent.length && (
-          <SubContentWrapper>
+          <SubContentWrapper key={key}>
             {subContent.map(sh => (
               <SidebarNavSubItem
                 to={`#${sh.content
