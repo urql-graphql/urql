@@ -19,11 +19,11 @@ automatically, which is the same as creating a client using the following
 exchanges:
 
 ```js
-import { Client, dedupExchange, cacheExchange, fetchExchange } from "urql";
+import { Client, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
 const client = new Client({
-  url: "/graphql",
-  exchanges: [dedupExchange, cacheExchange, fetchExchange]
+  url: '/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -88,7 +88,7 @@ cache"_ but more of a _"document cache"_.
 
 ### The document cache
 
-When an **operation** is sent it is identifier via its `key` which is a hash
+When an **operation** is sent it is identified by its `key` which is a hash
 of the `query` and `variables`. A document cache makes the assumption
 that there's **no overlap** between any two given queries.
 
@@ -126,7 +126,7 @@ respond with the types that are invalidated.
 Given an `addTodo` mutation for example, you will need to send
 back at least one `TodoItem` for the invalidation to happen.
 
-a **document cache** also doesn't normalize at all, which means
+A **document cache** also doesn't normalize at all, which means
 that after fetching a list of items, fetching a single item
 will never be fulfilled by this cache.
 
@@ -142,7 +142,7 @@ cached result is available it will let the operation through, so
 that the `fetchExchange` can send a request to the API.
 
 When `'cache-only'` is passed, the cache will always return the
-cached result or default to `{ data: undefined, error: undefined },
+cached result or default to `{ data: undefined, error: undefined }`,
 i.e. an empty result, when nothing is cached for a given operation.
 
 For `'network-only'` the opposite of `'cache-only'` is done.
@@ -152,14 +152,14 @@ so that the `fetchExchange` can respond with up-to-date data.
 The result will still be cached however.
 
 The last one `'cache-and-network'` is rather special
-in that it first does what `'cache-first'` does, it will
+in that it first does what `'cache-first'` does: it will
 return some cached results. After returning a cached result however,
 it will forward the operation anyway. This way a temporary cached
 result may be displayed that is then updated with fresh data
 from the API.
 
 > _Note:_ `'network-only'` and `'cache-and-network'` are extremely valuable
-> given the limitations of the default cache. The can be used to ensure
+> given the limitations of the default cache. They can be used to ensure
 > that data skips the cache, if it's clear to you that the result will
 > need to be up-to-date.
 
@@ -199,10 +199,10 @@ When you set up the `Client` for server-side rendering, on the server
 you will need to set `suspense` to `true` and on the client to `false`,
 
 ```js
-import { Client } from "urql";
+import { Client } from 'urql';
 
 const client = new Client({
-  suspense: !process.browser
+  suspense: !process.browser,
   // ...
 });
 ```
@@ -220,8 +220,8 @@ import {
   dedupExchange,
   cacheExchange,
   fetchExchange,
-  ssrExchange
-} from "urql";
+  ssrExchange,
+} from 'urql';
 
 const ssrCache = ssrExchange();
 
@@ -232,16 +232,25 @@ const client = new Client({
     // Put the exchange returned by calling ssrExchange after your cacheExchange,
     // but before any asynchronous exchanges like the fetchExchange:
     ssrCache,
-    fetchExchange
+    fetchExchange,
   ],
   // ...
-  suspense: !process.browser
+  suspense: !process.browser,
 });
 ```
 
 The exchange returned by `ssrExchange()` should be added after the `cacheExchange`
 (or any other custom cache exchange you've defined), and before any
 asynchronous exchanges like the `fetchExchange`.
+
+If you're also using suspense mode on the client, you can
+additionally set the `isClient` option, which tells the `ssrExchange` manually
+whether it's on the server or client, so that you can enable the `suspense`
+mode on the client-side as well.
+
+```js
+const ssrCache = ssrExchange({ isClient: !!process.browser });
+```
 
 ### Prefetching on the server
 
@@ -308,10 +317,10 @@ You can either do so when creating `ssrExchange`, by passing it `initialState`
 as a parameter or calling `restoreData` on it:
 
 ```js
-import { ssrExchange } from "urql";
+import { ssrExchange } from 'urql';
 
 const ssrCache = ssrExchange({
-  initialState: window.URQL_DATA
+  initialState: window.URQL_DATA,
 });
 
 // or:
@@ -339,16 +348,16 @@ To add support for subscriptions there's the `subscriptionExchange`.
 When you first setup subscriptions you will need to add it.
 
 ```js
-import { Client, defaultExchanges, subscriptionExchange } from "urql";
+import { Client, defaultExchanges, subscriptionExchange } from 'urql';
 
 const client = new Client({
-  url: "/graphql",
+  url: '/graphql',
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
-      forwardSubscription
-    })
-  ]
+      forwardSubscription,
+    }),
+  ],
 });
 ```
 
@@ -377,7 +386,7 @@ the `<Subscription>` component and/or the `useSubscription()` hook.
 
 The `<Subscription>` component is extremely similar to the `<Query>`
 component. You can pass it a query and variables, and it will serve
-you render props with `data`, `error`, and `fetching`.
+you render props with `data`, `error`, `extensions`, and `fetching`.
 
 ```js
 import { Subscription } from 'urql';
@@ -421,8 +430,8 @@ can display all messages that have come in over the subscription across
 events.
 
 ```js
-import React from "react";
-import { useSubscription } from "urql";
+import React from 'react';
+import { useSubscription } from 'urql';
 
 const newMessages = `
   subscription MessageSub {

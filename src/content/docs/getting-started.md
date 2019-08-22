@@ -67,8 +67,8 @@ To illustrate how this works, the next example will use `urql`'s `<Query>`
 component to fetch some GraphQL data.
 
 ```jsx
-import React from "react";
-import { Query } from "urql";
+import React from 'react';
+import { Query } from 'urql';
 
 const getTodos = `
   query GetTodos($limit: Int!) {
@@ -80,13 +80,13 @@ const getTodos = `
   }
 `;
 
-const TodoList = ({ limit = 10 }) => {
+const TodoList = ({ limit = 10 }) => (
   <Query query={getTodos} variables={{ limit }}>
-    {({ fetching, data, error }) => {
+    {({ fetching, data, error, extensions }) => {
       if (fetching) {
-        return "Loading...";
+        return 'Loading...';
       } else if (error) {
-        return "Oh no!";
+        return 'Oh no!';
       }
 
       return (
@@ -98,13 +98,14 @@ const TodoList = ({ limit = 10 }) => {
       );
     }}
   </Query>;
-};
+);
 ```
 
 When this component is mounted it will send the `query` and `variables`
 to your GraphQL API. Here we're using `fetching` to see whether the
 request is still being sent and is loading, `error` to see whether any
-errors have come back, and finally `data` to get the result.
+errors have come back, `data` to get the result, and finally `extensions`
+to get any arbitrary extensions data the server may have optionally returned.
 
 Whenever the query or variables props change, the `<Query>` component will
 send a new request and go back into the `fetching` state.
@@ -127,8 +128,8 @@ hooks API by switching to `useQuery()`.
 We can rewrite the above example as follows.
 
 ```jsx
-import React from "react";
-import { useQuery } from "urql";
+import React from 'react';
+import { useQuery } from 'urql';
 
 const getTodos = `
   query GetTodos($limit: Int!) {
@@ -143,13 +144,13 @@ const getTodos = `
 const TodoList = ({ limit = 10 }) => {
   const [res] = useQuery({
     query: getTodos,
-    variables: { limit }
+    variables: { limit },
   });
 
   if (res.fetching) {
-    return "Loading...";
+    return 'Loading...';
   } else if (res.error) {
-    return "Oh no!";
+    return 'Oh no!';
   }
 
   return (
@@ -184,9 +185,9 @@ You only have to make a small adjustment. Install `graphql-tag` and
 you can immediately write tagged template literals instead:
 
 ```jsx
-import React from "react";
-import gql from "graphql-tag";
-import { Query } from "urql";
+import React from 'react';
+import gql from 'graphql-tag';
+import { Query } from 'urql';
 
 const getTodos = gql`
   query GetTodos($limit: Int!) {
@@ -243,14 +244,13 @@ const addTodo = `
 
 class TodoForm extends Component {
   state = {
-    error: null
+    error: null,
   };
 
   add = () => {
-    this.props.addTodo({ text: 'something!' })
-      .catch(error => {
-        this.setState({ error });
-      });
+    this.props.addTodo({ text: 'something!' }).catch(error => {
+      this.setState({ error });
+    });
   };
 
   render() {
@@ -258,13 +258,13 @@ class TodoForm extends Component {
       return 'Oh no!';
     }
 
-    return <button onClick={this.add}>Add something!</button>
+    return <button onClick={this.add}>Add something!</button>;
   }
 }
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />
+    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />}
   </Mutation>
 );
 ```
@@ -298,7 +298,7 @@ class TodoForm extends Component {
 
 const WithMutation = () => (
   <Mutation query={addTodo}>
-    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />
+    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />}
   </Mutation>
 );
 ```
@@ -317,8 +317,8 @@ that can be used instead, which is the `useMutation()` hook.
 We can rewrite the second example from above as follows.
 
 ```jsx
-import React, { useCallback } from "react";
-import { useMutation } from "urql";
+import React, { useCallback } from 'react';
+import { useMutation } from 'urql';
 
 const addTodo = `
   mutation AddTodo($text: String!) {
@@ -333,11 +333,11 @@ const TodoForm = () => {
   const [res, executeMutation] = useMutation(addTodo);
 
   if (res.error) {
-    return "Oh no!";
+    return 'Oh no!';
   }
 
   return (
-    <button onClick={() => executeMutation({ text: "something!" })}>
+    <button onClick={() => executeMutation({ text: 'something!' })}>
       Add something!
     </button>
   );
@@ -377,7 +377,7 @@ A `requestPolicy` can be passed as a prop:
 
 /* or with hooks: */
 
-useQuery({ query: q, requestPolicy: "cache-and-network" });
+useQuery({ query: q, requestPolicy: 'cache-and-network' });
 ```
 
 Including `'cache-and-network'` there are four request policies in total:
@@ -409,7 +409,7 @@ const getTodos = `
   }
 `;
 
-const TodoList = () => {
+const TodoList = () => (
   <Query query={getTodos}>
     {({ executeQuery, data }) => {
       if (!data) {
@@ -425,7 +425,7 @@ const TodoList = () => {
           </ul>
 
           <button
-            onClick={() => executeQuery({ requestPolicy: "network-only" })}
+            onClick={() => executeQuery({ requestPolicy: 'network-only' })}
           >
             Refresh
           </button>
@@ -433,7 +433,7 @@ const TodoList = () => {
       );
     }}
   </Query>;
-};
+);
 ```
 
 As can be seen, the `<Query>` render props also expose an `executeQuery` method, which
