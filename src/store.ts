@@ -184,10 +184,14 @@ export class Store {
 
   updateQuery(
     dataQuery: DocumentNode,
-    updater: (data: Data | null) => Data
+    updater: (data: Data | null) => null | Data
   ): void {
-    const { data } = startQuery(this, { query: dataQuery });
-    startWrite(this, { query: dataQuery }, updater(data));
+    const { data, completeness } = startQuery(this, { query: dataQuery });
+    const input = completeness === 'EMPTY' ? null : data;
+    const output = updater(input);
+    if (output !== null) {
+      startWrite(this, { query: dataQuery }, output);
+    }
   }
 
   writeFragment(dataFragment: DocumentNode, data: Data): void {
