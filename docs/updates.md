@@ -72,11 +72,21 @@ The rest of the properties (complete and \_\_typename) will stay untouched.
 ```js
 const cache = cacheExchange({
   updates: {
-    addTodo: (result, arguments, cache, info) => {
-      cache.updateQuery(Todos, data => {
-        data.todos.push(result);
-        return data;
-      });
+    Mutation: {
+      addTodo: (result, args, cache, info) => {
+        cache.updateQuery(Todos, data => {
+          data.todos.push(result);
+          return data;
+        });
+      },
+    },
+    Subscription: {
+      newTodo: (result, args, cache) => {
+        cache.updateQuery(Todos, data => {
+          data.todos.push(result);
+          return data;
+        });
+      },
     },
   },
 });
