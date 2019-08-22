@@ -7,6 +7,7 @@ import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import replace from 'rollup-plugin-replace';
+import transfromInvariantWarning from './scripts/transform-invariant-warning';
 
 const pkgInfo = require('./package.json');
 const { main, peerDependencies, dependencies } = pkgInfo;
@@ -79,13 +80,13 @@ const terserMinified = terser({
 const makePlugins = (isProduction = false) => [
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
-    browser: true
+    browser: true,
   }),
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
     namedExports: {
-      'react': Object.keys(require('react'))
+      react: Object.keys(require('react')),
     },
   }),
   typescript({
@@ -94,16 +95,12 @@ const makePlugins = (isProduction = false) => [
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
       compilerOptions: {
-        sourceMap: true
+        sourceMap: true,
       },
     },
     tsconfigOverride: {
-     exclude: [
-       'src/**/*.test.ts',
-       'src/**/*.test.tsx',
-       'src/**/test-utils/*'
-     ],
-     compilerOptions: {
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/test-utils/*'],
+      compilerOptions: {
         declaration: !isProduction,
         declarationDir: './dist/types/',
         target: 'es6',
@@ -114,10 +111,10 @@ const makePlugins = (isProduction = false) => [
     transforms: {
       unicodeRegExp: false,
       dangerousForOf: true,
-      dangerousTaggedTemplateString: true
+      dangerousTaggedTemplateString: true,
     },
     objectAssign: 'Object.assign',
-    exclude: 'node_modules/**'
+    exclude: 'node_modules/**',
   }),
   babel({
     babelrc: false,
@@ -125,25 +122,31 @@ const makePlugins = (isProduction = false) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
-      ['babel-plugin-transform-dev-warning', {}],
-      ['babel-plugin-strip-invariant', {}],
+      transfromInvariantWarning,
       ['babel-plugin-closure-elimination', {}],
       ['@babel/plugin-transform-object-assign', {}],
-      ['@babel/plugin-transform-react-jsx', {
-        pragma: 'React.createElement',
-        pragmaFrag: 'React.Fragment',
-        useBuiltIns: true
-      }],
-      ['babel-plugin-transform-async-to-promises', {
-        inlineHelpers: true,
-        externalHelpers: true
-      }]
-    ]
+      [
+        '@babel/plugin-transform-react-jsx',
+        {
+          pragma: 'React.createElement',
+          pragmaFrag: 'React.Fragment',
+          useBuiltIns: true,
+        },
+      ],
+      [
+        'babel-plugin-transform-async-to-promises',
+        {
+          inlineHelpers: true,
+          externalHelpers: true,
+        },
+      ],
+    ],
   }),
-  isProduction && replace({
-    'process.env.NODE_ENV': JSON.stringify('production')
-  }),
-  isProduction ? terserMinified : terserPretty
+  isProduction &&
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+  isProduction ? terserMinified : terserPretty,
 ];
 
 const config = {

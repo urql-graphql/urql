@@ -920,20 +920,10 @@ babel-plugin-jest-hoist@^24.6.0:
   dependencies:
     "@types/babel__traverse" "^7.0.6"
 
-babel-plugin-strip-invariant@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-strip-invariant/-/babel-plugin-strip-invariant-1.0.0.tgz#09d1046a0bf818f558535a4d7a87cbc4a6136d11"
-  integrity sha512-ZQcVDBlxcpKiayFfGq+YQs4JdR6E8k78JCFXaMpu33DL5pddrpAsYxv1Qm5Is1daT5OUdoNr7yuuTaRcSFn7GQ==
-
 babel-plugin-transform-async-to-promises@^0.8.14:
   version "0.8.14"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.14.tgz#8c783aecb1139f39c608f8bb0f5bb69c343c878e"
   integrity sha512-BHw2WriDbnLwaaIydAjVeXXKBal0pWlFWxfo0UKL2CTaSorvRocrsTflni/mzIOP8c+EJ8xHqtbre8GbIm4ehQ==
-
-babel-plugin-transform-dev-warning@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-dev-warning/-/babel-plugin-transform-dev-warning-0.1.1.tgz#9e3cca7c22b27a667486fda11bbce29c0c59e76e"
-  integrity sha512-3n6ptKAU1KqhfzmrQuI4Blyvt0T6vHCeaOpULKjAbU+5+JSePSeVorB+24SHe58/zxXsP4sm1q3crsDFD+UHYQ==
 
 babel-preset-jest@^24.6.0:
   version "24.6.0"
