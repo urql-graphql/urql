@@ -6,7 +6,7 @@ deleting entities it can't really make assumptions.
 
 That's where updates come into play. Analogue to our `resolvers` this gets
 arguments but instead of the parent argument (first one) we get the
-result given from the server in response to our mutation.
+result given from the server due to a subscription trigger or a mutation.
 
 Let's look at two additional methods provided by the cache to enable
 updates.
