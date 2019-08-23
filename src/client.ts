@@ -204,16 +204,13 @@ export class Client {
     }
   };
 
-  query({
+  async query({
     query,
     variables,
     context,
   }: PromisfiedOperation): Promise<OperationResult> {
     const request = createRequest(query, variables);
-    return pipe(
-      this.executeQuery(request, context),
-      toPromise
-    );
+    return toPromise(this.executeQuery(request, context));
   }
 
   executeQuery = (
@@ -248,10 +245,7 @@ export class Client {
     context,
   }: PromisfiedOperation): Promise<OperationResult> {
     const request = createRequest(query, variables);
-    return pipe(
-      this.executeMutation(request, context),
-      toPromise
-    );
+    return toPromise(this.executeMutation(request, context));
   }
 
   executeMutation = (
