@@ -108,7 +108,7 @@ const makePlugins = (isProduction = false) => [
     transforms: {
       unicodeRegExp: false,
       dangerousForOf: true,
-      dangerousTaggedTemplateString: true,
+      dangerousTaggedTemplateString: true
     },
     objectAssign: 'Object.assign',
     exclude: 'node_modules/**'
