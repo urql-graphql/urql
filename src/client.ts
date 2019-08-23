@@ -55,7 +55,7 @@ interface ActiveOperations {
 }
 
 interface PromisfiedOperation {
-  context: Partial<OperationContext>;
+  context?: Partial<OperationContext>;
   query: string | DocumentNode;
   variables?;
 }
@@ -204,13 +204,17 @@ export class Client {
     }
   };
 
-  async query({
+  query({
     query,
     variables,
     context,
   }: PromisfiedOperation): Promise<OperationResult> {
     const request = createRequest(query, variables);
-    return toPromise(this.executeQuery(request, context));
+    return pipe(
+      this.executeQuery(request, context),
+      take(1),
+      toPromise
+    );
   }
 
   executeQuery = (
@@ -245,7 +249,11 @@ export class Client {
     context,
   }: PromisfiedOperation): Promise<OperationResult> {
     const request = createRequest(query, variables);
-    return toPromise(this.executeMutation(request, context));
+    return pipe(
+      this.executeMutation(request, context),
+      take(1),
+      toPromise
+    );
   }
 
   executeMutation = (
