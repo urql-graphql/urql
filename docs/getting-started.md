@@ -487,6 +487,12 @@ const TodoList = ({ limit = 10 }) => {
 
 Which again looks a lot like `useMutation`'s tuple that contains the `executeMutation` function.
 
+## Polling
+
+Your query can be passed an argument named `pollInterval`, this will ensure that your query
+is reexecuted every x ms. You'll have to make sure that your `requestPolicy` for these queries
+is `cache-and-network` or `network-only` else the data will never be refetched.
+
 ## More examples
 
 More examples on how to use `urql`
