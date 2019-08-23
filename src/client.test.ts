@@ -66,7 +66,7 @@ describe('exchange args', () => {
 
 describe('promisified arguments', () => {
   it('query', () => {
-    client.query(
+    const queryResult = client.query(
       gql`
         {
           todos {
@@ -74,7 +74,9 @@ describe('promisified arguments', () => {
           }
         }
       `,
-      { example: 1234 }
+      { example: 1234 },
+      {},
+      true
     );
 
     const received = receivedOps[0];
@@ -88,10 +90,11 @@ describe('promisified arguments', () => {
       fetchOptions: undefined,
       fetch: undefined,
     });
+    expect(queryResult).toHaveProperty('then');
   });
 
   it('mutation', () => {
-    client.mutation(
+    const mutationResult = client.mutation(
       gql`
         {
           todos {
@@ -99,7 +102,9 @@ describe('promisified arguments', () => {
           }
         }
       `,
-      { example: 1234 }
+      { example: 1234 },
+      {},
+      true
     );
 
     const received = receivedOps[0];
@@ -113,6 +118,7 @@ describe('promisified arguments', () => {
       fetchOptions: undefined,
       fetch: undefined,
     });
+    expect(mutationResult).toHaveProperty('then');
   });
 });
 
