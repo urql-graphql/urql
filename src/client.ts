@@ -201,13 +201,19 @@ export class Client {
   query(
     query: DocumentNode | string,
     variables?: object,
-    context?: Partial<OperationContext>
-  ): Promise<OperationResult> {
-    return pipe(
-      this.executeQuery(createRequest(query, variables), context),
-      take(1),
-      toPromise
-    );
+    context?: Partial<OperationContext>,
+    promisify?: boolean
+  ): Promise<OperationResult> | Source<OperationResult> {
+    const query$ = this.executeQuery(createRequest(query, variables), context);
+    if (promisify) {
+      return pipe(
+        query$,
+        take(1),
+        toPromise
+      );
+    }
+
+    return query$;
   }
 
   executeQuery = (
@@ -223,9 +229,8 @@ export class Client {
         merge([fromValue(0), interval(pollInterval)]),
         switchMap(() => response$)
       );
-    } else {
-      return response$;
     }
+    return response$;
   };
 
   executeSubscription = (
@@ -239,13 +244,21 @@ export class Client {
   mutation(
     query: DocumentNode | string,
     variables?: object,
-    context?: Partial<OperationContext>
-  ): Promise<OperationResult> {
-    return pipe(
-      this.executeMutation(createRequest(query, variables), context),
-      take(1),
-      toPromise
+    context?: Partial<OperationContext>,
+    promisify?: boolean
+  ): Promise<OperationResult> | Source<OperationResult> {
+    const mutation$ = this.executeMutation(
+      createRequest(query, variables),
+      context
     );
+    if (promisify) {
+      return pipe(
+        mutation$,
+        take(1),
+        toPromise
+      );
+    }
+    return mutation$;
   }
 
   executeMutation = (
