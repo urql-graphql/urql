@@ -12,6 +12,7 @@ import {
   interval,
   fromValue,
   switchMap,
+  toPromise,
 } from 'wonka';
 
 import {
@@ -30,7 +31,8 @@ import {
   RequestPolicy,
 } from './types';
 
-import { toSuspenseSource } from './utils';
+import { createRequest, toSuspenseSource } from './utils';
+import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -50,6 +52,12 @@ export interface ClientOptions {
 
 interface ActiveOperations {
   [operationKey: string]: number;
+}
+
+interface PromisfiedOperation {
+  context: Partial<OperationContext>;
+  query: string | DocumentNode;
+  variables?;
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
@@ -196,6 +204,18 @@ export class Client {
     }
   };
 
+  query({
+    query,
+    variables,
+    context,
+  }: PromisfiedOperation): Promise<OperationResult> {
+    const request = createRequest(query, variables);
+    return pipe(
+      this.executeQuery(request, context),
+      toPromise
+    );
+  }
+
   executeQuery = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
@@ -221,6 +241,18 @@ export class Client {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
   };
+
+  mutation({
+    query,
+    variables,
+    context,
+  }: PromisfiedOperation): Promise<OperationResult> {
+    const request = createRequest(query, variables);
+    return pipe(
+      this.executeMutation(request, context),
+      toPromise
+    );
+  }
 
   executeMutation = (
     query: GraphQLRequest,
