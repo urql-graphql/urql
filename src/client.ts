@@ -54,12 +54,6 @@ interface ActiveOperations {
   [operationKey: string]: number;
 }
 
-interface PromisfiedOperation {
-  context?: Partial<OperationContext>;
-  query: string | DocumentNode;
-  variables?;
-}
-
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
@@ -204,14 +198,13 @@ export class Client {
     }
   };
 
-  query({
-    query,
-    variables,
-    context,
-  }: PromisfiedOperation): Promise<OperationResult> {
-    const request = createRequest(query, variables);
+  query(
+    query: DocumentNode | string,
+    variables?: object,
+    context?: Partial<OperationContext>
+  ): Promise<OperationResult> {
     return pipe(
-      this.executeQuery(request, context),
+      this.executeQuery(createRequest(query, variables), context),
       take(1),
       toPromise
     );
@@ -243,14 +236,13 @@ export class Client {
     return this.executeRequestOperation(operation);
   };
 
-  mutation({
-    query,
-    variables,
-    context,
-  }: PromisfiedOperation): Promise<OperationResult> {
-    const request = createRequest(query, variables);
+  mutation(
+    query: DocumentNode | string,
+    variables?: object,
+    context?: Partial<OperationContext>
+  ): Promise<OperationResult> {
     return pipe(
-      this.executeMutation(request, context),
+      this.executeMutation(createRequest(query, variables), context),
       take(1),
       toPromise
     );

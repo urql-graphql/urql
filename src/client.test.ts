@@ -66,17 +66,16 @@ describe('exchange args', () => {
 
 describe('promisified arguments', () => {
   it('query', () => {
-    client.query({
-      query: gql`
+    client.query(
+      gql`
         {
           todos {
             id
           }
         }
       `,
-      variables: { example: 1234 },
-      context: {},
-    });
+      { example: 1234 }
+    );
 
     const received = receivedOps[0];
     expect(print(received.query)).toEqual(print(query.query));
@@ -92,17 +91,16 @@ describe('promisified arguments', () => {
   });
 
   it('mutation', () => {
-    client.mutation({
-      query: gql`
+    client.mutation(
+      gql`
         {
           todos {
             id
           }
         }
       `,
-      variables: { example: 1234 },
-      context: {},
-    });
+      { example: 1234 }
+    );
 
     const received = receivedOps[0];
     expect(print(received.query)).toEqual(print(query.query));
