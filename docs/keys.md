@@ -6,7 +6,7 @@ and use `id` or `_id` to identify them.
 The `keys` property allows us to intervene in this behavior by pointing
 to another location on the entity or by pre-/post-fixing it.
 
-Let's look at an example. Say we have a set of todos each with `__typename`
+Let's look at an example. Say we have a set of todos each with a `__typename`
 of `Todo`, but instead of identifying on `id` or `_id` we want to identify
 each record by its `name`.
 
