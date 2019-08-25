@@ -10,18 +10,24 @@ set up to alias local dependencies to avoid deduplication.
 
 ## Usage
 
-#### 1. Install dependencies
+#### 1. Build urql
 
 ```bash
-yarn
+cd ../../ && yarn && yarn build
 ```
 
-#### 2. Start server
+#### 2. Install dependencies
+
+```bash
+cd examples/3-ssr-with-nextjs && yarn
+```
+
+#### 3. Start server
 
 ```bash
 yarn dev
 ```
 
-#### 3. Open browser
+#### 4. Open browser
 
 Navigate to example at [http://localhost:3000/](http://localhost:3000/).
