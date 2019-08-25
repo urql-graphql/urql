@@ -1,7 +1,7 @@
 # Resolvers
 
-This is a way to alter the response you'll receive from the cache,
-so let's look at an example to get a better understanding.
+`resolvers` are a way to alter the response you'll receive from the cache.
+Let's look at an example to get a better understanding.
 
 ```js
 const cache = cacheExchange({
@@ -12,27 +12,30 @@ const cache = cacheExchange({
 ```
 
 Now when we query our `todos` every time we encounter an object with `Todo`
-as the `__typename` it will change the `text` to `secret`. So here we
-effectively change how we handle a certain property on an entity.
+as the `__typename` it will change the `text` to `'Secret'`. In this way we
+can effectively change how we handle a certain property on an entity.
 
-This looks pretty useless right now but let's look at what arguments
-are passed to this method so we can get a better understanding.
+This may seem pretty useless right now, but let's look at the arguments
+passed to `resolvers` to get a better sense of how powerful they are.
 
-A resolver gets four arguments:
+A `resolver` gets four arguments:
 
-- parent: in this case the result of the `Todo` up until us getting `text`
-- arguments: the arguments used in this field.
-- cache: this is the normalised cache, this cache provides us with a `resolve` method
-  more about this underneath.
-- info: contains the fragments used in the query and the field arguments in the query.
+- `parent` – The original entity in the cache. In the example above, this
+  would be the full `Todo` object.
+- `arguments` – The arguments used in this field.
+- `cache` – This is the normalized cache. The cache provides us with a `resolve` method;
+  see more about this [below](#cache.resolve).
+- `info` – This contains the fragments used in the query and the field arguments in the query.
 
-The `cache.resolve` method is used to get links and property values from the cache,
-our cache methods has three arguments:
+## `cache.resolve`
 
-- entity: this can either be an object containing a `__typename` and an `id` or `_id`.
-  This argument however can also be a string, this will be a key leading to a cached entity.
-- field: the field you want data for, this can be a relation or a single property.
-- arguments: the arguments to include on the field.
+The `cache.resolve` method is used to get links and property values from the cache.
+Our cache methods have three arguments:
+
+- `entity` – This can either be an object containing a `__typename` and an `id` or
+  `_id` field _or_ a string key leading to a cached entity.
+- `field` – The field you want data for. This can be a relation or a single property.
+- `arguments` – The arguments to include on the field.
 
 To get a better grasp let's look at a few examples.
 Consider the following data structure:
@@ -54,7 +57,7 @@ todos: [
 ];
 ```
 
-When we would use `resolve` to get the author it would look like this:
+Using `cache.resolve` to get the author would look like this:
 
 ```js
 const parent = {
@@ -68,7 +71,7 @@ const result = cache.resolve(parent, 'author');
 console.log(result); // 'Author:2'
 ```
 
-Now we have a stringed key that indicates our author, now we
+Now we have a stringed key that identifies our author. We
 can use this to derive the name of our author.
 
 ```js
@@ -76,7 +79,7 @@ const name = cache.resolve('Author:2', 'name');
 console.log(name); // 'Bar'
 ```
 
-This can solve practical use cases like for example date formatting,
-you can query the date and then convert it in your resolver.
+This can help solve practical use cases like date formatting,
+where you would query the date and then convert it in your resolver.
 
 [Back](../README.md)
