@@ -28,7 +28,7 @@ desirable to have data update across the entirety of an app when a response upda
 known pieces of data. This cache also provides configurable APIs to:
 
 - resolve Query data from the offline cache
-- update Query data after mutations
+- update Query data after mutations/subscriptions responses
 - provide optimistic Mutation responses
 
 > ⚠️ Note: `@urql/exchange-graphcache` is still in **beta**. Some features may be
@@ -85,7 +85,7 @@ is in place that matches if all fields of the fragment are present in the cache*
 You can currently configure:
 
 - `resolvers`: A nested `['__typename'][fieldName]` map to resolve results from cache
-- `updates`: A mutation field map to apply side-effect updates to the cache
+- `updates`: A Mutation/Subscription field map to apply side-effect updates to the cache
 - `optimistic`: A mutation field map to supply optimistic mutation responses
 - `keys`: A `__typename` map of functions to generate keys with
 
