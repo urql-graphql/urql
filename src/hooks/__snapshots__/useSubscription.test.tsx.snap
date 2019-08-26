@@ -2,8 +2,8 @@
 
 exports[`on initial useEffect initialises default state 1`] = `
 Object {
-  "data": undefined,
-  "error": undefined,
+  "data": 1234,
+  "error": 5678,
   "extensions": undefined,
   "fetching": true,
 }

@@ -1,9 +1,10 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 import { pipe, onEnd, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
+import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
 import { OperationContext } from '../types';
 
@@ -37,7 +38,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   const client = useContext(Context);
 
   const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
-    fetching: true,
+    fetching: false,
     error: undefined,
     data: undefined,
     extensions: undefined,
@@ -54,6 +55,8 @@ export const useSubscription = <T = any, R = T, V = object>(
   const executeSubscription = useCallback(
     (opts?: Partial<OperationContext>) => {
       unsubscribe.current();
+
+      setState(s => ({ ...s, fetching: true }));
 
       [unsubscribe.current] = pipe(
         client.executeSubscription(request, {
@@ -76,7 +79,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, setState, args.context]
   );
 
-  useEffect(() => {
+  useImmediateEffect(() => {
     if (args.pause) {
       unsubscribe.current();
       setState(s => ({ ...s, fetching: false }));
