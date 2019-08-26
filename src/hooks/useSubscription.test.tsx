@@ -123,9 +123,20 @@ it('calls handler', () => {
   expect(handler).toBeCalledWith(undefined, 1234);
 });
 
-it('Sets fetching false when pausing', () => {
-  const wrapper = renderer.create(<SubscriptionUser q={query} />);
-  wrapper.update(<SubscriptionUser q={query} pause />);
-  wrapper.update(<SubscriptionUser q={query} pause />);
-  expect(state.fetching).toBe(false);
+describe('pause', () => {
+  const props = { q: query };
+
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).not.toBeCalled();
+  });
+
+  it('skips executing queries if pause updates to true', () => {
+    const wrapper = renderer.create(<SubscriptionUser {...props} />);
+
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).toBeCalledTimes(1);
+    expect(state.fetching).toBe(false);
+  });
 });
