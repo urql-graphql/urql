@@ -33,6 +33,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
   const unsubscribe = useRef(noop);
+  const handlerRef = useRef(handler);
   const client = useContext(Context);
 
   const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
@@ -41,6 +42,10 @@ export const useSubscription = <T = any, R = T, V = object>(
     data: undefined,
     extensions: undefined,
   });
+
+  // Update handler on constant ref, since handler changes shouldn't
+  // trigger a new subscription run
+  handlerRef.current = handler;
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
@@ -57,16 +62,18 @@ export const useSubscription = <T = any, R = T, V = object>(
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
         subscribe(({ data, error, extensions }) => {
+          const { current: handler } = handlerRef;
+
           setState(s => ({
             fetching: true,
-            data: handler !== undefined ? handler(s.data, data) : data,
+            data: typeof handler === 'function' ? handler(s.data, data) : data,
             error,
             extensions,
           }));
         })
       );
     },
-    [client, handler, request, setState, args.context]
+    [client, request, setState, args.context]
   );
 
   useEffect(() => {
