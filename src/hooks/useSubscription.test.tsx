@@ -17,13 +17,15 @@ import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
-import { useSubscription } from './useSubscription';
+import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { OperationContext } from '../types';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
-let state: any;
+
+let state: UseSubscriptionState<any> | undefined;
+let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
 const SubscriptionUser: FC<{
   q: string;
@@ -31,9 +33,8 @@ const SubscriptionUser: FC<{
   context?: Partial<OperationContext>;
   pause?: boolean;
 }> = ({ q, handler, context, pause = false }) => {
-  const [s] = useSubscription({ query: q, context, pause }, handler);
-  state = s;
-  return <p>{s.data}</p>;
+  [state, execute] = useSubscription({ query: q, context, pause }, handler);
+  return <p>{state.data}</p>;
 };
 
 beforeEach(() => {
@@ -123,6 +124,15 @@ it('calls handler', () => {
   expect(handler).toBeCalledWith(undefined, 1234);
 });
 
+describe('execute subscription', () => {
+  it('triggers subscription execution', () => {
+    renderer.create(<SubscriptionUser q={query} />);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    act(() => execute && execute());
+    expect(client.executeSubscription).toBeCalledTimes(2);
+  });
+});
+
 describe('pause', () => {
   const props = { q: query };
 
@@ -137,6 +147,6 @@ describe('pause', () => {
     wrapper.update(<SubscriptionUser {...props} pause={true} />);
     wrapper.update(<SubscriptionUser {...props} pause={true} />);
     expect(client.executeSubscription).toBeCalledTimes(1);
-    expect(state.fetching).toBe(false);
+    expect(state).toMatchObject({ fetching: false });
   });
 });
