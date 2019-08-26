@@ -29,8 +29,9 @@ const SubscriptionUser: FC<{
   q: string;
   handler?: (prev: any, data: any) => any;
   context?: Partial<OperationContext>;
-}> = ({ q, handler, context }) => {
-  const [s] = useSubscription({ query: q, context }, handler);
+  pause?: boolean;
+}> = ({ q, handler, context, pause = false }) => {
+  const [s] = useSubscription({ query: q, context, pause }, handler);
   state = s;
   return <p>{s.data}</p>;
 };
@@ -120,4 +121,11 @@ it('calls handler', () => {
   wrapper.update(<SubscriptionUser q={query} handler={handler} />);
   expect(handler).toBeCalledTimes(1);
   expect(handler).toBeCalledWith(undefined, 1234);
+});
+
+it('Sets fetching false when pausing', () => {
+  const wrapper = renderer.create(<SubscriptionUser q={query} />);
+  wrapper.update(<SubscriptionUser q={query} pause />);
+  wrapper.update(<SubscriptionUser q={query} pause />);
+  expect(state.fetching).toBe(false);
 });
