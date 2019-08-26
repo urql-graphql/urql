@@ -15,6 +15,7 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import { empty } from 'wonka';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
 import { useSubscription, UseSubscriptionState } from './useSubscription';
@@ -124,10 +125,18 @@ it('calls handler', () => {
   expect(handler).toBeCalledWith(undefined, 1234);
 });
 
+describe('active teardown', () => {
+  it('sets fetching to false when the source ends', () => {
+    client.executeSubscription.mockReturnValueOnce(empty);
+    renderer.create(<SubscriptionUser q={query} />);
+    expect(client.executeSubscription).toHaveBeenCalled();
+    expect(state).toMatchObject({ fetching: false });
+  });
+});
+
 describe('execute subscription', () => {
   it('triggers subscription execution', () => {
     renderer.create(<SubscriptionUser q={query} />);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     act(() => execute && execute());
     expect(client.executeSubscription).toBeCalledTimes(2);
   });

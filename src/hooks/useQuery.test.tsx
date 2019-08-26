@@ -20,7 +20,7 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { pipe, onStart, onEnd, never } from 'wonka';
+import { pipe, onStart, onEnd, empty, never } from 'wonka';
 import { createClient } from '../client';
 import { OperationContext } from '../types';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
@@ -200,11 +200,19 @@ describe('on unmount', () => {
   });
 });
 
+describe('active teardown', () => {
+  it('sets fetching to false when the source ends', () => {
+    client.executeQuery.mockReturnValueOnce(empty);
+    renderer.create(<QueryUser {...props} />);
+    expect(client.executeQuery).toHaveBeenCalled();
+    expect(state).toMatchObject({ fetching: false });
+  });
+});
+
 describe('execute query', () => {
   it('triggers query execution', () => {
     renderer.create(<QueryUser {...props} />);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    act(() => execute!());
+    act(() => execute && execute());
     expect(client.executeQuery).toBeCalledTimes(2);
   });
 });
