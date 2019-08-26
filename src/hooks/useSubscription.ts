@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useContext, useEffect, useRef } from 'react';
-import { pipe, subscribe } from 'wonka';
+import { pipe, onEnd, subscribe } from 'wonka';
 import { Context } from '../context';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
@@ -47,6 +47,7 @@ export const useSubscription = <T = any, R = T, V = object>(
 
     [unsubscribe.current] = pipe(
       client.executeSubscription(request, args.context || {}),
+      onEnd(() => setState(s => ({ ...s, fetching: false }))),
       subscribe(({ data, error, extensions }) => {
         setState(s => ({
           fetching: true,

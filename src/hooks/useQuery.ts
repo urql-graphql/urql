@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useContext, useRef } from 'react';
-import { pipe, subscribe } from 'wonka';
+import { pipe, onEnd, subscribe } from 'wonka';
 import { Context } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
@@ -61,6 +61,7 @@ export const useQuery = <T = any, V = object>(
           ...args.context,
           ...opts,
         }),
+        onEnd(() => setState(s => ({ ...s, fetching: false }))),
         subscribe(({ data, error, extensions }) => {
           setState({ fetching: false, data, error, extensions });
         })
