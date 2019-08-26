@@ -10,6 +10,7 @@ import { OperationContext } from '../types';
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
   variables?: V;
+  pause?: boolean;
   context?: Partial<OperationContext>;
 }
 
@@ -22,7 +23,10 @@ export interface UseSubscriptionState<T> {
   extensions?: Record<string, any>;
 }
 
-export type UseSubscriptionResponse<T> = [UseSubscriptionState<T>];
+export type UseSubscriptionResponse<T> = [
+  UseSubscriptionState<T>,
+  (opts?: Partial<OperationContext>) => void
+];
 
 export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
@@ -42,30 +46,39 @@ export const useSubscription = <T = any, R = T, V = object>(
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  const executeSubscription = useCallback(() => {
-    unsubscribe.current();
+  const executeSubscription = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      unsubscribe.current();
 
-    [unsubscribe.current] = pipe(
-      client.executeSubscription(request, args.context || {}),
-      onEnd(() => setState(s => ({ ...s, fetching: false }))),
-      subscribe(({ data, error, extensions }) => {
-        setState(s => ({
-          fetching: true,
-          data: handler !== undefined ? handler(s.data, data) : data,
-          error,
-          extensions,
-        }));
-      })
-    );
-  }, [client, handler, request, setState, args.context]);
+      [unsubscribe.current] = pipe(
+        client.executeSubscription(request, {
+          ...args.context,
+          ...opts,
+        }),
+        onEnd(() => setState(s => ({ ...s, fetching: false }))),
+        subscribe(({ data, error, extensions }) => {
+          setState(s => ({
+            fetching: true,
+            data: handler !== undefined ? handler(s.data, data) : data,
+            error,
+            extensions,
+          }));
+        })
+      );
+    },
+    [client, handler, request, setState, args.context]
+  );
 
-  // Trigger subscription on query change
-  // We don't use useImmediateEffect here as we have no way of
-  // unsubscribing from subscriptions during SSR
   useEffect(() => {
+    if (args.pause) {
+      unsubscribe.current();
+      setState(s => ({ ...s, fetching: false }));
+      return noop;
+    }
+
     executeSubscription();
     return () => unsubscribe.current(); // eslint-disable-line
-  }, [executeSubscription]);
+  }, [executeSubscription, args.pause, setState]);
 
-  return [state];
+  return [state, executeSubscription];
 };
