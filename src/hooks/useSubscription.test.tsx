@@ -2,9 +2,9 @@
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { fromArray } = require('wonka');
+  const { concat, fromValue, never } = require('wonka');
   const mock = {
-    executeSubscription: jest.fn(() => fromArray([d])),
+    executeSubscription: jest.fn(() => concat([fromValue(d), never])),
   };
 
   return {
