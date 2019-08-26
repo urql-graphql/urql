@@ -136,6 +136,6 @@
   },
   "dependencies": {
     "fast-json-stable-stringify": "^2.0.0",
-    "wonka": "^3.2.0"
+    "wonka": "^3.2.1"
   }
 }

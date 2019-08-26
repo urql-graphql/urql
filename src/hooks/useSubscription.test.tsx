@@ -2,9 +2,9 @@
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { fromArray } = require('wonka');
+  const { merge, fromValue, never } = require('wonka');
   const mock = {
-    executeSubscription: jest.fn(() => fromArray([d])),
+    executeSubscription: jest.fn(() => merge([fromValue(d), never])),
   };
 
   return {
@@ -15,24 +15,27 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import { empty } from 'wonka';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
-import { useSubscription } from './useSubscription';
+import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { OperationContext } from '../types';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
-let state: any;
+
+let state: UseSubscriptionState<any> | undefined;
+let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
 const SubscriptionUser: FC<{
   q: string;
   handler?: (prev: any, data: any) => any;
   context?: Partial<OperationContext>;
-}> = ({ q, handler, context }) => {
-  const [s] = useSubscription({ query: q, context }, handler);
-  state = s;
-  return <p>{s.data}</p>;
+  pause?: boolean;
+}> = ({ q, handler, context, pause = false }) => {
+  [state, execute] = useSubscription({ query: q, context, pause }, handler);
+  return <p>{state.data}</p>;
 };
 
 beforeEach(() => {
@@ -120,4 +123,39 @@ it('calls handler', () => {
   wrapper.update(<SubscriptionUser q={query} handler={handler} />);
   expect(handler).toBeCalledTimes(1);
   expect(handler).toBeCalledWith(undefined, 1234);
+});
+
+describe('active teardown', () => {
+  it('sets fetching to false when the source ends', () => {
+    client.executeSubscription.mockReturnValueOnce(empty);
+    renderer.create(<SubscriptionUser q={query} />);
+    expect(client.executeSubscription).toHaveBeenCalled();
+    expect(state).toMatchObject({ fetching: false });
+  });
+});
+
+describe('execute subscription', () => {
+  it('triggers subscription execution', () => {
+    renderer.create(<SubscriptionUser q={query} />);
+    act(() => execute && execute());
+    expect(client.executeSubscription).toBeCalledTimes(2);
+  });
+});
+
+describe('pause', () => {
+  const props = { q: query };
+
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).not.toBeCalled();
+  });
+
+  it('skips executing queries if pause updates to true', () => {
+    const wrapper = renderer.create(<SubscriptionUser {...props} />);
+
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).toBeCalledTimes(1);
+    expect(state).toMatchObject({ fetching: false });
+  });
 });

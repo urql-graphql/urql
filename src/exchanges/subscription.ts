@@ -59,7 +59,7 @@ const isSubscriptionOperation = (operation: Operation) =>
 
 export const subscriptionExchange = ({
   forwardSubscription,
-}: SubscriptionExchangeOpts): Exchange => ({ forward }) => {
+}: SubscriptionExchangeOpts): Exchange => ({ client, forward }) => {
   const createSubscriptionSource = (
     operation: Operation
   ): Source<OperationResult> => {
@@ -72,13 +72,27 @@ export const subscriptionExchange = ({
     });
 
     return make<OperationResult>(([next, complete]) => {
+      let isComplete = false;
+
       const sub = observableish.subscribe({
         next: result => next(makeResult(operation, result)),
         error: err => next(makeErrorResult(operation, err)),
-        complete,
+        complete: () => {
+          if (!isComplete) {
+            client.reexecuteOperation({
+              ...operation,
+              operationName: 'teardown',
+            });
+          }
+
+          complete();
+        },
       });
 
-      return () => sub.unsubscribe();
+      return () => {
+        isComplete = true;
+        sub.unsubscribe();
+      };
     });
   };
 

@@ -6255,10 +6255,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.0.tgz#40b9ce8e0c375127437661290e98e5d9e5278440"
-  integrity sha512-sHCLouGzTclUlp1sdXAhuTqGMIoAQfpBit9puepaINPVqDBRtC8DPWtTUHC0DJIdFSO+DsO86AFBFCDor7Sn0g==
+wonka@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.1.tgz#f66123fabbb260f23a4e89f1526317169203e258"
+  integrity sha512-LpquZ9PJtYJ31AlMPp5tEba1y+S+wUmY7OyFLGZCmGSNO1ZOTTZGp/HbieFzP5fVJ9fWXCus3ecgDjwAssHSGg==
 
 wordwrap@~0.0.2:
   version "0.0.3"

@@ -8,6 +8,7 @@ import {
   share,
   Source,
   take,
+  takeUntil,
   merge,
   interval,
   fromValue,
@@ -179,8 +180,14 @@ export class Client {
       );
     }
 
+    const teardown$ = pipe(
+      this.operations$,
+      filter(op => op.operationName === 'teardown' && op.key === key)
+    );
+
     const result$ = pipe(
       operationResults$,
+      takeUntil(teardown$),
       onStart<OperationResult>(() => this.onOperationStart(operation)),
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
