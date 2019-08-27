@@ -84,8 +84,8 @@ export class Store {
     optimisticMutations?: OptimisticMutationConfig,
     keys?: KeyingConfig
   ) {
-    this.records = Pessimism.make();
-    this.links = Pessimism.make();
+    this.records = Pessimism.asMutable(Pessimism.make());
+    this.links = Pessimism.asMutable(Pessimism.make());
     this.resolvers = resolvers || {};
     this.updates = {
       Mutation: (updates && updates.Mutation) || {},

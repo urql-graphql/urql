@@ -4329,10 +4329,10 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-pessimism@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/pessimism/-/pessimism-1.0.1.tgz#5757cfa0a124e4a34ce99a0dc132aee2340d9160"
-  integrity sha512-7KaCFv6ZRbcOh9mCvbuh6/7VDDqCloFfu1ypqXKY0ko94K/8nKgLDHpaBRTnQWEByY83Y3ifthbU+v3d4D0Slw==
+pessimism@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pessimism/-/pessimism-1.1.0.tgz#51841ed6ed07d4e599c7c432b2187c9979d363ec"
+  integrity sha512-mf+BXYAIhNuwuV97CU9Pc6GhQQN/QyDFv4bxOVeevotlHPm4gcg4m9z6R5uFzP0XBfS5RZonFSKhq24w4MbiTw==
 
 picomatch@^2.0.5:
   version "2.0.7"
@@ -5820,6 +5820,11 @@ wonka@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.0.tgz#40b9ce8e0c375127437661290e98e5d9e5278440"
   integrity sha512-sHCLouGzTclUlp1sdXAhuTqGMIoAQfpBit9puepaINPVqDBRtC8DPWtTUHC0DJIdFSO+DsO86AFBFCDor7Sn0g==
+
+wonka@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.1.tgz#f66123fabbb260f23a4e89f1526317169203e258"
+  integrity sha512-LpquZ9PJtYJ31AlMPp5tEba1y+S+wUmY7OyFLGZCmGSNO1ZOTTZGp/HbieFzP5fVJ9fWXCus3ecgDjwAssHSGg==
 
 wordwrap@~0.0.2:
   version "0.0.3"
