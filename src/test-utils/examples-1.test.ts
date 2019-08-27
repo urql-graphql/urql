@@ -184,18 +184,18 @@ it('Respects property-level resolvers when given', () => {
             data.todos &&
             result &&
             result.toggleTodo &&
-            result.toggleTodo.id === '1'
+            (result.toggleTodo as any).id === '1'
           ) {
             data.todos[1] = {
               id: '1',
               text: `${data.todos[1].text} (Updated)`,
-              complete: result.toggleTodo.complete,
+              complete: (result.toggleTodo as any).complete,
               __typename: 'Todo',
             };
           } else if (data && data.todos) {
-            data.todos[Number(result.toggleTodo.id)] = {
-              ...data.todos[Number(result.toggleTodo.id)],
-              complete: result.toggleTodo.complete,
+            data.todos[Number((result.toggleTodo as any).id)] = {
+              ...data.todos[Number((result.toggleTodo as any).id)],
+              complete: (result.toggleTodo as any).complete,
             };
           }
           return data as Data;

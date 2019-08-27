@@ -66,8 +66,8 @@ export interface ResolverConfig {
   };
 }
 
-export type UpdateResolver<T = any> = (
-  result: T,
+export type UpdateResolver = (
+  result: Data,
   args: Variables,
   cache: Store,
   info: ResolveInfo
