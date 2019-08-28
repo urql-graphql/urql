@@ -32,6 +32,12 @@ You can then run the build using:
 yarn build
 ```
 
+Or run just the TypeScript build for type checks:
+
+```sh
+yarn run check
+```
+
 ## How do I test my changes?
 
 It's always good practice to run the tests when making changes.
