@@ -15,7 +15,10 @@ export interface UseMutationState<T> {
 
 export type UseMutationResponse<T, V> = [
   UseMutationState<T>,
-  (variables?: V) => Promise<OperationResult<T>>
+  (
+    variables?: V,
+    context?: Partial<OperationContext>
+  ) => Promise<OperationResult<T>>
 ];
 
 export const useMutation = <T = any, V = object>(

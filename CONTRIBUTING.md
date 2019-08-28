@@ -35,7 +35,7 @@ yarn build
 Or run just the TypeScript build for type checks:
 
 ```sh
-yarn build:types
+yarn run check
 ```
 
 ## How do I test my changes?
