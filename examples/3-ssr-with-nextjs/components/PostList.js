@@ -31,7 +31,7 @@ export default function PostList() {
 
   if (allPostsResult.error) {
     return <ErrorMessage message="Error loading posts." />;
-  } else if (allPostsResult.loading || !allPostsResult.data) {
+  } else if (allPostsResult.fetching || !allPostsResult.data) {
     return <div>Loading</div>;
   }
 
