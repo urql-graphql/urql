@@ -50,20 +50,18 @@ You'll then need to add the `cacheExchange`, that this package exposes, to your 
 by replacing the default cache exchange with it:
 
 ```js
-import {
-  createClient,
-  dedupExchange,
-  fetchExchange,
-} from 'urql';
+import { createClient, dedupExchange, fetchExchange } from 'urql';
 
-import { cacheExchange } from '@urql/exchange-graphcache;
+import { cacheExchange } from '@urql/exchange-graphcache';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
     dedupExchange,
     // Replace the default cacheExchange with the new one
-    cacheExchange({ /* config */ }),
+    cacheExchange({
+      /* config */
+    }),
     fetchExchange,
   ],
 });

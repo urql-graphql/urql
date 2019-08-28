@@ -8,7 +8,7 @@ That's where updates come into play. Analogous to our `resolvers`,
 `updates` get arguments, but instead of the `parent` argument we get the
 result given from the server due to a subscription trigger or a mutation.
 
-Let's look at two additional methods provided by the cache to enable
+Let's look at three additional methods provided by the cache to enable
 updates.
 
 The first we'll look at is `updateQuery`. This method, given a query and a result,
@@ -94,5 +94,30 @@ const cache = cacheExchange({
   },
 });
 ```
+
+The last method we'll look at is essentially an escape hatch
+this is called `invalidateQuery` and accepts a `query` as
+the first argument and variables for that query as the second.
+
+This method should only be needed when a mutation has some sort
+of side-effect, let's say when a user subscribes to a certain subject
+that user gets an additional agenda.
+
+This can't really be derived from the mutation response so we opt
+to invalidate our agenda's as followed:
+
+```js
+const cache = cacheExchange({
+  updates: {
+    Mutation: {
+      subscribeToSubject: (result, args, cache, info) => {
+        cache.invalidateQuery(AgendasForUser, { userId: args.userId });
+      },
+    },
+  },
+});
+```
+
+Next time we hit the query for agendas this will be refetched.
 
 [Back](../README.md)

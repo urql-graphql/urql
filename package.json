@@ -2,7 +2,14 @@
   "name": "@urql/exchange-graphcache",
   "version": "1.0.0-beta.3",
   "description": "A normalized and configurable cache exchange for urql",
-  "repository": "https://github.com/kitten/urql-exchange-graphcache",
+  "repository": "https://github.com/FormidableLabs/urql-exchange-graphcache",
+  "keywords": [
+    "normalized cache",
+    "cache",
+    "urql",
+    "graphql",
+    "exchange"
+  ],
   "bugs": {
     "url": "https://github.com/FormidableLabs/urql-exchange-graphcache/issues"
   },

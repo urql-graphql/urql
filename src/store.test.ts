@@ -99,7 +99,7 @@ describe('Store with OptimisticMutationConfig', () => {
     clearStoreState();
   });
 
-  it('should resolve witha key as first argument', () => {
+  it('should resolve with a key as first argument', () => {
     const authorResult = store.resolve('Author:0', 'name');
     expect(authorResult).toBe('Jovi');
     const deps = getCurrentDependencies();
@@ -119,6 +119,63 @@ describe('Store with OptimisticMutationConfig', () => {
     const deps = getCurrentDependencies();
     expect(deps).toEqual(new Set(['Todo:0']));
     clearStoreState();
+  });
+
+  it('should be able to invalidate data (one relation key)', () => {
+    let { data } = query(store, { query: Todos });
+    expect((data as any).todos).toHaveLength(3);
+    expect(store.getRecord('Todo:0.text')).toBe('Go to the shops');
+    initStoreState(0);
+    store.invalidateQuery(Todos);
+    clearStoreState();
+    ({ data } = query(store, { query: Todos }));
+    expect((data as any).todos).toEqual(null);
+    expect(store.getRecord('Todo:0.text')).toBe(undefined);
+  });
+
+  it('should be able to invalidate data with arguments', () => {
+    const AppointmentQuery = gql`
+      query appointment($id: String) {
+        appointment(id: $id) {
+          __typename
+          id
+          info
+        }
+      }
+    `;
+    initStoreState(0);
+    write(
+      store,
+      {
+        query: AppointmentQuery,
+        variables: { id: '1' },
+      },
+      {
+        __typename: 'Query',
+        appointment: {
+          __typename: 'Appointment',
+          id: '1',
+          info: 'urql meeting',
+        },
+      }
+    );
+    clearStoreState();
+
+    let { data } = query(store, {
+      query: AppointmentQuery,
+      variables: { id: '1' },
+    });
+    expect((data as any).appointment.info).toBe('urql meeting');
+    expect(store.getRecord('Appointment:1.info')).toBe('urql meeting');
+    initStoreState(0);
+    store.invalidateQuery(AppointmentQuery, { id: '1' });
+    clearStoreState();
+    ({ data } = query(store, {
+      query: AppointmentQuery,
+      variables: { id: '1' },
+    }));
+    expect((data as any).appointment).toEqual(null);
+    expect(store.getRecord('Appointment:1.info')).toBe(undefined);
   });
 
   it('should be able to update a fragment', () => {

@@ -17,6 +17,7 @@ import {
 import { keyOfEntity, joinKeys, keyOfField } from './helpers';
 import { startQuery } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
+import { invalidate } from './operations/invalidate';
 
 interface Ref<T> {
   current: null | T;
@@ -176,6 +177,10 @@ export class Store {
         joinKeys(entityKey, keyOfField(field, args))
       );
     }
+  }
+
+  invalidateQuery(dataQuery: DocumentNode, variables: Variables) {
+    invalidate(this, { query: dataQuery, variables });
   }
 
   hasField(key: string): boolean {
