@@ -11,6 +11,16 @@ import { Data } from './types';
 import { query } from './operations/query';
 import { write, writeOptimistic } from './operations/write';
 
+const Appointment = gql`
+  query appointment($id: String) {
+    appointment(id: $id) {
+      __typename
+      id
+      info
+    }
+  }
+`;
+
 const Todos = gql`
   query {
     __typename
@@ -134,20 +144,11 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to invalidate data with arguments', () => {
-    const AppointmentQuery = gql`
-      query appointment($id: String) {
-        appointment(id: $id) {
-          __typename
-          id
-          info
-        }
-      }
-    `;
     initStoreState(0);
     write(
       store,
       {
-        query: AppointmentQuery,
+        query: Appointment,
         variables: { id: '1' },
       },
       {
@@ -162,16 +163,16 @@ describe('Store with OptimisticMutationConfig', () => {
     clearStoreState();
 
     let { data } = query(store, {
-      query: AppointmentQuery,
+      query: Appointment,
       variables: { id: '1' },
     });
     expect((data as any).appointment.info).toBe('urql meeting');
     expect(store.getRecord('Appointment:1.info')).toBe('urql meeting');
     initStoreState(0);
-    store.invalidateQuery(AppointmentQuery, { id: '1' });
+    store.invalidateQuery(Appointment, { id: '1' });
     clearStoreState();
     ({ data } = query(store, {
-      query: AppointmentQuery,
+      query: Appointment,
       variables: { id: '1' },
     }));
     expect((data as any).appointment).toEqual(null);
@@ -217,7 +218,7 @@ describe('Store with OptimisticMutationConfig', () => {
 
   it('should be able to update a query', () => {
     initStoreState(0);
-    store.updateQuery(Todos, data => ({
+    store.updateQuery({ query: Todos }, data => ({
       ...data,
       todos: [
         ...data.todos,
@@ -251,6 +252,49 @@ describe('Store with OptimisticMutationConfig', () => {
           },
         },
       ],
+    });
+    clearStoreState();
+  });
+
+  it('should be able to update a query with variables', () => {
+    initStoreState(0);
+    write(
+      store,
+      {
+        query: Appointment,
+        variables: { id: '1' },
+      },
+      {
+        __typename: 'Query',
+        appointment: {
+          __typename: 'Appointment',
+          id: '1',
+          info: 'urql meeting',
+        },
+      }
+    );
+    clearStoreState();
+    initStoreState(0);
+    store.updateQuery({ query: Appointment, variables: { id: '1' } }, data => ({
+      ...data,
+      appointment: {
+        ...data.appointment,
+        info: 'urql meeting revisited',
+      },
+    }));
+    clearStoreState();
+
+    const { data: result } = query(store, {
+      query: Appointment,
+      variables: { id: '1' },
+    });
+    expect(result).toEqual({
+      __typename: 'Query',
+      appointment: {
+        id: '1',
+        info: 'urql meeting revisited',
+        __typename: 'Appointment',
+      },
     });
     clearStoreState();
   });

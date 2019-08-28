@@ -188,14 +188,14 @@ export class Store {
   }
 
   updateQuery(
-    dataQuery: DocumentNode,
+    ctx: { query: DocumentNode; variables?: Variables },
     updater: (data: Data | null) => null | Data
   ): void {
-    const { data, completeness } = startQuery(this, { query: dataQuery });
+    const { data, completeness } = startQuery(this, ctx);
     const input = completeness === 'EMPTY' ? null : data;
     const output = updater(input);
     if (output !== null) {
-      startWrite(this, { query: dataQuery }, output);
+      startWrite(this, ctx, output);
     }
   }
 

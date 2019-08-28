@@ -178,7 +178,7 @@ it('Respects property-level resolvers when given', () => {
   const store = new Store(undefined, {
     Mutation: {
       toggleTodo: function toggleTodo(result, _, cache) {
-        cache.updateQuery(Todos, data => {
+        cache.updateQuery({ query: Todos }, data => {
           if (
             data &&
             data.todos &&
