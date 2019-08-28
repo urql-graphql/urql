@@ -13,12 +13,18 @@ export const evaluateValueNode = (node: ValueNode, vars: Variables) => {
     case Kind.FLOAT:
       return parseFloat(node.value);
     case Kind.LIST:
-      return node.values.map(v => evaluateValueNode(v, vars));
+      const values = new Array(node.values.length);
+      for (let i = 0, l = node.values.length; i < l; i++)
+        values[i] = evaluateValueNode(node.values[i], vars);
+      return values;
     case Kind.OBJECT:
-      return node.fields.reduce((obj, field) => {
-        obj[getName(field)] = evaluateValueNode(field.value, vars);
-        return obj;
-      }, Object.create(null));
+      const fields = Object.create(null);
+      for (let i = 0, l = node.fields.length; i < l; i++) {
+        const field = node.fields[i];
+        fields[getName(field)] = evaluateValueNode(field.value, vars);
+      }
+
+      return fields;
     case Kind.VARIABLE:
       const varValue = vars[getName(node)];
       return varValue !== undefined ? varValue : null;
@@ -36,10 +42,13 @@ export const getFieldArguments = (
     return null;
   }
 
-  return node.arguments.reduce((args, arg) => {
+  const args = Object.create(null);
+  for (let i = 0, l = node.arguments.length; i < l; i++) {
+    const arg = node.arguments[i];
     args[getName(arg)] = evaluateValueNode(arg.value, vars);
-    return args;
-  }, Object.create(null));
+  }
+
+  return args;
 };
 
 /** Returns a normalized form of variables with defaulted values */

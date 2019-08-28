@@ -29,7 +29,7 @@ import {
   clearStoreState,
 } from '../store';
 
-import { forEachFieldNode } from './shared';
+import { SelectionIterator } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 
 export interface QueryResult {
@@ -86,7 +86,7 @@ const readSelection = (
   const { store, variables } = ctx;
 
   // Get the __typename field for a given entity to check that it exists
-  const typename = store.getField(entityKey, '__typename');
+  const typename = isQuery ? 'Query' : store.getField(entityKey, '__typename');
   if (typeof typename !== 'string') {
     ctx.result.completeness = 'EMPTY';
     return null;
@@ -94,7 +94,10 @@ const readSelection = (
 
   data.__typename = typename;
 
-  forEachFieldNode(typename, entityKey, select, ctx, node => {
+  const iter = new SelectionIterator(typename, entityKey, select, ctx);
+
+  let node;
+  while ((node = iter.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, variables);
@@ -161,7 +164,7 @@ const readSelection = (
         data[fieldAlias] = resolveLink(ctx, link, fieldSelect, prevData);
       }
     }
-  });
+  }
 
   return data;
 };
@@ -222,11 +225,13 @@ const resolveLink = (
   prevData: void | Data | Data[]
 ): null | Data | Data[] => {
   if (Array.isArray(link)) {
-    // @ts-ignore: Link cannot be expressed as a recursive type
-    return link.map((childLink, index) => {
-      const data = prevData !== undefined ? prevData[index] : undefined;
-      return resolveLink(ctx, childLink, select, data);
-    });
+    const newLink = new Array(link.length);
+    for (let i = 0, l = link.length; i < l; i++) {
+      const data = prevData !== undefined ? prevData[i] : undefined;
+      newLink[i] = resolveLink(ctx, link[i], select, data);
+    }
+
+    return newLink;
   } else if (link === null) {
     return null;
   } else {

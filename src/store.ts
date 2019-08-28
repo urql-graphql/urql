@@ -54,17 +54,17 @@ export const getCurrentDependencies = () => refValue(currentDependencies);
 
 // Add a dependency to the internal store state
 export const addDependency = (dependency: string) => {
-  refValue(currentDependencies).add(dependency);
+  (currentDependencies.current as Set<string>).add(dependency);
 };
 
 const mapSet = <T>(map: Pessimism.Map<T>, key: string, value: T) => {
-  const optimisticKey = refValue(currentOptimisticKey);
+  const optimisticKey = currentOptimisticKey.current || 0;
   return Pessimism.setOptimistic(map, key, value, optimisticKey);
 };
 
 // Used to remove a value from a Map optimistially (possible by setting it to undefined)
 const mapRemove = <T>(map: Pessimism.Map<T>, key: string) => {
-  const optimisticKey = refValue(currentOptimisticKey);
+  const optimisticKey = currentOptimisticKey.current || 0;
   return optimisticKey
     ? Pessimism.setOptimistic(map, key, undefined, optimisticKey)
     : Pessimism.remove(map, key);

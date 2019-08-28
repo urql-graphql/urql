@@ -4330,10 +4330,10 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-pessimism@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/pessimism/-/pessimism-1.1.0.tgz#51841ed6ed07d4e599c7c432b2187c9979d363ec"
-  integrity sha512-mf+BXYAIhNuwuV97CU9Pc6GhQQN/QyDFv4bxOVeevotlHPm4gcg4m9z6R5uFzP0XBfS5RZonFSKhq24w4MbiTw==
+pessimism@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/pessimism/-/pessimism-1.1.1.tgz#29938c99416798d79a08b310546ccaf726765638"
+  integrity sha512-6+g9htw1Z1MlO4oh8jKGzLq8BZ+1EADzYiN1hCiDny4kLRMl2f02220aQoFY5sDjcV8M8UpIE90d8EkFTgsZFg==
 
 picomatch@^2.0.5:
   version "2.0.7"

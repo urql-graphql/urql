@@ -52,29 +52,26 @@ export const shouldInclude = (
   }
 
   // Finds any @include or @skip directive that forces the node to be skipped
-  const isSkipped = node.directives.some(directive => {
+  const { directives } = node;
+  for (let i = 0, l = directives.length; i < l; i++) {
+    const directive = directives[i];
     const name = getName(directive);
+
     // Ignore other directives
     const isInclude = name === 'include';
-    if (!isInclude && name !== 'skip') {
-      return false;
-    }
+    if (!isInclude && name !== 'skip') continue;
 
     // Get the first argument and expect it to be named "if"
     const arg = directive.arguments ? directive.arguments[0] : null;
-    if (!arg || getName(arg) !== 'if') {
-      return false;
-    }
+    if (!arg || getName(arg) !== 'if') continue;
 
     const value = evaluateValueNode(arg.value, vars);
-    if (typeof value !== 'boolean' && value !== null) {
-      return false;
-    }
+    if (typeof value !== 'boolean' && value !== null) continue;
 
     // Return whether this directive forces us to skip
     // `@include(if: false)` or `@skip(if: true)`
-    return isInclude ? !value : !!value;
-  });
+    return isInclude ? !!value : !value;
+  }
 
-  return !isSkipped;
+  return true;
 };

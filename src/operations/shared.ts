@@ -41,31 +41,65 @@ const isFragmentMatching = (
   });
 };
 
-export const forEachFieldNode = (
-  typename: void | string,
-  entityKey: string,
-  select: SelectionSet,
-  ctx: Context,
-  cb: (node: FieldNode) => void
-) => {
-  select.forEach(node => {
-    if (!shouldInclude(node, ctx.variables)) {
-      // Directives instruct this node to be skipped
-      return;
-    } else if (!isFieldNode(node)) {
-      // A fragment is either referred to by FragmentSpread or inline
-      const fragmentNode = isInlineFragment(node)
-        ? node
-        : ctx.fragments[getName(node)];
-      if (
-        fragmentNode !== undefined &&
-        isFragmentMatching(fragmentNode, typename, entityKey, ctx)
-      ) {
-        const fragmentSelect = getSelectionSet(fragmentNode);
-        forEachFieldNode(typename, entityKey, fragmentSelect, ctx, cb);
+export class SelectionIterator {
+  typename: void | string;
+  entityKey: string;
+  indexStack: number[];
+  context: Context;
+  selectionStack: SelectionSet[];
+
+  constructor(
+    typename: void | string,
+    entityKey: string,
+    select: SelectionSet,
+    ctx: Context
+  ) {
+    this.typename = typename;
+    this.entityKey = entityKey;
+    this.context = ctx;
+    this.indexStack = [0];
+    this.selectionStack = [select];
+  }
+
+  next(): void | FieldNode {
+    while (this.indexStack.length !== 0) {
+      const index = this.indexStack[this.indexStack.length - 1]++;
+      const select = this.selectionStack[this.selectionStack.length - 1];
+      if (index >= select.length) {
+        this.indexStack.pop();
+        this.selectionStack.pop();
+        continue;
+      } else {
+        const node = select[index];
+        if (!shouldInclude(node, this.context.variables)) {
+          continue;
+        } else if (!isFieldNode(node)) {
+          // A fragment is either referred to by FragmentSpread or inline
+          const fragmentNode = !isInlineFragment(node)
+            ? this.context.fragments[getName(node)]
+            : node;
+          if (
+            fragmentNode !== undefined &&
+            isFragmentMatching(
+              fragmentNode,
+              this.typename,
+              this.entityKey,
+              this.context
+            )
+          ) {
+            this.indexStack.push(0);
+            this.selectionStack.push(getSelectionSet(fragmentNode));
+          }
+
+          continue;
+        } else if (getName(node) === '__typename') {
+          continue;
+        } else {
+          return node;
+        }
       }
-    } else if (getName(node) !== '__typename') {
-      cb(node);
     }
-  });
-};
+
+    return undefined;
+  }
+}

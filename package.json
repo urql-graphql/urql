@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "fast-json-stable-stringify": "^2.0.0",
-    "pessimism": "^1.1.0",
+    "pessimism": "^1.1.1",
     "tiny-invariant": "^1.0.6",
     "warning": "^4.0.3",
     "wonka": "^3.2.1"
