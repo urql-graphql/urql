@@ -11,8 +11,10 @@ result given from the server due to a subscription trigger or a mutation.
 Let's look at three additional methods provided by the cache to enable
 updates.
 
-The first we'll look at is `updateQuery`. This method, given a query and a result,
-updates the cache.
+The first we'll look at is `updateQuery`. This method, given an object
+containg the query and optionally some variables as first argument and
+a callback with the result from this query as the second, will update the
+cache.
 
 ```js
 const Todos = gql`
@@ -27,7 +29,7 @@ const Todos = gql`
   }
 `;
 
-cache.updateQuery(Todos, data => {
+cache.updateQuery({ query: Todos, variables: { page: 1 } }, data => {
   data.todos.push({
     id: '2',
     text: 'Learn updates and resolvers',
@@ -77,7 +79,7 @@ const cache = cacheExchange({
   updates: {
     Mutation: {
       addTodo: (result, args, cache, info) => {
-        cache.updateQuery(Todos, data => {
+        cache.updateQuery({ query: Todos }, data => {
           data.todos.push(result);
           return data;
         });
@@ -85,7 +87,7 @@ const cache = cacheExchange({
     },
     Subscription: {
       newTodo: (result, args, cache) => {
-        cache.updateQuery(Todos, data => {
+        cache.updateQuery({ query: Todos }, data => {
           data.todos.push(result);
           return data;
         });
