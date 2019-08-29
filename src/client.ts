@@ -192,7 +192,9 @@ export class Client {
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
 
-    return this.suspense ? toSuspenseSource(result$) : result$;
+    return this.suspense && operationName !== 'subscription'
+      ? toSuspenseSource(result$)
+      : result$;
   }
 
   reexecuteOperation = (operation: Operation) => {
