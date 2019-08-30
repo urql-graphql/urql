@@ -8,7 +8,7 @@ import {
 } from 'urql';
 
 import { filter, map, merge, pipe, share, tap } from 'wonka';
-import { query, write, writeOptimistic } from './operations';
+import { query, write, writeOptimistic, readOperation } from './operations';
 import { Store } from './store';
 
 import {
@@ -185,11 +185,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // Take any OperationResult and update the cache with it
-  const updateCacheWithResult = ({ data, operation }: OperationResult) => {
-    let dependencies;
-    if (data !== null && data !== undefined) {
-      dependencies = write(store, operation, data).dependencies;
-    }
+  const updateCacheWithResult = (result: OperationResult): OperationResult => {
+    const { operation, error, extensions } = result;
+    const isQuery = isQueryOperation(operation);
+    let { data } = result;
 
     // Clear old optimistic values from the store
     const { key } = operation;
@@ -198,15 +197,30 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       store.clearOptimistic(key);
     }
 
-    if (dependencies !== undefined) {
-      // Update operations that depend on the updated data (except the current one)
-      processDependencies(operation, dependencies);
+    let writeDependencies, queryDependencies;
+    if (data !== null && data !== undefined) {
+      writeDependencies = write(store, operation, data).dependencies;
 
-      // Update this operation's dependencies if it's a query
-      if (isQueryOperation(operation)) {
-        updateDependencies(operation, dependencies);
+      if (isQuery) {
+        const queryResult = query(store, operation);
+        data = queryResult.data;
+        queryDependencies = queryResult.dependencies;
+      } else {
+        data = readOperation(store, operation, data).data;
       }
     }
+
+    if (writeDependencies !== undefined) {
+      // Update operations that depend on the updated data (except the current one)
+      processDependencies(result.operation, writeDependencies);
+    }
+
+    // Update this operation's dependencies if it's a query
+    if (isQuery && queryDependencies !== undefined) {
+      updateDependencies(result.operation, queryDependencies);
+    }
+
+    return { data, error, extensions, operation };
   };
 
   return ops$ => {
@@ -259,7 +273,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           cacheOps$,
         ])
       ),
-      tap(updateCacheWithResult),
+      map(updateCacheWithResult),
       map(addCacheOutcome('miss'))
     );
 

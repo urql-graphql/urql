@@ -19,7 +19,6 @@ import {
   Variables,
   Data,
   Link,
-  Scalar,
   SelectionSet,
   OperationRequest,
 } from '../types';
@@ -32,7 +31,7 @@ import {
   clearStoreState,
 } from '../store';
 
-import { SelectionIterator } from './shared';
+import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 
 export interface WriteResult {
@@ -204,7 +203,7 @@ const writeSelection = (
       store.writeRecord(fieldValue, fieldKey);
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
-      const { selections: fieldSelect } = node.selectionSet;
+      const fieldSelect = getSelectionSet(node);
       const link = writeField(ctx, fieldKey, fieldSelect, fieldValue);
       store.writeLink(link, fieldKey);
       store.removeRecord(fieldKey);
@@ -289,7 +288,7 @@ const writeRoot = (
       fieldValue !== null &&
       !isScalar(fieldValue)
     ) {
-      const { selections: fieldSelect } = node.selectionSet;
+      const fieldSelect = getSelectionSet(node);
       writeRootField(ctx, fieldValue, fieldSelect);
     }
 
@@ -327,18 +326,4 @@ const writeRootField = (
     const typename = data.__typename;
     writeRoot(ctx, typename, select, data);
   }
-};
-
-// Without a typename field on Data or Data[] the result must be a scalar
-// This effectively prevents us from writing Data into the store that
-// doesn't have a __typename field
-const isScalar = (x: any): x is Scalar | Scalar[] => {
-  if (Array.isArray(x)) {
-    return x.some(isScalar);
-  }
-
-  return (
-    typeof x !== 'object' ||
-    (x !== null && typeof (x as any).__typename !== 'string')
-  );
 };

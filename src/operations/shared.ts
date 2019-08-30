@@ -1,5 +1,5 @@
 import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
-import { Fragments, Variables, SelectionSet } from '../types';
+import { Fragments, Variables, SelectionSet, Scalar } from '../types';
 import { Store } from '../store';
 import { joinKeys, keyOfField } from '../helpers';
 
@@ -103,3 +103,17 @@ export class SelectionIterator {
     return undefined;
   }
 }
+
+// Without a typename field on Data or Data[] the result must be a scalar
+// This effectively prevents us from writing Data into the store that
+// doesn't have a __typename field
+export const isScalar = (x: any): x is Scalar | Scalar[] => {
+  if (Array.isArray(x)) {
+    return x.some(isScalar);
+  }
+
+  return (
+    typeof x !== 'object' ||
+    (x !== null && typeof (x as any).__typename !== 'string')
+  );
+};
