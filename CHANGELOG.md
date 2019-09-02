@@ -8,6 +8,16 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.4.1](https://github.com/FormidableLabs/urql/compare/v1.4.0...v1.4.1)
+
+This release adds "active teardowns" for operations, which means that an exchange can now send a teardown to cancel ongoing operations. The `subscriptionsExchange` for instance now ends ongoing subscriptions proactively if the server says that they've completed! This is also reflected as `fetching: false` in the `useQuery` and `useSubscription` hook.
+
+We've also fixed a small issue with suspense and added all features from `useQuery` to `useSubscription`! This includes the `pause` argument and an `executeSubscription` function.
+
+- ✨ Implement active teardowns and add missing features to `useSubscription` (see [#410](https://github.com/FormidableLabs/urql/pull/410))
+- Fix `UseMutationResponse` TypeScript type, by [@jbugman](https://github.com/jbugman) (see [#412](https://github.com/FormidableLabs/urql/pull/412))
+- Exclude subscriptions from suspense source (see [#415](https://github.com/FormidableLabs/urql/pull/415))
+
 ## [v1.4.0](https://github.com/FormidableLabs/urql/compare/v1.3.0...v1.4.0)
 
 This release removes all metadata for the `@urql/devtools` extension from the core
