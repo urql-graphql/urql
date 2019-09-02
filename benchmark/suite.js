@@ -1,6 +1,6 @@
 const gql = require('graphql-tag');
 const { InMemoryCache } = require('apollo-cache-inmemory');
-const { Store, write, query } = require('..');
+const { Store, write, query } = require('../dist/urql-exchange-graphcache.min');
 
 const countries = ['UK', 'BE', 'ES', 'US'];
 
