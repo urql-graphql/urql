@@ -555,18 +555,21 @@ it('follows nested resolvers for mutations', () => {
     );
 
   const fakeResolver = jest.fn();
+  const called: any[] = [];
 
   pipe(
     cacheExchange({
       resolvers: {
         Author: {
-          name: () => {
+          name: parent => {
+            called.push(parent.name);
             fakeResolver();
             return 'Secret Author';
           },
         },
         Book: {
-          title: () => {
+          title: parent => {
+            called.push(parent.title);
             fakeResolver();
             return 'Secret Book';
           },
@@ -607,4 +610,15 @@ it('follows nested resolvers for mutations', () => {
       },
     ],
   });
+
+  expect(called).toEqual([
+    // Query
+    '[REDACTED ONLINE]',
+    'Formidable',
+    'AwesomeGQL',
+    // Mutation
+    '[REDACTED ONLINE]',
+    'Formidable',
+    'AwesomeGQL',
+  ]);
 });

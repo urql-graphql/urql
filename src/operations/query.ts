@@ -205,6 +205,9 @@ const readSelection = (
     const resolvers = store.resolvers[typename];
     if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
       // We have a resolver for this field.
+      if (fieldValue !== undefined) {
+        data[fieldAlias] = fieldValue;
+      }
       const resolverValue = resolvers[fieldName](
         data,
         fieldArgs || {},
