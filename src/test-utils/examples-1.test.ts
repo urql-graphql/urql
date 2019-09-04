@@ -43,7 +43,7 @@ const NestedClearNameTodo = gql`
 `;
 
 it('passes the "getting-started" example', () => {
-  const store = new Store();
+  const store = new Store(undefined);
   const todosData = {
     __typename: 'Query',
     todos: [
@@ -117,7 +117,9 @@ it('passes the "getting-started" example', () => {
 });
 
 it('respects property-level resolvers when given', () => {
-  const store = new Store({ Todo: { text: () => 'hi' } });
+  const store = new Store(undefined, {
+    Todo: { text: () => 'hi' },
+  });
   const todosData = {
     __typename: 'Query',
     todos: [
@@ -175,7 +177,7 @@ it('respects property-level resolvers when given', () => {
 });
 
 it('Respects property-level resolvers when given', () => {
-  const store = new Store(undefined, {
+  const store = new Store(undefined, undefined, {
     Mutation: {
       toggleTodo: function toggleTodo(result, _, cache) {
         cache.updateQuery({ query: Todos }, data => {

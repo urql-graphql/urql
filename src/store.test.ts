@@ -39,7 +39,7 @@ const Todos = gql`
 
 describe('Store with KeyingConfig', () => {
   it('generates keys from custom keying function', () => {
-    const store = new Store(undefined, undefined, undefined, {
+    const store = new Store(undefined, undefined, undefined, undefined, {
       User: () => 'me',
     });
 
@@ -56,7 +56,7 @@ describe('Store with OptimisticMutationConfig', () => {
   let store, todosData;
 
   beforeEach(() => {
-    store = new Store(undefined, undefined, {
+    store = new Store(undefined, undefined, undefined, {
       addTodo: variables => {
         return {
           ...variables,
@@ -236,7 +236,9 @@ describe('Store with OptimisticMutationConfig', () => {
     }));
     clearStoreState();
 
-    const { data: result } = query(store, { query: Todos });
+    const { data: result } = query(store, {
+      query: Todos,
+    });
     expect(result).toEqual({
       __typename: 'Query',
       todos: [

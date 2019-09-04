@@ -8,7 +8,6 @@ import {
   getName,
   getFieldArguments,
   getFieldAlias,
-  getOperationName,
 } from '../ast';
 
 import {
@@ -33,6 +32,7 @@ import {
 
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
+import { SchemaPredicates } from '../ast/schemaPredicates';
 
 export interface QueryResult {
   completeness: Completeness;
@@ -45,6 +45,7 @@ interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
+  schemaPredicates?: SchemaPredicates;
 }
 
 /** Reads a request entirely from the store */
@@ -70,9 +71,15 @@ export const startQuery = (store: Store, request: OperationRequest) => {
     fragments: getFragments(request.query),
     result,
     store,
+    schemaPredicates: store.schemaPredicates,
   };
 
-  result.data = readSelection(ctx, 'Query', getSelectionSet(operation), root);
+  result.data = readSelection(
+    ctx,
+    ctx.store.getRootKey('query'),
+    getSelectionSet(operation),
+    root
+  );
 
   return result;
 };
@@ -97,11 +104,12 @@ export const readOperation = (
     fragments: getFragments(request.query),
     result,
     store,
+    schemaPredicates: store.schemaPredicates,
   };
 
   result.data = readRoot(
     ctx,
-    getOperationName(operation),
+    ctx.store.getRootKey(operation.operation),
     getSelectionSet(operation),
     data
   );
@@ -175,23 +183,24 @@ const readSelection = (
   select: SelectionSet,
   data: Data
 ): Data | null => {
-  const isQuery = entityKey === 'Query';
+  const { store, variables, schemaPredicates } = ctx;
+  const isQuery = entityKey === store.getRootKey('query');
   if (!isQuery) addDependency(entityKey);
 
-  const { store, variables } = ctx;
-
   // Get the __typename field for a given entity to check that it exists
-  const typename = isQuery ? 'Query' : store.getField(entityKey, '__typename');
+  const typename = isQuery
+    ? store.getRootKey('query')
+    : store.getField(entityKey, '__typename');
   if (typeof typename !== 'string') {
     ctx.result.completeness = 'EMPTY';
     return null;
   }
 
   data.__typename = typename;
-
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
   let node;
+  let hasFields = false;
   while ((node = iter.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -205,9 +214,12 @@ const readSelection = (
     const resolvers = store.resolvers[typename];
     if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
       // We have a resolver for this field.
+      hasFields = true;
+      // Prepare the actual fieldValue, so that the resolver can use it
       if (fieldValue !== undefined) {
         data[fieldAlias] = fieldValue;
       }
+
       const resolverValue = resolvers[fieldName](
         data,
         fieldArgs || {},
@@ -235,13 +247,21 @@ const readSelection = (
       }
     } else if (node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly
-      if (fieldValue === undefined) {
+      if (
+        fieldValue === undefined &&
+        schemaPredicates !== undefined &&
+        schemaPredicates.isFieldNullable(typename, fieldName)
+      ) {
         // Cache Incomplete: A missing field means it wasn't cached
+        ctx.result.completeness = 'PARTIAL';
+        data[fieldAlias] = null;
+      } else if (fieldValue === undefined) {
         ctx.result.completeness = 'EMPTY';
         data[fieldAlias] = null;
       } else {
         // Not dealing with undefined means it's a cached field
         data[fieldAlias] = fieldValue;
+        hasFields = true;
       }
     } else {
       // null values mean that a field might be linked to other entities
@@ -253,6 +273,13 @@ const readSelection = (
         if (typeof fieldValue === 'object' && fieldValue !== null) {
           // The entity on the field was invalid and can still be recovered
           data[fieldAlias] = fieldValue;
+          hasFields = true;
+        } else if (
+          schemaPredicates !== undefined &&
+          schemaPredicates.isFieldNullable(typename, fieldName)
+        ) {
+          ctx.result.completeness = 'PARTIAL';
+          data[fieldAlias] = null;
         } else {
           ctx.result.completeness = 'EMPTY';
           data[fieldAlias] = null;
@@ -260,8 +287,14 @@ const readSelection = (
       } else {
         const prevData = data[fieldAlias] as Data;
         data[fieldAlias] = resolveLink(ctx, link, fieldSelect, prevData);
+        hasFields = true;
       }
     }
+  }
+
+  if (isQuery && ctx.result.completeness === 'PARTIAL' && !hasFields) {
+    ctx.result.completeness = 'EMPTY';
+    return null;
   }
 
   return data;

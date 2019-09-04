@@ -1,3 +1,4 @@
+import warning from 'warning';
 import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
 import { Fragments, Variables, SelectionSet, Scalar } from '../types';
 import { Store } from '../store';
@@ -12,26 +13,36 @@ import {
   getSelectionSet,
   getName,
 } from '../ast';
+import { SchemaPredicates } from '../ast/schemaPredicates';
 
 interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
+  schemaPredicates?: SchemaPredicates;
 }
 
-const isFragmentMatching = (
+const isFragmentHeuristicallyMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,
   typename: void | string,
   entityKey: string,
   ctx: Context
 ) => {
-  if (!typename) {
-    return false;
-  } else if (typename === getTypeCondition(node)) {
-    return true;
-  }
+  if (!typename) return false;
+  const typeCondition = getTypeCondition(node);
+  if (typename === typeCondition) return true;
 
-  // This is a heuristic for now, but temporary until schema awareness becomes a thing
+  warning(
+    false,
+    'Heuristic Fragment Matching: A fragment is trying to match against the `%s` type, ' +
+      'but the type condition is `%s`. Since GraphQL allows for interfaces `%s` may be an' +
+      'interface.\nA schema needs to be defined for this match to be deterministic, ' +
+      'otherwise the fragment will be matched heuristically!',
+    typename,
+    typeCondition,
+    typeCondition
+  );
+
   return !getSelectionSet(node).some(node => {
     if (!isFieldNode(node)) return false;
     const fieldName = getName(node);
@@ -78,17 +89,25 @@ export class SelectionIterator {
           const fragmentNode = !isInlineFragment(node)
             ? this.context.fragments[getName(node)]
             : node;
-          if (
-            fragmentNode !== undefined &&
-            isFragmentMatching(
-              fragmentNode,
-              this.typename,
-              this.entityKey,
-              this.context
-            )
-          ) {
-            this.indexStack.push(0);
-            this.selectionStack.push(getSelectionSet(fragmentNode));
+
+          if (fragmentNode !== undefined) {
+            const isMatching =
+              this.context.schemaPredicates !== undefined
+                ? this.context.schemaPredicates.isInterfaceOfType(
+                    getTypeCondition(fragmentNode),
+                    this.typename
+                  )
+                : isFragmentHeuristicallyMatching(
+                    fragmentNode,
+                    this.typename,
+                    this.entityKey,
+                    this.context
+                  );
+
+            if (isMatching) {
+              this.indexStack.push(0);
+              this.selectionStack.push(getSelectionSet(fragmentNode));
+            }
           }
 
           continue;

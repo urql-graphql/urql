@@ -16,11 +16,13 @@ import {
   clearStoreState,
 } from '../store';
 import { joinKeys, keyOfField } from '../helpers';
+import { SchemaPredicates } from '../ast/schemaPredicates';
 
 interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
+  schemaPredicates?: SchemaPredicates;
 }
 
 export const invalidate = (store: Store, request: OperationRequest) => {
@@ -31,9 +33,14 @@ export const invalidate = (store: Store, request: OperationRequest) => {
     variables: normalizeVariables(operation, request.variables),
     fragments: getFragments(request.query),
     store,
+    schemaPredicates: store.schemaPredicates,
   };
 
-  invalidateSelection(ctx, 'Query', getSelectionSet(operation));
+  invalidateSelection(
+    ctx,
+    ctx.store.getRootKey('query'),
+    getSelectionSet(operation)
+  );
 
   clearStoreState();
 };
