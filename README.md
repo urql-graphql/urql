@@ -23,6 +23,9 @@
 This is a drop-in replacement for the default `cacheExchange` that, instead of document
 caching, caches normalized data by keys and connections between data.
 
+You can also pass your introspected GraphQL schema to the `cacheExchange`, which enables
+it to deliver partial results and match fragments deterministically!
+
 `urql` is already quite a comprehensive GraphQL client. However in several cases it may be
 desirable to have data update across the entirety of an app when a response updates some
 known pieces of data. This cache also provides configurable APIs to:
@@ -69,14 +72,36 @@ const client = createClient({
 
 ## Future Features
 
-- [ ] Schema awareness and deterministic fragment matching
+- [x] Schema awareness and deterministic fragment matching
 - [ ] Basic offline and persistence support
-- [ ] Partial query results with `cache-only` and `cache-and-network` policies
+- [x] Partial query results
 
-Schema awareness is important so that we can offer safe offline results that
-are partially cached instead of fully. The schema is also necessary to know
-how to match interface or enum fragments correctly. **Currently a heuristic
-is in place that matches if all fields of the fragment are present in the cache**
+This cache defaults to **delivering safe results** by marking results as incomplete
+when any field is missing, triggering a `network-only` operation (a request), when
+it encounters uncached fields.
+
+Furthermore there's one case in caching where only having the `__typename` field
+leads to potentially unsafe behaviour: **interfaces**. When the cache encounters a
+fragment that tries to get data for an interface, it can't tell whether the
+cached type matches the interface. In this case we resort to a heuristic
+by default. When all fields of the fragment are on the target type, then the
+fragment matches successfully and we log a warning.
+
+Schema awareness has been introduced to the cache to improve this behaviour.
+When you pass your API's GraphQL schema to the cache, it becomes able to
+deliver **partial results**. When the cache has enough information so that
+only **optional fields** in a given query are missing, then it delivers
+a partial result from the cached data. Subsequently it still issues a network
+request (like with `cache-and-network`) to ensure that all information will
+still be delivered eventually.
+
+With a schema the cache can also match fragments that refer to interfaces
+**deterministically**, since it can look at the schema to match fragments
+against types.
+
+Schema awareness is also an important stepping stone for offline support.
+Without partial results it becomes difficult to deliver an offline UI
+safely, when just some bits of information are missing.
 
 ## Usage
 
@@ -86,6 +111,8 @@ You can currently configure:
 - `updates`: A Mutation/Subscription field map to apply side-effect updates to the cache
 - `optimistic`: A mutation field map to supply optimistic mutation responses
 - `keys`: A `__typename` map of functions to generate keys with
+- `schema`: An introspected GraphQL schema in JSON format. When it's passed the cache will
+  deliver partial results and enable deterministic fragment matching.
 
 > Note that you don't need any of these options to get started
 
