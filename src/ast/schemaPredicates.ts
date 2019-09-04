@@ -4,6 +4,8 @@ import warning from 'warning';
 import {
   buildClientSchema,
   isNullableType,
+  isListType,
+  isNonNullType,
   GraphQLSchema,
   GraphQLAbstractType,
   GraphQLObjectType,
@@ -19,37 +21,16 @@ export class SchemaPredicates {
   }
 
   isFieldNullable(typename: string, fieldName: string): boolean {
-    const type = this.schema.getType(typename);
-    expectObjectType(type, typename);
-
-    const object = type as GraphQLObjectType;
-    if (object === undefined) {
-      warning(
-        false,
-        'Invalid type: The type `%s` is not a type in the defined schema, ' +
-          'but the GraphQL document expects it to exist.\n' +
-          'Traversal will continue, however this may lead to undefined behavior!',
-        typename
-      );
-
-      return false;
-    }
-
-    const field = object.getFields()[fieldName];
-    if (field === undefined) {
-      warning(
-        false,
-        'Invalid field: The field `%s` does not exist on `%s`, ' +
-          'but the GraphQL document expects it to exist.\n' +
-          'Traversal will continue, however this may lead to undefined behavior!',
-        fieldName,
-        typename
-      );
-
-      return false;
-    }
-
+    const field = getField(this.schema, typename, fieldName);
+    if (field === undefined) return false;
     return isNullableType(field.type);
+  }
+
+  isListNullable(typename: string, fieldName: string): boolean {
+    const field = getField(this.schema, typename, fieldName);
+    if (field === undefined) return false;
+    const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
+    return isListType(ofType) && isNullableType(ofType.ofType);
   }
 
   isInterfaceOfType(
@@ -69,6 +50,44 @@ export class SchemaPredicates {
     return this.schema.isPossibleType(abstractNode, concreteNode);
   }
 }
+
+const getField = (
+  schema: GraphQLSchema,
+  typename: string,
+  fieldName: string
+) => {
+  const type = schema.getType(typename);
+  expectObjectType(type, typename);
+
+  const object = type as GraphQLObjectType;
+  if (object === undefined) {
+    warning(
+      false,
+      'Invalid type: The type `%s` is not a type in the defined schema, ' +
+        'but the GraphQL document expects it to exist.\n' +
+        'Traversal will continue, however this may lead to undefined behavior!',
+      typename
+    );
+
+    return undefined;
+  }
+
+  const field = object.getFields()[fieldName];
+  if (field === undefined) {
+    warning(
+      false,
+      'Invalid field: The field `%s` does not exist on `%s`, ' +
+        'but the GraphQL document expects it to exist.\n' +
+        'Traversal will continue, however this may lead to undefined behavior!',
+      fieldName,
+      typename
+    );
+
+    return undefined;
+  }
+
+  return field;
+};
 
 const expectObjectType = (type: any, typename: string) => {
   invariant(

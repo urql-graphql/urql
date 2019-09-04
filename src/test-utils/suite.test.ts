@@ -14,8 +14,9 @@ const expectCacheIntegrity = (testcase: TestCase) => {
   const request = { query: testcase.query, variables: testcase.variables };
   const writeRes = write(store, request, testcase.data);
   const queryRes = query(store, request);
+  expect(queryRes.data).not.toBe(null);
   expect(queryRes.data).toEqual(testcase.data);
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
 };
 

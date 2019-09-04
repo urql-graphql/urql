@@ -15,7 +15,7 @@ import {
 } from './types';
 
 import { keyOfEntity, joinKeys, keyOfField } from './helpers';
-import { startQuery } from './operations/query';
+import { read } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
 import { SchemaPredicates } from './ast/schemaPredicates';
@@ -211,9 +211,7 @@ export class Store {
     ctx: { query: DocumentNode; variables?: Variables },
     updater: (data: Data | null) => null | Data
   ): void {
-    const { data, completeness } = startQuery(this, ctx);
-    const input = completeness === 'EMPTY' ? null : data;
-    const output = updater(input);
+    const output = updater(read(this, ctx).data);
     if (output !== null) {
       startWrite(this, ctx, output);
     }

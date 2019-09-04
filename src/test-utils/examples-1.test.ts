@@ -62,7 +62,7 @@ it('passes the "getting-started" example', () => {
 
   expect(queryRes.data).toEqual(todosData);
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
 
   const mutatedTodo = {
     ...todosData.todos[2],
@@ -82,7 +82,7 @@ it('passes the "getting-started" example', () => {
 
   queryRes = query(store, { query: Todos });
 
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
   expect(queryRes.data).toEqual({
     ...todosData,
     todos: [...todosData.todos.slice(0, 2), mutatedTodo],
@@ -109,7 +109,7 @@ it('passes the "getting-started" example', () => {
 
   queryRes = query(store, { query: Todos });
 
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
   expect(queryRes.data).toEqual({
     ...todosData,
     todos: [...todosData.todos.slice(0, 2), newMutatedTodo],
@@ -145,7 +145,7 @@ it('respects property-level resolvers when given', () => {
     ],
   });
   expect(queryRes.dependencies).toEqual(writeRes.dependencies);
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
 
   const mutatedTodo = {
     ...todosData.todos[2],
@@ -165,7 +165,7 @@ it('respects property-level resolvers when given', () => {
 
   queryRes = query(store, { query: Todos });
 
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
   expect(queryRes.data).toEqual({
     ...todosData,
     todos: [
@@ -248,7 +248,7 @@ it('Respects property-level resolvers when given', () => {
 
   const queryRes = query(store, { query: Todos });
 
-  expect(queryRes.completeness).toBe('FULL');
+  expect(queryRes.partial).toBe(false);
   expect(queryRes.data).toEqual({
     ...todosData,
     todos: [

@@ -45,7 +45,7 @@ describe('Query', () => {
 
   it('test partial results', () => {
     const result = query(store, { query: TODO_QUERY });
-    expect(result.completeness).toEqual('PARTIAL');
+    expect(result.partial).toBe(true);
     expect(result.data).toEqual({
       __typename: 'Query',
       todos: [

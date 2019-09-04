@@ -17,7 +17,6 @@ import {
   DataField,
   Link,
   SelectionSet,
-  Completeness,
   OperationRequest,
   NullArray,
 } from '../types';
@@ -35,90 +34,61 @@ import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
 export interface QueryResult {
-  completeness: Completeness;
   dependencies: Set<string>;
+  partial: boolean;
   data: null | Data;
 }
 
 interface Context {
-  result: QueryResult;
+  partial: boolean;
   store: Store;
   variables: Variables;
   fragments: Fragments;
   schemaPredicates?: SchemaPredicates;
 }
 
-/** Reads a request entirely from the store */
-export const query = (store: Store, request: OperationRequest): QueryResult => {
-  initStoreState(0);
-
-  const result = startQuery(store, request);
-  clearStoreState();
-  return result;
-};
-
-export const startQuery = (store: Store, request: OperationRequest) => {
-  const operation = getMainOperation(request.query);
-  const root: Data = Object.create(null);
-  const result: QueryResult = {
-    completeness: 'FULL',
-    dependencies: getCurrentDependencies(),
-    data: root,
-  };
-
-  const ctx: Context = {
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    result,
-    store,
-    schemaPredicates: store.schemaPredicates,
-  };
-
-  result.data = readSelection(
-    ctx,
-    ctx.store.getRootKey('query'),
-    getSelectionSet(operation),
-    root
-  );
-
-  return result;
-};
-
-export const readOperation = (
+export const query = (
   store: Store,
   request: OperationRequest,
-  data: Data
-) => {
+  data?: Data
+): QueryResult => {
   initStoreState(0);
-
-  const operation = getMainOperation(request.query);
-
-  const result: QueryResult = {
-    completeness: 'FULL',
-    dependencies: getCurrentDependencies(),
-    data: null,
-  };
-
-  const ctx: Context = {
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    result,
-    store,
-    schemaPredicates: store.schemaPredicates,
-  };
-
-  result.data = readRoot(
-    ctx,
-    ctx.store.getRootKey(operation.operation),
-    getSelectionSet(operation),
-    data
-  );
-
+  const result = read(store, request, data);
   clearStoreState();
   return result;
 };
 
-export const readRoot = (
+export const read = (
+  store: Store,
+  request: OperationRequest,
+  input?: Data
+): QueryResult => {
+  const operation = getMainOperation(request.query);
+  const rootKey = store.getRootKey(operation.operation);
+  const rootSelect = getSelectionSet(operation);
+
+  const ctx: Context = {
+    variables: normalizeVariables(operation, request.variables),
+    fragments: getFragments(request.query),
+    partial: false,
+    store,
+    schemaPredicates: store.schemaPredicates,
+  };
+
+  let data = input || Object.create(null);
+  data =
+    rootKey !== 'Query'
+      ? readRoot(ctx, rootKey, rootSelect, data)
+      : readSelection(ctx, rootKey, rootSelect, data);
+
+  return {
+    dependencies: getCurrentDependencies(),
+    partial: data === undefined ? false : ctx.partial,
+    data: data === undefined ? null : data,
+  };
+};
+
+const readRoot = (
   ctx: Context,
   entityKey: string,
   select: SelectionSet,
@@ -169,8 +139,11 @@ const readRootField = (
   // Write entity to key that falls back to the given parentFieldKey
   const entityKey = ctx.store.keyOfEntity(originalData);
   if (entityKey !== null) {
-    const data: Data = Object.create(null);
-    return readSelection(ctx, entityKey, select, data);
+    // We assume that since this is used for result data this can never be undefined,
+    // since the result data has already been written to the cache
+    const newData = Object.create(null);
+    const fieldValue = readSelection(ctx, entityKey, select, newData);
+    return fieldValue === undefined ? null : fieldValue;
   } else {
     const typename = originalData.__typename;
     return readRoot(ctx, typename, select, originalData);
@@ -182,7 +155,7 @@ const readSelection = (
   entityKey: string,
   select: SelectionSet,
   data: Data
-): Data | null => {
+): Data | undefined => {
   const { store, variables, schemaPredicates } = ctx;
   const isQuery = entityKey === store.getRootKey('query');
   if (!isQuery) addDependency(entityKey);
@@ -192,8 +165,7 @@ const readSelection = (
     ? store.getRootKey('query')
     : store.getField(entityKey, '__typename');
   if (typeof typename !== 'string') {
-    ctx.result.completeness = 'EMPTY';
-    return null;
+    return undefined;
   }
 
   data.__typename = typename;
@@ -201,6 +173,7 @@ const readSelection = (
 
   let node;
   let hasFields = false;
+  let hasPartials = false;
   while ((node = iter.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -211,110 +184,133 @@ const readSelection = (
 
     if (isQuery) addDependency(fieldKey);
 
+    // We temporarily store the data field in here, but undefined
+    // means that the value is missing from the cache
+    let dataFieldValue: void | DataField;
+
     const resolvers = store.resolvers[typename];
-    if (resolvers !== undefined && resolvers.hasOwnProperty(fieldName)) {
+    if (resolvers !== undefined && typeof resolvers[fieldName] === 'function') {
       // We have a resolver for this field.
-      hasFields = true;
       // Prepare the actual fieldValue, so that the resolver can use it
       if (fieldValue !== undefined) {
         data[fieldAlias] = fieldValue;
       }
 
-      const resolverValue = resolvers[fieldName](
+      let resolverValue: DataField | undefined = resolvers[fieldName](
         data,
         fieldArgs || {},
         store,
         ctx
       );
 
-      if (node.selectionSet === undefined) {
-        // If it doesn't have a selection set we have resolved a property.
-        // We assume that a resolver for scalar values implies that this
-        // field is always present, so completeness won't be set to EMPTY here
-        data[fieldAlias] = resolverValue !== undefined ? resolverValue : null;
-      } else {
+      if (node.selectionSet !== undefined) {
         // When it has a selection set we are resolving an entity with a
         // subselection. This can either be a list or an object.
-        const fieldSelect = getSelectionSet(node);
-
-        data[fieldAlias] = resolveResolverResult(
+        resolverValue = resolveResolverResult(
           ctx,
           resolverValue,
+          typename,
+          fieldName,
           fieldKey,
-          fieldSelect,
+          getSelectionSet(node),
           data[fieldAlias] as Data | Data[]
         );
       }
+
+      // When we have a schema we check for a user's resolver whether the field is nullable
+      // Otherwise we trust the resolver and assume that it is
+      const isNull = resolverValue === undefined || resolverValue === null;
+      if (isNull && schemaPredicates !== undefined) {
+        dataFieldValue = undefined;
+      } else {
+        dataFieldValue = isNull ? null : resolverValue;
+      }
     } else if (node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly
-      if (
-        fieldValue === undefined &&
-        schemaPredicates !== undefined &&
-        schemaPredicates.isFieldNullable(typename, fieldName)
-      ) {
-        // Cache Incomplete: A missing field means it wasn't cached
-        ctx.result.completeness = 'PARTIAL';
-        data[fieldAlias] = null;
-      } else if (fieldValue === undefined) {
-        ctx.result.completeness = 'EMPTY';
-        data[fieldAlias] = null;
-      } else {
-        // Not dealing with undefined means it's a cached field
-        data[fieldAlias] = fieldValue;
-        hasFields = true;
-      }
+      dataFieldValue = fieldValue;
     } else {
-      // null values mean that a field might be linked to other entities
+      // We have a selection set which means that we'll be checking for links
       const fieldSelect = getSelectionSet(node);
       const link = store.getLink(fieldKey);
 
-      // Cache Incomplete: A missing link for a field means it's not cached
-      if (link === undefined) {
-        if (typeof fieldValue === 'object' && fieldValue !== null) {
-          // The entity on the field was invalid and can still be recovered
-          data[fieldAlias] = fieldValue;
-          hasFields = true;
-        } else if (
-          schemaPredicates !== undefined &&
-          schemaPredicates.isFieldNullable(typename, fieldName)
-        ) {
-          ctx.result.completeness = 'PARTIAL';
-          data[fieldAlias] = null;
-        } else {
-          ctx.result.completeness = 'EMPTY';
-          data[fieldAlias] = null;
-        }
-      } else {
+      if (link !== undefined) {
         const prevData = data[fieldAlias] as Data;
-        data[fieldAlias] = resolveLink(ctx, link, fieldSelect, prevData);
-        hasFields = true;
+        dataFieldValue = resolveLink(
+          ctx,
+          link,
+          typename,
+          fieldName,
+          fieldSelect,
+          prevData
+        );
+      } else if (typeof fieldValue === 'object' && fieldValue !== null) {
+        // The entity on the field was invalid but can still be recovered
+        dataFieldValue = fieldValue;
       }
+    }
+
+    // Now that dataFieldValue has been retrieved it'll be set on data
+    // If it's uncached (undefined) but nullable we can continue assembling
+    // a partial query result
+    if (
+      dataFieldValue === undefined &&
+      schemaPredicates !== undefined &&
+      schemaPredicates.isFieldNullable(typename, fieldName)
+    ) {
+      // The field is uncached but we have a schema that says it's nullable
+      // Set the field to null and continue
+      hasPartials = true;
+      data[fieldAlias] = null;
+    } else if (dataFieldValue === undefined) {
+      // The field is uncached and not nullable; return undefined
+      return undefined;
+    } else {
+      // Otherwise continue as usual
+      hasFields = true;
+      data[fieldAlias] = dataFieldValue;
     }
   }
 
-  if (isQuery && ctx.result.completeness === 'PARTIAL' && !hasFields) {
-    ctx.result.completeness = 'EMPTY';
-    return null;
-  }
-
-  return data;
+  if (hasPartials) ctx.partial = true;
+  return isQuery && hasPartials && !hasFields ? undefined : data;
 };
 
 const resolveResolverResult = (
   ctx: Context,
   result: DataField,
+  typename: string,
+  fieldName: string,
   key: string,
   select: SelectionSet,
   prevData: void | Data | Data[]
-) => {
+): DataField | undefined => {
   // When we are dealing with a list we have to call this method again.
   if (Array.isArray(result)) {
-    // @ts-ignore: Link cannot be expressed as a recursive type
-    return result.map((childResult, index) => {
-      const data = prevData !== undefined ? prevData[index] : undefined;
-      const indexKey = joinKeys(key, `${index}`);
-      return resolveResolverResult(ctx, childResult, indexKey, select, data);
-    });
+    const { schemaPredicates } = ctx;
+    const isListNullable =
+      schemaPredicates !== undefined &&
+      schemaPredicates.isListNullable(typename, fieldName);
+    const newResult = new Array(result.length);
+    for (let i = 0, l = result.length; i < l; i++) {
+      const data = prevData !== undefined ? prevData[i] : undefined;
+      const childKey = joinKeys(key, `${i}`);
+      const childResult = resolveResolverResult(
+        ctx,
+        result[i],
+        typename,
+        fieldName,
+        childKey,
+        select,
+        data
+      );
+      if (childResult === undefined && !isListNullable) {
+        return undefined;
+      } else {
+        result[i] = childResult !== undefined ? childResult : null;
+      }
+    }
+
+    return newResult;
   } else if (result === null) {
     return null;
   } else if (isDataOrKey(result)) {
@@ -324,17 +320,8 @@ const resolveResolverResult = (
     const childKey =
       (typeof result === 'string' ? result : ctx.store.keyOfEntity(result)) ||
       key;
-    const selectionResult = readSelection(ctx, childKey, select, data);
-
-    if (selectionResult !== null && typeof result === 'object') {
-      for (key in result) {
-        if (key !== '__typename' && result.hasOwnProperty(key)) {
-          selectionResult[key] = result[key];
-        }
-      }
-    }
-
-    return selectionResult;
+    // TODO: Copy over fields from result but check against schema whether that's safe
+    return readSelection(ctx, childKey, select, data);
   }
 
   warning(
@@ -345,21 +332,38 @@ const resolveResolverResult = (
     key
   );
 
-  ctx.result.completeness = 'EMPTY';
-  return null;
+  return undefined;
 };
 
 const resolveLink = (
   ctx: Context,
   link: Link | Link[],
+  typename: string,
+  fieldName: string,
   select: SelectionSet,
   prevData: void | Data | Data[]
-): null | Data | Data[] => {
+): DataField | undefined => {
   if (Array.isArray(link)) {
+    const { schemaPredicates } = ctx;
+    const isListNullable =
+      schemaPredicates !== undefined &&
+      schemaPredicates.isListNullable(typename, fieldName);
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
-      const data = prevData !== undefined ? prevData[i] : undefined;
-      newLink[i] = resolveLink(ctx, link[i], select, data);
+      const innerPrevData = prevData !== undefined ? prevData[i] : undefined;
+      const childLink = resolveLink(
+        ctx,
+        link[i],
+        typename,
+        fieldName,
+        select,
+        innerPrevData
+      );
+      if (childLink === undefined && !isListNullable) {
+        return undefined;
+      } else {
+        newLink[i] = childLink !== undefined ? childLink : null;
+      }
     }
 
     return newLink;

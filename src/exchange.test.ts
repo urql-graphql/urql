@@ -497,6 +497,7 @@ it('follows nested resolvers for mutations', () => {
       {
         __typename: 'Author',
         id: '123',
+        book: null,
         name: '[REDACTED ONLINE]',
       },
       {
@@ -519,6 +520,7 @@ it('follows nested resolvers for mutations', () => {
         __typename: 'Author',
         id: '123',
         name: '[REDACTED ONLINE]',
+        book: null,
       },
       {
         __typename: 'Author',
@@ -537,8 +539,7 @@ it('follows nested resolvers for mutations', () => {
     (forwardOp: Operation): OperationResult => {
       if (forwardOp.key === 1) {
         return { operation: queryOperation, data: queryData };
-      }
-      if (forwardOp.key === 2) {
+      } else if (forwardOp.key === 2) {
         return { operation: mutationOperation, data: mutationData };
       }
 
@@ -623,7 +624,7 @@ it('follows nested resolvers for mutations', () => {
   ]);
 });
 
-it.only('reexecutes query and returns data on partial result', () => {
+it('reexecutes query and returns data on partial result', () => {
   jest.useFakeTimers();
   const client = createClient({ url: '' });
   const [ops$, next] = makeSubject<Operation>();
@@ -632,6 +633,16 @@ it.only('reexecutes query and returns data on partial result', () => {
     // Empty mock to avoid going in an endless loop, since we would again return
     // partial data.
     .mockImplementation(() => {});
+
+  const initialQuery = gql`
+    query {
+      todos {
+        id
+        text
+        __typename
+      }
+    }
+  `;
 
   const query = gql`
     query {
@@ -649,8 +660,13 @@ it.only('reexecutes query and returns data on partial result', () => {
     }
   `;
 
-  const queryOperation = client.createRequestOperation('query', {
+  const initialQueryOperation = client.createRequestOperation('query', {
     key: 1,
+    query: initialQuery,
+  });
+
+  const queryOperation = client.createRequestOperation('query', {
+    key: 2,
     query,
   });
 
@@ -673,6 +689,8 @@ it.only('reexecutes query and returns data on partial result', () => {
   const response = jest.fn(
     (forwardOp: Operation): OperationResult => {
       if (forwardOp.key === 1) {
+        return { operation: initialQueryOperation, data: queryData };
+      } else if (forwardOp.key === 2) {
         return { operation: queryOperation, data: queryData };
       }
 
@@ -697,7 +715,7 @@ it.only('reexecutes query and returns data on partial result', () => {
     publish
   );
 
-  next(queryOperation);
+  next(initialQueryOperation);
   jest.runAllTimers();
   expect(response).toHaveBeenCalledTimes(1);
   expect(reexec).toHaveBeenCalledTimes(0);
@@ -706,15 +724,11 @@ it.only('reexecutes query and returns data on partial result', () => {
     todos: [
       {
         __typename: 'Todo',
-        author: null,
-        complete: null,
         id: '123',
         text: 'Learn',
       },
       {
         __typename: 'Todo',
-        author: null,
-        complete: null,
         id: '456',
         text: 'Teach',
       },

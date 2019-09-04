@@ -8,7 +8,8 @@ import {
 } from 'urql';
 
 import { filter, map, merge, pipe, share, tap } from 'wonka';
-import { query, write, writeOptimistic, readOperation } from './operations';
+import { query, write, writeOptimistic } from './operations';
+import { SchemaPredicates } from './ast/schemaPredicates';
 import { Store } from './store';
 
 import {
@@ -17,7 +18,6 @@ import {
   OptimisticMutationConfig,
   KeyingConfig,
 } from './types';
-import { SchemaPredicates } from './ast/schemaPredicates';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -96,13 +96,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 }) => {
   if (!opts) opts = {};
 
-  let schemaPredicates;
-  if (opts.schema) {
-    schemaPredicates = new SchemaPredicates(opts.schema);
-  }
-
   const store = new Store(
-    schemaPredicates,
+    opts.schema ? new SchemaPredicates(opts.schema) : undefined,
     opts.resolvers,
     opts.updates,
     opts.optimistic,
@@ -175,22 +170,19 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     operation: Operation
   ): OperationResultWithMeta => {
     const policy = getRequestPolicy(operation);
-    const { data, dependencies, completeness } = query(store, operation);
+    const { data, dependencies, partial } = query(store, operation);
     let cacheOutcome: CacheOutcome;
 
-    if (completeness === 'FULL' || policy === 'cache-only') {
-      updateDependencies(operation, dependencies);
-      cacheOutcome = 'hit';
-    } else if (completeness === 'PARTIAL') {
-      updateDependencies(operation, dependencies);
-      cacheOutcome = 'partial';
-    } else {
+    if (data === null) {
       cacheOutcome = 'miss';
+    } else {
+      updateDependencies(operation, dependencies);
+      cacheOutcome = !partial || policy === 'cache-only' ? 'hit' : 'partial';
     }
 
     return {
-      operation,
       outcome: cacheOutcome,
+      operation,
       data,
     };
   };
@@ -217,7 +209,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         data = queryResult.data;
         queryDependencies = queryResult.dependencies;
       } else {
-        data = readOperation(store, operation, data).data;
+        data = query(store, operation, data).data;
       }
     }
 

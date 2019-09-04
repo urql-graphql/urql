@@ -97,6 +97,3 @@ export interface OptimisticMutationConfig {
 export interface KeyingConfig {
   [typename: string]: KeyGenerator;
 }
-
-// Completeness of the query result
-export type Completeness = 'EMPTY' | 'PARTIAL' | 'FULL';
