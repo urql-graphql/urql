@@ -23,9 +23,7 @@
                 "name": "Todo",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -48,9 +46,7 @@
                 "name": "ID",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "text",
@@ -63,9 +59,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "complete",
@@ -74,9 +68,7 @@
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "author",
@@ -85,9 +77,7 @@
               "kind": "OBJECT",
               "name": "Author",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -137,9 +127,7 @@
                 "name": "ID",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "name",
@@ -152,9 +140,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "known",
@@ -163,9 +149,7 @@
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -190,17 +174,14 @@
                     "name": "ID",
                     "ofType": null
                   }
-                },
-                "defaultValue": null
+                }
               }
             ],
             "type": {
               "kind": "OBJECT",
               "name": "Todo",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -231,9 +212,7 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "queryType",
@@ -246,9 +225,7 @@
                 "name": "__Type",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "mutationType",
@@ -257,9 +234,7 @@
               "kind": "OBJECT",
               "name": "__Type",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "subscriptionType",
@@ -268,9 +243,7 @@
               "kind": "OBJECT",
               "name": "__Type",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "directives",
@@ -291,9 +264,7 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -316,9 +287,7 @@
                 "name": "__TypeKind",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "name",
@@ -327,9 +296,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "description",
@@ -338,9 +305,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "fields",
@@ -351,8 +316,7 @@
                   "kind": "SCALAR",
                   "name": "Boolean",
                   "ofType": null
-                },
-                "defaultValue": "false"
+                }
               }
             ],
             "type": {
@@ -367,9 +331,7 @@
                   "ofType": null
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "interfaces",
@@ -386,9 +348,7 @@
                   "ofType": null
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "possibleTypes",
@@ -405,9 +365,7 @@
                   "ofType": null
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "enumValues",
@@ -418,8 +376,7 @@
                   "kind": "SCALAR",
                   "name": "Boolean",
                   "ofType": null
-                },
-                "defaultValue": "false"
+                }
               }
             ],
             "type": {
@@ -434,9 +391,7 @@
                   "ofType": null
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "inputFields",
@@ -453,9 +408,7 @@
                   "ofType": null
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "ofType",
@@ -464,9 +417,7 @@
               "kind": "OBJECT",
               "name": "__Type",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -482,44 +433,28 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "SCALAR",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "SCALAR"
           },
           {
-            "name": "OBJECT",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "OBJECT"
           },
           {
-            "name": "INTERFACE",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INTERFACE"
           },
           {
-            "name": "UNION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "UNION"
           },
           {
-            "name": "ENUM",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "ENUM"
           },
           {
-            "name": "INPUT_OBJECT",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INPUT_OBJECT"
           },
           {
-            "name": "LIST",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "LIST"
           },
           {
-            "name": "NON_NULL",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "NON_NULL"
           }
         ],
         "possibleTypes": null
@@ -539,9 +474,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "description",
@@ -550,9 +483,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "args",
@@ -573,9 +504,7 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "type",
@@ -588,9 +517,7 @@
                 "name": "__Type",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "isDeprecated",
@@ -603,9 +530,7 @@
                 "name": "Boolean",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "deprecationReason",
@@ -614,9 +539,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -639,9 +562,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "description",
@@ -650,9 +571,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "type",
@@ -665,9 +584,7 @@
                 "name": "__Type",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "defaultValue",
@@ -676,9 +593,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -701,9 +616,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "description",
@@ -712,9 +625,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "isDeprecated",
@@ -727,9 +638,7 @@
                 "name": "Boolean",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "deprecationReason",
@@ -738,9 +647,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -763,9 +670,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "description",
@@ -774,9 +679,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "locations",
@@ -797,9 +700,7 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "args",
@@ -820,9 +721,7 @@
                   }
                 }
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -838,99 +737,61 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "QUERY",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "QUERY"
           },
           {
-            "name": "MUTATION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "MUTATION"
           },
           {
-            "name": "SUBSCRIPTION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "SUBSCRIPTION"
           },
           {
-            "name": "FIELD",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "FIELD"
           },
           {
-            "name": "FRAGMENT_DEFINITION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "FRAGMENT_DEFINITION"
           },
           {
-            "name": "FRAGMENT_SPREAD",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "FRAGMENT_SPREAD"
           },
           {
-            "name": "INLINE_FRAGMENT",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INLINE_FRAGMENT"
           },
           {
-            "name": "VARIABLE_DEFINITION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "VARIABLE_DEFINITION"
           },
           {
-            "name": "SCHEMA",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "SCHEMA"
           },
           {
-            "name": "SCALAR",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "SCALAR"
           },
           {
-            "name": "OBJECT",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "OBJECT"
           },
           {
-            "name": "FIELD_DEFINITION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "FIELD_DEFINITION"
           },
           {
-            "name": "ARGUMENT_DEFINITION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "ARGUMENT_DEFINITION"
           },
           {
-            "name": "INTERFACE",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INTERFACE"
           },
           {
-            "name": "UNION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "UNION"
           },
           {
-            "name": "ENUM",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "ENUM"
           },
           {
-            "name": "ENUM_VALUE",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "ENUM_VALUE"
           },
           {
-            "name": "INPUT_OBJECT",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INPUT_OBJECT"
           },
           {
-            "name": "INPUT_FIELD_DEFINITION",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "INPUT_FIELD_DEFINITION"
           }
         ],
         "possibleTypes": null
@@ -950,9 +811,7 @@
                 "name": "ID",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "text",
@@ -965,9 +824,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "complete",
@@ -976,9 +833,7 @@
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "author",
@@ -987,9 +842,7 @@
               "kind": "OBJECT",
               "name": "Author",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -1023,9 +876,7 @@
                 "name": "ID",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "text",
@@ -1038,9 +889,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "complete",
@@ -1049,9 +898,7 @@
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "author",
@@ -1060,9 +907,7 @@
               "kind": "OBJECT",
               "name": "Author",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "wallOfText",
@@ -1071,9 +916,7 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -1102,9 +945,7 @@
                 "name": "ID",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "text",
@@ -1117,9 +958,7 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "complete",
@@ -1128,9 +967,7 @@
               "kind": "SCALAR",
               "name": "Boolean",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "author",
@@ -1139,9 +976,7 @@
               "kind": "OBJECT",
               "name": "Author",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           },
           {
             "name": "maxLength",
@@ -1150,9 +985,7 @@
               "kind": "SCALAR",
               "name": "Int",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
+            }
           }
         ],
         "inputFields": null,
@@ -1183,14 +1016,10 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "SmallTodo",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "SmallTodo"
           },
           {
-            "name": "BigTodo",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "BigTodo"
           }
         ],
         "possibleTypes": null
@@ -1223,14 +1052,10 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "PUBLIC",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "PUBLIC"
           },
           {
-            "name": "PRIVATE",
-            "isDeprecated": false,
-            "deprecationReason": null
+            "name": "PRIVATE"
           }
         ],
         "possibleTypes": null
@@ -1243,85 +1068,6 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
-      }
-    ],
-    "directives": [
-      {
-        "name": "cacheControl",
-        "locations": ["FIELD_DEFINITION", "OBJECT", "INTERFACE"],
-        "args": [
-          {
-            "name": "maxAge",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "scope",
-            "type": {
-              "kind": "ENUM",
-              "name": "CacheControlScope",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ]
-      },
-      {
-        "name": "skip",
-        "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"],
-        "args": [
-          {
-            "name": "if",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ]
-      },
-      {
-        "name": "include",
-        "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"],
-        "args": [
-          {
-            "name": "if",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ]
-      },
-      {
-        "name": "deprecated",
-        "locations": ["FIELD_DEFINITION", "ENUM_VALUE"],
-        "args": [
-          {
-            "name": "reason",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": "\"No longer supported\""
-          }
-        ]
       }
     ]
   }

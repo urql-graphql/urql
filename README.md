@@ -146,6 +146,12 @@ mutation.
 
 [Read more](./docs/optimistic.md)
 
+### Schema
+
+Our way to see what your backend schema looks like, this offers additional functionality.
+
+[Read more](./docs/schema.md)
+
 ## Maintenance Status
 
 **Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
