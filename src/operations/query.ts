@@ -162,7 +162,7 @@ const readSelection = (
 
   // Get the __typename field for a given entity to check that it exists
   const typename = isQuery
-    ? store.getRootKey('query')
+    ? entityKey
     : store.getField(entityKey, '__typename');
   if (typeof typename !== 'string') {
     return undefined;

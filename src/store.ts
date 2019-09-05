@@ -1,5 +1,5 @@
 import invariant from 'invariant';
-import { DocumentNode, GraphQLSchema } from 'graphql';
+import { DocumentNode } from 'graphql';
 import * as Pessimism from 'pessimism';
 
 import {
@@ -14,7 +14,7 @@ import {
   KeyingConfig,
 } from './types';
 
-import { keyOfEntity, joinKeys, keyOfField } from './helpers';
+import { joinKeys, keyOfField } from './helpers';
 import { read } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
@@ -71,12 +71,6 @@ const mapRemove = <T>(map: Pessimism.Map<T>, key: string) => {
     : Pessimism.remove(map, key);
 };
 
-const defaultRootFields = {
-  query: 'Query',
-  mutation: 'Mutation',
-  subscription: 'Subscription',
-};
-
 type RootField = 'query' | 'mutation' | 'subscription';
 
 export class Store {
@@ -88,7 +82,9 @@ export class Store {
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
   schemaPredicates?: SchemaPredicates;
+
   rootFields: { query: string; mutation: string; subscription: string };
+  rootNames: { [name: string]: RootField };
 
   constructor(
     schemaPredicates?: SchemaPredicates,
@@ -100,16 +96,51 @@ export class Store {
     this.records = Pessimism.asMutable(Pessimism.make());
     this.links = Pessimism.asMutable(Pessimism.make());
     this.resolvers = resolvers || {};
+    this.optimisticMutations = optimisticMutations || {};
+    this.keys = keys || {};
+    this.schemaPredicates = schemaPredicates;
+
     this.updates = {
       Mutation: (updates && updates.Mutation) || {},
       Subscription: (updates && updates.Subscription) || {},
     } as UpdatesConfig;
-    this.optimisticMutations = optimisticMutations || {};
-    this.keys = keys || {};
-    this.schemaPredicates = schemaPredicates;
-    this.rootFields = schemaPredicates
-      ? getRootTypes(schemaPredicates.schema)
-      : defaultRootFields;
+
+    if (schemaPredicates) {
+      const { schema } = schemaPredicates;
+      const queryType = schema.getQueryType();
+      const mutationType = schema.getMutationType();
+      const subscriptionType = schema.getSubscriptionType();
+
+      const queryName = queryType ? queryType.name : 'Query';
+      const mutationName = mutationType ? mutationType.name : 'Mutation';
+      const subscriptionName = subscriptionType
+        ? subscriptionType.name
+        : 'Subscription';
+
+      this.rootFields = {
+        query: queryName,
+        mutation: mutationName,
+        subscription: subscriptionName,
+      };
+
+      this.rootNames = {
+        [queryName]: 'query',
+        [mutationName]: 'mutation',
+        [subscriptionName]: 'subscription',
+      };
+    } else {
+      this.rootFields = {
+        query: 'Query',
+        mutation: 'Mutation',
+        subscription: 'Subscription',
+      };
+
+      this.rootNames = {
+        Query: 'query',
+        Mutation: 'mutation',
+        Subscription: 'subscription',
+      };
+    }
   }
 
   getRootKey(name: RootField) {
@@ -117,12 +148,25 @@ export class Store {
   }
 
   keyOfEntity(data: Data) {
-    const { __typename: typename } = data;
-    if (typename !== undefined && this.keys[typename] !== undefined) {
-      return this.keys[typename](data);
-    } else {
-      return keyOfEntity(data);
+    const { __typename: typename, id, _id } = data;
+    if (!typename) {
+      return null;
+    } else if (this.rootNames[typename]) {
+      return this.rootNames[typename];
     }
+
+    let key;
+    if (this.keys[typename]) {
+      key = `${this.keys[typename](data)}`;
+    } else if (id !== undefined && id !== null) {
+      key = `${id}`;
+    } else if (_id !== undefined && _id !== null) {
+      key = `${_id}`;
+    } else {
+      return null;
+    }
+
+    return key ? `${typename}:${key}` : null;
   }
 
   clearOptimistic(optimisticKey: number) {
@@ -221,14 +265,3 @@ export class Store {
     writeFragment(this, dataFragment, data);
   }
 }
-
-const getRootTypes = (schema: GraphQLSchema) => {
-  const queryType = schema.getQueryType();
-  const mutationType = schema.getMutationType();
-  const subscriptionType = schema.getSubscriptionType();
-  return {
-    query: queryType ? queryType.name : 'Query',
-    mutation: mutationType ? mutationType.name : 'Mutation',
-    subscription: subscriptionType ? subscriptionType.name : 'Subscription',
-  };
-};

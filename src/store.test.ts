@@ -48,7 +48,7 @@ describe('Store with KeyingConfig', () => {
       'Any:123'
     );
     expect(store.keyOfEntity({ __typename: 'Any' })).toBe(null);
-    expect(store.keyOfEntity({ __typename: 'User' })).toBe('me');
+    expect(store.keyOfEntity({ __typename: 'User' })).toBe('User:me');
   });
 });
 
