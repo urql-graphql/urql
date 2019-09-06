@@ -1,21 +1,15 @@
 const pipeExpression = (t, pipeline) => {
-  if (pipeline.length === 1) {
-    return pipeline[0];
-  } else {
-    const operator = pipeline[pipeline.length - 1];
-    const rest = pipeline.slice(0, -1);
-    return t.callExpression(
-      pipeExpression(t, rest),
-      [operator]
-    );
-  }
+  let x = pipeline[0];
+  for (let i = 1; i < pipeline.length; i++)
+    x = t.callExpression(pipeline[i], [x]);
+  return x;
 };
 
 const pipePlugin = ({ types: t }) => ({
   visitor: {
     ImportDeclaration(path, state) {
       if (path.node.source.value === 'wonka') {
-        const { specifiers } = path.node
+        const { specifiers } = path.node;
         const pipeSpecifierIndex = specifiers.findIndex(spec => {
           return spec.imported.name === 'pipe';
         });
