@@ -1,7 +1,7 @@
 import { Store } from '../store';
 import gql from 'graphql-tag';
 import { write } from './write';
-import { query } from './query';
+import { invalidate } from './invalidate';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
 const TODO_QUERY = gql`
@@ -49,30 +49,6 @@ describe('Query', () => {
     spy.console = jest.spyOn(console, 'warn');
   });
 
-  it('test partial results', () => {
-    const result = query(store, { query: TODO_QUERY });
-    expect(result.partial).toBe(true);
-    expect(result.data).toEqual({
-      __typename: 'Query',
-      todos: [
-        {
-          id: '0',
-          text: 'Teach',
-          __typename: 'Todo',
-          author: null,
-          complete: null,
-        },
-        {
-          id: '1',
-          text: 'Learn',
-          __typename: 'Todo',
-          author: null,
-          complete: null,
-        },
-      ],
-    });
-  });
-
   it('should warn once for invalid fields on an entity', () => {
     const INVALID_TODO_QUERY = gql`
       query {
@@ -83,9 +59,9 @@ describe('Query', () => {
         }
       }
     `;
-    query(store, { query: INVALID_TODO_QUERY });
+    invalidate(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
-    query(store, { query: INVALID_TODO_QUERY });
+    invalidate(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/incomplete/);
   });
@@ -102,9 +78,9 @@ describe('Query', () => {
         }
       }
     `;
-    query(store, { query: INVALID_TODO_QUERY });
+    invalidate(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
-    query(store, { query: INVALID_TODO_QUERY });
+    invalidate(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });

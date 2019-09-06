@@ -1,7 +1,6 @@
 import { Store } from '../store';
 import gql from 'graphql-tag';
 import { write } from './write';
-import { query } from './query';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
 const TODO_QUERY = gql`
@@ -49,51 +48,51 @@ describe('Query', () => {
     spy.console = jest.spyOn(console, 'warn');
   });
 
-  it('test partial results', () => {
-    const result = query(store, { query: TODO_QUERY });
-    expect(result.partial).toBe(true);
-    expect(result.data).toEqual({
-      __typename: 'Query',
-      todos: [
-        {
-          id: '0',
-          text: 'Teach',
-          __typename: 'Todo',
-          author: null,
-          complete: null,
-        },
-        {
-          id: '1',
-          text: 'Learn',
-          __typename: 'Todo',
-          author: null,
-          complete: null,
-        },
-      ],
-    });
-  });
-
   it('should warn once for invalid fields on an entity', () => {
     const INVALID_TODO_QUERY = gql`
-      query {
-        todos {
+      mutation {
+        toggleTodo {
           id
           text
           incomplete
         }
       }
     `;
-    query(store, { query: INVALID_TODO_QUERY });
+    write(
+      store,
+      { query: INVALID_TODO_QUERY },
+      {
+        __typename: 'Mutation',
+        toggleTodo: {
+          __typename: 'Todo',
+          id: '0',
+          text: 'Teach',
+          incomplete: false,
+        },
+      }
+    );
     expect(console.warn).toHaveBeenCalledTimes(1);
-    query(store, { query: INVALID_TODO_QUERY });
+    write(
+      store,
+      { query: INVALID_TODO_QUERY },
+      {
+        __typename: 'Mutation',
+        toggleTodo: {
+          __typename: 'Todo',
+          id: '0',
+          text: 'Teach',
+          incomplete: false,
+        },
+      }
+    );
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/incomplete/);
   });
 
-  it('should warn once for invalid sub-entities on an entity', () => {
+  it('should warn once for invalid fields on an entity', () => {
     const INVALID_TODO_QUERY = gql`
-      query {
-        todos {
+      mutation {
+        toggleTodo {
           id
           text
           writer {
@@ -102,10 +101,40 @@ describe('Query', () => {
         }
       }
     `;
-    query(store, { query: INVALID_TODO_QUERY });
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    query(store, { query: INVALID_TODO_QUERY });
-    expect(console.warn).toHaveBeenCalledTimes(1);
+    write(
+      store,
+      { query: INVALID_TODO_QUERY },
+      {
+        __typename: 'Mutation',
+        toggleTodo: {
+          __typename: 'Todo',
+          id: '0',
+          text: 'Teach',
+          writer: {
+            id: '0',
+          },
+        },
+      }
+    );
+    // Because of us indicating Todo:Writer as a scalar
+    expect(console.warn).toHaveBeenCalledTimes(2);
+    write(
+      store,
+      { query: INVALID_TODO_QUERY },
+      {
+        __typename: 'Mutation',
+        toggleTodo: {
+          __typename: 'Todo',
+          id: '0',
+          text: 'Teach',
+          writer: {
+            id: '0',
+          },
+        },
+      }
+    );
+
+    expect(console.warn).toHaveBeenCalledTimes(2);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
 });

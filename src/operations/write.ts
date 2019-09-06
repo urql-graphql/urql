@@ -1,4 +1,4 @@
-import warning from 'warning';
+import { warning } from '../helpers/warning';
 import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 import {
@@ -163,8 +163,9 @@ export const writeFragment = (
     return warning(
       false,
       "Can't generate a key for writeFragment(...) data.\n" +
-        'You have to pass an `id` or `_id` field or create a custom `keys` config for `%s`.',
-      typeName
+        'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
+        typeName +
+        '`.'
     );
   }
 
@@ -202,6 +203,11 @@ const writeSelection = (
     const fieldValue = data[getFieldAlias(node)];
 
     if (isQuery) addDependency(fieldKey);
+
+    if (process.env.NODE_ENV !== 'production' && ctx.schemaPredicates) {
+      ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    }
+
     if (node.selectionSet === undefined) {
       // This is a leaf node, so we're setting the field's value directly
       store.writeRecord(fieldValue, fieldKey);
@@ -214,10 +220,11 @@ const writeSelection = (
     } else {
       warning(
         false,
-        'Invalid value: The field at `%s` is a scalar (number, boolean, etc)' +
+        'Invalid value: The field at `' +
+          fieldKey +
+          '` is a scalar (number, boolean, etc)' +
           ', but the GraphQL query expects a selection set for this field.\n' +
-          'The value will still be cached, however this may lead to undefined behavior!',
-        fieldKey
+          'The value will still be cached, however this may lead to undefined behavior!'
       );
 
       // This is a rare case for invalid entities
@@ -252,20 +259,27 @@ const writeField = (
   const entityKey = ctx.store.keyOfEntity(data);
   const key = entityKey !== null ? entityKey : parentFieldKey;
 
-  warning(
+  if (
     typeof data.__typename !== 'string' ||
-      ctx.store.keys[data.__typename] !== undefined ||
-      entityKey !== null,
-    'Invalid key: The GraphQL query at the field at `%s` has a selection set, ' +
-      'but no key could be generated for the data at this field.\n' +
-      'You have to request `id` or `_id` fields for all selection sets or create ' +
-      'a custom `keys` config for `%s`.\n' +
-      'Entities without keys will be embedded directly on the parent entity. ' +
-      'If this is intentional, create a `keys` config for `%s` that always returns null.',
-    parentFieldKey,
-    data.__typename,
-    data.__typename
-  );
+    ctx.store.keys[data.__typename] !== undefined ||
+    entityKey !== null
+  ) {
+    warning(
+      false,
+      'Invalid key: The GraphQL query at the field at `' +
+        parentFieldKey +
+        '` has a selection set, ' +
+        'but no key could be generated for the data at this field.\n' +
+        'You have to request `id` or `_id` fields for all selection sets or create ' +
+        'a custom `keys` config for `' +
+        data.__typename +
+        '`.\n' +
+        'Entities without keys will be embedded directly on the parent entity. ' +
+        'If this is intentional, create a `keys` config for `' +
+        data.__typename +
+        '` that always returns null.'
+    );
+  }
 
   writeSelection(ctx, key, select, data);
   return key;

@@ -1,5 +1,4 @@
-import warning from 'warning';
-
+import { warning } from '../helpers/warning';
 import {
   getFragments,
   getMainOperation,
@@ -184,6 +183,10 @@ const readSelection = (
 
     if (isQuery) addDependency(fieldKey);
 
+    if (process.env.NODE_ENV !== 'production' && schemaPredicates) {
+      schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    }
+
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
@@ -326,10 +329,11 @@ const resolveResolverResult = (
 
   warning(
     false,
-    'Invalid resolver value: The resolver at `%s` returned a scalar (number, boolean, etc)' +
+    'Invalid resolver value: The resolver at `' +
+      key +
+      '` returned a scalar (number, boolean, etc)' +
       ', but the GraphQL query expects a selection set for this field.\n' +
-      'If necessary, use Cache.resolve() to resolve a link or entity from the cache.',
-    key
+      'If necessary, use Cache.resolve() to resolve a link or entity from the cache.'
   );
 
   return undefined;
