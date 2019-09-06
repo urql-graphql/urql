@@ -8,6 +8,25 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.5.0](https://github.com/FormidableLabs/urql/compare/v1.4.1...v1.5.0)
+
+This release finally adds shortcuts to imperatively make queries and mutations.
+They make it easier to quickly use the client programmatically, either with
+a Wonka source-based or Promise-based call.
+
+```js
+// Call .query or .mutation which return Source<OperationResult>
+const source = client.query(doc, vars);
+const source = client.mutation(doc, vars);
+// Call .toPromise() on the source to get Promise<OperationResult>
+const promise = client.query(doc, vars).toPromise();
+const promise = client.mutation(doc, vars).toPromise();
+```
+
+- ✨ Implement `client.query()` and `client.mutation()` (see [#405](https://github.com/FormidableLabs/urql/pull/405))
+- Fix `useImmediateEffect` for concurrent mode (see [#418](https://github.com/FormidableLabs/urql/pull/418))
+- Deconstruct `Wonka.pipe` using a Babel transform (see [#419](https://github.com/FormidableLabs/urql/pull/419))
+
 ## [v1.4.1](https://github.com/FormidableLabs/urql/compare/v1.4.0...v1.4.1)
 
 This release adds "active teardowns" for operations, which means that an exchange can now send a teardown to cancel ongoing operations. The `subscriptionsExchange` for instance now ends ongoing subscriptions proactively if the server says that they've completed! This is also reflected as `fetching: false` in the `useQuery` and `useSubscription` hook.
