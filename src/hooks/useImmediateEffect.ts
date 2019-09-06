@@ -2,11 +2,10 @@
 
 import { useRef, useEffect, EffectCallback } from 'react';
 
-type LifecycleState = 0 | 1 | 2;
+type LifecycleState = 0 | 1;
 
-const WILL_MOUNT = 0;
-const DID_MOUNT = 1;
-const UPDATE = 2;
+const MOUNT = 0;
+const UPDATE = 1;
 
 /** This is a drop-in replacement for useEffect that will execute the first effect that happens during initial mount synchronously */
 export const useImmediateEffect = (
@@ -14,11 +13,10 @@ export const useImmediateEffect = (
   changes: ReadonlyArray<any>
 ) => {
   const teardown = useRef<ReturnType<EffectCallback>>(undefined);
-  const state = useRef<LifecycleState>(WILL_MOUNT);
+  const state = useRef<LifecycleState>(MOUNT);
 
   // On initial render we just execute the effect
-  if (state.current === WILL_MOUNT) {
-    state.current = DID_MOUNT;
+  if (state.current === MOUNT) {
     teardown.current = effect();
   }
 
