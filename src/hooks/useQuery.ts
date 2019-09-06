@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { pipe, onEnd, subscribe } from 'wonka';
-import { Context } from '../context';
+import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
@@ -33,7 +33,7 @@ export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
   const unsubscribe = useRef(noop);
-  const client = useContext(Context);
+  const client = useClient();
 
   // This is like useState but updates the state object
   // immediately, when we're still before the initial mount
