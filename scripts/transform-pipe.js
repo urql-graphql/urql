@@ -13,28 +13,35 @@ const pipeExpression = (t, pipeline) => {
 
 const pipePlugin = ({ types: t }) => ({
   visitor: {
-    ImportDeclaration(path) {
+    ImportDeclaration(path, state) {
       if (path.node.source.value === 'wonka') {
-        const specifiers = path.node.specifiers.filter(spec => {
-          return spec.imported.name !== 'pipe';
+        const { specifiers } = path.node
+        const pipeSpecifierIndex = specifiers.findIndex(spec => {
+          return spec.imported.name === 'pipe';
         });
 
-        if (specifiers.length > 0) {
-          path.node.specifiers = specifiers;
-        } else {
-          path.remove();
+        if (pipeSpecifierIndex > -1) {
+          const pipeSpecifier = specifiers[pipeSpecifierIndex];
+          state.pipeName = pipeSpecifier.local.name;
+          if (specifiers.length > 1) {
+          path.node.specifiers.splice(pipeSpecifierIndex, 1);
+          } else {
+          	path.remove();
+          }
         }
       }
     },
-    CallExpression(path) {
-      const callee = path.node.callee;
-      const args = path.node.arguments;
-      if (callee.name !== 'pipe') {
-        return;
-      } else if (args.length === 0) {
-        path.replaceWith(t.identifier('undefined'));
-      } else {
-        path.replaceWith(pipeExpression(t, args));
+    CallExpression(path, state) {
+      if (state.pipeName) {
+        const callee = path.node.callee;
+        const args = path.node.arguments;
+        if (callee.name !== state.pipeName) {
+          return;
+        } else if (args.length === 0) {
+          path.replaceWith(t.identifier('undefined'));
+        } else {
+          path.replaceWith(pipeExpression(t, args));
+        }
       }
     }
   }
