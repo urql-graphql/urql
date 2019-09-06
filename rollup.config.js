@@ -6,6 +6,7 @@ import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
+import transformPipe from './scripts/transform-pipe';
 
 const pkgInfo = require('./package.json');
 const external = ['dns', 'fs', 'path', 'url'];
@@ -119,8 +120,9 @@ const makePlugins = (isProduction = false) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
-      ['babel-plugin-closure-elimination', {}],
-      ['@babel/plugin-transform-object-assign', {}],
+      transformPipe,
+      'babel-plugin-closure-elimination',
+      '@babel/plugin-transform-object-assign',
       ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
         pragmaFrag: 'React.Fragment',
