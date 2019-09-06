@@ -1,7 +1,7 @@
 import { Source, pipe, toPromise, take } from 'wonka';
 import { PromisifiedSource } from '../types';
 
-export function withPromise<T = any>(source$: Source<T>): PromisifiedSource<T> {
+export function withPromise<T>(source$: Source<T>): PromisifiedSource<T> {
   (source$ as PromisifiedSource<T>).toPromise = () =>
     pipe(
       source$,
