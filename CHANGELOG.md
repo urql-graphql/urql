@@ -23,9 +23,14 @@ const promise = client.query(doc, vars).toPromise();
 const promise = client.mutation(doc, vars).toPromise();
 ```
 
+This version also adds a `useClient` hook as a shortcut for `useContext(Context)`.
+We provide a default client that makes requests to `/graphql`. Since that has
+confused users before, we now log a warning, when it's used.
+
 - ✨ Implement `client.query()` and `client.mutation()` (see [#405](https://github.com/FormidableLabs/urql/pull/405))
 - Fix `useImmediateEffect` for concurrent mode (see [#418](https://github.com/FormidableLabs/urql/pull/418))
 - Deconstruct `Wonka.pipe` using a Babel transform (see [#419](https://github.com/FormidableLabs/urql/pull/419))
+- ⚠ Add `useClient` hook and warning when default client is used (see [#420](https://github.com/FormidableLabs/urql/pull/420))
 
 ## [v1.4.1](https://github.com/FormidableLabs/urql/compare/v1.4.0...v1.4.1)
 
