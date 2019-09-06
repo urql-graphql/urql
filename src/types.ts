@@ -8,6 +8,10 @@ export { ExecutionResult } from 'graphql';
 /** Utility type to Omit keys from an interface/object type */
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
+export type PromisifiedSource<T = any> = Source<T> & {
+  toPromise: () => Promise<T>;
+};
+
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 

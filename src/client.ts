@@ -29,9 +29,11 @@ import {
   OperationResult,
   OperationType,
   RequestPolicy,
+  PromisifiedSource,
 } from './types';
 
-import { toSuspenseSource } from './utils';
+import { createRequest, toSuspenseSource, withPromise } from './utils';
+import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -205,6 +207,16 @@ export class Client {
     }
   };
 
+  query(
+    query: DocumentNode | string,
+    variables?: object,
+    context?: Partial<OperationContext>
+  ): PromisifiedSource<OperationResult> {
+    return withPromise<OperationResult>(
+      this.executeQuery(createRequest(query, variables), context)
+    );
+  }
+
   executeQuery = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
@@ -218,9 +230,9 @@ export class Client {
         merge([fromValue(0), interval(pollInterval)]),
         switchMap(() => response$)
       );
-    } else {
-      return response$;
     }
+
+    return response$;
   };
 
   executeSubscription = (
@@ -230,6 +242,16 @@ export class Client {
     const operation = this.createRequestOperation('subscription', query, opts);
     return this.executeRequestOperation(operation);
   };
+
+  mutation(
+    query: DocumentNode | string,
+    variables?: object,
+    context?: Partial<OperationContext>
+  ): PromisifiedSource<OperationResult> {
+    return withPromise<OperationResult>(
+      this.executeMutation(createRequest(query, variables), context)
+    );
+  }
 
   executeMutation = (
     query: GraphQLRequest,
