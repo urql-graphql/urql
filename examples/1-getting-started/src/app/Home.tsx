@@ -14,6 +14,7 @@ interface QueryResponse {
 }
 
 export const Home: FC = () => {
+  console.log('render home');
   const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
   const refetch = useCallback(
     () => executeQuery({ requestPolicy: 'network-only' }),
