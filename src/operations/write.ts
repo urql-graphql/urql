@@ -261,8 +261,7 @@ const writeField = (
 
   if (
     typeof data.__typename !== 'string' ||
-    ctx.store.keys[data.__typename] !== undefined ||
-    entityKey !== null
+    (ctx.store.keys[data.__typename] === undefined && entityKey === null)
   ) {
     warning(
       false,
