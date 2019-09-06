@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useCallback } from 'react';
+import { useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
-import { Context } from '../context';
+import { useClient } from '../context';
 import { OperationResult, OperationContext } from '../types';
 import { CombinedError, createRequest } from '../utils';
 import { useImmediateState } from './useImmediateState';
@@ -24,7 +24,7 @@ export type UseMutationResponse<T, V> = [
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
-  const client = useContext(Context);
+  const client = useClient();
   const [state, setState] = useImmediateState<UseMutationState<T>>({
     fetching: false,
     error: undefined,

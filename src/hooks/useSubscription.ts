@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useContext, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { pipe, onEnd, subscribe } from 'wonka';
-import { Context } from '../context';
+import { useClient } from '../context';
 import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
@@ -35,7 +35,7 @@ export const useSubscription = <T = any, R = T, V = object>(
 ): UseSubscriptionResponse<R> => {
   const unsubscribe = useRef(noop);
   const handlerRef = useRef(handler);
-  const client = useContext(Context);
+  const client = useClient();
 
   const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
     fetching: false,
