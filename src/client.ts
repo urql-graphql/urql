@@ -56,6 +56,22 @@ interface ActiveOperations {
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
+type PromisfiedOperationResult = Source<OperationResult> & {
+  toPromise: () => Promise<any>;
+};
+
+const withPromise = (
+  source$: Source<OperationResult>
+): PromisfiedOperationResult => {
+  (source$ as PromisfiedOperationResult).toPromise = () =>
+    pipe(
+      source$,
+      take(1),
+      toPromise
+    );
+  return source$ as PromisfiedOperationResult;
+};
+
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
   // These are variables derived from ClientOptions
@@ -201,19 +217,11 @@ export class Client {
   query(
     query: DocumentNode | string,
     variables?: object,
-    context?: Partial<OperationContext>,
-    promisify?: boolean
-  ): Promise<OperationResult> | Source<OperationResult> {
-    const query$ = this.executeQuery(createRequest(query, variables), context);
-    if (promisify) {
-      return pipe(
-        query$,
-        take(1),
-        toPromise
-      );
-    }
-
-    return query$;
+    context?: Partial<OperationContext>
+  ): PromisfiedOperationResult {
+    return withPromise(
+      this.executeQuery(createRequest(query, variables), context)
+    );
   }
 
   executeQuery = (
@@ -230,6 +238,7 @@ export class Client {
         switchMap(() => response$)
       );
     }
+
     return response$;
   };
 
@@ -244,21 +253,11 @@ export class Client {
   mutation(
     query: DocumentNode | string,
     variables?: object,
-    context?: Partial<OperationContext>,
-    promisify?: boolean
-  ): Promise<OperationResult> | Source<OperationResult> {
-    const mutation$ = this.executeMutation(
-      createRequest(query, variables),
-      context
+    context?: Partial<OperationContext>
+  ): PromisfiedOperationResult {
+    return withPromise(
+      this.executeMutation(createRequest(query, variables), context)
     );
-    if (promisify) {
-      return pipe(
-        mutation$,
-        take(1),
-        toPromise
-      );
-    }
-    return mutation$;
   }
 
   executeMutation = (

@@ -66,18 +66,19 @@ describe('exchange args', () => {
 
 describe('promisified arguments', () => {
   it('query', () => {
-    const queryResult = client.query(
-      gql`
-        {
-          todos {
-            id
+    const queryResult = client
+      .query(
+        gql`
+          {
+            todos {
+              id
+            }
           }
-        }
-      `,
-      { example: 1234 },
-      {},
-      true
-    );
+        `,
+        { example: 1234 },
+        {}
+      )
+      .toPromise();
 
     const received = receivedOps[0];
     expect(print(received.query)).toEqual(print(query.query));
@@ -94,18 +95,18 @@ describe('promisified arguments', () => {
   });
 
   it('mutation', () => {
-    const mutationResult = client.mutation(
-      gql`
-        {
-          todos {
-            id
+    const mutationResult = client
+      .mutation(
+        gql`
+          {
+            todos {
+              id
+            }
           }
-        }
-      `,
-      { example: 1234 },
-      {},
-      true
-    );
+        `,
+        { example: 1234 }
+      )
+      .toPromise();
 
     const received = receivedOps[0];
     expect(print(received.query)).toEqual(print(query.query));
