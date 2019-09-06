@@ -12,7 +12,6 @@ import {
   interval,
   fromValue,
   switchMap,
-  toPromise,
 } from 'wonka';
 
 import {
@@ -29,9 +28,10 @@ import {
   OperationResult,
   OperationType,
   RequestPolicy,
+  PromisifiedSource,
 } from './types';
 
-import { createRequest, toSuspenseSource } from './utils';
+import { createRequest, toSuspenseSource, withPromise } from './utils';
 import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -55,22 +55,6 @@ interface ActiveOperations {
 }
 
 export const createClient = (opts: ClientOptions) => new Client(opts);
-
-type PromisfiedOperationResult = Source<OperationResult> & {
-  toPromise: () => Promise<OperationResult>;
-};
-
-const withPromise = (
-  source$: Source<OperationResult>
-): PromisfiedOperationResult => {
-  (source$ as PromisfiedOperationResult).toPromise = () =>
-    pipe(
-      source$,
-      take(1),
-      toPromise
-    );
-  return source$ as PromisfiedOperationResult;
-};
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
@@ -218,8 +202,8 @@ export class Client {
     query: DocumentNode | string,
     variables?: object,
     context?: Partial<OperationContext>
-  ): PromisfiedOperationResult {
-    return withPromise(
+  ): PromisifiedSource<OperationResult> {
+    return withPromise<OperationResult>(
       this.executeQuery(createRequest(query, variables), context)
     );
   }
@@ -254,8 +238,8 @@ export class Client {
     query: DocumentNode | string,
     variables?: object,
     context?: Partial<OperationContext>
-  ): PromisfiedOperationResult {
-    return withPromise(
+  ): PromisifiedSource<OperationResult> {
+    return withPromise<OperationResult>(
       this.executeMutation(createRequest(query, variables), context)
     );
   }
