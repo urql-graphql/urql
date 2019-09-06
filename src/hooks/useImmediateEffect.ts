@@ -12,6 +12,10 @@ export const useImmediateEffect = (
 
   // On initial render we just execute the effect
   if (!isMounted.current) {
+    // There's the slight possibility that we had an interrupt due to
+    // conccurrent mode after running the effect.
+    // This could result in memory leaks.
+    if (teardown.current) teardown.current();
     teardown.current = effect();
   }
 
