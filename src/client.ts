@@ -57,7 +57,7 @@ interface ActiveOperations {
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
 type PromisfiedOperationResult = Source<OperationResult> & {
-  toPromise: () => Promise<any>;
+  toPromise: () => Promise<OperationResult>;
 };
 
 const withPromise = (
