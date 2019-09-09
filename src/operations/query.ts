@@ -183,7 +183,7 @@ const readSelection = (
 
     if (isQuery) addDependency(fieldKey);
 
-    if (process.env.NODE_ENV !== 'production' && schemaPredicates) {
+    if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
       schemaPredicates.isFieldAvailableOnType(typename, fieldName);
     }
 

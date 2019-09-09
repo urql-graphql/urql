@@ -74,7 +74,11 @@ export const invalidateSelection = (
     const fieldArgs = getFieldArguments(node, variables);
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
 
-    if (process.env.NODE_ENV !== 'production' && ctx.schemaPredicates) {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      ctx.schemaPredicates &&
+      typename
+    ) {
       ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
     }
 

@@ -204,7 +204,11 @@ const writeSelection = (
 
     if (isQuery) addDependency(fieldKey);
 
-    if (process.env.NODE_ENV !== 'production' && ctx.schemaPredicates) {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      ctx.schemaPredicates &&
+      typename
+    ) {
       ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
     }
 

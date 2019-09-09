@@ -108,4 +108,36 @@ describe('Query', () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
+
+  // Issue#64
+  it('should not crash for valid queries', () => {
+    const VALID_QUERY = gql`
+      query getTodos {
+        todos {
+          id
+          text
+        }
+      }
+    `;
+    // Use new store to ensure bug reproduction
+    const store = new Store(new SchemaPredicates(schema));
+
+    let { data } = query(store, { query: VALID_QUERY });
+    expect(data).toEqual(null);
+
+    write(
+      store,
+      { query: VALID_QUERY },
+      // @ts-ignore
+      {
+        // Removing typename here would formerly crash this.
+        todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
+      }
+    );
+    ({ data } = query(store, { query: VALID_QUERY }));
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
+    });
+  });
 });
