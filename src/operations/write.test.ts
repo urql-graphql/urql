@@ -137,4 +137,21 @@ describe('Query', () => {
     expect(console.warn).toHaveBeenCalledTimes(2);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
+
+  it('should skip undefined values that are expected', () => {
+    const query = gql`
+      {
+        field
+      }
+    `;
+
+    write(store, { query }, { field: 'test' } as any);
+    // This should not overwrite the field
+    write(store, { query }, { field: undefined } as any);
+    // Because of us writing an undefined field
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    expect((console.warn as any).mock.calls[0][0]).toMatch(/undefined/);
+    // The field must still be `'test'`
+    expect(store.getRecord('Query.field')).toBe('test');
+  });
 });

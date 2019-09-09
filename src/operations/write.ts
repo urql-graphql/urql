@@ -43,6 +43,7 @@ interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
+  isOptimistic?: boolean;
   schemaPredicates?: SchemaPredicates;
 }
 
@@ -53,11 +54,8 @@ export const write = (
   data: Data
 ): WriteResult => {
   initStoreState(0);
-
   const result = startWrite(store, request, data);
-
   clearStoreState();
-
   return result;
 };
 
@@ -106,6 +104,10 @@ export const writeOptimistic = (
     store,
     schemaPredicates: store.schemaPredicates,
   };
+
+  if (process.env.NODE_ENV === 'development') {
+    ctx.isOptimistic = true;
+  }
 
   const operationName = ctx.store.getRootKey(operation.operation);
   if (operationName === ctx.store.getRootKey('mutation')) {
@@ -204,12 +206,31 @@ const writeSelection = (
 
     if (isQuery) addDependency(fieldKey);
 
-    if (
-      process.env.NODE_ENV !== 'production' &&
-      ctx.schemaPredicates &&
-      typename
-    ) {
-      ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    if (process.env.NODE_ENV !== 'production') {
+      if (fieldValue === undefined) {
+        const advice = ctx.isOptimistic
+          ? '\nYour optimistic result may be missing a field!'
+          : '';
+
+        const expected =
+          node.selectionSet === undefined
+            ? 'scalar (number, boolean, etc)'
+            : 'selection set';
+
+        warning(
+          false,
+          'Invalid value: The field at `' +
+            fieldKey +
+            '` is `undefined`, but the GraphQL query expects a ' +
+            expected +
+            ' for this field.' +
+            advice
+        );
+
+        continue; // Skip this field
+      } else if (ctx.schemaPredicates && typename) {
+        ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+      }
     }
 
     if (node.selectionSet === undefined) {
