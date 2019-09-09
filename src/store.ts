@@ -1,5 +1,6 @@
 import invariant from 'invariant';
 import { DocumentNode } from 'graphql';
+import { createRequest } from 'urql';
 import * as Pessimism from 'pessimism';
 
 import {
@@ -252,12 +253,13 @@ export class Store {
   }
 
   updateQuery(
-    ctx: { query: DocumentNode; variables?: Variables },
+    input: { query: string | DocumentNode; variables?: Variables },
     updater: (data: Data | null) => null | Data
   ): void {
-    const output = updater(read(this, ctx).data);
+    const request = createRequest(input.query, input.variables);
+    const output = updater(read(this, request).data);
     if (output !== null) {
-      startWrite(this, ctx, output);
+      startWrite(this, request, output);
     }
   }
 
