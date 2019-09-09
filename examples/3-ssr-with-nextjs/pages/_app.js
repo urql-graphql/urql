@@ -15,4 +15,7 @@ class MyApp extends App {
   }
 }
 
-export default withUrqlClient(MyApp);
+// If you want to opt-in to automatic static optimization this
+// has to be true. This has the downside that you can't fetch data on
+// getInitialProps.
+export default withUrqlClient(MyApp, { staticPage: false });

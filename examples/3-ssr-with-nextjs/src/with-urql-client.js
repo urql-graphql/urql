@@ -3,13 +3,18 @@ import React from 'react';
 import ssrPrepass from 'react-ssr-prepass';
 import initUrqlClient from './init-urql-client';
 
-const withUrqlClient = App => {
-  return class WithUrql extends React.Component {
-    static async getInitialProps(ctx) {
+const withUrqlClient = (App, { staticPage = false } = {}) => {
+  const withUrql = (props) => {
+    const urqlClient = React.useMemo(() => props.urqlClient || initUrqlClient(props.urqlState)[0], []);
+    return <App {...props} urqlClient={urqlClient} />;
+  };
+  if (!staticPage) {
+    withUrql.getInitialProps = async ctx => {
       const { AppTree } = ctx;
 
       // Run the wrapped component's getInitialProps function
       let appProps = {};
+
       if (App.getInitialProps) {
         appProps = await App.getInitialProps(ctx);
       }
@@ -17,9 +22,7 @@ const withUrqlClient = App => {
       // getInitialProps is universal, but we only want
       // to run server-side rendered suspense on the server
       const isBrowser = typeof window !== "undefined";
-      if (isBrowser) {
-        return appProps;
-      }
+      if (isBrowser) return appProps;
 
       const [urqlClient, ssrCache] = initUrqlClient();
 
@@ -40,23 +43,8 @@ const withUrqlClient = App => {
         urqlState,
       };
     }
-
-    constructor(props) {
-      super(props);
-
-      if (props.urqlClient) {
-        this.urqlClient = props.urqlClient;
-      } else {
-        // Create the urql client and rehydrate the prefetched data
-        const [urqlClient] = initUrqlClient(props.urqlState);
-        this.urqlClient = urqlClient;
-      }
-    }
-
-    render() {
-      return <App {...this.props} urqlClient={this.urqlClient} />;
-    }
-  };
+  }
+  return withUrql;
 };
 
 export default withUrqlClient;
