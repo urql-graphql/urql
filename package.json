@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "A normalized and configurable cache exchange for urql",
   "repository": "https://github.com/FormidableLabs/urql-exchange-graphcache",
   "keywords": [
