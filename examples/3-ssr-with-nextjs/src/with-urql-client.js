@@ -18,7 +18,6 @@ const withUrqlClient = (App) => {
     // Run the wrapped component's getInitialProps function
     let appProps = {};
 
-    console.log('getting initialProps', Boolean(App.getInitialProps));
     if (App.getInitialProps) appProps = await App.getInitialProps(ctx);
 
     // getInitialProps is universal, but we only want
