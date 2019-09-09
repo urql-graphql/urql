@@ -1,49 +1,53 @@
 import React from 'react';
+import { Provider } from 'urql';
 
 import ssrPrepass from 'react-ssr-prepass';
 import initUrqlClient from './init-urql-client';
 
-const withUrqlClient = (App, { staticPage = false } = {}) => {
+const withUrqlClient = (App) => {
   const withUrql = (props) => {
     const urqlClient = React.useMemo(() => props.urqlClient || initUrqlClient(props.urqlState)[0], []);
-    return <App {...props} urqlClient={urqlClient} />;
+    return (
+      <Provider value={urqlClient}>
+        <App {...props} urqlClient={urqlClient} />
+      </Provider>
+    )
   };
-  if (!staticPage) {
-    withUrql.getInitialProps = async ctx => {
-      const { AppTree } = ctx;
 
-      // Run the wrapped component's getInitialProps function
-      let appProps = {};
+  withUrql.getInitialProps = async ({ AppTree }) => {
+    // Run the wrapped component's getInitialProps function
+    let appProps = {};
 
-      if (App.getInitialProps) {
-        appProps = await App.getInitialProps(ctx);
-      }
+    console.log('getting initialProps', Boolean(App.getInitialProps));
+    if (App.getInitialProps) appProps = await App.getInitialProps(ctx);
 
-      // getInitialProps is universal, but we only want
-      // to run server-side rendered suspense on the server
-      const isBrowser = typeof window !== "undefined";
-      if (isBrowser) return appProps;
+    // getInitialProps is universal, but we only want
+    // to run server-side rendered suspense on the server
+    const isBrowser = typeof window !== "undefined";
+    if (isBrowser) return appProps;
 
-      const [urqlClient, ssrCache] = initUrqlClient();
+    const [urqlClient, ssrCache] = initUrqlClient();
 
-      // Run suspense and hence all urql queries
-      await ssrPrepass(
-        <AppTree
+    // Run suspense and hence all urql queries
+    await ssrPrepass(
+      <Provider value={urqlClient}>
+        <App
           {...appProps}
           urqlClient={urqlClient}
         />
-      );
+      </Provider>
+    );
 
-      // Extract query data from the Apollo store
-      // Extract the SSR query data from urql's SSR cache
-      const urqlState = ssrCache.extractData();
+    // Extract query data from the urql store
+    // Extract the SSR query data from urql's SSR cache
+    const urqlState = ssrCache.extractData();
 
-      return {
-        ...appProps,
-        urqlState,
-      };
-    }
+    return {
+      ...appProps,
+      urqlState,
+    };
   }
+
   return withUrql;
 };
 
