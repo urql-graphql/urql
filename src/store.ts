@@ -157,7 +157,7 @@ export class Store {
 
     let key;
     if (this.keys[typename]) {
-      key = `${this.keys[typename](data)}`;
+      key = this.keys[typename](data);
     } else if (id !== undefined && id !== null) {
       key = `${id}`;
     } else if (_id !== undefined && _id !== null) {

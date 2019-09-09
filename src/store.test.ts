@@ -41,6 +41,7 @@ describe('Store with KeyingConfig', () => {
   it('generates keys from custom keying function', () => {
     const store = new Store(undefined, undefined, undefined, undefined, {
       User: () => 'me',
+      None: () => null,
     });
 
     expect(store.keyOfEntity({ __typename: 'Any', id: '123' })).toBe('Any:123');
@@ -49,6 +50,7 @@ describe('Store with KeyingConfig', () => {
     );
     expect(store.keyOfEntity({ __typename: 'Any' })).toBe(null);
     expect(store.keyOfEntity({ __typename: 'User' })).toBe('User:me');
+    expect(store.keyOfEntity({ __typename: 'None' })).toBe(null);
   });
 });
 
