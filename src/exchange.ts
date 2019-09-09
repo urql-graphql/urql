@@ -129,9 +129,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
       if (key !== triggerOp.key) {
-        const op = ops.get(key) as Operation;
-        ops.delete(key);
-        client.reexecuteOperation(op);
+        const op = ops.get(key);
+        if (op !== undefined) {
+          ops.delete(key);
+          client.reexecuteOperation(op);
+        }
       }
     });
   };
