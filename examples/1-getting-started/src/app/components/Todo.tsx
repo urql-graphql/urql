@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const Todo: FC<Props> = props => {
-  const [mutation, executeMutation] = useMutation(RemoveTodo);
+  const [mutation, executeMutation] = useMutation(ToggleTodo);
 
   const handleToggle = () => executeMutation({ id: props.id });
 
@@ -22,10 +22,11 @@ export const Todo: FC<Props> = props => {
 
 Todo.displayName = 'Todo';
 
-const RemoveTodo = `
+const ToggleTodo = `
   mutation($id: ID!) {
     toggleTodo(id: $id) {
       id
+      complete
     }
   }
 `;
