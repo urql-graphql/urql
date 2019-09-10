@@ -147,8 +147,8 @@ const makeConfig = (input) => ({
 
 export default [
   {
-    ...makeConfig('./src/index.ts', './dist'),
-    plugins: makePlugins(false),
+    ...makeConfig('./src/index.ts'),
+    plugins: makePlugins(false, './dist'),
     output: [
       {
         sourcemap: true,
@@ -169,8 +169,8 @@ export default [
     ],
   },
   {
-    ...makeConfig('./src/index.ts', './dist'),
-    plugins: makePlugins(true),
+    ...makeConfig('./src/index.ts'),
+    plugins: makePlugins(true, './dist'),
     onwarn: () => {},
     output: [
       {
