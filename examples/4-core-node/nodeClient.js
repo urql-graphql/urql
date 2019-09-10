@@ -1,6 +1,6 @@
 /* eslint-disable */
 require('isomorphic-fetch');
-const { createClient, createRequest } = require('../');
+const { createClient, createRequest } = require('../../core');
 const gql = require('graphql-tag');
 const { pipe, subscribe } = require('wonka');
 

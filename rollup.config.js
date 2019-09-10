@@ -191,14 +191,14 @@ export default [
   },
   {
     ...makeConfig('./src/client.ts'),
-    plugins: makePlugins(false, './client/dist'),
+    plugins: makePlugins(false, './core/dist'),
     output: [
       {
         sourcemap: true,
         legacy: true,
         freeze: false,
         esModule: false,
-        file: './client/dist/urql-client.js',
+        file: './core/dist/urql-core.js',
         format: 'cjs',
       },
       {
@@ -206,28 +206,28 @@ export default [
         legacy: true,
         freeze: false,
         esModule: false,
-        file: './client/dist/urql-client.es.js',
+        file: './core/dist/urql-core.es.js',
         format: 'esm',
       },
     ],
   },
   {
     ...makeConfig('./src/client.ts'),
-    plugins: makePlugins(true, './client/dist'),
+    plugins: makePlugins(true, './core/dist'),
     onwarn: () => {},
     output: [
       {
         sourcemap: false,
         legacy: true,
         freeze: false,
-        file: './client/dist/urql-client.min.js',
+        file: './core/dist/urql-core.min.js',
         format: 'cjs',
       },
       {
         sourcemap: false,
         legacy: true,
         freeze: false,
-        file: './client/dist/urql-client.es.min.js',
+        file: './core/dist/urql-core.es.min.js',
         format: 'esm',
       },
     ],
