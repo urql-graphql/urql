@@ -1,12 +1,13 @@
-import App from '../components/App';
+import React from 'react';
 import Submit from '../components/Submit';
 import PostList from '../components/PostList';
+import withUrqlClient from '../src/with-urql-client';
 
 const Root = () => (
-  <App>
+  <React.Fragment>
     <Submit />
     <PostList />
-  </App>
+  </React.Fragment>
 );
 
-export default Root;
+export default withUrqlClient(Root);
