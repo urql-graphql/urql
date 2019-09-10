@@ -16,7 +16,7 @@ The `execute*` methods all accept an instance of a `GraphQLRequest`, which can b
 ```javascript
 // load dependencies
 require('isomorphic-fetch');
-const { createClient, createRequest } = require('urql/client');
+const { createClient, createRequest } = require('urql/core');
 const gql = require('graphql-tag');
 
 // create the urql Client
@@ -86,7 +86,7 @@ The `Client` comes with more methods than just the `execute*` methods. While the
 
 ```javascript
 require('isomorphic-fetch');
-const { createClient, createRequest } = require('urql/client');
+const { createClient, createRequest } = require('urql/core');
 const gql = require('graphql-tag');
 const { pipe, subscribe, interval, take } = require('wonka');
 
