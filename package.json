@@ -22,14 +22,14 @@
   ],
   "scripts": {
     "prepare-core": "node ./scripts/prepare-core.js",
-    "clean": "rimraf ./dist ./node_modules/.cache",
+    "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -w -c rollup.config.js",
     "check": "tsc --noEmit",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s pepare-core clean test build",
+    "prepublishOnly": "run-s clean prepare-core test build",
     "codecov": "codecov"
   },
   "author": "Formidable",
