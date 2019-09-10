@@ -1,0 +1,17 @@
+{
+  "name": "urql-client",
+  "version": "1.5.0",
+  "description": "A highly customizable and versatile GraphQL client to use everywhere",
+  "repository": "https://www.github.com/FormidableLabs/urql",
+  "bugs": {
+    "url": "https://github.com/FormidableLabs/urql/issues"
+  },
+  "homepage": "https://formidable.com/open-source/urql",
+  "main": "./dist/urql-client.js",
+  "module": "./dist/urqclient.es.js",
+  "types": "./dist/types/index.d.ts",
+  "source": "../src/client.ts",
+  "sideEffects": false,
+  "author": "Formidable",
+  "license": "MIT"
+}
