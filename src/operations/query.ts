@@ -7,6 +7,7 @@ import {
   getName,
   getFieldArguments,
   getFieldAlias,
+  getFragmentTypeName,
 } from '../ast';
 
 import {
@@ -31,6 +32,7 @@ import {
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 export interface QueryResult {
   dependencies: Set<string>;
@@ -147,6 +149,58 @@ const readRootField = (
     const typename = originalData.__typename;
     return readRoot(ctx, typename, select, originalData);
   }
+};
+
+export const readFragment = (
+  store: Store,
+  query: DocumentNode,
+  entity: Data | string
+): Data | null => {
+  const fragments = getFragments(query);
+  const names = Object.keys(fragments);
+  const fragment = fragments[names[0]] as FragmentDefinitionNode;
+  if (fragment === undefined) {
+    warning(
+      false,
+      'readFragment(...) was called with an empty fragment.\n' +
+        'You have to call it with at least one fragment in your GraphQL document.'
+    );
+
+    return null;
+  }
+
+  const select = getSelectionSet(fragment);
+  const typename = getFragmentTypeName(fragment);
+  if (typeof entity !== 'string' && !entity.__typename) {
+    entity.__typename = typename;
+  }
+
+  const entityKey =
+    typeof entity !== 'string'
+      ? store.keyOfEntity({ __typename: typename, ...entity } as Data)
+      : entity;
+
+  if (!entityKey) {
+    warning(
+      false,
+      "Can't generate a key for readFragment(...).\n" +
+        'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
+        typename +
+        '`.'
+    );
+
+    return null;
+  }
+
+  const ctx: Context = {
+    variables: {},
+    fragments,
+    partial: false,
+    store,
+    schemaPredicates: store.schemaPredicates,
+  };
+
+  return readSelection(ctx, entityKey, select, Object.create(null)) || null;
 };
 
 const readSelection = (

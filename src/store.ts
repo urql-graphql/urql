@@ -16,7 +16,7 @@ import {
 } from './types';
 
 import { joinKeys, keyOfField } from './helpers';
-import { read } from './operations/query';
+import { read, readFragment } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
 import { SchemaPredicates } from './ast/schemaPredicates';
@@ -73,6 +73,11 @@ const mapRemove = <T>(map: Pessimism.Map<T>, key: string) => {
 };
 
 type RootField = 'query' | 'mutation' | 'subscription';
+
+interface QueryInput {
+  query: string | DocumentNode;
+  variables?: Variables;
+}
 
 export class Store {
   records: Pessimism.Map<EntityField>;
@@ -257,10 +262,18 @@ export class Store {
     updater: (data: Data | null) => null | Data
   ): void {
     const request = createRequest(input.query, input.variables);
-    const output = updater(read(this, request).data);
+    const output = updater(this.readQuery(request as QueryInput));
     if (output !== null) {
       startWrite(this, request, output);
     }
+  }
+
+  readQuery(input: QueryInput): Data | null {
+    return read(this, createRequest(input.query, input.variables)).data;
+  }
+
+  readFragment(dataFragment: DocumentNode, entity: string | Data): Data | null {
+    return readFragment(this, dataFragment, entity);
   }
 
   writeFragment(dataFragment: DocumentNode, data: Data): void {

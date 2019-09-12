@@ -157,22 +157,21 @@ export const writeFragment = (
   }
 
   const select = getSelectionSet(fragment);
-  const typeName = getFragmentTypeName(fragment);
-  const writeData = { ...data, __typename: typeName } as Data;
-
-  const entityKey = store.keyOfEntity(writeData) as string;
+  const typename = getFragmentTypeName(fragment);
+  const writeData = { __typename: typename, ...data } as Data;
+  const entityKey = store.keyOfEntity(writeData);
   if (!entityKey) {
     return warning(
       false,
       "Can't generate a key for writeFragment(...) data.\n" +
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
-        typeName +
+        typename +
         '`.'
     );
   }
 
   const ctx: Context = {
-    variables: {}, // TODO: Should we support variables?
+    variables: {},
     fragments,
     result: { dependencies: getCurrentDependencies() },
     store,

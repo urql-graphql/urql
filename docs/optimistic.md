@@ -20,8 +20,11 @@ Let's see an example.
 const myGraphCache = cacheExchange({
   optimistic: {
     addTodo: (variables, cache, info) => {
-      console.log(variables); // { id: '1', text: 'optimistic', __typename: 'Todo' }
-      return variables;
+      console.log(variables); // { id: '1', text: 'optimistic' }
+      return {
+        ...variables
+        __typename: 'Todo', // We still have to let the cache know what entity we are on.
+      };
     },
   },
 });

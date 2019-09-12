@@ -181,8 +181,9 @@ describe('Store with OptimisticMutationConfig', () => {
     expect(store.getRecord('Appointment:1.info')).toBe(undefined);
   });
 
-  it('should be able to update a fragment', () => {
+  it('should be able to write a fragment', () => {
     initStoreState(0);
+
     store.writeFragment(
       gql`
         fragment _ on Todo {
@@ -215,6 +216,32 @@ describe('Store with OptimisticMutationConfig', () => {
         todosData.todos[2],
       ],
     });
+    clearStoreState();
+  });
+
+  it('should be able to read a fragment', () => {
+    initStoreState(0);
+    const result = store.readFragment(
+      gql`
+        fragment _ on Todo {
+          id
+          text
+          complete
+        }
+      `,
+      { id: '0' }
+    );
+
+    const deps = getCurrentDependencies();
+    expect(deps).toEqual(new Set(['Todo:0']));
+
+    expect(result).toEqual({
+      id: '0',
+      text: 'Go to the shops',
+      complete: false,
+      __typename: 'Todo',
+    });
+
     clearStoreState();
   });
 
@@ -299,6 +326,29 @@ describe('Store with OptimisticMutationConfig', () => {
         info: 'urql meeting revisited',
         __typename: 'Appointment',
       },
+    });
+    clearStoreState();
+  });
+
+  it('should be able to read a query', () => {
+    initStoreState(0);
+    const result = store.readQuery({ query: Todos });
+
+    const deps = getCurrentDependencies();
+    expect(deps).toEqual(
+      new Set([
+        'Query.todos',
+        'Todo:0',
+        'Todo:1',
+        'Todo:2',
+        'Author:0',
+        'Author:1',
+      ])
+    );
+
+    expect(result).toEqual({
+      __typename: 'Query',
+      todos: todosData.todos,
     });
     clearStoreState();
   });
