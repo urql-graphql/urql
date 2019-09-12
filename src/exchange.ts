@@ -132,7 +132,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         const op = ops.get(key);
         if (op !== undefined) {
           ops.delete(key);
-          client.reexecuteOperation(op);
+          const cacheFirst = toRequestPolicy(op, 'cache-first');
+          client.reexecuteOperation(cacheFirst);
         }
       }
     });
