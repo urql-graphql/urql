@@ -287,19 +287,21 @@ const writeField = (
     typeof data.__typename !== 'string' ||
     (ctx.store.keys[data.__typename] === undefined && entityKey === null)
   ) {
+    const typename = data.__typename;
+
     warning(
-      false,
+      typename.endsWith('Connection') || typename.endsWith('Edge'),
       'Invalid key: The GraphQL query at the field at `' +
         parentFieldKey +
         '` has a selection set, ' +
         'but no key could be generated for the data at this field.\n' +
         'You have to request `id` or `_id` fields for all selection sets or create ' +
         'a custom `keys` config for `' +
-        data.__typename +
+        typename +
         '`.\n' +
         'Entities without keys will be embedded directly on the parent entity. ' +
         'If this is intentional, create a `keys` config for `' +
-        data.__typename +
+        typename +
         '` that always returns null.'
     );
   }
