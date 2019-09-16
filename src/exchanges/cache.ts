@@ -61,20 +61,11 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
           reexecuteOperation(client, operation);
         }
 
-        if (cachedResult !== undefined) {
-          return {
-            ...cachedResult,
-            operation: addMetadata(cachedResult.operation, {
-              cacheOutcome: 'hit',
-            }),
-          };
-        }
-
         return {
-          data: undefined,
-          error: undefined,
-          extensions: undefined,
-          operation: addMetadata(operation, { cacheOutcome: 'miss' }),
+          ...cachedResult,
+          operation: addMetadata(operation, {
+            cacheOutcome: cachedResult ? 'hit' : 'miss',
+          }),
         };
       })
     );
