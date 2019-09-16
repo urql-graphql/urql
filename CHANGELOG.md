@@ -8,6 +8,10 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.0.0-rc.9](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.8...v1.0.0-rc.9)
+
+- ⚠ Fix optimistic updates by upgrading to Pessimism `1.1.3` (see [#81](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/81))
+
 ## [v1.0.0-rc.8](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.7...v1.0.0-rc.8)
 
 - Fix warnings being shown for Relay `Connection` and `Edge` embedded types (see [#79](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/79))
