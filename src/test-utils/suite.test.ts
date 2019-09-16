@@ -301,60 +301,42 @@ it('entity list on query and spread fragment', () => {
   });
 });
 
-it('embedded invalid object on entity', () => {
+it('embedded objects on entities', () => {
   expectCacheIntegrity({
     query: gql`
       {
-        __typename
-        item {
+        user {
           __typename
           id
-          author {
+          posts {
             __typename
-            name
+            edges {
+              __typename
+              node {
+                __typename
+                id
+              }
+            }
           }
         }
       }
     `,
     data: {
       __typename: 'Query',
-      item: {
-        __typename: 'Item',
+      user: {
+        __typename: 'User',
         id: 1,
-        author: {
-          __typename: 'Author',
-          name: 'Stanley',
-        },
-      },
-    },
-  });
-});
-
-it('embedded object on entity', () => {
-  expectCacheIntegrity({
-    query: gql`
-      {
-        __typename
-        item {
-          __typename
-          id
-          author {
-            __typename
-            id
-            name
-          }
-        }
-      }
-    `,
-    data: {
-      __typename: 'Query',
-      item: {
-        __typename: 'Item',
-        id: 1,
-        author: {
-          __typename: 'Author',
-          id: 1,
-          name: 'Stanley',
+        posts: {
+          __typename: 'PostsConnection',
+          edges: [
+            {
+              __typename: 'PostsEdge',
+              node: {
+                __typename: 'Post',
+                id: 1,
+              },
+            },
+          ],
         },
       },
     },

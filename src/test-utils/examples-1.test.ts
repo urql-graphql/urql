@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { query, write } from '../operations';
+import { query, write, writeOptimistic } from '../operations';
 import { Store } from '../store';
 import { Data } from '../types';
 
@@ -176,7 +176,7 @@ it('respects property-level resolvers when given', () => {
   });
 });
 
-it('Respects property-level resolvers when given', () => {
+it('respects property-level resolvers when given', () => {
   const store = new Store(undefined, undefined, {
     Mutation: {
       toggleTodo: function toggleTodo(result, _, cache) {
@@ -262,4 +262,87 @@ it('Respects property-level resolvers when given', () => {
       { id: '2', text: 'Install urql', complete: true, __typename: 'Todo' },
     ],
   });
+});
+
+it('correctly resolves optimistic updates on Relay schemas', () => {
+  const store = new Store(undefined, undefined, undefined, {
+    updateItem: variables => ({
+      __typename: 'UpdateItemPayload',
+      item: {
+        __typename: 'Item',
+        id: variables.id as string,
+        name: 'Offline',
+      },
+    }),
+  });
+
+  const queryData = {
+    __typename: 'Query',
+    root: {
+      __typename: 'Root',
+      id: 'root',
+      items: {
+        __typename: 'ItemConnection',
+        edges: [
+          {
+            __typename: 'ItemEdge',
+            node: {
+              __typename: 'Item',
+              id: '1',
+              name: 'Number One',
+            },
+          },
+          {
+            __typename: 'ItemEdge',
+            node: {
+              __typename: 'Item',
+              id: '2',
+              name: 'Number Two',
+            },
+          },
+        ],
+      },
+    },
+  };
+
+  const getRoot = gql`
+    query GetRoot {
+      root {
+        __typename
+        id
+        items {
+          __typename
+          edges {
+            __typename
+            node {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const updateItem = gql`
+    mutation UpdateItem($id: ID!) {
+      updateItem(id: $id) {
+        __typename
+        item {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  `;
+
+  write(store, { query: getRoot }, queryData);
+  writeOptimistic(store, { query: updateItem, variables: { id: '2' } }, 1);
+  store.clearOptimistic(1);
+  const queryRes = query(store, { query: getRoot });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data).not.toBe(null);
 });
