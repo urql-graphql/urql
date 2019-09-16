@@ -14,7 +14,7 @@
     <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
   </a>
   <a href="https://github.com/FormidableLabs/urql/actions">
-    <img alt="Test Status" src="https://github.com/FormidableLabs/urql/workflows/ci/badge.svg" />
+    <img alt="Test Status" src="https://github.com/FormidableLabs/urql/workflows/CI/badge.svg" />
   </a>
   <a href="https://codecov.io/gh/FormidableLabs/urql">
     <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql/branch/master/graph/badge.svg" />
