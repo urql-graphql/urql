@@ -36,4 +36,3 @@ jobs:
     - run: yarn run codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
