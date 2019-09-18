@@ -6,11 +6,11 @@ import {
   DocumentNode,
   FragmentDefinitionNode,
   OperationDefinitionNode,
+  valueFromASTUntyped,
   Kind,
 } from 'graphql';
 
 import { getName } from './node';
-import { evaluateValueNode } from './variables';
 import { Fragments, Variables } from '../types';
 
 const isFragmentNode = (
@@ -65,7 +65,7 @@ export const shouldInclude = (
     const arg = directive.arguments ? directive.arguments[0] : null;
     if (!arg || getName(arg) !== 'if') continue;
 
-    const value = evaluateValueNode(arg.value, vars);
+    const value = valueFromASTUntyped(arg.value, vars);
     if (typeof value !== 'boolean' && value !== null) continue;
 
     // Return whether this directive forces us to skip
