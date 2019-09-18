@@ -21,11 +21,11 @@ describe('formatTypeNames', () => {
 
   it('does not duplicate typenames', () => {
     expect(
-      formatTypeNames(`{ 
-      todos { 
+      formatTypeNames(`{
+      todos {
         id
+        __typename
       }
-      __typename
     }`)
     ).toMatchInlineSnapshot(`
                   "{
@@ -33,7 +33,6 @@ describe('formatTypeNames', () => {
                       id
                       __typename
                     }
-                    __typename
                   }
                   "
             `);

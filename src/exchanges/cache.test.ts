@@ -75,6 +75,31 @@ describe('on query', () => {
     expect(reexecuteOperation).not.toBeCalled();
   });
 
+  it('respects cache-and-network', () => {
+    const [ops$, next, complete] = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+
+    publish(exchange);
+    next(queryOperation);
+
+    next({
+      ...queryOperation,
+      context: {
+        ...queryOperation.context,
+        requestPolicy: 'cache-and-network',
+      },
+    });
+
+    complete();
+    expect(forwardedOperations.length).toBe(1);
+    expect(reexecuteOperation).toHaveBeenCalledTimes(1);
+
+    expect(reexecuteOperation.mock.calls[0][0]).toEqual({
+      ...queryOperation,
+      context: { ...queryOperation.context, requestPolicy: 'network-only' },
+    });
+  });
+
   describe('cache hit', () => {
     it('is miss when operation is forwarded', () => {
       const [ops$, next, complete] = input;

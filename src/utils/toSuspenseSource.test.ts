@@ -7,6 +7,7 @@ import {
   fromArray,
   makeSubject,
   never,
+  publish,
   subscribe,
 } from 'wonka';
 
@@ -99,4 +100,23 @@ it('behaves like a normal source when the first result was synchronous', async (
   });
 
   expect(push).toHaveBeenCalledTimes(2);
+});
+
+it('still supports cancellation', async () => {
+  let unsubscribe;
+  const end = jest.fn();
+
+  try {
+    [unsubscribe] = pipe(
+      fromArray([1, 2]),
+      toSuspenseSource,
+      onEnd(end),
+      publish
+    );
+  } catch (promise) {
+    expect(promise).toBe(expect.any(Promise));
+  }
+
+  unsubscribe();
+  expect(end).toHaveBeenCalledTimes(1);
 });
