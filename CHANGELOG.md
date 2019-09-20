@@ -8,6 +8,16 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.0.0-rc.11](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.10...v1.0.0-rc.11)
+
+- Fix `updates` not being called for `optimistic` results (see [#83](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/83))
+- Add optional `variables` argument to `readFragment` and `writeFragment` (see [#84](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/84))
+- ⚠ Fix field arguments not normalising optional `null` values (see [#85](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/85))
+
+## [v1.0.0-rc.10](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.9...v1.0.0-rc.10)
+
+- ⚠ Fix removing cache entries by upgrading to Pessimism `1.1.4` (see [ae72d3](https://github.com/FormidableLabs/urql-exchange-graphcache/commit/ae72d3b1c8b3e5965e122d5509eb561f68579474))
+
 ## [v1.0.0-rc.9](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.8...v1.0.0-rc.9)
 
 - ⚠ Fix optimistic updates by upgrading to Pessimism `1.1.3` (see [#81](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/81))
