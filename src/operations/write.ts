@@ -1,3 +1,4 @@
+import invariant from 'invariant';
 import { warning } from '../helpers/warning';
 import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
@@ -103,34 +104,39 @@ export const writeOptimistic = (
     result,
     store,
     schemaPredicates: store.schemaPredicates,
+    isOptimistic: true,
   };
 
-  if (process.env.NODE_ENV === 'development') {
-    ctx.isOptimistic = true;
-  }
-
+  const mutationRootKey = ctx.store.getRootKey('mutation');
   const operationName = ctx.store.getRootKey(operation.operation);
-  if (operationName === ctx.store.getRootKey('mutation')) {
-    const select = getSelectionSet(operation);
-    const iter = new SelectionIterator(
-      operationName,
-      operationName,
-      select,
-      ctx
-    );
+  invariant(
+    operationName === mutationRootKey,
+    'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
+      'This case is unsupported and should never occur.'
+  );
 
-    let node;
-    while ((node = iter.next()) !== undefined) {
-      if (node.selectionSet !== undefined) {
-        const fieldName = getName(node);
-        const resolver = ctx.store.optimisticMutations[fieldName];
-        if (resolver !== undefined) {
-          const fieldArgs = getFieldArguments(node, ctx.variables);
-          const fieldSelect = getSelectionSet(node);
-          const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
-          if (!isScalar(resolverValue)) {
-            writeRootField(ctx, resolverValue, fieldSelect);
-          }
+  const select = getSelectionSet(operation);
+  const data = Object.create(null);
+  const iter = new SelectionIterator(operationName, operationName, select, ctx);
+
+  let node;
+  while ((node = iter.next()) !== undefined) {
+    if (node.selectionSet !== undefined) {
+      const fieldName = getName(node);
+      const resolver = ctx.store.optimisticMutations[fieldName];
+      if (resolver !== undefined) {
+        const fieldArgs = getFieldArguments(node, ctx.variables);
+        const fieldSelect = getSelectionSet(node);
+        const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
+
+        if (!isScalar(resolverValue)) {
+          writeRootField(ctx, resolverValue, fieldSelect);
+        }
+
+        data[fieldName] = resolverValue;
+        const updater = ctx.store.updates[mutationRootKey][fieldName];
+        if (updater !== undefined) {
+          updater(data, fieldArgs || {}, ctx.store, ctx);
         }
       }
     }
@@ -317,6 +323,10 @@ const writeRoot = (
   select: SelectionSet,
   data: Data
 ) => {
+  const isRootField =
+    typename === ctx.store.getRootKey('mutation') ||
+    typename === ctx.store.getRootKey('subscription');
+
   const iter = new SelectionIterator(typename, typename, select, ctx);
 
   let node;
@@ -335,10 +345,7 @@ const writeRoot = (
       writeRootField(ctx, fieldValue, fieldSelect);
     }
 
-    if (
-      typename === ctx.store.getRootKey('mutation') ||
-      typename === ctx.store.getRootKey('subscription')
-    ) {
+    if (isRootField) {
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
