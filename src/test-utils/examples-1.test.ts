@@ -116,6 +116,40 @@ it('passes the "getting-started" example', () => {
   });
 });
 
+it('resolves missing, nullable arguments on fields', () => {
+  const store = new Store();
+
+  const GetWithVariables = gql`
+    query {
+      todo(first: null) {
+        __typename
+        id
+      }
+    }
+  `;
+
+  const GetWithoutVariables = gql`
+    query {
+      todo {
+        __typename
+        id
+      }
+    }
+  `;
+
+  const writeData = {
+    __typename: 'Query',
+    todo: {
+      __typename: 'Todo',
+      id: '123',
+    },
+  };
+
+  write(store, { query: GetWithVariables }, writeData);
+  const { data } = query(store, { query: GetWithoutVariables });
+  expect(data).toEqual(writeData);
+});
+
 it('respects property-level resolvers when given', () => {
   const store = new Store(undefined, {
     Todo: { text: () => 'hi' },

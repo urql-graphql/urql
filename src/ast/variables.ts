@@ -17,12 +17,18 @@ export const getFieldArguments = (
   }
 
   const args = Object.create(null);
+  let argsSize = 0;
+
   for (let i = 0, l = node.arguments.length; i < l; i++) {
     const arg = node.arguments[i];
-    args[getName(arg)] = valueFromASTUntyped(arg.value, vars);
+    const value = valueFromASTUntyped(arg.value, vars);
+    if (value !== undefined && value !== null) {
+      args[getName(arg)] = value;
+      argsSize++;
+    }
   }
 
-  return args;
+  return argsSize > 0 ? args : null;
 };
 
 /** Returns a normalized form of variables with defaulted values */
