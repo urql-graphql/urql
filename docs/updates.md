@@ -9,8 +9,8 @@ That's where updates come into play. Analogous to our `resolvers`,
 result given from the server due to a subscription trigger or a mutation.
 
 > Note that this result will look like result.data, this means that in
-> the example of us adding a todo by means of `addTodo` it will look like
-> `{ addTodo: addedTodo }`.
+> the example of us adding a todo by means of `addTodo` it will look like
+> `{ addTodo: addedTodo }`.
 
 Let's look at three additional methods provided by the cache to enable
 updates.
