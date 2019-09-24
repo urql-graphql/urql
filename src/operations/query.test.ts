@@ -22,11 +22,12 @@ const TODO_QUERY = gql`
 `;
 
 describe('Query', () => {
-  let schema, store;
+  let schema, store, alteredRoot;
   const spy: { console?: any } = {};
 
   beforeAll(() => {
     schema = require('../test-utils/simple_schema.json');
+    alteredRoot = require('../test-utils/altered_root_schema.json');
   });
 
   afterEach(() => {
@@ -137,6 +138,37 @@ describe('Query', () => {
     ({ data } = query(store, { query: VALID_QUERY }));
     expect(data).toEqual({
       __typename: 'Query',
+      todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
+    });
+  });
+
+  it('should respect altered root types', () => {
+    const QUERY = gql`
+      query getTodos {
+        todos {
+          id
+          text
+        }
+      }
+    `;
+
+    const store = new Store(new SchemaPredicates(alteredRoot));
+
+    let { data } = query(store, { query: QUERY });
+    expect(data).toEqual(null);
+
+    write(
+      store,
+      { query: QUERY },
+      {
+        todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
+        __typename: 'query_root',
+      }
+    );
+
+    ({ data } = query(store, { query: QUERY }));
+    expect(data).toEqual({
+      __typename: 'query_root',
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
   });

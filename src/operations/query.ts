@@ -79,7 +79,7 @@ export const read = (
 
   let data = input || Object.create(null);
   data =
-    rootKey !== 'Query'
+    rootKey !== ctx.store.getRootKey('query')
       ? readRoot(ctx, rootKey, rootSelect, data)
       : readSelection(ctx, rootKey, rootSelect, data);
 
