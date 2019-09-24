@@ -15,6 +15,17 @@ const Todos = gql`
   }
 `;
 
+const Todo = gql`
+  query($id: ID!) {
+    __typename
+    todo(id: $id) {
+      id
+      text
+      complete
+    }
+  }
+`;
+
 const ToggleTodo = gql`
   mutation($id: ID!) {
     __typename
@@ -150,6 +161,37 @@ it('resolves missing, nullable arguments on fields', () => {
   expect(data).toEqual(writeData);
 });
 
+it('should link entities', () => {
+  const store = new Store(undefined, {
+    Query: {
+      todo: (_parent, args) => {
+        return { __typename: 'Todo', ...args };
+      },
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', text: 'Go to the shops', complete: false, __typename: 'Todo' },
+      { id: '1', text: 'Pick up the kids', complete: true, __typename: 'Todo' },
+      { id: '2', text: 'Install urql', complete: false, __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+  const res = query(store, { query: Todo, variables: { id: '0' } });
+  expect(res.data).toEqual({
+    __typename: 'Query',
+    todo: {
+      id: '0',
+      text: 'Go to the shops',
+      complete: false,
+      __typename: 'Todo',
+    },
+  });
+});
+
 it('respects property-level resolvers when given', () => {
   const store = new Store(undefined, {
     Todo: { text: () => 'hi' },
@@ -210,7 +252,7 @@ it('respects property-level resolvers when given', () => {
   });
 });
 
-it('respects property-level resolvers when given', () => {
+it('respects Mutation update functions', () => {
   const store = new Store(undefined, undefined, {
     Mutation: {
       toggleTodo: function toggleTodo(result, _, cache) {

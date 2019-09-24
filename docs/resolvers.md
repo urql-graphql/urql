@@ -82,6 +82,19 @@ console.log(name); // 'Bar'
 This can help solve practical use cases like date formatting,
 where you would query the date and then convert it in your resolver.
 
+You can also link entities that come from a list, imagine the scenario where
+we have queried `todos` but now want the detailView of a single `todo`.
+
+```js
+const cache = cacheExchange({
+  resolvers: {
+    Query: { todo: (parent, args) => ({ __typename: 'Todo', id: args.id }) },
+  },
+});
+```
+
+will do the trick.
+
 ## `cache.readQuery`
 
 Another method the cache allows is to let you read a full query, this method
