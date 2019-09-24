@@ -166,7 +166,7 @@ export class Client {
   }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation(operation: Operation): Source<OperationResult> {
+  executeRequestOperation(operation: Operation,): Source<OperationResult> {
     const { key, operationName } = operation;
     const operationResults$ = pipe(
       this.results$,
@@ -211,11 +211,12 @@ export class Client {
   query(
     query: DocumentNode | string,
     variables?: object,
-    context?: Partial<OperationContext>
+    context?: Partial<OperationContext>,
   ): PromisifiedSource<OperationResult> {
     if (!context || typeof context.suspense !== 'boolean') {
       context = { ...context, suspense: false };
     }
+
     return withPromise<OperationResult>(
       this.executeQuery(createRequest(query, variables), context)
     );
@@ -223,7 +224,7 @@ export class Client {
 
   executeQuery = (
     query: GraphQLRequest,
-    opts?: Partial<OperationContext>
+    opts?: Partial<OperationContext>,
   ): Source<OperationResult> => {
     const operation = this.createRequestOperation('query', query, opts);
     const response$ = this.executeRequestOperation(operation);
