@@ -147,7 +147,7 @@ const afterQuery = (
 ) => (response: OperationResult) => {
   const { operation, data, error } = response;
 
-  if (!data) {
+  if (data === undefined || data === null) {
     return;
   }
 
