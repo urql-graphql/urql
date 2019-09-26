@@ -106,6 +106,8 @@ Schema awareness is also an important stepping stone for offline support.
 Without partial results it becomes difficult to deliver an offline UI
 safely, when just some bits of information are missing.
 
+Read more about the [architecture](./docs/architecture.md)
+
 ## Usage
 
 You can currently configure:
