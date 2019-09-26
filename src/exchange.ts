@@ -108,27 +108,31 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const ops: OperationMap = new Map();
   const deps = Object.create(null) as DependentOperations;
 
-  // This accepts an array of dependencies and reexecutes all known operations
-  // against the mapping of dependencies to operations
-  // The passed triggerOp is ignored however
-  const processDependencies = (
-    triggerOp: Operation,
-    dependencies: Set<string>
+  const collectPendingOperations = (
+    pendingOperations: Set<number>,
+    dependencies: void | Set<string>
   ) => {
-    const pendingOperations = new Set<number>();
+    if (dependencies !== undefined) {
+      // Collect operations that will be updated due to cache changes
+      dependencies.forEach(dep => {
+        const keys = deps[dep];
+        if (keys !== undefined) {
+          deps[dep] = [];
+          for (let i = 0, l = keys.length; i < l; i++) {
+            pendingOperations.add(keys[i]);
+          }
+        }
+      });
+    }
+  };
 
-    // Collect operations that will be updated due to cache changes
-    dependencies.forEach(dep => {
-      const keys = deps[dep];
-      if (keys !== undefined) {
-        deps[dep] = [];
-        keys.forEach(key => pendingOperations.add(key));
-      }
-    });
-
+  const executePendingOperations = (
+    operation: Operation,
+    pendingOperations: Set<number>
+  ) => {
     // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
-      if (key !== triggerOp.key) {
+      if (key !== operation.key) {
         const op = ops.get(key);
         if (op !== undefined) {
           ops.delete(key);
@@ -146,7 +150,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
         optimisticKeys.add(key);
-        processDependencies(operation, dependencies);
+        const pendingOperations = new Set<number>();
+        collectPendingOperations(pendingOperations, dependencies);
+        executePendingOperations(operation, pendingOperations);
       }
     }
   };
@@ -216,10 +222,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       }
     }
 
-    if (writeDependencies !== undefined) {
-      // Update operations that depend on the updated data (except the current one)
-      processDependencies(result.operation, writeDependencies);
+    // Collect all write dependencies and query dependencies for queries
+    const pendingOperations = new Set<number>();
+    collectPendingOperations(pendingOperations, writeDependencies);
+    if (isQuery) {
+      collectPendingOperations(pendingOperations, queryDependencies);
     }
+
+    // Execute all pending operations related to changed dependencies
+    executePendingOperations(result.operation, pendingOperations);
 
     // Update this operation's dependencies if it's a query
     if (isQuery && queryDependencies !== undefined) {

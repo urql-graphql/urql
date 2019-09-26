@@ -161,6 +161,29 @@ const config = {
 export default [
   {
     ...config,
+    input: './src/extras/index.ts',
+    plugins: makePlugins(false),
+    output: [
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        esModule: false,
+        file: `./dist/${name}-extras.js`,
+        format: 'cjs'
+      },
+      {
+        sourcemap: true,
+        legacy: true,
+        freeze: false,
+        esModule: false,
+        file: `./dist/${name}-extras.es.js`,
+        format: 'esm'
+      }
+    ]
+  },
+  {
+    ...config,
     plugins: makePlugins(false),
     output: [
       {

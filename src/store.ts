@@ -4,12 +4,15 @@ import { createRequest } from 'urql';
 import * as Pessimism from 'pessimism';
 
 import {
+  Cache,
   EntityField,
   Link,
+  Connection,
   ResolverConfig,
   DataField,
   Variables,
   Data,
+  QueryInput,
   UpdatesConfig,
   OptimisticMutationConfig,
   KeyingConfig,
@@ -74,13 +77,9 @@ const mapRemove = <T>(map: Pessimism.Map<T>, key: string) => {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-interface QueryInput {
-  query: string | DocumentNode;
-  variables?: Variables;
-}
-
-export class Store {
+export class Store implements Cache {
   records: Pessimism.Map<EntityField>;
+  connections: Pessimism.Map<Connection[]>;
   links: Pessimism.Map<Link>;
 
   resolvers: ResolverConfig;
@@ -100,7 +99,9 @@ export class Store {
     keys?: KeyingConfig
   ) {
     this.records = Pessimism.asMutable(Pessimism.make());
+    this.connections = Pessimism.asMutable(Pessimism.make());
     this.links = Pessimism.asMutable(Pessimism.make());
+
     this.resolvers = resolvers || {};
     this.optimisticMutations = optimisticMutations || {};
     this.keys = keys || {};
@@ -177,6 +178,10 @@ export class Store {
 
   clearOptimistic(optimisticKey: number) {
     this.records = Pessimism.clearOptimistic(this.records, optimisticKey);
+    this.connections = Pessimism.clearOptimistic(
+      this.connections,
+      optimisticKey
+    );
     this.links = Pessimism.clearOptimistic(this.links, optimisticKey);
   }
 
@@ -223,6 +228,23 @@ export class Store {
     return (this.links = mapSet(this.links, key, link));
   }
 
+  writeConnection(key: string, linkKey: string, args: Variables | null) {
+    if (args === null) return this.connections;
+
+    let connections = Pessimism.get(this.connections, key);
+    const connection: Connection = [args, linkKey];
+    if (connections === undefined) {
+      connections = [connection];
+    } else {
+      for (let i = 0, l = connections.length; i < l; i++)
+        if (connections[i][1] === linkKey) return this.connections;
+      connections = connections.slice();
+      connections.push(connection);
+    }
+
+    return (this.connections = mapSet(this.connections, key, connections));
+  }
+
   resolveValueOrLink(fieldKey: string): DataField {
     const fieldValue = this.getRecord(fieldKey);
     // Undefined implies a link OR incomplete data.
@@ -234,12 +256,17 @@ export class Store {
     return link ? link : null;
   }
 
-  resolve(entity: Data | string, field: string, args?: Variables): DataField {
-    if (typeof entity === 'string') {
+  resolve(
+    entity: Data | string | null,
+    field: string,
+    args?: Variables
+  ): DataField {
+    if (entity === null) {
+      return null;
+    } else if (typeof entity === 'string') {
       addDependency(entity);
       return this.resolveValueOrLink(joinKeys(entity, keyOfField(field, args)));
     } else {
-      // This gives us __typename:key
       const entityKey = this.keyOfEntity(entity);
       if (entityKey === null) return null;
       addDependency(entityKey);
@@ -249,8 +276,29 @@ export class Store {
     }
   }
 
-  invalidateQuery(dataQuery: DocumentNode, variables: Variables) {
-    invalidate(this, { query: dataQuery, variables });
+  resolveConnections(
+    entity: Data | string | null,
+    field: string
+  ): Connection[] {
+    let connections: undefined | Connection[];
+    if (typeof entity === 'string') {
+      connections = Pessimism.get(this.connections, joinKeys(entity, field));
+    } else if (entity !== null) {
+      const entityKey = this.keyOfEntity(entity);
+      if (entityKey !== null) {
+        addDependency(entityKey);
+        connections = Pessimism.get(
+          this.connections,
+          joinKeys(entityKey, field)
+        );
+      }
+    }
+
+    return connections !== undefined ? connections : [];
+  }
+
+  invalidateQuery(query: string | DocumentNode, variables?: Variables) {
+    invalidate(this, createRequest(query, variables));
   }
 
   hasField(key: string): boolean {
@@ -258,8 +306,8 @@ export class Store {
   }
 
   updateQuery(
-    input: { query: string | DocumentNode; variables?: Variables },
-    updater: (data: Data | null) => null | Data
+    input: QueryInput,
+    updater: (data: Data | null) => Data | null
   ): void {
     const request = createRequest(input.query, input.variables);
     const output = updater(this.readQuery(request as QueryInput));

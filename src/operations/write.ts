@@ -40,11 +40,15 @@ export interface WriteResult {
 }
 
 interface Context {
+  parentTypeName: string;
+  parentKey: string;
+  parentFieldKey: string;
+  fieldName: string;
   result: WriteResult;
   store: Store;
   variables: Variables;
   fragments: Fragments;
-  isOptimistic?: boolean;
+  optimistic?: boolean;
   schemaPredicates?: SchemaPredicates;
 }
 
@@ -68,16 +72,20 @@ export const startWrite = (
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
 
+  const select = getSelectionSet(operation);
+  const operationName = store.getRootKey(operation.operation);
+
   const ctx: Context = {
+    parentTypeName: operationName,
+    parentKey: operationName,
+    parentFieldKey: '',
+    fieldName: '',
     variables: normalizeVariables(operation, request.variables),
     fragments: getFragments(request.query),
     result,
     store,
     schemaPredicates: store.schemaPredicates,
   };
-
-  const select = getSelectionSet(operation);
-  const operationName = ctx.store.getRootKey(operation.operation);
 
   if (operationName === ctx.store.getRootKey('query')) {
     writeSelection(ctx, operationName, select, data);
@@ -98,22 +106,26 @@ export const writeOptimistic = (
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
 
-  const ctx: Context = {
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    result,
-    store,
-    schemaPredicates: store.schemaPredicates,
-    isOptimistic: true,
-  };
-
-  const mutationRootKey = ctx.store.getRootKey('mutation');
-  const operationName = ctx.store.getRootKey(operation.operation);
+  const mutationRootKey = store.getRootKey('mutation');
+  const operationName = store.getRootKey(operation.operation);
   invariant(
     operationName === mutationRootKey,
     'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
       'This case is unsupported and should never occur.'
   );
+
+  const ctx: Context = {
+    parentTypeName: mutationRootKey,
+    parentKey: mutationRootKey,
+    parentFieldKey: '',
+    fieldName: '',
+    variables: normalizeVariables(operation, request.variables),
+    fragments: getFragments(request.query),
+    result,
+    store,
+    schemaPredicates: store.schemaPredicates,
+    optimistic: true,
+  };
 
   const select = getSelectionSet(operation);
   const data = Object.create(null);
@@ -125,6 +137,9 @@ export const writeOptimistic = (
       const fieldName = getName(node);
       const resolver = ctx.store.optimisticMutations[fieldName];
       if (resolver !== undefined) {
+        // We have to update the context to reflect up-to-date ResolveInfo
+        ctx.fieldName = fieldName;
+
         const fieldArgs = getFieldArguments(node, ctx.variables);
         const fieldSelect = getSelectionSet(node);
         const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
@@ -178,6 +193,10 @@ export const writeFragment = (
   }
 
   const ctx: Context = {
+    parentTypeName: typename,
+    parentKey: entityKey,
+    parentFieldKey: '',
+    fieldName: '',
     variables: variables || {},
     fragments,
     result: { dependencies: getCurrentDependencies() },
@@ -214,7 +233,7 @@ const writeSelection = (
 
     if (process.env.NODE_ENV !== 'production') {
       if (fieldValue === undefined) {
-        const advice = ctx.isOptimistic
+        const advice = ctx.optimistic
           ? '\nYour optimistic result may be missing a field!'
           : '';
 
@@ -245,8 +264,10 @@ const writeSelection = (
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
       const fieldSelect = getSelectionSet(node);
+      const connectionKey = joinKeys(entityKey, fieldName);
       const link = writeField(ctx, fieldKey, fieldSelect, fieldValue);
       store.writeLink(link, fieldKey);
+      store.writeConnection(connectionKey, fieldKey, fieldArgs);
       store.removeRecord(fieldKey);
     } else {
       warning(
@@ -297,7 +318,9 @@ const writeField = (
     const typename = data.__typename;
 
     warning(
-      typename.endsWith('Connection') || typename.endsWith('Edge'),
+      typename.endsWith('Connection') ||
+        typename.endsWith('Edge') ||
+        typename === 'PageInfo',
       'Invalid key: The GraphQL query at the field at `' +
         parentFieldKey +
         '` has a selection set, ' +
@@ -347,6 +370,13 @@ const writeRoot = (
     }
 
     if (isRootField) {
+      const fieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
+      // We have to update the context to reflect up-to-date ResolveInfo
+      ctx.parentTypeName = typename;
+      ctx.parentKey = typename;
+      ctx.parentFieldKey = fieldKey;
+      ctx.fieldName = fieldName;
+
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];

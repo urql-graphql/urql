@@ -27,7 +27,8 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s clean test build",
+    "prepare:extras": "./scripts/prepare-extras.js",
+    "prepublishOnly": "run-s clean test build prepare:extras",
     "codecov": "codecov"
   },
   "author": "Formidable",

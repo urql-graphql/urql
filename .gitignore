@@ -1,6 +1,6 @@
 node_modules
 /lib
-es
+/extras
 types
 coverage
 .vscode

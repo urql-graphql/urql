@@ -42,6 +42,10 @@ export interface QueryResult {
 }
 
 interface Context {
+  parentTypeName: string;
+  parentKey: string;
+  parentFieldKey: string;
+  fieldName: string;
   partial: boolean;
   store: Store;
   variables: Variables;
@@ -70,6 +74,10 @@ export const read = (
   const rootSelect = getSelectionSet(operation);
 
   const ctx: Context = {
+    parentTypeName: rootKey,
+    parentKey: rootKey,
+    parentFieldKey: '',
+    fieldName: '',
     variables: normalizeVariables(operation, request.variables),
     fragments: getFragments(request.query),
     partial: false,
@@ -195,6 +203,10 @@ export const readFragment = (
   }
 
   const ctx: Context = {
+    parentTypeName: typename,
+    parentKey: entityKey,
+    parentFieldKey: '',
+    fieldName: '',
     variables: variables || {},
     fragments,
     partial: false,
@@ -249,13 +261,20 @@ const readSelection = (
 
     const resolvers = store.resolvers[typename];
     if (resolvers !== undefined && typeof resolvers[fieldName] === 'function') {
+      // We have to update the information in context to reflect the info
+      // that the resolver will receive
+      ctx.parentTypeName = typename;
+      ctx.parentKey = entityKey;
+      ctx.parentFieldKey = fieldKey;
+      ctx.fieldName = fieldName;
+
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
       if (fieldValue !== undefined) {
         data[fieldAlias] = fieldValue;
       }
 
-      let resolverValue: DataField | undefined = resolvers[fieldName](
+      const resolverValue: DataField | undefined = resolvers[fieldName](
         data,
         fieldArgs || {},
         store,
@@ -265,42 +284,39 @@ const readSelection = (
       if (node.selectionSet !== undefined) {
         // When it has a selection set we are resolving an entity with a
         // subselection. This can either be a list or an object.
-        resolverValue = resolveResolverResult(
+        const fieldSelect = getSelectionSet(node);
+        const prevData = (data[fieldAlias] as Data) || Object.create(null);
+        dataFieldValue = resolveResolverResult(
           ctx,
-          resolverValue,
           typename,
           fieldName,
           fieldKey,
-          getSelectionSet(node),
-          data[fieldAlias] as Data | Data[]
+          fieldSelect,
+          prevData,
+          resolverValue
         );
-      }
-
-      // When we have a schema we check for a user's resolver whether the field is nullable
-      // Otherwise we trust the resolver and assume that it is
-      const isNull = resolverValue === undefined || resolverValue === null;
-      if (isNull && schemaPredicates !== undefined) {
-        dataFieldValue = undefined;
       } else {
-        dataFieldValue = isNull ? null : resolverValue;
+        // Otherwise we set the resolverValue, and normalise it to null when there's
+        // no schema data to check with whether this field is nullable
+        dataFieldValue =
+          resolverValue === undefined && schemaPredicates === undefined
+            ? null
+            : resolverValue;
       }
     } else if (node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly
       dataFieldValue = fieldValue;
     } else {
       // We have a selection set which means that we'll be checking for links
-      const fieldSelect = getSelectionSet(node);
       const link = store.getLink(fieldKey);
-
       if (link !== undefined) {
-        const prevData = data[fieldAlias] as Data;
         dataFieldValue = resolveLink(
           ctx,
           link,
           typename,
           fieldName,
-          fieldSelect,
-          prevData
+          getSelectionSet(node),
+          data[fieldAlias] as Data
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -334,65 +350,178 @@ const readSelection = (
   return isQuery && hasPartials && !hasFields ? undefined : data;
 };
 
+const readResolverResult = (
+  ctx: Context,
+  key: string,
+  select: SelectionSet,
+  data: Data,
+  result: Data
+): Data | undefined => {
+  const { store, variables, schemaPredicates } = ctx;
+  const entityKey = store.keyOfEntity(result) || key;
+  addDependency(entityKey);
+
+  const resolvedTypename = result.__typename;
+  const typename = store.getField(entityKey, '__typename') || resolvedTypename;
+
+  if (
+    typeof typename !== 'string' ||
+    (resolvedTypename && typename !== resolvedTypename)
+  ) {
+    warning(
+      false,
+      'Invalid resolver value: The resolver at `' +
+        entityKey +
+        '` returned an ' +
+        'invalid typename that could not be reconciled with the cache.'
+    );
+
+    return undefined;
+  }
+
+  // The following closely mirrors readSelection, but differs only slightly for the
+  // sake of resolving from an existing resolver result
+  data.__typename = typename;
+  const iter = new SelectionIterator(typename, entityKey, select, ctx);
+
+  let node;
+  let hasFields = false;
+  let hasPartials = false;
+  while ((node = iter.next()) !== undefined) {
+    // Derive the needed data from our node.
+    const fieldName = getName(node);
+    const fieldArgs = getFieldArguments(node, variables);
+    const fieldAlias = getFieldAlias(node);
+    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
+    const fieldValue = store.getRecord(fieldKey);
+    const resultValue = result[fieldName];
+
+    if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
+      schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    }
+
+    // We temporarily store the data field in here, but undefined
+    // means that the value is missing from the cache
+    let dataFieldValue: void | DataField;
+    if (resultValue !== undefined && node.selectionSet === undefined) {
+      // The field is a scalar and can be retrieved directly from the result
+      dataFieldValue = resultValue;
+    } else if (node.selectionSet === undefined) {
+      // The field is a scalar but isn't on the result, so it's retrieved from the cache
+      dataFieldValue = fieldValue;
+    } else if (resultValue !== undefined) {
+      // We start walking the nested resolver result here
+      dataFieldValue = resolveResolverResult(
+        ctx,
+        typename,
+        fieldName,
+        fieldKey,
+        getSelectionSet(node),
+        data[fieldAlias] as Data,
+        resultValue
+      );
+    } else {
+      // Otherwise we attempt to get the missing field from the cache
+      const link = store.getLink(fieldKey);
+      if (link !== undefined) {
+        dataFieldValue = resolveLink(
+          ctx,
+          link,
+          typename,
+          fieldName,
+          getSelectionSet(node),
+          data[fieldAlias] as Data
+        );
+      } else if (typeof fieldValue === 'object' && fieldValue !== null) {
+        // The entity on the field was invalid but can still be recovered
+        dataFieldValue = fieldValue;
+      }
+    }
+
+    // Now that dataFieldValue has been retrieved it'll be set on data
+    // If it's uncached (undefined) but nullable we can continue assembling
+    // a partial query result
+    if (
+      dataFieldValue === undefined &&
+      schemaPredicates !== undefined &&
+      schemaPredicates.isFieldNullable(typename, fieldName)
+    ) {
+      // The field is uncached but we have a schema that says it's nullable
+      // Set the field to null and continue
+      hasPartials = true;
+      data[fieldAlias] = null;
+    } else if (dataFieldValue === undefined) {
+      // The field is uncached and not nullable; return undefined
+      return undefined;
+    } else {
+      // Otherwise continue as usual
+      hasFields = true;
+      data[fieldAlias] = dataFieldValue;
+    }
+  }
+
+  if (hasPartials) ctx.partial = true;
+  return !hasFields ? undefined : data;
+};
+
 const resolveResolverResult = (
   ctx: Context,
-  result: DataField,
   typename: string,
   fieldName: string,
   key: string,
   select: SelectionSet,
-  prevData: void | Data | Data[]
+  prevData: void | Data | Data[],
+  result: void | DataField
 ): DataField | undefined => {
-  // When we are dealing with a list we have to call this method again.
   if (Array.isArray(result)) {
     const { schemaPredicates } = ctx;
+    // Check whether values of the list may be null; for resolvers we assume
+    // that they can be, since it's user-provided data
     const isListNullable =
-      schemaPredicates !== undefined &&
+      schemaPredicates === undefined ||
       schemaPredicates.isListNullable(typename, fieldName);
-    const newResult = new Array(result.length);
+    const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
-      const data = prevData !== undefined ? prevData[i] : undefined;
-      const childKey = joinKeys(key, `${i}`);
+      const innerResult = result[i];
+      // Get the inner previous data from prevData
+      const innerPrevData = prevData !== undefined ? prevData[i] : undefined;
+      // Recursively read resolver result
       const childResult = resolveResolverResult(
         ctx,
-        result[i],
         typename,
         fieldName,
-        childKey,
+        joinKeys(key, `${i}`),
         select,
-        data
+        innerPrevData,
+        innerResult
       );
+
       if (childResult === undefined && !isListNullable) {
         return undefined;
       } else {
-        result[i] = childResult !== undefined ? childResult : null;
+        data[i] = childResult !== undefined ? childResult : null;
       }
     }
 
-    return newResult;
-  } else if (result === null) {
+    return data;
+  } else if (result === null || result === undefined) {
     return null;
   } else if (isDataOrKey(result)) {
-    // We don't need to read the entity after exiting a resolver
-    // we can just go on and read the selection further.
     const data = prevData === undefined ? Object.create(null) : prevData;
-    const childKey =
-      (typeof result === 'string' ? result : ctx.store.keyOfEntity(result)) ||
-      key;
-    // TODO: Copy over fields from result but check against schema whether that's safe
-    return readSelection(ctx, childKey, select, data);
+    return typeof result === 'string'
+      ? readSelection(ctx, result, select, data)
+      : readResolverResult(ctx, key, select, data, result);
+  } else {
+    warning(
+      false,
+      'Invalid resolver value: The field at `' +
+        key +
+        '` is a scalar (number, boolean, etc)' +
+        ', but the GraphQL query expects a selection set for this field.'
+    );
+
+    return undefined;
   }
-
-  warning(
-    false,
-    'Invalid resolver value: The resolver at `' +
-      key +
-      '` returned a scalar (number, boolean, etc)' +
-      ', but the GraphQL query expects a selection set for this field.\n' +
-      'If necessary, use Cache.resolve() to resolve a link or entity from the cache.'
-  );
-
-  return undefined;
 };
 
 const resolveLink = (
@@ -411,9 +540,10 @@ const resolveLink = (
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
       const innerPrevData = prevData !== undefined ? prevData[i] : undefined;
+      const innerLink = link[i];
       const childLink = resolveLink(
         ctx,
-        link[i],
+        innerLink,
         typename,
         fieldName,
         select,
@@ -437,6 +567,4 @@ const resolveLink = (
 
 const isDataOrKey = (x: any): x is string | Data =>
   typeof x === 'string' ||
-  (typeof x === 'object' &&
-    x !== null &&
-    typeof (x as any).__typename === 'string');
+  (typeof x === 'object' && typeof (x as any).__typename === 'string');
