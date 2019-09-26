@@ -8,6 +8,11 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.5.1](https://github.com/FormidableLabs/urql/compare/v1.5.0...v1.5.1)
+
+- Replace `fast-json-stable-stringify` with embedded code (see [#426](https://github.com/FormidableLabs/urql/pull/426))
+- ⚠ Prevent caching `null` data (see [#437](https://github.com/FormidableLabs/urql/pull/437))
+
 ## [v1.5.0](https://github.com/FormidableLabs/urql/compare/v1.4.1...v1.5.0)
 
 This release finally adds shortcuts to imperatively make queries and mutations.
