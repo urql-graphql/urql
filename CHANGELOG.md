@@ -8,6 +8,27 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.0.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.11...v1.0.0)
+
+> **Note:** The minimum required version of `urql` for this release is now `1.5.1`!
+
+**Hooray it's `v1.0.0` time!** This doesn't mean that we won't be changing little things anymore, but we're so far happy with our API and trust Graphcache to work correctly. We will further iterate on this version with some **planned features**, like "fragment invalidation", garbage collection, and more.
+
+This version refactors the **cache resolvers** and adds some new special powers to them! You can now return almost anything from cache resolvers and trust that it'll do the right thing:
+
+- You can return entity keys, which will resolve the cached entities
+- You can return keyable entities, which will also be resolved from cache
+- You may also return unkeyable entities, which will be partially resolved from cache, with your resolved values taking precedence
+
+This can also be nested, so that unkeyable entities can eventually lead back to normal, cached entities!
+
+This has enabled us to expose the `relayPagination()` helper! This is a resolver that you can just drop into the `cacheExchange`'s `resolvers` config. It automatically does Relay-style pagination, which is now possible due to our more powerful resolvers! You can import it from `@urql/exchange-graphcache/extras`.
+
+- ✨ Add full cache resolver traversal (see [#91](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/91))
+- ✨ Add a new `relayPagination` helper (see [#91](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/91))
+- Add a `Cache` interface with all methods (that are safe for userland) having documentation (see [#91](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/91))
+- ⚠ Fix non-default root keys (that aren't just `Query`) not being respected (see [#87](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/87))
+
 ## [v1.0.0-rc.11](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.10...v1.0.0-rc.11)
 
 - Fix `updates` not being called for `optimistic` results (see [#83](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/83))
