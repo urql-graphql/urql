@@ -1,8 +1,8 @@
-import stringify from 'fast-json-stable-stringify';
+import { stringifyVariables } from 'urql';
 import { Variables } from '../types';
 
 export const keyOfField = (fieldName: string, args?: null | Variables) =>
-  args ? `${fieldName}(${stringify(args)})` : fieldName;
+  args ? `${fieldName}(${stringifyVariables(args)})` : fieldName;
 
 export const joinKeys = (parentKey: string, key: string) =>
   `${parentKey}.${key}`;
