@@ -37,10 +37,8 @@ known pieces of data. This cache also provides configurable APIs to:
 - update Query data after mutations/subscriptions responses
 - provide optimistic Mutation responses
 
-> ⚠️ Note: `@urql/exchange-graphcache` is still in **beta**. Some features may be
-> temporarily unstable and others are not yet done. Please check the **Future Features**
-> section for more details and report any bugs or feature requests on
-> [Spectrum](https://spectrum.chat/urql).
+> ⚠️ Note: Documentation for some parts of `@urql/exchange-graphcache` are still being worked on!
+> For help for features requests, please join our [Spectrum](https://spectrum.chat/urql).
 
 ## Quick Start Guide
 
@@ -73,11 +71,15 @@ const client = createClient({
 });
 ```
 
-## Future Features
+## Features and Roadmap
 
+- [x] Normalized resolving and updates
 - [x] Schema awareness and deterministic fragment matching
+- [x] Partial query results when the cache is schema aware
+- [x] Customization using custom resolvers, updates, and keying functions
+- [x] Optimistic updates
 - [ ] Basic offline and persistence support
-- [x] Partial query results
+- [ ] Advanced fragment and entity invalidation
 
 This cache defaults to **delivering safe results** by marking results as incomplete
 when any field is missing, triggering a `network-only` operation (a request), when
