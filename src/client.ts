@@ -194,7 +194,8 @@ export class Client {
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
 
-    return this.suspense && operationName !== 'subscription'
+    return (operation.context.suspense || this.suspense) &&
+      operationName === 'query'
       ? toSuspenseSource(result$)
       : result$;
   }
@@ -212,6 +213,9 @@ export class Client {
     variables?: object,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult> {
+    if (!context || typeof context.suspense !== 'boolean') {
+      context = { ...context, suspense: false };
+    }
     return withPromise<OperationResult>(
       this.executeQuery(createRequest(query, variables), context)
     );

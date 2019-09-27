@@ -49,6 +49,7 @@ export interface OperationContext {
   url: string;
   pollInterval?: number;
   meta?: OperationDebugMeta;
+  suspense?: boolean;
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */

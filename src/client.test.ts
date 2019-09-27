@@ -90,6 +90,7 @@ describe('promisified arguments', () => {
       requestPolicy: 'cache-and-network',
       fetchOptions: undefined,
       fetch: undefined,
+      suspense: false,
     });
     expect(queryResult).toHaveProperty('then');
   });
