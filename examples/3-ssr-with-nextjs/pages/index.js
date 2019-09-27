@@ -14,10 +14,11 @@ const Root = () => (
 Root.getInitialProps = async () => {
   const [urqlClient] = initUrqlClient();
   // Prefetch data
-  await urqlClient
-    .query(allPostsQuery, allPostsQueryVars, undefined, true)
+  const { data } = await urqlClient
+    .query(allPostsQuery, allPostsQueryVars)
     .toPromise();
-  return {};
+
+  return { posts: data.allPosts };
 }
 
 export default withUrqlClient(Root);
