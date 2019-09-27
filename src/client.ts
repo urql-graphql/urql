@@ -213,9 +213,9 @@ export class Client {
   query(
     query: DocumentNode | string,
     variables?: object,
-    context: Partial<OperationContext> = {}
+    context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult> {
-    context.suspense = false;
+    context = { ...context, suspense: false };
     return withPromise<OperationResult>(
       this.executeQuery(createRequest(query, variables), context)
     );
