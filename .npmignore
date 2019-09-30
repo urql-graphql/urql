@@ -4,6 +4,7 @@
 !README.md
 !/dist/**/*.{d.ts,js,js.map}
 !/src/**/*.{d.ts,ts,tsx}
+!/extras/package.json
 __snapshots__/
 __tests__/
 test-utils/
