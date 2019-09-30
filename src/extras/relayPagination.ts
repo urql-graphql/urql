@@ -7,6 +7,7 @@ export interface PaginationParams {
 }
 
 interface PageInfo {
+  __typename: string;
   endCursor: null | string;
   startCursor: null | string;
   hasNextPage: boolean;
@@ -14,11 +15,13 @@ interface PageInfo {
 }
 
 interface Page {
+  __typename: string;
   edges: NullArray<string>;
   pageInfo: PageInfo;
 }
 
 const defaultPageInfo: PageInfo = {
+  __typename: 'PageInfo',
   endCursor: null,
   startCursor: null,
   hasNextPage: false,
@@ -56,23 +59,28 @@ const getPage = (cache: Cache, linkKey: string): Page | null => {
   const link = ensureKey(cache.resolveValueOrLink(linkKey));
   if (!link) return null;
 
+  const typename = cache.resolve(link, '__typename') as string;
   const edges = cache.resolve(link, 'edges') as NullArray<string>;
-  if (
-    !Array.isArray(edges) ||
-    !edges.every(x => x === null || typeof x === 'string')
-  ) {
+  if (typeof typename !== 'string' || !Array.isArray(edges)) {
     return null;
   }
 
-  const page: Page = { edges, pageInfo: defaultPageInfo };
+  const page: Page = {
+    __typename: typename,
+    edges,
+    pageInfo: defaultPageInfo,
+  };
+
   const pageInfoKey = cache.resolve(link, 'pageInfo');
   if (typeof pageInfoKey === 'string') {
+    const pageInfoType = ensureKey(cache.resolve(pageInfoKey, '__typename'));
     const endCursor = ensureKey(cache.resolve(pageInfoKey, 'endCursor'));
     const startCursor = ensureKey(cache.resolve(pageInfoKey, 'startCursor'));
     const hasNextPage = cache.resolve(pageInfoKey, 'hasNextPage');
     const hasPreviousPage = cache.resolve(pageInfoKey, 'hasPreviousPage');
 
     const pageInfo: PageInfo = (page.pageInfo = {
+      __typename: typeof pageInfoType === 'string' ? pageInfoType : 'PageInfo',
       hasNextPage: typeof hasNextPage === 'boolean' ? hasNextPage : !!endCursor,
       hasPreviousPage:
         typeof hasPreviousPage === 'boolean' ? hasPreviousPage : !!startCursor,
@@ -113,14 +121,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       return undefined;
     }
 
-    const typename = cache.resolve(entityKey, '__typename');
-
-    const pageInfoKey = ensureKey(cache.resolve(entityKey, 'pageInfo'));
-    const pageInfoTypename = cache.resolve(pageInfoKey, '__typename');
-    if (typeof typename !== 'string' || typeof pageInfoTypename !== 'string') {
-      return undefined;
-    }
-
+    let typename = '';
     let startEdges: NullArray<string> = [];
     let endEdges: NullArray<string> = [];
     let pageInfo: PageInfo = { ...defaultPageInfo };
@@ -145,6 +146,26 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
         startEdges = concatEdges(cache, startEdges, page.edges);
         pageInfo = page.pageInfo;
       }
+
+      if (page.pageInfo.__typename !== pageInfo.__typename)
+        pageInfo.__typename = page.pageInfo.__typename;
+      if (typename !== page.__typename) typename = page.__typename;
+    }
+
+    if (
+      typeof typename !== 'string' ||
+      startEdges.length + endEdges.length === 0
+    ) {
+      return undefined;
+    }
+
+    const hasCurrentPage = !!cache.resolve(entityKey, '__typename');
+    if (!hasCurrentPage) {
+      if ((info as any).schemaPredicates === undefined) {
+        return undefined;
+      } else {
+        info.partial = true;
+      }
     }
 
     return {
@@ -154,7 +175,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
           ? concatEdges(cache, startEdges, endEdges)
           : concatEdges(cache, endEdges, startEdges),
       pageInfo: {
-        __typename: pageInfoTypename,
+        __typename: pageInfo.__typename,
         endCursor: pageInfo.endCursor,
         startCursor: pageInfo.startCursor,
         hasNextPage: pageInfo.hasNextPage,
