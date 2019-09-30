@@ -8,6 +8,15 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.0.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0...v1.0.1)
+
+- Trims down the size by 100 bytes (see [#96](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/96))
+- Include the `/extras` build in the published version (see [#97](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/97))
+- Invariant and warnings will now have an error code associated with a more elabore explanation (see [#99](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/99))
+- Invariant errors will now be included in your production bundle (see [#100](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/100))
+- Fixes the relayPagination helper to correctly return partial results (see [#101](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/101))
+- Add special case to relayPagination for first and last during inwards merge (see [#102](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/102))
+
 ## [v1.0.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0-rc.11...v1.0.0)
 
 > **Note:** The minimum required version of `urql` for this release is now `1.5.1`!
