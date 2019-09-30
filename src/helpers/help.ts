@@ -9,7 +9,9 @@ const cache = new Set<string>();
 
 export const invariant = (clause: any, message: string, code: number) => {
   if (!clause) {
-    const error = new Error(message + helpUrl + code);
+    const error = new Error(
+      (message || 'Minfied Error #' + code + '\n') + helpUrl + code
+    );
     error.name = 'Graphcache Error';
     throw error;
   }
