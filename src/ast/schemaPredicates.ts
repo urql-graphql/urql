@@ -48,9 +48,10 @@ export class SchemaPredicates {
     const objectType = this.schema.getType(typename);
     expectObjectType(objectType, typename);
 
-    const abstractNode = abstractType as GraphQLAbstractType;
-    const concreteNode = objectType as GraphQLObjectType;
-    return this.schema.isPossibleType(abstractNode, concreteNode);
+    return this.schema.isPossibleType(
+      abstractType as GraphQLAbstractType,
+      objectType as GraphQLObjectType
+    );
   }
 }
 

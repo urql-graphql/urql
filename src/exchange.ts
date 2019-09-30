@@ -60,14 +60,12 @@ const isMutationOperation = (op: Operation): boolean =>
 
 // Returns whether an operation can potentially be read from cache
 const isCacheableQuery = (op: Operation): boolean => {
-  const policy = getRequestPolicy(op);
-  return isQueryOperation(op) && policy !== 'network-only';
+  return isQueryOperation(op) && getRequestPolicy(op) !== 'network-only';
 };
 
 // Returns whether an operation potentially triggers an optimistic update
 const isOptimisticMutation = (op: Operation): boolean => {
-  const policy = getRequestPolicy(op);
-  return isMutationOperation(op) && policy !== 'network-only';
+  return isMutationOperation(op) && getRequestPolicy(op) !== 'network-only';
 };
 
 // Copy an operation and change the requestPolicy to skip the cache
@@ -136,8 +134,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         const op = ops.get(key);
         if (op !== undefined) {
           ops.delete(key);
-          const cacheFirst = toRequestPolicy(op, 'cache-first');
-          client.reexecuteOperation(cacheFirst);
+          client.reexecuteOperation(toRequestPolicy(op, 'cache-first'));
         }
       }
     });
@@ -164,10 +161,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       keys.push(op.key);
 
       if (!ops.has(op.key)) {
-        const isNetworkOnly = op.context.requestPolicy === 'network-only';
         ops.set(
           op.key,
-          isNetworkOnly ? toRequestPolicy(op, 'cache-and-network') : op
+          getRequestPolicy(op) === 'network-only'
+            ? toRequestPolicy(op, 'cache-and-network')
+            : op
         );
       }
     });
@@ -178,7 +176,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
-    const policy = getRequestPolicy(operation);
     const { data, dependencies, partial } = query(store, operation);
     let cacheOutcome: CacheOutcome;
 
@@ -186,7 +183,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       cacheOutcome = 'miss';
     } else {
       updateDependencies(operation, dependencies);
-      cacheOutcome = !partial || policy === 'cache-only' ? 'hit' : 'partial';
+      cacheOutcome =
+        !partial || getRequestPolicy(operation) === 'cache-only'
+          ? 'hit'
+          : 'partial';
     }
 
     return {
@@ -276,8 +276,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             policy === 'cache-and-network' ||
             (policy === 'cache-first' && outcome === 'partial')
           ) {
-            const networkOnly = toRequestPolicy(operation, 'network-only');
-            client.reexecuteOperation(networkOnly);
+            client.reexecuteOperation(
+              toRequestPolicy(operation, 'network-only')
+            );
           }
 
           return {

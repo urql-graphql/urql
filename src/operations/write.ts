@@ -127,25 +127,29 @@ export const writeOptimistic = (
     optimistic: true,
   };
 
-  const select = getSelectionSet(operation);
   const data = Object.create(null);
-  const iter = new SelectionIterator(operationName, operationName, select, ctx);
+  const iter = new SelectionIterator(
+    operationName,
+    operationName,
+    getSelectionSet(operation),
+    ctx
+  );
 
   let node;
   while ((node = iter.next()) !== undefined) {
     if (node.selectionSet !== undefined) {
       const fieldName = getName(node);
       const resolver = ctx.store.optimisticMutations[fieldName];
+
       if (resolver !== undefined) {
         // We have to update the context to reflect up-to-date ResolveInfo
         ctx.fieldName = fieldName;
 
         const fieldArgs = getFieldArguments(node, ctx.variables);
-        const fieldSelect = getSelectionSet(node);
         const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
 
         if (!isScalar(resolverValue)) {
-          writeRootField(ctx, resolverValue, fieldSelect);
+          writeRootField(ctx, resolverValue, getSelectionSet(node));
         }
 
         data[fieldName] = resolverValue;
@@ -178,7 +182,6 @@ export const writeFragment = (
     );
   }
 
-  const select = getSelectionSet(fragment);
   const typename = getFragmentTypeName(fragment);
   const writeData = { __typename: typename, ...data } as Data;
   const entityKey = store.keyOfEntity(writeData);
@@ -204,7 +207,7 @@ export const writeFragment = (
     schemaPredicates: store.schemaPredicates,
   };
 
-  writeSelection(ctx, entityKey, select, writeData);
+  writeSelection(ctx, entityKey, getSelectionSet(fragment), writeData);
 };
 
 const writeSelection = (
@@ -213,7 +216,7 @@ const writeSelection = (
   select: SelectionSet,
   data: Data
 ) => {
-  const { store, variables } = ctx;
+  const { store } = ctx;
   const isQuery = entityKey === ctx.store.getRootKey('query');
   const typename = data.__typename;
   if (!isQuery) addDependency(entityKey);
@@ -225,7 +228,7 @@ const writeSelection = (
   let node;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, variables);
+    const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
     const fieldValue = data[getFieldAlias(node)];
 
@@ -263,11 +266,13 @@ const writeSelection = (
       store.writeRecord(fieldValue, fieldKey);
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
-      const fieldSelect = getSelectionSet(node);
-      const connectionKey = joinKeys(entityKey, fieldName);
-      const link = writeField(ctx, fieldKey, fieldSelect, fieldValue);
+      const link = writeField(ctx, fieldKey, getSelectionSet(node), fieldValue);
       store.writeLink(link, fieldKey);
-      store.writeConnection(connectionKey, fieldKey, fieldArgs);
+      store.writeConnection(
+        joinKeys(entityKey, fieldName),
+        fieldKey,
+        fieldArgs
+      );
       store.removeRecord(fieldKey);
     } else {
       warning(
@@ -356,25 +361,22 @@ const writeRoot = (
   let node;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
-    const fieldAlias = getFieldAlias(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
-    const fieldValue = data[fieldAlias];
+    const fieldValue = data[getFieldAlias(node)];
 
     if (
       node.selectionSet !== undefined &&
       fieldValue !== null &&
       !isScalar(fieldValue)
     ) {
-      const fieldSelect = getSelectionSet(node);
-      writeRootField(ctx, fieldValue, fieldSelect);
+      writeRootField(ctx, fieldValue, getSelectionSet(node));
     }
 
     if (isRootField) {
-      const fieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
       // We have to update the context to reflect up-to-date ResolveInfo
       ctx.parentTypeName = typename;
       ctx.parentKey = typename;
-      ctx.parentFieldKey = fieldKey;
+      ctx.parentFieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
       ctx.fieldName = fieldName;
 
       // We run side-effect updates after the default, normalized updates

@@ -50,7 +50,7 @@ export const invalidateSelection = (
   entityKey: string,
   select: SelectionSet
 ) => {
-  const { store, variables } = ctx;
+  const { store } = ctx;
   const isQuery = entityKey === 'Query';
 
   let typename;
@@ -71,8 +71,10 @@ export const invalidateSelection = (
   let node;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, variables);
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
+    const fieldKey = joinKeys(
+      entityKey,
+      keyOfField(fieldName, getFieldArguments(node, ctx.variables))
+    );
 
     if (
       process.env.NODE_ENV !== 'production' &&

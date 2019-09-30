@@ -151,12 +151,15 @@ const readRootField = (
   if (entityKey !== null) {
     // We assume that since this is used for result data this can never be undefined,
     // since the result data has already been written to the cache
-    const newData = Object.create(null);
-    const fieldValue = readSelection(ctx, entityKey, select, newData);
+    const fieldValue = readSelection(
+      ctx,
+      entityKey,
+      select,
+      Object.create(null)
+    );
     return fieldValue === undefined ? null : fieldValue;
   } else {
-    const typename = originalData.__typename;
-    return readRoot(ctx, typename, select, originalData);
+    return readRoot(ctx, originalData.__typename, select, originalData);
   }
 };
 
@@ -179,7 +182,6 @@ export const readFragment = (
     return null;
   }
 
-  const select = getSelectionSet(fragment);
   const typename = getFragmentTypeName(fragment);
   if (typeof entity !== 'string' && !entity.__typename) {
     entity.__typename = typename;
@@ -214,7 +216,14 @@ export const readFragment = (
     schemaPredicates: store.schemaPredicates,
   };
 
-  return readSelection(ctx, entityKey, select, Object.create(null)) || null;
+  return (
+    readSelection(
+      ctx,
+      entityKey,
+      getSelectionSet(fragment),
+      Object.create(null)
+    ) || null
+  );
 };
 
 const readSelection = (
@@ -223,7 +232,7 @@ const readSelection = (
   select: SelectionSet,
   data: Data
 ): Data | undefined => {
-  const { store, variables, schemaPredicates } = ctx;
+  const { store, schemaPredicates } = ctx;
   const isQuery = entityKey === store.getRootKey('query');
   if (!isQuery) addDependency(entityKey);
 
@@ -244,7 +253,7 @@ const readSelection = (
   while ((node = iter.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, variables);
+    const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
     const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
     const fieldValue = store.getRecord(fieldKey);
@@ -284,15 +293,13 @@ const readSelection = (
       if (node.selectionSet !== undefined) {
         // When it has a selection set we are resolving an entity with a
         // subselection. This can either be a list or an object.
-        const fieldSelect = getSelectionSet(node);
-        const prevData = (data[fieldAlias] as Data) || Object.create(null);
         dataFieldValue = resolveResolverResult(
           ctx,
           typename,
           fieldName,
           fieldKey,
-          fieldSelect,
-          prevData,
+          getSelectionSet(node),
+          (data[fieldAlias] as Data) || Object.create(null),
           resolverValue
         );
       } else {
@@ -357,7 +364,7 @@ const readResolverResult = (
   data: Data,
   result: Data
 ): Data | undefined => {
-  const { store, variables, schemaPredicates } = ctx;
+  const { store, schemaPredicates } = ctx;
   const entityKey = store.keyOfEntity(result) || key;
   addDependency(entityKey);
 
@@ -390,9 +397,11 @@ const readResolverResult = (
   while ((node = iter.next()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, variables);
     const fieldAlias = getFieldAlias(node);
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
+    const fieldKey = joinKeys(
+      entityKey,
+      keyOfField(fieldName, getFieldArguments(node, ctx.variables))
+    );
     const fieldValue = store.getRecord(fieldKey);
     const resultValue = result[fieldName];
 
@@ -482,9 +491,6 @@ const resolveResolverResult = (
       schemaPredicates.isListNullable(typename, fieldName);
     const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
-      const innerResult = result[i];
-      // Get the inner previous data from prevData
-      const innerPrevData = prevData !== undefined ? prevData[i] : undefined;
       // Recursively read resolver result
       const childResult = resolveResolverResult(
         ctx,
@@ -492,8 +498,9 @@ const resolveResolverResult = (
         fieldName,
         joinKeys(key, `${i}`),
         select,
-        innerPrevData,
-        innerResult
+        // Get the inner previous data from prevData
+        prevData !== undefined ? prevData[i] : undefined,
+        result[i]
       );
 
       if (childResult === undefined && !isListNullable) {
@@ -539,15 +546,13 @@ const resolveLink = (
       schemaPredicates.isListNullable(typename, fieldName);
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
-      const innerPrevData = prevData !== undefined ? prevData[i] : undefined;
-      const innerLink = link[i];
       const childLink = resolveLink(
         ctx,
-        innerLink,
+        link[i],
         typename,
         fieldName,
         select,
-        innerPrevData
+        prevData !== undefined ? prevData[i] : undefined
       );
       if (childLink === undefined && !isListNullable) {
         return undefined;
@@ -560,8 +565,12 @@ const resolveLink = (
   } else if (link === null) {
     return null;
   } else {
-    const data = prevData === undefined ? Object.create(null) : prevData;
-    return readSelection(ctx, link, select, data);
+    return readSelection(
+      ctx,
+      link,
+      select,
+      prevData === undefined ? Object.create(null) : prevData
+    );
   }
 };
 

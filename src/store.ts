@@ -169,8 +169,6 @@ export class Store implements Cache {
       key = `${id}`;
     } else if (_id !== undefined && _id !== null) {
       key = `${_id}`;
-    } else {
-      return null;
     }
 
     return key ? `${typename}:${key}` : null;
@@ -202,8 +200,7 @@ export class Store implements Cache {
     fieldName: string,
     args?: Variables
   ): EntityField {
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, args));
-    return this.getRecord(fieldKey);
+    return this.getRecord(joinKeys(entityKey, keyOfField(fieldName, args)));
   }
 
   writeField(
@@ -212,8 +209,11 @@ export class Store implements Cache {
     fieldName: string,
     args?: Variables
   ) {
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, args));
-    return (this.records = mapSet(this.records, fieldKey, field));
+    return (this.records = mapSet(
+      this.records,
+      joinKeys(entityKey, keyOfField(fieldName, args)),
+      field
+    ));
   }
 
   getLink(key: string): undefined | Link {

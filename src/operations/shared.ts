@@ -48,9 +48,10 @@ const isFragmentHeuristicallyMatching = (
 
   return !getSelectionSet(node).some(node => {
     if (!isFieldNode(node)) return false;
-    const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, ctx.variables);
-    const fieldKey = keyOfField(fieldName, fieldArgs);
+    const fieldKey = keyOfField(
+      getName(node),
+      getFieldArguments(node, ctx.variables)
+    );
     return !ctx.store.hasField(joinKeys(entityKey, fieldKey));
   });
 };

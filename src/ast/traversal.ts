@@ -13,11 +13,8 @@ import {
 import { getName } from './node';
 import { Fragments, Variables } from '../types';
 
-const isFragmentNode = (
-  node: DefinitionNode
-): node is FragmentDefinitionNode => {
-  return node.kind === Kind.FRAGMENT_DEFINITION;
-};
+const isFragmentNode = (node: DefinitionNode): node is FragmentDefinitionNode =>
+  node.kind === Kind.FRAGMENT_DEFINITION;
 
 /** Returns the main operation's definition */
 export const getMainOperation = (
@@ -47,12 +44,12 @@ export const shouldInclude = (
   node: SelectionNode,
   vars: Variables
 ): boolean => {
-  if (node.directives === undefined) {
+  const { directives } = node;
+  if (directives === undefined) {
     return true;
   }
 
   // Finds any @include or @skip directive that forces the node to be skipped
-  const { directives } = node;
   for (let i = 0, l = directives.length; i < l; i++) {
     const directive = directives[i];
     const name = getName(directive);
