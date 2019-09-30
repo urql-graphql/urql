@@ -1,5 +1,3 @@
-import invariant from 'invariant';
-
 import {
   SelectionNode,
   DefinitionNode,
@@ -10,6 +8,7 @@ import {
   Kind,
 } from 'graphql';
 
+import { invariant } from '../helpers/help';
 import { getName } from './node';
 import { Fragments, Variables } from '../types';
 
@@ -27,7 +26,8 @@ export const getMainOperation = (
   invariant(
     !!operation,
     'Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition' +
-      'node for a query, subscription, or mutation.'
+      'node for a query, subscription, or mutation.',
+    1
   );
 
   return operation;

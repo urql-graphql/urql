@@ -1,5 +1,3 @@
-import { warning } from '../helpers/warning';
-
 import {
   getFragments,
   getMainOperation,
@@ -30,6 +28,7 @@ import {
   clearStoreState,
 } from '../store';
 
+import { warning } from '../helpers/help';
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
@@ -176,7 +175,8 @@ export const readFragment = (
     warning(
       false,
       'readFragment(...) was called with an empty fragment.\n' +
-        'You have to call it with at least one fragment in your GraphQL document.'
+        'You have to call it with at least one fragment in your GraphQL document.',
+      6
     );
 
     return null;
@@ -198,7 +198,8 @@ export const readFragment = (
       "Can't generate a key for readFragment(...).\n" +
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         typename +
-        '`.'
+        '`.',
+      7
     );
 
     return null;
@@ -375,12 +376,14 @@ const readResolverResult = (
     typeof typename !== 'string' ||
     (resolvedTypename && typename !== resolvedTypename)
   ) {
+    // TODO: This may be an invalid error for resolvers that return interfaces
     warning(
       false,
-      'Invalid resolver value: The resolver at `' +
+      'Invalid resolver data: The resolver at `' +
         entityKey +
         '` returned an ' +
-        'invalid typename that could not be reconciled with the cache.'
+        'invalid typename that could not be reconciled with the cache.',
+      8
     );
 
     return undefined;
@@ -524,7 +527,8 @@ const resolveResolverResult = (
       'Invalid resolver value: The field at `' +
         key +
         '` is a scalar (number, boolean, etc)' +
-        ', but the GraphQL query expects a selection set for this field.'
+        ', but the GraphQL query expects a selection set for this field.',
+      9
     );
 
     return undefined;

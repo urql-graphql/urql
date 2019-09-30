@@ -1,8 +1,8 @@
-import { warning } from '../helpers/warning';
 import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
 import { Fragments, Variables, SelectionSet, Scalar } from '../types';
 import { Store } from '../store';
 import { joinKeys, keyOfField } from '../helpers';
+import { warning } from '../helpers/help';
 
 import {
   getTypeCondition,
@@ -43,7 +43,8 @@ const isFragmentHeuristicallyMatching = (
       typeCondition +
       '` may be an' +
       'interface.\nA schema needs to be defined for this match to be deterministic, ' +
-      'otherwise the fragment will be matched heuristically!'
+      'otherwise the fragment will be matched heuristically!',
+    16
   );
 
   return !getSelectionSet(node).some(node => {

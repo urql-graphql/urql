@@ -1,28 +1,28 @@
 const visited = 'visitedByInvariantWarningTransformer';
 
-export default function Plugin({ template }) {
+const warningDevCheckTemplate = `
+  if (process.env.NODE_ENV !== 'production') {
+    NODE;
+  }
+`.trim();
+
+const plugin = ({ template }) => {
   const wrapWithDevCheck = template(
-      `
-    if (process.env.NODE_ENV !== "production") {
-      NODE;
-    }
-  `,
+    warningDevCheckTemplate,
     { placeholderPattern: /^NODE$/ }
   );
 
   return {
     visitor: {
-      Program(p) {
-        p.traverse({
-          CallExpression(path) {
-            if (path.node[visited]) return
-            path.node[visited] = true;
-            if (path.node.callee.name === 'invariant' || path.node.callee.name === 'warning') {
-              path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
-            }
-          }
-        })
-      },
-    },
+      CallExpression(path) {
+        const { name } = path.node.callee;
+        if ((name === 'warning' || name === 'invariant') && !path.node[visited]) {
+          path.node[visited] = true;
+          path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
+        }
+      }
+    }
   };
-}
+};
+
+export default plugin;

@@ -1,4 +1,3 @@
-import invariant from 'invariant';
 import { DocumentNode } from 'graphql';
 import { createRequest } from 'urql';
 import * as Pessimism from 'pessimism';
@@ -19,6 +18,7 @@ import {
 } from './types';
 
 import { joinKeys, keyOfField } from './helpers';
+import { invariant } from './helpers/help';
 import { read, readFragment } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
@@ -37,7 +37,8 @@ const refValue = <T>(ref: Ref<T>): T => {
     ref.current !== null,
     'Invalid Cache call: The cache may only be accessed or mutated during' +
       'operations like write or query, or as part of its resolvers, updaters, ' +
-      'or optimistic configs.'
+      'or optimistic configs.',
+    2
   );
 
   return ref.current as T;
