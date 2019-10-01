@@ -8,6 +8,11 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.0.2](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.1...v1.0.2)
+
+- Deduplicate connections in `Store.writeConnection` when possible (see [#103](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/103))
+- Fix early bail-out in `relayPagination` helper (see [#103](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/103))
+
 ## [v1.0.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.0...v1.0.1)
 
 - Trims down the size by 100 bytes (see [#96](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/96))
