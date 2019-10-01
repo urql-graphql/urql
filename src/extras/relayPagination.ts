@@ -116,8 +116,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
 
     const connections = cache.resolveConnections(key, fieldName);
     const size = connections.length;
-    const entityKey = ensureKey(cache.resolve(key, fieldName, args));
-    if (size === 0 || !entityKey) {
+    if (size === 0) {
       return undefined;
     }
 
@@ -180,7 +179,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       return undefined;
     }
 
-    const hasCurrentPage = !!cache.resolve(entityKey, '__typename');
+    const hasCurrentPage = !!ensureKey(cache.resolve(key, fieldName, args));
     if (!hasCurrentPage) {
       if ((info as any).schemaPredicates === undefined) {
         return undefined;

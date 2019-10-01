@@ -270,12 +270,14 @@ const writeSelection = (
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
       const link = writeField(ctx, fieldKey, getSelectionSet(node), fieldValue);
-      store.writeLink(link, fieldKey);
+
       store.writeConnection(
         joinKeys(entityKey, fieldName),
         fieldKey,
         fieldArgs
       );
+
+      store.writeLink(link, fieldKey);
       store.removeRecord(fieldKey);
     } else {
       warning(
