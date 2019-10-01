@@ -480,7 +480,7 @@ if (isFileUpload) {
   const map = {}
   let i = 0
   files.forEach(paths => {
-    map[++i] = paths
+    map[++i] = paths.map(path => `variables.${path}`)
   });
 
   fetchOptions.body.append('map', JSON.stringify(map));
