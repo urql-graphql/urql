@@ -1,4 +1,5 @@
-import { Cache, Resolver, NullArray } from '../types';
+import { stringifyVariables } from 'urql';
+import { Cache, Resolver, Variables, NullArray } from '../types';
 
 export type MergeMode = 'outwards' | 'inwards';
 
@@ -53,6 +54,37 @@ const concatEdges = (
   }
 
   return newEdges;
+};
+
+const compareArgs = (
+  fieldArgs: Variables,
+  connectionArgs: Variables
+): boolean => {
+  for (const key in connectionArgs) {
+    if (
+      key === 'first' ||
+      key === 'last' ||
+      key === 'after' ||
+      key === 'before'
+    ) {
+      continue;
+    } else if (!(key in fieldArgs)) {
+      return false;
+    }
+
+    const argA = fieldArgs[key];
+    const argB = connectionArgs[key];
+
+    if (
+      typeof argA !== typeof argB || typeof argA !== 'object'
+        ? argA !== argB
+        : stringifyVariables(argA) !== stringifyVariables(argB)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 const getPage = (cache: Cache, linkKey: string): Page | null => {
@@ -111,7 +143,7 @@ const getPage = (cache: Cache, linkKey: string): Page | null => {
 export const relayPagination = (params: PaginationParams = {}): Resolver => {
   const mergeMode = params.mergeMode || 'inwards';
 
-  return (_parent, args, cache, info) => {
+  return (_parent, fieldArgs, cache, info) => {
     const { parentKey: key, fieldName } = info;
 
     const connections = cache.resolveConnections(key, fieldName);
@@ -127,6 +159,10 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
 
     for (let i = 0; i < size; i++) {
       const [args, linkKey] = connections[i];
+      if (!compareArgs(fieldArgs, args)) {
+        continue;
+      }
+
       const page = getPage(cache, linkKey);
       if (page === null) {
         continue;
@@ -179,7 +215,9 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       return undefined;
     }
 
-    const hasCurrentPage = !!ensureKey(cache.resolve(key, fieldName, args));
+    const hasCurrentPage = !!ensureKey(
+      cache.resolve(key, fieldName, fieldArgs)
+    );
     if (!hasCurrentPage) {
       if ((info as any).schemaPredicates === undefined) {
         return undefined;

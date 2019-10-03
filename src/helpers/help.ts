@@ -4,7 +4,7 @@
 // You can read more about the messages themselves in `docs/help.md`
 
 const helpUrl =
-  '\nhttps://github.com/FormidableLabs/urql/blob/master/docs/help.md#';
+  '\nhttps://github.com/FormidableLabs/urql-exchange-graphcache/blob/master/docs/help.md#';
 const cache = new Set<string>();
 
 export const invariant = (clause: any, message: string, code: number) => {

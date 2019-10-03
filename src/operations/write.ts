@@ -146,7 +146,11 @@ export const writeOptimistic = (
         ctx.fieldName = fieldName;
 
         const fieldArgs = getFieldArguments(node, ctx.variables);
-        const resolverValue = resolver(fieldArgs || {}, ctx.store, ctx);
+        const resolverValue = resolver(
+          fieldArgs || Object.create(null),
+          ctx.store,
+          ctx
+        );
 
         if (!isScalar(resolverValue)) {
           writeRootField(ctx, resolverValue, getSelectionSet(node));
@@ -155,7 +159,7 @@ export const writeOptimistic = (
         data[fieldName] = resolverValue;
         const updater = ctx.store.updates[mutationRootKey][fieldName];
         if (updater !== undefined) {
-          updater(data, fieldArgs || {}, ctx.store, ctx);
+          updater(data, fieldArgs || Object.create(null), ctx.store, ctx);
         }
       }
     }
@@ -390,7 +394,7 @@ const writeRoot = (
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
       if (updater !== undefined) {
-        updater(data, fieldArgs || {}, ctx.store, ctx);
+        updater(data, fieldArgs || Object.create(null), ctx.store, ctx);
       }
     }
   }

@@ -286,7 +286,7 @@ const readSelection = (
 
       const resolverValue: DataField | undefined = resolvers[fieldName](
         data,
-        fieldArgs || {},
+        fieldArgs || Object.create(null),
         store,
         ctx
       );

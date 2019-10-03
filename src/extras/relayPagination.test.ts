@@ -552,3 +552,93 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
     },
   });
 });
+
+it('prevents overlapping of pagination on different arguments', () => {
+  const Pagination = gql`
+    query($filter: String) {
+      items(first: 1, filter: $filter) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        pageInfo {
+          __typename
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store(undefined, {
+    Query: {
+      items: relayPagination(),
+    },
+  });
+
+  const page = withId => ({
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [
+        {
+          __typename: 'ItemEdge',
+          node: {
+            __typename: 'Item',
+            id: `${withId}`,
+          },
+        },
+      ],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: false,
+        endCursor: null,
+      },
+    },
+  });
+
+  write(
+    store,
+    { query: Pagination, variables: { filter: 'one' } },
+    page('one')
+  );
+  write(
+    store,
+    { query: Pagination, variables: { filter: 'two' } },
+    page('two')
+  );
+
+  const resOne = query(store, {
+    query: Pagination,
+    variables: { filter: 'one' },
+  });
+  const resTwo = query(store, {
+    query: Pagination,
+    variables: { filter: 'two' },
+  });
+  const resThree = query(store, {
+    query: Pagination,
+    variables: { filter: 'three' },
+  });
+
+  expect(resOne.data).toHaveProperty(
+    ['items', 'edges', 0, 'node', 'id'],
+    'one'
+  );
+  expect(resOne.data).toHaveProperty('items.edges.length', 1);
+
+  expect(resTwo.data).toHaveProperty(
+    ['items', 'edges', 0, 'node', 'id'],
+    'two'
+  );
+  expect(resTwo.data).toHaveProperty('items.edges.length', 1);
+
+  expect(resThree.data).toEqual({
+    __typename: 'Query',
+    items: null,
+  });
+});
