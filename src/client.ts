@@ -216,6 +216,7 @@ export class Client {
     if (!context || typeof context.suspense !== 'boolean') {
       context = { ...context, suspense: false };
     }
+
     return withPromise<OperationResult>(
       this.executeQuery(createRequest(query, variables), context)
     );
