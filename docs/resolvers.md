@@ -123,4 +123,49 @@ const data = cache.readFragment(gql`
 This way we'll get the Todo with id 1 and the relevant data we are askng for in the
 fragment.
 
+## Pagination
+
+Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
+on your backend we offer the possibility of endless data resolving.
+This means that when you fetch the next page in your data
+received in `useQuery` you'll see the previous pages as well. This is usefull for
+endless scrolling.
+
+You can achieve this by importing `relayPagination` from `@urql/exchange-graphcache/extras`.
+
+```js
+import { cacheExchange } from '@urql/exchange-graphcache';
+import { relayPagination } from '@urql/exchange-graphcache/extras';
+
+const cache = cacheExchange({
+  resolvers: {
+    Query: {
+      todos: relayPagination(),
+    },
+  },
+});
+```
+
+`relayPagination` accepts an object of options, for now we are offering one
+option and that is the `mergeMode`. This defaults to `inwards` and can otherwise
+be set to `outwards`. This will handle how pages are merged when you paginate
+forwards and backwards at the same time. outwards pagination assumes that pages
+that come in last should be merged before the first pages, so that the list
+grows outwards in both directions. The default inwards pagination assumes that
+pagination last pages is part of the same list and come after first pages.
+Hence it merges pages so that they converge in the middle.
+
+Example series of requests:
+
+```
+first: 1 => node 1, endCursor: a
+first: 1, after: 1 => node 2, endCursor: b
+...
+last: 1 => node 99, startCursor: c
+last: 1, before: c => node 89, startCursor: d
+```
+
+With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
+And with outwards merging: `[..., 89, 99, 1, 2, ...]`
+
 [Back](../README.md)
