@@ -4,29 +4,35 @@ import { useMutation } from 'urql';
 interface Props {
   complete: boolean;
   text: string;
-  id: string;
+  disabled: boolean;
+  loading: boolean;
+  toggleTodo: () => void;
+  deleteTodo: () => void;
 }
 
-export const Todo: FC<Props> = props => {
-  const [mutation, executeMutation] = useMutation(ToggleTodo);
-
-  const handleToggle = () => executeMutation({ id: props.id });
-
+export const Todo: FC<Props> = ({
+  complete,
+  deleteTodo,
+  loading,
+  text,
+  toggleTodo,
+  disabled,
+}) => {
   return (
-    <li onClick={handleToggle}>
-      <p className={props.complete ? 'strikethrough' : ''}>{props.text}</p>
-      {mutation.fetching && <span>(updating)</span>}
+    <li>
+      <p onClick={toggleTodo} className={complete ? 'strikethrough' : ''}>
+        {text}
+      </p>
+      {loading && <span>(updating)</span>}
+      <button
+        disabled={disabled}
+        className="delete-button"
+        onClick={deleteTodo}
+      >
+        x
+      </button>
     </li>
   );
 };
 
 Todo.displayName = 'Todo';
-
-const ToggleTodo = `
-  mutation($id: ID!) {
-    toggleTodo(id: $id) {
-      id
-      complete
-    }
-  }
-`;
