@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { useMutation } from 'urql';
 
 interface Props {
   complete: boolean;

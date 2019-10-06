@@ -37,12 +37,12 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    todos: (root, args, context) => {
+    todos: () => {
       return store.todos;
     },
   },
   Mutation: {
-    toggleTodo: (root, args, context) => {
+    toggleTodo: (root, args) => {
       const { id } = args;
 
       const todo = store.todos.find(t => String(t.id) === id);
@@ -50,13 +50,13 @@ const resolvers = {
 
       return todo;
     },
-    addTodo: (root, args, context) => {
+    addTodo: (root, args) => {
       const id = ++idCounter;
       const todo = { complete: false, id, text: args.text };
       store.todos.push(todo);
       return todo;
     },
-    deleteTodo: (root, args, context) => {
+    deleteTodo: (root, args) => {
       const { id } = args;
       const todo = store.todos.find(t => String(t.id) === id);
       store.todos = store.todos.filter(t => {

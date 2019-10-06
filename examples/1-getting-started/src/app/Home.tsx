@@ -44,7 +44,7 @@ export const Home: FC = () => {
   const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
   const refetch = useCallback(
     () => executeQuery({ requestPolicy: 'network-only' }),
-    []
+    [executeQuery]
   );
 
   const [toggleTodoMutation, executeToggleTodoMutation] = useMutation(
@@ -79,7 +79,13 @@ export const Home: FC = () => {
         ))}
       </ul>
     );
-  }, [res]);
+  }, [
+    res,
+    toggleTodoMutation,
+    deleteTodoMutation,
+    executeToggleTodoMutation,
+    executeDeleteTodoMutation,
+  ]);
 
   return (
     <>
