@@ -1,6 +1,5 @@
-const { ApolloServer, graphiqlExpress } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const { createServer } = require('http');
-const { SubscriptionServer } = require('subscriptions-transport-ws');
 const expressPlayground = require('graphql-playground-middleware-express')
   .default;
 const express = require('express');
