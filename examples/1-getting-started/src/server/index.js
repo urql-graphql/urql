@@ -21,9 +21,7 @@ const webServer = createServer(app);
 server.installSubscriptionHandlers(webServer);
 
 const graphqlEndpoint = `http://localhost:${PORT}${server.graphqlPath}`;
-const subscriptionEndpoint = `ws://localhost:${PORT}${
-  server.subscriptionsPath
-}`;
+const subscriptionEndpoint = `ws://localhost:${PORT}${server.subscriptionsPath}`;
 
 app.use(cors());
 app.get(

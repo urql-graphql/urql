@@ -1,3 +1,4 @@
+let idCounter = 2;
 
 const store = {
   todos: [
@@ -25,6 +26,8 @@ const typeDefs = `
   }
   type Mutation {
     toggleTodo(id: ID!): Todo
+    addTodo(text: String!): Todo
+    deleteTodo(id: ID!): Todo
   }
   type Todo {
     id: ID,
@@ -35,15 +38,32 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    todos: (root, args, context) => {
+    todos: () => {
       return store.todos;
     },
   },
   Mutation: {
-    toggleTodo: (root, args, context) => {
+    toggleTodo: (root, args) => {
       const { id } = args;
-      store.todos[args.id].complete = !store.todos[args.id].complete;
-      return store.todos[args.id];
+
+      const todo = store.todos.find(t => String(t.id) === id);
+      todo.complete = !todo.complete;
+
+      return todo;
+    },
+    addTodo: (root, args) => {
+      const id = ++idCounter;
+      const todo = { complete: false, id, text: args.text };
+      store.todos.push(todo);
+      return todo;
+    },
+    deleteTodo: (root, args) => {
+      const { id } = args;
+      const todo = store.todos.find(t => String(t.id) === id);
+      store.todos = store.todos.filter(t => {
+        return String(t.id) !== id;
+      });
+      return todo;
     },
   },
 };
