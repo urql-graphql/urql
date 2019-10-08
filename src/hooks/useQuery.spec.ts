@@ -303,4 +303,37 @@ describe('useQuery', () => {
     rerender({ query: mockQuery, variables: mockVariables, pause: true });
     expect(client.executeQuery).toBeCalledTimes(1);
   });
+
+  it('should keep fetching at true when the result instructs it to', async () => {
+    client.executeQuery.mockImplementationOnce(() =>
+      pipe(
+        interval(400),
+        map(() => ({
+          fetching: true,
+          data: { test: true },
+        }))
+      )
+    );
+
+    const { result, waitForNextUpdate } = renderHook(
+      ({ query, variables }) => useQuery({ query, variables }),
+      {
+        initialProps: {
+          query: mockQuery,
+          variables: mockVariables,
+        },
+      }
+    );
+
+    await waitForNextUpdate();
+    expect(client.executeQuery).toBeCalledTimes(1);
+
+    const [state] = result.current;
+    expect(state).toEqual({
+      fetching: true,
+      data: { test: true },
+      error: undefined,
+      extensions: undefined,
+    });
+  });
 });
