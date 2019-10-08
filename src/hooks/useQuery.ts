@@ -62,8 +62,8 @@ export const useQuery = <T = any, V = object>(
           ...opts,
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(({ data, error, extensions }) => {
-          setState({ fetching: false, data, error, extensions });
+        subscribe(({ fetching, data, error, extensions }) => {
+          setState({ fetching: fetching || false, data, error, extensions });
         })
       );
     },

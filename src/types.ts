@@ -67,6 +67,8 @@ export interface OperationResult<Data = any> {
   error?: CombinedError;
   /** Optional extensions return by the Graphql server. */
   extensions?: Record<string, any>;
+  /** Optional flag to force fetching to remain true. */
+  fetching?: void | true;
 }
 
 /** Input parameters for to an Exchange factory function. */

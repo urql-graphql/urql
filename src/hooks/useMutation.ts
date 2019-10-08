@@ -47,8 +47,8 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
-        const { data, error, extensions } = result;
-        setState({ fetching: false, data, error, extensions });
+        const { fetching, data, error, extensions } = result;
+        setState({ fetching: fetching || false, data, error, extensions });
         return result;
       });
     },
