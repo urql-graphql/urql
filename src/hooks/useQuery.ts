@@ -4,10 +4,10 @@ import { pipe, onEnd, subscribe } from 'wonka';
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError, noop } from '../utils';
+import { Client } from '../client';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
-import { Client } from 'src/client';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
