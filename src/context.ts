@@ -11,16 +11,16 @@ export const Consumer = Context.Consumer;
 
 let hasWarnedAboutDefault = false;
 
-export const useClient = (client?: Client): Client => {
-  const context = useContext(Context);
+export const useClient = (overrideClient?: Client): Client => {
+  const client = useContext(Context);
 
-  if (!!client) {
-    return client;
+  if (overrideClient) {
+    return overrideClient;
   }
 
   if (
     process.env.NODE_ENV !== 'production' &&
-    context === defaultClient &&
+    client === defaultClient &&
     !hasWarnedAboutDefault
   ) {
     hasWarnedAboutDefault = true;
@@ -33,5 +33,5 @@ export const useClient = (client?: Client): Client => {
     );
   }
 
-  return context;
+  return client;
 };
