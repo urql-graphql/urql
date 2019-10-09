@@ -7,6 +7,7 @@ import { CombinedError, noop } from '../utils';
 import { useRequest } from './useRequest';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
+import { Client } from 'src/client';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -14,6 +15,7 @@ export interface UseQueryArgs<V> {
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
   context?: Partial<OperationContext>;
+  client?: Client;
   pause?: boolean;
 }
 
@@ -33,7 +35,7 @@ export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
   const unsubscribe = useRef(noop);
-  const client = useClient();
+  const client = useClient(args.client);
 
   // This is like useState but updates the state object
   // immediately, when we're still before the initial mount

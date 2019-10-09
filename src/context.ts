@@ -11,12 +11,16 @@ export const Consumer = Context.Consumer;
 
 let hasWarnedAboutDefault = false;
 
-export const useClient = (): Client => {
-  const client = useContext(Context);
+export const useClient = (client?: Client): Client => {
+  const context = useContext(Context);
+
+  if (!!client) {
+    return client;
+  }
 
   if (
     process.env.NODE_ENV !== 'production' &&
-    client === defaultClient &&
+    context === defaultClient &&
     !hasWarnedAboutDefault
   ) {
     hasWarnedAboutDefault = true;
@@ -29,5 +33,5 @@ export const useClient = (): Client => {
     );
   }
 
-  return client;
+  return context;
 };

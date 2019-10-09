@@ -303,4 +303,24 @@ describe('useQuery', () => {
     rerender({ query: mockQuery, variables: mockVariables, pause: true });
     expect(client.executeQuery).toBeCalledTimes(1);
   });
+
+  it('should support passing a custom client instance', async () => {
+    const mock = {
+      executeQuery: jest.fn(() =>
+        pipe(
+          interval(1),
+          map(() => ({ data: {} }))
+        )
+      ),
+    } as any;
+
+    const { waitForNextUpdate } = renderHook(
+      ({ query, variables }) => useQuery({ query, variables, client: mock }),
+      { initialProps: { query: mockQuery, variables: mockVariables } }
+    );
+
+    await waitForNextUpdate();
+    expect(mock.executeQuery).toBeCalledTimes(1);
+    expect(client.executeQuery).toBeCalledTimes(0);
+  });
 });
