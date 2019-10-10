@@ -9,15 +9,14 @@ import { terser } from 'rollup-plugin-terser';
 import transformPipe from './scripts/transform-pipe';
 
 const pkgInfo = require('./package.json');
-const external = ['dns', 'fs', 'path', 'url'];
 
-if (pkgInfo.peerDependencies) {
+let external = ['dns', 'fs', 'path', 'url'];
+if (pkgInfo.peerDependencies)
   external.push(...Object.keys(pkgInfo.peerDependencies));
-}
-
-if (pkgInfo.dependencies) {
+if (pkgInfo.dependencies)
   external.push(...Object.keys(pkgInfo.dependencies));
-}
+
+external = external.filter(x => x !== 'react-wonka');
 
 const externalPredicate = new RegExp(`^(${external.join('|')})($|/)`);
 const externalTest = id => {
