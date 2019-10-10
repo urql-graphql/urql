@@ -1,12 +1,25 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useRef } from 'react';
-import { pipe, onEnd, subscribe } from 'wonka';
+import { useCallback, useRef, useMemo } from 'react';
+import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+import { useSubjectValue } from 'react-wonka';
+
 import { useClient } from '../context';
-import { CombinedError, noop } from '../utils';
+import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
-import { useImmediateEffect } from './useImmediateEffect';
-import { useImmediateState } from './useImmediateState';
-import { OperationContext } from '../types';
+import { GraphQLRequest, OperationContext } from '../types';
+
+const initialState: UseSubscriptionState<any> = {
+  fetching: false,
+  data: undefined,
+  error: undefined,
+  extensions: undefined,
+};
+
+type InternalEvent = [
+  GraphQLRequest,
+  Partial<OperationContext>,
+  undefined | boolean
+];
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -33,62 +46,82 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const unsubscribe = useRef(noop);
-  const handlerRef = useRef(handler);
   const client = useClient();
-
-  const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
-    fetching: false,
-    error: undefined,
-    data: undefined,
-    extensions: undefined,
-  });
 
   // Update handler on constant ref, since handler changes shouldn't
   // trigger a new subscription run
+  const handlerRef = useRef(handler);
   handlerRef.current = handler;
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  const executeSubscription = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      unsubscribe.current();
-
-      setState(s => ({ ...s, fetching: true }));
-
-      [unsubscribe.current] = pipe(
-        client.executeSubscription(request, {
-          ...args.context,
-          ...opts,
-        }),
-        onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(({ data, error, extensions }) => {
-          const { current: handler } = handlerRef;
-
-          setState(s => ({
-            fetching: true,
-            data: typeof handler === 'function' ? handler(s.data, data) : data,
-            error,
-            extensions,
-          }));
-        })
-      );
-    },
-    [client, request, setState, args.context]
+  // A utility function to create a new context merged with `opts` and `args.context`
+  const makeContext = useCallback(
+    (opts?: Partial<OperationContext>) => ({
+      ...args.context,
+      ...opts,
+    }),
+    [args.context]
   );
 
-  useImmediateEffect(() => {
-    if (args.pause) {
-      unsubscribe.current();
-      setState(s => ({ ...s, fetching: false }));
-      return noop;
-    }
+  // Create an internal event with only the changes we care about
+  const input = useMemo<InternalEvent>(
+    () => [request, makeContext(), args.pause],
+    [request, makeContext, args.pause]
+  );
 
-    executeSubscription();
-    return () => unsubscribe.current(); // eslint-disable-line
-  }, [executeSubscription, args.pause, setState]);
+  const [state, update] = useSubjectValue(
+    event$ =>
+      pipe(
+        event$,
+        switchMap(([request, context, pause]: InternalEvent) => {
+          // On pause fetching is reset to false
+          if (pause) return fromValue({ fetching: false });
+
+          return concat([
+            // Initially set fetching to true
+            fromValue({ fetching: true }),
+            pipe(
+              // Call executeSubscription and transform its result to the local state shape
+              client.executeSubscription(request, context),
+              map(({ data, error, extensions }) => ({
+                fetching: true,
+                data,
+                error,
+                extensions,
+              }))
+            ),
+            // When the source proactively closes, fetching is set to false
+            fromValue({ fetching: false }),
+          ]);
+        }),
+        // The individual partial results are merged into each previous result
+        scan((result, partial: any) => {
+          const { current: handler } = handlerRef;
+          // If a handler has been passed, it's used to merge new data in
+          if (partial.data !== undefined && typeof handler === 'function') {
+            return {
+              ...result,
+              ...partial,
+              data: handler(result.data, partial.data),
+            };
+          } else {
+            return { ...result, ...partial };
+          }
+        }, initialState)
+      ),
+    input,
+    initialState
+  );
+
+  // This is the imperative execute function passed to the user
+  const executeSubscription = useCallback(
+    (opts?: Partial<OperationContext>) =>
+      update([request, makeContext(opts), false]),
+    [makeContext, request, update]
+  );
 
   return [state, executeSubscription];
 };

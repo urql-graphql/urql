@@ -96,25 +96,6 @@ describe('on subscription', () => {
   });
 });
 
-describe('on change', () => {
-  const qa = 'subscription NewSubA { exampleA }';
-  const qb = 'subscription NewSubB { exampleB }';
-
-  it('executes subscription', () => {
-    const wrapper = renderer.create(<SubscriptionUser q={query} />);
-
-    /**
-     * Have to call update twice for the change to be detected.
-     * Only a single change is detected (updating 5 times still only calls
-     * execute subscription twice).
-     */
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qb} />);
-    expect(client.executeSubscription).toBeCalledTimes(2);
-  });
-});
-
 it('calls handler', () => {
   const handler = jest.fn();
   const wrapper = renderer.create(
