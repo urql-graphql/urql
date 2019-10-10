@@ -53,18 +53,6 @@ describe('on initial useEffect', () => {
     renderer.create(<SubscriptionUser q={query} />);
     expect(client.executeSubscription).toBeCalledTimes(1);
   });
-
-  it('passes query to executeSubscription', () => {
-    renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith(
-      {
-        key: expect.any(Number),
-        query: expect.any(Object),
-        variables: {},
-      },
-      expect.any(Object)
-    );
-  });
 });
 
 it('should support setting context in useSubscription params', () => {

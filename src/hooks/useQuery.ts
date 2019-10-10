@@ -4,7 +4,7 @@ import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 import { useSubjectValue } from 'react-wonka';
 
 import { useClient } from '../context';
-import { GraphQLRequest, OperationContext, RequestPolicy } from '../types';
+import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
 
@@ -14,12 +14,6 @@ const initialState: UseQueryState<any> = {
   error: undefined,
   extensions: undefined,
 };
-
-type InternalEvent = [
-  GraphQLRequest,
-  Partial<OperationContext>,
-  undefined | boolean
-];
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -51,37 +45,36 @@ export const useQuery = <T = any, V = object>(
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  // A utility function to create a new context merged with `opts` and some args
-  const makeContext = useCallback(
-    (opts?: Partial<OperationContext>) => ({
+  // Create a new query-source from client.executeQuery
+  const query$ = useMemo(() => {
+    if (args.pause) return null;
+
+    return client.executeQuery(request, {
       requestPolicy: args.requestPolicy,
       pollInterval: args.pollInterval,
       ...args.context,
-      ...opts,
-    }),
-    [args.context, args.requestPolicy, args.pollInterval]
-  );
-
-  // Create an internal event with only the changes we care about
-  const input = useMemo<InternalEvent>(
-    () => [request, makeContext(), args.pause],
-    [request, makeContext, args.pause]
-  );
+    });
+  }, [
+    client,
+    request,
+    args.requestPolicy,
+    args.pollInterval,
+    args.context,
+    args.pause,
+  ]);
 
   const [state, update] = useSubjectValue(
-    event$ =>
+    query$$ =>
       pipe(
-        event$,
-        switchMap(([request, context, pause]: InternalEvent) => {
-          // On pause fetching is reset to false
-          if (pause) return fromValue({ fetching: false });
+        query$$,
+        switchMap(query$ => {
+          if (!query$) return fromValue({ fetching: false });
 
           return concat([
             // Initially set fetching to true
             fromValue({ fetching: true }),
             pipe(
-              // Call executeQuery and transform its result to the local state shape
-              client.executeQuery(request, context),
+              query$,
               map(({ data, error, extensions }) => ({
                 fetching: false,
                 data,
@@ -96,15 +89,30 @@ export const useQuery = <T = any, V = object>(
         // The individual partial results are merged into each previous result
         scan((result, partial) => ({ ...result, ...partial }), initialState)
       ),
-    input,
+    query$,
     initialState
   );
 
   // This is the imperative execute function passed to the user
   const executeQuery = useCallback(
-    (opts?: Partial<OperationContext>) =>
-      update([request, makeContext(opts), false]),
-    [makeContext, request, update]
+    (opts?: Partial<OperationContext>) => {
+      update(
+        client.executeQuery(request, {
+          requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
+          ...args.context,
+          ...opts,
+        })
+      );
+    },
+    [
+      client,
+      request,
+      update,
+      args.requestPolicy,
+      args.pollInterval,
+      args.context,
+    ]
   );
 
   return [state, executeQuery];

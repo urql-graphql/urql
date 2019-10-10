@@ -6,7 +6,7 @@ import { useSubjectValue } from 'react-wonka';
 import { useClient } from '../context';
 import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
-import { GraphQLRequest, OperationContext } from '../types';
+import { OperationContext } from '../types';
 
 const initialState: UseSubscriptionState<any> = {
   fetching: false,
@@ -14,12 +14,6 @@ const initialState: UseSubscriptionState<any> = {
   error: undefined,
   extensions: undefined,
 };
-
-type InternalEvent = [
-  GraphQLRequest,
-  Partial<OperationContext>,
-  undefined | boolean
-];
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -57,35 +51,24 @@ export const useSubscription = <T = any, R = T, V = object>(
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  // A utility function to create a new context merged with `opts` and `args.context`
-  const makeContext = useCallback(
-    (opts?: Partial<OperationContext>) => ({
-      ...args.context,
-      ...opts,
-    }),
-    [args.context]
-  );
-
-  // Create an internal event with only the changes we care about
-  const input = useMemo<InternalEvent>(
-    () => [request, makeContext(), args.pause],
-    [request, makeContext, args.pause]
-  );
+  // Create a new subscription-source from client.executeSubscription
+  const subscription$ = useMemo(() => {
+    if (args.pause) return null;
+    return client.executeSubscription(request, args.context);
+  }, [client, request, args.context, args.pause]);
 
   const [state, update] = useSubjectValue(
-    event$ =>
+    subscription$$ =>
       pipe(
-        event$,
-        switchMap(([request, context, pause]: InternalEvent) => {
-          // On pause fetching is reset to false
-          if (pause) return fromValue({ fetching: false });
+        subscription$$,
+        switchMap(subscription$ => {
+          if (!subscription$) return fromValue({ fetching: false });
 
           return concat([
             // Initially set fetching to true
             fromValue({ fetching: true }),
             pipe(
-              // Call executeSubscription and transform its result to the local state shape
-              client.executeSubscription(request, context),
+              subscription$,
               map(({ data, error, extensions }) => ({
                 fetching: true,
                 data,
@@ -112,15 +95,16 @@ export const useSubscription = <T = any, R = T, V = object>(
           }
         }, initialState)
       ),
-    input,
+    subscription$,
     initialState
   );
 
   // This is the imperative execute function passed to the user
   const executeSubscription = useCallback(
-    (opts?: Partial<OperationContext>) =>
-      update([request, makeContext(opts), false]),
-    [makeContext, request, update]
+    (opts?: Partial<OperationContext>) => {
+      update(client.executeSubscription(request, { ...args.context, ...opts }));
+    },
+    [client, request, update, args.context]
   );
 
   return [state, executeSubscription];
