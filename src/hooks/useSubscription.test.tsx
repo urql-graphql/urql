@@ -53,18 +53,6 @@ describe('on initial useEffect', () => {
     renderer.create(<SubscriptionUser q={query} />);
     expect(client.executeSubscription).toBeCalledTimes(1);
   });
-
-  it('passes query to executeSubscription', () => {
-    renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith(
-      {
-        key: expect.any(Number),
-        query: expect.any(Object),
-        variables: {},
-      },
-      expect.any(Object)
-    );
-  });
 });
 
 it('should support setting context in useSubscription params', () => {
@@ -93,25 +81,6 @@ describe('on subscription', () => {
      */
     wrapper.update(<SubscriptionUser q={query} />);
     expect(state).toEqual({ ...data, fetching: true });
-  });
-});
-
-describe('on change', () => {
-  const qa = 'subscription NewSubA { exampleA }';
-  const qb = 'subscription NewSubB { exampleB }';
-
-  it('executes subscription', () => {
-    const wrapper = renderer.create(<SubscriptionUser q={query} />);
-
-    /**
-     * Have to call update twice for the change to be detected.
-     * Only a single change is detected (updating 5 times still only calls
-     * execute subscription twice).
-     */
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qb} />);
-    expect(client.executeSubscription).toBeCalledTimes(2);
   });
 });
 
