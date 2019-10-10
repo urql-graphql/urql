@@ -52,10 +52,12 @@ export const useSubscription = <T = any, R = T, V = object>(
   const request = useRequest(args.query, args.variables);
 
   // Create a new subscription-source from client.executeSubscription
-  const subscription$ = useMemo(() => {
-    if (args.pause) return null;
-    return client.executeSubscription(request, args.context);
-  }, [client, request, args.context, args.pause]);
+  const makeSubscription$ = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      return client.executeSubscription(request, { ...args.context, ...opts });
+    },
+    [client, request, args.context]
+  );
 
   const [state, update] = useSubjectValue(
     subscription$$ =>
@@ -95,16 +97,17 @@ export const useSubscription = <T = any, R = T, V = object>(
           }
         }, initialState)
       ),
-    subscription$,
+    useMemo(() => (args.pause ? null : makeSubscription$()), [
+      args.pause,
+      makeSubscription$,
+    ]),
     initialState
   );
 
   // This is the imperative execute function passed to the user
   const executeSubscription = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      update(client.executeSubscription(request, { ...args.context, ...opts }));
-    },
-    [client, request, update, args.context]
+    (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
+    [update, makeSubscription$]
   );
 
   return [state, executeSubscription];

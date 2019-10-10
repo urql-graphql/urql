@@ -46,22 +46,17 @@ export const useQuery = <T = any, V = object>(
   const request = useRequest(args.query, args.variables);
 
   // Create a new query-source from client.executeQuery
-  const query$ = useMemo(() => {
-    if (args.pause) return null;
-
-    return client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      pollInterval: args.pollInterval,
-      ...args.context,
-    });
-  }, [
-    client,
-    request,
-    args.requestPolicy,
-    args.pollInterval,
-    args.context,
-    args.pause,
-  ]);
+  const makeQuery$ = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      return client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        pollInterval: args.pollInterval,
+        ...args.context,
+        ...opts,
+      });
+    },
+    [client, request, args.requestPolicy, args.pollInterval, args.context]
+  );
 
   const [state, update] = useSubjectValue(
     query$$ =>
@@ -89,30 +84,14 @@ export const useQuery = <T = any, V = object>(
         // The individual partial results are merged into each previous result
         scan((result, partial) => ({ ...result, ...partial }), initialState)
       ),
-    query$,
+    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
     initialState
   );
 
   // This is the imperative execute function passed to the user
   const executeQuery = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      update(
-        client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
-          ...args.context,
-          ...opts,
-        })
-      );
-    },
-    [
-      client,
-      request,
-      update,
-      args.requestPolicy,
-      args.pollInterval,
-      args.context,
-    ]
+    (opts?: Partial<OperationContext>) => update(makeQuery$(opts)),
+    [update, makeQuery$]
   );
 
   return [state, executeQuery];
