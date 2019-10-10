@@ -16,7 +16,7 @@ const plugin = ({ template, types: t }) => {
     visitor: {
       CallExpression(path) {
         const { name } = path.node.callee;
-        if ((name === 'warning') && !path.node[visited]) {
+        if ((name === 'warn') && !path.node[visited]) {
           path.node[visited] = true;
           path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
         } else if (name === 'invariant' && !path.node[visited]) {

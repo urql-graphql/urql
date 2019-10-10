@@ -29,7 +29,7 @@ import {
   clearStoreState,
 } from '../store';
 
-import { invariant, warning } from '../helpers/help';
+import { invariant, warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
@@ -86,6 +86,10 @@ export const startWrite = (
     schemaPredicates: store.schemaPredicates,
   };
 
+  if (process.env.NODE_ENV !== 'production') {
+    pushDebugNode(operationName, operation);
+  }
+
   if (operationName === ctx.store.getRootKey('query')) {
     writeSelection(ctx, operationName, select, data);
   } else {
@@ -113,6 +117,10 @@ export const writeOptimistic = (
       'This case is unsupported and should never occur.',
     10
   );
+
+  if (process.env.NODE_ENV !== 'production') {
+    pushDebugNode(operationName, operation);
+  }
 
   const ctx: Context = {
     parentTypeName: mutationRootKey,
@@ -179,8 +187,7 @@ export const writeFragment = (
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
   if (fragment === undefined) {
-    return warning(
-      false,
+    return warn(
       'writeFragment(...) was called with an empty fragment.\n' +
         'You have to call it with at least one fragment in your GraphQL document.',
       11
@@ -191,14 +198,17 @@ export const writeFragment = (
   const writeData = { __typename: typename, ...data } as Data;
   const entityKey = store.keyOfEntity(writeData);
   if (!entityKey) {
-    return warning(
-      false,
+    return warn(
       "Can't generate a key for writeFragment(...) data.\n" +
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         typename +
         '`.',
       12
     );
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    pushDebugNode(typename, fragment);
   }
 
   const ctx: Context = {
@@ -251,8 +261,7 @@ const writeSelection = (
             ? 'scalar (number, boolean, etc)'
             : 'selection set';
 
-        warning(
-          false,
+        warn(
           'Invalid undefined: The field at `' +
             fieldKey +
             '` is `undefined`, but the GraphQL query expects a ' +
@@ -284,8 +293,7 @@ const writeSelection = (
       store.writeLink(link, fieldKey);
       store.removeRecord(fieldKey);
     } else {
-      warning(
-        false,
+      warn(
         'Invalid value: The field at `' +
           fieldKey +
           '` is a scalar (number, boolean, etc)' +
@@ -325,17 +333,16 @@ const writeField = (
 
   const entityKey = ctx.store.keyOfEntity(data);
   const key = entityKey !== null ? entityKey : parentFieldKey;
+  const typename = data.__typename;
 
   if (
-    typeof data.__typename !== 'string' ||
-    (ctx.store.keys[data.__typename] === undefined && entityKey === null)
+    ctx.store.keys[data.__typename] === undefined &&
+    entityKey === null &&
+    !typename.endsWith('Connection') &&
+    !typename.endsWith('Edge') &&
+    typename !== 'PageInfo'
   ) {
-    const typename = data.__typename;
-
-    warning(
-      typename.endsWith('Connection') ||
-        typename.endsWith('Edge') ||
-        typename === 'PageInfo',
+    warn(
       'Invalid key: The GraphQL query at the field at `' +
         parentFieldKey +
         '` has a selection set, ' +

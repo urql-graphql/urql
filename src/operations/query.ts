@@ -28,7 +28,7 @@ import {
   clearStoreState,
 } from '../store';
 
-import { warning } from '../helpers/help';
+import { warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
@@ -83,6 +83,10 @@ export const read = (
     store,
     schemaPredicates: store.schemaPredicates,
   };
+
+  if (process.env.NODE_ENV !== 'production') {
+    pushDebugNode(rootKey, operation);
+  }
 
   let data = input || Object.create(null);
   data =
@@ -172,8 +176,7 @@ export const readFragment = (
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
   if (fragment === undefined) {
-    warning(
-      false,
+    warn(
       'readFragment(...) was called with an empty fragment.\n' +
         'You have to call it with at least one fragment in your GraphQL document.',
       6
@@ -193,8 +196,7 @@ export const readFragment = (
       : entity;
 
   if (!entityKey) {
-    warning(
-      false,
+    warn(
       "Can't generate a key for readFragment(...).\n" +
         'You have to pass an `id` or `_id` field or create a custom `keys` config for `' +
         typename +
@@ -203,6 +205,10 @@ export const readFragment = (
     );
 
     return null;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    pushDebugNode(typename, fragment);
   }
 
   const ctx: Context = {
@@ -377,8 +383,7 @@ const readResolverResult = (
     (resolvedTypename && typename !== resolvedTypename)
   ) {
     // TODO: This may be an invalid error for resolvers that return interfaces
-    warning(
-      false,
+    warn(
       'Invalid resolver data: The resolver at `' +
         entityKey +
         '` returned an ' +
@@ -522,8 +527,7 @@ const resolveResolverResult = (
       ? readSelection(ctx, result, select, data)
       : readResolverResult(ctx, key, select, data, result);
   } else {
-    warning(
-      false,
+    warn(
       'Invalid resolver value: The field at `' +
         key +
         '` is a scalar (number, boolean, etc)' +

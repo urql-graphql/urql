@@ -10,7 +10,7 @@ import {
   GraphQLUnionType,
 } from 'graphql';
 
-import { invariant, warning } from '../helpers/help';
+import { invariant, warn } from '../helpers/help';
 
 export class SchemaPredicates {
   schema: GraphQLSchema;
@@ -65,8 +65,7 @@ const getField = (
 
   const field = object.getFields()[fieldName];
   if (field === undefined) {
-    warning(
-      false,
+    warn(
       'Invalid field: The field `' +
         fieldName +
         '` does not exist on `' +

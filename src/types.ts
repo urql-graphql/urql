@@ -3,6 +3,10 @@ import { DocumentNode, FragmentDefinitionNode, SelectionNode } from 'graphql';
 // Helper types
 export type NullArray<T> = Array<null | T>;
 
+export interface Ref<T> {
+  current: T;
+}
+
 // GraphQL helper types
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 export interface Fragments {

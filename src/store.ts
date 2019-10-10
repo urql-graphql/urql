@@ -3,6 +3,7 @@ import { createRequest } from 'urql';
 import * as Pessimism from 'pessimism';
 
 import {
+  Ref,
   Cache,
   EntityField,
   Link,
@@ -18,21 +19,17 @@ import {
 } from './types';
 
 import { joinKeys, keyOfField } from './helpers';
-import { invariant } from './helpers/help';
+import { invariant, currentDebugStack } from './helpers/help';
 import { read, readFragment } from './operations/query';
 import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
 import { SchemaPredicates } from './ast/schemaPredicates';
 
-interface Ref<T> {
-  current: null | T;
-}
-
-const currentDependencies: Ref<Set<string>> = { current: null };
-const currentOptimisticKey: Ref<number> = { current: null };
+const currentDependencies: Ref<null | Set<string>> = { current: null };
+const currentOptimisticKey: Ref<null | number> = { current: null };
 
 // Resolve a ref value or throw when we're outside of a store run
-const refValue = <T>(ref: Ref<T>): T => {
+const refValue = <T>(ref: Ref<T | null>): T => {
   invariant(
     ref.current !== null,
     'Invalid Cache call: The cache may only be accessed or mutated during' +
@@ -48,12 +45,20 @@ const refValue = <T>(ref: Ref<T>): T => {
 export const initStoreState = (optimisticKey: null | number) => {
   currentDependencies.current = new Set();
   currentOptimisticKey.current = optimisticKey;
+
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.current = [];
+  }
 };
 
 // Finalise a store run by clearing its internal state
 export const clearStoreState = () => {
   currentDependencies.current = null;
   currentOptimisticKey.current = null;
+
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.current = [];
+  }
 };
 
 export const getCurrentDependencies = () => refValue(currentDependencies);
