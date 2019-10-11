@@ -61,6 +61,8 @@ describe('useQuery', () => {
     const [state] = result.current;
     expect(state).toEqual({
       fetching: true,
+      stale: false,
+      extensions: undefined,
       error: undefined,
       data: undefined,
     });
@@ -126,6 +128,8 @@ describe('useQuery', () => {
     const [state] = result.current;
     expect(state).toEqual({
       fetching: false,
+      stale: false,
+      extensions: undefined,
       error: 1,
       data: 0,
     });
