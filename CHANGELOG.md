@@ -8,7 +8,7 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
-## [v1.1.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.3...v1.1.0)
+## [v1.1.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.3...v1.1.1)
 
 This is a minor release since it increases the peer dependency of `urql` to `>= 1.6.0`, due to the addition
 of the `stale` flag to partial responses and `cache-and-network` responses. This flag is useful to check
