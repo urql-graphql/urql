@@ -8,6 +8,19 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.1.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.3...v1.1.0)
+
+This is a minor release since it increases the peer dependency of `urql` to `>= 1.6.0`, due to the addition
+of the `stale` flag to partial responses and `cache-and-network` responses. This flag is useful to check
+whether more requests are being made in the background by `@urql/exchange-graphcache`.
+
+Additionally, this release adds a small stack to every error and warning that indicates where an
+error has occured. It lists out the query and all subsequent fragments it has been traversing
+so that errors and warnings can be traced more easily.
+
+- Add a query/fragment stack to all errors and warnings (see [#107](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/107))
+- Add `stale: true` to all `cache-and-network` and partial responses (see [#108](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/108))
+
 ## [v1.0.3](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.2...v1.0.3)
 
 - Fix `relayPagination` helper merging pages with different field arguments (see [#104](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/104))
