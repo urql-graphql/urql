@@ -744,6 +744,7 @@ it('reexecutes query and returns data on partial result', () => {
   jest.runAllTimers();
   expect(result).toHaveBeenCalledTimes(2);
   expect(reexec).toHaveBeenCalledTimes(1);
+  expect(result.mock.calls[1][0].stale).toBe(true);
   expect(result.mock.calls[1][0].data).toEqual({
     __typename: 'Query',
     todos: [

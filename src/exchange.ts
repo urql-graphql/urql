@@ -272,21 +272,24 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         (res: OperationResultWithMeta): OperationResult => {
           const { operation, outcome } = res;
           const policy = getRequestPolicy(operation);
-          if (
-            policy === 'cache-and-network' ||
-            (policy === 'cache-first' && outcome === 'partial')
-          ) {
-            client.reexecuteOperation(
-              toRequestPolicy(operation, 'network-only')
-            );
-          }
-
-          return {
+          const result: OperationResult = {
             operation: addCacheOutcome(operation, outcome),
             data: res.data,
             error: res.error,
             extensions: res.extensions,
           };
+
+          if (
+            policy === 'cache-and-network' ||
+            (policy === 'cache-first' && outcome === 'partial')
+          ) {
+            result.stale = true;
+            client.reexecuteOperation(
+              toRequestPolicy(operation, 'network-only')
+            );
+          }
+
+          return result;
         }
       )
     );
