@@ -10,6 +10,7 @@ import { OperationContext } from '../types';
 
 const initialState: UseSubscriptionState<any> = {
   fetching: false,
+  stale: false,
   data: undefined,
   error: undefined,
   extensions: undefined,
@@ -26,6 +27,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export interface UseSubscriptionState<T> {
   fetching: boolean;
+  stale: boolean;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -71,8 +73,9 @@ export const useSubscription = <T = any, R = T, V = object>(
             fromValue({ fetching: true }),
             pipe(
               subscription$,
-              map(({ data, error, extensions }) => ({
+              map(({ stale, data, error, extensions }) => ({
                 fetching: true,
+                stale: !!stale,
                 data,
                 error,
                 extensions,
@@ -86,15 +89,13 @@ export const useSubscription = <T = any, R = T, V = object>(
         scan((result, partial: any) => {
           const { current: handler } = handlerRef;
           // If a handler has been passed, it's used to merge new data in
-          if (partial.data !== undefined && typeof handler === 'function') {
-            return {
-              ...result,
-              ...partial,
-              data: handler(result.data, partial.data),
-            };
-          } else {
-            return { ...result, ...partial };
-          }
+          const data =
+            partial.data !== undefined
+              ? typeof handler === 'function'
+                ? handler(result.data, partial.data)
+                : partial.data
+              : result.data;
+          return { ...result, stale: false, ...partial, data };
         }, initialState)
       ),
     useMemo(() => (args.pause ? null : makeSubscription$()), [

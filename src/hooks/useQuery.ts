@@ -10,6 +10,7 @@ import { useRequest } from './useRequest';
 
 const initialState: UseQueryState<any> = {
   fetching: false,
+  stale: false,
   data: undefined,
   error: undefined,
   extensions: undefined,
@@ -26,6 +27,7 @@ export interface UseQueryArgs<V> {
 
 export interface UseQueryState<T> {
   fetching: boolean;
+  stale: boolean;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -70,8 +72,9 @@ export const useQuery = <T = any, V = object>(
             fromValue({ fetching: true }),
             pipe(
               query$,
-              map(({ data, error, extensions }) => ({
+              map(({ stale, data, error, extensions }) => ({
                 fetching: false,
+                stale: !!stale,
                 data,
                 error,
                 extensions,
@@ -82,7 +85,10 @@ export const useQuery = <T = any, V = object>(
           ]);
         }),
         // The individual partial results are merged into each previous result
-        scan((result, partial) => ({ ...result, ...partial }), initialState)
+        scan(
+          (result, partial) => ({ ...result, stale: false, ...partial }),
+          initialState
+        )
       ),
     useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
     initialState

@@ -7,6 +7,7 @@ import { CombinedError, createRequest } from '../utils';
 
 export interface UseMutationState<T> {
   fetching: boolean;
+  stale: boolean;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -27,6 +28,7 @@ export const useMutation = <T = any, V = object>(
 
   const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,
+    stale: false,
     error: undefined,
     data: undefined,
     extensions: undefined,
@@ -36,6 +38,7 @@ export const useMutation = <T = any, V = object>(
     (variables?: V, context?: Partial<OperationContext>) => {
       setState({
         fetching: true,
+        stale: false,
         error: undefined,
         data: undefined,
         extensions: undefined,
@@ -47,8 +50,8 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
-        const { data, error, extensions } = result;
-        setState({ fetching: false, data, error, extensions });
+        const { stale, data, error, extensions } = result;
+        setState({ fetching: false, stale: !!stale, data, error, extensions });
         return result;
       });
     },

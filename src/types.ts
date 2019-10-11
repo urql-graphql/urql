@@ -68,6 +68,8 @@ export interface OperationResult<Data = any> {
   error?: CombinedError;
   /** Optional extensions return by the Graphql server. */
   extensions?: Record<string, any>;
+  /** Optional stale flag added by exchanges that return stale results. */
+  stale?: boolean;
 }
 
 /** Input parameters for to an Exchange factory function. */
