@@ -5,6 +5,7 @@ import {
   publish,
   Source,
   Subject,
+  forEach,
   scan,
   toPromise,
 } from 'wonka';
@@ -77,9 +78,13 @@ describe('on query', () => {
 
   it('respects cache-and-network', () => {
     const [ops$, next, complete] = input;
+    const result = jest.fn();
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
-    publish(exchange);
+    pipe(
+      exchange,
+      forEach(result)
+    );
     next(queryOperation);
 
     next({
@@ -93,6 +98,8 @@ describe('on query', () => {
     complete();
     expect(forwardedOperations.length).toBe(1);
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(result.mock.calls[1][0].stale).toBe(true);
 
     expect(reexecuteOperation.mock.calls[0][0]).toEqual({
       ...queryOperation,
