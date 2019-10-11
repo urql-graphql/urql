@@ -80,7 +80,12 @@ describe('on subscription', () => {
      * result of the state change.
      */
     wrapper.update(<SubscriptionUser q={query} />);
-    expect(state).toEqual({ ...data, fetching: true });
+    expect(state).toEqual({
+      ...data,
+      extensions: undefined,
+      fetching: true,
+      stale: false,
+    });
   });
 });
 

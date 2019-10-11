@@ -57,16 +57,19 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
-        if (operation.context.requestPolicy === 'cache-and-network') {
-          reexecuteOperation(client, operation);
-        }
-
-        return {
+        const result: OperationResult = {
           ...cachedResult,
           operation: addMetadata(operation, {
             cacheOutcome: cachedResult ? 'hit' : 'miss',
           }),
         };
+
+        if (operation.context.requestPolicy === 'cache-and-network') {
+          result.stale = true;
+          reexecuteOperation(client, operation);
+        }
+
+        return result;
       })
     );
 
