@@ -8,6 +8,25 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.6.0](https://github.com/FormidableLabs/urql/compare/v1.5.1...v1.6.0)
+
+This release comes with stability improvements for the `useQuery` and `useSubscription` hooks
+when using suspense and concurrent mode. They should behave the same as before under normal
+circumstances and continue to deliver the correct state on initial mount and updates.
+The `useQuery` hook may however now trigger suspense updates when its inputs are changing,
+as it should, instead of erroneously throwing a promise in `useEffect`.
+
+The added `stale: boolean` flag on the hooks indicates whether a result is "stale".
+`useQuery` will expose `stale: true` on results that are cached but will be updated
+due to the use of `cache-and-network`.
+
+We've also made some changes so that `client.query()` won't throw a promise, when suspense
+mode is activated.
+
+- ✨ Add `stale` flag to `OperationResult` and hook results (see [#449](https://github.com/FormidableLabs/urql/pull/449))
+- Replace `useImmeditateEffect` and `useImmediateState` with `react-wonka` derived state and effect (see [#447](https://github.com/FormidableLabs/urql/pull/447))
+- Add (internal) `suspense` flag to `OperationContext`
+
 ## [v1.5.1](https://github.com/FormidableLabs/urql/compare/v1.5.0...v1.5.1)
 
 - Replace `fast-json-stable-stringify` with embedded code (see [#426](https://github.com/FormidableLabs/urql/pull/426))
