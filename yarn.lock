@@ -4588,10 +4588,10 @@ react-test-renderer@^16.0.0-0, react-test-renderer@^16.10.2:
     react-is "^16.8.6"
     scheduler "^0.16.2"
 
-react-wonka@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-1.0.1.tgz#66b44aa1fb4e3e38cb2ef49f7d7195de1a322775"
-  integrity sha512-SMZCQUQ1gTxCqH9ftx5RecykOx1wWDtbZa6lJDmBU8aCpX3Xxs3baTtbGP+PIvrDMIOZIJN7Ezv1e/8jWQ2vXw==
+react-wonka@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-1.0.2.tgz#b8d5a095e5ce40548842036898a2665ea5202f69"
+  integrity sha512-oZgI5Z0DY7HjqPQZPbY5+2hEmDSWJfdurt1uaB65bvH4FLWA9/0cW4KNn8Y776fnicsxTNMtVMYMlFgB/2KJjQ==
 
 react@^16.10.2:
   version "16.10.2"
