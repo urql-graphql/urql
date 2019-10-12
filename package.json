@@ -133,7 +133,7 @@
     "react-dom": ">= 16.8.0"
   },
   "dependencies": {
-    "react-wonka": "^1.0.1",
+    "react-wonka": "^1.0.2",
     "wonka": "^3.2.1"
   }
 }

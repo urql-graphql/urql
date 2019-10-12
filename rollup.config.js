@@ -16,8 +16,6 @@ if (pkgInfo.peerDependencies)
 if (pkgInfo.dependencies)
   external.push(...Object.keys(pkgInfo.dependencies));
 
-external = external.filter(x => x !== 'react-wonka');
-
 const externalPredicate = new RegExp(`^(${external.join('|')})($|/)`);
 const externalTest = id => {
   if (id === 'babel-plugin-transform-async-to-promises/helpers') {
