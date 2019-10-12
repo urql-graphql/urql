@@ -8,6 +8,10 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.6.1](https://github.com/FormidableLabs/urql/compare/v1.6.0...v1.6.1)
+
+- Fix hook updates not being propagated to potential context providers (see [#451](https://github.com/FormidableLabs/urql/pull/451))
+
 ## [v1.6.0](https://github.com/FormidableLabs/urql/compare/v1.5.1...v1.6.0)
 
 This release comes with stability improvements for the `useQuery` and `useSubscription` hooks
