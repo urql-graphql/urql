@@ -1,0 +1,31 @@
+{
+  "name": "next-urql",
+  "version": "0.1.0",
+  "description": "Convenience wrappers for using urql with NextJS.",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "check:types": "tsc",
+    "format": "prettier --write **/*.{ts,tsx,d.ts}",
+    "lint": "eslint **/*.{ts,tsx}"
+  },
+  "devDependencies": {
+    "@types/next": "^8.0.6",
+    "@types/react": "^16.9.6",
+    "@types/react-dom": "^16.9.2",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
+    "prettier": "^1.18.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "typescript": "^3.6.4",
+    "urql": "^1.6.1"
+  },
+  "dependencies": {
+    "react-ssr-prepass": "^1.0.7"
+  }
+}
