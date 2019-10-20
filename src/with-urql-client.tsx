@@ -48,6 +48,7 @@ const withUrqlClient = <T extends {}>(
         initUrqlClient(clientOptions, mergeExchanges, props.urqlState)[0],
       [],
     );
+
     return (
       <Provider value={urqlClient}>
         <App {...props} urqlClient={urqlClient} />
