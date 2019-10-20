@@ -1,26 +1,51 @@
 import React from 'react';
-import { Provider, Client } from 'urql';
-
+import { NextComponentClass, NextFC, NextContext } from 'next';
 import ssrPrepass from 'react-ssr-prepass';
-import initUrqlClient from './init-urql-client';
-import { NextContext, NextComponentClass } from 'next';
-import { SSRData } from 'urql/dist/types/exchanges/ssr';
+import {
+  Provider,
+  Client,
+  ClientOptions,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  Exchange,
+} from 'urql';
+import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 
-interface Ctx extends NextContext {
-  AppTree: React.ComponentType<{
-    pageProps: object & { urqlClient: Client };
-  }>;
+import { initUrqlClient } from './init-urql-client';
+
+interface WithUrqlClient {
+  urqlClient: Client;
 }
 
-interface WithUrqlProps {
-  urqlClient: Client;
+interface WithUrqlState {
   urqlState: SSRData;
 }
 
-const withUrqlClient = (App: NextComponentClass) => {
-  const withUrql = <P extends WithUrqlProps>(props: P) => {
+interface NextContextWithAppTree extends NextContext {
+  AppTree: React.ComponentType<any>;
+}
+
+const withUrqlClient = <T extends {}>(
+  clientOptions: ClientOptions,
+  mergeExchanges: (ssrEx: SSRExchange) => Exchange[] = ssrEx => [
+    dedupExchange,
+    cacheExchange,
+    ssrEx,
+    fetchExchange,
+  ],
+) => (
+  App: NextComponentClass<T & WithUrqlClient> | NextFC<T & WithUrqlClient>,
+) => {
+  const withUrql: NextFC<
+    T & WithUrqlClient & WithUrqlState,
+    T & WithUrqlState,
+    NextContextWithAppTree
+  > = props => {
     const urqlClient = React.useMemo(
-      () => props.urqlClient || initUrqlClient(props.urqlState)[0],
+      () =>
+        props.urqlClient ||
+        initUrqlClient(clientOptions, mergeExchanges, props.urqlState)[0],
       [],
     );
     return (
@@ -30,20 +55,30 @@ const withUrqlClient = (App: NextComponentClass) => {
     );
   };
 
-  withUrql.getInitialProps = async (ctx: Ctx) => {
+  withUrql.getInitialProps = async (ctx: NextContextWithAppTree) => {
     const { AppTree } = ctx;
-    // Run the wrapped component's getInitialProps function
+
+    // Run the wrapped component's getInitialProps function.
     let appProps = {};
-    if (App.getInitialProps) appProps = await App.getInitialProps(ctx);
+    if (App.getInitialProps) {
+      appProps = await App.getInitialProps(ctx);
+    }
 
-    // getInitialProps is universal, but we only want
-    // to run server-side rendered suspense on the server
+    /**
+     * Check the window object to determine whether we are on the server.
+     * getInitialProps is universal, but we only want to run suspense on the server.
+     */
     const isBrowser = typeof window !== 'undefined';
-    if (isBrowser) return appProps;
+    if (isBrowser) {
+      return appProps as T & WithUrqlState;
+    }
 
-    const [urqlClient, ssrCache] = initUrqlClient();
+    const [urqlClient, ssrCache] = initUrqlClient(clientOptions);
 
-    // Run suspense and hence all urql queries
+    /**
+     * Run the prepass step on AppTree.
+     * This will run all urql queries on the server.
+     */
     await ssrPrepass(
       <AppTree
         pageProps={{
@@ -53,14 +88,13 @@ const withUrqlClient = (App: NextComponentClass) => {
       />,
     );
 
-    // Extract query data from the urql store
-    // Extract the SSR query data from urql's SSR cache
+    // Extract the SSR query data from urql's SSR cache.
     const urqlState = ssrCache && ssrCache.extractData();
 
     return {
       ...appProps,
       urqlState,
-    };
+    } as T & WithUrqlState;
   };
 
   return withUrql;
