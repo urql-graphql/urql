@@ -3,6 +3,8 @@ import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
+import replace from 'rollup-plugin-replace';
+
 import pkg from './package.json';
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
@@ -18,52 +20,39 @@ if (pkg.dependencies) {
 }
 
 const terserPretty = terser({
-  sourcemap: true,
   warnings: true,
   ecma: 5,
   keep_fnames: true,
-  ie8: false,
   compress: {
+    conditionals: false,
+    if_return: false,
+    join_vars: false,
+    keep_fnames: true,
+    loops: false,
     pure_getters: true,
     toplevel: true,
-    booleans_as_integers: false,
-    keep_fnames: true,
-    keep_fargs: true,
-    if_return: false,
-    ie8: false,
     sequences: false,
-    loops: false,
-    conditionals: false,
-    join_vars: false,
   },
   mangle: false,
   output: {
-    beautify: true,
     braces: true,
     indent_level: 2,
   },
 });
 
 const terserMinified = terser({
-  sourcemap: true,
   warnings: true,
   ecma: 5,
-  ie8: false,
   toplevel: true,
   compress: {
     keep_infinity: true,
-    pure_getters: true,
     passes: 10,
-  },
-  output: {
-    comments: false,
+    pure_getters: true,
   },
 });
 
-export default {
-  input: './src/index.ts',
-  external,
-  plugins: [
+const makePlugins = isProduction =>
+  [
     resolve({
       mainFields: ['module', 'jsnext', 'main'],
       browser: true,
@@ -87,17 +76,42 @@ export default {
     }),
     // Compile TypeScript files using Babel.
     babel({ extensions, include: ['src/**/*'], exclude: 'node_modules/**' }),
-    terserPretty,
-  ],
+    isProduction &&
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
+    // isProduction ? terserMinified : terserPretty,
+  ].filter(Boolean);
 
-  output: [
-    {
-      file: './dist/next-urql.min.js',
-      format: 'cjs',
-    },
-    {
-      file: './dist/next-urql.es.min.js',
-      format: 'esm',
-    },
-  ],
-};
+export default [
+  {
+    input: './src/index.ts',
+    external,
+    plugins: makePlugins(false),
+    output: [
+      {
+        file: './dist/next-urql.js',
+        format: 'cjs',
+      },
+      {
+        file: './dist/next-urql.es.js',
+        format: 'esm',
+      },
+    ],
+  },
+  {
+    input: './src/index.ts',
+    external,
+    plugins: makePlugins(true),
+    output: [
+      {
+        file: './dist/next-urql.min.js',
+        format: 'cjs',
+      },
+      {
+        file: './dist/next-urql.es.min.js',
+        format: 'esm',
+      },
+    ],
+  },
+];

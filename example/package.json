@@ -11,10 +11,9 @@
     "graphql-tag": "^2.10.1",
     "next": "9.1.1",
     "next-urql": "link:../",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
     "react-is": "^16.8.6",
     "urql": "^1.6.1"
-  },
-  "devDependencies": {}
+  }
 }
