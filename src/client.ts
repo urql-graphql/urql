@@ -208,24 +208,24 @@ export class Client {
     }
   };
 
-  query(
+  query<Data = any, Variables extends object = {}>(
     query: DocumentNode | string,
-    variables?: object,
+    variables?: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult> {
+  ): PromisifiedSource<OperationResult<Data>> {
     if (!context || typeof context.suspense !== 'boolean') {
       context = { ...context, suspense: false };
     }
 
-    return withPromise<OperationResult>(
+    return withPromise<OperationResult<Data>>(
       this.executeQuery(createRequest(query, variables), context)
     );
   }
 
-  executeQuery = (
+  executeQuery = <Data = any>(
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult> => {
+  ): Source<OperationResult<Data>> => {
     const operation = this.createRequestOperation('query', query, opts);
     const response$ = this.executeRequestOperation(operation);
     const { pollInterval } = operation.context;
@@ -248,20 +248,20 @@ export class Client {
     return this.executeRequestOperation(operation);
   };
 
-  mutation(
+  mutation<Data = any, Variables extends object = {}>(
     query: DocumentNode | string,
-    variables?: object,
+    variables?: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult> {
-    return withPromise<OperationResult>(
+  ): PromisifiedSource<OperationResult<Data>> {
+    return withPromise<OperationResult<Data>>(
       this.executeMutation(createRequest(query, variables), context)
     );
   }
 
-  executeMutation = (
+  executeMutation = <Data = any>(
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult> => {
+  ): Source<OperationResult<Data>> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
