@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - run: yarn install --frozen-lockfile
     - run: yarn run build
   check:
@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - run: yarn install --frozen-lockfile
     - run: yarn run check
     - run: yarn run lint
@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - run: yarn install --frozen-lockfile
     - run: yarn run coverage
     - run: yarn run codecov
