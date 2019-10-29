@@ -48,8 +48,8 @@ export const useQuery = <T = any, V = object>(
   const request = useRequest(args.query, args.variables);
 
   // Create a new query-source from client.executeQuery
-  const makeQuery$ = useCallback(
-    (opts?: Partial<OperationContext>) => {
+  const makeQuery$ = useMemo(
+    () => (opts?: Partial<OperationContext>) => {
       return client.executeQuery(request, {
         requestPolicy: args.requestPolicy,
         pollInterval: args.pollInterval,
