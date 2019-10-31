@@ -313,6 +313,44 @@ We can call this method to rerun the query and pass it a `requestPolicy` differe
 case we'll pass `'network-only'` which will skip the cache and make sure we actually refresh
 our todo list.
 
+This `executeQuery` method accepts everything that's available on an [OperationContext](<./api.md#OperationContext(type)>)
+
+## Pausing queries
+
+Let's say our query needs a `userId` to correctly execute our query, we don't want to dispatch
+the query to receive an error in this scenario we can avoid.
+
+```jsx
+import React from 'react';
+import { useQuery } from 'urql';
+
+const getUser = `
+  query getUser (id: $id) {
+    user(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+const Profile = ({ userId }) => {
+  const [{ data, fetching, error }] = useQuery({
+    query: getUser,
+    variables: { id: userid },
+    pause: !userId,
+  });
+
+  if (!userId) return 'Please select a "userId".';
+  if (fetching) return 'Loading...';
+  if (error) return 'Oh no!';
+
+  return <p>Welcome {data.user.me}</p>;
+};
+```
+
+When the user now selects a userId pause will evaluate to `false` and
+the query will be executed with the new variable.
+
 ## Polling
 
 Your query can be passed an argument named `pollInterval`, this will ensure that your query
