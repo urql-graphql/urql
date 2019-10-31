@@ -27,7 +27,7 @@ interface NextContextWithAppTree extends NextContext {
 }
 
 const withUrqlClient = <T extends {}>(
-  clientOptions: ClientOptions,
+  clientOptions: Omit<ClientOptions, 'exchanges' | 'suspense'>,
   mergeExchanges: (ssrEx: SSRExchange) => Exchange[] = ssrEx => [
     dedupExchange,
     cacheExchange,

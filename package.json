@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Convenience wrappers for using urql with NextJS.",
   "main": "dist/next-urql.min.js",
-  "module": "dist/next-urql.es.js",
+  "module": "dist/next-urql.es.min.js",
   "source": "src/index.ts",
   "license": "MIT",
   "scripts": {

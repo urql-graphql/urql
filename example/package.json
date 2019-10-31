@@ -10,10 +10,10 @@
   "dependencies": {
     "graphql-tag": "^2.10.1",
     "next": "9.1.1",
-    "next-urql": "link:../",
+    "next-urql": "file:../next-urql.tgz",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-is": "^16.8.6",
+    "react-is": "^16.11.0",
     "urql": "^1.6.1"
   }
 }

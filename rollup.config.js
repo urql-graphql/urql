@@ -80,7 +80,7 @@ const makePlugins = isProduction =>
       replace({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-    // isProduction ? terserMinified : terserPretty,
+    isProduction ? terserMinified : terserPretty,
   ].filter(Boolean);
 
 export default [
