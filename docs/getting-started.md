@@ -220,6 +220,8 @@ When using the `useMutation` hook we have the choice to use `.catch` or `.then`
 to manually look at our result or we can use the second argument to look at what
 the API has returned for said mutation.
 
+This `executeQuery` method accepts a second argument which is the [OperationContext](<./api.md#OperationContext(type)>)
+
 > A tutorial on the `useMutation` hook is also available as a
 > [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-mutation-using-react-hooks-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
 
