@@ -179,6 +179,9 @@ into a loading state instead of you having to do this manually for every compone
 
 Enabling suspense can be done by going to your client and passing it the option `suspense: true`.
 Be careful when combining this with `ssr`, the next chapter will cover this.
+Additionally, we'll need to add an [`exchange`](https://github.com/FormidableLabs/urql-exchange-suspense)
+to our client. This exchange will make `client.suspense` linear to `React.lazy` as we would
+expect.
 
 ## Server-side rendering
 

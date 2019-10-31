@@ -85,17 +85,17 @@ const getTodos = `
 `;
 
 const TodoList = ({ limit = 10 }) => {
-  const [{ fetching, data, error, extensions }] = useQuery({
+  const [result] = useQuery({
     query: getTodos,
     variables: { limit },
   });
 
-  if (fetching) return 'Loading...';
-  if (error) return 'Oh no!';
+  if (result.fetching) return 'Loading...';
+  if (result.error) return 'Oh no!';
 
   return (
     <ul>
-      {data.todos.map(({ id, text }) => (
+      {result.data.todos.map(({ id, text }) => (
         <li key={id}>{text}</li>
       ))}
     </ul>
@@ -193,7 +193,7 @@ const addTodo = `
 `;
 
 const TodoForm = () => {
-  const [addTodo, addTodoResult] = useMutation(addTodo);
+  const [addTodoResult, addTodo] = useMutation(addTodo);
   if (addTodoResult.error) {
     return 'Oh no!';
   }
