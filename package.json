@@ -2,9 +2,14 @@
   "name": "next-urql",
   "version": "0.1.0",
   "description": "Convenience wrappers for using urql with NextJS.",
+  "repository": "https://www.github.com/FormidableLabs/next-urql",
+  "bugs": {
+    "url": "https://github.com/FormidableLabs/next-urql/issues"
+  },
   "main": "dist/next-urql.min.js",
   "module": "dist/next-urql.es.min.js",
   "source": "src/index.ts",
+  "author": "Formidable",
   "license": "MIT",
   "scripts": {
     "check:types": "tsc",
@@ -59,6 +64,6 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-is": "^16.8.6",
-    "urql": "^1.6.1"
+    "urql": "^1.1.0"
   }
 }

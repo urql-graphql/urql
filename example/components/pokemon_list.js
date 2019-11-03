@@ -61,7 +61,7 @@ const PokemonList = () => {
                 {pokemon.types.map(type => {
                   if (typesToIcon.get(type)) {
                     return (
-                      <div className="pokemon-type-container__type">
+                      <div className="pokemon-type-container__type" key={type}>
                         <img
                           src={typesToIcon.get(type)}
                           className="pokemon-type-container__type-icon"

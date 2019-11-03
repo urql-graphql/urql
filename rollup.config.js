@@ -74,7 +74,6 @@ const makePlugins = isProduction =>
         },
       },
     }),
-    // Compile TypeScript files using Babel.
     babel({ extensions, include: ['src/**/*'], exclude: 'node_modules/**' }),
     isProduction &&
       replace({
