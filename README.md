@@ -13,6 +13,12 @@ Using GraphQL with server-side rendering in React is a challenging problem. Curr
 
 `next-urql` handles integrating this prepass step for you, such that your NextJS application using `urql` will prefetch your GraphQL queries on the server before sending down markup to the client.
 
+### Installation
+
+```sh
+yarn add next-urql
+```
+
 ### API
 
 `next-urql` exposes a single higher order component, `withUrqlClient`. This HoC accepts two arguments:
@@ -34,7 +40,7 @@ export interface ClientOptions {
 }
 ```
 
-In client-side SPAs using `urql`, you typically configure the `Client` yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted in to server-side `Suspense` and have the necessary `exchanges` setup for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`.
+In client-side SPAs using `urql`, you typically configure the `Client` yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` setup for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
 
 #### `mergeExchanges` (Optional)
 
