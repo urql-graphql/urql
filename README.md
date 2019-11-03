@@ -56,6 +56,10 @@ The `mergeExchanges` argument is optional. This is a function that takes the `ss
 
 By default, `next-urql` will incorprate the `ssrExchange` into your `exchanges` array in the correct location (after any other caching exchanges, but _before_ the `fetchExchange` – read more [here](https://formidable.com/open-source/urql/docs/basics/#setting-up-the-client)). Use this argument if you want to configure your client with additional custom `exchanges`, or access the `ssrCache` directly to extract or restore data from its cache.
 
+### Example
+
+You can see an example project with `next-urql` in our [example directory](/example/README.md) or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
+
 ### Caveats
 
 `withUrqlClient` implements NextJS's unique `getInitialProps` method uner the hood. This means that any page containing a component wrapped by `withUrqlClient` will be opted out of [automatic static optimization](https://nextjs.org/docs#automatic-static-optimization). Automatic static optimization was added in Next v9, so you shouldn't worry about this if using an earlier version of Next. This is **not** unique to `next-urql` – any implementation of `getInitialProps` by any component in your application will cause Next to opt out of automatic static optimization.

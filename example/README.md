@@ -2,6 +2,8 @@
 
 This example is a small reference of how to integrate `next-urql` with your NextJS application. The project is a small Pokedex querying the excellent [Pokemon GraphQL API](https://github.com/lucasbento/graphql-pokemon).
 
+See this example on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
+
 ### Installation
 
 To get the example project running, follow these two steps:
