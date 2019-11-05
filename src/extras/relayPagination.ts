@@ -92,8 +92,8 @@ const getPage = (cache: Cache, linkKey: string): Page | null => {
   if (!link) return null;
 
   const typename = cache.resolve(link, '__typename') as string;
-  const edges = cache.resolve(link, 'edges') as NullArray<string>;
-  if (typeof typename !== 'string' || !Array.isArray(edges)) {
+  const edges = (cache.resolve(link, 'edges') || []) as NullArray<string>;
+  if (typeof typename !== 'string') {
     return null;
   }
 
@@ -152,7 +152,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       return undefined;
     }
 
-    let typename = '';
+    let typename: string | null = null;
     let startEdges: NullArray<string> = [];
     let endEdges: NullArray<string> = [];
     let pageInfo: PageInfo = { ...defaultPageInfo };
@@ -208,10 +208,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       if (typename !== page.__typename) typename = page.__typename;
     }
 
-    if (
-      typeof typename !== 'string' ||
-      startEdges.length + endEdges.length === 0
-    ) {
+    if (typeof typename !== 'string') {
       return undefined;
     }
 
