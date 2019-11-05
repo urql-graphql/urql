@@ -8,6 +8,10 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.1.2](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.1.1...v1.1.2)
+
+- Fix `relayPagination` helper causing cache-misses for empty lists, by [@rafeca](https://github.com/rafeca) (see [#111](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/111))
+
 ## [v1.1.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.0.3...v1.1.1)
 
 This is a minor release since it increases the peer dependency of `urql` to `>= 1.6.0`, due to the addition
