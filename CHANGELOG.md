@@ -8,6 +8,15 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.6.2](https://github.com/FormidableLabs/urql/compare/v1.6.1...v1.6.2)
+
+This fixes a potentially critical bug, where a component would enter an infinite rerender loop,
+when another hook triggers an update. This may happen when multiple `useQuery` hooks are used in
+a single component or when another state hook triggers a synchronous update.
+
+- Add generic type-parameter to `client.query` and `client.mutation`, by [@ctrlplusb](https://github.com/ctrlplusb) (see [#456](https://github.com/FormidableLabs/urql/pull/456))
+- ⚠️ Fix `useQuery` entering an infinite loop during SSR when an update is triggered (see [#459](https://github.com/FormidableLabs/urql/pull/459))
+
 ## [v1.6.1](https://github.com/FormidableLabs/urql/compare/v1.6.0...v1.6.1)
 
 - Fix hook updates not being propagated to potential context providers (see [#451](https://github.com/FormidableLabs/urql/pull/451))
