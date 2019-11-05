@@ -77,7 +77,7 @@ There are three hooks, one for each possible GraphQL operation.
 The [`useQuery` hook](https://formidable.com/open-source/urql/docs/api/#usequery-hook) is
 used to send GraphQL queries and will provide GraphQL results from your API.
 
-When you're using `useQuery` it'll accept a configuration object that may contain a `query` and `variables`.
+When you're using `useQuery` it'll accept a configuration object that may contain keys for `query` and `variables`.
 The `query` can either be your GraphQL query as a string or as a `DocumentNode`, which may be
 parsed using [`graphql-tag`](https://github.com/apollographql/graphql-tag) for instance.
 
