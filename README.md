@@ -341,14 +341,17 @@ const client = new Client({
 });
 ```
 
-## 📦 Add on Exchanges
+## 📦 Ecosystem
 
-`urql` can be extended by adding "Exchanges" to it, [which you can read
-more about in our docs](https://formidable.com/open-source/urql/docs/architecture/#exchanges)! Here's just a couple of them.
+`urql` has an extended ecosystem of additional packages that either are ["Exchanges" which extend
+`urql`'s core functionality](https://formidable.com/open-source/urql/docs/architecture/#exchanges)
+or are built to make certain tasks easier.
 
 - [`@urql/devtools`](https://github.com/FormidableLabs/urql-devtools): A Chrome extension for monitoring and debugging
-- [`@urql/exchange-graphcache`](https://github.com/FormidableLabs/urql-exchange-graphcache): A full normalized cache implementation (beta)
+- [`@urql/exchange-graphcache`](https://github.com/FormidableLabs/urql-exchange-graphcache): A full normalized cache implementation
 - [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense): An experimental exchange for using `<React.Suspense>`
+- [`next-urql`](https://github.com/FormidableLabs/next-urql): Helpers for adding `urql` to [Next.js](https://github.com/zeit/next.js/) with SSR support
+- [`reason-urql`](https://github.com/FormidableLabs/reason-urql): Reason bindings for `urql`
 - [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support
 
 [You can find the full list of exchanges in the docs.](./docs/exchanges.md)
