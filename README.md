@@ -89,8 +89,8 @@ const YourComponent = () => {
     query: `{ todos { id } }`,
   });
 
-  if (result.error) return 'Oh no!';
-  if (result.fetching) return 'Loading...';
+  if (result.error) return <Error message={result.error.message} />;
+  if (result.fetching) return <Loading />;
 
   return <List data={result.data.todos} />;
 };
