@@ -1,4 +1,4 @@
-import { DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 import {
   getFieldAlias,
@@ -143,7 +143,7 @@ export const writeOptimistic = (
     ctx
   );
 
-  let node;
+  let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     if (node.selectionSet !== undefined) {
       const fieldName = getName(node);
@@ -241,7 +241,7 @@ const writeSelection = (
 
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
@@ -376,7 +376,7 @@ const writeRoot = (
 
   const iter = new SelectionIterator(typename, typename, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);

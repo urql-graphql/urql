@@ -209,7 +209,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       store.clearOptimistic(key);
     }
 
-    let writeDependencies, queryDependencies;
+    let writeDependencies: Set<string> | void;
+    let queryDependencies: Set<string> | void;
     if (data !== null && data !== undefined) {
       writeDependencies = write(store, operation, data).dependencies;
 

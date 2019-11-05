@@ -32,7 +32,7 @@ import { warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
-import { DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 export interface QueryResult {
   dependencies: Set<string>;
@@ -116,7 +116,7 @@ const readRoot = (
 
   const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
@@ -254,7 +254,7 @@ const readSelection = (
   data.__typename = typename;
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
   while ((node = iter.next()) !== undefined) {
@@ -399,7 +399,7 @@ const readResolverResult = (
   data.__typename = typename;
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
   while ((node = iter.next()) !== undefined) {

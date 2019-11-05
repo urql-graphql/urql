@@ -15,8 +15,8 @@ import { invariant, warn } from '../helpers/help';
 export class SchemaPredicates {
   schema: GraphQLSchema;
 
-  constructor(schema) {
-    this.schema = buildClientSchema(schema);
+  constructor(schema: object) {
+    this.schema = buildClientSchema(schema as any);
   }
 
   isFieldNullable(typename: string, fieldName: string): boolean {

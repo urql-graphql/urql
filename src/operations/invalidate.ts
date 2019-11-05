@@ -7,14 +7,23 @@ import {
   getFieldArguments,
 } from '../ast';
 
-import { OperationRequest, Variables, Fragments, SelectionSet } from '../types';
-import { SelectionIterator } from './shared';
+import {
+  EntityField,
+  OperationRequest,
+  Variables,
+  Fragments,
+  SelectionSet,
+} from '../types';
+
 import {
   Store,
   addDependency,
   initStoreState,
   clearStoreState,
 } from '../store';
+
+import { FieldNode } from 'graphql';
+import { SelectionIterator } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
@@ -53,7 +62,7 @@ export const invalidateSelection = (
   const { store } = ctx;
   const isQuery = entityKey === 'Query';
 
-  let typename;
+  let typename: EntityField;
   if (!isQuery) {
     addDependency(entityKey);
     typename = store.getField(entityKey, '__typename');
@@ -68,7 +77,7 @@ export const invalidateSelection = (
 
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
-  let node;
+  let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
     const fieldKey = joinKeys(

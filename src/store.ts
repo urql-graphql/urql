@@ -168,7 +168,7 @@ export class Store implements Cache {
       return this.rootNames[typename];
     }
 
-    let key;
+    let key: string | null | void;
     if (this.keys[typename]) {
       key = this.keys[typename](data);
     } else if (id !== undefined && id !== null) {
