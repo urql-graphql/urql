@@ -147,9 +147,30 @@ Unlike the `useMutation` hook, the `useQuery`'s `executeQuery` function actually
 Instead it accepts a full object of all of `useQuery`'s normal options, so it can be used to change the entire query, variables, or
 other options that the hook uses to run the query.
 
+```js
+const [result, executeQuery] = useQuery({
+  query: 'query ($sort: Sorting!) { todos(sort: $sort) { text } }',
+  variables: { sort: 'by-date' },
+});
+
+// executeQuery can trigger queries and override options
+const update = () => executeQuery({ variables: { sort: 'by-text' } });
+```
+
 Instead of running the `useQuery` operation eagerly you may also pass `pause: true`, which causes the
 hook not to run your query automatically until `pause` becomes `false` or until `executeQuery` is called
 manually.
+
+```js
+// This won't execute automatically...
+const [result, executeQuery] = useQuery({
+  query: '{ todos { text } }',
+  pause: true,
+});
+
+// ...but it can still be triggered programmatically
+const execute = () => executeQuery();
+```
 
 Apart from `pause` you may also pass a `requestPolicy` option that changes how the cache treats your data.
 By default this option will be set to `"cache-first"` which will give you cached data when it's available,
@@ -159,8 +180,7 @@ but it can also be set to `"network-only"` which skips the cache entirely and re
 ```js
 const [result, executeQuery] = useQuery({
   query: '{ todos { text } }',
-  variables: {},
-  pause: false, // pass true to pause
+  // Refetch up-to-date data in the background
   requestPolicy: 'cache-and-network',
 });
 
@@ -176,6 +196,7 @@ const [result, executeQuery] = useQuery({
   query: '{ todos { text } }',
 });
 
+// We change the requestPolicy to bypass the cache just this once
 const refetch = () => executeQuery({ requestPolicy: 'network-only' });
 ```
 
@@ -257,6 +278,68 @@ It also supports "schema awareness". By adding introspected schema data it becom
 GraphQL results entirely from cache and to match fragments to interfaces deterministically.
 
 [Read more about _Graphcache_ on its repository!](https://github.com/FormidableLabs/urql-exchange-graphcache)
+
+### Server-side Rendering
+
+`urql` supports server-side rendering via its **suspense mode** and its `ssrExchange`.
+When setting up SSR you will need to set `suspense: true` on the `Client` for the server-side
+and add an `ssrExchange`.
+
+```js
+import {
+  Client,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  ssrExchange,
+} from 'urql';
+
+// Depending on your build process you may want to use one of these checks:
+const isServer = typeof window !== 'object' || process.browser;
+
+const ssrCache = ssrExchange({ isClient: !isServer });
+
+const client = new Client({
+  suspense: isServer
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    // Add this after the cacheExchange but before fetchExchange:
+    ssrCache,
+    fetchExchange
+  ]
+});
+```
+
+The `ssrExchange` is another small cache that stores full results temporarily.
+On the server you may call `ssrCache.extractData()` to get the serialisable data
+for the server's SSR data, while on the client you can call `ssrCache.restoreData(...)`
+to restore the server's SSR data.
+
+[Read more about SSR in our Basics' SSR section!](https://formidable.com/open-source/urql/docs/basics/#server-side-rendering)
+
+### Client-side Suspense
+
+You may also activate the Client's suspense mode on the client-side and use React Suspense for
+data loading in your entire app! This requires you to use the [`@urql/exchange-suspense`](https://github.com/FormidableLabs/urql-exchange-suspense)
+package.
+
+```js
+import { Client, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+
+import { suspenseExchange } from '@urql/exchange-suspense';
+
+const client = new Client({
+  url: 'http://localhost:1234/graphql',
+  suspense: true, // Enable suspense mode
+  exchanges: [
+    dedupExchange,
+    suspenseExchange, // Add suspenseExchange to your urql exchanges
+    cacheExchange,
+    fetchExchange,
+  ],
+});
+```
 
 ## 📦 Add on Exchanges
 
