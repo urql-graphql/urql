@@ -209,7 +209,9 @@ This client is responsible for managing GraphQL operations and sending requests.
 
 <img width="787" src="docs/urql-client-architecture.png" />
 
-Any hook in `urql` will send an operation to the client and the client will eventually respond with a result.
+Any hook in `urql` dispatches its operation on the client (A, B, C) which will be handled by the client on a
+single stream of inputs. As responses come back from the cache or your GraphQL API one or more results are
+dispatched on an output stream that correspond to the operations, which update the hooks.
 
 <img width="709" src="docs/urql-event-hub.png" />
 
@@ -221,9 +223,18 @@ operation.
 
 [Learn more about the shape of operations and results in our Architecture section!](https://formidable.com/open-source/urql/docs/architecture/)
 
-The exchanges are separate middleware extensions that determine how operations flow through the client
+_Exchanges_ are separate middleware-like extensions that determine how operations flow through the client
 and how they're fulfilled. All functionality in `urql` can be customised by changing the client's exchanges
 or by writing a custom one.
+
+_Exchanges_ are named as such because middleware are often associated with a single stream of inputs,
+like Express' per-request handlers and middleware, which imperatively send results, or Redux's middleware,
+which only deal with actions.
+
+Instead _Exchanges_ are nested and deal with two streams, the input stream of operations and the output stream of results,
+where the stream of operations go through a pipeline like an intersection in an arbitrary order.
+
+<img width="634" src="docs/urql-exchanges.png" />
 
 By default there are three exchanges. The `dedupExchange` deduplicates operations with the same key, the
 cache exchange handles caching and has a "document" strategy by default, and the `fetchExchange` is typically
@@ -231,8 +242,6 @@ the last exchange and sends operations to a GraphQL API.
 
 There are also other exchanges, both built into `urql` and as separate packages, that can be used to add
 more functionality, like the `subscriptionExchange` for instance.
-
-<img width="634" src="docs/urql-exchanges.png" />
 
 [Learn more about Exchanges and how to write them in our Guides section!](https://formidable.com/open-source/urql/docs/guides/)
 
