@@ -230,6 +230,8 @@ more functionality, like the `subscriptionExchange` for instance.
 
 <img width="634" src="docs/urql-exchanges.png" />
 
+[Learn more about Exchanges and how to write them in our Guides section!](https://formidable.com/open-source/urql/docs/guides/)
+
 ### Document Caching
 
 The default cache in `urql` works like a document or page cache, for example like a browser would cache pages.
