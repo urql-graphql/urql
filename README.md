@@ -200,6 +200,8 @@ const [result, executeQuery] = useQuery({
 const refetch = () => executeQuery({ requestPolicy: 'network-only' });
 ```
 
+[Learn more about request policies in our Getting Started section!](https://formidable.com/open-source/urql/docs/getting-started/#refetching-data)
+
 ### Client and Exchanges
 
 In `urql` all operations are controlled by a central [`Client`](https://formidable.com/open-source/urql/docs/api/#client-class).
@@ -216,6 +218,8 @@ sends back a result. A special teardown-event is issued when a hook unmounts or 
 operation.
 
 <img width="700" src="docs/urql-signals.png" />
+
+[Learn more about the shape of operations and results in our Architecture section!](https://formidable.com/open-source/urql/docs/architecture/)
 
 The exchanges are separate middleware extensions that determine how operations flow through the client
 and how they're fulfilled. All functionality in `urql` can be customised by changing the client's exchanges
