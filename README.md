@@ -382,3 +382,5 @@ There are currently three examples included in this repository:
 ## Maintenance Status
 
 **Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
+
+<img width="100%" src="docs/urql-spoiler.png" />
