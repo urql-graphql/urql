@@ -143,9 +143,7 @@ Mutations will only execute once the `executeMutation` method is called with som
 The `useQuery` hook can actually be used similarly. The hook also provides an `executeQuery`
 function that can be called imperatively to change what query the hook is running.
 
-Unlike the `useMutation` hook, the `useQuery`'s `executeQuery` function actually accepts more than just variables.
-Instead it accepts a full object of all of `useQuery`'s normal options, so it can be used to change the entire query, variables, or
-other options that the hook uses to run the query.
+Unlike the `useMutation` hook, the `useQuery`'s `executeQuery` function accepts an `OperationContext` as the argument, this allows you to for example override the `requestPolicy` or even the `fetchOptions`.
 
 ```js
 const [result, executeQuery] = useQuery({
@@ -154,7 +152,7 @@ const [result, executeQuery] = useQuery({
 });
 
 // executeQuery can trigger queries and override options
-const update = () => executeQuery({ variables: { sort: 'by-text' } });
+const update = () => executeQuery({ requestPolicy: 'network-only' });
 ```
 
 Instead of running the `useQuery` operation eagerly you may also pass `pause: true`, which causes the
