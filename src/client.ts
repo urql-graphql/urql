@@ -194,7 +194,8 @@ export class Client {
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
 
-    return (operation.context.suspense || this.suspense) &&
+    return operation.context.suspense !== false &&
+      this.suspense &&
       operationName === 'query'
       ? toSuspenseSource(result$)
       : result$;
