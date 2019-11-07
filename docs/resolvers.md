@@ -117,7 +117,7 @@ const data = cache.readFragment(gql`
     id
     text
   }
-`, '1'`;
+`, '1');
 ```
 
 This way we'll get the Todo with id 1 and the relevant data we are askng for in the
