@@ -1,6 +1,6 @@
 {
   "name": "next-urql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convenience wrappers for using urql with NextJS.",
   "repository": "https://www.github.com/FormidableLabs/next-urql",
   "bugs": {
