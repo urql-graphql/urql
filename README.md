@@ -19,9 +19,52 @@ Using GraphQL with server-side rendering in React is a challenging problem. Curr
 
 ### Installation
 
+Install `next-urql` along with its `peerDependencies`.
+
 ```sh
-yarn add next-urql
+npm install --save next-urql react-is styled-components isomorphic-unfetch
 ```
+
+`react-is`, `styled-components`, and `isomorphic-unfetch` help to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
+
+### Usage
+
+To use `next-urql`, first `import` the `withUrqlClient` higher order component.
+
+```javascript
+import { withUrqlClient } from 'next-urql';
+```
+
+Then, for any page in your `pages` directory for which you want to prefetch GraphQL queries, wrap the page in `withUrqlClient`. For example, let's say you have an `index.js` page that renders two components that make GraphQL requests using `urql`, `PokemonList` and `PokemonTypes`. To run their queries initially on the server-side you'd do something like the following:
+
+```javascript
+import React from 'react';
+import Head from 'next/head';
+import { withUrqlClient } from 'next-urql';
+
+import PokemonList from '../components/pokemon_list';
+import PokemonTypes from '../components/pokemon_types';
+
+const Root = () => (
+  <div>
+    <Head>
+      <title>Root</title>
+      <link rel="icon" href="/static/favicon.ico" />
+    </Head>
+
+    <PokemonList />
+    <PokemonTypes />
+  </div>
+);
+
+export default withUrqlClient({ url: 'https://graphql-pokemon.now.sh' })(Root);
+```
+
+Read more below in the [API](#API) section to learn more about the arguments that can be passed to `withUrqlClient`.
+
+#### Integration with `_app.js`
+
+Next allows you to override the root of your application using a special page called [`_app.js`](https://nextjs.org/docs#custom-app). If you want to have all GraphQL requests in your application fetched on the server-side, you _could_ wrap the component exported by `_app.js` in `withUrqlClient`. However, be aware that this will opt you out of [automatic static optimization](https://nextjs.org/docs#automatic-static-optimization) for your entire application. In general, it's recommended practice to only use `withUrqlClient` on the pages that have GraphQL operations in their component tree. Read more in the [Caveats](#Caveats) section.
 
 ### API
 

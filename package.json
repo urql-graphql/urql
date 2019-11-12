@@ -9,14 +9,18 @@
   "main": "dist/next-urql.min.js",
   "module": "dist/next-urql.es.min.js",
   "source": "src/index.ts",
+  "types": "index.d.ts",
   "author": "Formidable",
   "license": "MIT",
   "scripts": {
-    "check:types": "tsc",
+    "build": "rollup -c rollup.config.js",
+    "check": "run-s check:types test lint format",
+    "check:types": "tsc --noEmit",
+    "clean": "rimraf ./dist ./node_modules/.cache",
     "format": "prettier --write **/*.{ts,tsx,d.ts,js}",
     "lint": "eslint **/*.{ts,tsx}",
-    "test": "jest",
-    "build": "rollup -c rollup.config.js"
+    "preversion": "run-s clean test build",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
@@ -38,10 +42,12 @@
     "graphql-tag": "^2.10.1",
     "isomorphic-unfetch": "^3.0.0",
     "jest": "^24.9.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.18.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-is": "^16.10.2",
+    "rimraf": "^3.0.0",
     "rollup": "^1.25.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -57,7 +63,7 @@
     "urql": "^1.6.1"
   },
   "dependencies": {
-    "react-ssr-prepass": "^1.0.7"
+    "react-ssr-prepass": "^1.0.8"
   },
   "peerDependencies": {
     "isomorphic-unfetch": "^3.0.0",

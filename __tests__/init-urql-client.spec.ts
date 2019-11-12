@@ -17,6 +17,7 @@ describe('initUrqlClient', () => {
 
     expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
     expect(urqlClient).toHaveProperty('suspense', true);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(ssrCache!.toString()).toEqual(ssrExchange().toString());
   });
 
@@ -36,6 +37,7 @@ describe('initUrqlClient', () => {
 
     expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
     expect(urqlClient).toHaveProperty('suspense', true);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(ssrCache!.toString()).toEqual(ssrExchange().toString());
   });
 

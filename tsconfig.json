@@ -5,7 +5,6 @@
     "jsx": "react",
     "lib": ["dom", "esnext"],
     "noUnusedLocals": true,
-    "outDir": "dist/cjs",
     "rootDir": "./src",
     "module": "es2015",
     "moduleResolution": "node",
@@ -16,5 +15,5 @@
     "strict": true,
     "target": "esnext"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "index.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "**/*.d.ts"]
 }
