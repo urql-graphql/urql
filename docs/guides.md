@@ -78,23 +78,24 @@ Before we jump into writing some exchanges, there are a couple of
 patterns and limitations that always remain the same when writing
 an exchange.
 
+### Forward Operation Streams. Return OperationResult Streams.
+
 For reference, this is a basic template for an exchange:
 
 ```js
 const noopExchange = ({ client, forward }) => {
-  return operation$ => {
-    // <-- The ExchangeIO function
+  return operation$ => { // <-- The ExchangeIO function
     const operationResult$ = forward(operations$);
     return operationResult$;
   };
 };
 ```
 
-By convention, variables ending with `$` are streams. Each exchange's `ExchangeIO` function receives an [`Operation`](https://formidable.com/open-source/urql/docs/api/#operation-type) stream (`operation$`) and must return an [`OperationResult`](https://formidable.com/open-source/urql/docs/api/#operationresult-type) stream (`operationResult$`).
+By convention, variables ending with `$` are streams. Each exchange's `ExchangeIO` function receives a stream containing an [`Operation`](https://formidable.com/open-source/urql/docs/api/#operation-type) object (`operation$`) and must return a stream of [`OperationResult`](https://formidable.com/open-source/urql/docs/api/#operationresult-type) object(s)(`operationResult$`).
 
-### Exchange Composition
+#### Forward and Return Composition
 
-When you create a client and pass it an array of exchanges, Urql composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). Here's the noopExchange in context:
+When you create a client and pass it an array of exchanges, Urql composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). `composeExchanges` orchestrates stream forward and return between exchanges. Here's the noopExchange in context:
 
 ```js
 import { Client, dedupeExchange, fetchExchange } from 'urql';
@@ -115,22 +116,17 @@ const client = new Client({
 });
 ```
 
-### Request and Response Handling
+#### Forward + Return = Request + Response
 
-Interacting with a request occurs before the forward() call. Interacting with a response occurs after the forward call. Here's what the noopExchange looks like with explicit request and reponse handlers.
+Interacting with a request occurs before the forward() call. Interacting with a response occurs after the forward call. Here's the noopExchange with explicit request and response stream handlers.
 
 ```js
-const handleRequest = operation$ => {
-  /*do stuff*/ return operation$;
-};
-const handleResponse = operationResult$ => {
-  /*do stuff*/ return operationResult$;
-};
+const handleRequest = operation$ => {/*do stuff*/ return operation$;};
+const handleResponse = operationResult$ => {/*do stuff*/ return operationResult$;};
 
 const noopExchange = ({ client, forward }) => {
-  return operations$ => {
-    // <-- The ExchangeIO function
-    return handleResponse(forward(handleRequest(operations$)));
+  return operations$ => { // <-- The ExchangeIO function
+    return handleResponse( forward( handleRequest( operations$ )));
   };
 };
 ```
@@ -150,7 +146,7 @@ must be careful to either only use it once, or to _share_ its subscription.
 import { pipe, filter, merge, share } from 'wonka';
 
 // DON'T: split use operations$ twice
-({ forward }) => operations$ => {
+({ forward }) => operations$ => { // <-- The ExchangeIO function (inline)
   const queries = pipe(
     operations$,
     filter(op => op.operationName === 'query')
@@ -163,7 +159,7 @@ import { pipe, filter, merge, share } from 'wonka';
 };
 
 // DO: share operations$ if you have to use it twice
-({ forward }) => operations$ => {
+({ forward }) => operations$ => { // <-- The ExchangeIO function (inline)
   const shared = pipe(
     operations$,
     share
@@ -180,7 +176,7 @@ import { pipe, filter, merge, share } from 'wonka';
 };
 
 // DO: use operations$ only once alternatively
-({ forward }) => operations$ =>
+({ forward }) => operations$ => // <-- The ExchangeIO function (inline)
   pipe(
     operations$,
     map(op => {
