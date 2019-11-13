@@ -82,23 +82,58 @@ For reference, this is a basic template for an exchange:
 
 ```js
 const noopExchange = ({ client, forward }) => {
-  return operations$ => {
-    return forward(operations$);
+  return operation$ => {
+    // <-- The ExchangeIO function
+    const operationResult$ = forward(operations$);
+    return operationResult$;
   };
 };
 ```
 
-In this form the exchange doesn't do anything yet.
-When you create a client and pass it an array of exchanges, all exchanges
-will be composed together into a single one. They will each be called with
-an object that contains the `client` itself, and a `forward` function which
-is the next `ExchangeIO` function.
+By convention, variables ending with `$` are streams. Each exchange's `ExchangeIO` function receives an [`Operation`](https://formidable.com/open-source/urql/docs/api/#operation-type) stream (`operation$`) and must return an [`OperationResult`](https://formidable.com/open-source/urql/docs/api/#operationresult-type) stream (`operationResult$`).
 
-The `ExchangeIO` function is what each exchange returns. This is a function
-that receives the stream of operations and must return a stream of results.
+### Exchange Composition
 
-So our `noopExchange` is the minimal template that fulfils this requirement.
-It just receives the operations stream and passes it on to `forward`.
+When you create a client and pass it an array of exchanges, Urql composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). Here's the noopExchange in context:
+
+```js
+import { Client, dedupeExchange, fetchExchange } from 'urql';
+
+const noopExchange = ({ client, forward }) => {
+  // ExchangeIO function receives Operation object stream from dedupeExchange
+  return operation$ => {
+    // noopExchange forwards Operation object stream to fetchExchange,
+    // and receives a stream with an OperationResult object created by fetchExchange
+    const operationResult$ = forward(operations$);
+    // then returns the OperationResult stream to dedupeExchange
+    return operationResult$;
+  };
+};
+
+const client = new Client({
+  exchanges: [dedupeExchange, noopExchange, fetchExchange],
+});
+```
+
+### Request and Response Handling
+
+Interacting with a request occurs before the forward() call. Interacting with a response occurs after the forward call. Here's what the noopExchange looks like with explicit request and reponse handlers.
+
+```js
+const handleRequest = operation$ => {
+  /*do stuff*/ return operation$;
+};
+const handleResponse = operationResult$ => {
+  /*do stuff*/ return operationResult$;
+};
+
+const noopExchange = ({ client, forward }) => {
+  return operations$ => {
+    // <-- The ExchangeIO function
+    return handleResponse(forward(handleRequest(operations$)));
+  };
+};
+```
 
 ### One operations stream only
 
