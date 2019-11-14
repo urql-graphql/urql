@@ -95,7 +95,7 @@ By convention, variables ending with `$` are streams. Each exchange's `ExchangeI
 
 #### Forward and Return Composition
 
-When you create a client and pass it an array of exchanges, Urql composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). `composeExchanges` orchestrates stream forward and return between exchanges. Here's the noopExchange in context:
+When you create a client and pass it an array of exchanges, `urql` composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). `composeExchanges` orchestrates stream forward and return between exchanges. Here's the `noopExchange` in context:
 
 ```js
 import { Client, dedupeExchange, fetchExchange } from 'urql';
@@ -114,21 +114,6 @@ const noopExchange = ({ client, forward }) => {
 const client = new Client({
   exchanges: [dedupeExchange, noopExchange, fetchExchange],
 });
-```
-
-#### Forward + Return = Request + Response
-
-Interacting with a request occurs before the forward() call. Interacting with a response occurs after the forward call. Here's the noopExchange with explicit request and response stream handlers.
-
-```js
-const handleRequest = operation$ => {/*do stuff*/ return operation$;};
-const handleResponse = operationResult$ => {/*do stuff*/ return operationResult$;};
-
-const noopExchange = ({ client, forward }) => {
-  return operations$ => { // <-- The ExchangeIO function
-    return handleResponse( forward( handleRequest( operations$ )));
-  };
-};
 ```
 
 ### One operations stream only
