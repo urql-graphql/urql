@@ -101,13 +101,26 @@ When you create a client and pass it an array of exchanges, `urql` composes them
 import { Client, dedupeExchange, fetchExchange } from 'urql';
 
 const noopExchange = ({ client, forward }) => {
-  // ExchangeIO function receives Operation object stream from dedupeExchange
-  return operation$ => {
-    // noopExchange forwards Operation object stream to fetchExchange,
-    // and receives a stream with an OperationResult object created by fetchExchange
+  return operation$ => { // <-- This exchange's ExchangeIO function
+    // calling forward() here will call the next exchange's ExchangeIO function.
+    // So before this...
+    // urql creates an Operation object, places it in a stream (operation$),
+    // and calls composeExchange's ExchangeIO function.
+    // composeExchange forward()s the operation$ stream to dedupeExchange's ExchangeIO function.
+    // dedupeExchange filters duplicates and forward()s the stream to noopExchange's ExchangeIO function.
+    // noopExchange forward()s the operation$ stream to fetchExchange's ExchangeIO function
+    
     const operationResult$ = forward(operations$);
-    // then returns the OperationResult stream to dedupeExchange
+    
+    // fetchExchange receives the operation$ stream, creates an OperationResult object,
+    // and returns it in an operationResult$ stream.
+    // finally, noopExchange returns the operationsResult$ stream to dedupeExchange's forward() call.
+    
     return operationResult$;
+    
+    // After this...
+    // dedupExchange returns operationResult$ to composeExchange's forward() call.
+    // urql client receives the operationResult$ from composeExchange and provides data to components.
   };
 };
 
