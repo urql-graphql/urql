@@ -6,8 +6,8 @@
 <a href="https://npmjs.com/package/@urql/exchange-suspense">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-suspense.svg" />
 </a>
-<a href="https://github.com/FormidableLabs/urql-exchange-suspense/actions">
-  <img alt="Test Status" src="https://github.com/FormidableLabs/urql-exchange-suspense/workflows/CI/badge.svg" />
+<a href="https://travis-ci.org/FormidableLabs/urql-exchange-suspense">
+  <img alt="Test Status" src="https://api.travis-ci.org/FormidableLabs/urql-exchange-suspense.svg?branch=master" />
 </a>
 <a href="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense">
   <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense/branch/master/graph/badge.svg" />
