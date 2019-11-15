@@ -24,12 +24,64 @@
                 "ofType": null
               }
             }
+          },
+          {
+            "name": "latestTodo",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "LatestTodoResult",
+                "ofType": null
+              }
+            }
           }
         ],
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
+      },
+      {
+        "name": "LatestTodoResult",
+        "kind": "UNION",
+        "args": [],
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Todo",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "NoTodosError",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "NoTodosError",
+        "interfaces": [],
+        "fields": [
+          {
+            "name": "message",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ]
       },
       {
         "kind": "OBJECT",

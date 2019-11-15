@@ -29,4 +29,16 @@ describe('SchemaPredicates', () => {
     expect(schemaPredicates.isFieldNullable('Todo', 'complete')).toBeTruthy();
     expect(schemaPredicates.isFieldNullable('Todo', 'author')).toBeTruthy();
   });
+
+  it('should handle unions of objects', () => {
+    expect(
+      schemaPredicates.isInterfaceOfType('LatestTodoResult', 'Todo')
+    ).toBeTruthy();
+    expect(
+      schemaPredicates.isInterfaceOfType('LatestTodoResult', 'NoTodosError')
+    ).toBeTruthy();
+    expect(
+      schemaPredicates.isInterfaceOfType('Todo', 'NoTodosError')
+    ).toBeFalsy();
+  });
 });

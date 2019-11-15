@@ -44,8 +44,13 @@ export class SchemaPredicates {
     if (typename === typeCondition) return true;
 
     const abstractType = this.schema.getType(typeCondition);
-    expectAbstractType(abstractType, typeCondition);
     const objectType = this.schema.getType(typename);
+
+    if (abstractType instanceof GraphQLObjectType) {
+      return abstractType === objectType;
+    }
+
+    expectAbstractType(abstractType, typeCondition);
     expectObjectType(objectType, typename);
 
     return this.schema.isPossibleType(
