@@ -28,7 +28,7 @@ const rehydrateGraphQlError = (error: any): GraphQLError => {
       error.source,
       error.positions,
       error.path,
-      error.originalError,
+      error,
       error.extensions || {}
     );
   } else {
