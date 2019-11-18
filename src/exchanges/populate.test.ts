@@ -1,4 +1,4 @@
-import { makeFragmentsFromQuery, addFragmentsToQuery } from './mutateBody';
+import { makeFragmentsFromQuery, addFragmentsToQuery } from './populate';
 import {
   introspectionFromSchema,
   buildSchema,

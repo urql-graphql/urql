@@ -18,7 +18,7 @@ interface ExchangeArgs {
 }
 
 /** An exchange for auto-populating mutations with a required response body. */
-export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
+export const populateExchange = ({ schema }: ExchangeArgs): Exchange => ({
   forward,
 }) => {
   let parsedKeys: Record<string, boolean | undefined> = {};
