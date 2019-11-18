@@ -125,6 +125,33 @@ fragment.
 
 ## Pagination
 
+### Simple
+
+Given you have a schema that uses some form of `offset` and `limit` based pagination you can use the
+`simplePagination` exported from `@urql/exchange-graphcache/extras` to achieve an endless scroller.
+
+This helper will concatenate all queries performed to one long data structure.
+
+```js
+import { cacheExchange } from '@urql/exchange-graphcache';
+import { simplePagination } from '@urql/exchange-graphcache/extras';
+
+const cache = cacheExchange({
+  resolvers: {
+    Query: {
+      todos: simplePagination(),
+    },
+  },
+});
+```
+
+This form of pagination accepts an object as an argument, you can specify two
+options in here `limitArgument` and `offsetArgument` these will default to `limit`
+and `skip` respectively. This way you can use the keywords that you are using in
+your queries.
+
+### Relay
+
 Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
 on your backend we offer the possibility of endless data resolving.
 This means that when you fetch the next page in your data
