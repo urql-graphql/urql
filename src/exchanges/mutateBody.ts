@@ -2,27 +2,21 @@ import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 import {
   DocumentNode,
-  SelectionSetNode,
   print,
   ASTNode,
-  FieldNode,
   buildClientSchema,
-  buildASTSchema,
-  buildSchema,
-  typeFromAST,
-  execute,
   visitWithTypeInfo,
-  printSchema,
   TypeInfo,
+  FragmentDefinitionNode,
 } from 'graphql';
 import { parse, visit, NonNullTypeNode } from 'graphql';
 import { type } from 'os';
 import { object } from 'prop-types';
+import gql from 'graphql-tag';
 
-type TypeFragmentMap<T extends string = string> = Record<
-  T & '_fragments',
-  string[] | undefined
->;
+type TypeFragmentMap<T extends string = string> = Record<string, string[]> & {
+  _fragments?: FragmentDefinitionNode[];
+};
 
 interface ExchangeArgs {
   schema: any;
@@ -34,40 +28,12 @@ export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
 }) => {
   let typeFragments: TypeFragmentMap = { _fragments: [] };
 
-  const handleMutation = op => op;
-
-  const handleTeardown = op => op;
-
-  const handleOperation = (op: Operation) => {
-    if (op.operationName === 'mutation') {
-      return handleMutation(op);
+  const handleIncomingMutation = (op: Operation) => {
+    if (op.operationName !== 'mutation') {
+      return op;
     }
 
-    if (op.operationName === 'query') {
-      return handleQuery(op);
-    }
-
-    if (op.operationName === 'teardown') {
-      return handleTeardown(op);
-    }
-
-    return op;
-  };
-
-  const handleQueryResponse = (op: OperationResult) => {
-    if (op.error) {
-      return;
-    }
-
-    if (op.operation.query) console.log(op.operation.query);
-    console.log(op.data);
-    console.log('map response', buildTypeMap(op.data));
-  };
-
-  const handleResponse = (op: OperationResult) => {
-    if (op.operation.operationName === 'query') {
-      return handleQueryResponse(op);
-    }
+    return;
   };
 
   const handleIncomingQuery = (op: Operation) => {
@@ -75,76 +41,34 @@ export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
       return;
     }
 
-    typeFragments = makeFragmentsFromQuery(schema, op.query, typeFragments);
+    typeFragments = makeFragmentsFromQuery({
+      schema,
+      query: op.query,
+      fragmentMap: typeFragments,
+    });
   };
 
   return ops$ => {
     return pipe(
       ops$,
-      map(handleOperation),
-      forward,
-      tap(handleResponse)
+      tap(handleIncomingQuery),
+      forward
     );
   };
 };
 
-const buildTypeMap = (obj: any, typemap: any = {}) => {
-  if (Array.isArray(obj)) {
-    return buildTypeMap(obj[0], typemap);
-  }
-
-  if (typeof obj !== 'object' || obj === null) {
-    return typemap;
-  }
-
-  if ('__typename' in obj) {
-    const { __typename, ...keys } = obj;
-    const existingKeys = typemap[__typename] || [];
-
-    console.log(existingKeys);
-    return {
-      ...typemap,
-      [obj.__typename]: [...existingKeys, ...Object.keys(keys)],
-    };
-  }
-
-  return Object.values(obj).reduce(
-    (map, vals) => buildTypeMap(vals, map),
-    typemap
-  );
-};
-
-/** Stolen from urql */
-const collectTypes = (obj: any, types: string[] = []) => {
-  if (Array.isArray(obj)) {
-    obj.forEach(inner => {
-      collectTypes(inner, types);
-    });
-  } else if (typeof obj === 'object' && obj !== null) {
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        const val = obj[key];
-        if (key === '__typename' && typeof val === 'string') {
-          types.push(val);
-        } else if (typeof val === 'object' && val !== null) {
-          collectTypes(val, types);
-        }
-      }
-    }
-  }
-
-  return types;
-};
-
-const collectTypesFromResponse = (response: object) =>
-  collectTypes(response as any).filter((v, i, a) => a.indexOf(v) === i);
+interface MakeFragmentsFromQueryArg {
+  schema: any;
+  query: DocumentNode;
+  fragmentMap: TypeFragmentMap;
+}
 
 /** Creates fragments object from query */
-export const makeFragmentsFromQuery = (
-  schema: any,
-  query: DocumentNode,
-  fragmentMap: TypeFragmentMap
-) => {
+export const makeFragmentsFromQuery = ({
+  schema,
+  query,
+  fragmentMap,
+}: MakeFragmentsFromQueryArg) => {
   let f = fragmentMap;
   const typeInfo = new TypeInfo(buildClientSchema(schema));
 
@@ -163,15 +87,17 @@ export const makeFragmentsFromQuery = (
           return undefined;
         }
 
+        // @ts-ignore
         f = {
           ...f,
           [t]: [...(f[t] || []), print(node.selectionSet)],
         };
       },
-      FragmentDefinition: (node, key, parent, path) => {
+      FragmentDefinition: node => {
+        // @ts-ignore
         f = {
           ...f,
-          _fragments: [...(f._fragments || []), print(node)],
+          _fragments: [...(f._fragments || []), node],
         };
       },
     })
@@ -180,66 +106,54 @@ export const makeFragmentsFromQuery = (
   return f;
 };
 
-const nodeHasTypename = (o: SelectionSetNode) =>
-  o.selections.some(v => v.kind === 'Field' && v.name.value === '__typename');
+interface AddFragmentsToQuery {
+  schema: any;
+  query: DocumentNode;
+  fragmentMap: TypeFragmentMap;
+}
 
-// export const getTypeFromSchema = (
-//   schema: any,
-//   query: DocumentNode,
-//   path: readonly (string | number)[]
-// ) => {
-//   const s = schema.__schema;
-//   // console.log('schema is', schema);
-//   path.reduce(
-//     (p, c) => {
-//       if (p.node.kind !== 'Field') {
-//         return { ...p, node: p.node[c] };
-//       }
+export const addFragmentsToQuery = ({
+  schema,
+  query,
+  fragmentMap,
+}: AddFragmentsToQuery) => {
+  let newType: string;
+  const typeInfo = new TypeInfo(buildClientSchema(schema));
 
-//       const newType = schema.__schema
-//       return { type:  }
+  const x = visit(
+    query,
+    visitWithTypeInfo(typeInfo, {
+      Field: {
+        enter: node => {
+          const directive =
+            node.directives &&
+            node.directives.find(d => d.name.value === 'populate');
 
-//       console.log('node is', p.node);
-//       console.log('path is', c);
-//       return p;
-//     },
-//     {
-//       type: schema.__schema.types.find(t => t.name === 'Query'),
-//       node: query as ASTNode,
-//     }
-//   );
-//   // console.log(query);
-//   // console.log(path);
-// };
+          if (!directive) {
+            return;
+          }
 
-const getTypenameFromResponse = (
-  query: DocumentNode,
-  data: any,
-  path: readonly (string | number)[]
-) => {
-  console.log('path is', path);
-  const reduced = path.reduce(
-    (p, key, i) => {
-      // console.log('key is', key);
-      // console.log(p.node);
-      // console.log('node is', p.node[key]);
+          // @ts-ignore
+          const type = typeInfo.getType().ofType;
+          newType = type;
 
-      if (p.node.kind !== 'Field' && p.node.kind !== 'SelectionSet') {
-        return { ...p, node: p.node[key] };
-      }
+          console.log(node);
+          console.log(fragmentMap[type].map(t => gql`... on ${type} ${t}`));
 
-      // console.log('data is', p.data[key]);
-      return {
-        node: p.node[key],
-        data: Array.isArray(p.data) ? p.data[0][key] : p.data[key],
-      };
-    },
-    { node: query as ASTNode, data }
+          return {
+            ...node,
+            directives: (node.directives as any).filter(
+              d => d.name.value !== 'populate'
+            ),
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: fragmentMap[type].map(t => gql`... on ${type} ${t}`),
+            },
+          };
+        },
+      },
+    })
   );
 
-  console.log(reduced);
-
-  return Array.isArray(reduced.data)
-    ? reduced.data[0]['__typename']
-    : reduced.data['__typename'];
+  console.log(print(x));
 };
