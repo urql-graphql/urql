@@ -58,9 +58,69 @@ describe('exchange args', () => {
     expect(typeof exchangeMock.mock.calls[0][0].forward).toBe('function');
   });
 
-  it('recieves client', () => {
+  it('receives client', () => {
     // @ts-ignore
     expect(exchangeMock.mock.calls[0][0]).toHaveProperty('client', client);
+  });
+});
+
+describe('promisified arguments', () => {
+  it('query', () => {
+    const queryResult = client
+      .query(
+        gql`
+          {
+            todos {
+              id
+            }
+          }
+        `,
+        { example: 1234 },
+        {}
+      )
+      .toPromise();
+
+    const received = receivedOps[0];
+    expect(print(received.query)).toEqual(print(query.query));
+    expect(received.key).toBeDefined();
+    expect(received.variables).toEqual({ example: 1234 });
+    expect(received.operationName).toEqual('query');
+    expect(received.context).toEqual({
+      url: 'https://hostname.com',
+      requestPolicy: 'cache-and-network',
+      fetchOptions: undefined,
+      fetch: undefined,
+      suspense: false,
+    });
+    expect(queryResult).toHaveProperty('then');
+  });
+
+  it('mutation', () => {
+    const mutationResult = client
+      .mutation(
+        gql`
+          {
+            todos {
+              id
+            }
+          }
+        `,
+        { example: 1234 }
+      )
+      .toPromise();
+
+    const received = receivedOps[0];
+    expect(print(received.query)).toEqual(print(query.query));
+    expect(received.key).toBeDefined();
+    expect(received.variables).toEqual({ example: 1234 });
+    expect(received.operationName).toEqual('mutation');
+    expect(received.context).toEqual({
+      url: 'https://hostname.com',
+      requestPolicy: 'cache-and-network',
+      fetchOptions: undefined,
+      fetch: undefined,
+    });
+    expect(mutationResult).toHaveProperty('then');
   });
 });
 

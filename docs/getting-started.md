@@ -33,7 +33,7 @@ npm install --save react react-dom graphql
 > The library is updated frequently and remains very backwards compatible,
 > but make sure it will work with other GraphQL tooling you might have installed.
 
-## Writing queries
+## Creating a client
 
 Like similar libraries that manage state and data, you will need to wrap your
 app with `urql`'s `<Provider>`. This `<Provider>` holds the `Client` that is
@@ -63,69 +63,12 @@ const YourApp = () => (
 Every component and query underneath the `<Provider>` in the tree now has access
 to the client and will call the client when it needs to execute GraphQL requests.
 
-To illustrate how this works, the next example will use `urql`'s `<Query>`
-component to fetch some GraphQL data.
+The client accepts more options these can be found in the [API](<./api.md#Client(class)>)
 
-```jsx
-import React from 'react';
-import { Query } from 'urql';
+## Writing queries
 
-const getTodos = `
-  query GetTodos($limit: Int!) {
-    todos(limit: $limit) {
-      id
-      text
-      isDone
-    }
-  }
-`;
-
-const TodoList = ({ limit = 10 }) => (
-  <Query query={getTodos} variables={{ limit }}>
-    {({ fetching, data, error, extensions }) => {
-      if (fetching) {
-        return 'Loading...';
-      } else if (error) {
-        return 'Oh no!';
-      }
-
-      return (
-        <ul>
-          {data.todos.map(({ id, text }) => (
-            <li key={id}>{text}</li>
-          ))}
-        </ul>
-      );
-    }}
-  </Query>;
-);
-```
-
-When this component is mounted it will send the `query` and `variables`
-to your GraphQL API. Here we're using `fetching` to see whether the
-request is still being sent and is loading, `error` to see whether any
-errors have come back, `data` to get the result, and finally `extensions`
-to get any arbitrary extensions data the server may have optionally returned.
-
-Whenever the query or variables props change, the `<Query>` component will
-send a new request and go back into the `fetching` state.
-
-The shape of the result include `data` and `error` which is rather similar
-to the response a GraphQL API sends back by default. However, the `error`
-is not the plural `errors`. `urql` wraps any network error or GraphQL
-errors in a `CombinedError` which is more convenient to handle and
-observe.
-
-[Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
-
-### Using hooks
-
-> _Note:_ Hooks are only available in React 16.8 and onwards
-
-Instead of using `<Query>` and a render prop API, you can also use the
-hooks API by switching to `useQuery()`.
-
-We can rewrite the above example as follows.
+To illustrate how this works, the next example will use `urql`'s `useQuery`
+to fetch some GraphQL data.
 
 ```jsx
 import React from 'react';
@@ -142,20 +85,17 @@ const getTodos = `
 `;
 
 const TodoList = ({ limit = 10 }) => {
-  const [res] = useQuery({
+  const [result] = useQuery({
     query: getTodos,
     variables: { limit },
   });
 
-  if (res.fetching) {
-    return 'Loading...';
-  } else if (res.error) {
-    return 'Oh no!';
-  }
+  if (result.fetching) return 'Loading...';
+  if (result.error) return 'Oh no!';
 
   return (
     <ul>
-      {res.data.todos.map(({ id, text }) => (
+      {result.data.todos.map(({ id, text }) => (
         <li key={id}>{text}</li>
       ))}
     </ul>
@@ -163,13 +103,25 @@ const TodoList = ({ limit = 10 }) => {
 };
 ```
 
-Similarly to the `<Query>` component, `useQuery` will start the request
-as soon as it's mounted and will rerun it when the query or variables change.
+When this hook is executed it will send the `query` and `variables`
+to your GraphQL API. Here we're using `fetching` to see whether the
+request is still being sent and is loading, `error` to see whether any
+errors have come back, `data` to get the result, and finally `extensions`
+to get any arbitrary extensions data the server may have optionally returned.
+
+Whenever the query or variables props change, the `useQuery` hook will
+send a new request and go back into the `fetching` state.
+
+The shape of the result include `data` and `error` which is rather similar
+to the response a GraphQL API sends back by default. However, the `error`
+is not the plural `errors`. `urql` wraps any network error or GraphQL
+errors in a `CombinedError` which is more convenient to handle and
+observe.
+
+[Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
 
 > A tutorial on the `useQuery` hook is also available as a
 > [screencast on egghead](https://egghead.io/lessons/graphql-query-graphql-data-with-urql-using-react-hooks?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
-
-[Read more about the result's API in the Architecture's Results section.](https://formidable.com/open-source/urql/docs/architecture#operation-results)
 
 ### Using graphql-tag
 
@@ -187,7 +139,7 @@ you can immediately write tagged template literals instead:
 ```jsx
 import React from 'react';
 import gql from 'graphql-tag';
-import { Query } from 'urql';
+import { useQuery } from 'urql';
 
 const getTodos = gql`
   query GetTodos($limit: Int!) {
@@ -198,8 +150,6 @@ const getTodos = gql`
     }
   }
 `;
-
-<Query query={getTodos} variables={{ limit }} />;
 ```
 
 Keep in mind that it makes sense to give your queries unique
@@ -217,107 +167,20 @@ to a query's response, but often they're used in multiple use cases.
 Sometimes you care about the response, sometimes you don't, sometimes
 it might make more sense to imperatively use the mutations' result.
 
-To support all these use cases `urql`'s `<Mutation>` component
-is quite flexible. The render prop API passes down an object that
-contains the `executeMutation` method that accepts variables
-as its first argument. When called it will return a Promise with
+To support all these use cases `urql`'s `useMutation` hook
+is quite flexible. The return value has object that
+contains the `executeMutation` method that accepts `variables`
+as its first argument. When called it will return a `Promise` with
 the mutations result.
 
-However, the render prop API will expose the result as well, like
-the `<Query>` component exposes it, with a `fetching`, `data`,
+However, the `useMutation` hook will expose the result as well, like
+the `useQuery` hook exposes it, with a `fetching`, `data`,
 and an `error` property.
 
 Here's an example of an imperative use case where we create a todo.
 
 ```js
 import React, { Component } from 'react';
-import { Mutation } from 'urql';
-
-const addTodo = `
-  mutation AddTodo($text: String!) {
-    addTodo(text: $text) {
-      id
-      text
-    }
-  }
-`;
-
-class TodoForm extends Component {
-  state = {
-    error: null,
-  };
-
-  add = () => {
-    this.props.addTodo({ text: 'something!' }).catch(error => {
-      this.setState({ error });
-    });
-  };
-
-  render() {
-    if (this.state.error) {
-      return 'Oh no!';
-    }
-
-    return <button onClick={this.add}>Add something!</button>;
-  }
-}
-
-const WithMutation = () => (
-  <Mutation query={addTodo}>
-    {({ executeMutation }) => <TodoForm addTodo={executeMutation} />}
-  </Mutation>
-);
-```
-
-In this example, when the button is clicked, the component will call
-the passed in `executeMutation` method, i.e. the `addTodo` prop.
-When an error occurs it changes it states to reflect that in the UI
-and it displays an error message.
-
-While this is a common use case, `urql` offers an alternative
-approach to this, by using the result directly from the render props.
-So let's look at another example.
-
-```js
-import React, { Component } from 'react';
-import { Mutation } from 'urql';
-
-const addTodo = /* ... */;
-
-class TodoForm extends Component {
-  add = () => this.props.addTodo({ text: 'something!' });
-
-  render() {
-    if (this.props.error) {
-      return 'Oh no!';
-    }
-
-    return <button onClick={this.add}>Add something!</button>
-  }
-}
-
-const WithMutation = () => (
-  <Mutation query={addTodo}>
-    {({ error, executeMutation }) => <TodoForm error={error} addTodo={executeMutation} />}
-  </Mutation>
-);
-```
-
-This example looks very similar, but as we can see there's sometimes
-no need to maintain state to handle a mutation's result, when it's
-not used as a fire-and-forget.
-
-### Using hooks
-
-> _Note:_ Hooks are only available in React 16.8 and onwards
-
-Like the `<Query>` component the `<Mutation>` component has an alternative hook
-that can be used instead, which is the `useMutation()` hook.
-
-We can rewrite the second example from above as follows.
-
-```jsx
-import React, { useCallback } from 'react';
 import { useMutation } from 'urql';
 
 const addTodo = `
@@ -330,23 +193,34 @@ const addTodo = `
 `;
 
 const TodoForm = () => {
-  const [res, executeMutation] = useMutation(addTodo);
-
-  if (res.error) {
+  const [addTodoResult, addTodo] = useMutation(addTodo);
+  if (addTodoResult.error) {
     return 'Oh no!';
   }
 
+  const add = () => {
+    addTodo({ text: 'learn urql' })
+      .then(result => {
+        // You can do something here or use the result object on the useMutation
+      })
+      .catch(error => {
+        // You can do something here if it throws
+      })
+  }
+
   return (
-    <button onClick={() => executeMutation({ text: 'something!' })}>
+    <button onClick={add}>
       Add something!
-    </button>
+    </button>;
   );
-};
+}
 ```
 
-This is functionally the same as the second example, but `executeMutation`
-also returns a promise with `useMutation` as it does with `<Mutation>` so
-the first example could also be written using hooks.
+When using the `useMutation` hook we have the choice to use `.catch` or `.then`
+to manually look at our result or we can use the second argument to look at what
+the API has returned for said mutation.
+
+This `executeQuery` method accepts a second argument which is the [OperationContext](<./api.md#OperationContext(type)>)
 
 > A tutorial on the `useMutation` hook is also available as a
 > [screencast on egghead](https://egghead.io/lessons/graphql-write-a-graphql-mutation-using-react-hooks-with-urql?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5).
@@ -368,7 +242,8 @@ data from the GraphQL API and skip the cache, if we need fresh data.
 The easiest way to always display up-to-date data is to set the `requestPolicy`
 to `'cache-and-network'`. Using this policy `urql` will first return a cached
 result if it has one, and subsequently it will send a new request to the API
-to get the up-to-date result.
+to get the up-to-date result. When `urql` is refreshing data in the background
+due to `cache-and-network` your result will also carry `stale: true` on its payload.
 
 A `requestPolicy` can be passed as a prop:
 
@@ -396,8 +271,8 @@ imperatively. In our previous example this would come in handy to refresh the
 list of todos.
 
 ```jsx
-import React from "react";
-import { Query } from "urql";
+import React from 'react';
+import { useQuery } from 'urql';
 
 const getTodos = `
   query GetTodos {
@@ -409,75 +284,23 @@ const getTodos = `
   }
 `;
 
-const TodoList = () => (
-  <Query query={getTodos}>
-    {({ executeQuery, data }) => {
-      if (!data) {
-        return null;
-      }
-
-      return (
-        <div>
-          <ul>
-            {data.todos.map(({ id, text }) => (
-              <li key={id}>{text}</li>
-            ))}
-          </ul>
-
-          <button
-            onClick={() => executeQuery({ requestPolicy: 'network-only' })}
-          >
-            Refresh
-          </button>
-        </div>
-      );
-    }}
-  </Query>;
-);
-```
-
-As can be seen, the `<Query>` render props also expose an `executeQuery` method, which
-isn't unlike the `<Mutation>` component's `executeMutation` method.
-
-We can call this method to rerun the query and pass it a `requestPolicy` different. In this
-case we'll pass `'network-only'` which will skip the cache and make sure we actually refresh
-our todo list.
-
-The same example can again also be implemented using hooks:
-
-```jsx
-import React from 'react';
-import { useQuery } from 'urql';
-
-const getTodos = `
-  query GetTodos($limit: Int!) {
-    todos(limit: $limit) {
-      id
-      text
-      isDone
-    }
-  }
-`;
-
 const TodoList = ({ limit = 10 }) => {
-  const [res, executeQuery] = useQuery({
+  const [{ fetching, data, error, extensions }, executeQuery] = useQuery({
     query: getTodos,
-    variables: { limit }
+    variables: { limit },
   });
 
-  if (!res.data) {
-    return null;
-  }
+  if (fetching) return 'Loading...';
+  if (error) return 'Oh no!';
 
   return (
     <div>
       <ul>
-        {res.data.todos.map(({ id, text }) => (
+        {data.todos.map(({ id, text }) => (
           <li key={id}>{text}</li>
         ))}
       </ul>
-
-      <button onClick={() => executeQuery({ requestPolicy: 'network-only' })}
+      <button onClick={() => executeQuery({ requestPolicy: 'network-only' })}>
         Refresh
       </button>
     </div>
@@ -485,7 +308,50 @@ const TodoList = ({ limit = 10 }) => {
 };
 ```
 
-Which again looks a lot like `useMutation`'s tuple that contains the `executeMutation` function.
+As can be seen, the `useQuery` hook also expose an `executeQuery` method, which
+isn't unlike the `useMutation` hook with its `executeMutation` method.
+
+We can call this method to rerun the query and pass it a `requestPolicy` different. In this
+case we'll pass `'network-only'` which will skip the cache and make sure we actually refresh
+our todo list.
+
+This `executeQuery` method accepts everything that's available on an [OperationContext](<./api.md#OperationContext(type)>)
+
+## Pausing queries
+
+Let's say our query needs a `userId` to correctly execute our query, we don't want to dispatch
+the query to receive an error in this scenario we can avoid.
+
+```jsx
+import React from 'react';
+import { useQuery } from 'urql';
+
+const getUser = `
+  query getUser (id: $id) {
+    user(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+const Profile = ({ userId }) => {
+  const [{ data, fetching, error }] = useQuery({
+    query: getUser,
+    variables: { id: userid },
+    pause: !userId,
+  });
+
+  if (!userId) return 'Please select a "userId".';
+  if (fetching) return 'Loading...';
+  if (error) return 'Oh no!';
+
+  return <p>Welcome {data.user.me}</p>;
+};
+```
+
+When the user now selects a userId pause will evaluate to `false` and
+the query will be executed with the new variable.
 
 ## Polling
 

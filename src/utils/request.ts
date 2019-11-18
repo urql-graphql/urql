@@ -1,6 +1,6 @@
 import { DocumentNode, parse, print } from 'graphql';
 import { hash, phash } from './hash';
-import stringify from 'fast-json-stable-stringify';
+import { stringifyVariables } from './stringifyVariables';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
 
 interface Documents {
@@ -33,7 +33,7 @@ export const createRequest = (
   (query as any)[keyProp] = key;
 
   return {
-    key: vars ? phash(key, stringify(vars)) >>> 0 : key,
+    key: vars ? phash(key, stringifyVariables(vars)) >>> 0 : key,
     query,
     variables: vars || {},
   };

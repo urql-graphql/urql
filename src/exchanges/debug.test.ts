@@ -39,3 +39,23 @@ it('forwards query operations correctly', async () => {
   // eslint-disable-next-line no-console
   expect(console.log).toBeCalledTimes(2);
 });
+
+describe('production', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'production';
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = 'test';
+  });
+
+  it('is a noop in production', () => {
+    const [ops$] = input;
+
+    debugExchange({
+      forward: ops => {
+        expect(ops).toBe(ops$);
+      },
+    } as any)(ops$);
+  });
+});

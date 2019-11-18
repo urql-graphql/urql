@@ -8,6 +8,10 @@ export { ExecutionResult } from 'graphql';
 /** Utility type to Omit keys from an interface/object type */
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
+export type PromisifiedSource<T = any> = Source<T> & {
+  toPromise: () => Promise<T>;
+};
+
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';
 
@@ -45,6 +49,7 @@ export interface OperationContext {
   url: string;
   pollInterval?: number;
   meta?: OperationDebugMeta;
+  suspense?: boolean;
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
@@ -63,6 +68,8 @@ export interface OperationResult<Data = any> {
   error?: CombinedError;
   /** Optional extensions return by the Graphql server. */
   extensions?: Record<string, any>;
+  /** Optional stale flag added by exchanges that return stale results. */
+  stale?: boolean;
 }
 
 /** Input parameters for to an Exchange factory function. */

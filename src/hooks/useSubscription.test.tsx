@@ -2,9 +2,9 @@
 jest.mock('../client', () => {
   const d = { data: 1234, error: 5678 };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { fromArray } = require('wonka');
+  const { merge, fromValue, never } = require('wonka');
   const mock = {
-    executeSubscription: jest.fn(() => fromArray([d])),
+    executeSubscription: jest.fn(() => merge([fromValue(d), never])),
   };
 
   return {
@@ -15,24 +15,27 @@ jest.mock('../client', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
+import { empty } from 'wonka';
 // @ts-ignore - data is imported from mock only
 import { createClient, data } from '../client';
-import { useSubscription } from './useSubscription';
+import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { OperationContext } from '../types';
 
 // @ts-ignore
 const client = createClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
-let state: any;
+
+let state: UseSubscriptionState<any> | undefined;
+let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
 const SubscriptionUser: FC<{
   q: string;
   handler?: (prev: any, data: any) => any;
   context?: Partial<OperationContext>;
-}> = ({ q, handler, context }) => {
-  const [s] = useSubscription({ query: q, context }, handler);
-  state = s;
-  return <p>{s.data}</p>;
+  pause?: boolean;
+}> = ({ q, handler, context, pause = false }) => {
+  [state, execute] = useSubscription({ query: q, context, pause }, handler);
+  return <p>{state.data}</p>;
 };
 
 beforeEach(() => {
@@ -49,18 +52,6 @@ describe('on initial useEffect', () => {
   it('executes subscription', () => {
     renderer.create(<SubscriptionUser q={query} />);
     expect(client.executeSubscription).toBeCalledTimes(1);
-  });
-
-  it('passes query to executeSubscription', () => {
-    renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toBeCalledWith(
-      {
-        key: expect.any(Number),
-        query: expect.any(Object),
-        variables: {},
-      },
-      expect.any(Object)
-    );
   });
 });
 
@@ -89,26 +80,12 @@ describe('on subscription', () => {
      * result of the state change.
      */
     wrapper.update(<SubscriptionUser q={query} />);
-    expect(state).toEqual({ ...data, fetching: true });
-  });
-});
-
-describe('on change', () => {
-  const qa = 'subscription NewSubA { exampleA }';
-  const qb = 'subscription NewSubB { exampleB }';
-
-  it('executes subscription', () => {
-    const wrapper = renderer.create(<SubscriptionUser q={query} />);
-
-    /**
-     * Have to call update twice for the change to be detected.
-     * Only a single change is detected (updating 5 times still only calls
-     * execute subscription twice).
-     */
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qa} />);
-    wrapper.update(<SubscriptionUser q={qb} />);
-    expect(client.executeSubscription).toBeCalledTimes(2);
+    expect(state).toEqual({
+      ...data,
+      extensions: undefined,
+      fetching: true,
+      stale: false,
+    });
   });
 });
 
@@ -120,4 +97,39 @@ it('calls handler', () => {
   wrapper.update(<SubscriptionUser q={query} handler={handler} />);
   expect(handler).toBeCalledTimes(1);
   expect(handler).toBeCalledWith(undefined, 1234);
+});
+
+describe('active teardown', () => {
+  it('sets fetching to false when the source ends', () => {
+    client.executeSubscription.mockReturnValueOnce(empty);
+    renderer.create(<SubscriptionUser q={query} />);
+    expect(client.executeSubscription).toHaveBeenCalled();
+    expect(state).toMatchObject({ fetching: false });
+  });
+});
+
+describe('execute subscription', () => {
+  it('triggers subscription execution', () => {
+    renderer.create(<SubscriptionUser q={query} />);
+    act(() => execute && execute());
+    expect(client.executeSubscription).toBeCalledTimes(2);
+  });
+});
+
+describe('pause', () => {
+  const props = { q: query };
+
+  it('skips executing the query if pause is true', () => {
+    renderer.create(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).not.toBeCalled();
+  });
+
+  it('skips executing queries if pause updates to true', () => {
+    const wrapper = renderer.create(<SubscriptionUser {...props} />);
+
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    wrapper.update(<SubscriptionUser {...props} pause={true} />);
+    expect(client.executeSubscription).toBeCalledTimes(1);
+    expect(state).toMatchObject({ fetching: false });
+  });
 });

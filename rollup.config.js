@@ -6,17 +6,15 @@ import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
+import transformPipe from './scripts/transform-pipe';
 
 const pkgInfo = require('./package.json');
-const external = ['dns', 'fs', 'path', 'url'];
 
-if (pkgInfo.peerDependencies) {
+let external = ['dns', 'fs', 'path', 'url'];
+if (pkgInfo.peerDependencies)
   external.push(...Object.keys(pkgInfo.peerDependencies));
-}
-
-if (pkgInfo.dependencies) {
+if (pkgInfo.dependencies)
   external.push(...Object.keys(pkgInfo.dependencies));
-}
 
 const externalPredicate = new RegExp(`^(${external.join('|')})($|/)`);
 const externalTest = id => {
@@ -119,8 +117,9 @@ const makePlugins = (isProduction = false) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
-      ['babel-plugin-closure-elimination', {}],
-      ['@babel/plugin-transform-object-assign', {}],
+      transformPipe,
+      'babel-plugin-closure-elimination',
+      '@babel/plugin-transform-object-assign',
       ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
         pragmaFrag: 'React.Fragment',

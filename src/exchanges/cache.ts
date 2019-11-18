@@ -57,25 +57,19 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
+        const result: OperationResult = {
+          ...cachedResult,
+          operation: addMetadata(operation, {
+            cacheOutcome: cachedResult ? 'hit' : 'miss',
+          }),
+        };
+
         if (operation.context.requestPolicy === 'cache-and-network') {
+          result.stale = true;
           reexecuteOperation(client, operation);
         }
 
-        if (cachedResult !== undefined) {
-          return {
-            ...cachedResult,
-            operation: addMetadata(cachedResult.operation, {
-              cacheOutcome: 'hit',
-            }),
-          };
-        }
-
-        return {
-          data: undefined,
-          error: undefined,
-          extensions: undefined,
-          operation: addMetadata(operation, { cacheOutcome: 'miss' }),
-        };
+        return result;
       })
     );
 
@@ -156,7 +150,7 @@ const afterQuery = (
 ) => (response: OperationResult) => {
   const { operation, data, error } = response;
 
-  if (data === undefined) {
+  if (data === undefined || data === null) {
     return;
   }
 

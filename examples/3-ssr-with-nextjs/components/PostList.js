@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import ErrorMessage from './ErrorMessage';
 import PostUpvoter from './PostUpvoter';
 
-const allPostsQuery = gql`
+export const allPostsQuery = gql`
   query allPosts($first: Int!, $skip: Int!) {
     allPosts(orderBy: createdAt_DESC, first: $first, skip: $skip) {
       id
@@ -18,7 +18,7 @@ const allPostsQuery = gql`
   }
 `;
 
-const allPostsQueryVars = {
+export const allPostsQueryVars = {
   skip: 0,
   first: 10,
 };
@@ -31,7 +31,7 @@ export default function PostList() {
 
   if (allPostsResult.error) {
     return <ErrorMessage message="Error loading posts." />;
-  } else if (allPostsResult.loading || !allPostsResult.data) {
+  } else if (allPostsResult.fetching || !allPostsResult.data) {
     return <div>Loading</div>;
   }
 
