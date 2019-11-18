@@ -6,11 +6,10 @@ import {
   visitWithTypeInfo,
   TypeInfo,
   FragmentDefinitionNode,
-  print,
 } from 'graphql';
 import { visit } from 'graphql';
 
-type TypeFragmentMap<T extends string = string> = Record<string, string[]> & {
+type TypeFragmentMap<T extends string = string> = Record<T, string[]> & {
   _fragments?: FragmentDefinitionNode[];
 };
 
@@ -81,7 +80,7 @@ export const makeFragmentsFromQuery = ({
   visit(
     query,
     visitWithTypeInfo(typeInfo, {
-      Field: (node, key, parent, path) => {
+      Field: node => {
         if (!node.selectionSet) {
           return undefined;
         }
@@ -138,12 +137,8 @@ export const addFragmentsToQuery = ({
             return;
           }
 
-          console.log(schema);
-          console.log(typeInfo.getType());
           const t = typeInfo.getType() as any;
           const type = t.ofType || t.toString();
-
-          console.log(type, fragmentMap);
 
           return {
             ...node,
@@ -177,8 +172,6 @@ export const addFragmentsToQuery = ({
       },
     })
   );
-
-  console.log(print(v));
 
   return v;
 };
