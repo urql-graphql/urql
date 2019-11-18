@@ -209,6 +209,14 @@ Internally they then create an `Operation` and call `.executeRequestOperation()`
 the `Operation`. This then returns a `Source<OperationResult>`, i.e. a stream of
 `OperationResult`s.
 
+#### .query and .mutation
+
+These two methods accept a `query`, `variables` and a `context`, these two methods
+are really similar to the above in the sense that they return you a `Source<OperationResult>`
+you can subscribe to. The difference is that this returned value has a method on it called
+`toPromise`, when invoked it will convert the `Source` to a one-time promise. These methods
+are ideal for SSR, like for example the `getInitialProps` method in [Next.js](https://nextjs.org/).
+
 #### .executeRequestOperation()
 
 This method accepts an `Operation` and handles the flow of said `Operation`. Every `Operation`

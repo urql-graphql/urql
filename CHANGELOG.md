@@ -8,6 +8,81 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.6.3](https://github.com/FormidableLabs/urql/compare/v1.6.2...v1.6.3)
+
+- Fix suspense-mode being erroneously activated when using `client.query()` (see [#466](https://github.com/FormidableLabs/react-ssr-prepass/pull/21))
+
+## [v1.6.2](https://github.com/FormidableLabs/urql/compare/v1.6.1...v1.6.2)
+
+This fixes a potentially critical bug, where a component would enter an infinite rerender loop,
+when another hook triggers an update. This may happen when multiple `useQuery` hooks are used in
+a single component or when another state hook triggers a synchronous update.
+
+- Add generic type-parameter to `client.query` and `client.mutation`, by [@ctrlplusb](https://github.com/ctrlplusb) (see [#456](https://github.com/FormidableLabs/urql/pull/456))
+- ⚠️ Fix `useQuery` entering an infinite loop during SSR when an update is triggered (see [#459](https://github.com/FormidableLabs/urql/pull/459))
+
+## [v1.6.1](https://github.com/FormidableLabs/urql/compare/v1.6.0...v1.6.1)
+
+- Fix hook updates not being propagated to potential context providers (see [#451](https://github.com/FormidableLabs/urql/pull/451))
+
+## [v1.6.0](https://github.com/FormidableLabs/urql/compare/v1.5.1...v1.6.0)
+
+This release comes with stability improvements for the `useQuery` and `useSubscription` hooks
+when using suspense and concurrent mode. They should behave the same as before under normal
+circumstances and continue to deliver the correct state on initial mount and updates.
+The `useQuery` hook may however now trigger suspense updates when its inputs are changing,
+as it should, instead of erroneously throwing a promise in `useEffect`.
+
+The added `stale: boolean` flag on the hooks indicates whether a result is "stale".
+`useQuery` will expose `stale: true` on results that are cached but will be updated
+due to the use of `cache-and-network`.
+
+We've also made some changes so that `client.query()` won't throw a promise, when suspense
+mode is activated.
+
+- ✨ Add `stale` flag to `OperationResult` and hook results (see [#449](https://github.com/FormidableLabs/urql/pull/449))
+- Replace `useImmeditateEffect` and `useImmediateState` with `react-wonka` derived state and effect (see [#447](https://github.com/FormidableLabs/urql/pull/447))
+- Add (internal) `suspense` flag to `OperationContext`
+
+## [v1.5.1](https://github.com/FormidableLabs/urql/compare/v1.5.0...v1.5.1)
+
+- Replace `fast-json-stable-stringify` with embedded code (see [#426](https://github.com/FormidableLabs/urql/pull/426))
+- ⚠ Prevent caching `null` data (see [#437](https://github.com/FormidableLabs/urql/pull/437))
+
+## [v1.5.0](https://github.com/FormidableLabs/urql/compare/v1.4.1...v1.5.0)
+
+This release finally adds shortcuts to imperatively make queries and mutations.
+They make it easier to quickly use the client programmatically, either with
+a Wonka source-based or Promise-based call.
+
+```js
+// Call .query or .mutation which return Source<OperationResult>
+const source = client.query(doc, vars);
+const source = client.mutation(doc, vars);
+// Call .toPromise() on the source to get Promise<OperationResult>
+const promise = client.query(doc, vars).toPromise();
+const promise = client.mutation(doc, vars).toPromise();
+```
+
+This version also adds a `useClient` hook as a shortcut for `useContext(Context)`.
+We provide a default client that makes requests to `/graphql`. Since that has
+confused users before, we now log a warning, when it's used.
+
+- ✨ Implement `client.query()` and `client.mutation()` (see [#405](https://github.com/FormidableLabs/urql/pull/405))
+- Fix `useImmediateEffect` for concurrent mode (see [#418](https://github.com/FormidableLabs/urql/pull/418))
+- Deconstruct `Wonka.pipe` using a Babel transform (see [#419](https://github.com/FormidableLabs/urql/pull/419))
+- ⚠ Add `useClient` hook and warning when default client is used (see [#420](https://github.com/FormidableLabs/urql/pull/420))
+
+## [v1.4.1](https://github.com/FormidableLabs/urql/compare/v1.4.0...v1.4.1)
+
+This release adds "active teardowns" for operations, which means that an exchange can now send a teardown to cancel ongoing operations. The `subscriptionsExchange` for instance now ends ongoing subscriptions proactively if the server says that they've completed! This is also reflected as `fetching: false` in the `useQuery` and `useSubscription` hook.
+
+We've also fixed a small issue with suspense and added all features from `useQuery` to `useSubscription`! This includes the `pause` argument and an `executeSubscription` function.
+
+- ✨ Implement active teardowns and add missing features to `useSubscription` (see [#410](https://github.com/FormidableLabs/urql/pull/410))
+- Fix `UseMutationResponse` TypeScript type, by [@jbugman](https://github.com/jbugman) (see [#412](https://github.com/FormidableLabs/urql/pull/412))
+- Exclude subscriptions from suspense source (see [#415](https://github.com/FormidableLabs/urql/pull/415))
+
 ## [v1.4.0](https://github.com/FormidableLabs/urql/compare/v1.3.0...v1.4.0)
 
 This release removes all metadata for the `@urql/devtools` extension from the core

@@ -8,6 +8,7 @@ import {
   share,
   Source,
   take,
+  takeUntil,
   merge,
   interval,
   fromValue,
@@ -28,9 +29,11 @@ import {
   OperationResult,
   OperationType,
   RequestPolicy,
+  PromisifiedSource,
 } from './types';
 
-import { toSuspenseSource } from './utils';
+import { createRequest, toSuspenseSource, withPromise } from './utils';
+import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -179,13 +182,23 @@ export class Client {
       );
     }
 
+    const teardown$ = pipe(
+      this.operations$,
+      filter(op => op.operationName === 'teardown' && op.key === key)
+    );
+
     const result$ = pipe(
       operationResults$,
+      takeUntil(teardown$),
       onStart<OperationResult>(() => this.onOperationStart(operation)),
       onEnd<OperationResult>(() => this.onOperationEnd(operation))
     );
 
-    return this.suspense ? toSuspenseSource(result$) : result$;
+    return operation.context.suspense !== false &&
+      this.suspense &&
+      operationName === 'query'
+      ? toSuspenseSource(result$)
+      : result$;
   }
 
   reexecuteOperation = (operation: Operation) => {
@@ -196,10 +209,24 @@ export class Client {
     }
   };
 
-  executeQuery = (
+  query<Data = any, Variables extends object = {}>(
+    query: DocumentNode | string,
+    variables?: Variables,
+    context?: Partial<OperationContext>
+  ): PromisifiedSource<OperationResult<Data>> {
+    if (!context || typeof context.suspense !== 'boolean') {
+      context = { ...context, suspense: false };
+    }
+
+    return withPromise<OperationResult<Data>>(
+      this.executeQuery(createRequest(query, variables), context)
+    );
+  }
+
+  executeQuery = <Data = any>(
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult> => {
+  ): Source<OperationResult<Data>> => {
     const operation = this.createRequestOperation('query', query, opts);
     const response$ = this.executeRequestOperation(operation);
     const { pollInterval } = operation.context;
@@ -209,9 +236,9 @@ export class Client {
         merge([fromValue(0), interval(pollInterval)]),
         switchMap(() => response$)
       );
-    } else {
-      return response$;
     }
+
+    return response$;
   };
 
   executeSubscription = (
@@ -222,10 +249,20 @@ export class Client {
     return this.executeRequestOperation(operation);
   };
 
-  executeMutation = (
+  mutation<Data = any, Variables extends object = {}>(
+    query: DocumentNode | string,
+    variables?: Variables,
+    context?: Partial<OperationContext>
+  ): PromisifiedSource<OperationResult<Data>> {
+    return withPromise<OperationResult<Data>>(
+      this.executeMutation(createRequest(query, variables), context)
+    );
+  }
+
+  executeMutation = <Data = any>(
     query: GraphQLRequest,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult> => {
+  ): Source<OperationResult<Data>> => {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };

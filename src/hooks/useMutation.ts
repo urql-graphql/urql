@@ -1,13 +1,13 @@
 import { DocumentNode } from 'graphql';
-import { useContext, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
-import { Context } from '../context';
+import { useClient } from '../context';
 import { OperationResult, OperationContext } from '../types';
 import { CombinedError, createRequest } from '../utils';
-import { useImmediateState } from './useImmediateState';
 
 export interface UseMutationState<T> {
   fetching: boolean;
+  stale: boolean;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -15,15 +15,20 @@ export interface UseMutationState<T> {
 
 export type UseMutationResponse<T, V> = [
   UseMutationState<T>,
-  (variables?: V) => Promise<OperationResult<T>>
+  (
+    variables?: V,
+    context?: Partial<OperationContext>
+  ) => Promise<OperationResult<T>>
 ];
 
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
-  const client = useContext(Context);
-  const [state, setState] = useImmediateState<UseMutationState<T>>({
+  const client = useClient();
+
+  const [state, setState] = useState<UseMutationState<T>>({
     fetching: false,
+    stale: false,
     error: undefined,
     data: undefined,
     extensions: undefined,
@@ -33,6 +38,7 @@ export const useMutation = <T = any, V = object>(
     (variables?: V, context?: Partial<OperationContext>) => {
       setState({
         fetching: true,
+        stale: false,
         error: undefined,
         data: undefined,
         extensions: undefined,
@@ -44,8 +50,8 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
-        const { data, error, extensions } = result;
-        setState({ fetching: false, data, error, extensions });
+        const { stale, data, error, extensions } = result;
+        setState({ fetching: false, stale: !!stale, data, error, extensions });
         return result;
       });
     },

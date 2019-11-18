@@ -3,7 +3,8 @@ import { queryGql } from '../test-utils';
 import { useRequest } from './useRequest';
 
 it('preserves instance of request when key has not changed', () => {
-  let { query, variables } = queryGql;
+  const { query } = queryGql;
+  let { variables } = queryGql;
 
   const { result, rerender } = renderHook(
     ({ query, variables }) => useRequest(query, variables),

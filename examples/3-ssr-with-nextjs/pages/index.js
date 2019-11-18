@@ -1,12 +1,24 @@
-import App from '../components/App';
+import React from 'react';
 import Submit from '../components/Submit';
-import PostList from '../components/PostList';
+import PostList, { allPostsQuery, allPostsQueryVars } from '../components/PostList';
+import withUrqlClient from '../src/with-urql-client';
+import initUrqlClient from '../src/init-urql-client';
 
 const Root = () => (
-  <App>
+  <>
     <Submit />
     <PostList />
-  </App>
+  </>
 );
 
-export default Root;
+Root.getInitialProps = async () => {
+  const [urqlClient] = initUrqlClient();
+  // Prefetch data
+  const { data } = await urqlClient
+    .query(allPostsQuery, allPostsQueryVars)
+    .toPromise();
+
+  return { posts: data.allPosts };
+}
+
+export default withUrqlClient(Root);

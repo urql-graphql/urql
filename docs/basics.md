@@ -170,6 +170,20 @@ other things yourself, if needed.
 
 [Read more about customizing `urql` in the "Extending & Experimenting" section.](https://formidable.com/open-source/urql/docs/extending-&-experimenting)
 
+## Suspense
+
+React has this neat feature called [`suspense`](https://reactjs.org/docs/code-splitting.html) which
+these days is used for `code-splitting` but it can be used for more. In our case when
+your query is fetching we can also utilise this `Suspense` boundary to transition
+into a loading state instead of you having to do this manually for every component.
+
+Enabling suspense can be done by going to your client and passing it the option `suspense: true`.
+Additionally, we'll need to add an [`exchange`](https://github.com/FormidableLabs/urql-exchange-suspense)
+to our client. This exchange will make `client.suspense` linear to `React.lazy` as we would
+expect.
+
+> Be careful when combining this with `ssr`, the next chapter will cover this.
+
 ## Server-side rendering
 
 Server-side rendering is a common method to reduce the time it takes for

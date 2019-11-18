@@ -14,14 +14,14 @@
     "trailingComma": "es5"
   },
   "dependencies": {
-    "graphql": "^14.1.1",
+    "graphql": "^14.5.3",
     "graphql-tag": "^2.10.1",
     "isomorphic-unfetch": "^3.0.0",
     "next": "latest",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-is": "^16.8.6",
-    "react-ssr-prepass": "1.0.5",
-    "styled-components": "^4.2.1"
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-is": "^16.9.0",
+    "react-ssr-prepass": "1.0.6",
+    "styled-components": "^4.3.2"
   }
 }
