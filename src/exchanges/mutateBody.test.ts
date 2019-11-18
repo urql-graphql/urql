@@ -47,9 +47,6 @@ const query = gql`
 const mutation = gql`
   mutation MyMutation {
     addTodo @populate
-    addTodo @populate {
-      id
-    }
   }
 `;
 
@@ -85,7 +82,16 @@ describe('getFragmentsFromResponse', () => {
     const r = makeFragmentsFromQuery({
       schema,
       query,
-      fragmentMap: { _fragments: [] },
+      fragmentMap: {
+        _fragments: [
+          gql`
+            fragment MyFragment on User {
+              id
+              name
+            }
+          `,
+        ],
+      },
     });
     // expect(r).toMatchInlineSnapshot(`
     //   Object {
@@ -115,11 +121,14 @@ describe('getFragmentsFromResponse', () => {
 
 describe('addFragmentsToQuery', () => {
   const fragmentMap = {
-    Todo: [
-      `{
-        id,
-        name
-      }`,
+    Todo: [query.definitions[0].selectionSet.selections[0].selectionSet],
+    _fragments: [
+      gql`
+        fragment MyFragment on User {
+          id
+          name
+        }
+      `,
     ],
   } as any;
 

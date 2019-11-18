@@ -90,7 +90,7 @@ export const makeFragmentsFromQuery = ({
         // @ts-ignore
         f = {
           ...f,
-          [t]: [...(f[t] || []), print(node.selectionSet)],
+          [t]: [...(f[t] || []), node.selectionSet],
         };
       },
       FragmentDefinition: node => {
@@ -117,7 +117,6 @@ export const addFragmentsToQuery = ({
   query,
   fragmentMap,
 }: AddFragmentsToQuery) => {
-  let newType: string;
   const typeInfo = new TypeInfo(buildClientSchema(schema));
 
   const x = visit(
@@ -135,10 +134,6 @@ export const addFragmentsToQuery = ({
 
           // @ts-ignore
           const type = typeInfo.getType().ofType;
-          newType = type;
-
-          console.log(node);
-          console.log(fragmentMap[type].map(t => gql`... on ${type} ${t}`));
 
           return {
             ...node,
@@ -147,8 +142,28 @@ export const addFragmentsToQuery = ({
             ),
             selectionSet: {
               kind: 'SelectionSet',
-              selections: fragmentMap[type].map(t => gql`... on ${type} ${t}`),
+              selections: fragmentMap[type].map(selectionSet => ({
+                kind: 'InlineFragment',
+                typeCondition: {
+                  kind: 'NamedType',
+                  // @ts-ignore
+                  name: { kind: 'Name', value: typeInfo.getType().ofType },
+                },
+                // @ts-ignore
+                selectionSet,
+              })),
             },
+          };
+        },
+      },
+      Document: {
+        leave: node => {
+          return {
+            ...node,
+            definitions: [
+              ...node.definitions,
+              ...(fragmentMap._fragments || []),
+            ],
           };
         },
       },
