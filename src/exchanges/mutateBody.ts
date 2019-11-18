@@ -1,18 +1,16 @@
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation } from '../types';
 import {
   DocumentNode,
-  print,
-  ASTNode,
   buildClientSchema,
   visitWithTypeInfo,
   TypeInfo,
   FragmentDefinitionNode,
+  GraphQLNonNull,
+  GraphQLNullableType,
+  print,
 } from 'graphql';
-import { parse, visit, NonNullTypeNode } from 'graphql';
-import { type } from 'os';
-import { object } from 'prop-types';
-import gql from 'graphql-tag';
+import { visit } from 'graphql';
 
 type TypeFragmentMap<T extends string = string> = Record<string, string[]> & {
   _fragments?: FragmentDefinitionNode[];
@@ -26,14 +24,17 @@ interface ExchangeArgs {
 export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
   forward,
 }) => {
-  let typeFragments: TypeFragmentMap = { _fragments: [] };
+  let fragmentMap: TypeFragmentMap = { _fragments: [] };
 
   const handleIncomingMutation = (op: Operation) => {
     if (op.operationName !== 'mutation') {
       return op;
     }
 
-    return;
+    return {
+      ...op,
+      query: addFragmentsToQuery({ schema, fragmentMap, query: op.query }),
+    };
   };
 
   const handleIncomingQuery = (op: Operation) => {
@@ -41,17 +42,20 @@ export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
       return;
     }
 
-    typeFragments = makeFragmentsFromQuery({
+    fragmentMap = makeFragmentsFromQuery({
       schema,
       query: op.query,
-      fragmentMap: typeFragments,
+      fragmentMap: fragmentMap,
     });
+
+    console.log(fragmentMap);
   };
 
   return ops$ => {
     return pipe(
       ops$,
       tap(handleIncomingQuery),
+      map(handleIncomingMutation),
       forward
     );
   };
@@ -119,7 +123,7 @@ export const addFragmentsToQuery = ({
 }: AddFragmentsToQuery) => {
   const typeInfo = new TypeInfo(buildClientSchema(schema));
 
-  const x = visit(
+  const v = visit(
     query,
     visitWithTypeInfo(typeInfo, {
       Field: {
@@ -132,8 +136,12 @@ export const addFragmentsToQuery = ({
             return;
           }
 
-          // @ts-ignore
-          const type = typeInfo.getType().ofType;
+          console.log(schema);
+          console.log(typeInfo.getType());
+          const t = typeInfo.getType() as any;
+          const type = t.ofType || t.toString();
+
+          console.log(type, fragmentMap);
 
           return {
             ...node,
@@ -142,14 +150,12 @@ export const addFragmentsToQuery = ({
             ),
             selectionSet: {
               kind: 'SelectionSet',
-              selections: fragmentMap[type].map(selectionSet => ({
+              selections: (fragmentMap[type] || []).map(selectionSet => ({
                 kind: 'InlineFragment',
                 typeCondition: {
                   kind: 'NamedType',
-                  // @ts-ignore
-                  name: { kind: 'Name', value: typeInfo.getType().ofType },
+                  name: { kind: 'Name', value: type },
                 },
-                // @ts-ignore
                 selectionSet,
               })),
             },
@@ -170,5 +176,7 @@ export const addFragmentsToQuery = ({
     })
   );
 
-  console.log(print(x));
+  console.log(print(v));
+
+  return v;
 };

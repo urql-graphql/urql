@@ -6,7 +6,7 @@ export { dedupExchange } from './dedup';
 export { fetchExchange } from './fetch';
 export { fallbackExchangeIO } from './fallback';
 export { composeExchanges } from './compose';
-
+export { mutateBodyExchange } from './mutateBody';
 import { cacheExchange } from './cache';
 import { dedupExchange } from './dedup';
 import { fetchExchange } from './fetch';
