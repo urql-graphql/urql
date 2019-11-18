@@ -6,8 +6,6 @@ import {
   visitWithTypeInfo,
   TypeInfo,
   FragmentDefinitionNode,
-  GraphQLNonNull,
-  GraphQLNullableType,
   print,
 } from 'graphql';
 import { visit } from 'graphql';
@@ -24,6 +22,7 @@ interface ExchangeArgs {
 export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
   forward,
 }) => {
+  let parsedKeys: Record<string, boolean | undefined> = {};
   let fragmentMap: TypeFragmentMap = { _fragments: [] };
 
   const handleIncomingMutation = (op: Operation) => {
@@ -38,17 +37,20 @@ export const mutateBodyExchange = ({ schema }: ExchangeArgs): Exchange => ({
   };
 
   const handleIncomingQuery = (op: Operation) => {
-    if (op.operationName !== 'query') {
+    if (op.operationName !== 'query' || parsedKeys[op.key]) {
       return;
     }
+
+    parsedKeys = {
+      ...parsedKeys,
+      [op.key]: true,
+    };
 
     fragmentMap = makeFragmentsFromQuery({
       schema,
       query: op.query,
       fragmentMap: fragmentMap,
     });
-
-    console.log(fragmentMap);
   };
 
   return ops$ => {
