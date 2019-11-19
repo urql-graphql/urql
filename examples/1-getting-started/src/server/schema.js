@@ -21,18 +21,20 @@ const store = {
 };
 
 const typeDefs = `
+  type Todo {
+    id: ID
+    text: String
+    complete: Boolean
+  }
+
   type Query {
     todos: [Todo]
   }
+
   type Mutation {
     toggleTodo(id: ID!): Todo
     addTodo(text: String!): Todo
     deleteTodo(id: ID!): Todo
-  }
-  type Todo {
-    id: ID,
-    text: String,
-    complete: Boolean,
   }
 `;
 

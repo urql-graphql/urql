@@ -246,12 +246,12 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@urql/devtools@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@urql/devtools/-/devtools-0.0.3.tgz#55d88a4ef3aa1585242ea62b3bae5b0f5e1c0bc0"
-  integrity sha512-gHBYgJavlfObYKJchvJD7iQuWfO/mzM+rZZCovb+Rqvlu3uOxgOr2ek1Ogk0QaT123OSdD4GNozQe5deT6UKPg==
+"@urql/devtools@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@urql/devtools/-/devtools-0.1.0.tgz#68c8edbbea24af7bfd5c1ad280a3d5dc61579276"
+  integrity sha512-zqE+UBtjqrs8VM1kBxqr3xRdBfejifIIctzXDzJi7JEX35oLMtTBV44FBgdcXLTJjZtUHyL4zT1xQ99IsSuYDg==
   dependencies:
-    wonka "^3.2.0"
+    wonka "^3.2.1"
 
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
@@ -4007,6 +4007,11 @@ react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.1.tgz#a80141e246eb894824fb4f2901c0c50ef31d4cdb"
   integrity sha512-ioMCzVDWvCvKD8eeT+iukyWrBGrA3DiFYkXfBsVYIRdaREZuBjENG+KjrikavCLasozqRWTwFUagU/O4vPpRMA==
 
+react-wonka@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-1.0.3.tgz#2d997403be347489e1161cb58d502ac683499847"
+  integrity sha512-7ocCcMnSxc7zD06V6H2Er4PJNbHQL2bityy6aZPrsn2JqJSP4SEkCzdvCk+nQVKDDqO8Lk5L5F9GG7PUB8gGsA==
+
 react@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
@@ -5173,11 +5178,6 @@ wide-align@^1.1.0:
   integrity sha512-QGkOQc8XL6Bt5PwnsExKBPuMKBxnGxWWW3fU55Xt4feHozMUhdUMaBCk290qpm/wG5u/RSKzwdAC4i51YigihA==
   dependencies:
     string-width "^1.0.2 || 2"
-
-wonka@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.0.tgz#40b9ce8e0c375127437661290e98e5d9e5278440"
-  integrity sha512-sHCLouGzTclUlp1sdXAhuTqGMIoAQfpBit9puepaINPVqDBRtC8DPWtTUHC0DJIdFSO+DsO86AFBFCDor7Sn0g==
 
 wonka@^3.2.1:
   version "3.2.1"
