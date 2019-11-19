@@ -16,48 +16,67 @@ export const populateExchange = ({
   schema: ogSchema,
 }: ExchangeArgs): Exchange => ({ forward }) => {
   const schema = buildClientSchema(ogSchema);
-  let parsedKeys: Record<string, boolean | undefined> = {};
+  let parsedOperations: Record<string, boolean | undefined> = {};
+  let activeOperations: Record<string, boolean | undefined> = {};
   let fragments: UserFragmentMap = {};
   let selections: TypeSelectionMap = {};
 
+  /** Handle query and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
     if (op.operationName !== 'mutation') {
       return op;
     }
 
+    const activeSelections = Object.entries(selections).reduce(
+      (state, [key, value]) => ({
+        ...state,
+        [key]: value.filter(s => activeOperations[s.key]),
+      }),
+      selections
+    );
+
     return {
       ...op,
       query: addFragmentsToQuery({
         schema,
-        selections,
+        selections: activeSelections,
         fragments,
         query: op.query,
       }),
     };
   };
 
+  /** Handle query and extract fragments. */
   const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
-    if (operationName !== 'query' || parsedKeys[key]) {
+    if (operationName !== 'query' || parsedOperations[key]) {
       return;
     }
 
-    parsedKeys = {
-      ...parsedKeys,
-      [key]: true,
-    };
+    parsedOperations = addKey(parsedOperations, key);
+    activeOperations = addKey(activeOperations, key);
 
     const {
       fragments: newFragments,
       selections: newSelections,
-    } = makeFragmentsFromQuery({ schema, query });
+    } = makeFragmentsFromQuery({
+      schema,
+      query,
+    });
 
     fragments = newFragments.reduce(
-      (state, fragment) => ({ ...state, [fragment.name.value]: fragment }),
+      (state, fragment) => ({
+        ...state,
+        [fragment.name.value]: fragment,
+      }),
       fragments
     );
 
     selections = newSelections.reduce((state, { selection, type }) => {
-      const entry = { key, selection, type };
+      const entry = {
+        key,
+        selection,
+        type,
+      };
       return {
         ...state,
         [type]: state[type] ? [...state[type], entry] : [entry],
@@ -65,9 +84,18 @@ export const populateExchange = ({
     }, selections);
   };
 
+  const handleIncomingTeardown = ({ key, operationName }: Operation) => {
+    if (operationName !== 'teardown') {
+      return;
+    }
+
+    activeOperations = removeKey(activeOperations, key);
+  };
+
   return ops$ => {
     return pipe(
       ops$,
+      tap(handleIncomingTeardown),
       tap(handleIncomingQuery),
       map(handleIncomingMutation),
       forward
@@ -205,3 +233,19 @@ export const addFragmentsToQuery = ({
     })
   );
 };
+
+const addKey = (
+  s: Record<string, boolean | undefined>,
+  key: number | string
+) => ({
+  ...s,
+  [key]: true,
+});
+
+const removeKey = (
+  s: Record<string, boolean | undefined>,
+  key: number | string
+) => ({
+  ...s,
+  [key]: false,
+});

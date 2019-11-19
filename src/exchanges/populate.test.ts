@@ -1,6 +1,5 @@
 import { makeFragmentsFromQuery, addFragmentsToQuery } from './populate';
 import {
-  introspectionFromSchema,
   buildSchema,
   print,
   FragmentDefinitionNode,
