@@ -342,3 +342,26 @@ it('embedded objects on entities', () => {
     },
   });
 });
+
+it('nested viewer selections', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        int
+        viewer {
+          __typename
+          int
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      int: 42,
+      viewer: {
+        __typename: 'Query',
+        int: 42,
+      },
+    },
+  });
+});

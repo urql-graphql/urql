@@ -164,8 +164,8 @@ export class Store implements Cache {
     const { __typename: typename, id, _id } = data;
     if (!typename) {
       return null;
-    } else if (this.rootNames[typename]) {
-      return this.rootNames[typename];
+    } else if (this.rootNames[typename] !== undefined) {
+      return typename;
     }
 
     let key: string | null | void;
