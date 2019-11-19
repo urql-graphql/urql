@@ -37,7 +37,7 @@ Object {
   ],
   "selections": Array [
     Object {
-      "selection": Object {
+      "selections": Object {
         "kind": "SelectionSet",
         "selections": Array [
           Object {
@@ -93,7 +93,7 @@ Object {
       "type": "Todo",
     },
     Object {
-      "selection": Object {
+      "selections": Object {
         "kind": "SelectionSet",
         "selections": Array [
           Object {

@@ -86,8 +86,11 @@ describe('addFragmentsToQuery', () => {
       Todo: [
         {
           key: 1234,
-          selection:
-            query.definitions[0].selectionSet.selections[0].selectionSet,
+          fragment: gql`
+            fragment Type_PopulateFragment_0 on Todo {
+              id
+            }
+          `.definitions[0],
           type: 'Todo',
         },
       ],
@@ -107,14 +110,12 @@ describe('addFragmentsToQuery', () => {
     expect(print(q)).toMatchInlineSnapshot(`
       "mutation MyMutation {
         addTodo {
-          ... on Todo {
-            id
-            name
-            creator {
-              id
-            }
-          }
+          ...Type_PopulateFragment_0
         }
+      }
+
+      fragment Type_PopulateFragment_0 on Todo {
+        id
       }
 
       fragment MyFragment on User {
@@ -146,15 +147,15 @@ describe('addFragmentsToQuery', () => {
     it('are added to query', () => {
       const r = addFragmentsToQuery(arg);
 
-      let selelctionSets: SelectionSetNode[] = [];
+      let addedFragments: FragmentDefinitionNode[] = [];
       visit(r, {
-        SelectionSet: node => {
-          selelctionSets = [...selelctionSets, node];
+        FragmentDefinition: node => {
+          addedFragments = [...addedFragments, node];
         },
       });
 
       expect(
-        selelctionSets.filter(s => s === arg.selections.Todo[0].selection)
+        addedFragments.filter(s => s === arg.selections.Todo[0].fragment)
       ).toHaveLength(1);
     });
   });

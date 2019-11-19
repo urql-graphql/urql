@@ -21,10 +21,14 @@ export const populateExchange = ({
   schema: ogSchema,
 }: ExchangeArgs): Exchange => ({ forward }) => {
   const schema = buildClientSchema(ogSchema);
+  /** List of operation keys that have already been parsed. */
   let parsedOperations: Record<string, boolean | undefined> = {};
+  /** List of operation keys that have not been torn down. */
   let activeOperations: Record<string, boolean | undefined> = {};
+  /** Collection of fragments used by the user. */
   let fragments: UserFragmentMap = {};
-  let selections: TypeSelectionMap = {};
+  /** Collection of type fragments. */
+  let selections: TypeFragmentMap = {};
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
@@ -77,15 +81,30 @@ export const populateExchange = ({
       fragments
     );
 
-    selections = newSelections.reduce((state, { selection, type }) => {
-      const entry = {
+    selections = newSelections.reduce((state, { selections, type }) => {
+      const current = state[type] || [];
+      const entry: TypeFragment = {
         key,
-        selection,
+        fragment: {
+          kind: 'FragmentDefinition',
+          typeCondition: {
+            kind: 'NamedType',
+            name: {
+              kind: 'Name',
+              value: type,
+            },
+          },
+          name: {
+            kind: 'Name',
+            value: `${type}_PopulateFragment_${current.length}`,
+          },
+          selectionSet: selections,
+        },
         type,
       };
       return {
         ...state,
-        [type]: state[type] ? [...state[type], entry] : [entry],
+        [type]: [...current, entry],
       };
     }, selections);
   };
@@ -114,16 +133,13 @@ type UserFragmentMap<T extends string = string> = Record<
   FragmentDefinitionNode
 >;
 
-type TypeSelectionMap<T extends string = string> = Record<
-  T,
-  UserSelectionSet[]
->;
+type TypeFragmentMap<T extends string = string> = Record<T, TypeFragment[]>;
 
-interface UserSelectionSet {
+interface TypeFragment {
   /** Operation key where selection set is being used. */
   key: number;
   /** Selection set. */
-  selection: SelectionSetNode;
+  fragment: FragmentDefinitionNode;
   /** Type of selection. */
   type: string;
 }
@@ -138,7 +154,7 @@ export const makeFragmentsFromQuery = ({
   schema,
   query,
 }: MakeFragmentsFromQueryArg) => {
-  let selections: Omit<UserSelectionSet, 'key'>[] = [];
+  let selections: { selections: SelectionSetNode; type: string }[] = [];
   let fragments: FragmentDefinitionNode[] = [];
   const typeInfo = new TypeInfo(schema);
 
@@ -150,8 +166,6 @@ export const makeFragmentsFromQuery = ({
           return undefined;
         }
 
-        console.log(typeInfo);
-
         // @ts-ignore
         const t = typeInfo.getType().ofType;
 
@@ -159,7 +173,10 @@ export const makeFragmentsFromQuery = ({
           return undefined;
         }
 
-        selections = [...selections, { selection: node.selectionSet, type: t }];
+        selections = [
+          ...selections,
+          { selections: node.selectionSet, type: t },
+        ];
       },
       FragmentDefinition: node => {
         fragments = [...fragments, node];
@@ -167,13 +184,13 @@ export const makeFragmentsFromQuery = ({
     })
   );
 
-  return { selections, fragments } as const;
+  return { selections, fragments };
 };
 
 interface AddFragmentsToQuery {
   schema: GraphQLSchema;
   query: DocumentNode;
-  selections: Record<string, Omit<UserSelectionSet, 'key'>[]>;
+  selections: Record<string, Omit<TypeFragment, 'key'>[]>;
   fragments: UserFragmentMap;
 }
 
@@ -184,6 +201,7 @@ export const addFragmentsToQuery = ({
   fragments,
 }: AddFragmentsToQuery) => {
   const typeInfo = new TypeInfo(schema);
+  let additionalFragments: Record<string, FragmentDefinitionNode> = {};
 
   return visit(
     query,
@@ -204,14 +222,21 @@ export const addFragmentsToQuery = ({
           const existingSelections =
             (node.selectionSet && node.selectionSet.selections) || [];
           const newSelections = selections[type]
-            ? selections[type].map(({ selection }) => ({
-                kind: 'InlineFragment',
-                typeCondition: {
-                  kind: 'NamedType',
-                  name: { kind: 'Name', value: type },
-                },
-                selectionSet: selection,
-              }))
+            ? selections[type].map(({ fragment }) => {
+                // Add fragment for Document node
+                additionalFragments = {
+                  ...additionalFragments,
+                  [fragment.name.value]: fragment,
+                };
+
+                return {
+                  kind: 'FragmentSpread',
+                  name: {
+                    kind: 'Name',
+                    value: fragment.name.value,
+                  },
+                };
+              })
             : [];
 
           return {
@@ -230,7 +255,11 @@ export const addFragmentsToQuery = ({
         leave: node => {
           return {
             ...node,
-            definitions: [...node.definitions, ...Object.values(fragments)],
+            definitions: [
+              ...node.definitions,
+              ...Object.values(additionalFragments),
+              ...Object.values(fragments),
+            ],
           };
         },
       },
