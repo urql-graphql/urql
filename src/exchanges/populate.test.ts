@@ -47,7 +47,7 @@ const query = gql`
   }
 `;
 
-const schema = introspectionFromSchema(buildSchema(schemaDef));
+const schema = buildSchema(schemaDef);
 
 describe('makeFragmentsFromQuery', () => {
   const arg = {

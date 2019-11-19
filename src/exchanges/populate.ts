@@ -7,13 +7,15 @@ import {
   TypeInfo,
   FragmentDefinitionNode,
   SelectionSetNode,
+  GraphQLSchema,
 } from 'graphql';
 import { visit } from 'graphql';
 
 /** An exchange for auto-populating mutations with a required response body. */
-export const populateExchange = ({ schema }: ExchangeArgs): Exchange => ({
-  forward,
-}) => {
+export const populateExchange = ({
+  schema: ogSchema,
+}: ExchangeArgs): Exchange => ({ forward }) => {
+  const schema = buildClientSchema(ogSchema);
   let parsedKeys: Record<string, boolean | undefined> = {};
   let fragments: UserFragmentMap = {};
   let selections: TypeSelectionMap = {};
@@ -97,7 +99,7 @@ interface ExchangeArgs {
 }
 
 interface MakeFragmentsFromQueryArg {
-  schema: any;
+  schema: GraphQLSchema;
   query: DocumentNode;
 }
 
@@ -108,8 +110,7 @@ export const makeFragmentsFromQuery = ({
 }: MakeFragmentsFromQueryArg) => {
   let selections: Omit<UserSelectionSet, 'key'>[] = [];
   let fragments: FragmentDefinitionNode[] = [];
-
-  const typeInfo = new TypeInfo(buildClientSchema(schema));
+  const typeInfo = new TypeInfo(schema);
 
   visit(
     query,
@@ -138,7 +139,7 @@ export const makeFragmentsFromQuery = ({
 };
 
 interface AddFragmentsToQuery {
-  schema: any;
+  schema: GraphQLSchema;
   query: DocumentNode;
   selections: Record<string, Omit<UserSelectionSet, 'key'>[]>;
   fragments: UserFragmentMap;
@@ -150,9 +151,9 @@ export const addFragmentsToQuery = ({
   selections,
   fragments,
 }: AddFragmentsToQuery) => {
-  const typeInfo = new TypeInfo(buildClientSchema(schema));
+  const typeInfo = new TypeInfo(schema);
 
-  const v = visit(
+  return visit(
     query,
     visitWithTypeInfo(typeInfo, {
       Field: {
@@ -203,6 +204,4 @@ export const addFragmentsToQuery = ({
       },
     })
   );
-
-  return v;
 };
