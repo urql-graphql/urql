@@ -26,9 +26,9 @@ export const populateExchange = ({
   /** List of operation keys that have not been torn down. */
   let activeOperations: Record<string, boolean | undefined> = {};
   /** Collection of fragments used by the user. */
-  let fragments: UserFragmentMap = {};
+  let userFragments: UserFragmentMap = {};
   /** Collection of type fragments. */
-  let selections: TypeFragmentMap = {};
+  let typeFragments: TypeFragmentMap = {};
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
@@ -36,20 +36,20 @@ export const populateExchange = ({
       return op;
     }
 
-    const activeSelections = Object.entries(selections).reduce(
+    const activeSelections = Object.entries(typeFragments).reduce(
       (state, [key, value]) => ({
         ...state,
         [key]: value.filter(s => activeOperations[s.key]),
       }),
-      selections
+      typeFragments
     );
 
     return {
       ...op,
       query: addFragmentsToQuery({
         schema,
-        selections: activeSelections,
-        fragments,
+        typeFragments: activeSelections,
+        userFragments: userFragments,
         query: op.query,
       }),
     };
@@ -68,20 +68,20 @@ export const populateExchange = ({
     const {
       fragments: newFragments,
       selections: newSelections,
-    } = makeFragmentsFromQuery({
+    } = extractSelectionsFromQuery({
       schema,
       query,
     });
 
-    fragments = newFragments.reduce(
+    userFragments = newFragments.reduce(
       (state, fragment) => ({
         ...state,
         [fragment.name.value]: fragment,
       }),
-      fragments
+      userFragments
     );
 
-    selections = newSelections.reduce((state, { selections, type }) => {
+    typeFragments = newSelections.reduce((state, { selections, type }) => {
       const current = state[type] || [];
       const entry: TypeFragment = {
         key,
@@ -106,7 +106,7 @@ export const populateExchange = ({
         ...state,
         [type]: [...current, entry],
       };
-    }, selections);
+    }, typeFragments);
   };
 
   const handleIncomingTeardown = ({ key, operationName }: Operation) => {
@@ -150,7 +150,7 @@ interface MakeFragmentsFromQueryArg {
 }
 
 /** Creates fragments object from query */
-export const makeFragmentsFromQuery = ({
+export const extractSelectionsFromQuery = ({
   schema,
   query,
 }: MakeFragmentsFromQueryArg) => {
@@ -166,17 +166,13 @@ export const makeFragmentsFromQuery = ({
           return undefined;
         }
 
-        // @ts-ignore
-        const t = typeInfo.getType().ofType;
+        const type = getType(typeInfo);
 
-        if (!t) {
+        if (!type) {
           return undefined;
         }
 
-        selections = [
-          ...selections,
-          { selections: node.selectionSet, type: t },
-        ];
+        selections = [...selections, { selections: node.selectionSet, type }];
       },
       FragmentDefinition: node => {
         fragments = [...fragments, node];
@@ -190,15 +186,15 @@ export const makeFragmentsFromQuery = ({
 interface AddFragmentsToQuery {
   schema: GraphQLSchema;
   query: DocumentNode;
-  selections: Record<string, Omit<TypeFragment, 'key'>[]>;
-  fragments: UserFragmentMap;
+  typeFragments: Record<string, Omit<TypeFragment, 'key'>[]>;
+  userFragments: UserFragmentMap;
 }
 
 export const addFragmentsToQuery = ({
   schema,
   query,
-  selections,
-  fragments,
+  typeFragments,
+  userFragments,
 }: AddFragmentsToQuery) => {
   const typeInfo = new TypeInfo(schema);
   let additionalFragments: Record<string, FragmentDefinitionNode> = {};
@@ -208,42 +204,40 @@ export const addFragmentsToQuery = ({
     visitWithTypeInfo(typeInfo, {
       Field: {
         enter: node => {
-          const directive =
-            node.directives &&
-            node.directives.find(d => d.name.value === 'populate');
-
-          if (!directive) {
+          if (
+            !node.directives ||
+            !node.directives.find(d => d.name.value === 'populate')
+          ) {
             return;
           }
 
-          const t = typeInfo.getType() as any;
-          const type = t.ofType || t.toString();
-
+          const type = getType(typeInfo);
+          const directives = node.directives.filter(
+            d => d.name.value !== 'populate'
+          );
           const existingSelections =
             (node.selectionSet && node.selectionSet.selections) || [];
-          const newSelections = selections[type]
-            ? selections[type].map(({ fragment }) => {
-                // Add fragment for Document node
-                additionalFragments = {
-                  ...additionalFragments,
-                  [fragment.name.value]: fragment,
-                };
+          const newSelections = (typeFragments[type] || []).map(
+            ({ fragment }) => {
+              // Add fragment for insertion at Document node
+              additionalFragments = {
+                ...additionalFragments,
+                [fragment.name.value]: fragment,
+              };
 
-                return {
-                  kind: 'FragmentSpread',
-                  name: {
-                    kind: 'Name',
-                    value: fragment.name.value,
-                  },
-                };
-              })
-            : [];
+              return {
+                kind: 'FragmentSpread',
+                name: {
+                  kind: 'Name',
+                  value: fragment.name.value,
+                },
+              };
+            }
+          );
 
           return {
             ...node,
-            directives: (node.directives as any).filter(
-              d => d.name.value !== 'populate'
-            ),
+            directives,
             selectionSet: {
               kind: 'SelectionSet',
               selections: [...newSelections, ...existingSelections],
@@ -258,7 +252,7 @@ export const addFragmentsToQuery = ({
             definitions: [
               ...node.definitions,
               ...Object.values(additionalFragments),
-              ...Object.values(fragments),
+              ...Object.values(userFragments),
             ],
           };
         },
@@ -282,3 +276,8 @@ const removeKey = (
   ...s,
   [key]: false,
 });
+
+const getType = (t: TypeInfo) => {
+  const type = t.getType() as any;
+  return type.ofType || type.toString();
+};

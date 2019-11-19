@@ -1,4 +1,4 @@
-import { makeFragmentsFromQuery, addFragmentsToQuery } from './populate';
+import { extractSelectionsFromQuery, addFragmentsToQuery } from './populate';
 import {
   buildSchema,
   print,
@@ -56,7 +56,7 @@ describe('makeFragmentsFromQuery', () => {
 
   describe('new selections', () => {
     it('are created', () => {
-      const r = makeFragmentsFromQuery(arg);
+      const r = extractSelectionsFromQuery(arg);
       expect(r.selections.length).toBe(2);
       expect(r).toMatchSnapshot();
     });
@@ -64,7 +64,7 @@ describe('makeFragmentsFromQuery', () => {
 
   describe('user declared fragments', () => {
     it('are extracted', () => {
-      const r = makeFragmentsFromQuery(arg);
+      const r = extractSelectionsFromQuery(arg);
       expect(
         r.fragments.filter(f => f.name.value === 'TodoFragment')
       ).toHaveLength(1);
@@ -82,7 +82,7 @@ describe('addFragmentsToQuery', () => {
   const arg = {
     schema,
     query: mutation,
-    selections: {
+    typeFragments: {
       Todo: [
         {
           key: 1234,
@@ -95,7 +95,7 @@ describe('addFragmentsToQuery', () => {
         },
       ],
     },
-    fragments: {
+    userFragments: {
       MyFragment: gql`
         fragment MyFragment on User {
           id
@@ -155,7 +155,7 @@ describe('addFragmentsToQuery', () => {
       });
 
       expect(
-        addedFragments.filter(s => s === arg.selections.Todo[0].fragment)
+        addedFragments.filter(s => s === arg.typeFragments.Todo[0].fragment)
       ).toHaveLength(1);
     });
   });
