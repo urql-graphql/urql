@@ -8,6 +8,10 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.2.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.0...v1.2.1)
+
+- Fix viewer fields (which return `Query` types) not being written or read correctl (see [#116](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/116))
+
 ## [v1.2.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.1.2...v1.2.0)
 
 - ⚠️ Fix unions not being checked supported by schema predicates, by [@StevenLangbroek](https://github.com/StevenLangbroek) (see [#113](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/113))
