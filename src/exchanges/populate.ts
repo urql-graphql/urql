@@ -212,11 +212,11 @@ export const addFragmentsToQuery = ({
           }
 
           const type = getType(typeInfo);
+
           const directives = node.directives.filter(
             d => d.name.value !== 'populate'
           );
-          const existingSelections =
-            (node.selectionSet && node.selectionSet.selections) || [];
+
           const newSelections = (typeFragments[type] || []).map(
             ({ fragment }) => {
               // Add fragment for insertion at Document node
@@ -235,12 +235,27 @@ export const addFragmentsToQuery = ({
             }
           );
 
+          const existingSelections =
+            (node.selectionSet && node.selectionSet.selections) || [];
+          const selections =
+            existingSelections.length + newSelections.length !== 0
+              ? [...newSelections, ...existingSelections]
+              : [
+                  {
+                    kind: 'Field',
+                    name: {
+                      kind: 'Name',
+                      value: '__typename',
+                    },
+                  },
+                ];
+
           return {
             ...node,
             directives,
             selectionSet: {
               kind: 'SelectionSet',
-              selections: [...newSelections, ...existingSelections],
+              selections,
             },
           };
         },

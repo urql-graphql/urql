@@ -143,7 +143,7 @@ describe('addFragmentsToQuery', () => {
     });
   });
 
-  describe('new selection sets', () => {
+  describe('new type fragments', () => {
     it('are added to query', () => {
       const r = addFragmentsToQuery(arg);
 
@@ -157,6 +157,25 @@ describe('addFragmentsToQuery', () => {
       expect(
         addedFragments.filter(s => s === arg.typeFragments.Todo[0].fragment)
       ).toHaveLength(1);
+    });
+
+    describe('on empty', () => {
+      it('typename is returned', () => {
+        const r = addFragmentsToQuery({ ...arg, typeFragments: {} });
+        expect(print(r)).toMatchInlineSnapshot(`
+          "mutation MyMutation {
+            addTodo {
+              __typename
+            }
+          }
+
+          fragment MyFragment on User {
+            id
+            name
+          }
+          "
+        `);
+      });
     });
   });
 });
