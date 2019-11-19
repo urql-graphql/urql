@@ -3,8 +3,8 @@ import {
   introspectionFromSchema,
   buildSchema,
   print,
-  visit,
   FragmentDefinitionNode,
+  visit,
   SelectionSetNode,
 } from 'graphql';
 import gql from 'graphql-tag';
@@ -53,22 +53,12 @@ describe('makeFragmentsFromQuery', () => {
   const arg = {
     schema,
     query,
-    fragmentMap: {
-      _fragments: [
-        gql`
-          fragment MyFragment on User {
-            id
-            name
-          }
-        `.definitions[0],
-      ],
-    },
   };
 
-  describe('new fragments', () => {
+  describe('new selections', () => {
     it('are created', () => {
       const r = makeFragmentsFromQuery(arg);
-      expect(r.Todo.length).toBe(1);
+      expect(r.selections.length).toBe(2);
       expect(r).toMatchSnapshot();
     });
   });
@@ -77,7 +67,7 @@ describe('makeFragmentsFromQuery', () => {
     it('are extracted', () => {
       const r = makeFragmentsFromQuery(arg);
       expect(
-        (r._fragments as any[]).filter(f => f.name.value === 'TodoFragment')
+        r.fragments.filter(f => f.name.value === 'TodoFragment')
       ).toHaveLength(1);
     });
   });
@@ -90,22 +80,27 @@ describe('addFragmentsToQuery', () => {
     }
   `;
 
-  const fragmentMap = {
-    Todo: [query.definitions[0].selectionSet.selections[0].selectionSet],
-    _fragments: [
-      gql`
+  const arg = {
+    schema,
+    query: mutation,
+    selections: {
+      Todo: [
+        {
+          key: 1234,
+          selection:
+            query.definitions[0].selectionSet.selections[0].selectionSet,
+          type: 'Todo',
+        },
+      ],
+    },
+    fragments: {
+      MyFragment: gql`
         fragment MyFragment on User {
           id
           name
         }
-      `,
-    ],
-  } as any;
-
-  const arg = {
-    schema,
-    query: mutation,
-    fragmentMap,
+      `.definitions[0],
+    },
   };
 
   it('returns result matching snapshot', () => {
@@ -127,7 +122,6 @@ describe('addFragmentsToQuery', () => {
         id
         name
       }
-
       "
     `);
   });
@@ -161,7 +155,7 @@ describe('addFragmentsToQuery', () => {
       });
 
       expect(
-        selelctionSets.filter(s => s === fragmentMap.Todo[0])
+        selelctionSets.filter(s => s === arg.selections.Todo[0].selection)
       ).toHaveLength(1);
     });
   });

@@ -6,23 +6,17 @@ import {
   visitWithTypeInfo,
   TypeInfo,
   FragmentDefinitionNode,
+  SelectionSetNode,
 } from 'graphql';
 import { visit } from 'graphql';
-
-type TypeFragmentMap<T extends string = string> = Record<T, string[]> & {
-  _fragments?: FragmentDefinitionNode[];
-};
-
-interface ExchangeArgs {
-  schema: any;
-}
 
 /** An exchange for auto-populating mutations with a required response body. */
 export const populateExchange = ({ schema }: ExchangeArgs): Exchange => ({
   forward,
 }) => {
   let parsedKeys: Record<string, boolean | undefined> = {};
-  let fragmentMap: TypeFragmentMap = { _fragments: [] };
+  let fragments: UserFragmentMap = {};
+  let selections: TypeSelectionMap = {};
 
   const handleIncomingMutation = (op: Operation) => {
     if (op.operationName !== 'mutation') {
@@ -31,25 +25,42 @@ export const populateExchange = ({ schema }: ExchangeArgs): Exchange => ({
 
     return {
       ...op,
-      query: addFragmentsToQuery({ schema, fragmentMap, query: op.query }),
+      query: addFragmentsToQuery({
+        schema,
+        selections,
+        fragments,
+        query: op.query,
+      }),
     };
   };
 
-  const handleIncomingQuery = (op: Operation) => {
-    if (op.operationName !== 'query' || parsedKeys[op.key]) {
+  const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
+    if (operationName !== 'query' || parsedKeys[key]) {
       return;
     }
 
     parsedKeys = {
       ...parsedKeys,
-      [op.key]: true,
+      [key]: true,
     };
 
-    fragmentMap = makeFragmentsFromQuery({
-      schema,
-      query: op.query,
-      fragmentMap: fragmentMap,
-    });
+    const {
+      fragments: newFragments,
+      selections: newSelections,
+    } = makeFragmentsFromQuery({ schema, query });
+
+    fragments = newFragments.reduce(
+      (state, fragment) => ({ ...state, [fragment.name.value]: fragment }),
+      fragments
+    );
+
+    selections = newSelections.reduce((state, { selection, type }) => {
+      const entry = { key, selection, type };
+      return {
+        ...state,
+        [type]: state[type] ? [...state[type], entry] : [entry],
+      };
+    }, selections);
   };
 
   return ops$ => {
@@ -62,19 +73,42 @@ export const populateExchange = ({ schema }: ExchangeArgs): Exchange => ({
   };
 };
 
+type UserFragmentMap<T extends string = string> = Record<
+  T,
+  FragmentDefinitionNode
+>;
+
+type TypeSelectionMap<T extends string = string> = Record<
+  T,
+  UserSelectionSet[]
+>;
+
+interface UserSelectionSet {
+  /** Operation key where selection set is being used. */
+  key: number;
+  /** Selection set. */
+  selection: SelectionSetNode;
+  /** Type of selection. */
+  type: string;
+}
+
+interface ExchangeArgs {
+  schema: any;
+}
+
 interface MakeFragmentsFromQueryArg {
   schema: any;
   query: DocumentNode;
-  fragmentMap: TypeFragmentMap;
 }
 
 /** Creates fragments object from query */
 export const makeFragmentsFromQuery = ({
   schema,
   query,
-  fragmentMap,
 }: MakeFragmentsFromQueryArg) => {
-  let f = fragmentMap;
+  let selections: Omit<UserSelectionSet, 'key'>[] = [];
+  let fragments: FragmentDefinitionNode[] = [];
+
   const typeInfo = new TypeInfo(buildClientSchema(schema));
 
   visit(
@@ -92,35 +126,29 @@ export const makeFragmentsFromQuery = ({
           return undefined;
         }
 
-        // @ts-ignore
-        f = {
-          ...f,
-          [t]: [...(f[t] || []), node.selectionSet],
-        };
+        selections = [...selections, { selection: node.selectionSet, type: t }];
       },
       FragmentDefinition: node => {
-        // @ts-ignore
-        f = {
-          ...f,
-          _fragments: [...(f._fragments || []), node],
-        };
+        fragments = [...fragments, node];
       },
     })
   );
 
-  return f;
+  return { selections, fragments } as const;
 };
 
 interface AddFragmentsToQuery {
   schema: any;
   query: DocumentNode;
-  fragmentMap: TypeFragmentMap;
+  selections: Record<string, Omit<UserSelectionSet, 'key'>[]>;
+  fragments: UserFragmentMap;
 }
 
 export const addFragmentsToQuery = ({
   schema,
   query,
-  fragmentMap,
+  selections,
+  fragments,
 }: AddFragmentsToQuery) => {
   const typeInfo = new TypeInfo(buildClientSchema(schema));
 
@@ -140,6 +168,19 @@ export const addFragmentsToQuery = ({
           const t = typeInfo.getType() as any;
           const type = t.ofType || t.toString();
 
+          const existingSelections =
+            (node.selectionSet && node.selectionSet.selections) || [];
+          const newSelections = selections[type]
+            ? selections[type].map(({ selection }) => ({
+                kind: 'InlineFragment',
+                typeCondition: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: type },
+                },
+                selectionSet: selection,
+              }))
+            : [];
+
           return {
             ...node,
             directives: (node.directives as any).filter(
@@ -147,14 +188,7 @@ export const addFragmentsToQuery = ({
             ),
             selectionSet: {
               kind: 'SelectionSet',
-              selections: (fragmentMap[type] || []).map(selectionSet => ({
-                kind: 'InlineFragment',
-                typeCondition: {
-                  kind: 'NamedType',
-                  name: { kind: 'Name', value: type },
-                },
-                selectionSet,
-              })),
+              selections: [...newSelections, ...existingSelections],
             },
           };
         },
@@ -163,10 +197,7 @@ export const addFragmentsToQuery = ({
         leave: node => {
           return {
             ...node,
-            definitions: [
-              ...node.definitions,
-              ...(fragmentMap._fragments || []),
-            ],
+            definitions: [...node.definitions, ...Object.values(fragments)],
           };
         },
       },

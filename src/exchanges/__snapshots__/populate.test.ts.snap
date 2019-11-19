@@ -1,123 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`makeFragmentsFromQuery new fragments are created 1`] = `
+exports[`makeFragmentsFromQuery new selections are created 1`] = `
 Object {
-  "Todo": Array [
-    Object {
-      "kind": "SelectionSet",
-      "selections": Array [
-        Object {
-          "alias": undefined,
-          "arguments": Array [],
-          "directives": Array [],
-          "kind": "Field",
-          "name": Object {
-            "kind": "Name",
-            "value": "id",
-          },
-          "selectionSet": undefined,
-        },
-        Object {
-          "alias": undefined,
-          "arguments": Array [],
-          "directives": Array [],
-          "kind": "Field",
-          "name": Object {
-            "kind": "Name",
-            "value": "name",
-          },
-          "selectionSet": undefined,
-        },
-        Object {
-          "alias": undefined,
-          "arguments": Array [],
-          "directives": Array [],
-          "kind": "Field",
-          "name": Object {
-            "kind": "Name",
-            "value": "creator",
-          },
-          "selectionSet": Object {
-            "kind": "SelectionSet",
-            "selections": Array [
-              Object {
-                "alias": undefined,
-                "arguments": Array [],
-                "directives": Array [],
-                "kind": "Field",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "id",
-                },
-                "selectionSet": undefined,
-              },
-            ],
-          },
-        },
-      ],
-    },
-  ],
-  "User": Array [
-    Object {
-      "kind": "SelectionSet",
-      "selections": Array [
-        Object {
-          "alias": undefined,
-          "arguments": Array [],
-          "directives": Array [],
-          "kind": "Field",
-          "name": Object {
-            "kind": "Name",
-            "value": "id",
-          },
-          "selectionSet": undefined,
-        },
-      ],
-    },
-  ],
-  "_fragments": Array [
-    Object {
-      "directives": Array [],
-      "kind": "FragmentDefinition",
-      "name": Object {
-        "kind": "Name",
-        "value": "MyFragment",
-      },
-      "selectionSet": Object {
-        "kind": "SelectionSet",
-        "selections": Array [
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "id",
-            },
-            "selectionSet": undefined,
-          },
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "name",
-            },
-            "selectionSet": undefined,
-          },
-        ],
-      },
-      "typeCondition": Object {
-        "kind": "NamedType",
-        "name": Object {
-          "kind": "Name",
-          "value": "User",
-        },
-      },
-    },
+  "fragments": Array [
     Object {
       "directives": Array [],
       "kind": "FragmentDefinition",
@@ -148,6 +33,83 @@ Object {
           "value": "Todo",
         },
       },
+    },
+  ],
+  "selections": Array [
+    Object {
+      "selection": Object {
+        "kind": "SelectionSet",
+        "selections": Array [
+          Object {
+            "alias": undefined,
+            "arguments": Array [],
+            "directives": Array [],
+            "kind": "Field",
+            "name": Object {
+              "kind": "Name",
+              "value": "id",
+            },
+            "selectionSet": undefined,
+          },
+          Object {
+            "alias": undefined,
+            "arguments": Array [],
+            "directives": Array [],
+            "kind": "Field",
+            "name": Object {
+              "kind": "Name",
+              "value": "name",
+            },
+            "selectionSet": undefined,
+          },
+          Object {
+            "alias": undefined,
+            "arguments": Array [],
+            "directives": Array [],
+            "kind": "Field",
+            "name": Object {
+              "kind": "Name",
+              "value": "creator",
+            },
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "name": Object {
+                    "kind": "Name",
+                    "value": "id",
+                  },
+                  "selectionSet": undefined,
+                },
+              ],
+            },
+          },
+        ],
+      },
+      "type": "Todo",
+    },
+    Object {
+      "selection": Object {
+        "kind": "SelectionSet",
+        "selections": Array [
+          Object {
+            "alias": undefined,
+            "arguments": Array [],
+            "directives": Array [],
+            "kind": "Field",
+            "name": Object {
+              "kind": "Name",
+              "value": "id",
+            },
+            "selectionSet": undefined,
+          },
+        ],
+      },
+      "type": "User",
     },
   ],
 }
