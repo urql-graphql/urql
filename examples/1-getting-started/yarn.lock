@@ -253,6 +253,14 @@
   dependencies:
     wonka "^3.2.1"
 
+"@urql/exchange-graphcache@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-graphcache/-/exchange-graphcache-1.2.0.tgz#e46846da6f30fa301e5ced8dada27209fd40b366"
+  integrity sha512-mLzHHroAkzsClKB0TEkWbfVa4wT4VBzHD83n7ys5DBtVvElWawclHB+H1pcPITs7GxLKVwH2ixtt93yl/UXYCQ==
+  dependencies:
+    pessimism "^1.1.4"
+    wonka "^3.2.1"
+
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.8.5.tgz#51b1c5fe6576a34953bf4b253df9f0d490d9e359"
@@ -3690,6 +3698,11 @@ pbkdf2@^3.0.3:
     ripemd160 "^2.0.1"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+pessimism@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/pessimism/-/pessimism-1.1.4.tgz#9a83bde165a773bb65a0e77551a9960a28df0741"
+  integrity sha512-MZypBlwcfyd+v53cUeY4188rX9PPZYe7UfdBxenfzVaeW64UX4yGk+xNUp6FTBeqQfRw1m9z2eLFGHQrZp0gJw==
 
 pidtree@^0.3.0:
   version "0.3.0"

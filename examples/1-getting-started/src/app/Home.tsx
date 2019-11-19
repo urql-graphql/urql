@@ -16,8 +16,10 @@ interface QueryResponse {
 const ToggleTodo = `
   mutation($id: ID!) {
     toggleTodo(id: $id) {
-      id
-      complete
+      todo @populate
+      viewer {
+        todos @populate
+      }
     }
   }
 `;
@@ -25,7 +27,10 @@ const ToggleTodo = `
 const DeleteTodo = `
   mutation($id: ID!) {
     deleteTodo(id: $id) {
-      id
+      todo @populate
+      viewer {
+        todos @populate
+      }
     }
   }
 `;
@@ -41,7 +46,10 @@ const TodoQuery = gql`
 `;
 
 export const Home: FC = () => {
-  const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
+  const [res, executeQuery] = useQuery<QueryResponse>({
+    query: TodoQuery,
+    requestPolicy: 'cache-and-network',
+  });
   const refetch = useCallback(
     () => executeQuery({ requestPolicy: 'network-only' }),
     [executeQuery]

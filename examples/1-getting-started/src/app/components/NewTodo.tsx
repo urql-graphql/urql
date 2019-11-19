@@ -3,7 +3,12 @@ import { useMutation } from 'urql';
 
 const AddTodo = `
   mutation($text: String!) {
-    addTodo(text: $text) @populate
+    addTodo(text: $text) {
+      todo @populate
+      viewer {
+        todos @populate
+      }
+    }
   }
 `;
 

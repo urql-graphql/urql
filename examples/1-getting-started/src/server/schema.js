@@ -27,14 +27,19 @@ const typeDefs = `
     complete: Boolean
   }
 
+  type TodoResponse {
+    todo: Todo!
+    viewer: Query!
+  }
+
   type Query {
     todos: [Todo]
   }
 
   type Mutation {
-    toggleTodo(id: ID!): Todo
-    addTodo(text: String!): Todo
-    deleteTodo(id: ID!): Todo
+    toggleTodo(id: ID!): TodoResponse
+    addTodo(text: String!): TodoResponse
+    deleteTodo(id: ID!): TodoResponse
   }
 `;
 
@@ -51,13 +56,13 @@ const resolvers = {
       const todo = store.todos.find(t => String(t.id) === id);
       todo.complete = !todo.complete;
 
-      return todo;
+      return { todo, viewer: {} };
     },
     addTodo: (root, args) => {
       const id = ++idCounter;
       const todo = { complete: false, id, text: args.text };
       store.todos.push(todo);
-      return todo;
+      return { todo, viewer: {} };
     },
     deleteTodo: (root, args) => {
       const { id } = args;
@@ -65,7 +70,7 @@ const resolvers = {
       store.todos = store.todos.filter(t => {
         return String(t.id) !== id;
       });
-      return todo;
+      return { todo, viewer: {} };
     },
   },
 };

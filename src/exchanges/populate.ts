@@ -8,8 +8,13 @@ import {
   FragmentDefinitionNode,
   SelectionSetNode,
   GraphQLSchema,
+  IntrospectionQuery,
 } from 'graphql';
 import { visit } from 'graphql';
+
+interface ExchangeArgs {
+  schema: IntrospectionQuery;
+}
 
 /** An exchange for auto-populating mutations with a required response body. */
 export const populateExchange = ({
@@ -21,7 +26,7 @@ export const populateExchange = ({
   let fragments: UserFragmentMap = {};
   let selections: TypeSelectionMap = {};
 
-  /** Handle query and inject selections + fragments. */
+  /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
     if (op.operationName !== 'mutation') {
       return op;
@@ -48,12 +53,13 @@ export const populateExchange = ({
 
   /** Handle query and extract fragments. */
   const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
+    activeOperations = addKey(activeOperations, key);
+
     if (operationName !== 'query' || parsedOperations[key]) {
       return;
     }
 
     parsedOperations = addKey(parsedOperations, key);
-    activeOperations = addKey(activeOperations, key);
 
     const {
       fragments: newFragments,
@@ -122,10 +128,6 @@ interface UserSelectionSet {
   type: string;
 }
 
-interface ExchangeArgs {
-  schema: any;
-}
-
 interface MakeFragmentsFromQueryArg {
   schema: GraphQLSchema;
   query: DocumentNode;
@@ -147,6 +149,8 @@ export const makeFragmentsFromQuery = ({
         if (!node.selectionSet) {
           return undefined;
         }
+
+        console.log(typeInfo);
 
         // @ts-ignore
         const t = typeInfo.getType().ofType;
