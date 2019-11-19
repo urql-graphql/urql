@@ -8,6 +8,11 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.2.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.1.2...v1.2.0)
+
+- ⚠️ Fix unions not being checked supported by schema predicates, by [@StevenLangbroek](https://github.com/StevenLangbroek) (see [#113](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/113))
+- ✨ Add `simplePagination` helper for resolving simple, paginated lists (see [#115](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/115))
+
 ## [v1.1.2](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.1.1...v1.1.2)
 
 - Fix `relayPagination` helper causing cache-misses for empty lists, by [@rafeca](https://github.com/rafeca) (see [#111](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/111))
