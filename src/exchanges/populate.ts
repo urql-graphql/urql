@@ -331,5 +331,5 @@ const getUsedFragments = (node: ASTNode) => {
 
 const getType = (t: TypeInfo) => {
   const type = t.getType() as any;
-  return type.ofType || type.toString();
+  return type.ofType.toString() || type.toString();
 };
