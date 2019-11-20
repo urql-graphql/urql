@@ -70,7 +70,7 @@ const exchangeArgs = {
   client: {} as Client,
 };
 
-describe('on mutation without query', () => {
+describe('on mutation', () => {
   const operation = {
     key: 1234,
     operationName: 'mutation',
@@ -93,7 +93,7 @@ describe('on mutation without query', () => {
   });
 });
 
-describe('on query then mutation', () => {
+describe('on query -> mutation', () => {
   const queryOp = {
     key: 1234,
     operationName: 'query',
@@ -139,7 +139,7 @@ describe('on query then mutation', () => {
   });
 });
 
-describe('on query w/ fragment then mutation', () => {
+describe('on (query w/ fragment) -> mutation', () => {
   const queryOp = {
     key: 1234,
     operationName: 'query',
@@ -193,7 +193,7 @@ describe('on query w/ fragment then mutation', () => {
   });
 });
 
-describe('on query then mutation w/ interface return type', () => {
+describe('on query -> (mutation w/ interface return type)', () => {
   const queryOp = {
     key: 1234,
     operationName: 'query',
@@ -230,6 +230,59 @@ describe('on query then mutation w/ interface return type', () => {
       );
 
       expect(print(response[1].query)).toMatchSnapshot();
+    });
+  });
+});
+
+describe('on query -> teardown -> mutation', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        todos {
+          id
+          text
+        }
+      }
+    `,
+  } as Operation;
+
+  const teardownOp = {
+    key: queryOp.key,
+    operationName: 'teardown',
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addTodo @populate
+      }
+    `,
+  } as Operation;
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, teardownOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[2].query)).toMatchSnapshot();
+    });
+
+    it('only requests __typename', () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, teardownOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+      getNodesByType(response[2].query, 'Field').forEach(field => {
+        expect(field.name.value).toMatch(/addTodo|__typename/);
+      });
     });
   });
 });

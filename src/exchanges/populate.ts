@@ -123,8 +123,8 @@ export const populateExchange = ({
   return ops$ => {
     return pipe(
       ops$,
-      tap(handleIncomingTeardown),
       tap(handleIncomingQuery),
+      tap(handleIncomingTeardown),
       map(handleIncomingMutation),
       forward
     );
@@ -302,7 +302,7 @@ const removeKey = (
   [key]: false,
 });
 
-/** Get possible all possible types for node with TypeInfo. */
+/** Get all possible types for node with TypeInfo. */
 const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
   const type = typeInfo.getType();
 

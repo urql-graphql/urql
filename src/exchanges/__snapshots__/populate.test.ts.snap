@@ -1,6 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`on mutation without query mutation query matches snapshot 1`] = `
+exports[`on (query w/ fragment) -> mutation mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  addTodo {
+    ...Todo_PopulateFragment_0
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  ...TodoFragment
+}
+
+fragment TodoFragment on Todo {
+  id
+  text
+}
+"
+`;
+
+exports[`on mutation mutation query matches snapshot 1`] = `
 "mutation MyMutation {
   addTodo {
     __typename
@@ -9,7 +27,27 @@ exports[`on mutation without query mutation query matches snapshot 1`] = `
 "
 `;
 
-exports[`on query then mutation mutation query matches snapshot 1`] = `
+exports[`on query -> (mutation w/ interface return type) mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  removeTodo {
+    ...Todo_PopulateFragment_0
+    ...User_PopulateFragment_0
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  name
+}
+
+fragment User_PopulateFragment_0 on User {
+  id
+  text
+}
+"
+`;
+
+exports[`on query -> mutation mutation query matches snapshot 1`] = `
 "mutation MyMutation {
   addTodo {
     ...Todo_PopulateFragment_0
@@ -32,40 +70,11 @@ fragment Todo_PopulateFragment_1 on Todo {
 "
 `;
 
-exports[`on query then mutation w/ interface return type mutation query matches snapshot 1`] = `
-"mutation MyMutation {
-  removeTodo {
-    ...Todo_PopulateFragment_0
-    ...User_PopulateFragment_0
-  }
-}
-
-fragment Todo_PopulateFragment_0 on Todo {
-  id
-  name
-}
-
-fragment User_PopulateFragment_0 on User {
-  id
-  text
-}
-"
-`;
-
-exports[`on query w/ fragment then mutation mutation query matches snapshot 1`] = `
+exports[`on query -> teardown -> mutation mutation query matches snapshot 1`] = `
 "mutation MyMutation {
   addTodo {
-    ...Todo_PopulateFragment_0
+    __typename
   }
-}
-
-fragment Todo_PopulateFragment_0 on Todo {
-  ...TodoFragment
-}
-
-fragment TodoFragment on Todo {
-  id
-  text
 }
 "
 `;
