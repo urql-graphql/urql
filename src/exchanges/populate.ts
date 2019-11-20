@@ -61,9 +61,13 @@ export const populateExchange = ({
 
   /** Handle query and extract fragments. */
   const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
+    if (operationName !== 'query') {
+      return;
+    }
+
     activeOperations.add(key);
 
-    if (operationName !== 'query' || parsedOperations.has(key)) {
+    if (parsedOperations.has(key)) {
       return;
     }
 
