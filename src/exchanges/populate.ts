@@ -285,7 +285,7 @@ export const addFragmentsToQuery = ({
             definitions: [
               ...node.definitions,
               ...Object.values(additionalFragments),
-              ...[...requiredUserFragments],
+              ...requiredUserFragments,
             ],
           };
         },
