@@ -26,9 +26,9 @@ export const populateExchange = ({
 }: ExchangeArgs): Exchange => ({ forward }) => {
   const schema = buildClientSchema(ogSchema);
   /** List of operation keys that have already been parsed. */
-  let parsedOperations: Record<string, boolean | undefined> = {};
+  const parsedOperations = new Set<number>();
   /** List of operation keys that have not been torn down. */
-  let activeOperations: Record<string, boolean | undefined> = {};
+  const activeOperations = new Set<number>();
   /** Collection of fragments used by the user. */
   let userFragments: UserFragmentMap = {};
   /** Collection of type fragments. */
@@ -43,7 +43,7 @@ export const populateExchange = ({
     const activeSelections = Object.entries(typeFragments).reduce(
       (state, [key, value]) => ({
         ...state,
-        [key]: value.filter(s => activeOperations[s.key]),
+        [key]: value.filter(s => activeOperations.has(s.key)),
       }),
       typeFragments
     );
@@ -61,13 +61,13 @@ export const populateExchange = ({
 
   /** Handle query and extract fragments. */
   const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
-    activeOperations = addKey(activeOperations, key);
+    activeOperations.add(key);
 
-    if (operationName !== 'query' || parsedOperations[key]) {
+    if (operationName !== 'query' || parsedOperations.has(key)) {
       return;
     }
 
-    parsedOperations = addKey(parsedOperations, key);
+    parsedOperations.add(key);
 
     const {
       fragments: newFragments,
@@ -118,7 +118,7 @@ export const populateExchange = ({
       return;
     }
 
-    activeOperations = removeKey(activeOperations, key);
+    activeOperations.delete(key);
   };
 
   return ops$ => {
@@ -153,7 +153,7 @@ interface MakeFragmentsFromQueryArg {
   query: DocumentNode;
 }
 
-/** Creates fragments object from query */
+/** Gets typed selection sets and fragments from query */
 export const extractSelectionsFromQuery = ({
   schema,
   query,
@@ -194,6 +194,7 @@ interface AddFragmentsToQuery {
   userFragments: UserFragmentMap;
 }
 
+/** Replaces populate decorator with fragment spreads + fragments. */
 export const addFragmentsToQuery = ({
   schema,
   query,
@@ -292,22 +293,6 @@ export const addFragmentsToQuery = ({
     })
   );
 };
-
-const addKey = (
-  s: Record<string, boolean | undefined>,
-  key: number | string
-) => ({
-  ...s,
-  [key]: true,
-});
-
-const removeKey = (
-  s: Record<string, boolean | undefined>,
-  key: number | string
-) => ({
-  ...s,
-  [key]: false,
-});
 
 /** Get all possible types for node with TypeInfo. */
 const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
