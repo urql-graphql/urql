@@ -9,6 +9,9 @@ import {
   SelectionSetNode,
   GraphQLSchema,
   IntrospectionQuery,
+  FragmentSpreadNode,
+  GraphQLObjectType,
+  GraphQLInterfaceType,
 } from 'graphql';
 import { visit } from 'graphql';
 
@@ -211,29 +214,36 @@ export const addFragmentsToQuery = ({
             return;
           }
 
-          const type = getType(typeInfo);
-
           const directives = node.directives.filter(
             d => d.name.value !== 'populate'
           );
 
-          const newSelections = (typeFragments[type] || []).map(
-            ({ fragment }) => {
-              // Add fragment for insertion at Document node
-              additionalFragments = {
-                ...additionalFragments,
-                [fragment.name.value]: fragment,
-              };
-
-              return {
-                kind: 'FragmentSpread',
-                name: {
-                  kind: 'Name',
-                  value: fragment.name.value,
-                },
-              };
+          const types = getTypes(schema, typeInfo);
+          const newSelections = types.reduce((p, t) => {
+            const typeFrags = typeFragments[t.name];
+            if (!typeFrags) {
+              return p;
             }
-          );
+
+            return [
+              ...p,
+              ...typeFragments[t.name].map(({ fragment }) => {
+                // Add fragment for insertion at Document node
+                additionalFragments = {
+                  ...additionalFragments,
+                  [fragment.name.value]: fragment,
+                };
+
+                return {
+                  kind: 'FragmentSpread',
+                  name: {
+                    kind: 'Name',
+                    value: fragment.name.value,
+                  },
+                } as const;
+              }),
+            ];
+          }, [] as FragmentSpreadNode[]);
 
           const existingSelections =
             (node.selectionSet && node.selectionSet.selections) || [];
@@ -291,6 +301,24 @@ const removeKey = (
   ...s,
   [key]: false,
 });
+
+/** Get possible all possible types for node with TypeInfo. */
+const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
+  const type = typeInfo.getType();
+
+  if (!type || !('ofType' in type)) {
+    console.warn('PopulateExchange: Unsupported type at populate decorator.');
+    return [];
+  }
+
+  const ofType = type.ofType;
+
+  if (ofType instanceof GraphQLInterfaceType) {
+    return schema.getPossibleTypes(ofType);
+  }
+
+  return [ofType as GraphQLObjectType];
+};
 
 const getType = (t: TypeInfo) => {
   const type = t.getType() as any;

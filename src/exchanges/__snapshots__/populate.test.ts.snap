@@ -1,116 +1,71 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`makeFragmentsFromQuery new selections are created 1`] = `
-Object {
-  "fragments": Array [
-    Object {
-      "directives": Array [],
-      "kind": "FragmentDefinition",
-      "name": Object {
-        "kind": "Name",
-        "value": "TodoFragment",
-      },
-      "selectionSet": Object {
-        "kind": "SelectionSet",
-        "selections": Array [
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "id",
-            },
-            "selectionSet": undefined,
-          },
-        ],
-      },
-      "typeCondition": Object {
-        "kind": "NamedType",
-        "name": Object {
-          "kind": "Name",
-          "value": "Todo",
-        },
-      },
-    },
-  ],
-  "selections": Array [
-    Object {
-      "selections": Object {
-        "kind": "SelectionSet",
-        "selections": Array [
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "id",
-            },
-            "selectionSet": undefined,
-          },
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "name",
-            },
-            "selectionSet": undefined,
-          },
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "creator",
-            },
-            "selectionSet": Object {
-              "kind": "SelectionSet",
-              "selections": Array [
-                Object {
-                  "alias": undefined,
-                  "arguments": Array [],
-                  "directives": Array [],
-                  "kind": "Field",
-                  "name": Object {
-                    "kind": "Name",
-                    "value": "id",
-                  },
-                  "selectionSet": undefined,
-                },
-              ],
-            },
-          },
-        ],
-      },
-      "type": "Todo",
-    },
-    Object {
-      "selections": Object {
-        "kind": "SelectionSet",
-        "selections": Array [
-          Object {
-            "alias": undefined,
-            "arguments": Array [],
-            "directives": Array [],
-            "kind": "Field",
-            "name": Object {
-              "kind": "Name",
-              "value": "id",
-            },
-            "selectionSet": undefined,
-          },
-        ],
-      },
-      "type": "User",
-    },
-  ],
+exports[`on mutation without query mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  addTodo {
+    __typename
+  }
 }
+"
+`;
+
+exports[`on query then mutation mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  addTodo {
+    ...Todo_PopulateFragment_0
+    ...Todo_PopulateFragment_1
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  text
+  creator {
+    id
+    name
+  }
+}
+
+fragment Todo_PopulateFragment_1 on Todo {
+  text
+}
+"
+`;
+
+exports[`on query then mutation w/ interface return type mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  removeTodo {
+    ...Todo_PopulateFragment_0
+    ...User_PopulateFragment_0
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  name
+}
+
+fragment User_PopulateFragment_0 on User {
+  id
+  text
+}
+"
+`;
+
+exports[`on query w/ fragment then mutation mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  addTodo {
+    ...Todo_PopulateFragment_0
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  ...TodoFragment
+}
+
+fragment TodoFragment on Todo {
+  id
+  text
+}
+"
 `;
