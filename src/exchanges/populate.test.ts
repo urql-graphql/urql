@@ -1,16 +1,10 @@
-import {
-  extractSelectionsFromQuery,
-  addFragmentsToQuery,
-  populateExchange,
-} from './populate';
+import { populateExchange } from './populate';
 import {
   buildSchema,
   print,
   introspectionFromSchema,
   visit,
-  FragmentDefinitionNode,
   DocumentNode,
-  ASTNode,
   ASTKindToNode,
 } from 'graphql';
 import gql from 'graphql-tag';
@@ -189,6 +183,64 @@ describe('on (query w/ fragment) -> mutation', () => {
       expect(
         fragments.filter(f => f.name.value === 'TodoFragment')
       ).toHaveLength(1);
+    });
+  });
+});
+
+describe('on (query w/ unused fragment) -> mutation', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        todos {
+          id
+          text
+        }
+        users {
+          ...UserFragment
+        }
+      }
+
+      fragment UserFragment on User {
+        id
+        name
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addTodo @populate
+      }
+    `,
+  } as Operation;
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchSnapshot();
+    });
+
+    it('excludes user fragment', () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      const fragments = getNodesByType(response[1].query, 'FragmentDefinition');
+      expect(
+        fragments.filter(f => f.name.value === 'UserFragment')
+      ).toHaveLength(0);
     });
   });
 });

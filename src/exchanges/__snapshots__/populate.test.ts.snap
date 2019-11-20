@@ -18,6 +18,20 @@ fragment TodoFragment on Todo {
 "
 `;
 
+exports[`on (query w/ unused fragment) -> mutation mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  addTodo {
+    ...Todo_PopulateFragment_0
+  }
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  text
+}
+"
+`;
+
 exports[`on mutation mutation query matches snapshot 1`] = `
 "mutation MyMutation {
   addTodo {

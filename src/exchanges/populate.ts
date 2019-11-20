@@ -12,6 +12,7 @@ import {
   FragmentSpreadNode,
   GraphQLObjectType,
   GraphQLInterfaceType,
+  ASTNode,
 } from 'graphql';
 import { visit } from 'graphql';
 
@@ -200,6 +201,7 @@ export const addFragmentsToQuery = ({
   userFragments,
 }: AddFragmentsToQuery) => {
   const typeInfo = new TypeInfo(schema);
+  const requiredUserFragments = new Set<FragmentDefinitionNode>();
   let additionalFragments: Record<string, FragmentDefinitionNode> = {};
 
   return visit(
@@ -228,6 +230,11 @@ export const addFragmentsToQuery = ({
             return [
               ...p,
               ...typeFragments[t.name].map(({ fragment }) => {
+                // Add used fragment for insertion at Document node
+                getUsedFragments(fragment).forEach(f =>
+                  requiredUserFragments.add(userFragments[f])
+                );
+
                 // Add fragment for insertion at Document node
                 additionalFragments = {
                   ...additionalFragments,
@@ -277,7 +284,7 @@ export const addFragmentsToQuery = ({
             definitions: [
               ...node.definitions,
               ...Object.values(additionalFragments),
-              ...Object.values(userFragments),
+              ...[...requiredUserFragments],
             ],
           };
         },
@@ -318,6 +325,19 @@ const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
   }
 
   return [ofType as GraphQLObjectType];
+};
+
+/** Get fragment names referenced by node. */
+const getUsedFragments = (node: ASTNode) => {
+  let names: string[] = [];
+
+  visit(node, {
+    FragmentSpread: f => {
+      names = [...names, f.name.value];
+    },
+  });
+
+  return names;
 };
 
 const getType = (t: TypeInfo) => {
