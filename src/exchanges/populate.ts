@@ -10,8 +10,6 @@ import {
   GraphQLSchema,
   IntrospectionQuery,
   FragmentSpreadNode,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
   ASTNode,
   isNonNullType,
   isListType,
