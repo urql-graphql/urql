@@ -8,8 +8,9 @@
     "start": "NODE_ENV=production benchr suite.js"
   },
   "dependencies": {
-    "apollo-cache-inmemory": "1.6.3",
+    "@apollo/client": "^3.0.0-beta.11",
     "benchr": "4.3.0",
+    "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1"
   }
 }
