@@ -13,6 +13,12 @@ import {
   GraphQLObjectType,
   GraphQLInterfaceType,
   ASTNode,
+  isNonNullType,
+  isListType,
+  isUnionType,
+  isInterfaceType,
+  isCompositeType,
+  isAbstractType,
 } from 'graphql';
 import { visit } from 'graphql';
 
@@ -174,7 +180,7 @@ export const extractSelectionsFromQuery = ({
           return undefined;
         }
 
-        const type = getType(typeInfo);
+        const type = getTypeName(typeInfo);
 
         if (!type) {
           return undefined;
@@ -302,20 +308,41 @@ export const addFragmentsToQuery = ({
 
 /** Get all possible types for node with TypeInfo. */
 const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
-  const type = typeInfo.getType();
+  const typeInfoType = typeInfo.getType();
+  const type =
+    isListType(typeInfoType) || isNonNullType(typeInfoType)
+      ? typeInfoType.ofType
+      : typeInfoType;
 
-  if (!type || !('ofType' in type)) {
-    console.warn('PopulateExchange: Unsupported type at populate decorator.');
+  if (!isCompositeType(type)) {
+    console.warn(
+      `PopulateExchange: Unsupported type "${type}" at populate decorator.`
+    );
     return [];
   }
 
-  const ofType = type.ofType;
-
-  if (ofType instanceof GraphQLInterfaceType) {
-    return schema.getPossibleTypes(ofType);
+  if (isInterfaceType(type) || isUnionType(type)) {
+    return schema.getPossibleTypes(type);
   }
 
-  return [ofType as GraphQLObjectType];
+  return [type];
+};
+
+/** Get name of non-abstract type for adding to 'typeFragments'. */
+const getTypeName = (t: TypeInfo) => {
+  const typeInfoType = t.getType();
+  const type =
+    isListType(typeInfoType) || isNonNullType(typeInfoType)
+      ? typeInfoType.ofType
+      : typeInfoType;
+
+  if (isAbstractType(type)) {
+    throw Error(
+      'PopulateExchange: "getTypeName" does not expect to receive an abstract type.'
+    );
+  }
+
+  return type.toString();
 };
 
 /** Get fragment names referenced by node. */
@@ -329,9 +356,4 @@ const getUsedFragments = (node: ASTNode) => {
   });
 
   return names;
-};
-
-const getType = (t: TypeInfo) => {
-  const type = t.getType() as any;
-  return type.ofType.toString() || type.toString();
 };

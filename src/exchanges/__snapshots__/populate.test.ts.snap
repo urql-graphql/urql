@@ -61,6 +61,26 @@ fragment User_PopulateFragment_0 on User {
 "
 `;
 
+exports[`on query -> (mutation w/ union return type) mutation query matches snapshot 1`] = `
+"mutation MyMutation {
+  updateTodo {
+    ...User_PopulateFragment_0
+    ...Todo_PopulateFragment_0
+  }
+}
+
+fragment User_PopulateFragment_0 on User {
+  id
+  text
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  name
+}
+"
+`;
+
 exports[`on query -> mutation mutation query matches snapshot 1`] = `
 "mutation MyMutation {
   addTodo {

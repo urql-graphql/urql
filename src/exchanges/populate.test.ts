@@ -30,6 +30,8 @@ const schemaDef = `
     creator: User!
   }
 
+  union UnionType = User | Todo
+
   type Query {
     todos: [Todo]
     users: [User]
@@ -38,6 +40,7 @@ const schemaDef = `
   type Mutation {
     addTodo: [Todo]
     removeTodo: [Node]
+    updateTodo: [UnionType]
   }
 `;
 
@@ -269,6 +272,47 @@ describe('on query -> (mutation w/ interface return type)', () => {
     query: gql`
       mutation MyMutation {
         removeTodo @populate
+      }
+    `,
+  } as Operation;
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchSnapshot();
+    });
+  });
+});
+
+describe('on query -> (mutation w/ union return type)', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        todos {
+          id
+          name
+        }
+        users {
+          id
+          text
+        }
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        updateTodo @populate
       }
     `,
   } as Operation;
