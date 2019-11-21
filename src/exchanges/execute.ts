@@ -1,22 +1,22 @@
 import {
   pipe,
-  tap,
   share,
   filter,
   map,
   fromPromise,
-  mergeAll,
+  mergeMap,
   merge,
+  tap,
 } from 'wonka';
 import { Exchange } from '../types';
 import {
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
-  graphql,
+  execute,
   print,
 } from 'graphql';
-import { CombinedError } from 'src/utils';
+import { CombinedError, makeResult, makeErrorResult } from '../utils';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
@@ -40,38 +40,24 @@ export const executeExchange = ({
     const executedOps$ = pipe(
       sharedOps$,
       filter(f => targetOperationTypes.includes(f.operationName)),
-      map(operation =>
-        graphql(
-          schema,
-          print(operation.query),
-          rootValue,
-          contextValue,
-          operation.variables,
-          operation.operationName,
-          fieldResolver,
-          typeResolver
-        )
-          .then(r => ({
-            operation,
-            data: r.data,
-            error: Array.isArray(r.errors)
-              ? new CombinedError({
-                  graphQLErrors: r.errors,
-                  response: r,
-                })
-              : undefined,
-          }))
-          .catch(networkError => ({
-            operation,
-            data: undefined,
-            error: new CombinedError({
-              networkError,
-              response: networkError,
-            }),
-          }))
-      ),
-      map(fromPromise),
-      mergeAll
+      map(async o => {
+        try {
+          const r = await execute(
+            schema,
+            o.query,
+            rootValue,
+            contextValue,
+            o.variables,
+            o.operationName,
+            fieldResolver,
+            typeResolver
+          );
+          return makeResult(o, r);
+        } catch (err) {
+          return makeErrorResult(o, err);
+        }
+      }),
+      mergeMap(p => fromPromise(p))
     );
 
     const forwardedOps$ = pipe(
@@ -80,6 +66,6 @@ export const executeExchange = ({
       forward
     );
 
-    return merge([forwardedOps$, executedOps$]);
+    return merge([executedOps$, forwardedOps$]);
   };
 };
