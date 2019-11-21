@@ -181,11 +181,6 @@ export const extractSelectionsFromQuery = ({
         }
 
         const type = getTypeName(typeInfo);
-
-        if (!type) {
-          return undefined;
-        }
-
         selections = [...selections, { selections: node.selectionSet, type }];
       },
       FragmentDefinition: node => {
@@ -342,7 +337,7 @@ const getTypeName = (t: TypeInfo) => {
     );
   }
 
-  return type.toString();
+  return type.toString() as string;
 };
 
 /** Get fragment names referenced by node. */
