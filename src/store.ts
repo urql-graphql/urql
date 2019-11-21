@@ -1,6 +1,5 @@
 import { DocumentNode } from 'graphql';
 import { createRequest } from 'urql';
-import * as Pessimism from 'pessimism';
 
 import {
   Ref,
@@ -18,6 +17,7 @@ import {
   KeyingConfig,
 } from './types';
 
+import * as KVMap from './map';
 import { joinKeys, keyOfField } from './helpers';
 import { invariant, currentDebugStack } from './helpers/help';
 import { read, readFragment } from './operations/query';
@@ -68,25 +68,23 @@ export const addDependency = (dependency: string) => {
   (currentDependencies.current as Set<string>).add(dependency);
 };
 
-const mapSet = <T>(map: Pessimism.Map<T>, key: string, value: T) => {
+const mapSet = <T>(map: KVMap.KVMap<T>, key: string, value: T) => {
   const optimisticKey = currentOptimisticKey.current || 0;
-  return Pessimism.setOptimistic(map, key, value, optimisticKey);
+  return KVMap.set(map, key, value, optimisticKey);
 };
 
 // Used to remove a value from a Map optimistially (possible by setting it to undefined)
-const mapRemove = <T>(map: Pessimism.Map<T>, key: string) => {
+const mapRemove = <T>(map: KVMap.KVMap<T>, key: string) => {
   const optimisticKey = currentOptimisticKey.current || 0;
-  return optimisticKey
-    ? Pessimism.setOptimistic(map, key, undefined, optimisticKey)
-    : Pessimism.remove(map, key);
+  return KVMap.remove(map, key, optimisticKey);
 };
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
 export class Store implements Cache {
-  records: Pessimism.Map<EntityField>;
-  connections: Pessimism.Map<Connection[]>;
-  links: Pessimism.Map<Link>;
+  records: KVMap.KVMap<EntityField>;
+  connections: KVMap.KVMap<Connection[]>;
+  links: KVMap.KVMap<Link>;
 
   resolvers: ResolverConfig;
   updates: UpdatesConfig;
@@ -104,9 +102,9 @@ export class Store implements Cache {
     optimisticMutations?: OptimisticMutationConfig,
     keys?: KeyingConfig
   ) {
-    this.records = Pessimism.asMutable(Pessimism.make());
-    this.connections = Pessimism.asMutable(Pessimism.make());
-    this.links = Pessimism.asMutable(Pessimism.make());
+    this.records = KVMap.make();
+    this.connections = KVMap.make();
+    this.links = KVMap.make();
 
     this.resolvers = resolvers || {};
     this.optimisticMutations = optimisticMutations || {};
@@ -181,16 +179,13 @@ export class Store implements Cache {
   }
 
   clearOptimistic(optimisticKey: number) {
-    this.records = Pessimism.clearOptimistic(this.records, optimisticKey);
-    this.connections = Pessimism.clearOptimistic(
-      this.connections,
-      optimisticKey
-    );
-    this.links = Pessimism.clearOptimistic(this.links, optimisticKey);
+    this.records = KVMap.clear(this.records, optimisticKey);
+    this.connections = KVMap.clear(this.connections, optimisticKey);
+    this.links = KVMap.clear(this.links, optimisticKey);
   }
 
   getRecord(fieldKey: string): EntityField {
-    return Pessimism.get(this.records, fieldKey);
+    return KVMap.get(this.records, fieldKey);
   }
 
   removeRecord(fieldKey: string) {
@@ -223,7 +218,7 @@ export class Store implements Cache {
   }
 
   getLink(key: string): undefined | Link {
-    return Pessimism.get(this.links, key);
+    return KVMap.get(this.links, key);
   }
 
   removeLink(key: string) {
@@ -239,7 +234,7 @@ export class Store implements Cache {
       return this.connections;
     }
 
-    let connections = Pessimism.get(this.connections, key);
+    let connections = KVMap.get(this.connections, key);
     const connection: Connection = [args, linkKey];
     if (connections === undefined) {
       connections = [connection];
@@ -290,15 +285,12 @@ export class Store implements Cache {
   ): Connection[] {
     let connections: undefined | Connection[];
     if (typeof entity === 'string') {
-      connections = Pessimism.get(this.connections, joinKeys(entity, field));
+      connections = KVMap.get(this.connections, joinKeys(entity, field));
     } else if (entity !== null) {
       const entityKey = this.keyOfEntity(entity);
       if (entityKey !== null) {
         addDependency(entityKey);
-        connections = Pessimism.get(
-          this.connections,
-          joinKeys(entityKey, field)
-        );
+        connections = KVMap.get(this.connections, joinKeys(entityKey, field));
       }
     }
 

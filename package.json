@@ -76,7 +76,6 @@
     }
   },
   "dependencies": {
-    "pessimism": "^1.1.4",
     "wonka": "^3.2.1"
   },
   "peerDependencies": {
