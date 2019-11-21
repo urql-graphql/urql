@@ -8,8 +8,8 @@ import {
   ASTKindToNode,
 } from 'graphql';
 import gql from 'graphql-tag';
-import { fromValue, pipe, toPromise, fromArray, toArray } from 'wonka';
-import { Operation, OperationResult } from 'src/types';
+import { fromValue, pipe, fromArray, toArray } from 'wonka';
+import { Operation } from 'src/types';
 import { Client } from 'src/client';
 
 const schemaDef = `

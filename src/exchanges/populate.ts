@@ -30,9 +30,9 @@ export const populateExchange = ({
   /** List of operation keys that have not been torn down. */
   const activeOperations = new Set<number>();
   /** Collection of fragments used by the user. */
-  let userFragments: UserFragmentMap = {};
+  let userFragments: UserFragmentMap = Object.create(null);
   /** Collection of type fragments. */
-  let typeFragments: TypeFragmentMap = {};
+  let typeFragments: TypeFragmentMap = Object.create(null);
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
