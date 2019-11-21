@@ -17,6 +17,7 @@ import {
   isInterfaceType,
   isCompositeType,
   isAbstractType,
+  print,
 } from 'graphql';
 import { visit } from 'graphql';
 
@@ -258,6 +259,7 @@ export const addFragmentsToQuery = ({
 
           const existingSelections =
             (node.selectionSet && node.selectionSet.selections) || [];
+
           const selections =
             existingSelections.length + newSelections.length !== 0
               ? [...newSelections, ...existingSelections]
@@ -290,7 +292,7 @@ export const addFragmentsToQuery = ({
               ...Object.keys(additionalFragments).map(
                 k => additionalFragments[k]
               ), // Object.values
-              ...requiredUserFragments,
+              ...Array.from(requiredUserFragments),
             ],
           };
         },

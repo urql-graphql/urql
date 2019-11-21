@@ -22,7 +22,7 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
-    "@urql/exchange-graphcache": "^1.2.0",
+    "@urql/exchange-graphcache": "^1.2.2",
     "apollo-server-express": "^2.9.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
