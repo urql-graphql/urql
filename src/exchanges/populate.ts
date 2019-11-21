@@ -40,10 +40,10 @@ export const populateExchange = ({
       return op;
     }
 
-    const activeSelections = Object.entries(typeFragments).reduce(
-      (state, [key, value]) => ({
+    const activeSelections = Object.keys(typeFragments).reduce(
+      (state, key) => ({
         ...state,
-        [key]: value.filter(s => activeOperations.has(s.key)),
+        [key]: state[key].filter(s => activeOperations.has(s.key)),
       }),
       typeFragments
     );
@@ -288,7 +288,9 @@ export const addFragmentsToQuery = ({
             ...node,
             definitions: [
               ...node.definitions,
-              ...Object.values(additionalFragments),
+              ...Object.keys(additionalFragments).map(
+                k => additionalFragments[k]
+              ), // Object.values
               ...requiredUserFragments,
             ],
           };
