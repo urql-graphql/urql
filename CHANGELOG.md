@@ -8,9 +8,17 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.2.2](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.1...v1.2.2)
+
+This patch replaces `pessimism` (our former underlying data structure) with a smaller implementation
+that just uses `Map`s, since we weren't relying on any immutability internally. This cuts down
+on bundlesize and massively on GC-pressure, which provides a large speedup on low-end devices.
+
+- Replace Pessimism with mutable store to prevent excessive GC work (see [#117](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/117))
+
 ## [v1.2.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.0...v1.2.1)
 
-- Fix viewer fields (which return `Query` types) not being written or read correctl (see [#116](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/116))
+- Fix viewer fields (which return `Query` types) not being written or read correctly (see [#116](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/116))
 
 ## [v1.2.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.1.2...v1.2.0)
 
