@@ -23,7 +23,7 @@ A `resolver` gets four arguments:
 - `parent` – The original entity in the cache. In the example above, this
   would be the full `Todo` object.
 - `arguments` – The arguments used in this field.
-- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods;
+- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods;
   see more about this [below](#cache.resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.
 
