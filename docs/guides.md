@@ -78,27 +78,55 @@ Before we jump into writing some exchanges, there are a couple of
 patterns and limitations that always remain the same when writing
 an exchange.
 
+### Forward Operation Streams. Return OperationResult Streams.
+
 For reference, this is a basic template for an exchange:
 
 ```js
 const noopExchange = ({ client, forward }) => {
-  return operations$ => {
-    return forward(operations$);
+  return operation$ => { // <-- The ExchangeIO function
+    const operationResult$ = forward(operations$);
+    return operationResult$;
   };
 };
 ```
 
-In this form the exchange doesn't do anything yet.
-When you create a client and pass it an array of exchanges, all exchanges
-will be composed together into a single one. They will each be called with
-an object that contains the `client` itself, and a `forward` function which
-is the next `ExchangeIO` function.
+By convention, variables ending with `$` are streams. Each exchange's `ExchangeIO` function receives a stream containing an [`Operation`](https://formidable.com/open-source/urql/docs/api/#operation-type) object (`operation$`) and must return a stream of [`OperationResult`](https://formidable.com/open-source/urql/docs/api/#operationresult-type) object(s)(`operationResult$`).
 
-The `ExchangeIO` function is what each exchange returns. This is a function
-that receives the stream of operations and must return a stream of results.
+#### Forward and Return Composition
 
-So our `noopExchange` is the minimal template that fulfils this requirement.
-It just receives the operations stream and passes it on to `forward`.
+When you create a client and pass it an array of exchanges, `urql` composes them left-to-right into a single exchange using [`composeExchanges`](https://github.com/FormidableLabs/urql/blob/master/src/exchanges/compose.ts). `composeExchanges` orchestrates stream forward and return between exchanges. Here's the `noopExchange` in context:
+
+```js
+import { Client, dedupeExchange, fetchExchange } from 'urql';
+
+const noopExchange = ({ client, forward }) => {
+  return operation$ => { // <-- This exchange's ExchangeIO function
+    // calling forward() here will call the next exchange's ExchangeIO function.
+    // So before this,
+    // urql creates an Operation object, places it in a stream (operation$),
+    // and calls composeExchange's ExchangeIO function with it.
+    // composeExchange forward()s the operation$ stream to dedupeExchange's ExchangeIO function.
+    // dedupeExchange filters duplicates and forward()s the stream to noopExchange's ExchangeIO function.
+    
+    // Here, noopExchange forward()s the operation$ stream to fetchExchange's ExchangeIO function
+    const operationResult$ = forward(operations$);
+    
+    // fetchExchange receives the operation$ stream, creates an OperationResult object,
+    // and returns it in an operationResult$ stream.
+    // finally, noopExchange returns the operationsResult$ stream to dedupeExchange's forward() call.
+    
+    return operationResult$;
+    
+    // After this, dedupExchange returns operationResult$ to composeExchange's forward() call.
+    // urql client receives the operationResult$ from composeExchange and provides data to components.
+  };
+};
+
+const client = new Client({
+  exchanges: [dedupeExchange, noopExchange, fetchExchange],
+});
+```
 
 ### One operations stream only
 
@@ -115,7 +143,7 @@ must be careful to either only use it once, or to _share_ its subscription.
 import { pipe, filter, merge, share } from 'wonka';
 
 // DON'T: split use operations$ twice
-({ forward }) => operations$ => {
+({ forward }) => operations$ => { // <-- The ExchangeIO function (inline)
   const queries = pipe(
     operations$,
     filter(op => op.operationName === 'query')
@@ -128,7 +156,7 @@ import { pipe, filter, merge, share } from 'wonka';
 };
 
 // DO: share operations$ if you have to use it twice
-({ forward }) => operations$ => {
+({ forward }) => operations$ => { // <-- The ExchangeIO function (inline)
   const shared = pipe(
     operations$,
     share
@@ -145,7 +173,7 @@ import { pipe, filter, merge, share } from 'wonka';
 };
 
 // DO: use operations$ only once alternatively
-({ forward }) => operations$ =>
+({ forward }) => operations$ => // <-- The ExchangeIO function (inline)
   pipe(
     operations$,
     map(op => {
