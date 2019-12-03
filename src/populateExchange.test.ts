@@ -1,4 +1,3 @@
-import { populateExchange } from './populate';
 import {
   buildSchema,
   print,
@@ -7,9 +6,12 @@ import {
   DocumentNode,
   ASTKindToNode,
 } from 'graphql';
+
 import gql from 'graphql-tag';
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
 import { Client, Operation } from 'urql';
+
+import { populateExchange } from './populateExchange';
 
 const schemaDef = `
   interface Node {

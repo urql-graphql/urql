@@ -52,11 +52,7 @@ export class SchemaPredicates {
 
     expectAbstractType(abstractType, typeCondition);
     expectObjectType(objectType, typename);
-
-    return this.schema.isPossibleType(
-      abstractType as GraphQLAbstractType,
-      objectType as GraphQLObjectType
-    );
+    return this.schema.isPossibleType(abstractType, objectType);
   }
 }
 
@@ -65,7 +61,7 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
-  const object = schema.getType(typename) as GraphQLObjectType;
+  const object = schema.getType(typename);
   expectObjectType(object, typename);
 
   const field = object.getFields()[fieldName];
@@ -87,24 +83,24 @@ const getField = (
   return field;
 };
 
-const expectObjectType = (type: any, typename: string) => {
+function expectObjectType(x: any, typename: string): asserts x is GraphQLObjectType {
   invariant(
-    type instanceof GraphQLObjectType,
+    x instanceof GraphQLObjectType,
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
       'but the GraphQL document is traversing it.',
     3
   );
-};
+}
 
-const expectAbstractType = (type: any, typename: string) => {
+function expectAbstractType(x: any, typename: string): asserts x is GraphQLAbstractType {
   invariant(
-    type instanceof GraphQLInterfaceType || type instanceof GraphQLUnionType,
+    x instanceof GraphQLInterfaceType || x instanceof GraphQLUnionType,
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +
       'but a fragment in the GraphQL document is using it as a type condition.',
     5
   );
-};
+}

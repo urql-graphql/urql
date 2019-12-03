@@ -311,8 +311,8 @@ const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
 
   if (!isCompositeType(type)) {
     warn(
-      `PopulateExchange: Unsupported type "${type}" at populate decorator.`,
-      1
+      'Invalid type: The type ` + type + ` is used with @populate but does not exist.',
+      17
     );
     return [];
   }
@@ -332,15 +332,13 @@ const getTypeName = (t: TypeInfo) => {
       ? typeInfoType.ofType
       : typeInfoType;
 
-  if (isAbstractType(type)) {
-    invariant(
-      'PopulateExchange',
-      'Invalid TypeInfo state. "getTypeName" does not expect to receive an abstract type.',
-      1
-    );
-  }
+  invariant(
+    !isAbstractType(type),
+    'Invalid TypeInfo state: Found an abstract type when none was expected.',
+    18
+  );
 
-  return type.toString() as string;
+  return type.toString();
 };
 
 /** Get fragment names referenced by node. */

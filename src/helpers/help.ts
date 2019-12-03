@@ -37,8 +37,12 @@ const getDebugOutput = (): string =>
     ? '\n(Caused At: ' + currentDebugStack.current.join(', ') + ')'
     : '';
 
-export const invariant = (clause: any, message: string, code: ErrorCode) => {
-  if (!clause) {
+export function invariant(
+  condition: any,
+  message: string,
+  code: ErrorCode
+): asserts condition {
+  if (!condition) {
     let errorMessage = message || 'Minfied Error #' + code + '\n';
     if (process.env.NODE_ENV !== 'production') {
       errorMessage += getDebugOutput();
@@ -50,7 +54,7 @@ export const invariant = (clause: any, message: string, code: ErrorCode) => {
   }
 };
 
-export const warn = (message: string, code: ErrorCode) => {
+export function warn(message: string, code: ErrorCode) {
   if (!cache.has(message)) {
     console.warn(message + getDebugOutput() + helpUrl + code);
     cache.add(message);

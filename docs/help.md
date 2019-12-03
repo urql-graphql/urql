@@ -244,3 +244,28 @@ in the cache, which is then treated as a fragment match.
 
 When you pass an introspected schema to the cache, this warning will never be displayed
 as the cache can then do deterministic fragment matching using schema information.
+
+## (17) Invalid type <a id="17"></a>
+
+> Invalid type: The type `???` is used with @populate but does not exist.
+
+When you're using the populate exchange with an introspected schema and add the
+`@populate` directive to fields it first checks whether the type is valid and
+exists on the schema.
+
+If the field does not have sufficient type information because it doesn't exist
+on the schema or does not match expectations then this warning is logged.
+
+Check whether your schema is up-to-date or whether you're using an invalid
+field somewhere, maybe due to a typo.
+
+## (18) Invalid TypeInfo state <a id="18"></a>
+
+> Invalid TypeInfo state: Found an abstract type when none was expected.
+
+When you're using the populate exchange with an introspected schema, it will
+start collecting used fragments and selection sets on all of your queries.
+This error may occur if it hits unexpected abstract types when doing so.
+
+Please open an issue if it happens on a query that you expect to be supported
+by the `populateExchange`.

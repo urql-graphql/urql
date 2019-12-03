@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 import { createClient, ExchangeIO, Operation, OperationResult } from 'urql';
 import { pipe, map, makeSubject, tap, publish, delay } from 'wonka';
-import { cacheExchange } from './exchange';
+import { cacheExchange } from './cacheExchange';
 
 const queryOne = gql`
   {
@@ -37,17 +37,9 @@ it('writes queries to the cache', () => {
 
   const [ops$, next] = makeSubject<Operation>();
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-  pipe(
-    cacheExchange({})({ forward, client })(ops$),
-    tap(result),
-    publish
-  );
+  pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
 
   next(op);
   next(op);
@@ -114,18 +106,10 @@ it('updates related queries when their data changes', () => {
     }
   );
 
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
   const result = jest.fn();
 
-  pipe(
-    cacheExchange({})({ forward, client })(ops$),
-    tap(result),
-    publish
-  );
+  pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
 
   next(opOne);
   expect(response).toHaveBeenCalledTimes(1);
@@ -183,18 +167,10 @@ it('does nothing when no related queries have changed', () => {
     }
   );
 
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
   const result = jest.fn();
 
-  pipe(
-    cacheExchange({})({ forward, client })(ops$),
-    tap(result),
-    publish
-  );
+  pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
 
   next(opOne);
   expect(response).toHaveBeenCalledTimes(1);
@@ -266,12 +242,7 @@ it('writes optimistic mutations to the cache', () => {
   );
 
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      delay(1),
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
   const optimistic = {
     concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
@@ -316,11 +287,7 @@ it('follows resolvers on initial write', () => {
     }
   );
 
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
   const result = jest.fn();
   const fakeResolver = jest.fn();
@@ -402,12 +369,7 @@ it('follows resolvers for mutations', () => {
   );
 
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      delay(1),
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
   const fakeResolver = jest.fn();
 
@@ -548,12 +510,7 @@ it('follows nested resolvers for mutations', () => {
   );
 
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      delay(1),
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
   const fakeResolver = jest.fn();
   const called: any[] = [];
@@ -632,7 +589,7 @@ it('reexecutes query and returns data on partial result', () => {
     .spyOn(client, 'reexecuteOperation')
     // Empty mock to avoid going in an endless loop, since we would again return
     // partial data.
-    .mockImplementation(() => {});
+    .mockImplementation(() => undefined);
 
   const initialQuery = gql`
     query {
@@ -699,12 +656,7 @@ it('reexecutes query and returns data on partial result', () => {
   );
 
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ =>
-    pipe(
-      ops$,
-      delay(1),
-      map(response)
-    );
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
   pipe(
     cacheExchange({
