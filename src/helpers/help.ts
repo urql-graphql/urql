@@ -4,7 +4,7 @@
 // You can read more about the messages themselves in `docs/help.md`
 
 import { Kind, ExecutableDefinitionNode, InlineFragmentNode } from 'graphql';
-import { Ref } from '../types';
+import { Ref, ErrorCode } from '../types';
 
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 
@@ -37,7 +37,7 @@ const getDebugOutput = (): string =>
     ? '\n(Caused At: ' + currentDebugStack.current.join(', ') + ')'
     : '';
 
-export const invariant = (clause: any, message: string, code: number) => {
+export const invariant = (clause: any, message: string, code: ErrorCode) => {
   if (!clause) {
     let errorMessage = message || 'Minfied Error #' + code + '\n';
     if (process.env.NODE_ENV !== 'production') {
@@ -50,7 +50,7 @@ export const invariant = (clause: any, message: string, code: number) => {
   }
 };
 
-export const warn = (message: string, code: number) => {
+export const warn = (message: string, code: ErrorCode) => {
   if (!cache.has(message)) {
     console.warn(message + getDebugOutput() + helpUrl + code);
     cache.add(message);
