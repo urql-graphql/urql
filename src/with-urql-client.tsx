@@ -22,12 +22,18 @@ interface WithUrqlState {
   urqlState: SSRData;
 }
 
-interface NextContextWithAppTree extends NextContext {
+export interface NextContextWithAppTree extends NextContext {
   AppTree: React.ComponentType<any>;
 }
 
+type NextUrqlClientOptions =
+  | Omit<ClientOptions, 'exchanges' | 'suspense'>
+  | ((
+      ctx: NextContext<any, any>,
+    ) => Omit<ClientOptions, 'exchanges' | 'suspense'>);
+
 const withUrqlClient = <T extends {}>(
-  clientOptions: Omit<ClientOptions, 'exchanges' | 'suspense'>,
+  clientOptions: NextUrqlClientOptions,
   mergeExchanges: (ssrEx: SSRExchange) => Exchange[] = ssrEx => [
     dedupExchange,
     cacheExchange,
@@ -38,14 +44,19 @@ const withUrqlClient = <T extends {}>(
   App: NextComponentClass<T & WithUrqlClient> | NextFC<T & WithUrqlClient>,
 ) => {
   const withUrql: NextFC<
-    T & WithUrqlClient & WithUrqlState,
+    T & WithUrqlClient & WithUrqlState & { ctx: NextContextWithAppTree },
     T & WithUrqlState,
     NextContextWithAppTree
   > = props => {
+    const opts =
+      typeof clientOptions === 'function'
+        ? clientOptions(props.ctx)
+        : clientOptions;
+
     const urqlClient = React.useMemo(
       () =>
         props.urqlClient ||
-        initUrqlClient(clientOptions, mergeExchanges, props.urqlState)[0],
+        initUrqlClient(opts, mergeExchanges, props.urqlState)[0],
       [],
     );
 
@@ -74,7 +85,9 @@ const withUrqlClient = <T extends {}>(
       return appProps as T & WithUrqlState;
     }
 
-    const [urqlClient, ssrCache] = initUrqlClient(clientOptions);
+    const opts =
+      typeof clientOptions === 'function' ? clientOptions(ctx) : clientOptions;
+    const [urqlClient, ssrCache] = initUrqlClient(opts);
 
     /**
      * Run the prepass step on AppTree.
@@ -95,7 +108,8 @@ const withUrqlClient = <T extends {}>(
     return {
       ...appProps,
       urqlState,
-    } as T & WithUrqlState;
+      ctx,
+    } as T & WithUrqlState & { ctx: NextContextWithAppTree };
   };
 
   return withUrql;

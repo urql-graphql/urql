@@ -1,5 +1,5 @@
 import React from 'react';
-import { NextComponentClass, NextContext } from 'next';
+import { NextComponentClass, NextContext, NextFC } from 'next';
 import { Client, ClientOptions, Exchange } from 'urql';
 import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 
@@ -15,11 +15,14 @@ interface NextContextWithAppTree extends NextContext {
   AppTree: React.ComponentType<any>;
 }
 
-declare const withUrqlClient: <T extends {}>(
-  clientOptions: Pick<
-    ClientOptions,
-    'fetch' | 'url' | 'fetchOptions' | 'requestPolicy'
-  >,
+type NextUrqlClientOptions =
+  | Omit<ClientOptions, 'exchanges' | 'suspense'>
+  | ((
+      ctx: NextContext<any, any>,
+    ) => Omit<ClientOptions, 'exchanges' | 'suspense'>);
+
+declare const withUrqlClient: <T>(
+  clientOptions: NextUrqlClientOptions,
   mergeExchanges?: (ssrEx: SSRExchange) => Exchange[],
 ) => (
   App:
@@ -28,12 +31,12 @@ declare const withUrqlClient: <T extends {}>(
         T & WithUrqlClient,
         NextContext<Record<string, string | string[] | undefined>, {}>
       >
-    | import('next').NextFunctionComponent<
+    | NextFC<
         T & WithUrqlClient,
         T & WithUrqlClient,
         NextContext<Record<string, string | string[] | undefined>, {}>
       >,
-) => import('next').NextFunctionComponent<
+) => NextFC<
   T & WithUrqlClient & WithUrqlState,
   T & WithUrqlState,
   NextContextWithAppTree

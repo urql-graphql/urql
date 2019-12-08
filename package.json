@@ -17,7 +17,7 @@
     "check": "run-s check:types test lint format",
     "check:types": "tsc --noEmit",
     "clean": "rimraf ./dist ./node_modules/.cache",
-    "format": "prettier --write **/*.{ts,tsx,d.ts,js}",
+    "format": "prettier --write {src,__tests__,example}/*.{ts,tsx,d.ts,js}",
     "lint": "eslint **/*.{ts,tsx}",
     "preversion": "run-s clean test build",
     "test": "jest"
@@ -34,6 +34,8 @@
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
     "babel-plugin-transform-async-to-promises": "^0.8.14",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",
@@ -63,6 +65,8 @@
     "urql": "^1.6.1"
   },
   "dependencies": {
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
     "react-ssr-prepass": "^1.0.8"
   },
   "peerDependencies": {
