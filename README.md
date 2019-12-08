@@ -72,10 +72,20 @@ Next allows you to override the root of your application using a special page ca
 
 #### `clientOptions` (Required)
 
-The `clientOptions` argument is required. It represents all of the options you want to enable on your `urql` Client instance. It has the following type:
+The `clientOptions` argument is required. It represents all of the options you want to enable on your `urql` Client instance. It has the following union type:
 
 ```typescript
-export interface ClientOptions {
+type NextUrqlClientOptions =
+  | Omit<ClientOptions, 'exchanges' | 'suspense'>
+  | ((
+      ctx: NextContext<any, any>,
+    ) => Omit<ClientOptions, 'exchanges' | 'suspense'>);
+```
+
+The `ClientOptions` `interface` comes from `urql` itself and has the following type:
+
+```typescript
+interface ClientOptions {
   /** The GraphQL endpoint your application is using. */
   url: string;
   /** Any additional options to pass to fetch. */
@@ -85,6 +95,31 @@ export interface ClientOptions {
   /** The default request policy for requests. */
   requestPolicy?: RequestPolicy;
 }
+```
+
+This means you have two options for creating your `urql` Client. The first involves just passing the options as an object directly:
+
+```typescript
+withUrqlClient({
+  url: 'http://localhost:3000',
+  fetchOptions: {
+    referrer: 'no-referrer',
+    redirect: 'follow',
+  },
+});
+```
+
+The second involves passing a function, which receives Next's context object, `ctx`, as an argument and returns `urql`'s client options. This is helpful if you need to access some part of Next's context to instantiate your client options:
+
+```typescript
+withUrqlClient(ctx => ({
+  url: 'http://localhost:3000',
+  fetchOptions: {
+    headers: {
+      Authorization: `Bearer ${ctx.req.headers.token}`,
+    },
+  },
+}));
 ```
 
 In client-side SPAs using `urql`, you typically configure the `Client` yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` setup for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
