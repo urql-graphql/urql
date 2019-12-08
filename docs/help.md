@@ -261,11 +261,14 @@ field somewhere, maybe due to a typo.
 
 ## (18) Invalid TypeInfo state <a id="18"></a>
 
-> Invalid TypeInfo state: Found an abstract type when none was expected.
+> Invalid TypeInfo state: Found no flat schema type when one was expected.
 
 When you're using the populate exchange with an introspected schema, it will
 start collecting used fragments and selection sets on all of your queries.
-This error may occur if it hits unexpected abstract types when doing so.
+This error may occur if it hits unexpected types or inexistent types when doing so.
+
+Check whether your schema is up-to-date or whether you're using an invalid
+field somewhere, maybe due to a typo.
 
 Please open an issue if it happens on a query that you expect to be supported
 by the `populateExchange`.

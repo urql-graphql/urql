@@ -17,7 +17,7 @@ import {
   KeyingConfig,
 } from './types';
 
-import * as KVMap from './map';
+import * as KVMap from './helpers/map';
 import { joinKeys, keyOfField } from './helpers';
 import { invariant, currentDebugStack } from './helpers/help';
 import { read, readFragment } from './operations/query';

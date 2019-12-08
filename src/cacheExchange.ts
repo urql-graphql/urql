@@ -7,6 +7,7 @@ import {
   CacheOutcome,
 } from 'urql';
 
+import { IntrospectionQuery } from 'graphql';
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 import { query, write, writeOptimistic } from './operations';
 import { SchemaPredicates } from './ast/schemaPredicates';
@@ -85,7 +86,7 @@ export interface CacheExchangeOpts {
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
-  schema?: object;
+  schema?: IntrospectionQuery;
 }
 
 export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({

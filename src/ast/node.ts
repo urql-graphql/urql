@@ -6,10 +6,13 @@ import {
   InlineFragmentNode,
   FieldNode,
   FragmentDefinitionNode,
+  GraphQLOutputType,
   Kind,
+  isListType,
+  isNonNullType,
 } from 'graphql';
 
-import { SelectionSet } from '../types';
+import { SelectionSet, GraphQLFlatType } from '../types';
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;
@@ -40,3 +43,11 @@ export const isFieldNode = (node: SelectionNode): node is FieldNode =>
 export const isInlineFragment = (
   node: SelectionNode
 ): node is InlineFragmentNode => node.kind === Kind.INLINE_FRAGMENT;
+
+export const unwrapType = (
+  type: null | undefined | GraphQLOutputType
+): GraphQLFlatType | null => {
+  return type && (isListType(type) || isNonNullType(type))
+    ? type.ofType
+    : type || null;
+};
