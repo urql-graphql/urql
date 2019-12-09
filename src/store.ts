@@ -2,7 +2,6 @@ import { DocumentNode } from 'graphql';
 import { createRequest } from 'urql';
 
 import {
-  Ref,
   Cache,
   EntityField,
   Link,
@@ -25,58 +24,53 @@ import { writeFragment, startWrite } from './operations/write';
 import { invalidate } from './operations/invalidate';
 import { SchemaPredicates } from './ast/schemaPredicates';
 
-const currentDependencies: Ref<null | Set<string>> = { current: null };
-const currentOptimisticKey: Ref<null | number> = { current: null };
+let currentDependencies: null | Set<string> = null;
+let currentOptimisticKey: null | number = null;
 
-// Resolve a ref value or throw when we're outside of a store run
-const refValue = <T>(ref: Ref<T | null>): T => {
+// Initialise a store run by resetting its internal state
+export const initStoreState = (optimisticKey: null | number) => {
+  currentDependencies = new Set();
+  currentOptimisticKey = optimisticKey;
+
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
+};
+
+// Finalise a store run by clearing its internal state
+export const clearStoreState = () => {
+  currentDependencies = null;
+  currentOptimisticKey = null;
+
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
+};
+
+export const getCurrentDependencies = (): Set<string> => {
   invariant(
-    ref.current !== null,
+    currentDependencies !== null,
     'Invalid Cache call: The cache may only be accessed or mutated during' +
       'operations like write or query, or as part of its resolvers, updaters, ' +
       'or optimistic configs.',
     2
   );
 
-  return ref.current as T;
+  return currentDependencies;
 };
-
-// Initialise a store run by resetting its internal state
-export const initStoreState = (optimisticKey: null | number) => {
-  currentDependencies.current = new Set();
-  currentOptimisticKey.current = optimisticKey;
-
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.current = [];
-  }
-};
-
-// Finalise a store run by clearing its internal state
-export const clearStoreState = () => {
-  currentDependencies.current = null;
-  currentOptimisticKey.current = null;
-
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.current = [];
-  }
-};
-
-export const getCurrentDependencies = () => refValue(currentDependencies);
 
 // Add a dependency to the internal store state
 export const addDependency = (dependency: string) => {
-  (currentDependencies.current as Set<string>).add(dependency);
+  (currentDependencies as Set<string>).add(dependency);
 };
 
 const mapSet = <T>(map: KVMap.KVMap<T>, key: string, value: T) => {
-  const optimisticKey = currentOptimisticKey.current || 0;
-  return KVMap.set(map, key, value, optimisticKey);
+  return KVMap.set(map, key, value, currentOptimisticKey);
 };
 
 // Used to remove a value from a Map optimistially (possible by setting it to undefined)
 const mapRemove = <T>(map: KVMap.KVMap<T>, key: string) => {
-  const optimisticKey = currentOptimisticKey.current || 0;
-  return KVMap.remove(map, key, optimisticKey);
+  return KVMap.remove(map, key, currentOptimisticKey);
 };
 
 type RootField = 'query' | 'mutation' | 'subscription';
@@ -179,9 +173,9 @@ export class Store implements Cache {
   }
 
   clearOptimistic(optimisticKey: number) {
-    this.records = KVMap.clear(this.records, optimisticKey);
-    this.connections = KVMap.clear(this.connections, optimisticKey);
-    this.links = KVMap.clear(this.links, optimisticKey);
+    KVMap.clear(this.records, optimisticKey);
+    KVMap.clear(this.connections, optimisticKey);
+    KVMap.clear(this.links, optimisticKey);
   }
 
   getRecord(fieldKey: string): EntityField {
@@ -189,11 +183,11 @@ export class Store implements Cache {
   }
 
   removeRecord(fieldKey: string) {
-    return (this.records = mapRemove(this.records, fieldKey));
+    return mapRemove(this.records, fieldKey);
   }
 
   writeRecord(field: EntityField, fieldKey: string) {
-    return (this.records = mapSet(this.records, fieldKey, field));
+    return mapSet(this.records, fieldKey, field);
   }
 
   getField(
@@ -210,11 +204,11 @@ export class Store implements Cache {
     fieldName: string,
     args?: Variables
   ) {
-    return (this.records = mapSet(
+    return mapSet(
       this.records,
       joinKeys(entityKey, keyOfField(fieldName, args)),
       field
-    ));
+    );
   }
 
   getLink(key: string): undefined | Link {
@@ -222,11 +216,11 @@ export class Store implements Cache {
   }
 
   removeLink(key: string) {
-    return (this.links = mapRemove(this.links, key));
+    return mapRemove(this.links, key);
   }
 
   writeLink(link: Link, key: string) {
-    return (this.links = mapSet(this.links, key, link));
+    return mapSet(this.links, key, link);
   }
 
   writeConnection(key: string, linkKey: string, args: Variables | null) {
@@ -245,7 +239,7 @@ export class Store implements Cache {
       connections.push(connection);
     }
 
-    return (this.connections = mapSet(this.connections, key, connections));
+    return mapSet(this.connections, key, connections);
   }
 
   resolveValueOrLink(fieldKey: string): DataField {

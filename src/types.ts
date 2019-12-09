@@ -9,10 +9,6 @@ import {
 // Helper types
 export type NullArray<T> = Array<null | T>;
 
-export interface Ref<T> {
-  current: T;
-}
-
 // GraphQL helper types
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 export type GraphQLFlatType = Exclude<GraphQLOutputType, GraphQLWrappingType>;

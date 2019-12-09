@@ -4,7 +4,7 @@
 // You can read more about the messages themselves in `docs/help.md`
 
 import { Kind, ExecutableDefinitionNode, InlineFragmentNode } from 'graphql';
-import { Ref, ErrorCode } from '../types';
+import { ErrorCode } from '../types';
 
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 
@@ -12,7 +12,7 @@ const helpUrl =
   '\nhttps://github.com/FormidableLabs/urql-exchange-graphcache/blob/master/docs/help.md#';
 const cache = new Set<string>();
 
-export const currentDebugStack: Ref<string[]> = { current: [] };
+export const currentDebugStack: string[] = [];
 
 export const pushDebugNode = (typename: void | string, node: DebugNode) => {
   let identifier = '';
@@ -28,13 +28,13 @@ export const pushDebugNode = (typename: void | string, node: DebugNode) => {
   }
 
   if (identifier) {
-    currentDebugStack.current.push(identifier);
+    currentDebugStack.push(identifier);
   }
 };
 
 const getDebugOutput = (): string =>
-  currentDebugStack.current.length
-    ? '\n(Caused At: ' + currentDebugStack.current.join(', ') + ')'
+  currentDebugStack.length
+    ? '\n(Caused At: ' + currentDebugStack.join(', ') + ')'
     : '';
 
 export function invariant(
@@ -52,11 +52,11 @@ export function invariant(
     error.name = 'Graphcache Error';
     throw error;
   }
-};
+}
 
 export function warn(message: string, code: ErrorCode) {
   if (!cache.has(message)) {
     console.warn(message + getDebugOutput() + helpUrl + code);
     cache.add(message);
   }
-};
+}
