@@ -16,7 +16,7 @@ export const make = <T>(): KVMap<T> => ({
 export const set = <T>(
   map: KVMap<T>,
   key: string,
-  value: T,
+  value: T | undefined,
   optimisticKey: null | number
 ): KVMap<T> => {
   if (optimisticKey) {
@@ -26,27 +26,10 @@ export const set = <T>(
     }
 
     map.optimistic[optimisticKey].set(key, value);
+  } else if (value === undefined) {
+    map.base.delete(key);
   } else {
     map.base.set(key, value);
-  }
-
-  return map;
-};
-
-export const remove = <T>(
-  map: KVMap<T>,
-  key: string,
-  optimisticKey: null | number
-): KVMap<T> => {
-  if (optimisticKey) {
-    if (map.optimistic[optimisticKey] === undefined) {
-      map.optimistic[optimisticKey] = new Map();
-      map.keys.unshift(optimisticKey);
-    }
-
-    map.optimistic[optimisticKey].set(key, undefined);
-  } else {
-    map.base.delete(key);
   }
 
   return map;

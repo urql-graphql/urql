@@ -291,7 +291,7 @@ const writeSelection = (
       );
 
       store.writeLink(link, fieldKey);
-      store.removeRecord(fieldKey);
+      store.writeRecord(undefined, fieldKey);
     } else {
       warn(
         'Invalid value: The field at `' +

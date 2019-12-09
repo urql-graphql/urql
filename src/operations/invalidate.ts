@@ -69,7 +69,10 @@ export const invalidateSelection = (
     if (typeof typename !== 'string') {
       return;
     } else {
-      store.removeRecord(joinKeys(entityKey, keyOfField('__typename')));
+      store.writeRecord(
+        undefined,
+        joinKeys(entityKey, keyOfField('__typename'))
+      );
     }
   } else {
     typename = entityKey;
@@ -96,15 +99,15 @@ export const invalidateSelection = (
     if (isQuery) addDependency(fieldKey);
 
     if (node.selectionSet === undefined) {
-      store.removeRecord(fieldKey);
+      store.writeRecord(undefined, fieldKey);
     } else {
       const fieldSelect = getSelectionSet(node);
       const link = store.getLink(fieldKey);
-      store.removeLink(fieldKey);
+      store.writeLink(undefined, fieldKey);
 
       if (link === undefined) {
         if (store.getRecord(fieldKey) !== undefined) {
-          store.removeRecord(fieldKey);
+          store.writeRecord(undefined, fieldKey);
         }
       } else if (Array.isArray(link)) {
         for (let i = 0, l = link.length; i < l; i++) {

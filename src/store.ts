@@ -64,15 +64,6 @@ export const addDependency = (dependency: string) => {
   (currentDependencies as Set<string>).add(dependency);
 };
 
-const mapSet = <T>(map: KVMap.KVMap<T>, key: string, value: T) => {
-  return KVMap.set(map, key, value, currentOptimisticKey);
-};
-
-// Used to remove a value from a Map optimistially (possible by setting it to undefined)
-const mapRemove = <T>(map: KVMap.KVMap<T>, key: string) => {
-  return KVMap.remove(map, key, currentOptimisticKey);
-};
-
 type RootField = 'query' | 'mutation' | 'subscription';
 
 export class Store implements Cache {
@@ -182,12 +173,8 @@ export class Store implements Cache {
     return KVMap.get(this.records, fieldKey);
   }
 
-  removeRecord(fieldKey: string) {
-    return mapRemove(this.records, fieldKey);
-  }
-
   writeRecord(field: EntityField, fieldKey: string) {
-    return mapSet(this.records, fieldKey, field);
+    return KVMap.set(this.records, fieldKey, field, currentOptimisticKey);
   }
 
   getField(
@@ -204,10 +191,9 @@ export class Store implements Cache {
     fieldName: string,
     args?: Variables
   ) {
-    return mapSet(
-      this.records,
-      joinKeys(entityKey, keyOfField(fieldName, args)),
-      field
+    return this.writeRecord(
+      field,
+      joinKeys(entityKey, keyOfField(fieldName, args))
     );
   }
 
@@ -215,12 +201,8 @@ export class Store implements Cache {
     return KVMap.get(this.links, key);
   }
 
-  removeLink(key: string) {
-    return mapRemove(this.links, key);
-  }
-
-  writeLink(link: Link, key: string) {
-    return mapSet(this.links, key, link);
+  writeLink(link: undefined | Link, key: string) {
+    return KVMap.set(this.links, key, link, currentOptimisticKey);
   }
 
   writeConnection(key: string, linkKey: string, args: Variables | null) {
@@ -239,7 +221,7 @@ export class Store implements Cache {
       connections.push(connection);
     }
 
-    return mapSet(this.connections, key, connections);
+    return KVMap.set(this.connections, key, connections, currentOptimisticKey);
   }
 
   resolveValueOrLink(fieldKey: string): DataField {
