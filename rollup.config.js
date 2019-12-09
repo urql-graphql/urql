@@ -67,6 +67,7 @@ const terserMinified = terser({
   ecma: 5,
   ie8: false,
   toplevel: true,
+  mangle: true,
   compress: {
     keep_infinity: true,
     pure_getters: true,
@@ -209,14 +210,15 @@ export default [
     plugins: makePlugins(true),
     output: [
       {
-        sourcemap: true,
+        sourcemap: false,
         legacy: true,
+        esModule: false,
         freeze: false,
         file: `./dist/${name}.min.js`,
         format: 'cjs'
       },
       {
-        sourcemap: true,
+        sourcemap: false,
         legacy: true,
         freeze: false,
         file: `./dist/${name}.es.min.js`,
