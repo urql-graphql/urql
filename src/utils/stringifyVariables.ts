@@ -1,6 +1,7 @@
 const seen = new Set();
 
 const stringify = (x: any): string => {
+  if (x && x.toJson) x = x.toJSON();
   if (x === undefined) {
     return '';
   } else if (typeof x == 'number') {
