@@ -6,6 +6,7 @@ import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import transformPipe from './scripts/transform-pipe';
 
 const pkgInfo = require('./package.json');
@@ -68,7 +69,7 @@ const terserMinified = terser({
   }
 });
 
-const makePlugins = (isProduction = false) => [
+const makePlugins = (isProduction = false, compilation) => [
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
     browser: true
@@ -81,6 +82,9 @@ const makePlugins = (isProduction = false) => [
     },
   }),
   typescript({
+    // Object-hash (closure compiler) has an issue with certain compilations
+    // That's why we're ignoring that.
+    objectHashIgnoreUnknownHack: true,
     typescript: require('typescript'),
     cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
@@ -134,6 +138,7 @@ const makePlugins = (isProduction = false) => [
   isProduction && replace({
     'process.env.NODE_ENV': JSON.stringify('production')
   }),
+  compiler({ compilation_level: compilation }),
   isProduction ? terserMinified : terserPretty
 ].filter(Boolean);
 
@@ -148,7 +153,7 @@ const config = {
 export default [
   {
     ...config,
-    plugins: makePlugins(false),
+    plugins: makePlugins(false, 'SIMPLE_OPTIMIZATIONS'),
     output: [
       {
         sourcemap: true,
@@ -169,8 +174,20 @@ export default [
     ]
   }, {
     ...config,
-    plugins: makePlugins(true),
+    plugins: makePlugins(true, 'ADVANCED_OPTIMIZATIONS'),
     onwarn: () => {},
+    output: [
+      {
+        sourcemap: false,
+        legacy: true,
+        freeze: false,
+        file: './dist/urql.es.min.js',
+        format: 'esm'
+      }
+    ]
+  }, {
+    ...config,
+    plugins: makePlugins(true, 'SIMPLE_OPTIMIZATIONS'),
     output: [
       {
         sourcemap: false,
@@ -179,13 +196,6 @@ export default [
         file: './dist/urql.min.js',
         format: 'cjs'
       },
-      {
-        sourcemap: false,
-        legacy: true,
-        freeze: false,
-        file: './dist/urql.es.min.js',
-        format: 'esm'
-      }
     ]
   }
 ];
