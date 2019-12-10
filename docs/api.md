@@ -491,6 +491,16 @@ a corresponding `OperationResult` yet. Any duplicate `Operation` that it
 receives is filtered out if the same `Operation` has already been received
 and is still waiting for a result.
 
+### retryExchange (Exchange factory)
+
+The `retryExchange` is of type `Options => Exchange`. It periodically retries
+requests that fail due to network errors. It accepts two options: `minDelayMs`,
+which is the initial delay to retry a request, and `maxDelayMs`, which is the
+maximum delay to retry a request.
+
+The `retryExchange` will exponentially increase the delay from `minDelayMs` up
+to `maxDelayMs`, with some random jitter added to avoid the [thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem).
+
 ### fallbackExchangeIO (ExchangeIO)
 
 This is an `ExchangeIO` function that the `Client` adds on after all

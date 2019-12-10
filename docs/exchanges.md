@@ -17,6 +17,7 @@ These exchanges can be imported from the `urql` package.
 - `fetchExchange`: sends operations to GraphQL HTTP endpoints and resolves results
 - `ssrExchange`: used to cache results during SSR and rehydrate them on the client-side
 - `subscriptionExchange`: used to support GraphQL subscriptions
+- `retryExchange`: retries requests that fail due to network errors
 
 ## Addons
 

@@ -6,6 +6,7 @@ export { dedupExchange } from './dedup';
 export { fetchExchange } from './fetch';
 export { fallbackExchangeIO } from './fallback';
 export { composeExchanges } from './compose';
+export { retryExchange } from './retry';
 
 import { cacheExchange } from './cache';
 import { dedupExchange } from './dedup';
