@@ -3,14 +3,14 @@ const seen = new Set();
 const stringify = (x: any): string => {
   if (x === undefined) {
     return '';
-  } else if (x && x.toJSON) {
-    return x.toJSON();
   } else if (typeof x == 'number') {
     return isFinite(x) ? '' + x : 'null';
   } else if (typeof x !== 'object') {
     return JSON.stringify(x);
   } else if (x === null) {
     return 'null';
+  } else if (x.toJSON) {
+    return x.toJSON();
   }
 
   let out = '';
