@@ -1,9 +1,10 @@
 const seen = new Set();
 
 const stringify = (x: any): string => {
-  if (x && x.toJson) x = x.toJSON();
   if (x === undefined) {
     return '';
+  } else if (x && x.toJSON) {
+    return x.toJSON();
   } else if (typeof x == 'number') {
     return isFinite(x) ? '' + x : 'null';
   } else if (typeof x !== 'object') {
