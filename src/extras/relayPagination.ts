@@ -166,25 +166,18 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       const page = getPage(cache, linkKey);
       if (page === null) {
         continue;
-      } else if (
+      }
+
+      if (
         mergeMode === 'inwards' &&
         typeof args.last === 'number' &&
         typeof args.first === 'number'
       ) {
-        // This is a special but rare case for simultaneously merging first and last edges
-        if (page.edges.length < args.first + args.last) {
-          startEdges = concatEdges(cache, startEdges, page.edges);
-          pageInfo.hasNextPage = false;
-          pageInfo.hasPreviousPage = false;
-          pageInfo.startCursor = null;
-          pageInfo.endCursor = null;
-          break;
-        } else {
-          const firstEdges = page.edges.slice(0, args.first);
-          const lastEdges = page.edges.slice(-args.last);
-          startEdges = concatEdges(cache, startEdges, firstEdges);
-          endEdges = concatEdges(cache, lastEdges, endEdges);
-        }
+        const firstEdges = page.edges.slice(0, args.first + 1);
+        const lastEdges = page.edges.slice(-args.last);
+
+        startEdges = concatEdges(cache, startEdges, firstEdges);
+        endEdges = concatEdges(cache, lastEdges, endEdges);
 
         pageInfo = page.pageInfo;
       } else if (args.after) {
