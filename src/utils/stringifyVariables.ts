@@ -9,6 +9,8 @@ const stringify = (x: any): string => {
     return JSON.stringify(x);
   } else if (x === null) {
     return 'null';
+  } else if (x.toJSON) {
+    return x.toJSON();
   }
 
   let out = '';

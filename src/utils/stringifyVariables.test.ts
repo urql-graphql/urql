@@ -28,3 +28,9 @@ it('throws for circular structures', () => {
     stringifyVariables(x);
   }).toThrow();
 });
+
+it('stringifies date correctly', () => {
+  expect(stringifyVariables(new Date('2019-12-11T04:20:00'))).toBe(
+    '2019-12-11T04:20:00.000Z'
+  );
+});
