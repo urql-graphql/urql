@@ -8,6 +8,17 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.7.0](https://github.com/FormidableLabs/urql/compare/v1.6.3...v1.7.0)
+
+This release splits our main package into two entrypoints. Importing from `urql` remains
+unchanged, but internally this entrypoint uses `urql/core`, which doesn't contain any
+React-related code. If you're building framework-agnostic libraries or apps without
+React, you can now use `urql/core` directly.
+
+- Fix `originalError` on `GraphQLError` instances (see [#470](https://github.com/FormidableLabs/urql/pull/470))
+- Fix `stringifyVariables` not using `.toJSON()` which prevented Dates from being stringified, by [@BjoernRave](https://github.com/BjoernRave) (see [#485](https://github.com/FormidableLabs/urql/pull/485))
+- Expose `urql/core` without any React code included (see [#424](https://github.com/FormidableLabs/urql/pull/424))
+
 ## [v1.6.3](https://github.com/FormidableLabs/urql/compare/v1.6.2...v1.6.3)
 
 - Fix suspense-mode being erroneously activated when using `client.query()` (see [#466](https://github.com/FormidableLabs/react-ssr-prepass/pull/21))
