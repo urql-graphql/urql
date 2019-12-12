@@ -22,15 +22,16 @@
   ],
   "scripts": {
     "prepare-core": "node ./scripts/prepare-core.js",
+    "prepare-bundle": "node ./scripts/post-transformation.js",
     "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
-    "postbuild": "node ./scripts/post-transformation.js",
+    "postbuild": "run-s prepare-core prepare-bundle",
     "watch": "rollup -w -c rollup.config.js",
     "check": "tsc --noEmit",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s clean prepare-core test build",
+    "prepublishOnly": "run-s clean test build",
     "codecov": "codecov"
   },
   "author": "Formidable",
