@@ -8,6 +8,38 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v2.0.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.2...v2.0.0)
+
+> **Note:** The minimum required version of `urql` for this release is now `1.7.0`!
+
+**Christmas came early!** This version improves performance again by about 25% over `1.2.2`. It also
+now ships with two new features: The `populateExchange` and automatic garbage collection.
+
+Including the `populateExchange` is optional. It records all fragments in any active queries, and
+populates mutation selection sets when the `@populate` directive is used based on typenames. If your
+schema includes `viewer` fields on mutations, which resolve back to your `Query` type, you can use
+this to automatically update your app's data when a mutation is made. _(More documentation on this
+is coming soon!)_
+
+The garbage collection works by utilising an automatic reference counting algorithm rather than
+a mark & sweep algorithm. We feel this is the best tradeoff to maintain good performance during
+runtime while minimising the data that is unnecessarily retained in-memory. You don't have to do
+_anything_! Graphcache will do its newly added magic in the background.
+
+There are some breaking changes, if you're using `cache.resolveConnections` or `resolveValueOrLink`
+then you now need to use `inspectFields` and `resolveFieldByKey` instead. You may also now make
+use of `cache.keyOfField`. (More info on [#128](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/128))
+
+- ✨ Implement `populateExchange` (eee [#120](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/120))
+- Improve type safety of `invariant` and `warning` (see [#121](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/121))
+- Reduce size of `populateExchange` (see [#122](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/122))
+- Move more code to KVMap (see [#125](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/125))
+- Move deletion to setting `undefined` instead (see [#126](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/126))
+- Fix multiple edge cases in the `relayPagination` helper, by [@rafeca](https://github.com/rafeca) (see [#127](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/127))
+- ✨⚠️ Reimplement data structure and add garbage collection (see [#128](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/128))
+- Use Closure Compiler (see [#131](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/131))
+- Switch to using `urql/core` on `1.7.0` (see [#132](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/132))
+
 ## [v1.2.2](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.1...v1.2.2)
 
 This patch replaces `pessimism` (our former underlying data structure) with a smaller implementation
