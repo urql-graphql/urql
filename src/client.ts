@@ -1,3 +1,18 @@
+// This is the entrypoint for the urql/client bundle.
+// It'll be output to dist/es/core.js and dist/cjs/core.js
+// This file also contains the main urql Client
+export * from './exchanges';
+export * from './types';
+
+export {
+  CombinedError,
+  stringifyVariables,
+  createRequest,
+  makeResult,
+  makeErrorResult,
+  formatDocument,
+} from './utils';
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import {
   filter,

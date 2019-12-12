@@ -7,8 +7,8 @@
     "url": "https://github.com/FormidableLabs/urql/issues"
   },
   "homepage": "https://formidable.com/open-source/urql",
-  "main": "dist/urql.js",
-  "module": "dist/urql.es.js",
+  "main": "dist/cjs/urql.js",
+  "module": "dist/es/urql.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "sideEffects": false,
@@ -21,8 +21,11 @@
     "exchanges"
   ],
   "scripts": {
-    "clean": "rimraf ./dist ./node_modules/.cache",
+    "prepare-core": "node ./scripts/prepare-core.js",
+    "prepare-bundle": "node ./scripts/post-transformation.js",
+    "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
+    "postbuild": "run-s prepare-core prepare-bundle",
     "watch": "rollup -w -c rollup.config.js",
     "check": "tsc --noEmit",
     "test": "jest",

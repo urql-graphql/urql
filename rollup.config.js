@@ -68,7 +68,7 @@ const terserMinified = terser({
   }
 });
 
-const makePlugins = (isProduction = false) => [
+const makePlugins = (isProduction = false, outputFolder) => [
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
     browser: true
@@ -97,7 +97,7 @@ const makePlugins = (isProduction = false) => [
      ],
      compilerOptions: {
         declaration: !isProduction,
-        declarationDir: './dist/types/',
+        declarationDir: `${outputFolder}/types/`,
         target: 'es6',
       },
     },
@@ -137,55 +137,59 @@ const makePlugins = (isProduction = false) => [
   isProduction ? terserMinified : terserPretty
 ].filter(Boolean);
 
-const config = {
-  input: './src/index.ts',
+const makeConfig = () => ({
+  input: {
+    core: './src/client.ts',
+    urql: './src/index.ts'
+  },
   external: externalTest,
   treeshake: {
     propertyReadSideEffects: false
   }
-};
+});
 
 export default [
   {
-    ...config,
-    plugins: makePlugins(false),
+    ...makeConfig(),
+    plugins: makePlugins(false, './dist'),
     output: [
       {
         sourcemap: true,
         legacy: true,
         freeze: false,
         esModule: false,
-        file: './dist/urql.js',
-        format: 'cjs'
+        dir: './dist/cjs',
+        format: 'cjs',
       },
       {
         sourcemap: true,
         legacy: true,
         freeze: false,
         esModule: false,
-        file: './dist/urql.es.js',
-        format: 'esm'
-      }
-    ]
-  }, {
-    ...config,
-    plugins: makePlugins(true),
+        dir: './dist/es',
+        format: 'esm',
+      },
+    ],
+  },
+  {
+    ...makeConfig(),
+    plugins: makePlugins(true, './dist'),
     onwarn: () => {},
     output: [
       {
         sourcemap: false,
         legacy: true,
         freeze: false,
-        file: './dist/urql.min.js',
-        format: 'cjs'
+        dir: './dist/cjs/min',
+        format: 'cjs',
       },
       {
         sourcemap: false,
         legacy: true,
         freeze: false,
-        file: './dist/urql.es.min.js',
-        format: 'esm'
-      }
-    ]
-  }
+        dir: './dist/es/min',
+        format: 'esm',
+      },
+    ],
+  },
 ];
