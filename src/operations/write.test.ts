@@ -152,6 +152,6 @@ describe('Query', () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/undefined/);
     // The field must still be `'test'`
-    expect(store.getRecord('Query.field')).toBe('test');
+    expect(store.getRecord('Query', 'field')).toBe('test');
   });
 });

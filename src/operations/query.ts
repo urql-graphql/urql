@@ -29,8 +29,9 @@ import {
 } from '../store';
 
 import { warn, pushDebugNode } from '../helpers/help';
-import { SelectionIterator, isScalar } from './shared';
+import { makeDict } from '../helpers/dict';
 import { joinKeys, keyOfField } from '../helpers';
+import { SelectionIterator, isScalar } from './shared';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
@@ -57,7 +58,7 @@ export const query = (
   request: OperationRequest,
   data?: Data
 ): QueryResult => {
-  initStoreState(0);
+  initStoreState(store, 0);
   const result = read(store, request, data);
   clearStoreState();
   return result;
@@ -88,7 +89,7 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  let data = input || Object.create(null);
+  let data = input || makeDict();
   data =
     rootKey !== ctx.store.getRootKey('query')
       ? readRoot(ctx, rootKey, rootSelect, data)
@@ -111,7 +112,7 @@ const readRoot = (
     return originalData;
   }
 
-  const data = Object.create(null);
+  const data = makeDict();
   data.__typename = originalData.__typename;
 
   const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
@@ -154,12 +155,7 @@ const readRootField = (
   if (entityKey !== null) {
     // We assume that since this is used for result data this can never be undefined,
     // since the result data has already been written to the cache
-    const fieldValue = readSelection(
-      ctx,
-      entityKey,
-      select,
-      Object.create(null)
-    );
+    const fieldValue = readSelection(ctx, entityKey, select, makeDict());
     return fieldValue === undefined ? null : fieldValue;
   } else {
     return readRoot(ctx, originalData.__typename, select, originalData);
@@ -224,12 +220,7 @@ export const readFragment = (
   };
 
   return (
-    readSelection(
-      ctx,
-      entityKey,
-      getSelectionSet(fragment),
-      Object.create(null)
-    ) || null
+    readSelection(ctx, entityKey, getSelectionSet(fragment), makeDict()) || null
   );
 };
 
@@ -262,10 +253,11 @@ const readSelection = (
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
-    const fieldValue = store.getRecord(fieldKey);
+    const fieldKey = keyOfField(fieldName, fieldArgs);
+    const fieldValue = store.getRecord(entityKey, fieldKey);
+    const key = joinKeys(entityKey, fieldKey);
 
-    if (isQuery) addDependency(fieldKey);
+    if (isQuery) addDependency(key);
 
     if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
       schemaPredicates.isFieldAvailableOnType(typename, fieldName);
@@ -281,7 +273,7 @@ const readSelection = (
       // that the resolver will receive
       ctx.parentTypeName = typename;
       ctx.parentKey = entityKey;
-      ctx.parentFieldKey = fieldKey;
+      ctx.parentFieldKey = key;
       ctx.fieldName = fieldName;
 
       // We have a resolver for this field.
@@ -292,7 +284,7 @@ const readSelection = (
 
       const resolverValue: DataField | undefined = resolvers[fieldName](
         data,
-        fieldArgs || Object.create(null),
+        fieldArgs || makeDict(),
         store,
         ctx
       );
@@ -304,9 +296,9 @@ const readSelection = (
           ctx,
           typename,
           fieldName,
-          fieldKey,
+          key,
           getSelectionSet(node),
-          (data[fieldAlias] as Data) || Object.create(null),
+          (data[fieldAlias] as Data) || makeDict(),
           resolverValue
         );
       } else {
@@ -322,7 +314,7 @@ const readSelection = (
       dataFieldValue = fieldValue;
     } else {
       // We have a selection set which means that we'll be checking for links
-      const link = store.getLink(fieldKey);
+      const link = store.getLink(entityKey, fieldKey);
       if (link !== undefined) {
         dataFieldValue = resolveLink(
           ctx,
@@ -406,11 +398,12 @@ const readResolverResult = (
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldAlias = getFieldAlias(node);
-    const fieldKey = joinKeys(
-      entityKey,
-      keyOfField(fieldName, getFieldArguments(node, ctx.variables))
+    const fieldKey = keyOfField(
+      fieldName,
+      getFieldArguments(node, ctx.variables)
     );
-    const fieldValue = store.getRecord(fieldKey);
+    const key = joinKeys(entityKey, fieldKey);
+    const fieldValue = store.getRecord(entityKey, fieldKey);
     const resultValue = result[fieldName];
 
     if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
@@ -432,14 +425,15 @@ const readResolverResult = (
         ctx,
         typename,
         fieldName,
-        fieldKey,
+        key,
         getSelectionSet(node),
         data[fieldAlias] as Data,
         resultValue
       );
     } else {
       // Otherwise we attempt to get the missing field from the cache
-      const link = store.getLink(fieldKey);
+      const link = store.getLink(entityKey, fieldKey);
+
       if (link !== undefined) {
         dataFieldValue = resolveLink(
           ctx,
@@ -522,7 +516,7 @@ const resolveResolverResult = (
   } else if (result === null || result === undefined) {
     return null;
   } else if (isDataOrKey(result)) {
-    const data = prevData === undefined ? Object.create(null) : prevData;
+    const data = prevData === undefined ? makeDict() : prevData;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readResolverResult(ctx, key, select, data, result);
@@ -577,7 +571,7 @@ const resolveLink = (
       ctx,
       link,
       select,
-      prevData === undefined ? Object.create(null) : prevData
+      prevData === undefined ? makeDict() : prevData
     );
   }
 };

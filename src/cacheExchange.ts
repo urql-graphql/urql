@@ -11,6 +11,7 @@ import { IntrospectionQuery } from 'graphql';
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 import { query, write, writeOptimistic } from './operations';
 import { SchemaPredicates } from './ast/schemaPredicates';
+import { makeDict } from './helpers/dict';
 import { Store } from './store';
 
 import {
@@ -105,7 +106,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   const optimisticKeys = new Set();
   const ops: OperationMap = new Map();
-  const deps = Object.create(null) as DependentOperations;
+  const deps: DependentOperations = makeDict();
 
   const collectPendingOperations = (
     pendingOperations: Set<number>,

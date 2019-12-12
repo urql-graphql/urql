@@ -48,6 +48,12 @@ export type Link<Key = string> = null | Key | NullArray<Key>;
 export type ResolvedLink = Link<Data>;
 export type Connection = [Variables, string];
 
+export interface FieldInfo {
+  fieldKey: string;
+  fieldName: string;
+  arguments: Variables | null;
+}
+
 // This is an input operation
 export interface OperationRequest {
   query: DocumentNode;
@@ -74,6 +80,12 @@ export interface Cache {
   /** keyOfEntity() returns the key for an entity or null if it's unkeyable */
   keyOfEntity(data: Data): string | null;
 
+  /** keyOfField() returns the key for a field */
+  keyOfField(
+    fieldName: string,
+    args?: Variables | null | undefined
+  ): string | null;
+
   /** resolve() retrieves the value (or link) of a field on any entity, given a partial/keyable entity or an entity key */
   resolve(
     entity: Data | string | null,
@@ -81,14 +93,11 @@ export interface Cache {
     args?: Variables
   ): DataField;
 
-  /** resolveValueOrLink() returns a field's value on an entity, given that field's key */
-  resolveValueOrLink(fieldKey: string): DataField;
+  /** resolveFieldByKey() returns a field's value on an entity, given that field's key */
+  resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField;
 
-  /** resolveConnections() retrieves all known connections (arguments and links) for a given field on an entity */
-  resolveConnections(
-    entity: Data | string | null,
-    fieldName: string
-  ): Connection[];
+  /** inspectFields() retrieves all known fields for a given entity */
+  inspectFields(entity: Data | string | null): FieldInfo[];
 
   /** invalidateQuery() invalidates all data of a given query */
   invalidateQuery(query: DocumentNode, variables?: Variables): void;

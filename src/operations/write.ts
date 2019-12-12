@@ -30,6 +30,7 @@ import {
 } from '../store';
 
 import { invariant, warn, pushDebugNode } from '../helpers/help';
+import { makeDict } from '../helpers/dict';
 import { SelectionIterator, isScalar } from './shared';
 import { joinKeys, keyOfField } from '../helpers';
 import { SchemaPredicates } from '../ast/schemaPredicates';
@@ -57,7 +58,7 @@ export const write = (
   request: OperationRequest,
   data: Data
 ): WriteResult => {
-  initStoreState(0);
+  initStoreState(store, 0);
   const result = startWrite(store, request, data);
   clearStoreState();
   return result;
@@ -104,7 +105,7 @@ export const writeOptimistic = (
   request: OperationRequest,
   optimisticKey: number
 ): WriteResult => {
-  initStoreState(optimisticKey);
+  initStoreState(store, optimisticKey);
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
@@ -135,7 +136,7 @@ export const writeOptimistic = (
     optimistic: true,
   };
 
-  const data = Object.create(null);
+  const data = makeDict();
   const iter = new SelectionIterator(
     operationName,
     operationName,
@@ -154,11 +155,7 @@ export const writeOptimistic = (
         ctx.fieldName = fieldName;
 
         const fieldArgs = getFieldArguments(node, ctx.variables);
-        const resolverValue = resolver(
-          fieldArgs || Object.create(null),
-          ctx.store,
-          ctx
-        );
+        const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
 
         if (!isScalar(resolverValue)) {
           writeRootField(ctx, resolverValue, getSelectionSet(node));
@@ -167,7 +164,7 @@ export const writeOptimistic = (
         data[fieldName] = resolverValue;
         const updater = ctx.store.updates[mutationRootKey][fieldName];
         if (updater !== undefined) {
-          updater(data, fieldArgs || Object.create(null), ctx.store, ctx);
+          updater(data, fieldArgs || makeDict(), ctx.store, ctx);
         }
       }
     }
@@ -245,10 +242,11 @@ const writeSelection = (
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
-    const fieldKey = joinKeys(entityKey, keyOfField(fieldName, fieldArgs));
+    const fieldKey = keyOfField(fieldName, fieldArgs);
     const fieldValue = data[getFieldAlias(node)];
+    const key = joinKeys(entityKey, fieldKey);
 
-    if (isQuery) addDependency(fieldKey);
+    if (isQuery) addDependency(key);
 
     if (process.env.NODE_ENV !== 'production') {
       if (fieldValue === undefined) {
@@ -279,19 +277,12 @@ const writeSelection = (
 
     if (node.selectionSet === undefined) {
       // This is a leaf node, so we're setting the field's value directly
-      store.writeRecord(fieldValue, fieldKey);
+      store.writeRecord(fieldValue, entityKey, fieldKey);
     } else if (!isScalar(fieldValue)) {
       // Process the field and write links for the child entities that have been written
-      const link = writeField(ctx, fieldKey, getSelectionSet(node), fieldValue);
-
-      store.writeConnection(
-        joinKeys(entityKey, fieldName),
-        fieldKey,
-        fieldArgs
-      );
-
-      store.writeLink(link, fieldKey);
-      store.writeRecord(undefined, fieldKey);
+      const link = writeField(ctx, key, getSelectionSet(node), fieldValue);
+      store.writeLink(link, entityKey, fieldKey);
+      store.writeRecord(undefined, entityKey, fieldKey);
     } else {
       warn(
         'Invalid value: The field at `' +
@@ -303,7 +294,7 @@ const writeSelection = (
       );
 
       // This is a rare case for invalid entities
-      store.writeRecord(fieldValue, fieldKey);
+      store.writeRecord(fieldValue, entityKey, fieldKey);
     }
   }
 };
@@ -401,7 +392,7 @@ const writeRoot = (
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
       if (updater !== undefined) {
-        updater(data, fieldArgs || Object.create(null), ctx.store, ctx);
+        updater(data, fieldArgs || makeDict(), ctx.store, ctx);
       }
     }
   }

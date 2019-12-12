@@ -1,7 +1,7 @@
 import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
 import { Fragments, Variables, SelectionSet, Scalar } from '../types';
 import { Store } from '../store';
-import { joinKeys, keyOfField } from '../helpers';
+import { keyOfField } from '../helpers';
 import { warn, pushDebugNode } from '../helpers/help';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
@@ -52,7 +52,7 @@ const isFragmentHeuristicallyMatching = (
       getName(node),
       getFieldArguments(node, ctx.variables)
     );
-    return !ctx.store.hasField(joinKeys(entityKey, fieldKey));
+    return !ctx.store.hasField(entityKey, fieldKey);
   });
 };
 

@@ -22,6 +22,7 @@ import { Exchange, Operation } from 'urql';
 
 import { getName, getSelectionSet, unwrapType } from './ast';
 import { invariant, warn } from './helpers/help';
+import { makeDict } from './helpers/dict';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
@@ -37,9 +38,9 @@ export const populateExchange = ({
   /** List of operation keys that have not been torn down. */
   const activeOperations = new Set<number>();
   /** Collection of fragments used by the user. */
-  const userFragments: UserFragmentMap = Object.create(null);
+  const userFragments: UserFragmentMap = makeDict();
   /** Collection of type fragments. */
-  const typeFragments: TypeFragmentMap = Object.create(null);
+  const typeFragments: TypeFragmentMap = makeDict();
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
@@ -47,7 +48,7 @@ export const populateExchange = ({
       return op;
     }
 
-    const activeSelections: TypeFragmentMap = Object.create(null);
+    const activeSelections: TypeFragmentMap = makeDict();
     for (const name in typeFragments) {
       activeSelections[name] = typeFragments[name].filter(s =>
         activeOperations.has(s.key)
@@ -176,12 +177,12 @@ export const addFragmentsToQuery = (
   const requiredUserFragments: Record<
     string,
     FragmentDefinitionNode
-  > = Object.create(null);
+  > = makeDict();
 
   const additionalFragments: Record<
     string,
     FragmentDefinitionNode
-  > = Object.create(null);
+  > = makeDict();
 
   return visit(
     query,

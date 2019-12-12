@@ -4,6 +4,7 @@ import {
   valueFromASTUntyped,
 } from 'graphql';
 
+import { makeDict } from '../helpers/dict';
 import { getName } from './node';
 import { Variables } from '../types';
 
@@ -16,7 +17,7 @@ export const getFieldArguments = (
     return null;
   }
 
-  const args = Object.create(null);
+  const args = makeDict();
   let argsSize = 0;
 
   for (let i = 0, l = node.arguments.length; i < l; i++) {
@@ -55,5 +56,5 @@ export const normalizeVariables = (
 
     vars[name] = value;
     return vars;
-  }, Object.create(null));
+  }, makeDict());
 };

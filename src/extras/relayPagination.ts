@@ -87,8 +87,12 @@ const compareArgs = (
   return true;
 };
 
-const getPage = (cache: Cache, linkKey: string): Page | null => {
-  const link = ensureKey(cache.resolveValueOrLink(linkKey));
+const getPage = (
+  cache: Cache,
+  entityKey: string,
+  fieldKey: string
+): Page | null => {
+  const link = ensureKey(cache.resolveFieldByKey(entityKey, fieldKey));
   if (!link) return null;
 
   const typename = cache.resolve(link, '__typename') as string;
@@ -144,10 +148,11 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
   const mergeMode = params.mergeMode || 'inwards';
 
   return (_parent, fieldArgs, cache, info) => {
-    const { parentKey: key, fieldName } = info;
+    const { parentKey: entityKey, fieldName } = info;
 
-    const connections = cache.resolveConnections(key, fieldName);
-    const size = connections.length;
+    const allFields = cache.inspectFields(entityKey);
+    const fieldInfos = allFields.filter(info => info.fieldName === fieldName);
+    const size = fieldInfos.length;
     if (size === 0) {
       return undefined;
     }
@@ -158,12 +163,12 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
     let pageInfo: PageInfo = { ...defaultPageInfo };
 
     for (let i = 0; i < size; i++) {
-      const [args, linkKey] = connections[i];
-      if (!compareArgs(fieldArgs, args)) {
+      const { fieldKey, arguments: args } = fieldInfos[i];
+      if (args === null || !compareArgs(fieldArgs, args)) {
         continue;
       }
 
-      const page = getPage(cache, linkKey);
+      const page = getPage(cache, entityKey, fieldKey);
       if (page === null) {
         continue;
       }
@@ -206,7 +211,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
     }
 
     const hasCurrentPage = !!ensureKey(
-      cache.resolve(key, fieldName, fieldArgs)
+      cache.resolve(entityKey, fieldName, fieldArgs)
     );
     if (!hasCurrentPage) {
       if ((info as any).schemaPredicates === undefined) {

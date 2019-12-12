@@ -37,25 +37,35 @@ export const simplePagination = ({
   };
 
   return (_parent, fieldArgs, cache, info) => {
-    const { parentKey: key, fieldName } = info;
-    const connections = cache.resolveConnections(key, fieldName);
-    const size = connections.length;
-    let result: NullArray<string> = [];
+    const { parentKey: entityKey, fieldName } = info;
+
+    const allFields = cache.inspectFields(entityKey);
+    const fieldInfos = allFields.filter(info => info.fieldName === fieldName);
+    const size = fieldInfos.length;
+    if (size === 0) {
+      return undefined;
+    }
+
     const visited = new Set();
+    let result: NullArray<string> = [];
     let prevOffset: number | null = null;
-    if (size === 0) return undefined;
 
     for (let i = 0; i < size; i++) {
-      const [args, linkKey] = connections[i];
-      if (!compareArgs(fieldArgs, args)) continue;
-      const links = cache.resolveValueOrLink(linkKey) as string[];
+      const { fieldKey, arguments: args } = fieldInfos[i];
+      if (args === null || !compareArgs(fieldArgs, args)) {
+        continue;
+      }
+
+      const links = cache.resolveFieldByKey(entityKey, fieldKey) as string[];
       const currentOffset = args[offsetArgument];
+
       if (
         links === null ||
         links.length === 0 ||
         typeof currentOffset !== 'number'
-      )
+      ) {
         continue;
+      }
 
       if (!prevOffset || currentOffset > prevOffset) {
         for (let j = 0; j < links.length; j++) {
