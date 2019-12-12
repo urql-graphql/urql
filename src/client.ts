@@ -1,3 +1,17 @@
+// This is the entrypoint for the urql/client bundle.
+// It'll be output to dist/es/core.js and dist/cjs/core.js
+// This file also contains the main urql Client
+export * from './exchanges';
+export * from './types';
+
+export {
+  CombinedError,
+  createRequest,
+  makeResult,
+  makeErrorResult,
+  formatDocument,
+} from './utils';
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import {
   filter,
@@ -34,16 +48,6 @@ import {
 
 import { createRequest, toSuspenseSource, withPromise } from './utils';
 import { DocumentNode } from 'graphql';
-
-export * from './exchanges';
-export * from './types';
-export {
-  CombinedError,
-  createRequest,
-  makeResult,
-  makeErrorResult,
-  formatDocument,
-} from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
