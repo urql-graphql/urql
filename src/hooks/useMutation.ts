@@ -60,3 +60,11 @@ export const useMutation = <T = any, V = object>(
 
   return [state, executeMutation];
 };
+
+if (process.env.NODE_ENV !== 'production') {
+  Object.defineProperty(useMutation, 'name', {
+    get() {
+      return 'useMutation';
+    },
+  });
+}

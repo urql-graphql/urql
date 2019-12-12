@@ -21,3 +21,11 @@ export const useRequest = (
     }
   }, [query, variables]);
 };
+
+if (process.env.NODE_ENV !== 'production') {
+  Object.defineProperty(useRequest, 'name', {
+    get() {
+      return 'useRequest';
+    },
+  });
+}

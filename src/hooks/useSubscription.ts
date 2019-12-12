@@ -113,3 +113,11 @@ export const useSubscription = <T = any, R = T, V = object>(
 
   return [state, executeSubscription];
 };
+
+if (process.env.NODE_ENV !== 'production') {
+  Object.defineProperty(useSubscription, 'name', {
+    get() {
+      return 'useSubscription';
+    },
+  });
+}

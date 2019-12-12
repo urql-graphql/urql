@@ -102,3 +102,11 @@ export const useQuery = <T = any, V = object>(
 
   return [state, executeQuery];
 };
+
+if (process.env.NODE_ENV !== 'production') {
+  Object.defineProperty(useQuery, 'name', {
+    get() {
+      return 'useQuery';
+    },
+  });
+}
