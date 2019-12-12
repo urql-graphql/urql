@@ -25,7 +25,7 @@ const contents = JSON.stringify(
     homepage: mainPkgJson.homepage,
     main: '../dist/cjs/core.js',
     module: '../dist/es/core.js',
-    types: '../dist/types/index.core.d.ts',
+    types: '../dist/types/client.d.ts',
     source: '../src/client.ts',
     sideEffects: false,
     author: mainPkgJson.author,
