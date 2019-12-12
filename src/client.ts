@@ -6,6 +6,7 @@ export * from './types';
 
 export {
   CombinedError,
+  stringifyVariables,
   createRequest,
   makeResult,
   makeErrorResult,
