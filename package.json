@@ -24,6 +24,7 @@
     "prepare-core": "node ./scripts/prepare-core.js",
     "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
+    "postbuild": "node ./scripts/post-transformation.js",
     "watch": "rollup -w -c rollup.config.js",
     "check": "tsc --noEmit",
     "test": "jest",
