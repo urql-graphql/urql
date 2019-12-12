@@ -1,5 +1,10 @@
 import gql from 'graphql-tag';
-import { createClient, ExchangeIO, Operation, OperationResult } from 'urql';
+import {
+  createClient,
+  ExchangeIO,
+  Operation,
+  OperationResult,
+} from 'urql/core';
 import { pipe, map, makeSubject, tap, publish, delay } from 'wonka';
 import { cacheExchange } from './cacheExchange';
 

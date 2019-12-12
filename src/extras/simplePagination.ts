@@ -1,4 +1,4 @@
-import { stringifyVariables } from 'urql';
+import { stringifyVariables } from 'urql/core';
 import { Resolver, Variables, NullArray } from '../types';
 
 export interface PaginationParams {

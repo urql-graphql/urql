@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { createRequest } from 'urql';
+import { createRequest } from 'urql/core';
 
 import {
   Cache,

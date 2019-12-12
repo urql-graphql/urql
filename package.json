@@ -80,7 +80,7 @@
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
-    "urql": ">= 1.6.0"
+    "urql": ">= 1.7.0"
   },
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
@@ -131,6 +131,6 @@
     "terser": "^4.4.2",
     "ts-jest": "^24.2.0",
     "typescript": "^3.7.3",
-    "urql": "^1.6.3"
+    "urql": "^1.7.0"
   }
 }

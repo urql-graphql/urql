@@ -9,7 +9,7 @@ import {
 
 import gql from 'graphql-tag';
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
-import { Client, Operation } from 'urql';
+import { Client, Operation } from 'urql/core';
 
 import { populateExchange } from './populateExchange';
 

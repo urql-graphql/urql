@@ -5,7 +5,7 @@ import {
   OperationResult,
   RequestPolicy,
   CacheOutcome,
-} from 'urql';
+} from 'urql/core';
 
 import { IntrospectionQuery } from 'graphql';
 import { filter, map, merge, pipe, share, tap } from 'wonka';
