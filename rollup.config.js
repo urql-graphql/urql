@@ -6,6 +6,7 @@ import typescript from 'rollup-plugin-typescript2';
 import buble from 'rollup-plugin-buble';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import replace from 'rollup-plugin-replace';
 
 import transformPipe from './scripts/transform-pipe';
@@ -78,7 +79,7 @@ const terserMinified = terser({
   }
 });
 
-const makePlugins = (isProduction = false) => [
+const makePlugins = (isProduction = false, useSimpleOptimizations = true) => [
   nodeResolve({
     mainFields: ['module', 'jsnext', 'main'],
     browser: true,
@@ -92,6 +93,9 @@ const makePlugins = (isProduction = false) => [
   }),
   typescript({
     typescript: require('typescript'),
+    // Object-hash (closure compiler) has an issue with certain compilations
+    // That's why we're ignoring that.
+    objectHashIgnoreUnknownHack: true,
     cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
@@ -148,6 +152,11 @@ const makePlugins = (isProduction = false) => [
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
     }),
+  compiler({
+    compilation_level: useSimpleOptimizations
+      ? 'SIMPLE_OPTIMIZATIONS'
+      : 'ADVANCED_OPTIMIZATIONS'
+  }),
   isProduction ? terserMinified : terserPretty,
 ];
 
@@ -164,7 +173,7 @@ export default [
   {
     ...config,
     input: './src/extras/index.ts',
-    plugins: makePlugins(false),
+    plugins: makePlugins(false, true),
     output: [
       {
         sourcemap: true,
@@ -186,7 +195,7 @@ export default [
   },
   {
     ...config,
-    plugins: makePlugins(false),
+    plugins: makePlugins(false, true),
     output: [
       {
         sourcemap: true,
@@ -207,7 +216,7 @@ export default [
     ]
   }, {
     ...config,
-    plugins: makePlugins(true),
+    plugins: makePlugins(true, true),
     output: [
       {
         sourcemap: false,
@@ -216,13 +225,6 @@ export default [
         freeze: false,
         file: `./dist/${name}.min.js`,
         format: 'cjs'
-      },
-      {
-        sourcemap: false,
-        legacy: true,
-        freeze: false,
-        file: `./dist/${name}.es.min.js`,
-        format: 'esm'
       }
     ]
   }
