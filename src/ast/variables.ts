@@ -4,8 +4,8 @@ import {
   valueFromASTUntyped,
 } from 'graphql';
 
-import { makeDict } from '../helpers/dict';
 import { getName } from './node';
+import { makeDict } from '../store';
 import { Variables } from '../types';
 
 /** Evaluates a fields arguments taking vars into account */

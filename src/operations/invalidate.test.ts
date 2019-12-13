@@ -1,7 +1,8 @@
-import { Store, initStoreState, clearStoreState } from '../store';
 import gql from 'graphql-tag';
 import { write } from './write';
 import { invalidate } from './invalidate';
+import * as InMemoryData from '../store/data';
+import { Store } from '../store';
 import { SchemaPredicates } from '../ast/schemaPredicates';
 
 const TODO_QUERY = gql`
@@ -48,11 +49,7 @@ describe('Query', () => {
     );
     spy.console = jest.spyOn(console, 'warn');
 
-    initStoreState(store, 0);
-  });
-
-  afterEach(() => {
-    clearStoreState();
+    InMemoryData.initDataState(store.data, 0);
   });
 
   it('should warn once for invalid fields on an entity', () => {

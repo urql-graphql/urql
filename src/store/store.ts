@@ -3,8 +3,6 @@ import { createRequest } from 'urql/core';
 
 import {
   Cache,
-  EntityField,
-  Link,
   FieldInfo,
   ResolverConfig,
   DataField,
@@ -14,61 +12,14 @@ import {
   UpdatesConfig,
   OptimisticMutationConfig,
   KeyingConfig,
-} from './types';
+} from '../types';
 
-import * as InMemoryData from './helpers/data';
-import { invariant, currentDebugStack } from './helpers/help';
-import { defer, keyOfField } from './helpers';
-import { read, readFragment } from './operations/query';
-import { writeFragment, startWrite } from './operations/write';
-import { invalidate } from './operations/invalidate';
-import { SchemaPredicates } from './ast/schemaPredicates';
-
-let currentStore: null | Store = null;
-let currentDependencies: null | Set<string> = null;
-
-// Initialise a store run by resetting its internal state
-export const initStoreState = (store: Store, optimisticKey: null | number) => {
-  InMemoryData.setCurrentOptimisticKey(optimisticKey);
-  currentStore = store;
-  currentDependencies = new Set();
-
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.length = 0;
-  }
-};
-
-// Finalise a store run by clearing its internal state
-export const clearStoreState = () => {
-  if (!(currentStore as Store).gcScheduled) {
-    defer((currentStore as Store).gc);
-  }
-
-  InMemoryData.setCurrentOptimisticKey(null);
-  currentStore = null;
-  currentDependencies = null;
-
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.length = 0;
-  }
-};
-
-export const getCurrentDependencies = (): Set<string> => {
-  invariant(
-    currentDependencies !== null,
-    'Invalid Cache call: The cache may only be accessed or mutated during' +
-      'operations like write or query, or as part of its resolvers, updaters, ' +
-      'or optimistic configs.',
-    2
-  );
-
-  return currentDependencies;
-};
-
-// Add a dependency to the internal store state
-export const addDependency = (dependency: string) => {
-  (currentDependencies as Set<string>).add(dependency);
-};
+import { read, readFragment } from '../operations/query';
+import { writeFragment, startWrite } from '../operations/write';
+import { invalidate } from '../operations/invalidate';
+import { SchemaPredicates } from '../ast';
+import { keyOfField } from './keys';
+import * as InMemoryData from './data';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
@@ -91,8 +42,6 @@ export class Store implements Cache {
     optimisticMutations?: OptimisticMutationConfig,
     keys?: KeyingConfig
   ) {
-    this.data = InMemoryData.make();
-
     this.resolvers = resolvers || {};
     this.optimisticMutations = optimisticMutations || {};
     this.keys = keys || {};
@@ -139,6 +88,8 @@ export class Store implements Cache {
         Subscription: 'subscription',
       };
     }
+
+    this.data = InMemoryData.make(this.getRootKey('query'));
   }
 
   gcScheduled = false;
@@ -173,57 +124,15 @@ export class Store implements Cache {
     return key ? `${typename}:${key}` : null;
   }
 
-  clearOptimistic(optimisticKey: number) {
-    InMemoryData.clearOptimistic(this.data, optimisticKey);
-  }
-
-  getRecord(entityKey: string, fieldKey: string): EntityField {
-    return InMemoryData.readRecord(this.data, entityKey, fieldKey);
-  }
-
-  writeRecord(field: EntityField, entityKey: string, fieldKey: string) {
-    InMemoryData.writeRecord(this.data, entityKey, fieldKey, field);
-  }
-
-  getField(
-    entityKey: string,
-    fieldName: string,
-    args?: Variables
-  ): EntityField {
-    return InMemoryData.readRecord(
-      this.data,
-      entityKey,
-      keyOfField(fieldName, args)
-    );
-  }
-
-  writeField(
-    field: EntityField,
-    entityKey: string,
-    fieldName: string,
-    args?: Variables
-  ) {
-    return this.writeRecord(field, entityKey, keyOfField(fieldName, args));
-  }
-
-  getLink(entityKey: string, fieldKey: string): undefined | Link {
-    return InMemoryData.readLink(this.data, entityKey, fieldKey);
-  }
-
-  writeLink(link: undefined | Link, entityKey: string, fieldKey: string) {
-    return InMemoryData.writeLink(this.data, entityKey, fieldKey, link);
-  }
-
   resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField {
     const entityKey =
       entity !== null && typeof entity !== 'string'
         ? this.keyOfEntity(entity)
         : entity;
     if (entityKey === null) return null;
-    addDependency(entityKey);
-    const fieldValue = InMemoryData.readRecord(this.data, entityKey, fieldKey);
+    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     if (fieldValue !== undefined) return fieldValue;
-    const link = InMemoryData.readLink(this.data, entityKey, fieldKey);
+    const link = InMemoryData.readLink(entityKey, fieldKey);
     return link ? link : null;
   }
 
@@ -239,21 +148,12 @@ export class Store implements Cache {
     invalidate(this, createRequest(query, variables));
   }
 
-  hasField(entityKey: string, fieldKey: string): boolean {
-    return (
-      InMemoryData.readRecord(this.data, entityKey, fieldKey) !== undefined ||
-      InMemoryData.readLink(this.data, entityKey, fieldKey) !== undefined
-    );
-  }
-
   inspectFields(entity: Data | string | null): FieldInfo[] {
     const entityKey =
       entity !== null && typeof entity !== 'string'
         ? this.keyOfEntity(entity)
         : entity;
-    return entityKey !== null
-      ? InMemoryData.inspectFields(this.data, entityKey)
-      : [];
+    return entityKey !== null ? InMemoryData.inspectFields(entityKey) : [];
   }
 
   updateQuery(

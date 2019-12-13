@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import { query, write, writeOptimistic } from '../operations';
+import * as InMemoryData from '../store/data';
 import { Store } from '../store';
 import { Data } from '../types';
 
@@ -416,7 +417,7 @@ it('correctly resolves optimistic updates on Relay schemas', () => {
 
   write(store, { query: getRoot }, queryData);
   writeOptimistic(store, { query: updateItem, variables: { id: '2' } }, 1);
-  store.clearOptimistic(1);
+  InMemoryData.clearOptimistic(store.data, 1);
   const queryRes = query(store, { query: getRoot });
 
   expect(queryRes.partial).toBe(false);

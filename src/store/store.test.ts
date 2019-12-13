@@ -1,15 +1,10 @@
 import gql from 'graphql-tag';
 
-import {
-  Store,
-  initStoreState,
-  clearStoreState,
-  getCurrentDependencies,
-} from './store';
-
-import { Data } from './types';
-import { query } from './operations/query';
-import { write, writeOptimistic } from './operations/write';
+import { Data } from '../types';
+import { query } from '../operations/query';
+import { write, writeOptimistic } from '../operations/write';
+import * as InMemoryData from './data';
+import { Store } from './store';
 
 const Appointment = gql`
   query appointment($id: String) {
@@ -91,9 +86,9 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       ],
     };
-    initStoreState(store, null);
+    InMemoryData.initDataState(store.data, 0);
     write(store, { query: Todos }, todosData);
-    initStoreState(store, null);
+    InMemoryData.initDataState(store.data, null);
   });
 
   it('Should resolve a property', () => {
@@ -107,17 +102,17 @@ describe('Store with OptimisticMutationConfig', () => {
     const result = store.resolve({ id: 0, __typename: 'Todo' }, 'text');
     expect(result).toEqual('Go to the shops');
     // TODO: we have no way of asserting this to really be the case.
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(new Set(['Todo:0', 'Author:0']));
-    clearStoreState();
+    InMemoryData.clearDataState();
   });
 
   it('should resolve with a key as first argument', () => {
     const authorResult = store.resolve('Author:0', 'name');
     expect(authorResult).toBe('Jovi');
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(new Set(['Author:0']));
-    clearStoreState();
+    InMemoryData.clearDataState();
   });
 
   it('Should resolve a link property', () => {
@@ -129,23 +124,25 @@ describe('Store with OptimisticMutationConfig', () => {
     };
     const result = store.resolve(parent, 'author');
     expect(result).toEqual('Author:0');
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(new Set(['Todo:0']));
-    clearStoreState();
+    InMemoryData.clearDataState();
   });
 
   it('should be able to invalidate data (one relation key)', () => {
     let { data } = query(store, { query: Todos });
-    expect((data as any).todos).toHaveLength(3);
-    expect(store.getRecord('Todo:0', 'text')).toBe('Go to the shops');
 
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
+    expect((data as any).todos).toHaveLength(3);
+    expect(InMemoryData.readRecord('Todo:0', 'text')).toBe('Go to the shops');
     store.invalidateQuery(Todos);
-    clearStoreState();
+    InMemoryData.clearDataState();
 
     ({ data } = query(store, { query: Todos }));
     expect(data).toBe(null);
-    expect(store.getRecord('Todo:0', 'text')).toBe(undefined);
+
+    InMemoryData.initDataState(store.data, 0);
+    expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
   });
 
   it('should be able to invalidate data with arguments', () => {
@@ -170,20 +167,26 @@ describe('Store with OptimisticMutationConfig', () => {
       variables: { id: '1' },
     });
     expect((data as any).appointment.info).toBe('urql meeting');
-    expect(store.getRecord('Appointment:1', 'info')).toBe('urql meeting');
-    initStoreState(store, 0);
+
+    InMemoryData.initDataState(store.data, 0);
+    expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(
+      'urql meeting'
+    );
     store.invalidateQuery(Appointment, { id: '1' });
-    clearStoreState();
+    InMemoryData.clearDataState();
+
     ({ data } = query(store, {
       query: Appointment,
       variables: { id: '1' },
     }));
     expect(data).toBe(null);
-    expect(store.getRecord('Appointment:1', 'info')).toBe(undefined);
+
+    InMemoryData.initDataState(store.data, 0);
+    expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(undefined);
   });
 
   it('should be able to write a fragment', () => {
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
 
     store.writeFragment(
       gql`
@@ -200,7 +203,7 @@ describe('Store with OptimisticMutationConfig', () => {
       }
     );
 
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(new Set(['Todo:0']));
 
     const { data } = query(store, { query: Todos });
@@ -220,7 +223,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a fragment', () => {
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
     const result = store.readFragment(
       gql`
         fragment _ on Todo {
@@ -232,7 +235,7 @@ describe('Store with OptimisticMutationConfig', () => {
       { id: '0' }
     );
 
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(new Set(['Todo:0']));
 
     expect(result).toEqual({
@@ -242,11 +245,11 @@ describe('Store with OptimisticMutationConfig', () => {
       __typename: 'Todo',
     });
 
-    clearStoreState();
+    InMemoryData.clearDataState();
   });
 
   it('should be able to update a query', () => {
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
     store.updateQuery({ query: Todos }, data => ({
       ...data,
       todos: [
@@ -263,7 +266,7 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       ],
     }));
-    clearStoreState();
+    InMemoryData.clearDataState();
 
     const { data: result } = query(store, {
       query: Todos,
@@ -304,7 +307,7 @@ describe('Store with OptimisticMutationConfig', () => {
       }
     );
 
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
     store.updateQuery({ query: Appointment, variables: { id: '1' } }, data => ({
       ...data,
       appointment: {
@@ -312,7 +315,7 @@ describe('Store with OptimisticMutationConfig', () => {
         info: 'urql meeting revisited',
       },
     }));
-    clearStoreState();
+    InMemoryData.clearDataState();
 
     const { data: result } = query(store, {
       query: Appointment,
@@ -329,10 +332,10 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a query', () => {
-    initStoreState(store, 0);
+    InMemoryData.initDataState(store.data, 0);
     const result = store.readQuery({ query: Todos });
 
-    const deps = getCurrentDependencies();
+    const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual(
       new Set([
         'Query.todos',
@@ -348,7 +351,7 @@ describe('Store with OptimisticMutationConfig', () => {
       __typename: 'Query',
       todos: todosData.todos,
     });
-    clearStoreState();
+    InMemoryData.clearDataState();
   });
 
   it('should be able to optimistically mutate', () => {
@@ -394,7 +397,7 @@ describe('Store with OptimisticMutationConfig', () => {
       ],
     });
 
-    store.clearOptimistic(1);
+    InMemoryData.clearOptimistic(store.data, 1);
     ({ data } = query(store, { query: Todos }));
     expect(data).toEqual({
       __typename: 'Query',

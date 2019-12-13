@@ -1,5 +1,7 @@
 import { Link, EntityField, FieldInfo } from '../types';
-import { fieldInfoOfKey } from './keys';
+import { invariant, currentDebugStack } from '../helpers/help';
+import { fieldInfoOfKey, joinKeys } from './keys';
+import { defer } from './timing';
 
 type Dict<T> = Record<string, T>;
 type KeyMap<T> = Map<string, T>;
@@ -12,6 +14,8 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
+  queryRootKey: string;
+  gcScheduled: boolean;
   gcBatch: Set<string>;
   refCount: Dict<number>;
   refLock: OptimisticMap<Dict<number>>;
@@ -19,9 +23,11 @@ export interface InMemoryData {
   links: NodeMap<Link>;
 }
 
+let currentData: null | InMemoryData = null;
+let currentDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
 
-const makeDict = <T>(): Dict<T> => Object.create(null);
+export const makeDict = (): any => Object.create(null);
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
@@ -29,11 +35,51 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
   keys: [],
 });
 
-export const setCurrentOptimisticKey = (optimisticKey: number | null) => {
+/** Before reading or writing the global state needs to be initialised */
+export const initDataState = (
+  data: InMemoryData,
+  optimisticKey: number | null
+) => {
+  currentData = data;
+  currentDependencies = new Set();
   currentOptimisticKey = optimisticKey;
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
 };
 
-export const make = (): InMemoryData => ({
+/** Reset the data state after read/write is complete */
+export const clearDataState = () => {
+  const data = currentData!;
+  if (!data.gcScheduled && data.gcBatch.size > 0) {
+    data.gcScheduled = true;
+    defer(() => gc(data));
+  }
+
+  currentData = null;
+  currentDependencies = null;
+  currentOptimisticKey = null;
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
+};
+
+/** As we're writing, we keep around all the records and links we've read or have written to */
+export const getCurrentDependencies = (): Set<string> => {
+  invariant(
+    currentDependencies !== null,
+    'Invalid Cache call: The cache may only be accessed or mutated during' +
+      'operations like write or query, or as part of its resolvers, updaters, ' +
+      'or optimistic configs.',
+    2
+  );
+
+  return currentDependencies;
+};
+
+export const make = (queryRootKey: string): InMemoryData => ({
+  queryRootKey,
+  gcScheduled: false,
   gcBatch: new Set(),
   refCount: makeDict(),
   refLock: makeDict(),
@@ -187,6 +233,8 @@ const extractNodeMapFields = <T>(
 
 /** Garbage collects all entities that have been marked as having no references */
 export const gc = (data: InMemoryData) => {
+  // Reset gcScheduled flag
+  data.gcScheduled = false;
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
@@ -228,35 +276,55 @@ export const gc = (data: InMemoryData) => {
   });
 };
 
+const updateDependencies = (entityKey: string, fieldKey?: string) => {
+  if (fieldKey !== '__typename') {
+    if (entityKey !== currentData!.queryRootKey) {
+      currentDependencies!.add(entityKey);
+    } else if (fieldKey !== undefined) {
+      currentDependencies!.add(joinKeys(entityKey, fieldKey));
+    }
+  }
+};
+
 /** Reads an entity's field (a "record") from data */
 export const readRecord = (
-  data: InMemoryData,
   entityKey: string,
   fieldKey: string
-): EntityField => getNode(data.records, entityKey, fieldKey);
+): EntityField => {
+  updateDependencies(entityKey, fieldKey);
+  return getNode(currentData!.records, entityKey, fieldKey);
+};
 
 /** Reads an entity's link from data */
 export const readLink = (
-  data: InMemoryData,
   entityKey: string,
   fieldKey: string
-): Link | undefined => getNode(data.links, entityKey, fieldKey);
+): Link | undefined => {
+  updateDependencies(entityKey, fieldKey);
+  return getNode(currentData!.links, entityKey, fieldKey);
+};
 
 /** Writes an entity's field (a "record") to data */
 export const writeRecord = (
-  data: InMemoryData,
   entityKey: string,
   fieldKey: string,
   value: EntityField
-) => setNode(data.records, entityKey, fieldKey, value);
+) => {
+  updateDependencies(entityKey, fieldKey);
+  setNode(currentData!.records, entityKey, fieldKey, value);
+};
+
+export const hasField = (entityKey: string, fieldKey: string): boolean =>
+  readRecord(entityKey, fieldKey) !== undefined ||
+  readLink(entityKey, fieldKey) !== undefined;
 
 /** Writes an entity's link to data */
 export const writeLink = (
-  data: InMemoryData,
   entityKey: string,
   fieldKey: string,
   link: Link | undefined
 ) => {
+  const data = currentData!;
   // Retrieve the reference counting dict or the optimistic reference locking dict
   let refCount: Dict<number>;
   // Retrive the link NodeMap from either an optimistic or the base layer
@@ -280,6 +348,8 @@ export const writeLink = (
   const prevLinkNode = links !== undefined ? links.get(entityKey) : undefined;
   const prevLink = prevLinkNode !== undefined ? prevLinkNode[fieldKey] : null;
 
+  // Update dependencies
+  updateDependencies(entityKey, fieldKey);
   // Update the link
   setNode(data.links, entityKey, fieldKey, link);
   // First decrease the reference count for the previous link
@@ -297,13 +367,12 @@ export const clearOptimistic = (data: InMemoryData, optimisticKey: number) => {
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */
-export const inspectFields = (
-  data: InMemoryData,
-  entityKey: string
-): FieldInfo[] => {
-  const { links, records } = data;
+export const inspectFields = (entityKey: string): FieldInfo[] => {
+  const { links, records } = currentData!;
   const fieldInfos: FieldInfo[] = [];
   const seenFieldKeys: Set<string> = new Set();
+  // Update dependencies
+  updateDependencies(entityKey);
   // Extract FieldInfos to the fieldInfos array for links and records
   // This also deduplicates by keeping track of fieldKeys in the seenFieldKeys Set
   extractNodeMapFields(fieldInfos, seenFieldKeys, entityKey, links);

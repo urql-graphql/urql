@@ -21,8 +21,8 @@ import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from 'urql/core';
 
 import { getName, getSelectionSet, unwrapType } from './ast';
+import { makeDict } from './store';
 import { invariant, warn } from './helpers/help';
-import { makeDict } from './helpers/dict';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;

@@ -17,10 +17,10 @@ import {
   SelectionSet,
 } from '../types';
 
-import { Store, addDependency } from '../store';
+import * as InMemoryData from '../store/data';
+import { Store, keyOfField } from '../store';
+import { SchemaPredicates } from '../ast';
 import { SelectionIterator } from './shared';
-import { joinKeys, keyOfField } from '../helpers';
-import { SchemaPredicates } from '../ast/schemaPredicates';
 
 interface Context {
   store: Store;
@@ -51,17 +51,15 @@ export const invalidateSelection = (
   entityKey: string,
   select: SelectionSet
 ) => {
-  const { store } = ctx;
   const isQuery = entityKey === 'Query';
 
   let typename: EntityField;
   if (!isQuery) {
-    addDependency(entityKey);
-    typename = store.getField(entityKey, '__typename');
+    typename = InMemoryData.readRecord(entityKey, '__typename');
     if (typeof typename !== 'string') {
       return;
     } else {
-      store.writeRecord(undefined, entityKey, keyOfField('__typename'));
+      InMemoryData.writeRecord(entityKey, '__typename', undefined);
     }
   } else {
     typename = entityKey;
@@ -76,7 +74,6 @@ export const invalidateSelection = (
       fieldName,
       getFieldArguments(node, ctx.variables)
     );
-    const key = joinKeys(entityKey, fieldKey);
 
     if (
       process.env.NODE_ENV !== 'production' &&
@@ -86,15 +83,14 @@ export const invalidateSelection = (
       ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
     }
 
-    if (isQuery) addDependency(key);
-
     if (node.selectionSet === undefined) {
-      store.writeRecord(undefined, entityKey, fieldKey);
+      InMemoryData.writeRecord(entityKey, fieldKey, undefined);
     } else {
       const fieldSelect = getSelectionSet(node);
-      const link = store.getLink(entityKey, fieldKey);
-      store.writeLink(undefined, entityKey, fieldKey);
-      store.writeRecord(undefined, entityKey, fieldKey);
+      const link = InMemoryData.readLink(entityKey, fieldKey);
+
+      InMemoryData.writeLink(entityKey, fieldKey, undefined);
+      InMemoryData.writeRecord(entityKey, fieldKey, undefined);
 
       if (Array.isArray(link)) {
         for (let i = 0, l = link.length; i < l; i++) {
