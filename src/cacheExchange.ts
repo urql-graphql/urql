@@ -8,7 +8,22 @@ import {
 } from 'urql/core';
 
 import { IntrospectionQuery } from 'graphql';
-import { filter, map, merge, pipe, share, tap } from 'wonka';
+import {
+  filter,
+  map,
+  merge,
+  pipe,
+  share,
+  tap,
+  fromPromise,
+  fromArray,
+  buffer,
+  take,
+  mergeMap,
+  concat,
+  empty,
+  Source,
+} from 'wonka';
 import { query, write, writeOptimistic } from './operations';
 import { SchemaPredicates } from './ast';
 import { makeDict, Store, clearOptimistic } from './store';
@@ -18,6 +33,7 @@ import {
   ResolverConfig,
   OptimisticMutationConfig,
   KeyingConfig,
+  StorageAdapter,
 } from './types';
 
 type OperationResultWithMeta = OperationResult & {
@@ -87,6 +103,7 @@ export interface CacheExchangeOpts {
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
   schema?: IntrospectionQuery;
+  storage?: StorageAdapter;
 }
 
 export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
@@ -102,6 +119,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     opts.optimistic,
     opts.keys
   );
+
+  let hydration: void | Promise<void>;
+  if (opts.storage) {
+    const storage = opts.storage;
+    hydration = storage.read().then(data => {
+      store.hydrateData(data, storage);
+    });
+  }
 
   const optimisticKeys = new Set();
   const ops: OperationMap = new Map();
@@ -243,8 +268,21 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   return ops$ => {
-    const sharedOps$ = pipe(
-      ops$,
+    const sharedOps$ = pipe(ops$, share);
+
+    // Buffer operations while waiting on hydration to finish
+    // If no hydration takes place we replace this stream with an empty one
+    const bufferedOps$ = hydration
+      ? pipe(
+          sharedOps$,
+          buffer(fromPromise(hydration)),
+          take(1),
+          mergeMap(fromArray)
+        )
+      : (empty as Source<Operation>);
+
+    const inputOps$ = pipe(
+      concat([bufferedOps$, sharedOps$]),
       map(addTypeNames),
       tap(optimisticUpdate),
       share
@@ -252,7 +290,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
-      sharedOps$,
+      inputOps$,
       filter(op => isCacheableQuery(op)),
       map(operationResultFromCache),
       share
@@ -302,7 +340,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       forward(
         merge([
           pipe(
-            sharedOps$,
+            inputOps$,
             filter(op => !isCacheableQuery(op))
           ),
           cacheOps$,

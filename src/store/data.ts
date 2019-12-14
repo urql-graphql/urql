@@ -1,6 +1,12 @@
-import { Link, EntityField, FieldInfo } from '../types';
+import {
+  Link,
+  EntityField,
+  FieldInfo,
+  StorageAdapter,
+  SerializedEntries,
+} from '../types';
 import { invariant, currentDebugStack } from '../helpers/help';
-import { fieldInfoOfKey, joinKeys } from './keys';
+import { fieldInfoOfKey, joinKeys, prefixKey } from './keys';
 import { defer } from './timing';
 
 type Dict<T> = Record<string, T>;
@@ -21,6 +27,7 @@ export interface InMemoryData {
   refLock: OptimisticMap<Dict<number>>;
   records: NodeMap<EntityField>;
   links: NodeMap<Link>;
+  storage: StorageAdapter | null;
 }
 
 let currentData: null | InMemoryData = null;
@@ -28,6 +35,7 @@ let currentDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
 
 export const makeDict = (): any => Object.create(null);
+let persistenceBatch: SerializedEntries = makeDict();
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
@@ -51,9 +59,19 @@ export const initDataState = (
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
   const data = currentData!;
+
   if (!data.gcScheduled && data.gcBatch.size > 0) {
     data.gcScheduled = true;
-    defer(() => gc(data));
+    defer(() => {
+      gc(data);
+    });
+  }
+
+  if (data.storage) {
+    defer(() => {
+      data.storage!.write(persistenceBatch);
+      persistenceBatch = makeDict();
+    });
   }
 
   currentData = null;
@@ -85,6 +103,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
   refLock: makeDict(),
   links: makeNodeMap(),
   records: makeNodeMap(),
+  storage: null,
 });
 
 /** Adds a node value to a NodeMap (taking optimistic values into account */
@@ -260,12 +279,18 @@ export const gc = (data: InMemoryData) => {
       delete data.refCount[entityKey];
       data.records.base.delete(entityKey);
       data.gcBatch.delete(entityKey);
+      if (data.storage) {
+        persistenceBatch[prefixKey('r', entityKey)] = undefined;
+      }
 
       // Delete all the entity's links, but also update the reference count
       // for those links (which can lead to an unrolled recursive GC of the children)
       const linkNode = data.links.base.get(entityKey);
       if (linkNode !== undefined) {
         data.links.base.delete(entityKey);
+        if (data.storage) {
+          persistenceBatch[prefixKey('l', entityKey)] = undefined;
+        }
         for (const key in linkNode) {
           updateRCForLink(data.gcBatch, data.refCount, linkNode[key], -1);
         }
@@ -312,6 +337,10 @@ export const writeRecord = (
 ) => {
   updateDependencies(entityKey, fieldKey);
   setNode(currentData!.records, entityKey, fieldKey, value);
+  if (currentData!.storage && !currentOptimisticKey) {
+    const key = prefixKey('r', joinKeys(entityKey, fieldKey));
+    persistenceBatch[key] = value;
+  }
 };
 
 export const hasField = (entityKey: string, fieldKey: string): boolean =>
@@ -339,6 +368,10 @@ export const writeLink = (
       (data.refLock[currentOptimisticKey] = makeDict());
     links = data.links.optimistic[currentOptimisticKey];
   } else {
+    if (data.storage) {
+      const key = prefixKey('l', joinKeys(entityKey, fieldKey));
+      persistenceBatch[key] = link;
+    }
     refCount = data.refCount;
     links = data.links.base;
     gcBatch = data.gcBatch;

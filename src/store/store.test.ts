@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-import { Data } from '../types';
+import { Data, StorageAdapter } from '../types';
 import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
@@ -403,5 +403,57 @@ describe('Store with OptimisticMutationConfig', () => {
       __typename: 'Query',
       todos: todosData.todos,
     });
+  });
+});
+
+describe('Store with storage', () => {
+  const expectedData = {
+    __typename: 'Query',
+    appointment: {
+      __typename: 'Appointment',
+      id: '1',
+      info: 'urql meeting',
+    },
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  it('should be able to store and rehydrate data', () => {
+    const storage: StorageAdapter = {
+      read: jest.fn(),
+      write: jest.fn(),
+    };
+    let store = new Store();
+
+    store.hydrateData(Object.create(null), storage);
+
+    write(
+      store,
+      {
+        query: Appointment,
+        variables: { id: '1' },
+      },
+      expectedData
+    );
+
+    expect(storage.write).not.toHaveBeenCalled();
+
+    jest.runAllTimers();
+    expect(storage.write).toHaveBeenCalled();
+
+    const serialisedStore = (storage.write as any).mock.calls[0][0];
+    expect(serialisedStore).toMatchSnapshot();
+
+    store = new Store();
+    store.hydrateData(serialisedStore, storage);
+
+    const { data } = query(store, {
+      query: Appointment,
+      variables: { id: '1' },
+    });
+
+    expect(data).toEqual(expectedData);
   });
 });
