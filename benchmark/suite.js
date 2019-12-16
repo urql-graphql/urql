@@ -51,7 +51,7 @@ suite('100 entries write', () => {
   });
 });
 
-suite('1000 entries write', () => {
+suite('1,000 entries write', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -67,7 +67,7 @@ suite('1000 entries write', () => {
   });
 });
 
-suite('10000 entries write', () => {
+suite('10,000 entries write', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -84,6 +84,60 @@ suite('10000 entries write', () => {
       { query: TodosQuery },
       { todos: tenThousandEntries }
     );
+  });
+});
+
+suite('100 entries GC', () => {
+  const urqlStore = new Store();
+  const apolloCache = new InMemoryCache({ resultCaching: false });
+
+  benchmark('apollo', () => {
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: hundredEntries } })
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: [] } })
+    apolloCache.gc();
+  });
+
+  benchmark('urql', () => {
+    write(urqlStore, { query: TodosQuery }, { todos: hundredEntries });
+    write(urqlStore, { query: TodosQuery }, { todos: [] });
+    urqlStore.gcScheduled = false;
+    urqlStore.gc();
+  });
+});
+
+suite('1,000 entries GC', () => {
+  const urqlStore = new Store();
+  const apolloCache = new InMemoryCache({ resultCaching: false });
+
+  benchmark('apollo', () => {
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: thousandEntries } })
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: [] } })
+    apolloCache.gc();
+  });
+
+  benchmark('urql', () => {
+    write(urqlStore, { query: TodosQuery }, { todos: thousandEntries });
+    write(urqlStore, { query: TodosQuery }, { todos: [] });
+    urqlStore.gcScheduled = false;
+    urqlStore.gc();
+  });
+});
+
+suite('10,000 entries GC', () => {
+  const urqlStore = new Store();
+  const apolloCache = new InMemoryCache({ resultCaching: false });
+
+  benchmark('apollo', () => {
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: tenThousandEntries } })
+    apolloCache.writeQuery({ query: TodosQuery, data: { todos: [] } })
+    apolloCache.gc();
+  });
+
+  benchmark('urql', () => {
+    write(urqlStore, { query: TodosQuery }, { todos: tenThousandEntries });
+    write(urqlStore, { query: TodosQuery }, { todos: [] });
+    urqlStore.gcScheduled = false;
+    urqlStore.gc();
   });
 });
 
@@ -105,7 +159,7 @@ suite('100 entries read', () => {
   });
 });
 
-suite('1000 entries read', () => {
+suite('1,000 entries read', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -126,7 +180,7 @@ suite('1000 entries read', () => {
   });
 });
 
-suite('10000 entries read', () => {
+suite('10,000 entries read', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -283,7 +337,7 @@ suite('100 entries write five entities', () => {
   });
 });
 
-suite('1000 entries write five entities', () => {
+suite('1,000 entries write five entities', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -323,7 +377,7 @@ suite('1000 entries write five entities', () => {
   });
 });
 
-suite('10000 entries write five entities', () => {
+suite('10,000 entries write five entities', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -437,7 +491,7 @@ suite('100 entries complex write', () => {
   });
 });
 
-suite('1000 entries complex write', () => {
+suite('1,000 entries complex write', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
@@ -453,7 +507,7 @@ suite('1000 entries complex write', () => {
   });
 });
 
-suite('10000 entries complex write', () => {
+suite('10,000 entries complex write', () => {
   const urqlStore = new Store();
   const apolloCache = new InMemoryCache({ resultCaching: false });;
 
