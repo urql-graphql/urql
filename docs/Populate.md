@@ -53,7 +53,7 @@ mutation addTodo(id: ID!) {
 }
 ```
 
-By using the `populate` exchange, you no longer need to manually specify the selection set required to update your other queries.
+By using `populateExchange`, you no longer need to manually specify the selection set required to update your other queries. Instead you can just add the `@populate` directive.
 
 ```graphql
 # With populate
