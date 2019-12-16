@@ -19,7 +19,7 @@ const client = createClient({
 
 ## Example usage
 
-Consider the following queries which have been requested
+Consider the following queries which have been requested in other parts of your application:
 
 
 ```graphql
