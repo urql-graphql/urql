@@ -20,9 +20,11 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
-  queryRootKey: string;
+  persistenceScheduled: boolean;
+  persistenceBatch: SerializedEntries;
   gcScheduled: boolean;
   gcBatch: Set<string>;
+  queryRootKey: string;
   refCount: Dict<number>;
   refLock: OptimisticMap<Dict<number>>;
   records: NodeMap<EntityField>;
@@ -30,12 +32,11 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
+export const makeDict = (): any => Object.create(null);
+
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
-
-export const makeDict = (): any => Object.create(null);
-let persistenceBatch: SerializedEntries = makeDict();
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
@@ -67,10 +68,12 @@ export const clearDataState = () => {
     });
   }
 
-  if (data.storage) {
+  if (data.storage && !data.persistenceScheduled) {
+    data.persistenceScheduled = true;
     defer(() => {
-      data.storage!.write(persistenceBatch);
-      persistenceBatch = makeDict();
+      data.storage!.write(data.persistenceBatch);
+      data.persistenceScheduled = false;
+      data.persistenceBatch = makeDict();
     });
   }
 
@@ -96,8 +99,10 @@ export const getCurrentDependencies = (): Set<string> => {
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
-  queryRootKey,
+  persistenceScheduled: false,
+  persistenceBatch: makeDict(),
   gcScheduled: false,
+  queryRootKey,
   gcBatch: new Set(),
   refCount: makeDict(),
   refLock: makeDict(),
@@ -273,14 +278,23 @@ export const gc = (data: InMemoryData) => {
 
       // All conditions are met: The entity can be deleted
 
-      // Delete the reference count, all records, and delete the entity from the GC batch
+      // Delete the reference count, and delete the entity from the GC batch
+      delete data.refCount[entityKey];
+      data.gcBatch.delete(entityKey);
+
+      // Delete the record and for each of its fields, delete them on the persistence
+      // layer if one is present
       // No optimistic data needs to be deleted, as the entity is not being referenced by
       // anything and optimistic layers will eventually be deleted anyway
-      delete data.refCount[entityKey];
-      data.records.base.delete(entityKey);
-      data.gcBatch.delete(entityKey);
-      if (data.storage) {
-        persistenceBatch[prefixKey('r', entityKey)] = undefined;
+      const recordsNode = data.records.base.get(entityKey);
+      if (recordsNode !== undefined) {
+        data.records.base.delete(entityKey);
+        if (data.storage) {
+          for (const fieldKey in recordsNode) {
+            const key = prefixKey('r', joinKeys(entityKey, fieldKey));
+            data.persistenceBatch[key] = undefined;
+          }
+        }
       }
 
       // Delete all the entity's links, but also update the reference count
@@ -288,11 +302,14 @@ export const gc = (data: InMemoryData) => {
       const linkNode = data.links.base.get(entityKey);
       if (linkNode !== undefined) {
         data.links.base.delete(entityKey);
-        if (data.storage) {
-          persistenceBatch[prefixKey('l', entityKey)] = undefined;
-        }
-        for (const key in linkNode) {
-          updateRCForLink(data.gcBatch, data.refCount, linkNode[key], -1);
+        for (const fieldKey in linkNode) {
+          // Delete all links from the persistence layer if one is present
+          if (data.storage) {
+            const key = prefixKey('l', joinKeys(entityKey, fieldKey));
+            data.persistenceBatch[key] = undefined;
+          }
+
+          updateRCForLink(data.gcBatch, data.refCount, linkNode[fieldKey], -1);
         }
       }
     } else {
@@ -339,7 +356,7 @@ export const writeRecord = (
   setNode(currentData!.records, entityKey, fieldKey, value);
   if (currentData!.storage && !currentOptimisticKey) {
     const key = prefixKey('r', joinKeys(entityKey, fieldKey));
-    persistenceBatch[key] = value;
+    currentData!.persistenceBatch[key] = value;
   }
 };
 
@@ -370,7 +387,7 @@ export const writeLink = (
   } else {
     if (data.storage) {
       const key = prefixKey('l', joinKeys(entityKey, fieldKey));
-      persistenceBatch[key] = link;
+      data.persistenceBatch[key] = link;
     }
     refCount = data.refCount;
     links = data.links.base;
@@ -411,4 +428,27 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
   extractNodeMapFields(fieldInfos, seenFieldKeys, entityKey, links);
   extractNodeMapFields(fieldInfos, seenFieldKeys, entityKey, records);
   return fieldInfos;
+};
+
+export const hydrateData = (
+  data: InMemoryData,
+  storage: StorageAdapter,
+  entries: SerializedEntries
+) => {
+  initDataState(data, 0);
+  for (const key in entries) {
+    const dotIndex = key.indexOf('.');
+    const entityKey = key.slice(2, dotIndex);
+    const fieldKey = key.slice(dotIndex + 1);
+    switch (key.charCodeAt(0)) {
+      case 108:
+        writeLink(entityKey, fieldKey, entries[key] as Link);
+        break;
+      case 114:
+        writeRecord(entityKey, fieldKey, entries[key]);
+        break;
+    }
+  }
+  clearDataState();
+  data.storage = storage;
 };

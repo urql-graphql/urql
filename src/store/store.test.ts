@@ -425,9 +425,9 @@ describe('Store with storage', () => {
       read: jest.fn(),
       write: jest.fn(),
     };
-    let store = new Store();
 
-    store.hydrateData(Object.create(null), storage);
+    let store = new Store();
+    InMemoryData.hydrateData(store.data, storage, Object.create(null));
 
     write(
       store,
@@ -447,7 +447,7 @@ describe('Store with storage', () => {
     expect(serialisedStore).toMatchSnapshot();
 
     store = new Store();
-    store.hydrateData(serialisedStore, storage);
+    InMemoryData.hydrateData(store.data, storage, serialisedStore);
 
     const { data } = query(store, {
       query: Appointment,
@@ -455,5 +455,39 @@ describe('Store with storage', () => {
     });
 
     expect(data).toEqual(expectedData);
+  });
+
+  it('writes removals based on GC to storage', () => {
+    const storage: StorageAdapter = {
+      read: jest.fn(),
+      write: jest.fn(),
+    };
+
+    const store = new Store();
+    InMemoryData.hydrateData(store.data, storage, Object.create(null));
+
+    write(
+      store,
+      {
+        query: Appointment,
+        variables: { id: '1' },
+      },
+      expectedData
+    );
+
+    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.writeLink(
+      'Query',
+      store.keyOfField('appointment', { id: '1' }),
+      undefined
+    );
+    InMemoryData.gc(store.data);
+    InMemoryData.clearDataState();
+
+    jest.runAllTimers();
+
+    expect(storage.write).toHaveBeenCalled();
+    const serialisedStore = (storage.write as any).mock.calls[0][0];
+    expect(serialisedStore).toMatchSnapshot();
   });
 });

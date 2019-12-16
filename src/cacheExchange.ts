@@ -1,3 +1,5 @@
+import { IntrospectionQuery } from 'graphql';
+
 import {
   Exchange,
   formatDocument,
@@ -7,7 +9,6 @@ import {
   CacheOutcome,
 } from 'urql/core';
 
-import { IntrospectionQuery } from 'graphql';
 import {
   filter,
   map,
@@ -24,8 +25,10 @@ import {
   empty,
   Source,
 } from 'wonka';
+
 import { query, write, writeOptimistic } from './operations';
 import { SchemaPredicates } from './ast';
+import { hydrateData } from './store/data';
 import { makeDict, Store, clearOptimistic } from './store';
 
 import {
@@ -123,8 +126,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   let hydration: void | Promise<void>;
   if (opts.storage) {
     const storage = opts.storage;
-    hydration = storage.read().then(data => {
-      store.hydrateData(data, storage);
+    hydration = storage.read().then(entries => {
+      hydrateData(store.data, storage, entries);
     });
   }
 

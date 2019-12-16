@@ -10,3 +10,14 @@ Object {
   "r|Query.appointment({\\"id\\":\\"1\\"})": undefined,
 }
 `;
+
+exports[`Store with storage writes removals based on GC to storage 1`] = `
+Object {
+  "l|Query.appointment({\\"id\\":\\"1\\"})": undefined,
+  "r|Appointment:1.__typename": undefined,
+  "r|Appointment:1.id": undefined,
+  "r|Appointment:1.info": undefined,
+  "r|Query.__typename": "Query",
+  "r|Query.appointment({\\"id\\":\\"1\\"})": undefined,
+}
+`;
