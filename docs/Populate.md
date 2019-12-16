@@ -40,7 +40,7 @@ Consider the following queries which have been requested in other parts of your 
 }
 ```
 
-Now consider the following mutation which returns a todo
+Without the `populateExchange` you may write a mutation like the following which returns a newly created todo item:
 
 ```graphql
 # Without populate
