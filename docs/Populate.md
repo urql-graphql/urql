@@ -4,7 +4,9 @@
 
 ## How to use
 
-As with any exchange, add this to your client (before your cache).
+As with any exchange, add this to your client.
+
+> Note: Populate needs to be declared before the cache in order to ensure the `populate` directive is replaced with the respective attributes.
 
 ```tsx
 import { populateExchange } from '@urql/exchange-graphcache';
