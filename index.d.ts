@@ -23,7 +23,7 @@ type NextUrqlClientConfig =
   | ((ctx: NextContext<any, any>) => NextUrqlClientOptions);
 
 declare const withUrqlClient: <T = any, IP = any>(
-  clientOptions: NextUrqlClientOptions,
+  clientOptions: NextUrqlClientConfig,
   mergeExchanges?: (ssrEx: SSRExchange) => Exchange[],
 ) => (
   App:
