@@ -3,41 +3,34 @@ import { NextComponentClass, NextContext, NextFC } from 'next';
 import { Client, ClientOptions, Exchange } from 'urql';
 import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 
+type NextUrqlClientOptions = Omit<ClientOptions, 'exchanges' | 'suspense'>;
+
 interface WithUrqlClient {
   urqlClient: Client;
 }
 
-interface WithUrqlState {
+interface WithUrqlInitialProps {
   urqlState: SSRData;
+  clientOptions: NextUrqlClientOptions;
 }
 
-interface NextContextWithAppTree extends NextContext {
+export interface NextContextWithAppTree extends NextContext {
   AppTree: React.ComponentType<any>;
 }
 
-type NextUrqlClientOptions =
-  | Omit<ClientOptions, 'exchanges' | 'suspense'>
-  | ((
-      ctx: NextContext<any, any>,
-    ) => Omit<ClientOptions, 'exchanges' | 'suspense'>);
+type NextUrqlClientConfig =
+  | NextUrqlClientOptions
+  | ((ctx: NextContext<any, any>) => NextUrqlClientOptions);
 
-declare const withUrqlClient: <T>(
+declare const withUrqlClient: <T = any, IP = any>(
   clientOptions: NextUrqlClientOptions,
   mergeExchanges?: (ssrEx: SSRExchange) => Exchange[],
 ) => (
   App:
-    | NextComponentClass<
-        T & WithUrqlClient,
-        T & WithUrqlClient,
-        NextContext<Record<string, string | string[] | undefined>, {}>
-      >
-    | NextFC<
-        T & WithUrqlClient,
-        T & WithUrqlClient,
-        NextContext<Record<string, string | string[] | undefined>, {}>
-      >,
+    | NextComponentClass<T & IP & WithUrqlClient, T & IP & WithUrqlClient>
+    | NextFC<T & IP & WithUrqlClient, T & IP & WithUrqlClient>,
 ) => NextFC<
-  T & WithUrqlClient & WithUrqlState,
-  T & WithUrqlState,
+  T & IP & WithUrqlClient & WithUrqlInitialProps,
+  IP | (IP & WithUrqlInitialProps),
   NextContextWithAppTree
 >;

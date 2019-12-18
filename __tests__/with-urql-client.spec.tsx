@@ -48,12 +48,12 @@ describe('withUrqlClient', () => {
       spyInitUrqlClient.mockClear();
     });
 
-    it('should instantiate and pass the urql client instance to the wrapped component if no client is passed by getInitialProps', () => {
+    it('should instantiate an empty client before getInitialProps has been run', () => {
       const tree = shallow(<Component />);
       const app = tree.find(MockApp);
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
-      expect(app.props().urqlClient.url).toEqual('http://localhost:3000');
+      expect(app.props().urqlClient.url).toBeUndefined();
       expect(spyInitUrqlClient).toHaveBeenCalled();
     });
 

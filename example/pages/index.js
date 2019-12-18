@@ -15,4 +15,13 @@ const Home = () => (
   </div>
 );
 
-export default withUrqlClient({ url: 'https://graphql-pokemon.now.sh' })(Home);
+export default withUrqlClient(ctx => {
+  return {
+    url: 'https://graphql-pokemon.now.sh',
+    fetchOptions: {
+      headers: {
+        Authorization: `Bearer ${ctx.req.token}`,
+      },
+    },
+  };
+})(Home);
