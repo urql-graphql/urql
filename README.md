@@ -75,7 +75,7 @@ Next allows you to override the root of your application using a special page ca
 The `clientOptions` argument is required. It represents all of the options you want to enable on your `urql` Client instance. It has the following union type:
 
 ```typescript
-type NextUrqlClientOptions =
+type NextUrqlClientConfig =
   | Omit<ClientOptions, 'exchanges' | 'suspense'>
   | ((
       ctx: NextContext<any, any>,
@@ -122,7 +122,7 @@ withUrqlClient(ctx => ({
 }));
 ```
 
-In client-side SPAs using `urql`, you typically configure the `Client` yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` setup for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
+In client-side SPAs using `urql`, you typically configure the `Client` yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` set up for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
 
 #### `mergeExchanges` (Optional)
 
@@ -140,4 +140,4 @@ You can see an example project with `next-urql` in our [example directory](/exam
 
 ### Caveats
 
-`withUrqlClient` implements NextJS's unique `getInitialProps` method uner the hood. This means that any page containing a component wrapped by `withUrqlClient` will be opted out of [automatic static optimization](https://nextjs.org/docs#automatic-static-optimization). Automatic static optimization was added in Next v9, so you shouldn't worry about this if using an earlier version of Next. This is **not** unique to `next-urql` – any implementation of `getInitialProps` by any component in your application will cause Next to opt out of automatic static optimization.
+`withUrqlClient` implements NextJS's unique `getInitialProps` method under the hood. This means that any page containing a component wrapped by `withUrqlClient` will be opted out of [automatic static optimization](https://nextjs.org/docs#automatic-static-optimization). Automatic static optimization was added in Next v9, so you shouldn't worry about this if using an earlier version of Next. This is **not** unique to `next-urql` – any implementation of `getInitialProps` by any component in your application will cause Next to opt out of automatic static optimization.
