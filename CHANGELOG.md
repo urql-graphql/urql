@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2019-12-17
 
+This release fixes a small discrepancy in the types used by `withUrqlClient` and the public API defined by our `index.d.ts` file.
+
+### Fixed
+
+- Use `NextUrqlClientConfig` in lieu of `NextUrqlClientOptions` in `index.d.ts` to match implementation of `withUrqlClient`. PR by @kylealwyn [here](https://github.com/FormidableLabs/next-urql/pull/9).
+
+### Diff
+
+https://github.com/FormidableLabs/next-urql/compare/v0.2.1...v0.2.2
+
+## [0.2.1] - 2019-12-17
+
 This release fixes a regression introduced in 0.2.0 involving circular structures created bt `withUrqlClient`'s `getInitialProps` method.
 
 ### Fixed
