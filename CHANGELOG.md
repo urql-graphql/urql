@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2019-12-08
+## [0.2.1] - 2019-12-17
+
+This release fixes a regression introduced in 0.2.0 involving circular structures created bt `withUrqlClient`'s `getInitialProps` method.
+
+### Fixed
+
+- Amend circular structure in `withUrqlClient` caused by returning `ctx` in `getInitialProps`. PR by @parkerziegler [here](https://github.com/FormidableLabs/next-urql/pull/7).
+- Fix dependency resolution issues in the `example` project. Update `example` documentation. PR by @parkerziegler [here](https://github.com/FormidableLabs/next-urql/pull/7).
+
+### Diff
+
+https://github.com/FormidableLabs/next-urql/compare/v0.2.0...v0.2.1
+
+## [0.2.0] - 2019-12-08 [Deprecated]
 
 This release adds support for accessing Next's context object, `ctx`, to instantiate your `urql` Client instance.
 
