@@ -88,6 +88,14 @@ export const simplePagination = ({
       prevOffset = currentOffset;
     }
 
-    return result;
+    const hasCurrentPage = cache.resolve(entityKey, fieldName, fieldArgs);
+    if (hasCurrentPage) {
+      return result;
+    } else if ((info as any).schemaPredicates === undefined) {
+      return undefined;
+    } else {
+      info.partial = true;
+      return result;
+    }
   };
 };

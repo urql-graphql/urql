@@ -276,7 +276,7 @@ const readSelection = (
         data[fieldAlias] = fieldValue;
       }
 
-      const resolverValue: DataField | undefined = resolvers[fieldName](
+      dataFieldValue = resolvers[fieldName](
         data,
         fieldArgs || makeDict(),
         store,
@@ -293,15 +293,18 @@ const readSelection = (
           key,
           getSelectionSet(node),
           (data[fieldAlias] as Data) || makeDict(),
-          resolverValue
+          dataFieldValue
         );
-      } else {
-        // Otherwise we set the resolverValue, and normalise it to null when there's
-        // no schema data to check with whether this field is nullable
-        dataFieldValue =
-          resolverValue === undefined && schemaPredicates === undefined
-            ? null
-            : resolverValue;
+      }
+
+      if (
+        schemaPredicates !== undefined &&
+        dataFieldValue === null &&
+        !schemaPredicates.isFieldNullable(typename, fieldName)
+      ) {
+        // Special case for when null is not a valid value for the
+        // current field
+        return undefined;
       }
     } else if (node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly
@@ -476,7 +479,7 @@ const resolveResolverResult = (
   select: SelectionSet,
   prevData: void | Data | Data[],
   result: void | DataField
-): DataField | undefined => {
+): DataField | void => {
   if (Array.isArray(result)) {
     const { schemaPredicates } = ctx;
     // Check whether values of the list may be null; for resolvers we assume
@@ -507,7 +510,7 @@ const resolveResolverResult = (
 
     return data;
   } else if (result === null || result === undefined) {
-    return null;
+    return result;
   } else if (isDataOrKey(result)) {
     const data = prevData === undefined ? makeDict() : prevData;
     return typeof result === 'string'

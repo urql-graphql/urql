@@ -530,10 +530,7 @@ it('prevents overlapping of pagination on different arguments', () => {
   );
   expect(resTwo.data).toHaveProperty('items.edges.length', 1);
 
-  expect(resThree.data).toEqual({
-    __typename: 'Query',
-    items: null,
-  });
+  expect(resThree.data).toEqual(null);
 });
 
 it('returns an empty array of edges when the cache has zero edges stored', () => {

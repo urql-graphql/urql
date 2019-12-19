@@ -43,17 +43,32 @@ it('works with simple pagination', () => {
     { query: Pagination, variables: { skip: 0, limit: 3 } },
     pageOne
   );
+  const pageOneResult = query(store, {
+    query: Pagination,
+    variables: { skip: 0, limit: 3 },
+  });
+  expect(pageOneResult.data).toEqual(pageOne);
+
   write(
     store,
     { query: Pagination, variables: { skip: 3, limit: 3 } },
     pageTwo
   );
 
-  const result = query(store, { query: Pagination });
-  expect(result.data).toEqual({
-    __typename: 'Query',
-    persons: [...pageOne.persons, ...pageTwo.persons],
+  const pageTwoResult = query(store, {
+    query: Pagination,
+    variables: { skip: 3, limit: 3 },
   });
+  expect((pageTwoResult.data as any).persons).toEqual([
+    ...pageOne.persons,
+    ...pageTwo.persons,
+  ]);
+
+  const pageThreeResult = query(store, {
+    query: Pagination,
+    variables: { skip: 6, limit: 3 },
+  });
+  expect(pageThreeResult.data).toEqual(null);
 });
 
 it('handles duplicates', () => {
@@ -102,7 +117,10 @@ it('handles duplicates', () => {
     pageTwo
   );
 
-  const result = query(store, { query: Pagination });
+  const result = query(store, {
+    query: Pagination,
+    variables: { skip: 2, limit: 3 },
+  });
   expect(result.data).toEqual({
     __typename: 'Query',
     persons: [...pageOne.persons, pageTwo.persons[1], pageTwo.persons[2]],
@@ -155,7 +173,10 @@ it('should preserve the correct order', () => {
     pageOne
   );
 
-  const result = query(store, { query: Pagination });
+  const result = query(store, {
+    query: Pagination,
+    variables: { skip: 3, limit: 3 },
+  });
   expect(result.data).toEqual({
     __typename: 'Query',
     persons: [...pageOne.persons, ...pageTwo.persons],
@@ -215,5 +236,5 @@ it('prevents overlapping of pagination on different arguments', () => {
   expect(resTwo.data).toHaveProperty(['persons', 0, 'id'], 'two');
   expect(resTwo.data).toHaveProperty('persons.length', 1);
 
-  expect(resThree.data).toEqual({ __typename: 'Query', persons: [] });
+  expect(resThree.data).toEqual(null);
 });
