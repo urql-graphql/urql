@@ -189,16 +189,6 @@ As data is written to the cache, this warning is issued when `undefined` is enco
 GraphQL results should never contain an `undefined` value, so this warning will let you
 know which part of your result did contain `undefined`.
 
-## (14) Invalid undefined <a id="14"></a>
-
-> Invalid value: The field at `???` is a scalar (number, boolean, etc), but the
-> GraphQL query expects a selection set for this field.
-> The value will still be cached, however this may lead to undefined behavior!
-
-This warning occurs when a scalar is being written to a field that has
-a selection set. This may happen when an object without a `__typename` field
-is encountered on a GraphQL result.
-
 ## (15) Invalid key <a id="15"></a>
 
 > Invalid key: The GraphQL query at the field at `???` has a selection set,

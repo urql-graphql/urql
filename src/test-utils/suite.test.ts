@@ -100,26 +100,6 @@ it('non-keyable entity on query', () => {
   });
 });
 
-it('invalid entity on query', () => {
-  expectCacheIntegrity({
-    query: gql`
-      {
-        __typename
-        item {
-          __typename
-          id
-          name
-        }
-      }
-    `,
-    // This entity comes back with an invalid typename (for some reason or another)
-    data: {
-      __typename: 'Query',
-      item: { __typename: null, id: '123', name: 'Test' },
-    },
-  });
-});
-
 it('non-IDable entity on query', () => {
   expectCacheIntegrity({
     query: gql`
@@ -226,7 +206,10 @@ it('entity list on query', () => {
     `,
     data: {
       __typename: 'Query',
-      items: [{ __typename: 'Item', id: 1 }, { __typename: 'Item', id: 2 }],
+      items: [
+        { __typename: 'Item', id: 1 },
+        { __typename: 'Item', id: 2 },
+      ],
     },
   });
 });

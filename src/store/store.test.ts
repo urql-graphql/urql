@@ -260,6 +260,7 @@ describe('Store with OptimisticMutationConfig', () => {
           text: 'Test updateQuery',
           complete: false,
           author: {
+            __typename: 'Author',
             id: '3',
             name: 'Andy',
           },
@@ -282,6 +283,7 @@ describe('Store with OptimisticMutationConfig', () => {
           text: 'Test updateQuery',
           complete: false,
           author: {
+            __typename: 'Author',
             id: '3',
             name: 'Andy',
           },

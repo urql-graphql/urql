@@ -482,12 +482,12 @@ suite('100 entries complex write', () => {
   benchmark('apollo', () => {
     return apolloCache.writeQuery({
       query: AuthorQuery,
-      data: { todos: hundredEntriesComplex },
+      data: { authors: hundredEntriesComplex },
     });
   });
 
   benchmark('urql', () => {
-    return write(urqlStore, { query: AuthorQuery }, { todos: hundredEntriesComplex });
+    return write(urqlStore, { query: AuthorQuery }, { authors: hundredEntriesComplex });
   });
 });
 
@@ -498,12 +498,12 @@ suite('1,000 entries complex write', () => {
   benchmark('apollo', () => {
     return apolloCache.writeQuery({
       query: AuthorQuery,
-      data: { todos: thousandEntriesComplex },
+      data: { authors: thousandEntriesComplex },
     });
   });
 
   benchmark('urql', () => {
-    return write(urqlStore, { query: AuthorQuery }, { todos: thousandEntriesComplex });
+    return write(urqlStore, { query: AuthorQuery }, { authors: thousandEntriesComplex });
   });
 });
 
@@ -514,7 +514,7 @@ suite('10,000 entries complex write', () => {
   benchmark('apollo', () => {
     return apolloCache.writeQuery({
       query: AuthorQuery,
-      data: { todos: tenThousandEntriesComplex },
+      data: { authors: tenThousandEntriesComplex },
     });
   });
 
@@ -522,7 +522,7 @@ suite('10,000 entries complex write', () => {
     return write(
       urqlStore,
       { query: AuthorQuery },
-      { todos: tenThousandEntriesComplex }
+      { authors: tenThousandEntriesComplex }
     );
   });
 });

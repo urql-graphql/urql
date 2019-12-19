@@ -34,7 +34,7 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode } from '../helpers/help';
-import { SelectionIterator, isScalar } from './shared';
+import { SelectionIterator, ensureData } from './shared';
 import { SchemaPredicates } from '../ast';
 
 export interface QueryResult {
@@ -114,22 +114,17 @@ const readRoot = (
     return originalData;
   }
 
+  const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
   const data = makeDict();
   data.__typename = originalData.__typename;
-
-  const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
 
   let node: FieldNode | void;
   while ((node = iter.next()) !== undefined) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
-
-    if (
-      node.selectionSet !== undefined &&
-      fieldValue !== null &&
-      !isScalar(fieldValue)
-    ) {
-      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldValue);
+    if (node.selectionSet !== undefined && fieldValue !== null) {
+      const fieldData = ensureData(fieldValue);
+      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
     } else {
       data[fieldAlias] = fieldValue;
     }

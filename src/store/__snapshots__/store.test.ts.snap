@@ -7,7 +7,6 @@ Object {
   "r|Appointment:1.id": "1",
   "r|Appointment:1.info": "urql meeting",
   "r|Query.__typename": "Query",
-  "r|Query.appointment({\\"id\\":\\"1\\"})": undefined,
 }
 `;
 
@@ -18,6 +17,5 @@ Object {
   "r|Appointment:1.id": undefined,
   "r|Appointment:1.info": undefined,
   "r|Query.__typename": "Query",
-  "r|Query.appointment({\\"id\\":\\"1\\"})": undefined,
 }
 `;

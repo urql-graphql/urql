@@ -34,7 +34,7 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { invariant, warn, pushDebugNode } from '../helpers/help';
-import { SelectionIterator, isScalar } from './shared';
+import { SelectionIterator, ensureData } from './shared';
 
 export interface WriteResult {
   dependencies: Set<string>;
@@ -157,11 +157,8 @@ export const writeOptimistic = (
 
         const fieldArgs = getFieldArguments(node, ctx.variables);
         const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
-
-        if (!isScalar(resolverValue)) {
-          writeRootField(ctx, resolverValue, getSelectionSet(node));
-        }
-
+        const resolverData = ensureData(resolverValue);
+        writeRootField(ctx, resolverData, getSelectionSet(node));
         data[fieldName] = resolverValue;
         const updater = ctx.store.updates[mutationRootKey][fieldName];
         if (updater !== undefined) {
@@ -231,13 +228,10 @@ const writeSelection = (
   data: Data
 ) => {
   const isQuery = entityKey === ctx.store.getRootKey('query');
-  const typename = data.__typename;
+  const typename = isQuery ? entityKey : data.__typename;
+  if (typeof typename !== 'string') return;
 
-  InMemoryData.writeRecord(
-    entityKey,
-    '__typename',
-    isQuery ? entityKey : typename
-  );
+  InMemoryData.writeRecord(entityKey, '__typename', typename);
 
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
@@ -279,23 +273,11 @@ const writeSelection = (
     if (node.selectionSet === undefined) {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(entityKey, fieldKey, fieldValue);
-    } else if (!isScalar(fieldValue)) {
-      // Process the field and write links for the child entities that have been written
-      const link = writeField(ctx, key, getSelectionSet(node), fieldValue);
-      InMemoryData.writeLink(entityKey, fieldKey, link);
-      InMemoryData.writeRecord(entityKey, fieldKey, undefined);
     } else {
-      warn(
-        'Invalid value: The field at `' +
-          fieldKey +
-          '` is a scalar (number, boolean, etc)' +
-          ', but the GraphQL query expects a selection set for this field.\n' +
-          'The value will still be cached, however this may lead to undefined behavior!',
-        14
-      );
-
-      // This is a rare case for invalid entities
-      InMemoryData.writeRecord(entityKey, fieldKey, fieldValue);
+      // Process the field and write links for the child entities that have been written
+      const fieldData = ensureData(fieldValue);
+      const link = writeField(ctx, key, getSelectionSet(node), fieldData);
+      InMemoryData.writeLink(entityKey, fieldKey, link);
     }
   }
 };
@@ -330,6 +312,7 @@ const writeField = (
   if (
     ctx.store.keys[data.__typename] === undefined &&
     entityKey === null &&
+    typeof typename === 'string' &&
     !typename.endsWith('Connection') &&
     !typename.endsWith('Edge') &&
     typename !== 'PageInfo'
@@ -372,13 +355,9 @@ const writeRoot = (
   while ((node = iter.next()) !== undefined) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
-    const fieldValue = data[getFieldAlias(node)];
-
-    if (
-      node.selectionSet !== undefined &&
-      fieldValue !== null &&
-      !isScalar(fieldValue)
-    ) {
+    const fieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
+    if (node.selectionSet !== undefined) {
+      const fieldValue = ensureData(data[getFieldAlias(node)]);
       writeRootField(ctx, fieldValue, getSelectionSet(node));
     }
 
@@ -386,7 +365,7 @@ const writeRoot = (
       // We have to update the context to reflect up-to-date ResolveInfo
       ctx.parentTypeName = typename;
       ctx.parentKey = typename;
-      ctx.parentFieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
+      ctx.parentFieldKey = fieldKey;
       ctx.fieldName = fieldName;
 
       // We run side-effect updates after the default, normalized updates
