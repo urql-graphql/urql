@@ -5,8 +5,8 @@
 <a href="https://npmjs.com/package/@urql/exchange-graphcache">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-graphcache.svg" />
 </a>
-<a href="https://travis-ci.org/FormidableLabs/urql-exchange-graphcache">
-  <img alt="Test Status" src="https://api.travis-ci.org/FormidableLabs/urql-exchange-graphcache.svg?branch=master" />
+<a href="https://travis-ci.com/FormidableLabs/urql-exchange-graphcache">
+  <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/urql-exchange-graphcache.svg?branch=master" />
 </a>
 <a href="https://codecov.io/gh/formidablelabs/urql-exchange-graphcache">
   <img alt="Test Coverage" src="https://codecov.io/gh/formidablelabs/urql-exchange-graphcache/branch/master/graph/badge.svg" />
