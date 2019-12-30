@@ -13,8 +13,8 @@
   <a href="https://npmjs.com/package/urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
   </a>
-  <a href="https://travis-ci.org/FormidableLabs/urql">
-    <img alt="Test Status" src="https://api.travis-ci.org/FormidableLabs/urql.svg?branch=master" />
+  <a href="https://travis-ci.com/FormidableLabs/urql">
+    <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/urql.svg?branch=master" />
   </a>
   <a href="https://codecov.io/gh/FormidableLabs/urql">
     <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql/branch/master/graph/badge.svg" />
