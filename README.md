@@ -134,9 +134,9 @@ The `mergeExchanges` argument is optional. This is a function that takes the `ss
 
 By default, `next-urql` will incorprate the `ssrExchange` into your `exchanges` array in the correct location (after any other caching exchanges, but _before_ the `fetchExchange` – read more [here](https://formidable.com/open-source/urql/docs/basics/#setting-up-the-client)). Use this argument if you want to configure your client with additional custom `exchanges`, or access the `ssrCache` directly to extract or restore data from its cache.
 
-### Example
+### Examples
 
-You can see an example project with `next-urql` in our [example directory](/example/README.md) or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
+You can see simple example projects using `next-urql` in the `examples` directory or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
 
 ### Caveats
 
