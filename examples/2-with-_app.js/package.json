@@ -1,0 +1,15 @@
+{
+  "name": "2-with-_app.js",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "next dev",
+    "prestart": "npm run build --prefix ../../"
+  },
+  "dependencies": {
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "9.1.6"
+  }
+}

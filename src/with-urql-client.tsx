@@ -17,12 +17,16 @@ import { initUrqlClient } from './init-urql-client';
 type NextUrqlClientOptions = Omit<ClientOptions, 'exchanges' | 'suspense'>;
 
 interface WithUrqlClient {
-  urqlClient: Client;
+  urqlClient?: Client;
 }
 
 interface WithUrqlInitialProps {
   urqlState: SSRData;
   clientOptions: NextUrqlClientOptions;
+}
+
+interface PageProps {
+  pageProps?: WithUrqlClient;
 }
 
 export interface NextContextWithAppTree extends NextContext {
@@ -43,15 +47,15 @@ function withUrqlClient<T = any, IP = any>(
   ],
 ) {
   return (
-    App:
+    Page:
       | NextComponentClass<T & IP & WithUrqlClient, IP>
       | NextFC<T & IP & WithUrqlClient, IP>,
   ) => {
     const withUrql: NextFC<
-      T & IP & WithUrqlClient & WithUrqlInitialProps,
+      T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps,
       IP | (IP & WithUrqlInitialProps),
       NextContextWithAppTree
-    > = ({ urqlClient, urqlState, clientOptions, ...rest }) => {
+    > = ({ urqlClient, urqlState, clientOptions, pageProps, ...rest }) => {
       /**
        * The React Hooks ESLint plugin will not interpret withUrql as a React component
        * due to the Next.FC annotation. Ignore the warning about not using useMemo.
@@ -60,13 +64,14 @@ function withUrqlClient<T = any, IP = any>(
       const client = React.useMemo(
         () =>
           urqlClient ||
+          (pageProps && pageProps.urqlClient) ||
           initUrqlClient(clientOptions, mergeExchanges, urqlState)[0],
-        [urqlClient, clientOptions, urqlState],
-      );
+        [urqlClient, pageProps, clientOptions, urqlState],
+      ) as Client;
 
       return (
         <Provider value={client}>
-          <App urqlClient={client} {...(rest as T & IP)} />
+          <Page urqlClient={client} {...(rest as T & IP)} />
         </Provider>
       );
     };
@@ -75,9 +80,9 @@ function withUrqlClient<T = any, IP = any>(
       const { AppTree } = ctx;
 
       // Run the wrapped component's getInitialProps function.
-      let appProps = {} as IP;
-      if (App.getInitialProps) {
-        appProps = await App.getInitialProps(ctx);
+      let pageProps = {} as IP;
+      if (Page.getInitialProps) {
+        pageProps = await Page.getInitialProps(ctx);
       }
 
       /**
@@ -86,7 +91,7 @@ function withUrqlClient<T = any, IP = any>(
        */
       const isBrowser = typeof window !== 'undefined';
       if (isBrowser) {
-        return appProps;
+        return pageProps;
       }
 
       const opts =
@@ -100,7 +105,7 @@ function withUrqlClient<T = any, IP = any>(
       await ssrPrepass(
         <AppTree
           pageProps={{
-            ...appProps,
+            ...pageProps,
             urqlClient,
           }}
         />,
@@ -110,7 +115,7 @@ function withUrqlClient<T = any, IP = any>(
       const urqlState = ssrCache && ssrCache.extractData();
 
       return {
-        ...appProps,
+        ...pageProps,
         urqlState,
         clientOptions: opts,
       };
