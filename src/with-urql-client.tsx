@@ -31,6 +31,7 @@ interface PageProps {
 
 export interface NextContextWithAppTree extends NextContext {
   AppTree: React.ComponentType<any>;
+  urqlClient: Client;
 }
 
 type NextUrqlClientConfig =
@@ -79,6 +80,14 @@ function withUrqlClient<T = any, IP = any>(
     withUrql.getInitialProps = async (ctx: NextContextWithAppTree) => {
       const { AppTree } = ctx;
 
+      const opts =
+        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
+      const [urqlClient, ssrCache] = initUrqlClient(opts);
+
+      if (urqlClient) {
+        ctx.urqlClient = urqlClient;
+      }
+
       // Run the wrapped component's getInitialProps function.
       let pageProps = {} as IP;
       if (Page.getInitialProps) {
@@ -93,10 +102,6 @@ function withUrqlClient<T = any, IP = any>(
       if (isBrowser) {
         return pageProps;
       }
-
-      const opts =
-        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
-      const [urqlClient, ssrCache] = initUrqlClient(opts);
 
       /**
        * Run the prepass step on AppTree.

@@ -20,6 +20,7 @@ interface PageProps {
 
 export interface NextContextWithAppTree extends NextContext {
   AppTree: React.ComponentType<any>;
+  urqlClient: Client;
 }
 
 type NextUrqlClientConfig =
