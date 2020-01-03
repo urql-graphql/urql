@@ -31,9 +31,6 @@
     "trailingComma": "es5"
   },
   "jest": {
-    "setupFiles": [
-      "./scripts/setupTests.js"
-    ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
@@ -122,6 +119,7 @@
     "preact": ">= 10.0.0"
   },
   "dependencies": {
+    "@testing-library/preact": "^1.0.2",
     "urql": "^1.7.0",
     "wonka": "^3.2.1"
   }
