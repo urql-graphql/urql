@@ -1,7 +1,6 @@
 import { useRef, useEffect, EffectCallback } from 'preact/hooks';
 import { noop } from './useQuery';
 
-/** This is a drop-in replacement for useEffect that will execute the first effect that happens during initial mount synchronously */
 export const useImmediateEffect = (
   effect: EffectCallback,
   changes: ReadonlyArray<any>

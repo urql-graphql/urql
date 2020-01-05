@@ -9,6 +9,7 @@ import {
 } from 'urql/core';
 import { useClient } from '../context';
 import { useImmediateState } from './useImmediateState';
+import { initialState } from './useQuery';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -32,21 +33,14 @@ export const useMutation = <T = any, V = object>(
   const client = useClient();
 
   const [state, setState] = useImmediateState<UseMutationState<T>>({
-    fetching: false,
-    stale: false,
-    error: undefined,
-    data: undefined,
-    extensions: undefined,
+    ...initialState,
   });
 
   const executeMutation = useCallback(
     (variables?: V, context?: Partial<OperationContext>) => {
       setState({
+        ...initialState,
         fetching: true,
-        stale: false,
-        error: undefined,
-        data: undefined,
-        extensions: undefined,
       });
 
       const request = createRequest(query, variables as any);
@@ -55,8 +49,13 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
-        const { stale, data, error, extensions } = result;
-        setState({ fetching: false, stale: !!stale, data, error, extensions });
+        setState({
+          fetching: false,
+          stale: !!result.stale,
+          data: result.data,
+          error: result.error,
+          extensions: result.extensions,
+        });
         return result;
       });
     },

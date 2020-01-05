@@ -8,7 +8,7 @@ import { useRequest } from './useRequest';
 import { useImmediateState } from './useImmediateState';
 import { useImmediateEffect } from './useImmediateEffect';
 
-const initialState: UseQueryState<any> = {
+export const initialState: UseQueryState<any> = {
   fetching: false,
   stale: false,
   data: undefined,
@@ -46,7 +46,9 @@ export const useQuery = <T = any, V = object>(
 ): UseQueryResponse<T> => {
   const unsubscribe = useRef(noop);
   const client = useClient();
-  const [state, setState] = useImmediateState<UseQueryState<T>>(initialState);
+  const [state, setState] = useImmediateState<UseQueryState<T>>({
+    ...initialState,
+  });
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
@@ -66,13 +68,13 @@ export const useQuery = <T = any, V = object>(
           ...opts,
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(({ data, error, extensions, stale }) => {
+        subscribe(result => {
           setState({
             fetching: false,
-            data,
-            error,
-            extensions,
-            stale: !!stale,
+            data: result.data,
+            error: result.error,
+            extensions: result.extensions,
+            stale: !!result.stale,
           });
         })
       );

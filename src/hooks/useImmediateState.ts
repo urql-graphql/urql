@@ -12,11 +12,6 @@ type SetState<S> = (action: SetStateAction<S>) => void;
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-/**
- * This is a drop-in replacement for useState, limited to object-based state.
- * During initial mount it will mutably update the state, instead of scheduling
- * a React update using setState
- */
 export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
   const isMounted = useRef(false);
   const [state, setState] = useState<S>(init);

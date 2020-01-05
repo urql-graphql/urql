@@ -4,7 +4,7 @@ import { pipe, onEnd, subscribe } from 'wonka';
 import { CombinedError, OperationContext } from 'urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { noop } from './useQuery';
+import { noop, initialState } from './useQuery';
 import { useImmediateEffect } from './useImmediateEffect';
 import { useImmediateState } from './useImmediateState';
 
@@ -39,11 +39,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   const client = useClient();
 
   const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
-    fetching: false,
-    error: undefined,
-    data: undefined,
-    extensions: undefined,
-    stale: false,
+    ...initialState,
   });
 
   // Update handler on constant ref, since handler changes shouldn't
@@ -66,15 +62,18 @@ export const useSubscription = <T = any, R = T, V = object>(
           ...opts,
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(({ data, error, extensions, stale }) => {
+        subscribe(result => {
           const { current: handler } = handlerRef;
 
           setState(s => ({
             fetching: true,
-            data: typeof handler === 'function' ? handler(s.data, data) : data,
-            error,
-            extensions,
-            stale: !!stale,
+            data:
+              typeof handler === 'function'
+                ? handler(s.data, result.data)
+                : result.data,
+            error: result.error,
+            extensions: result.extensions,
+            stale: !!result.stale,
           }));
         })
       );
