@@ -37,7 +37,7 @@ export type UseQueryResponse<T> = [
 ];
 
 // eslint-disable-next-line
-const noop = () => {};
+export const noop = () => {};
 
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
