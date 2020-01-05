@@ -12,3 +12,4 @@ coverage
 build
 lib
 node_modules
+dist

@@ -10,7 +10,7 @@ import transformPipe from './scripts/transform-pipe';
 
 const pkgInfo = require('./package.json');
 
-let external = ['dns', 'fs', 'path', 'url'];
+const external = ['dns', 'fs', 'path', 'url'];
 if (pkgInfo.peerDependencies)
   external.push(...Object.keys(pkgInfo.peerDependencies));
 if (pkgInfo.dependencies)
@@ -76,9 +76,6 @@ const makePlugins = (isProduction = false, outputFolder) => [
   commonjs({
     ignoreGlobal: true,
     include: /\/node_modules\//,
-    namedExports: {
-      'react': Object.keys(require('react'))
-    },
   }),
   typescript({
     typescript: require('typescript'),
@@ -138,10 +135,7 @@ const makePlugins = (isProduction = false, outputFolder) => [
 ].filter(Boolean);
 
 const makeConfig = () => ({
-  input: {
-    core: './src/client.ts',
-    urql: './src/index.ts'
-  },
+  input: './src/index.ts',
   external: externalTest,
   treeshake: {
     propertyReadSideEffects: false
