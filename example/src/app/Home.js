@@ -20,7 +20,7 @@ const DeleteTodo = `
   }
 `;
 
-const TodoQuery = gql`
+const TodoQuery = `
   query {
     todos {
       id
