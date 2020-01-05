@@ -34,7 +34,6 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
         setState(action);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

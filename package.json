@@ -85,8 +85,6 @@
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-react": "^7.16.0",
-    "eslint-plugin-react-hooks": "^2.2.0",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
     "husky": "^3.0.9",
