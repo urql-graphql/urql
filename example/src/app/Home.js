@@ -31,7 +31,7 @@ const TodoQuery = gql`
 `;
 
 export const Home = () => {
-  const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
+  const [res, executeQuery] = useQuery({ query: TodoQuery });
 
   const [toggleTodoMutation, executeToggleTodoMutation] = useMutation(
     ToggleTodo
