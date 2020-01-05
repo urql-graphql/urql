@@ -31,9 +31,6 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
     "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
       "js",
