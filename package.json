@@ -1,6 +1,6 @@
 {
   "name": "@urql/preact",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Urql that works with native Preact",
   "author": "jdecroock <decroockjovi@gmail.com> (https://twitter.com/JoviDeC)",
   "license": "MIT",
