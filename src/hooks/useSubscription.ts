@@ -4,7 +4,7 @@ import { pipe, onEnd, subscribe } from 'wonka';
 import { CombinedError, OperationContext } from 'urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { noop } from './helpers';
+import { noop } from './useQuery';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
