@@ -1,5 +1,5 @@
 {
-  "name": "urql-preact",
+  "name": "@urql/preact",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoviDeCroock/urql-preact.git"
+    "url": "git+https://github.com/JoviDeCroock/preact-urql.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JoviDeCroock/urql-preact/issues"
+    "url": "https://github.com/JoviDeCroock/preact-urql/issues"
   },
-  "homepage": "https://github.com/JoviDeCroock/urql-preact#readme",
+  "homepage": "https://github.com/JoviDeCroock/preact-urql#readme",
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5"
