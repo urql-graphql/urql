@@ -88,7 +88,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     }
 
     executeSubscription();
-    return () => unsubscribe.current(); // eslint-disable-line
+    return unsubscribe.current; // eslint-disable-line
   }, [executeSubscription, args.pause, setState]);
 
   return [state, executeSubscription];
