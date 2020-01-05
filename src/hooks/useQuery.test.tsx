@@ -14,7 +14,6 @@ const mock = {
   ),
 };
 
-// @ts-ignore
 const client = mock as { executeQuery: jest.Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
@@ -24,7 +23,6 @@ const props: UseQueryArgs<{ myVar: number }> = {
   pause: false,
 };
 
-// @ts-ignore
 let state: UseQueryState<any> | undefined;
 // @ts-ignore
 let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
