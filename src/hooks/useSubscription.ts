@@ -17,6 +17,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export interface UseSubscriptionState<T> {
   fetching: boolean;
+  stale: boolean;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -40,6 +41,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     error: undefined,
     data: undefined,
     extensions: undefined,
+    stale: false,
   });
 
   // Update handler on constant ref, since handler changes shouldn't
@@ -62,7 +64,7 @@ export const useSubscription = <T = any, R = T, V = object>(
           ...opts,
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(({ data, error, extensions }) => {
+        subscribe(({ data, error, extensions, stale }) => {
           const { current: handler } = handlerRef;
 
           setState(s => ({
@@ -70,6 +72,7 @@ export const useSubscription = <T = any, R = T, V = object>(
             data: typeof handler === 'function' ? handler(s.data, data) : data,
             error,
             extensions,
+            stale: !!stale,
           }));
         })
       );

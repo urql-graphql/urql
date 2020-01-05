@@ -31,10 +31,8 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   variables,
   pause,
 }) => {
-  const [s, e] = useQuery({ query, variables, pause });
-  state = s;
-  execute = e;
-  return h('p', {}, s.data);
+  [state, execute] = useQuery({ query, variables, pause });
+  return h('p', {}, state.data);
 };
 
 beforeAll(() => {
