@@ -1,7 +1,9 @@
 {
   "name": "@urql/preact",
   "version": "1.0.0",
-  "description": "",
+  "description": "Urql that works with native Preact",
+  "author": "jdecroock <decroockjovi@gmail.com> (https://twitter.com/JoviDeC)",
+  "license": "MIT",
   "scripts": {
     "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
@@ -16,12 +18,21 @@
     "type": "git",
     "url": "git+https://github.com/JoviDeCroock/preact-urql.git"
   },
-  "author": "",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JoviDeCroock/preact-urql/issues"
   },
   "homepage": "https://github.com/JoviDeCroock/preact-urql#readme",
+  "sideEffects": false,
+  "keywords": [
+    "preact",
+    "graphql client",
+    "state management",
+    "cache"
+  ],
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5"
