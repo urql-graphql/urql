@@ -32,7 +32,7 @@ The usage is a 1:1 mapping of the React usage found [here](https://formidable.co
 small example:
 
 ```jsx
-import { createClient, defaultExchanges, Provider, useQuery } from 'urql';
+import { createClient, defaultExchanges, Provider, useQuery } from '@urql/preact';
 
 const client = createClient({
   url: 'https://myHost/graphql',
