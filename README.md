@@ -1,8 +1,8 @@
 <div align="center">
   <br />
   <br />
-  <a href="https://travis-ci.org/JoviDeCroock/preact-urql">
-    <img alt="Test Status" src="https://api.travis-ci.org/JoviDeCroock/preact-urql.svg?branch=master" />
+  <a href="https://travis-ci.org/JoviDeCroock/urql-preact">
+    <img alt="Test Status" src="https://api.travis-ci.org/JoviDeCroock/urql-preact.svg?branch=master" />
   </a>
   <a href="https://codecov.io/gh/JoviDeCroock/preact-urql">
     <img alt="Test Coverage" src="https://codecov.io/gh/JoviDeCroock/preact-urql/branch/master/graph/badge.svg" />
