@@ -43,7 +43,6 @@
       "<rootDir>/src/**/*.{ts,tsx}"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/src/test-utils",
       "<rootDir>/src.*/index.ts"
     ]
   },
@@ -66,7 +65,6 @@
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/plugin-transform-react-jsx": "^7.7.0",
     "@testing-library/preact": "^1.0.2",
     "@types/jest": "^24.0.22",
     "@typescript-eslint/eslint-plugin": "^2.7.0",

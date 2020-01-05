@@ -117,11 +117,6 @@ const makePlugins = (isProduction = false, outputFolder) => [
       transformPipe,
       'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
-      ['@babel/plugin-transform-react-jsx', {
-        pragma: 'React.createElement',
-        pragmaFrag: 'React.Fragment',
-        useBuiltIns: true
-      }],
       ['babel-plugin-transform-async-to-promises', {
         inlineHelpers: true,
         externalHelpers: true
