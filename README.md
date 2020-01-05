@@ -7,8 +7,8 @@
   <a href="https://codecov.io/gh/JoviDeCroock/preact-urql">
     <img alt="Test Coverage" src="https://codecov.io/gh/JoviDeCroock/preact-urql/branch/master/graph/badge.svg" />
   </a>
-  <a href="https://bundlephobia.com/result?p=urql">
-    <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/preact-urql.svg?label=gzip%20size" />
+  <a href="https://bundlephobia.com/result?p=@urql/preact">
+    <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/@urql/preact.svg?label=gzip%20size" />
   </a>
   <a href="https://spectrum.chat/urql">
     <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
@@ -32,7 +32,7 @@ The usage is a 1:1 mapping of the React usage found [here](https://formidable.co
 small example:
 
 ```jsx
-import { createClient, defaultExchanges, Provider, useQuery } from 'urql';
+import { createClient, defaultExchanges, Provider, useQuery } from '@urql/preact';
 
 const client = createClient({
   url: 'https://myHost/graphql',
