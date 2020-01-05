@@ -1,10 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
-import { useState, useRef, useEffect, useCallback } from 'preact/hooks';
+import { useRef, useCallback } from 'preact/hooks';
 import { OperationContext, RequestPolicy, CombinedError } from 'urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
+import { useImmediateState } from './useImmediateState';
+import { useImmediateEffect } from './useImmediateEffect';
 
 const initialState: UseQueryState<any> = {
   fetching: false,
@@ -44,7 +46,7 @@ export const useQuery = <T = any, V = object>(
 ): UseQueryResponse<T> => {
   const unsubscribe = useRef(noop);
   const client = useClient();
-  const [state, setState] = useState<UseQueryState<T>>(initialState);
+  const [state, setState] = useImmediateState<UseQueryState<T>>(initialState);
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
@@ -85,7 +87,7 @@ export const useQuery = <T = any, V = object>(
     ]
   );
 
-  useEffect(() => {
+  useImmediateEffect(() => {
     if (args.pause) {
       unsubscribe.current();
       setState(s => ({ ...s, fetching: false }));
@@ -93,7 +95,7 @@ export const useQuery = <T = any, V = object>(
     }
 
     executeQuery();
-    return () => unsubscribe.current(); // eslint-disable-line
+    return unsubscribe.current; // eslint-disable-line
   }, [executeQuery, args.pause, setState]);
 
   return [state, executeQuery];
