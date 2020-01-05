@@ -15,10 +15,12 @@ export interface MutationState<T, V> extends UseMutationState<T> {
   ) => Promise<OperationResult<T>>;
 }
 
-export function Mutation<T = any, V = any>({
-  children,
-  query,
-}: MutationProps<T, V>): VNode<any> {
-  const [state, executeMutation] = useMutation<T, V>(query);
-  return children({ ...state, executeMutation });
+export function Mutation<T = any, V = any>(
+  props: MutationProps<T, V>
+): VNode<any> {
+  const mutationState = useMutation<T, V>(props.query);
+  return props.children({
+    ...mutationState[0],
+    executeMutation: mutationState[1],
+  });
 }

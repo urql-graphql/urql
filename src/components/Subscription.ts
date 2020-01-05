@@ -19,9 +19,9 @@ export interface SubscriptionState<T> extends UseSubscriptionState<T> {
 export function Subscription<T = any, R = T, V = any>(
   props: SubscriptionProps<T, R, V>
 ): VNode<any> {
-  const [state, executeSubscription] = useSubscription<T, R, V>(
-    props,
-    props.handler
-  );
-  return props.children({ ...state, executeSubscription });
+  const subscriptionState = useSubscription<T, R, V>(props, props.handler);
+  return props.children({
+    ...subscriptionState[0],
+    executeSubscription: subscriptionState[1],
+  });
 }

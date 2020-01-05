@@ -63,13 +63,11 @@ export const useSubscription = <T = any, R = T, V = object>(
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
         subscribe(result => {
-          const { current: handler } = handlerRef;
-
           setState(s => ({
             fetching: true,
             data:
-              typeof handler === 'function'
-                ? handler(s.data, result.data)
+              typeof handlerRef.current === 'function'
+                ? handlerRef.current(s.data, result.data)
                 : result.data,
             error: result.error,
             extensions: result.extensions,

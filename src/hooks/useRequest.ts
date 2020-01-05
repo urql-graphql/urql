@@ -15,8 +15,7 @@ export const useRequest = (
     if (prev.current !== undefined && prev.current.key === request.key) {
       return prev.current;
     } else {
-      prev.current = request;
-      return request;
+      return (prev.current = request);
     }
   }, [query, variables]);
 };

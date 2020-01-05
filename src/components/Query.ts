@@ -11,6 +11,6 @@ export interface QueryState<T> extends UseQueryState<T> {
 }
 
 export function Query<T = any, V = any>(props: QueryProps<T, V>): VNode<any> {
-  const [state, executeQuery] = useQuery<T, V>(props);
-  return props.children({ ...state, executeQuery });
+  const queryState = useQuery<T, V>(props);
+  return props.children({ ...queryState[0], executeQuery: queryState[1] });
 }

@@ -28,10 +28,6 @@ const SubscriptionUser: FC<{
 };
 
 beforeAll(() => {
-  // eslint-disable-next-line no-console
-  console.log(
-    'supressing console.error output due to react-test-renderer spam (hooks related)'
-  );
   jest.spyOn(global.console, 'error').mockImplementation();
 });
 
