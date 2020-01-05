@@ -1,12 +1,13 @@
 {
-  "name": "urql-preact",
+  "name": "@urql/preact",
   "version": "1.0.0",
-  "description": "",
+  "description": "Urql that works with native Preact",
+  "author": "jdecroock <decroockjovi@gmail.com> (https://twitter.com/JoviDeC)",
+  "license": "MIT",
   "scripts": {
     "clean": "rimraf ./dist ./node_modules/.cache ./core",
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -w -c rollup.config.js",
-    "check": "tsc --noEmit",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
@@ -15,14 +16,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoviDeCroock/urql-preact.git"
+    "url": "git+https://github.com/JoviDeCroock/preact-urql.git"
   },
-  "author": "",
-  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JoviDeCroock/urql-preact/issues"
+    "url": "https://github.com/JoviDeCroock/preact-urql/issues"
   },
-  "homepage": "https://github.com/JoviDeCroock/urql-preact#readme",
+  "homepage": "https://github.com/JoviDeCroock/preact-urql#readme",
+  "sideEffects": false,
+  "keywords": [
+    "preact",
+    "graphql client",
+    "state management",
+    "cache"
+  ],
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5"
@@ -43,7 +53,6 @@
       "<rootDir>/src/**/*.{ts,tsx}"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/src/test-utils",
       "<rootDir>/src.*/index.ts"
     ]
   },
@@ -66,7 +75,6 @@
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/plugin-transform-react-jsx": "^7.7.0",
     "@testing-library/preact": "^1.0.2",
     "@types/jest": "^24.0.22",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
@@ -77,8 +85,6 @@
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-react": "^7.16.0",
-    "eslint-plugin-react-hooks": "^2.2.0",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
     "husky": "^3.0.9",
@@ -92,6 +98,7 @@
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-filesize": "^6.2.1",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-terser": "^5.1.2",

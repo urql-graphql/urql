@@ -7,6 +7,7 @@ import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 import transformPipe from './scripts/transform-pipe';
+import filesize from 'rollup-plugin-filesize';
 
 const pkgInfo = require('./package.json');
 
@@ -117,11 +118,6 @@ const makePlugins = (isProduction = false, outputFolder) => [
       transformPipe,
       'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
-      ['@babel/plugin-transform-react-jsx', {
-        pragma: 'React.createElement',
-        pragmaFrag: 'React.Fragment',
-        useBuiltIns: true
-      }],
       ['babel-plugin-transform-async-to-promises', {
         inlineHelpers: true,
         externalHelpers: true
@@ -131,7 +127,8 @@ const makePlugins = (isProduction = false, outputFolder) => [
   isProduction && replace({
     'process.env.NODE_ENV': JSON.stringify('production')
   }),
-  isProduction ? terserMinified : terserPretty
+  isProduction ? terserMinified : terserPretty,
+  isProduction && filesize(),
 ].filter(Boolean);
 
 const makeConfig = () => ({

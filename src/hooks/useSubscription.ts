@@ -1,10 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useRef, useEffect, useState } from 'preact/hooks';
+import { useCallback, useRef } from 'preact/hooks';
 import { pipe, onEnd, subscribe } from 'wonka';
 import { CombinedError, OperationContext } from 'urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { noop } from './helpers';
+import { noop } from './useQuery';
+import { useImmediateEffect } from './useImmediateEffect';
+import { useImmediateState } from './useImmediateState';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -36,7 +38,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   const handlerRef = useRef(handler);
   const client = useClient();
 
-  const [state, setState] = useState<UseSubscriptionState<R>>({
+  const [state, setState] = useImmediateState<UseSubscriptionState<R>>({
     fetching: false,
     error: undefined,
     data: undefined,
@@ -80,7 +82,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, setState, args.context]
   );
 
-  useEffect(() => {
+  useImmediateEffect(() => {
     if (args.pause) {
       unsubscribe.current();
       setState(s => ({ ...s, fetching: false }));
@@ -88,7 +90,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     }
 
     executeSubscription();
-    return () => unsubscribe.current(); // eslint-disable-line
+    return unsubscribe.current; // eslint-disable-line
   }, [executeSubscription, args.pause, setState]);
 
   return [state, executeSubscription];

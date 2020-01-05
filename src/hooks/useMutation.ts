@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'preact/hooks';
+import { useCallback } from 'preact/hooks';
 import { DocumentNode } from 'graphql';
 import { pipe, toPromise } from 'wonka';
 import {
@@ -8,6 +8,7 @@ import {
   createRequest,
 } from 'urql/core';
 import { useClient } from '../context';
+import { useImmediateState } from './useImmediateState';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -30,7 +31,7 @@ export const useMutation = <T = any, V = object>(
 ): UseMutationResponse<T, V> => {
   const client = useClient();
 
-  const [state, setState] = useState<UseMutationState<T>>({
+  const [state, setState] = useImmediateState<UseMutationState<T>>({
     fetching: false,
     stale: false,
     error: undefined,

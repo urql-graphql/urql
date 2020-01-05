@@ -7,7 +7,7 @@
     "outDir": "dist/cjs",
     "lib": ["dom", "esnext"],
     "jsxFactory": "h",
-    "jsx": "preserve",
+    "jsx": "react",
     "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
