@@ -23,7 +23,6 @@ jobs:
 
     - stage: Lint and Check
       script:
-        - yarn run check
         - yarn run lint
 
     - stage: Test
