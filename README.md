@@ -366,6 +366,7 @@ or are built to make certain tasks easier.
 - [`next-urql`](https://github.com/FormidableLabs/next-urql): Helpers for adding `urql` to [Next.js](https://github.com/zeit/next.js/) with SSR support
 - [`reason-urql`](https://github.com/FormidableLabs/reason-urql): Reason bindings for `urql`
 - [`urql-persisted-queries`](https://github.com/Daniel15/urql-persisted-queries): An exchange for adding persisted query support
+- [`@urql/preact`](https://github.com/JoviDeCroock/preact-urql): Preact implementation of urql hooks and components
 
 [You can find the full list of exchanges in the docs.](./docs/exchanges.md)
 
