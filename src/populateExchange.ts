@@ -9,8 +9,6 @@ import {
   FragmentSpreadNode,
   NameNode,
   ASTNode,
-  isUnionType,
-  isInterfaceType,
   isCompositeType,
   isAbstractType,
   Kind,
@@ -282,9 +280,7 @@ const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
     return [];
   }
 
-  return isInterfaceType(type) || isUnionType(type)
-    ? schema.getPossibleTypes(type)
-    : [type];
+  return isAbstractType(type) ? schema.getPossibleTypes(type) : [type];
 };
 
 /** Get name of non-abstract type for adding to 'typeFragments'. */

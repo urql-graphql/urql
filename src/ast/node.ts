@@ -8,8 +8,7 @@ import {
   FragmentDefinitionNode,
   GraphQLOutputType,
   Kind,
-  isListType,
-  isNonNullType,
+  isWrappingType,
 } from 'graphql';
 
 import { SelectionSet, GraphQLFlatType } from '../types';
@@ -47,7 +46,9 @@ export const isInlineFragment = (
 export const unwrapType = (
   type: null | undefined | GraphQLOutputType
 ): GraphQLFlatType | null => {
-  return type && (isListType(type) || isNonNullType(type))
-    ? type.ofType
-    : type || null;
+  if (isWrappingType(type)) {
+    return unwrapType(type.ofType);
+  }
+
+  return type || null;
 };
