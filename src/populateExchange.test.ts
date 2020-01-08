@@ -34,8 +34,8 @@ const schemaDef = `
   union UnionType = User | Todo
 
   type Query {
-    todos: [Todo]
-    users: [User]
+    todos: [Todo!]
+    users: [User!]!
   }
 
   type Mutation {
@@ -86,7 +86,14 @@ describe('on mutation', () => {
         populateExchange({ schema })(exchangeArgs),
         toArray
       );
-      expect(print(response[0].query)).toMatchSnapshot();
+      expect(print(response[0].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            __typename
+          }
+        }
+        "
+      `);
     });
   });
 });
@@ -132,7 +139,28 @@ describe('on query -> mutation', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchSnapshot();
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            ...Todo_PopulateFragment_0
+            ...Todo_PopulateFragment_1
+          }
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          id
+          text
+          creator {
+            id
+            name
+          }
+        }
+
+        fragment Todo_PopulateFragment_1 on Todo {
+          text
+        }
+        "
+      `);
     });
   });
 });
@@ -145,12 +173,20 @@ describe('on (query w/ fragment) -> mutation', () => {
       query {
         todos {
           ...TodoFragment
+          creator {
+            ...CreatorFragment
+          }
         }
       }
 
       fragment TodoFragment on Todo {
         id
         text
+      }
+
+      fragment CreatorFragment on User {
+        id
+        name
       }
     `,
   } as Operation;
@@ -160,7 +196,14 @@ describe('on (query w/ fragment) -> mutation', () => {
     operationName: 'mutation',
     query: gql`
       mutation MyMutation {
-        addTodo @populate
+        addTodo @populate {
+          ...TodoFragment
+        }
+      }
+
+      fragment TodoFragment on Todo {
+        id
+        text
       }
     `,
   } as Operation;
@@ -173,7 +216,32 @@ describe('on (query w/ fragment) -> mutation', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchSnapshot();
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            ...Todo_PopulateFragment_0
+            ...TodoFragment
+          }
+        }
+
+        fragment TodoFragment on Todo {
+          id
+          text
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          ...TodoFragment
+          creator {
+            ...CreatorFragment
+          }
+        }
+
+        fragment CreatorFragment on User {
+          id
+          name
+        }
+        "
+      `);
     });
 
     it('includes user fragment', () => {
@@ -231,7 +299,19 @@ describe('on (query w/ unused fragment) -> mutation', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchSnapshot();
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            ...Todo_PopulateFragment_0
+          }
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          id
+          text
+        }
+        "
+      `);
     });
 
     it('excludes user fragment', () => {
@@ -285,7 +365,25 @@ describe('on query -> (mutation w/ interface return type)', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchSnapshot();
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          removeTodo {
+            ...Todo_PopulateFragment_0
+            ...User_PopulateFragment_0
+          }
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          id
+          name
+        }
+
+        fragment User_PopulateFragment_0 on User {
+          id
+          text
+        }
+        "
+      `);
     });
   });
 });
@@ -326,7 +424,25 @@ describe('on query -> (mutation w/ union return type)', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchSnapshot();
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          updateTodo {
+            ...User_PopulateFragment_0
+            ...Todo_PopulateFragment_0
+          }
+        }
+
+        fragment User_PopulateFragment_0 on User {
+          id
+          text
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          id
+          name
+        }
+        "
+      `);
     });
   });
 });
@@ -368,7 +484,14 @@ describe('on query -> teardown -> mutation', () => {
         toArray
       );
 
-      expect(print(response[2].query)).toMatchSnapshot();
+      expect(print(response[2].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            __typename
+          }
+        }
+        "
+      `);
     });
 
     it('only requests __typename', () => {

@@ -37,8 +37,8 @@ export const populateExchange = ({
   const activeOperations = new Set<number>();
   /** Collection of fragments used by the user. */
   const userFragments: UserFragmentMap = makeDict();
-  /** Collection of type fragments. */
-  const typeFragments: TypeFragmentMap = makeDict();
+  /** Collection of actively in use type fragments. */
+  const activeTypeFragments: TypeFragmentMap = makeDict();
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
@@ -47,8 +47,8 @@ export const populateExchange = ({
     }
 
     const activeSelections: TypeFragmentMap = makeDict();
-    for (const name in typeFragments) {
-      activeSelections[name] = typeFragments[name].filter(s =>
+    for (const name in activeTypeFragments) {
+      activeSelections[name] = activeTypeFragments[name].filter(s =>
         activeOperations.has(s.key)
       );
     }
@@ -90,7 +90,8 @@ export const populateExchange = ({
     for (let i = 0, l = newFragments.length; i < l; i++) {
       const fragment = newFragments[i];
       const type = getName(fragment.typeCondition);
-      const current = typeFragments[type] || (typeFragments[type] = []);
+      const current =
+        activeTypeFragments[type] || (activeTypeFragments[type] = []);
 
       (fragment as any).name.value += current.length;
       current.push({ key, fragment });
@@ -167,7 +168,7 @@ export const extractSelectionsFromQuery = (
 export const addFragmentsToQuery = (
   schema: GraphQLSchema,
   query: DocumentNode,
-  typeFragments: TypeFragmentMap,
+  activeTypeFragments: TypeFragmentMap,
   userFragments: UserFragmentMap
 ) => {
   const typeInfo = new TypeInfo(schema);
@@ -181,6 +182,9 @@ export const addFragmentsToQuery = (
     string,
     FragmentDefinitionNode
   > = makeDict();
+
+  /** Fragments provided and used by the current query */
+  const existingFragmentsForQuery: Set<string> = new Set();
 
   return visit(
     query,
@@ -198,9 +202,9 @@ export const addFragmentsToQuery = (
             return;
           }
 
-          const types = getTypes(schema, typeInfo);
-          const newSelections = types.reduce((p, t) => {
-            const typeFrags = typeFragments[t.name];
+          const possibleTypes = getTypes(schema, typeInfo);
+          const newSelections = possibleTypes.reduce((p, possibleType) => {
+            const typeFrags = activeTypeFragments[possibleType.name];
             if (!typeFrags) {
               return p;
             }
@@ -213,7 +217,9 @@ export const addFragmentsToQuery = (
               // Add used fragment for insertion at Document node
               for (let j = 0, l = usedFragments.length; j < l; j++) {
                 const name = usedFragments[j];
-                requiredUserFragments[name] = userFragments[name];
+                if (!existingFragmentsForQuery.has(name)) {
+                  requiredUserFragments[name] = userFragments[name];
+                }
               }
 
               // Add fragment for insertion at Document node
@@ -251,6 +257,14 @@ export const addFragmentsToQuery = (
         },
       },
       Document: {
+        enter: node => {
+          node.definitions.reduce((set, definition) => {
+            if (definition.kind === 'FragmentDefinition') {
+              set.add(definition.name.value);
+            }
+            return set;
+          }, existingFragmentsForQuery);
+        },
         leave: node => {
           const definitions = [...node.definitions];
           for (const key in additionalFragments)
@@ -283,7 +297,7 @@ const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
   return isAbstractType(type) ? schema.getPossibleTypes(type) : [type];
 };
 
-/** Get name of non-abstract type for adding to 'typeFragments'. */
+/** Get name of non-abstract type for adding to 'activeTypeFragments'. */
 const getTypeName = (typeInfo: TypeInfo) => {
   const type = unwrapType(typeInfo.getType());
   invariant(
