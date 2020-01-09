@@ -36,6 +36,7 @@ describe('withUrqlClient', () => {
         test: '',
       },
       asPath: '/',
+      urqlClient: {} as Client,
     };
 
     const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
@@ -90,6 +91,7 @@ describe('withUrqlClient', () => {
           cookie: token,
         },
       },
+      urqlClient: {} as Client,
     };
 
     beforeEach(() => {
