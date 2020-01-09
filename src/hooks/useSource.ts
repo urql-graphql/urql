@@ -3,96 +3,90 @@ import {
   useRef,
   useEffect,
   useLayoutEffect,
-  useCallback,
+  Dispatch,
 } from 'react';
-import { pipe, makeSubject, subscribe, Operator } from 'wonka';
-// eslint-disable-next-line
+
+import { Subject, Operator, makeSubject, subscribe, pipe } from 'wonka';
+
 import {
-  unstable_scheduleCallback,
-  unstable_cancelCallback,
-  unstable_getCurrentPriorityLevel,
+  CallbackNode,
+  unstable_scheduleCallback as scheduleCallback,
+  unstable_cancelCallback as cancelCallback,
+  unstable_getCurrentPriorityLevel as getPriorityLevel,
 } from 'scheduler';
 
 interface State<R, T = R> {
-  active?: boolean;
-  output: R;
-  input?: T;
-  task?: any;
-  [key: string]: any;
+  subject: Subject<T>;
+  onValue: Dispatch<R>;
+  teardown: null | (() => void);
+  task: null | CallbackNode;
+  value: R;
 }
 
-const useIsoEffect =
+const useIsomorphicEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export const useSubjectValue = <T, R>(
-  fn: Operator<T, R>,
+  operator: Operator<T, R>,
   input: T,
-  init: R
-): any => {
-  const state = useRef<State<R, T>>({
-    output: init,
+  init?: R
+): [R, Dispatch<T>] => {
+  const subscription = useRef<State<R, T>>({
+    subject: makeSubject<T>(),
+    value: init as R,
     onValue: () => {},
     teardown: null,
     task: null,
-    subject: makeSubject<T>(),
   });
 
-  // This forces an update when the given output hasn't been stored yet
-  const [, force] = useReducer((x: number, output: R) => {
-    state.current.output = output;
+  const [, setValue] = useReducer((x: number, value: R) => {
+    subscription.current.value = value;
     return x + 1;
   }, 0);
 
-  const sub = useCallback(
-    (shouldSchedule: boolean) => {
-      const [unsubscribe] = pipe(
-        fn(state.current.subject[0]),
-        subscribe(o => {
-          state.current.onValue(o);
-        })
+  const observe = useCallback((shouldScheduleTeardown: boolean) => {
+    const [unsubscribe] = pipe(
+      operator(subscription.current.subject[0]),
+      subscribe((value: R) => subscription.current.onValue(value))
+    );
+
+    subscription.current.teardown = unsubscribe;
+    if (shouldScheduleTeardown) {
+      subscription.current.task = scheduleCallback(
+        getPriorityLevel(),
+        unsubscribe
       );
-      state.current.teardown = unsubscribe;
+    }
+  });
 
-      if (shouldSchedule) {
-        state.current.task = unstable_scheduleCallback(
-          unstable_getCurrentPriorityLevel(),
-          () => {
-            unsubscribe();
-          }
-        );
-      }
-    },
-    [fn]
-  );
-
-  if (!state.current.teardown) {
-    sub(true);
-    state.current.subject[1](input);
+  if (subscription.current.teardown === null) {
+    observe(/* shouldScheduleTeardown */ true);
+    subscription.current.subject[1](input);
   }
 
   useEffect(() => {
-    const isInitial = state.current.onValue !== force;
-    state.current.onValue = force;
-    if (state.current.teardown === null) {
-      sub(false);
+    const isInitial = subscription.current.onValue !== setValue;
+    subscription.current.onValue = setValue;
+    if (subscription.current.teardown === null) {
+      observe(/* shouldScheduleTeardown */ false);
     }
 
     if (!isInitial) {
-      state.current.subject[1](input);
+      subscription.current.subject[1](input);
     }
-  }, [sub, input]);
+  }, [input, observe]);
 
-  // Let React call unsubscribe on unmount
-  useIsoEffect(() => {
-    if (state.current.task) unstable_cancelCallback(state.current.task);
-    state.current.task = null;
+  useIsomorphicEffect(() => {
+    if (subscription.current.task !== null) {
+      cancelCallback(subscription.current.task);
+    }
+
     return () => {
-      if (state.current.teardown !== null) {
-        state.current.teardown();
-        state.current.teardown = null;
+      if (subscription.current.teardown !== null) {
+        subscription.current.teardown();
       }
     };
   }, []);
 
-  return [state.current.output, state.current.subject[1]];
+  return [subscription.current.value, subscription.current.subject[1]];
 };
