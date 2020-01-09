@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import {
   useReducer,
@@ -112,7 +113,7 @@ export const useOperator = <T, R>(
     if (!isInitial) {
       subscription.current.subject[1](input);
     }
-  }, [input, operator]);
+  }, [input]);
 
   return [subscription.current.value, subscription.current.subject[1]];
 };
