@@ -1,12 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useSubjectValue } from './useSource';
 
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
+import { useOperator } from './useOperator';
 
 const initialState: UseQueryState<any> = {
   fetching: false,
@@ -60,7 +60,7 @@ export const useQuery = <T = any, V = object>(
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
-  const [state, update] = useSubjectValue(
+  const [state, update] = useOperator(
     query$$ =>
       pipe(
         query$$,

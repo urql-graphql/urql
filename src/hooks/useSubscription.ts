@@ -1,12 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useSubjectValue } from './useSource';
 
 import { useClient } from '../context';
 import { CombinedError } from '../utils';
-import { useRequest } from './useRequest';
 import { OperationContext } from '../types';
+import { useRequest } from './useRequest';
+import { useOperator } from './useOperator';
 
 const initialState: UseSubscriptionState<any> = {
   fetching: false,
@@ -61,7 +61,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [state] = useSubjectValue(
+  const [state] = useOperator(
     subscription$$ =>
       pipe(
         subscription$$,

@@ -26,7 +26,7 @@ interface State<R, T = R> {
 const useIsomorphicEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export const useSubjectValue = <T, R>(
+export const useOperator = <T, R>(
   operator: Operator<T, R>,
   input: T,
   init?: R
