@@ -3,10 +3,10 @@ import { pipe, make, onPush, onEnd, subscribe, Source } from 'wonka';
 /** This converts a Source to a suspense Source; It will forward the first result synchronously or throw a promise that resolves when the result becomes available */
 export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
   // Create a new Source from scratch so we have full control over the Source's lifecycle
-  return make(({ next, complete }) => {
+  return make<T>(({ next, complete }) => {
     let isCancelled = false;
-    let resolveSuspense;
-    let synchronousResult;
+    let resolveSuspense: (value: T) => void;
+    let synchronousResult: undefined | T;
 
     const { unsubscribe } = pipe(
       source,
