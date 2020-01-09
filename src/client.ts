@@ -187,7 +187,7 @@ export class Client {
     const { key, operationName } = operation;
     const operationResults$ = pipe(
       this.results$,
-      filter(res => res.operation.key === key)
+      filter((res: OperationResult) => res.operation.key === key)
     );
 
     if (operationName === 'mutation') {
@@ -201,7 +201,9 @@ export class Client {
 
     const teardown$ = pipe(
       this.operations$,
-      filter(op => op.operationName === 'teardown' && op.key === key)
+      filter(
+        (op: Operation) => op.operationName === 'teardown' && op.key === key
+      )
     );
 
     const result$ = pipe(
