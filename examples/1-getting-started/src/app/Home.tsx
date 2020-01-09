@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'urql';
 import { Error, Loading, Todo, NewTodo } from './components';
