@@ -138,6 +138,6 @@
     "scheduler": ">= 0.16.0"
   },
   "dependencies": {
-    "wonka": "https://github.pika.dev/kitten/wonka/pr/65"
+    "wonka": "^4.0.0"
   }
 }

@@ -1294,12 +1294,7 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^2.11.0, commander@^2.19.0, commander@^2.20.0:
-  version "2.20.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.0.tgz#d58bb2b5c1ee8f87b0d340027e9e94e222c5a422"
-  integrity sha512-7j2y+40w61zy6YC2iRNpUe/NwhNyoXrYpHMrSunaMG64nRnaf96zO/KMQR4OyN/UnE5KLyEBnKHd4aG3rskjpQ==
-
-commander@~2.20.3:
+commander@^2.11.0, commander@^2.19.0, commander@^2.20.0, commander@~2.20.3:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
@@ -5906,9 +5901,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-"wonka@https://github.pika.dev/kitten/wonka/pr/65":
-  version "4.0.0-rc.4"
-  resolved "https://github.pika.dev/kitten/wonka/pr/65#7ca68095b43161f903adbb4378a8414029cb4a2b"
+wonka@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.0.tgz#722930f8cdddb60b43706eb9de9ecdfe9c520a17"
+  integrity sha512-5PG8O71yQp22eqrfqktthdzZcNvFKo8Z8eaLPyhpHR2W0J+BjF76qJUh3VjNtzGsyP5Bsp+csYvU5JvQ9li4kw==
 
 wordwrap@~0.0.2:
   version "0.0.3"
