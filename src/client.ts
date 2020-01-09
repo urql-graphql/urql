@@ -220,8 +220,8 @@ export class Client {
     return operation.context.suspense !== false &&
       this.suspense &&
       operationName === 'query'
-      ? toSuspenseSource(result$)
-      : result$;
+      ? toSuspenseSource<OperationResult>(result$)
+      : (result$ as Source<OperationResult>);
   }
 
   reexecuteOperation = (operation: Operation) => {
