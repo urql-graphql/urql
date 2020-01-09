@@ -105,5 +105,11 @@ export const useSubscription = <T = any, R = T, V = object>(
     initialState
   );
 
-  return [state, update];
+  // This is the imperative execute function passed to the user
+  const executeSubscription = useCallback(
+    (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
+    [update, makeSubscription$]
+  );
+
+  return [state, executeSubscription];
 };
