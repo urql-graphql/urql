@@ -5930,10 +5930,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.0.tgz#722930f8cdddb60b43706eb9de9ecdfe9c520a17"
-  integrity sha512-5PG8O71yQp22eqrfqktthdzZcNvFKo8Z8eaLPyhpHR2W0J+BjF76qJUh3VjNtzGsyP5Bsp+csYvU5JvQ9li4kw==
+wonka@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.2.tgz#32004bab7373da2150711fc703f7f12404dfdcb7"
+  integrity sha512-3Iwtr5agZFMs9j3c1fLn44FKi62G4XlNMbTluMbsF4fmJE6DDgVvkq7HwVOExWXOyGEfs8awOTTOebWbqG4quw==
 
 wordwrap@~0.0.2:
   version "0.0.3"
