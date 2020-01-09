@@ -1,42 +1,32 @@
-import { useReducer, useRef, useMemo, useEffect } from 'react';
-import { pipe, makeSubject, subscribe, Operator } from 'wonka';
+import { useReducer, useRef, useMemo, useEffect, useLayoutEffect } from 'react';
+import { pipe, makeSubject, subscribe, Operator, Source } from 'wonka';
 
 interface State<R, T = R> {
-  active?: boolean;
+  active: boolean;
   output: R;
   input?: T;
-  unsubscribe?: () => void;
 }
 
-type Internals<T> = [(input: T) => void, () => void];
+const useIsomorphicEffect =
+  typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+type Internals<T> = [(input: T) => void, Source<T>];
 
 export const useSubjectValue = <T, R>(
   fn: Operator<T, R>,
   input: T,
   init: R
 ): [R, (value: T) => void] => {
-  const state = useRef<State<R, T>>({ output: init });
+  const state = useRef<State<R, T>>({ active: false, output: init });
 
   // This forces an update when the given output hasn't been stored yet
-  const [, force] = useReducer((x: number, output: R) => {
+  const [, forceUpdate] = useReducer((x: number, output: R) => {
     state.current.output = output;
     return x + 1;
   }, 0);
 
-  const [update, unsubscribe] = useMemo<Internals<T>>(() => {
+  const [update, input$] = useMemo<Internals<T>>(() => {
     const [input$, next] = makeSubject<T>();
-    const [unsubscribe] = pipe(
-      fn(input$),
-      subscribe((output: R) => {
-        if (!state.current.active) {
-          if (state.current.unsubscribe) state.current.unsubscribe();
-          force(output);
-        } else {
-          // The result of the input stream updates the latest output if it's an immediate result
-          state.current.output = output;
-        }
-      })
-    );
 
     // When the input has changed this causes a new update on the input stream
     const update = (input: T) => {
@@ -46,21 +36,25 @@ export const useSubjectValue = <T, R>(
       } else if (!('input' in state.current) || input !== state.current.input) {
         // This is only safe in concurrent mode, because a second run wouldn't trigger another update,
         // but our effect will be updating the output regardless
-        next((state.current.input = input));
+        state.current.input = input;
+        next(input);
       }
     };
 
-    state.current.unsubscribe = unsubscribe;
-    return [update, unsubscribe];
-  }, [fn]);
+    return [update, input$];
+  }, []);
 
-  // Set active flag to true while updating and call it with new input
-  state.current.active = true;
-  update(input);
-  state.current.active = false;
+  useIsomorphicEffect(() => {
+    const [unsubscribe] = pipe(fn(input$), subscribe(forceUpdate));
 
-  // Let React call unsubscribe on unmount
-  useEffect(() => unsubscribe, [unsubscribe]);
+    return unsubscribe;
+  }, []);
+
+  useIsomorphicEffect(() => {
+    state.current.active = true;
+    update(input);
+    state.current.active = false;
+  }, [input]);
 
   return [state.current.output, update];
 };

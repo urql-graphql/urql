@@ -11,12 +11,14 @@ const client = createClient({
 });
 
 export const App: FC = () => (
-  <Provider value={client}>
-    <main>
-      <h1>Todos</h1>
-      <Home />
-    </main>
-  </Provider>
+  <StrictMode>
+    <Provider value={client}>
+      <main>
+        <h1>Todos</h1>
+        <Home />
+      </main>
+    </Provider>
+  </StrictMode>
 );
 
 App.displayName = 'App';
