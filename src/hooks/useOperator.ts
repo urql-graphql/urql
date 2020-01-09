@@ -25,8 +25,8 @@ interface State<R, T = R> {
   value: R;
 }
 
-const useIsomorphicEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const isServerSide = typeof window === 'undefined';
+const useIsomorphicEffect = !isServerSide ? useLayoutEffect : useEffect;
 
 /**
  * Creates a stream of `input` as it's changing and pipes this stream
@@ -61,9 +61,16 @@ export const useOperator = <T, R>(
 
   // On mount, subscribe to the operator using the subject and schedule a teardown using scheduler (1)
   if (subscription.current.teardown === null) {
-    observe(operator, subscription.current, /* shouldScheduleTeardown */ true);
+    observe(
+      operator,
+      subscription.current,
+      /* shouldScheduleTeardown */ !isServerSide
+    );
     // Send the initial input value to the operator; this may call `onValue` synchronously
     subscription.current.subject[1](input);
+    if (isServerSide && subscription.current.teardown !== null) {
+      (subscription.current.teardown as any)();
+    }
   }
 
   // We utilise useLayoutEffect to cancel the scheduled teardown again
