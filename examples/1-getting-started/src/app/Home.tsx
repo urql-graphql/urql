@@ -39,21 +39,9 @@ const TodoQuery = gql`
     }
   }
 `;
-const Todos2 = () => {
-  const [res] = useQuery<QueryResponse>({ query: TodoQuery });
-  if (res.fetching) throw new Error('NOOOOO');
-  return (
-    <ul>
-      {res.data.todos.map((todo: ITodo) => (
-        <li key={todo.id}>{todo.text}</li>
-      ))}
-    </ul>
-  );
-};
 
 export const Home: FC = () => {
   const [res, executeQuery] = useQuery<QueryResponse>({ query: TodoQuery });
-  const [state, set] = useState(false);
   const refetch = useCallback(
     () => executeQuery({ requestPolicy: 'network-only' }),
     [executeQuery]
@@ -104,8 +92,6 @@ export const Home: FC = () => {
       <NewTodo />
       {todos}
       <button onClick={refetch}>Refetch</button>
-      {state && <Todos2 />}
-      <button onClick={() => set(true)}>Show 2</button>
     </>
   );
 };

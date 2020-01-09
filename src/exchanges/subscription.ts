@@ -102,17 +102,13 @@ export const subscriptionExchange = ({
       sharedOps$,
       filter(isSubscriptionOperation),
       mergeMap(operation => {
-        console.log('subscription', operation);
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(
-          createSubscriptionSource(operation),
-          takeUntil(teardown$)
-        );
+        return pipe(createSubscriptionSource(operation), takeUntil(teardown$));
       })
     );
 

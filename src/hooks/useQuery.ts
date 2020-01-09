@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useSubjectValue } from 'react-wonka';
+import { useSubjectValue } from './useSource';
 
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
