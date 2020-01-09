@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2020-01-08
+
+This release adds support for accessing the `urqlClient` instance off of Next's context object.
+
+### Added
+
+- `urqlClient` is now added to Next's context object, `ctx`, such that it can be accessed by other components lower in the tree. PR by @BjoernRave [here](https://github.com/FormidableLabs/next-urql/pull/15).
+
+### Diff
+
+https://github.com/FormidableLabs/next-urql/compare/v0.2.3...v0.2.4
+
 ## [0.2.3] - 2019-12-31
 
 This release fixes support for using `withUrqlClient` with `_app.js`.
