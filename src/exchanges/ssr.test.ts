@@ -14,11 +14,7 @@ let output;
 beforeEach(() => {
   input = makeSubject<Operation>();
   output = jest.fn();
-  forward = ops$ =>
-    pipe(
-      ops$,
-      map(output)
-    );
+  forward = ops$ => pipe(ops$, map(output));
   client = { suspense: true } as any;
   exchangeInput = { forward, client };
 });
@@ -27,7 +23,7 @@ it('caches query results correctly', () => {
   output.mockReturnValueOnce(queryResponse);
 
   const ssr = ssrExchange();
-  const [ops$, next] = input;
+  const { source: ops$, next } = input;
   const exchange = ssr(exchangeInput)(ops$);
 
   publish(exchange);
@@ -51,13 +47,10 @@ it('resolves cached query results correctly', () => {
     initialState: { [queryOperation.key]: queryResponse as any },
   });
 
-  const [ops$, next] = input;
+  const { source: ops$, next } = input;
   const exchange = ssr(exchangeInput)(ops$);
 
-  pipe(
-    exchange,
-    forEach(onPush)
-  );
+  pipe(exchange, forEach(onPush));
   next(queryOperation);
 
   const data = ssr.extractData();
@@ -74,13 +67,10 @@ it('deletes cached results in non-suspense environments', () => {
   ssr.restoreData({ [queryOperation.key]: queryResponse as any });
   expect(Object.keys(ssr.extractData()).length).toBe(1);
 
-  const [ops$, next] = input;
+  const { source: ops$, next } = input;
   const exchange = ssr(exchangeInput)(ops$);
 
-  pipe(
-    exchange,
-    forEach(onPush)
-  );
+  pipe(exchange, forEach(onPush));
   next(queryOperation);
 
   expect(Object.keys(ssr.extractData()).length).toBe(0);

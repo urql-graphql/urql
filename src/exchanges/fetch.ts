@@ -29,10 +29,7 @@ export const fetchExchange: Exchange = ({ forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(
-          createFetchSource(operation),
-          takeUntil(teardown$)
-        );
+        return pipe(createFetchSource(operation), takeUntil(teardown$));
       })
     );
 
@@ -66,7 +63,7 @@ const createFetchSource = (operation: Operation) => {
     );
   }
 
-  return make<OperationResult>(([next, complete]) => {
+  return make<OperationResult>(({ next, complete }) => {
     const abortController =
       typeof AbortController !== 'undefined'
         ? new AbortController()

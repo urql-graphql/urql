@@ -3,17 +3,17 @@ import { pipe, make, onPush, onEnd, subscribe, Source } from 'wonka';
 /** This converts a Source to a suspense Source; It will forward the first result synchronously or throw a promise that resolves when the result becomes available */
 export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
   // Create a new Source from scratch so we have full control over the Source's lifecycle
-  return make(([push, end]) => {
+  return make(({ next, complete }) => {
     let isCancelled = false;
     let resolveSuspense;
     let synchronousResult;
 
-    const [teardown] = pipe(
+    const { unsubscribe } = pipe(
       source,
       // The onPush and onEnd forward the underlying results as usual, so that when no
       // suspense promise is thrown, the source behaves as it normally would
-      onPush(push),
-      onEnd(end),
+      onPush(next),
+      onEnd(complete as any),
       subscribe(value => {
         // When this operation resolved synchronously assign the result to
         // synchronousResult which will be picked up below
@@ -24,8 +24,8 @@ export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
           resolveSuspense(value);
           // And end and teardown both sources, since suspense will abort the
           // underlying rendering component anyway
-          end();
-          teardown();
+          complete();
+          unsubscribe();
         }
       })
     );
@@ -42,7 +42,7 @@ export const toSuspenseSource = <T>(source: Source<T>): Source<T> => {
     // the thrown promise from resolving if this source is cancelled
     return () => {
       isCancelled = true;
-      teardown();
+      unsubscribe();
     };
   });
 };

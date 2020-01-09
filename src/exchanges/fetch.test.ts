@@ -120,7 +120,7 @@ describe('on teardown', () => {
   it('aborts the outgoing request', () => {
     fetch.mockReturnValue(Promise.reject(abortError));
 
-    const [unsubscribe] = pipe(
+    const { unsubscribe } = pipe(
       fromValue(queryOperation),
       fetchExchange(exchangeArgs),
       subscribe(fail)

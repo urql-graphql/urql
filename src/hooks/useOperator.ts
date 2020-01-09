@@ -18,10 +18,12 @@ import {
   unstable_getCurrentPriorityLevel as getPriorityLevel,
 } from 'scheduler';
 
+type TeardownFn = () => void;
+
 interface State<R, T = R> {
   subject: Subject<T>;
   onValue: Dispatch<R>;
-  teardown: null | (() => void);
+  teardown: null | TeardownFn;
   task: null | CallbackNode;
   value: R;
 }
@@ -68,7 +70,7 @@ export const useOperator = <T, R>(
       /* shouldScheduleTeardown */ !isServerSide
     );
     // Send the initial input value to the operator; this may call `onValue` synchronously
-    subscription.current.subject[1](input);
+    subscription.current.subject.next(input);
     if (isServerSide && subscription.current.teardown !== null) {
       (subscription.current.teardown as any)();
     }
@@ -111,11 +113,11 @@ export const useOperator = <T, R>(
     // If the input value has changed (except during the initial mount) we send it to the operator
     // This may call `setValue` which schedules an update
     if (!isInitial) {
-      subscription.current.subject[1](input);
+      subscription.current.subject.next(input);
     }
   }, [input]);
 
-  return [subscription.current.value, subscription.current.subject[1]];
+  return [subscription.current.value, subscription.current.subject.next];
 };
 
 const observe = <R, T>(
@@ -124,19 +126,21 @@ const observe = <R, T>(
   shouldScheduleTeardown: boolean
 ) => {
   // Start the subscription using the subject and operator
-  const [unsubscribe] = pipe(
-    subscription.subject[0],
-    operator,
+  const { unsubscribe } = pipe(
+    operator(subscription.subject.source),
     subscribe((value: R) => subscription.onValue(value))
   );
 
   // Update the current teardown to now be the subscription's unsubcribe function
-  subscription.teardown = unsubscribe;
+  subscription.teardown = unsubscribe as TeardownFn;
 
   // See (1): We schedule a teardown on mount that is cancelled by useLayoutEffect,
   // unless we're not expecting effects to run at all and the component not to be
   // rendered, which means this callback won't be cancelled and will unsubscribe.
   if (shouldScheduleTeardown) {
-    subscription.task = scheduleCallback(getPriorityLevel(), unsubscribe);
+    subscription.task = scheduleCallback(
+      getPriorityLevel(),
+      subscription.teardown
+    );
   }
 };

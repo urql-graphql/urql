@@ -71,7 +71,7 @@ export const subscriptionExchange = ({
       context: { ...operation.context },
     });
 
-    return make<OperationResult>(([next, complete]) => {
+    return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;
 
       const sub = observableish.subscribe({

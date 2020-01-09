@@ -16,11 +16,7 @@ import { toSuspenseSource } from './toSuspenseSource';
 it('does nothing when not subscribed to', () => {
   const start = jest.fn();
 
-  pipe(
-    fromValue('test'),
-    onStart(start),
-    toSuspenseSource
-  );
+  pipe(fromValue('test'), onStart(start), toSuspenseSource);
 
   expect(start).not.toHaveBeenCalled();
 });
@@ -49,14 +45,14 @@ it('throws a promise when the source is not resolving immediately', () => {
   expect(() => {
     pipe(
       never,
-      toSuspenseSource,
+      toSuspenseSource as any,
       subscribe(() => {})
     );
   }).toThrow(expect.any(Promise));
 });
 
 it('throws a promise that resolves when the source emits a value', () => {
-  const [source, push] = makeSubject();
+  const { source, next } = makeSubject();
   const end = jest.fn();
 
   let promise;
@@ -79,7 +75,7 @@ it('throws a promise that resolves when the source emits a value', () => {
   // Expect it to have thrown
   expect(promise).toBeInstanceOf(Promise);
 
-  push('test');
+  next('test');
   expect(result).toBe('test');
 
   return promise.then(resolved => {
@@ -91,12 +87,7 @@ it('throws a promise that resolves when the source emits a value', () => {
 it('behaves like a normal source when the first result was synchronous', async () => {
   const push = jest.fn();
   await new Promise(resolve => {
-    pipe(
-      fromArray([1, 2]),
-      toSuspenseSource,
-      onEnd(resolve),
-      subscribe(push)
-    );
+    pipe(fromArray([1, 2]), toSuspenseSource, onEnd(resolve), subscribe(push));
   });
 
   expect(push).toHaveBeenCalledTimes(2);
@@ -107,12 +98,12 @@ it('still supports cancellation', async () => {
   const end = jest.fn();
 
   try {
-    [unsubscribe] = pipe(
+    ({ unsubscribe } = pipe(
       fromArray([1, 2]),
       toSuspenseSource,
       onEnd(end),
       publish
-    );
+    ));
   } catch (promise) {
     expect(promise).toBe(expect.any(Promise));
   }

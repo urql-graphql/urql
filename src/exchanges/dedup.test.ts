@@ -42,7 +42,7 @@ beforeEach(() => {
 });
 
 it('forwards query operations correctly', async () => {
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
@@ -53,7 +53,7 @@ it('forwards query operations correctly', async () => {
 
 it('forwards only non-pending query operations', async () => {
   shouldRespond = false; // We filter out our mock responses
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
@@ -65,7 +65,7 @@ it('forwards only non-pending query operations', async () => {
 
 it('forwards duplicate query operations as usual after they respond', async () => {
   shouldRespond = true; // Response will immediately resolve
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
@@ -77,7 +77,7 @@ it('forwards duplicate query operations as usual after they respond', async () =
 
 it('forwards duplicate query operations after one was torn down', async () => {
   shouldRespond = false; // We filter out our mock responses
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);
@@ -90,7 +90,7 @@ it('forwards duplicate query operations after one was torn down', async () => {
 
 it('always forwards mutation operations without deduplicating them', async () => {
   shouldRespond = false; // We filter out our mock responses
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = dedupExchange(exchangeArgs)(ops$);
 
   publish(exchange);

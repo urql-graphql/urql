@@ -97,7 +97,9 @@ export class Client {
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
-    const [operations$, nextOperation] = makeSubject<Operation>();
+    const { source: operations$, next: nextOperation } = makeSubject<
+      Operation
+    >();
     this.operations$ = operations$;
 
     // Internally operations aren't always dispatched immediately
