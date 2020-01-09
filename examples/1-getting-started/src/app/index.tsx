@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { createClient, Provider, defaultExchanges } from 'urql';
 import { devtoolsExchange } from '@urql/devtools';
@@ -11,12 +11,14 @@ const client = createClient({
 });
 
 export const App: FC = () => (
-  <Provider value={client}>
-    <main>
-      <h1>Todos</h1>
-      <Home />
-    </main>
-  </Provider>
+  <StrictMode>
+    <Provider value={client}>
+      <main>
+        <h1>Todos</h1>
+        <Home />
+      </main>
+    </Provider>
+  </StrictMode>
 );
 
 App.displayName = 'App';
