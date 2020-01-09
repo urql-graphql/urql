@@ -54,7 +54,7 @@ beforeEach(() => {
 
 describe('on query', () => {
   it('forwards to next exchange when no cache hit', () => {
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     publish(exchange);
@@ -65,7 +65,7 @@ describe('on query', () => {
   });
 
   it('caches results', () => {
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     publish(exchange);
@@ -77,14 +77,11 @@ describe('on query', () => {
   });
 
   it('respects cache-and-network', () => {
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const result = jest.fn();
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
-    pipe(
-      exchange,
-      forEach(result)
-    );
+    pipe(exchange, forEach(result));
     next(queryOperation);
 
     next({
@@ -109,7 +106,7 @@ describe('on query', () => {
 
   describe('cache hit', () => {
     it('is miss when operation is forwarded', () => {
-      const [ops$, next, complete] = input;
+      const { source: ops$, next, complete } = input;
       const exchange = cacheExchange(exchangeArgs)(ops$);
 
       publish(exchange);
@@ -123,7 +120,7 @@ describe('on query', () => {
     });
 
     it('is true when cached response is returned', async () => {
-      const [ops$, next, complete] = input;
+      const { source: ops$, next, complete } = input;
       const exchange = cacheExchange(exchangeArgs)(ops$);
 
       const results$ = pipe(
@@ -149,7 +146,7 @@ describe('on query', () => {
 describe('on mutation', () => {
   it('does not cache', () => {
     response = mutationResponse;
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     publish(exchange);
@@ -165,7 +162,11 @@ describe('on mutation', () => {
     const resultCache = new Map([[123, queryResponse]]);
     const operationCache = { [typename]: new Set([123]) };
 
-    afterMutation(resultCache, operationCache, exchangeArgs.client)({
+    afterMutation(
+      resultCache,
+      operationCache,
+      exchangeArgs.client
+    )({
       ...mutationResponse,
       data: {
         todos: [
@@ -184,7 +185,7 @@ describe('on mutation', () => {
 describe('on subscription', () => {
   it('forwards subscriptions', () => {
     response = subscriptionResult;
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     publish(exchange);
@@ -223,7 +224,7 @@ describe('on empty query response', () => {
   });
 
   it('does not cache response', () => {
-    const [ops$, next, complete] = input;
+    const { source: ops$, next, complete } = input;
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     publish(exchange);

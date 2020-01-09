@@ -1,8 +1,8 @@
 import { DEFAULT_EXTENSIONS } from '@babel/core';
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
-import buble from 'rollup-plugin-buble';
+import buble from '@rollup/plugin-buble';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
@@ -82,8 +82,6 @@ const makePlugins = (isProduction = false, outputFolder) => [
     },
   }),
   typescript({
-    typescript: require('typescript'),
-    cacheRoot: './node_modules/.cache/.rts2_cache',
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
       compilerOptions: {

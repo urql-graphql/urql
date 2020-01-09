@@ -188,17 +188,18 @@ describe('executeQuery', () => {
 
   it('polls when pollInterval is specified', () => {
     jest.useFakeTimers();
-    pipe(
-      client.executeQuery(query, { pollInterval: 10000 }),
+    const { unsubscribe } = pipe(
+      client.executeQuery(query, { pollInterval: 100 }),
       subscribe(x => x)
     );
 
     expect(receivedOps.length).toEqual(1);
-    jest.runOnlyPendingTimers();
+    jest.advanceTimersByTime(200);
     expect(receivedOps.length).toEqual(3);
     expect(receivedOps[0].operationName).toEqual('query');
-    expect(receivedOps[1].operationName).toEqual('teardown');
+    expect(receivedOps[1].operationName).toEqual('query');
     expect(receivedOps[2].operationName).toEqual('query');
+    unsubscribe();
   });
 });
 

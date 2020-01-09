@@ -86,7 +86,11 @@ export const useQuery = <T = any, V = object>(
         }),
         // The individual partial results are merged into each previous result
         scan(
-          (result, partial) => ({ ...result, stale: false, ...partial }),
+          (result, partial: { fetching: boolean }) => ({
+            ...result,
+            stale: false,
+            ...partial,
+          }),
           initialState
         )
       ),

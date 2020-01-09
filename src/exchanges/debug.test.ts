@@ -28,7 +28,7 @@ beforeEach(() => {
 
 it('forwards query operations correctly', async () => {
   jest.spyOn(global.console, 'log').mockImplementation();
-  const [ops$, next, complete] = input;
+  const { source: ops$, next, complete } = input;
   const exchange = debugExchange(exchangeArgs)(ops$);
 
   publish(exchange);
@@ -50,7 +50,7 @@ describe('production', () => {
   });
 
   it('is a noop in production', () => {
-    const [ops$] = input;
+    const { source: ops$ } = input;
 
     debugExchange({
       forward: ops => {

@@ -97,7 +97,9 @@ export class Client {
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
-    const [operations$, nextOperation] = makeSubject<Operation>();
+    const { source: operations$, next: nextOperation } = makeSubject<
+      Operation
+    >();
     this.operations$ = operations$;
 
     // Internally operations aren't always dispatched immediately
@@ -185,7 +187,7 @@ export class Client {
     const { key, operationName } = operation;
     const operationResults$ = pipe(
       this.results$,
-      filter(res => res.operation.key === key)
+      filter((res: OperationResult) => res.operation.key === key)
     );
 
     if (operationName === 'mutation') {
@@ -199,7 +201,9 @@ export class Client {
 
     const teardown$ = pipe(
       this.operations$,
-      filter(op => op.operationName === 'teardown' && op.key === key)
+      filter(
+        (op: Operation) => op.operationName === 'teardown' && op.key === key
+      )
     );
 
     const result$ = pipe(
@@ -216,8 +220,8 @@ export class Client {
     return operation.context.suspense !== false &&
       this.suspense &&
       operationName === 'query'
-      ? toSuspenseSource(result$)
-      : result$;
+      ? toSuspenseSource<OperationResult>(result$ as Source<OperationResult>)
+      : (result$ as Source<OperationResult>);
   }
 
   reexecuteOperation = (operation: Operation) => {
