@@ -4,10 +4,11 @@ import { useSubscription } from 'urql';
 import { Error, MessageEntry, Message, MessageResponse } from './components';
 
 export const Messages: FC = () => {
-  const handleSubscription = (
+  const handleSubscription = React.useCallback((
     messages: MessageEntry[] = [],
     response: MessageResponse
-  ) => [response.newMessages, ...messages];
+    // @ts-ignore
+  ) => console.log('trigger') || [response.newMessages, ...messages], []);
 
   const [res] = useSubscription(
     { query: NewMessageSubQuery },

@@ -170,6 +170,7 @@ export class Client {
 
   /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
   private onOperationEnd(operation: Operation) {
+    console.log('end', operation);
     const { key } = operation;
     const prevActive = this.activeOperations[key] || 0;
     const newActive = (this.activeOperations[key] =

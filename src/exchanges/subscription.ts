@@ -102,6 +102,7 @@ export const subscriptionExchange = ({
       sharedOps$,
       filter(isSubscriptionOperation),
       mergeMap(operation => {
+        console.log('subscription', operation);
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,

@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useSubjectValue } from 'react-wonka';
+import { useSubjectValue } from './useSomething';
 
 import { useClient } from '../context';
 import { CombinedError } from '../utils';
@@ -61,7 +61,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [state, update] = useSubjectValue(
+  const state = useSubjectValue(
     subscription$$ =>
       pipe(
         subscription$$,
@@ -105,11 +105,5 @@ export const useSubscription = <T = any, R = T, V = object>(
     initialState
   );
 
-  // This is the imperative execute function passed to the user
-  const executeSubscription = useCallback(
-    (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
-    [update, makeSubscription$]
-  );
-
-  return [state, executeSubscription];
+  return [state, () => {}];
 };
