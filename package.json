@@ -138,6 +138,6 @@
     "scheduler": ">= 0.16.0"
   },
   "dependencies": {
-    "wonka": "^3.2.1"
+    "wonka": "4.0.0-rc.4"
   }
 }

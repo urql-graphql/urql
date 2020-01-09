@@ -5906,10 +5906,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.1.tgz#f66123fabbb260f23a4e89f1526317169203e258"
-  integrity sha512-LpquZ9PJtYJ31AlMPp5tEba1y+S+wUmY7OyFLGZCmGSNO1ZOTTZGp/HbieFzP5fVJ9fWXCus3ecgDjwAssHSGg==
+wonka@4.0.0-rc.4:
+  version "4.0.0-rc.4"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.0-rc.4.tgz#d1f3f02da44c6b50fb3d463c72c92a8fa8368ae4"
+  integrity sha512-gIFR1GrKYvPHMeq8l2Umxqkr0HOmgAV5ikXnilNfoq7FgUXY8j88gSF6gFi5rtfUGX4T/E3SLvtqm5ovyT1k3A==
 
 wordwrap@~0.0.2:
   version "0.0.3"
