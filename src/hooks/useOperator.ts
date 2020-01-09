@@ -26,6 +26,22 @@ interface State<R, T = R> {
 const useIsomorphicEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
+const observe = <R, T>(
+  operator: Operator<T, R>,
+  subscription: State<R, T>,
+  shouldScheduleTeardown: boolean
+) => {
+  const [unsubscribe] = pipe(
+    operator(subscription.subject[0]),
+    subscribe((value: R) => subscription.onValue(value))
+  );
+
+  subscription.teardown = unsubscribe;
+  if (shouldScheduleTeardown) {
+    subscription.task = scheduleCallback(getPriorityLevel(), unsubscribe);
+  }
+};
+
 export const useOperator = <T, R>(
   operator: Operator<T, R>,
   input: T,
@@ -44,23 +60,8 @@ export const useOperator = <T, R>(
     return x + 1;
   }, 0);
 
-  const observe = useCallback((shouldScheduleTeardown: boolean) => {
-    const [unsubscribe] = pipe(
-      operator(subscription.current.subject[0]),
-      subscribe((value: R) => subscription.current.onValue(value))
-    );
-
-    subscription.current.teardown = unsubscribe;
-    if (shouldScheduleTeardown) {
-      subscription.current.task = scheduleCallback(
-        getPriorityLevel(),
-        unsubscribe
-      );
-    }
-  });
-
   if (subscription.current.teardown === null) {
-    observe(/* shouldScheduleTeardown */ true);
+    observe(operator, subscription.current, /* shouldScheduleTeardown */ true);
     subscription.current.subject[1](input);
   }
 
@@ -68,13 +69,17 @@ export const useOperator = <T, R>(
     const isInitial = subscription.current.onValue !== setValue;
     subscription.current.onValue = setValue;
     if (subscription.current.teardown === null) {
-      observe(/* shouldScheduleTeardown */ false);
+      observe(
+        operator,
+        subscription.current,
+        /* shouldScheduleTeardown */ false
+      );
     }
 
     if (!isInitial) {
       subscription.current.subject[1](input);
     }
-  }, [input, observe]);
+  }, [input, operator]);
 
   useIsomorphicEffect(() => {
     if (subscription.current.task !== null) {
