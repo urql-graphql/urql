@@ -61,7 +61,7 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [state] = useOperator(
+  const [state, update] = useOperator(
     subscription$$ =>
       pipe(
         subscription$$,
@@ -105,5 +105,5 @@ export const useSubscription = <T = any, R = T, V = object>(
     initialState
   );
 
-  return [state, () => {}];
+  return [state, update];
 };
