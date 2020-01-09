@@ -5906,10 +5906,9 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@4.0.0-rc.4:
+"wonka@https://github.pika.dev/kitten/wonka/pr/65":
   version "4.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.0-rc.4.tgz#d1f3f02da44c6b50fb3d463c72c92a8fa8368ae4"
-  integrity sha512-gIFR1GrKYvPHMeq8l2Umxqkr0HOmgAV5ikXnilNfoq7FgUXY8j88gSF6gFi5rtfUGX4T/E3SLvtqm5ovyT1k3A==
+  resolved "https://github.pika.dev/kitten/wonka/pr/65#7ca68095b43161f903adbb4378a8414029cb4a2b"
 
 wordwrap@~0.0.2:
   version "0.0.3"
