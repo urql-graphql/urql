@@ -205,8 +205,12 @@ export class Client {
     const result$ = pipe(
       operationResults$,
       takeUntil(teardown$),
-      onStart<OperationResult>(() => this.onOperationStart(operation)),
-      onEnd<OperationResult>(() => this.onOperationEnd(operation))
+      onStart<OperationResult>(() => {
+        this.onOperationStart(operation);
+      }),
+      onEnd<OperationResult>(() => {
+        this.onOperationEnd(operation);
+      })
     );
 
     return operation.context.suspense !== false &&

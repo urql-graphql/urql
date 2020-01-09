@@ -77,7 +77,8 @@ const makePlugins = (isProduction = false, outputFolder) => [
     ignoreGlobal: true,
     include: /\/node_modules\//,
     namedExports: {
-      'react': Object.keys(require('react'))
+      'react': Object.keys(require('react')),
+      'node_modules/scheduler/index.js': Object.keys(require('scheduler')),
     },
   }),
   typescript({

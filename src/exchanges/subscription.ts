@@ -108,10 +108,7 @@ export const subscriptionExchange = ({
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(
-          createSubscriptionSource(operation),
-          takeUntil(teardown$)
-        );
+        return pipe(createSubscriptionSource(operation), takeUntil(teardown$));
       })
     );
 

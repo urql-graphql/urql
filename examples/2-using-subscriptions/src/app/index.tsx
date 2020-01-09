@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import {
@@ -8,6 +8,7 @@ import {
   fetchExchange,
   Provider,
   subscriptionExchange,
+  dedupExchange,
 } from 'urql';
 import './index.css';
 import { Messages } from './Messages';
@@ -20,6 +21,7 @@ const subscriptionClient = new SubscriptionClient(
 const client = createClient({
   url: 'http://localhost:4000/graphql',
   exchanges: [
+    dedupExchange,
     debugExchange,
     cacheExchange,
     fetchExchange,
@@ -30,12 +32,14 @@ const client = createClient({
 });
 
 export const App: FC = () => (
-  <Provider value={client}>
-    <main>
-      <h1>New messages</h1>
-      <Messages />
-    </main>
-  </Provider>
+  <StrictMode>
+    <Provider value={client}>
+      <main>
+        <h1>New messages</h1>
+        <Messages />
+      </main>
+    </Provider>
+  </StrictMode>
 );
 
 App.displayName = 'App';

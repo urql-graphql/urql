@@ -10,7 +10,7 @@ export const dedupExchange: Exchange = ({ forward }) => {
     if (operationName === 'teardown') {
       inFlightKeys.delete(key);
       return true;
-    } else if (operationName !== 'query') {
+    } else if (operationName !== 'query' && operationName !== 'subscription') {
       return true;
     }
 
@@ -24,13 +24,7 @@ export const dedupExchange: Exchange = ({ forward }) => {
   };
 
   return ops$ => {
-    const forward$ = pipe(
-      ops$,
-      filter(filterIncomingOperation)
-    );
-    return pipe(
-      forward(forward$),
-      tap(afterOperationResult)
-    );
+    const forward$ = pipe(ops$, filter(filterIncomingOperation));
+    return pipe(forward(forward$), tap(afterOperationResult));
   };
 };
