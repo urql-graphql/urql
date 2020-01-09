@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useRef, useMemo } from 'react';
+import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import { useClient } from '../context';
