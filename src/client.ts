@@ -139,26 +139,22 @@ export class Client {
 
   private createOperationContext = (
     opts?: Partial<OperationContext>
-  ): OperationContext => {
-    const { requestPolicy = this.requestPolicy } = opts || {};
-
-    return {
-      url: this.url,
-      fetchOptions: this.fetchOptions,
-      fetch: this.fetch,
-      ...opts,
-      requestPolicy,
-    };
-  };
+  ): OperationContext => ({
+    url: this.url,
+    fetchOptions: this.fetchOptions,
+    fetch: this.fetch,
+    ...opts,
+    requestPolicy: (opts || {}).requestPolicy || this.requestPolicy,
+  });
 
   createRequestOperation = (
     type: OperationType,
-    { key, query, variables }: GraphQLRequest,
+    request: GraphQLRequest,
     opts?: Partial<OperationContext>
   ): Operation => ({
-    key,
-    query,
-    variables,
+    key: request.key,
+    query: request.query,
+    variables: request.variables,
     operationName: type,
     context: this.createOperationContext(opts),
   });
