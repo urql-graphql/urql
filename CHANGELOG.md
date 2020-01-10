@@ -8,6 +8,31 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.8.0](https://github.com/FormidableLabs/urql/compare/v1.7.0...v1.8.0)
+
+This release doesn't change any major feature aspects, but comes with bugfixes
+to our suspense and concurrent-mode handling. Due to an upgrade to `wonka@^4.0.0`
+this is a minor version though.
+
+In [v1.6.0](https://github.com/FormidableLabs/urql/blob/master/CHANGELOG.md#v160) we believed to
+have solved all issues related to suspense and concurrent mode. However there were
+still some remaining cases where concurrent mode behaved incorrectly. With the new
+`useOperator` hook in [`react-wonka@2.0.0`](https://github.com/kitten/react-wonka) we believe
+to have now fixed all issues.
+
+The initial mount of `useQuery` and `useSubscription` will now synchronously reflect
+whatever `urql` returns, most of the times those will be cached results. Afterwards
+all subsequent updates and fetches will be scheduled cooperatively with React on
+an effect.
+
+If you're using `wonka` for an exchange with `urql` you may want to upgrade to `wonka@^4.0.5` soon.
+You can still use the older `v3.2.2` which will work with the new version (even in the same bundle),
+unless you're making use of its `subscribe`, `make`, or `makeSubject` exports.
+[A migration guide can be found in the `wonka` docs.](https://wonka.kitten.sh/migration)
+
+- Support concurrent mode with all edge cases fully (see [#496](https://github.com/FormidableLabs/urql/pull/496))
+- Move to `react-wonka@2.0.0` with the prior fix in #496 (see [#499](https://github.com/FormidableLabs/urql/pull/499))
+
 ## [v1.7.0](https://github.com/FormidableLabs/urql/compare/v1.6.3...v1.7.0)
 
 This release splits our main package into two entrypoints. Importing from `urql` remains
