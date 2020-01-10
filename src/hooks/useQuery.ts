@@ -1,12 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+import { useOperator } from 'react-wonka';
 
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
-import { useOperator } from './useOperator';
 import { initialState } from './constants';
 
 export interface UseQueryArgs<V> {
