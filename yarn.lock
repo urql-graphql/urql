@@ -6050,6 +6050,11 @@ wonka@^3.2.1:
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.1.tgz#f66123fabbb260f23a4e89f1526317169203e258"
   integrity sha512-LpquZ9PJtYJ31AlMPp5tEba1y+S+wUmY7OyFLGZCmGSNO1ZOTTZGp/HbieFzP5fVJ9fWXCus3ecgDjwAssHSGg==
 
+"wonka@^3.2.1 || ^4.0.0":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.5.tgz#3384b90ed8c1e6e182d6e2fb18468c33ab94e0af"
+  integrity sha512-XKnzSpsk2UcPfyjecdc14b7LZSPeOEhYEs+/oAZ+gXV9BuYIcZC3hpapFi2DFHj1Bk38/npusgkiSD0+KdyCzQ==
+
 word-wrap@~1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.3.tgz#610636f6b1f703891bd34771ccb17fb93b47079c"

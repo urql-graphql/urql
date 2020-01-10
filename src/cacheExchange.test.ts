@@ -40,7 +40,7 @@ it('writes queries to the cache', () => {
     }
   );
 
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
   const result = jest.fn();
   const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
@@ -83,7 +83,7 @@ it('updates related queries when their data changes', () => {
   };
 
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
 
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
@@ -146,7 +146,7 @@ it('does nothing when no related queries have changed', () => {
   };
 
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
     .mockImplementation(next);
@@ -218,7 +218,7 @@ it('writes optimistic mutations to the cache', () => {
   };
 
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
 
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
@@ -275,7 +275,7 @@ it('writes optimistic mutations to the cache', () => {
 
 it('follows resolvers on initial write', () => {
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
 
   const opOne = client.createRequestOperation('query', {
     key: 1,
@@ -349,7 +349,7 @@ it('follows resolvers for mutations', () => {
   };
 
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
 
   const opOne = client.createRequestOperation('query', {
     key: 1,
@@ -431,7 +431,7 @@ it('follows nested resolvers for mutations', () => {
   `;
 
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
 
   const query = gql`
     query {
@@ -589,7 +589,7 @@ it('follows nested resolvers for mutations', () => {
 it('reexecutes query and returns data on partial result', () => {
   jest.useFakeTimers();
   const client = createClient({ url: '' });
-  const [ops$, next] = makeSubject<Operation>();
+  const { source: ops$, next } = makeSubject<Operation>();
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
     // Empty mock to avoid going in an endless loop, since we would again return
