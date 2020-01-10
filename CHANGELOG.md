@@ -8,6 +8,15 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v2.0.1](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v2.0.0...v2.0.1)
+
+This patch allows `wonka@^4.0.0` to be compatible with [`urql@1.8.0`](https://github.com/FormidableLabs/urql/blob/master/CHANGELOG.md#v180). It also fixes a couple of issues in our
+new `populateExchange`.
+
+- Fix nested types (e.g. `[Item!]!`) in `populateExchange` (see [#150](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/150))
+- Fix duplicate fragments in `populateExchange` output (see [#151](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/151))
+- Allow `wonka@^3.2.1||^4.0.0` to be used (see [#153](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/153))
+
 ## [v2.0.0](https://github.com/FormidableLabs/urql-exchange-graphcache/compare/v1.2.2...v2.0.0)
 
 > **Note:** The minimum required version of `urql` for this release is now `1.7.0`!
