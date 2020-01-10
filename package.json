@@ -134,8 +134,7 @@
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
-    "react": ">= 16.8.0",
-    "scheduler": ">= 0.16.0"
+    "react": ">= 16.8.0"
   },
   "dependencies": {
     "react-wonka": "^2.0.0",
