@@ -4,10 +4,7 @@ jest.mock('../client', () => {
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
     executeMutation: jest.fn(() =>
-      pipe(
-        fromValue({ data: 1, error: 2 }),
-        delay(200)
-      )
+      pipe(fromValue({ data: 1, error: 2 }), delay(200))
     ),
   };
 
@@ -40,7 +37,9 @@ describe('Mutation', () => {
   });
 
   it('Should execute the mutation', done => {
-    let execute = () => {},
+    let execute = () => {
+        /* noop */
+      },
       props = {};
     const Test = () => <p>Hi</p>;
     const App = () => {

@@ -43,11 +43,7 @@ it('resolves synchronously when the source resolves synchronously', () => {
 
 it('throws a promise when the source is not resolving immediately', () => {
   expect(() => {
-    pipe(
-      never,
-      toSuspenseSource as any,
-      subscribe(() => {})
-    );
+    pipe(never, toSuspenseSource as any, publish);
   }).toThrow(expect.any(Promise));
 });
 
