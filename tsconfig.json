@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "rootDir": "./src",
     "baseUrl": ".",
