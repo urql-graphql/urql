@@ -4,6 +4,7 @@ import { pipe, toPromise } from 'wonka';
 import { useClient } from '../context';
 import { OperationResult, OperationContext } from '../types';
 import { CombinedError, createRequest } from '../utils';
+import { initialState } from './constants';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -26,23 +27,11 @@ export const useMutation = <T = any, V = object>(
 ): UseMutationResponse<T, V> => {
   const client = useClient();
 
-  const [state, setState] = useState<UseMutationState<T>>({
-    fetching: false,
-    stale: false,
-    error: undefined,
-    data: undefined,
-    extensions: undefined,
-  });
+  const [state, setState] = useState<UseMutationState<T>>(initialState);
 
   const executeMutation = useCallback(
     (variables?: V, context?: Partial<OperationContext>) => {
-      setState({
-        fetching: true,
-        stale: false,
-        error: undefined,
-        data: undefined,
-        extensions: undefined,
-      });
+      setState({ ...initialState, fetching: true });
 
       const request = createRequest(query, variables as any);
 
@@ -50,8 +39,13 @@ export const useMutation = <T = any, V = object>(
         client.executeMutation(request, context || {}),
         toPromise
       ).then(result => {
-        const { stale, data, error, extensions } = result;
-        setState({ fetching: false, stale: !!stale, data, error, extensions });
+        setState({
+          fetching: false,
+          stale: !!result.stale,
+          data: result.data,
+          error: result.error,
+          extensions: result.extensions,
+        });
         return result;
       });
     },

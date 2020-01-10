@@ -7,14 +7,7 @@ import { CombinedError } from '../utils';
 import { OperationContext } from '../types';
 import { useRequest } from './useRequest';
 import { useOperator } from './useOperator';
-
-const initialState: UseSubscriptionState<any> = {
-  fetching: false,
-  stale: false,
-  data: undefined,
-  error: undefined,
-  extensions: undefined,
-};
+import { initialState } from './constants';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;

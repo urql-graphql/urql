@@ -7,14 +7,7 @@ import { OperationContext, RequestPolicy } from '../types';
 import { CombinedError } from '../utils';
 import { useRequest } from './useRequest';
 import { useOperator } from './useOperator';
-
-const initialState: UseQueryState<any> = {
-  fetching: false,
-  stale: false,
-  data: undefined,
-  error: undefined,
-  extensions: undefined,
-};
+import { initialState } from './constants';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;

@@ -6,9 +6,9 @@ export const composeExchanges = (exchanges: Exchange[]): Exchange => {
     return exchanges[0];
   }
 
-  return ({ client, forward: outerForward }) => {
+  return payload => {
     return exchanges.reduceRight((forward, exchange) => {
-      return exchange({ client, forward });
-    }, outerForward);
+      return exchange({ client: payload.client, forward });
+    }, payload.forward);
   };
 };
