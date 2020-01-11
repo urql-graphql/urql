@@ -60,12 +60,12 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "urql": "^1.8.1"
+    "urql": "^1.8.1",
+    "wonka": "^3.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@testing-library/preact": "^1.0.2",
     "@types/jest": "^24.0.22",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
@@ -81,7 +81,6 @@
     "jest": "^24.9.0",
     "lint-staged": "^9.4.2",
     "npm-run-all": "^4.1.5",
-    "preact": "^10.1.1",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "rollup": "^1.26.5",
