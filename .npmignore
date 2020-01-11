@@ -1,0 +1,14 @@
+/*
+!LICENSE
+!CHANGELOG.md
+!README.md
+!/core/package.json
+!/dist/**/*.{d.ts,js,js.map}
+!/src/**/*.{d.ts,ts,tsx}
+__snapshots__/
+test-utils/
+*.test.js
+*.test.jsx
+*.test.ts
+*.test.d.ts
+*.test.tsx
