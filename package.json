@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "A highly customizable and versatile GraphQL client for React",
   "repository": "https://www.github.com/FormidableLabs/urql",
   "bugs": {
@@ -136,8 +136,8 @@
     "react": ">= 16.8.0"
   },
   "dependencies": {
-    "scheduler": ">= 0.16.0",
     "react-wonka": "^2.0.0",
+    "scheduler": ">= 0.16.0",
     "wonka": "^4.0.5"
   }
 }
