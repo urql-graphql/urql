@@ -8,6 +8,15 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.8.1](https://github.com/FormidableLabs/urql/compare/v1.8.0...v1.8.1)
+
+This patch fixes `urql` relying on a quirk in older versions of `wonka` where
+shared sources wouldn't cascade cancellations, which they now do. This meant
+that when an app goes from some queries/subscriptions to having none at all,
+the exchange pipeline would be stopped completely.
+
+- Fix exchange pipeline stalling when all queries end (see [#503](https://github.com/FormidableLabs/urql/pull/503))
+
 ## [v1.8.0](https://github.com/FormidableLabs/urql/compare/v1.7.0...v1.8.0)
 
 This release doesn't change any major feature aspects, but comes with bugfixes
