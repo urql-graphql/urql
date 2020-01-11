@@ -52,6 +52,6 @@ describe('Subscription', () => {
     setTimeout(() => {
       expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
       done();
-    }, 200);
+    }, 300);
   });
 });
