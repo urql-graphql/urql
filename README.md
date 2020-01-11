@@ -1,6 +1,9 @@
 <div align="center">
   <br />
   <br />
+  <a href="https://www.npmjs.com/package/@urql/preact">
+    <img alt="Npm version" src="https://badgen.net/npm/v/@urql/preact" />
+  </a>
   <a href="https://travis-ci.org/JoviDeCroock/preact-urql">
     <img alt="Test Status" src="https://api.travis-ci.org/JoviDeCroock/preact-urql.svg?branch=master" />
   </a>
