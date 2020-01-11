@@ -5322,6 +5322,11 @@ wonka@^3.2.1:
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.2.tgz#4d5c79fee2e6042066ba7aa86bd2f180487cc0c3"
   integrity sha512-btmYyFDuDpJXJfELkFkoTjfyn0M+/a54/kjqt3qGN/h/90A8Ynq8qxG4b0uXBAOvJNRnWnL8+d0C3r6Clt8PYA==
 
+wonka@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.6.tgz#810e080f14f1ada7e5561b5504292de7fd5fdb1a"
+  integrity sha512-TYvOaAEyw50aracY97gXTcP5eifVNp+djbXbsBmR32luS4OTdIOBLasKH7SIlYVCATS5O5Fk0bP1gocg20AbIg==
+
 word-wrap@~1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.3.tgz#610636f6b1f703891bd34771ccb17fb93b47079c"

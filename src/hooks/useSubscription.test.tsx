@@ -7,6 +7,7 @@ import { Provider } from '../context';
 
 const data = { data: 1234, error: 5678 };
 const mock = {
+  // @ts-ignore
   executeSubscription: jest.fn(() => merge([fromValue(data), never])),
 };
 
@@ -14,7 +15,6 @@ const client = mock as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;
-// @ts-ignore
 let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
 const SubscriptionUser: FC<{

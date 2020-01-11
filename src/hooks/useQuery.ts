@@ -44,7 +44,7 @@ export const noop = () => {};
 export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
-  const unsubscribe = useRef(noop);
+  const unsubscribe = useRef<(_1?: any) => void>(noop);
   const client = useClient();
   const [state, setState] = useImmediateState<UseQueryState<T>>({
     ...initialState,
@@ -60,7 +60,7 @@ export const useQuery = <T = any, V = object>(
 
       setState(s => ({ ...s, fetching: true }));
 
-      [unsubscribe.current] = pipe(
+      const result = pipe(
         client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
           pollInterval: args.pollInterval,
@@ -78,6 +78,7 @@ export const useQuery = <T = any, V = object>(
           });
         })
       );
+      unsubscribe.current = result.unsubscribe;
     },
     [
       args.context,

@@ -34,7 +34,7 @@ export const useSubscription = <T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
 ): UseSubscriptionResponse<R> => {
-  const unsubscribe = useRef(noop);
+  const unsubscribe = useRef<(_1?: any) => void>(noop);
   const handlerRef = useRef(handler);
   const client = useClient();
 
@@ -56,7 +56,7 @@ export const useSubscription = <T = any, R = T, V = object>(
 
       setState(s => ({ ...s, fetching: true }));
 
-      [unsubscribe.current] = pipe(
+      const result = pipe(
         client.executeSubscription(request, {
           ...args.context,
           ...opts,
@@ -75,6 +75,7 @@ export const useSubscription = <T = any, R = T, V = object>(
           }));
         })
       );
+      unsubscribe.current = result.unsubscribe;
     },
     [client, request, setState, args.context]
   );
