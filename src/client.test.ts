@@ -195,10 +195,12 @@ describe('executeQuery', () => {
 
     expect(receivedOps.length).toEqual(1);
     jest.advanceTimersByTime(200);
-    expect(receivedOps.length).toEqual(3);
+    expect(receivedOps.length).toEqual(5);
     expect(receivedOps[0].operationName).toEqual('query');
-    expect(receivedOps[1].operationName).toEqual('query');
+    expect(receivedOps[1].operationName).toEqual('teardown');
     expect(receivedOps[2].operationName).toEqual('query');
+    expect(receivedOps[3].operationName).toEqual('teardown');
+    expect(receivedOps[4].operationName).toEqual('query');
     unsubscribe();
   });
 });

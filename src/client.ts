@@ -28,6 +28,7 @@ import {
   interval,
   fromValue,
   switchMap,
+  publish,
 } from 'wonka';
 
 import {
@@ -135,6 +136,10 @@ export class Client {
         forward: fallbackExchangeIO,
       })(this.operations$)
     );
+
+    // Prevent the `results$` exchange pipeline from being closed by active
+    // cancellations cascading up from components
+    pipe(this.results$, publish);
   }
 
   private createOperationContext = (
