@@ -9,13 +9,10 @@ export const mutate = <Response = any, Variables = object>(
   variables?: Variables,
   context?: Partial<OperationContext>
 ) => Promise<Response>) => (
-    variables?: Variables,
-    context?: Partial<OperationContext>
-  ): Promise<any> => {
-    const request = createRequest(query, variables as any);
-    return pipe(
-      getClient().executeMutation(
-        request,
-        context || {}
-      ), toPromise);
-  };
+  variables?: Variables,
+  context?: Partial<OperationContext>
+): Promise<any> => {
+  // TODO: temp
+  const request = createRequest(query, variables as any);
+  return pipe(getClient().executeMutation(request, context || {}), toPromise);
+};

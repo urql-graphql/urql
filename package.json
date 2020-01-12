@@ -23,9 +23,9 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
-    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
+    "testRegex": "(src/.*(\\.|/)(test|spec))\\.ts$",
     "moduleFileExtensions": [
       "js",
       "jsx",
@@ -61,6 +61,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "svelte-observable": "^0.4.0",
     "urql": "^1.8.1",
     "wonka": "^3.2.1"
   },
