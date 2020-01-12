@@ -14,7 +14,6 @@ export const mutate = <Response = any, Variables = object>(
     variables?: Variables,
     context?: Partial<OperationContext>
   ): Promise<any> => {
-    // TODO: temp
     const request = createRequest(query, variables as any);
     return pipe(client.executeMutation(request, context || {}), toPromise);
   };
