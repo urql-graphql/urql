@@ -22,7 +22,7 @@ const typesToIcon = new Map([
   ['Water', '/types/Water@2x.png'],
 ]);
 
-const queryPokemon = gql`
+const queryPokémon = gql`
   query pokemon($first: Int!) {
     pokemons(first: $first) {
       id
@@ -38,8 +38,31 @@ const queryPokemon = gql`
   }
 `;
 
-const PokemonList = () => {
-  const [result] = useQuery({ query: queryPokemon, variables: { first: 20 } });
+interface PokémonData {
+  pokemons: Pokémon[];
+}
+
+interface PokémonVariables {
+  first: number;
+}
+
+interface Pokémon {
+  id: string;
+  name: string;
+  types: string[];
+  resistant: string[];
+  weaknesses: string[];
+  image: string;
+  evolutions: {
+    name: string;
+  };
+}
+
+const PokémonList: React.FC = () => {
+  const [result] = useQuery<PokémonData, PokémonVariables>({
+    query: queryPokémon,
+    variables: { first: 20 },
+  });
 
   if (result.fetching || !result.data) {
     return null;
@@ -51,41 +74,37 @@ const PokemonList = () => {
 
   return (
     <>
-      <div className="pokemon-list">
-        {result.data.pokemons.map(pokemon => (
-          <div key={pokemon.id}>
-            <img src={pokemon.image} className="pokemon-image" />
+      <div className="pokémon-list">
+        {result.data.pokemons.map(pokémon => (
+          <div key={pokémon.id}>
+            <img src={pokémon.image} className="pokémon-image" />
             <div>
-              <h2>{pokemon.name}</h2>
-              <div className="pokemon-type-container">
-                {pokemon.types.map(type => {
-                  if (typesToIcon.get(type)) {
-                    return (
-                      <div className="pokemon-type-container__type" key={type}>
-                        <img
-                          src={typesToIcon.get(type)}
-                          className="pokemon-type-container__type-icon"
-                        />
-                        <span className="pokemon-type-container__type-text">
-                          {type}
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })}
+              <h2>{pokémon.name}</h2>
+              <div className="pokémon-type-container">
+                {pokémon.types
+                  .filter(type => typesToIcon.has(type))
+                  .map(type => (
+                    <div className="pokémon-type-container__type" key={type}>
+                      <img
+                        src={typesToIcon.get(type)}
+                        className="pokémon-type-container__type-icon"
+                      />
+                      <span className="pokémon-type-container__type-text">
+                        {type}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
         ))}
       </div>
-      <style jsx>{`
+      <style>{`
         * {
           font-family: monospace;
         }
 
-        .pokemon-list {
+        .pokémon-list {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           grid-template-rows: repeat(5, 1fr);
@@ -93,27 +112,27 @@ const PokemonList = () => {
           padding: 1rem;
         }
 
-        .pokemon-image {
+        .pokémon-image {
           height: 15rem;
         }
 
-        .pokemon-type-container,
-        .pokemon-type-container__type {
+        .pokémon-type-container,
+        .pokémon-type-container__type {
           display: flex;
         }
 
-        .pokemon-type-container__type {
+        .pokémon-type-container__type {
           margin-right: 0.5rem;
         }
 
-        .pokemon-type-container__type-text {
+        .pokémon-type-container__type-text {
           background: #f1f8ff;
           color: #0366d6;
           padding: 0.5rem;
           border-radius: 0.5rem;
         }
 
-        .pokemon-type-container__type-icon {
+        .pokémon-type-container__type-icon {
           height: 2rem;
         }
       `}</style>
@@ -121,4 +140,4 @@ const PokemonList = () => {
   );
 };
 
-export default PokemonList;
+export default PokémonList;
