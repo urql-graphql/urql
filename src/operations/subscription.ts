@@ -4,25 +4,21 @@ import { DocumentNode } from 'graphql';
 import { observe } from 'svelte-observable';
 import { getClient } from '../context';
 
-export interface QueryArguments<Variables> {
-  query: string | DocumentNode;
-  variables?: Variables;
-  requestPolicy?: RequestPolicy;
-  pollInterval?: number;
-  context?: Partial<OperationContext>;
+export interface SubscriptionArguments<Variables> {
+  query: DocumentNode | string;
+  variables?: V;
   pause?: boolean;
+  context?: Partial<OperationContext>;
 }
 
-export const query = <Variables = object>(args: QueryArguments<Variables>) => {
+export const subscribe = <Variables = object>(
+  args: QueryArguments<Variables>
+) => {
   const client = getClient();
   const request = createRequest(args.query, args.variables as any);
 
   const observable = pipe(
-    client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      pollInterval: args.pollInterval,
-      ...args.context,
-    }),
+    client.executeSubscription(request, args.context),
     subscribe(arg => arg)
   );
 
