@@ -72,7 +72,9 @@ it('throws a promise that resolves when the source emits a value', () => {
   expect(promise).toBeInstanceOf(Promise);
 
   next('test');
-  expect(result).toBe('test');
+
+  // The result came in asynchronously and the original source has ended
+  expect(result).toBe(undefined);
 
   return promise.then(resolved => {
     expect(resolved).toBe('test');
