@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "A highly customizable and versatile GraphQL client for React",
   "repository": "https://www.github.com/FormidableLabs/urql",
   "bugs": {
