@@ -47,8 +47,8 @@ export const useSubscription = <T = any, R = T, V = object>(
   const request = useRequest(args.query, args.variables);
 
   // Create a new subscription-source from client.executeSubscription
-  const makeSubscription$ = useMemo(
-    () => (opts?: Partial<OperationContext>) => {
+  const makeSubscription$ = useCallback(
+    (opts?: Partial<OperationContext>) => {
       return client.executeSubscription(request, { ...args.context, ...opts });
     },
     [client, request, args.context]
