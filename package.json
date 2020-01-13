@@ -136,8 +136,8 @@
     "react": ">= 16.8.0"
   },
   "dependencies": {
-    "react-wonka": "^2.0.0",
+    "react-wonka": "^2.0.1",
     "scheduler": ">= 0.16.0",
-    "wonka": "^4.0.5"
+    "wonka": "^4.0.7"
   }
 }

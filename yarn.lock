@@ -4718,10 +4718,10 @@ react-test-renderer@^16.0.0-0, react-test-renderer@^16.12.0:
     react-is "^16.8.6"
     scheduler "^0.18.0"
 
-react-wonka@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-2.0.0.tgz#d62d87c9c93ec3e603ecf1582df3615aadc5c2e9"
-  integrity sha512-7q0CNBnSltRyzb61joCxKqVntHbRJRhP/WPxEx+zM8l9Yd+0IRevJuPG8iCamgrGphusX5xtEtd4yyX7qvRM1g==
+react-wonka@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-2.0.1.tgz#75bdf03dbad8ceb8c1066216f635f05ce2b642a5"
+  integrity sha512-mM2UH2gnK5LLzaqVWd6JCLrB1vO3I4PN/sQZbjvzsjms4vSv+nKwelNUftM0KeC+LtTPC4GGsuxyu2XJnsCUTw==
 
 react@^16.12.0:
   version "16.12.0"
@@ -5981,10 +5981,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
-wonka@^4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.5.tgz#3384b90ed8c1e6e182d6e2fb18468c33ab94e0af"
-  integrity sha512-XKnzSpsk2UcPfyjecdc14b7LZSPeOEhYEs+/oAZ+gXV9BuYIcZC3hpapFi2DFHj1Bk38/npusgkiSD0+KdyCzQ==
+wonka@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.7.tgz#b4934685bd2449367bd72ce7770bfe3e6cc8a68b"
+  integrity sha512-Uhyl2cgWCUksYtU0Jt8MSzKUqK4BVUrewWxnn1YlKL3Zco4sDcCUDkbgH0i762HJs1rtsq03cfzsCWxJKaDgVg==
 
 word-wrap@~1.2.3:
   version "1.2.3"
