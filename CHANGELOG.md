@@ -8,6 +8,19 @@ If a change is missing an attribution, it may have been made by a Core Contribut
 
 _The format is based on [Keep a Changelog](http://keepachangelog.com/)._
 
+## [v1.8.2](https://github.com/FormidableLabs/urql/compare/v1.8.1...v1.8.2)
+
+This patch fixes client-side suspense. While we wouldn't recommend its use
+anymore, since suspense lends itself to prerendering instead of a loading
+primitive, we'd like to ensure that suspense-mode works as expected in `urql`.
+
+Also, as mentioned in `v1.8.0`'s notes, please ensure that `urql` upgrades to
+use `wonka@^4.0.7` to avoid any issues. If your bundler or packager uses a
+lower version with `urql`, you will see runtime errors.
+
+- Clean up unnecessary `useMemo` for `useCallback` in hooks (see [#504](https://github.com/FormidableLabs/urql/pull/504))
+- Fix synchronous, client-side suspense and simplify `toSuspenseSource` helper (see [#506](https://github.com/FormidableLabs/urql/pull/506))
+
 ## [v1.8.1](https://github.com/FormidableLabs/urql/compare/v1.8.0...v1.8.1)
 
 This patch fixes `urql` relying on a quirk in older versions of `wonka` where
