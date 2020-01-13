@@ -5,6 +5,7 @@
   "main": "rollup.config.js",
   "scripts": {
     "build": "rollup -c",
+    "watch": "rollup -c -w",
     "test": "jest"
   },
   "repository": {
