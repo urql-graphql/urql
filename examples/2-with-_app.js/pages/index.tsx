@@ -1,16 +1,16 @@
 import React from 'react';
 import Head from 'next/head';
 
-import PokemonList from '../components/pokemon_list';
+import PokémonList from '../components/pokemon_list';
 
-const Home = () => (
+const Home: React.FC = () => (
   <div>
     <Head>
       <title>Home</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
 
-    <PokemonList />
+    <PokémonList />
   </div>
 );
 
