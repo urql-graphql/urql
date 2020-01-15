@@ -54,7 +54,7 @@ Some of the available exchanges that extend `urql` are listed below in the ["Add
 - [Getting Started guide](https://formidable.com/open-source/urql/docs/getting-started/)
 - [Architecture](https://formidable.com/open-source/urql/docs/architecture/)
 - [Basics](https://formidable.com/open-source/urql/docs/basics/)
-- [Extending & Experimenting](https://formidable.com/open-source/urql/docs/extending-&-experimenting/)
+- [Extending & Experimenting](https://formidable.com/open-source/urql/docs/extending-and-experimenting/)
 - [API](https://formidable.com/open-source/urql/docs/api/)
 - [Guides](./docs/guides.md)
 
