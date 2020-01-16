@@ -45,7 +45,7 @@
 
 While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
 
-Some of the available exchanges that extend `urql` are listed below in the ["Add on Exchanges" list](https://github.com/FormidableLabs/urql#-add-on-exchanges) including a normalized cache and a Chrome devtools extension.
+Some of the available exchanges that extend `urql` are listed below in the ["Ecosystem" list](https://github.com/FormidableLabs/urql#-ecosystem) including a normalized cache and a Chrome devtools extension.
 
 ## 📃 [Documentation](https://formidable.com/open-source/urql/docs)
 
