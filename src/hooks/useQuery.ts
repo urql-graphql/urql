@@ -4,7 +4,8 @@ import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
-import { useSource, useBehaviourSubject, CombinedError } from '../utils';
+import { CombinedError } from '../utils';
+import { useSource, useBehaviourSubject } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
