@@ -3,15 +3,17 @@
 
 import { useMemo, useEffect } from 'react';
 import { Subscription, Unsubscribe, useSubscription } from 'use-subscription';
+
 import {
   Source,
   make,
   makeSubject,
+  empty,
   pipe,
   concat,
   onPush,
   share,
-  take,
+  takeUntil,
   toArray,
   subscribe,
 } from 'wonka';
@@ -31,7 +33,7 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
       return {
         getCurrentValue(): T {
           if (hasUpdate) return currentValue;
-          const values = pipe(shared, take(1), toArray);
+          const values = pipe(shared, takeUntil(empty), toArray);
           return values.length ? values[0] : currentValue;
         },
         subscribe(onValue: () => void): Unsubscribe {
