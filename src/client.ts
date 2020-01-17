@@ -90,6 +90,9 @@ export class Client {
   activeOperations = Object.create(null) as ActiveOperations;
 
   constructor(opts: ClientOptions) {
+    if (process.env.NODE_ENV !== 'production' && !opts.url) {
+      console.warn('You are creating an urql-client without a url.');
+    }
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions;
     this.fetch = opts.fetch;
