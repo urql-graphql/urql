@@ -1,10 +1,9 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useOperator } from 'react-wonka';
 
 import { useClient } from '../context';
-import { CombinedError } from '../utils';
+import { useSource, useBehaviourSubject, CombinedError } from '../utils';
 import { OperationContext } from '../types';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
@@ -54,9 +53,16 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [state, update] = useOperator(
-    subscription$$ =>
-      pipe(
+  const [subscription$$, update] = useBehaviourSubject(
+    useMemo(() => (args.pause ? null : makeSubscription$()), [
+      args.pause,
+      makeSubscription$,
+    ])
+  );
+
+  const state = useSource(
+    useMemo(() => {
+      return pipe(
         subscription$$,
         switchMap(subscription$ => {
           if (!subscription$) return fromValue({ fetching: false });
@@ -90,11 +96,8 @@ export const useSubscription = <T = any, R = T, V = object>(
               : result.data;
           return { ...result, stale: false, ...partial, data };
         }, initialState)
-      ),
-    useMemo(() => (args.pause ? null : makeSubscription$()), [
-      args.pause,
-      makeSubscription$,
-    ]),
+      );
+    }, [subscription$$]),
     initialState
   );
 

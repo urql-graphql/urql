@@ -1,11 +1,10 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useOperator } from 'react-wonka';
 
 import { useClient } from '../context';
 import { OperationContext, RequestPolicy } from '../types';
-import { CombinedError } from '../utils';
+import { useSource, useBehaviourSubject, CombinedError } from '../utils';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -53,9 +52,13 @@ export const useQuery = <T = any, V = object>(
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
-  const [state, update] = useOperator(
-    query$$ =>
-      pipe(
+  const [query$$, update] = useBehaviourSubject(
+    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$])
+  );
+
+  const state = useSource(
+    useMemo(() => {
+      return pipe(
         query$$,
         switchMap(query$ => {
           if (!query$) return fromValue({ fetching: false });
@@ -86,8 +89,8 @@ export const useQuery = <T = any, V = object>(
           }),
           initialState
         )
-      ),
-    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
+      );
+    }, [query$$]),
     initialState
   );
 
