@@ -8,13 +8,10 @@ import {
   Source,
   make,
   makeSubject,
-  empty,
   pipe,
   concat,
   onPush,
-  share,
-  takeUntil,
-  toArray,
+  publish,
   subscribe,
 } from 'wonka';
 
@@ -24,24 +21,21 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
       let hasUpdate = false;
       let currentValue: T = init;
 
-      const shared = pipe(
+      const updateValue = pipe(
         source,
-        onPush(value => (currentValue = value)),
-        share
+        onPush(value => (currentValue = value))
       );
 
       return {
         getCurrentValue(): T {
-          if (hasUpdate) return currentValue;
-          const values = pipe(shared, takeUntil(empty), toArray);
-          return values.length ? values[values.length - 1] : currentValue;
+          if (!hasUpdate) publish(updateValue).unsubscribe();
+          return currentValue;
         },
         subscribe(onValue: () => void): Unsubscribe {
           return pipe(
-            shared,
-            subscribe(value => {
+            updateValue,
+            subscribe(() => {
               hasUpdate = true;
-              currentValue = value;
               onValue();
               hasUpdate = false;
             })
