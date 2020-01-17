@@ -34,7 +34,7 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
         getCurrentValue(): T {
           if (hasUpdate) return currentValue;
           const values = pipe(shared, takeUntil(empty), toArray);
-          return values.length ? values[0] : currentValue;
+          return values.length ? values[values.length - 1] : currentValue;
         },
         subscribe(onValue: () => void): Unsubscribe {
           return pipe(
