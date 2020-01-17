@@ -67,7 +67,9 @@ export const useBehaviourSubject = <T>(value: T) => {
     return [source, subject.next];
   });
 
-  useEffect(() => state[1](value), [state, value]);
+  useEffect(() => {
+    state[1](value);
+  }, [state, value]);
 
   return state;
 };
