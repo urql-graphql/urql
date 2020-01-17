@@ -1,4 +1,7 @@
-import { useMemo, useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import { useMemo, useEffect } from 'react';
 import { Subscription, Unsubscribe, useSubscription } from 'use-subscription';
 import {
   Source,
@@ -43,11 +46,11 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
           ).unsubscribe as Unsubscribe;
         },
       };
-    }, [init, source])
+    }, [source])
   );
 
 export const useBehaviourSubject = <T>(value: T) => {
-  const [state] = useState((): [Source<T>, (value: T) => void] => {
+  const state = useMemo((): [Source<T>, (value: T) => void] => {
     let prevValue = value;
 
     const prevValueSource = make<T>(observer => {
@@ -65,7 +68,7 @@ export const useBehaviourSubject = <T>(value: T) => {
     );
 
     return [source, subject.next];
-  });
+  }, []);
 
   useEffect(() => {
     state[1](value);
