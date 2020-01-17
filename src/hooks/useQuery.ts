@@ -61,11 +61,11 @@ export const useQuery = <T = any, V = object>(
       return pipe(
         query$$,
         switchMap(query$ => {
-          if (!query$) return fromValue({ fetching: false });
+          if (!query$) return fromValue({ fetching: false, stale: false });
 
           return concat([
             // Initially set fetching to true
-            fromValue({ fetching: true }),
+            fromValue({ fetching: true, stale: false }),
             pipe(
               query$,
               map(({ stale, data, error, extensions }) => ({
@@ -77,14 +77,13 @@ export const useQuery = <T = any, V = object>(
               }))
             ),
             // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false }),
+            fromValue({ fetching: false, stale: false }),
           ]);
         }),
         // The individual partial results are merged into each previous result
         scan(
-          (result, partial: { fetching: boolean }) => ({
+          (result, partial) => ({
             ...result,
-            stale: false,
             ...partial,
           }),
           initialState

@@ -69,7 +69,7 @@ export const useSubscription = <T = any, R = T, V = object>(
 
           return concat([
             // Initially set fetching to true
-            fromValue({ fetching: true }),
+            fromValue({ fetching: true, stale: false }),
             pipe(
               subscription$,
               map(({ stale, data, error, extensions }) => ({
@@ -81,7 +81,7 @@ export const useSubscription = <T = any, R = T, V = object>(
               }))
             ),
             // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false }),
+            fromValue({ fetching: false, stale: false }),
           ]);
         }),
         // The individual partial results are merged into each previous result
@@ -94,7 +94,7 @@ export const useSubscription = <T = any, R = T, V = object>(
                 ? handler(result.data, partial.data)
                 : partial.data
               : result.data;
-          return { ...result, stale: false, ...partial, data };
+          return { ...result, ...partial, data };
         }, initialState)
       );
     }, [subscription$$]),
