@@ -4,6 +4,7 @@ export * from './result';
 export * from './typenames';
 export * from './toSuspenseSource';
 export * from './stringifyVariables';
+export * from './useSource';
 export * from './withPromise';
 
 export const noop = () => {
