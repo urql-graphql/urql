@@ -1,16 +1,9 @@
 <script>
-  import { createSvelteClient, mutate, query } from '../../dist/es';
-  console.log(query);
+  import { createSvelteClient, query } from '../../dist/es';
+  let i = 0;
   const client = createSvelteClient({ url: "https://0ufyz.sse.codesandbox.io" });
-  const toggleTodo = mutate(`
-    mutation($id: ID!) {
-      toggleTodo(id: $id) {
-        id
-      }
-    }
-  `);
 
-  const getTodos = query({
+  $: getTodos = query({
     query: `
       query {
         todos {
@@ -19,17 +12,11 @@
           complete
         }
       }
-    `
-  })
+    `, variables: { i },
+  });
+  const increment = () => i = i + 1;
 </script>
 
-<div>
-  <h1>Hello urql!</h1>
-  <button on:click={() => {
-    console.log('toggling');
-    toggleTodo({ id: 0 }).then(console.log).catch(console.error)
-  }}>Toggle</button>
-</div>
 {#await $getTodos}
 Loading...
 {:then result}
@@ -39,3 +26,4 @@ Loading...
 {:catch error}
   Error: {error}
 {/await}
+<button on:click={increment}>Increment {i}</button>
