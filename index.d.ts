@@ -1,5 +1,5 @@
 import React from 'react';
-import { NextComponentClass, NextContext, NextFC } from 'next';
+import { NextPageContext, NextPage, NextComponentType } from 'next';
 import { Client, ClientOptions, Exchange } from 'urql';
 import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 
@@ -18,24 +18,21 @@ interface PageProps {
   pageProps?: WithUrqlClient;
 }
 
-export interface NextContextWithAppTree extends NextContext {
-  AppTree: React.ComponentType<any>;
+export interface NextUrqlContext extends NextPageContext {
   urqlClient: Client;
 }
 
 type NextUrqlClientConfig =
   | NextUrqlClientOptions
-  | ((ctx: NextContext<any, any>) => NextUrqlClientOptions);
+  | ((ctx: NextPageContext) => NextUrqlClientOptions);
 
 declare const withUrqlClient: <T = any, IP = any>(
-  clientOptions: NextUrqlClientConfig,
+  clientConfig: NextUrqlClientConfig,
   mergeExchanges?: (ssrEx: SSRExchange) => Exchange[],
 ) => (
-  Page:
-    | NextComponentClass<T & IP & WithUrqlClient, IP>
-    | NextFC<T & IP & WithUrqlClient, IP>,
-) => NextFC<
-  T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps,
+  Page: NextPage<T & IP & WithUrqlClient, IP>,
+) => NextComponentType<
+  NextUrqlContext,
   IP | (IP & WithUrqlInitialProps),
-  NextContextWithAppTree
+  T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps
 >;

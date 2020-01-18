@@ -1,5 +1,5 @@
 import React from 'react';
-import { NextComponentClass, NextFC, NextContext } from 'next';
+import { NextPage, NextPageContext, NextComponentType } from 'next';
 import ssrPrepass from 'react-ssr-prepass';
 import {
   Provider,
@@ -29,14 +29,13 @@ interface PageProps {
   pageProps?: WithUrqlClient;
 }
 
-export interface NextContextWithAppTree extends NextContext {
-  AppTree: React.ComponentType<any>;
+export interface NextUrqlContext extends NextPageContext {
   urqlClient: Client;
 }
 
 type NextUrqlClientConfig =
   | NextUrqlClientOptions
-  | ((ctx: NextContext<any, any>) => NextUrqlClientOptions);
+  | ((ctx: NextPageContext) => NextUrqlClientOptions);
 
 function withUrqlClient<T = any, IP = any>(
   clientConfig: NextUrqlClientConfig,
@@ -47,15 +46,11 @@ function withUrqlClient<T = any, IP = any>(
     fetchExchange,
   ],
 ) {
-  return (
-    Page:
-      | NextComponentClass<T & IP & WithUrqlClient, IP>
-      | NextFC<T & IP & WithUrqlClient, IP>,
-  ) => {
-    const withUrql: NextFC<
-      T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps,
+  return (Page: NextPage<T & IP & WithUrqlClient, IP>) => {
+    const withUrql: NextComponentType<
+      NextUrqlContext,
       IP | (IP & WithUrqlInitialProps),
-      NextContextWithAppTree
+      T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps
     > = ({ urqlClient, urqlState, clientOptions, pageProps, ...rest }) => {
       /**
        * The React Hooks ESLint plugin will not interpret withUrql as a React component
@@ -77,7 +72,7 @@ function withUrqlClient<T = any, IP = any>(
       );
     };
 
-    withUrql.getInitialProps = async (ctx: NextContextWithAppTree) => {
+    withUrql.getInitialProps = async (ctx: NextPageContext) => {
       const { AppTree } = ctx;
 
       const opts =
@@ -85,13 +80,13 @@ function withUrqlClient<T = any, IP = any>(
       const [urqlClient, ssrCache] = initUrqlClient(opts);
 
       if (urqlClient) {
-        ctx.urqlClient = urqlClient;
+        (ctx as NextUrqlContext).urqlClient = urqlClient;
       }
 
       // Run the wrapped component's getInitialProps function.
       let pageProps = {} as IP;
       if (Page.getInitialProps) {
-        pageProps = await Page.getInitialProps(ctx);
+        pageProps = await Page.getInitialProps(ctx as NextUrqlContext);
       }
 
       /**

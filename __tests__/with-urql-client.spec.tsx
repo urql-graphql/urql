@@ -1,12 +1,10 @@
 import React from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { NextFC } from 'next';
+import { NextComponentType } from 'next';
 import { Client, defaultExchanges, composeExchanges } from 'urql';
 
-import withUrqlClient, {
-  NextContextWithAppTree,
-} from '../src/with-urql-client';
+import withUrqlClient, { NextUrqlContext } from '../src/with-urql-client';
 import * as init from '../src/init-urql-client';
 
 interface Props {
@@ -27,9 +25,9 @@ describe('withUrqlClient', () => {
   });
 
   describe('with client options', () => {
-    let Component: NextFC<any>;
+    let Component: NextComponentType<any>;
 
-    const mockContext: NextContextWithAppTree = {
+    const mockContext: NextUrqlContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {
@@ -72,14 +70,14 @@ describe('withUrqlClient', () => {
   });
 
   describe('with ctx callback to create client options', () => {
-    let Component: NextFC<any>;
+    let Component: NextComponentType<any>;
 
     // Fake up a string to simulate, say, a token accessed via browser cookies or localStorage.
     const token = Math.random()
       .toString(36)
       .slice(-10);
 
-    const mockContext: NextContextWithAppTree = {
+    const mockContext: NextUrqlContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {
@@ -90,7 +88,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      },
+      } as NextUrqlContext['req'],
       urqlClient: {} as Client,
     };
 
@@ -98,7 +96,7 @@ describe('withUrqlClient', () => {
       Component = withUrqlClient(ctx => ({
         url: 'http://localhost:3000',
         fetchOptions: {
-          headers: { Authorization: ctx.req.headers.cookie },
+          headers: { Authorization: ctx.req!.headers.cookie as string },
         },
       }))(MockApp);
     });
@@ -116,7 +114,7 @@ describe('withUrqlClient', () => {
   });
 
   describe('with mergeExchanges provided', () => {
-    let Component: NextFC<any>;
+    let Component: NextComponentType<any>;
     const mockMergeExchanges = jest.fn(() => defaultExchanges);
 
     beforeEach(() => {
