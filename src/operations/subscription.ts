@@ -1,26 +1,20 @@
-import { RequestPolicy, OperationContext, createRequest } from 'urql/core';
-import { pipe, subscribe } from 'wonka';
+import { OperationContext, createRequest } from 'urql/core';
 import { DocumentNode } from 'graphql';
-import { observe } from 'svelte-observable';
 import { getClient } from '../context';
+import { observe } from './observe';
 
 export interface SubscriptionArguments<Variables> {
   query: DocumentNode | string;
-  variables?: V;
+  variables?: Variables;
   pause?: boolean;
   context?: Partial<OperationContext>;
 }
 
 export const subscribe = <Variables = object>(
-  args: QueryArguments<Variables>
+  args: SubscriptionArguments<Variables>
 ) => {
   const client = getClient();
   const request = createRequest(args.query, args.variables as any);
 
-  const observable = pipe(
-    client.executeSubscription(request, args.context),
-    subscribe(arg => arg)
-  );
-
-  return observe(observable);
+  return observe(client.executeSubscription(request, args.context));
 };
