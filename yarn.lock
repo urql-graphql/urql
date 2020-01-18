@@ -4016,10 +4016,10 @@ react-is@^16.8.4:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.12.0.tgz#2cc0fe0fba742d97fd527c42a13bec4eeb06241c"
   integrity sha512-rPCkf/mWBtKc97aLL9/txD8DZdemK0vkA3JMLShjlJB3Pj3s+lpf1KaBzMfQrAmhMQB0n1cU/SUGgKKBCe837Q==
 
-react-wonka@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-2.0.0.tgz#d62d87c9c93ec3e603ecf1582df3615aadc5c2e9"
-  integrity sha512-7q0CNBnSltRyzb61joCxKqVntHbRJRhP/WPxEx+zM8l9Yd+0IRevJuPG8iCamgrGphusX5xtEtd4yyX7qvRM1g==
+react-wonka@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-wonka/-/react-wonka-2.0.1.tgz#75bdf03dbad8ceb8c1066216f635f05ce2b642a5"
+  integrity sha512-mM2UH2gnK5LLzaqVWd6JCLrB1vO3I4PN/sQZbjvzsjms4vSv+nKwelNUftM0KeC+LtTPC4GGsuxyu2XJnsCUTw==
 
 read-pkg-up@^2.0.0:
   version "2.0.0"
@@ -4862,11 +4862,6 @@ supports-color@^7.1.0:
   dependencies:
     has-flag "^4.0.0"
 
-svelte-observable@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/svelte-observable/-/svelte-observable-0.4.0.tgz#74756e42fa3516c154d53f4244fa9cf691854224"
-  integrity sha512-e8CfnkUfOZ/nAIpdFi+g63lS5oU+8J+KKhwkHpO0/reADeTBbIiVbcCqVrLsETp8+i+4ydQoawNCwMP/C8oMyA==
-
 svelte@^3.16.7:
   version "3.16.7"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.16.7.tgz#9ade80a4bbbac95595c676dd817222f632fa2c07"
@@ -5145,14 +5140,14 @@ urlgrey@^0.4.4:
   resolved "https://registry.yarnpkg.com/urlgrey/-/urlgrey-0.4.4.tgz#892fe95960805e85519f1cd4389f2cb4cbb7652f"
   integrity sha1-iS/pWWCAXoVRnxzUOJ8stMu3ZS8=
 
-urql@^1.8.1:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/urql/-/urql-1.8.1.tgz#a78d806c1e740b5a9672da19c9727786908b6be5"
-  integrity sha512-tjIevDBTnK9QRpBhvqHBKTFXw7jIenWShssLzQNw5n6ZwfnfDNPROi2En+JwvdCd5t9nFFkf34XC67swLmPjMw==
+urql@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-1.8.2.tgz#66fcd111c346c45e647b7905fc6291e044425b06"
+  integrity sha512-ilTTkRxQrY1H9kz8YPFjE4Npe9J540uxT4tUb5kTP1Cs+xJCjxKcqIVPZtRkrLw/1pUM5vKxg4a3I2GYFLmHoQ==
   dependencies:
-    react-wonka "^2.0.0"
+    react-wonka "^2.0.1"
     scheduler ">= 0.16.0"
-    wonka "^4.0.5"
+    wonka "^4.0.7"
 
 use@^3.1.0:
   version "3.1.1"
@@ -5269,15 +5264,10 @@ widest-line@^3.1.0:
   dependencies:
     string-width "^4.0.0"
 
-wonka@^3.2.1:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.2.tgz#4d5c79fee2e6042066ba7aa86bd2f180487cc0c3"
-  integrity sha512-btmYyFDuDpJXJfELkFkoTjfyn0M+/a54/kjqt3qGN/h/90A8Ynq8qxG4b0uXBAOvJNRnWnL8+d0C3r6Clt8PYA==
-
-wonka@^4.0.5:
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.6.tgz#810e080f14f1ada7e5561b5504292de7fd5fdb1a"
-  integrity sha512-TYvOaAEyw50aracY97gXTcP5eifVNp+djbXbsBmR32luS4OTdIOBLasKH7SIlYVCATS5O5Fk0bP1gocg20AbIg==
+wonka@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.7.tgz#b4934685bd2449367bd72ce7770bfe3e6cc8a68b"
+  integrity sha512-Uhyl2cgWCUksYtU0Jt8MSzKUqK4BVUrewWxnn1YlKL3Zco4sDcCUDkbgH0i762HJs1rtsq03cfzsCWxJKaDgVg==
 
 word-wrap@~1.2.3:
   version "1.2.3"
