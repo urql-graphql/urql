@@ -1,30 +1,25 @@
-import { readable } from 'svelte/store';
+import { readable, Readable } from 'svelte/store';
 import { pipe, subscribe } from 'wonka';
-
-export type Fulfill<T> = (value: T) => void;
-export type Reject = (error: Error) => void;
-export type Deferred<T> = T | Promise<T>;
+import { OperationResult } from 'urql';
 
 export interface Resolve<T> {
-  fulfill: Fulfill<T>;
-  reject: Reject;
+  fulfill: (value: T) => void;
+  reject: (error: Error) => void;
 }
 
 function deferred<T>(
-  set: (value: Deferred<T>) => void,
+  set: (value: T | Promise<T>) => void,
   initial?: T
 ): Resolve<T> {
-  let initialized = initial !== undefined;
-  let resolve: (value: T) => void | undefined;
-  let reject: (error: Error) => void | undefined;
+  let resolve: (value: T) => void | undefined,
+    reject: (error: Error) => void | undefined,
+    initialized = initial !== undefined;
 
-  // Set initial value
   set(
     initialized
-      ? initial!
-      : new Promise<T>((_resolve, _reject) => {
-          resolve = _resolve;
-          reject = _reject;
+      ? (initial as T)
+      : new Promise<T>((res, rej) => {
+          (resolve = res), (reject = rej);
         })
   );
 
@@ -44,19 +39,21 @@ function deferred<T>(
   };
 }
 
-export function observe<T>(observable: any, initial?: T): any {
-  return readable((undefined as unknown) as Deferred<T>, set => {
-    const { fulfill, reject } = deferred<T>(set, initial);
+export function observe<T>(
+  observable: any,
+  initial?: OperationResult<T>
+): Readable<OperationResult<T> | undefined> {
+  return readable(initial, set => {
+    const p = deferred<OperationResult<T>>(set as any, initial);
 
     const subscription = pipe(
       observable,
-      subscribe((res: any) => {
-        if (res.error) reject(res.error);
-        else fulfill(res);
+      subscribe((res: OperationResult<T>) => {
+        if (res.error) p.reject(res.error);
+        else p.fulfill(res);
       })
     );
 
-    // @ts-ignore
     return () => subscription.unsubscribe();
   });
 }
