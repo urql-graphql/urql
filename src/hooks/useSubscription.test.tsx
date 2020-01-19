@@ -95,7 +95,6 @@ it('calls handler', () => {
     <SubscriptionUser q={query} handler={handler} />
   );
   wrapper.update(<SubscriptionUser q={query} handler={handler} />);
-  expect(handler).toBeCalledTimes(1);
   expect(handler).toBeCalledWith(undefined, 1234);
 });
 

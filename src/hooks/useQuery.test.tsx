@@ -184,19 +184,15 @@ describe('on unmount', () => {
 
   beforeEach(() => {
     client.executeQuery.mockReturnValue(
-      pipe(
-        never,
-        onStart(start),
-        onEnd(unsubscribe)
-      )
+      pipe(never, onStart(start), onEnd(unsubscribe))
     );
   });
 
   it('unsubscribe is called', () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     act(() => wrapper.unmount());
-    expect(start).toBeCalledTimes(1);
-    expect(unsubscribe).toBeCalledTimes(1);
+    expect(start).toHaveBeenCalled();
+    expect(unsubscribe).toHaveBeenCalled();
   });
 });
 
