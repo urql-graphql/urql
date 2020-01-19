@@ -117,7 +117,7 @@ describe('on error', () => {
 });
 
 describe('on teardown', () => {
-  it('aborts the outgoing request', () => {
+  it('does not start the outgoing request on immediate teardowns', () => {
     fetch.mockReturnValue(Promise.reject(abortError));
 
     const { unsubscribe } = pipe(
@@ -125,6 +125,22 @@ describe('on teardown', () => {
       fetchExchange(exchangeArgs),
       subscribe(fail)
     );
+
+    unsubscribe();
+    expect(fetch).toHaveBeenCalledTimes(0);
+    expect(abort).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts the outgoing request', async () => {
+    fetch.mockReturnValue(Promise.reject(abortError));
+
+    const { unsubscribe } = pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      subscribe(fail)
+    );
+
+    await Promise.resolve();
 
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(1);

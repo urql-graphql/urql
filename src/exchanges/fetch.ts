@@ -99,15 +99,18 @@ const createFetchSource = (operation: Operation) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
-    executeFetch(operation, fetchOptions).then(result => {
-      if (result !== undefined) {
-        next(result);
-      }
+    let ended = false;
 
-      complete();
+    executeFetch(operation, fetchOptions).then(result => {
+      if (!ended) {
+        ended = true;
+        if (result !== undefined) next(result);
+        complete();
+      }
     });
 
     return () => {
+      ended = true;
       if (abortController !== undefined) {
         abortController.abort();
       }
@@ -117,10 +120,10 @@ const createFetchSource = (operation: Operation) => {
 
 const executeFetch = (operation: Operation, opts: RequestInit) => {
   const { url, fetch: fetcher } = operation.context;
-
   let response: Response | undefined;
 
-  return (fetcher || fetch)(url, opts)
+  return Promise.resolve()
+    .then(() => (fetcher || fetch)(url, opts))
     .then(res => {
       const { status } = res;
       const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
