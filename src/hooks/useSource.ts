@@ -6,9 +6,10 @@ import { Subscription, Unsubscribe, useSubscription } from 'use-subscription';
 
 import {
   Source,
-  make,
+  fromValue,
   makeSubject,
   pipe,
+  map,
   concat,
   onPush,
   publish,
@@ -49,21 +50,20 @@ export const useBehaviourSubject = <T>(value: T) => {
   const state = useMemo((): [Source<T>, (value: T) => void] => {
     let prevValue = value;
 
-    const prevValueSource = make<T>(observer => {
-      observer.next(prevValue);
-      observer.complete();
-      return () => {
-        /* noop */
-      };
-    });
-
     const subject = makeSubject<T>();
-    const source = pipe(
-      concat([prevValueSource, subject.source]),
-      onPush(value => (prevValue = value))
+    const prevValue$ = pipe(
+      fromValue(value),
+      map(() => prevValue)
     );
 
-    return [source, subject.next];
+    const source = concat([prevValue$, subject.source]);
+
+    const next = (value: T) => {
+      prevValue = value;
+      subject.next(value);
+    };
+
+    return [source, next];
   }, []);
 
   useEffect(() => {
