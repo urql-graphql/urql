@@ -24,7 +24,9 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
 
       const updateValue = pipe(
         source,
-        onPush(value => (currentValue = value))
+        onPush(value => {
+          currentValue = value;
+        })
       );
 
       return {
@@ -59,8 +61,7 @@ export const useBehaviourSubject = <T>(value: T) => {
     const source = concat([prevValue$, subject.source]);
 
     const next = (value: T) => {
-      prevValue = value;
-      subject.next(value);
+      subject.next((prevValue = value));
     };
 
     return [source, next];
