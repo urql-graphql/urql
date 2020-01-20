@@ -3,6 +3,7 @@ import { makeSubject, pipe, map, publish, forEach, Subject } from 'wonka';
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { ExchangeIO, Operation } from '../types';
+import { CombinedError } from '../utils';
 import { ssrExchange } from './ssr';
 
 let forward: ExchangeIO;
@@ -36,6 +37,36 @@ it('caches query results correctly', () => {
     [queryOperation.key]: {
       data: queryResponse.data,
       error: undefined,
+    },
+  });
+});
+
+it('caches errored query results correctly', () => {
+  output.mockReturnValueOnce({
+    ...queryResponse,
+    data: null,
+    error: new CombinedError({
+      graphQLErrors: ['Oh no!'],
+    }),
+  });
+
+  const ssr = ssrExchange();
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+
+  const data = ssr.extractData();
+  expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
+
+  expect(data).toEqual({
+    [queryOperation.key]: {
+      data: null,
+      error: {
+        graphQLErrors: ['Oh no!'],
+        networkError: undefined,
+      },
     },
   });
 });
