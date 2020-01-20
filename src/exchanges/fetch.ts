@@ -101,13 +101,15 @@ const createFetchSource = (operation: Operation) => {
 
     let ended = false;
 
-    executeFetch(operation, fetchOptions).then(result => {
-      if (!ended) {
-        ended = true;
-        if (result !== undefined) next(result);
-        complete();
-      }
-    });
+    Promise.resolve()
+      .then(() => (ended ? undefined : executeFetch(operation, fetchOptions)))
+      .then((result: OperationResult | undefined) => {
+        if (!ended) {
+          ended = true;
+          if (result) next(result);
+          complete();
+        }
+      });
 
     return () => {
       ended = true;
@@ -118,12 +120,14 @@ const createFetchSource = (operation: Operation) => {
   });
 };
 
-const executeFetch = (operation: Operation, opts: RequestInit) => {
+const executeFetch = (
+  operation: Operation,
+  opts: RequestInit
+): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let response: Response | undefined;
 
-  return Promise.resolve()
-    .then(() => (fetcher || fetch)(url, opts))
+  return (fetcher || fetch)(url, opts)
     .then(res => {
       const { status } = res;
       const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
