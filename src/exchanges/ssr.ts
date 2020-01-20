@@ -37,8 +37,8 @@ const serializeResult = ({
   const result: SerializedResult = { data, error: undefined };
   if (error !== undefined) {
     result.error = {
-      networkError: '' + error.networkError,
-      graphQLErrors: error.graphQLErrors.map(x => '' + x),
+      graphQLErrors: error.graphQLErrors.map(x => x.message),
+      networkError: error.networkError ? '' + error.networkError : undefined,
     };
   }
 
@@ -55,14 +55,18 @@ const deserializeResult = (
     operation,
     data,
     extensions: undefined,
-    error: undefined,
+    error: error
+      ? new CombinedError({
+          networkError: error.networkError
+            ? new Error(error.networkError)
+            : undefined,
+          graphQLErrors:
+            error.graphQLErrors && error.graphQLErrors.length
+              ? error.graphQLErrors
+              : undefined,
+        })
+      : undefined,
   };
-  if (error !== undefined) {
-    deserialized.error = new CombinedError({
-      networkError: new Error(error.networkError),
-      graphQLErrors: error.graphQLErrors,
-    });
-  }
 
   return deserialized;
 };
