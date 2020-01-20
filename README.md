@@ -4,8 +4,8 @@
   <a href="https://www.npmjs.com/package/@urql/preact">
     <img alt="Npm version" src="https://badgen.net/npm/v/@urql/preact" />
   </a>
-  <a href="https://travis-ci.org/JoviDeCroock/preact-urql">
-    <img alt="Test Status" src="https://api.travis-ci.org/JoviDeCroock/preact-urql.svg?branch=master" />
+  <a href="https://travis-ci.com/JoviDeCroock/preact-urql">
+    <img alt="Test Status" src="https://api.travis-ci.com/JoviDeCroock/preact-urql.svg?branch=master" />
   </a>
   <a href="https://codecov.io/gh/JoviDeCroock/preact-urql">
     <img alt="Test Coverage" src="https://codecov.io/gh/JoviDeCroock/preact-urql/branch/master/graph/badge.svg" />
