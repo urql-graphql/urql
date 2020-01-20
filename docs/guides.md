@@ -465,7 +465,7 @@ import { extractFiles } from 'extract-files';
 
 ...
 const createFetchSource = (operation) => {
-  return make(([next, complete]) => {
+  return make(({next, complete}) => {
     const { context } = operation;
     const { clone, files } = extractFiles(operation.variables);
     const isFileUpload = !!files.size;
