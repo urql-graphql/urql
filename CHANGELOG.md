@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2020-01-20
+
+This release encompasses small changes to our TypeScript definitions for `next-urql`, with an upgrade to using `next@9` as the basis for new type definitions in lieu of `@types/next`. The examples were also converted over to TypeScript from JavaScript.
+
+### Added
+
+- All example projects now use TypeScript 🎉 PRs by @ryan-gilb [here](https://github.com/FormidableLabs/next-urql/pull/19) and [here](https://github.com/FormidableLabs/next-urql/pull/21). This gives us stronger guarantees around library types.
+
+### Fixed
+
+- Upgraded type definitions to use types from `next@9`. PR by @ryan-gilb [here](https://github.com/FormidableLabs/next-urql/pull/22). If accessing the `NextContextWithAppTree` `interface`, the name has changed to `NextUrqlContext`.
+
+### Diff
+
+https://github.com/FormidableLabs/next-urql/compare/v0.2.4...v0.2.5
+
 ## [0.2.4] - 2020-01-08
 
 This release adds support for accessing the `urqlClient` instance off of Next's context object.
