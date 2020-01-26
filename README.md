@@ -38,7 +38,7 @@ known pieces of data. This cache also provides configurable APIs to:
 - provide optimistic Mutation responses
 
 > ⚠️ Note: Documentation for some parts of `@urql/exchange-graphcache` are still being worked on!
-> For help for features requests, please join our [Spectrum](https://spectrum.chat/urql).
+> For help or features requests, please join our [Spectrum](https://spectrum.chat/urql).
 
 ## Quick Start Guide
 
