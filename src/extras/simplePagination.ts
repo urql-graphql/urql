@@ -33,6 +33,13 @@ export const simplePagination = ({
       }
     }
 
+    for (const key in fieldArgs) {
+      if (key === offsetArgument || key === limitArgument) {
+        continue;
+      }
+      if (!(key in connectionArgs)) return false;
+    }
+
     return true;
   };
 

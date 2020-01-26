@@ -84,6 +84,19 @@ const compareArgs = (
     }
   }
 
+  for (const key in fieldArgs) {
+    if (
+      key === 'first' ||
+      key === 'last' ||
+      key === 'after' ||
+      key === 'before'
+    ) {
+      continue;
+    }
+
+    if (!(key in connectionArgs)) return false;
+  }
+
   return true;
 };
 

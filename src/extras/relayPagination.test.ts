@@ -849,3 +849,77 @@ it('caches and retrieves correctly queries with inwards pagination', () => {
   expect(res.partial).toBe(false);
   expect(res.data).toEqual(results);
 });
+
+it('does not include a previous result when adding parameters', () => {
+  const Pagination = gql`
+    query($first: Int, $filter: String) {
+      items(first: $first, filter: $filter) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store(undefined, {
+    Query: {
+      items: relayPagination(),
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '2',
+      },
+    },
+  };
+
+  const results2 = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '2',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 2 } }, results);
+
+  write(
+    store,
+    { query: Pagination, variables: { first: 2, filter: 'b' } },
+    results2
+  );
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { first: 2, filter: 'b' },
+  });
+  expect(res.data).toEqual(results2);
+});

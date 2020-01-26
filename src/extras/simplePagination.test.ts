@@ -127,6 +127,55 @@ it('handles duplicates', () => {
   });
 });
 
+it('should not return previous result when adding a parameter', () => {
+  const Pagination = gql`
+    query($skip: Number, $limit: Number, $filter: String) {
+      persons(skip: $skip, limit: $limit, filter: $filter) {
+        __typename
+        id
+        name
+      }
+    }
+  `;
+
+  const store = new Store(undefined, {
+    Query: {
+      persons: simplePagination(),
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    persons: [
+      { id: 1, name: 'Jovi', __typename: 'Person' },
+      { id: 2, name: 'Phil', __typename: 'Person' },
+      { id: 3, name: 'Andy', __typename: 'Person' },
+    ],
+  };
+
+  const emptyPage = {
+    __typename: 'Query',
+    persons: [],
+  };
+
+  write(
+    store,
+    { query: Pagination, variables: { skip: 0, limit: 3 } },
+    pageOne
+  );
+  write(
+    store,
+    { query: Pagination, variables: { skip: 0, limit: 3, filter: 'b' } },
+    emptyPage
+  );
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { skip: 0, limit: 3, filter: 'b' },
+  });
+  expect(res.data).toEqual({ __typename: 'Query', persons: [] });
+});
+
 it('should preserve the correct order', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
