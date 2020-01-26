@@ -134,6 +134,42 @@ The `mergeExchanges` argument is optional. This is a function that takes the `ss
 
 By default, `next-urql` will incorprate the `ssrExchange` into your `exchanges` array in the correct location (after any other caching exchanges, but _before_ the `fetchExchange` – read more [here](https://formidable.com/open-source/urql/docs/basics/#setting-up-the-client)). Use this argument if you want to configure your client with additional custom `exchanges`, or access the `ssrCache` directly to extract or restore data from its cache.
 
+### Usage with ReasonML
+
+While there are no official bindings for using `next-urql` with ReasonML, porting `next-urql` to Reason is not too difficult. Moreover, having your own bindings means you can select only the pieces you need from the library. Here's an example of how you could bind `next-urql` if you only needed access to the non-functional `clientOptions` API, and only wanted to pass a `url` and `fetchOptions`. This assumes BuckleScript 7 to take advantage of records compiling into plain JS objects.
+
+```reason
+type clientOptions = {
+  url: string,
+  fetchOptions: Fetch.requestInit
+};
+
+[@bs.module "next-urql"]
+external withUrqlClient:
+  (. clientOptions) =>
+  (. React.component('props)) => React.component('props) =
+  "withUrqlClient";
+```
+
+Which can then be used like so:
+
+```reason
+let headers = Fetch.HeadersInit.make({ "Content-Type": "application/json" });
+let client = {
+  url: "https://mygraphqlapi.com/graphql",
+  fetchOptions: Fetch.RequestInit.make(~headers, ~method_=POST, ())
+};
+
+[@react.component]
+let make = () => {
+  <h1>"Heck yeah, next-urql with Reason!"->React.string</h1>
+};
+
+let default = (withUrqlClient(. clientOptions))(. make);
+```
+
+The great part about writing thin bindings like this is that they are zero cost – in fact, the above bindings get totally compiled away by BuckleScript, so you get the full benefits of type safety with absolutely zero runtime cost!
+
 ### Examples
 
 You can see simple example projects using `next-urql` in the `examples` directory or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
