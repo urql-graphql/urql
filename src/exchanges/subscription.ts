@@ -79,13 +79,14 @@ export const subscriptionExchange = ({
         error: err => next(makeErrorResult(operation, err)),
         complete: () => {
           if (!isComplete) {
+            isComplete = true;
             client.reexecuteOperation({
               ...operation,
               operationName: 'teardown',
             });
-          }
 
-          complete();
+            complete();
+          }
         },
       });
 

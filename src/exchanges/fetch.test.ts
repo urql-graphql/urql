@@ -17,7 +17,7 @@ beforeAll(() => {
   };
 });
 
-beforeEach(() => {
+afterEach(() => {
   fetch.mockClear();
   abort.mockClear();
 });
@@ -42,11 +42,6 @@ const exchangeArgs = {
 
 describe('on success', () => {
   beforeEach(() => {
-    jest
-      .spyOn(Date, 'now')
-      .mockImplementationOnce(() => 100)
-      .mockImplementationOnce(() => 200);
-
     fetch.mockResolvedValue({
       status: 200,
       json: jest.fn().mockResolvedValue(response),
@@ -76,11 +71,6 @@ describe('on success', () => {
 
 describe('on error', () => {
   beforeEach(() => {
-    jest
-      .spyOn(Date, 'now')
-      .mockImplementationOnce(() => 100)
-      .mockImplementationOnce(() => 200);
-
     fetch.mockResolvedValue({
       status: 400,
       json: jest.fn().mockResolvedValue(response),
@@ -117,14 +107,30 @@ describe('on error', () => {
 });
 
 describe('on teardown', () => {
-  it('aborts the outgoing request', () => {
-    fetch.mockReturnValue(Promise.reject(abortError));
+  it('does not start the outgoing request on immediate teardowns', () => {
+    fetch.mockRejectedValueOnce(abortError);
 
     const { unsubscribe } = pipe(
       fromValue(queryOperation),
       fetchExchange(exchangeArgs),
       subscribe(fail)
     );
+
+    unsubscribe();
+    expect(fetch).toHaveBeenCalledTimes(0);
+    expect(abort).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts the outgoing request', async () => {
+    fetch.mockRejectedValueOnce(abortError);
+
+    const { unsubscribe } = pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      subscribe(fail)
+    );
+
+    await Promise.resolve();
 
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(1);

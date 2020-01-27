@@ -99,15 +99,20 @@ const createFetchSource = (operation: Operation) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
-    executeFetch(operation, fetchOptions).then(result => {
-      if (result !== undefined) {
-        next(result);
-      }
+    let ended = false;
 
-      complete();
-    });
+    Promise.resolve()
+      .then(() => (ended ? undefined : executeFetch(operation, fetchOptions)))
+      .then((result: OperationResult | undefined) => {
+        if (!ended) {
+          ended = true;
+          if (result) next(result);
+          complete();
+        }
+      });
 
     return () => {
+      ended = true;
       if (abortController !== undefined) {
         abortController.abort();
       }
@@ -115,9 +120,11 @@ const createFetchSource = (operation: Operation) => {
   });
 };
 
-const executeFetch = (operation: Operation, opts: RequestInit) => {
+const executeFetch = (
+  operation: Operation,
+  opts: RequestInit
+): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
-
   let response: Response | undefined;
 
   return (fetcher || fetch)(url, opts)

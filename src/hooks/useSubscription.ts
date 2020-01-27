@@ -1,10 +1,10 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { useOperator } from 'react-wonka';
 
 import { useClient } from '../context';
 import { CombinedError } from '../utils';
+import { useSource, useBehaviourSubject } from './useSource';
 import { OperationContext } from '../types';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
@@ -54,16 +54,23 @@ export const useSubscription = <T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [state, update] = useOperator(
-    subscription$$ =>
-      pipe(
+  const [subscription$$, update] = useBehaviourSubject(
+    useMemo(() => (args.pause ? null : makeSubscription$()), [
+      args.pause,
+      makeSubscription$,
+    ])
+  );
+
+  const state = useSource(
+    useMemo(() => {
+      return pipe(
         subscription$$,
         switchMap(subscription$ => {
           if (!subscription$) return fromValue({ fetching: false });
 
           return concat([
             // Initially set fetching to true
-            fromValue({ fetching: true }),
+            fromValue({ fetching: true, stale: false }),
             pipe(
               subscription$,
               map(({ stale, data, error, extensions }) => ({
@@ -75,7 +82,7 @@ export const useSubscription = <T = any, R = T, V = object>(
               }))
             ),
             // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false }),
+            fromValue({ fetching: false, stale: false }),
           ]);
         }),
         // The individual partial results are merged into each previous result
@@ -88,13 +95,10 @@ export const useSubscription = <T = any, R = T, V = object>(
                 ? handler(result.data, partial.data)
                 : partial.data
               : result.data;
-          return { ...result, stale: false, ...partial, data };
+          return { ...result, ...partial, data };
         }, initialState)
-      ),
-    useMemo(() => (args.pause ? null : makeSubscription$()), [
-      args.pause,
-      makeSubscription$,
-    ]),
+      );
+    }, [subscription$$]),
     initialState
   );
 
