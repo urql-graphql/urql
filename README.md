@@ -22,7 +22,7 @@ Using GraphQL with server-side rendering in React is a challenging problem. Curr
 Install `next-urql` along with its `peerDependencies`.
 
 ```sh
-npm install --save next-urql react-is styled-components isomorphic-unfetch
+npm install --save next-urql urql react-is styled-components isomorphic-unfetch
 ```
 
 `react-is`, `styled-components`, and `isomorphic-unfetch` help to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
