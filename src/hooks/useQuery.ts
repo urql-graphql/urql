@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef, useEffect } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import { useClient } from '../context';
@@ -35,6 +35,7 @@ export const useQuery = <T = any, V = object>(
   args: UseQueryArgs<V>
 ): UseQueryResponse<T> => {
   const client = useClient();
+  const isMounted = useRef<boolean | undefined>();
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
@@ -48,6 +49,7 @@ export const useQuery = <T = any, V = object>(
         pollInterval: args.pollInterval,
         ...args.context,
         ...opts,
+        suspense: isMounted.current ? false : undefined,
       });
     },
     [client, request, args.requestPolicy, args.pollInterval, args.context]
@@ -99,6 +101,10 @@ export const useQuery = <T = any, V = object>(
     (opts?: Partial<OperationContext>) => update(makeQuery$(opts)),
     [update, makeQuery$]
   );
+
+  useEffect(() => {
+    isMounted.current = true;
+  }, []);
 
   return [state, executeQuery];
 };
