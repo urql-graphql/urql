@@ -273,6 +273,120 @@ it('writes optimistic mutations to the cache', () => {
   expect(result).toHaveBeenCalledTimes(4);
 });
 
+it('correctly clears on error', () => {
+  jest.useFakeTimers();
+
+  const authorsQuery = gql`
+    query {
+      authors {
+        id
+        name
+      }
+    }
+  `;
+
+  const authorsQueryData = {
+    __typename: 'Query',
+    authors: [
+      {
+        __typename: 'Author',
+        id: '1',
+        name: 'Author',
+      },
+    ],
+  };
+
+  const mutation = gql`
+    mutation {
+      addAuthor {
+        id
+        name
+      }
+    }
+  `;
+
+  const optimisticMutationData = {
+    __typename: 'Mutation',
+    addAuthor: {
+      __typename: 'Author',
+      id: '123',
+      name: '[REDACTED OFFLINE]',
+    },
+  };
+
+  const client = createClient({ url: '' });
+  const { source: ops$, next } = makeSubject<Operation>();
+
+  const reexec = jest
+    .spyOn(client, 'reexecuteOperation')
+    .mockImplementation(next);
+
+  const opOne = client.createRequestOperation('query', {
+    key: 1,
+    query: authorsQuery,
+  });
+
+  const opMutation = client.createRequestOperation('mutation', {
+    key: 2,
+    query: mutation,
+  });
+
+  const response = jest.fn(
+    (forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { operation: opOne, data: authorsQueryData };
+      } else if (forwardOp.key === 2) {
+        return {
+          operation: opMutation,
+          error: 'error' as any,
+          data: { __typename: 'Mutation', addAuthor: null },
+        };
+      }
+
+      return undefined as any;
+    }
+  );
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+  const optimistic = {
+    addAuthor: jest.fn(() => optimisticMutationData.addAuthor) as any,
+  };
+
+  const updates = {
+    Mutation: {
+      addAuthor: jest.fn((data, _, cache) => {
+        cache.updateQuery({ query: authorsQuery }, (prevData: any) => ({
+          ...prevData,
+          authors: [...prevData.authors, data.addAuthor],
+        }));
+      }),
+    },
+  };
+
+  pipe(
+    cacheExchange({ optimistic, updates })({ forward, client })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(opOne);
+  jest.runAllTimers();
+  expect(response).toHaveBeenCalledTimes(1);
+
+  next(opMutation);
+  expect(response).toHaveBeenCalledTimes(1);
+  expect(optimistic.addAuthor).toHaveBeenCalledTimes(1);
+  expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(1);
+  expect(reexec).toHaveBeenCalledTimes(1);
+
+  jest.runAllTimers();
+  expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(2);
+  expect(response).toHaveBeenCalledTimes(2);
+  expect(result).toHaveBeenCalledTimes(4);
+});
+
 it('follows resolvers on initial write', () => {
   const client = createClient({ url: '' });
   const { source: ops$, next } = makeSubject<Operation>();

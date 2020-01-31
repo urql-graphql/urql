@@ -131,7 +131,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     });
   }
 
-  const optimisticKeys = new Set();
+  const optimisticKeysToDependencies = new Map<number, Set<string>>();
   const ops: OperationMap = new Map();
   const deps: DependentOperations = makeDict();
 
@@ -175,7 +175,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       const { key } = operation;
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
-        optimisticKeys.add(key);
+        optimisticKeysToDependencies.set(key, dependencies);
         const pendingOperations = new Set<number>();
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
@@ -233,10 +233,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     // Clear old optimistic values from the store
     const { key } = operation;
-    if (optimisticKeys.has(key)) {
-      optimisticKeys.delete(key);
-      clearOptimistic(store.data, key);
-    }
+    const pendingOperations = new Set<number>();
+    collectPendingOperations(
+      pendingOperations,
+      optimisticKeysToDependencies.get(key)
+    );
+    optimisticKeysToDependencies.delete(key);
+    clearOptimistic(store.data, key);
 
     let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
@@ -253,7 +256,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     }
 
     // Collect all write dependencies and query dependencies for queries
-    const pendingOperations = new Set<number>();
     collectPendingOperations(pendingOperations, writeDependencies);
     if (isQuery) {
       collectPendingOperations(pendingOperations, queryDependencies);
