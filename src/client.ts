@@ -29,6 +29,7 @@ import {
   fromValue,
   switchMap,
   publish,
+  subscribe,
 } from 'wonka';
 
 import {
@@ -248,6 +249,23 @@ export class Client {
     return withPromise<OperationResult<Data>>(
       this.executeQuery(createRequest(query, variables), context)
     );
+  }
+
+  readQuery<Data = any, Variables extends object = {}>(
+    query: DocumentNode | string,
+    variables?: Variables,
+    context?: Partial<OperationContext>
+  ): OperationResult<Data> | null {
+    let result: OperationResult<Data> | null = null;
+
+    pipe(
+      this.executeQuery(createRequest(query, variables), context),
+      subscribe(res => {
+        result = res;
+      })
+    ).unsubscribe();
+
+    return result;
   }
 
   executeQuery = <Data = any>(
