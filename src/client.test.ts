@@ -64,7 +64,7 @@ describe('exchange args', () => {
   });
 });
 
-describe('promisified arguments', () => {
+describe('promisified methods', () => {
   it('query', () => {
     const queryResult = client
       .query(
@@ -121,6 +121,33 @@ describe('promisified arguments', () => {
       fetch: undefined,
     });
     expect(mutationResult).toHaveProperty('then');
+  });
+});
+
+describe('synchronous methods', () => {
+  it('readQuery', () => {
+    const result = client.readQuery(
+      gql`
+        {
+          todos {
+            id
+          }
+        }
+      `,
+      { example: 1234 }
+    );
+
+    expect(receivedOps.length).toBe(2);
+    expect(receivedOps[0].operationName).toBe('query');
+    expect(receivedOps[1].operationName).toBe('teardown');
+    expect(result).toEqual({
+      operation: {
+        ...query,
+        context: expect.anything(),
+        key: expect.any(Number),
+        operationName: 'query',
+      },
+    });
   });
 });
 
