@@ -54,7 +54,7 @@ function withUrqlClient<T = any, IP = any>(
     > = ({ urqlClient, urqlState, clientOptions, pageProps, ...rest }) => {
       /**
        * The React Hooks ESLint plugin will not interpret withUrql as a React component
-       * due to the Next.FC annotation. Ignore the warning about not using useMemo.
+       * due to the NextComponentType annotation. Ignore the warning about not using useMemo.
        */
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(
@@ -71,6 +71,10 @@ function withUrqlClient<T = any, IP = any>(
         </Provider>
       );
     };
+
+    // Set the displayName to indicate use of withUrqlClient.
+    const displayName = Page.displayName || Page.name || 'Component';
+    withUrql.displayName = `withUrqlClient(${displayName})`;
 
     withUrql.getInitialProps = async (ctx: NextPageContext) => {
       const { AppTree } = ctx;

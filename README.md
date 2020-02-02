@@ -5,6 +5,9 @@
   <a href="https://npmjs.com/package/next-urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/next-urql.svg" />
   </a>
+  <a href="https://travis-ci.com/FormidableLabs/next-urql">
+    <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/next-urql.svg?branch=master" />
+  </a>
 </div>
 
 ## `next-urql`

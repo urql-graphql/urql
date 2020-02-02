@@ -6,15 +6,16 @@
   "bugs": {
     "url": "https://github.com/FormidableLabs/next-urql/issues"
   },
-  "main": "dist/next-urql.min.js",
-  "module": "dist/next-urql.es.min.js",
+  "main": "dist/next-urql.js",
+  "module": "dist/next-urql.es.js",
   "source": "src/index.ts",
-  "types": "index.d.ts",
+  "types": "dist/types/index.d.ts",
   "author": "Formidable",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "check": "run-s check:types test lint format",
+    "check:ci": "run-s check:types lint format test",
+    "check:format": "prettier --check {src,__tests__,examples}/*.{ts,tsx,d.ts,js}",
     "check:types": "tsc --noEmit",
     "clean": "rimraf ./dist ./node_modules/.cache",
     "format": "prettier --write {src,__tests__,examples}/*.{ts,tsx,d.ts,js}",
@@ -25,15 +26,22 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/plugin-transform-object-assign": "^7.8.3",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-typescript": "^7.6.0",
+    "@rollup/plugin-buble": "^0.21.1",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.0",
+    "@rollup/plugin-replace": "^2.3.1",
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/jest": "^24.0.19",
     "@types/node-fetch": "^2.5.4",
     "@types/react": "^16.9.6",
     "@types/react-dom": "^16.9.2",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
-    "babel-plugin-transform-async-to-promises": "^0.8.14",
+    "babel-plugin-transform-async-to-promises": "^0.8.15",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.5.1",
@@ -54,9 +62,6 @@
     "rimraf": "^3.0.0",
     "rollup": "^1.25.0",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.24.3",
     "styled-components": "^4.4.0",
@@ -67,8 +72,6 @@
     "urql": "^1.6.1"
   },
   "dependencies": {
-    "@types/enzyme": "^3.10.3",
-    "@types/enzyme-adapter-react-16": "^1.0.5",
     "react-ssr-prepass": "^1.0.8"
   },
   "peerDependencies": {

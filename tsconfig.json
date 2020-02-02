@@ -4,16 +4,17 @@
     "esModuleInterop": true,
     "jsx": "react",
     "lib": ["dom", "esnext"],
-    "noUnusedLocals": true,
-    "rootDir": "./src",
     "module": "es2015",
     "moduleResolution": "node",
     "noImplicitAny": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "dist",
     "pretty": true,
+    "rootDir": "./src",
     "sourceMap": true,
     "strict": true,
     "target": "esnext"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "**/*.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

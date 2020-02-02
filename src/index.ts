@@ -1,1 +1,1 @@
-export { default as withUrqlClient } from './with-urql-client';
+export { default as withUrqlClient, NextUrqlContext } from './with-urql-client';
