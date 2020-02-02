@@ -19,14 +19,13 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { Store, keyOfField } from '../store';
-import { SchemaPredicates } from '../ast';
+import { isFieldAvailableOnType } from '../ast';
 import { SelectionIterator } from './shared';
 
 interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
-  schemaPredicates?: SchemaPredicates;
 }
 
 export const invalidate = (store: Store, request: OperationRequest) => {
@@ -36,7 +35,6 @@ export const invalidate = (store: Store, request: OperationRequest) => {
     variables: normalizeVariables(operation, request.variables),
     fragments: getFragments(request.query),
     store,
-    schemaPredicates: store.schemaPredicates,
   };
 
   invalidateSelection(
@@ -75,12 +73,8 @@ export const invalidateSelection = (
       getFieldArguments(node, ctx.variables)
     );
 
-    if (
-      process.env.NODE_ENV !== 'production' &&
-      ctx.schemaPredicates &&
-      typename
-    ) {
-      ctx.schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    if (process.env.NODE_ENV !== 'production' && ctx.store.schema && typename) {
+      isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
     }
 
     if (node.selectionSet === undefined) {

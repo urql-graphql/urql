@@ -1,5 +1,4 @@
 import {
-  buildClientSchema,
   isNullableType,
   isListType,
   isNonNullType,
@@ -12,49 +11,54 @@ import {
 
 import { invariant, warn } from '../helpers/help';
 
-export class SchemaPredicates {
-  schema: GraphQLSchema;
+export const isFieldNullable = (
+  schema: GraphQLSchema,
+  typename: string,
+  fieldName: string
+): boolean => {
+  const field = getField(schema, typename, fieldName);
+  if (field === undefined) return false;
+  return isNullableType(field.type);
+};
 
-  constructor(schema: object) {
-    this.schema = buildClientSchema(schema as any);
+export const isListNullable = (
+  schema: GraphQLSchema,
+  typename: string,
+  fieldName: string
+): boolean => {
+  const field = getField(schema, typename, fieldName);
+  if (field === undefined) return false;
+  const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
+  return isListType(ofType) && isNullableType(ofType.ofType);
+};
+
+export const isFieldAvailableOnType = (
+  schema: GraphQLSchema,
+  typename: string,
+  fieldName: string
+): boolean => {
+  return !!getField(schema, typename, fieldName);
+};
+
+export const isInterfaceOfType = (
+  schema: GraphQLSchema,
+  typeCondition: null | string,
+  typename: string | void
+): boolean => {
+  if (!typename || !typeCondition) return false;
+  if (typename === typeCondition) return true;
+
+  const abstractType = schema.getType(typeCondition);
+  const objectType = schema.getType(typename);
+
+  if (abstractType instanceof GraphQLObjectType) {
+    return abstractType === objectType;
   }
 
-  isFieldNullable(typename: string, fieldName: string): boolean {
-    const field = getField(this.schema, typename, fieldName);
-    if (field === undefined) return false;
-    return isNullableType(field.type);
-  }
-
-  isListNullable(typename: string, fieldName: string): boolean {
-    const field = getField(this.schema, typename, fieldName);
-    if (field === undefined) return false;
-    const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
-    return isListType(ofType) && isNullableType(ofType.ofType);
-  }
-
-  isFieldAvailableOnType(typename: string, fieldname: string): boolean {
-    return !!getField(this.schema, typename, fieldname);
-  }
-
-  isInterfaceOfType(
-    typeCondition: null | string,
-    typename: string | void
-  ): boolean {
-    if (!typename || !typeCondition) return false;
-    if (typename === typeCondition) return true;
-
-    const abstractType = this.schema.getType(typeCondition);
-    const objectType = this.schema.getType(typename);
-
-    if (abstractType instanceof GraphQLObjectType) {
-      return abstractType === objectType;
-    }
-
-    expectAbstractType(abstractType, typeCondition);
-    expectObjectType(objectType, typename);
-    return this.schema.isPossibleType(abstractType, objectType);
-  }
-}
+  expectAbstractType(abstractType, typeCondition);
+  expectObjectType(objectType, typename);
+  return schema.isPossibleType(abstractType, objectType);
+};
 
 const getField = (
   schema: GraphQLSchema,
@@ -83,7 +87,10 @@ const getField = (
   return field;
 };
 
-function expectObjectType(x: any, typename: string): asserts x is GraphQLObjectType {
+function expectObjectType(
+  x: any,
+  typename: string
+): asserts x is GraphQLObjectType {
   invariant(
     x instanceof GraphQLObjectType,
     'Invalid Object type: The type `' +
@@ -94,7 +101,10 @@ function expectObjectType(x: any, typename: string): asserts x is GraphQLObjectT
   );
 }
 
-function expectAbstractType(x: any, typename: string): asserts x is GraphQLAbstractType {
+function expectAbstractType(
+  x: any,
+  typename: string
+): asserts x is GraphQLAbstractType {
   invariant(
     x instanceof GraphQLInterfaceType || x instanceof GraphQLUnionType,
     'Invalid Abstract type: The type `' +

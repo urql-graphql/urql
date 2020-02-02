@@ -2,7 +2,6 @@ import gql from 'graphql-tag';
 import { write } from './write';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';
-import { SchemaPredicates } from '../ast';
 
 const TODO_QUERY = gql`
   query todos {
@@ -34,7 +33,7 @@ describe('Query', () => {
   });
 
   beforeEach(() => {
-    store = new Store(new SchemaPredicates(schema));
+    store = new Store(schema);
     write(
       store,
       { query: TODO_QUERY },

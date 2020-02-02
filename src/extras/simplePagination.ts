@@ -98,7 +98,7 @@ export const simplePagination = ({
     const hasCurrentPage = cache.resolve(entityKey, fieldName, fieldArgs);
     if (hasCurrentPage) {
       return result;
-    } else if ((info as any).schemaPredicates === undefined) {
+    } else if (!(info as any).store.schema) {
       return undefined;
     } else {
       info.partial = true;

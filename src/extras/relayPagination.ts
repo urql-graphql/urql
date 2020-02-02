@@ -227,7 +227,7 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       cache.resolve(entityKey, fieldName, fieldArgs)
     );
     if (!hasCurrentPage) {
-      if ((info as any).schemaPredicates === undefined) {
+      if (!(info as any).store.schema) {
         return undefined;
       } else {
         info.partial = true;

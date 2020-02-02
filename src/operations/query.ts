@@ -35,7 +35,11 @@ import {
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, ensureData } from './shared';
-import { SchemaPredicates } from '../ast';
+import {
+  isFieldAvailableOnType,
+  isFieldNullable,
+  isListNullable,
+} from '../ast';
 
 export interface QueryResult {
   dependencies: Set<string>;
@@ -48,11 +52,10 @@ interface Context {
   parentKey: string;
   parentFieldKey: string;
   fieldName: string;
-  partial: boolean;
   store: Store;
   variables: Variables;
   fragments: Fragments;
-  schemaPredicates?: SchemaPredicates;
+  partial: boolean;
 }
 
 export const query = (
@@ -80,11 +83,10 @@ export const read = (
     parentKey: rootKey,
     parentFieldKey: '',
     fieldName: '',
+    store,
     variables: normalizeVariables(operation, request.variables),
     fragments: getFragments(request.query),
     partial: false,
-    store,
-    schemaPredicates: store.schemaPredicates,
   };
 
   if (process.env.NODE_ENV !== 'production') {
@@ -213,7 +215,6 @@ export const readFragment = (
     fragments,
     partial: false,
     store,
-    schemaPredicates: store.schemaPredicates,
   };
 
   return (
@@ -227,7 +228,7 @@ const readSelection = (
   select: SelectionSet,
   data: Data
 ): Data | undefined => {
-  const { store, schemaPredicates } = ctx;
+  const { store } = ctx;
   const isQuery = entityKey === store.getRootKey('query');
 
   // Get the __typename field for a given entity to check that it exists
@@ -253,8 +254,8 @@ const readSelection = (
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const key = joinKeys(entityKey, fieldKey);
 
-    if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
-      schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
+      isFieldAvailableOnType(store.schema, typename, fieldName);
     }
 
     // We temporarily store the data field in here, but undefined
@@ -298,9 +299,9 @@ const readSelection = (
       }
 
       if (
-        schemaPredicates !== undefined &&
+        store.schema &&
         dataFieldValue === null &&
-        !schemaPredicates.isFieldNullable(typename, fieldName)
+        !isFieldNullable(store.schema, typename, fieldName)
       ) {
         // Special case for when null is not a valid value for the
         // current field
@@ -332,8 +333,8 @@ const readSelection = (
     // a partial query result
     if (
       dataFieldValue === undefined &&
-      schemaPredicates !== undefined &&
-      schemaPredicates.isFieldNullable(typename, fieldName)
+      store.schema &&
+      isFieldNullable(store.schema, typename, fieldName)
     ) {
       // The field is uncached but we have a schema that says it's nullable
       // Set the field to null and continue
@@ -360,7 +361,7 @@ const readResolverResult = (
   data: Data,
   result: Data
 ): Data | undefined => {
-  const { store, schemaPredicates } = ctx;
+  const { store } = ctx;
   const entityKey = store.keyOfEntity(result) || key;
   const resolvedTypename = result.__typename;
   const typename =
@@ -402,8 +403,8 @@ const readResolverResult = (
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result[fieldName];
 
-    if (process.env.NODE_ENV !== 'production' && schemaPredicates && typename) {
-      schemaPredicates.isFieldAvailableOnType(typename, fieldName);
+    if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
+      isFieldAvailableOnType(store.schema, typename, fieldName);
     }
 
     // We temporarily store the data field in here, but undefined
@@ -450,8 +451,8 @@ const readResolverResult = (
     // a partial query result
     if (
       dataFieldValue === undefined &&
-      schemaPredicates !== undefined &&
-      schemaPredicates.isFieldNullable(typename, fieldName)
+      store.schema !== undefined &&
+      isFieldNullable(store.schema, typename, fieldName)
     ) {
       // The field is uncached but we have a schema that says it's nullable
       // Set the field to null and continue
@@ -481,12 +482,11 @@ const resolveResolverResult = (
   result: void | DataField
 ): DataField | void => {
   if (Array.isArray(result)) {
-    const { schemaPredicates } = ctx;
+    const { store } = ctx;
     // Check whether values of the list may be null; for resolvers we assume
     // that they can be, since it's user-provided data
-    const isListNullable =
-      schemaPredicates === undefined ||
-      schemaPredicates.isListNullable(typename, fieldName);
+    const _isListNullable =
+      !store.schema || isListNullable(store.schema, typename, fieldName);
     const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
       // Recursively read resolver result
@@ -501,7 +501,7 @@ const resolveResolverResult = (
         result[i]
       );
 
-      if (childResult === undefined && !isListNullable) {
+      if (childResult === undefined && !_isListNullable) {
         return undefined;
       } else {
         data[i] = childResult !== undefined ? childResult : null;
@@ -538,10 +538,9 @@ const resolveLink = (
   prevData: void | Data | Data[]
 ): DataField | undefined => {
   if (Array.isArray(link)) {
-    const { schemaPredicates } = ctx;
-    const isListNullable =
-      schemaPredicates !== undefined &&
-      schemaPredicates.isListNullable(typename, fieldName);
+    const { store } = ctx;
+    const _isListNullable =
+      store.schema && isListNullable(store.schema, typename, fieldName);
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
       const childLink = resolveLink(
@@ -552,7 +551,7 @@ const resolveLink = (
         select,
         prevData !== undefined ? prevData[i] : undefined
       );
-      if (childLink === undefined && !isListNullable) {
+      if (childLink === undefined && !_isListNullable) {
         return undefined;
       } else {
         newLink[i] = childLink !== undefined ? childLink : null;

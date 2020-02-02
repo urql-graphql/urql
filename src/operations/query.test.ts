@@ -2,7 +2,6 @@ import { Store } from '../store';
 import gql from 'graphql-tag';
 import { write } from './write';
 import { query } from './query';
-import { SchemaPredicates } from '../ast/schemaPredicates';
 
 const TODO_QUERY = gql`
   query todos {
@@ -35,7 +34,7 @@ describe('Query', () => {
   });
 
   beforeEach(() => {
-    store = new Store(new SchemaPredicates(schema));
+    store = new Store(schema);
     write(
       store,
       { query: TODO_QUERY },
@@ -121,7 +120,7 @@ describe('Query', () => {
       }
     `;
     // Use new store to ensure bug reproduction
-    const store = new Store(new SchemaPredicates(schema));
+    const store = new Store(schema);
 
     let { data } = query(store, { query: VALID_QUERY });
     expect(data).toEqual(null);
@@ -152,7 +151,7 @@ describe('Query', () => {
       }
     `;
 
-    const store = new Store(new SchemaPredicates(alteredRoot));
+    const store = new Store(alteredRoot);
 
     let { data } = query(store, { query: QUERY });
     expect(data).toEqual(null);

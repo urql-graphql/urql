@@ -27,7 +27,6 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { SchemaPredicates } from './ast';
 import { hydrateData } from './store/data';
 import { makeDict, Store, clearOptimistic } from './store';
 
@@ -116,7 +115,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   if (!opts) opts = {};
 
   const store = new Store(
-    opts.schema ? new SchemaPredicates(opts.schema) : undefined,
+    opts.schema,
     opts.resolvers,
     opts.updates,
     opts.optimistic,

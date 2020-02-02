@@ -14,10 +14,10 @@ import {
 } from '../types';
 
 import {
-  SchemaPredicates,
   getTypeCondition,
   getFieldArguments,
   shouldInclude,
+  isInterfaceOfType,
   isFieldNode,
   isInlineFragment,
   getSelectionSet,
@@ -28,14 +28,13 @@ interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
-  schemaPredicates?: SchemaPredicates;
 }
 
 const isFragmentHeuristicallyMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,
   typename: void | string,
   entityKey: string,
-  ctx: Context
+  vars: Variables
 ) => {
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
@@ -57,10 +56,7 @@ const isFragmentHeuristicallyMatching = (
 
   return !getSelectionSet(node).some(node => {
     if (!isFieldNode(node)) return false;
-    const fieldKey = keyOfField(
-      getName(node),
-      getFieldArguments(node, ctx.variables)
-    );
+    const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
     return !hasField(entityKey, fieldKey);
   });
 };
@@ -108,18 +104,18 @@ export class SelectionIterator {
               pushDebugNode(this.typename, fragmentNode);
             }
 
-            const isMatching =
-              this.context.schemaPredicates !== undefined
-                ? this.context.schemaPredicates.isInterfaceOfType(
-                    getTypeCondition(fragmentNode),
-                    this.typename
-                  )
-                : isFragmentHeuristicallyMatching(
-                    fragmentNode,
-                    this.typename,
-                    this.entityKey,
-                    this.context
-                  );
+            const isMatching = this.context.store.schema
+              ? isInterfaceOfType(
+                  this.context.store.schema,
+                  getTypeCondition(fragmentNode),
+                  this.typename
+                )
+              : isFragmentHeuristicallyMatching(
+                  fragmentNode,
+                  this.typename,
+                  this.entityKey,
+                  this.context.variables
+                );
 
             if (isMatching) {
               this.indexStack.push(0);

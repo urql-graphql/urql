@@ -2,7 +2,6 @@ import gql from 'graphql-tag';
 import { query, write } from '../operations';
 import { Store } from '../store';
 import { relayPagination } from './relayPagination';
-import { SchemaPredicates } from '../../src/ast/schemaPredicates';
 
 function itemEdge(numItem: number) {
   return {
@@ -634,7 +633,7 @@ it('returns a subset of the cached items if the query requests less items than t
   `;
 
   const store = new Store(
-    new SchemaPredicates(require('../test-utils/relayPagination_schema.json')),
+    require('../test-utils/relayPagination_schema.json'),
     {
       Query: {
         items: relayPagination({ mergeMode: 'outwards' }),
@@ -692,7 +691,7 @@ it("returns the cached items even if they don't fullfil the query", () => {
   `;
 
   const store = new Store(
-    new SchemaPredicates(require('../test-utils/relayPagination_schema.json')),
+    require('../test-utils/relayPagination_schema.json'),
     {
       Query: {
         items: relayPagination(),
@@ -754,7 +753,7 @@ it('returns the cached items even when they come from a different query', () => 
   `;
 
   const store = new Store(
-    new SchemaPredicates(require('../test-utils/relayPagination_schema.json')),
+    require('../test-utils/relayPagination_schema.json'),
     {
       Query: {
         items: relayPagination(),
@@ -812,7 +811,7 @@ it('caches and retrieves correctly queries with inwards pagination', () => {
   `;
 
   const store = new Store(
-    new SchemaPredicates(require('../test-utils/relayPagination_schema.json')),
+    require('../test-utils/relayPagination_schema.json'),
     {
       Query: {
         items: relayPagination(),

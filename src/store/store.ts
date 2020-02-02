@@ -1,4 +1,10 @@
-import { DocumentNode } from 'graphql';
+import {
+  buildClientSchema,
+  DocumentNode,
+  IntrospectionQuery,
+  GraphQLSchema,
+} from 'graphql';
+
 import { createRequest } from 'urql/core';
 
 import {
@@ -17,7 +23,6 @@ import {
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
 import { invalidate } from '../operations/invalidate';
-import { SchemaPredicates } from '../ast';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
@@ -30,13 +35,13 @@ export class Store implements Cache {
   updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
-  schemaPredicates?: SchemaPredicates;
+  schema?: GraphQLSchema;
 
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
   constructor(
-    schemaPredicates?: SchemaPredicates,
+    rawSchema?: IntrospectionQuery,
     resolvers?: ResolverConfig,
     updates?: Partial<UpdatesConfig>,
     optimisticMutations?: OptimisticMutationConfig,
@@ -45,15 +50,15 @@ export class Store implements Cache {
     this.resolvers = resolvers || {};
     this.optimisticMutations = optimisticMutations || {};
     this.keys = keys || {};
-    this.schemaPredicates = schemaPredicates;
 
     this.updates = {
       Mutation: (updates && updates.Mutation) || {},
       Subscription: (updates && updates.Subscription) || {},
     } as UpdatesConfig;
 
-    if (schemaPredicates) {
-      const { schema } = schemaPredicates;
+    if (rawSchema) {
+      const schema = (this.schema = buildClientSchema(rawSchema));
+
       const queryType = schema.getQueryType();
       const mutationType = schema.getMutationType();
       const subscriptionType = schema.getSubscriptionType();
