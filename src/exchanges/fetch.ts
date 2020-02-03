@@ -87,8 +87,8 @@ const createFetchSource = (operation: Operation) => {
       body.operationName = operationName;
     }
 
+
     const fetchOptions = {
-      body: JSON.stringify(body),
       method: 'POST',
       ...extraOptions,
       headers: {
@@ -98,6 +98,12 @@ const createFetchSource = (operation: Operation) => {
       signal:
         abortController !== undefined ? abortController.signal : undefined,
     };
+
+    if (fetchOptions.method === 'GET') {
+      operation.context.url = convertToGet(operation.context.url, body);
+    } else {
+      fetchOptions.body = JSON.stringify(body);
+    }
 
     let ended = false;
 
@@ -146,3 +152,22 @@ const executeFetch = (
       }
     });
 };
+
+const convertToGet = (uri: string, body: Body): string => {
+  const queryParams: string[] = [];
+  if (body.query) {
+    queryParams.push(`query=${encodeURIComponent(body.query)}`);
+  }
+
+  if (body.operationName) {
+    queryParams.push(`operationName=${encodeURIComponent(body.query)}`);
+  }
+
+  if (body.variables) {
+    queryParams.push(`variables=${encodeURIComponent(JSON.stringify(body.variables))}`);
+  }
+
+  // TODO: fragments
+
+  return uri + queryParams.join('&');
+}
