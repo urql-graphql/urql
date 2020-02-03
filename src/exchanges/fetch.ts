@@ -153,22 +153,13 @@ const executeFetch = (
 };
 
 export const convertToGet = (uri: string, body: Body): string => {
-  const queryParams: string[] = [];
-  if (body.query) {
-    queryParams.push(`query=${encodeURIComponent(body.query)}`);
-  }
-
-  if (body.operationName) {
-    queryParams.push(`operationName=${encodeURIComponent(body.query)}`);
-  }
+  const queryParams: string[] = [`query=${encodeURIComponent(body.query)}`];
 
   if (body.variables) {
     queryParams.push(
       `variables=${encodeURIComponent(JSON.stringify(body.variables))}`
     );
   }
-
-  // TODO: fragments
 
   return uri + '?' + queryParams.join('&');
 };
