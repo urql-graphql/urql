@@ -157,10 +157,10 @@ describe('convert for GET', () => {
   it('should do a basic conversion', () => {
     const query = `query ($id: ID!) { node(id: $id) { id } }`;
     const variables = { id: 2 };
-    expect(
-      convertToGet('http://localhost:3000', { query, variables })
-    ).toBe(
-      `http://localhost:3000?query=${encodeURIComponent(query)}&variables=${encodeURIComponent(JSON.stringify(variables))}`
+    expect(convertToGet('http://localhost:3000', { query, variables })).toBe(
+      `http://localhost:3000?query=${encodeURIComponent(
+        query
+      )}&variables=${encodeURIComponent(JSON.stringify(variables))}`
     );
   });
 
@@ -172,16 +172,18 @@ describe('convert for GET', () => {
     `;
     const variables = { id: 2 };
     const query = gql`
-      query ($id: ID!) {
-        node(id: $id) { ...nodeFragment }
+      query($id: ID!) {
+        node(id: $id) {
+          ...nodeFragment
+        }
       }
       ${nodeFragment}
     `;
 
-    expect(
-      convertToGet('http://localhost:3000', { query, variables })
-    ).toBe(
-      ``
+    expect(convertToGet('http://localhost:3000', { query, variables })).toBe(
+      `http://localhost:3000?query=${encodeURIComponent(
+        query
+      )}&variables=${encodeURIComponent(JSON.stringify(variables))}`
     );
   });
 });

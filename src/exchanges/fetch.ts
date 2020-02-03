@@ -170,5 +170,5 @@ export const convertToGet = (uri: string, body: Body): string => {
 
   // TODO: fragments
 
-  return uri + queryParams.join('&');
+  return uri + '?' + queryParams.join('&');
 };
