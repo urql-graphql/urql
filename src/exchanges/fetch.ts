@@ -33,7 +33,7 @@ export const fetchExchange: Exchange = ({ forward }) => {
           createFetchSource(
             operation,
             operation.operationName === 'query' &&
-              operation.context.preferGetMethod
+              !!operation.context.preferGetMethod
           ),
           takeUntil(teardown$)
         );
