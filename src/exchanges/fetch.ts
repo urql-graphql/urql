@@ -29,7 +29,13 @@ export const fetchExchange: Exchange = ({ client, forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(createFetchSource(operation, operation.operationName === 'query' && client.preferGetMethod), takeUntil(teardown$));
+        return pipe(
+          createFetchSource(
+            operation,
+            operation.operationName === 'query' && client.preferGetMethod
+          ),
+          takeUntil(teardown$)
+        );
       })
     );
 
