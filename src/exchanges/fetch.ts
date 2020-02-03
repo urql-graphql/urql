@@ -11,7 +11,7 @@ interface Body {
 }
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward }) => {
+export const fetchExchange: Exchange = ({ client, forward }) => {
   const isOperationFetchable = (operation: Operation) => {
     const { operationName } = operation;
     return operationName === 'query' || operationName === 'mutation';
@@ -29,7 +29,7 @@ export const fetchExchange: Exchange = ({ forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(createFetchSource(operation), takeUntil(teardown$));
+        return pipe(createFetchSource(operation, operation.operationName === 'query' && client.preferGetMethod), takeUntil(teardown$));
       })
     );
 
@@ -53,7 +53,7 @@ const getOperationName = (query: DocumentNode): string | null => {
   return node !== undefined && node.name ? node.name.value : null;
 };
 
-const createFetchSource = (operation: Operation) => {
+const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
   if (
     process.env.NODE_ENV !== 'production' &&
     operation.operationName === 'subscription'
@@ -89,6 +89,8 @@ const createFetchSource = (operation: Operation) => {
 
     const fetchOptions = {
       ...extraOptions,
+      body: shouldUseGet ? undefined : JSON.stringify(body),
+      method: shouldUseGet ? 'GET' : 'POST',
       headers: {
         'content-type': 'application/json',
         ...extraOptions.headers,
@@ -97,11 +99,8 @@ const createFetchSource = (operation: Operation) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
-    if (fetchOptions.method === 'GET' && operation.operationName === 'query') {
+    if (shouldUseGet) {
       operation.context.url = convertToGet(operation.context.url, body);
-    } else {
-      fetchOptions.body = JSON.stringify(body);
-      fetchOptions.method = 'POST';
     }
 
     let ended = false;

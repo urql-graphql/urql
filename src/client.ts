@@ -66,6 +66,8 @@ export interface ClientOptions {
   suspense?: boolean;
   /** The default request policy for requests. */
   requestPolicy?: RequestPolicy;
+  /** Use HTTP GET for queries. */
+  preferGetMethod?: boolean;
 }
 
 interface ActiveOperations {
@@ -82,6 +84,7 @@ export class Client {
   fetchOptions?: RequestInit | (() => RequestInit);
   exchange: Exchange;
   suspense: boolean;
+  preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
 
   // These are internals to be used to keep track of operations
@@ -99,6 +102,7 @@ export class Client {
     this.fetch = opts.fetch;
     this.suspense = !!opts.suspense;
     this.requestPolicy = opts.requestPolicy || 'cache-first';
+    this.preferGetMethod = !!opts.preferGetMethod;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
