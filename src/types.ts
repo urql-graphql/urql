@@ -73,7 +73,7 @@ export interface OperationResult<Data = any> {
 }
 
 export interface MaskedClient {
-  fetch: Client['fetch'];
+  fetch?: Client['fetch'];
   reexecuteOperation: Client['reexecuteOperation'];
   suspense: Client['suspense'];
 }
