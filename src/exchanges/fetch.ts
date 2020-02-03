@@ -11,7 +11,7 @@ interface Body {
 }
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ client, forward }) => {
+export const fetchExchange: Exchange = ({ forward }) => {
   const isOperationFetchable = (operation: Operation) => {
     const { operationName } = operation;
     return operationName === 'query' || operationName === 'mutation';
@@ -32,7 +32,8 @@ export const fetchExchange: Exchange = ({ client, forward }) => {
         return pipe(
           createFetchSource(
             operation,
-            operation.operationName === 'query' && client.preferGetMethod
+            operation.operationName === 'query' &&
+              operation.context.preferGetMethod
           ),
           takeUntil(teardown$)
         );

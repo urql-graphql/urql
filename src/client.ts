@@ -97,6 +97,7 @@ export class Client {
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
       throw new Error('You are creating an urql-client without a url.');
     }
+
     this.url = opts.url;
     this.fetchOptions = opts.fetchOptions;
     this.fetch = opts.fetch;
@@ -156,6 +157,7 @@ export class Client {
     url: this.url,
     fetchOptions: this.fetchOptions,
     fetch: this.fetch,
+    preferGetMethod: this.preferGetMethod,
     ...opts,
     requestPolicy: (opts || {}).requestPolicy || this.requestPolicy,
   });
