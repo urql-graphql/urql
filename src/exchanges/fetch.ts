@@ -29,7 +29,14 @@ export const fetchExchange: Exchange = ({ forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        return pipe(createFetchSource(operation), takeUntil(teardown$));
+        return pipe(
+          createFetchSource(
+            operation,
+            operation.operationName === 'query' &&
+              !!operation.context.preferGetMethod
+          ),
+          takeUntil(teardown$)
+        );
       })
     );
 
@@ -53,7 +60,7 @@ const getOperationName = (query: DocumentNode): string | null => {
   return node !== undefined && node.name ? node.name.value : null;
 };
 
-const createFetchSource = (operation: Operation) => {
+const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
   if (
     process.env.NODE_ENV !== 'production' &&
     operation.operationName === 'subscription'
@@ -88,9 +95,9 @@ const createFetchSource = (operation: Operation) => {
     }
 
     const fetchOptions = {
-      body: JSON.stringify(body),
-      method: 'POST',
       ...extraOptions,
+      body: shouldUseGet ? undefined : JSON.stringify(body),
+      method: shouldUseGet ? 'GET' : 'POST',
       headers: {
         'content-type': 'application/json',
         ...extraOptions.headers,
@@ -98,6 +105,10 @@ const createFetchSource = (operation: Operation) => {
       signal:
         abortController !== undefined ? abortController.signal : undefined,
     };
+
+    if (shouldUseGet) {
+      operation.context.url = convertToGet(operation.context.url, body);
+    }
 
     let ended = false;
 
@@ -145,4 +156,16 @@ const executeFetch = (
         return makeErrorResult(operation, err, response);
       }
     });
+};
+
+export const convertToGet = (uri: string, body: Body): string => {
+  const queryParams: string[] = [`query=${encodeURIComponent(body.query)}`];
+
+  if (body.variables) {
+    queryParams.push(
+      `variables=${encodeURIComponent(JSON.stringify(body.variables))}`
+    );
+  }
+
+  return uri + '?' + queryParams.join('&');
 };

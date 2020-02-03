@@ -13,6 +13,7 @@ Client {
   "fetch": undefined,
   "fetchOptions": undefined,
   "operations$": [Function],
+  "preferGetMethod": false,
   "reexecuteOperation": [Function],
   "requestPolicy": "cache-first",
   "results$": [Function],
