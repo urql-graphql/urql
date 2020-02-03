@@ -91,6 +91,7 @@ describe('promisified methods', () => {
       fetchOptions: undefined,
       fetch: undefined,
       suspense: false,
+      preferGetMethod: false,
     });
     expect(queryResult).toHaveProperty('then');
   });
@@ -119,6 +120,7 @@ describe('promisified methods', () => {
       requestPolicy: 'cache-and-network',
       fetchOptions: undefined,
       fetch: undefined,
+      preferGetMethod: false,
     });
     expect(mutationResult).toHaveProperty('then');
   });
