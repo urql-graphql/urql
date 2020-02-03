@@ -72,10 +72,16 @@ export interface OperationResult<Data = any> {
   stale?: boolean;
 }
 
+export interface MaskedClient {
+  fetch: Client['fetch'];
+  reexecuteOperation: Client['reexecuteOperation'];
+  suspense: Client['suspense'];
+}
+
 /** Input parameters for to an Exchange factory function. */
 export interface ExchangeInput {
   forward: ExchangeIO;
-  client: Client;
+  client: MaskedClient;
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
