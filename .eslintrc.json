@@ -33,5 +33,10 @@
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "import/no-internal-modules": "off",
     "prefer-arrow/prefer-arrow-functions": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

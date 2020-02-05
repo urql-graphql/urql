@@ -7,4 +7,6 @@ build/
 coverage/
 package-lock.json
 .DS_Store
+**/scripts
+**/benchmark
 **/examples
