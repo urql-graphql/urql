@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-static";
 import { Wrapper } from "../../components/wrapper";
 import styled from "styled-components";
-import badge from "../../static/sidebar-badge.png";
+import badge from "../../static/sidebar-badge.svg";
 
 const WrapperStyled = styled(Wrapper)`
   z-index: 1;

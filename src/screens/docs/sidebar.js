@@ -10,7 +10,7 @@ import {
   SideBarSvg
 } from "../../components/navigation";
 import closeButton from "../../static/svgs/x.svg";
-import logoSidebar from "../../static/sidebar-badge.png";
+import logoSidebar from "../../static/sidebar-badge.svg";
 import constants from "../../constants";
 
 const HeroLogo = styled.img`
