@@ -1,22 +1,4 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "noUnusedLocals": true,
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "outDir": "dist/cjs",
-    "lib": ["dom", "esnext"],
-    "jsxFactory": "h",
-    "jsx": "react",
-    "declaration": false,
-    "module": "es2015",
-    "moduleResolution": "node",
-    "target": "esnext",
-    "strict": true,
-    "noImplicitAny": false,
-    "noUnusedParameters": true,
-    "sourceMap": true,
-    "pretty": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "extends": "../../tsconfig.json",
+  "include": ["src"]
 }

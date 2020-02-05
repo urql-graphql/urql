@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@urql/core": ["packages/core/src"],
+      "@urql/exchange-graphcache": ["exchanges/graphcache/src"],
+      "urql": ["packages/react-urql/src"],
+      "preact-urql": ["packages/preact-urql/src"],
+      "svelte-urql": ["packages/svelte-urql/src"]
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "declaration": false,
+    "lib": ["dom", "esnext"],
+    "jsx": "react",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "strict": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "packages",
+    "exchanges"
+  ],
+  "exclude": [
+    "scripts",
+    "packages/*/examples",
+    "packages/*/dist",
+    "exchanges/*/examples",
+    "exchanges/*/dist"
+  ]
+}
