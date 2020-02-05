@@ -12,7 +12,7 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
   if (!client.suspense) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
-        '[@urql/exchange-suspense]: suspensenExchange is currently disabled.\n' +
+        '[@urql/exchange-suspense]: suspenseExchange is currently disabled.\n' +
           'To use the suspense exchange with urql the Client needs to put into suspense mode.' +
           'You can do so by passing `suspense: true` when creating the client.'
       );
