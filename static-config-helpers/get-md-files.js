@@ -1,4 +1,5 @@
 /* eslint-disable func-style */
+import { stage, landerBasePath } from "../static-config-parts/constants";
 const fs = require("fs");
 const klaw = require("klaw");
 const path = require("path");
@@ -73,6 +74,19 @@ function slugWithLink() {
   return slugTransformer;
 }
 
+function appendImageBasePath(ast) {
+  function visitor(node) {
+    if (!!node.value.match(/<img /) && stage !== "development") {
+      node.value = node.value.replace(`src="`, `src="/${landerBasePath}`);
+    }
+  }
+  visit(ast, "html", visitor);
+}
+
+function imageTransformer() {
+  return appendImageBasePath;
+}
+
 const subHeadingRangeDefaults = {
   start: 1,
   end: 3
@@ -124,7 +138,8 @@ const baseConfig = {
     .use(html)
     .use(codeHighlightTransformer)
     .use(slug)
-    .use(slugWithLink),
+    .use(slugWithLink)
+    .use(imageTransformer),
   // converting to an originally grey-matter idiom for all our existing transforms and future interop -- it's not much of a stretch
   // for remark, but who knows what the future (and the past) hold.
   outputHarmonizer: result => ({
