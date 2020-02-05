@@ -37,30 +37,7 @@
   "author": "Formidable",
   "license": "MIT",
   "jest": {
-    "setupFiles": [
-      "./scripts/setupTests.js"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
-    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "collectCoverageFrom": [
-      "<rootDir>/src/**/*.{ts,tsx}"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/src/test-utils",
-      "<rootDir>/src.*/index.ts"
-    ]
+    "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
     "@types/use-subscription": "^1.0.0",

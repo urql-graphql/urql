@@ -3,7 +3,7 @@ import { interval, map, pipe } from 'wonka';
 
 import { createClient } from '../client';
 import { useQuery } from './useQuery';
-import { RequestPolicy } from 'src/types';
+import { RequestPolicy } from '../types';
 
 jest.mock('../client', () => {
   const d = { data: 'data', error: 'error' };

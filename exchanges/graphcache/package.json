@@ -35,26 +35,7 @@
   "author": "Formidable",
   "license": "MIT",
   "jest": {
-    "setupFiles": [
-      "./scripts/setupTests.js"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "collectCoverageFrom": [
-      "<rootDir>/src/**/*.{ts,tsx}"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/src.*/index.ts"
-    ]
+    "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
     "wonka": "^3.2.1 || ^4.0.0"
