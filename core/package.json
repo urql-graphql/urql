@@ -1,0 +1,18 @@
+{
+  "name": "@urql/core",
+  "version": "1.8.2",
+  "private": true,
+  "description": "A highly customizable and versatile GraphQL client for React",
+  "repository": "https://www.github.com/FormidableLabs/urql",
+  "bugs": {
+    "url": "https://github.com/FormidableLabs/urql/issues"
+  },
+  "homepage": "https://formidable.com/open-source/urql",
+  "main": "../dist/cjs/core.js",
+  "module": "../dist/es/core.js",
+  "types": "../dist/types/client.d.ts",
+  "source": "../src/client.ts",
+  "sideEffects": false,
+  "author": "Formidable",
+  "license": "MIT"
+}
