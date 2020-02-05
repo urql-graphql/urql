@@ -118,9 +118,16 @@ export class Client {
       queuedOperations.push(operation);
       if (!isDispatching) {
         isDispatching = true;
-        let queued;
-        while ((queued = queuedOperations.shift()) !== undefined)
-          nextOperation(queued);
+        let queued: Operation | undefined;
+        while ((queued = queuedOperations.shift()) !== undefined) {
+          if (
+            this.activeOperations[queued.key] ||
+            queued.operationName !== 'query'
+          ) {
+            nextOperation(queued);
+          }
+        }
+
         isDispatching = false;
       }
     };
@@ -182,7 +189,7 @@ export class Client {
     const newActive = (this.activeOperations[key] =
       prevActive <= 0 ? 0 : prevActive - 1);
 
-    if (newActive <= 0) {
+    if (prevActive && !newActive) {
       this.dispatchOperation({ ...operation, operationName: 'teardown' });
     }
   }
