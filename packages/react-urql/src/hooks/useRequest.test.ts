@@ -1,10 +1,21 @@
+import gql from 'graphql-tag';
 import { renderHook } from '@testing-library/react-hooks';
-import { queryGql } from '../test-utils';
 import { useRequest } from './useRequest';
 
 it('preserves instance of request when key has not changed', () => {
-  const { query } = queryGql;
-  let { variables } = queryGql;
+  const query = gql`
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
+    }
+  `;
+
+  let variables = {
+    name: 'Clara',
+  };
 
   const { result, rerender } = renderHook(
     ({ query, variables }) => useRequest(query, variables),
