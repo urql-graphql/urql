@@ -35,14 +35,12 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
           return currentValue;
         },
         subscribe(onValue: () => void): Unsubscribe {
-          return pipe(
-            updateValue,
-            subscribe(() => {
-              hasUpdate = true;
-              onValue();
-              hasUpdate = false;
-            })
-          ).unsubscribe as Unsubscribe;
+          hasUpdate = true;
+          const { unsubscribe } = pipe(updateValue, subscribe(onValue));
+          return () => {
+            unsubscribe();
+            hasUpdate = false;
+          };
         },
       };
     }, [source])
