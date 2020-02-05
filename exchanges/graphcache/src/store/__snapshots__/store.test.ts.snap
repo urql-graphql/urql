@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Store with storage should be able to store and rehydrate data 1`] = `
+Object {
+  "l|Query.appointment({\\"id\\":\\"1\\"})": "Appointment:1",
+  "r|Appointment:1.__typename": "Appointment",
+  "r|Appointment:1.id": "1",
+  "r|Appointment:1.info": "urql meeting",
+  "r|Query.__typename": "Query",
+}
+`;
+
+exports[`Store with storage writes removals based on GC to storage 1`] = `
+Object {
+  "l|Query.appointment({\\"id\\":\\"1\\"})": undefined,
+  "r|Appointment:1.__typename": undefined,
+  "r|Appointment:1.id": undefined,
+  "r|Appointment:1.info": undefined,
+  "r|Query.__typename": "Query",
+}
+`;

@@ -1,0 +1,16 @@
+{
+  "name": "@urql/exchange-graphcache-benchmark",
+  "private": true,
+  "version": "1.0.0",
+  "main": "suite.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "NODE_ENV=production benchr suite.js"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.0.0-beta.11",
+    "benchr": "4.3.0",
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1"
+  }
+}
