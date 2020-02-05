@@ -1,8 +1,8 @@
 {
+  "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "useJSXTextNode": true,
-    "ecmaVersion": 6,
+    "ecmaVersion": 8,
     "sourceType": "module",
     "ecmaFeatures": {
       "modules": true,
@@ -33,10 +33,5 @@
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "import/no-internal-modules": "off",
     "prefer-arrow/prefer-arrow-functions": "off"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
   }
 }

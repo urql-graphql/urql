@@ -1,3 +1,4 @@
+# http://editorconfig.org
 root = true
 
 [*]
@@ -7,3 +8,10 @@ end_of_line = lf
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+[*.md]
+max_line_length = 100
+trim_trailing_whitespace = false
+
+[COMMIT_EDITMSG]
+max_line_length = 0

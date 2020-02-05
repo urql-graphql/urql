@@ -1,0 +1,112 @@
+{
+  "name": "urql",
+  "version": "1.8.2",
+  "description": "A highly customizable and versatile GraphQL client for React",
+  "repository": "https://www.github.com/FormidableLabs/urql",
+  "bugs": {
+    "url": "https://github.com/FormidableLabs/urql/issues"
+  },
+  "homepage": "https://formidable.com/open-source/urql",
+  "main": "dist/cjs/urql.js",
+  "module": "dist/es/urql.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "sideEffects": false,
+  "keywords": [
+    "react",
+    "graphql client",
+    "state management",
+    "cache",
+    "formidablelabs",
+    "exchanges"
+  ],
+  "scripts": {
+    "prepare-core": "node ./scripts/prepare-core.js",
+    "prepare-bundle": "node ./scripts/post-transformation.js",
+    "clean": "rimraf ./dist ./node_modules/.cache ./core",
+    "build": "rollup -c rollup.config.js",
+    "postbuild": "run-s prepare-core prepare-bundle",
+    "watch": "rollup -w -c rollup.config.js",
+    "check": "tsc --noEmit",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prepublishOnly": "run-s clean test build",
+    "codecov": "codecov"
+  },
+  "author": "Formidable",
+  "license": "MIT",
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "jest": {
+    "setupFiles": [
+      "./scripts/setupTests.js"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "testRegex": "(src/.*(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "ts",
+      "tsx",
+      "json"
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.{ts,tsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/test-utils",
+      "<rootDir>/src.*/index.ts"
+    ]
+  },
+  "lint-staged": {
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/react-hooks": "^3.2.1",
+    "@types/enzyme": "3.10.4",
+    "@types/jest": "^25.1.1",
+    "@types/react": "^16.9.19",
+    "@types/react-test-renderer": "^16.9.2",
+    "@types/use-subscription": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "babel-plugin-closure-elimination": "^1.3.0",
+    "babel-plugin-transform-async-to-promises": "^0.8.15",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-to-json": "^3.4.3",
+    "graphql": "^14.6.0",
+    "graphql-tag": "^2.10.1",
+    "react-ssr-prepass": "1.0.8",
+    "react-test-renderer": "^16.12.0",
+    "ts-jest": "^25.1.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "react": ">= 16.8.0"
+  },
+  "dependencies": {
+    "use-subscription": "^1.3.0",
+    "wonka": "^4.0.7"
+  }
+}

@@ -1,2 +1,10 @@
-dist
-examples/**/*
+/.vscode
+**/node_modules
+*.log
+.rts2_cache*
+dist/
+build/
+coverage/
+package-lock.json
+.DS_Store
+**/examples
