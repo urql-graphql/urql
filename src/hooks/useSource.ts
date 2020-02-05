@@ -16,12 +16,15 @@ import {
   subscribe,
 } from 'wonka';
 
+import { useClient } from '../context';
+
 export const useSource = <T>(source: Source<T>, init: T): T =>
   useSubscription(
     useMemo((): Subscription<T> => {
       let hasUpdate = false;
       let currentValue: T = init;
 
+      // Wrap the source and track its `currentValue`
       const updateValue = pipe(
         source,
         onPush(value => {
@@ -30,10 +33,17 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
       );
 
       return {
+        // getCurrentValue may be implemented by subscribing to the
+        // given source and immediately unsubscribing. Only synchronous
+        // values will therefore reach our `onPush` callback.
         getCurrentValue(): T {
           if (!hasUpdate) publish(updateValue).unsubscribe();
           return currentValue;
         },
+        // subscribe is just a regular subscription, but it also tracks
+        // `hasUpdate`. If we're subscribed and receive a new value we
+        // set `hasUpdate` to avoid `getCurrentValue` trying to subscribe
+        // again.
         subscribe(onValue: () => void): Unsubscribe {
           hasUpdate = true;
           const { unsubscribe } = pipe(updateValue, subscribe(onValue));
@@ -47,6 +57,8 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
   );
 
 export const useBehaviourSubject = <T>(value: T) => {
+  const client = useClient();
+
   const state = useMemo((): [Source<T>, (value: T) => void] => {
     let prevValue = value;
 
@@ -56,18 +68,28 @@ export const useBehaviourSubject = <T>(value: T) => {
       map(() => prevValue)
     );
 
+    // This turns the subject into a behaviour subject that returns
+    // the last known value (or the initial value) synchronously
     const source = concat([prevValue$, subject.source]);
 
     const next = (value: T) => {
-      subject.next((prevValue = value));
+      // We can use the latest known value to also deduplicate next calls.
+      if (value !== prevValue) {
+        subject.next((prevValue = value));
+      }
     };
 
     return [source, next];
   }, []);
 
+  // NOTE: This is a special case for client-side suspense.
+  // We can't trigger suspense inside an effect but only in the render function.
+  // So we "deopt" to not using an effect if the client is in suspense-mode.
   useEffect(() => {
-    state[1](value);
+    if (!client.suspense) state[1](value);
   }, [state, value]);
+
+  if (client.suspense) state[1](value);
 
   return state;
 };
