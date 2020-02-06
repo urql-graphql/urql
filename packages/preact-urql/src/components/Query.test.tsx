@@ -56,6 +56,6 @@ describe('Query', () => {
     setTimeout(() => {
       expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
       done();
-    }, 200);
+    }, 250);
   });
 });

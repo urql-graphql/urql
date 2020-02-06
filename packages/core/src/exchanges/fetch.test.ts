@@ -1,9 +1,11 @@
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
+import gql from 'graphql-tag';
+import { print } from 'graphql';
+
 import { Client } from '../client';
 import { queryOperation } from '../test-utils';
 import { OperationResult, OperationType } from '../types';
 import { fetchExchange, convertToGet } from './fetch';
-import gql from 'graphql-tag';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -170,15 +172,16 @@ describe('convert for GET', () => {
         id
       }
     `;
+
     const variables = { id: 2 };
-    const query = gql`
+    const query = print(gql`
       query($id: ID!) {
         node(id: $id) {
           ...nodeFragment
         }
       }
       ${nodeFragment}
-    `;
+    `);
 
     expect(convertToGet('http://localhost:3000', { query, variables })).toBe(
       `http://localhost:3000?query=${encodeURIComponent(

@@ -27,7 +27,7 @@ const queryOneData = {
 };
 
 it('writes queries to the cache', () => {
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const op = client.createRequestOperation('query', {
     key: 1,
     query: queryOne,
@@ -82,7 +82,7 @@ it('updates related queries when their data changes', () => {
     ],
   };
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const reexec = jest
@@ -145,7 +145,7 @@ it('does nothing when no related queries have changed', () => {
     },
   };
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
@@ -217,7 +217,7 @@ it('writes optimistic mutations to the cache', () => {
     },
   };
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const reexec = jest
@@ -314,7 +314,7 @@ it('correctly clears on error', () => {
     },
   };
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const reexec = jest
@@ -388,7 +388,7 @@ it('correctly clears on error', () => {
 });
 
 it('follows resolvers on initial write', () => {
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const opOne = client.createRequestOperation('query', {
@@ -462,7 +462,7 @@ it('follows resolvers for mutations', () => {
     },
   };
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const opOne = client.createRequestOperation('query', {
@@ -544,7 +544,7 @@ it('follows nested resolvers for mutations', () => {
     }
   `;
 
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
 
   const query = gql`
@@ -702,7 +702,7 @@ it('follows nested resolvers for mutations', () => {
 
 it('reexecutes query and returns data on partial result', () => {
   jest.useFakeTimers();
-  const client = createClient({ url: '' });
+  const client = createClient({ url: 'http://0.0.0.0' });
   const { source: ops$, next } = makeSubject<Operation>();
   const reexec = jest
     .spyOn(client, 'reexecuteOperation')
