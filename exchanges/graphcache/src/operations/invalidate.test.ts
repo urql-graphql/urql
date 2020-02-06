@@ -23,14 +23,9 @@ const TODO_QUERY = gql`
 
 describe('Query', () => {
   let schema, store;
-  const spy: { console?: any } = {};
 
   beforeAll(() => {
     schema = require('../test-utils/simple_schema.json');
-  });
-
-  afterEach(() => {
-    spy.console.mockRestore();
   });
 
   beforeEach(() => {
@@ -46,9 +41,9 @@ describe('Query', () => {
         ],
       }
     );
-    spy.console = jest.spyOn(console, 'warn');
 
     InMemoryData.initDataState(store.data, 0);
+    jest.clearAllMocks();
   });
 
   it('should warn once for invalid fields on an entity', () => {

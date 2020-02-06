@@ -9,7 +9,7 @@ jest.mock('../context', () => {
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
-        interval(400),
+        interval(1000 / 60),
         map(i => ({ data: i, error: i + 1 }))
       )
     ),
