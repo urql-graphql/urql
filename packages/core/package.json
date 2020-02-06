@@ -18,10 +18,13 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-core.js",
-  "module": "dist/urql-core.es.js",
+  "main": "dist/urql-core.cjs.js",
+  "module": "dist/urql-core.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "scripts": {
+    "build": "rollup -c ../../scripts/rollup/config.js"
+  },
   "jest": {
     "preset": "../../scripts/jest/preset"
   },
