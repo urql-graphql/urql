@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import { DocumentNode } from 'graphql';
-import { OperationResult, OperationContext } from '../types';
+import { OperationResult, OperationContext } from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
 export interface MutationProps<T, V> {

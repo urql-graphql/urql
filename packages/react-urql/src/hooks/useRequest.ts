@@ -1,7 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { useRef, useMemo } from 'react';
-import { GraphQLRequest } from '../types';
-import { createRequest } from '../utils';
+import { GraphQLRequest, createRequest } from '@urql/core';
 
 /** Creates a request from a query and variables but preserves reference equality if the key isn't changing */
 export const useRequest = (

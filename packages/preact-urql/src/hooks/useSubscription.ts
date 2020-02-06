@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef } from 'preact/hooks';
 import { pipe, onEnd, subscribe } from 'wonka';
-import { CombinedError, OperationContext } from 'urql/core';
+import { CombinedError, OperationContext } from '@urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { noop, initialState } from './useQuery';

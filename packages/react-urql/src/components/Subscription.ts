@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { OperationContext } from '../types';
+import { OperationContext } from '@urql/core';
 
 import {
   useSubscription,

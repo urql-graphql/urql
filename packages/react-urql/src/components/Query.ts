@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { OperationContext } from '../types';
+import { OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from '../hooks';
 
 export interface QueryProps<T, V> extends UseQueryArgs<V> {

@@ -1,6 +1,6 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
-import { OperationContext } from 'urql/core';
+import { OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { map, interval, pipe, never, onStart, onEnd, empty } from 'wonka';
 import { Provider } from '../context';

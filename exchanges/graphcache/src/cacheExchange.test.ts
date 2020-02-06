@@ -4,7 +4,7 @@ import {
   ExchangeIO,
   Operation,
   OperationResult,
-} from 'urql/core';
+} from '@urql/core';
 import { pipe, map, makeSubject, tap, publish, delay } from 'wonka';
 import { cacheExchange } from './cacheExchange';
 

@@ -22,8 +22,7 @@ import { print } from 'graphql';
 import gql from 'graphql-tag';
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-// @ts-ignore - data is imported from mock only
-import { createClient } from '../client';
+import { createClient } from '@urql/core';
 import { useMutation } from './useMutation';
 
 // @ts-ignore

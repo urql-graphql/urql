@@ -1,9 +1,8 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 
-import { createClient } from '../client';
+import { createClient, RequestPolicy } from '@urql/core';
 import { useQuery } from './useQuery';
-import { RequestPolicy } from '../types';
 
 jest.mock('../client', () => {
   const d = { data: 'data', error: 'error' };

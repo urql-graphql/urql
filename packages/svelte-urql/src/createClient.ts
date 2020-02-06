@@ -1,4 +1,4 @@
-import { createClient, ClientOptions, Client  } from 'urql/core';
+import { createClient, ClientOptions, Client  } from '@urql/core';
 import { setClient } from './context/setClient';
 
 export const createSvelteClient = (args: ClientOptions): Client => {

@@ -9,7 +9,7 @@ const client = {
 jest.mock('../context/getClient', () => ({ getClient: () => client }));
 
 import { mutate } from './mutate';
-import { createRequest } from 'urql/core';
+import { createRequest } from '@urql/core';
 
 describe('mutate', () => {
   const mutation = 'mutation ($text: String) { addTodo(text: $text) { id } }';

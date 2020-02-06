@@ -7,7 +7,7 @@ import {
   OperationResult,
   RequestPolicy,
   CacheOutcome,
-} from 'urql/core';
+} from '@urql/core';
 
 import {
   filter,

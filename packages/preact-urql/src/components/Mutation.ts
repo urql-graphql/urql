@@ -1,6 +1,6 @@
 import { VNode } from 'preact';
 import { DocumentNode } from 'graphql';
-import { OperationResult, OperationContext } from 'urql/core';
+import { OperationResult, OperationContext } from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
 export interface MutationProps<T, V> {

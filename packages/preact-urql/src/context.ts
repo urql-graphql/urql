@@ -1,6 +1,6 @@
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
-import { Client, createClient } from 'urql/core';
+import { Client, createClient } from '@urql/core';
 
 // We assume some default options here; mainly not to actually be used
 // but not to error catastrophically if someone is just playing around

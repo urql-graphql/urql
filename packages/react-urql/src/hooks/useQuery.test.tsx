@@ -21,8 +21,7 @@ jest.mock('../client', () => {
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { pipe, onStart, onEnd, empty, never } from 'wonka';
-import { createClient } from '../client';
-import { OperationContext } from '../types';
+import { createClient, OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 
 // @ts-ignore

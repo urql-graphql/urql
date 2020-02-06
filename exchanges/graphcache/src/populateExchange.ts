@@ -16,7 +16,7 @@ import {
 } from 'graphql';
 
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation } from 'urql/core';
+import { Exchange, Operation } from '@urql/core';
 
 import { getName, getSelectionSet, unwrapType } from './ast';
 import { makeDict } from './store';

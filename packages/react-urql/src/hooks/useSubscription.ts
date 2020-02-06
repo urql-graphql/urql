@@ -1,11 +1,10 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+import { CombinedError, OperationContext } from '@urql/core';
 
 import { useClient } from '../context';
-import { CombinedError } from '../utils';
 import { useSource, useBehaviourSubject } from './useSource';
-import { OperationContext } from '../types';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 

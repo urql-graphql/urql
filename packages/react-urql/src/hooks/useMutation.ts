@@ -1,9 +1,15 @@
 import { DocumentNode } from 'graphql';
 import { useState, useCallback } from 'react';
 import { pipe, toPromise } from 'wonka';
+
+import {
+  OperationResult,
+  OperationContext,
+  CombinedError,
+  createRequest
+} from '@urql/core';
+
 import { useClient } from '../context';
-import { OperationResult, OperationContext } from '../types';
-import { CombinedError, createRequest } from '../utils';
 import { initialState } from './constants';
 
 export interface UseMutationState<T> {

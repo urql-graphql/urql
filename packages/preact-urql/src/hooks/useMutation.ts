@@ -6,7 +6,7 @@ import {
   OperationContext,
   CombinedError,
   createRequest,
-} from 'urql/core';
+} from '@urql/core';
 import { useClient } from '../context';
 import { useImmediateState } from './useImmediateState';
 import { initialState } from './useQuery';

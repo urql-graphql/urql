@@ -5,7 +5,7 @@ import {
   GraphQLSchema,
 } from 'graphql';
 
-import { createRequest } from 'urql/core';
+import { createRequest } from '@urql/core';
 
 import {
   Cache,

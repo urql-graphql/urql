@@ -16,13 +16,12 @@ jest.mock('../client', () => {
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { empty } from 'wonka';
-// @ts-ignore - data is imported from mock only
-import { createClient, data } from '../client';
 import { useSubscription, UseSubscriptionState } from './useSubscription';
-import { OperationContext } from '../types';
+import { createClient, OperationContext } from '@urql/core';
 
 // @ts-ignore
-const client = createClient() as { executeSubscription: jest.Mock };
+const data = { data: 1234, error: 5678 };
+const client = createClient({ url: '' }) as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;

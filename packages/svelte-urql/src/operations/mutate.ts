@@ -1,4 +1,4 @@
-import { createRequest, OperationContext } from 'urql/core';
+import { createRequest, OperationContext } from '@urql/core';
 import { DocumentNode } from 'graphql';
 import { pipe, toPromise } from 'wonka';
 import { getClient } from '../context/getClient';

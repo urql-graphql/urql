@@ -1,5 +1,5 @@
 import { VNode } from 'preact';
-import { OperationContext } from 'urql/core';
+import { OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from '../hooks';
 
 export interface QueryProps<T, V> extends UseQueryArgs<V> {

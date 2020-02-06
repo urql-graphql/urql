@@ -17,7 +17,7 @@ jest.mock('../client', () => {
 import * as React from 'react';
 import { act, cleanup, render } from '@testing-library/react';
 import { Mutation } from './Mutation';
-import { createClient } from '../client';
+import { createClient } from '@urql/core';
 
 // @ts-ignore
 const client = createClient() as { executeMutation: jest.Mock };

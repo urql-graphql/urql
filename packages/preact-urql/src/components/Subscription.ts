@@ -1,5 +1,5 @@
 import { VNode } from 'preact';
-import { OperationContext } from 'urql/core';
+import { OperationContext } from '@urql/core';
 import {
   useSubscription,
   UseSubscriptionArgs,

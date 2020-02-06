@@ -1,4 +1,4 @@
-import { RequestPolicy, OperationContext, createRequest } from 'urql/core';
+import { RequestPolicy, OperationContext, createRequest } from '@urql/core';
 import { DocumentNode } from 'graphql';
 import { getClient } from '../context';
 import { observe } from './observe';

@@ -1,13 +1,71 @@
 import React from 'react';
+import gql from 'graphql-tag';
 import prepass from 'react-ssr-prepass';
 import { never, publish, filter, delay, pipe, map } from 'wonka';
 
-import { createClient } from '../client';
+import {
+  createClient,
+  Exchange,
+  dedupExchange,
+  cacheExchange,
+  ssrExchange,
+  OperationContext,
+  GraphQLRequest,
+  Operation,
+  OperationResult
+} from '@urql/core';
+
 import { Provider } from '../context';
 import { useQuery } from '../hooks';
-import { dedupExchange, cacheExchange, ssrExchange } from '../exchanges';
-import { Exchange } from '../types';
-import { queryOperation, queryResponse } from './index';
+
+const context: OperationContext = {
+  fetchOptions: {
+    method: 'POST',
+  },
+  requestPolicy: 'cache-first',
+  url: 'http://localhost:3000/graphql',
+};
+
+export const queryGql: GraphQLRequest = {
+  key: 2,
+  query: gql`
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
+    }
+  `,
+  variables: {
+    name: 'Clara',
+  },
+};
+
+const teardownOperation: Operation = {
+  query: queryGql.query,
+  variables: queryGql.variables,
+  key: queryGql.key,
+  operationName: 'teardown',
+  context,
+};
+
+const queryOperation: Operation = {
+  query: teardownOperation.query,
+  variables: teardownOperation.variables,
+  key: teardownOperation.key,
+  operationName: 'query',
+  context,
+};
+
+const queryResponse: OperationResult = {
+  operation: queryOperation,
+  data: {
+    user: {
+      name: 'Clive',
+    },
+  },
+};
 
 const url = 'https://hostname.com';
 
