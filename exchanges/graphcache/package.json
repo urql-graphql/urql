@@ -2,38 +2,27 @@
   "name": "@urql/exchange-graphcache",
   "version": "2.1.0",
   "description": "A normalized and configurable cache exchange for urql",
-  "repository": "https://github.com/FormidableLabs/urql-exchange-graphcache",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/core"
+  },
   "keywords": [
+    "urql",
+    "state management",
     "normalized cache",
     "cache",
-    "urql",
-    "graphql",
-    "exchange"
+    "formidablelabs",
+    "exchanges"
   ],
-  "bugs": {
-    "url": "https://github.com/FormidableLabs/urql-exchange-graphcache/issues"
-  },
-  "homepage": "https://github.com/FormidableLabs/urql-exchange-graphcache",
   "main": "dist/urql-exchange-graphcache.js",
   "module": "dist/urql-exchange-graphcache.es.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
-  "sideEffects": false,
-  "scripts": {
-    "clean": "rimraf ./dist ./node_modules/.cache",
-    "build": "rollup -c rollup.config.js",
-    "postbuild": "run-s prepare:extras",
-    "watch": "rollup -w -c rollup.config.js",
-    "check": "tsc --noEmit",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "lint": "eslint . --ext .ts,.tsx",
-    "prepare:extras": "./scripts/prepare-extras.js",
-    "prepublishOnly": "run-s clean test build",
-    "codecov": "codecov"
-  },
-  "author": "Formidable",
-  "license": "MIT",
   "jest": {
     "preset": "../../scripts/jest/preset"
   },

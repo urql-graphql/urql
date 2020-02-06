@@ -1,34 +1,23 @@
 {
   "name": "@urql/preact",
   "version": "1.1.0",
-  "description": "Urql that works with Preact-core",
-  "author": "jdecroock <decroockjovi@gmail.com> (https://twitter.com/JoviDeC)",
+  "description": "A highly customizable and versatile GraphQL client for Preact",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
   "license": "MIT",
-  "scripts": {
-    "clean": "rimraf ./dist ./node_modules/.cache",
-    "build": "rollup -c rollup.config.js",
-    "watch": "rollup -w -c rollup.config.js",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s clean test build",
-    "codecov": "codecov"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoviDeCroock/preact-urql.git"
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/core"
   },
-  "bugs": {
-    "url": "https://github.com/JoviDeCroock/preact-urql/issues"
-  },
-  "homepage": "https://github.com/JoviDeCroock/preact-urql#readme",
-  "sideEffects": false,
-  "private": false,
   "keywords": [
-    "preact",
     "graphql client",
     "state management",
-    "cache"
+    "cache",
+    "formidablelabs",
+    "exchanges",
+    "preact"
   ],
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",

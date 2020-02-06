@@ -2,16 +2,15 @@
   "name": "@urql/core",
   "version": "1.8.2",
   "description": "The shared core for the highly customizable and versatile GraphQL client",
-  "repository": "https://www.github.com/FormidableLabs/urql",
-  "bugs": {
-    "url": "https://github.com/FormidableLabs/urql/issues"
-  },
-  "homepage": "https://formidable.com/open-source/urql",
-  "main": "dist/urql-core.js",
-  "module": "dist/urql-core.es.js",
-  "types": "dist/types/index.d.ts",
-  "source": "src/index.ts",
   "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/core"
+  },
   "keywords": [
     "graphql client",
     "state management",
@@ -19,22 +18,10 @@
     "formidablelabs",
     "exchanges"
   ],
-  "scripts": {
-    "prepare-core": "node ./scripts/prepare-core.js",
-    "prepare-bundle": "node ./scripts/post-transformation.js",
-    "clean": "rimraf ./dist ./node_modules/.cache ./core",
-    "build": "rollup -c rollup.config.js",
-    "postbuild": "run-s prepare-core prepare-bundle",
-    "watch": "rollup -w -c rollup.config.js",
-    "check": "tsc --noEmit",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "run-s clean test build",
-    "codecov": "codecov"
-  },
-  "author": "Formidable",
-  "license": "MIT",
+  "main": "dist/urql-core.js",
+  "module": "dist/urql-core.es.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
   "jest": {
     "preset": "../../scripts/jest/preset"
   },

@@ -1,26 +1,25 @@
 {
   "name": "svelte-urql",
-  "version": "1.0.0",
-  "description": "",
-  "main": "rollup.config.js",
-  "scripts": {
-    "build": "rollup -c rollup.config.js",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "lint": "eslint --ext .ts,.tsx",
-    "codecov": "codecov",
-    "prepublishOnly": "run-s clean test build"
-  },
+  "version": "0.0.0",
+  "private": true,
+  "description": "WIP: A highly customizable and versatile GraphQL client for Svelte",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoviDeCroock/svelte-urql.git"
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/core"
   },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/JoviDeCroock/svelte-urql/issues"
-  },
-  "homepage": "https://github.com/JoviDeCroock/svelte-urql#readme",
+  "keywords": [
+    "graphql client",
+    "state management",
+    "cache",
+    "formidablelabs",
+    "exchanges",
+    "svelte"
+  ],
   "jest": {
     "preset": "../../scripts/jest/preset"
   },
