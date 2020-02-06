@@ -10,6 +10,16 @@
       "<rootDir>/exchanges/*"
     ]
   },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "./scripts/eslint/preset.js"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
     "@babel/core": "^7.7.7",
