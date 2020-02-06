@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "packages/core"
+    "directory": "exchanges/graphcache"
   },
   "keywords": [
     "urql",
@@ -19,10 +19,13 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-graphcache.js",
-  "module": "dist/urql-exchange-graphcache.es.js",
+  "main": "dist/urql-exchange-graphcache.cjs.js",
+  "module": "dist/urql-exchange-graphcache.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "scripts": {
+    "build": "rollup -c ../../scripts/rollup/config.js"
+  },
   "jest": {
     "preset": "../../scripts/jest/preset"
   },

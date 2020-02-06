@@ -1,5 +1,5 @@
 {
-  "name": "svelte-urql",
+  "name": "@urql/svelte",
   "version": "0.0.0",
   "private": true,
   "description": "WIP: A highly customizable and versatile GraphQL client for Svelte",
@@ -10,7 +10,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "packages/core"
+    "directory": "packages/svelte-urql"
   },
   "keywords": [
     "graphql client",
@@ -20,6 +20,13 @@
     "exchanges",
     "svelte"
   ],
+  "main": "dist/urql-svelte.cjs.js",
+  "module": "dist/urql-svelte.esm.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "rollup -c ../../scripts/rollup/config.js"
+  },
   "jest": {
     "preset": "../../scripts/jest/preset"
   },
