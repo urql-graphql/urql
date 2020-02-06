@@ -1,5 +1,5 @@
 {
-  "name": "@urql/example-using-subscriptions",
+  "name": "@urql/graphcache-example-using-subscriptions",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",

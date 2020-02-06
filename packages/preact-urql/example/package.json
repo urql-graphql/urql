@@ -1,5 +1,5 @@
 {
-  "name": "@urql/example-getting-started",
+  "name": "@urql/preact-example-getting-started",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
