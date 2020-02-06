@@ -1,5 +1,4 @@
-jest.mock('../client', () => {
-  const d = { data: 1, error: 2 };
+jest.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { pipe, interval, map } = require('wonka');
   const mock = {
@@ -12,8 +11,7 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock,
   };
 });
 
@@ -25,10 +23,7 @@ const query = 'subscription Example { example }';
 
 describe('Subscription', () => {
   beforeEach(() => {
-    // eslint-disable-next-line no-console
-    console.log(
-      'supressing console.error output due to react-test-renderer spam (hooks related)'
-    );
+    // TODO: Fix use of act()
     jest.spyOn(global.console, 'error').mockImplementation();
   });
 

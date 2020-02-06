@@ -1,6 +1,5 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../client', () => {
-  const d = { data: 1234, error: 5678 };
+jest.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
@@ -13,19 +12,21 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock,
   };
 });
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { pipe, onStart, onEnd, empty, never } from 'wonka';
-import { createClient, OperationContext } from '@urql/core';
+import { OperationContext } from '@urql/core';
+
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
+import { useClient } from '../context';
 
 // @ts-ignore
-const client = createClient() as { executeQuery: jest.Mock };
+const client = useClient() as { executeQuery: jest.Mock };
+
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -49,10 +50,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 };
 
 beforeAll(() => {
-  // eslint-disable-next-line no-console
-  console.log(
-    'supressing console.error output due to react-test-renderer spam (hooks related)'
-  );
+  // TODO: Fix use of act()
   jest.spyOn(global.console, 'error').mockImplementation();
 });
 

@@ -1,5 +1,4 @@
-jest.mock('../client', () => {
-  const d = { data: 1234, error: 5678 };
+jest.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
@@ -9,26 +8,22 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock,
   };
 });
 
 import * as React from 'react';
 import { act, cleanup, render } from '@testing-library/react';
 import { Mutation } from './Mutation';
-import { createClient } from '@urql/core';
+import { useClient } from '../context';
 
 // @ts-ignore
-const client = createClient() as { executeMutation: jest.Mock };
+const client = useClient() as { executeMutation: jest.Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
-    // eslint-disable-next-line no-console
-    console.log(
-      'supressing console.error output due to react-test-renderer spam (hooks related)'
-    );
+    // TODO: Fix use of act()
     jest.spyOn(global.console, 'error').mockImplementation();
   });
 

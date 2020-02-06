@@ -1,5 +1,5 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../client', () => {
+jest.mock('../context', () => {
   const d = { data: 1234, error: 5678 };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { merge, fromValue, never } = require('wonka');
@@ -8,20 +8,20 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock,
   };
 });
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { empty } from 'wonka';
+import { OperationContext } from '@urql/core';
+
 import { useSubscription, UseSubscriptionState } from './useSubscription';
-import { createClient, OperationContext } from '@urql/core';
+import { useClient } from '../context';
 
 // @ts-ignore
-const data = { data: 1234, error: 5678 };
-const client = createClient({ url: '' }) as { executeSubscription: jest.Mock };
+const client = useClient() as { executeSubscription: jest.Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;
@@ -80,7 +80,8 @@ describe('on subscription', () => {
      */
     wrapper.update(<SubscriptionUser q={query} />);
     expect(state).toEqual({
-      ...data,
+      data: 1234,
+      error: 5678,
       extensions: undefined,
       fetching: true,
       stale: false,

@@ -35,7 +35,7 @@ it('preserves instance of request when key has not changed', () => {
   const resultB = result.current;
   expect(resultA).toBe(resultB);
 
-  variables = { ...variables, test: true }; // Change values
+  variables = { ...variables, test: true } as any; // Change values
   rerender({ query, variables });
 
   const resultC = result.current;

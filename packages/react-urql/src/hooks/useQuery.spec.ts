@@ -1,11 +1,11 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
+import { RequestPolicy } from '@urql/core';
 
-import { createClient, RequestPolicy } from '@urql/core';
+import { useClient } from '../context';
 import { useQuery } from './useQuery';
 
-jest.mock('../client', () => {
-  const d = { data: 'data', error: 'error' };
+jest.mock('../context', () => {
   const mock = {
     executeQuery: jest.fn(() =>
       pipe(
@@ -16,13 +16,12 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock
   };
 });
 
 // @ts-ignore
-const client = createClient() as { executeQuery: jest.Mock };
+const client = useClient() as { executeQuery: jest.Mock };
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -40,10 +39,7 @@ const mockVariables = {
 
 describe('useQuery', () => {
   beforeAll(() => {
-    // eslint-disable-next-line no-console
-    console.log(
-      'supressing console.error output due to react-test-renderer spam (hooks related)'
-    );
+    // TODO: Fix use of act()
     jest.spyOn(global.console, 'error').mockImplementation();
   });
 

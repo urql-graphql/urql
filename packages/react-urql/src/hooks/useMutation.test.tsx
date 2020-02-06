@@ -1,6 +1,5 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../client', () => {
-  const d = { data: 1234, error: 5678 };
+jest.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
@@ -13,8 +12,7 @@ jest.mock('../client', () => {
   };
 
   return {
-    createClient: () => mock,
-    data: d,
+    useClient: () => mock,
   };
 });
 
@@ -22,14 +20,17 @@ import { print } from 'graphql';
 import gql from 'graphql-tag';
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { createClient } from '@urql/core';
+
+import { useClient } from '../context';
 import { useMutation } from './useMutation';
 
 // @ts-ignore
-const client = createClient() as { executeMutation: jest.Mock };
+const client = useClient() as { executeMutation: jest.Mock };
+
 const props = {
   query: 'mutation Example { example }',
 };
+
 let state: any;
 let execute: any;
 
@@ -41,10 +42,7 @@ const MutationUser: FC<typeof props> = ({ query }) => {
 };
 
 beforeAll(() => {
-  // eslint-disable-next-line no-console
-  console.log(
-    'supressing console.error output due to react-test-renderer spam (hooks related)'
-  );
+  // TODO: Fix use of act()
   jest.spyOn(global.console, 'error').mockImplementation();
 });
 
