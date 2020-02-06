@@ -40,10 +40,18 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
+    "@types/react": "^16.9.19",
+    "@types/react-test-renderer": "^16.9.2",
     "@types/use-subscription": "^1.0.0",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/react-hooks": "^3.2.1",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
-    "react-ssr-prepass": "1.0.8"
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-is": "^16.12.0",
+    "react-ssr-prepass": "1.0.8",
+    "react-test-renderer": "^16.12.0"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",

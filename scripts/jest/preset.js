@@ -1,9 +1,19 @@
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const { compilerOptions } = require('../../tsconfig.json');
+
 module.exports = {
-  setupFiles: [require.resolve('./setup.js')],
+  preset: 'ts-jest',
+  setupFiles: [
+    require.resolve('./setup.js')
+  ],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
-  snapshotSerializers: ['enzyme-to-json/serializer'],
+  moduleNameMapper: pathsToModuleNameMapper(
+    compilerOptions.paths,
+    { prefix: '<rootDir>/../../' }
+  ),
+  watchPlugins: ['jest-watch-yarn-workspaces'],
   testRegex: '(src/.*(\\.|/)(test|spec))\\.tsx?$',
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json'],
   collectCoverageFrom: ['<rootDir>/src/**/*.{ts,tsx}'],
