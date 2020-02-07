@@ -3,30 +3,27 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: "bug \U0001F41B"
-assignees: ''
+---<!--
+  Please describe your bug clearly and concisely.
+  Include a screenshot or a reproduction to illustrate
+  the bug and how to reproduce it.
+  Please also leave a note on what version of urql you're using
+  and include a list of exchanges (if any).
+-->
 
----
-
-**Describe the bug**
-A clear and concise description of what the bug is.
+urql version & exchanges:
 
 **Steps to reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+
+1. 2.
 
 **Expected behavior**
-A clear and concise description of what you expected to happen.
 
 **Actual behavior**
-A clear and concise description of what is actually happening.
 
-**Additional context**
-Add any other context about the problem here.
-
-It offers a lot of help when you add a reproduction to your bug report, here are some templates to help you get started:
-
-- client: https://codesandbox.io/s/urql-issue-template-client-iui0o
-- server: https://codesandbox.io/s/urql-issue-template-server-0ufyz
+<!--
+  Your issue will be addressed much faster if you include a
+  reproduction. Here are some templates to help you create one:
+  - client: https://codesandbox.io/s/urql-issue-template-client-iui0o
+  - server: https://codesandbox.io/s/urql-issue-template-server-0ufyz
+-->
