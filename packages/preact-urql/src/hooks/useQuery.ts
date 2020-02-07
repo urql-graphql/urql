@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 import { useRef, useCallback } from 'preact/hooks';
-import { OperationContext, RequestPolicy, CombinedError } from '@urql/core';
+import { OperationContext, RequestPolicy, CombinedError, stripTypename } from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
@@ -23,6 +23,7 @@ export interface UseQueryArgs<V> {
   pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
+  stripTypename?: boolean;
 }
 
 export interface UseQueryState<T> {
@@ -71,7 +72,9 @@ export const useQuery = <T = any, V = object>(
         subscribe(result => {
           setState({
             fetching: false,
-            data: result.data,
+            data: args.stripTypename ?
+              stripTypename(result.data) :
+              result.data,
             error: result.error,
             extensions: result.extensions,
             stale: !!result.stale,
@@ -80,14 +83,7 @@ export const useQuery = <T = any, V = object>(
       );
       unsubscribe.current = result.unsubscribe;
     },
-    [
-      args.context,
-      args.requestPolicy,
-      args.pollInterval,
-      client,
-      request,
-      setState,
-    ]
+    [setState, client, request, args.requestPolicy, args.pollInterval, args.context, args.stripTypename]
   );
 
   useImmediateEffect(() => {
