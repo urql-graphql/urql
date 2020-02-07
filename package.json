@@ -6,9 +6,9 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "wsrun build",
     "check": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "./scripts/rollup/build.js"
   },
   "jest": {
     "projects": [
@@ -59,6 +59,7 @@
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-react": "^7.18.0",
     "eslint-plugin-react-hooks": "^2.3.0",
+    "execa": "^4.0.0",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
     "husky": "^4.2.1",

@@ -1,6 +1,6 @@
 import { readable, Readable } from 'svelte/store';
 import { pipe, subscribe } from 'wonka';
-import { OperationResult } from 'urql';
+import { OperationResult } from '@urql/core';
 
 export interface Resolve<T> {
   fulfill: (value: T) => void;

@@ -1,0 +1,87 @@
+version: 2
+
+aliases:
+  - &docker
+    - image: circleci/node:12-buster
+  - &yarn_cache
+    restore_cache:
+      name: Restore Yarn cache
+      keys:
+        - yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+        - yarn-{{ .Branch }}-
+  - &yarn
+    run:
+      name: Install Packages
+      command: yarn --frozen-lockfile --non-interactive
+
+jobs:
+  setup:
+    docker: *docker
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - save_cache:
+          name: Save Yarn cache
+          key: yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+  lint:
+    docker: *docker
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: ESLint
+          command: yarn run lint
+
+  typescript:
+    docker: *docker
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: TypeScript
+          command: yarn run check
+
+  test:
+    docker: *docker
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: Unit Tests
+          command: yarn run test --maxWorkers=2
+
+  build:
+    docker: *docker
+    parallelism: 4
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: Build
+          command: yarn run build
+
+workflows:
+  version: 2
+  stable:
+    jobs:
+      - setup
+      - lint:
+          requires:
+            - setup
+      - typescript:
+          requires:
+            - setup
+      - test:
+          requires:
+            - setup
+      - build:
+          requires:
+            - setup
