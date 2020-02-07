@@ -5,7 +5,7 @@
     { "repo": "FormidableLabs/urql" }
   ],
   "commit": false,
-  "linked": [],
+  "linked": [["urql", "@urql/core"]],
   "access": "public",
   "baseBranch": "master"
 }
