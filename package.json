@@ -4,6 +4,11 @@
     "packages/*",
     "exchanges/*"
   ],
+  "scripts": {
+    "test": "jest",
+    "check": "tsc --noEmit",
+    "lint": "eslint ."
+  },
   "jest": {
     "projects": [
       "<rootDir>/packages/*",
@@ -56,6 +61,7 @@
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
     "husky": "^4.2.1",
+    "invariant": "^2.2.4",
     "jest": "^25.1.0",
     "jest-watch-yarn-workspaces": "^1.1.0",
     "lint-staged": "^10.0.7",

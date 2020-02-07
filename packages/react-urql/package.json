@@ -23,8 +23,20 @@
   "module": "dist/urql.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "core/",
+    "dist/"
+  ],
   "scripts": {
-    "build": "rollup -c ../../scripts/rollup/config.js"
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean test build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset"
