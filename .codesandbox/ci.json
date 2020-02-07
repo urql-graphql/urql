@@ -1,0 +1,5 @@
+{
+  "packages": ["packages/core", "exchanges/graphcache", "packages/react-urql"],
+  "buildCommand": "build",
+  "sandboxes": ["urql-issue-template-client-iui0o"]
+}
