@@ -81,6 +81,19 @@ to automatically fix up your code, or display an error.
 
 If you have them set up in your editor, even better!
 
+## How do I document a change for the changelog?
+
+This project uses [changesets](https://github.com/atlassian/changesets). This means that for
+every PR there must be documentation for what has been changed and which package is affected.
+
+You can document a change by running `yarn changeset`, which will ask you which packages
+have changed and whether the change is major/minor/patch. It will then ask you to write
+a change entry as markdown.
+
+This will eventually end up in the package's `CHANGELOG.md` file when we do a release.
+
+[Read more about adding a `changeset` here.](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md#i-am-in-a-multi-package-repository-a-mono-repo)
+
 ## How do I upgrade all dependencies?
 
 It may be a good idea to keep all dependencies on the `urql` repository up-to-date every now and
@@ -133,4 +146,23 @@ Afterwards you can check whether everything is working correctly by running:
 ```sh
 yarn
 yarn run check
+```
+
+## How do I release new versions of our packages?
+
+The process of releasing versions is automated using `changeset`. This moves a lot of
+the work of writing CHANGELOG entries away from our release process and to our PR
+review process. During the release the created `changeset` entries are automatically
+applied and our `CHANGELOG`s are updated.
+
+First check what changes you're about to release with `yarn changeset status`.
+
+Then the process is similar to using `yarn version` and `yarn publish`:
+
+```sh
+# This will automatically bump versions as necessary and update CHANGELOG files:
+yarn changeset version
+# Please check all versions and CHANGELOGs manually.
+# Then publish all new packages / versions:
+yarn changeset publish
 ```

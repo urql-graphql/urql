@@ -1,14 +1,6 @@
-# Changelog
+# urql
 
-All notable changes to this project will be documented in this file.
-If a change is missing an attribution, it may have been made by a Core Contributor.
-
-- Critical bugfixes or breaking changes are marked using a `warning` symbol: ⚠️
-- Significant new features or enhancements are marked using the `sparkles` symbol: ✨
-
-_The format is based on [Keep a Changelog](http://keepachangelog.com/)._
-
-## [v1.8.2](https://github.com/FormidableLabs/urql/compare/v1.8.1...v1.8.2)
+## 1.8.2
 
 This patch fixes client-side suspense. While we wouldn't recommend its use
 anymore, since suspense lends itself to prerendering instead of a loading
@@ -21,7 +13,7 @@ lower version with `urql`, you will see runtime errors.
 - Clean up unnecessary `useMemo` for `useCallback` in hooks (see [#504](https://github.com/FormidableLabs/urql/pull/504))
 - Fix synchronous, client-side suspense and simplify `toSuspenseSource` helper (see [#506](https://github.com/FormidableLabs/urql/pull/506))
 
-## [v1.8.1](https://github.com/FormidableLabs/urql/compare/v1.8.0...v1.8.1)
+## 1.8.1
 
 This patch fixes `urql` relying on a quirk in older versions of `wonka` where
 shared sources wouldn't cascade cancellations, which they now do. This meant
@@ -30,13 +22,13 @@ the exchange pipeline would be stopped completely.
 
 - Fix exchange pipeline stalling when all queries end (see [#503](https://github.com/FormidableLabs/urql/pull/503))
 
-## [v1.8.0](https://github.com/FormidableLabs/urql/compare/v1.7.0...v1.8.0)
+## 1.8.0
 
 This release doesn't change any major feature aspects, but comes with bugfixes
 to our suspense and concurrent-mode handling. Due to an upgrade to `wonka@^4.0.0`
 this is a minor version though.
 
-In [v1.6.0](https://github.com/FormidableLabs/urql/blob/master/CHANGELOG.md#v160) we believed to
+In [v1.6.0](https://github.com/FormidableLabs/urql/blob/master/CHANGELOG.md#160) we believed to
 have solved all issues related to suspense and concurrent mode. However there were
 still some remaining cases where concurrent mode behaved incorrectly. With the new
 `useOperator` hook in [`react-wonka@2.0.0`](https://github.com/kitten/react-wonka) we believe
@@ -55,7 +47,7 @@ unless you're making use of its `subscribe`, `make`, or `makeSubject` exports.
 - Support concurrent mode with all edge cases fully (see [#496](https://github.com/FormidableLabs/urql/pull/496))
 - Move to `react-wonka@2.0.0` with the prior fix in #496 (see [#499](https://github.com/FormidableLabs/urql/pull/499))
 
-## [v1.7.0](https://github.com/FormidableLabs/urql/compare/v1.6.3...v1.7.0)
+## 1.7.0
 
 This release splits our main package into two entrypoints. Importing from `urql` remains
 unchanged, but internally this entrypoint uses `urql/core`, which doesn't contain any
@@ -66,11 +58,11 @@ React, you can now use `urql/core` directly.
 - Fix `stringifyVariables` not using `.toJSON()` which prevented Dates from being stringified, by [@BjoernRave](https://github.com/BjoernRave) (see [#485](https://github.com/FormidableLabs/urql/pull/485))
 - Expose `urql/core` without any React code included (see [#424](https://github.com/FormidableLabs/urql/pull/424))
 
-## [v1.6.3](https://github.com/FormidableLabs/urql/compare/v1.6.2...v1.6.3)
+## 1.6.3
 
 - Fix suspense-mode being erroneously activated when using `client.query()` (see [#466](https://github.com/FormidableLabs/react-ssr-prepass/pull/21))
 
-## [v1.6.2](https://github.com/FormidableLabs/urql/compare/v1.6.1...v1.6.2)
+## 1.6.2
 
 This fixes a potentially critical bug, where a component would enter an infinite rerender loop,
 when another hook triggers an update. This may happen when multiple `useQuery` hooks are used in
@@ -79,11 +71,11 @@ a single component or when another state hook triggers a synchronous update.
 - Add generic type-parameter to `client.query` and `client.mutation`, by [@ctrlplusb](https://github.com/ctrlplusb) (see [#456](https://github.com/FormidableLabs/urql/pull/456))
 - ⚠️ Fix `useQuery` entering an infinite loop during SSR when an update is triggered (see [#459](https://github.com/FormidableLabs/urql/pull/459))
 
-## [v1.6.1](https://github.com/FormidableLabs/urql/compare/v1.6.0...v1.6.1)
+## 1.6.1
 
 - Fix hook updates not being propagated to potential context providers (see [#451](https://github.com/FormidableLabs/urql/pull/451))
 
-## [v1.6.0](https://github.com/FormidableLabs/urql/compare/v1.5.1...v1.6.0)
+## 1.6.0
 
 This release comes with stability improvements for the `useQuery` and `useSubscription` hooks
 when using suspense and concurrent mode. They should behave the same as before under normal
@@ -102,12 +94,12 @@ mode is activated.
 - Replace `useImmeditateEffect` and `useImmediateState` with `react-wonka` derived state and effect (see [#447](https://github.com/FormidableLabs/urql/pull/447))
 - Add (internal) `suspense` flag to `OperationContext`
 
-## [v1.5.1](https://github.com/FormidableLabs/urql/compare/v1.5.0...v1.5.1)
+## 1.5.1
 
 - Replace `fast-json-stable-stringify` with embedded code (see [#426](https://github.com/FormidableLabs/urql/pull/426))
 - ⚠ Prevent caching `null` data (see [#437](https://github.com/FormidableLabs/urql/pull/437))
 
-## [v1.5.0](https://github.com/FormidableLabs/urql/compare/v1.4.1...v1.5.0)
+## 1.5.0
 
 This release finally adds shortcuts to imperatively make queries and mutations.
 They make it easier to quickly use the client programmatically, either with
@@ -131,7 +123,7 @@ confused users before, we now log a warning, when it's used.
 - Deconstruct `Wonka.pipe` using a Babel transform (see [#419](https://github.com/FormidableLabs/urql/pull/419))
 - ⚠ Add `useClient` hook and warning when default client is used (see [#420](https://github.com/FormidableLabs/urql/pull/420))
 
-## [v1.4.1](https://github.com/FormidableLabs/urql/compare/v1.4.0...v1.4.1)
+## 1.4.1
 
 This release adds "active teardowns" for operations, which means that an exchange can now send a teardown to cancel ongoing operations. The `subscriptionsExchange` for instance now ends ongoing subscriptions proactively if the server says that they've completed! This is also reflected as `fetching: false` in the `useQuery` and `useSubscription` hook.
 
@@ -141,7 +133,7 @@ We've also fixed a small issue with suspense and added all features from `useQue
 - Fix `UseMutationResponse` TypeScript type, by [@jbugman](https://github.com/jbugman) (see [#412](https://github.com/FormidableLabs/urql/pull/412))
 - Exclude subscriptions from suspense source (see [#415](https://github.com/FormidableLabs/urql/pull/415))
 
-## [v1.4.0](https://github.com/FormidableLabs/urql/compare/v1.3.0...v1.4.0)
+## 1.4.0
 
 This release removes all metadata for the `@urql/devtools` extension from the core
 `urql` package. This data will now be generated internally in the devtools exchange
@@ -163,7 +155,7 @@ boilerplate code that you need for custom fetch exchanges.
 - ⚠ Prevent `__typename` from being added to the toplevel GraphQL documents (see [#399](https://github.com/FormidableLabs/urql/pull/399))
 - Add `operationName` field to `fetch` request body (see [#401](https://github.com/FormidableLabs/urql/pull/401))
 
-## [v1.3.0](https://github.com/FormidableLabs/urql/compare/v1.2.0...v1.3.0)
+## 1.3.0
 
 This release comes with some important fixes and enhancements, which all address
 certain edge-cases when using `urql`.
@@ -177,7 +169,7 @@ It fixes the `cache-and-network` request policy, which wouldn't always work corr
 - ✨ Add `context` option to all hooks to allow `OperationContext` to be changed dynamically (see [#351](https://github.com/FormidableLabs/urql/pull/351))
 - Add `isClient` option to `ssrExchange` in case `suspense` is activated on the client-side (see [#369](https://github.com/FormidableLabs/urql/pull/369))
 
-## [v1.2.0](https://github.com/FormidableLabs/urql/compare/v1.1.3...v1.2.0)
+## 1.2.0
 
 A release focused on improving developer experience (in preparation for the
 upcoming devtools) as well as minor documentation improvements and bug fixes.
@@ -189,14 +181,14 @@ upcoming devtools) as well as minor documentation improvements and bug fixes.
 - Fix error in `collectTypes` method (see [#343](https://github.com/FormidableLabs/urql/pull/343))
 - Fix HTTP status bounds check error (see [#348](https://github.com/FormidableLabs/urql/pull/348/files))
 
-## [v1.1.3](https://github.com/FormidableLabs/urql/compare/v1.1.2...v1.1.3)
+## 1.1.3
 
 This is a hotfix that patches a small regression from `1.1.2` where
 `useQuery` would crash due to an incorrect teardown function from pause.
 
 - Fix `executeQuery` dispose function when `pause` is set, by[@JoviDeCroock](https://github.com/JoviDeCroock) (see [#315](https://github.com/FormidableLabs/urql/pull/315))
 
-## [v1.1.2](https://github.com/FormidableLabs/urql/compare/v1.1.1...v1.1.2)
+## 1.1.2
 
 This patch fixes a small bug that usually manifests in development,
 where the initial state would be incorrect after a fast response from
@@ -208,7 +200,7 @@ indefinitely in some cases.
 - Refactor build tooling to be driven only by Rollup (see [#306](https://github.com/FormidableLabs/urql/pull/306))
 - Remove dev-only dependencies from `dependencies` (see [#304](https://github.com/FormidableLabs/urql/pull/304))
 
-## [v1.1.1](https://github.com/FormidableLabs/urql/compare/v1.1.0...v1.1.1)
+## 1.1.1
 
 This release comes with two small patches. One being a crticial fix,
 where cancelled requests would be erroneously deduped, which meant
@@ -221,7 +213,7 @@ restore IE11 support and reduce the amount of duplicate helper in our bundles.
 - Fix `useQuery`'s `pause` argument blocking explicit `executeQuery` calls (see [#278](https://github.com/FormidableLabs/urql/pull/278))
 - Add `Object.assign` transpilation for IE11 and refactor bundling (see [#274](https://github.com/FormidableLabs/urql/pull/274))
 
-## [v1.1.0](https://github.com/FormidableLabs/urql/compare/v1.0.5...v1.1.0)
+## 1.1.0
 
 This release introduces support for **server-side rendering**.
 You can find out more about it by reading
@@ -238,7 +230,7 @@ We unfortunately forgot to correct the `peerDependencies` entries in our v1.0.0 
 - ⚠️ Fix issues where `useQuery` wouldn't update or teardown correctly (see [#243](https://github.com/FormidableLabs/urql/pull/243))
 - ✨ Add support for `pause` prop/option to `useQuery` and `Query` (see [#237](https://github.com/FormidableLabs/urql/pull/237))
 
-## [v1.0.5](https://github.com/FormidableLabs/urql/compare/v1.0.4...v1.0.5)
+## 1.0.5
 
 - Export `MutationProps` types for TS typings, by [@mxstbr](https://github.com/mxstbr) (see [#236](https://github.com/FormidableLabs/urql/pull/236))
 - Export `Use*Args` types for TS typings, by [@mxstbr](https://github.com/mxstbr) (see [#235](https://github.com/FormidableLabs/urql/pull/235))
@@ -248,26 +240,26 @@ We unfortunately forgot to correct the `peerDependencies` entries in our v1.0.0 
 - Change `GraphQLRequest` to always pass on a parsed GraphQL `DocumentNode` instead of just a string, which reduces work (see [#221](https://github.com/FormidableLabs/urql/pull/221))
 - Fix incorrect TS types by using `Omit<T, K>` (see [#220](https://github.com/FormidableLabs/urql/pull/220))
 
-## [v1.0.4](https://github.com/FormidableLabs/urql/compare/v1.0.3...v1.0.4)
+## 1.0.4
 
 - Fix `__typename` not being extracted from responses correctly, which broke caching
 - Fix `fetchOptions` being called in the client instead of the `fetchExchange`
 - Improve `CombinedError` to actually extend `Error` and rehydrate `GraphQLError` instances
 - Fix `executeMutation` prop not accepting any generics types
 
-## [v1.0.3](https://github.com/FormidableLabs/urql/compare/v1.0.2...v1.0.3)
+## 1.0.3
 
 - Fix bug where `variables` were only compared using reference equality, leading to
   infinite rerenders
 
-## [v1.0.2](https://github.com/FormidableLabs/urql/compare/v1.0.0...v1.0.2)
+## 1.0.2
 
 - Allow `graphql-tag` / `DocumentNode` usage; Operations' queries can now be `DocumentNode`s
 - Generating keys for queries has been optimized
 
 https://github.com/FormidableLabs/urql/compare/v1.0.4...v1.0.5
 
-## v1.0.0
+## 1.0.0
 
 > Since the entire library has been rewritten for v1.0.0, no changes
 > are listed here!

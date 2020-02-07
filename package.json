@@ -41,6 +41,8 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-transform-object-assign": "^7.8.3",
     "@babel/plugin-transform-react-jsx": "^7.8.3",
+    "@changesets/changelog-github": "^0.2.1",
+    "@changesets/cli": "^2.5.1",
     "@rollup/plugin-buble": "^0.21.0",
     "@rollup/plugin-commonjs": "^11.0.1",
     "@rollup/plugin-node-resolve": "^7.0.0",
