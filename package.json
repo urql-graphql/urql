@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "test": "jest",
+    "build": "wsrun build",
     "check": "tsc --noEmit",
     "lint": "eslint ."
   },
@@ -79,6 +80,7 @@
     "rollup-plugin-typescript2": "^0.25.3",
     "terser": "^4.6.3",
     "ts-jest": "^25.1.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "wsrun": "^5.2.0"
   }
 }

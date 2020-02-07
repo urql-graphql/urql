@@ -5,22 +5,13 @@
   <br />
 
   <strong>
-    A highly customisable and versatile GraphQL client for React
+    A highly customisable and versatile GraphQL client
   </strong>
 
   <br />
   <br />
-  <a href="https://npmjs.com/package/urql">
-    <img alt="NPM Version" src="https://img.shields.io/npm/v/urql.svg" />
-  </a>
   <a href="https://travis-ci.com/FormidableLabs/urql">
     <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/urql.svg?branch=master" />
-  </a>
-  <a href="https://codecov.io/gh/FormidableLabs/urql">
-    <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql/branch/master/graph/badge.svg" />
-  </a>
-  <a href="https://bundlephobia.com/result?p=urql">
-    <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/urql.svg?label=gzip%20size" />
   </a>
   <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
@@ -35,7 +26,7 @@
 
 ## ✨ Features
 
-- 📦 **One package** to get a working GraphQL client in React
+- 📦 **One package** to get a working GraphQL client in React or Preact
 - ⚙️ Fully **customisable** behaviour [via "exchanges"](#-add-on-exchanges)
 - 🗂 Logical but simple default behaviour and document caching
 - ⚛️ Minimal React components and hooks
