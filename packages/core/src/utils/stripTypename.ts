@@ -1,4 +1,6 @@
 export const stripTypename = (data: any): any => {
+  if (!data) return data;
+
   const result = {};
 
   Object.keys(data).forEach((key: string) => {
