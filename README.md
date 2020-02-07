@@ -10,8 +10,8 @@
 
   <br />
   <br />
-  <a href="https://travis-ci.com/FormidableLabs/urql">
-    <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/urql.svg?branch=master" />
+  <a href="https://circleci.com/gh/FormidableLabs/urql">
+    <img alt="Test Status" src="https://circleci.com/gh/FormidableLabs/urql.svg?style=shield" />
   </a>
   <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
