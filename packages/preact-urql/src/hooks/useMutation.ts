@@ -6,7 +6,6 @@ import {
   OperationContext,
   CombinedError,
   createRequest,
-  stripTypename,
 } from '@urql/core';
 import { useClient } from '../context';
 import { useImmediateState } from './useImmediateState';
@@ -44,10 +43,11 @@ export const useMutation = <T = any, V = object>(
         fetching: true,
       });
 
-      const request = createRequest(query, stripTypename(variables as any));
-
       return pipe(
-        client.executeMutation(request, context || {}),
+        client.executeMutation(
+          createRequest(query, variables as any),
+          context || {},
+        ),
         toPromise
       ).then(result => {
         setState({
