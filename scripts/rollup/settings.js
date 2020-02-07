@@ -46,3 +46,4 @@ export const hasReact = externalModules.includes('react');
 export const hasPreact = externalModules.includes('preact');
 export const hasSvelte = externalModules.includes('svelte');
 export const mayReexport = hasReact || hasPreact || hasSvelte;
+export const isCI = !!process.env.CI;

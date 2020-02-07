@@ -59,7 +59,7 @@ export default [
       output('esm', '.js'),
     ],
   },
-  {
+  !settings.isCI && {
     ...config,
     plugins: makePlugins({ isProduction: true }),
     output: [
@@ -67,4 +67,4 @@ export default [
       output('esm', '.min.js'),
     ],
   },
-];
+].filter(Boolean);

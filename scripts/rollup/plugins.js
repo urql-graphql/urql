@@ -28,6 +28,7 @@ export const makePlugins = ({ isProduction } = {}) => [
     } : {},
   }),
   typescript({
+    check: !settings.isCI,
     useTsconfigDeclarationDir: true,
     objectHashIgnoreUnknownHack: true,
     tsconfigDefaults: require('../../tsconfig.json'),
