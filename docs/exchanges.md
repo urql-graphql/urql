@@ -17,6 +17,15 @@ These exchanges can be imported from the `urql` package.
 - `fetchExchange`: sends operations to GraphQL HTTP endpoints and resolves results
 - `ssrExchange`: used to cache results during SSR and rehydrate them on the client-side
 - `subscriptionExchange`: used to support GraphQL subscriptions
+- `populateExchange`: will automatically populate the body of your mutations, [more info](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/Populate.md)
+- `graphcacheExchange`: used to implement a normalised cache
+  - [About architecture](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/architecture.md)
+  - [About resolvers](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/resolvers.md)
+  - [About updates](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/updates.md)
+  - [About keys](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/keys.md)
+  - [About optimistic](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/optimistic.md)
+  - [About schema-awareness](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/schema.md)
+  - [Error-codes](https://github.com/FormidableLabs/urql/tree/singularity/docs/graphcache/help.md)
 
 ## Addons
 
