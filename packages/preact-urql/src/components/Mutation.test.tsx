@@ -1,3 +1,4 @@
+/* @jsx h */
 import { h } from 'preact';
 import { act, cleanup, render } from '@testing-library/preact';
 import { pipe, fromValue, delay } from 'wonka';
