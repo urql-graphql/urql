@@ -30,7 +30,7 @@
 - ⚙️ Fully **customisable** behaviour [via "exchanges"](#-add-on-exchanges)
 - 🗂 Logical but simple default behaviour and document caching
 - ⚛️ Minimal React components and hooks
-- 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://github.com/FormidableLabs/urql-exchange-graphcache)
+- 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://github.com/FormidableLabs/urql/tree/master/exchanges/graphcache)
 
 `urql` is a GraphQL client that exposes a set of React components and hooks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
