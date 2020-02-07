@@ -5,6 +5,8 @@ import {
   StorageAdapter,
   SerializedEntries,
 } from '../types';
+
+import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
 import { fieldInfoOfKey, joinKeys, prefixKey } from './keys';
 import { defer } from './timing';
@@ -31,8 +33,6 @@ export interface InMemoryData {
   links: NodeMap<Link>;
   storage: StorageAdapter | null;
 }
-
-export const makeDict = (): any => Object.create(null);
 
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Set<string> = null;

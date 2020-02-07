@@ -5,7 +5,7 @@ import {
 } from 'graphql';
 
 import { getName } from './node';
-import { makeDict } from '../store';
+import { makeDict } from '../helpers/dict';
 import { Variables } from '../types';
 
 /** Evaluates a fields arguments taking vars into account */

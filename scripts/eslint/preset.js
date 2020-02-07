@@ -26,6 +26,7 @@ module.exports = {
   ],
   plugins: ['react-hooks'],
   rules: {
+    '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/member-ordering': 'off',
     '@typescript-eslint/explicit-member-accessibility': 'off',

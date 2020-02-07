@@ -27,14 +27,15 @@ import {
   getCurrentDependencies,
   initDataState,
   clearDataState,
-  makeDict,
   joinKeys,
   keyOfField,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
+import { makeDict } from '../helpers/dict';
 import { warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, ensureData } from './shared';
+
 import {
   isFieldAvailableOnType,
   isFieldNullable,

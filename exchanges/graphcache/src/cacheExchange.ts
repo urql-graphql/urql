@@ -28,7 +28,8 @@ import {
 
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
-import { makeDict, Store, clearOptimistic } from './store';
+import { makeDict } from './helpers/dict';
+import { Store, clearOptimistic } from './store';
 
 import {
   UpdatesConfig,
