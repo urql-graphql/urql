@@ -9,4 +9,5 @@ export {
   makeResult,
   makeErrorResult,
   formatDocument,
+  stripTypename,
 } from './utils';
