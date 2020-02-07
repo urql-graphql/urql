@@ -40,7 +40,7 @@
     "preact": ">= 10.0.0"
   },
   "dependencies": {
-    "urql": "^1.8.0",
+    "@urql/core": "^1.8.0",
     "wonka": "^4.0.6"
   }
 }

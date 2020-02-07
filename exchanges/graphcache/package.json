@@ -23,6 +23,20 @@
   "module": "dist/urql-exchange-graphcache.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "dist/urql-core.esm.js",
+      "require": "dist/urql-core.cjs.js",
+      "types": "dist/types/index.d.ts",
+      "source": "src/index.ts"
+    },
+    "./extras": {
+      "import": "dist/urql-core-extras.esm.js",
+      "require": "dist/urql-core-extras.cjs.js",
+      "types": "dist/types/extras/index.d.ts",
+      "source": "src/extras/index.ts"
+    }
+  },
   "scripts": {
     "build": "rollup -c ../../scripts/rollup/config.js"
   },
@@ -30,15 +44,14 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "wonka": "^3.2.1 || ^4.0.0"
+    "wonka": "^3.2.1 || ^4.0.0",
+    "@urql/core": "^1.7.0"
   },
   "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
-    "urql": ">= 1.7.0"
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
   },
   "devDependencies": {
     "graphql": "^14.5.8",
-    "graphql-tag": "^2.10.1",
-    "urql": "*"
+    "graphql-tag": "^2.10.1"
   }
 }

@@ -42,6 +42,7 @@ export const makePlugins = ({ isProduction } = {}) => [
         'src/**/test-utils/*'
       ],
       compilerOptions: {
+        baseUrl: '.',
         declaration: !isProduction,
         declarationDir: './dist/types',
         target: 'es6',

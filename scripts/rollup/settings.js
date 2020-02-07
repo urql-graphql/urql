@@ -1,15 +1,32 @@
 const path = require('path');
 const cwd = process.cwd();
 
-const pkg = require(path.resolve(cwd, './package.json'));
+export const pkg = require(path.resolve(cwd, './package.json'));
 
-export const name = pkg.name
-  .replace(/[@\s\/]+/g, ' ')
+const normalize = name => name
+  .replace(/[@\s\/\.]+/g, ' ')
   .trim()
   .replace(/\s+/, '-')
   .toLowerCase();
 
-export const source = pkg.source || './src/index.ts';
+export const name = normalize(pkg.name);
+
+export const sources = pkg.exports
+  ? Object.keys(pkg.exports).map(entry => {
+    const exports = pkg.exports[entry];
+    const dir = normalize(entry);
+    return {
+      name: dir ? `${name}-${dir}` : name,
+      dir: dir || '.',
+      main: exports.require,
+      module: exports.import,
+      types: exports.types,
+      source: exports.source,
+    };
+  }) : [{
+    name,
+    source: pkg.source || './src/index.ts'
+  }];
 
 export const externalModules = ['dns', 'fs', 'path', 'url'];
 if (pkg.peerDependencies)
@@ -20,10 +37,8 @@ if (pkg.dependencies)
 const externalPredicate = new RegExp(`^(${externalModules.join('|')})($|/)`);
 
 export const isExternal = id => {
-  if (id === 'babel-plugin-transform-async-to-promises/helpers') {
+  if (id === 'babel-plugin-transform-async-to-promises/helpers')
     return false;
-  }
-
   return externalPredicate.test(id);
 };
 

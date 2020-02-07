@@ -1,13 +1,34 @@
+import genPackageJson from 'rollup-plugin-generate-package-json';
+import { relative, join } from 'path';
 import { makePlugins } from './plugins';
 import * as settings from './settings';
 
-const input = {
-  [settings.name]: settings.source,
-};
+const plugins = makePlugins({ isProduction: false });
+
+const input = settings.sources.reduce((acc, source) => {
+  acc[source.name] = source.source;
+  if (source.name !== settings.name) {
+    const rel = relative(source.dir, process.cwd());
+    plugins.push(genPackageJson({
+      outputFolder: source.dir,
+      baseContents: {
+        name: source.name,
+        private: true,
+        main: join(rel, source.main),
+        module: join(rel, source.module),
+        types: join(rel, source.types),
+        source: join(rel, source.source),
+      }
+    }));
+  }
+
+  return acc;
+}, {});
 
 const config = {
   input,
   external: settings.isExternal,
+  onwarn() {},
   treeshake: {
     unknownGlobalSideEffects: false,
     tryCatchDeoptimization: false,
@@ -16,7 +37,7 @@ const config = {
 };
 
 const output = (format = 'cjs', ext = '.js') => ({
-  chunkFileNames: '[name]-[hash].[format]' + ext,
+  chunkFileNames: '[hash].[format]' + ext,
   entryFileNames: '[name].[format]' + ext,
   dir: './dist',
   exports: 'named',
@@ -32,7 +53,7 @@ const output = (format = 'cjs', ext = '.js') => ({
 export default [
   {
     ...config,
-    plugins: makePlugins({ isProduction: false }),
+    plugins,
     output: [
       output('cjs', '.js'),
       output('esm', '.js'),

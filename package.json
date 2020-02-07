@@ -68,6 +68,7 @@
     "rimraf": "^3.0.1",
     "rollup": "^1.31.0",
     "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-terser": "^5.2.0",
     "rollup-plugin-typescript2": "^0.25.3",
     "terser": "^4.6.3",
