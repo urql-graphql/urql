@@ -44,3 +44,4 @@ export const isExternal = id => {
 
 export const hasReact = externalModules.includes('react');
 export const hasPreact = externalModules.includes('preact');
+export const isNamespaced = pkg.name.startsWith('@urql');

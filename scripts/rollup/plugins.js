@@ -86,7 +86,7 @@ export const makePlugins = ({ isProduction } = {}) => [
   isProduction && replace({
     'process.env.NODE_ENV': JSON.stringify('production')
   }),
-  compiler({
+  settings.isNamespaced && compiler({
     formatting: 'PRETTY_PRINT',
     compilation_level: 'SIMPLE_OPTIMIZATIONS'
   }),
