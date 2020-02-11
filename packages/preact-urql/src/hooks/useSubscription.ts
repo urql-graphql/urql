@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef } from 'preact/hooks';
 import { pipe, onEnd, subscribe } from 'wonka';
-import { CombinedError, OperationContext } from '@urql/core';
+import { CombinedError, OperationContext, stripTypename } from '@urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { noop, initialState } from './useQuery';
@@ -63,6 +63,7 @@ export const useSubscription = <T = any, R = T, V = object>(
         }),
         onEnd(() => setState(s => ({ ...s, fetching: false }))),
         subscribe(result => {
+          result.data = stripTypename(result.data);
           setState(s => ({
             fetching: true,
             data:
