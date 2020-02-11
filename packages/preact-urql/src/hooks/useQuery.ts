@@ -23,7 +23,6 @@ export interface UseQueryArgs<V> {
   pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
-  stripTypename?: boolean;
 }
 
 export interface UseQueryState<T> {
@@ -72,9 +71,7 @@ export const useQuery = <T = any, V = object>(
         subscribe(result => {
           setState({
             fetching: false,
-            data: args.stripTypename ?
-              stripTypename(result.data) :
-              result.data,
+            data: stripTypename(result.data),
             error: result.error,
             extensions: result.extensions,
             stale: !!result.stale,
@@ -83,7 +80,7 @@ export const useQuery = <T = any, V = object>(
       );
       unsubscribe.current = result.unsubscribe;
     },
-    [setState, client, request, args.requestPolicy, args.pollInterval, args.context, args.stripTypename]
+    [setState, client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
   useImmediateEffect(() => {

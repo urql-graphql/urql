@@ -15,7 +15,6 @@ export interface UseQueryArgs<V> {
   pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
-  stripTypename?: boolean;
 }
 
 export interface UseQueryState<T> {
@@ -72,9 +71,7 @@ export const useQuery = <T = any, V = object>(
               map(({ stale, data, error, extensions }) => ({
                 fetching: false,
                 stale: !!stale,
-                data: args.stripTypename ?
-                  stripTypename(data) :
-                  data,
+                data: stripTypename(data),
                 error,
                 extensions,
               }))
@@ -92,7 +89,7 @@ export const useQuery = <T = any, V = object>(
           initialState
         )
       );
-    }, [args.stripTypename, query$$]),
+    }, [query$$]),
     initialState
   );
 

@@ -75,7 +75,7 @@ export const useSubscription = <T = any, R = T, V = object>(
               map(({ stale, data, error, extensions }) => ({
                 fetching: true,
                 stale: !!stale,
-                data,
+                data: data,
                 error,
                 extensions,
               }))
