@@ -10,7 +10,7 @@ export const stripTypename = (data: any): any => {
       });
     } else if (Array.isArray(value)) {
       acc[key] = value.map(stripTypename);
-    } else if (typeof value === 'object') {
+    } else if (typeof value === 'object' && '__typename' in value) {
       acc[key] = stripTypename(value);
     } else {
       acc[key] = value;

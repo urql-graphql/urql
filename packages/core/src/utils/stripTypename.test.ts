@@ -6,6 +6,13 @@ it('strips typename from flat objects', () => {
   ).toEqual({ id: 1 });
 });
 
+it('strips typename from flat objects containing dates', () => {
+  const date = new Date();
+  expect(
+    stripTypename({ __typename: 'Todo', id: 1, date })
+  ).toEqual({ id: 1, date });
+});
+
 it('strips typename from nested objects', () => {
   expect(
     stripTypename({
