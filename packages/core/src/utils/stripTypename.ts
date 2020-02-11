@@ -1,5 +1,5 @@
 export const stripTypename = (data: any): any => {
-  if (!data) return data;
+  if (!data || typeof data !== 'object') return data;
 
   return Object.keys(data).reduce((acc, key: string) => {
     const value = data[key];
