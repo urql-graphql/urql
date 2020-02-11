@@ -4,6 +4,7 @@ const { getInfo } = require('@changesets/get-github-info');
 config();
 
 const REPO = 'FormidableLabs/urql';
+const SEE_LINE = /^See:\s*(.*)/i;
 
 /** Creates a "(See X)" string from a template */
 const templateSeeRef = links => {
@@ -55,13 +56,24 @@ const changelogFunctions = {
     return [changesetLink, ...detailsLinks].join('\n');
   },
   getReleaseLine: async (changeset, type) => {
-    const [firstLine, ...futureLines] = changeset.summary
+    let pull, commit, user;
+
+    const lines = changeset.summary
       .trim()
       .split(/[\r\n]+/)
-      .map(l => l.trimRight());
+      .map(l => l.trim())
+      .filter(Boolean);
 
-    let pull, commit, user;
-    if (changeset.commit) {
+    const prLineIndex = lines.findIndex(line => SEE_LINE.test(line));
+    if (prLineIndex > -1) {
+      const match = lines[prLineIndex].match(SEE_LINE);
+      pull = (match && match[1].trim()) || undefined;
+      lines.splice(prLineIndex, 1);
+    }
+
+    const [firstLine, ...futureLines] = lines;
+
+    if (changeset.commit && !pull) {
       const { links } = await getInfo({
         repo: REPO,
         commit: changeset.commit
