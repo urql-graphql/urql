@@ -1,7 +1,7 @@
-import { DEFAULT_EXTENSIONS } from '@babel/core';
 import commonjs from '@rollup/plugin-commonjs';
-import nodeResolve from '@rollup/plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
+import sucrase from '@rollup/plugin-sucrase';
 import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from 'rollup-plugin-babel';
@@ -14,8 +14,9 @@ import babelPluginTransformInvariant from '../babel/transform-invariant-warning'
 import * as settings from './settings';
 
 export const makePlugins = ({ isProduction } = {}) => [
-  nodeResolve({
+  resolve({
     dedupe: settings.externalModules,
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     mainFields: ['module', 'jsnext', 'main'],
     preferBuiltins: false,
     browser: true
@@ -27,26 +28,30 @@ export const makePlugins = ({ isProduction } = {}) => [
       react: Object.keys(require('react'))
     } : {},
   }),
-  typescript({
-    check: !settings.isCI,
-    useTsconfigDeclarationDir: true,
-    objectHashIgnoreUnknownHack: true,
-    tsconfigDefaults: require('../../tsconfig.json'),
-    tsconfigOverride: {
-      exclude: [
-        'src/**/*.test.ts',
-        'src/**/*.test.tsx',
-        'src/**/test-utils/*'
-      ],
-      compilerOptions: {
-        sourceMap: true,
-        baseUrl: '.',
-        declaration: !isProduction,
-        declarationDir: './dist/types',
-        target: 'es6',
+  settings.isCI
+    ? sucrase({
+      exclude: ['node_modules/**'],
+      transforms: ['typescript']
+    })
+    : typescript({
+      useTsconfigDeclarationDir: true,
+      objectHashIgnoreUnknownHack: true,
+      tsconfigDefaults: require('../../tsconfig.json'),
+      tsconfigOverride: {
+        exclude: [
+          'src/**/*.test.ts',
+          'src/**/*.test.tsx',
+          'src/**/test-utils/*'
+        ],
+        compilerOptions: {
+          sourceMap: true,
+          baseUrl: '.',
+          declaration: !isProduction,
+          declarationDir: './dist/types',
+          target: 'es6',
+        },
       },
-    },
-  }),
+    }),
   buble({
     transforms: {
       unicodeRegExp: false,
@@ -58,7 +63,7 @@ export const makePlugins = ({ isProduction } = {}) => [
   }),
   babel({
     babelrc: false,
-    extensions: [...DEFAULT_EXTENSIONS, 'ts', 'tsx'],
+    extensions: ['js', 'jsx', 'ts', 'tsx'],
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
