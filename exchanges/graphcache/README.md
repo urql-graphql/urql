@@ -108,7 +108,7 @@ Schema awareness is also an important stepping stone for offline support.
 Without partial results it becomes difficult to deliver an offline UI
 safely, when just some bits of information are missing.
 
-Read more about the [architecture](./docs/architecture.md)
+Read more about the [architecture](../../docs/graphcache/architecture.md)
 
 ## Usage
 
@@ -128,14 +128,14 @@ You can currently configure:
 Keys are used when you need a slight alteration to the value of your identifier or
 when the identifier is a non-traditional property.
 
-[Read more](./docs/keys.md)
+[Read more](../../docs/graphcache/keys.md)
 
 ### Resolvers
 
 Resolvers are needed when you want to do additional resolving, for example do some
 custom date formatting.
 
-[Read more](./docs/resolvers.md)
+[Read more](../../docs/graphcache/resolvers.md)
 
 ### Updates
 
@@ -143,7 +143,7 @@ The graph cache will automatically handle updates but some things are quite hard
 incorporate. Let's say you delete/add an item, it's hard for us to know you wanted to
 delete or where to add an item in a list.
 
-[Read more](./docs/updates.md)
+[Read more](../../docs/graphcache/updates.md)
 
 ### Optimistic
 
@@ -151,13 +151,13 @@ Here you can configure optimistic responses, this means that we don't wait for t
 to respond but offer the user to instantly replace the data with the variables from the
 mutation.
 
-[Read more](./docs/optimistic.md)
+[Read more](../../docs/graphcache/optimistic.md)
 
 ### Schema
 
 Our way to see what your backend schema looks like, this offers additional functionality.
 
-[Read more](./docs/schema.md)
+[Read more](../../docs/graphcache/schema.md)
 
 ## Maintenance Status
 
