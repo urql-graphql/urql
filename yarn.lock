@@ -237,15 +237,6 @@
     "@changesets/types" "^0.4.0"
     semver "^5.4.1"
 
-"@changesets/changelog-github@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@changesets/changelog-github/-/changelog-github-0.2.1.tgz#59b723958c6293618de278f48ed15af740d9ed2a"
-  integrity sha512-9rtct8gcbORJH7fmNhSOCgOyETk8JEoXFIC8PnFrdpQPuweknOORMKrsItfUnuYqRuSf0P13P1HCXgZFqBCPmg==
-  dependencies:
-    "@changesets/get-github-info" "^0.4.1"
-    "@changesets/types" "^0.4.0"
-    dotenv "^8.1.0"
-
 "@changesets/cli@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@changesets/cli/-/cli-2.5.1.tgz#06e90296039879617cf9d1084ac7123ddfce7871"
@@ -1958,7 +1949,7 @@ domexception@^1.0.1:
   dependencies:
     webidl-conversions "^4.0.2"
 
-dotenv@^8.1.0:
+dotenv@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
