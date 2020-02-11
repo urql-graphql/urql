@@ -1,19 +1,22 @@
 export const stripTypename = (data: any): any => {
   if (!data) return data;
 
-  const result = {};
-
-  Object.keys(data).forEach((key: string) => {
+  return Object.keys(data).reduce((acc, key: string) => {
     const value = data[key];
-    if (key === '__typename') { // SKIP!
+    if (key === '__typename') {
+      return acc;
     } else if (Array.isArray(value)) {
-      result[key] = value.map(stripTypename);
+      return {
+        ...acc,
+        [key]: value.map(stripTypename),
+      };
     } else if (typeof value === 'object') {
-      result[key] = stripTypename(value);
+      return {
+        ...acc,
+        [key]: stripTypename(value),
+      };
     } else {
-      result[key] = value;
+      return { ...acc, [key]: value };
     }
-  });
-
-  return result;
+  }, {});
 }
