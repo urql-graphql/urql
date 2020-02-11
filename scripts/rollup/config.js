@@ -53,6 +53,7 @@ const output = (format = 'cjs', ext = '.js') => ({
 export default [
   {
     ...config,
+    shimMissingExports: true,
     plugins,
     output: [
       output('cjs', '.js'),
