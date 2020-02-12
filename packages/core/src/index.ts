@@ -9,5 +9,5 @@ export {
   makeResult,
   makeErrorResult,
   formatDocument,
-  stripTypename,
+  maskTypename,
 } from './utils';
