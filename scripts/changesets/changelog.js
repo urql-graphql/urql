@@ -6,6 +6,13 @@ config();
 const REPO = 'FormidableLabs/urql';
 const SEE_LINE = /^See:\s*(.*)/i;
 
+const getSummaryLines = cs =>
+  cs.summary
+    .trim()
+    .split(/[\r\n]+/)
+    .map(l => l.trim())
+    .filter(Boolean);
+
 /** Creates a "(See X)" string from a template */
 const templateSeeRef = links => {
   const humanReadableLinks = links
@@ -33,14 +40,21 @@ const changelogFunctions = {
 
     const dependenciesLinks = await Promise.all(
       changesets.map(async cs => {
-        if (cs.commit) {
-          const { links } = await getInfo({
-            repo: REPO,
-            commit: cs.commit
-          });
+        if (!cs.commit) return undefined;
 
-          return links;
+        const lines = getSummaryLines(cs);
+        const prLine = lines.find(line => SEE_LINE.test(line));
+        if (prLine) {
+          const match = prLine.match(SEE_LINE);
+          return (match && match[1].trim()) || undefined;
         }
+
+        const { links } = await getInfo({
+          repo: REPO,
+          commit: cs.commit
+        });
+
+        return links;
       })
     );
 
@@ -58,12 +72,7 @@ const changelogFunctions = {
   getReleaseLine: async (changeset, type) => {
     let pull, commit, user;
 
-    const lines = changeset.summary
-      .trim()
-      .split(/[\r\n]+/)
-      .map(l => l.trim())
-      .filter(Boolean);
-
+    const lines = getSummaryLines(changeset);
     const prLineIndex = lines.findIndex(line => SEE_LINE.test(line));
     if (prLineIndex > -1) {
       const match = lines[prLineIndex].match(SEE_LINE);
@@ -89,7 +98,7 @@ const changelogFunctions = {
       annotation = '⚠️ ';
     }
 
-    let str = `\n- ${annotation}${firstLine}`;
+    let str = `- ${annotation}${firstLine}`;
     if (futureLines.length > 0) {
       str += `\n${futureLines.map(l => `  ${l}`).join('\n')}`;
     }
