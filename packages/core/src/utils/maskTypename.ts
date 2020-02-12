@@ -1,4 +1,4 @@
-export const stripTypename = (data: any): any => {
+export const maskTypename = (data: any): any => {
   if (!data || typeof data !== 'object') return data;
 
   return Object.keys(data).reduce((acc, key: string) => {
@@ -9,9 +9,9 @@ export const stripTypename = (data: any): any => {
         value,
       });
     } else if (Array.isArray(value)) {
-      acc[key] = value.map(stripTypename);
+      acc[key] = value.map(maskTypename);
     } else if (typeof value === 'object' && '__typename' in value) {
-      acc[key] = stripTypename(value);
+      acc[key] = maskTypename(value);
     } else {
       acc[key] = value;
     }

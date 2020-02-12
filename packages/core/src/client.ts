@@ -16,6 +16,7 @@ import {
   switchMap,
   publish,
   subscribe,
+  map,
 } from 'wonka';
 
 import {
@@ -35,7 +36,7 @@ import {
   PromisifiedSource,
 } from './types';
 
-import { createRequest, toSuspenseSource, withPromise } from './utils';
+import { createRequest, toSuspenseSource, withPromise, maskTypename } from './utils';
 import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -54,6 +55,8 @@ export interface ClientOptions {
   requestPolicy?: RequestPolicy;
   /** Use HTTP GET for queries. */
   preferGetMethod?: boolean;
+  /** Mask __typename from results. */
+  maskTypename?: boolean;
 }
 
 interface ActiveOperations {
@@ -72,6 +75,7 @@ export class Client {
   suspense: boolean;
   preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
+  maskTypename: boolean;
 
   // These are internals to be used to keep track of operations
   dispatchOperation: (operation: Operation) => void;
@@ -90,6 +94,7 @@ export class Client {
     this.suspense = !!opts.suspense;
     this.requestPolicy = opts.requestPolicy || 'cache-first';
     this.preferGetMethod = !!opts.preferGetMethod;
+    this.maskTypename = !!opts.maskTypename;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -182,10 +187,20 @@ export class Client {
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {
     const { key, operationName } = operation;
-    const operationResults$ = pipe(
+    let operationResults$ = pipe(
       this.results$,
       filter((res: OperationResult) => res.operation.key === key)
     );
+
+    if (this.maskTypename) {
+      operationResults$ = pipe(
+        operationResults$,
+        map(res => {
+          res.data = maskTypename(res.data);
+          return res;
+        }),
+      );
+    }
 
     if (operationName === 'mutation') {
       // A mutation is always limited to just a single result and is never shared

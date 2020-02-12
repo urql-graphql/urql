@@ -1,21 +1,21 @@
-import { stripTypename } from './stripTypename';
+import { maskTypename } from './maskTypename';
 
 it('strips typename from flat objects', () => {
   expect(
-    stripTypename({ __typename: 'Todo', id: 1 })
+    maskTypename({ __typename: 'Todo', id: 1 })
   ).toEqual({ id: 1 });
 });
 
 it('strips typename from flat objects containing dates', () => {
   const date = new Date();
   expect(
-    stripTypename({ __typename: 'Todo', id: 1, date })
+    maskTypename({ __typename: 'Todo', id: 1, date })
   ).toEqual({ id: 1, date });
 });
 
 it('strips typename from nested objects', () => {
   expect(
-    stripTypename({
+    maskTypename({
       __typename: 'Todo',
       id: 1,
       author: {
@@ -28,7 +28,7 @@ it('strips typename from nested objects', () => {
 
 it('strips typename from nested objects with arrays', () => {
   expect(
-    stripTypename({
+    maskTypename({
       __typename: 'Todo',
       id: 1,
       author: {

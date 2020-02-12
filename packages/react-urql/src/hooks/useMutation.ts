@@ -7,7 +7,6 @@ import {
   OperationContext,
   CombinedError,
   createRequest,
-  stripTypename,
 } from '@urql/core';
 
 import { useClient } from '../context';
@@ -50,7 +49,7 @@ export const useMutation = <T = any, V = object>(
         setState({
           fetching: false,
           stale: !!result.stale,
-          data: stripTypename(result.data),
+          data: result.data,
           error: result.error,
           extensions: result.extensions,
         });

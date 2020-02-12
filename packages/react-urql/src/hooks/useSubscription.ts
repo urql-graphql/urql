@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { CombinedError, OperationContext, stripTypename } from '@urql/core';
+import { CombinedError, OperationContext } from '@urql/core';
 
 import { useClient } from '../context';
 import { useSource, useBehaviourSubject } from './useSource';
@@ -75,7 +75,7 @@ export const useSubscription = <T = any, R = T, V = object>(
               map(({ stale, data, error, extensions }) => ({
                 fetching: true,
                 stale: !!stale,
-                data: stripTypename(data),
+                data,
                 error,
                 extensions,
               }))
