@@ -169,9 +169,6 @@ export class Store implements Cache {
     const request = createRequest(input.query, input.variables);
     const output = updater(this.readQuery(request as QueryInput));
     if (output !== null) {
-      if (!output.__typename) {
-        output.__typename = this.rootFields.query;
-      }
       startWrite(this, request, output as Data);
     }
   }
