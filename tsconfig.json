@@ -2,11 +2,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@urql/core": ["packages/core/src"],
-      "@urql/exchange-graphcache": ["exchanges/graphcache/src"],
       "urql": ["packages/react-urql/src"],
-      "preact-urql": ["packages/preact-urql/src"],
-      "svelte-urql": ["packages/svelte-urql/src"]
+      "*-urql": ["packages/*-urql/src"],
+      "@urql/exchange-*": ["exchanges/*/src"],
+      "@urql/*": ["packages/*-urql/src", "packages/*/src"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -21,10 +20,7 @@
     "noImplicitAny": false,
     "noUnusedParameters": true
   },
-  "include": [
-    "packages",
-    "exchanges"
-  ],
+  "include": ["packages", "exchanges"],
   "exclude": [
     "scripts",
     "packages/*/examples",

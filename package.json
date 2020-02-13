@@ -64,6 +64,7 @@
     "eslint-plugin-react": "^7.18.0",
     "eslint-plugin-react-hooks": "^2.3.0",
     "execa": "^4.0.0",
+    "glob": "^7.1.6",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
     "husky": "^4.2.1",

@@ -111,6 +111,16 @@ yarn
 
 ## How do I add a new package?
 
+First of all we need to know where to put the package.
+
+- Exchanges should be added to `exchanges/` and the folder should be the plain
+  name of the exchange. Since the `package.json:name` is following the convention
+  of `@urql/exchange-*` the folder should just be without this conventional prefix.
+- All other packages should be added to `packages/`. Typically all packages should
+  be named `@urql/*` and their folders should be named exactly this without the
+  prefix or `*-urql`. Optionally if the package will be named `*-urql` then the folder
+  can take on the same name.
+
 When adding a new package, start by copying a `package.json` file from another project.
 You may want to alter the following fields first:
 
@@ -130,16 +140,15 @@ an appropriate extension (`.esm.js` for `module` and `.cjs.js` for `main`).
 
 If your entrypoint won't be at `src/index.ts` you may alter it. But the `types` field has to match
 the same file relative to the `dist/types` folder, where `rollup` will output the TypeScript
-declaration files. When setting up your package make sure to create a `src/index.ts` file (or a file
-at what you've set `source` to)
+declaration files.
+
+When setting up your package make sure to create a `src/index.ts` file
+(or any other file which you've pointed `package.json:source` to). Also don't forget to
+copy over the `tsconfig.json` from another package (You won't need to change it).
 
 The `scripts.prepare` task is set up to check your new `package.json` file for correctness. So in
 case you get anything wrong, you'll get a short error when running `yarn` after setting your new
 project up. Just in case! 😄
-
-Lastly, your new package will need to be added to the `tsconfig.json` in the root of the repository.
-Add a new entry to `compilerOptions.paths` where the key is the `name` you've used in your
-`package.json` and the value is an array with a single entry, the path to your package + `src/`.
 
 Afterwards you can check whether everything is working correctly by running:
 

@@ -1,7 +1,8 @@
 const path = require('path');
-const cwd = process.cwd();
 
+export const cwd = process.cwd();
 export const pkg = require(path.resolve(cwd, './package.json'));
+export const types = path.resolve(cwd, 'dist/types/');
 
 const normalize = name => name
   .replace(/[@\s\/\.]+/g, ' ')

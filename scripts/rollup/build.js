@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 const path = require('path');
+const glob = require('glob').sync;
 const execa = require('execa');
 
-const { compilerOptions: { paths } } = require('../../tsconfig.json');
 const workspaceRoot = path.resolve(__dirname, '../../');
 const rollupConfig = path.resolve(__dirname, './config.js');
 
-let packages = Object.keys(paths).map(package => {
-  return path.resolve(workspaceRoot, paths[package][0], '../');
+let packages = glob('{packages,exchanges}/*/package.json').map(pkg => {
+  return path.resolve(pkg, '../');
 });
 
 // CircleCI parallelism
