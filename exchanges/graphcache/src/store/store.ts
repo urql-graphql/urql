@@ -18,6 +18,7 @@ import {
   UpdatesConfig,
   OptimisticMutationConfig,
   KeyingConfig,
+  DataFields,
 } from '../types';
 
 import { read, readFragment } from '../operations/query';
@@ -163,12 +164,15 @@ export class Store implements Cache {
 
   updateQuery(
     input: QueryInput,
-    updater: (data: Data | null) => Data | null
+    updater: (data: Data | null) => DataFields | null
   ): void {
     const request = createRequest(input.query, input.variables);
     const output = updater(this.readQuery(request as QueryInput));
     if (output !== null) {
-      startWrite(this, request, output);
+      if (!output.__typename) {
+        output.__typename = this.rootFields.query;
+      }
+      startWrite(this, request, output as Data);
     }
   }
 
