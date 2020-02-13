@@ -12,6 +12,7 @@ Client {
   "executeSubscription": [Function],
   "fetch": undefined,
   "fetchOptions": undefined,
+  "maskTypename": false,
   "operations$": [Function],
   "preferGetMethod": false,
   "reexecuteOperation": [Function],

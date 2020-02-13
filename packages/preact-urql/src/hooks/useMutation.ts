@@ -43,10 +43,11 @@ export const useMutation = <T = any, V = object>(
         fetching: true,
       });
 
-      const request = createRequest(query, variables as any);
-
       return pipe(
-        client.executeMutation(request, context || {}),
+        client.executeMutation(
+          createRequest(query, variables as any),
+          context || {},
+        ),
         toPromise
       ).then(result => {
         setState({

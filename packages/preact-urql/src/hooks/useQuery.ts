@@ -80,14 +80,7 @@ export const useQuery = <T = any, V = object>(
       );
       unsubscribe.current = result.unsubscribe;
     },
-    [
-      args.context,
-      args.requestPolicy,
-      args.pollInterval,
-      client,
-      request,
-      setState,
-    ]
+    [setState, client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
   useImmediateEffect(() => {
