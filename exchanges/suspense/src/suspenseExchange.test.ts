@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 it('logs a warning if suspense mode is not activated', () => {
-  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
   const client = createClient({ url: '', suspense: false });
   const forward = jest.fn(() => fromArray([]));
   const ops = fromArray([]);
@@ -68,7 +68,7 @@ it('resolves synchronous results immediately', () => {
       ops,
       map(resolveResult)
     );
-  const [ops, dispatch] = makeSubject<Operation>();
+  const { source: ops, next: dispatch } = makeSubject<Operation>();
 
   pipe(
     suspenseExchange({ client, forward })(ops),
@@ -103,7 +103,7 @@ it('caches asynchronous results once for suspense', () => {
       delay(1),
       map(resolveResult)
     );
-  const [ops, dispatch] = makeSubject<Operation>();
+  const { source: ops, next: dispatch } = makeSubject<Operation>();
 
   pipe(
     suspenseExchange({ client, forward })(ops),
