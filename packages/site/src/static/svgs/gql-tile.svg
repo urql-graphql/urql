@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="160px" height="160px" viewBox="0 0 160 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>clock-tile 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-15.6%" y="-14.4%" width="131.2%" height="131.2%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <filter x="-10.0%" y="-8.8%" width="120.0%" height="120.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <polygon id="path-3" points="0 0 160 0 160 160 0 160"></polygon>
+        <filter x="-4.4%" y="-3.1%" width="108.8%" height="108.8%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="clock-tile" filter="url(#filter-1)" fill-rule="nonzero">
+            <g id="a-link" fill="#000000">
+                <polygon id="a" points="0 0 160 0 160 160 0 160"></polygon>
+            </g>
+            <g id="a-link" filter="url(#filter-2)">
+                <g id="a">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                    <use fill="#A7B6FE" xlink:href="#path-3"></use>
+                </g>
+            </g>
+            <g id="SVG-Layer" transform="translate(37.500000, 31.000000)" fill="#FFFFFF">
+                <g id="Group" transform="translate(0.993395, 0.966975)">
+                    <polygon id="Path" points="8.07066234 73.9032849 4.49688312 71.8493663 44.3055974 3.21171512 47.8793766 5.26563372"></polygon>
+                    <polygon id="Path" points="3.95454545 66.5465116 83.6103896 66.5465116 83.6103896 70.494186 3.95454545 70.494186"></polygon>
+                    <path d="M45.0778636,91.5623605 L5.25446104,68.6731802 L7.3176039,65.1163256 L47.1410065,88.0055058 L45.0778636,91.5623605 Z M79.6727922,31.9079244 L39.8488247,9.01874419 L41.9119675,5.46132558 L81.7359351,28.3505058 L79.6727922,31.9079244 Z" id="Shape"></path>
+                    <polygon id="Path" points="7.32833766 31.8915698 5.26519481 28.3347151 45.0891623 5.44609884 47.1523052 9.00295349"></polygon>
+                    <path d="M78.9383766,73.9038488 L39.1296623,5.26676163 L42.7028766,3.21284302 L82.5115909,71.8499302 L78.9383766,73.9038488 Z M6.77922078,25.377907 L10.7337662,25.377907 L10.7337662,71.0581395 L6.77922078,71.0581395 L6.77922078,25.377907 Z" id="Shape"></path>
+                    <polygon id="Path" points="76.2662338 25.377907 80.2207792 25.377907 80.2207792 71.0581395 76.2662338 71.0581395"></polygon>
+                    <polygon id="Path" points="44.3756494 89.8236919 42.5735065 86.7163081 77.2091104 66.80875 79.0112532 69.9161337"></polygon>
+                    <path d="M85.250961,72.8898605 C82.8449026,77.0715756 77.482539,78.4983779 73.2969351,76.0948081 C69.112461,73.6912384 67.6843052,68.3325523 70.0897987,64.1508372 C72.4952922,59.9691221 77.8582208,58.5423198 82.0432597,60.9458895 C86.2531558,63.3748372 87.6813117,68.7081453 85.2503961,72.8898605 M16.3435714,32.8491628 C13.9363831,37.0308779 8.56837013,38.4576802 4.37937662,36.0541105 C0.190383117,33.6505407 -1.2389026,28.2918547 1.16885065,24.1101395 C3.5766039,19.9284244 8.94461688,18.5016221 13.1336104,20.9051919 C17.3226039,23.3341395 18.7518896,28.6674477 16.3441364,32.8491628 M1.73435065,72.8898605 C-0.673967532,68.7081453 0.755318182,63.3748372 4.94431169,60.9458895 C9.13330519,58.5423198 14.4758961,59.9691221 16.9090714,64.1508372 C19.3168247,68.3325523 17.887539,73.6658605 13.6985455,76.0948081 C9.48412987,78.4983779 4.14153896,77.0715756 1.73378571,72.8898605 M70.6564286,32.8491628 C68.2481104,28.6674477 69.6773961,23.3341395 73.8663896,20.9051919 C78.0553831,18.5016221 83.397974,19.9284244 85.8311494,24.1101395 C88.2389026,28.2918547 86.8096169,33.6251628 82.6206234,36.0541105 C78.4316299,38.4576802 73.0636169,37.0308779 70.6558636,32.8491628 M43.7824675,97 C38.9398442,97 35.025974,93.0929302 35.025974,88.2587209 C35.025974,83.4245116 38.9398442,79.5174419 43.7824675,79.5174419 C48.6250909,79.5174419 52.538961,83.4245116 52.538961,88.2587209 C52.538961,93.0675523 48.6250909,97 43.7824675,97 M43.7824675,17.4825581 C38.9398442,17.4825581 35.025974,13.5754884 35.025974,8.74127907 C35.025974,3.90706977 38.9398442,0 43.7824675,0 C48.6250909,0 52.538961,3.90706977 52.538961,8.74127907 C52.538961,13.5754884 48.6250909,17.4825581 43.7824675,17.4825581" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
