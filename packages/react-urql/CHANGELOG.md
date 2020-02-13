@@ -1,5 +1,15 @@
 # urql
 
+## 1.9.0
+
+### Patch Changes
+
+- ⚠️ Fix more concurrent-mode and strict-mode edge cases and bugs by switching to useSubscription. (See [#514](https://github.com/FormidableLabs/urql/pull/514))
+- ⚠️ Fix client-side suspense support (as minimally as possible) by altering
+  the useBehaviourSubject behaviour. (See [#512](https://github.com/FormidableLabs/urql/pull/521))
+- Updated dependencies (See [#533](https://github.com/FormidableLabs/urql/pull/533), [#519](https://github.com/FormidableLabs/urql/pull/519), [#515](https://github.com/FormidableLabs/urql/pull/515), [#512](https://github.com/FormidableLabs/urql/pull/512), and [#518](https://github.com/FormidableLabs/urql/pull/518))
+  - @urql/core@1.9.0
+
 ## 1.8.2
 
 This patch fixes client-side suspense. While we wouldn't recommend its use

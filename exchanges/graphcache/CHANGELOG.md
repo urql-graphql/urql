@@ -1,5 +1,17 @@
 # @urql/exchange-graphcache
 
+## 2.1.1
+
+### Patch Changes
+
+- Update the `updater` function type of `cache.updateQuery` to have a return type of `DataFields` so that `__typename` does not need to be defined, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#538](https://github.com/FormidableLabs/urql/pull/538))
+- ⚠️ Fix updates not being triggered when optimistic updates diverge from the actual result. (See [#160](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/160))
+- Refactor away SchemaPredicates helper to reduce bundlesize. (See [#161](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/161))
+- Ensure that pagination helpers don't confuse pages that have less params with a
+  query that has more params. (See [#156](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/156))
+- Updated dependencies (See [#533](https://github.com/FormidableLabs/urql/pull/533), [#519](https://github.com/FormidableLabs/urql/pull/519), [#515](https://github.com/FormidableLabs/urql/pull/515), [#512](https://github.com/FormidableLabs/urql/pull/512), and [#518](https://github.com/FormidableLabs/urql/pull/518))
+  - @urql/core@1.9.0
+
 ## 2.1.0
 
 This release adds support for cache persistence which is bringing us one step closer to
