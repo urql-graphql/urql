@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="540" alt="urql" src="https://raw.githubusercontent.com/FormidableLabs/urql/master/docs/urql-banner.gif" />
+  <img alt="urql" width="250" src="docs/assets/urql-logo.png" />
 
   <br />
   <br />
@@ -90,12 +90,12 @@ const YourComponent = () => {
 Internally, `urql` will create a unique `key` for any operation it starts which is a hash of `query` and
 `variables`. The internal "Exchange pipeline" is then responsible for fulfilling the operation.
 
-<img width="606" src="docs/urql-operation-keys.png" alt="Diagram: An Operation key is computed by hashing the combination of the stringified query and the stabily stringified variables. DocumentNodes may either be stringified fully or just by using their operation names. Properties of any variables object need to be stabily sorted." />
+<img width="606" src="docs/assets/urql-operation-keys.png" alt="Diagram: An Operation key is computed by hashing the combination of the stringified query and the stabily stringified variables. DocumentNodes may either be stringified fully or just by using their operation names. Properties of any variables object need to be stabily sorted." />
 
 The result's error is a [`CombinedError`](https://formidable.com/open-source/urql/docs/api/#combinederror-class), which
 normalises GraphQL errors and Network errors by combining them into one wrapping class.
 
-<img width="693" src="docs/urql-combined-error.png" alt="Diagram: A CombinedError has two states. It can either have a property 'networkError', or it can have multiple, rehydrated GraphQL errors on the 'graphQLErrors' property. The message of the CombinedError will always be a summary of the errors it contains." />
+<img width="693" src="docs/assets/urql-combined-error.png" alt="Diagram: A CombinedError has two states. It can either have a property 'networkError', or it can have multiple, rehydrated GraphQL errors on the 'graphQLErrors' property. The message of the CombinedError will always be a summary of the errors it contains." />
 
 [Learn more about `useQuery` in the Getting Started guide](https://formidable.com/open-source/urql/docs/getting-started/#writing-queries)
 
@@ -196,19 +196,19 @@ const refetch = () => executeQuery({ requestPolicy: 'network-only' });
 In `urql` all operations are controlled by a central [`Client`](https://formidable.com/open-source/urql/docs/api/#client-class).
 This client is responsible for managing GraphQL operations and sending requests.
 
-<img width="787" src="docs/urql-client-architecture.png" alt="Diagram: The Client is an event hub on which operations may be dispatched by hooks. This creates an input stream (displayed as operations A, B, and C). Each Operation Result that then comes back from the client corresponds to one operation that has been sent to the client. This is the output stream of results (displayed as results A, B, and C)" />
+<img width="787" src="docs/assets/urql-client-architecture.png" alt="Diagram: The Client is an event hub on which operations may be dispatched by hooks. This creates an input stream (displayed as operations A, B, and C). Each Operation Result that then comes back from the client corresponds to one operation that has been sent to the client. This is the output stream of results (displayed as results A, B, and C)" />
 
 Any hook in `urql` dispatches its operation on the client (A, B, C) which will be handled by the client on a
 single stream of inputs. As responses come back from the cache or your GraphQL API one or more results are
 dispatched on an output stream that correspond to the operations, which update the hooks.
 
-<img width="709" src="docs/urql-event-hub.png" alt="Diagram: The 'useQuery' hook dispatches an operation on the client when it mounts or updates. When it unmounts it dispatches a 'teardown' operation that cancels the original operation. Results that come back from the client update the hook and are filtered by the operation's original key."/>
+<img width="709" src="docs/assets/urql-event-hub.png" alt="Diagram: The 'useQuery' hook dispatches an operation on the client when it mounts or updates. When it unmounts it dispatches a 'teardown' operation that cancels the original operation. Results that come back from the client update the hook and are filtered by the operation's original key."/>
 
 Hence the client can be seen as an event hub. Operations are sent to the client, which executes them and
 sends back a result. A special teardown-event is issued when a hook unmounts or updates to a different
 operation.
 
-<img width="700" src="docs/urql-signals.png" alt="Diagram: Operations can be seen as signals. Operations with an 'operationName' of query, mutation, or subscription start a query of the given DocumentNode operation. The same operation with an 'operationName' of 'teardown' instructs the client to stop or cancel an ongoing operation of the same key. Operation Results carry the original operation on an 'operation' property, which means they can be identified by reading the key of this operation."/>
+<img width="700" src="docs/assets/urql-signals.png" alt="Diagram: Operations can be seen as signals. Operations with an 'operationName' of query, mutation, or subscription start a query of the given DocumentNode operation. The same operation with an 'operationName' of 'teardown' instructs the client to stop or cancel an ongoing operation of the same key. Operation Results carry the original operation on an 'operation' property, which means they can be identified by reading the key of this operation."/>
 
 [Learn more about the shape of operations and results in our Architecture section!](https://formidable.com/open-source/urql/docs/architecture/)
 
@@ -223,7 +223,7 @@ which only deal with actions.
 Instead _Exchanges_ are nested and deal with two streams, the input stream of operations and the output stream of results,
 where the stream of operations go through a pipeline like an intersection in an arbitrary order.
 
-<img width="634" src="docs/urql-exchanges.png" alt="Diagram: By default the client has three exchanges. Operations flow through a 'dedup', 'cache', and 'fetch' exchange in this exact order. Their results are flowing backwards through this same chain of exchanges. The 'dedupExchange' deduplicates ongoing operations by their key. The 'cacheExchange' caches results and retrieves them by the operations' keys. The 'fetchExchange' sends operations to a GraphQL API and supports cancellation." />
+<img width="634" src="docs/assets/urql-exchanges.png" alt="Diagram: By default the client has three exchanges. Operations flow through a 'dedup', 'cache', and 'fetch' exchange in this exact order. Their results are flowing backwards through this same chain of exchanges. The 'dedupExchange' deduplicates ongoing operations by their key. The 'cacheExchange' caches results and retrieves them by the operations' keys. The 'fetchExchange' sends operations to a GraphQL API and supports cancellation." />
 
 By default there are three exchanges. The `dedupExchange` deduplicates operations with the same key, the
 cache exchange handles caching and has a "document" strategy by default, and the `fetchExchange` is typically
@@ -243,7 +243,7 @@ each unique operation can have exactly one cached result.
 These results are aggressively invalidated. Whenever you send a mutation, each result that contains `__typename`s
 that also occur in the mutation result is invalidated.
 
-<img width="736" src="docs/urql-document-caching.png" alt="Diagram: First, a query is made that gets a type, in this example a 'Book'. The result contains the '__typename' field that says 'Book'. This is stored in a mapping of all types to the operations that contained this type. Later a mutation may change some data and will have overlapping types, in this example a 'Book' is liked. The mutation also contains a 'Book' so it retrieves the original operation that was getting a 'Book' and reexecutes and invalidates it." />
+<img width="736" src="docs/assets/urql-document-caching.png" alt="Diagram: First, a query is made that gets a type, in this example a 'Book'. The result contains the '__typename' field that says 'Book'. This is stored in a mapping of all types to the operations that contained this type. Later a mutation may change some data and will have overlapping types, in this example a 'Book' is liked. The mutation also contains a 'Book' so it retrieves the original operation that was getting a 'Book' and reexecutes and invalidates it." />
 
 ### Normalized Caching
 
@@ -251,7 +251,7 @@ You can opt into having a fully normalized cache by using the [`@urql/exchange-g
 package. The normalized cache is a cache that stores every separate entity in a big graph. Therefore multiple separate queries, subscriptions, and mutations
 can update each other, if they contain overlapping data with the same type and ID.
 
-<img width="466" src="docs/urql-normalized-cache.png" alt="Diagram: A normalized cache contains a graph of different nodes. Queries point to different nodes, which point to other nodes, and so on and so forth. Nodes may be reused and are called 'entities'. Each entity corresponds to an object that came back from the API." />
+<img width="466" src="docs/assets/urql-normalized-cache.png" alt="Diagram: A normalized cache contains a graph of different nodes. Queries point to different nodes, which point to other nodes, and so on and so forth. Nodes may be reused and are called 'entities'. Each entity corresponds to an object that came back from the API." />
 
 Getting started with Graphcache is easy and is as simple as installing it and adding it to your client.
 Afterwards it comes with a lot of ways to configure it so that less requests need to be sent to your API.
@@ -373,4 +373,4 @@ There are currently three examples included in this repository:
 
 **Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
 
-<img width="100%" src="docs/urql-spoiler.png" />
+<img width="100%" src="docs/assets/urql-spoiler.png" />
