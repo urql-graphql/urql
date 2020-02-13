@@ -22,7 +22,7 @@ afterEach(() => {
 
 it('logs a warning if suspense mode is not activated', () => {
   const warn = jest.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
-  const client = createClient({ url: '', suspense: false });
+  const client = createClient({ url: 'https://example.com', suspense: false });
   const forward = jest.fn(() => fromArray([]));
   const ops = fromArray([]);
 
@@ -33,7 +33,7 @@ it('logs a warning if suspense mode is not activated', () => {
 });
 
 it('forwards skipped operations', () => {
-  const client = createClient({ url: '', suspense: true });
+  const client = createClient({ url: 'https://example.com', suspense: true });
   const operation = client.createRequestOperation('mutation', {
     key: 123,
     query: {} as any,
@@ -55,7 +55,7 @@ it('forwards skipped operations', () => {
 it('resolves synchronous results immediately', () => {
   let prevResult;
 
-  const client = createClient({ url: '', suspense: true });
+  const client = createClient({ url: 'https://example.com', suspense: true });
   const operation = client.createRequestOperation('query', {
     key: 123,
     query: {} as any,
@@ -89,7 +89,7 @@ it('resolves synchronous results immediately', () => {
 it('caches asynchronous results once for suspense', () => {
   let prevResult;
 
-  const client = createClient({ url: '', suspense: true });
+  const client = createClient({ url: 'https://example.com', suspense: true });
   const operation = client.createRequestOperation('query', {
     key: 123,
     query: {} as any,
