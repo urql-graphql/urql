@@ -1,4 +1,3 @@
-<p align="center"><img width="340" alt="urql-exchange-suspense" src="https://user-images.githubusercontent.com/2041385/62209781-73265580-b392-11e9-9145-318d46f64f53.gif" /></p>
 <h2 align="center">@urql/exchange-suspense</h2>
 <p align="center">
 <strong>An exchange for client-side React Suspense support in <code>urql</code></strong>
@@ -6,18 +5,17 @@
 <a href="https://npmjs.com/package/@urql/exchange-suspense">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-suspense.svg" />
 </a>
-<a href="https://travis-ci.com/FormidableLabs/urql-exchange-suspense">
-  <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/urql-exchange-suspense.svg?branch=master" />
-</a>
-<a href="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense">
-  <img alt="Test Coverage" src="https://codecov.io/gh/FormidableLabs/urql-exchange-suspense/branch/master/graph/badge.svg" />
+<a href="https://bundlephobia.com/result?p=@urql/exchange-suspense">
+  <img alt="Minified gzip size"
+  src="https://img.shields.io/bundlephobia/minzip/@urql/exchange-suspense.svg?label=gzip%20size" />
 </a>
 <a href="https://github.com/FormidableLabs/urql-exchange-suspense#maintenance-status">
   <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-experimental-blueviolet.svg" />
 </a>
 </p>
 
-`@urql/exchange-suspense` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client that allows the use of React Suspense on the client-side with `urql`'s built-in suspense mode.
+`@urql/exchange-suspense` is an exchange for the [`urql`](../../README.md) GraphQL client that allows the
+use of React Suspense on the client-side with `urql`'s built-in suspense mode.
 
 `urql` already supports suspense today, but it's typically used to implement prefetching
 during server-side rendering with `react-ssr-prepass`, which allows it to execute React
@@ -44,12 +42,7 @@ You'll then need to add the `suspenseExchange`, that this package exposes, to yo
 `urql` Client and set the `suspense` mode to `true`:
 
 ```js
-import {
-  createClient,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-} from 'urql';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 import { suspenseExchange } from '@urql/exchange-suspense';
 
 const client = createClient({
