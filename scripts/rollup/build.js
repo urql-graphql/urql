@@ -5,7 +5,6 @@ const glob = require('glob').sync;
 const execa = require('execa');
 
 const workspaceRoot = path.resolve(__dirname, '../../');
-const rollupConfig = path.resolve(__dirname, './config.js');
 
 let packages = glob('{packages,exchanges}/*/package.json').map(pkg => {
   return path.resolve(pkg, '../');
@@ -26,8 +25,8 @@ if (process.env.CIRCLE_NODE_TOTAL) {
 
     try {
       await execa(
-        'rollup',
-        ['--silent', '-c', rollupConfig],
+        'run-s',
+        ['build'],
         {
           preferLocal: true,
           localDir: workspaceRoot,
