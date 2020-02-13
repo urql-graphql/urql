@@ -111,6 +111,16 @@ yarn
 
 ## How do I add a new package?
 
+First of all we need to know where to put the package.
+
+- Exchanges should be added to `exchanges/` and the folder should be the plain
+  name of the exchange. Since the `package.json:name` is following the convention
+  of `@urql/exchange-*` the folder should just be without this conventional prefix.
+- All other packages should be added to `packages/`. Typically all packages should
+  be named `@urql/*` and their folders should be named exactly this without the
+  prefix or `*-urql`. Optionally if the package will be named `*-urql` then the folder
+  can take on the same name.
+
 When adding a new package, start by copying a `package.json` file from another project.
 You may want to alter the following fields first:
 
@@ -136,10 +146,6 @@ at what you've set `source` to)
 The `scripts.prepare` task is set up to check your new `package.json` file for correctness. So in
 case you get anything wrong, you'll get a short error when running `yarn` after setting your new
 project up. Just in case! 😄
-
-Lastly, your new package will need to be added to the `tsconfig.json` in the root of the repository.
-Add a new entry to `compilerOptions.paths` where the key is the `name` you've used in your
-`package.json` and the value is an array with a single entry, the path to your package + `src/`.
 
 Afterwards you can check whether everything is working correctly by running:
 
