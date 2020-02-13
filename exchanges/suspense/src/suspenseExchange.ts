@@ -1,5 +1,5 @@
 import { pipe, share, filter, merge, map, onPush } from 'wonka';
-import { Exchange, OperationResult, Operation } from 'urql';
+import { Exchange, OperationResult, Operation } from '@urql/core';
 
 type SuspenseCache = Map<number, OperationResult>;
 type SuspenseKeys = Set<number>;
