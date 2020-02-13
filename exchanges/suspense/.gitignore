@@ -1,0 +1,15 @@
+node_modules
+/lib
+es
+types
+coverage
+.vscode
+yarn-error.log*
+package-lock.json
+package-lock.json.*
+bundles
+dist
+webpack-build
+.rts2_cache*
+cypress/screenshots
+.DS_Store
