@@ -1,6 +1,3 @@
-const { pathsToModuleNameMapper } = require('ts-jest/utils');
-const { compilerOptions } = require('../../tsconfig.json');
-
 module.exports = {
   preset: 'ts-jest',
   setupFiles: [
@@ -9,10 +6,11 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
-  moduleNameMapper: pathsToModuleNameMapper(
-    compilerOptions.paths,
-    { prefix: '<rootDir>/../../' }
-  ),
+  moduleNameMapper: {
+    "^urql$": "<rootDir>/../../node_modules/urql/src",
+    "^(.*-urql)$": "<rootDir>/../../node_modules/$1/src",
+    "^@urql/(.*)$": "<rootDir>/../../node_modules/@urql/$1/src",
+  },
   watchPlugins: ['jest-watch-yarn-workspaces'],
   testRegex: '(src/.*(\\.|/)(test|spec))\\.tsx?$',
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json'],
