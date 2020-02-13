@@ -36,7 +36,6 @@ export const makePlugins = ({ isProduction } = {}) => [
     : typescript({
       useTsconfigDeclarationDir: true,
       objectHashIgnoreUnknownHack: true,
-      tsconfigDefaults: require('../../tsconfig.json'),
       tsconfigOverride: {
         exclude: [
           'src/**/*.test.ts',
@@ -45,9 +44,8 @@ export const makePlugins = ({ isProduction } = {}) => [
         ],
         compilerOptions: {
           sourceMap: true,
-          baseUrl: '.',
           declaration: !isProduction,
-          declarationDir: './dist/types',
+          declarationDir: settings.types,
           target: 'es6',
         },
       },

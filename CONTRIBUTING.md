@@ -140,8 +140,11 @@ an appropriate extension (`.esm.js` for `module` and `.cjs.js` for `main`).
 
 If your entrypoint won't be at `src/index.ts` you may alter it. But the `types` field has to match
 the same file relative to the `dist/types` folder, where `rollup` will output the TypeScript
-declaration files. When setting up your package make sure to create a `src/index.ts` file (or a file
-at what you've set `source` to)
+declaration files.
+
+When setting up your package make sure to create a `src/index.ts` file
+(or any other file which you've pointed `package.json:source` to). Also don't forget to
+copy over the `tsconfig.json` from another package (You won't need to change it).
 
 The `scripts.prepare` task is set up to check your new `package.json` file for correctness. So in
 case you get anything wrong, you'll get a short error when running `yarn` after setting your new

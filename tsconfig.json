@@ -4,8 +4,8 @@
     "paths": {
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],
-      "@urql/*": ["packages/*-urql/src", "packages/*/src"],
-      "@urql/exchange-*": ["exchanges/*/src"]
+      "@urql/exchange-*": ["exchanges/*/src"],
+      "@urql/*": ["packages/*-urql/src", "packages/*/src"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
