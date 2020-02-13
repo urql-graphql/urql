@@ -5,13 +5,22 @@ config();
 
 const REPO = 'FormidableLabs/urql';
 const SEE_LINE = /^See:\s*(.*)/i;
+const TRAILING_CHAR = /[.;:]$/g;
 
-const getSummaryLines = cs =>
-  cs.summary
+const getSummaryLines = cs => {
+  const lines = cs.summary
     .trim()
     .split(/[\r\n]+/)
     .map(l => l.trim())
     .filter(Boolean);
+  const size = lines.length;
+  if (size > 0) {
+    lines[size - 1] = lines[size - 1]
+      .replace(TRAILING_CHAR, '');
+  }
+
+  return lines;
+};
 
 /** Creates a "(See X)" string from a template */
 const templateSeeRef = links => {
