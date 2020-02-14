@@ -1,11 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { BodyCopy } from "../../components/body-copy";
-import { SectionTitle } from "../../components/section-title";
-import constants from "../../constants";
-import octoCat from "../../static/svgs/Octicons-mark-github.svg";
+import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import { BodyCopy } from '../../components/body-copy';
+import { SectionTitle } from '../../components/section-title';
+import constants from '../../constants';
+import octoCat from '../../static/svgs/Octicons-mark-github.svg';
 
 const OuterWrapper = styled.div`
   background: ${constants.color};
@@ -128,7 +128,7 @@ class GetStarted extends React.Component {
 }
 
 GetStarted.propTypes = {
-  getStartedObj: PropTypes.object
+  getStartedObj: PropTypes.object,
 };
 
 export default GetStarted;

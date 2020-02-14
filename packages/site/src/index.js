@@ -1,25 +1,25 @@
-import React from 'react'
-import { render, hydrate } from 'react-dom'
-import { AppContainer } from 'react-hot-loader'
+import React from 'react';
+import { render, hydrate } from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
 
-import App from './app'
+import App from './app';
 
-export default App
+export default App;
 
 // Render your app
 if (typeof document !== 'undefined') {
-  const renderMethod = module.hot ? render : hydrate
+  const renderMethod = module.hot ? render : hydrate;
   const mount = Comp => {
     renderMethod(
       <AppContainer>
         <Comp />
       </AppContainer>,
       document.getElementById('root')
-    )
-  }
+    );
+  };
 
-  mount(App)
+  mount(App);
   if (module.hot) {
-    module.hot.accept('./app', () => mount(require('./app').default))
+    module.hot.accept('./app', () => mount(require('./app').default));
   }
 }

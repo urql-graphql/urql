@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { Link } from "react-router-dom";
-import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import collapsedSidebarBackground from '../static/svgs/collapsed-sidebar-background.svg';
 
 export const Navigation = styled.div`
   align-items: center;
@@ -41,7 +41,7 @@ export const SideBarSvg = styled.div`
 `;
 
 export const SidebarWrapper = styled.aside`
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-size: 100% 100%;
   background: linear-gradient(
       rgba(223, 223, 223, 0.4),
@@ -60,8 +60,8 @@ export const SidebarWrapper = styled.aside`
 
   @media (max-width: 768px) {
     background: #dfdfdf;
-    min-width: ${props => (props.overlay ? "24rem" : "2.5rem")};
-    width: ${props => (props.overlay ? "24rem" : "2.5rem")};
+    min-width: ${props => (props.overlay ? '24rem' : '2.5rem')};
+    width: ${props => (props.overlay ? '24rem' : '2.5rem')};
     background-size: cover;
   }
 `;

@@ -1,11 +1,11 @@
-import { getSidebarItems } from "./static-config-helpers/md-data-transforms";
+import { getSidebarItems } from './static-config-helpers/md-data-transforms';
 
-const staticWebpackConfig = require("./static-config-parts/static-webpack-config");
+const staticWebpackConfig = require('./static-config-parts/static-webpack-config');
 const {
   stage,
   landerBasePath,
-  metaData
-} = require("./static-config-parts/constants");
+  metaData,
+} = require('./static-config-parts/constants');
 
 export default {
   plugins: [
@@ -31,7 +31,7 @@ export default {
   devBasePath: '',
 
   getSiteData: () => ({
-    title: metaData.title
+    title: metaData.title,
   }),
 
   getRoutes: async () => {
@@ -39,17 +39,17 @@ export default {
     const sidebarHeaders = sidebarItems.map(d => ({
       title: d.title,
       path: `/${d.slug}/`,
-      slug: d.slug
+      slug: d.slug,
     }));
 
     return [
       {
-        path: "/",
-        template: "src/screens/home"
+        path: '/',
+        template: 'src/screens/home',
       },
       {
-        path: "/docs",
-        template: "src/screens/docs",
+        path: '/docs',
+        template: 'src/screens/docs',
         getData: () => ({
           title: `${metaData.title} | Documentation`,
           markdown: sidebarItems[0].markdown,
@@ -57,14 +57,14 @@ export default {
           sidebarHeaders,
           tocArray: sidebarItems[0].data.subHeadings.map(sh => ({
             content: sh.value,
-            level: sh.depth
-          }))
+            level: sh.depth,
+          })),
         }),
         // move slug + path to data in transform, renderedMd to data, and nuke markdown prop
         children: sidebarItems.map(
           ({ slug, path, markdown, content, data }) => ({
             path,
-            template: "src/screens/docs",
+            template: 'src/screens/docs',
             getData: () => ({
               title: data.title,
               markdown,
@@ -73,12 +73,12 @@ export default {
               sidebarHeaders,
               tocArray: data.subHeadings.map(sh => ({
                 content: sh.value,
-                level: sh.depth
-              }))
-            })
+                level: sh.depth,
+              })),
+            }),
           })
-        )
-      }
+        ),
+      },
     ];
   },
 };

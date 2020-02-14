@@ -10,22 +10,22 @@ const staticWebpackConfig = (config, { defaultLoaders }) => {
           test: /\.svg$/,
           use: [
             {
-              loader: "url-loader",
+              loader: 'url-loader',
               options: {
-                limit: Number.MAX_SAFE_INTEGER
-              }
-            }
-          ]
+                limit: Number.MAX_SAFE_INTEGER,
+              },
+            },
+          ],
         },
         {
           test: /\.md$/,
-          use: "raw-loader"
+          use: 'raw-loader',
         },
         defaultLoaders.cssLoader,
         defaultLoaders.jsLoader,
-        defaultLoaders.fileLoader
-      ]
-    }
+        defaultLoaders.fileLoader,
+      ],
+    },
   ];
   return config;
 };

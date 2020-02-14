@@ -4,15 +4,15 @@
 // react-static build, aka production:  REACT_STATIC_ENV="production" && REACT_STATIC_STAGING=undefined
 
 const stage =
-  process.env.REACT_STATIC_STAGING === "true"
-    ? "staging"
+  process.env.REACT_STATIC_STAGING === 'true'
+    ? 'staging'
     : process.env.REACT_STATIC_ENV;
-const landerBasePath = "open-source/urql";
+const landerBasePath = 'open-source/urql';
 const metaData = {
-  title: "urql",
+  title: 'urql',
   description:
-    "A GraphQL client that exposes a set of React components and hooks.",
-  url: "http://www.formidable.com/open-source/urql/"
+    'A GraphQL client that exposes a set of React components and hooks.',
+  url: 'http://www.formidable.com/open-source/urql/',
 };
 
 module.exports = { stage, landerBasePath, metaData };
