@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link } from "react-static";
+import { Link } from "react-router-dom";
 import collapsedSidebarBackground from "../static/svgs/collapsed-sidebar-background.svg";
 
 export const Navigation = styled.div`

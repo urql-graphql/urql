@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { BodyCopy } from "../../components/body-copy";
 import { SectionTitle } from "../../components/section-title";
-import { Link } from "react-static";
 import constants from "../../constants";
 import octoCat from "../../static/svgs/Octicons-mark-github.svg";
 

@@ -1,5 +1,4 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 9,
     sourceType: 'module',
@@ -9,10 +8,9 @@ module.exports = {
     },
   },
   extends: [
-    'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
+    'plugin:import/errors',
     'prettier',
-    'prettier/@typescript-eslint',
   ],
   ignorePatterns: [
     'node_modules/',
@@ -24,17 +22,13 @@ module.exports = {
     'examples/',
     'scripts/'
   ],
-  plugins: ['react-hooks'],
+  plugins: [
+    'react-hooks'
+  ],
   rules: {
-    '@typescript-eslint/no-use-before-define': 'off',
-    '@typescript-eslint/ban-ts-ignore': 'off',
-    '@typescript-eslint/member-ordering': 'off',
-    '@typescript-eslint/explicit-member-accessibility': 'off',
-    '@typescript-eslint/no-object-literal-type-assertion': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/array-type': 'off',
+    'consistent-return': 'warn',
+    'no-magic-numbers': 'off', // TODO
+    'react/jsx-handler-names': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'react/react-in-jsx-scope': 'off',
@@ -42,7 +36,6 @@ module.exports = {
     'react/no-children-prop': 'off',
     'sort-keys': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
-    'import/no-internal-modules': 'off',
     'prefer-arrow/prefer-arrow-functions': 'off',
   },
   settings: {

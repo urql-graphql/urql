@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { ProjectBadge } from "formidable-oss-badges";
+// import { ProjectBadge } from "formidable-oss-badges";
 import styled from "styled-components";
 import { BodyCopy } from "../../components/body-copy";
 import { Button } from "../../components/button";
@@ -56,6 +56,7 @@ const OSSLink = styled.a`
   }
 `;
 
+/*
 const StyledProjectBadge = styled(ProjectBadge)`
   left: 0;
   position: relative;
@@ -65,6 +66,7 @@ const StyledProjectBadge = styled(ProjectBadge)`
     width: 14rem;
   }
 `;
+*/
 
 const OSSCopyContainer = styled.div`
   display: flex;
@@ -105,6 +107,9 @@ const ButtonStyled = styled(Button)`
 
 class MoreOSS extends React.Component {
   render() {
+    return null; // TODO: formidable-oss-badges incorrectly bundles styled-components due to a broken rollup config
+
+    /*
     return (
       <OuterWrapper>
         <SectionWrapper>
@@ -114,14 +119,7 @@ class MoreOSS extends React.Component {
               <OSSLink href={card.link}>
                 {card.hasOwnLogo ? (
                   <OSSImage src={card.logo} />
-                ) : (
-                  <StyledProjectBadge
-                    color={card.color}
-                    number={card.number}
-                    abbreviation={card.abbreviation}
-                    description={card.title}
-                  />
-                )}
+                ) : null}
               </OSSLink>
               <OSSCopyContainer>
                 <OSSLink href={card.link}>
@@ -137,6 +135,7 @@ class MoreOSS extends React.Component {
         </SectionWrapper>
       </OuterWrapper>
     );
+    */
   }
 }
 
