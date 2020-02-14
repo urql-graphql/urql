@@ -157,7 +157,6 @@ const getMdFiles = async (
   sort = defaultSort,
   config = baseConfig
 ) =>
-  // eslint-disable-next-line promise/avoid-new
   new Promise(resolve => {
     if (fs.existsSync(mdPath)) {
       klaw(mdPath)
