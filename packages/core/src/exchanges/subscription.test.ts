@@ -47,7 +47,7 @@ it('should return response data from forwardSubscription observable', async () =
   expect(unsubscribe).toHaveBeenCalled();
 });
 
-it('should tear down the operation if the source subscription ends', () => {
+it('should tear down the operation if the source subscription ends', async () => {
   const reexecuteOperation = jest.fn();
   const unsubscribe = jest.fn();
 
@@ -68,6 +68,8 @@ it('should tear down the operation if the source subscription ends', () => {
     subscriptionExchange({ forwardSubscription })(exchangeArgs),
     publish
   );
+
+  await Promise.resolve();
 
   expect(unsubscribe).not.toHaveBeenCalled();
   expect(reexecuteOperation).toHaveBeenCalled();

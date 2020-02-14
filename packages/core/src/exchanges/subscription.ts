@@ -73,26 +73,31 @@ export const subscriptionExchange = ({
 
     return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;
+      let sub;
 
-      const sub = observableish.subscribe({
-        next: result => next(makeResult(operation, result)),
-        error: err => next(makeErrorResult(operation, err)),
-        complete: () => {
-          if (!isComplete) {
-            isComplete = true;
-            client.reexecuteOperation({
-              ...operation,
-              operationName: 'teardown',
-            });
+      Promise.resolve().then(() => {
+        if (isComplete) return;
 
-            complete();
-          }
-        },
+        sub = observableish.subscribe({
+          next: result => next(makeResult(operation, result)),
+          error: err => next(makeErrorResult(operation, err)),
+          complete: () => {
+            if (!isComplete) {
+              isComplete = true;
+              client.reexecuteOperation({
+                ...operation,
+                operationName: 'teardown',
+              });
+
+              complete();
+            }
+          },
+        })
       });
 
       return () => {
         isComplete = true;
-        sub.unsubscribe();
+        if (sub) sub.unsubscribe();
       };
     });
   };
