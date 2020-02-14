@@ -24,7 +24,10 @@ module.exports = {
     'examples/',
     'scripts/'
   ],
-  plugins: ['react-hooks'],
+  plugins: [
+    'react-hooks',
+    'prettier',
+  ],
   rules: {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
@@ -44,6 +47,11 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'import/no-internal-modules': 'off',
     'prefer-arrow/prefer-arrow-functions': 'off',
+
+    'prettier/prettier': ['error', {
+      singleQuote: true,
+      trailingComma: 'es5',
+    }],
   },
   settings: {
     react: {

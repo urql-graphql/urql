@@ -23,7 +23,8 @@ module.exports = {
     'scripts/'
   ],
   plugins: [
-    'react-hooks'
+    'react-hooks',
+    'prettier',
   ],
   rules: {
     'consistent-return': 'warn',
@@ -37,6 +38,11 @@ module.exports = {
     'sort-keys': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'prefer-arrow/prefer-arrow-functions': 'off',
+
+    'prettier/prettier': ['error', {
+      singleQuote: true,
+      trailingComma: 'es5',
+    }],
   },
   settings: {
     react: {
