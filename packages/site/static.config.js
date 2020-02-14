@@ -13,13 +13,12 @@ const {
 chokidar.watch("src/content").on("all", () => reloadRoutes());
 
 export default {
-  // plugins: ["react-static-plugin-styled-components"],
   paths: {
     root: process.cwd(), // The root of your project. Don't change this unless you know what you're doing.
     src: "src", // The source directory. Must include an index.js entry file.
     // See app.js for how stage is used to make client-side routing resolve correctly by stage.
     dist: stage === "staging" ? `dist/${landerBasePath}` : "dist", // The production output directory.
-    devDist: "tmp/dev-server", // The development scratch directory.
+    devDist: "dist", // The development scratch directory.
     public: "public" // The public directory (files copied to dist during build)
   },
   basePath: landerBasePath,
