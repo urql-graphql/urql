@@ -1,13 +1,8 @@
 import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
-  
-
-  :root {
-    font-size: 10px;
-  }
-
   html {
+    font-size: 10px;
     box-sizing: border-box;
   }
 
@@ -24,7 +19,7 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
-  
+
   p {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     letter-spacing: -0.03em;

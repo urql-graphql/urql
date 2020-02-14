@@ -1,34 +1,23 @@
-import React from "react";
+import React, { Suspense} from "react";
 import { Routes, Root } from "react-static";
-import { Router } from "react-router";
+import Analytics from "react-router-ga";
 
-import Template from "./template";
-import Analytics from "./google-analytics";
+import { GlobalStyle } from "./global-style";
+import { ScrollToTop } from "./scroll-to-top";
 
-// import default prism theme styles
 import "prismjs/themes/prism.css";
-
-let history;
-let basename;
-if (typeof window !== "undefined") {
-  const createBrowserHistory = require("history").createBrowserHistory;
-  const { stage, landerBasePath } = require("../static-config-parts/constants");
-  basename = `/${landerBasePath}`;
-  history =
-    stage === "development"
-      ? createBrowserHistory()
-      : createBrowserHistory({ basename });
-}
 
 const App = () => (
   <Root>
-    <Router history={history}>
-      <Analytics>
-        <Template>
+    <Analytics id="UA-43290258-1">
+      <main>
+        <Suspense fallback={<h3>Loading</h3>}>
+          <GlobalStyle />
+          <ScrollToTop />
           <Routes />
-        </Template>
-      </Analytics>
-    </Router>
+        </Suspense>
+      </main>
+    </Analytics>
   </Root>
 );
 

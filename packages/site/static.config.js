@@ -13,18 +13,27 @@ export default {
     'react-static-plugin-react-router',
   ],
   paths: {
-    root: process.cwd(), // The root of your project. Don't change this unless you know what you're doing.
-    src: "src", // The source directory. Must include an index.js entry file.
-    // See app.js for how stage is used to make client-side routing resolve correctly by stage.
-    dist: stage === "staging" ? `dist/${landerBasePath}` : "dist", // The production output directory.
-    public: "public" // The public directory (files copied to dist during build)
+    root: process.cwd(),
+    src: 'src',
+    dist: 'dist',
+    public: 'public',
+    assets: 'dist',
+
+    buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
+    devDist: 'node_modules/.cache/react-static/dist/',
+    temp: 'node_modules/.cache/react-static/temp/',
   },
-  basePath: landerBasePath,
-  stagingBasePath: landerBasePath,
-  devBasePath: "",
+
+  webpack: staticWebpackConfig,
+
+  basePath: 'open-source/urql',
+  stagingBasePath: 'open-source/urql',
+  devBasePath: '',
+
   getSiteData: () => ({
     title: metaData.title
   }),
+
   getRoutes: async () => {
     const sidebarItems = await getSidebarItems();
     const sidebarHeaders = sidebarItems.map(d => ({
@@ -70,11 +79,6 @@ export default {
           })
         )
       }
-      // we can totes add lander or project specific 404s, if we ever have call to
-      // { path: "/404", component: "src/screens/404" }
     ];
   },
-  // turn this on if it helps your local development workflow for build testing
-  bundleAnalyzer: false,
-  webpack: staticWebpackConfig
 };
