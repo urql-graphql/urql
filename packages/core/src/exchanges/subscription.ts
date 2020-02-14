@@ -75,8 +75,9 @@ export const subscriptionExchange = ({
       let isComplete = false;
       let sub;
 
-      sub = Promise.resolve().then(() => {
-        if (isComplete) return undefined;
+      Promise.resolve().then(() => {
+        if (isComplete) return;
+
         sub = observableish.subscribe({
           next: result => next(makeResult(operation, result)),
           error: err => next(makeErrorResult(operation, err)),
