@@ -1,7 +1,9 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { withRouteData, withRouter, Link } from "react-static";
+import { withRouteData } from "react-static";
+import { withRouter, Link } from "react-router-dom";
+
 import {
   SidebarNavItem,
   SidebarNavSubItem,
@@ -9,6 +11,7 @@ import {
   SidebarWrapper,
   SideBarSvg
 } from "../../components/navigation";
+
 import closeButton from "../../static/svgs/x.svg";
 import logoSidebar from "../../static/sidebar-badge.svg";
 import constants from "../../constants";

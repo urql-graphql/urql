@@ -1,7 +1,9 @@
 import React, { forwardRef } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { withRouteData, Link } from "react-static";
+import { withRouteData } from "react-static";
+import { Link } from "react-router-dom";
+
 import Article from "./article";
 import Sidebar from "./sidebar";
 import burger from "../../static/svgs/burger.svg";
