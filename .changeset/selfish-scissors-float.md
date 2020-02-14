@@ -2,4 +2,4 @@
 '@urql/core': patch
 ---
 
-Ensure we don't dispatch network-requests on getCurrentValue or subscriptions that will tear down early
+Adds a one-tick delay to the subscriptionExchange to prevent unnecessary early tear downs.
