@@ -20,59 +20,58 @@ const MockAppTree: React.FC = () => {
 };
 
 describe('withUrqlClient', () => {
+  const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
+  const mockMergeExchanges = jest.fn(() => defaultExchanges);
+  let Component: NextComponentType<any>;
+
   beforeAll(() => {
     configure({ adapter: new Adapter() });
   });
 
+  afterEach(() => {
+    spyInitUrqlClient.mockClear();
+    mockMergeExchanges.mockClear();
+  });
+
   describe('with client options', () => {
-    let Component: NextComponentType<any>;
-
-    const mockContext: NextUrqlContext = {
-      AppTree: MockAppTree,
-      pathname: '/',
-      query: {
-        test: '',
-      },
-      asPath: '/',
-      urqlClient: {} as Client,
-    };
-
-    const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
-
     beforeEach(() => {
       Component = withUrqlClient({ url: 'http://localhost:3000' })(MockApp);
     });
 
-    afterEach(() => {
-      spyInitUrqlClient.mockClear();
-    });
+    const mockContext: NextUrqlContext = {
+      AppTree: MockAppTree,
+      pathname: '/',
+      query: {},
+      asPath: '/',
+      urqlClient: {} as Client,
+    };
 
-    it('should instantiate an empty client before getInitialProps has been run', () => {
+    it('should create the client instance when the component mounts', () => {
       const tree = shallow(<Component />);
       const app = tree.find(MockApp);
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
-      expect(app.props().urqlClient.url).toBeUndefined();
-      expect(spyInitUrqlClient).toHaveBeenCalled();
+      expect(app.props().urqlClient.url).toBe('http://localhost:3000');
+      expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
     });
 
-    it('should instantiate and pass the urql client instance via getInitialProps', async () => {
+    it('should create the urql client instance server-side inside getInitialProps and client-side in the component', async () => {
       const props =
         Component.getInitialProps &&
         (await Component.getInitialProps(mockContext));
+      expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
+
       const tree = shallow(<Component {...props} />);
       const app = tree.find(MockApp);
 
+      expect(spyInitUrqlClient).toHaveBeenCalledTimes(2);
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.url).toEqual('http://localhost:3000');
-      expect(spyInitUrqlClient).toHaveBeenCalled();
     });
   });
 
   describe('with ctx callback to create client options', () => {
-    let Component: NextComponentType<any>;
-
-    // Fake up a string to simulate, say, a token accessed via browser cookies or localStorage.
+    // Simulate a token that might be passed in a request to the server-rendered application.
     const token = Math.random()
       .toString(36)
       .slice(-10);
@@ -80,9 +79,7 @@ describe('withUrqlClient', () => {
     const mockContext: NextUrqlContext = {
       AppTree: MockAppTree,
       pathname: '/',
-      query: {
-        test: '',
-      },
+      query: {},
       asPath: '/',
       req: {
         headers: {
@@ -93,30 +90,31 @@ describe('withUrqlClient', () => {
     };
 
     beforeEach(() => {
-      Component = withUrqlClient(ctx => ({
-        url: 'http://localhost:3000',
-        fetchOptions: {
-          headers: { Authorization: ctx.req!.headers.cookie as string },
-        },
-      }))(MockApp);
+      Component = withUrqlClient(
+        ctx => ({
+          url: 'http://localhost:3000',
+          fetchOptions: {
+            headers: { Authorization: ctx?.req?.headers?.cookie ?? '' },
+          },
+        }),
+        mockMergeExchanges,
+      )(MockApp);
     });
 
-    it('should allow a user to access the ctx object from Next', async () => {
-      const props =
-        Component.getInitialProps &&
+    it('should allow a user to access the ctx object from Next on the server', async () => {
+      Component.getInitialProps &&
         (await Component.getInitialProps(mockContext));
-      const tree = shallow(<Component {...props} />);
-      const app = tree.find(MockApp);
-      expect(app.props().urqlClient.fetchOptions).toEqual({
-        headers: { Authorization: token },
-      });
+      expect(spyInitUrqlClient).toHaveBeenCalledWith(
+        {
+          url: 'http://localhost:3000',
+          fetchOptions: { headers: { Authorization: token } },
+        },
+        mockMergeExchanges,
+      );
     });
   });
 
   describe('with mergeExchanges provided', () => {
-    let Component: NextComponentType<any>;
-    const mockMergeExchanges = jest.fn(() => defaultExchanges);
-
     beforeEach(() => {
       Component = withUrqlClient(
         { url: 'http://localhost:3000' },

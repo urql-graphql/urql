@@ -1,5 +1,6 @@
 import React from 'react';
 import { NextPage, NextPageContext, NextComponentType } from 'next';
+import { AppContext } from 'next/app';
 import ssrPrepass from 'react-ssr-prepass';
 import {
   Provider,
@@ -14,7 +15,10 @@ import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 
 import { initUrqlClient } from './init-urql-client';
 
-type NextUrqlClientOptions = Omit<ClientOptions, 'exchanges' | 'suspense'>;
+export type NextUrqlClientOptions = Omit<
+  ClientOptions,
+  'exchanges' | 'suspense'
+>;
 
 interface WithUrqlClient {
   urqlClient?: Client;
@@ -22,7 +26,6 @@ interface WithUrqlClient {
 
 interface WithUrqlInitialProps {
   urqlState: SSRData;
-  clientOptions: NextUrqlClientOptions;
 }
 
 interface PageProps {
@@ -35,7 +38,7 @@ export interface NextUrqlContext extends NextPageContext {
 
 type NextUrqlClientConfig =
   | NextUrqlClientOptions
-  | ((ctx: NextPageContext) => NextUrqlClientOptions);
+  | ((ctx?: NextPageContext) => NextUrqlClientOptions);
 
 function withUrqlClient<T = any, IP = any>(
   clientConfig: NextUrqlClientConfig,
@@ -51,19 +54,21 @@ function withUrqlClient<T = any, IP = any>(
       NextUrqlContext,
       IP | (IP & WithUrqlInitialProps),
       T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps
-    > = ({ urqlClient, urqlState, clientOptions, pageProps, ...rest }) => {
-      /**
-       * The React Hooks ESLint plugin will not interpret withUrql as a React component
-       * due to the NextComponentType annotation. Ignore the warning about not using useMemo.
-       */
+    > = ({ urqlClient, urqlState, pageProps, ...rest }) => {
+      // The React Hooks ESLint plugin will not interpret withUrql as a React component
+      // due to the NextComponentType annotation. Ignore the warning about not using useMemo.
+
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const client = React.useMemo(
-        () =>
+      const client = React.useMemo(() => {
+        const clientOptions =
+          typeof clientConfig === 'function' ? clientConfig() : clientConfig;
+
+        return (
           urqlClient ||
-          (pageProps && pageProps.urqlClient) ||
-          initUrqlClient(clientOptions, mergeExchanges, urqlState)[0],
-        [urqlClient, pageProps, clientOptions, urqlState],
-      ) as Client;
+          pageProps?.urqlClient ||
+          initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]
+        );
+      }, [urqlClient, pageProps, urqlState]) as Client;
 
       return (
         <Provider value={client}>
@@ -76,12 +81,17 @@ function withUrqlClient<T = any, IP = any>(
     const displayName = Page.displayName || Page.name || 'Component';
     withUrql.displayName = `withUrqlClient(${displayName})`;
 
-    withUrql.getInitialProps = async (ctx: NextPageContext) => {
+    withUrql.getInitialProps = async (ctx: NextPageContext | AppContext) => {
       const { AppTree } = ctx;
 
+      const appCtx = (ctx as AppContext).ctx;
+      const isApp = !!appCtx;
+
       const opts =
-        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
-      const [urqlClient, ssrCache] = initUrqlClient(opts);
+        typeof clientConfig === 'function'
+          ? clientConfig(isApp ? appCtx : (ctx as NextPageContext))
+          : clientConfig;
+      const [urqlClient, ssrCache] = initUrqlClient(opts, mergeExchanges);
 
       if (urqlClient) {
         (ctx as NextUrqlContext).urqlClient = urqlClient;
@@ -93,19 +103,14 @@ function withUrqlClient<T = any, IP = any>(
         pageProps = await Page.getInitialProps(ctx as NextUrqlContext);
       }
 
-      /**
-       * Check the window object to determine whether we are on the server.
-       * getInitialProps is universal, but we only want to run suspense on the server.
-       */
-      const isBrowser = typeof window !== 'undefined';
-      if (isBrowser) {
+      // Check the window object to determine whether or not we are on the server.
+      // getInitialProps runs on the server for initial render, and on the client for navigation.
+      // We only want to run the prepass step on the server.
+      if (typeof window !== 'undefined') {
         return pageProps;
       }
 
-      /**
-       * Run the prepass step on AppTree.
-       * This will run all urql queries on the server.
-       */
+      // Run the prepass step on AppTree. This will run all urql queries on the server.
       await ssrPrepass(
         <AppTree
           pageProps={{
@@ -115,13 +120,12 @@ function withUrqlClient<T = any, IP = any>(
         />,
       );
 
-      // Extract the SSR query data from urql's SSR cache.
-      const urqlState = ssrCache && ssrCache.extractData();
+      // Extract the query data from urql's SSR cache.
+      const urqlState = ssrCache?.extractData();
 
       return {
         ...pageProps,
         urqlState,
-        clientOptions: opts,
       };
     };
 

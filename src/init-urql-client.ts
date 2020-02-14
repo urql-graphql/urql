@@ -5,18 +5,19 @@ import {
   fetchExchange,
   ssrExchange,
   Client,
-  ClientOptions,
   Exchange,
 } from 'urql';
 import { SSRData, SSRExchange } from 'urql/dist/types/exchanges/ssr';
 
 import 'isomorphic-unfetch';
 
+import { NextUrqlClientOptions } from './with-urql-client';
+
 let urqlClient: Client | null = null;
 let ssrCache: SSRExchange | null = null;
 
 export function initUrqlClient(
-  clientOptions: ClientOptions,
+  clientOptions: NextUrqlClientOptions,
   mergeExchanges: (ssrEx: SSRExchange) => Exchange[] = ssrEx => [
     dedupExchange,
     cacheExchange,
