@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const BodyCopy = styled.p`
   font-size: 1.4rem;

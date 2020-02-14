@@ -1,19 +1,19 @@
 /* eslint-disable func-style */
-import { stage, landerBasePath } from "../static-config-parts/constants";
-const fs = require("fs");
-const klaw = require("klaw");
-const path = require("path");
-const html = require("remark-html");
-const frontmatter = require("remark-frontmatter");
-const yaml = require("js-yaml");
-const remark = require("remark");
-const _ = require("lodash");
-const select = require("unist-util-select");
-const visit = require("unist-util-visit");
-const slug = require("remark-slug");
-const slugs = require("github-slugger")();
+import { stage, landerBasePath } from '../static-config-parts/constants';
+const fs = require('fs');
+const klaw = require('klaw');
+const path = require('path');
+const html = require('remark-html');
+const frontmatter = require('remark-frontmatter');
+const yaml = require('js-yaml');
+const remark = require('remark');
+const _ = require('lodash');
+const select = require('unist-util-select');
+const visit = require('unist-util-visit');
+const slug = require('remark-slug');
+const slugs = require('github-slugger')();
 // gatsby-remark plugins are usable for remark parsing without requiring gatsby.
-const remarkPrism = require("gatsby-remark-prismjs");
+const remarkPrism = require('gatsby-remark-prismjs');
 
 function defaultSort(items) {
   return items;
@@ -32,7 +32,7 @@ function slugTransformer(ast) {
     if (node.depth) {
       const nodeClass = props.className
         ? `${props.className} doc-hash-link`
-        : "doc-hash-link";
+        : 'doc-hash-link';
       // This adds GH style links to our md based on existing behaviors by converting mdast heading
       // nodes to html so we can inject the link and svg directly rather than do something like add
       // a marker value to the mdast and let the renderer handle it, in part because our "renderer"
@@ -67,7 +67,7 @@ function slugTransformer(ast) {
       data.className = nodeClass;
     }
   }
-  visit(ast, "heading", visitor);
+  visit(ast, 'heading', visitor);
 }
 
 function slugWithLink() {
@@ -76,11 +76,11 @@ function slugWithLink() {
 
 function appendImageBasePath(ast) {
   function visitor(node) {
-    if (!!node.value.match(/<img /) && stage !== "development") {
+    if (!!node.value.match(/<img /) && stage !== 'development') {
       node.value = node.value.replace(`src="`, `src="/${landerBasePath}`);
     }
   }
-  visit(ast, "html", visitor);
+  visit(ast, 'html', visitor);
 }
 
 function imageTransformer() {
@@ -89,12 +89,12 @@ function imageTransformer() {
 
 const subHeadingRangeDefaults = {
   start: 1,
-  end: 3
+  end: 3,
 };
 
 function setYamlToFile(subHeadingRange = subHeadingRangeDefaults) {
   function transformer(ast, file) {
-    const yamlObj = select(ast, "yaml");
+    const yamlObj = select(ast, 'yaml');
     let obj;
     if (yamlObj.length > 0) {
       const { children } = ast;
@@ -103,15 +103,15 @@ function setYamlToFile(subHeadingRange = subHeadingRangeDefaults) {
 
       file.data = obj;
 
-      Object.defineProperty(file, "raw", {
+      Object.defineProperty(file, 'raw', {
         value: file.contents,
-        enumerable: true
+        enumerable: true,
       });
 
       file.data.subHeadings = children
         .filter(
           c =>
-            c.type === "heading" &&
+            c.type === 'heading' &&
             c.depth >= subHeadingRange.start &&
             c.depth <= subHeadingRange.end
         )
@@ -119,7 +119,7 @@ function setYamlToFile(subHeadingRange = subHeadingRangeDefaults) {
           type: c.type,
           value: c.children[0].value,
           depth: c.depth,
-          slug: _.kebabCase(c.children[0].value).toLowerCase()
+          slug: _.kebabCase(c.children[0].value).toLowerCase(),
         }));
     }
   }
@@ -133,7 +133,7 @@ function setYamlToFile(subHeadingRange = subHeadingRangeDefaults) {
 
 const baseConfig = {
   renderer: remark()
-    .use(frontmatter, ["yaml", "toml"])
+    .use(frontmatter, ['yaml', 'toml'])
     .use(setYamlToFile)
     .use(html)
     .use(codeHighlightTransformer)
@@ -145,8 +145,8 @@ const baseConfig = {
   outputHarmonizer: result => ({
     content: result.contents,
     data: result.data,
-    raw: result.raw
-  })
+    raw: result.raw,
+  }),
 };
 
 // eslint-disable-next-line max-params
@@ -160,9 +160,9 @@ const getMdFiles = async (
   new Promise(resolve => {
     if (fs.existsSync(mdPath)) {
       klaw(mdPath)
-        .on("data", item => {
-          if (path.extname(item.path) === ".md") {
-            const data = fs.readFileSync(item.path, "utf8");
+        .on('data', item => {
+          if (path.extname(item.path) === '.md') {
+            const data = fs.readFileSync(item.path, 'utf8');
 
             const { renderer, outputHarmonizer } = config;
             renderer.process(data, (err, result) => {
@@ -180,10 +180,10 @@ const getMdFiles = async (
             });
           }
         })
-        .on("error", e => {
+        .on('error', e => {
           throw e;
         })
-        .on("end", () => {
+        .on('end', () => {
           resolve(sort(items));
         });
     } else {

@@ -1,8 +1,8 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Wrapper } from "../../components/wrapper";
-import styled from "styled-components";
-import badge from "../../static/sidebar-badge.svg";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Wrapper } from '../../components/wrapper';
+import styled from 'styled-components';
+import badge from '../../static/sidebar-badge.svg';
 
 const WrapperStyled = styled(Wrapper)`
   z-index: 1;
@@ -40,7 +40,7 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   letter-spacing: 0.08em;
   font-size: 2rem;
   line-height: 3rem;
@@ -208,14 +208,14 @@ const HeroNavList = styled.ul`
 `;
 
 const copyFallBack = () => {
-  const copyTextArea = document.createElement("textArea");
-  copyTextArea.value = "npm install urql";
+  const copyTextArea = document.createElement('textArea');
+  copyTextArea.value = 'npm install urql';
 
   document.body.appendChild(copyTextArea);
 
   copyTextArea.focus();
   copyTextArea.select();
-  document.execCommand("copy");
+  document.execCommand('copy');
   copyTextArea.remove();
 };
 
@@ -225,7 +225,7 @@ class Hero extends React.Component {
 
     this.state = {
       animating: false,
-      copied: false
+      copied: false,
     };
   }
 
@@ -235,7 +235,7 @@ class Hero extends React.Component {
       e.preventDefault();
       return;
     }
-    navigator.clipboard.writeText("npm install urql");
+    navigator.clipboard.writeText('npm install urql');
   }
 
   render() {

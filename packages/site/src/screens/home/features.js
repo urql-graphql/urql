@@ -1,9 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
-import { BodyCopy } from "../../components/body-copy";
-import { SecondaryTitle } from "../../components/secondary-title";
-import { SectionTitle } from "../../components/section-title";
+import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { BodyCopy } from '../../components/body-copy';
+import { SecondaryTitle } from '../../components/secondary-title';
+import { SectionTitle } from '../../components/section-title';
 
 const FullWidthContainer = styled.div`
   display: flex;
@@ -142,7 +142,7 @@ class Features extends React.Component {
 
 Features.propTypes = {
   components: PropTypes.object,
-  featureArray: PropTypes.array
+  featureArray: PropTypes.array,
 };
 
 export default Features;

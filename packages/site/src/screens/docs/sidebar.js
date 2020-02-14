@@ -1,20 +1,20 @@
-import React, { Fragment } from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
-import { withRouteData } from "react-static";
-import { withRouter, Link } from "react-router-dom";
+import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { withRouteData } from 'react-static';
+import { withRouter, Link } from 'react-router-dom';
 
 import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
   SidebarWrapper,
-  SideBarSvg
-} from "../../components/navigation";
+  SideBarSvg,
+} from '../../components/navigation';
 
-import closeButton from "../../static/svgs/x.svg";
-import logoSidebar from "../../static/sidebar-badge.svg";
-import constants from "../../constants";
+import closeButton from '../../static/svgs/x.svg';
+import logoSidebar from '../../static/sidebar-badge.svg';
+import constants from '../../constants';
 
 const HeroLogo = styled.img`
   position: absolute;
@@ -23,7 +23,7 @@ const HeroLogo = styled.img`
   width: 14rem;
 
   @media (max-width: 768px) {
-    display: ${props => (props.overlay ? "" : "none")};
+    display: ${props => (props.overlay ? '' : 'none')};
   }
 `;
 
@@ -33,7 +33,7 @@ const ContentWrapper = styled.div`
   margin: 3rem 0rem 0rem 2.5rem;
   height: auto;
   @media (max-width: 768px) {
-    display: ${props => (props.overlay ? "" : "none")};
+    display: ${props => (props.overlay ? '' : 'none')};
   }
 `;
 
@@ -51,7 +51,7 @@ const CloseButton = styled.img`
   display: none;
 
   @media (max-width: 768px) {
-    display: ${props => (props.overlay ? "block" : "none")};
+    display: ${props => (props.overlay ? 'block' : 'none')};
     right: 1rem;
   }
 `;
@@ -72,7 +72,7 @@ class Sidebar extends React.Component {
       `/docs${item.path}` === this.props.history.location.pathname;
     // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
-    const key = item.title.split(" ").join("_");
+    const key = item.title.split(' ').join('_');
 
     return (
       <Fragment key={`${key}-group`}>
@@ -80,7 +80,7 @@ class Sidebar extends React.Component {
           to={`/docs${item.path}`}
           replace
           key={key}
-          className={currentPath ? "is-current" : ""}
+          className={currentPath ? 'is-current' : ''}
         >
           {item.title}
         </SidebarNavItem>
@@ -89,10 +89,10 @@ class Sidebar extends React.Component {
             {subContent.map(sh => (
               <SidebarNavSubItem
                 to={`#${sh.content
-                  .split(" ")
-                  .join("-")
+                  .split(' ')
+                  .join('-')
                   .toLowerCase()}`}
-                key={sh.content.split(" ").join("_")}
+                key={sh.content.split(' ').join('_')}
               >
                 {sh.content}
               </SidebarNavSubItem>
@@ -115,7 +115,7 @@ class Sidebar extends React.Component {
             overlay={overlay}
             onClick={() => closeSidebar()}
           />
-          <Link to={"/"}>
+          <Link to={'/'}>
             <HeroLogo
               src={logoSidebar}
               alt="Formidable Logo"
@@ -123,17 +123,17 @@ class Sidebar extends React.Component {
             />
           </Link>
           <ContentWrapper overlay={overlay}>
-            <SidebarNavItem to={constants.readme} key={"readme"}>
+            <SidebarNavItem to={constants.readme} key={'readme'}>
               Readme
             </SidebarNavItem>
             {sidebarHeaders &&
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
 
             <HorizontalLine />
-            <SidebarNavItem to={constants.githubIssues} key={"issues"}>
+            <SidebarNavItem to={constants.githubIssues} key={'issues'}>
               Issues
             </SidebarNavItem>
-            <SidebarNavItem to={constants.github} key={"github"}>
+            <SidebarNavItem to={constants.github} key={'github'}>
               Github
             </SidebarNavItem>
           </ContentWrapper>
@@ -148,7 +148,7 @@ Sidebar.propTypes = {
   history: PropTypes.object,
   overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
-  tocArray: PropTypes.array
+  tocArray: PropTypes.array,
 };
 
 export default withRouter(withRouteData(Sidebar));
