@@ -52,13 +52,14 @@ export interface SubscriptionExchangeOpts {
   // This has been modelled to work with subscription-transport-ws
   // See: https://github.com/apollographql/subscriptions-transport-ws#requestoptions--observableexecutionresult-returns-observable-to-execute-the-operation
   forwardSubscription: SubscriptionForwarder;
-}
 
-const isSubscriptionOperation = (operation: Operation) =>
-  operation.operationName === 'subscription';
+  /** This flag may be turned on to allow your subscriptions-transport to handle all operation types */
+  enableAllOperations?: boolean;
+}
 
 export const subscriptionExchange = ({
   forwardSubscription,
+  enableAllOperations,
 }: SubscriptionExchangeOpts): Exchange => ({ client, forward }) => {
   const createSubscriptionSource = (
     operation: Operation
@@ -100,6 +101,13 @@ export const subscriptionExchange = ({
         if (sub) sub.unsubscribe();
       };
     });
+  };
+
+  const isSubscriptionOperation = (operation: Operation): boolean => {
+    const { operationName } = operation;
+    return operationName === 'subscription' ||
+      (!!enableAllOperations &&
+        (operationName === 'query' || operationName === 'mutation'));
   };
 
   return ops$ => {
