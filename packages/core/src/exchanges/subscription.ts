@@ -106,7 +106,7 @@ export const subscriptionExchange = ({
   const isSubscriptionOperation = (operation: Operation): boolean => {
     const { operationName } = operation;
     return operationName === 'subscription' ||
-      (enableAllOperations &&
+      (!!enableAllOperations &&
         (operationName === 'query' || operationName === 'mutation'));
   };
 
