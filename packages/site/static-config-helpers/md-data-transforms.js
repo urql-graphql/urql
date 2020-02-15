@@ -32,7 +32,7 @@ const sidebarTitleSlugMutation = (mdData, mdPath) => {
 const sidebarSort = items => _.orderBy(items, ['data.order'], 'asc');
 
 function getSidebarItems(
-  mdPath = 'src/content/docs/',
+  mdPath,
   items = [],
   mutations = [sidebarTitleSlugMutation],
   sort = sidebarSort

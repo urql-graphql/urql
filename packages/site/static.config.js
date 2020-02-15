@@ -1,11 +1,10 @@
-import { getSidebarItems } from './static-config-helpers/md-data-transforms';
+import { resolve } from 'path';
 
-const staticWebpackConfig = require('./static-config-parts/static-webpack-config');
-const {
-  stage,
-  landerBasePath,
-  metaData,
-} = require('./static-config-parts/constants');
+import { getSidebarItems } from './static-config-helpers/md-data-transforms';
+import { webpack } from './static-config-parts/static-webpack-config';
+import { metaData } from './static-config-parts/constants';
+
+const docsContentPath = resolve(__dirname, '../../docs/');
 
 export default {
   plugins: [
@@ -23,8 +22,7 @@ export default {
     temp: 'node_modules/.cache/react-static/temp/',
   },
 
-  webpack: staticWebpackConfig,
-
+  webpack,
   basePath: 'open-source/urql',
   stagingBasePath: 'open-source/urql',
   devBasePath: '',
@@ -34,7 +32,7 @@ export default {
   }),
 
   getRoutes: async () => {
-    const sidebarItems = await getSidebarItems();
+    const sidebarItems = await getSidebarItems(docsContentPath);
     const sidebarHeaders = sidebarItems.map(d => ({
       title: d.title,
       path: `/${d.slug}/`,
