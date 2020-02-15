@@ -1,7 +1,7 @@
 // SURGEON GENERAL'S WARNING: THIS IS NOT A WEBPACK CONFIG, THIS IS A FUNCTION
 // THAT ENHANCES THE BASE REACT-STATIC WEBPACK CONFIG.
 
-const staticWebpackConfig = (config, { defaultLoaders }) => {
+const webpack = (config, { defaultLoaders }) => {
   config.devtool = false;
   config.module.rules = [
     {
@@ -30,4 +30,4 @@ const staticWebpackConfig = (config, { defaultLoaders }) => {
   return config;
 };
 
-module.exports = staticWebpackConfig;
+module.exports = { webpack };
