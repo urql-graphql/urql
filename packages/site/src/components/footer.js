@@ -1,7 +1,8 @@
 import React from 'react';
 import { Wrapper } from './wrapper';
 import styled from 'styled-components';
-import logoFormidableWhite from '../static/svgs/logo_formidable_white.svg';
+
+import logoFormidableWhite from '../assets/logo_formidable_white.svg';
 
 const Container = styled.footer`
   background: #1f1f1f;

@@ -1,9 +1,10 @@
 import React from 'react';
+import styled from 'styled-components';
+
 import Features from './features';
 import GetStarted from './get-started';
 import MoreOSS from './more-oss';
 import content from './_content';
-import styled from 'styled-components';
 import { Header } from '../../components/header';
 import { Footer } from '../../components/footer';
 

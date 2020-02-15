@@ -6,9 +6,10 @@ import { Link } from 'react-router-dom';
 
 import Article from './article';
 import Sidebar from './sidebar';
-import burger from '../../static/svgs/burger.svg';
-import logoFormidableDark from '../../static/svgs/logo_formidable_dark.svg';
 import constants from '../../constants';
+
+import burger from '../../assets/burger.svg';
+import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 
 const Container = styled.div`
   display: flex;

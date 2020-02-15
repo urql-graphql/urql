@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import { BodyCopy } from '../../components/body-copy';
 import { SectionTitle } from '../../components/section-title';
 import constants from '../../constants';
-import octoCat from '../../static/svgs/Octicons-mark-github.svg';
+
+import octoCat from '../../assets/github.svg';
 
 const OuterWrapper = styled.div`
   background: ${constants.color};
@@ -117,7 +118,7 @@ class GetStarted extends React.Component {
               <img src={octoCat} />
               <p>GitHub</p>
             </GithubButton>
-            <DocButton prefetch to="/docs">
+            <DocButton to="/docs">
               Documentation
             </DocButton>
           </ButtonsWrapper>

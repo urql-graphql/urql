@@ -16,7 +16,6 @@ export default {
     root: process.cwd(),
     src: 'src',
     dist: 'dist',
-    public: 'public',
     assets: 'dist',
 
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="186px" height="186px" viewBox="0 0 186 186" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
-    <title>graph-ql-tile</title>
-    <desc>Created with Sketch.</desc>
+<svg width="160px" height="160px" viewBox="0 0 160 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>gql-tile</title>
     <defs>
-        <filter x="-10.0%" y="-8.8%" width="120.0%" height="120.0%" filterUnits="objectBoundingBox" id="filter-1">
+        <filter x="-15.6%" y="-14.4%" width="131.2%" height="131.2%" filterUnits="objectBoundingBox" id="filter-1">
             <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
             <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
             <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
@@ -13,22 +11,31 @@
                 <feMergeNode in="SourceGraphic"></feMergeNode>
             </feMerge>
         </filter>
-        <polygon id="path-2" points="0 0 160 0 160 160 0 160"></polygon>
-        <filter x="-4.4%" y="-3.1%" width="108.8%" height="108.8%" filterUnits="objectBoundingBox" id="filter-3">
+        <filter x="-10.0%" y="-8.8%" width="120.0%" height="120.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <polygon id="path-3" points="0 0 160 0 160 160 0 160"></polygon>
+        <filter x="-4.4%" y="-3.1%" width="108.8%" height="108.8%" filterUnits="objectBoundingBox" id="filter-4">
             <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
             <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
             <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
         </filter>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="clock-tile" transform="translate(13.000000, 11.000000)" fill-rule="nonzero">
+        <g id="clock-tile" filter="url(#filter-1)" fill-rule="nonzero">
             <g id="a-link" fill="#000000">
                 <polygon id="a" points="0 0 160 0 160 160 0 160"></polygon>
             </g>
-            <g id="a-link" filter="url(#filter-1)">
+            <g id="a-link" filter="url(#filter-2)">
                 <g id="a">
-                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
-                    <use fill="#A7B6FE" xlink:href="#path-2"></use>
+                    <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                    <use fill="#A7B6FE" xlink:href="#path-3"></use>
                 </g>
             </g>
             <g id="SVG-Layer" transform="translate(37.500000, 31.000000)" fill="#FFFFFF">
