@@ -12,8 +12,8 @@ import {
   SideBarSvg,
 } from '../../components/navigation';
 
-import closeButton from '../../static/svgs/x.svg';
-import logoSidebar from '../../static/sidebar-badge.svg';
+import closeButton from '../../assets/close.svg';
+import logoSidebar from '../../assets/sidebar-badge.svg';
 import constants from '../../constants';
 
 const HeroLogo = styled.img`

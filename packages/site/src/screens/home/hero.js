@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Wrapper } from '../../components/wrapper';
 import styled from 'styled-components';
-import badge from '../../static/sidebar-badge.svg';
+
+import badge from '../../assets/sidebar-badge.svg';
 
 const WrapperStyled = styled(Wrapper)`
   z-index: 1;
@@ -255,14 +256,14 @@ class Hero extends React.Component {
               <HeroNPMCopy>npm install urql</HeroNPMCopy>
               <HeroNPMButton onClick={this.handleCopy}>copy</HeroNPMButton>
             </HeroNPMWrapper>
-            <HeroDocsButton prefetch to="/docs">
+            <HeroDocsButton to="/docs">
               Documentation
             </HeroDocsButton>
           </HeroButtonsWrapper>
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link prefetch to="/docs">
+            <Link to="/docs">
               Docs
             </Link>
           </li>

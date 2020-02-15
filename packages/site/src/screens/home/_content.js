@@ -4,26 +4,26 @@ const content = {
       title: 'Fully functional GraphQL client with a single import',
       description:
         'Urql is a lightweight, powerful, and easy to use alternative to bulky GraphQL clients.',
-      icon: require('../../static/svgs/gql-tile.svg'),
+      icon: require('../../assets/gql-tile.svg'),
     },
     {
       title: 'Logical default behavior and caching',
       description:
         'Urql helps you to rapidly use GraphQL in your apps without complex configuration or large API overhead.',
-      icon: require('../../static/svgs/clock-tile.svg'),
+      icon: require('../../assets/clock-tile.svg'),
     },
     {
       title: 'Extensible library that grows with you',
       description:
         'Want to change how you fetch, cache, or subscribe to data? Urql Exchanges allow you to customize your data layer to suit your needs.',
-      icon: require('../../static/svgs/eagle-tile.svg'),
+      icon: require('../../assets/eagle-tile.svg'),
     },
   ],
   components: {
     title: 'Minimal React Components and Hooks',
     description:
       "Whether you prefer a <Query> component or useQuery Hook, urql's API is intuitive to use, with full support for GraphQL Queries, Mutations and Subscriptions in both styles!",
-    icon: require('../../static/svgs/React-icon.svg'),
+    icon: require('../../assets/react-tile.svg'),
   },
   preview: {
     description: '',
@@ -34,12 +34,14 @@ const content = {
       'Dive into the documentation to see how you can get your urql client up and running.',
     link: '/docs',
   },
+  // TODO: This needs to be shared content instead of hardcoded in each site
+  /*
   oss: [
     {
       title: 'Victory',
       description:
         'An ecosystem of modular data visualization components for React. Friendly and flexible.',
-      logo: require('../../static/svgs/logo_victory.svg'),
+      logo: require('../../assets/logo_victory.svg'),
       link: 'https://formidable.com/open-source/victory',
       hasOwnLogo: true,
     },
@@ -71,6 +73,7 @@ const content = {
       link: 'https://formidable.com/open-source/jest-enzyme/',
     },
   ],
+  */
 };
 
 export default content;

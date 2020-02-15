@@ -1,9 +1,10 @@
 import React from 'react';
 import Hero from '../screens/home/hero';
 import styled from 'styled-components';
-import logoFormidableWhite from '../static/svgs/logo_formidable_white.svg';
-import LeftTriangles from '../static/svgs/left-triangles.svg';
-import RightTriangles from '../static/svgs/right-triangles.svg';
+
+import logoFormidableWhite from '../assets/logo_formidable_white.svg';
+import LeftTriangles from '../assets/left-triangles.svg';
+import RightTriangles from '../assets/right-triangles.svg';
 
 const Container = styled.header`
   background: rgb(109, 117, 153);
