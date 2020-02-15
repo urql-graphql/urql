@@ -27,7 +27,8 @@
     "trailingComma": "es5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.{ts,tsx}": "eslint -c scripts/eslint/preset.js --fix",
+    "*.{js,jsx}": "eslint -c scripts/eslint/js-preset.js --fix",
     "*.json": "prettier --write",
     "*.md": "prettier --write"
   },
@@ -68,7 +69,7 @@
     "glob": "^7.1.6",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
-    "husky": "^4.2.1",
+    "husky": "^4.2.3",
     "invariant": "^2.2.4",
     "jest": "^25.1.0",
     "jest-watch-yarn-workspaces": "^1.1.0",
