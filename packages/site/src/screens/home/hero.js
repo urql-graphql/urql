@@ -256,16 +256,12 @@ class Hero extends React.Component {
               <HeroNPMCopy>npm install urql</HeroNPMCopy>
               <HeroNPMButton onClick={this.handleCopy}>copy</HeroNPMButton>
             </HeroNPMWrapper>
-            <HeroDocsButton to="/docs">
-              Documentation
-            </HeroDocsButton>
+            <HeroDocsButton to="/docs">Documentation</HeroDocsButton>
           </HeroButtonsWrapper>
         </HeroContent>
         <HeroNavList>
           <li>
-            <Link to="/docs">
-              Docs
-            </Link>
+            <Link to="/docs">Docs</Link>
           </li>
           <li>
             <a

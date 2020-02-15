@@ -118,9 +118,7 @@ class GetStarted extends React.Component {
               <img src={octoCat} />
               <p>GitHub</p>
             </GithubButton>
-            <DocButton to="/docs">
-              Documentation
-            </DocButton>
+            <DocButton to="/docs">Documentation</DocButton>
           </ButtonsWrapper>
         </GetStartedWrapper>
       </OuterWrapper>
