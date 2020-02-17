@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withRouteData } from 'react-static';
 import { Link } from 'react-router-dom';
 
-import Article from './article';
+import NotFoundPage from './404';
 import Sidebar from '../../components/sidebar';
 import constants from '../../constants';
 
@@ -102,7 +102,7 @@ const SideBarWithRef = forwardRef((props, ref) => {
 });
 
 /* eslint-disable react/no-multi-comp */
-class Docs extends React.Component {
+class NotFound extends React.Component {
   constructor(props) {
     super(props);
     this.closeSidebar = this.closeSidebar.bind(this);
@@ -142,29 +142,22 @@ class Docs extends React.Component {
           </Link>
         </Wrapper>
         <SideBarWithRef
-          location={this.props.location}
           overlay={this.state.openSidebar}
           closeSidebar={this.closeSidebar}
-          sidebarHeaders={this.props.sidebarHeaders}
-          tocArray={this.props.toc[this.props.slug]}
           ref={this.sidebarRef}
         />
-        <Article />
+        <NotFoundPage />
       </Container>
     );
   }
 }
 
-Docs.propTypes = {
-  location: PropTypes.object,
+NotFound.propTypes = {
   params: PropTypes.object,
-  sidebarHeaders: PropTypes.array,
-  slug: PropTypes.string,
-  toc: PropTypes.object,
 };
 
-Docs.defaultProps = {
+NotFound.defaultProps = {
   params: null,
 };
 
-export default withRouteData(Docs);
+export default withRouteData(NotFound);

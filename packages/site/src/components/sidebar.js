@@ -1,8 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { withRouteData } from 'react-static';
-import { withRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import {
   SidebarNavItem,
@@ -10,11 +9,11 @@ import {
   SidebarContainer,
   SidebarWrapper,
   SideBarSvg,
-} from '../../components/navigation';
+} from './navigation';
 
-import closeButton from '../../assets/close.svg';
-import logoSidebar from '../../assets/sidebar-badge.svg';
-import constants from '../../constants';
+import closeButton from '../assets/close.svg';
+import logoSidebar from '../assets/sidebar-badge.svg';
+import constants from '../constants';
 
 const HeroLogo = styled.img`
   position: absolute;
@@ -67,26 +66,25 @@ const HorizontalLine = styled.hr`
 
 class Sidebar extends React.Component {
   renderSidebarItem(item) {
-    const { tocArray } = this.props;
-    const currentPath =
-      `/docs${item.path}` === this.props.history.location.pathname;
+    const { tocArray = [] } = this.props;
+    const currentPath = `/docs${item.path}` === this.props.location.pathname;
     // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
     const key = item.title.split(' ').join('_');
-
+    const className = currentPath ? 'is-current' : '';
     return (
       <Fragment key={`${key}-group`}>
         <SidebarNavItem
           to={`/docs${item.path}`}
           replace
-          key={key}
-          className={currentPath ? 'is-current' : ''}
+          key={`${key}-${className}`}
+          className={className}
         >
           {item.title}
         </SidebarNavItem>
         {currentPath && !!subContent.length && (
           <SubContentWrapper key={key}>
-            {subContent.map(sh => (
+            {subContent.map((sh, i) => (
               <SidebarNavSubItem
                 to={`#${sh.content
                   .split(' ')
@@ -123,17 +121,17 @@ class Sidebar extends React.Component {
             />
           </Link>
           <ContentWrapper overlay={overlay}>
-            <SidebarNavItem to={constants.readme} key={'readme'}>
+            <SidebarNavItem as="a" href={constants.readme} key={'readme'}>
               Readme
             </SidebarNavItem>
             {sidebarHeaders &&
               sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
 
             <HorizontalLine />
-            <SidebarNavItem to={constants.githubIssues} key={'issues'}>
+            <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
               Issues
             </SidebarNavItem>
-            <SidebarNavItem to={constants.github} key={'github'}>
+            <SidebarNavItem as="a" href={constants.github} key={'github'}>
               Github
             </SidebarNavItem>
           </ContentWrapper>
@@ -145,10 +143,10 @@ class Sidebar extends React.Component {
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
-  history: PropTypes.object,
+  location: PropTypes.object,
   overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
   tocArray: PropTypes.array,
 };
 
-export default withRouter(withRouteData(Sidebar));
+export default Sidebar;
