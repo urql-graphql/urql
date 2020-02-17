@@ -124,6 +124,7 @@ const Docs = props => {
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Link>
       </Wrapper>
+      {/*
       <SideBarWithRef
         location={props.location}
         overlay={openSidebar}
@@ -132,7 +133,8 @@ const Docs = props => {
         tocArray={props.toc[props.slug]}
         ref={sidebarRef}
       />
-      <Article />
+      */}
+      <Article contents={props.context} />
     </Container>
   );
 };

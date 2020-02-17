@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { withRouteData } from 'react-static';
+import { MDXProvider, mdx } from '@mdx-js/react';
+
 import { Markdown } from '../../components/markdown';
 
 const Container = styled.div`
@@ -22,22 +24,31 @@ const Container = styled.div`
   }
 `;
 
-class Article extends React.Component {
-  render() {
-    return (
-      <Container className="Page-content">
-        <Markdown dangerouslySetInnerHTML={{ __html: this.props.renderedMd }} />
-      </Container>
-    );
+const hastToMdx = (node, index = 0) => {
+  switch (node.type) {
+    case 'text':
+      return node.value;
+    case 'root':
+      return node.children.map(hastToMdx);
+    case 'element':
+      return mdx(node.tagName, {
+        ...node.properties,
+        children: node.children.map(hastToMdx),
+        key: index,
+      });
+    default:
+      return null;
   }
-}
-
-Article.propTypes = {
-  renderedMd: PropTypes.string,
 };
 
-Article.defaultProps = {
-  params: null,
-};
+const Article = ({ contents }) => (
+  <Container className="Page-content">
+    <MDXProvider>
+      <Markdown>
+        {hastToMdx(contents)}
+      </Markdown>
+    </MDXProvider>
+  </Container>
+);
 
 export default withRouteData(Article);
