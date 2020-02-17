@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "check": "tsc --noEmit",
+    "check": "tsc",
     "lint": "eslint .",
     "build": "./scripts/rollup/build.js"
   },

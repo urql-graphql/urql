@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
-    "declaration": false,
+    "noEmit": true,
     "lib": ["dom", "esnext"],
     "jsx": "react",
     "module": "es2015",

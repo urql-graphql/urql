@@ -44,6 +44,7 @@ export const makePlugins = ({ isProduction } = {}) => [
         ],
         compilerOptions: {
           sourceMap: true,
+          noEmit: false,
           declaration: !isProduction,
           declarationDir: settings.types,
           target: 'es6',
