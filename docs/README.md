@@ -1,3 +1,8 @@
+---
+title: README
+order: 1
+---
+
 # Documentation
 
 `urql` is a highly customizable and flexible GraphQL client, that

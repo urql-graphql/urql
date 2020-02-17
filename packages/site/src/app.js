@@ -5,13 +5,13 @@ import { Route } from 'react-router';
 import { animateScroll as scroll } from 'react-scroll';
 import { ResizeObserver as _ResizeObserver } from '@juggle/resize-observer';
 import get from 'lodash/get';
+import { ThemeProvider } from 'styled-components';
 
-import { GlobalStyle } from './global-style';
+import constants from './constants';
+import { GlobalStyle } from './styles/global';
+import theme from './styles/theme';
 import Analytics from './google-analytics';
 import NotFound from './screens/404';
-
-import 'prismjs/themes/prism.css';
-import './app.css';
 
 const HEADER_PIXEL_HEIGHT = 60;
 const SCROLL_PIXEL_OFFSET = 25;
@@ -89,25 +89,27 @@ const App = () => {
     <Root>
       {/* TODO: create a better fallback component */}
       <React.Suspense fallback={<h1>Loading</h1>}>
-        <GlobalStyle />
-        <Analytics id="UA-43290258-1">
-          <Routes
-            render={({ routePath, getComponentForPath }) => (
-              <Route path="*">
-                {props => {
-                  const Comp = getComponentForPath(routePath) || <NotFound />;
-                  // Add react-router route props like location and history
-                  const CompWithRouteProps = React.cloneElement(Comp, props);
-                  return (
-                    <ScrollToCurrentSection {...props}>
-                      {CompWithRouteProps}
-                    </ScrollToCurrentSection>
-                  );
-                }}
-              </Route>
-            )}
-          />
-        </Analytics>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <Analytics id={constants.googleAnalyticsId}>
+            <Routes
+              render={({ routePath, getComponentForPath }) => (
+                <Route path="*">
+                  {props => {
+                    const Comp = getComponentForPath(routePath) || <NotFound />;
+                    // Add react-router route props like location and history
+                    const CompWithRouteProps = React.cloneElement(Comp, props);
+                    return (
+                      <ScrollToCurrentSection {...props}>
+                        {CompWithRouteProps}
+                      </ScrollToCurrentSection>
+                    );
+                  }}
+                </Route>
+              )}
+            />
+          </Analytics>
+        </ThemeProvider>
       </React.Suspense>
     </Root>
   );

@@ -29,6 +29,7 @@ module.exports = {
   rules: {
     'consistent-return': 'warn',
     'no-magic-numbers': 'off', // TODO
+    'react/jsx-key': 'off',
     'react/jsx-handler-names': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',

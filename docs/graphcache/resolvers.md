@@ -1,3 +1,8 @@
+---
+title: resolvers
+order: 5
+---
+
 # Resolvers
 
 `resolvers` are a way to alter the response you'll receive from the cache.

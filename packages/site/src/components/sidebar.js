@@ -1,7 +1,10 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import * as path from 'path';
+
+import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
 
 import {
   SidebarNavItem,
@@ -64,89 +67,73 @@ const HorizontalLine = styled.hr`
   margin: 1rem 0;
 `;
 
-class Sidebar extends React.Component {
-  renderSidebarItem(item) {
-    const { tocArray = [] } = this.props;
-    const currentPath = `/docs${item.path}` === this.props.location.pathname;
-    // eslint-disable-next-line no-magic-numbers
-    const subContent = tocArray.filter(toc => toc.level === 2);
-    const key = item.title.split(' ').join('_');
-    const className = currentPath ? 'is-current' : '';
-    return (
-      <Fragment key={`${key}-group`}>
-        <SidebarNavItem
-          to={`/docs${item.path}`}
-          replace
-          key={`${key}-${className}`}
-          className={className}
-        >
-          {item.title}
-        </SidebarNavItem>
-        {currentPath && !!subContent.length && (
-          <SubContentWrapper key={key}>
-            {subContent.map((sh, i) => (
+const relative = (from, to) => {
+  if (!from || !to) return null;
+  const pathname = path.relative(path.dirname(from), to);
+  return { pathname };
+};
+
+const Sidebar = ({ overlay, closeSidebar }) => {
+  const currentPage = useMarkdownPage();
+  const tree = useMarkdownTree();
+
+  const sidebarItems = useMemo(() => {
+    if (!currentPage || !tree || !tree.children) {
+      return null;
+    }
+
+    return tree.children.map(page => {
+      return (
+        <Fragment key={page.key}>
+          <SidebarNavItem to={relative(currentPage.path, page.path)}>
+            {page.frontmatter.title}
+          </SidebarNavItem>
+
+          {page.children &&
+            page.children.map(childPage => (
               <SidebarNavSubItem
-                to={`#${sh.content
-                  .split(' ')
-                  .join('-')
-                  .toLowerCase()}`}
-                key={sh.content.split(' ').join('_')}
+                to={relative(currentPage.path, childPage.path)}
+                key={childPage.key}
               >
-                {sh.content}
+                {childPage.frontmatter.title}
               </SidebarNavSubItem>
             ))}
-          </SubContentWrapper>
-        )}
-      </Fragment>
-    );
-  }
+        </Fragment>
+      );
+    });
+  }, [tree, currentPage]);
 
-  render() {
-    const { sidebarHeaders, overlay, closeSidebar } = this.props;
-    return (
-      <SidebarContainer>
-        <SideBarSvg />
-        <SidebarWrapper overlay={overlay}>
-          <CloseButton
-            src={closeButton}
-            alt="X"
-            overlay={overlay}
-            onClick={() => closeSidebar()}
-          />
-          <Link to={'/'}>
-            <HeroLogo
-              src={logoSidebar}
-              alt="Formidable Logo"
-              overlay={overlay}
-            />
-          </Link>
-          <ContentWrapper overlay={overlay}>
-            <SidebarNavItem as="a" href={constants.readme} key={'readme'}>
-              Readme
-            </SidebarNavItem>
-            {sidebarHeaders &&
-              sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
-
-            <HorizontalLine />
-            <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
-              Issues
-            </SidebarNavItem>
-            <SidebarNavItem as="a" href={constants.github} key={'github'}>
-              Github
-            </SidebarNavItem>
-          </ContentWrapper>
-        </SidebarWrapper>
-      </SidebarContainer>
-    );
-  }
-}
+  return (
+    <SidebarContainer>
+      <SideBarSvg />
+      <SidebarWrapper overlay={overlay}>
+        <CloseButton
+          src={closeButton}
+          alt="X"
+          overlay={overlay}
+          onClick={() => closeSidebar()}
+        />
+        <Link to={'/'}>
+          <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
+        </Link>
+        <ContentWrapper overlay={overlay}>
+          {sidebarItems}
+          <HorizontalLine />
+          <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
+            Issues
+          </SidebarNavItem>
+          <SidebarNavItem as="a" href={constants.github} key={'github'}>
+            Github
+          </SidebarNavItem>
+        </ContentWrapper>
+      </SidebarWrapper>
+    </SidebarContainer>
+  );
+};
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
-  location: PropTypes.object,
   overlay: PropTypes.bool,
-  sidebarHeaders: PropTypes.array,
-  tocArray: PropTypes.array,
 };
 
 export default Sidebar;
