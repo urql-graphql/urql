@@ -1,7 +1,6 @@
 import { resolve } from 'path';
 
 import { getSidebarItems } from './static-config-helpers/md-data-transforms';
-import { webpack } from './static-config-parts/static-webpack-config';
 import { metaData } from './static-config-parts/constants';
 
 const docsContentPath = resolve(__dirname, '../../docs/');
@@ -10,21 +9,20 @@ export default {
   plugins: [
     'react-static-plugin-styled-components',
     'react-static-plugin-react-router',
+    resolve(__dirname, 'static-config-parts'),
   ],
+
   paths: {
-    root: process.cwd(),
+    nodeModules: '../../node_modules',
     src: 'src',
     dist: 'dist',
-    assets: 'dist',
-
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
     devDist: 'node_modules/.cache/react-static/dist/',
     temp: 'node_modules/.cache/react-static/temp/',
   },
 
-  webpack,
   basePath: 'open-source/urql',
-  stagingBasePath: 'open-source/urql',
+  stagingBasePath: '',
   devBasePath: '',
 
   getSiteData: () => ({
@@ -42,7 +40,7 @@ export default {
     return [
       {
         path: '/',
-        template: 'src/screens/home',
+        template: require.resolve('./src/screens/home'),
       },
       {
         path: '/docs',
