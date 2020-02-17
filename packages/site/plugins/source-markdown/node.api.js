@@ -5,10 +5,15 @@ import frontmatter from 'remark-frontmatter';
 import squeeze from 'remark-squeeze-paragraphs';
 import toHast from 'mdast-util-to-hast';
 import sanitize from 'hast-util-sanitize';
+import GithubSlugger from 'github-slugger';
+import { select, selectAll } from 'unist-util-select';
+import toString from 'mdast-util-to-string';
+import { parse as yaml } from 'yaml';
 import raw from 'hast-util-raw';
 import remark from 'remark';
 import * as path from 'path';
 
+const slugger = new GithubSlugger();
 const glob = promisify(globCb);
 const cwd = process.cwd();
 
@@ -18,7 +23,7 @@ const staticPluginSourceMarkdown = (opts = {}) => {
   const plugins = opts.remarkPlugins || [];
 
   const processor = remark()
-    .use(frontmatter, ['yaml', 'toml'])
+    .use(frontmatter, ['yaml'])
     .use(squeeze);
 
   plugins.forEach(plugin => {
@@ -32,8 +37,18 @@ const staticPluginSourceMarkdown = (opts = {}) => {
   const getFileData = async ({ route }) => {
     const vfile = await readVFile(path.resolve(location, `${route.path}.md`));
     const tree = await processor.parse(vfile);
-    const hast = raw(sanitize(toHast(tree)));
-    return { contents: hast };
+
+    const headings = selectAll('heading', tree)
+      .map(node => {
+        const value = toString(node);
+        const depth = node.depth;
+        const slug = slugger.slug(value);
+        return { type: 'heading', value, slug, depth };
+      });
+
+    const frontmatter = yaml(select('yaml', tree)?.value);
+    const contents = raw(sanitize(toHast(tree)));
+    return { contents, frontmatter, headings };
   };
 
   const getRoutes = async () => {

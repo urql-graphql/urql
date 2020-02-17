@@ -51,9 +51,9 @@
     "github-slugger": "^1.2.1",
     "hast-util-raw": "^5.0.1",
     "hast-util-sanitize": "^2.0.1",
-    "js-yaml": "^3.12.0",
     "lodash": "^4.17.11",
     "mdast-util-to-hast": "^7.0.0",
+    "mdast-util-to-string": "^1.0.7",
     "raw-loader": "^1.0.0",
     "react-static-plugin-mdx": "^7.2.2",
     "react-static-plugin-react-router": "^7.2.3",
@@ -67,9 +67,10 @@
     "remark-squeeze-paragraphs": "^3.0.4",
     "remark-toc": "^5.1.0",
     "to-vfile": "^6.0.0",
-    "unist-util-select": "^1.5.0",
+    "unist-util-select": "^3.0.1",
     "url-loader": "^1.1.2",
-    "webpack": "^4.41.6"
+    "webpack": "^4.41.6",
+    "yaml": "^1.7.2"
   },
   "resolutions": {
     "react-hot-loader/source-map": "^0.8.0-beta.0"

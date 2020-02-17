@@ -3340,9 +3340,10 @@ css-select@^2.0.0:
     domutils "^1.7.0"
     nth-check "^1.0.2"
 
-css-selector-parser@^1.1.0:
+css-selector-parser@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/css-selector-parser/-/css-selector-parser-1.3.0.tgz#5f1ad43e2d8eefbfdc304fcd39a521664943e3eb"
+  integrity sha1-XxrUPi2O77/cME/NOaUhZklD4+s=
 
 css-to-react-native@^3.0.0:
   version "3.0.0"
@@ -6495,7 +6496,7 @@ jest@^25.1.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
 
-js-yaml@^3.12.0, js-yaml@^3.13.1, js-yaml@^3.6.1:
+js-yaml@^3.13.1, js-yaml@^3.6.1:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.1.tgz#aff151b30bfdfa8e49e05da22e7415e9dfa37847"
   dependencies:
@@ -7060,7 +7061,7 @@ mdast-util-to-hast@^7.0.0:
     unist-util-position "^3.0.0"
     unist-util-visit "^2.0.0"
 
-mdast-util-to-string@^1.0.0, mdast-util-to-string@^1.0.5:
+mdast-util-to-string@^1.0.0, mdast-util-to-string@^1.0.5, mdast-util-to-string@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/mdast-util-to-string/-/mdast-util-to-string-1.0.7.tgz#62d8e9c6b2113070d8b497c7dc35bf12796f06ee"
 
@@ -7504,6 +7505,11 @@ normalize-url@^3.0.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
 
+not@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/not/-/not-0.1.0.tgz#c9691c1746c55dcfbe54cbd8bd4ff041bc2b519d"
+  integrity sha1-yWkcF0bFXc++VMvYvU/wQbwrUZ0=
+
 npm-conf@^1.1.0:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/npm-conf/-/npm-conf-1.1.3.tgz#256cc47bd0e218c259c4e9550bf413bc2192aff9"
@@ -7537,7 +7543,7 @@ npm-run-path@^4.0.0:
   dependencies:
     path-key "^3.0.0"
 
-nth-check@^1.0.1, nth-check@^1.0.2, nth-check@~1.0.1:
+nth-check@^1.0.0, nth-check@^1.0.2, nth-check@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-1.0.2.tgz#b2bd295c37e3dd58a3bf0700376663ba4d9cf05c"
   dependencies:
@@ -9968,6 +9974,13 @@ source-map@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
 
+source-map@^0.8.0-beta.0:
+  version "0.8.0-beta.0"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.8.0-beta.0.tgz#d4c1bb42c3f7ee925f005927ba10709e0d1d1f11"
+  integrity sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==
+  dependencies:
+    whatwg-url "^7.0.0"
+
 sourcemap-codec@1.4.8, sourcemap-codec@^1.4.4:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz#ea804bd94857402e6992d05a38ef1ae35a9ab4c4"
@@ -10932,13 +10945,16 @@ unist-util-remove@^1.0.0:
   dependencies:
     unist-util-is "^3.0.0"
 
-unist-util-select@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/unist-util-select/-/unist-util-select-1.5.0.tgz#a93c2be8c0f653827803b81331adec2aa24cd933"
+unist-util-select@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/unist-util-select/-/unist-util-select-3.0.1.tgz#787fc452db9ba77f0ade0e7dc53c3d9d4acc79c7"
+  integrity sha512-VQpTuqZVJlRbosQdnLdTPIIqwZeU70YZ5aMBOqtFNGeeCdYn6ORZt/9RiaVlbl06ocuf58SVMoFa7a13CSGPMA==
   dependencies:
-    css-selector-parser "^1.1.0"
-    debug "^2.2.0"
-    nth-check "^1.0.1"
+    css-selector-parser "^1.0.0"
+    not "^0.1.0"
+    nth-check "^1.0.0"
+    unist-util-is "^4.0.0"
+    zwitch "^1.0.0"
 
 unist-util-stringify-position@^1.0.0, unist-util-stringify-position@^1.1.1:
   version "1.1.2"
@@ -11629,6 +11645,7 @@ yallist@^3.0.2:
 yaml@^1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.7.2.tgz#f26aabf738590ab61efaca502358e48dc9f348b2"
+  integrity sha512-qXROVp90sb83XtAoqE8bP9RwAkTTZbugRUTm5YeFCBfNRPEp2YzTeqWiz7m5OORHzEvrA/qcGS8hp/E+MMROYw==
   dependencies:
     "@babel/runtime" "^7.6.3"
 
