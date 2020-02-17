@@ -168,6 +168,11 @@ const getMdFiles = async (
             renderer.process(data, (err, result) => {
               if (err) {
                 throw err;
+              } else if (
+                !result.data ||
+                Object.keys(result.data).length === 0
+              ) {
+                return;
               }
 
               const mdData = outputHarmonizer(result);
