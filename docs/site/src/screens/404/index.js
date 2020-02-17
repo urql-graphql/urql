@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withRouteData } from 'react-static';
@@ -92,15 +92,6 @@ const DocsTitle = styled.h2`
   }
 `;
 
-// eslint-disable-next-line react/display-name
-const SideBarWithRef = forwardRef((props, ref) => {
-  return (
-    <div ref={ref}>
-      <Sidebar {...props} />
-    </div>
-  );
-});
-
 /* eslint-disable react/no-multi-comp */
 class NotFound extends React.Component {
   constructor(props) {
@@ -141,10 +132,11 @@ class NotFound extends React.Component {
             <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
           </Link>
         </Wrapper>
-        <SideBarWithRef
+        <Sidebar
+          location={this.props.location}
           overlay={this.state.openSidebar}
           closeSidebar={this.closeSidebar}
-          ref={this.sidebarRef}
+          sidebarHeaders={this.props.sidebarHeaders}
         />
         <NotFoundPage />
       </Container>
@@ -153,7 +145,9 @@ class NotFound extends React.Component {
 }
 
 NotFound.propTypes = {
+  location: PropTypes.object,
   params: PropTypes.object,
+  sidebarHeaders: PropTypes.array,
 };
 
 NotFound.defaultProps = {

@@ -2,9 +2,10 @@ import { resolve } from 'path';
 
 import { getSidebarItems } from './static-config-helpers/md-data-transforms';
 import { metaData } from './static-config-parts/constants';
-import { createSharedData } from 'react-static/node'
+import { createSharedData } from 'react-static/node';
 
 const docsContentPath = resolve(__dirname, '../core');
+const assetsPath = resolve(__dirname, '../assets');
 
 export default {
   plugins: [
@@ -16,12 +17,11 @@ export default {
     root: process.cwd(),
     src: 'src',
     dist: 'dist',
-    assets: 'dist',
-
-    buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
+    public: assetsPath,
     devDist: 'node_modules/.cache/react-static/dist/',
-    temp: 'node_modules/.cache/react-static/temp/',
   },
+  generateSourceMaps: false,
+  siteRoot: 'https://formidable.com',
   basePath: 'open-source/urql',
   stagingBasePath: 'open-source/urql',
   devBasePath: '',
@@ -78,6 +78,12 @@ export default {
           })
         ),
       },
+      {
+        path: '404',
+        template: 'src/screens/404',
+        sharedData: { sidebarHeaders },
+      },
     ];
   },
+  Document: require('./src/html').default,
 };

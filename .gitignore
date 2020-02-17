@@ -10,6 +10,7 @@ package-lock.json
 
 packages/*/LICENSE
 exchanges/*/LICENSE
+docs/site/artifacts
 
 # TODO: Figure out how to remove these:
 tmp/
