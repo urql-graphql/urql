@@ -153,6 +153,10 @@ export class Client {
     requestPolicy: (opts || {}).requestPolicy || this.requestPolicy,
   });
 
+  setFetchOptions(fetchOptions: RequestInit | (() => RequestInit))  {
+    this.fetchOptions = fetchOptions;
+  }
+
   createRequestOperation = (
     type: OperationType,
     request: GraphQLRequest,
