@@ -25,7 +25,7 @@ const Container = styled.div`
 class Article extends React.Component {
   render() {
     return (
-      <Container>
+      <Container className="Page-content">
         <Markdown dangerouslySetInnerHTML={{ __html: this.props.renderedMd }} />
       </Container>
     );
