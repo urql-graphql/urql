@@ -66,6 +66,11 @@ const ScrollToCurrentSection = ({ location, children }) => {
   useLayoutEffect(() => {
     if (checkScrollRoutes(pathname)) {
       scrollContent(hash);
+    } else {
+      scroll.scrollTo(0, {
+        duration: 0,
+        delay: 0,
+      });
     }
   }, [hash, pathname, pageContentHeight]);
 
