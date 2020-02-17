@@ -4,7 +4,7 @@ import { getSidebarItems } from './static-config-helpers/md-data-transforms';
 import { metaData } from './static-config-parts/constants';
 import { createSharedData } from 'react-static/node'
 
-const docsContentPath = resolve(__dirname, '../../docs/core');
+const docsContentPath = resolve(__dirname, '../core');
 
 export default {
   plugins: [
