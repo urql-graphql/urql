@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useRef } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withRouteData } from 'react-static';
@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import Article from './article';
 import Sidebar from '../../components/sidebar';
 import constants from '../../constants';
+import Header from './header';
 
 import burger from '../../assets/burger.svg';
 import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
@@ -102,58 +103,39 @@ const SideBarWithRef = forwardRef((props, ref) => {
 });
 
 /* eslint-disable react/no-multi-comp */
-class Docs extends React.Component {
-  constructor(props) {
-    super(props);
-    this.closeSidebar = this.closeSidebar.bind(this);
-    this.state = { openSidebar: false };
-    this.sidebarRef = React.createRef();
-  }
+const Docs = props => {
+  const [openSidebar, setOpenSidebar] = useState(false);
+  const sidebarRef = useRef(null);
 
-  openSidebar() {
-    this.setState({ openSidebar: true });
-  }
-
-  closeSidebar() {
-    this.setState({ openSidebar: false });
-  }
-
-  render() {
-    return (
-      <Container
-        onClick={event => {
-          return !this.sidebarRef.current.contains(event.target) &&
-            this.state.openSidebar
-            ? this.closeSidebar()
-            : null;
-        }}
-      >
-        <Wrapper noPadding>
-          <CollapsedMenu overlay={this.state.openSidebar}>
-            <img src={burger} alt="Menu" onClick={() => this.openSidebar()} />
-          </CollapsedMenu>
-          <DocsTitle>
-            <Link to={'/'} style={{ color: '#3b3b3b' }}>
-              {constants.docsTitle}
-            </Link>
-          </DocsTitle>
-          <Link to={'https://formidable.com'}>
-            <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
-          </Link>
-        </Wrapper>
-        <SideBarWithRef
-          location={this.props.location}
-          overlay={this.state.openSidebar}
-          closeSidebar={this.closeSidebar}
-          sidebarHeaders={this.props.sidebarHeaders}
-          tocArray={this.props.toc[this.props.slug]}
-          ref={this.sidebarRef}
-        />
-        <Article />
-      </Container>
-    );
-  }
-}
+  return (
+    <Container
+      onClick={event => {
+        return !sidebarRef.current.contains(event.target) && openSidebar
+          ? closeSidebar()
+          : null;
+      }}
+    >
+      <Wrapper noPadding>
+        <CollapsedMenu overlay={openSidebar}>
+          <img src={burger} alt="Menu" onClick={() => setOpenSidebar(true)} />
+        </CollapsedMenu>
+        <Header location={props.location} title={constants.docsTitle} />
+        <Link to={'https://formidable.com'}>
+          <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
+        </Link>
+      </Wrapper>
+      <SideBarWithRef
+        location={props.location}
+        overlay={openSidebar}
+        closeSidebar={() => setOpenSidebar(false)}
+        sidebarHeaders={props.sidebarHeaders}
+        tocArray={props.toc[props.slug]}
+        ref={sidebarRef}
+      />
+      <Article />
+    </Container>
+  );
+};
 
 Docs.propTypes = {
   location: PropTypes.object,

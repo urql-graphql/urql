@@ -2,7 +2,8 @@ import { resolve } from 'path';
 
 import { getSidebarItems } from './static-config-helpers/md-data-transforms';
 import { metaData } from './static-config-parts/constants';
-import { createSharedData } from 'react-static/node'
+import { createSharedData } from 'react-static/node';
+import Document from './src/html';
 
 const docsContentPath = resolve(__dirname, '../../docs/core');
 
@@ -80,4 +81,5 @@ export default {
       },
     ];
   },
+  // Document,
 };

@@ -34,12 +34,14 @@
     "react-document-meta": "^2.0.3",
     "react-dom": "^16.12.0",
     "react-ga": "^2.4.1",
+    "react-inlinesvg": "^1.2.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-router-ga": "^1.0.0",
     "react-scroll": "^1.7.15",
     "react-static": "^7.2.3",
-    "styled-components": "^5.0.1"
+    "styled-components": "^5.0.1",
+    "styled-normalize": "^8.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
