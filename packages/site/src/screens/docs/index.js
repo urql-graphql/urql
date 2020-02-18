@@ -153,7 +153,9 @@ const Docs = props => {
         tocArray={getTocArray(props.pages)}
         ref={sidebarRef}
       />
-      <Article>{props.children}</Article>
+      <Article>
+        {props.children}
+      </Article>
     </Container>
   );
 };
