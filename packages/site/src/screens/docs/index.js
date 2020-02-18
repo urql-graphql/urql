@@ -104,6 +104,7 @@ const SideBarWithRef = forwardRef((props, ref) => {
 
 /* eslint-disable react/no-multi-comp */
 const Docs = props => {
+  console.log(props);
   const [openSidebar, setOpenSidebar] = useState(false);
   const sidebarRef = useRef(null);
 
@@ -134,7 +135,9 @@ const Docs = props => {
         ref={sidebarRef}
       />
       */}
-      <Article contents={props.context} />
+      <Article>
+        {props.children}
+      </Article>
     </Container>
   );
 };

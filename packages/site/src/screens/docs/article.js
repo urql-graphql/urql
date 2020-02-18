@@ -1,8 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { withRouteData } from 'react-static';
-import { MDXProvider, mdx } from '@mdx-js/react';
+import { MDXProvider } from '@mdx-js/react';
 
 import { Markdown } from '../../components/markdown';
 
@@ -41,14 +39,14 @@ const hastToMdx = (node, index = 0) => {
   }
 };
 
-const Article = ({ contents }) => (
+const Article = ({ children }) => (
   <Container className="Page-content">
     <MDXProvider>
       <Markdown>
-        {hastToMdx(contents)}
+        {children}
       </Markdown>
     </MDXProvider>
   </Container>
 );
 
-export default withRouteData(Article);
+export default Article;
