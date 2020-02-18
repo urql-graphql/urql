@@ -18,8 +18,9 @@ const staticPluginSourceMarkdown = (opts = {}) => {
   const plugins = opts.remarkPlugins || [];
 
   // Find all markdown files in the given location
-  const mds = glob('**/*.md', { cwd: location })
-    .map(x => path.resolve(location, x));
+  const mds = glob('**/*.md', { cwd: location }).map(x =>
+    path.resolve(location, x)
+  );
 
   // By default the remark parsers gets the frontmatter data and removes
   // extra-long paragraphs
@@ -30,11 +31,29 @@ const staticPluginSourceMarkdown = (opts = {}) => {
   // All plugins in opts.remarkPlugins will be added to remark
   plugins.forEach(plugin => {
     if (Array.isArray(plugin) && plugin.length > 1) {
-      fn.use(plugin[0], plugin[1])
+      fn.use(plugin[0], plugin[1]);
     } else {
-      fn.use(plugin)
+      fn.use(plugin);
     }
   });
+
+  const getAllHeadings = () =>
+    Promise.all(
+      mds.map(async md => {
+        const vfile = await readVFile(md);
+        const tree = processor.parse(vfile);
+
+        slugger.reset();
+
+        // Find all headings and convert them to a reusable format
+        return selectAll('heading', tree).map(node => {
+          const value = toString(node);
+          const depth = node.depth;
+          const slug = slugger.slug(value);
+          return { type: 'heading', value, slug, depth };
+        });
+      })
+    );
 
   const getFileData = async ({ route }) => {
     // Send the given file through the processor
@@ -44,13 +63,7 @@ const staticPluginSourceMarkdown = (opts = {}) => {
     slugger.reset();
 
     // Find all headings and convert them to a reusable format
-    const headings = selectAll('heading', tree)
-      .map(node => {
-        const value = toString(node);
-        const depth = node.depth;
-        const slug = slugger.slug(value);
-        return { type: 'heading', value, slug, depth };
-      });
+    const headings = await getAllHeadings();
 
     // Parse the frontmatter yaml data to JSON
     const frontmatter = yaml(select('yaml', tree)?.value);
@@ -93,10 +106,10 @@ const staticPluginSourceMarkdown = (opts = {}) => {
             },
           },
         ],
-      })
+      });
 
       return config;
-    }
+    },
   };
 };
 

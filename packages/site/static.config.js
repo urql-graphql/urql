@@ -12,8 +12,8 @@ export default {
       resolve(__dirname, 'plugins/source-markdown/'),
       {
         location: docsContentPath,
-        template: './src/screens/docs'
-      }
+        template: './src/screens/docs',
+      },
     ],
 
     'react-static-plugin-styled-components',

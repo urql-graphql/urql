@@ -64,81 +64,72 @@ const HorizontalLine = styled.hr`
   margin: 1rem 0;
 `;
 
-class Sidebar extends React.Component {
-  renderSidebarItem(tocArray) {
-    const heading = tocArray.find(toc => toc.level === 1);
-    // const currentPath =
-    //   `/docs${tocArray.filter(toc => toc.level === 1).path}` ===
+const renderSidebarItem = (tocArray, pathname) => {
+  const heading = tocArray.find(toc => toc.depth === 1);
+  const isCurrentPath = `/${heading.slug}` === pathname;
 
-    const currentPath = `/${heading.slug}` === this.props.location.pathname;
-    // eslint-disable-next-line no-magic-numbers
-    const subContent = tocArray.filter(toc => toc.level === 2);
-    const key = heading.slug;
-    const className = currentPath ? 'is-current' : '';
-    return (
-      <Fragment key={`${key}-group`}>
-        <SidebarNavItem
-          to={`/docs${heading.slug}`}
-          replace
-          key={`${key}-${className}`}
-          className={className}
-        >
-          {heading.title}
+  const subContent = tocArray.filter(toc => toc.depth === 2);
+  const className = isCurrentPath ? 'is-current' : '';
+  return (
+    <Fragment key={`${heading.slug}-group`}>
+      <SidebarNavItem
+        /* path relative to current */
+        to={heading.slug}
+        replace
+        key={`${heading.slug}-${className}`}
+        className={className}
+      >
+        {heading.value}
+      </SidebarNavItem>
+      {isCurrentPath && !!subContent.length && (
+        <SubContentWrapper key={heading.slug}>
+          {subContent.map((sh, i) => (
+            <SidebarNavSubItem
+              to={`#${sh.slug}`}
+              key={[...heading.slug, ...sh.slug].join('_')}
+            >
+              {sh.value}
+            </SidebarNavSubItem>
+          ))}
+        </SubContentWrapper>
+      )}
+    </Fragment>
+  );
+};
+
+const Sidebar = ({
+  sidebarHeaders,
+  overlay,
+  closeSidebar,
+  tocArray,
+  location,
+}) => (
+  <SidebarContainer>
+    <SideBarSvg />
+    <SidebarWrapper overlay={overlay}>
+      <CloseButton
+        src={closeButton}
+        alt="X"
+        overlay={overlay}
+        onClick={() => closeSidebar()}
+      />
+      <Link to={'/'}>
+        <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
+      </Link>
+      <ContentWrapper overlay={overlay}>
+        {tocArray && tocArray.map(t => renderSidebarItem(t, location.pathname))}
+
+        <HorizontalLine />
+        <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
+          Issues
         </SidebarNavItem>
-        {currentPath && !!subContent.length && (
-          <SubContentWrapper key={key}>
-            {subContent.map((sh, i) => (
-              <SidebarNavSubItem
-                to={`#${sh.slug}`}
-                key={[...heading.slug, ...sh.slug].join('_')}
-              >
-                {sh.title}
-              </SidebarNavSubItem>
-            ))}
-          </SubContentWrapper>
-        )}
-      </Fragment>
-    );
-  }
-
-  render() {
-    const { sidebarHeaders, overlay, closeSidebar, tocArray } = this.props;
-
-    console.log(tocArray);
-
-    return (
-      <SidebarContainer>
-        <SideBarSvg />
-        <SidebarWrapper overlay={overlay}>
-          <CloseButton
-            src={closeButton}
-            alt="X"
-            overlay={overlay}
-            onClick={() => closeSidebar()}
-          />
-          <Link to={'/'}>
-            <HeroLogo
-              src={logoSidebar}
-              alt="Formidable Logo"
-              overlay={overlay}
-            />
-          </Link>
-          <ContentWrapper overlay={overlay}>
-            {this.renderSidebarItem(tocArray)}
-
-            <HorizontalLine />
-            <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
-              Issues
-            </SidebarNavItem>
-            <SidebarNavItem as="a" href={constants.github} key={'github'}>
-              Github
-            </SidebarNavItem>
-          </ContentWrapper>
-        </SidebarWrapper>
-      </SidebarContainer>
-    );
-  }
-}
+        <SidebarNavItem as="a" href={constants.github} key={'github'}>
+          Github
+        </SidebarNavItem>
+      </ContentWrapper>
+    </SidebarWrapper>
+  </SidebarContainer>
+);
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,

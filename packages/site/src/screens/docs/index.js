@@ -102,15 +102,6 @@ const SideBarWithRef = forwardRef((props, ref) => {
   );
 });
 
-const createTocArr = headings =>
-  headings.reduce(
-    (acc, { value: title, slug, depth }) => [
-      ...acc,
-      { title, slug, level: depth },
-    ],
-    []
-  );
-
 /* eslint-disable react/no-multi-comp */
 const Docs = props => {
   console.log(props);
@@ -140,7 +131,7 @@ const Docs = props => {
         overlay={openSidebar}
         closeSidebar={() => setOpenSidebar(false)}
         sidebarHeaders={props.sidebarHeaders}
-        tocArray={createTocArr(props.headings)}
+        tocArray={props.headings}
         ref={sidebarRef}
       />
 
