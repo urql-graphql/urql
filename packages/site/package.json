@@ -68,6 +68,7 @@
     "remark-toc": "^5.1.0",
     "to-vfile": "^6.0.0",
     "unist-util-select": "^3.0.1",
+    "unist-util-visit": "^2.0.2",
     "url-loader": "^1.1.2",
     "webpack": "^4.41.6",
     "yaml": "^1.7.2"

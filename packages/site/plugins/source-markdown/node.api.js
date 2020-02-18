@@ -41,6 +41,8 @@ const staticPluginSourceMarkdown = (opts = {}) => {
     const vfile = await readVFile(path.resolve(location, `${route.path}.md`));
     const tree = processor.parse(vfile);
 
+    slugger.reset();
+
     // Find all headings and convert them to a reusable format
     const headings = selectAll('heading', tree)
       .map(node => {
@@ -87,6 +89,7 @@ const staticPluginSourceMarkdown = (opts = {}) => {
             options: {
               template,
               processor,
+              mds,
             },
           },
         ],
