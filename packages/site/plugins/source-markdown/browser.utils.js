@@ -21,6 +21,9 @@ export const hastToMdx = (node, assets, i = 0) => {
         key: i,
       };
 
+      // Normalise className props to consistently be strings
+      if (Array.isArray(props.className)) props.className = props.className.join(' ');
+
       // Given a dictionary of image files, read the Webpack-included
       // output path and replace the `src` path.
       if (node.tagName === 'img') props.src = assets[props.src] || props.src;

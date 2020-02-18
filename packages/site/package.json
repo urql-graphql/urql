@@ -28,6 +28,7 @@
     "@mdx-js/react": "^1.5.5",
     "formidable-oss-badges": "0.2.1",
     "history": "^4.7.2",
+    "prism-react-renderer": "^1.0.2",
     "prop-types": "^15.6.2",
     "react": "^16.9.0",
     "react-document-meta": "^2.0.3",
