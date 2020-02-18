@@ -1,4 +1,4 @@
-import { sync as glob } from 'glob';
+import { promisify } from 'util';
 import { createSharedData } from 'react-static/node';
 import { read as readVFile } from 'to-vfile';
 import frontmatter from 'remark-frontmatter';
@@ -7,23 +7,71 @@ import GithubSlugger from 'github-slugger';
 import { select, selectAll } from 'unist-util-select';
 import toString from 'mdast-util-to-string';
 import { parse as yaml } from 'yaml';
-import remark from 'remark';
 import * as path from 'path';
+import remark from 'remark';
+import nodeGlob from 'glob';
 
-const slugger = new GithubSlugger();
-const cwd = process.cwd();
+const glob = promisify(nodeGlob);
 
-const staticPluginSourceMarkdown = (opts = {}) => {
-  const location = path.resolve(cwd, opts.location);
-  const template = path.resolve(cwd, opts.template);
-  const pathPrefix = opts.pathPrefix || '';
-  const plugins = opts.remarkPlugins || [];
+const staticPluginSourceMarkdown = (opts = {}) => ({
+  async getRoutes(_, { config }) {
+    // Resolve target location from ROOT folder
+    const location = path.resolve(config.paths.ROOT, opts.location);
 
-  // Find all markdown files in the given location
-  const mds = glob('**/*.md', { cwd: location }).map(x =>
-    path.resolve(location, x)
-  );
+    // Get page data for each discovered markdown file
+    const markdownPages = await getMarkdownData(
+      getMarkdownProcessor(opts.remarkPlugins),
+      location,
+      opts.pathPrefix,
+    );
 
+    // Share data, since all pages will be displayed e.g. in the sidebar
+    const pages = createSharedData(markdownPages);
+
+    // Create react-static routes for each page
+    return markdownPages.map(page => ({
+      path: page.path,
+      // The markdown file becomes the "template" which the Webpack loader
+      // below picks up
+      template: `${path.resolve(location, page.originalPath)}.md`,
+      sharedData: { pages },
+      getData: () => ({ ...page, headings: undefined }),
+    }));
+  },
+  afterGetConfig({ config }) {
+    // Register `md` files as a valid extension with react-static
+    config.extensions = [...config.extensions, '.md'];
+  },
+  webpack(webpackConfig, { config, defaultLoaders }) {
+    // Resolve target location and template from ROOT folder
+    const location = path.resolve(config.paths.ROOT, opts.location);
+    const template = path.resolve(config.paths.ROOT, opts.template);
+
+    // Create a rule that only applies to the discovered markdown files
+    webpackConfig.module.rules[0].oneOf.unshift({
+      test: /.md$/,
+      // Limit the rule strictly to the files we have
+      include: [location],
+      use: [
+        defaultLoaders.jsLoader.use[0],
+        // The loader will parse the markdown to an MDX-compatible HAST
+        // and will wrap it in the actual template given in `opts.template`
+        {
+          loader: require.resolve('./loader'),
+          options: {
+            processor: getMarkdownProcessor(opts.remarkPlugins),
+            template,
+            location,
+          },
+        },
+      ],
+    });
+
+    return webpackConfig;
+  },
+});
+
+const getMarkdownProcessor = (plugins = []) => {
   // By default the remark parsers gets the frontmatter data and removes
   // extra-long paragraphs
   const processor = remark()
@@ -39,90 +87,51 @@ const staticPluginSourceMarkdown = (opts = {}) => {
     }
   });
 
-  const getMarkdownData = async () => {
-    return Promise.all(
-      mds.map(async originalPath => {
-        // Reproduce the current markdown file's route path
-        const relative = path.relative(location, originalPath);
-        const filename = path.basename(relative, '.md');
-        const dirname = path.dirname(relative);
+  return processor;
+};
 
-        // Parse the given markdown file into MAST
-        const vfile = await readVFile(originalPath);
-        const tree = processor.parse(vfile);
+const getMarkdownData = async (processor, location, pathPrefix = '') => {
+  const slugger = new GithubSlugger();
 
-        slugger.reset();
+  // Find all markdown files in the given location
+  const mds = (await glob('**/*.md', { cwd: location }))
+    .map(x => path.resolve(location, x));
 
-        // Find all headings and convert them to a reusable format
-        const headings = selectAll('heading', tree).map(node => {
-          const value = toString(node);
-          const depth = node.depth;
-          const slug = slugger.slug(value);
-          return { value, slug, depth };
-        });
+  // Map each markdown to its page data
+  return Promise.all(
+    mds.map(async originalPath => {
+      // Reproduce the current markdown file's route path
+      const relative = path.relative(location, originalPath);
+      const filename = path.basename(relative, '.md');
+      const dirname = path.dirname(relative);
 
-        // Parse the frontmatter yaml data to JSON
-        const frontmatter = yaml(select('yaml', tree)?.value);
+      // Parse the given markdown file into MAST
+      const vfile = await readVFile(originalPath);
+      const tree = processor.parse(vfile);
 
-        // Add fallback for Frontmatter title to first h1 heading
-        frontmatter.title =
-          frontmatter.title || headings.find(x => x.depth === 1)?.value || path;
-
-        return {
-          originalPath: path.join(dirname, filename),
-          path: path.join(pathPrefix, dirname, filename),
-          headings,
-          frontmatter,
-        };
-      })
-    );
-  };
-
-  return {
-    async getRoutes() {
-      // Get page data for each discovered markdown file
-      const markdownPages = await getMarkdownData();
-      // Share data, since all pages will be displayed e.g. in the sidebar
-      const pages = createSharedData(markdownPages);
-
-      // Create react-static routes for each page
-      return markdownPages.map(page => ({
-        path: page.path,
-        // The markdown file becomes the "template" which the Webpack loader
-        // below picks up
-        template: `${path.resolve(location, page.originalPath)}.md`,
-        sharedData: { pages },
-        getData: () => ({ ...page, headings: undefined }),
-      }));
-    },
-    afterGetConfig({ config }) {
-      // Register `md` files as a valid extension with react-static
-      config.extensions = [...config.extensions, '.md'];
-    },
-    webpack(config, { defaultLoaders }) {
-      // Create a rule that only applies to the discovered markdown files
-      config.module.rules[0].oneOf.unshift({
-        test: /.md$/,
-        // Limit the rule strictly to the files we have
-        include: mds,
-        use: [
-          defaultLoaders.jsLoader.use[0],
-          // The loader will parse the markdown to an MDX-compatible HAST
-          // and will wrap it in the actual template given in `opts.template`
-          {
-            loader: require.resolve('./loader'),
-            options: {
-              template,
-              processor,
-              mds,
-            },
-          },
-        ],
+      // Find all headings and convert them to a reusable format
+      const headings = selectAll('heading', tree).map(node => {
+        const value = toString(node);
+        const depth = node.depth;
+        const slug = slugger.slug(value);
+        return { value, slug, depth };
       });
 
-      return config;
-    },
-  };
+      // Parse the frontmatter yaml data to JSON
+      const frontmatter = yaml(select('yaml', tree)?.value);
+
+      // Add fallback for Frontmatter title to first h1 heading
+      frontmatter.title =
+        frontmatter.title || headings.find(x => x.depth === 1)?.value || path;
+
+      return {
+        originalPath: path.join(dirname, filename),
+        path: path.join(pathPrefix, dirname, filename),
+        headings,
+        frontmatter,
+      };
+    })
+  );
 };
 
 export default staticPluginSourceMarkdown;

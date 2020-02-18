@@ -11,11 +11,9 @@ const MD_FILE_RE = /\.md$/;
 export default function loader(source) {
   const options = getOptions(this);
 
-  // Get normalised list of all markdopwn file paths
-  const mds = (options.mds || []).map(req => stringifyRequest(this, req));
-
   // Ensure that the template and utilities are relative paths
   const template = stringifyRequest(this, options.template);
+  const location = options.location || process.cwd();
   const utils = stringifyRequest(this, require.resolve('./browser.utils.js'));
 
   // Parse the markdown contents
@@ -23,20 +21,17 @@ export default function loader(source) {
 
   // Fix up all links that end in `.md`
   visit(tree, 'link', node => {
-    if (!MD_FILE_RE.test(node.url)) return node;
-
     try {
+      // Only apply to urls ending in `.md`
+      if (!MD_FILE_RE.test(node.url)) return node;
       // Check whether the link's normalised URL is a known markdown file
-      const path = resolve(this.context, node.url);
-      const req = stringifyRequest(this, path);
-      if (mds.includes(req)) {
+      if (resolve(this.context, node.url).startsWith(location)) {
         // If so remove the `.md` extension
         node.url = node.url.replace(MD_FILE_RE, '');
-        return node;
       }
-    } catch (err) {
-      return node;
-    }
+    } catch (_err) {}
+
+    return node;
   });
 
   // Extract all images and add require statements for them
