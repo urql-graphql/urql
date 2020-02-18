@@ -12,6 +12,11 @@ import Header from './header';
 import burger from '../../assets/burger.svg';
 import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 
+import {
+  useMarkdownPage,
+  useMarkdownTree,
+} from '../../../plugins/source-markdown/hooks';
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -102,31 +107,10 @@ const SideBarWithRef = forwardRef((props, ref) => {
   );
 });
 
-// override the heading slug with the page path
-const getTocArray = pages =>
-  pages.map(p => p.headings.map(heading => ({ ...heading, slug: p.path })));
-
-const convertPageArrToSections = pageData =>
-  pageData.reduce((acc, page) => {
-    const sectionIndex = acc.findIndex(a => a.section === page.section);
-    if (sectionIndex === -1) {
-      return [
-        ...acc,
-        {
-          section: page.section,
-          pages: [page],
-        },
-      ];
-    }
-
-    acc[sectionIndex].pages = [...acc[sectionIndex].pages, page];
-    return acc;
-  }, []);
-
 const Docs = props => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const sidebarRef = useRef(null);
-  const pagesBySection = useRef(convertPageArrToSections(props.pages));
+  const tree = useMarkdownTree();
 
   return (
     <Container
@@ -150,7 +134,6 @@ const Docs = props => {
         overlay={openSidebar}
         closeSidebar={() => setOpenSidebar(false)}
         sidebarHeaders={props.sidebarHeaders}
-        tocArray={getTocArray(props.pages)}
         ref={sidebarRef}
       />
       <Article>{props.children}</Article>

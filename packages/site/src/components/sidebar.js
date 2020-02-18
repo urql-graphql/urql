@@ -11,6 +11,8 @@ import {
   SideBarSvg,
 } from './navigation';
 
+import { useMarkdownTree } from '../../plugins/source-markdown/hooks';
+
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
 import constants from '../constants';
@@ -64,23 +66,32 @@ const HorizontalLine = styled.hr`
   margin: 1rem 0;
 `;
 
-const renderSidebarItem = (tocArray, pathname) => {
-  const heading = tocArray.find(toc => toc.depth === 1);
-  const isCurrentPath = `/${heading.slug}` === pathname;
+// override the heading slug with the page path
+const getTocArray = pages =>
+  pages.map(p => p.headings.map(heading => ({ ...heading, slug: p.path })));
 
-  const subContent = tocArray.filter(toc => toc.depth === 2);
+const renderSidebarItem = (item, isCurrentPath) => {
+  // const headings = item.pages.find(page => page.depth === 1);
+  // const subContent = tocArray.filter(toc => toc.depth === 2);
+
+  console.log(item);
   const className = isCurrentPath ? 'is-current' : '';
   return (
-    <Fragment key={`${heading.slug}-group`}>
+    <Fragment key={`${item.value}-group`}>
       <SidebarNavItem
         /* path relative to current */
-        to={heading.slug}
         replace
-        key={`${heading.slug}-${className}`}
+        key={`${item.section}-${className}`}
         className={className}
       >
-        {heading.value}
+        {item.section}
       </SidebarNavItem>
+      {item.pages.map(p => (
+        <SidebarNavSubItem key={p.frontmatter.title}>
+          {p.frontmatter.title}
+        </SidebarNavSubItem>
+      ))}
+
       {isCurrentPath && !!subContent.length && (
         <SubContentWrapper key={heading.slug}>
           {subContent.map((sh, i) => (
@@ -97,39 +108,60 @@ const renderSidebarItem = (tocArray, pathname) => {
   );
 };
 
+/*
+      <SidebarNavItem
+        to={heading.slug}
+        replace
+        key={`${heading.slug}-${className}`}
+        className={className}
+      >
+        {heading.value}
+      </SidebarNavItem>
+
+*/
+
 const Sidebar = ({
   sidebarHeaders,
   overlay,
   closeSidebar,
   tocArray,
   location,
-}) => (
-  <SidebarContainer>
-    <SideBarSvg />
-    <SidebarWrapper overlay={overlay}>
-      <CloseButton
-        src={closeButton}
-        alt="X"
-        overlay={overlay}
-        onClick={() => closeSidebar()}
-      />
-      <Link to={'/'}>
-        <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
-      </Link>
-      <ContentWrapper overlay={overlay}>
-        {tocArray && tocArray.map(t => renderSidebarItem(t, location.pathname))}
+}) => {
+  const tree = useMarkdownTree();
 
-        <HorizontalLine />
-        <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
-          Issues
-        </SidebarNavItem>
-        <SidebarNavItem as="a" href={constants.github} key={'github'}>
-          Github
-        </SidebarNavItem>
-      </ContentWrapper>
-    </SidebarWrapper>
-  </SidebarContainer>
-);
+  console.log(tree);
+
+  return (
+    <SidebarContainer>
+      <SideBarSvg />
+      <SidebarWrapper overlay={overlay}>
+        <CloseButton
+          src={closeButton}
+          alt="X"
+          overlay={overlay}
+          onClick={() => closeSidebar()}
+        />
+        <Link to={'/'}>
+          <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
+        </Link>
+        <ContentWrapper overlay={overlay}>
+          {tree &&
+            tree.map(t =>
+              renderSidebarItem(t, t.section === location.pathname)
+            )}
+
+          <HorizontalLine />
+          <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
+            Issues
+          </SidebarNavItem>
+          <SidebarNavItem as="a" href={constants.github} key={'github'}>
+            Github
+          </SidebarNavItem>
+        </ContentWrapper>
+      </SidebarWrapper>
+    </SidebarContainer>
+  );
+};
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
