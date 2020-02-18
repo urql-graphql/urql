@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { metaData } from './static-config-parts/constants';
 import Document from './src/html';
 
-const docsContentPath = resolve(__dirname, '../../docs/core');
+const docsContentPath = resolve(__dirname, '../../docs');
 
 export default {
   plugins: [

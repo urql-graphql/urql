@@ -22,7 +22,7 @@ const staticPluginSourceMarkdown = (opts = {}) => ({
     const markdownPages = await getMarkdownData(
       getMarkdownProcessor(opts.remarkPlugins),
       location,
-      opts.pathPrefix,
+      opts.pathPrefix
     );
 
     // Share data, since all pages will be displayed e.g. in the sidebar
@@ -94,8 +94,9 @@ const getMarkdownData = async (processor, location, pathPrefix = '') => {
   const slugger = new GithubSlugger();
 
   // Find all markdown files in the given location
-  const mds = (await glob('**/*.md', { cwd: location }))
-    .map(x => path.resolve(location, x));
+  const mds = (await glob('**/*.md', { cwd: location })).map(x =>
+    path.resolve(location, x)
+  );
 
   // Map each markdown to its page data
   return Promise.all(
@@ -104,29 +105,33 @@ const getMarkdownData = async (processor, location, pathPrefix = '') => {
       const relative = path.relative(location, originalPath);
       const filename = path.basename(relative, '.md');
       const dirname = path.dirname(relative);
+      const newPath = path.join(pathPrefix, dirname, filename);
 
       // Parse the given markdown file into MAST
       const vfile = await readVFile(originalPath);
       const tree = processor.parse(vfile);
 
+      // Parse the frontmatter yaml data to JSON
+      const frontmatter = yaml(select('yaml', tree)?.value || '') || {};
+
       // Find all headings and convert them to a reusable format
       const headings = selectAll('heading', tree).map(node => {
-        const value = toString(node);
         const depth = node.depth;
+        const value = depth === 1 ? frontmatter.title : toString(node);
         const slug = slugger.slug(value);
         return { value, slug, depth };
       });
 
-      // Parse the frontmatter yaml data to JSON
-      const frontmatter = yaml(select('yaml', tree)?.value);
-
       // Add fallback for Frontmatter title to first h1 heading
       frontmatter.title =
-        frontmatter.title || headings.find(x => x.depth === 1)?.value || path;
+        frontmatter.title ||
+        headings.find(x => x.depth === 1)?.value ||
+        newPath;
 
       return {
+        section: dirname,
         originalPath: path.join(dirname, filename),
-        path: path.join(pathPrefix, dirname, filename),
+        path: newPath,
         headings,
         frontmatter,
       };

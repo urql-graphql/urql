@@ -102,11 +102,31 @@ const SideBarWithRef = forwardRef((props, ref) => {
   );
 });
 
-/* eslint-disable react/no-multi-comp */
+// override the heading slug with the page path
+const getTocArray = pages =>
+  pages.map(p => p.headings.map(heading => ({ ...heading, slug: p.path })));
+
+const convertPageArrToSections = pageData =>
+  pageData.reduce((acc, page) => {
+    const sectionIndex = acc.findIndex(a => a.section === page.section);
+    if (sectionIndex === -1) {
+      return [
+        ...acc,
+        {
+          section: page.section,
+          pages: [page],
+        },
+      ];
+    }
+
+    acc[sectionIndex].pages = [...acc[sectionIndex].pages, page];
+    return acc;
+  }, []);
+
 const Docs = props => {
-  console.log(props);
   const [openSidebar, setOpenSidebar] = useState(false);
   const sidebarRef = useRef(null);
+  const pagesBySection = useRef(convertPageArrToSections(props.pages));
 
   return (
     <Container
@@ -125,16 +145,14 @@ const Docs = props => {
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Link>
       </Wrapper>
-
       <SideBarWithRef
         location={props.location}
         overlay={openSidebar}
         closeSidebar={() => setOpenSidebar(false)}
         sidebarHeaders={props.sidebarHeaders}
-        tocArray={props.headings}
+        tocArray={getTocArray(props.pages)}
         ref={sidebarRef}
       />
-
       <Article>{props.children}</Article>
     </Container>
   );
