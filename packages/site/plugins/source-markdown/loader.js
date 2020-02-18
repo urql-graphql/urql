@@ -1,10 +1,13 @@
 import { resolve } from 'path';
 import { getOptions, stringifyRequest } from 'loader-utils';
 import { selectAll } from 'unist-util-select';
+import GithubSlugger from 'github-slugger';
+import toString from 'mdast-util-to-string';
 import raw from 'hast-util-raw';
 import sanitize from 'hast-util-sanitize';
 import toHast from 'mdast-util-to-hast';
 import visit from 'unist-util-visit';
+import remove from 'unist-util-remove';
 
 const MD_FILE_RE = /\.md$/;
 
@@ -40,8 +43,20 @@ export default function loader(source) {
     return `[${path}]: require(${path}),`;
   });
 
-  // Sanitise the markdown HAST and JSON stringify it
-  const contents = JSON.stringify(raw(sanitize(toHast(tree))));
+  // Convert from MAST to HAST
+  const hast = sanitize(toHast(tree, { allowDangerousHTML: true }));
+
+  // Find all headings and add ids to them
+  const slugger = new GithubSlugger();
+  visit(hast, 'element', node => {
+    if (/h\d/.test(node.tagName))
+      node.properties.id = slugger.slug(toString(node));
+  });
+
+  // Remove empty text lines
+  remove(hast, 'text', node => /^[\n\r]+$/.test(node.value));
+  // Remove empty paragraphs
+  remove(hast, 'element', node => node.tagName === 'p' && node.children.length === 0);
 
   return `
     import React from "react";
@@ -50,7 +65,7 @@ export default function loader(source) {
     import { hastToMdx } from ${utils};
 
     var assets = { ${assets.join(',')} };
-    var mdx = hastToMdx(${contents}, assets);
+    var mdx = hastToMdx(${JSON.stringify(raw(sanitize(hast)))}, assets);
 
     export default function MarkdownTemplate(props) {
       return <Template {...props}>{mdx}</Template>;

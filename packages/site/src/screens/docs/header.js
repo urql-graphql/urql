@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import SVG from 'react-inlinesvg';
 
-import config from '../../../static-config-parts/site-data';
 import formidableIcon from '../../assets/logos/logo-formidable-icon.svg';
 import formidableLogo from '../../assets/logos/logo-formidable.svg';
 import burgerIcon from '../../assets/burger.svg';
@@ -149,11 +148,11 @@ const Header = ({ className = '', location, onMenuClick, title }) => {
               Gallery
             </NavLink>
 
-            {config.projectLinks.map(link => (
+            {/*config.projectLinks.map(link => (
               <NavAnchor key={link.url} href={link.url}>
                 {link.label}
               </NavAnchor>
-            ))}
+            ))*/}
 
             <NavLink active={pathname.includes('faq')} to="/docs/faq/">
               FAQs
