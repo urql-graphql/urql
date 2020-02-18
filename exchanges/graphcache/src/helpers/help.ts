@@ -9,7 +9,7 @@ import { ErrorCode } from '../types';
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 
 const helpUrl =
-  '\nhttps://github.com/FormidableLabs/urql-exchange-graphcache/blob/master/docs/help.md#';
+  '\nhttps://github.com/FormidableLabs/urql/blob/master/docs/graphcache/help.md#';
 const cache = new Set<string>();
 
 export const currentDebugStack: string[] = [];
