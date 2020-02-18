@@ -26,16 +26,18 @@ export default function loader(source) {
     if (!MD_FILE_RE.test(node.url)) return node;
 
     try {
+      // Check whether the link's normalised URL is a known markdown file
       const path = resolve(this.context, node.url);
       const req = stringifyRequest(this, path);
       if (mds.includes(req)) {
+        // If so remove the `.md` extension
         node.url = node.url.replace(MD_FILE_RE, '');
         return node;
       }
     } catch (err) {
       return node;
     }
-  })
+  });
 
   // Extract all images and add require statements for them
   const assets = selectAll('image', tree).map(node => {
