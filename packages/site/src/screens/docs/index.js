@@ -136,7 +136,9 @@ const Docs = props => {
         sidebarHeaders={props.sidebarHeaders}
         ref={sidebarRef}
       />
-      <Article>{props.children}</Article>
+      <Article>
+        {props.children}
+      </Article>
     </Container>
   );
 };

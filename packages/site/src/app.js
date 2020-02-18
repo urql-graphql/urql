@@ -5,15 +5,13 @@ import { Route } from 'react-router';
 import { animateScroll as scroll } from 'react-scroll';
 import { ResizeObserver as _ResizeObserver } from '@juggle/resize-observer';
 import get from 'lodash/get';
-import { ThemeProvider, ThemeContext } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 
 import constants from './constants';
 import { GlobalStyle } from './styles/global';
 import theme from './styles/theme';
 import Analytics from './google-analytics';
 import NotFound from './screens/404';
-
-import 'prismjs/themes/prism.css';
 
 const HEADER_PIXEL_HEIGHT = 60;
 const SCROLL_PIXEL_OFFSET = 25;
