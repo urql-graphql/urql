@@ -15,6 +15,7 @@ const cwd = process.cwd();
 const staticPluginSourceMarkdown = (opts = {}) => {
   const location = path.resolve(cwd, opts.location);
   const template = path.resolve(cwd, opts.template);
+  const pathPrefix = opts.pathPrefix || '';
   const plugins = opts.remarkPlugins || [];
 
   // Find all markdown files in the given location
@@ -72,13 +73,19 @@ const staticPluginSourceMarkdown = (opts = {}) => {
   };
 
   const getRoutes = async () => {
-    return mds.map(file => ({
-      // Each route will be at the exact path that the markdown is at
-      path: path.basename(path.relative(location, file), '.md'),
-      // We'll render the markdown file itself as a "template"
-      getData: getFileData,
-      template: file,
-    }));
+    return mds.map(file => {
+      const relative = path.relative(location, file);
+      const filename = path.basename(relative, '.md');
+      const dirname = path.dirname(relative);
+
+      return {
+        // Each route will be at the exact path that the markdown is at
+        path: path.join(pathPrefix, dirname, filename),
+        // We'll render the markdown file itself as a "template"
+        getData: getFileData,
+        template: file,
+      }
+    });
   };
 
   return {
