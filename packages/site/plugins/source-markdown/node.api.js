@@ -117,7 +117,7 @@ const getMarkdownData = async (processor, location, pathPrefix = '') => {
       // Find all headings and convert them to a reusable format
       const headings = selectAll('heading', tree).map(node => {
         const depth = node.depth;
-        const value = depth === 1 ? frontmatter.title : toString(node);
+        const value = (depth === 1 && frontmatter.title) || toString(node);
         const slug = slugger.slug(value);
         return { value, slug, depth };
       });
