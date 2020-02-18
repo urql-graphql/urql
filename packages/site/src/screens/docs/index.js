@@ -102,6 +102,15 @@ const SideBarWithRef = forwardRef((props, ref) => {
   );
 });
 
+const createTocArr = headings =>
+  headings.reduce(
+    (acc, { value: title, slug, depth }) => [
+      ...acc,
+      { title, slug, level: depth },
+    ],
+    []
+  );
+
 /* eslint-disable react/no-multi-comp */
 const Docs = props => {
   console.log(props);
@@ -125,19 +134,17 @@ const Docs = props => {
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Link>
       </Wrapper>
-      {/*
+
       <SideBarWithRef
         location={props.location}
         overlay={openSidebar}
         closeSidebar={() => setOpenSidebar(false)}
         sidebarHeaders={props.sidebarHeaders}
-        tocArray={props.toc[props.slug]}
+        tocArray={createTocArr(props.headings)}
         ref={sidebarRef}
       />
-      */}
-      <Article>
-        {props.children}
-      </Article>
+
+      <Article>{props.children}</Article>
     </Container>
   );
 };

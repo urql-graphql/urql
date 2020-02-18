@@ -42,9 +42,7 @@ const hastToMdx = (node, index = 0) => {
 const Article = ({ children }) => (
   <Container className="Page-content">
     <MDXProvider>
-      <Markdown>
-        {children}
-      </Markdown>
+      <Markdown>{children}</Markdown>
     </MDXProvider>
   </Container>
 );

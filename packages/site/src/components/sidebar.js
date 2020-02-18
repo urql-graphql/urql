@@ -65,34 +65,34 @@ const HorizontalLine = styled.hr`
 `;
 
 class Sidebar extends React.Component {
-  renderSidebarItem(item) {
-    const { tocArray = [] } = this.props;
-    const currentPath = `/docs${item.path}` === this.props.location.pathname;
+  renderSidebarItem(tocArray) {
+    const heading = tocArray.find(toc => toc.level === 1);
+    // const currentPath =
+    //   `/docs${tocArray.filter(toc => toc.level === 1).path}` ===
+
+    const currentPath = `/${heading.slug}` === this.props.location.pathname;
     // eslint-disable-next-line no-magic-numbers
     const subContent = tocArray.filter(toc => toc.level === 2);
-    const key = item.title.split(' ').join('_');
+    const key = heading.slug;
     const className = currentPath ? 'is-current' : '';
     return (
       <Fragment key={`${key}-group`}>
         <SidebarNavItem
-          to={`/docs${item.path}`}
+          to={`/docs${heading.slug}`}
           replace
           key={`${key}-${className}`}
           className={className}
         >
-          {item.title}
+          {heading.title}
         </SidebarNavItem>
         {currentPath && !!subContent.length && (
           <SubContentWrapper key={key}>
             {subContent.map((sh, i) => (
               <SidebarNavSubItem
-                to={`#${sh.content
-                  .split(' ')
-                  .join('-')
-                  .toLowerCase()}`}
-                key={sh.content.split(' ').join('_')}
+                to={`#${sh.slug}`}
+                key={[...heading.slug, ...sh.slug].join('_')}
               >
-                {sh.content}
+                {sh.title}
               </SidebarNavSubItem>
             ))}
           </SubContentWrapper>
@@ -102,7 +102,10 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const { sidebarHeaders, overlay, closeSidebar } = this.props;
+    const { sidebarHeaders, overlay, closeSidebar, tocArray } = this.props;
+
+    console.log(tocArray);
+
     return (
       <SidebarContainer>
         <SideBarSvg />
@@ -121,11 +124,7 @@ class Sidebar extends React.Component {
             />
           </Link>
           <ContentWrapper overlay={overlay}>
-            <SidebarNavItem as="a" href={constants.readme} key={'readme'}>
-              Readme
-            </SidebarNavItem>
-            {sidebarHeaders &&
-              sidebarHeaders.map(sh => this.renderSidebarItem(sh))}
+            {this.renderSidebarItem(tocArray)}
 
             <HorizontalLine />
             <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
