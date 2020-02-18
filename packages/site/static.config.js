@@ -1,12 +1,13 @@
 import { resolve } from 'path';
-import { metaData } from './static-config-parts/constants';
+
+import constants from './src/constants';
 import Document from './src/html';
 
 const docsContentPath = resolve(__dirname, '../../docs/core');
 
 export default {
   plugins: [
-    resolve(__dirname, 'static-config-parts/'),
+    resolve(__dirname, 'plugins/monorepo-fix/'),
 
     [
       resolve(__dirname, 'plugins/source-markdown/'),
@@ -35,7 +36,7 @@ export default {
   devBasePath: '',
 
   getSiteData: () => ({
-    title: metaData.title,
+    title: constants.docsTitle
   }),
 
   getRoutes: async () => [
