@@ -2,10 +2,12 @@ import { mdx } from '@mdx-js/react';
 
 /** Recursively convert an MDX-compatible HAST to JSX */
 export const hastToMdx = (node, assets, i = 0) => {
-  const children =
-    node.children && node.children.length > 0
-      ? node.children.map((node, i) => hastToMdx(node, assets, i))
-      : null;
+  let children = null;
+  if (node.children && node.children.length === 1) {
+    children = hastToMdx(node.children[0], assets);
+  } else if (node.children && node.children.length > 1) {
+    children = node.children.map((node, i) => hastToMdx(node, assets, i));
+  }
 
   switch (node.type) {
     case 'text':

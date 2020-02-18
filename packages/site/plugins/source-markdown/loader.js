@@ -3,9 +3,7 @@ import { getOptions, stringifyRequest } from 'loader-utils';
 import { selectAll } from 'unist-util-select';
 import GithubSlugger from 'github-slugger';
 import toString from 'mdast-util-to-string';
-import raw from 'hast-util-raw';
-import sanitize from 'hast-util-sanitize';
-import toHast from 'mdast-util-to-hast';
+import toHast from '@mdx-js/mdx/mdx-ast-to-mdx-hast';
 import visit from 'unist-util-visit';
 import remove from 'unist-util-remove';
 
@@ -44,7 +42,7 @@ export default function loader(source) {
   });
 
   // Convert from MAST to HAST
-  const hast = sanitize(toHast(tree, { allowDangerousHTML: true }));
+  const hast = toHast()(tree);
 
   // Find all headings and add ids to them
   const slugger = new GithubSlugger();
@@ -65,7 +63,7 @@ export default function loader(source) {
     import { hastToMdx } from ${utils};
 
     var assets = { ${assets.join(',')} };
-    var mdx = hastToMdx(${JSON.stringify(raw(sanitize(hast)))}, assets);
+    var mdx = hastToMdx(${JSON.stringify(hast)}, assets);
 
     export default function MarkdownTemplate(props) {
       return <Template {...props}>{mdx}</Template>;
