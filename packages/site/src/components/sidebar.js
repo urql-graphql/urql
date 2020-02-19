@@ -12,7 +12,7 @@ import {
   SideBarSvg,
 } from './navigation';
 
-import { useMarkdownTree, useMarkdownPage } from '../../plugins/source-markdown/hooks';
+import { useMarkdownTree, useMarkdownPage } from '../../plugins/source-markdown';
 
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';

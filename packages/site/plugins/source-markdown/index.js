@@ -1,3 +1,4 @@
+import { useRouteData } from 'react-static';
 import { mdx } from '@mdx-js/react';
 
 /** Recursively convert an MDX-compatible HAST to JSX */
@@ -32,4 +33,16 @@ export const hastToMdx = (node, assets, i = 0) => {
     default:
       return null;
   }
+};
+
+/** Returns the current page's markdown data */
+export const useMarkdownPage = () => {
+  const { page } = useRouteData();
+  if (!page || !page.frontmatter) return;
+  return page;
+};
+
+/* Returns all page's nested markdown data */
+export const useMarkdownTree = () => {
+  return useRouteData().pages || undefined;
 };

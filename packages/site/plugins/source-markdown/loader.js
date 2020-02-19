@@ -15,7 +15,7 @@ export default function loader(source) {
   // Ensure that the template and utilities are relative paths
   const template = stringifyRequest(this, options.template);
   const location = options.location || process.cwd();
-  const utils = stringifyRequest(this, require.resolve('./browser.utils.js'));
+  const utils = stringifyRequest(this, require.resolve('./index.js'));
 
   // Parse the markdown contents
   const tree = options.processor.parse(source);

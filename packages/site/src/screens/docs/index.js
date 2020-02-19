@@ -15,7 +15,7 @@ import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 import {
   useMarkdownPage,
   useMarkdownTree,
-} from '../../../plugins/source-markdown/hooks';
+} from '../../../plugins/source-markdown';
 
 const Container = styled.div`
   display: flex;

@@ -29,9 +29,12 @@ const staticPluginSourceMarkdown = (opts = {}) => ({
         ? `${path.resolve(location, page.originalPath)}.md`
         : undefined;
       const data = {
-        path: page.path,
-        originalPath: page.originalPath,
-        frontmatter: page.frontmatter,
+        page: {
+          path: page.path,
+          originalPath: page.originalPath,
+          frontmatter: page.frontmatter,
+          headings: page.headings,
+        }
       };
 
       return {
