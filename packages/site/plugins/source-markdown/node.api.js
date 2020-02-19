@@ -6,7 +6,7 @@ import { parse as yaml } from 'yaml';
 import * as path from 'path';
 import remark from 'remark';
 
-import { getPages } from './parseMarkdown';
+import { getPages } from './markdown';
 
 const staticPluginSourceMarkdown = (opts = {}) => ({
   async getRoutes(_, { config }) {
