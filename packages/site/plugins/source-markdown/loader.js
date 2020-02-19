@@ -7,7 +7,7 @@ import toHast from '@mdx-js/mdx/mdx-ast-to-mdx-hast';
 import visit from 'unist-util-visit';
 import remove from 'unist-util-remove';
 
-const MD_FILE_RE = /\.md$/;
+const REMAP_ROUTE_RE = /(?:[/\\]?(?:readme|index))?\.md$/i;
 
 export default function loader(source) {
   const options = getOptions(this);
@@ -23,12 +23,12 @@ export default function loader(source) {
   // Fix up all links that end in `.md`
   visit(tree, 'link', node => {
     try {
-      // Only apply to urls ending in `.md`
-      if (!MD_FILE_RE.test(node.url)) return node;
+      // Only apply to matching URLs
+      if (!REMAP_ROUTE_RE.test(node.url)) return node;
       // Check whether the link's normalised URL is a known markdown file
       if (resolve(this.context, node.url).startsWith(location)) {
         // If so remove the `.md` extension
-        node.url = node.url.replace(MD_FILE_RE, '');
+        node.url = node.url.replace(REMAP_ROUTE_RE, '');
       }
     } catch (_err) {}
 
@@ -54,7 +54,11 @@ export default function loader(source) {
   // Remove empty text lines
   remove(hast, 'text', node => /^[\n\r]+$/.test(node.value));
   // Remove empty paragraphs
-  remove(hast, 'element', node => node.tagName === 'p' && node.children.length === 0);
+  remove(
+    hast,
+    'element',
+    node => node.tagName === 'p' && node.children.length === 0
+  );
 
   return `
     import React from "react";
