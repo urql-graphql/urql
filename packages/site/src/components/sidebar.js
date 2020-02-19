@@ -76,7 +76,8 @@ const relative = (from, to) => {
 const Sidebar = ({ overlay, closeSidebar }) => {
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
-  if (!currentPage || !tree || !tree.children) return;
+
+  if (!currentPage || !tree || !tree.children) return null;
 
   const sidebarItems = useMemo(() => {
     return tree.children.map(page => {

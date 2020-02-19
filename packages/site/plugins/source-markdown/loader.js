@@ -7,18 +7,29 @@ import toHast from '@mdx-js/mdx/mdx-ast-to-mdx-hast';
 import visit from 'unist-util-visit';
 import remove from 'unist-util-remove';
 
+import { getMarkdownProcessor, getPageData } from './markdown';
+
 const REMAP_ROUTE_RE = /(?:[/\\]?(?:readme|index))?\.md$/i;
 
 export default function loader(source) {
   const options = getOptions(this);
 
   // Ensure that the template and utilities are relative paths
-  const template = stringifyRequest(this, options.template);
   const location = options.location || process.cwd();
   const utils = stringifyRequest(this, require.resolve('./index.js'));
+  const processor = getMarkdownProcessor(options.remarkPlugins);
 
   // Parse the markdown contents
-  const tree = options.processor.parse(source);
+  const tree = processor.parse(source);
+  const { frontmatter } = getPageData(tree);
+
+  // Use override template if provided
+  const template = stringifyRequest(
+    this,
+    frontmatter.template
+      ? resolve(this.context, frontmatter.template)
+      : options.defaultTemplate
+  );
 
   // Fix up all links that end in `.md`
   visit(tree, 'link', node => {

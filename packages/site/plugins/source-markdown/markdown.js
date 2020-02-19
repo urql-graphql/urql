@@ -1,9 +1,13 @@
+import remark from 'remark';
+import { parse as yaml } from 'yaml';
+import toString from 'mdast-util-to-string';
+import squeeze from 'remark-squeeze-paragraphs';
+import frontmatter from 'remark-frontmatter';
 import { promisify } from 'util';
 import GithubSlugger from 'github-slugger';
 import nodeGlob from 'glob';
 import { read as readVFile } from 'to-vfile';
 import { select, selectAll } from 'unist-util-select';
-import { parse as yaml } from 'yaml';
 import * as path from 'path';
 
 const glob = promisify(nodeGlob);
@@ -67,8 +71,54 @@ const groupPages = (pages, pathPrefix) => {
   return groupChildrenToArray(rootGroup);
 };
 
-export const getPages = async (processor, location, pathPrefix) => {
+export const getMarkdownProcessor = (plugins = []) => {
+  // By default the remark parsers gets the frontmatter data and removes
+  // extra-long paragraphs
+  const processor = remark()
+    .use(frontmatter, ['yaml'])
+    .use(squeeze);
+
+  // All plugins in opts.remarkPlugins will be added to remark
+  plugins.forEach(plugin => {
+    if (Array.isArray(plugin) && plugin.length > 1) {
+      fn.use(plugin[0], plugin[1]);
+    } else {
+      fn.use(plugin);
+    }
+  });
+
+  return processor;
+};
+
+export const getPageData = tree => {
   const slugger = new GithubSlugger();
+
+  // Parse the frontmatter yaml data to JSON
+  const yamlNode = select('yaml', tree);
+  const frontmatter = yaml((yamlNode && yamlNode.value) || '') || {};
+
+  // Find all headings and convert them to a reusable format
+  const headings = selectAll('heading', tree)
+    .filter(node => node.depth <= 3)
+    .map(node => {
+      const depth = node.depth;
+      const value = (depth === 1 && frontmatter.title) || toString(node);
+      const slug = slugger.slug(value);
+      return { value, slug, depth };
+    });
+
+  // Add fallback for Frontmatter title to first h1 heading
+  const h1Node = headings.find(x => x.depth === 1);
+  frontmatter.title =
+    frontmatter.title ||
+    (h1Node && h1Node.value) ||
+    formatNameToTitle(filename);
+
+  return { frontmatter, headings };
+};
+
+export const getPages = async (location, remarkPlugins, pathPrefix) => {
+  const processor = getMarkdownProcessor(remarkPlugins);
 
   // Find all markdown files in the given location
   const mds = (await glob('**/*.md', { cwd: location })).map(x =>
@@ -86,27 +136,7 @@ export const getPages = async (processor, location, pathPrefix) => {
       // Parse the given markdown file into MAST
       const vfile = await readVFile(originalPath);
       const tree = processor.parse(vfile);
-
-      // Parse the frontmatter yaml data to JSON
-      const yamlNode = select('yaml', tree);
-      const frontmatter = yaml((yamlNode && yamlNode.value) || '') || {};
-
-      // Find all headings and convert them to a reusable format
-      const headings = selectAll('heading', tree)
-        .filter(node => node.depth <= 3)
-        .map(node => {
-          const depth = node.depth;
-          const value = (depth === 1 && frontmatter.title) || toString(node);
-          const slug = slugger.slug(value);
-          return { value, slug, depth };
-        });
-
-      // Add fallback for Frontmatter title to first h1 heading
-      const h1Node = headings.find(x => x.depth === 1);
-      frontmatter.title =
-        frontmatter.title ||
-        (h1Node && h1Node.value) ||
-        formatNameToTitle(filename);
+      const { frontmatter, headings } = getPageData(tree);
 
       return {
         originalPath: path.join(dirname, filename),
