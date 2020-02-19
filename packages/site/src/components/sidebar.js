@@ -66,20 +66,14 @@ const HorizontalLine = styled.hr`
   margin: 1rem 0;
 `;
 
-// override the heading slug with the page path
-const getTocArray = pages =>
-  pages.map(p => p.headings.map(heading => ({ ...heading, slug: p.path })));
-
 const renderSidebarItem = (item, isCurrentPath) => {
-  // const headings = item.pages.find(page => page.depth === 1);
-  // const subContent = tocArray.filter(toc => toc.depth === 2);
   const className = isCurrentPath ? 'is-current' : '';
   return (
-    <Fragment key={`${item.section}-group`}>
-      <SidebarNavItem to={`/${item.section}`} replace className={className}>
-        {item.section}
+    <Fragment key={`${item.key}-group`}>
+      <SidebarNavItem to={`/${item.key}`} replace className={className}>
+        {item.frontmatter.title}
       </SidebarNavItem>
-      {item.pages.map(p => (
+      {item.children.map(p => (
         <SidebarNavSubItem to={`/${p.path}`} key={p.frontmatter.title}>
           {p.frontmatter.title}
         </SidebarNavSubItem>
@@ -101,18 +95,6 @@ const renderSidebarItem = (item, isCurrentPath) => {
   );
 };
 
-/*
-      <SidebarNavItem
-        to={heading.slug}
-        replace
-        key={`${heading.slug}-${className}`}
-        className={className}
-      >
-        {heading.value}
-      </SidebarNavItem>
-
-*/
-
 const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
   const tree = useMarkdownTree();
 
@@ -130,11 +112,10 @@ const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
           <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
         </Link>
         <ContentWrapper overlay={overlay}>
-          {tree &&
-            tree.map(t =>
-              renderSidebarItem(t, t.section === location.pathname)
+          {tree.children &&
+            tree.children.map(child =>
+              renderSidebarItem(child, child.section === location.pathname)
             )}
-
           <HorizontalLine />
           <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
             Issues

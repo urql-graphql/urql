@@ -1,8 +1,8 @@
 ---
-title: test
+title: Core
 order: 0
 ---
 
-# Test index page
+# Test Core Index Page
 
 testing
