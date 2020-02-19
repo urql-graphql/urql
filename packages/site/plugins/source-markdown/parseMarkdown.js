@@ -26,10 +26,11 @@ const makeGroup = groupName => ({
 });
 
 const groupPages = (pages, pathPrefix) => {
-  const rootGroup = makeGroup(pathPrefix || '');
+  const rootGroup = makeGroup(pathPrefix || '/');
 
   for (let i = 0, l = pages.length; i < l; i++) {
     const page = pages[i];
+    const keyPath = pathPrefix ? [pathPrefix] : [];
     const groupPath = page.originalPath.split(path.sep);
 
     let group = rootGroup;
@@ -37,6 +38,7 @@ const groupPages = (pages, pathPrefix) => {
       const childGroupName = path.basename(groupPath.shift(), '.md');
       const isIndexPage = INDEX_PAGE_RE.test(childGroupName);
       if (!isIndexPage) {
+        keyPath.push(childGroupName);
         group =
           group.children[childGroupName] ||
           (group.children[childGroupName] = makeGroup(childGroupName));
@@ -44,7 +46,7 @@ const groupPages = (pages, pathPrefix) => {
     }
 
     group.originalPath = page.originalPath;
-    group.path = page.path;
+    group.path = keyPath.join('/');
     group.headings = page.headings;
     group.frontmatter = page.frontmatter;
   }
@@ -59,7 +61,7 @@ const groupPages = (pages, pathPrefix) => {
   return groupChildrenToArray(rootGroup);
 };
 
-export const getPages = async (processor, location, pathPrefix = '') => {
+export const getPages = async (processor, location, pathPrefix) => {
   const slugger = new GithubSlugger();
 
   // Find all markdown files in the given location
@@ -74,7 +76,6 @@ export const getPages = async (processor, location, pathPrefix = '') => {
       const relative = path.relative(location, originalPath);
       const filename = path.basename(relative, '.md');
       const dirname = path.dirname(relative);
-      const newPath = path.join(pathPrefix, dirname, filename);
 
       // Parse the given markdown file into MAST
       const vfile = await readVFile(originalPath);
@@ -95,11 +96,12 @@ export const getPages = async (processor, location, pathPrefix = '') => {
       // Add fallback for Frontmatter title to first h1 heading
       const h1Node = headings.find(x => x.depth === 1);
       frontmatter.title =
-        frontmatter.title || (h1Node && h1Node.value) || newPath;
+        frontmatter.title ||
+        (h1Node && h1Node.value) ||
+        formatNameToTitle(filename);
 
       return {
         originalPath: path.join(dirname, filename),
-        path: newPath,
         headings,
         frontmatter,
       };
