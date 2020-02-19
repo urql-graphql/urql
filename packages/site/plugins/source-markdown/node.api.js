@@ -6,7 +6,7 @@ import { parse as yaml } from 'yaml';
 import * as path from 'path';
 import remark from 'remark';
 
-import { getPages, groupPages } from './parseMarkdown';
+import { getPages } from './parseMarkdown';
 
 const staticPluginSourceMarkdown = (opts = {}) => ({
   async getRoutes(_, { config }) {
@@ -14,24 +14,36 @@ const staticPluginSourceMarkdown = (opts = {}) => ({
     const location = path.resolve(config.paths.ROOT, opts.location);
 
     // Get page data for each discovered markdown file
-    const markdownPages = await getPages(
+    const pages = await getPages(
       getMarkdownProcessor(opts.remarkPlugins),
       location,
       opts.pathPrefix
     );
 
     // Share data, since all pages will be displayed e.g. in the sidebar
-    const groupedPages = createSharedData(groupPages(markdownPages));
+    const sharedData = { pages: createSharedData(pages) };
 
-    // Create react-static routes for each page
-    return markdownPages.map(page => ({
-      path: page.path,
-      // The markdown file becomes the "template" which the Webpack loader
-      // below picks up
-      template: `${path.resolve(location, page.originalPath)}.md`,
-      sharedData: { pages: groupedPages },
-      getData: () => ({ ...page, headings: undefined }),
-    }));
+    // Convert the page tree into the react-static route structure
+    const groupToPage = page => {
+      const file = page.originalPath
+        ? `${path.resolve(location, page.originalPath)}.md`
+        : undefined;
+      const data = {
+        originalPath: page.originalPath,
+        frontmatter: page.frontmatter,
+      };
+
+      return {
+        path: page.key || '/',
+        template: file,
+        sharedData,
+        getData: page.path ? () => data : undefined,
+        children:
+          page.children.length > 0 ? page.children.map(groupToPage) : undefined,
+      };
+    };
+
+    return [groupToPage(pages)];
   },
   afterGetConfig({ config }) {
     // Register `md` files as a valid extension with react-static

@@ -7,34 +7,68 @@ import { parse as yaml } from 'yaml';
 import * as path from 'path';
 
 const glob = promisify(nodeGlob);
+const INDEX_PAGE_RE = /^(readme|index)$/i;
 
-export const groupPages = pages =>
-  pages.reduce((acc, page) => {
-    const sectionIndex = acc.findIndex(a => a.section === page.section);
-    if (sectionIndex === -1) {
-      return [
-        ...acc,
-        {
-          section: page.section,
-          pages: [page],
-        },
-      ];
+const formatNameToTitle = title => {
+  return title
+    .split(/[\s-_]+/)
+    .map(x => x.replace(/^\w/, y => y.toUpperCase()))
+    .join(' ');
+};
+
+const makeGroup = groupName => ({
+  key: groupName,
+  children: {},
+  frontmatter: {
+    title: formatNameToTitle(groupName),
+    order: -1,
+  },
+});
+
+const groupPages = (pages, pathPrefix) => {
+  const rootGroup = makeGroup(pathPrefix || '');
+
+  for (let i = 0, l = pages.length; i < l; i++) {
+    const page = pages[i];
+    const groupPath = page.originalPath.split(path.sep);
+
+    let group = rootGroup;
+    while (groupPath.length > 0) {
+      const childGroupName = path.basename(groupPath.shift(), '.md');
+      const isIndexPage = INDEX_PAGE_RE.test(childGroupName);
+      if (!isIndexPage) {
+        group =
+          group.children[childGroupName] ||
+          (group.children[childGroupName] = makeGroup(childGroupName));
+      }
     }
 
-    acc[sectionIndex].pages = [...acc[sectionIndex].pages, page];
-    return acc;
-  }, []);
+    group.originalPath = page.originalPath;
+    group.path = page.path;
+    group.headings = page.headings;
+    group.frontmatter = page.frontmatter;
+  }
+
+  const groupChildrenToArray = group => {
+    const children = Object.values(group.children)
+      .map(groupChildrenToArray)
+      .sort((a, b) => a.frontmatter.order - b.frontmatter.order);
+    return { ...group, children };
+  };
+
+  return groupChildrenToArray(rootGroup);
+};
 
 export const getPages = async (processor, location, pathPrefix = '') => {
   const slugger = new GithubSlugger();
 
   // Find all markdown files in the given location
   const mds = (await glob('**/*.md', { cwd: location })).map(x =>
-    path.resolve(location, x)
+    path.normalize(path.resolve(location, x))
   );
 
   // Map each markdown to its page data
-  return Promise.all(
+  const pages = await Promise.all(
     mds.map(async originalPath => {
       // Reproduce the current markdown file's route path
       const relative = path.relative(location, originalPath);
@@ -47,7 +81,8 @@ export const getPages = async (processor, location, pathPrefix = '') => {
       const tree = processor.parse(vfile);
 
       // Parse the frontmatter yaml data to JSON
-      const frontmatter = yaml(select('yaml', tree)?.value || '') || {};
+      const yamlNode = select('yaml', tree);
+      const frontmatter = yaml((yamlNode && yamlNode.value) || '') || {};
 
       // Find all headings and convert them to a reusable format
       const headings = selectAll('heading', tree).map(node => {
@@ -58,13 +93,11 @@ export const getPages = async (processor, location, pathPrefix = '') => {
       });
 
       // Add fallback for Frontmatter title to first h1 heading
+      const h1Node = headings.find(x => x.depth === 1);
       frontmatter.title =
-        frontmatter.title ||
-        headings.find(x => x.depth === 1)?.value ||
-        newPath;
+        frontmatter.title || (h1Node && h1Node.value) || newPath;
 
       return {
-        section: dirname,
         originalPath: path.join(dirname, filename),
         path: newPath,
         headings,
@@ -72,4 +105,6 @@ export const getPages = async (processor, location, pathPrefix = '') => {
       };
     })
   );
+
+  return groupPages(pages, pathPrefix);
 };
