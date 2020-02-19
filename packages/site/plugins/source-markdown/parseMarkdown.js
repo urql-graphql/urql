@@ -92,12 +92,14 @@ export const getPages = async (processor, location, pathPrefix) => {
       const frontmatter = yaml((yamlNode && yamlNode.value) || '') || {};
 
       // Find all headings and convert them to a reusable format
-      const headings = selectAll('heading', tree).map(node => {
-        const depth = node.depth;
-        const value = (depth === 1 && frontmatter.title) || toString(node);
-        const slug = slugger.slug(value);
-        return { value, slug, depth };
-      });
+      const headings = selectAll('heading', tree)
+        .filter(node => node.depth <= 3)
+        .map(node => {
+          const depth = node.depth;
+          const value = (depth === 1 && frontmatter.title) || toString(node);
+          const slug = slugger.slug(value);
+          return { value, slug, depth };
+        });
 
       // Add fallback for Frontmatter title to first h1 heading
       const h1Node = headings.find(x => x.depth === 1);
