@@ -1,13 +1,16 @@
 import { useRouteData } from 'react-static';
 
 export const useMarkdownPage = () => {
-  const currentPageData = useRouteData();
+  const pageData = useRouteData();
+  if (!pageData.frontmatter) return;
 
   return {
-    ...currentPageData,
-    pages: undefined,
+    path: pageData.path,
+    originalPath: pageData.originalPath,
+    frontmatter: pageData.frontmatter,
   };
 };
+
 export const useMarkdownTree = () => {
   return useRouteData().pages;
 };

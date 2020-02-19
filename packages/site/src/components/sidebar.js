@@ -1,7 +1,8 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import * as path from 'path';
 
 import {
   SidebarNavItem,
@@ -11,7 +12,7 @@ import {
   SideBarSvg,
 } from './navigation';
 
-import { useMarkdownTree } from '../../plugins/source-markdown/hooks';
+import { useMarkdownTree, useMarkdownPage } from '../../plugins/source-markdown/hooks';
 
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
@@ -66,37 +67,37 @@ const HorizontalLine = styled.hr`
   margin: 1rem 0;
 `;
 
-const renderSidebarItem = (item, isCurrentPath) => {
-  const className = isCurrentPath ? 'is-current' : '';
-  return (
-    <Fragment key={`${item.key}-group`}>
-      <SidebarNavItem to={`/${item.key}`} replace className={className}>
-        {item.frontmatter.title}
-      </SidebarNavItem>
-      {item.children.map(p => (
-        <SidebarNavSubItem to={`/${p.path}`} key={p.frontmatter.title}>
-          {p.frontmatter.title}
-        </SidebarNavSubItem>
-      ))}
-
-      {isCurrentPath && !!subContent.length && (
-        <SubContentWrapper key={heading.slug}>
-          {subContent.map((sh, i) => (
-            <SidebarNavSubItem
-              to={`#${sh.slug}`}
-              key={[...heading.slug, ...sh.slug].join('_')}
-            >
-              {sh.value}
-            </SidebarNavSubItem>
-          ))}
-        </SubContentWrapper>
-      )}
-    </Fragment>
-  );
+const relative = (from, to) => {
+  if (!from || !to) return null;
+  const pathname = path.relative(path.dirname(from), to);
+  return { pathname };
 };
 
-const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
+const Sidebar = ({ overlay, closeSidebar }) => {
+  const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
+  if (!currentPage || !tree || !tree.children) return;
+
+  const sidebarItems = useMemo(() => {
+    return tree.children.map(page => {
+      return (
+        <Fragment key={page.key}>
+          <SidebarNavItem to={relative(currentPage.path, page.path)}>
+            {page.frontmatter.title}
+          </SidebarNavItem>
+
+          {page.children && page.children.map(childPage => (
+            <SidebarNavSubItem
+              to={relative(currentPage.path, childPage.path)}
+              key={childPage.key}
+            >
+              {childPage.frontmatter.title}
+            </SidebarNavSubItem>
+          ))}
+        </Fragment>
+      );
+    });
+  }, [tree, currentPage]);
 
   return (
     <SidebarContainer>
@@ -112,10 +113,7 @@ const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
           <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
         </Link>
         <ContentWrapper overlay={overlay}>
-          {tree.children &&
-            tree.children.map(child =>
-              renderSidebarItem(child, child.section === location.pathname)
-            )}
+          {sidebarItems}
           <HorizontalLine />
           <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
             Issues
@@ -131,9 +129,7 @@ const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
 
 Sidebar.propTypes = {
   closeSidebar: PropTypes.func,
-  location: PropTypes.object,
   overlay: PropTypes.bool,
-  sidebarHeaders: PropTypes.array,
 };
 
 export default Sidebar;
