@@ -12,7 +12,8 @@ const staticPluginSourceMarkdown = (opts = {}) => ({
     const pages = await getPages(
       location,
       opts.remarkPlugins,
-      opts.pathPrefix
+      opts.pathPrefix,
+      opts.order
     );
 
     // Share data, since all pages will be displayed e.g. in the sidebar

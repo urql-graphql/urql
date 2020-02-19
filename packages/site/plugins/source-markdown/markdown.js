@@ -20,16 +20,16 @@ const formatNameToTitle = title => {
     .join(' ');
 };
 
-const makeGroup = groupName => ({
+const makeGroup = (groupName, order) => ({
   key: groupName,
   children: {},
   frontmatter: {
     title: formatNameToTitle(groupName),
-    order: undefined,
+    order,
   },
 });
 
-const groupPages = (pages, pathPrefix) => {
+const groupPages = (pages, pathPrefix, orderOverride = {}) => {
   const rootGroup = makeGroup(pathPrefix || '/');
 
   for (let i = 0, l = pages.length; i < l; i++) {
@@ -38,21 +38,31 @@ const groupPages = (pages, pathPrefix) => {
     const groupPath = page.originalPath.split(path.sep);
 
     let group = rootGroup;
+    let order = orderOverride;
     while (groupPath.length > 0) {
       const childGroupName = path.basename(groupPath.shift(), '.md');
       const isIndexPage = INDEX_PAGE_RE.test(childGroupName);
       if (!isIndexPage) {
         keyPath.push(childGroupName);
+        order = typeof order === 'object' &&
+          order[childGroupName];
         group =
           group.children[childGroupName] ||
-          (group.children[childGroupName] = makeGroup(childGroupName));
+          (group.children[childGroupName] = makeGroup(childGroupName, order));
       }
     }
 
     group.originalPath = page.originalPath;
     group.path = keyPath.join('/');
     group.headings = page.headings;
-    group.frontmatter = page.frontmatter;
+
+    group.frontmatter = {
+      ...group.frontmatter,
+      ...page.frontmatter,
+      order: typeof group.frontmatter.order === 'number'
+        ? group.frontmatter.order
+        : page.frontmatter.order
+    };
   }
 
   const groupChildrenToArray = group => {
@@ -117,7 +127,7 @@ export const getPageData = tree => {
   return { frontmatter, headings };
 };
 
-export const getPages = async (location, remarkPlugins, pathPrefix) => {
+export const getPages = async (location, remarkPlugins, pathPrefix, order) => {
   const processor = getMarkdownProcessor(remarkPlugins);
 
   // Find all markdown files in the given location
@@ -146,5 +156,5 @@ export const getPages = async (location, remarkPlugins, pathPrefix) => {
     })
   );
 
-  return groupPages(pages, pathPrefix);
+  return groupPages(pages, pathPrefix, order);
 };

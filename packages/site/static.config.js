@@ -14,6 +14,10 @@ export default {
       {
         location: docsContentPath,
         template: './src/screens/docs',
+        order: {
+          core: 0,
+          graphcache: 1,
+        }
       },
     ],
 
