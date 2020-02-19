@@ -1,22 +1,12 @@
-import {
-  pipe,
-  share,
-  filter,
-  map,
-  fromPromise,
-  mergeMap,
-  merge,
-  tap,
-} from 'wonka';
+import { pipe, share, filter, map, fromPromise, mergeMap, merge } from 'wonka';
 import { Exchange } from '../types';
 import {
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
   execute,
-  print,
 } from 'graphql';
-import { CombinedError, makeResult, makeErrorResult } from '../utils';
+import { makeResult, makeErrorResult } from '../utils';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;

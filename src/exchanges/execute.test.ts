@@ -2,19 +2,10 @@ jest.mock('graphql');
 
 import { executeExchange } from './execute';
 import { execute, print } from 'graphql';
-import {
-  pipe,
-  fromValue,
-  toArray,
-  toPromise,
-  tap,
-  take,
-  fromArray,
-  makeSubject,
-} from 'wonka';
+import { pipe, fromValue, toPromise, take, makeSubject } from 'wonka';
 import { mocked } from 'ts-jest/utils';
 import { queryOperation } from '../test-utils';
-import { makeErrorResult, makeResult } from '../utils';
+import { makeErrorResult } from '../utils';
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {
