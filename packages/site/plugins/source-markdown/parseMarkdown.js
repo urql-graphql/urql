@@ -21,7 +21,7 @@ const makeGroup = groupName => ({
   children: {},
   frontmatter: {
     title: formatNameToTitle(groupName),
-    order: -1,
+    order: undefined,
   },
 });
 
@@ -52,9 +52,15 @@ const groupPages = (pages, pathPrefix) => {
   }
 
   const groupChildrenToArray = group => {
-    const children = Object.values(group.children)
-      .map(groupChildrenToArray)
-      .sort((a, b) => a.frontmatter.order - b.frontmatter.order);
+    const children = Object.values(group.children).map(groupChildrenToArray);
+
+    children.sort((a, b) => {
+      const { title: titleA, order: orderA = children.length } = a.frontmatter;
+      const { title: titleB, order: orderB = children.length } = b.frontmatter;
+      const order = orderA - orderB;
+      return order || titleA.localeCompare(titleB);
+    });
+
     return { ...group, children };
   };
 
