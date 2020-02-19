@@ -73,21 +73,14 @@ const getTocArray = pages =>
 const renderSidebarItem = (item, isCurrentPath) => {
   // const headings = item.pages.find(page => page.depth === 1);
   // const subContent = tocArray.filter(toc => toc.depth === 2);
-
-  console.log(item);
   const className = isCurrentPath ? 'is-current' : '';
   return (
-    <Fragment key={`${item.value}-group`}>
-      <SidebarNavItem
-        /* path relative to current */
-        replace
-        key={`${item.section}-${className}`}
-        className={className}
-      >
+    <Fragment key={`${item.section}-group`}>
+      <SidebarNavItem to={`/${item.section}`} replace className={className}>
         {item.section}
       </SidebarNavItem>
       {item.pages.map(p => (
-        <SidebarNavSubItem key={p.frontmatter.title}>
+        <SidebarNavSubItem to={`/${p.path}`} key={p.frontmatter.title}>
           {p.frontmatter.title}
         </SidebarNavSubItem>
       ))}
@@ -120,16 +113,8 @@ const renderSidebarItem = (item, isCurrentPath) => {
 
 */
 
-const Sidebar = ({
-  sidebarHeaders,
-  overlay,
-  closeSidebar,
-  tocArray,
-  location,
-}) => {
+const Sidebar = ({ sidebarHeaders, overlay, closeSidebar, location }) => {
   const tree = useMarkdownTree();
-
-  console.log(tree);
 
   return (
     <SidebarContainer>
@@ -168,7 +153,6 @@ Sidebar.propTypes = {
   location: PropTypes.object,
   overlay: PropTypes.bool,
   sidebarHeaders: PropTypes.array,
-  tocArray: PropTypes.array,
 };
 
 export default Sidebar;

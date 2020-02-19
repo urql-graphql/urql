@@ -1,3 +1,8 @@
+---
+title: architecture
+order: 1
+---
+
 # Architecture
 
 This cache implementation builds on the concept of normalisation,

@@ -1,3 +1,8 @@
+---
+title: Optimistic
+order: 3
+---
+
 # Optimistic
 
 Let's say we want to work offline or we don't want to wait for
