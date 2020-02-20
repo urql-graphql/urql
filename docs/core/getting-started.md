@@ -3,8 +3,6 @@ title: Getting Started
 order: 0
 ---
 
-<a name="getting-started"></a>
-
 # Getting Started
 
 ## Installation

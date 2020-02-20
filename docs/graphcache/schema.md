@@ -1,3 +1,8 @@
+---
+title: Schema
+order: 6
+---
+
 # Schema
 
 As mentioned in the docs we allow for the schema to be passed

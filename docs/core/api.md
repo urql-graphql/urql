@@ -3,8 +3,6 @@ title: API
 order: 6
 ---
 
-<a name="api"></a>
-
 # API
 
 ## React components and hooks

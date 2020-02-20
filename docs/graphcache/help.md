@@ -1,3 +1,8 @@
+---
+title: Help
+order: 2
+---
+
 # Help!
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**

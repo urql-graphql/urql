@@ -1,3 +1,8 @@
+---
+title: Populate Exchange
+order: 4
+---
+
 # Populate Exchange
 
 `populate` is an exchange for auto-populating fields in your mutations.
@@ -29,7 +34,7 @@ Consider the following queries which have been requested in other parts of your 
     id
     name
   }
-} 
+}
 
 # Query 2
 {
@@ -89,7 +94,7 @@ If you find yourself using multiple queries with variables, it may be necessary 
     id
     name
   }
-} 
+}
 
 # Query 2
 {
@@ -108,7 +113,7 @@ If you find yourself using multiple queries with variables, it may be necessary 
     id
     name
   }
-} 
+}
 
 # Query 2
 {

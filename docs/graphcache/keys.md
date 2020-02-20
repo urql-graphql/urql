@@ -1,3 +1,8 @@
+---
+title: Keys
+order: 3
+---
+
 # Keys
 
 When resolving entities the graph cache will try to look at the entity

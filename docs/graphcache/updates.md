@@ -1,3 +1,8 @@
+---
+title: Updates
+order: 7
+---
+
 # Updates
 
 When the cache receives a response it will try and do its best to
