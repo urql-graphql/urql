@@ -12,11 +12,6 @@ import Header from './header';
 import burger from '../../assets/burger.svg';
 import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 
-import {
-  useMarkdownPage,
-  useMarkdownTree,
-} from '../../../plugins/source-markdown';
-
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -110,7 +105,6 @@ const SideBarWithRef = forwardRef((props, ref) => {
 const Docs = props => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const sidebarRef = useRef(null);
-  const tree = useMarkdownTree();
 
   return (
     <Container

@@ -1,18 +1,14 @@
 import { resolve } from 'path';
-
 import constants from './src/constants';
-import Document from './src/html';
-
-const docsContentPath = resolve(__dirname, '../../docs');
 
 export default {
   plugins: [
     resolve(__dirname, 'plugins/monorepo-fix/'),
 
     [
-      resolve(__dirname, 'plugins/source-markdown/'),
+      'react-static-plugin-md-pages',
       {
-        location: docsContentPath,
+        location: '../../docs',
         template: './src/screens/docs',
         order: {
           core: 0,

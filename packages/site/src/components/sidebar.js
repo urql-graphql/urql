@@ -5,14 +5,17 @@ import { Link } from 'react-router-dom';
 import * as path from 'path';
 
 import {
+  useMarkdownTree,
+  useMarkdownPage
+} from 'react-static-plugin-md-pages';
+
+import {
   SidebarNavItem,
   SidebarNavSubItem,
   SidebarContainer,
   SidebarWrapper,
   SideBarSvg,
 } from './navigation';
-
-import { useMarkdownTree, useMarkdownPage } from '../../plugins/source-markdown';
 
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
