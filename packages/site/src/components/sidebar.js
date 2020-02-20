@@ -1,7 +1,6 @@
-import React, { Fragment, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment, useMemo } from 'react';
+import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
 import * as path from 'path';
 
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -14,8 +13,6 @@ import {
   SidebarWrapper,
   SideBarStripes,
 } from './navigation';
-
-import { mediaSizes } from '../styles/theme';
 
 import logoSidebar from '../assets/sidebar-badge.svg';
 
@@ -41,11 +38,13 @@ const ContentWrapper = styled.div`
 
 const relative = (from, to) => {
   if (!from || !to) return null;
-  const pathname = path.relative(path.dirname(from), to);
+  let pathname = path.relative(path.dirname(from), to);
+  if (from.endsWith('/')) pathname = '../' + pathname;
   return { pathname };
 };
 
 const Sidebar = ({ sidebarOpen }) => {
+  const { pathname } = useLocation();
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
 
@@ -57,7 +56,7 @@ const Sidebar = ({ sidebarOpen }) => {
     return tree.children.map(page => {
       return (
         <Fragment key={page.key}>
-          <SidebarNavItem to={relative(currentPage.path, page.path)}>
+          <SidebarNavItem to={relative(pathname, page.path)}>
             {page.frontmatter.title}
           </SidebarNavItem>
 
@@ -65,7 +64,7 @@ const Sidebar = ({ sidebarOpen }) => {
             <SidebarNavSubItemWrapper>
               {page.children.map(childPage => (
                 <SidebarNavSubItem
-                  to={relative(currentPage.path, childPage.path)}
+                  to={relative(pathname, childPage.path)}
                   key={childPage.key}
                 >
                   {childPage.frontmatter.title}
