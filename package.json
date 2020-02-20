@@ -72,7 +72,7 @@
     "urql": "^1.6.1"
   },
   "dependencies": {
-    "react-ssr-prepass": "^1.1.0"
+    "react-ssr-prepass": "^1.1.2"
   },
   "peerDependencies": {
     "isomorphic-unfetch": "^3.0.0",
