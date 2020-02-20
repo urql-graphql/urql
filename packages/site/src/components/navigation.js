@@ -18,7 +18,11 @@ export const Navigation = styled.div`
 `;
 
 export const SidebarContainer = styled.div`
-  width: ${p => p.theme.layout.sidebar};
+  display: none;
+  @media ${({ theme }) => theme.media.sm} {
+    display: block;
+    width: ${p => p.theme.layout.sidebar};
+  }
 `;
 
 export const SideBarStripes = styled.div`

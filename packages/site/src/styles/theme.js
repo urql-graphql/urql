@@ -30,7 +30,8 @@ export const layout = {
   header: '4.8rem',
   stripes: '0.9rem',
   sidebar: '28rem',
-  legend: '24rem',
+  legend: '100%',
+  legendMaxWidth: '25rem',
   logo: '12rem',
 };
 
@@ -66,7 +67,7 @@ export const shadows = {
 };
 
 export const media = {
-  sm: '(min-width: 650px)',
+  sm: '(min-width: 700px)',
   md: '(min-width: 960px)',
   lg: '(min-width: 1200px)',
 };
