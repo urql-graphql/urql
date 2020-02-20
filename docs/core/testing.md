@@ -69,15 +69,11 @@ it('triggers a mutation', () => {
     name: 'Carla',
   };
 
-  wrapper
-    .find('input')
-    .simulate('change', { currentTarget: { value: variables.name } });
+  wrapper.find('input').simulate('change', { currentTarget: { value: variables.name } });
   wrapper.find('button').simulate('click');
 
   expect(mockClient.executeMutation).toBeCalledTimes(1);
-  expect(mockClient.executeMutation).toBeCalledWith(
-    expect.objectContaining({ variables })
-  );
+  expect(mockClient.executeMutation).toBeCalledWith(expect.objectContaining({ variables }));
 });
 ```
 
