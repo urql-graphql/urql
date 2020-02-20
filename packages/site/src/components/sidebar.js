@@ -35,7 +35,8 @@ const HeroLogo = styled.img.attrs(() => ({
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: ${p => p.theme.spacing.xs} 0;
+  padding-top: ${p => p.theme.spacing.xs};
+  padding-bottom: ${p => p.theme.spacing.lg};
 `;
 
 const relative = (from, to) => {
@@ -60,7 +61,7 @@ const Sidebar = ({ sidebarOpen }) => {
             {page.frontmatter.title}
           </SidebarNavItem>
 
-          {page.children && (
+          {page.children && page.children.length ? (
             <SidebarNavSubItemWrapper>
               {page.children.map(childPage => (
                 <SidebarNavSubItem
@@ -71,7 +72,7 @@ const Sidebar = ({ sidebarOpen }) => {
                 </SidebarNavSubItem>
               ))}
             </SidebarNavSubItemWrapper>
-          )}
+          ) : null}
         </Fragment>
       );
     });

@@ -19,10 +19,16 @@ export const SideBarStripes = styled.div`
   position: fixed;
   left: 0;
   top: 0;
+  bottom: 0;
 `;
 
 export const SidebarWrapper = styled.aside`
   position: fixed;
+  bottom: 0;
+  top: ${p => p.theme.layout.header};
+  -webkit-overflow-scrolling: touch;
+  overflow-y: scroll;
+
   display: flex;
   flex-direction: column;
   z-index: 1;
@@ -34,6 +40,7 @@ export const SidebarWrapper = styled.aside`
   background: ${p => p.theme.colors.bg};
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
+
   @media ${({ theme }) => theme.media.sm} {
     width: ${p => p.theme.layout.sidebar};
   }
@@ -41,7 +48,7 @@ export const SidebarWrapper = styled.aside`
 
 export const SidebarNavItem = styled(Link)`
   display: block;
-  margin-bottom: ${p => p.theme.spacing.xs};
+  margin: ${p => p.theme.spacing.xs} 0;
   color: ${p => p.theme.colors.accent};
   font-weight: ${p => p.theme.fontWeights.heading};
   text-decoration: none;
@@ -50,8 +57,8 @@ export const SidebarNavItem = styled(Link)`
 
 export const SidebarNavSubItemWrapper = styled.div`
   padding-left: ${p => p.theme.spacing.sm};
-  margin-bottom: ${p => p.theme.spacing.sm};
   border-left: 1px solid ${p => p.theme.colors.activeBorder};
+  margin-bottom: ${p => p.theme.spacing.xs};
 `;
 
 export const SidebarNavSubItem = styled(Link)`
