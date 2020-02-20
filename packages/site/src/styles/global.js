@@ -21,43 +21,48 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   html {
-    background: ${({ theme }) => theme.color.black};
     box-sizing: border-box;
     font-size: 62.5%;
     overflow-x: hidden;
   }
 
   body {
-    background: ${({ theme }) => theme.color.white};
-    color: ${({ theme }) => theme.color.darkGray};
+    background: ${p => p.theme.colors.passiveBg};
+    color: ${p => p.theme.colors.text};
+    font-family: ${p => p.theme.fonts.body};
+    font-size: ${p => p.theme.fontSizes.body};
+    line-height: ${p => p.theme.lineHeights.body};
+    font-weight: ${p => p.theme.fontWeights.body};
     text-rendering: optimizeLegibility;
-    font-family: ${systemFonts.join(', ')};
-    font-size: 1.8rem;
-    font-weight: 400;
-    line-height: 1.5;
     margin: 0;
     padding: 0;
   }
 
+  a {
+    color: ${p => p.theme.colors.accent};
+  }
+
   p, h1, h2, h3 {
-    margin: 0 0 2.7rem 0;
+    margin: 0 0 ${p => p.theme.spacing.md} 0;
   }
 
   h1, h2, h3 {
-    font-weight: 500;
-    line-height: 1.1;
+    font-family: ${p => p.theme.fonts.heading};
+    font-weight: ${p => p.theme.fontWeights.heading};
+    line-height: ${p => p.theme.lineHeights.heading};
+    color: ${p => p.theme.colors.heading};
   }
 
   h1 {
-    font-size: 2.556em;
+    font-size: ${p => p.theme.fontSizes.h1};
   }
 
   h2 {
-    font-size: 1.755em;
+    font-size: ${p => p.theme.fontSizes.h2};
   }
 
   h3 {
-    font-size: 1.455em;
+    font-size: ${p => p.theme.fontSizes.h3};
   }
 
   img {

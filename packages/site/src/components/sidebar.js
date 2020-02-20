@@ -9,6 +9,7 @@ import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
 import {
   SidebarNavItem,
   SidebarNavSubItem,
+  SidebarNavSubItemWrapper,
   SidebarContainer,
   SidebarWrapper,
   SideBarSvg,
@@ -32,17 +33,10 @@ const HeroLogo = styled.img`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 3rem 0rem 0rem 2.5rem;
   height: auto;
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? '' : 'none')};
   }
-`;
-
-const SubContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
 `;
 
 const CloseButton = styled.img`
@@ -56,15 +50,6 @@ const CloseButton = styled.img`
     display: ${props => (props.overlay ? 'block' : 'none')};
     right: 1rem;
   }
-`;
-
-const HorizontalLine = styled.hr`
-  width: 100%;
-  height: 2px;
-  background-color: #2e2e2e;
-  opacity: 0.1;
-  border: none;
-  margin: 1rem 0;
 `;
 
 const relative = (from, to) => {
@@ -89,15 +74,18 @@ const Sidebar = ({ overlay, closeSidebar }) => {
             {page.frontmatter.title}
           </SidebarNavItem>
 
-          {page.children &&
-            page.children.map(childPage => (
-              <SidebarNavSubItem
-                to={relative(currentPage.path, childPage.path)}
-                key={childPage.key}
-              >
-                {childPage.frontmatter.title}
-              </SidebarNavSubItem>
-            ))}
+          {page.children && (
+            <SidebarNavSubItemWrapper>
+              {page.children.map(childPage => (
+                <SidebarNavSubItem
+                  to={relative(currentPage.path, childPage.path)}
+                  key={childPage.key}
+                >
+                  {childPage.frontmatter.title}
+                </SidebarNavSubItem>
+              ))}
+            </SidebarNavSubItemWrapper>
+          )}
         </Fragment>
       );
     });
@@ -118,13 +106,6 @@ const Sidebar = ({ overlay, closeSidebar }) => {
         </Link>
         <ContentWrapper overlay={overlay}>
           {sidebarItems}
-          <HorizontalLine />
-          <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
-            Issues
-          </SidebarNavItem>
-          <SidebarNavItem as="a" href={constants.github} key={'github'}>
-            Github
-          </SidebarNavItem>
         </ContentWrapper>
       </SidebarWrapper>
     </SidebarContainer>

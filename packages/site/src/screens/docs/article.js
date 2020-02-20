@@ -6,10 +6,10 @@ import { MDXComponents } from '../../components/mdx';
 const Container = styled.article.attrs(() => ({
   className: 'page-content',
 }))`
-  max-width: 80rem;
+  flex-grow: 1;
   min-height: 100vh;
   width: 100%;
-  padding: 10rem 6rem 4rem 8rem;
+  padding: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
 
   @media (max-width: 768px) {
     padding: 6rem 4rem 8rem 3.5rem;

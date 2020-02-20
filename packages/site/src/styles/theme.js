@@ -1,92 +1,76 @@
-const theme = {
-  color: {
-    blue: '#8196FF',
-    paleRed: '#ffad9f',
-    red: '#ff684f',
-    darkRed: '#ad1b11',
-    brown: '#bc5240',
-    darkBrown: '#4c2e29',
+const systemFonts = [
+  '-apple-system',
+  'BlinkMacSystemFont',
+  'Segoe UI',
+  'Roboto',
+  'Helvetica Neue',
+  'Arial',
+  'Noto Sans',
+  'sans-serif',
+  'Apple Color Emoji',
+  'Segoe UI Emoji',
+  'Segoe UI Symbol',
+  'Noto Color Emoji',
+];
 
-    white: '#ffffff',
-    nearWhite: '#f2f2f2',
-    lightGray: '#e0e0e0',
-    gray: '#999999',
-    darkGray: '#3b3b3b',
-    nearBlack: '#242121',
-    black: '#1f1f1f',
-
-    inlineCodeBorder: '#d3d3d3',
-
-    codeMirror: {
-      bgDim: '#eeefee',
-      bg: '#fffefc',
-      bgFocused: '#fffefc',
-      bgSelected: '#b3d4fc',
-      def: '#333333',
-      comment: '#708090',
-      function: '#cc2345',
-      keyword: '#07a',
-      number: '#905',
-      operator: '#9a6e3a',
-      attribute: '#690',
-      punctuation: '#999',
-      selector: '#007a71',
-      variable: '#e90',
-      tag: '#905',
-    },
-  },
-
-  font: {
-    primary: 'Helvetica, sans-serif',
-    secondary: 'Castledown-Bold, sans-serif',
-    monospace: 'Monaco, Courier, monospace',
-    bold: 'Helvetica-Bold, sans-serif',
-  },
-  typography: {
-    lineHeight: {
-      sidebarHeading: '2.3rem',
-      sidebarItem: '2.8rem',
-    },
-  },
-
-  layout: {
-    maxWidth: '121rem',
-    footerMaxWidth: '90rem',
-
-    headerHeight: '6.4rem',
-    footerHeight: '43.2rem',
-    stripesWidth: '2.8rem',
-    sidebarWidth: '26rem',
-
-    pageGutterLeft: '2rem',
-    pageGutterRight: '3rem',
-    pageGutterTop: '2rem',
-    pageGutterBottom: '5.5rem',
-
-    // layout at md width and larger; use in conjunction with media query
-    md: {
-      footerHeight: '25.6rem',
-
-      pageGutterLeft: '6rem',
-      pageGutterRight: '7.5rem',
-      pageGutterTop: '4rem',
-      pageGutterBottom: '4.5rem',
-    },
-  },
-
-  mediaQuery: {
-    sm: 'only screen and (min-width: 650px)',
-    md: 'only screen and (min-width: 960px)',
-    lg: 'only screen and (min-width: 1200px)',
-  },
-
-  spacing: {
-    xs: '0.6rem',
-    sm: '1.5rem',
-    md: '2.75rem',
-    lg: '4.75rem',
-    xl: '8.2rem',
-  },
+export const colors = {
+  passiveBg: '#f6f6f6',
+  bg: '#ffffff',
+  border: '#ececec',
+  text: '#000000',
+  heading: '#050617',
+  accent: '#566ac8',
+  code: '#403f53',
+  passive: '#9999a6',
 };
 
-export default theme;
+export const layout = {
+  page: '144rem',
+  header: '4.8rem',
+  sidebar: '26rem',
+  legend: '22rem',
+};
+
+export const fonts = {
+  heading: systemFonts.join(', '),
+  body: systemFonts.join(', '),
+  code: 'monospace',
+};
+
+export const fontSizes = {
+  small: '0.9em',
+  body: '1.8rem',
+  code: '0.9em',
+  h1: '3.45em',
+  h2: '2.11em',
+  h3: '1.64em',
+};
+
+export const fontWeights = {
+  body: '400',
+  heading: '600',
+};
+
+export const lineHeights = {
+  body: '1.5',
+  heading: '1.1',
+  code: '1.2',
+};
+
+export const shadows = {
+  input: 'rgba(0, 0, 0, 0.09) 0px 2px 10px -3px',
+};
+
+export const media = {
+  sm: '(min-width: 650px)',
+  md: '(min-width: 960px)',
+  lg: '(min-width: 1200px)',
+};
+
+export const spacing = {
+  xs: '0.6rem',
+  sm: '1.5rem',
+  md: '2.75rem',
+  lg: '4.75rem',
+  xl: '8.2rem',
+};

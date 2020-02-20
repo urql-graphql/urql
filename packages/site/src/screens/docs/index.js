@@ -6,8 +6,9 @@ import { Link } from 'react-router-dom';
 
 import Article from './article';
 import Sidebar from '../../components/sidebar';
-import constants from '../../constants';
-import Header from './header';
+
+// import constants from '../../constants';
+// import Header from './header';
 
 import burger from '../../assets/burger.svg';
 import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
@@ -15,7 +16,14 @@ import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+
   width: 100%;
+  max-width: ${p => p.theme.layout.page};
+  margin: 0 auto;
+
+  background: ${p => p.theme.colors.bg};
+  border-left: 1px solid ${p => p.theme.colors.border};
+  border-right: 1px solid ${p => p.theme.colors.border};
 `;
 
 const Wrapper = styled.div`
@@ -114,6 +122,7 @@ const Docs = props => {
           : null;
       }}
     >
+      {/*
       <Wrapper noPadding>
         <CollapsedMenu overlay={openSidebar}>
           <img src={burger} alt="Menu" onClick={() => setOpenSidebar(true)} />
@@ -123,6 +132,7 @@ const Docs = props => {
           <HeaderLogo src={logoFormidableDark} alt="Formidable Logo" />
         </Link>
       </Wrapper>
+      */}
       <SideBarWithRef
         location={props.location}
         overlay={openSidebar}

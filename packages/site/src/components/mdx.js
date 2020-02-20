@@ -11,18 +11,20 @@ const getLanguage = className => {
 };
 
 const Pre = styled.pre`
+  background: ${p => p.theme.colors.passiveBg};
+  border: 1px solid ${p => p.theme.colors.border};
+  line-height: ${p => p.theme.lineHeights.code};
+  font-size: ${p => p.theme.fontSizes.code};
+  padding: ${p => p.theme.spacing.sm};
+  border-radius: ${p => p.theme.spacing.xs};
   position: relative;
   max-width: 100%;
-  background: #f0f0f2;
-  color: #36313d;
-  font-size: 0.9em;
-  line-height: 1.2;
-  padding: 1rem;
 `;
 
 const Code = styled.code`
   display: block;
-  font-family: monospace;
+  font-family: ${p => p.theme.fonts.code};
+  color: ${p => p.theme.colors.code};
 
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
@@ -33,12 +35,14 @@ const Code = styled.code`
 `;
 
 const InlineCode = styled.code`
+  background: ${p => p.theme.colors.passiveBg};
+  color: ${p => p.theme.colors.code};
+  font-family: ${p => p.theme.fonts.code};
+  font-size: ${p => p.theme.fontSizes.code};
+  border-radius: ${p => p.theme.spacing.xs};
+
   display: inline-block;
-  background: #f0f0f2;
-  color: #36313d;
-  border-radius: 3px
-  font-family: monospace;
-  font-size: inherit;
+  vertical-align: baseline;
   font-variant-ligatures: none;
   font-feature-settings: normal;
   padding: 0 0.2em;

@@ -9,7 +9,7 @@ import { ThemeProvider } from 'styled-components';
 
 import constants from './constants';
 import { GlobalStyle } from './styles/global';
-import theme from './styles/theme';
+import * as theme from './styles/theme';
 import Analytics from './google-analytics';
 import NotFound from './screens/404';
 

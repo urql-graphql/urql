@@ -42,57 +42,40 @@ export const SideBarSvg = styled.div`
 `;
 
 export const SidebarWrapper = styled.aside`
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-size: 100% 100%;
-  background: linear-gradient(
-      rgba(223, 223, 223, 0.4),
-      rgba(223, 223, 223, 0.4)
-    ),
-    #ffffff;
-  min-height: 100vh;
-  padding-top: 18rem;
-  min-width: 24rem;
-  width: 24rem;
+  max-height: 100%;
   z-index: 2;
   position: fixed;
   overflow-y: scroll;
   top: 0;
   bottom: 0;
+  width: ${p => p.theme.layout.sidebar};
+  padding: 0 ${p => p.theme.spacing.md};
+  padding-top: 18rem;
 
-  @media (max-width: 768px) {
-    background: #dfdfdf;
-    min-width: ${props => (props.overlay ? '24rem' : '2.5rem')};
-    width: ${props => (props.overlay ? '24rem' : '2.5rem')};
-    background-size: cover;
-  }
+  line-height: ${p => p.theme.lineHeights.body};
+  font-size: ${p => p.theme.fontSizes.small};
 `;
 
 export const SidebarNavItem = styled(Link)`
-  padding-left: 2rem;
-  padding-right: 1rem;
-  margin-bottom: 0.7rem;
-  font-size: 1.6rem;
-  display: inline-block;
-  line-height: 1.64;
-  letter-spacing: 0.5px;
-  color: #4c5db0;
-  text-transform: uppercase;
+  display: block;
+  margin-bottom: ${p => p.theme.spacing.xs};
+  color: ${p => p.theme.colors.accent};
+  text-decoration: none;
   font-weight: bold;
   width: 100%;
+`;
 
-  &.active {
-    background-color: rgba(46, 46, 46, 0.1);
-  }
+export const SidebarNavSubItemWrapper = styled.div`
+  padding-left: ${p => p.theme.spacing.sm};
+  margin-bottom: ${p => p.theme.spacing.sm};
+  border-left: 1px solid ${p => p.theme.colors.border};
 `;
 
 export const SidebarNavSubItem = styled(Link)`
-  color: white;
-  margin-left: 4rem;
-  margin-right: 1rem;
-  margin-top: 0.7rem;
-  font-size: 1.4rem;
-  line-height: 1.64;
-  letter-spacing: normal;
-  color: #505050;
-  font-weight: bold;
+  display: block;
+  margin-top: ${p => p.theme.spacing.xs};
+  color: ${p => p.theme.colors.heading};
+  text-decoration: none;
+  opacity: 0.7;
 `;
