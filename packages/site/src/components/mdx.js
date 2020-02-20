@@ -47,6 +47,39 @@ const InlineCode = styled.code`
   margin: 0;
 `;
 
+const ImageWrapper = styled.div`
+  margin: ${p => p.theme.spacing.md} 0;
+  border: 1px solid ${p => p.theme.colors.border};
+  border-radius: ${p => p.theme.spacing.xs};
+  background: ${p => p.theme.colors.bg};
+
+  display: flex;
+  flex-direction: column;
+
+  & > img {
+    padding: ${p => p.theme.spacing.md};
+    align-self: center;
+    max-height: 40vh;
+  }
+`;
+
+const ImageAlt = styled.span.attrs(() => ({
+  'aria-hidden': true, // This is just duplicating alt
+}))`
+  display: block;
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border-top: 1px solid ${p => p.theme.colors.border};
+  background: ${p => p.theme.colors.passiveBg};
+  font-size: ${p => p.theme.fontSizes.small};
+`;
+
+const Image = ({ alt, src }) => (
+  <ImageWrapper>
+    <img alt={alt} src={src} />
+    <ImageAlt>{alt}</ImageAlt>
+  </ImageWrapper>
+);
+
 const HighlightCode = ({ className = '', children }) => {
   const language = getLanguage(className);
 
@@ -75,6 +108,7 @@ const HighlightCode = ({ className = '', children }) => {
 };
 
 const components = {
+  img: Image,
   inlineCode: InlineCode,
   code: HighlightCode,
 };
