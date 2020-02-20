@@ -91,17 +91,18 @@ const HighlightCode = ({ className = '', children }) => {
       language={language}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <Pre className={className} style={style}>
-          <Code>
-            {tokens.map((line, i) => (
-              <div {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
-          </Code>
-        </Pre>
+        <Code
+          style={{ ...style, backgroundColor: 'none' }}
+          className={className}
+        >
+          {tokens.map((line, i) => (
+            <div {...getLineProps({ line, key: i })}>
+              {line.map((token, key) => (
+                <span {...getTokenProps({ token, key })} />
+              ))}
+            </div>
+          ))}
+        </Code>
       )}
     </Highlight>
   );
@@ -119,6 +120,7 @@ const Blockquote = styled.blockquote`
 `;
 
 const components = {
+  pre: Pre,
   img: Image,
   blockquote: Blockquote,
   inlineCode: InlineCode,
