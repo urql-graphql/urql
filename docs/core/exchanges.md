@@ -3,8 +3,6 @@ title: Exchanges
 order: 3
 ---
 
-<a name="exchanges"></a>
-
 # Exchanges
 
 ## Packages

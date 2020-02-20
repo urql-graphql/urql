@@ -1,9 +1,7 @@
 ---
-title: architecture
+title: Architecture
 order: 1
 ---
-
-<a name="architecture"></a>
 
 # Architecture
 

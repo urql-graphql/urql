@@ -1,5 +1,5 @@
 ---
-title: schema
+title: Schema
 order: 6
 ---
 

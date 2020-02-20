@@ -1,9 +1,7 @@
 ---
-title: urql outside of react
+title: Outside of React
 order: 5
 ---
-
-<a name="urql-outside-of-react"></a>
 
 # urql Outside of React
 

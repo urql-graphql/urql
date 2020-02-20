@@ -1,5 +1,5 @@
 ---
-title: resolvers
+title: Resolvers
 order: 5
 ---
 

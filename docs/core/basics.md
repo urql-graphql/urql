@@ -3,11 +3,7 @@ title: Basics
 order: 2
 ---
 
-<a name="basics"></a>
-
 # Basics
-
-<a name="main-file"></a>
 
 As mentioned before, `urql`'s core logic is split into exchanges.
 To that end, `urql`'s behavior is completely defined by the exchanges
