@@ -1,9 +1,9 @@
 ---
-title: mutating-data
+title: Mutations
 order: 2
 ---
 
-## (P)React
+## Mutate your data
 
 Now that we know how to query our data we'll also need to know
 how to mutate it, for this the `useMutation` hook and the `Mutation`
@@ -23,10 +23,9 @@ const Todo = ({ id, title }) => {
 }
 ```
 
-Similar to the `useQuery` output we see a tuple, the first being our result
-again with `fetching`, `error` and `data`. At this point in time the mutation
-hasn't done anything but return you this tuple, to mutate the data we have to call
-the function here named `updateTodo`.
+Similar to the `useQuery` output, `useMutation` returns a tuple. The first item in the tuple being our `result`
+containing: `fetching`, `error`, and `data`. At this point in time, no mutation has been performed.
+To mutate the data we first have to invoke the second item in the tuple - the function here named `updateTodo`.
 
 When calling this function we have two ways of getting the response from the server,
 we can get it from `updateTodoResult` or we chain a `.then` on our `updateTodo` call.

@@ -1,9 +1,9 @@
 ---
-title: querying-data
+title: Queries
 order: 1
 ---
 
-## (P)React
+## Run your first query
 
 Let's get to querying our first piece of data, we offer both a
 `render-props` component named `Query` and a hook named `useQuery` as

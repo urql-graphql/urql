@@ -1,12 +1,12 @@
 ---
-title: setting-up-the-client
+title: Getting started
 order: 0
 ---
 
 ## Installation
 
 Installing `urql` is as quick as you'd expect. Firstly, install it
-with your package manager of choice, this installation is specific for React:
+with your package manager of choice, Note: this installation is specific for React:
 
 ```sh
 yarn add urql graphql
@@ -14,9 +14,8 @@ yarn add urql graphql
 npm install --save urql graphql
 ```
 
-You can always replace urql with other supported frameworks, for now this is:
-
-- Preact with [`@urql/preact`](https://github.com/FormidableLabs/urql/tree/master/packages/preact-urql)
+To use urql with Preact, you have to install `@urql/preact` instead of urql and import from
+that package instead.
 
 > _Note:_ Most libraries related to GraphQL specify `graphql` as their peer
 > dependency so that they can adapt to your specific versioning
@@ -24,7 +23,7 @@ You can always replace urql with other supported frameworks, for now this is:
 > The library is updated frequently and remains very backwards compatible,
 > but make sure it will work with other GraphQL tooling you might have installed.
 
-## Setting up your client
+## Getting started (React/Preact)
 
 The package will export a method called `createClient` we can use this to create the
 client that will be used to dispatch our queries, mutations, etc.
