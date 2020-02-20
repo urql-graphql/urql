@@ -36,7 +36,7 @@ const InlineCode = styled.code`
   background: ${p => p.theme.colors.passiveBg};
   color: ${p => p.theme.colors.code};
   font-family: ${p => p.theme.fonts.code};
-  font-size: ${p => p.theme.fontSizes.code};
+  font-size: ${p => p.theme.fontSizes.small};
   border-radius: ${p => p.theme.spacing.xs};
 
   display: inline-block;
