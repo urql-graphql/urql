@@ -107,8 +107,20 @@ const HighlightCode = ({ className = '', children }) => {
   );
 };
 
+const Blockquote = styled.blockquote`
+  margin: ${p => p.theme.spacing.md} 0;
+  padding: 0 0 0 ${p => p.theme.spacing.md};
+  border-left: 0.5rem solid ${p => p.theme.colors.border};
+  font-size: ${p => p.theme.fontSizes.small};
+
+  & > * {
+    margin: ${p => p.theme.spacing.sm} 0;
+  }
+`;
+
 const components = {
   img: Image,
+  blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
 };
