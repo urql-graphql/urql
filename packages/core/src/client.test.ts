@@ -76,7 +76,7 @@ describe('promisified methods', () => {
           }
         `,
         { example: 1234 },
-        {}
+        { requestPolicy: 'cache-only' }
       )
       .toPromise();
 
@@ -87,7 +87,7 @@ describe('promisified methods', () => {
     expect(received.operationName).toEqual('query');
     expect(received.context).toEqual({
       url: 'https://hostname.com',
-      requestPolicy: 'cache-and-network',
+      requestPolicy: 'cache-only',
       fetchOptions: undefined,
       fetch: undefined,
       suspense: false,

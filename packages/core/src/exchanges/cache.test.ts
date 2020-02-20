@@ -104,6 +104,23 @@ describe('on query', () => {
     });
   });
 
+  it('respects cache-only', () => {
+    const { source: ops$, next, complete } = input;
+    const exchange = cacheExchange(exchangeArgs)(ops$);
+
+    publish(exchange);
+    next({
+      ...queryOperation,
+      context: {
+        ...queryOperation.context,
+        requestPolicy: 'cache-only',
+      },
+    });
+    complete();
+    expect(forwardedOperations.length).toBe(0);
+    expect(reexecuteOperation).not.toBeCalled();
+  });
+
   describe('cache hit', () => {
     it('is miss when operation is forwarded', () => {
       const { source: ops$, next, complete } = input;
