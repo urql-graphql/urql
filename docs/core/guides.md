@@ -1,9 +1,7 @@
 ---
-title: guides
+title: Guides
 order: 4
 ---
-
-<a name="guides"></a>
 
 # Guides
 
@@ -108,16 +106,16 @@ const noopExchange = ({ client, forward }) => {
     // and calls composeExchange's ExchangeIO function with it.
     // composeExchange forward()s the operation$ stream to dedupeExchange's ExchangeIO function.
     // dedupeExchange filters duplicates and forward()s the stream to noopExchange's ExchangeIO function.
-    
+
     // Here, noopExchange forward()s the operation$ stream to fetchExchange's ExchangeIO function
     const operationResult$ = forward(operations$);
-    
+
     // fetchExchange receives the operation$ stream, creates an OperationResult object,
     // and returns it in an operationResult$ stream.
     // finally, noopExchange returns the operationsResult$ stream to dedupeExchange's forward() call.
-    
+
     return operationResult$;
-    
+
     // After this, dedupExchange returns operationResult$ to composeExchange's forward() call.
     // urql client receives the operationResult$ from composeExchange and provides data to components.
   };

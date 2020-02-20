@@ -1,9 +1,7 @@
 ---
-title: extending-&-experimenting
+title: Extending & Experimenting
 order: 4
 ---
-
-<a name="extending-&-experimenting"></a>
 
 # Extending & Experimenting
 

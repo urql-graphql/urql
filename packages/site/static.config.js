@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import constants from './src/constants';
+import Document from './src/html';
 
 export default {
   plugins: [
@@ -33,6 +34,8 @@ export default {
   basePath: 'open-source/urql',
   stagingBasePath: '',
   devBasePath: '',
+
+  Document,
 
   getSiteData: () => ({
     title: constants.docsTitle,

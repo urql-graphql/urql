@@ -1,5 +1,5 @@
 ---
-title: UPDATES
+title: Updates
 order: 7
 ---
 

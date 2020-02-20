@@ -1,5 +1,5 @@
 ---
-title: help
+title: Help
 order: 2
 ---
 

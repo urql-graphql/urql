@@ -1,24 +1,93 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useMarkdownPage } from 'react-static-plugin-md-pages';
 
 import { MDXComponents } from '../../components/mdx';
 
-const Container = styled.article.attrs(() => ({
+const Container = styled.main.attrs(() => ({
   className: 'page-content',
 }))`
-  max-width: 80rem;
-  min-height: 100vh;
+  flex: 1;
   width: 100%;
-  padding: 10rem 6rem 4rem 8rem;
+  position: sticky;
 
-  @media (max-width: 768px) {
-    padding: 6rem 4rem 8rem 3.5rem;
-  }
+  display: flex;
+  flex-direction: row-reverse;
 `;
 
+const Content = styled.article.attrs(() => ({
+  id: 'page-content',
+}))`
+  flex: 1;
+  min-height: 100vh;
+  margin: 0 ${p => p.theme.spacing.md};
+  padding: ${p => p.theme.spacing.md} 0;
+`;
+
+const Legend = styled.aside`
+  position: sticky;
+  top: ${p => p.theme.layout.header};
+  max-height: 100vh;
+  width: ${p => p.theme.layout.legend};
+  margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
+  padding: ${p => p.theme.spacing.md} 0;
+`;
+
+const LegendTitle = styled.h3`
+  font-size: ${p => p.theme.fontSizes.body};
+  font-weight: ${p => p.theme.fontWeights.heading};
+  margin-bottom: ${p => p.theme.spacing.sm};
+`;
+
+const HeadingList = styled.ul`
+  list-style-type: none;
+  margin: 0;
+  padding-left: ${p => p.theme.spacing.sm};
+  border-left: 1px solid ${p => p.theme.colors.border};
+`;
+
+const HeadingItem = styled.a`
+  font-size: ${p => p.theme.fontSizes.small};
+  font-weight: ${p => p.theme.fontWeights.body};
+  color: ${p => p.theme.colors.heading};
+  text-decoration: none;
+  opacity: 0.7;
+`;
+
+const SectionList = () => {
+  const page = useMarkdownPage();
+  if (!page) return null;
+
+  const headings = page.headings.filter(x => x.depth > 1);
+
+  return (
+    <>
+      <LegendTitle>
+        In this section
+      </LegendTitle>
+      <HeadingList>
+        {headings.map(heading => (
+          <li key={heading.slug}>
+            <HeadingItem href={`#${heading.slug}`}>
+              {heading.value}
+            </HeadingItem>
+          </li>
+        ))}
+      </HeadingList>
+    </>
+  );
+};
+
 const Article = ({ children }) => (
-  <Container className="Page-content">
-    <MDXComponents>{children}</MDXComponents>
+  <Container>
+    <Legend>
+      <SectionList />
+    </Legend>
+    <Content>
+      <MDXComponents>
+        {children}
+      </MDXComponents>
+    </Content>
   </Container>
 );
 

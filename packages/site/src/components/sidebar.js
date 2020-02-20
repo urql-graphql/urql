@@ -1,7 +1,6 @@
 import React, { Fragment, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import * as path from 'path';
 
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -9,62 +8,38 @@ import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
 import {
   SidebarNavItem,
   SidebarNavSubItem,
+  SidebarNavSubItemWrapper,
   SidebarContainer,
   SidebarWrapper,
-  SideBarSvg,
+  SideBarStripes,
 } from './navigation';
 
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
-import constants from '../constants';
 
-const HeroLogo = styled.img`
-  position: absolute;
-  top: 3rem;
-  left: 6rem;
-  width: 14rem;
-
-  @media (max-width: 768px) {
-    display: ${props => (props.overlay ? '' : 'none')};
-  }
+const HeroLogo = styled.img.attrs(() => ({
+  src: logoSidebar,
+  alt: 'urql',
+}))`
+  width: ${p => p.theme.layout.logo};
+  margin-bottom: ${p => p.theme.spacing.sm};
+  align-self: center;
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 3rem 0rem 0rem 2.5rem;
-  height: auto;
-  @media (max-width: 768px) {
-    display: ${props => (props.overlay ? '' : 'none')};
-  }
+  padding: ${p => p.theme.spacing.xs} 0;
 `;
 
-const SubContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
-`;
-
-const CloseButton = styled.img`
+const CloseButton = styled.img.attrs(() => ({
+  src: closeButton
+}))`
   cursor: pointer;
   top: 1rem;
   right: 7rem;
   position: absolute;
   display: none;
-
-  @media (max-width: 768px) {
-    display: ${props => (props.overlay ? 'block' : 'none')};
-    right: 1rem;
-  }
-`;
-
-const HorizontalLine = styled.hr`
-  width: 100%;
-  height: 2px;
-  background-color: #2e2e2e;
-  opacity: 0.1;
-  border: none;
-  margin: 1rem 0;
 `;
 
 const relative = (from, to) => {
@@ -73,7 +48,7 @@ const relative = (from, to) => {
   return { pathname };
 };
 
-const Sidebar = ({ overlay, closeSidebar }) => {
+const Sidebar = () => {
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
 
@@ -89,15 +64,18 @@ const Sidebar = ({ overlay, closeSidebar }) => {
             {page.frontmatter.title}
           </SidebarNavItem>
 
-          {page.children &&
-            page.children.map(childPage => (
-              <SidebarNavSubItem
-                to={relative(currentPage.path, childPage.path)}
-                key={childPage.key}
-              >
-                {childPage.frontmatter.title}
-              </SidebarNavSubItem>
-            ))}
+          {page.children && (
+            <SidebarNavSubItemWrapper>
+              {page.children.map(childPage => (
+                <SidebarNavSubItem
+                  to={relative(currentPage.path, childPage.path)}
+                  key={childPage.key}
+                >
+                  {childPage.frontmatter.title}
+                </SidebarNavSubItem>
+              ))}
+            </SidebarNavSubItemWrapper>
+          )}
         </Fragment>
       );
     });
@@ -105,35 +83,16 @@ const Sidebar = ({ overlay, closeSidebar }) => {
 
   return (
     <SidebarContainer>
-      <SideBarSvg />
-      <SidebarWrapper overlay={overlay}>
-        <CloseButton
-          src={closeButton}
-          alt="X"
-          overlay={overlay}
-          onClick={() => closeSidebar()}
-        />
-        <Link to={'/'}>
-          <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
-        </Link>
-        <ContentWrapper overlay={overlay}>
+      <SideBarStripes />
+      <SidebarWrapper>
+        <CloseButton />
+        <HeroLogo />
+        <ContentWrapper>
           {sidebarItems}
-          <HorizontalLine />
-          <SidebarNavItem as="a" href={constants.githubIssues} key={'issues'}>
-            Issues
-          </SidebarNavItem>
-          <SidebarNavItem as="a" href={constants.github} key={'github'}>
-            Github
-          </SidebarNavItem>
         </ContentWrapper>
       </SidebarWrapper>
     </SidebarContainer>
   );
-};
-
-Sidebar.propTypes = {
-  closeSidebar: PropTypes.func,
-  overlay: PropTypes.bool,
 };
 
 export default Sidebar;
