@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import collapsedSidebarBackground from '../assets/collapsed-sidebar-background.svg';
-
 export const Navigation = styled.div`
   align-items: center;
   background: #8196ff;
@@ -18,40 +16,36 @@ export const Navigation = styled.div`
     }
   }
 `;
-export const SidebarContainer = styled.div`
-  width: 24rem;
-  min-width: 24rem;
-  min-height: 100vh;
 
-  @media (max-width: 768px) {
-    min-width: 2.5rem;
-    width: 2.5rem;
-  }
+export const SidebarContainer = styled.div`
+  width: ${p => p.theme.layout.sidebar};
 `;
 
 export const SideBarSvg = styled.div`
-  width: 2.5rem;
+  border-left: ${p => p.theme.layout.stripes} solid #8196ff;
+  border-right: ${p => p.theme.layout.stripes} solid #bcc6fa;
   height: 100%;
+  width: 0;
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 3;
-  background-image: url(${collapsedSidebarBackground});
-  background-size: cover;
-  background-repeat: repeat-y;
 `;
 
 export const SidebarWrapper = styled.aside`
-  background-size: 100% 100%;
-  max-height: 100%;
-  z-index: 2;
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+
   overflow-y: scroll;
-  top: 0;
-  bottom: 0;
+  min-height: 100%;
   width: ${p => p.theme.layout.sidebar};
-  padding: 0 ${p => p.theme.spacing.md};
-  padding-top: 18rem;
+
+  padding: ${p => p.theme.spacing.md};
+  padding-right: ${p => p.theme.spacing.sm};
+
+  background: ${p => p.theme.colors.bg};
+  border-right: 1px solid ${p => p.theme.colors.border};
 
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};

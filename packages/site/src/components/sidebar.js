@@ -1,7 +1,6 @@
 import React, { Fragment, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import * as path from 'path';
 
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -17,13 +16,13 @@ import {
 
 import closeButton from '../assets/close.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
-import constants from '../constants';
 
-const HeroLogo = styled.img`
-  position: absolute;
-  top: 3rem;
-  left: 6rem;
+const HeroLogo = styled.img.attrs(() => ({
+  alt: 'urql'
+}))`
   width: 14rem;
+  align-self: center;
+  margin-bottom: ${p => p.theme.spacing.md};
 
   @media (max-width: 768px) {
     display: ${props => (props.overlay ? '' : 'none')};
@@ -101,9 +100,7 @@ const Sidebar = ({ overlay, closeSidebar }) => {
           overlay={overlay}
           onClick={() => closeSidebar()}
         />
-        <Link to={'/'}>
-          <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
-        </Link>
+        <HeroLogo src={logoSidebar} alt="Formidable Logo" overlay={overlay} />
         <ContentWrapper overlay={overlay}>
           {sidebarItems}
         </ContentWrapper>

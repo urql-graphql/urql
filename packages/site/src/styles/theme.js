@@ -27,7 +27,8 @@ export const colors = {
 export const layout = {
   page: '144rem',
   header: '4.8rem',
-  sidebar: '26rem',
+  stripes: '0.9rem',
+  sidebar: '28rem',
   legend: '22rem',
 };
 
