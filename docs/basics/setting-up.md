@@ -62,7 +62,7 @@ const client = createClient({
 To make use of this client in (P)React we will have to provide the client through
 the context API. This is done with the help of the `Provider` export.
 
-```js
+```jsx
 import { createClient, Provider } from 'urql';
 
 const client = createClient({
