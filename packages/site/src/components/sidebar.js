@@ -4,10 +4,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import * as path from 'path';
 
-import {
-  useMarkdownTree,
-  useMarkdownPage
-} from 'react-static-plugin-md-pages';
+import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
 
 import {
   SidebarNavItem,
@@ -80,9 +77,11 @@ const Sidebar = ({ overlay, closeSidebar }) => {
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
 
-  if (!currentPage || !tree || !tree.children) return null;
-
   const sidebarItems = useMemo(() => {
+    if (!currentPage || !tree || !tree.children) {
+      return null;
+    }
+
     return tree.children.map(page => {
       return (
         <Fragment key={page.key}>
@@ -90,14 +89,15 @@ const Sidebar = ({ overlay, closeSidebar }) => {
             {page.frontmatter.title}
           </SidebarNavItem>
 
-          {page.children && page.children.map(childPage => (
-            <SidebarNavSubItem
-              to={relative(currentPage.path, childPage.path)}
-              key={childPage.key}
-            >
-              {childPage.frontmatter.title}
-            </SidebarNavSubItem>
-          ))}
+          {page.children &&
+            page.children.map(childPage => (
+              <SidebarNavSubItem
+                to={relative(currentPage.path, childPage.path)}
+                key={childPage.key}
+              >
+                {childPage.frontmatter.title}
+              </SidebarNavSubItem>
+            ))}
         </Fragment>
       );
     });

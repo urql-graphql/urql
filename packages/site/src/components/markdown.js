@@ -45,7 +45,8 @@ export const Markdown = styled.article`
     text-align: left;
   }
 
-  td, th {
+  td,
+  th {
     padding: 15px;
   }
 
@@ -53,7 +54,9 @@ export const Markdown = styled.article`
     text-align: center;
   }
 
-  table, th, td {
+  table,
+  th,
+  td {
     font-size: 1.7rem;
     border: 1px solid lightgrey;
 

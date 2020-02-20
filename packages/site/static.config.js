@@ -13,7 +13,7 @@ export default {
         order: {
           core: 0,
           graphcache: 1,
-        }
+        },
       },
     ],
 
@@ -23,7 +23,6 @@ export default {
   ],
 
   paths: {
-    nodeModules: '../../node_modules',
     src: 'src',
     dist: 'dist',
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
@@ -36,7 +35,7 @@ export default {
   devBasePath: '',
 
   getSiteData: () => ({
-    title: constants.docsTitle
+    title: constants.docsTitle,
   }),
 
   getRoutes: async () => [

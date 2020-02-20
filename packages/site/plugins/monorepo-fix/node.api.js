@@ -11,6 +11,7 @@ export default () => ({
         (context, request, callback) => {
           if (/^[.\/]/.test(request)) {
             return callback();
+            e;
           }
 
           const res = resolveFrom(`${context}/`, request);
@@ -19,9 +20,9 @@ export default () => ({
             NODE_MODULES_JS_RE.test(res) &&
             !REACT_STATIC_RE.test(res)
           ) {
-            callback(null, `commonjs ${request}`);
+            return callback(null, `commonjs ${request}`);
           } else {
-            callback();
+            return callback();
           }
         },
       ];

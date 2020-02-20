@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { MDXComponents } from '../../components/mdx';
 
 const Container = styled.article.attrs(() => ({
-  className: 'page-content'
+  className: 'page-content',
 }))`
   max-width: 80rem;
   min-height: 100vh;
@@ -18,9 +18,7 @@ const Container = styled.article.attrs(() => ({
 
 const Article = ({ children }) => (
   <Container className="Page-content">
-    <MDXComponents>
-      {children}
-    </MDXComponents>
+    <MDXComponents>{children}</MDXComponents>
   </Container>
 );
 
