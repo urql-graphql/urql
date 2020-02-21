@@ -11,7 +11,7 @@ const Container = styled.main.attrs(() => ({
   width: 100%;
   position: sticky;
 
-  display: flex;
+  display: ${p => (p.sidebarOpen ? 'none' : 'flex')};
   flex-direction: row-reverse;
 `;
 
@@ -25,12 +25,18 @@ const Content = styled.article.attrs(() => ({
 `;
 
 const Legend = styled.aside`
-  position: sticky;
-  top: ${p => p.theme.layout.header};
-  max-height: 100vh;
-  width: ${p => p.theme.layout.legend};
-  margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
-  padding: ${p => p.theme.spacing.md} 0;
+  display: none;
+
+  @media ${({ theme }) => theme.media.lg} {
+    display: block;
+    position: sticky;
+    top: ${p => p.theme.layout.header};
+    max-height: 100vh;
+    width: ${p => p.theme.layout.legend};
+    max-width: ${p => p.theme.layout.legendMaxWidth};
+    padding: ${p => p.theme.spacing.md} 0;
+    margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
+  }
 `;
 
 const LegendTitle = styled.h3`
@@ -62,15 +68,11 @@ const SectionList = () => {
 
   return (
     <>
-      <LegendTitle>
-        In this section
-      </LegendTitle>
+      <LegendTitle>In this section</LegendTitle>
       <HeadingList>
         {headings.map(heading => (
           <li key={heading.slug}>
-            <HeadingItem href={`#${heading.slug}`}>
-              {heading.value}
-            </HeadingItem>
+            <HeadingItem href={`#${heading.slug}`}>{heading.value}</HeadingItem>
           </li>
         ))}
       </HeadingList>
@@ -78,15 +80,13 @@ const SectionList = () => {
   );
 };
 
-const Article = ({ children }) => (
-  <Container>
+const Article = ({ children, sidebarOpen }) => (
+  <Container sidebarOpen={sidebarOpen}>
     <Legend>
       <SectionList />
     </Legend>
     <Content>
-      <MDXComponents>
-        {children}
-      </MDXComponents>
+      <MDXComponents>{children}</MDXComponents>
     </Content>
   </Container>
 );

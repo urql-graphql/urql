@@ -1,6 +1,7 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { useLocation } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import * as path from 'path';
 
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -14,16 +15,21 @@ import {
   SideBarStripes,
 } from './navigation';
 
-import closeButton from '../assets/close.svg';
+import { mediaSizes } from '../styles/theme';
+
 import logoSidebar from '../assets/sidebar-badge.svg';
 
 const HeroLogo = styled.img.attrs(() => ({
   src: logoSidebar,
   alt: 'urql',
 }))`
+  display: none;
   width: ${p => p.theme.layout.logo};
   margin-bottom: ${p => p.theme.spacing.sm};
   align-self: center;
+  @media ${p => p.theme.media.sm} {
+    display: block;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -32,23 +38,13 @@ const ContentWrapper = styled.div`
   padding: ${p => p.theme.spacing.xs} 0;
 `;
 
-const CloseButton = styled.img.attrs(() => ({
-  src: closeButton
-}))`
-  cursor: pointer;
-  top: 1rem;
-  right: 7rem;
-  position: absolute;
-  display: none;
-`;
-
 const relative = (from, to) => {
   if (!from || !to) return null;
   const pathname = path.relative(path.dirname(from), to);
   return { pathname };
 };
 
-const Sidebar = () => {
+const Sidebar = ({ sidebarOpen }) => {
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
 
@@ -82,14 +78,11 @@ const Sidebar = () => {
   }, [tree, currentPage]);
 
   return (
-    <SidebarContainer>
+    <SidebarContainer hidden={!sidebarOpen}>
       <SideBarStripes />
       <SidebarWrapper>
-        <CloseButton />
         <HeroLogo />
-        <ContentWrapper>
-          {sidebarItems}
-        </ContentWrapper>
+        <ContentWrapper>{sidebarItems}</ContentWrapper>
       </SidebarWrapper>
     </SidebarContainer>
   );

@@ -1,24 +1,14 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-export const Navigation = styled.div`
-  align-items: center;
-  background: #8196ff;
-  display: flex;
-  flex-direction: row;
-  height: 6rem;
-  width: 100%;
-
-  & img {
-    margin-left: auto;
-    @media (min-width: 768px) {
-      margin-left: 0;
-    }
-  }
-`;
-
 export const SidebarContainer = styled.div`
-  width: ${p => p.theme.layout.sidebar};
+  display: ${p => (p.hidden ? 'none' : 'block')};
+  position: absolute;
+  @media ${({ theme }) => theme.media.sm} {
+    display: block;
+    position: static;
+    width: ${p => p.theme.layout.sidebar};
+  }
 `;
 
 export const SideBarStripes = styled.div`
@@ -36,16 +26,17 @@ export const SidebarWrapper = styled.aside`
   display: flex;
   flex-direction: column;
   z-index: 1;
-
   overflow-y: scroll;
   min-height: 100%;
-  width: ${p => p.theme.layout.sidebar};
-
+  width: 100%;
   padding: ${p => p.theme.spacing.md};
   padding-right: ${p => p.theme.spacing.sm};
   background: ${p => p.theme.colors.bg};
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
+  @media ${({ theme }) => theme.media.sm} {
+    width: ${p => p.theme.layout.sidebar};
+  }
 `;
 
 export const SidebarNavItem = styled(Link)`

@@ -18,6 +18,7 @@ const systemFonts = [
 export const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: inherit;
+    min-width: 0;
   }
 
   html {
