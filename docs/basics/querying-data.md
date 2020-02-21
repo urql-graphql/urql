@@ -3,13 +3,20 @@ title: Queries
 order: 1
 ---
 
-## Run your first query
+# Queries
+
+Let's get to querying our data! This section will teach us how we can
+retrieve our data from the server with the help of `urql`.
+
+## React/Preact
 
 Let's get to querying our first piece of data, we offer both a
 `render-props` component named `Query` and a hook named `useQuery` as
 a means to query data.
 
 The examples will show the hooks-version but it will be the same for the component.
+
+### Run your first query
 
 For the following examples imagine we are querying a server offering us todo's, let's
 dive right into it!

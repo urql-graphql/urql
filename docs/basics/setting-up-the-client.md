@@ -3,7 +3,11 @@ title: Getting started
 order: 0
 ---
 
-## Installation
+# Getting started
+
+## React/Preact
+
+### Installation
 
 Installing `urql` is as quick as you'd expect. Firstly, install it
 with your package manager of choice, Note: this installation is specific for React:
@@ -23,7 +27,7 @@ that package instead.
 > The library is updated frequently and remains very backwards compatible,
 > but make sure it will work with other GraphQL tooling you might have installed.
 
-## Getting started (React/Preact)
+### Setting up the client
 
 The package will export a method called `createClient` we can use this to create the
 client that will be used to dispatch our queries, mutations, etc.
@@ -56,7 +60,7 @@ const client = createClient({
 });
 ```
 
-## Providing the client (React/Preact)
+### Providing the client
 
 To make use of this client in (P)React we will have to provide the client through
 the context API. This is done with the help of the `Provider` export.
