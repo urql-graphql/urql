@@ -3,7 +3,6 @@ title: Testing
 order: 6
 ---
 
-<a name="testing"></a>
 
 # Testing
 
