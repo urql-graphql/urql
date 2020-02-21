@@ -8,10 +8,9 @@ import {
   Exchange,
 } from 'urql';
 import { SSRData, SSRExchange } from 'urql/dist/types/exchanges/ssr';
-
 import 'isomorphic-unfetch';
 
-import { NextUrqlClientOptions } from './with-urql-client';
+import { NextUrqlClientOptions } from './types';
 
 let urqlClient: Client | null = null;
 let ssrCache: SSRExchange | null = null;
@@ -26,11 +25,9 @@ export function initUrqlClient(
   ],
   initialState?: SSRData,
 ): [Client | null, SSRExchange | null] {
-  /**
-   * Create a new Client for every server-side rendered request.
-   * This ensures we reset the state for each rendered page.
-   * If there is an exising client instance on the client-side, use it.
-   */
+  // Create a new Client for every server-side rendered request.
+  // This ensures we reset the state for each rendered page.
+  // If there is an exising client instance on the client-side, use it.
   const isServer = typeof window === 'undefined';
   if (isServer || !urqlClient) {
     ssrCache = ssrExchange({ initialState });

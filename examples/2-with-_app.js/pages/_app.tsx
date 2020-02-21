@@ -1,9 +1,9 @@
 import React from 'react';
 import { withUrqlClient } from 'next-urql';
-import { AppPropsType } from 'next/dist/next-server/lib/utils';
+import { AppProps } from 'next/app';
 
-const App: React.FC<AppPropsType> = ({ Component, pageProps }) => (
-  <Component {...pageProps} />
-);
+const App = ({ Component, pageProps }: AppProps) => {
+  return <Component {...pageProps} />;
+};
 
 export default withUrqlClient({ url: 'https://graphql-pokemon.now.sh' })(App);

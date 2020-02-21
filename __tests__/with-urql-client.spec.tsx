@@ -1,28 +1,23 @@
 import React from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { NextComponentType } from 'next';
 import { Client, defaultExchanges, composeExchanges } from 'urql';
 
-import withUrqlClient, { NextUrqlContext } from '../src/with-urql-client';
+import { withUrqlClient, NextUrqlPageContext } from '../src';
 import * as init from '../src/init-urql-client';
 
-interface Props {
-  urqlClient: Client;
-}
-
-const MockApp: React.FC<Props> = () => {
+const MockApp: React.FC<any> = () => {
   return <div />;
 };
 
-const MockAppTree: React.FC = () => {
+const MockAppTree: React.FC<any> = () => {
   return <div />;
 };
 
 describe('withUrqlClient', () => {
   const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
   const mockMergeExchanges = jest.fn(() => defaultExchanges);
-  let Component: NextComponentType<any>;
+  let Component: any;
 
   beforeAll(() => {
     configure({ adapter: new Adapter() });
@@ -38,7 +33,7 @@ describe('withUrqlClient', () => {
       Component = withUrqlClient({ url: 'http://localhost:3000' })(MockApp);
     });
 
-    const mockContext: NextUrqlContext = {
+    const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -76,7 +71,7 @@ describe('withUrqlClient', () => {
       .toString(36)
       .slice(-10);
 
-    const mockContext: NextUrqlContext = {
+    const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -85,7 +80,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      } as NextUrqlContext['req'],
+      } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
     };
 

@@ -1,63 +1,32 @@
 import React from 'react';
-import { NextPage, NextPageContext, NextComponentType } from 'next';
-import { AppContext } from 'next/app';
+import { NextPage, NextPageContext } from 'next';
+import NextApp, { AppContext } from 'next/app';
 import ssrPrepass from 'react-ssr-prepass';
-import {
-  Provider,
-  Client,
-  ClientOptions,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-  Exchange,
-} from 'urql';
-import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
+import { Provider, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 
 import { initUrqlClient } from './init-urql-client';
+import {
+  NextUrqlClientConfig,
+  MergeExchanges,
+  NextUrqlContext,
+  WithUrqlProps,
+} from './types';
 
-export type NextUrqlClientOptions = Omit<
-  ClientOptions,
-  'exchanges' | 'suspense'
->;
-
-interface WithUrqlClient {
-  urqlClient?: Client;
+function getDisplayName(Component: React.ComponentType<any>) {
+  return Component.displayName || Component.name || 'Component';
 }
 
-interface WithUrqlInitialProps {
-  urqlState: SSRData;
-}
-
-interface PageProps {
-  pageProps?: WithUrqlClient;
-}
-
-export interface NextUrqlContext extends NextPageContext {
-  urqlClient: Client;
-}
-
-type NextUrqlClientConfig =
-  | NextUrqlClientOptions
-  | ((ctx?: NextPageContext) => NextUrqlClientOptions);
-
-function withUrqlClient<T = any, IP = any>(
+export function withUrqlClient(
   clientConfig: NextUrqlClientConfig,
-  mergeExchanges: (ssrEx: SSRExchange) => Exchange[] = ssrEx => [
+  mergeExchanges: MergeExchanges = ssrExchange => [
     dedupExchange,
     cacheExchange,
-    ssrEx,
+    ssrExchange,
     fetchExchange,
   ],
 ) {
-  return (Page: NextPage<T & IP & WithUrqlClient, IP>) => {
-    const withUrql: NextComponentType<
-      NextUrqlContext,
-      IP | (IP & WithUrqlInitialProps),
-      T & IP & WithUrqlClient & WithUrqlInitialProps & PageProps
-    > = ({ urqlClient, urqlState, pageProps, ...rest }) => {
-      // The React Hooks ESLint plugin will not interpret withUrql as a React component
-      // due to the NextComponentType annotation. Ignore the warning about not using useMemo.
-
+  return (AppOrPage: NextPage<any> | typeof NextApp) => {
+    const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
         const clientOptions =
@@ -65,32 +34,32 @@ function withUrqlClient<T = any, IP = any>(
 
         return (
           urqlClient ||
-          pageProps?.urqlClient ||
-          initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]!
         );
-      }, [urqlClient, pageProps, urqlState]) as Client;
+      }, [urqlClient, urqlState]);
 
       return (
         <Provider value={client}>
-          <Page urqlClient={client} {...(rest as T & IP)} />
+          <AppOrPage urqlClient={client} {...rest} />
         </Provider>
       );
     };
 
     // Set the displayName to indicate use of withUrqlClient.
-    const displayName = Page.displayName || Page.name || 'Component';
-    withUrql.displayName = `withUrqlClient(${displayName})`;
+    withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
-    withUrql.getInitialProps = async (ctx: NextPageContext | AppContext) => {
-      const { AppTree } = ctx;
+    withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
+      const { AppTree } = appOrPageCtx;
 
-      const appCtx = (ctx as AppContext).ctx;
-      const isApp = !!appCtx;
+      // Determine if we are wrapping an App component or a Page component.
+      const isApp = !!(appOrPageCtx as AppContext).Component;
+      const ctx = isApp
+        ? (appOrPageCtx as AppContext).ctx
+        : (appOrPageCtx as NextPageContext);
 
       const opts =
-        typeof clientConfig === 'function'
-          ? clientConfig(isApp ? appCtx : (ctx as NextPageContext))
-          : clientConfig;
+        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
       const [urqlClient, ssrCache] = initUrqlClient(opts, mergeExchanges);
 
       if (urqlClient) {
@@ -98,9 +67,9 @@ function withUrqlClient<T = any, IP = any>(
       }
 
       // Run the wrapped component's getInitialProps function.
-      let pageProps = {} as IP;
-      if (Page.getInitialProps) {
-        pageProps = await Page.getInitialProps(ctx as NextUrqlContext);
+      let pageProps;
+      if (AppOrPage.getInitialProps) {
+        pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
       }
 
       // Check the window object to determine whether or not we are on the server.
@@ -110,27 +79,18 @@ function withUrqlClient<T = any, IP = any>(
         return pageProps;
       }
 
-      // Run the prepass step on AppTree. This will run all urql queries on the server.
-      await ssrPrepass(
-        <AppTree
-          pageProps={{
-            ...pageProps,
-            urqlClient,
-          }}
-        />,
-      );
+      const props = { ...pageProps, urqlClient };
+      const appTreeProps = isApp ? props : { pageProps: props };
 
-      // Extract the query data from urql's SSR cache.
-      const urqlState = ssrCache?.extractData();
+      // Run the prepass step on AppTree. This will run all urql queries on the server.
+      await ssrPrepass(<AppTree {...appTreeProps} />);
 
       return {
         ...pageProps,
-        urqlState,
+        urqlState: ssrCache?.extractData(),
       };
     };
 
     return withUrql;
   };
 }
-
-export default withUrqlClient;
