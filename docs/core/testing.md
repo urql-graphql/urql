@@ -7,11 +7,13 @@ order: 6
 
 # Testing
 
-When testing your components, you're likely going to want to check arguments and force different states from the Urql hooks, this is the place to get started.
+When testing your components, you're likely going to want to check arguments and force different states for your components using Urql.
 
-## Communicating with hooks
+> **Note:** Examples demonstrate the _React hooks_ version of Urql being used but underlying patterns apply to all implementations.
 
-Under the hood, Urql's hooks are just adapters for talking to the Urql client.
+## Mocking the client
+
+For the most part, Urql's hooks are just adapters for talking to the Urql client.
 
 The way in which they do this is by making calls to the client via context.
 
@@ -69,11 +71,15 @@ it('triggers a mutation', () => {
     name: 'Carla',
   };
 
-  wrapper.find('input').simulate('change', { currentTarget: { value: variables.name } });
+  wrapper
+    .find('input')
+    .simulate('change', { currentTarget: { value: variables.name } });
   wrapper.find('button').simulate('click');
 
   expect(mockClient.executeMutation).toBeCalledTimes(1);
-  expect(mockClient.executeMutation).toBeCalledWith(expect.objectContaining({ variables }));
+  expect(mockClient.executeMutation).toBeCalledWith(
+    expect.objectContaining({ variables })
+  );
 });
 ```
 
