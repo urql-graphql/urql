@@ -89,7 +89,7 @@ For testing render output, or creating fixtures, you may want to force the state
 
 ### Fetching
 
-Fetching states can be simulated by returning a stream which never returns. Wonka provides a utility for this aptly called `never`.
+Fetching states can be simulated by returning a stream which never returns. Wonka provides a utility for this, aptly called `never`.
 
 Here's a fixture which stays in the _fetching_ state.
 
