@@ -30,7 +30,7 @@ To mutate the data we first have to invoke the second item in the tuple - the fu
 ### Using the result
 
 When calling this function we have two ways of getting the response from the server,
-we can get it from `updateTodoResult` or we chain a `.then` on our `updateTodo` call.
+we can get it from `updateTodoResult` or we can await the promise returned from our mutation trigger function.
 
 ```jsx
 const Todo = ({ id, title }) => {
