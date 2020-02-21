@@ -75,7 +75,7 @@ const Sidebar = ({ sidebarOpen }) => {
         </Fragment>
       );
     });
-  }, [tree, currentPage]);
+  }, [currentPage, tree, pathname]);
 
   return (
     <SidebarContainer hidden={!sidebarOpen}>
