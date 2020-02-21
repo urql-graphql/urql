@@ -17,8 +17,6 @@ import {
 
 import { mediaSizes } from '../styles/theme';
 
-import closeButton from '../assets/close.svg';
-import burger from '../assets/burger.svg';
 import logoSidebar from '../assets/sidebar-badge.svg';
 
 const HeroLogo = styled.img.attrs(() => ({
@@ -40,41 +38,15 @@ const ContentWrapper = styled.div`
   padding: ${p => p.theme.spacing.xs} 0;
 `;
 
-const OpenCloseButton = css`
-  cursor: pointer;
-  display: ${p => (p.hidden ? 'none' : 'block')};
-  margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 1;
-  @media ${p => p.theme.media.sm} {
-    display: none;
-  }
-`;
-
-const OpenButton = styled.img.attrs(() => ({
-  src: burger,
-}))`
-  ${OpenCloseButton}
-`;
-
-const CloseButton = styled.img.attrs(() => ({
-  src: closeButton
-}))`
-  ${OpenCloseButton}
-`;
-
 const relative = (from, to) => {
   if (!from || !to) return null;
   const pathname = path.relative(path.dirname(from), to);
   return { pathname };
 };
 
-const Sidebar = () => {
+const Sidebar = ({ sidebarOpen }) => {
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const sidebarItems = useMemo(() => {
     if (!currentPage || !tree || !tree.children) {
@@ -106,20 +78,13 @@ const Sidebar = () => {
   }, [tree, currentPage]);
 
   return (
-    <>
-      <OpenButton hidden={sidebarOpen} onClick={() => setSidebarOpen(true)} />
-      <CloseButton
-        hidden={!sidebarOpen}
-        onClick={() => setSidebarOpen(false)}
-      />
-      <SidebarContainer hidden={!sidebarOpen}>
-        <SideBarStripes />
-        <SidebarWrapper>
-          <HeroLogo />
-          <ContentWrapper>{sidebarItems}</ContentWrapper>
-        </SidebarWrapper>
-      </SidebarContainer>
-    </>
+    <SidebarContainer hidden={!sidebarOpen}>
+      <SideBarStripes />
+      <SidebarWrapper>
+        <HeroLogo />
+        <ContentWrapper>{sidebarItems}</ContentWrapper>
+      </SidebarWrapper>
+    </SidebarContainer>
   );
 };
 

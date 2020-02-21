@@ -11,7 +11,7 @@ const Container = styled.main.attrs(() => ({
   width: 100%;
   position: sticky;
 
-  display: flex;
+  display: ${p => (p.sidebarOpen ? 'none' : 'flex')};
   flex-direction: row-reverse;
 `;
 
@@ -80,8 +80,8 @@ const SectionList = () => {
   );
 };
 
-const Article = ({ children }) => (
-  <Container>
+const Article = ({ children, sidebarOpen }) => (
+  <Container sidebarOpen={sidebarOpen}>
     <Legend>
       <SectionList />
     </Legend>

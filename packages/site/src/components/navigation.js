@@ -1,22 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-export const Navigation = styled.div`
-  align-items: center;
-  background: #8196ff;
-  display: flex;
-  flex-direction: row;
-  height: 6rem;
-  width: 100%;
-
-  & img {
-    margin-left: auto;
-    @media (min-width: 768px) {
-      margin-left: 0;
-    }
-  }
-`;
-
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
   position: absolute;
