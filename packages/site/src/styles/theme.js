@@ -66,10 +66,16 @@ export const shadows = {
   input: 'rgba(0, 0, 0, 0.09) 0px 2px 10px -3px',
 };
 
+export const mediaSizes = {
+  sm: 700,
+  md: 960,
+  lg: 1200,
+};
+
 export const media = {
-  sm: '(min-width: 700px)',
-  md: '(min-width: 960px)',
-  lg: '(min-width: 1200px)',
+  sm: `(min-width: ${mediaSizes.sm}px)`,
+  md: `(min-width: ${mediaSizes.md}px)`,
+  lg: `(min-width: ${mediaSizes.lg}px)`,
 };
 
 export const spacing = {
