@@ -48,7 +48,7 @@ const ProjectWording = styled(Link)`
 `;
 
 const FormidableLogo = styled.img.attrs(() => ({
-  src: formidableLogo
+  src: formidableLogo,
 }))`
   height: 2.8rem;
   position: relative;
@@ -62,9 +62,7 @@ const Header = () => {
         <BlockLink href="https://formidable.com/">
           <FormidableLogo />
         </BlockLink>
-        <ProjectWording to="/">
-          urql
-        </ProjectWording>
+        <ProjectWording to="/">urql</ProjectWording>
       </Wrapper>
     </Fixed>
   );
