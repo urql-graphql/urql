@@ -31,7 +31,6 @@ that package instead.
 
 The package will export a method called `createClient` we can use this to create the
 client that will be used to dispatch our queries, mutations, etc.
-
 ```js
 import { createClient } from 'urql';
 

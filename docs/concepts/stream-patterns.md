@@ -1,6 +1,6 @@
 ---
 title: Stream Patterns
-order: 3
+order: 1
 ---
 
 # Stream Patterns and Observables
