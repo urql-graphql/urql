@@ -42,6 +42,8 @@ const Todos = () => {
 }
 ```
 
+### Variables
+
 We have fetched our first set of todos. We can see the `useQuery` hook returns a tuple,
 the first being the result indicating whether it's fetching, it has errored and the result.
 The second can be used to refetch the query forcefully.
@@ -66,6 +68,8 @@ const Todos = ({ from, limit }) => {
 }
 ```
 
+### Skipping queries
+
 As you can see we are enforcing `from` and `limit` as mandatory (notice the "!" after the `Int` type)
 this means that if we don't supply them this query will fail, we need some way of pausing this query
 when we don't have these. We can do exactly this by means of the `skip` property.
@@ -81,6 +85,9 @@ const Todos = ({ from, limit }) => {
 ```
 
 Now whenever one of these two mandatory variables isn't supplied the query won't be executed.
+
+### Request policy
+
 We're almost there, there's one last thing we should touch on and that's the `requestPolicy`,
 this property tells the client how you want to get the result for your query, there are four values:
 

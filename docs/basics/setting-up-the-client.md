@@ -56,7 +56,7 @@ const client = createClient({
 });
 ```
 
-## (P)React
+## Providing the client (React/Preact)
 
 To make use of this client in (P)React we will have to provide the client through
 the context API. This is done with the help of the `Provider` export.

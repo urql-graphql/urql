@@ -27,6 +27,8 @@ Similar to the `useQuery` output, `useMutation` returns a tuple. The first item 
 containing: `fetching`, `error`, and `data`. At this point in time, no mutation has been performed.
 To mutate the data we first have to invoke the second item in the tuple - the function here named `updateTodo`.
 
+### Using the result
+
 When calling this function we have two ways of getting the response from the server,
 we can get it from `updateTodoResult` or we chain a `.then` on our `updateTodo` call.
 
