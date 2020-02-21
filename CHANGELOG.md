@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2020-02-20
+
+This release adds support for different `urql` Client configurations between the client-side and the server-side when using `next-urql`.
+
+**Warning:** To support this, access to Next's context object, `ctx`, **can only happen on the server**.
+
+### Added
+
+- An example showing how to use a custom exchange with `next-urql`. PR by @ryan-gilb [here](https://github.com/FormidableLabs/next-urql/pull/32).
+- Instructions for using `next-urql` with ReasonML. PR by @parkerziegler [here](https://github.com/FormidableLabs/next-urql/pull/28).
+
+### Fixed
+
+- `clientOptions` are no longer serialized inside of `withUrql`'s `getInitialProps` method. This ensures that users can use different Client configurations between the client and server. PR by @parkerziegler [here](https://github.com/FormidableLabs/next-urql/pull/33).
+- Proper support for forwarding `pageProps` when using `withUrqlClient` with an `_app.js` component. The `urql` Client instance is also attached to `ctx` for `_app.js` `getInitialProps`. PR by @parkerziegler [here](https://github.com/FormidableLabs/next-urql/pull/38).
+- `react-ssr-prepass` dependency upgraded to `1.1.2` to support `urql` `>= 1.9.0`. PR by @JoviDeCroock [here](https://github.com/FormidableLabs/next-urql/pull/37).
+
+### Diff
+
+https://github.com/FormidableLabs/next-urql/compare/v0.2.5...v0.3.0
+
 ## [0.2.5] - 2020-01-20
 
 This release encompasses small changes to our TypeScript definitions for `next-urql`, with an upgrade to using `next@9` as the basis for new type definitions in lieu of `@types/next`. The examples were also converted over to TypeScript from JavaScript.
