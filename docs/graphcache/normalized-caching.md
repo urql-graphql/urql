@@ -1,9 +1,11 @@
 ---
-title: Architecture
+title: Normalized Caching
 order: 1
 ---
 
-# Architecture
+# Normalized Caching
+
+<!-- TODO: Explain what it is and what Graphcache does -->
 
 This cache implementation builds on the concept of normalisation,
 we can use the naive implementation where we just refetch when we see
