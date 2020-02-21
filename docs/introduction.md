@@ -38,25 +38,6 @@ operation.
 
 ![Operation Signature](./assets/urql-signals.png)
 
-## Document Caching
-
-By default `urql` uses document caching.
-
-<!-- TODO: Explain document caching -->
-
-The default cache in `urql` works like a document or page cache, for example like a browser would cache pages.
-With this default behavior results are cached by the operation key that requested them. This means that
-each unique operation can have exactly one cached result.
-
-These results are aggressively invalidated. Whenever you send a mutation, each result that contains `__typename`s
-that also occur in the mutation result is invalidated.
-
-![Document Caching](./assets/urql-document-caching.png)
-
-> This cache has a small trade-off, when we would request an array of an entity and this results in an empty array response,
-> the cache won't be able to know the `__typename` resulting in no invalidation. You can build a guard for it or use the
-> normalised cache.
-
 ## Normalized Caching
 
 You can choose to use normalized caching instead.

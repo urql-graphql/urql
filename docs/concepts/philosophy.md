@@ -109,6 +109,10 @@ and all results.
 
 All default behavior in the [core package](./core-package.md) is implemented using
 _Exchanges_, which is possible because all operations and all results are treated as a stream
-of events. From our perspective, thinking about your GraphQL queries and results in terms of
-streams of data allows us to implement any given complex behaviour, which we'll learn more
-about in the next section.
+of events. We call these events "Operations".
+
+![Operation Signature](../assets/urql-signals.png)
+
+From our perspective, thinking about your GraphQL queries and results in terms of
+streams of operations and results allows us to implement any given complex behaviour,
+which we'll learn more about in the next section.
