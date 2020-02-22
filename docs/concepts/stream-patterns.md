@@ -71,3 +71,46 @@ In Wonka, like with Observables, streams are cancellable by calling `unsubscribe
 subscription returns.
 
 [Read more about Wonka in its documentation.](https://wonka.kitten.sh/basics/background)
+
+## The Client's query streams
+
+Internally the `Client` has methods that may be used to execute queries, mutations, and
+subscriptions. These methods typically return `Wonka` streams that when subscribed to will
+emit results for a given query.
+
+When a result can be retrieved from an in-memory cache, the stream may even emit the result
+synchronously — rather than asynchronously.
+
+There are three methods for each different type of operation that GraphQL supports, there's an
+`executeQuery`, `executeMutation`, and `executeSubscription` method. All these methods are
+convenience wrappers around `executeRequestOperation` that create an operation and return a stream.
+
+There are also convenience wrappers around the "execute" methods that are useful when using `urql`
+in a Node.js environment. Those are `query`, `mutation`, and `subscription`.
+
+```js
+import { pipe, subscribe } from 'wonka';
+
+const QUERY = `
+  query Test($id: ID!) {
+    getUser(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+const { unsubscribe } = pipe(
+  client.query(QUERY, { id: 'test' }),
+  subscribe(result => {
+    console.log(result); // { data: ... }
+  })
+);
+```
+
+All methods on the `Client` internally emit an operation on an "operations stream" and the result
+for this operation will be filtered out of all results and delivered to your stream.
+There are several of these convenience methods in `urql` that make it easier to work with the
+concept of GraphQL operation and result streams.
+
+[Read more about the available APIs on the `Client` in the Core API docs.](../api/core.md)
