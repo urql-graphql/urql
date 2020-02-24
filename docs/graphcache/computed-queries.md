@@ -1,6 +1,6 @@
 ---
-title: Resolvers
-order: 3
+title: Computed-queries
+order: 2
 ---
 
 # Resolvers
@@ -32,7 +32,9 @@ A `resolver` gets four arguments:
   see more about this [below](#cache.resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.
 
-## `cache.resolve`
+## Cache parameter
+
+### resolve
 
 The `cache.resolve` method is used to get links and property values from the cache.
 Our cache methods have three arguments:
@@ -100,7 +102,7 @@ const cache = cacheExchange({
 
 will do the trick.
 
-## `cache.readQuery`
+### Reading a query
 
 Another method the cache allows is to let you read a full query, this method
 accepts an object of `query` and optionally `variables`.
@@ -111,7 +113,7 @@ const data = cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } }
 
 This way we'll get the stored data for the `TodosQuery` with given variables.
 
-## `cache.readFragment`
+### Reading a fragment
 
 The store allows the user to also read a fragment for a certain entity, this function
 accepts a `fragment` and an `id`. This looks like the following.

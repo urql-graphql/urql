@@ -1,9 +1,9 @@
 ---
-title: Updates
-order: 4
+title: Custom-updates
+order: 3
 ---
 
-# Updates
+# Custom Updates (on Mutations or Subscriptions),
 
 ## Data-updates
 

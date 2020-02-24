@@ -1,9 +1,9 @@
 ---
-title: Schema
-order: 5
+title: Schema-awareness
+order: 4
 ---
 
-# Schema
+# Schema-awareness
 
 As mentioned in the docs we allow for the schema to be passed
 to the `cacheExchange` this allows for partial results in deterministic
@@ -19,8 +19,6 @@ We can run a script that generates the introspection result like this:
 
 ```js
 // import a fetch library for node.
-import introspectionQuery from '@urql/exchange-graphcache/docs/introspectionQuery';
-// or
 import { getIntrospectionQuery } from 'graphql';
 
 fetch('http://localhost:3000/graphql', {
@@ -50,9 +48,3 @@ import schema from './schema.json';
 
 const cache = cacheExchange({ schema });
 ```
-
-This should do the trick, it's also possible to just open your playground
-and manually execute the introspection with the query found [here](./introspectionQuery.js)
-this one is the smallest representation.
-
-> Note that our query can be unsuited for your case, it's best to resort to the one offered from graphql itself in that case
