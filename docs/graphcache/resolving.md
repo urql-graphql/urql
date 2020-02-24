@@ -1,6 +1,6 @@
 ---
 title: Resolvers
-order: 5
+order: 3
 ---
 
 # Resolvers
@@ -199,5 +199,3 @@ last: 1, before: c => node 89, startCursor: d
 
 With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
 And with outwards merging: `[..., 89, 99, 1, 2, ...]`
-
-[Back](../README.md)
