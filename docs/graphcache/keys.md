@@ -5,17 +5,20 @@ order: 2
 
 # Keys
 
-When resolving entities the graph cache will try to look at the entity
-and use `id` or `_id` to identify them.
+In the last chapter we saw that we always try to create a key with `__typename` and
+`id` or `_id`. `__typename` always has to be present but `id` or `_id` can be left out,
+graphcache will warn you for this.
 
-The `keys` property allows us to intervene in this behavior by pointing
-to another location on the entity or by pre-/post-fixing it.
+The custom `keys` property comes into play for this, when we don't have an `id` or `_id`
+we'll be asked to provide a way to create a key for said entity.
 
 Let's look at an example. Say we have a set of todos each with a `__typename`
 of `Todo`, but instead of identifying on `id` or `_id` we want to identify
 each record by its `name`.
 
 ```js
+import { cacheExchange } from '@urql/exchange-graphcache'; 
+
 const myGraphCache = cacheExchange({
   keys: {
     Todo: data => data.name,
@@ -36,5 +39,3 @@ const myGraphCache = cacheExchange({
   },
 });
 ```
-
-[Back](../README.md)
