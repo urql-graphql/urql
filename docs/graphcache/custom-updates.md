@@ -1,11 +1,13 @@
 ---
-title: Custom-updates
+title: Custom Updates
 order: 3
 ---
 
 # Custom Updates (on Mutations or Subscriptions),
 
-## Data-updates
+<!-- TODO: Introduction on updates and cache-altering behaviour -->
+
+## Data Updates
 
 When the cache receives a response it will try and do its best to
 incorporate that response into the current cache. However, for adding and

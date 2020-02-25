@@ -1,9 +1,13 @@
 ---
-title: Computed-queries
+title: Computed Queries
 order: 2
 ---
 
-# Resolvers
+# Computed Queries
+
+<!-- TODO: introduction to cache-altering configuration -->
+
+## Resolvers
 
 `resolvers` are a way to alter the response you'll receive from the cache.
 Let's look at an example to get a better understanding.

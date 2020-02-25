@@ -1,9 +1,9 @@
 ---
-title: Schema-awareness
+title: Schema Awareness
 order: 4
 ---
 
-# Schema-awareness
+# Schema Awareness
 
 As mentioned in the docs we allow for the schema to be passed
 to the `cacheExchange` this allows for partial results and deterministic
