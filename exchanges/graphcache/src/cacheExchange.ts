@@ -349,7 +349,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         ),
         cacheOps$,
       ]),
-      filter(op => !(op.operationName === 'query' && op.context.requestPolicy === 'cache-only')),
+      filter(op => op.context.requestPolicy !== 'cache-only'),
       forward,
       map(updateCacheWithResult)
     );
