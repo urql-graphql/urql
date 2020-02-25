@@ -52,12 +52,17 @@ const HeadingList = styled.ul`
   border-left: 1px solid ${p => p.theme.colors.border};
 `;
 
-const HeadingItem = styled.a`
-  font-size: ${p => p.theme.fontSizes.small};
-  font-weight: ${p => p.theme.fontWeights.body};
-  color: ${p => p.theme.colors.heading};
-  text-decoration: none;
-  opacity: 0.7;
+const HeadingItem = styled.li`
+  line-height: ${p => p.theme.lineHeights.heading};
+  margin-bottom: ${p => p.theme.spacing.xs};
+
+  > a {
+    font-size: ${p => p.theme.fontSizes.small};
+    font-weight: ${p => p.theme.fontWeights.body};
+    color: ${p => p.theme.colors.heading};
+    text-decoration: none;
+    opacity: 0.7;
+  }
 `;
 
 const SectionList = () => {
@@ -72,9 +77,9 @@ const SectionList = () => {
       <LegendTitle>In this section</LegendTitle>
       <HeadingList>
         {headings.map(heading => (
-          <li key={heading.slug}>
-            <HeadingItem href={`#${heading.slug}`}>{heading.value}</HeadingItem>
-          </li>
+          <HeadingItem key={heading.slug}>
+            <a href={`#${heading.slug}`}>{heading.value}</a>
+          </HeadingItem>
         ))}
       </HeadingList>
     </>
