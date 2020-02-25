@@ -1,8 +1,7 @@
-import React, { forwardRef, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withRouteData } from 'react-static';
-import { Link } from 'react-router-dom';
 
 import Article from './article';
 import Header from './header';
@@ -10,7 +9,6 @@ import Sidebar from '../../components/sidebar';
 
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
-import logoFormidableDark from '../../assets/logo_formidable_dark.svg';
 
 const Container = styled.div`
   display: flex;

@@ -1,9 +1,9 @@
 ---
-title: Populate Exchange
-order: 4
+title: Auto-populate Mutations
+order: 3
 ---
 
-# Populate Exchange
+# Automatically populating Mutations
 
 `populate` is an exchange for auto-populating fields in your mutations.
 

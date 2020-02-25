@@ -1,6 +1,6 @@
 ---
 title: Help
-order: 2
+order: 6
 ---
 
 # Help!

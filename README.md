@@ -12,8 +12,7 @@
   <br />
   <a href="https://circleci.com/gh/FormidableLabs/urql">
     <img alt="Test Status" src="https://circleci.com/gh/FormidableLabs/urql.svg?style=shield" />
-  </a>
-  <a href="https://github.com/FormidableLabs/urql#maintenance-status">
+  </a> <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
   </a>
   <a href="https://spectrum.chat/urql">
@@ -202,7 +201,6 @@ Any hook in `urql` dispatches its operation on the client (A, B, C) which will b
 single stream of inputs. As responses come back from the cache or your GraphQL API one or more results are
 dispatched on an output stream that correspond to the operations, which update the hooks.
 
-<img width="709" src="docs/assets/urql-event-hub.png" alt="Diagram: The 'useQuery' hook dispatches an operation on the client when it mounts or updates. When it unmounts it dispatches a 'teardown' operation that cancels the original operation. Results that come back from the client update the hook and are filtered by the operation's original key."/>
 
 Hence the client can be seen as an event hub. Operations are sent to the client, which executes them and
 sends back a result. A special teardown-event is issued when a hook unmounts or updates to a different

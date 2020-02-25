@@ -1,54 +1,54 @@
 ---
-title: README
-order: 1
+title: Introduction
+order: 0
 ---
 
-# Documentation
+# Introduction
 
-`urql` is a highly customizable and flexible GraphQL client, that
-happens to come with some default core behavior and some React
-component and hooks APIs.
+`urql` is an implementation of a GraphQL client, built to be both easy to use for newcomers to
+GraphQL, as well as extensible, to grow to support dynamic single-app applications and highly
+customised GraphQL infrastructure. In short, `urql` prioritizes usability and adaptability.
 
-You can take `urql` from writing your first GraphQL app, to
-building a full experience, and all the way to extending it,
-making it suitable for your needs, and experimenting with custom
-GraphQL clients!
+As you're adopting GraphQL, `urql` becomes your primary data layer and can handle content-heavy
+pages through ["Document Caching"](./basics/document-caching.md) as well as dynamic and data-heavy
+pages through ["Normalized Caching"](./graphcache/normalized-caching.md).
 
-### [Getting Started](core/getting-started.md)
+## Constituent Parts
 
-Let's get up and running! This section explains how to
-install `urql` and use its React components and hooks.
-This contains everything you need to know to get started
-and just use the default `urql`!
+`urql` can be understood as a collection of connected parts and packages. When you [get
+started](./basics/setting-up-the-client.md) you'll only need to install a single package for your
+framework of choice. We're then able to declaratively send GraphQL requests to our API.
 
-### [Architecture](core/architecture.md)
+All framework packages — like `urql` and `@urql/preact` — wrap the core package, which we can
+imagine as the brain of `urql` with most of its logic.
 
-A quick deep dive into `urql`'s structure, how the
-client works, and how requests get sent through the
-exchange pipeline to your GraphQL API.
+As we progress with implementing `urql` into our application, we're later able to extend it by
+adding ["addon packages", which we call _Exchanges_](./concepts/exchanges.md)
 
-### [Basics](core/basics.md)
+## The Documentation
 
-Everything about the basic & default `urql` behavior
-that comes with explanations of the `fetchExchange`,
-the `cacheExchange`, and how to use _Subscriptions_.
+This documentation is split into groups or sections that cover different levels of usage or areas of
+interest.
 
-### [Exchanges](core/exchanges.md)
+- **Basics** is the section where we find the ["Getting Started"
+  guide](./basics/setting-up-the-client.md) and usage patterns for our framework of choice.
+- **Main Concepts** then explains more about how `urql` functions, what it's made up of, and covers
+  the main aspects of the `Client` and GraphQL clients in general, on the ["Philosophy"
+  page](./concepts/philosophy.md)
+- **Advanced** covers all more uncommon use-cases and contains guides that we won't need immediately
+  when we get started with `urql`.
+- **Graphcache** documents one of the most important addons to `urql`, which adds ["Normalized
+  Caching" support](./graphcache/normalized-caching.md) to the `Client` and enables more complex
+  use-cases, smarter caching, and more dynamic apps to function.
+- **API** contains a detailed list of all helpers, utilities, components, and other parts of each of
+  `urql`'s packages, which may contain all details of each part and package.
 
-Here's everything you need to know to customize and augment
-every aspect of the GraphQL client from how data is cached
-to how components receive their data.
+Apart from these main sections there is also some additional content that doesn't fit into any of
+the other sections.
 
-### [Extending & Experimenting](core/extending-and-experimenting.md)
+- **Showcase** aims to list some companies that use `urql`, third-party packages, and other helpful
+  resources.
+- **Common Questions** lists frequently asked questions and problems that we may encounter
+  infrequently (but shall answer nonetheless.)
 
-Here's everything you need to know to extend,
-customise and experiment with `urql`. This section
-shows you how to use the `Client` to write new
-APIs (Be it for React or not) and how to write
-new "Exchanges" to customise `urql`'s core behavior!
-
-### [Guides](core/guides.md)
-
-Here are some guides on how to make common exchanges.
-
-### [API](core/api.md)
+We hope you grow to love `urql`!

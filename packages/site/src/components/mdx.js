@@ -36,7 +36,7 @@ const InlineCode = styled.code`
   background: ${p => p.theme.colors.passiveBg};
   color: ${p => p.theme.colors.code};
   font-family: ${p => p.theme.fonts.code};
-  font-size: ${p => p.theme.fontSizes.code};
+  font-size: ${p => p.theme.fontSizes.small};
   border-radius: ${p => p.theme.spacing.xs};
 
   display: inline-block;
@@ -46,6 +46,39 @@ const InlineCode = styled.code`
   padding: 0 0.2em;
   margin: 0;
 `;
+
+const ImageWrapper = styled.div`
+  margin: ${p => p.theme.spacing.md} 0;
+  border: 1px solid ${p => p.theme.colors.border};
+  border-radius: ${p => p.theme.spacing.xs};
+  background: ${p => p.theme.colors.bg};
+
+  display: flex;
+  flex-direction: column;
+
+  & > img {
+    padding: ${p => p.theme.spacing.md};
+    align-self: center;
+    max-height: 40vh;
+  }
+`;
+
+const ImageAlt = styled.span.attrs(() => ({
+  'aria-hidden': true, // This is just duplicating alt
+}))`
+  display: block;
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border-top: 1px solid ${p => p.theme.colors.border};
+  background: ${p => p.theme.colors.passiveBg};
+  font-size: ${p => p.theme.fontSizes.small};
+`;
+
+const Image = ({ alt, src }) => (
+  <ImageWrapper>
+    <img alt={alt} src={src} />
+    <ImageAlt>{alt}</ImageAlt>
+  </ImageWrapper>
+);
 
 const HighlightCode = ({ className = '', children }) => {
   const language = getLanguage(className);
@@ -58,23 +91,38 @@ const HighlightCode = ({ className = '', children }) => {
       language={language}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <Pre className={className} style={style}>
-          <Code>
-            {tokens.map((line, i) => (
-              <div {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
-          </Code>
-        </Pre>
+        <Code
+          style={{ ...style, backgroundColor: 'none' }}
+          className={className}
+        >
+          {tokens.map((line, i) => (
+            <div {...getLineProps({ line, key: i })}>
+              {line.map((token, key) => (
+                <span {...getTokenProps({ token, key })} />
+              ))}
+            </div>
+          ))}
+        </Code>
       )}
     </Highlight>
   );
 };
 
+const Blockquote = styled.blockquote`
+  margin: ${p => p.theme.spacing.md} 0;
+  padding: 0 0 0 ${p => p.theme.spacing.md};
+  border-left: 0.5rem solid ${p => p.theme.colors.border};
+  font-size: ${p => p.theme.fontSizes.small};
+
+  & > * {
+    margin: ${p => p.theme.spacing.sm} 0;
+  }
+`;
+
 const components = {
+  pre: Pre,
+  img: Image,
+  blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
 };

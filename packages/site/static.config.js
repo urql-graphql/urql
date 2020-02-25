@@ -11,10 +11,7 @@ export default {
       {
         location: '../../docs',
         template: './src/screens/docs',
-        order: {
-          core: 0,
-          graphcache: 1,
-        },
+        pathPrefix: 'docs',
       },
     ],
 
