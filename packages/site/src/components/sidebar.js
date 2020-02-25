@@ -53,7 +53,15 @@ const Sidebar = ({ sidebarOpen }) => {
       return null;
     }
 
-    return tree.children.map(page => {
+    let children = tree.children;
+    if (tree.frontmatter && tree.originalPath) {
+      children = [
+        { ...tree, children: undefined },
+        ...children
+      ];
+    }
+
+    return children.map(page => {
       return (
         <Fragment key={page.key}>
           <SidebarNavItem to={relative(pathname, page.path)}>
