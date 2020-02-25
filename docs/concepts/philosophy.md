@@ -19,7 +19,7 @@ In this guide, we will walkthrough how `urql` is set up internally and how all p
 ## Hello World
 
 [We previously read about how to set up a `Client` in "Getting
-Started".](../basics/setting-up-the-client.md)
+Started".](../basics/getting-started.md)
 
 When you use `urql` you will always create and set up a `Client` for which a `createClient`
 convenience helper exists.

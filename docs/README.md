@@ -16,7 +16,7 @@ pages through ["Normalized Caching"](./graphcache/normalized-caching.md).
 ## Constituent Parts
 
 `urql` can be understood as a collection of connected parts and packages. When you [get
-started](./basics/setting-up-the-client.md) you'll only need to install a single package for your
+started](./basics/getting-started.md) you'll only need to install a single package for your
 framework of choice. We're then able to declaratively send GraphQL requests to our API.
 
 All framework packages — like `urql` and `@urql/preact` — wrap the core package, which we can
@@ -31,7 +31,7 @@ This documentation is split into groups or sections that cover different levels 
 interest.
 
 - **Basics** is the section where we find the ["Getting Started"
-  guide](./basics/setting-up-the-client.md) and usage patterns for our framework of choice.
+  guide](./basics/getting-started.md) and usage patterns for our framework of choice.
 - **Main Concepts** then explains more about how `urql` functions, what it's made up of, and covers
   the main aspects of the `Client` and GraphQL clients in general, on the ["Philosophy"
   page](./concepts/philosophy.md)
