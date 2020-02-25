@@ -65,6 +65,7 @@ const SectionList = () => {
   if (!page) return null;
 
   const headings = page.headings.filter(x => x.depth > 1);
+  if (headings.length === 0) return null;
 
   return (
     <>
