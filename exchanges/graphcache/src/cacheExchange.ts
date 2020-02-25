@@ -305,7 +305,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const cacheOps$ = pipe(
       cache$,
       filter(res => res.outcome === 'miss'),
-      map(res => addCacheOutcome(res.operation, res.outcome))
+      map(res => addCacheOutcome(res.operation, res.outcome)),
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
@@ -342,15 +342,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Forward operations that aren't cacheable and rebound operations
     // Also update the cache with any network results
     const result$ = pipe(
-      forward(
-        merge([
-          pipe(
-            inputOps$,
-            filter(op => !isCacheableQuery(op))
-          ),
-          cacheOps$,
-        ])
-      ),
+      merge([
+        pipe(
+          inputOps$,
+          filter(op => !isCacheableQuery(op))
+        ),
+        cacheOps$,
+      ]),
+      filter(op => op.context.requestPolicy !== 'cache-only'),
+      forward,
       map(updateCacheWithResult)
     );
 

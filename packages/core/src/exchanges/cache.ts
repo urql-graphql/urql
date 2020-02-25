@@ -86,6 +86,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         ),
       ]),
       map(op => addMetadata(op, { cacheOutcome: 'miss' })),
+      filter(op => op.operationName !== 'query' || op.context.requestPolicy !== 'cache-only'),
       forward,
       tap(response => {
         if (
