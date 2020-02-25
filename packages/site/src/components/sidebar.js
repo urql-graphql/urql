@@ -24,6 +24,7 @@ const HeroLogo = styled.img.attrs(() => ({
   width: ${p => p.theme.layout.logo};
   margin-bottom: ${p => p.theme.spacing.sm};
   align-self: center;
+
   @media ${p => p.theme.media.sm} {
     display: block;
   }
@@ -34,6 +35,7 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   padding-top: ${p => p.theme.spacing.xs};
   padding-bottom: ${p => p.theme.spacing.lg};
+  padding-left: ${p => p.theme.spacing.sm};
 `;
 
 const relative = (from, to) => {

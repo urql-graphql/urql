@@ -17,11 +17,6 @@ const Container = styled.div`
   width: 100%;
   max-width: ${p => p.theme.layout.page};
   margin: 0 auto;
-
-  background: ${p => p.theme.colors.bg};
-  border-left: 1px solid ${p => p.theme.colors.border};
-  border-right: 1px solid ${p => p.theme.colors.border};
-
   margin-top: ${p => p.theme.layout.header};
 `;
 

@@ -10,7 +10,6 @@ const Container = styled.main.attrs(() => ({
   flex: 1;
   width: 100%;
   position: sticky;
-
   display: ${p => (p.sidebarOpen ? 'none' : 'flex')};
   flex-direction: row-reverse;
 `;
@@ -20,8 +19,9 @@ const Content = styled.article.attrs(() => ({
 }))`
   flex: 1;
   min-height: 100vh;
-  margin: 0 ${p => p.theme.spacing.md};
-  padding: ${p => p.theme.spacing.md} 0;
+  background: ${p => p.theme.colors.bg};
+  padding: ${p => p.theme.spacing.lg};
+  padding-bottom: ${p => p.theme.spacing.md};
 `;
 
 const Legend = styled.aside`
@@ -32,10 +32,9 @@ const Legend = styled.aside`
     position: sticky;
     top: ${p => p.theme.layout.header};
     max-height: 100vh;
-    width: ${p => p.theme.layout.legend};
-    max-width: ${p => p.theme.layout.legendMaxWidth};
-    padding: ${p => p.theme.spacing.md} 0;
-    margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
+    width: 100%;
+    max-width: ${p => p.theme.layout.legend};
+    margin: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
   }
 `;
 
@@ -48,8 +47,7 @@ const LegendTitle = styled.h3`
 const HeadingList = styled.ul`
   list-style-type: none;
   margin: 0;
-  padding-left: ${p => p.theme.spacing.sm};
-  border-left: 1px solid ${p => p.theme.colors.border};
+  padding: 0;
 `;
 
 const HeadingItem = styled.li`

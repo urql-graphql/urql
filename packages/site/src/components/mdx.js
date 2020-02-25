@@ -11,7 +11,7 @@ const getLanguage = className => {
 };
 
 const Pre = styled.pre`
-  background: ${p => p.theme.colors.passiveBg};
+  background: ${p => p.theme.colors.codeBg};
   border: 1px solid ${p => p.theme.colors.border};
   line-height: ${p => p.theme.lineHeights.code};
   font-size: ${p => p.theme.fontSizes.code};
@@ -33,7 +33,7 @@ const Code = styled.code`
 `;
 
 const InlineCode = styled.code`
-  background: ${p => p.theme.colors.passiveBg};
+  background: ${p => p.theme.colors.codeBg};
   color: ${p => p.theme.colors.code};
   font-family: ${p => p.theme.fonts.code};
   font-size: ${p => p.theme.fontSizes.small};
@@ -69,7 +69,7 @@ const ImageAlt = styled.span.attrs(() => ({
   display: block;
   padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
   border-top: 1px solid ${p => p.theme.colors.border};
-  background: ${p => p.theme.colors.passiveBg};
+  background: ${p => p.theme.colors.codeBg};
   font-size: ${p => p.theme.fontSizes.small};
 `;
 
