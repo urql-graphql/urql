@@ -3,4 +3,4 @@
 '@urql/core': patch
 ---
 
-Prevents `cache-only` operations from getting forwarded outside of the cache when no result was found
+Fix `cache-only` operations being forwarded and triggering fetch requests
