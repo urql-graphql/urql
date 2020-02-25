@@ -16,10 +16,10 @@ app:
 - the framework integration that allows you to declaratively write queries and mutations in your
   preferred framework, which are currently the `urql` or `@urql/preact` packages
 - the `Client` that manages the operation lifecycle and results
-- and; exchanges that may either be some default exchanges or some from external packages
+- and, exchanges that may either be some default exchanges or some from external packages
 
 On this page we'll learn about the latter two points, which is shared logic that isn't specific to
-any framework, like React code or Preact code.
+any framework, like React or Preact code.
 
 [We'll learn more about _Exchanges_ on the next page.](./exchanges.md)
 

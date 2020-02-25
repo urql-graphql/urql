@@ -10,7 +10,7 @@ order: 1
 
 By default, we aim to provide features that allow you to build your app quickly with minimal
 configuration. `urql` is a client that grows with you. As you go from building your first
-GraphQL app to a full experience, we give you he tools to extend and customize `urql` based on
+GraphQL app to a full experience, we give you the tools to extend and customize `urql` based on
 your needs.
 
 In this guide, we will walkthrough how `urql` is set up internally and how all pieces of the puzzle
@@ -71,10 +71,10 @@ query.
 ## Caching and State
 
 When we use GraphQL queries and mutations declaratively with `urql`, we expect them to interact
-and update automaticaly.
+and update automatically.
 
 Furthermore, we don't wish to send more requests for a query, when we've done so before. We'd like
-to instead cache results in-memory and notify other parts of an app when these results chane or
+to instead cache results in-memory and notify other parts of an app when these results change or
 are invalidated by mutations or subscriptions.
 
 GraphQL clients have access to some amount of type information for any GraphQL API and can hence
