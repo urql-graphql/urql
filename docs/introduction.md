@@ -5,59 +5,50 @@ order: 0
 
 # Introduction
 
-<!-- TODO: Write about urql -->
+`urql` is an implementation of a GraphQL client, built to be both easy to use for newcomers to
+GraphQL, as well as extensible, to grow to support dynamic single-app applications and highly
+customised GraphQL infrastructure. In short, `urql` prioritizes usability and adaptability.
 
-## Motivation
+As you're adopting GraphQL, `urql` becomes your primary data layer and can handle content-heavy
+pages through ["Document Caching"](./basics/document-caching.md) as well as dynamic and data-heavy
+pages through ["Normalized Caching"](./graphcache/normalized-caching.md).
 
-<!-- TODO: Why is urql a thing? What can the user expect? -->
+## Constituent Parts
 
-## Getting Started
+`urql` can be understood as a collection of connected parts and packages. When you [get
+started](./basics/setting-up-the-client.md) you'll only need to install a single package for your
+framework of choice. We're then able to declaratively send GraphQL requests to our API.
 
-In urql we have a core package (`@urql/core`) containing the `client`, this `client` is in charge
-of orchestrating all the communication between your UI and the server. We support integration with
-two front-end frameworks at the moment, [React](https://reactjs.org/) and [Preact](https://preactjs.com/).
+All framework packages — like `urql` and `@urql/preact` — wrap the core package, which we can
+imagine as the brain of `urql` with most of its logic.
 
-Let's dive into it [get started with urql](./basics/README.md)!
+As we progress with implementing `urql` into our application, we're later able to extend it by
+adding ["addon packages", which we call _Exchanges_](./concepts/exchanges.md)
 
-## Client and Operations
+## The Documentation
 
-In `urql` all operations are controlled by a central `Client`.
-This client is responsible for managing GraphQL operations and sending requests.
+This documentation is split into groups or sections that cover different levels of usage or areas of
+interest.
 
-![The Client as an Event Hub](./assets/urql-client-architecture.png)
+- **Basics** is the section where we find the ["Getting Started"
+  guide](./basics/setting-up-the-client.md) and usage patterns for our framework of choice.
+- **Main Concepts** then explains more about how `urql` functions, what it's made up of, and covers
+  the main aspects of the `Client` and GraphQL clients in general, on the ["Philosophy"
+  page](./concepts/philosophy.md)
+- **Advanced** covers all more uncommon use-cases and contains guides that we won't need immediately
+  when we get started with `urql`.
+- **Graphcache** documents one of the most important addons to `urql`, which adds ["Normalized
+  Caching" support](./graphcache/normalized-caching.md) to the `Client` and enables more complex
+  use-cases, smarter caching, and more dynamic apps to function.
+- **API** contains a detailed list of all helpers, utilities, components, and other parts of each of
+  `urql`'s packages, which may contain all details of each part and package.
 
-When you use `urql` operations are dispatched on the client (A, B, C) which will be handled by the client on a
-single stream of inputs. As responses come back from the cache or your GraphQL API one or more results are
-dispatched on an output stream that correspond to the operations, which update the hooks.
+Apart from these main sections there is also some additional content that doesn't fit into any of
+the other sections.
 
-![Operations and Results](./assets/urql-event-hub.png)
+- **Showcase** aims to list some companies that use `urql`, third-party packages, and other helpful
+  resources.
+- **Common Questions** lists frequently asked questions and problems that we may encounter
+  infrequently (but shall answer nonetheless.)
 
-Hence the client can be seen as an event hub. Operations are sent to the client, which executes them and
-sends back a result. A special teardown-event is issued when a hook unmounts or updates to a different
-operation.
-
-![Operation Signature](./assets/urql-signals.png)
-
-## Normalized Caching
-
-You can choose to use normalized caching instead.
-
-In the normalised cache we won't just take your response and save it for an operation, instead we will look at the response
-and extract the different types. These types are used to create entries in our cache so we can identify them `<type>:<id>.property`,
-this allows us to look at responses for `mutations/subscriptions` and automatically update existing entities.
-
-![Normalized Caching](./assets/urql-normalized-cache.png)
-
-The main difference with the document-cache is that we don't have to refetch queries for every mutation, we can automatically update
-if the entity exists in cache or we can specify what the cache should do with a certain mutation response.
-
-This normalised cache has more features:
-
-- optimistic updates
-- entity/property resolvers
-- cache-persistence
-- schema-awareness
-- custom keys
-
-[Read all about it here.](./graphcache/README.md)
-
+We hope you grow to love `urql`!
