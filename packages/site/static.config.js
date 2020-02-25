@@ -11,6 +11,7 @@ export default {
       {
         location: '../../docs',
         template: './src/screens/docs',
+        pathPrefix: 'docs',
       },
     ],
 
