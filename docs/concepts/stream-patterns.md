@@ -6,7 +6,7 @@ order: 1
 # Stream Patterns
 
 As we've learned [on the last page](./philosophy.md), `urql`'s main way of handling GraphQL requests
-is by abstracting them as streams of operations and results
+is by abstracting them as streams of operations and results.
 
 ## Streams on the Client
 
