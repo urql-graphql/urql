@@ -12,6 +12,8 @@ With deterministic fragment matching we mean that if you use an interface
 or a union we will be 100% sure you're allowed to do so, we'll check if the
 type you request can actually be returned from this union/interface.
 
+## Getting your schema
+
 But how do you get this schema? Well let's consider some steps, first
 make sure `introspection` is turned on on your server. This is very crucial
 else your server won't allow the schema to be shown.
@@ -41,6 +43,8 @@ fetch('http://localhost:3000/graphql', {
     });
   });
 ```
+
+## Integrating
 
 next up we can just import this schema and add it to the cacheExchange:
 
