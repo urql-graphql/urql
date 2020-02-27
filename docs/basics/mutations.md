@@ -5,59 +5,74 @@ order: 2
 
 # Mutations
 
-Now that we know how to query our data we'll also need to know
-how to mutate our data.
-In this chapter we'll see how we can dispatch mutations
-and view the result of these mutations.
+In this chapter we'll learn how to execute mutations and view their results.
+Sending mutations to our GraphQL API is similar to what we've learned about sending queries to our
+API [previously on the "Queries" page.](./queries.md)
 
-## React/Preact
+## React & Preact
 
-`urql` exposes the `useMutation` hook and the `Mutation` component to send out mutations.
+This guide covers how to query data with React and Preact, which share almost the same API.
+
+Both libraries offer a `useMutation` hook and a `Mutation` component. The latter accepts the same
+parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
+render-props components.](../api/urql.md#components)
 
 ### Sending a mutation
 
-Let's set up a mutation allowing us to change the name of our todo.
+Let's pick up an example in an imaginary todo items GraphQL API and dive into an example!
+We'll set up a mutation that _updates_ a todo item.
 
 ```jsx
-const Todo = ({ id, title }) => {
-  const [updateTodoResult, updateTodo] = useMutation(`
-    mutation ($id: ID!, $title: String!) {
-      updateTodo (id: $id, title: $title) {
-        id
-      }
+const UpdateTodo = `
+  mutation ($id: ID!, $title: String!) {
+    updateTodo (id: $id, title: $title) {
+      id
     }
-  `);
+  }
+`;
+
+const Todo = ({ id, title }) => {
+  const [updateTodoResult, updateTodo] = useMutation(UpdateTodo);
 }
 ```
 
-Similar to the `useQuery` output, `useMutation` returns a tuple. The first item in the tuple being our `result`
-containing: `fetching`, `error`, and `data`. At this point in time, no mutation has been performed.
-To mutate the data we first have to invoke the second item in the tuple - the function here named `updateTodo`.
+Similar to the `useQuery` output, `useMutation` returns a tuple. The first item in the tuple again
+contains `fetching`, `error`, and `data` — it's identical since this is a common pattern of how
+`urql` presents _operation results_.
+
+Unlike the `useQuery` hook, the `useMutation` hook doesn't execute automatically. At this point in
+our example, no mutation will be performed. To execute our mutation we instead have to call the
+execute function — `updateTodo` in our example — which is the second item in the tuple.
 
 ### Using the mutation result
 
-When calling this `updateTodo` function we have two ways of getting the response from the server,
-we can get it from `updateTodoResult` or we can await the promise returned from our mutation trigger function.
+When calling our `updateTodo` function we have two ways of getting to the result as it comes back
+from our API. We can either use the first value of the returned tuple — our `updateTodoResult` — or
+we can use the promise that `updateTodo` returns.
 
 ```jsx
 const Todo = ({ id, title }) => {
-  const [updateTodoResult, updateTodo] = useMutation(`
-    mutation ($id: ID!, $title: String!) {
-      updateTodo (id: $id, title: $title) {
-        id
-      }
-    }
-  `);
+  const [updateTodoResult, updateTodo] = useMutation(UpdateTodo);
 
-  const submit = (newTitle) => {
-    updateTodo({ variables: { id, title: newTitle } }).then((data) => {
-      // This data variable is an operationResult containing a potential
-      // error and data variable these correspond with the updateTodoResult.data
-      // and updateTodoResult.error.
-    });
+  const submit = newTitle => {
+    const variables = { id, title: newTitle || '' };
+    updateTodo(variables)
+      .then(result => {
+        // The result is almost identical to `updateTodoResult` with the exception
+        // of `result.fetching` not being set.
+      });
   }
 }
 ```
 
-This means that we can react to a completed todo with the resolved promise result
-or the hook result.
+This is useful when your UI has to display progress or results on the mutation, and the returned
+promise is particularly useful when you're adding side-effects that run after the mutation has
+completed.
+
+### Reading on
+
+There are some more tricks we can use with `useMutation`. [Read more about its API in the API docs for
+it.](../api/urql.md#usemutation)
+
+[On the next page we'll learn about "Document Caching", `urql`'s default caching
+mechanism.](./document-caching.md)
