@@ -3,19 +3,18 @@ title: Custom Updates
 order: 3
 ---
 
-# Custom Updates (on Mutations or Subscriptions),
+# Custom Updates (on Mutations or Subscriptions)
 
-<!-- TODO: Introduction on updates and cache-altering behaviour -->
+`Graphcache` will attempt to automatically react to your `mutation/subscription` results
+but sometimes this isn't possible. You can assume that updating an entity
+available in cache will work but we can't make assumptions about creating/deleting
+entities, these scenario's will have to be handled manually. Let's take a look
+how we can do this.
 
 ## Data Updates
 
-When the cache receives a response it will try and do its best to
-incorporate that response into the current cache. However, for adding and
-deleting entities it can't really make assumptions.
-
-That's where updates come into play. Analogous to our `resolvers`,
-`updates` get arguments, but instead of the `parent` argument we get the
-result given from the server due to a subscription trigger or a mutation.
+Analog to our `resolvers`, `updates` get arguments, but instead of the
+`parent` argument we get the result from the `subscription` or `mutation`.
 
 > Note that this result will look like result.data, this means that in
 > the example of us adding a todo by means of `addTodo` it will look like
@@ -49,6 +48,7 @@ cache.updateQuery({ query: Todos, variables: { page: 1 } }, data => {
     complete: false,
     __typename: 'Todo',
   });
+
   return data;
 });
 ```
@@ -133,25 +133,22 @@ const cache = cacheExchange({
 });
 ```
 
-Next time we hit the query for agendas this will be refetched.
+Next time we hit the query for agendas the query will be refetched due to it
+being invalidated.
 
 ## Optimistic updates
 
-Let's say we want to work offline or we don't want to wait for
-responses from the server.
-
-Optimistic responses can be a great solution to this problem. Optimisitc
-responses are simply a mapping of the name of a mutation to a function.
-This function gets three
-arguments:
+Optimistic responses can be a great solution to reduce waiting times or 
+work offline. Optimisitc responses are a mapping of the name of a mutation to a function.
+This function gets three arguments:
 
 - `variables` – The variables used to execute the mutation.
-- `cache` – The cache we've already seen in [resolvers](./resolvers.md) and
-  [updates](./updates.md). This can be used to get a certain entity/property
+- `cache` – The cache we've already seen in [resolvers](./computed-queries.md) and
+  [updates](#Data%20updates). This can be used to get a certain entity/property
   from the cache.
 - `info` – Contains the used fragments and field arguments.
 
-Let's see an example.
+Let's look at an example.
 
 ```js
 const myGraphCache = cacheExchange({
@@ -170,5 +167,4 @@ const myGraphCache = cacheExchange({
 Now that we return `variables` our `Todo:1` will be updated to have
 the new `text` property. In our cache this will form a layer above
 the property. When a response from the server comes in this layer
-will be removed and the response from the server will be used to
-replace the original properties.
+will be removed and the result will be used to update the entity.
