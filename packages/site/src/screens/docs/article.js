@@ -22,6 +22,11 @@ const Content = styled.article.attrs(() => ({
   background: ${p => p.theme.colors.bg};
   padding: ${p => p.theme.spacing.lg};
   padding-bottom: ${p => p.theme.spacing.md};
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 `;
 
 const Legend = styled.aside`
@@ -34,7 +39,8 @@ const Legend = styled.aside`
     max-height: 100vh;
     width: 100%;
     max-width: ${p => p.theme.layout.legend};
-    margin: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
+    margin: 0 ${p => p.theme.spacing.md};
+    padding: ${p => p.theme.spacing.lg} 0;
   }
 `;
 
