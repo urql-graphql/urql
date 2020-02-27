@@ -6,9 +6,9 @@ order: 2
 # Mutations
 
 Now that we know how to query our data we'll also need to know
-how to mutate that data.
-We'll see how we can dispatch mutations to our back-end and view
-the result of these mutations.
+how to mutate our data.
+In this chapter we'll see how we can dispatch mutations
+and view the result of these mutations.
 
 ## React/Preact
 
@@ -51,11 +51,13 @@ const Todo = ({ id, title }) => {
 
   const submit = (newTitle) => {
     updateTodo({ variables: { id, title: newTitle } }).then((data) => {
-      // this data variable will be the same as updateTodoResult.data
+      // This data variable is an operationResult containing a potential
+      // error and data variable these correspond with the updateTodoResult.data
+      // and updateTodoResult.error.
     });
   }
 }
 ```
 
-This means that we can react to a completed todo in the body of the `.then` or
-with a `useEffect`.
+This means that we can react to a completed todo with the resolved promise result
+or the hook result.
