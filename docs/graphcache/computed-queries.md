@@ -5,38 +5,42 @@ order: 2
 
 # Computed Queries
 
-<!-- TODO: introduction to cache-altering configuration -->
+When dealing with data we could have special cases where we want to format a date
+or make a details query take an entry from the list query so we don't have to query
+it from the server.
+
+These cases can be solved with the concept of `resolvers`.
 
 ## Resolvers
 
-`resolvers` are a way to alter the response you'll receive from the cache.
-Let's look at an example to get a better understanding.
+Let's look at how we can introduce these `resolvers` to our `cacheExchange`.
 
 ```js
 const cache = cacheExchange({
   resolvers: {
-    Todo: { text: () => 'Secret' },
+    Todo: { updatedAt: ({ date }) => Date.format(date) },
   },
 });
 ```
 
 Now when we query our `todos` every time we encounter an object with `Todo`
-as the `__typename` it will change the `text` to `'Secret'`. In this way we
+as the `__typename` it will format the `updatedAt` property. This way we
 can effectively change how we handle a certain property on an entity.
 
-This may seem pretty useless right now, but let's look at the arguments
-passed to `resolvers` to get a better sense of how powerful they are.
-
-A `resolver` gets four arguments:
+Let's look at the arguments passed to `resolvers` to get a better sense of
+what we can do, there are four arguments (these are in order):
 
 - `parent` – The original entity in the cache. In the example above, this
   would be the full `Todo` object.
 - `arguments` – The arguments used in this field.
-- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods;
-  see more about this [below](#cache.resolve).
+- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods,
+  read more about this [below](#cache.resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.
 
 ## Cache parameter
+
+This is the main point of communication with the cache, it will give us access to
+all cached data.
 
 ### resolve
 
@@ -48,8 +52,8 @@ Our cache methods have three arguments:
 - `field` – The field you want data for. This can be a relation or a single property.
 - `arguments` – The arguments to include on the field.
 
-To get a better grasp let's look at a few examples.
-Consider the following data structure:
+To get a better grasp let's look at a few examples,
+consider the following data structure:
 
 ```js
 todos: [
@@ -68,7 +72,7 @@ todos: [
 ];
 ```
 
-Using `cache.resolve` to get the author would look like this:
+Let's get the `author` for a todo.
 
 ```js
 const parent = {
@@ -78,8 +82,8 @@ const parent = {
   author: undefined,
   __typename: 'Todo',
 };
-const result = cache.resolve(parent, 'author');
-console.log(result); // 'Author:2'
+
+console.log(cache.resolve(parent, 'author')); // 'Author:2'
 ```
 
 Now we have a stringed key that identifies our author. We
@@ -104,7 +108,9 @@ const cache = cacheExchange({
 });
 ```
 
-will do the trick.
+Note that resolving from a list to details can lead to partial data, this will result in
+a network-request to get the full data when fields are missing.
+When graphcache isn't [aware of your schema](./schema-awareness.md) it won't show partial data.
 
 ### Reading a query
 
@@ -112,10 +118,10 @@ Another method the cache allows is to let you read a full query, this method
 accepts an object of `query` and optionally `variables`.
 
 ```js
-const data = cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
+cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
 ```
 
-This way we'll get the stored data for the `TodosQuery` with given variables.
+This way we'll get the stored data for the `TodosQuery` for the given `variables`.
 
 ### Reading a fragment
 
@@ -135,6 +141,8 @@ This way we'll get the Todo with id 1 and the relevant data we are askng for in 
 fragment.
 
 ## Pagination
+
+`Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination.
 
 ### Simple
 
