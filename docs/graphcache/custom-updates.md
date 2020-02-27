@@ -168,3 +168,7 @@ Now that we return `variables` our `Todo:1` will be updated to have
 the new `text` property. In our cache this will form a layer above
 the property. When a response from the server comes in this layer
 will be removed and the result will be used to update the entity.
+
+### Reading on
+
+[On the next page we'll learn about "Schema-awareness".](./schema-awareness.md)

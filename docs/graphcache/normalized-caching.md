@@ -70,3 +70,7 @@ const myGraphCache = cacheExchange({
   },
 });
 ```
+
+### Reading on
+
+[On the next page we'll learn about "Computed queries".](./computed-queries.md)
