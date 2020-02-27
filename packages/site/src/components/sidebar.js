@@ -57,10 +57,7 @@ const Sidebar = ({ sidebarOpen }) => {
 
     let children = tree.children;
     if (tree.frontmatter && tree.originalPath) {
-      children = [
-        { ...tree, children: undefined },
-        ...children
-      ];
+      children = [{ ...tree, children: undefined }, ...children];
     }
 
     return children.map(page => {
