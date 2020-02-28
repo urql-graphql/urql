@@ -23,7 +23,7 @@ export function withUrqlClient(
     cacheExchange,
     ssrExchange,
     fetchExchange,
-  ],
+  ]
 ) {
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {

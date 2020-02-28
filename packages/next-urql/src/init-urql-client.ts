@@ -22,7 +22,7 @@ export function initUrqlClient(
     ssrEx,
     fetchExchange,
   ],
-  initialState?: SSRData,
+  initialState?: SSRData
 ): [Client | null, SSRExchange | null] {
   // Create a new Client for every server-side rendered request.
   // This ensures we reset the state for each rendered page.
