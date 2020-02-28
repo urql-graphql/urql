@@ -1,9 +1,0 @@
-/*
-!/src/*.{ts,tsx,d.ts}
-!/dist/*.{ts,tsx,d.ts,js.js.map}
-!index.d.ts
-!react-ssr-prepass.d.ts
-!/package.json
-!/README.md
-!LICENSE
-!CHANGELOG.md
