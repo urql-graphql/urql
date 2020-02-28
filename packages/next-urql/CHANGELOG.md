@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2020-02-20
+## 0.3.0
 
 This release adds support for different `urql` Client configurations between the client-side and the server-side when using `next-urql`.
 
@@ -26,7 +26,7 @@ This release adds support for different `urql` Client configurations between the
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.5...v0.3.0
 
-## [0.2.5] - 2020-01-20
+## 0.2.5
 
 This release encompasses small changes to our TypeScript definitions for `next-urql`, with an upgrade to using `next@9` as the basis for new type definitions in lieu of `@types/next`. The examples were also converted over to TypeScript from JavaScript.
 
@@ -42,7 +42,7 @@ This release encompasses small changes to our TypeScript definitions for `next-u
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.4...v0.2.5
 
-## [0.2.4] - 2020-01-08
+## 0.2.4
 
 This release adds support for accessing the `urqlClient` instance off of Next's context object.
 
@@ -54,7 +54,7 @@ This release adds support for accessing the `urqlClient` instance off of Next's 
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.3...v0.2.4
 
-## [0.2.3] - 2019-12-31
+## 0.2.3
 
 This release fixes support for using `withUrqlClient` with `_app.js`.
 
@@ -70,7 +70,7 @@ This release fixes support for using `withUrqlClient` with `_app.js`.
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.2...v0.2.3
 
-## [0.2.2] - 2019-12-17
+## 0.2.2
 
 This release fixes a small discrepancy in the types used by `withUrqlClient` and the public API defined by our `index.d.ts` file.
 
@@ -82,7 +82,7 @@ This release fixes a small discrepancy in the types used by `withUrqlClient` and
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.1...v0.2.2
 
-## [0.2.1] - 2019-12-17
+## 0.2.1
 
 This release fixes a regression introduced in 0.2.0 involving circular structures created bt `withUrqlClient`'s `getInitialProps` method.
 
@@ -95,7 +95,7 @@ This release fixes a regression introduced in 0.2.0 involving circular structure
 
 https://github.com/FormidableLabs/next-urql/compare/v0.2.0...v0.2.1
 
-## [0.2.0] - 2019-12-08 [Deprecated]
+## 0.2.0 [Deprecated]
 
 This release adds support for accessing Next's context object, `ctx`, to instantiate your `urql` Client instance.
 
@@ -107,7 +107,7 @@ This release adds support for accessing Next's context object, `ctx`, to instant
 
 https://github.com/FormidableLabs/next-urql/compare/v0.1.1...v0.2.0
 
-## [0.1.1] - 2019-11-11
+## 0.1.1
 
 This release adds TypeScript definitions to `next-urql`, alongside important pieces like a License (MIT), and improved documentation for users and contributors.
 
@@ -122,6 +122,6 @@ This release adds TypeScript definitions to `next-urql`, alongside important pie
 
 https://github.com/FormidableLabs/next-urql/compare/v0.1.0...v0.1.1
 
-## [0.1.0] - 2019-11-02
+## 0.1.0
 
 This is the initial release of `next-urql` in its Beta API. The package is not meant to be consumed yet, and this purely serves as a prerelease for local testing.
