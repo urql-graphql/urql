@@ -27,7 +27,7 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { hydrateData } from './store/data';
+import { hydrateData, hasOptimisticKey, mergeAndDeleteOptimisticLayer } from './store/data';
 import { makeDict } from './helpers/dict';
 import { Store, clearOptimistic } from './store';
 
@@ -134,6 +134,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const optimisticKeysToDependencies = new Map<number, Set<string>>();
   const ops: OperationMap = new Map();
   const deps: DependentOperations = makeDict();
+  const inFlightKeys: Set<number> = new Set();
 
   const collectPendingOperations = (
     pendingOperations: Set<number>,
@@ -244,7 +245,43 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
     if (data !== null && data !== undefined) {
-      writeDependencies = write(store, operation, data).dependencies;
+      /**
+       * Q1 - Q2 (operation series)
+       *
+       * When Q2 arrives first in this dispatch series we can't assume Q1
+       * arriving won't goof up the data in our cache. That's why we'll write
+       * this to an optimistic layer which we'll merge into the main data
+       * after Q1 has arrived.
+       */
+      if (isQuery) {
+        const inFlight: number[] = [...inFlightKeys];
+        let index = inFlight.indexOf(result.operation.key);
+        // An index of -1 should not be possible here but we should verify it.
+        if (index === 0) {
+          writeDependencies = write(store, operation, data).dependencies;
+          inFlightKeys.delete(operation.key);
+          // TODO: can this have an optimistic entry, to verify
+          clearOptimistic(data, operation.key);
+        } else {
+          if (inFlight.every((key, i) => i >= index || hasOptimisticKey(data, key))) {
+            // When every query before the one arriving has completed we need to squash the optimistic layers
+            // into our main datasource.
+            for (index += 1; index < inFlightKeys.size; index++) {
+              // TODO: this should squash instead of simply removing the layer.
+              // Squash into main data
+              mergeAndDeleteOptimisticLayer(data, operation.key);
+              inFlightKeys.delete(inFlight[index]);
+            }
+          } else {
+            // If this is not the case we need to add an additional optimistic layer to our cache.
+            writeDependencies = write(store, operation, data, operation.key).dependencies;
+          }
+        }
+      } else {
+        // In case of mutations/subscriptions we just write since these should be idempotent
+        // by the nature of the operation.
+        writeDependencies = write(store, operation, data).dependencies;
+      }
 
       if (isQuery) {
         const queryResult = query(store, operation);
@@ -350,6 +387,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         cacheOps$,
       ]),
       filter(op => op.context.requestPolicy !== 'cache-only'),
+      tap(op => {
+        if (op.operationName === 'query') inFlightKeys.add(op.key);
+        if (op.operationName === 'teardown' && inFlightKeys.has(op.key)) inFlightKeys.delete(op.key);
+      }),
       forward,
       map(updateCacheWithResult)
     );

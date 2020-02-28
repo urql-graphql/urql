@@ -52,6 +52,7 @@ export const initDataState = (
   currentData = data;
   currentDependencies = new Set();
   currentOptimisticKey = optimisticKey;
+
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -170,6 +171,17 @@ const getNode = <T>(
   const node = map.base.get(entityKey);
   return node !== undefined ? node[fieldKey] : undefined;
 };
+
+export const hasOptimisticKey = (map: NodeMap<any>, optimisticKey: number): boolean =>
+  map.keys.indexOf(optimisticKey) !== -1;
+
+export const mergeAndDeleteOptimisticLayer = (map: NodeMap<any>, optimisticKey: number) => {
+  const index = map.keys.indexOf(optimisticKey);
+  const optimisticData = map.optimistic[optimisticKey];
+  // TODO: MERGE
+  delete map.optimistic[optimisticKey];
+  map.keys.splice(index, 1);
+}
 
 /** Clears an optimistic layers from a NodeMap */
 const clearOptimisticNodes = <T>(map: NodeMap<T>, optimisticKey: number) => {

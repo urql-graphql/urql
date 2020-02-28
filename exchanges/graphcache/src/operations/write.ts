@@ -55,9 +55,10 @@ interface Context {
 export const write = (
   store: Store,
   request: OperationRequest,
-  data: Data
+  data: Data,
+  key?: number
 ): WriteResult => {
-  initDataState(store.data, 0);
+  initDataState(store.data, key || 0);
   const result = startWrite(store, request, data);
   clearDataState();
   return result;

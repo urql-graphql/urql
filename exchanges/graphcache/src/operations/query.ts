@@ -126,8 +126,7 @@ const readRoot = (
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
     if (node.selectionSet !== undefined && fieldValue !== null) {
-      const fieldData = ensureData(fieldValue);
-      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
+      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), ensureData(fieldValue));
     } else {
       data[fieldAlias] = fieldValue;
     }
@@ -188,7 +187,7 @@ export const readFragment = (
 
   const entityKey =
     typeof entity !== 'string'
-      ? store.keyOfEntity({ __typename: typename, ...entity } as Data)
+      ? store.keyOfEntity(entity)
       : entity;
 
   if (!entityKey) {
@@ -236,6 +235,7 @@ const readSelection = (
   const typename = !isQuery
     ? InMemoryData.readRecord(entityKey, '__typename')
     : entityKey;
+
   if (typeof typename !== 'string') {
     return undefined;
   }
