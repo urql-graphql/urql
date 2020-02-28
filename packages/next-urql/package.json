@@ -30,7 +30,8 @@
     "prepublishOnly": "run-s clean test build"
   },
   "jest": {
-    "preset": "../../scripts/jest/preset"
+    "preset": "../../scripts/jest/preset",
+    "testEnvironment": "node"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
@@ -38,6 +39,8 @@
     "@types/node-fetch": "^2.5.4",
     "@types/react": "^16.9.6",
     "@types/react-dom": "^16.9.2",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.3",
     "isomorphic-unfetch": "^3.0.0",
@@ -47,8 +50,8 @@
     "react-is": "^16.12.0"
   },
   "dependencies": {
-    "urql": ">=1.9.0",
-    "react-ssr-prepass": "^1.1.2"
+    "react-ssr-prepass": "^1.1.2",
+    "urql": ">=1.9.0"
   },
   "peerDependencies": {
     "isomorphic-unfetch": "^3.0.0",

@@ -3,8 +3,8 @@ import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client, defaultExchanges, composeExchanges } from 'urql';
 
-import { withUrqlClient, NextUrqlPageContext } from '../src';
-import * as init from '../src/init-urql-client';
+import { withUrqlClient, NextUrqlPageContext } from '..';
+import * as init from '../init-urql-client';
 
 const MockApp: React.FC<any> = () => {
   return <div />;
@@ -89,7 +89,7 @@ describe('withUrqlClient', () => {
         ctx => ({
           url: 'http://localhost:3000',
           fetchOptions: {
-            headers: { Authorization: ctx?.req?.headers?.cookie ?? '' },
+            headers: { Authorization: ctx && ctx.req!.headers!.cookie || '' },
           },
         }),
         mockMergeExchanges,

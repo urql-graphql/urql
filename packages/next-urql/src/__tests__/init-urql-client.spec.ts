@@ -6,8 +6,7 @@ import {
   fetchExchange,
 } from 'urql';
 
-import { initUrqlClient } from '../src/init-urql-client';
-import { SSRData } from 'urql/dist/types/exchanges/ssr';
+import { initUrqlClient } from '../init-urql-client';
 
 describe('initUrqlClient', () => {
   it('should return the urqlClient instance and ssrCache', () => {
@@ -42,7 +41,7 @@ describe('initUrqlClient', () => {
   });
 
   it('should accept some initial state to populate the cache', () => {
-    const initialState: SSRData = {
+    const initialState = {
       123: { data: { name: 'Kadabra', type: 'Psychic' } },
       456: { data: { name: 'Butterfree', type: ['Psychic', 'Bug'] } },
     };
