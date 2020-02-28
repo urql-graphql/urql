@@ -1,6 +1,5 @@
 import { NextPageContext } from 'next';
 import { ClientOptions, Exchange, Client } from 'urql';
-import { SSRExchange, SSRData } from 'urql/dist/types/exchanges/ssr';
 import { AppContext } from 'next/app';
 
 export type NextUrqlClientOptions = Omit<
@@ -34,4 +33,23 @@ export interface WithUrqlClient {
 
 export interface WithUrqlProps extends WithUrqlClient, WithUrqlState {
   [key: string]: any;
+}
+
+export interface SerializedResult {
+  data?: any;
+  error?: {
+    networkError?: string;
+    graphQLErrors: string[];
+  };
+}
+
+export interface SSRData {
+  [key: string]: SerializedResult;
+}
+
+export interface SSRExchange extends Exchange {
+  /** Rehydrates cached data */
+  restoreData(data: SSRData): void;
+  /** Extracts cached data */
+  extractData(): SSRData;
 }

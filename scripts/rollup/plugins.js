@@ -31,7 +31,7 @@ export const makePlugins = ({ isProduction } = {}) => [
   settings.isCI
     ? sucrase({
       exclude: ['node_modules/**'],
-      transforms: ['typescript']
+      transforms: ['jsx', 'typescript']
     })
     : typescript({
       useTsconfigDeclarationDir: true,
@@ -47,7 +47,7 @@ export const makePlugins = ({ isProduction } = {}) => [
           noEmit: false,
           declaration: !isProduction,
           declarationDir: settings.types,
-          target: 'es6',
+          target: 'esnext',
         },
       },
     }),
@@ -55,7 +55,8 @@ export const makePlugins = ({ isProduction } = {}) => [
     transforms: {
       unicodeRegExp: false,
       dangerousForOf: true,
-      dangerousTaggedTemplateString: true
+      dangerousTaggedTemplateString: true,
+      asyncAwait: false,
     },
     objectAssign: 'Object.assign',
     exclude: 'node_modules/**'

@@ -87,7 +87,7 @@ export function withUrqlClient(
 
       return {
         ...pageProps,
-        urqlState: ssrCache?.extractData(),
+        urqlState: ssrCache ? ssrCache.extractData() : undefined,
       };
     };
 

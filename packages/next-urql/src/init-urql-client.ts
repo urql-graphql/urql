@@ -7,10 +7,9 @@ import {
   Client,
   Exchange,
 } from 'urql';
-import { SSRData, SSRExchange } from 'urql/dist/types/exchanges/ssr';
-import 'isomorphic-unfetch';
 
-import { NextUrqlClientOptions } from './types';
+import 'isomorphic-unfetch';
+import { NextUrqlClientOptions, SSRData, SSRExchange } from './types';
 
 let urqlClient: Client | null = null;
 let ssrCache: SSRExchange | null = null;
