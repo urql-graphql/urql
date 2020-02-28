@@ -36,7 +36,13 @@ import {
   PromisifiedSource,
 } from './types';
 
-import { createRequest, toSuspenseSource, withPromise, maskTypename } from './utils';
+import {
+  createRequest,
+  toSuspenseSource,
+  withPromise,
+  maskTypename,
+} from './utils';
+
 import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -198,7 +204,7 @@ export class Client {
         map(res => {
           res.data = maskTypename(res.data);
           return res;
-        }),
+        })
       );
     }
 

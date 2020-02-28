@@ -6,6 +6,7 @@
   "scripts": {
     "start": "react-static start",
     "build": "react-static build",
+    "lint": "eslint --ext=js,jsx .",
     "clean": "rimraf dist",
     "prepublishOnly": "run-s clean build"
   },

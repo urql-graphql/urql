@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 import { RequestPolicy } from '@urql/core';
@@ -16,7 +18,7 @@ jest.mock('../context', () => {
   };
 
   return {
-    useClient: () => mock
+    useClient: () => mock,
   };
 });
 

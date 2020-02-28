@@ -42,7 +42,7 @@ export const useMutation = <T = any, V = object>(
       return pipe(
         client.executeMutation(
           createRequest(query, variables as any),
-          context || {},
+          context || {}
         ),
         toPromise
       ).then(result => {

@@ -30,6 +30,6 @@ it('throws for circular structures', () => {
 });
 
 it('stringifies date correctly', () => {
-  const date =new Date('2019-12-11T04:20:00');
+  const date = new Date('2019-12-11T04:20:00');
   expect(stringifyVariables(date)).toBe(date.toJSON());
 });

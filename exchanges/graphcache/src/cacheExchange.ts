@@ -305,7 +305,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const cacheOps$ = pipe(
       cache$,
       filter(res => res.outcome === 'miss'),
-      map(res => addCacheOutcome(res.operation, res.outcome)),
+      map(res => addCacheOutcome(res.operation, res.outcome))
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger

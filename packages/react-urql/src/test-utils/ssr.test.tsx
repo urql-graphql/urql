@@ -12,7 +12,7 @@ import {
   OperationContext,
   GraphQLRequest,
   Operation,
-  OperationResult
+  OperationResult,
 } from '@urql/core';
 
 import { Provider } from '../context';
@@ -96,10 +96,7 @@ describe('server-side rendering', () => {
     let promise;
 
     try {
-      pipe(
-        client.executeRequestOperation(queryOperation),
-        publish
-      );
+      pipe(client.executeRequestOperation(queryOperation), publish);
     } catch (error) {
       promise = error;
     }
@@ -155,10 +152,7 @@ describe('client-side rehydration', () => {
     ssr.restoreData({ [queryOperation.key]: queryResponse });
 
     expect(() => {
-      pipe(
-        client.executeRequestOperation(queryOperation),
-        publish
-      );
+      pipe(client.executeRequestOperation(queryOperation), publish);
     }).not.toThrow();
 
     const data = ssr.extractData();

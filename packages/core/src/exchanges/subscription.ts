@@ -93,7 +93,7 @@ export const subscriptionExchange = ({
               complete();
             }
           },
-        })
+        });
       });
 
       return () => {
@@ -105,9 +105,11 @@ export const subscriptionExchange = ({
 
   const isSubscriptionOperation = (operation: Operation): boolean => {
     const { operationName } = operation;
-    return operationName === 'subscription' ||
+    return (
+      operationName === 'subscription' ||
       (!!enableAllOperations &&
-        (operationName === 'query' || operationName === 'mutation'));
+        (operationName === 'query' || operationName === 'mutation'))
+    );
   };
 
   return ops$ => {

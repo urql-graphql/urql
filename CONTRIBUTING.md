@@ -49,6 +49,9 @@ Each package also has its own scripts that are common and shared between all pac
 # Jest Tests for the current package:
 yarn run test
 
+# Linting (prettier & eslint):
+yarn run lint
+
 # Builds for the current package:
 yarn run build
 

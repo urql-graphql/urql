@@ -18,4 +18,4 @@ export const maskTypename = (data: any): any => {
 
     return acc;
   }, {});
-}
+};

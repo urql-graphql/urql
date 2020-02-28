@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useRef, useEffect, EffectCallback } from 'preact/hooks';
 import { noop } from './useQuery';
 
