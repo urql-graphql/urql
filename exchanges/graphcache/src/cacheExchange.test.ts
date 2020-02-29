@@ -5,7 +5,7 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { pipe, map, makeSubject, tap, publish, delay } from 'wonka';
+import { pipe, map, makeSubject, tap, publish, delay,  } from 'wonka';
 import { cacheExchange } from './cacheExchange';
 
 const queryOne = gql`
@@ -840,4 +840,168 @@ it('reexecutes query and returns data on partial result', () => {
     'operation.context.meta.cacheOutcome',
     'partial'
   );
+});
+
+describe('idempotent updates', () => {
+  it('writes out of order queries', async () => {
+    jest.useFakeTimers();
+    const { source: ops$, next } = makeSubject<Operation>();
+    const todoQuery = gql`
+      query {
+        todo {
+          id
+          title
+          __typename
+        }
+      }
+    `;
+
+    const q1Data = {
+      __typename: 'Query',
+      todo: {
+        __typename: 'Todo',
+        id: '1',
+        title: ':yikes:',
+      },
+    }
+
+    const q2Data = {
+      __typename: 'Query',
+      todo: {
+        __typename: 'Todo',
+        id: '1',
+        title: ':boss:',
+      },
+    }
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const op1 = client.createRequestOperation('query', {
+      key: 1,
+      query: todoQuery,
+    });
+
+    const op2 = client.createRequestOperation('query', {
+      key: 2,
+      query: todoQuery,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: op2, data: q2Data };
+        } else if (forwardOp.key === 2) {
+          return { operation: op1, data: q1Data };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(
+      ops$,
+      delay(1),
+      map(response),
+    );
+
+    pipe(
+      cacheExchange()({ forward, client })(ops$),
+      tap(result),
+      publish,
+    );
+
+    next(op1);
+    next(op2);
+
+    jest.runAllTimers();
+
+    expect(result.mock.calls[0][0].data).toEqual(q2Data);
+    expect(result.mock.calls[1][0].data).toEqual(q2Data);
+  });
+
+  it('respects unrelated results', async () => {
+    jest.useFakeTimers();
+    const { source: ops$, next } = makeSubject<Operation>();
+    const todoQuery = gql`
+      query {
+        todo {
+          id
+          title
+          __typename
+        }
+      }
+    `;
+
+  const authorQuery = gql`
+    query {
+      author {
+        id
+        name
+        __typename
+      }
+    }
+  `;
+
+    const q2Data = {
+      __typename: 'Query',
+      author: {
+        __typename: 'Author',
+        id: '1',
+        name: ':yikes:',
+      },
+    }
+
+    const q1Data = {
+      __typename: 'Query',
+      todo: {
+        __typename: 'Todo',
+        id: '1',
+        title: ':boss:',
+      },
+    }
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const op1 = client.createRequestOperation('query', {
+      key: 1,
+      query: todoQuery,
+    });
+
+    const op2 = client.createRequestOperation('query', {
+      key: 2,
+      query: authorQuery,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: op2, data: q2Data };
+        } else if (forwardOp.key === 2) {
+          return { operation: op1, data: q1Data };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(
+      ops$,
+      delay(1),
+      map(response),
+    );
+
+    pipe(
+      cacheExchange()({ forward, client })(ops$),
+      tap(result),
+      publish,
+    );
+
+    next(op1);
+    next(op2);
+
+    jest.runAllTimers();
+
+    expect(result.mock.calls[0][0].data).toEqual(q2Data);
+    expect(result.mock.calls[1][0].data).toEqual(q1Data);
+  });
 });

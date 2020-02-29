@@ -260,16 +260,20 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         if (index === 0) {
           writeDependencies = write(store, operation, data).dependencies;
           inFlightKeys.delete(operation.key);
-          // TODO: can this have an optimistic entry, to verify
-          clearOptimistic(data, operation.key);
+          if (hasOptimisticKey(store.data.records, operation.key)) clearOptimistic(store.data, operation.key);
+
+          for (index += 1; index < inFlightKeys.size; index++) {
+            if (hasOptimisticKey(store.data.records, inFlight[index])) {
+              mergeAndDeleteOptimisticLayer(store.data, inFlight[index]);
+              inFlightKeys.delete(inFlight[index]);
+            }
+          }
         } else {
-          if (inFlight.every((key, i) => i >= index || hasOptimisticKey(data, key))) {
+          if (inFlight.every((key, i) => i >= index || hasOptimisticKey(store.data.records, key))) {
             // When every query before the one arriving has completed we need to squash the optimistic layers
             // into our main datasource.
-            for (index += 1; index < inFlightKeys.size; index++) {
-              // TODO: this should squash instead of simply removing the layer.
-              // Squash into main data
-              mergeAndDeleteOptimisticLayer(data, operation.key);
+            for (index -= 1; index > -1; index--) {
+              mergeAndDeleteOptimisticLayer(store.data, operation.key);
               inFlightKeys.delete(inFlight[index]);
             }
           } else {
@@ -279,7 +283,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         }
       } else {
         // In case of mutations/subscriptions we just write since these should be idempotent
-        // by the nature of the operation.
+        // due the nature of the operation.
         writeDependencies = write(store, operation, data).dependencies;
       }
 
@@ -325,6 +329,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     const inputOps$ = pipe(
       concat([bufferedOps$, sharedOps$]),
+      tap(op => {
+        if (op.operationName === 'query') inFlightKeys.add(op.key);
+        if (op.operationName === 'teardown' && inFlightKeys.has(op.key)) inFlightKeys.delete(op.key);
+      }),
       map(addTypeNames),
       tap(optimisticUpdate),
       share
@@ -387,10 +395,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         cacheOps$,
       ]),
       filter(op => op.context.requestPolicy !== 'cache-only'),
-      tap(op => {
-        if (op.operationName === 'query') inFlightKeys.add(op.key);
-        if (op.operationName === 'teardown' && inFlightKeys.has(op.key)) inFlightKeys.delete(op.key);
-      }),
       forward,
       map(updateCacheWithResult)
     );
