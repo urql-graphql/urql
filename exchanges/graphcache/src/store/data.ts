@@ -96,7 +96,7 @@ export const getCurrentDependencies = (): Set<string> => {
     2
   );
 
-  return currentDependencies;
+  return currentDependencies as Set<string>;
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
@@ -172,20 +172,20 @@ const getNode = <T>(
   return node !== undefined ? node[fieldKey] : undefined;
 };
 
-export const hasOptimisticKey = (map: NodeMap<any>, optimisticKey: number): boolean => map.keys.indexOf(optimisticKey) !== -1;
+export const hasOptimisticKey = (map: InMemoryData, optimisticKey: number): boolean => map.records.keys.indexOf(optimisticKey) !== -1 || map.links.keys.indexOf(optimisticKey) !== -1;
 
-export const mergeAndDeleteOptimisticLayer = (data: InMemoryData, optimisticKey: number) => {
+export const mergeOptimisticLayerToData = (data: InMemoryData, optimisticKey: number) => {
   initDataState(data, 0);
 
   data.records.optimistic[optimisticKey].forEach((recordMap, entityKey) => {
-    Object.entries(recordMap).forEach(([fieldKey, value]) => {
-      writeRecord(entityKey, fieldKey, value);
+    Object.entries(recordMap).forEach(record => {
+      writeRecord(entityKey, record[0], record[1]);
     });
   });
 
   data.links.optimistic[optimisticKey].forEach((linkMap, entityKey) => {
-    Object.entries(linkMap).forEach(([fieldKey, value]) => {
-      writeLink(entityKey, fieldKey, value);
+    Object.entries(linkMap).forEach(link => {
+      writeLink(entityKey, link[0], link[1]);
     });
   });
 

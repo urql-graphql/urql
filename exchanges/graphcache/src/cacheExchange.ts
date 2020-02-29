@@ -27,7 +27,7 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { hydrateData, hasOptimisticKey, mergeAndDeleteOptimisticLayer } from './store/data';
+import { hydrateData, hasOptimisticKey, mergeOptimisticLayerToData } from './store/data';
 import { makeDict } from './helpers/dict';
 import { Store, clearOptimistic } from './store';
 
@@ -255,31 +255,43 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
        */
       if (isQuery) {
         const inFlight: number[] = [...inFlightKeys];
+        // Get the index for the current query, this will be used to opt for
+        // write/layer.
         let index = inFlight.indexOf(result.operation.key);
-        // An index of -1 should not be possible here but we should verify it.
+        // When we're at the front of the queue it's safe to write this query to
+        // our permanent data.
         if (index === 0) {
           writeDependencies = write(store, operation, data).dependencies;
           inFlightKeys.delete(operation.key);
-          if (hasOptimisticKey(store.data.records, operation.key)) clearOptimistic(store.data, operation.key);
 
-          for (index += 1; index < inFlightKeys.size; index++) {
-            if (hasOptimisticKey(store.data.records, inFlight[index])) {
-              mergeAndDeleteOptimisticLayer(store.data, inFlight[index]);
-              inFlightKeys.delete(inFlight[index]);
+          /**
+           * Now we are in a potential secenario where we've build up a series
+           * of results for our operations, for instance a later operation could have
+           * returned earlier than the current one at index 0.
+           *
+           * That's why we'll have to traverse from index 1 up until the first operation
+           * that hs no optimistic-layer attached to it.
+           */
+          for (index = 1; index < inFlight.length; index++) {
+            const opKey = inFlight[index];
+            if (hasOptimisticKey(store.data, opKey)) {
+              mergeOptimisticLayerToData(store.data, opKey);
+              clearOptimistic(store.data, opKey)
+              inFlightKeys.delete(opKey);
+            } else {
+              // Short-circuit this will make it so that we have an uncompleted operation
+              // at index 0 and a set of operations who are potentially completed or uncompleted
+              // behind it.
+              index = inFlight.length;
             }
           }
         } else {
-          if (inFlight.every((key, i) => i >= index || hasOptimisticKey(store.data.records, key))) {
-            // When every query before the one arriving has completed we need to squash the optimistic layers
-            // into our main datasource.
-            for (index -= 1; index > -1; index--) {
-              mergeAndDeleteOptimisticLayer(store.data, operation.key);
-              inFlightKeys.delete(inFlight[index]);
-            }
-          } else {
-            // If this is not the case we need to add an additional optimistic layer to our cache.
-            writeDependencies = write(store, operation, data, operation.key).dependencies;
-          }
+          /**
+           * When we're not a tthe front of the queue we need to treat this update as an
+           * optimistic layer since this update could always be subject to overriding because
+           * of things earlier in the queue.
+           */
+          writeDependencies = write(store, operation, data, operation.key).dependencies;
         }
       } else {
         // In case of mutations/subscriptions we just write since these should be idempotent
@@ -330,7 +342,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const inputOps$ = pipe(
       concat([bufferedOps$, sharedOps$]),
       tap(op => {
-        if (op.operationName === 'query') inFlightKeys.add(op.key);
+        if (op.operationName === 'query') {
+          if (inFlightKeys.has(op.key)) inFlightKeys.delete(op.key);
+          inFlightKeys.add(op.key);
+        }
         if (op.operationName === 'teardown' && inFlightKeys.has(op.key)) inFlightKeys.delete(op.key);
       }),
       map(addTypeNames),
