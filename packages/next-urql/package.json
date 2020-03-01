@@ -1,0 +1,60 @@
+{
+  "name": "next-urql",
+  "version": "0.3.0",
+  "description": "Convenience wrappers for using urql with NextJS.",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/next-urql"
+  },
+  "main": "dist/next-urql.cjs.js",
+  "module": "dist/next-urql.esm.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean test build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset",
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/node-fetch": "^2.5.4",
+    "@types/react": "^16.9.6",
+    "@types/react-dom": "^16.9.2",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "graphql": "^14.6.0",
+    "graphql-tag": "^2.10.3",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "^9.2.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-is": "^16.12.0"
+  },
+  "dependencies": {
+    "react-ssr-prepass": "^1.1.2",
+    "urql": ">=1.9.0"
+  },
+  "peerDependencies": {
+    "isomorphic-unfetch": "^3.0.0",
+    "react": ">=16.8.0"
+  }
+}
