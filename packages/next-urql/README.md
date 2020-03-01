@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="assets/next_logo.png" alt="NextJS" height="200" width="200">
-  <img src="assets/urql_logo.png" alt="urql" height="200" width="200">
+  <img src="../../docs/assets/next-logo.png" alt="NextJS" height="200" width="200">
+  <img src="../../docs/assets/urql-logo.png" alt="urql" height="200" width="200">
   <br />
   <a href="https://npmjs.com/package/next-urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/next-urql.svg" />
@@ -28,7 +28,7 @@ Install `next-urql` along with its `peerDependencies`.
 npm install --save next-urql urql react-is isomorphic-unfetch
 ```
 
-`react-is`, `styled-components`, and `isomorphic-unfetch` help to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
+`react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
 
 ### Usage
 
