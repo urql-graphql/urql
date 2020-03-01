@@ -89,10 +89,10 @@ describe('withUrqlClient', () => {
         ctx => ({
           url: 'http://localhost:3000',
           fetchOptions: {
-            headers: { Authorization: ctx && ctx.req!.headers!.cookie || '' },
+            headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
           },
         }),
-        mockMergeExchanges,
+        mockMergeExchanges
       )(MockApp);
     });
 
@@ -104,7 +104,7 @@ describe('withUrqlClient', () => {
           url: 'http://localhost:3000',
           fetchOptions: { headers: { Authorization: token } },
         },
-        mockMergeExchanges,
+        mockMergeExchanges
       );
     });
   });
@@ -113,7 +113,7 @@ describe('withUrqlClient', () => {
     beforeEach(() => {
       Component = withUrqlClient(
         { url: 'http://localhost:3000' },
-        mockMergeExchanges,
+        mockMergeExchanges
       )(MockApp);
     });
 
@@ -123,7 +123,7 @@ describe('withUrqlClient', () => {
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.exchange.toString()).toEqual(
-        composeExchanges(defaultExchanges).toString(),
+        composeExchanges(defaultExchanges).toString()
       );
       expect(mockMergeExchanges).toHaveBeenCalledTimes(1);
     });

@@ -31,7 +31,7 @@ describe('initUrqlClient', () => {
         cacheExchange,
         ssrEx,
         fetchExchange,
-      ],
+      ]
     );
 
     expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
@@ -51,7 +51,7 @@ describe('initUrqlClient', () => {
         url: 'http://localhost:3000',
       },
       undefined,
-      initialState,
+      initialState
     );
 
     expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');

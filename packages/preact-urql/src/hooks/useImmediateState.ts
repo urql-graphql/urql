@@ -31,7 +31,7 @@ export const useImmediateState = <S extends {}>(init: S): [S, SetState<S>] => {
         setState(action);
       }
     },
-    [state]
+    []
   );
 
   useIsomorphicLayoutEffect(() => {
