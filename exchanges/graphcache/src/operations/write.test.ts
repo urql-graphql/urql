@@ -148,7 +148,7 @@ describe('Query', () => {
     expect(console.warn).toHaveBeenCalledTimes(2);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/undefined/);
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     // The field must still be `'test'`
     expect(InMemoryData.readRecord('Query', 'field')).toBe('test');
   });

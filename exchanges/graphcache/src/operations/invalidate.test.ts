@@ -42,7 +42,7 @@ describe('Query', () => {
       }
     );
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     jest.clearAllMocks();
   });
 
