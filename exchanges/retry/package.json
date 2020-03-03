@@ -1,0 +1,58 @@
+{
+  "name": "@urql/exchange-retry",
+  "version": "1.8.4",
+  "description": "An exchange for operation retry support in urql",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "exchanges/retry"
+  },
+  "keywords": [
+    "urql",
+    "graphql client",
+    "formidablelabs",
+    "exchanges",
+    "react",
+    "retry"
+  ],
+  "main": "dist/urql-exchange-retry.cjs.js",
+  "module": "dist/urql-exchange-retry.esm.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean test build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "graphql": "^14.6.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "react": ">= 16.8.0"
+  },
+  "dependencies": {
+    "@urql/core": ">=1.9.0",
+    "wonka": "^4.0.7"
+  }
+}
