@@ -82,7 +82,7 @@ export const clearDataState = () => {
   if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
     const commutativeIndex =
       data.optimisticOrder.length - data.commutativeKeys.size;
-    const blockingKey = data.optimisticOrder[commutativeIndex];
+    const blockingKey = data.optimisticOrder[data.optimisticOrder.length - 1];
     if (blockingKey === optimisticKey) {
       for (let i = data.optimisticOrder.length - 1; i >= commutativeIndex; i--)
         squashLayer(data.optimisticOrder[i]);
