@@ -278,4 +278,39 @@ describe('commutative changes', () => {
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
   });
+
+  it('continues applying optimistic layers even if the first one completes', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+    InMemoryData.reserveLayer(data, 3);
+    InMemoryData.reserveLayer(data, 4);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+
+    InMemoryData.initDataState(data, 3);
+    InMemoryData.writeRecord('Query', 'index', 3);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
+
+    InMemoryData.initDataState(data, 4);
+    InMemoryData.writeRecord('Query', 'index', 4);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
+
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
+  });
 });

@@ -101,10 +101,20 @@ export const clearDataState = () => {
     // and is the "first" one and hence blocking all others, we squash all
     // results and empty the list of commutative keys
     if (blockingKey === optimisticKey) {
-      for (let i = data.optimisticOrder.length - 1; i >= commutativeIndex; i--)
-        squashLayer(data.optimisticOrder[i]);
-      data.optimisticOrder.length = commutativeIndex;
-      data.commutativeKeys.clear();
+      const squash: number[] = [];
+      const orderSize = data.optimisticOrder.length;
+      // Collect all completed, commutative layers until and excluding the first
+      // pending one that overrides the others
+      for (let i = commutativeIndex; i < orderSize; i++) {
+        const layerKey = data.optimisticOrder[i];
+        if (!data.refLock[layerKey]) break;
+        squash.unshift(layerKey);
+      }
+
+      // Apply all completed, commutative layers
+      for (let i = 0, l = squash.length; i < l; i++) {
+        squashLayer(squash[i]);
+      }
     }
   }
 
