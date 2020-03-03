@@ -56,11 +56,9 @@ export const initDataState = (
     currentDebugStack.length = 0;
   }
 
-  if (
-    layerKey &&
-    (forceOptimistic ||
-      (data.commutativeKeys.size > 1 && data.commutativeKeys.has(layerKey)))
-  ) {
+  if (!layerKey) {
+    currentOptimisticKey = null;
+  } else if (forceOptimistic) {
     currentOptimisticKey = layerKey;
     if (!data.refLock[layerKey]) {
       data.optimisticOrder.unshift(layerKey);
@@ -68,8 +66,14 @@ export const initDataState = (
       data.links.optimistic[layerKey] = new Map();
       data.records.optimistic[layerKey] = new Map();
     }
+  } else if (
+    data.commutativeKeys.size > 1 &&
+    data.commutativeKeys.has(layerKey)
+  ) {
+    currentOptimisticKey = layerKey;
   } else {
     currentOptimisticKey = null;
+    clearLayer(data, layerKey);
   }
 };
 
