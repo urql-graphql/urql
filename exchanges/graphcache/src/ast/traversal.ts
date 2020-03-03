@@ -8,8 +8,8 @@ import {
   Kind,
 } from 'graphql';
 
-import { invariant } from '../helpers/help';
-import { getName } from './node';
+import { invariant } from '../../../common/helpers/help';
+import { getName } from '../../../common/ast';
 import { Fragments, Variables } from '../types';
 
 const isFragmentNode = (node: DefinitionNode): node is FragmentDefinitionNode =>

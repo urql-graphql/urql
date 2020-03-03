@@ -4,7 +4,7 @@ import {
   valueFromASTUntyped,
 } from 'graphql';
 
-import { getName } from './node';
+import { getName } from '../../../common/ast';
 import { makeDict } from '../helpers/dict';
 import { Variables } from '../types';
 

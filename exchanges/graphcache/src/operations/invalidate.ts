@@ -4,17 +4,16 @@ import {
   getMainOperation,
   normalizeVariables,
   getFragments,
-  getSelectionSet,
-  getName,
   getFieldArguments,
 } from '../ast';
+
+import { getSelectionSet, getName, SelectionSet } from '../../../common/ast';
 
 import {
   EntityField,
   OperationRequest,
   Variables,
   Fragments,
-  SelectionSet,
 } from '../types';
 
 import * as InMemoryData from '../store/data';
