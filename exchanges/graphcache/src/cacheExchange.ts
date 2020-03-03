@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, clearLayer } from './store';
+import { Store, clearLayer, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -167,6 +167,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         }
       }
     });
+  };
+
+  // This registers queries with the data layer to ensure commutativity
+  const prepareCacheForResult = (operation: Operation) => {
+    if (operation.operationName === 'query') {
+      reserveLayer(store.data, operation.key);
+    } else if (operation.operationName === 'teardown') {
+      clearLayer(store.data, operation.key);
+    }
   };
 
   // This executes an optimistic update for mutations and registers it if necessary
@@ -350,6 +359,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         cacheOps$,
       ]),
       filter(op => op.context.requestPolicy !== 'cache-only'),
+      tap(prepareCacheForResult),
       forward,
       map(updateCacheWithResult)
     );
