@@ -47,23 +47,49 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
   data: InMemoryData,
-  optimisticKey: number | null
+  layerKey: number | null,
+  forceOptimistic?: boolean
 ) => {
   currentData = data;
   currentDependencies = new Set();
-  currentOptimisticKey = optimisticKey;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
 
-  if (
-    currentOptimisticKey &&
-    data.optimisticOrder.indexOf(currentOptimisticKey) === -1
-  ) {
-    data.optimisticOrder.unshift(currentOptimisticKey);
-    data.refLock[currentOptimisticKey] = makeDict();
-    data.links.optimistic[currentOptimisticKey] = new Map();
-    data.records.optimistic[currentOptimisticKey] = new Map();
+  // Before we write, we determine whether we'll write to an optimistic layer.
+  // This may happen when multiple layers have been reserved or when we force
+  // an optimistic write, both with a passed `layerKey`
+  const orderIndex = layerKey ? data.optimisticOrder.indexOf(layerKey) : -1;
+  if (layerKey && data.commutativeKeys.has(layerKey)) {
+    // If we have multiple reserved, commutative layers, we'll want to write to
+    // an optimistic layer instead, unless the current layer is the first that
+    // has been reserved
+    const commutativeIndex =
+      data.optimisticOrder.length - data.commutativeKeys.size;
+    if (orderIndex !== commutativeIndex) {
+      currentOptimisticKey = layerKey;
+    } else {
+      // If it's the first, we can clear out all other reserved, commutative layers
+      // and squash them
+      for (let i = commutativeIndex + 1; i < data.optimisticOrder.length; i++)
+        squashLayer(data, data.optimisticOrder[i]);
+      data.optimisticOrder.length = commutativeIndex;
+      data.commutativeKeys.clear();
+      currentOptimisticKey = null;
+    }
+  } else if (layerKey && forceOptimistic) {
+    // If we're forcing an optimistic write, we're likely dealing with an optimistic
+    // update, in which case no layer has been reserved and we'll have to create one
+    currentOptimisticKey = layerKey;
+    if (orderIndex === -1) {
+      data.optimisticOrder.unshift(layerKey);
+      data.refLock[layerKey] = makeDict();
+      data.links.optimistic[layerKey] = new Map();
+      data.records.optimistic[layerKey] = new Map();
+    }
+  } else {
+    // Otherwise we don't write optimistically ever
+    currentOptimisticKey = null;
   }
 };
 
@@ -414,31 +440,32 @@ export const reserveLayer = (data: InMemoryData, optimisticKey: number) => {
 };
 
 /** Removes an optimistic layer of links and records */
-export const clearLayer = (data: InMemoryData, optimisticKey: number) => {
-  const index = data.optimisticOrder.indexOf(optimisticKey);
+export const clearLayer = (data: InMemoryData, layerKey: number) => {
+  const index = data.optimisticOrder.indexOf(layerKey);
   if (index > -1) {
     data.optimisticOrder.splice(index, 1);
-    delete data.refLock[optimisticKey];
-    delete data.records.optimistic[optimisticKey];
-    delete data.links.optimistic[optimisticKey];
+    data.commutativeKeys.delete(layerKey);
+    delete data.refLock[layerKey];
+    delete data.records.optimistic[layerKey];
+    delete data.links.optimistic[layerKey];
   }
 };
 
 /** Merges an optimistic layer of links and records into the base data */
-export const squashLayer = (data: InMemoryData, optimisticKey: number) => {
-  data.links.optimistic[optimisticKey].forEach((keyMap, entityKey) => {
+export const squashLayer = (data: InMemoryData, layerKey: number) => {
+  data.links.optimistic[layerKey].forEach((keyMap, entityKey) => {
     for (const fieldKey in keyMap) {
       writeLink(entityKey, fieldKey, keyMap[fieldKey]);
     }
   });
 
-  data.records.optimistic[optimisticKey].forEach((keyMap, entityKey) => {
+  data.records.optimistic[layerKey].forEach((keyMap, entityKey) => {
     for (const fieldKey in keyMap) {
       writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
     }
   });
 
-  clearLayer(data, optimisticKey);
+  clearLayer(data, layerKey);
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */
@@ -460,7 +487,7 @@ export const hydrateData = (
   storage: StorageAdapter,
   entries: SerializedEntries
 ) => {
-  initDataState(data, 0);
+  initDataState(data, null);
   for (const key in entries) {
     const dotIndex = key.indexOf('.');
     const entityKey = key.slice(2, dotIndex);

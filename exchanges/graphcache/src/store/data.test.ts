@@ -78,9 +78,9 @@ describe('garbage collection', () => {
     InMemoryData.writeRecord('Todo:1', 'id', '1');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState(data, 1, true);
     InMemoryData.writeLink('Query', 'temp', 'Todo:1');
-    InMemoryData.initDataState(data, 0);
+    InMemoryData.initDataState(data, 0, true);
 
     InMemoryData.writeLink('Query', 'todo', undefined);
     InMemoryData.gc(data);
@@ -170,7 +170,7 @@ describe('inspectFields', () => {
   });
 
   it('returns field infos for all optimistic updates', () => {
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState(data, 1, true);
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
     expect(InMemoryData.inspectFields('Random')).toMatchInlineSnapshot(
@@ -181,7 +181,7 @@ describe('inspectFields', () => {
   it('avoids duplicate field infos', () => {
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState(data, 1, true);
     InMemoryData.writeLink('Query', 'todo', 'Todo:2');
 
     expect(InMemoryData.inspectFields('Query')).toMatchInlineSnapshot(`
