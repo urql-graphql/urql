@@ -5,30 +5,15 @@ import { withUrqlClient, NextUrqlPageContext } from 'next-urql';
 import fetch from 'isomorphic-unfetch';
 import PokémonList from '../components/pokemon_list';
 
-interface InitialProps {
-  title: string;
-}
-
-const Home: NextComponentType<
-  NextUrqlPageContext,
-  InitialProps,
-  InitialProps
-> = ({ title }) => (
+const Home: NextComponentType<NextUrqlPageContext> = () => (
   <div>
     <Head>
       <title>Home</title>
       <link rel="icon" href="/static/favicon.ico" />
     </Head>
-    <h1>{title}</h1>
     <PokémonList />
   </div>
 );
-
-Home.getInitialProps = () => {
-  return {
-    title: 'Pokédex',
-  };
-};
 
 export default withUrqlClient((ctx: NextUrqlPageContext) => {
   return {
