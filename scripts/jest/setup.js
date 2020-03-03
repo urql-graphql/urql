@@ -7,8 +7,13 @@ process.on('unhandledRejection', error => {
 
 jest.restoreAllMocks();
 
+const originalConsole = console;
+global.console = {
+  ...originalConsole,
+  warn() { /* noop */ },
+  error(message) { throw new Error(message); }
+};
+
 jest.spyOn(console, 'log');
-jest.spyOn(console, 'warn').mockReturnValue();
-jest.spyOn(console, 'error').mockImplementation(() => {
-  throw new Error(message);
-});
+jest.spyOn(console, 'warn');
+jest.spyOn(console, 'error');
