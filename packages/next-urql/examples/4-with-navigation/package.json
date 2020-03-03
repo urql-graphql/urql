@@ -1,16 +1,15 @@
 {
-  "name": "3-with-custom-exchange",
-  "version": "0.1.0",
+  "name": "example",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "start": "next dev",
-    "prestart": "cd ../../ && yarn build && cd examples/3-with-custom-exchange"
+    "prestart": "cd ../../ && yarn build && cd examples/4-with-navigation"
   },
   "dependencies": {
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
     "isomorphic-unfetch": "^3.0.0",
-    "next": "^9.2.0",
-    "wonka": "^4.0.7"
+    "next": "^9.2.0"
   }
 }

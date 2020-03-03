@@ -7,7 +7,6 @@ import {
   Client,
   Exchange,
 } from 'urql';
-
 import 'isomorphic-unfetch';
 import { NextUrqlClientOptions, SSRData, SSRExchange } from './types';
 
