@@ -1,4 +1,4 @@
-import { unwrapType } from './';
+import { unwrapType } from './node';
 import { GraphQLScalarType, GraphQLNonNull, GraphQLList } from 'graphql';
 
 describe('unwrapType', () => {

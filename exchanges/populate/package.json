@@ -1,7 +1,7 @@
 {
-  "name": "@urql/exchange-graphcache",
-  "version": "2.1.1",
-  "description": "A normalized and configurable cache exchange for urql",
+  "name": "@urql/exchange-populate",
+  "version": "1.0.0",
+  "description": "An exchange that automaticcally populates the mutation selection body",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/FormidableLabs/urql/issues",
@@ -9,32 +9,23 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "exchanges/graphcache"
+    "directory": "exchanges/populate"
   },
   "keywords": [
     "urql",
-    "state management",
-    "normalized cache",
-    "cache",
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-graphcache.cjs.js",
-  "module": "dist/urql-exchange-graphcache.esm.js",
+  "main": "dist/urql-exchange-populate.cjs.js",
+  "module": "dist/urql-exchange-populate.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-graphcache.esm.js",
-      "require": "dist/urql-exchange-graphcache.cjs.js",
+      "import": "dist/urql-exchange-populate.esm.js",
+      "require": "dist/urql-exchange-populate.cjs.js",
       "types": "dist/types/index.d.ts",
       "source": "src/index.ts"
-    },
-    "./extras": {
-      "import": "dist/urql-exchange-graphcache-extras.esm.js",
-      "require": "dist/urql-exchange-graphcache-extras.cjs.js",
-      "types": "dist/types/extras/index.d.ts",
-      "source": "src/extras/index.ts"
     }
   },
   "files": [
@@ -58,8 +49,7 @@
   },
   "dependencies": {
     "wonka": "^3.2.1 || ^4.0.0",
-    "@urql/core": ">=1.9.0",
-    "@urql/exchange-populate": ">=1.0.0"
+    "@urql/core": ">=1.9.0"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"

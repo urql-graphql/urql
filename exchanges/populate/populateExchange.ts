@@ -18,9 +18,9 @@ import {
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
 
-import { getName, getSelectionSet, unwrapType } from './ast';
-import { makeDict } from './helpers/dict';
-import { invariant, warn } from './helpers/help';
+import { getName, getSelectionSet, unwrapType } from '../graphcache/src/ast';
+import { makeDict } from '../graphcache/src/helpers/dict';
+import { invariant, warn } from '../graphcache/src/helpers/help';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
