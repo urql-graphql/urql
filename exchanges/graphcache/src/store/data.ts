@@ -70,25 +70,15 @@ export const initDataState = (
 
   if (!layerKey) {
     currentOptimisticKey = null;
-  } else if (forceOptimistic) {
-    // Optimistic Updates for mutations may use `forceOptimistic` to
-    // always create an optimistic layer
-    currentOptimisticKey = layerKey;
-    // Create an optimistic layer if it doesn't exist yet
-    if (!data.refLock[layerKey]) {
-      data.optimisticOrder.unshift(layerKey);
-      data.refLock[layerKey] = makeDict();
-      data.links.optimistic[layerKey] = new Map();
-      data.records.optimistic[layerKey] = new Map();
-    }
   } else if (
-    data.commutativeKeys.size > 1 &&
-    data.commutativeKeys.has(layerKey)
+    forceOptimistic ||
+    (data.commutativeKeys.size > 1 && data.commutativeKeys.has(layerKey))
   ) {
-    // We use an optimistic layer if this operation is part of
-    // the current list of pending Query operations of which we
-    // should have more than one
+    // An optimistic update of a mutation may force an optimistic layer,
+    // or this Query update may be applied optimistically since it's part
+    // of a commutate chain
     currentOptimisticKey = layerKey;
+    createLayer(data, layerKey);
   } else {
     // Otherwise we don't create an optimistic layer and clear the
     // operation's one if it already exists
@@ -204,18 +194,23 @@ const getNode = <T>(
   entityKey: string,
   fieldKey: string
 ): T | undefined => {
+  let node: Dict<T | undefined> | undefined;
+
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
-    const node = optimistic.get(entityKey);
     // If the node and node value exists it is returned, including undefined
-    if (node !== undefined && fieldKey in node) {
+    if (
+      optimistic &&
+      (node = optimistic.get(entityKey)) !== undefined &&
+      fieldKey in node
+    ) {
       return node[fieldKey];
     }
   }
 
   // Otherwise we read the non-optimistic base value
-  const node = map.base.get(entityKey);
+  node = map.base.get(entityKey);
   return node !== undefined ? node[fieldKey] : undefined;
 };
 
@@ -446,17 +441,29 @@ export const writeLink = (
 };
 
 /** Reserves an optimistic layer and preorders it */
-export const reserveLayer = (data: InMemoryData, optimisticKey: number) => {
-  if (!data.commutativeKeys.has(optimisticKey)) {
+export const reserveLayer = (data: InMemoryData, layerKey: number) => {
+  if (!data.commutativeKeys.has(layerKey)) {
+    // The new layer needs to be reserved in front of all other commutative
+    // keys but after all non-commutative keys (which are added by `forceUpdate`)
     data.optimisticOrder.splice(
       data.optimisticOrder.length - data.commutativeKeys.size,
       0,
-      optimisticKey
+      layerKey
     );
-    data.commutativeKeys.add(optimisticKey);
-    data.refLock[optimisticKey] = makeDict();
-    data.links.optimistic[optimisticKey] = new Map();
-    data.records.optimistic[optimisticKey] = new Map();
+    data.commutativeKeys.add(layerKey);
+  }
+};
+
+/** Creates an optimistic layer of links and records */
+const createLayer = (data: InMemoryData, layerKey: number) => {
+  if (data.optimisticOrder.indexOf(layerKey) === -1) {
+    data.optimisticOrder.unshift(layerKey);
+  }
+
+  if (!data.refLock[layerKey]) {
+    data.refLock[layerKey] = makeDict();
+    data.links.optimistic[layerKey] = new Map();
+    data.records.optimistic[layerKey] = new Map();
   }
 };
 
@@ -466,6 +473,9 @@ export const clearLayer = (data: InMemoryData, layerKey: number) => {
   if (index > -1) {
     data.optimisticOrder.splice(index, 1);
     data.commutativeKeys.delete(layerKey);
+  }
+
+  if (data.refLock[layerKey]) {
     delete data.refLock[layerKey];
     delete data.records.optimistic[layerKey];
     delete data.links.optimistic[layerKey];
@@ -474,17 +484,21 @@ export const clearLayer = (data: InMemoryData, layerKey: number) => {
 
 /** Merges an optimistic layer of links and records into the base data */
 const squashLayer = (layerKey: number) => {
-  currentData!.links.optimistic[layerKey].forEach((keyMap, entityKey) => {
-    for (const fieldKey in keyMap) {
-      writeLink(entityKey, fieldKey, keyMap[fieldKey]);
-    }
-  });
+  const links = currentData!.links.optimistic[layerKey];
+  if (links) {
+    links.forEach((keyMap, entityKey) => {
+      for (const fieldKey in keyMap)
+        writeLink(entityKey, fieldKey, keyMap[fieldKey]);
+    });
+  }
 
-  currentData!.records.optimistic[layerKey].forEach((keyMap, entityKey) => {
-    for (const fieldKey in keyMap) {
-      writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
-    }
-  });
+  const records = currentData!.records.optimistic[layerKey];
+  if (records) {
+    records.forEach((keyMap, entityKey) => {
+      for (const fieldKey in keyMap)
+        writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
+    });
+  }
 
   clearLayer(currentData!, layerKey);
 };
