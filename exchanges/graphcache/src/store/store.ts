@@ -20,6 +20,7 @@ import {
   KeyingConfig,
   DataFields,
 } from '../types';
+import { invariant } from '../helpers/help';
 
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
@@ -154,11 +155,29 @@ export class Store implements Cache {
     invalidate(this, createRequest(query, variables));
   }
 
+  invalidateEntity(entity: Data | string) {
+    const entityKey = typeof entity === 'string' ? entity : this.keyOfEntity(entity);
+
+    if (!entityKey) {
+      invariant(entityKey, `Invalidate entity passed to "invalidateEntity", expected an entityKey (__typename:id) or an entity with the "__typename" and "id" or "_id" properties. Received ${entity}`, 19);
+    }
+
+    const fields = this.inspectFields(entityKey);
+    for (const field of fields) {
+      if (InMemoryData.readLink(entityKey as string, field.fieldKey)) {
+        InMemoryData.writeLink(entityKey as string, field.fieldKey, undefined);
+      } else {
+        InMemoryData.writeRecord(entityKey as string, field.fieldKey, undefined);
+      }
+    }
+  }
+
   inspectFields(entity: Data | string | null): FieldInfo[] {
     const entityKey =
       entity !== null && typeof entity !== 'string'
         ? this.keyOfEntity(entity)
         : entity;
+
     return entityKey !== null ? InMemoryData.inspectFields(entityKey) : [];
   }
 

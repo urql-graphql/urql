@@ -406,6 +406,14 @@ describe('Store with OptimisticMutationConfig', () => {
       todos: todosData.todos,
     });
   });
+
+  describe('Invalidating an entity', () => {
+    it('removes an entity from a list.', () => {
+      store.invalidateEntity(todosData.todos[1]);
+      const { data } = query(store, { query: Todos });
+      expect(data).toBe(null);
+    });
+  });
 });
 
 describe('Store with storage', () => {
