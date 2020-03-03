@@ -1,6 +1,6 @@
 {
-  "name": "example",
-  "version": "0.2.0",
+  "name": "1-with-urql-client",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "next dev",
