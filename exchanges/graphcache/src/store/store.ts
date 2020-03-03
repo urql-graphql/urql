@@ -156,14 +156,15 @@ export class Store implements Cache {
   }
 
   invalidateEntity(entity: Data | string) {
-    const entityKey = typeof entity === 'string' ? entity : this.keyOfEntity(entity);
+    const entityKey =
+      typeof entity === 'string' ? entity : this.keyOfEntity(entity);
 
     if (!entityKey) {
       invariant(
         entityKey,
         `Can't generate a key for invalidateEntity(${entity}),
         You need to pass in a valid key (__typename:id) or an object with the "__typename" property and an "id" or "_id" property.`,
-        19,
+        19
       );
     }
 
@@ -172,7 +173,11 @@ export class Store implements Cache {
       if (InMemoryData.readLink(entityKey as string, field.fieldKey)) {
         InMemoryData.writeLink(entityKey as string, field.fieldKey, undefined);
       } else {
-        InMemoryData.writeRecord(entityKey as string, field.fieldKey, undefined);
+        InMemoryData.writeRecord(
+          entityKey as string,
+          field.fieldKey,
+          undefined
+        );
       }
     }
   }
