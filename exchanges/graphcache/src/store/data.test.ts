@@ -195,3 +195,87 @@ describe('inspectFields', () => {
     `);
   });
 });
+
+describe('commutative changes', () => {
+  it('always applies out-of-order updates in-order', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+  });
+
+  it('creates optimistic layers that may be removed using clearLayer', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    // Actively clearing out layer 2
+    InMemoryData.clearLayer(data, 2);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(undefined);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+  });
+
+  it('overrides data using optimistic layers', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+    InMemoryData.reserveLayer(data, 3);
+
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, 3);
+    InMemoryData.writeRecord('Query', 'index', 3);
+    InMemoryData.clearDataState();
+
+    // Regular write that isn't optimistic
+    InMemoryData.initDataState(data, null);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
+  });
+
+  it('avoids optimistic layers when only one layer is pending', () => {
+    InMemoryData.reserveLayer(data, 1);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    // This will be applied and visible since the above write isn't optimistic
+    InMemoryData.initDataState(data, null);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+  });
+});
