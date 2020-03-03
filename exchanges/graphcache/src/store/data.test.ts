@@ -87,7 +87,7 @@ describe('garbage collection', () => {
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
-    InMemoryData.clearOptimistic(data, 1);
+    InMemoryData.clearLayer(data, 1);
     InMemoryData.gc(data);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 

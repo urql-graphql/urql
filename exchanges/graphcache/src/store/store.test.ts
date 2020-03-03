@@ -399,7 +399,7 @@ describe('Store with OptimisticMutationConfig', () => {
       ],
     });
 
-    InMemoryData.clearOptimistic(store.data, 1);
+    InMemoryData.clearLayer(store.data, 1);
     ({ data } = query(store, { query: Todos }));
     expect(data).toEqual({
       __typename: 'Query',

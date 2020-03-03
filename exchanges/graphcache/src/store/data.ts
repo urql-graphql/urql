@@ -30,7 +30,8 @@ export interface InMemoryData {
   refLock: OptimisticMap<Dict<number>>;
   records: NodeMap<EntityField>;
   links: NodeMap<Link>;
-  keys: number[];
+  commutativeKeys: Set<number>;
+  optimisticOrder: number[];
   storage: StorageAdapter | null;
 }
 
@@ -55,18 +56,20 @@ export const initDataState = (
     currentDebugStack.length = 0;
   }
 
-  if (optimisticKey && !data.refLock[optimisticKey]) {
-    data.refLock[optimisticKey] = makeDict();
-    data.links.optimistic[optimisticKey] = new Map();
-    data.records.optimistic[optimisticKey] = new Map();
-    data.keys.unshift(optimisticKey);
+  if (
+    currentOptimisticKey &&
+    data.optimisticOrder.indexOf(currentOptimisticKey) === -1
+  ) {
+    data.optimisticOrder.unshift(currentOptimisticKey);
+    data.refLock[currentOptimisticKey] = makeDict();
+    data.links.optimistic[currentOptimisticKey] = new Map();
+    data.records.optimistic[currentOptimisticKey] = new Map();
   }
 };
 
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
   const data = currentData!;
-
   if (!data.gcScheduled && data.gcBatch.size > 0) {
     data.gcScheduled = true;
     defer(() => {
@@ -114,7 +117,8 @@ export const make = (queryRootKey: string): InMemoryData => ({
   refLock: makeDict(),
   links: makeNodeMap(),
   records: makeNodeMap(),
-  keys: [],
+  commutativeKeys: new Set(),
+  optimisticOrder: [],
   storage: null,
 });
 
@@ -154,8 +158,8 @@ const getNode = <T>(
   fieldKey: string
 ): T | undefined => {
   // This first iterates over optimistic layers (in order)
-  for (let i = 0, l = currentData!.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[currentData!.keys[i]];
+  for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
     const node = optimistic.get(entityKey);
     // If the node and node value exists it is returned, including undefined
     if (node !== undefined && fieldKey in node) {
@@ -174,7 +178,7 @@ const updateRCForEntity = (
   refCount: Dict<number>,
   entityKey: string,
   by: number
-) => {
+): void => {
   // Retrieve the reference count
   const count = refCount[entityKey] !== undefined ? refCount[entityKey] : 0;
   // Adjust it by the "by" value
@@ -193,7 +197,7 @@ const updateRCForLink = (
   refCount: Dict<number>,
   link: Link | undefined,
   by: number
-) => {
+): void => {
   if (typeof link === 'string') {
     updateRCForEntity(gcBatch, refCount, link, by);
   } else if (Array.isArray(link)) {
@@ -211,7 +215,7 @@ const extractNodeFields = <T>(
   fieldInfos: FieldInfo[],
   seenFieldKeys: Set<string>,
   node: Dict<T> | undefined
-) => {
+): void => {
   if (node !== undefined) {
     for (const fieldKey in node) {
       if (!seenFieldKeys.has(fieldKey)) {
@@ -235,8 +239,8 @@ const extractNodeMapFields = <T>(
   extractNodeFields(fieldInfos, seenFieldKeys, map.base.get(entityKey));
 
   // Then extracts FieldInfo for the entity from the optimistic maps
-  for (let i = 0, l = currentData!.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[currentData!.keys[i]];
+  for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
     extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
   }
 };
@@ -394,15 +398,47 @@ export const writeLink = (
   updateRCForLink(gcBatch, refCount, link, 1);
 };
 
+/** Reserves an optimistic layer and preorders it */
+export const reserveLayer = (data: InMemoryData, optimisticKey: number) => {
+  if (!data.commutativeKeys.has(optimisticKey)) {
+    data.optimisticOrder.splice(
+      data.optimisticOrder.length - data.commutativeKeys.size,
+      0,
+      optimisticKey
+    );
+    data.commutativeKeys.add(optimisticKey);
+    data.refLock[optimisticKey] = makeDict();
+    data.links.optimistic[optimisticKey] = new Map();
+    data.records.optimistic[optimisticKey] = new Map();
+  }
+};
+
 /** Removes an optimistic layer of links and records */
-export const clearOptimistic = (data: InMemoryData, optimisticKey: number) => {
-  const index = data.keys.indexOf(optimisticKey);
+export const clearLayer = (data: InMemoryData, optimisticKey: number) => {
+  const index = data.optimisticOrder.indexOf(optimisticKey);
   if (index > -1) {
-    data.keys.splice(index, 1);
+    data.optimisticOrder.splice(index, 1);
     delete data.refLock[optimisticKey];
     delete data.records.optimistic[optimisticKey];
     delete data.links.optimistic[optimisticKey];
   }
+};
+
+/** Merges an optimistic layer of links and records into the base data */
+export const squashLayer = (data: InMemoryData, optimisticKey: number) => {
+  data.links.optimistic[optimisticKey].forEach((keyMap, entityKey) => {
+    for (const fieldKey in keyMap) {
+      writeLink(entityKey, fieldKey, keyMap[fieldKey]);
+    }
+  });
+
+  data.records.optimistic[optimisticKey].forEach((keyMap, entityKey) => {
+    for (const fieldKey in keyMap) {
+      writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
+    }
+  });
+
+  clearLayer(data, optimisticKey);
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */

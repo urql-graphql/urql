@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, clearOptimistic } from './store';
+import { Store, clearLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -239,7 +239,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       optimisticKeysToDependencies.get(key)
     );
     optimisticKeysToDependencies.delete(key);
-    clearOptimistic(store.data, key);
+    clearLayer(store.data, key);
 
     let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
