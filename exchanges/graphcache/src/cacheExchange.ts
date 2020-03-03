@@ -243,17 +243,20 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Clear old optimistic values from the store
     const { key } = operation;
     const pendingOperations = new Set<number>();
-    collectPendingOperations(
-      pendingOperations,
-      optimisticKeysToDependencies.get(key)
-    );
-    optimisticKeysToDependencies.delete(key);
-    clearLayer(store.data, key);
+
+    if (!isQuery) {
+      collectPendingOperations(
+        pendingOperations,
+        optimisticKeysToDependencies.get(key)
+      );
+      optimisticKeysToDependencies.delete(key);
+      clearLayer(store.data, key);
+    }
 
     let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
     if (data !== null && data !== undefined) {
-      writeDependencies = write(store, operation, data).dependencies;
+      writeDependencies = write(store, operation, data, key).dependencies;
 
       if (isQuery) {
         const queryResult = query(store, operation);
