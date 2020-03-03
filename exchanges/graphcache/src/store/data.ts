@@ -21,17 +21,29 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
+  /** Ensure persistence is never scheduled twice at a time */
   persistenceScheduled: boolean;
+  /** Batches changes to the data layer that'll be written to `storage` */
   persistenceBatch: SerializedEntries;
+  /** Ensure garbage collection is never scheduled twice at a time */
   gcScheduled: boolean;
+  /** A list of entities that have been flagged for gargabe collection since no references to them are left */
   gcBatch: Set<string>;
+  /** The API's "Query" typename which is needed to filter dependencies */
   queryRootKey: string;
+  /** Number of references to each entity (except "Query") */
   refCount: Dict<number>;
+  /** Number of references to each entity on optimistic layers */
   refLock: OptimisticMap<Dict<number>>;
+  /** A map of entity fields (key-value entries per entity) */
   records: NodeMap<EntityField>;
+  /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  /** A set of Query operation keys that are in-flight and awaiting a result */
   commutativeKeys: Set<number>;
+  /** The order of optimistic layers */
   optimisticOrder: number[];
+  /** This may be a persistence adapter that will receive changes in a batch */
   storage: StorageAdapter | null;
 }
 
@@ -59,7 +71,10 @@ export const initDataState = (
   if (!layerKey) {
     currentOptimisticKey = null;
   } else if (forceOptimistic) {
+    // Optimistic Updates for mutations may use `forceOptimistic` to
+    // always create an optimistic layer
     currentOptimisticKey = layerKey;
+    // Create an optimistic layer if it doesn't exist yet
     if (!data.refLock[layerKey]) {
       data.optimisticOrder.unshift(layerKey);
       data.refLock[layerKey] = makeDict();
@@ -70,8 +85,13 @@ export const initDataState = (
     data.commutativeKeys.size > 1 &&
     data.commutativeKeys.has(layerKey)
   ) {
+    // We use an optimistic layer if this operation is part of
+    // the current list of pending Query operations of which we
+    // should have more than one
     currentOptimisticKey = layerKey;
   } else {
+    // Otherwise we don't create an optimistic layer and clear the
+    // operation's one if it already exists
     currentOptimisticKey = null;
     clearLayer(data, layerKey);
   }
@@ -87,6 +107,9 @@ export const clearDataState = () => {
     const commutativeIndex =
       data.optimisticOrder.length - data.commutativeKeys.size;
     const blockingKey = data.optimisticOrder[data.optimisticOrder.length - 1];
+    // If this is a Query operation that is in the list of commutative keys
+    // and is the "first" one and hence blocking all others, we squash all
+    // results and empty the list of commutative keys
     if (blockingKey === optimisticKey) {
       for (let i = data.optimisticOrder.length - 1; i >= commutativeIndex; i--)
         squashLayer(data.optimisticOrder[i]);
