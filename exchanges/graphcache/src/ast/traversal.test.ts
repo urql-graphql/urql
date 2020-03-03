@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { getSelectionSet } from './node';
+import { getSelectionSet } from '../../../common/ast/node';
 import { getMainOperation, shouldInclude } from './traversal';
 
 describe('getMainOperation', () => {

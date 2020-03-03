@@ -4,20 +4,17 @@ import { warn, pushDebugNode } from '../../../common/helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
 
+import { Fragments, Variables, DataField, NullArray, Data } from '../types';
 import {
-  Fragments,
-  Variables,
-  DataField,
-  NullArray,
-  Data,
-} from '../types';
-import { isInlineFragment, getTypeCondition, getSelectionSet, getName, SelectionSet, isFieldNode } from '../../../common/ast';
+  isInlineFragment,
+  getTypeCondition,
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  isFieldNode,
+} from '../../../common/ast';
 
-import {
-  getFieldArguments,
-  shouldInclude,
-  isInterfaceOfType,
-} from '../ast';
+import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
 interface Context {
   store: Store;

@@ -9,12 +9,7 @@ import {
 
 import { getSelectionSet, getName, SelectionSet } from '../../../common/ast';
 
-import {
-  EntityField,
-  OperationRequest,
-  Variables,
-  Fragments,
-} from '../types';
+import { EntityField, OperationRequest, Variables, Fragments } from '../types';
 
 import * as InMemoryData from '../store/data';
 import { Store, keyOfField } from '../store';

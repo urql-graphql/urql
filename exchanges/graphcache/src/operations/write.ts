@@ -7,8 +7,13 @@ import {
   getFieldArguments,
   isFieldAvailableOnType,
 } from '../ast';
-import { getSelectionSet, getName, SelectionSet, getFragmentTypeName, getFieldAlias } from '../../../common/ast';
-
+import {
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  getFragmentTypeName,
+  getFieldAlias,
+} from '../../../common/ast';
 
 import {
   NullArray,

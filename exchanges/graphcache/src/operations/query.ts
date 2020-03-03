@@ -6,7 +6,13 @@ import {
   normalizeVariables,
   getFieldArguments,
 } from '../ast';
-import { getSelectionSet, getName, SelectionSet, getFragmentTypeName, getFieldAlias } from '../../../common/ast';
+import {
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  getFragmentTypeName,
+  getFieldAlias,
+} from '../../../common/ast';
 
 import {
   Fragments,

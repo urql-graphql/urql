@@ -1,7 +1,4 @@
-import {
-  DocumentNode,
-  FragmentDefinitionNode,
-} from 'graphql';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
 export type NullArray<T> = Array<null | T>;
