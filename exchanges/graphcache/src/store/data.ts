@@ -55,6 +55,14 @@ export const initDataState = (
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
+
+  if (optimisticKey && !data.refLock[optimisticKey]) {
+    data.refLock[optimisticKey] = makeDict();
+    data.links.optimistic[optimisticKey] = new Map();
+    data.links.keys.unshift(optimisticKey);
+    data.records.optimistic[optimisticKey] = new Map();
+    data.records.keys.unshift(optimisticKey);
+  }
 };
 
 /** Reset the data state after read/write is complete */
@@ -120,19 +128,9 @@ const setNode = <T>(
 ) => {
   // Optimistic values are written to a map in the optimistic dict
   // All other values are written to the base map
-  let keymap: KeyMap<Dict<T | undefined>>;
-  if (currentOptimisticKey) {
-    // If the optimistic map doesn't exist yet, it' created, and
-    // the optimistic key is stored (in order of priority)
-    if (map.optimistic[currentOptimisticKey] === undefined) {
-      map.optimistic[currentOptimisticKey] = new Map();
-      map.keys.unshift(currentOptimisticKey);
-    }
-
-    keymap = map.optimistic[currentOptimisticKey];
-  } else {
-    keymap = map.base;
-  }
+  const keymap: KeyMap<Dict<T | undefined>> = currentOptimisticKey
+    ? map.optimistic[currentOptimisticKey]
+    : map.base;
 
   // On the map itself we get or create the entity as a dict
   let entity = keymap.get(entityKey) as Dict<T | undefined>;
