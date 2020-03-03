@@ -163,7 +163,7 @@ export class Store implements Cache {
       entityKey,
         "Can't generate a key for invalidate(...).\n" +
         "You have to pass an id or _id field or create a custom `keys` field for `" +
-        (entity as Data).__typename +
+        typeof entity === 'object' ? (entity as Data).__typename : entity +
         "`.",
       19,
     );
