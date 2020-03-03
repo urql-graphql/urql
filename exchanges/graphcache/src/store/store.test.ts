@@ -409,7 +409,7 @@ describe('Store with OptimisticMutationConfig', () => {
 
   describe('Invalidating an entity', () => {
     it('removes an entity from a list.', () => {
-      store.invalidateEntity(todosData.todos[1]);
+      store.invalidate(todosData.todos[1]);
       const { data } = query(store, { query: Todos });
       expect(data).toBe(null);
     });

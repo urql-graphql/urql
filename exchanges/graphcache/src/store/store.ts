@@ -161,11 +161,13 @@ export class Store implements Cache {
 
     invariant(
       entityKey,
-        "Can't generate a key for invalidate(...).\n" +
-        "You have to pass an id or _id field or create a custom `keys` field for `" +
-        typeof entity === 'object' ? (entity as Data).__typename : entity +
-        "`.",
-      19,
+      "Can't generate a key for invalidate(...).\n" +
+        'You have to pass an id or _id field or create a custom `keys` field for `' +
+        typeof entity ===
+        'object'
+        ? (entity as Data).__typename
+        : entity + '`.',
+      19
     );
 
     const fields = this.inspectFields(entityKey);
