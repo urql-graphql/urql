@@ -155,18 +155,18 @@ export class Store implements Cache {
     invalidate(this, createRequest(query, variables));
   }
 
-  invalidateEntity(entity: Data | string) {
+  invalidate(entity: Data | string) {
     const entityKey =
       typeof entity === 'string' ? entity : this.keyOfEntity(entity);
 
-    if (!entityKey) {
-      invariant(
-        entityKey,
-        `Can't generate a key for invalidateEntity(${entity}),
-        You need to pass in a valid key (__typename:id) or an object with the "__typename" property and an "id" or "_id" property.`,
-        19
-      );
-    }
+    invariant(
+      entityKey,
+        "Can't generate a key for invalidate(...).\n" +
+        "You have to pass an id or _id field or create a custom `keys` field for `" +
+        (entity as Data).__typename +
+        "`.",
+      19,
+    );
 
     const fields = this.inspectFields(entityKey);
     for (const field of fields) {

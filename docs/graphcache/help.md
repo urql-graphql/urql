@@ -268,12 +268,12 @@ field somewhere, maybe due to a typo.
 Please open an issue if it happens on a query that you expect to be supported
 by the `populateExchange`.
 
-## (19) Can't generate a key for invalidateEntity(...)
+## (19) Can't generate a key for invalidate(...)
 
-> Can't generate a key for invalidateEntity(...).
+> Can't generate a key for invalidate(...).
 > You need to pass in a valid key (__typename:id) or an object with the "__typename" property and an "id" or "_id" property.
 
-You probably have called `cache.invalidateEntity` with data that the cache can't generate a key for.
+You probably have called `cache.invalidate` with data that the cache can't generate a key for.
 
 This may either happen because you're missing the `__typename` and `id` or `_id` field or if the last two
 aren't applicable to this entity a custom `keys` entry.
