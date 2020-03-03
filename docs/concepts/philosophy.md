@@ -9,20 +9,20 @@ order: 1
 [core behavior in the core package](./core-package.md).
 
 By default, we aim to provide features that allow you to build your app quickly with minimal
-configuration. `urql` is a client that grows with you. As you go from building your first
-GraphQL app to a full experience, we give you the tools to extend and customize `urql` based on
+configuration. `urql` is designed to be a client that grows with you. As you go from building your first
+GraphQL app to a utilising the full functionality, the toopls are available to extend and customize `urql` based on
 your needs.
 
-In this guide, we will walkthrough how `urql` is set up internally and how all pieces of the puzzle
+In this guide, we will walk through how `urql` is set up internally and how all pieces of the puzzle
 — the building blocks of `urql` — interact with one another.
 
 ## Hello World
 
-[We previously read about how to set up a `Client` in "Getting
-Started".](../basics/getting-started.md)
+We previously read about how to set up a `Client` in [Getting
+Started](../basics/getting-started.md).
 
-When you use `urql` you will always create and set up a `Client` for which a `createClient`
-convenience helper exists.
+When you use `urql` you will always create and set up a `Client`. There is a `createClient`
+convenience helper to do just that.
 
 ```js
 import { Client } from 'urql';
@@ -36,14 +36,14 @@ In `urql`, the client is the first step towards manging the complexity of GraphQ
 
 ## Using GraphQL Clients
 
-You may have worked on a GraphQL API previously and noticed that using GraphQL in your app can be
+You may have worked with a GraphQL API previously and noticed that using GraphQL in your app can be
 as straightforward as sending a plain HTTP request with your query to fetch some data.
 
-But GraphQL provides an opportunity to abstract away a lot of the manual work that goes with
-sending these queries and managing the data. This ultimately lets you focus on building
-your app without handling the technical details of state management in detail.
+GraphQL also provides an opportunity to abstract away a lot of the manual work that goes with
+sending these queries and managing the data. Ultimately, this lets you focus on building
+your app without having to handle the technical details of state management in detail.
 
-Specifically `urql` simplifies three common aspects of using GraphQL easily:
+Specifically, `urql` simplifies three common aspects of using GraphQL:
 
 - Sending queries and mutations and receiving results _declaratively_
 - Abstracting _caching_ and state management internally
@@ -65,7 +65,7 @@ results.
 
 ![Operations and Results](../assets/urql-event-hub.png)
 
-This all happens in the background while you just declare that you'd like to have data for a given
+This all happens in the background, allowing you to simply declare that you'd like to have data for a given
 query.
 
 ## Caching and State
@@ -73,16 +73,15 @@ query.
 When we use GraphQL queries and mutations declaratively with `urql`, we expect them to interact
 and update automatically.
 
-Furthermore, we don't wish to send more requests for a query, when we've done so before. We'd like
-to instead cache results in-memory and notify other parts of an app when these results change or
-are invalidated by mutations or subscriptions.
+Furthermore, when we've already received the results from a query, we may not wish to send another request. To solve this, results can be cached in-memory and notifications can be sent to other parts of an app when the results change or
+are invalidated by mutations/subscriptions.
 
-GraphQL clients have access to some amount of type information for any GraphQL API and can hence
+GraphQL clients have access to some type information for any GraphQL API and hence can
 cache the results of queries automatically. In `urql` the `Client` can be extended with several
-cache implementations, but all of them mean that you'll never mix your declarative query or mutation
-code with cache-implementation details, which mostly happen behind the scenes.
+cache implementations; all of them allow you to prevent mixing your declarative query or mutation
+code with cache-implementation details, as they mostly happen behind the scenes.
 
-[We previously read about the default "Document Caching".](../basics/document-caching.md)
+We previously read about the default [Document Caching](../basics/document-caching.md).
 
 Some GraphQL clients also resort to caching data in a normalized format. This is similar to
 [how you may store data in Redux.](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape/)
@@ -90,29 +89,26 @@ Using this approach the cache uses more type information to reference parts of t
 in the cache and structures it in a graph, which leads to more shared data, and hence more shared
 updates in your UI!
 
-[Read more about how to add "Normalized Caching" to an app.](../graphcache/normalized-caching.md)
+[Read more](../graphcache/normalized-caching.md) on how to add Normalized Caching to an app.
 
 ## Extensibility and Integration
 
-With any kind of API come other concerns apart from caching and state mangagement that concern
-the global behavior or business logic of your application.
-
-For instance, you may want to add authentication, retry-logic for failed requests, or a global
+With any kind of API there can be concerns outside of caching and state mangagement. For example,
+the global behavior or business logic of your application. For instance, you may want to add authentication, retry-logic for failed requests, or a global
 error handler.
 
-`urql` provides a concept of _Exchanges_ to abstract the details of how the `Client` interacts with
+`urql` introduces the concept of _Exchanges_ in order to abstract the details of how the `Client` interacts with
 your framework of choice, your app, and your GraphQL API. They are akin to
 [middleware in Redux](https://redux.js.org/advanced/middleware) and have access to all operations
 and all results.
 
-[Read more about _Exchanges_ in a later page of the documentation.](./exchanges.md)
+Read more about [Exchanges](./exchanges.md) later on in the documentation.
 
 All default behavior in the [core package](./core-package.md) is implemented using
-_Exchanges_, which is possible because all operations and all results are treated as a stream
-of events. We call these events "Operations".
+Exchanges. This is possible as all operations and all results are treated as a stream
+of events; we call these events "Operations".
 
 ![Operation Signature](../assets/urql-signals.png)
 
-From our perspective, thinking about your GraphQL queries and results in terms of
-streams of operations and results allows us to implement any given complex behaviour,
-which we'll learn more about in the next section.
+Thinking about GraphQL queries and results in
+streams of operations and results allow us to implement complex behaviour in addition to allowing deep customisation over how the operations/results are handled. We'll learn more about this in the next section - [the Core Package](./core-package.md).
