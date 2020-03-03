@@ -159,7 +159,12 @@ export class Store implements Cache {
     const entityKey = typeof entity === 'string' ? entity : this.keyOfEntity(entity);
 
     if (!entityKey) {
-      invariant(entityKey, `Invalidate entity passed to "invalidateEntity", expected an entityKey (__typename:id) or an entity with the "__typename" and "id" or "_id" properties. Received ${entity}`, 19);
+      invariant(
+        entityKey,
+        `Can't generate a key for invalidateEntity(${entity}),
+        You need to pass in a valid key (__typename:id) or an object with the "__typename" property and an "id" or "_id" property.`,
+        19,
+      );
     }
 
     const fields = this.inspectFields(entityKey);
