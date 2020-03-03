@@ -72,7 +72,7 @@ export const initDataState = (
       // If it's the first, we can clear out all other reserved, commutative layers
       // and squash them
       for (let i = commutativeIndex + 1; i < data.optimisticOrder.length; i++)
-        squashLayer(data, data.optimisticOrder[i]);
+        squashLayer(data.optimisticOrder[i]);
       data.optimisticOrder.length = commutativeIndex;
       data.commutativeKeys.clear();
       currentOptimisticKey = null;
@@ -452,20 +452,20 @@ export const clearLayer = (data: InMemoryData, layerKey: number) => {
 };
 
 /** Merges an optimistic layer of links and records into the base data */
-export const squashLayer = (data: InMemoryData, layerKey: number) => {
-  data.links.optimistic[layerKey].forEach((keyMap, entityKey) => {
+const squashLayer = (layerKey: number) => {
+  currentData!.links.optimistic[layerKey].forEach((keyMap, entityKey) => {
     for (const fieldKey in keyMap) {
       writeLink(entityKey, fieldKey, keyMap[fieldKey]);
     }
   });
 
-  data.records.optimistic[layerKey].forEach((keyMap, entityKey) => {
+  currentData!.records.optimistic[layerKey].forEach((keyMap, entityKey) => {
     for (const fieldKey in keyMap) {
       writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
     }
   });
 
-  clearLayer(data, layerKey);
+  clearLayer(currentData!, layerKey);
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */
