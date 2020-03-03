@@ -16,13 +16,26 @@ const pokemonQuery = gql`
   }
 `;
 
+interface Response {
+  pokemon: {
+    types: string[];
+    name: string;
+    classification: string;
+    iamge: string;
+  };
+}
+
+interface Variables {
+  name: string;
+}
+
 const Pokemon = () => {
   const {
     query: { pokemon },
   } = useRouter();
-  const [result] = useQuery({
+  const [result] = useQuery<Response, Variables>({
     query: pokemonQuery,
-    variables: { name: pokemon },
+    variables: { name: pokemon as string },
   });
 
   if (result.fetching || !result.data) {
