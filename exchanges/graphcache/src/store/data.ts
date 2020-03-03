@@ -18,7 +18,6 @@ type OptimisticMap<T> = Record<number, T>;
 interface NodeMap<T> {
   optimistic: OptimisticMap<KeyMap<Dict<T | undefined>>>;
   base: KeyMap<Dict<T>>;
-  keys: number[];
 }
 
 export interface InMemoryData {
@@ -31,6 +30,7 @@ export interface InMemoryData {
   refLock: OptimisticMap<Dict<number>>;
   records: NodeMap<EntityField>;
   links: NodeMap<Link>;
+  keys: number[];
   storage: StorageAdapter | null;
 }
 
@@ -41,7 +41,6 @@ let currentOptimisticKey: null | number = null;
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
   base: new Map(),
-  keys: [],
 });
 
 /** Before reading or writing the global state needs to be initialised */
@@ -59,9 +58,8 @@ export const initDataState = (
   if (optimisticKey && !data.refLock[optimisticKey]) {
     data.refLock[optimisticKey] = makeDict();
     data.links.optimistic[optimisticKey] = new Map();
-    data.links.keys.unshift(optimisticKey);
     data.records.optimistic[optimisticKey] = new Map();
-    data.records.keys.unshift(optimisticKey);
+    data.keys.unshift(optimisticKey);
   }
 };
 
@@ -116,6 +114,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
   refLock: makeDict(),
   links: makeNodeMap(),
   records: makeNodeMap(),
+  keys: [],
   storage: null,
 });
 
@@ -155,8 +154,8 @@ const getNode = <T>(
   fieldKey: string
 ): T | undefined => {
   // This first iterates over optimistic layers (in order)
-  for (let i = 0, l = map.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[map.keys[i]];
+  for (let i = 0, l = currentData!.keys.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.keys[i]];
     const node = optimistic.get(entityKey);
     // If the node and node value exists it is returned, including undefined
     if (node !== undefined && fieldKey in node) {
@@ -167,17 +166,6 @@ const getNode = <T>(
   // Otherwise we read the non-optimistic base value
   const node = map.base.get(entityKey);
   return node !== undefined ? node[fieldKey] : undefined;
-};
-
-/** Clears an optimistic layers from a NodeMap */
-const clearOptimisticNodes = <T>(map: NodeMap<T>, optimisticKey: number) => {
-  // Check whether the optimistic layer exists on the NodeMap
-  const index = map.keys.indexOf(optimisticKey);
-  if (index > -1) {
-    // Then delete it and splice out the optimisticKey
-    delete map.optimistic[optimisticKey];
-    map.keys.splice(index, 1);
-  }
 };
 
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gcBatch */
@@ -247,8 +235,8 @@ const extractNodeMapFields = <T>(
   extractNodeFields(fieldInfos, seenFieldKeys, map.base.get(entityKey));
 
   // Then extracts FieldInfo for the entity from the optimistic maps
-  for (let i = 0, l = map.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[map.keys[i]];
+  for (let i = 0, l = currentData!.keys.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.keys[i]];
     extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
   }
 };
@@ -408,10 +396,13 @@ export const writeLink = (
 
 /** Removes an optimistic layer of links and records */
 export const clearOptimistic = (data: InMemoryData, optimisticKey: number) => {
-  // We also delete the optimistic reference locks
-  delete data.refLock[optimisticKey];
-  clearOptimisticNodes(data.records, optimisticKey);
-  clearOptimisticNodes(data.links, optimisticKey);
+  const index = data.keys.indexOf(optimisticKey);
+  if (index > -1) {
+    data.keys.splice(index, 1);
+    delete data.refLock[optimisticKey];
+    delete data.records.optimistic[optimisticKey];
+    delete data.links.optimistic[optimisticKey];
+  }
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */
