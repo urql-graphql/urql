@@ -56,39 +56,19 @@ export const initDataState = (
     currentDebugStack.length = 0;
   }
 
-  // Before we write, we determine whether we'll write to an optimistic layer.
-  // This may happen when multiple layers have been reserved or when we force
-  // an optimistic write, both with a passed `layerKey`
-  const orderIndex = layerKey ? data.optimisticOrder.indexOf(layerKey) : -1;
-  if (layerKey && data.commutativeKeys.has(layerKey)) {
-    // If we have multiple reserved, commutative layers, we'll want to write to
-    // an optimistic layer instead, unless the current layer is the first that
-    // has been reserved
-    const commutativeIndex =
-      data.optimisticOrder.length - data.commutativeKeys.size;
-    if (orderIndex !== commutativeIndex) {
-      currentOptimisticKey = layerKey;
-    } else {
-      // If it's the first, we can clear out all other reserved, commutative layers
-      // and squash them
-      for (let i = commutativeIndex + 1; i < data.optimisticOrder.length; i++)
-        squashLayer(data.optimisticOrder[i]);
-      data.optimisticOrder.length = commutativeIndex;
-      data.commutativeKeys.clear();
-      currentOptimisticKey = null;
-    }
-  } else if (layerKey && forceOptimistic) {
-    // If we're forcing an optimistic write, we're likely dealing with an optimistic
-    // update, in which case no layer has been reserved and we'll have to create one
+  if (
+    layerKey &&
+    (forceOptimistic ||
+      (data.commutativeKeys.size > 1 && data.commutativeKeys.has(layerKey)))
+  ) {
     currentOptimisticKey = layerKey;
-    if (orderIndex === -1) {
+    if (!data.refLock[layerKey]) {
       data.optimisticOrder.unshift(layerKey);
       data.refLock[layerKey] = makeDict();
       data.links.optimistic[layerKey] = new Map();
       data.records.optimistic[layerKey] = new Map();
     }
   } else {
-    // Otherwise we don't write optimistically ever
     currentOptimisticKey = null;
   }
 };
@@ -96,6 +76,27 @@ export const initDataState = (
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
   const data = currentData!;
+  const optimisticKey = currentOptimisticKey;
+  currentOptimisticKey = null;
+
+  if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
+    const commutativeIndex =
+      data.optimisticOrder.length - data.commutativeKeys.size;
+    const blockingKey = data.optimisticOrder[commutativeIndex];
+    if (blockingKey === optimisticKey) {
+      for (let i = data.optimisticOrder.length - 1; i >= commutativeIndex; i--)
+        squashLayer(data.optimisticOrder[i]);
+      data.optimisticOrder.length = commutativeIndex;
+      data.commutativeKeys.clear();
+    }
+  }
+
+  currentData = null;
+  currentDependencies = null;
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
+
   if (!data.gcScheduled && data.gcBatch.size > 0) {
     data.gcScheduled = true;
     defer(() => {
@@ -110,13 +111,6 @@ export const clearDataState = () => {
       data.persistenceScheduled = false;
       data.persistenceBatch = makeDict();
     });
-  }
-
-  currentData = null;
-  currentDependencies = null;
-  currentOptimisticKey = null;
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.length = 0;
   }
 };
 
