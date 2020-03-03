@@ -5,7 +5,17 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { pipe, map, makeSubject, tap, publish, delay } from 'wonka';
+import {
+  Source,
+  pipe,
+  map,
+  mergeMap,
+  fromValue,
+  makeSubject,
+  tap,
+  publish,
+  delay,
+} from 'wonka';
 import { cacheExchange } from './cacheExchange';
 
 const queryOne = gql`
@@ -840,4 +850,61 @@ it('reexecutes query and returns data on partial result', () => {
     'operation.context.meta.cacheOutcome',
     'partial'
   );
+});
+
+it('applies results that come in out-of-order commutatively and consistently', () => {
+  jest.useFakeTimers();
+
+  let data: any;
+
+  const client = createClient({
+    url: 'http://0.0.0.0',
+    requestPolicy: 'cache-and-network',
+  });
+  const { source: ops$, next: next } = makeSubject<Operation>();
+  const query = gql`
+    {
+      index
+    }
+  `;
+
+  const result = (operation: Operation): Source<OperationResult> =>
+    pipe(
+      fromValue({
+        operation,
+        data: {
+          __typename: 'Query',
+          index: operation.key,
+        },
+      }),
+      delay(operation.key === 2 ? 5 : operation.key * 10)
+    );
+
+  const output = jest.fn(result => {
+    data = result.data;
+  });
+
+  pipe(
+    cacheExchange()({ forward: ops$ => pipe(ops$, mergeMap(result)), client })(
+      ops$
+    ),
+    tap(output),
+    publish
+  );
+
+  next(client.createRequestOperation('query', { key: 1, query }));
+  next(client.createRequestOperation('query', { key: 2, query }));
+  next(client.createRequestOperation('query', { key: 3, query }));
+
+  jest.advanceTimersByTime(5);
+  expect(output).toHaveBeenCalledTimes(1);
+  expect(data.index).toBe(2);
+
+  jest.advanceTimersByTime(10);
+  expect(output).toHaveBeenCalledTimes(2);
+  expect(data.index).toBe(2);
+
+  jest.advanceTimersByTime(30);
+  expect(output).toHaveBeenCalledTimes(3);
+  expect(data.index).toBe(3);
 });
