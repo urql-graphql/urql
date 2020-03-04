@@ -134,8 +134,6 @@ It consists of `query` and optional `variables`.
 | query     | `DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    |
 | variables | `?object`      | The variables to be used with the GraphQL request.                                                                    |
 
-&nbsp;
-
 The `key` property is a hash of both the `query` and the `variables`, to uniquely
 identify the request.
 
@@ -152,8 +150,6 @@ This type is used to give an operation additional metadata and information.
 | meta            | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
 | suspense        | `?boolean`                            | Whether suspense is enabled.                                                                                          |
 | preferGetMethod | `?number`                             | Whether to use HTTP GET for queries.                                                                                  |
-
-&nbsp;
 
 It contains a lot of the above mentioned Client options and also `requestPolicy`.
 It accepts additional, untyped parameters that can be used to send more

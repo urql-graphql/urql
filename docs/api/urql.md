@@ -28,8 +28,6 @@ A tuple is returned with item one being the current query's state object and ite
 
 The shape of the current state is an [OperationResult Type](/api/core#operationresult-type)
 
-&nbsp;
-
 The `executeQuery` function optionally accepts a partial `OperationContext`.
 
 [More information on how to use this hook can be found in the Basics section.](/basics/querying-data#queries)
@@ -45,7 +43,6 @@ Accepts a single `query` argument of type `string`.
 A tuple is returned with item one being the current query's state object and item two being an `executeQuery` function.
 
 The shape of the current state is an [OperationResult Type](/api/core#operationresult-type)
-&nbsp;
 
 The `executeQuery` function optionally accepts a partial `OperationContext`.
 
@@ -64,8 +61,6 @@ The `options` object's property breakdown:
 | query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
 | variables | `?object`                | The variables to be used with the GraphQL request.                                 |
 | context   | `?object`                | Holds the contextual information for the query.                                    |
-
-&nbsp;
 
 The subscription handler's type signature:
 
@@ -107,8 +102,6 @@ More information can be found in the [Subscriptions](/advanced/subscriptions) se
 | error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
 | extensions   | `?Record<string, any>`              | Optional extensions that the GraphQL server may have returned.                                          |
 | executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
-
-&nbsp;
 
 [More information on how to use this hook can be found in the Basics section.](/basics/querying-data#queries)
 
