@@ -53,3 +53,13 @@ import schema from './schema.json';
 
 const cache = cacheExchange({ schema });
 ```
+
+So what benefits do we have now that graphCache is aware of the shape of our schema?
+
+### Partial results
+
+Let's approach this with the example from [Computed queries](./computed-queries.md#resolve) we have
+our `TodosQuery` result (a list) and now we want to get a specific `Todo` we wire these up through
+`resolve` but we are missing an optional field for this, without a schema we don't know this is optional
+and we will not show you the partial result. Now that we have a schema we can check if this is allowed to
+be left out, we'll return you the entity and fetch the missing properties in the background.
