@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
 
 import Highlight, { Prism } from 'prism-react-renderer';
@@ -123,12 +123,65 @@ const Blockquote = styled.blockquote`
   }
 `;
 
+const sharedTableCellStyling = css`
+  padding: ${p => p.theme.spacing.sm};
+  border-left: 0.1rem solid ${p => p.theme.colors.passiveBg};
+  border-bottom: 0.1rem solid ${p => p.theme.colors.passiveBg};
+`;
+
+const TableHeader = styled.th`
+  text-align: left;
+  white-space: nowrap;
+  ${sharedTableCellStyling}
+`;
+
+const StyledTd = styled.td`
+  padding: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md} 0 0;
+  &:first-child {
+    white-space: nowrap;
+  }
+  &:nth-child(2) {
+    overflow-wrap: break-word;
+    min-width: 20rem;
+  }
+  ${sharedTableCellStyling}
+`;
+
+const SanitizedTableCell = ({ children }) => {
+  // Remove the backslashes used to stop mdx assuming
+  // that the pipe was a new column
+  const newChildren = React.Children.map(children, child => {
+    if (child.props?.mdxType === 'inlineCode') {
+      return {
+        ...child,
+        props: {
+          ...child.props,
+          children: child.props.children.replace(/\\\|/g, '|'),
+        },
+      };
+    }
+
+    return child;
+  });
+
+  return <StyledTd>{newChildren}</StyledTd>;
+};
+
+const Table = styled.table`
+  border: 0.1rem solid ${p => p.theme.colors.passiveBg};
+  border-collapse: collapse;
+  margin: ${p => p.theme.spacing.sm} 0;
+`;
+
 const components = {
   pre: Pre,
   img: Image,
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
+  table: Table,
+  th: TableHeader,
+  td: SanitizedTableCell,
 };
 
 export const MDXComponents = ({ children }) => (

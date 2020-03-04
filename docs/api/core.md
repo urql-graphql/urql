@@ -128,11 +128,11 @@ handled.
 This often comes up as the **input** for every GraphQL request.
 It consists of `query` and optional `variables`.
 
-| Prop      | Type           | Description                                                                                                           | Required |     |
-| --------- | -------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | --- |
-| key       | `number`       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. | No       |
-| query     | `DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    | Yes      |
-| variables | `object`       | The variables to be used with the GraphQL request.                                                                    | No       |
+| Prop      | Type           | Description                                                                                                           |
+| --------- | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| key       | `?number`      | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| query     | `DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    |
+| variables | `?object`      | The variables to be used with the GraphQL request.                                                                    |
 
 &nbsp;
 
@@ -143,15 +143,15 @@ identify the request.
 
 This type is used to give an operation additional metadata and information.
 
-| Prop            | Type                                 | Description                                                                                                           | Always Present |     |
-| --------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------------- | --- |
-| fetchOptions    | `RequestInit \| (() => RequestInit)` | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. | No             |
-| requestPolicy   | `RequestPolicy`                      | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. | Yes            |
-| url             | `string`                             | The GraphQL endpoint                                                                                                  | Yes            |
-| pollInterval    | `number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        | No             |
-| meta            | `OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          | No             |
-| suspense        | `boolean`                            | Whether suspense is enabled.                                                                                          | No             |
-| preferGetMethod | `number`                             | Whether to use HTTP GET for queries.                                                                                  | No             |
+| Prop            | Type                                  | Description                                                                                                           |
+| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| fetchOptions    | `?RequestInit \| (() => RequestInit)` | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| requestPolicy   | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| url             | `string`                              | The GraphQL endpoint                                                                                                  |
+| pollInterval    | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
+| meta            | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
+| suspense        | `?boolean`                            | Whether suspense is enabled.                                                                                          |
+| preferGetMethod | `?number`                             | Whether to use HTTP GET for queries.                                                                                  |
 
 &nbsp;
 
@@ -164,10 +164,10 @@ information to custom exchanges.
 The input for every exchange that informs GraphQL requests.
 It contains all properties in the [GraphQLRequest](#graphqlrequest-type) type, as well as the additional properties below.
 
-| Prop          | Type               | Description                                   | Required |     |
-| ------------- | ------------------ | --------------------------------------------- | -------- | --- |
-| operationName | `OperationType`    | The type of GraphQL operation being executed. | Yes      |
-| context       | `OperationContext` | Additional metadata passed to exchange.       | Yes      |
+| Prop          | Type               | Description                                   |
+| ------------- | ------------------ | --------------------------------------------- |
+| operationName | `OperationType`    | The type of GraphQL operation being executed. |
+| context       | `OperationContext` | Additional metadata passed to exchange.       |
 
 ### OperationResult (type)
 
@@ -175,20 +175,20 @@ The result of every GraphQL request, i.e. an `Operation`.
 It's very similar to what comes back from a typical GraphQL API, but
 slightly enriched.
 
-| Prop       | Type                  | Description                                           | Always Present |
-| ---------- | --------------------- | ----------------------------------------------------- | -------------- |
-| operation  | `Operation`           | The operation that this is a result for               | Yes            |
-| data       | Generic               | Data returned by the specified query                  | No             |
-| error      | `CombinedError`       | The query error                                       | No             |
-| extensions | `Record<string, any>` | Extensions that the GraphQL server may have returned. | No             |
+| Prop       | Type                   | Description                                           |
+| ---------- | ---------------------- | ----------------------------------------------------- |
+| operation  | `Operation`            | The operation that this is a result for               |
+| data       | `?any`                 | Data returned by the specified query                  |
+| error      | `?CombinedError`       | The query error                                       |
+| extensions | `?Record<string, any>` | Extensions that the GraphQL server may have returned. |
 
 ### CombinedError (class)
 
-| Input         | Type                            | Description                                                                       | Required |
-| ------------- | ------------------------------- | --------------------------------------------------------------------------------- | -------- |
-| networkError  | `Error`                         | An unexpected error that might've occured when trying to send the GraphQL request | No       |
-| graphQLErrors | `Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                     | No       |
-| response      | `any`                           | The raw response object (if any) from the `fetch` call                            | No       |
+| Input         | Type                             | Description                                                                       |
+| ------------- | -------------------------------- | --------------------------------------------------------------------------------- |
+| networkError  | `?Error`                         | An unexpected error that might've occured when trying to send the GraphQL request |
+| graphQLErrors | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                     |
+| response      | `?any`                           | The raw response object (if any) from the `fetch` call                            |
 
 These are both inputs and properties on the `CombinedError`. Additionally it exposes a default `message`
 that combines all errors it has received.
@@ -200,10 +200,10 @@ that a GraphQL result might have normally.
 
 ### ExchangeInput (type)
 
-| Input   | Type         | Description                                                                                                             | Required |
-| ------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- | -------- |
-| forward | `ExchangeIO` | The unction responsible for receiving an observable operation and returning a result                                    | Yes      |
-| client  | `Client`     | The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. | Yes      |
+| Input   | Type         | Description                                                                                                             |
+| ------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| forward | `ExchangeIO` | The unction responsible for receiving an observable operation and returning a result                                    |
+| client  | `Client`     | The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. |
 
 ### ExchangeIO (type)
 

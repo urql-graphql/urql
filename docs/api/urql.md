@@ -10,16 +10,17 @@ order: 1
 ### useQuery
 
 #### useQuery Parameters
+
 Accepts a single required `options` object as an input with the following properties:
 
-| Prop          | Type                     | Description                                                                                                           | Required |  |
-| ------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------- |
-| query         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    | Yes      |
-| variables     | `object`                 | The variables to be used with the GraphQL request.                                                                    | No       |
-| requestPolicy | `RequestPolicy`          | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. | No       |
-| pause         | `boolean`                | A boolean flag instructing `Query` to pause execution of the subsequent query operation.                              | No       |
-| pollInterval  | `number`                 | Every `pollInterval` milliseconds the query will be refetched.                                                        | No       |
-| context       | `object`                 | Holds the contextual information for the query.                                                                       | No       |
+| Prop          | Type                     | Description                                                                                                           |
+| ------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| query         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    |
+| variables     | `?object`                | The variables to be used with the GraphQL request.                                                                    |
+| requestPolicy | `?RequestPolicy`         | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| pause         | `?boolean`               | A boolean flag instructing `Query` to pause execution of the subsequent query operation.                              |
+| pollInterval  | `?number`                | Every `pollInterval` milliseconds the query will be refetched.                                                        |
+| context       | `?object`                | Holds the contextual information for the query.                                                                       |
 
 #### useQuery Returned Data
 
@@ -37,7 +38,7 @@ The `executeQuery` function optionally accepts a partial `OperationContext`.
 
 #### useMutation Parameters
 
-Accepts a single `query` argument of type `string`. 
+Accepts a single `query` argument of type `string`.
 
 #### useMutation Returned Data
 
@@ -53,15 +54,16 @@ The `executeQuery` function optionally accepts a partial `OperationContext`.
 ### useSubscription
 
 #### useSubscription Parameters
+
 Accepts an `options` object as the required first parameter, and a second optional parameter that is the subscription's handler function.
 
 The `options` object's property breakdown:
 
-| Prop      | Type                     | Description                                                                        | Required |  |
-| --------- | ------------------------ | ---------------------------------------------------------------------------------- | -------- |
-| query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. | Yes      |
-| variables | `object`                 | The variables to be used with the GraphQL request.                                 | No       |
-| context   | `object`                 | Holds the contextual information for the query.                                    | No       |
+| Prop      | Type                     | Description                                                                        |
+| --------- | ------------------------ | ---------------------------------------------------------------------------------- |
+| query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
+| variables | `?object`                | The variables to be used with the GraphQL request.                                 |
+| context   | `?object`                | Holds the contextual information for the query.                                    |
 
 &nbsp;
 
@@ -86,15 +88,15 @@ More information can be found in the [Subscriptions](/advanced/subscriptions) se
 
 #### Props
 
-| Prop          | Type                       | Description                                                                                           | Required |
-| ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- | -------- |
-| query         | `string`                   | The GraphQL request's query                                                                           | Yes      |
-| variables     | `object`                   | The GraphQL request's variables                                                                       | Yes      |
-| context       | `?object`                  | The GraphQL request's context                                                                         | No       |
-| requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        | No       |
-| pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               | No       |
-| pollInterval  | `?number`                  | Every `pollInterval` milliseconds the query will be refetched                                         | No       |
-| children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows | N/A      |
+| Prop          | Type                       | Description                                                                                           |
+| ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| query         | `string`                   | The GraphQL request's query                                                                           |
+| variables     | `object`                   | The GraphQL request's variables                                                                       |
+| context       | `?object`                  | The GraphQL request's context                                                                         |
+| requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        |
+| pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               |
+| pollInterval  | `?number`                  | Every `pollInterval` milliseconds the query will be refetched                                         |
+| children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
 
 #### Render Props
 
@@ -167,11 +169,7 @@ E.g.
 ```js
 <App>
   <UrqlProvider>
-    <UrqlConsumer>
-      {urqlData => (
-        <MyComponent data={urqlData} />
-      )}
-    </UrqlConsumer>
+    <UrqlConsumer>{urqlData => <MyComponent data={urqlData} />}</UrqlConsumer>
   </UrqlProvider>
 </App>
 ```
