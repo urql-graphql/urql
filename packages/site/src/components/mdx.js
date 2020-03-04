@@ -32,7 +32,10 @@ const Code = styled.code`
   white-space: pre;
 `;
 
-const InlineCode = styled.code`
+const InlineCode = styled(props => {
+  const children = props.children.replace(/\\\|/g, '|');
+  return <code {...props}>{children}</code>;
+})`
   background: ${p => p.theme.colors.codeBg};
   color: ${p => p.theme.colors.code};
   font-family: ${p => p.theme.fonts.code};
@@ -124,9 +127,9 @@ const Blockquote = styled.blockquote`
 `;
 
 const sharedTableCellStyling = css`
-  padding: ${p => p.theme.spacing.sm};
-  border-left: 0.1rem solid ${p => p.theme.colors.passiveBg};
-  border-bottom: 0.1rem solid ${p => p.theme.colors.passiveBg};
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border-left: 1px solid ${p => p.theme.colors.passiveBg};
+  border-bottom: 1px solid ${p => p.theme.colors.passiveBg};
 `;
 
 const TableHeader = styled.th`
@@ -135,42 +138,46 @@ const TableHeader = styled.th`
   ${sharedTableCellStyling}
 `;
 
-const StyledTd = styled.td`
-  padding: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md} 0 0;
+const TableCell = styled.td`
+  width: min-content;
+  ${sharedTableCellStyling}
+
+  ${p => {
+    const isCodeOnly = React.Children.toArray(p.children).every(
+      x => x.props && x.props.mdxType === 'inlineCode'
+    );
+    return (
+      isCodeOnly &&
+      css`
+        background-color: ${p.theme.colors.codeBg};
+
+        & > ${InlineCode} {
+          background: none;
+          padding: 0;
+          margin: 0;
+        }
+      `
+    );
+  }}
+
+  &:last-child {
+    width: max-content;
+  }
+
   &:first-child {
     white-space: nowrap;
   }
+
   &:nth-child(2) {
     overflow-wrap: break-word;
     min-width: 20rem;
   }
-  ${sharedTableCellStyling}
 `;
 
-const SanitizedTableCell = ({ children }) => {
-  // Remove the backslashes used to stop mdx assuming
-  // that the pipe was a new column
-  const newChildren = React.Children.map(children, child => {
-    if (child.props?.mdxType === 'inlineCode') {
-      return {
-        ...child,
-        props: {
-          ...child.props,
-          children: child.props.children.replace(/\\\|/g, '|'),
-        },
-      };
-    }
-
-    return child;
-  });
-
-  return <StyledTd>{newChildren}</StyledTd>;
-};
-
 const Table = styled.table`
-  border: 0.1rem solid ${p => p.theme.colors.passiveBg};
+  width: 100%;
+  border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
-  margin: ${p => p.theme.spacing.sm} 0;
 `;
 
 const components = {
@@ -181,7 +188,7 @@ const components = {
   code: HighlightCode,
   table: Table,
   th: TableHeader,
-  td: SanitizedTableCell,
+  td: TableCell,
 };
 
 export const MDXComponents = ({ children }) => (

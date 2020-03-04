@@ -44,7 +44,7 @@ export const GlobalStyle = createGlobalStyle`
     font-weight: ${p => p.theme.fontWeights.links};
   }
 
-  pre, p, h1, h2, h3 {
+  table, pre, p, h1, h2, h3 {
     margin: 0 0 ${p => p.theme.spacing.md} 0;
   }
 
