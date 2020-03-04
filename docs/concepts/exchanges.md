@@ -36,10 +36,13 @@ type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 ```
 
 The first parameter to an exchange is a `forward` function that refers to the next Exchange in the
-chain. The second second parameter is the `Client` being used. Exchanges always return an `ExchangeIO` function (this applies to the `forward` funtion as well), which accepts the source of _Operations_ and
-returns a source of _Operation Results_:
+chain. The second second parameter is the `Client` being used. Exchanges always return an `ExchangeIO`
+function (this applies to the `forward` funtion as well), which accepts the source of
+[_Operations_](../api/core.md#operation) and returns a source of [_Operation
+Results_](../api/core.md#operationresult).
 
-<!-- TODO: explain what the source is -->
+- [Read more about streams on the "Stream Patterns" page.](../concepts/stream-patterns.md)
+- [Read more about the _Exchange_ type signature on the API docs.](../api/core.md#exchange)
 
 ## Using Exchanges
 

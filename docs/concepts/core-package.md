@@ -10,7 +10,7 @@ _Exchanges_. These are the shared, default parts of `urql` that we will be using
 framework we're interacting with.
 
 Therefore those are also the parts of `urql` that contain its most important logic — like the
-`Client` — and the package that we need to know about if we're either integrating `urql` with a new
+[`Client`](../api/core.md#client) — and the package that we need to know about if we're either integrating `urql` with a new
 framework, or if we're using the "raw" `Client` in Node.js.
 
 ## Background
@@ -21,11 +21,10 @@ of having a GraphQL client handle declarative querying and being a central point
 By extension there are three parts of `urql` you'll come in contact with when you add it to your
 app:
 
-<!-- TODO: Add more package links -->
-
 - the framework integration that allows you to declaratively write queries and mutations in your
-  preferred framework, which are currently the `urql` or `@urql/preact` packages
-- the `Client` that manages the operation lifecycle and results
+  preferred framework, which are currently the [`urql`](../api/urql.md) or
+  [`@urql/preact`](../api/preact.md) packages
+- the [`Client`](../api/core.md#client) that manages the operation lifecycle and results
 - and, exchanges that may either be some default exchanges or some from external packages
 
 On this page we'll learn about the latter two points - shared logic that isn't specific to
@@ -39,8 +38,8 @@ The largest part of `urql` itself and the core package is the aforementioned `Cl
 used directly when using `urql` in Node.js without any other integration.
 
 [We've previously seen how we can use the `Client`'s stream methods directly, in [Stream
-Patterns](./stream-patterns.md). However, the `Client` also has plenty of convenience methods that
-make interacting with the `Client` directly a lot easier.
+Patterns](./stream-patterns.md). However, the [`Client`](../api/core.md#client) also has plenty of
+convenience methods that make interacting with the `Client` directly a lot easier.
 
 ### One-off Queries and Mutations
 
@@ -97,11 +96,9 @@ resolved synchronosuly prior to the unsubscribe. If not, the query is cancelled 
 The `@urql/core` package contains other utilities that are shared between multiple addon packages.
 This is a short but non-exhaustive list. It contains,
 
-<!-- TODO: Add links to other docs pages where appropriate -->
-
-- `CombinedError` - our abstraction to combine one or more `GraphQLError`(s) and a `NetworkError`
+- [`CombinedError`](../api/core.md#combinederror) - our abstraction to combine one or more `GraphQLError`(s) and a `NetworkError`
 - `makeResult` and `makeErrorResult` - utilities to create _Operation Results_
-- `createRequest` - a utility function to create a request from a query and some variables (which
+- [`createRequest`](../api/core.md#createrequest) - a utility function to create a request from a query and some variables (which
   generates a stable _Operation Key_)
 
 There are other utilities not mentioned here. Read more about the `@urql/core` API in the [API docs](../api/core.md).

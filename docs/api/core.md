@@ -92,9 +92,15 @@ client
   });
 ```
 
+[Read more about how to use this API on the "Core Package"
+page.](../concepts/core-package.md#one-off-queries-and-mutations)
+
 ### client.mutation
 
 This is similar to [`client.query`](#clientquery), but dispatches mutations instead.
+
+[Read more about how to use this API on the "Core Package"
+page.](../concepts/core-package.md#one-off-queries-and-mutations)
 
 #### client.reexecuteOperation
 
