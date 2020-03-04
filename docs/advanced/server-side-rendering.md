@@ -5,46 +5,241 @@ order: 2
 
 # Server-side Rendering
 
-`urql` supports server-side rendering through the `ssrExchange`, this exchange
-will gather all results that are fetched during the server side render and store
-them. This data can then be used on the client when the application is being
-hydrated.
+In server-side rendered applications we often need to set our application up so that data will be
+fetched on the server-side and later sent down to the client for hydration. `urql` supports this
+through the `ssrExchange.`
 
-## Setting up
+## The SSR Exchange
 
-To start out with the `ssrExchange` we have to add the exchange
+The `ssrExchange` has two functions. On the server-side it's able to gather all results as they're
+being fetched, which can then be serialised and sent to the client. On the client-side it's able to
+use these serialised results to rehydrate and render the application without refetching this data.
+
+To start out with the `ssrExchange` we have to add the exchange to our `Client`:
 
 ```js
-const isClient = typeof window !== 'undefined';
+import {
+  createClient,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  ssrExchange
+} from '@urql/core';
+
+const isServerSide = typeof window !== 'undefined';
+
+// The `ssrExchange` must be initialised with `isClient` and `initialState`
 const ssr = ssrExchange({
-  initialData: isClient ? window.URQL_DATA : undefined,
-  // This will need to be passed explicitly to ssrExchange:
-  isClient: !!isClient
+  isClient: !isServerSide,
+  initialState: !isServerSide ? window.__URQL_DATA__ : undefined,
 });
 
-const client = createClient({
+const client createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    ssr,
+    ssr, // Add `ssr` in front of the `fetchExchange`
     fetchExchange,
   ]
-})
+});
 ```
 
-The `ssrExchange` allows you to pass in an object with two options, one being `isClient`,
-this option tells the exchange you're in the browser rather than in the process of a server-side
-render. The other option is called `initialState`, this being a mapping of `operationKey` to `operationResult`,
-this could for instance be `window.__URQL_DATA__`.
+The `ssrExchange` must be initialised with the `isClient` and `initialState` options. The `isClient`
+option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`.
 
-The returned exchange will have two methods available on it, `restoreData` and `extractData`, during your ssr
-we extract the gathered data and serialize it into a `<script>` tag inside head, this should bind it to a unique
-property on `window` for instance `window.__URQL_DATA__`.
+The `initialState` option should be set to the serialised data you retrieve on your server-side.
+This data may be retrieved using methods on `ssrExchange()`. You can retrive the serialised data
+after server-side rendering using `ssr.extractData()`:
 
-When `isClient` is true it will use the `initialState` to restore the gathered data.
+```js
+// Extract and serialise the data like so from the `ssr` instance
+// we've previously created by calling `ssrExchange()`
+const data = JSON.stringify(ssr.extractData());
 
-## Next
+const markup = ''; // The render code for our framework goes here
+
+const html = `
+<html>
+  <body>
+    <div id="root">${markup}</div>
+    <script>
+      window.__URQL_DATA__ = JSON.parse(${data});
+    </script>
+  </body>
+</html>
+`;
+```
+
+This will provide `__URQL_DATA__` globally which we've used in our first example to inject data into
+the `ssrExchange` on the client-side.
+
+Alternatively you can also call `restoreData` as long as this call happens synchronously before the
+`client` starts receiving queries.
+
+```js
+const isServerSide = typeof window !== 'undefined';
+const ssr = ssrExchange({ isClient: !isServerSide });
+
+if (!isServerSide) {
+  ssr.restoreData(window.__URQL_DATA__);
+}
+```
+
+## Using `react-ssr-prepass`
+
+In the previous examples we've set up the `ssrExchange`, however with React this still requires us
+to manually execute our queries before rendering a server-side React app [using `renderToString`
+or `renderToNodeStream`](https://reactjs.org/docs/react-dom-server.html#rendertostring).
+
+For React, `urql` has a "Suspense mode" that [allows data fetching to interrupt
+rendering](https://reactjs.org/docs/concurrent-mode-suspense.html). However, suspense is currently
+not supported by React during server-side rendering.
+
+Using [the `react-ssr-prepass` package](https://github.com/FormidableLabs/react-ssr-prepass) however,
+we can implement a prerendering step before we let React server-side render, which allows us to
+automatically fetch all data that the app requires with Suspense. This technique is commonly
+referred to as a "two-pass approach", since our React element is traversed twice.
+
+To set this up, first we'll install `react-ssr-prepass`. It has a peer dependency on `react-is`
+and `react`.
+
+```sh
+yarn add react-ssr-prepass react-is react-dom
+# or
+npm install --save react-ssr-prepass react-is react-dom
+```
+
+Next, we'll modify our server-side code and add `react-ssr-prepass` in front of `renderToString`.
+
+```jsx
+import { renderToString } from 'react-dom/server';
+import prepass from 'react-ssr-prepass';
+
+import {
+  createClient,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  ssrExchange
+} from 'urql';
+
+const handleRequest = async (req, res) => {
+  // ...
+  const ssr = ssrExchange({ isClient: false });
+
+  const client createClient({
+    suspense: true, // This activates urql's Suspense mode on the server-side
+    exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange]
+  });
+
+  const element = (
+    <Provider value={client}>
+      <App />
+    </Provider>
+  );
+
+  // Using `react-ssr-prepass` this prefetches all data
+  await prepass(element);
+  // This is the usual React SSR rendering code
+  const markup = renderToString(element);
+  // Extract the data after prepass and rendering
+  const data = JSON.stringify(ssr.extractData());
+
+  res.status(200).send(`
+    <html>
+      <body>
+        <div id="root">${markup}</div>
+        <script>
+          window.__URQL_DATA__ = JSON.parse(${data});
+        </script>
+      </body>
+    </html>
+  `);
+};
+```
+
+It's important to set enable the `suspense` option on the `Client`, which switches it to support
+React suspense.
+
+### With Preact
+
+If you're using Preact instead of React, there's a drop-in replacement package for
+`react-ssr-prepass`, which is called `preact-ssr-prepass`. It only has a peer dependency on Preact
+and we can install it like so:
+
+```sh
+yarn add preact-ssr-prepass preact
+# or
+npm install --save preact-ssr-prepass preact
+```
+
+All above examples for `react-ssr-prepass` will still be the exact same, except that instead of
+using the `urql` package we'll have to import from `@urql/preact`, and instead of `react-ssr-prepass`
+we'll have to import from. `preact-ssr-prepass`.
+
+## Next.js
+
+If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of work by using
+`next-urql`. The `next-urql` package includes setup for `react-ssr-prepass` already, which automates
+a lot of the complexity of setting up server-side rendering with `urql`.
 
 We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/FormidableLabs/next-urql)
 this integration contains convenience methods specifically for `Next.js`.
 These will simplify the above setup for SSR.
+
+To setup `next-urql`, first we'll install `next-urql` with `react-is` and `isomorphic-unfetch` as
+peer dependencies:
+
+```sh
+yarn add next-urql react-is isomorphic-unfetch
+# or
+npm install --save next-urql react-is isomorphic-unfetch
+```
+
+The peer dependency on `react-is` is inherited from `react-ssr-prepass` requiring it, and the peer
+dependency on `isomorphic-unfetch` exists, since `next-urql` automatically injects it as a `fetch`
+polyfill.
+
+We're now able to wrap any page or `_app.js` using the `withUrqlClient` higher-order component. If
+we wrap `_app.js` we won't have to wrap any individual page, but we also won't be able to make use
+of Next's ["Automatic Static
+Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimization).
+
+```js
+// pages/index.js
+import React from 'react';
+import Head from 'next/head';
+import { withUrqlClient } from 'next-urql';
+
+const Index = () => {
+  const [result] = useQuery({
+    query: '{ test }',
+  });
+
+  // ...
+};
+
+export default withUrqlClient(ctx => ({
+  // ...add your Client options here
+  url: 'http://localhost:3000/graphql',
+}))(Index);
+```
+
+This will automatically set up server-side rendering on the page. The `withUrqlClient` higher-order
+component function accepts the usual `Client` options as an argument. This may either just be an
+object or a function that receives the Next.js' `getInitialProps` context.
+
+One added caveat is that these options may not include the `exchanges` option because `next-urql`
+injects the `ssrExchange` automatically at the right location. If you're setting up custom exchanges
+you'll need to instead provide them in a custom `mergeExchanges` function as the second argument:
+
+```js
+import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+
+import { withUrqlClient } from 'next-urql';
+
+// Modify this array to include custom exchanges:
+const mergeExchanges = ssrExchange => [dedupExchange, cacheExchange, ssrExchange, fetchExchange];
+
+export default withUrqlClient({ url: 'http://localhost:3000/graphql' }, mergeExchanges)(Index);
+```
