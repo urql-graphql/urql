@@ -5,7 +5,14 @@ order: 3
 
 # Automatically populating Mutations
 
-`populate` is an exchange for auto-populating fields in your mutations.
+The `populateExchange` allows you to auto-populate selection sets in your mutations using the
+`@populate` directive. In combination with [Graphcache](../graphcache/README.md) this is a useful
+tool to update the data in your application automatically following a mutation, when your app grows
+and it becomes harder to track all fields that have been queried before.
+
+> **NOTE:** The `populateExchange` is currently _experimental_! Certain patterns and usage paths
+> like GraphQL field arguments aren't covered yet, and the exchange hasn't been extensively used
+> yet.
 
 ## How to use
 
@@ -19,13 +26,12 @@ import { populateExchange } from '@urql/exchange-graphcache';
 const client = createClient({
   // ...
   exchanges: [dedupExchange, populateExchange, cacheExchange, fetchExchange],
-})
+});
 ```
 
 ## Example usage
 
 Consider the following queries which have been requested in other parts of your application:
-
 
 ```graphql
 # Query 1
@@ -87,6 +93,7 @@ mutation addTodo(id: ID!) {
 If you find yourself using multiple queries with variables, it may be necessary to [use aliases](https://graphql.org/learn/queries/#aliases) in order to allow merging of queries.
 
 **Invalid usage**
+
 ```graphql
 # Query 1
 {
@@ -106,6 +113,7 @@ If you find yourself using multiple queries with variables, it may be necessary 
 ```
 
 **Usage with aliases**
+
 ```graphql
 # Query 1
 {
