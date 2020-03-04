@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-populate",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "An exchange that automaticcally populates the mutation selection body",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
