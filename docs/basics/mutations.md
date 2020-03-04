@@ -33,7 +33,7 @@ const UpdateTodo = `
 
 const Todo = ({ id, title }) => {
   const [updateTodoResult, updateTodo] = useMutation(UpdateTodo);
-}
+};
 ```
 
 Similar to the `useQuery` output, `useMutation` returns a tuple. The first item in the tuple again
@@ -56,18 +56,41 @@ const Todo = ({ id, title }) => {
 
   const submit = newTitle => {
     const variables = { id, title: newTitle || '' };
-    updateTodo(variables)
-      .then(result => {
-        // The result is almost identical to `updateTodoResult` with the exception
-        // of `result.fetching` not being set.
-      });
-  }
-}
+    updateTodo(variables).then(result => {
+      // The result is almost identical to `updateTodoResult` with the exception
+      // of `result.fetching` not being set.
+    });
+  };
+};
 ```
 
 This is useful when your UI has to display progress or results on the mutation, and the returned
 promise is particularly useful when you're adding side-effects that run after the mutation has
 completed.
+
+### Handling mutation errors
+
+It's worth noting that the promise we receive when calling the execute function will never
+reject. Instead it will always return a promise that resolves to a result.
+
+If you're checking for errors, you should use `result.error` instead, which will be set
+to a `CombinedError` when any kind of errors occurred while executing your mutation.
+[Read more about errors on our "Errors" page.](./errors.md)
+
+```jsx
+const Todo = ({ id, title }) => {
+  const [updateTodoResult, updateTodo] = useMutation(UpdateTodo);
+
+  const submit = newTitle => {
+    const variables = { id, title: newTitle || '' };
+    updateTodo(variables).then(result => {
+      if (result.error) {
+        console.error('Oh no!', result.error);
+      }
+    });
+  };
+};
+```
 
 ### Reading on
 

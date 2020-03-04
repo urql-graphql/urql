@@ -40,18 +40,13 @@ const Todos = () => {
 
   const { data, fetching, error } = result;
 
-  if (fetching) {
-    return <p>Loading...</p>;
-  } else if (error) {
-    return <p>Oh no... {error.message}</p>
-  }
+  if (fetching) return <p>Loading...</p>;
+  if (error) return <p>Oh no... {error.message}</p>;
 
   return (
     <ul>
       {data.todos.map(todo => (
-        <li key={todo.id}>
-          {todo.title}
-        </li>
+        <li key={todo.id}>{todo.title}</li>
       ))}
     </ul>
   );
@@ -111,14 +106,14 @@ variables have been defined to be non-nullable `Int!` values.
 
 Let's pause the query we've just
 written to not execute when these variables are empty, to prevent `null` variables from being
-executed.  We can do this by means of the `pause` option.
+executed. We can do this by means of the `pause` option.
 
 ```jsx
 const Todos = ({ from, limit }) => {
   const [result, reexecuteQuery] = useQuery({
     query: TodosListQuery,
     variables: { from, limit },
-    pause: !from || !limit
+    pause: !from || !limit,
   });
 
   // ...
