@@ -1,4 +1,5 @@
 import { FieldNode } from 'graphql';
+import { getSelectionSet, getName, SelectionSet } from 'shared';
 
 import {
   getMainOperation,
@@ -6,8 +7,6 @@ import {
   getFragments,
   getFieldArguments,
 } from '../ast';
-
-import { getSelectionSet, getName, SelectionSet } from '../../../common/ast';
 
 import { EntityField, OperationRequest, Variables, Fragments } from '../types';
 

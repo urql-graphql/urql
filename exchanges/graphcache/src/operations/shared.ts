@@ -1,18 +1,19 @@
 import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
-
-import { warn, pushDebugNode } from '../../../common/helpers/help';
-import { hasField } from '../store/data';
-import { Store, keyOfField } from '../store';
-
-import { Fragments, Variables, DataField, NullArray, Data } from '../types';
 import {
+  warn,
+  pushDebugNode,
   isInlineFragment,
   getTypeCondition,
   getSelectionSet,
   getName,
   SelectionSet,
   isFieldNode,
-} from '../../../common/ast';
+} from 'shared';
+
+import { hasField } from '../store/data';
+import { Store, keyOfField } from '../store';
+
+import { Fragments, Variables, DataField, NullArray, Data } from '../types';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 

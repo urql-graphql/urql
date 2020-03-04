@@ -14,12 +14,10 @@ import {
   Kind,
   visit,
 } from 'graphql';
+import { getName, getSelectionSet, unwrapType, invariant, warn } from 'shared';
 
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
-
-import { getName, getSelectionSet, unwrapType } from '../../common/ast';
-import { invariant, warn } from '../../common/helpers/help';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;

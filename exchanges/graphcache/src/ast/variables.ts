@@ -3,8 +3,8 @@ import {
   OperationDefinitionNode,
   valueFromASTUntyped,
 } from 'graphql';
+import { getName } from 'shared';
 
-import { getName } from '../../../common/ast';
 import { makeDict } from '../helpers/dict';
 import { Variables } from '../types';
 

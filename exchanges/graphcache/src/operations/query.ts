@@ -1,4 +1,13 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import {
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  getFragmentTypeName,
+  getFieldAlias,
+  warn,
+  pushDebugNode,
+} from 'shared';
 
 import {
   getFragments,
@@ -6,13 +15,6 @@ import {
   normalizeVariables,
   getFieldArguments,
 } from '../ast';
-import {
-  getSelectionSet,
-  getName,
-  SelectionSet,
-  getFragmentTypeName,
-  getFieldAlias,
-} from '../../../common/ast';
 
 import {
   Fragments,
@@ -35,7 +37,6 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { warn, pushDebugNode } from '../../../common/helpers/help';
 import { SelectionIterator, ensureData } from './shared';
 
 import {

@@ -13,7 +13,10 @@ import {
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
-} from '../../../common/ast';
+  invariant,
+  warn,
+  pushDebugNode
+} from 'shared';
 
 import {
   NullArray,
@@ -35,7 +38,6 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { warn, pushDebugNode, invariant } from '../../../common/helpers/help';
 import { SelectionIterator, ensureData } from './shared';
 
 export interface WriteResult {
