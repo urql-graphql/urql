@@ -2,6 +2,9 @@
   "private": true,
   "name": "shared",
   "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'not building shared'"
+  },
   "jest": {
     "preset": "../../scripts/jest/preset"
   }
