@@ -42,7 +42,7 @@
     "react-router-ga": "^1.0.0",
     "react-scroll": "^1.7.15",
     "react-static": "^7.2.3",
-    "react-static-plugin-md-pages": "^0.1.1",
+    "react-static-plugin-md-pages": "^0.1.2",
     "styled-components": "^5.0.1"
   },
   "devDependencies": {
@@ -50,7 +50,6 @@
     "@mdx-js/mdx": "^1.5.5",
     "config": "^3.0.0",
     "lodash": "^4.17.11",
-    "react-static-plugin-mdx": "^7.2.2",
     "react-static-plugin-react-router": "^7.2.3",
     "react-static-plugin-sitemap": "^7.0.0",
     "react-static-plugin-styled-components": "^7.2.2"
