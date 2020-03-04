@@ -3,12 +3,13 @@ title: Testing
 order: 4
 ---
 
-
 # Testing
 
-When testing your components, you're likely going to want to check arguments and force different states for your components using Urql.
+Testing with `urql` can be done in a multitude of ways. The most effective and straightforward
+method is to mock the `Client` to force your components into a fixed state during testing.
 
-> **Note:** Examples demonstrate the _React hooks_ version of Urql being used but underlying patterns apply to all implementations.
+The following examples demonstrate this method of testing for React and the `urql` package only,
+however the pattern itself can be adapted for any framework-bindings of `urql`.
 
 ## Mocking the client
 
@@ -70,15 +71,11 @@ it('triggers a mutation', () => {
     name: 'Carla',
   };
 
-  wrapper
-    .find('input')
-    .simulate('change', { currentTarget: { value: variables.name } });
+  wrapper.find('input').simulate('change', { currentTarget: { value: variables.name } });
   wrapper.find('button').simulate('click');
 
   expect(mockClient.executeMutation).toBeCalledTimes(1);
-  expect(mockClient.executeMutation).toBeCalledWith(
-    expect.objectContaining({ variables })
-  );
+  expect(mockClient.executeMutation).toBeCalledWith(expect.objectContaining({ variables }));
 });
 ```
 
