@@ -6,8 +6,9 @@ order: 2
 # Computed Queries
 
 When dealing with data we could have special cases where we want to format a date
-or make a details query take an entry from the list query so we don't have to query
-it from the server.
+or if we for instance have a list of a certain entity in cache and next we want
+to query a specific entity, chances are this will already be (partially) available
+in that list.
 
 These cases can be solved with the concept of `resolvers`.
 
@@ -107,6 +108,9 @@ const cache = cacheExchange({
   },
 });
 ```
+
+Returning a `__typename` and `key` (`id`/`_id`/custom key) is sufficient to make the
+cache resolve this to the full entity.
 
 Note that resolving from a list to details can lead to partial data, this will result in
 a network-request to get the full data when fields are missing.
