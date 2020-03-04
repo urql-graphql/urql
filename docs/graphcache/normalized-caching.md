@@ -5,68 +5,106 @@ order: 1
 
 # Normalized Caching
 
-In urql we have the option to utilize a normalized caching mechanism,
-this opens up a world of new features ranging from automatic updates
-to offline capabilities.
+With _Graphcache_ all data is stored in a normalized data structure. It automatically uses
+`__typename` information and `id` fields on entities to create a normalized table of data. Since
+GraphQL deals with connected data in a tree structure, each entity may link to other entities or
+even lists of entities, which we call "links". The scalar fields on entities like numbers, strings,
+etc is what we call "records."
 
-Instead of storing a query by its `operationKey` we'll store the entities
-we get back and normalize them so for instance:
+Instead of storing query results whole documents, like `urql` does with [its default "Document
+Caching"](../basics/document-caching.md), _Graphcache_ flattens all data it receives automatically.
+If we looked at doing this manually on the following piece of data, we'd separate each object into a
+list of key-value entries per entity.
 
-```js
-todo: {
-  __typename: 'Todo',
-  id: 1,
-  title: 'implement graphcache',
-  author: {
-    __typename: 'Author',
-    id: 1,
-    name: 'urql-team',
+```json
+{
+  "__typename": "Query",
+  "todo": {
+    "__typename": "Todo",
+    "id": 1,
+    "title": "implement graphcache",
+    "author": {
+      "__typename": "Author",
+      "id": 1,
+      "name": "urql-team"
+    }
   }
 }
 ```
 
-will become
+The above would look like the following once we normalized the data:
 
-```js
+```json
 {
-  "Todo:1.title": 'implement graphcache',
-  "Todo:1.author": 1,
-  "Author:1.name": 'urql-team',
+  "Query": {
+    "todo": "Todo:1" // link
+  },
+  "Todo:1": {
+    "__typename": "Todo",
+    "id": "1", // record
+    "title": "implement graphcache", // record
+    "author": "Author:1" // link
+  },
+  "Author:1": {
+    "__typename": "Todo",
+    "id": "1", // record
+    "name": "urql-team" // record
+  }
 }
 ```
 
-This allows us to for instance take the result of an update mutation to
-`Todo:1` and automatcally update altered properties, this also allows us to
-reuse entities. We will always try to create a key with the `__typename` and the
-`id` or `_id` whichever is present.
+This is vewry similar to how we'd go about creating a state management store manually, except that
+_Graphcache_ can use the GraphQL document and the `__typename` field to perform this normalization
+automatically.
 
-The custom `keys` property comes into play when we don't have an `id` or `_id`,
-in this scenario graphcache will warn us and ask to create a key for said entity.
+The interesting part of normalization starts when we read from the cache instead of writing to it.
+Multiple results may refer to the same piece of data — a mutation for instance may update `"Todo:1"`
+later on in the app. This would automatically cause _Graphcache_ to update any related queries in
+the entire app, because all references to each each entity are shared.
+
+## Key Generation
+
+As we saw in the previous example, by default _Graphcache_ will attempt to generate a key by
+combining the `__typename` of a piece of data with the `id` or `_id` fields, if they're present. For
+instance, `{ __typename: 'Author', id: 1 }` becomes `"Author:1"`.
+
+_Graphcache_ will log a warning when these fields weren't requested as part of a query's selection
+set or aren't present in the data. This can be useful if we forget to include them in our queries.
+In general, _Graphcache_ will always output warnings in development when it assumes that something
+went wrong.
+
+However, in your schema you may have types that don't have an `id` or `_id` field, say maybe some
+types have a `key` field instead. In such cases the custom `keys` configuration comes into play
 
 Let's look at an example. Say we have a set of todos each with a `__typename`
 of `Todo`, but instead of identifying on `id` or `_id` we want to identify
-each record by its `name`.
+each record by its `name`:
 
 ```js
-import { cacheExchange } from '@urql/exchange-graphcache'; 
+import { cacheExchange } from '@urql/exchange-graphcache';
 
-const myGraphCache = cacheExchange({
+const cache = cacheExchange({
   keys: {
     Todo: data => data.name,
   },
 });
 ```
 
-Now when we query or write a Todo it will use `name` to identify the record
-in the cache. All other records will be resolved the traditional way.
+This will cause our cache to generate a key from `__typename` and `name` instead if an entity's type
+is `Todo`.
 
-In the same way, you could say that a Todo meant only for admin access is
-prefixed with `admin`.
+Similarly some pieces of data shouldn't be normalized at all. If _Graphcache_ can't find the `id` or
+`_id` fields it will log a warning and _embed the data_ instead. Embedding the data means that it
+won't be normalized because the generated key is `null` and will instead only be referenced by the
+parent entity.
+
+You can force this behaviour and silence the warning by making a `keys` function that returns `null`
+immediately. This can be useful for types that aren't globally unique, like a `GeoPoint`:
 
 ```js
 const myGraphCache = cacheExchange({
   keys: {
-    Todo: data => (data.isAdminOnly ? `admin-${data.name}` : data.name),
+    GeoPoint: () => null,
   },
 });
 ```
