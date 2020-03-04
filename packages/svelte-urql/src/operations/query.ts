@@ -1,9 +1,4 @@
-import {
-  RequestPolicy,
-  OperationContext,
-  CombinedError,
-  createRequest,
-} from '@urql/core';
+import { RequestPolicy, OperationContext, CombinedError } from '@urql/core';
 import { pipe, fromValue, concat, scan, map, subscribe } from 'wonka';
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
@@ -31,13 +26,12 @@ export const query = <T = any, V = object>(
   args: QueryArguments<V>
 ): Readable<QueryResult<T>> => {
   const client = getClient();
-  const request = createRequest(args.query, args.variables as any);
 
   const queryResult$ = pipe(
     concat([
       fromValue({ fetching: true, stale: false }),
       pipe(
-        client.executeQuery(request, {
+        client.query<T>(args.query, args.variables, {
           requestPolicy: args.requestPolicy,
           pollInterval: args.pollInterval,
           ...args.context,

@@ -1,6 +1,7 @@
 <script>
   import { initClient, query } from '../..';
-  const client = initClient({ url: "https://0ufyz.sse.codesandbox.io" });
+
+  initClient({ url: "https://0ufyz.sse.codesandbox.io" });
 
   let i = 0;
 
@@ -21,7 +22,7 @@
 </script>
 
 {#if $todos.fetching}
-Loading...
+  Loading...
 {:else if $todos.error}
   Oh no! {$todos.error.message}
 {:else}
