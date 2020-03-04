@@ -41,6 +41,8 @@ const ContentWrapper = styled.div`
 const relative = (from, to) => {
   if (!from || !to) return null;
   let pathname = path.relative(path.dirname(from), to);
+  if (!pathname)
+    pathname = path.join(path.relative(from, to), path.basename(to));
   if (from.endsWith('/')) pathname = '../' + pathname;
   return { pathname };
 };
