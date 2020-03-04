@@ -1,5 +1,8 @@
 {
   "private": true,
   "name": "shared",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  }
 }
