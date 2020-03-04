@@ -20,21 +20,21 @@ It accepts several options on creation.
 
 `@urql/core` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-| Input           | Type                               | Description                                                                                                                                                        |
-| --------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| exchanges       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                       |
-| url             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                     |
-| fetchOptions    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                             |
-| fetch           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                        |
-| suspense        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                    |
-| requestPolicy   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default this will be `cache-first`.                                                                       |
-| preferGetMethod | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                          |
-| maskTypename    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on `OperationResult`s. This makes the `__typename` properties non-enumerable. |
+| Input           | Type                               | Description                                                                                                                                                                            |
+| --------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| exchanges       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                           |
+| url             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                                         |
+| fetchOptions    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                 |
+| fetch           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                            |
+| suspense        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                        |
+| requestPolicy   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default this will be `cache-first`.                                                                                           |
+| preferGetMethod | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                                              |
+| maskTypename    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable. |
 
 ### client.executeQuery
 
 Accepts a [`GraphQLRequest`](#graphqlrequest) and optionally `Partial<OperationContext>`, and returns a
-`Source<OperationResult>` — a stream of query results that can be subscribed to.
+[`Source<OperationResult>`](#operationresult) — a stream of query results that can be subscribed to.
 
 Internally, subscribing to the returned source will create an [`Operation`](#operation), with
 `operationName` set to `'query'`, and dispatch it on the
@@ -207,12 +207,13 @@ information to custom exchanges.
 The result of every GraphQL request, i.e. an `Operation`. It's very similar to what comes back from
 a typical GraphQL API, but slightly enriched and normalized.
 
-| Prop       | Type                   | Description                                                                                  |
-| ---------- | ---------------------- | -------------------------------------------------------------------------------------------- |
-| operation  | `Operation`            | The operation that this is a result for                                                      |
-| data       | `?any`                 | Data returned by the specified query                                                         |
-| error      | `?CombinedError`       | A [`CombinedError`](#combinederror) instances that wraps network or `GraphQLError`s (if any) |
-| extensions | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                        |
+| Prop       | Type                   | Description                                                                                                                                       |
+| ---------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| operation  | `Operation`            | The operation that this is a result for                                                                                                           |
+| data       | `?any`                 | Data returned by the specified query                                                                                                              |
+| error      | `?CombinedError`       | A [`CombinedError`](#combinederror) instances that wraps network or `GraphQLError`s (if any)                                                      |
+| extensions | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                             |
+| stale      | `?boolean`             | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon. |
 
 ### ExchangeInput
 
