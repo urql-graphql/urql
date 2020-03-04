@@ -26,7 +26,7 @@ import {
   ssrExchange
 } from '@urql/core';
 
-const isServerSide = typeof window !== 'undefined';
+const isServerSide = typeof window === 'undefined';
 
 // The `ssrExchange` must be initialised with `isClient` and `initialState`
 const ssr = ssrExchange({
@@ -77,7 +77,7 @@ Alternatively you can also call `restoreData` as long as this call happens synch
 `client` starts receiving queries.
 
 ```js
-const isServerSide = typeof window !== 'undefined';
+const isServerSide = typeof window === 'undefined';
 const ssr = ssrExchange({ isClient: !isServerSide });
 
 if (!isServerSide) {
