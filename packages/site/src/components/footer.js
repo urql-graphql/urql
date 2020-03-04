@@ -17,7 +17,6 @@ const Container = styled.footer`
 const FooterDescription = styled.p`
   flex: 2;
   font-size: 1.4rem;
-  letter-spacing: 0.05rem;
   line-height: 1.6;
   margin: 2rem 0 0;
   max-width: 56rem;
@@ -29,7 +28,6 @@ const FooterDescription = styled.p`
   }
   & a {
     color: white;
-    letter-spacing: 0.05em;
     transition: opacity 0.4s;
   }
   & a:hover {
@@ -56,17 +54,21 @@ const FooterLinks = styled.ul`
   list-style: none;
   padding: 0px 8px;
   text-transform: uppercase;
+
   & li {
-    margin-bottom: 1.4rem;
+    margin: 0.2rem 0;
   }
+
   & a {
     color: white;
     letter-spacing: 0.05em;
     transition: opacity 0.4s;
   }
+
   & a:hover {
     opacity: 0.7;
   }
+
   & a:visited {
     color: white;
   }

@@ -45,6 +45,10 @@ const InlineCode = styled.code`
   font-feature-settings: normal;
   padding: 0 0.2em;
   margin: 0;
+
+  a > & {
+    text-decoration: underline;
+  }
 `;
 
 const ImageWrapper = styled.div`
