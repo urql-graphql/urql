@@ -54,6 +54,14 @@ const InlineCode = styled(props => {
   }
 `;
 
+const InlineImage = styled.img`
+  display: inline-block;
+  margin: 0 ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md} 0;
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border: 1px solid ${p => p.theme.colors.border};
+  border-radius: ${p => p.theme.spacing.xs};
+`;
+
 const ImageWrapper = styled.div`
   margin: ${p => p.theme.spacing.md} 0;
   border: 1px solid ${p => p.theme.colors.border};
@@ -80,12 +88,17 @@ const ImageAlt = styled.span.attrs(() => ({
   font-size: ${p => p.theme.fontSizes.small};
 `;
 
-const Image = ({ alt, src }) => (
-  <ImageWrapper>
-    <img alt={alt} src={src} />
-    <ImageAlt>{alt}</ImageAlt>
-  </ImageWrapper>
-);
+const Image = props => {
+  const { height, width, alt, src } = props;
+  if (height || width) return <InlineImage {...props} />;
+
+  return (
+    <ImageWrapper>
+      <img alt={alt} src={src} />
+      <ImageAlt>{alt}</ImageAlt>
+    </ImageWrapper>
+  );
+};
 
 const HighlightCode = ({ className = '', children }) => {
   const language = getLanguage(className);

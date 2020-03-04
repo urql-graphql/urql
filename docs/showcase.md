@@ -5,13 +5,22 @@ order: 5
 
 # Showcase
 
+`urql` wouldn't be the same without our growing and loving community of users,
+maintainers, and supporters. This page is specifically dedicated to all of you!
+
 ## Used by folks at
 
-<img alt="TripAdvisor" height="50" src="./assets/logos/tripadvisor.png" />
+<a href="https://tripadvisor.com">
+  <img alt="TripAdvisor" height="60" src="./assets/logos/tripadvisor.png" />
+</a>
 
-<img alt="GitHub" height="50" src="./assets/logos/github.png" />
+<a href="https://github.com">
+  <img alt="GitHub" height="60" src="./assets/logos/github.png" />
+</a>
 
-<img alt="Egghead" height="50" src="./assets/logos/egghead.png" />
+<a href="https://egghead.io">
+  <img alt="Egghead" height="60" src="./assets/logos/egghead.png" />
+</a>
 
 ## Articles & Tutorials
 
