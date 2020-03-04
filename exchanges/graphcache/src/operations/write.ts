@@ -15,7 +15,7 @@ import {
   getFieldAlias,
   invariant,
   warn,
-  pushDebugNode
+  pushDebugNode,
 } from 'shared';
 
 import {
