@@ -8,7 +8,11 @@
     "build": "react-static build",
     "lint": "eslint --ext=js,jsx .",
     "clean": "rimraf dist",
-    "prepublishOnly": "run-s clean build"
+    "prepublishOnly": "run-s clean build",
+    "stage:build": "react-static build --staging",
+    "stage:deploy": "node scripts/deploy/surge.js",
+    "prod:build": "react-static build",
+    "prod:deploy": "node scripts/deploy/aws.js"
   },
   "babel": {
     "presets": [
@@ -52,6 +56,7 @@
     "lodash": "^4.17.11",
     "react-static-plugin-react-router": "^7.2.3",
     "react-static-plugin-sitemap": "^7.0.0",
-    "react-static-plugin-styled-components": "^7.2.2"
+    "react-static-plugin-styled-components": "^7.2.2",
+    "surge": "^0.21.3"
   }
 }
