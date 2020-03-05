@@ -20,7 +20,7 @@ import {
   KeyingConfig,
   DataFields,
 } from '../types';
-import { invariant } from '../helpers/help';
+import { invariant } from 'shared';
 
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';

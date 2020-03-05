@@ -14,17 +14,16 @@ import {
   Kind,
   visit,
 } from 'graphql';
+import { getName, getSelectionSet, unwrapType, invariant, warn } from 'shared';
 
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
 
-import { getName, getSelectionSet, unwrapType } from './ast';
-import { makeDict } from './helpers/dict';
-import { invariant, warn } from './helpers/help';
-
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
 }
+
+const makeDict = (): any => Object.create(null);
 
 /** An exchange for auto-populating mutations with a required response body. */
 export const populateExchange = ({

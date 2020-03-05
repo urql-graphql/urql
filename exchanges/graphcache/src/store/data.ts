@@ -7,7 +7,7 @@ import {
 } from '../types';
 
 import { makeDict } from '../helpers/dict';
-import { invariant, currentDebugStack } from '../helpers/help';
+import { invariant, currentDebugStack } from 'shared';
 import { fieldInfoOfKey, joinKeys, prefixKey } from './keys';
 import { defer } from './timing';
 

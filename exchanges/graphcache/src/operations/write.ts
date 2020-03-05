@@ -1,16 +1,22 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 import {
-  getFieldAlias,
   getFragments,
   getMainOperation,
-  getSelectionSet,
   normalizeVariables,
-  getFragmentTypeName,
-  getName,
   getFieldArguments,
   isFieldAvailableOnType,
 } from '../ast';
+import {
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  getFragmentTypeName,
+  getFieldAlias,
+  invariant,
+  warn,
+  pushDebugNode,
+} from 'shared';
 
 import {
   NullArray,
@@ -18,7 +24,6 @@ import {
   Variables,
   Data,
   Link,
-  SelectionSet,
   OperationRequest,
 } from '../types';
 
@@ -33,7 +38,6 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { invariant, warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, ensureData } from './shared';
 
 export interface WriteResult {
