@@ -14,13 +14,21 @@ and it becomes harder to track all fields that have been queried before.
 > like GraphQL field arguments aren't covered yet, and the exchange hasn't been extensively used
 > yet.
 
-## How to use
+## Installation and Setup
 
-As with any exchange, add this to your client.
+The `populateExchange` can be installed via the `@urql/exchange-populate` package.
 
-> Note: Populate needs to be declared before the cache in order to ensure the `populate` directive is replaced with the respective attributes.
+```sh
+yarn add @urql/exchange-populate
+# or
+npm install --save @urql/exchange-populate
+```
 
-```tsx
+Afterwards we can set the `populateExchange` up by adding it to our list of `exchanges` in the
+client options.
+
+```ts
+import { createClient, dedupExchange, populateExchange, fetchExchange } from '@urql/core';
 import { populateExchange } from '@urql/exchange-graphcache';
 
 const client = createClient({
@@ -28,6 +36,12 @@ const client = createClient({
   exchanges: [dedupExchange, populateExchange, cacheExchange, fetchExchange],
 });
 ```
+
+The `populateExchange` should be placed in front of the `cacheExchange`, especially if you're using
+[Graphcache](../graphcache/README.md), since it won't understand the `@populate` directive on its
+own. It should also be placed after the `dedupExchange` to avoid unnecessary work.
+
+Adding the `populateExchange` now enables us to use the `@populate` directive in our mutations.
 
 ## Example usage
 
@@ -73,8 +87,6 @@ mutation addTodo(id: ID!) {
 }
 ```
 
-> Note: The above two mutations produce an identical GraphQL request.
-
 ### Choosing when to populate
 
 You may not want to populate your whole mutation response. In order to reduce your payload, pass populate lower in your query.
@@ -90,7 +102,10 @@ mutation addTodo(id: ID!) {
 
 ### Using aliases
 
-If you find yourself using multiple queries with variables, it may be necessary to [use aliases](https://graphql.org/learn/queries/#aliases) in order to allow merging of queries.
+If you find yourself using multiple queries with variables, it may be necessary to
+[use aliases](https://graphql.org/learn/queries/#aliases) in order to allow merging of queries.
+
+> **Note:** This caveat may change in the future or this restriction may be lifted.
 
 **Invalid usage**
 
