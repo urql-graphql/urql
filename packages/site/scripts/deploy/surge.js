@@ -5,11 +5,22 @@ const path = require('path');
 const chalk = require('chalk');
 const execa = require('execa');
 
+if (!process.env.SURGE_LOGIN) {
+  console.warn('No SURGE_* env variables received. Skipping.');
+  process.exit(0);
+}
+
+const { CI_PULL_REQUEST = '' } = process.env;
+const parts = CI_PULL_REQUEST.split('/');
+const PR_NUM = parts[parts.length - 1];
+if (!PR_NUM) {
+  console.warn('Not a pull request. Skipping');
+  process.exit(0);
+}
+
 const PROJECT = 'urql';
-const { CIRCLE_SHA1 } = process.env;
-const COMMIT_HASH = CIRCLE_SHA1.slice(0, 7);
 const SRC = path.resolve(__dirname, '../../dist');
-const DOMAIN = `formidable-com-${PROJECT}-staging-${COMMIT_HASH}.surge.sh`;
+const DOMAIN = `formidable-com-${PROJECT}-staging-${PR_NUM}.surge.sh`;
 
 const EXECA_OPTS = {
   stdio: 'inherit',
