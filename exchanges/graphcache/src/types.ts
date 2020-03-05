@@ -102,6 +102,9 @@ export interface Cache {
   /** invalidateQuery() invalidates all data of a given query */
   invalidateQuery(query: DocumentNode, variables?: Variables): void;
 
+  /** invalidate() invalidates an entity */
+  invalidate(entity: Data | string): void;
+
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery(
     input: QueryInput,
