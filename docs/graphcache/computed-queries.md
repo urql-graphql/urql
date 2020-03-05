@@ -132,14 +132,23 @@ This way we'll get the stored data for the `TodosQuery` for the given `variables
 The store allows the user to also read a fragment for a certain entity, this function
 accepts a `fragment` and an `id`. This looks like the following.
 
-```js
-const data = cache.readFragment(gql`
-  fragment _ on Todo {
-    id
-    text
-  }
-`, '1');
+```js
+import gql from 'graphql-tag';
+
+const data = cache.readFragment(
+  gql`
+    fragment _ on Todo {
+      id
+      text
+    }
+  `,
+  '1'
+);
 ```
+
+> **Note:** In the above example, we've used
+> [graphql-tag](https://github.com/apollographql/graphql-tag) because `writeFragment` only accepts
+> GraphQL `DocumentNode`s as inputs, and not strings.
 
 This way we'll get the Todo with id 1 and the relevant data we are askng for in the
 fragment.
@@ -148,7 +157,7 @@ fragment.
 
 `Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination.
 
-### Simple
+### Simple Pagination
 
 Given you have a schema that uses some form of `offset` and `limit` based pagination you can use the
 `simplePagination` exported from `@urql/exchange-graphcache/extras` to achieve an endless scroller.
@@ -173,7 +182,7 @@ options in here `limitArgument` and `offsetArgument` these will default to `limi
 and `skip` respectively. This way you can use the keywords that you are using in
 your queries.
 
-### Relay
+### Relay Pagination
 
 Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
 on your backend we offer the possibility of endless data resolving.

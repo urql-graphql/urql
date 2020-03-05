@@ -147,39 +147,227 @@ used to read cached data or write cached data, which may be used in combination 
 
 ### keyOfEntity
 
-TODO
+The `cache.keyOfEntity` method may be called with a partial `Data` object and will return the key
+for that object, or `null` if it's not keyable.
 
-(Also mention `keyOfField` in here, but not as a separate section)
+An object may not be keyable if it's missing the `__typename` or `id` (which falls back to `_id`)
+fields. This method does take the [`keys` configuration](#keys-option) into account.
+
+```js
+cache.keyOfEntity({ __typename: 'Todo', id: 1 }); // 'Todo:1'
+cache.keyOfEntity({ __typename: 'Query' }); // 'Query'
+cache.keyOfEntity({ __typename: 'Unknown' }); // null
+```
+
+There's an alternative method, `cache.keyOfField` which generates a key for a given field. This is
+only rarely needed but similar to `cache.keyOfEntity`. This method accepts a field name and
+optionally a field's arguments.
+
+```js
+cache.keyOfField('todo'); // 'todo'
+cache.keyOfField('todo', { id: 1 }); // 'todo({"id":1})'
+```
+
+Internally, these are the keys that records and links are stored on per entity.
 
 ### resolve
 
-TODO
+This method retrieves a value or link for a given field, given a partially keyable `Data` object or
+entity, a field name, and optionally the field's arguments. Internally this method accesses the
+cache by using `cache.keyOfEntity` and `cache.keyOfField`.
 
-(Also mention `resolveFieldByKey` in here, but not as a separate section)
+```js
+// This may resolve a link:
+cache.resolve({ __typename: 'Query' }, 'todo', { id: 1 }); // 'Todo:1'
+
+// This may also resolve records / scalar values:
+cache.resolve({ __typename: 'Todo', id: 1 }, 'id'); // 1
+
+// You can also chain multiple calls to `cache.resolve`!
+cache.resolve(cache.resolve({ __typename: 'Query' }, 'todo', { id: 1 }), 'id'); // 1
+```
+
+As you can see in the last example of this code snippet, the `Data` object can also be replaced by
+an entity key, which makes it possible to pass a key from `cache.keyOfEntity` or another call to
+`cache.resolve` instead of the partial entity.
+
+> **Note:** Because `cache.resolve` may return either a scalar value or another entity key, it may
+> be dangerous to use in some cases. It's a good idea to make sure first whether the field you're
+> reading will be a key or a value.
+
+There's an alternative method, `cache.resolveFieldByKey` which accepts a field key that may be
+generated using `cache.keyOfField`.
+
+```js
+cache.resolveFieldByKey({ __typename: 'Query' }, cache.keyOfField('todo', { id: 1 })); // 'Todo:1'
+```
+
+This specialised method is likely only going to be useful in combination with
+[`cache.inspectFields`](#inspectfields).
 
 ### inspectFields
 
-TODO
+The `cache.inspectFields` method may be used to interrogate the cache about all available fields on
+a specific entity. It accepts a partial entity or an entity key, like [`cache.resolve`](#resolve)'s
+first argument.
 
-### updateQuery
+When calling the method this returns an array of `FieldInfo` objects, one per field (including
+differing arguments) that is known to the cache. The `FieldInfo` interface has three properties:
+`fieldKey`, `fieldName`, and `arguments`:
 
-TODO
+| Argument  | Type             | Description                                                                     |
+| --------- | ---------------- | ------------------------------------------------------------------------------- |
+| fieldName | `string`         | The field's name (without any arguments, just the name)                         |
+| arguments | `object \| null` | The field's arguments, or `null` if the field doesn't have any arguments        |
+| fieldKey  | `string`         | The field's cache key, which is similar to what `cache.keyOfField` would return |
 
-### readQuery
+This works on any given entity. When calling this method the cache works in reverse on its data
+structure, by parsing the entity's individual field keys.
 
-TODO
+```js
+cache.inspectFields({ __typename: 'Query' });
+
+/*
+  [
+    { fieldName: 'todo', arguments: { id: 1 }, fieldKey: 'id({"id":1})' },
+    { fieldName: 'todo', arguments: { id: 2 }, fieldKey: 'id({"id":2})' },
+    ...
+  ]
+*/
+```
 
 ### readFragment
 
-TODO
+`cache.readFragment` accepts a GraphQL `DocumentNode` as the first argument and a partial entity or
+an entity key as the second, like [`cache.resolve`](#resolve)'s first argument.
+
+The method will then attempt to read the entity according to the fragment entirely from the cached
+data. If any data is uncached and missing it'll return `null`.
+
+```js
+import gql from 'graphql-tag';
+
+cache.readFragment(
+  gql`
+    fragment _ on Todo {
+      id
+      text
+    }
+  `,
+  { id: 1 }
+); // Data or null
+```
+
+Note that the `__typename` may be left out on the partial entity, since the `__typename` is already
+present on the fragment itself.
+
+[Read more about using `readFragment` on the ["Computed Queries"
+page.](../graphcache/computed-queries.md#reading-a-fragment)
+
+### readQuery
+
+The `cache.readQuery` method is similar to `cache.readFragment`, but instead of reading a fragment
+from cache, it reads an entire query. The only difference between how these two methods are used is
+`cache.readQuery`'s input, which is an object instead of two arguments.
+
+The method accepts a `{ query, variables }` object as the first argument, where `query` may either
+be a `DocumentNode` or a `string` and variables may optionally be an object.
+
+```js
+cache.readQuery({
+  query: `
+    query ($id: ID!) {
+      todo(id: $id) { id, text }
+    }
+  `,
+  variables: {
+    id: 1
+  }
+); // Data or null
+```
+
+[Read more about using `readQuery` on the ["Computed Queries"
+page.](../graphcache/computed-queries.md#reading-a-query)
 
 ### writeFragment
 
-TODO
+Corresponding to [`cache.readFragment`](#readfragments), the `cache.writeFragment` method allows
+data in the cache to be updated.
+
+The arguments for `cache.writeFragment` are identical to [`cache.readFragment`](#readfragment),
+however the second argument, `data`, should not only contain properties that are necessary to derive
+an entity key from the given data, but also the fields that will be written:
+
+```js
+import gql from 'graphql-tag';
+
+cache.writeFragment(
+  gql`
+    fragment _ on Todo {
+      text
+    }
+  `,
+  { id: 1, text: 'New Todo Text' }
+);
+```
+
+In the example we can see that the `writeFragment` method returns `undefined`. Furthermore we pass
+`id` in our `data` object so that an entity key can be written, but the fragment itself doesn't have
+to include these fields.
+
+[Read more about using `writeFragment` on the ["Custom Updates"
+page.](../graphcache/custom-updates.md#cachewritefragment)
+
+### updateQuery
+
+Similarly to [`cache.writeFragment`](#writefragment), there's an analogous method for
+[`cache.readQuery`](#readquery) that may be used to update query data.
+
+The `cache.updateQuery` method accepts the same `{ query, variables }` object input as its first
+argument, which is the query we'd like to write to the cache. As a second argument the method
+accepts an updater function. This function will be called with the query data that is already in the
+cache (which may be `null` if the data is uncached) and must return the new data that should be
+written to the cache.
+
+```js
+const TodoQuery = `
+  query ($id: ID!) {
+    todo(id: $id) { id, text }
+  }
+`;
+
+cache.updateQuery({ query: TodoQuery, variables: { id: 1 } }, data => {
+  if (!data) return null;
+  data.todo.text = 'New Todo Text';
+  return data;
+});
+```
+
+As we can see, our updater may return `null` to cancel updating any data, which we do in case the
+query data is uncached.
+
+We can also see that data can simply be mutated and doesn't have to be altered immutably. This is
+because all data from the cache is already a deep copy and hence we can do to it whatever we want.
+
+[Read more about using `updateQuery` on the ["Custom Updates"
+page.](../graphcache/custom-updates.md#cacheupdatequery)
 
 ### invalidate
 
-TODO
+The `cache.invalidate` method can be used to delete (i.e. "evict") an entity from the cache
+entirely. This will cause it to disappear from all queries in _Graphcache_.
+
+Since deleting an entity will lead to some queries containing missing and uncached data, calling
+`invalidate` may lead to additional GraphQL requests being sent, unless you're using [_Graphcache_'s
+"Schema Awareness" feature](../graphcache/schema-awareness.md), which takes optional fields into
+account.
+
+This method accepts a partial entity or an entity key as its only argument, similar to
+[`cache.resolve`](#resolve)'s first argument.
+
+```js
+cache.invalidate({ __typename: 'Todo', id: 1 }); // Invalidates Todo:1
+```
 
 ## Info
 
@@ -204,12 +392,42 @@ field that a given resolver or updater is called on.
 
 ## The `/extras` import
 
-TODO
+The `extras` subpackage is published with _Graphcache_ and contains helpers and utilities that don't
+have to be included in every app or aren't needed by all users of _Graphcache_.
+All utilities from extras may be imported from `@urql/exchange-graphcache/extras`.
+
+Currently the `extras` subpackage only contains the [pagination resolvers that have been mentioned
+on the "Computed Queries" page.](../graphcache/computed-queries.md#pagination)
 
 ### simplePagination
 
-TODO
+Accepts a single object of optional options and returns a resolver that can be inserted into the
+[`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
+
+| Argument       | Type      | Description                                                                                                                                                         |
+| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| offsetArgument | `?string` | The field arguments's property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
+| limitArgument  | `?string` | The field arguments's property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
+
+Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
+automatically. Queries to this resolvers will from then on only return the infinite, combined list
+of all pages.
+
+[Read more about `simplePagination` on the "Computed Queries"
+page.](../graphcache/computed-queries.md#simple-pagination)
 
 ### relayPagination
 
-TODO
+Accepts a single object of optional options and returns a resolver that can be inserted into the
+[`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
+
+| Argument  | Type                      | Description                                                                                                                                                                                                                                                                      |
+| --------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mergeMode | `'outwards' \| 'inwards'` | With Relay pagination, pages can be queried forwards and backwards using `after` and `before` cursors. This option defines whether pages that have been quiered backwards should be concatenated before (outwards) or after (inwards) all pages that have been queried forwards. |
+
+Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
+automatically. Queries to this resolvers will from then on only return the infinite, combined list
+of all pages.
+
+[Read more about `relayPagnation` on the "Computed Queries"
+page.](../graphcache/computed-queries.md#relay-pagination)
