@@ -40,15 +40,9 @@ interest.
 - **Graphcache** documents one of the most important addons to `urql`, which adds ["Normalized
   Caching" support](./graphcache/normalized-caching.md) to the `Client` and enables more complex
   use-cases, smarter caching, and more dynamic apps to function.
+- **Showcase** aims to list some companies that use `urql`, third-party packages, and other helpful
+  resources, like tutorials or guides.
 - **API** contains a detailed list of all helpers, utilities, components, and other parts of each of
   `urql`'s packages, which may contain all details of each part and package.
-
-Apart from these main sections there is also some additional content that doesn't fit into any of
-the other sections.
-
-- **Showcase** aims to list some companies that use `urql`, third-party packages, and other helpful
-  resources.
-- **Common Questions** lists frequently asked questions and problems that we may encounter
-  infrequently (but shall answer nonetheless.)
 
 We hope you grow to love `urql`!
