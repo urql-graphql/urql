@@ -1,16 +1,6 @@
 import gql from 'graphql-tag';
 
-import {
-  pipe,
-  map,
-  fromValue,
-  toArray,
-  makeSubject,
-  // forEach,
-  // delay,
-  publish,
-  tap,
-} from 'wonka';
+import { pipe, map, makeSubject, publish, tap } from 'wonka';
 
 import {
   createClient,
@@ -18,7 +8,7 @@ import {
   OperationResult,
   ExchangeIO,
 } from '@urql/core';
-import { retryExchange } from './retryExchange';
+import { retryExchange, OperationWithRetry } from './retryExchange';
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -54,62 +44,102 @@ const queryOneData = {
   },
 };
 
-it('forwards skipped operations', () => {
-  const client = createClient({ url: 'https://example.com' });
-  const operation = client.createRequestOperation('query', {
-    key: 123,
-    query: {} as any,
-  });
-  const forward = ops$ =>
-    pipe(
-      ops$,
-      map(operation => ({ operation } as OperationResult))
-    );
+const queryOneError = {
+  name: 'error',
+  message: 'scary error',
+};
 
-  const res = pipe(
-    retryExchange(mockOptions)({ forward, client })(fromValue(operation)),
-    toArray
-  );
-
-  expect(forward).toHaveBeenCalledWith(operation);
-  expect(res).toEqual([{ operation }]);
-});
-
-it('writes queries to the cache', () => {
-  const client = createClient({ url: 'http://0.0.0.0' });
-  const op = client.createRequestOperation('query', {
+let client, op, ops$, next;
+beforeEach(() => {
+  client = createClient({ url: 'http://0.0.0.0' });
+  op = client.createRequestOperation('query', {
     key: 1,
     query: queryOne,
   });
 
+  ({ source: ops$, next } = makeSubject<OperationWithRetry>());
+});
+
+it('retries if it hits an error', () => {
+  const queryOneError = { networkError: 'scary network error' };
   const response = jest.fn(
     (forwardOp: Operation): OperationResult => {
       expect(forwardOp.key).toBe(op.key);
-      return { operation: forwardOp, data: queryOneData };
+      return {
+        operation: forwardOp,
+        // @ts-ignore
+        error: queryOneError,
+      };
     }
   );
 
-  const { source: ops$, next } = makeSubject<Operation>();
   const result = jest.fn();
-  const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
 
+  const mockRetryIf = jest.fn(() => true);
   pipe(
-    retryExchange(mockOptions)({ forward, client })(ops$),
+    retryExchange({
+      ...mockOptions,
+      retryIf: mockRetryIf,
+    })({
+      forward,
+      client,
+    })(ops$),
     tap(result),
     publish
   );
 
   next(op);
-  next(op);
-  expect(response).toHaveBeenCalledTimes(1);
-  expect(result).toHaveBeenCalledTimes(2);
+  expect(mockRetryIf).toHaveBeenCalledTimes(1);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError);
 
-  expect(result.mock.calls[0][0]).toHaveProperty(
-    'operation.context.meta.cacheOutcome',
-    'miss'
+  jest.runAllTimers();
+
+  // max number of retries, plus original call
+  expect(response).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts);
+});
+
+it('should retry x number of times and then return the successful result', () => {
+  const numberRetriesBeforeSuccess = 3;
+  const response = jest.fn(
+    (forwardOp: OperationWithRetry): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      // @ts-ignore
+      return {
+        operation: forwardOp,
+        ...(forwardOp.retryCount! >= numberRetriesBeforeSuccess
+          ? { data: queryOneData }
+          : { error: queryOneError }),
+      };
+    }
   );
-  expect(result.mock.calls[1][0]).toHaveProperty(
-    'operation.context.meta.cacheOutcome',
-    'hit'
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  const mockRetryIf = jest.fn(() => true);
+  pipe(
+    retryExchange({
+      ...mockOptions,
+      retryIf: mockRetryIf,
+    })({
+      forward,
+      client,
+    })(ops$),
+    tap(result),
+    publish
   );
+
+  next(op);
+  jest.runAllTimers();
+
+  expect(mockRetryIf).toHaveBeenCalledTimes(numberRetriesBeforeSuccess);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError);
+
+  // one for original source, one for retry
+  expect(response).toHaveBeenCalledTimes(1 + numberRetriesBeforeSuccess);
 });

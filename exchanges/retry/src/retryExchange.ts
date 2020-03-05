@@ -21,7 +21,7 @@ interface RetryExchangeOptions {
   retryIf?: (e: CombinedError) => boolean;
 }
 
-interface OperationWithRetry extends Operation {
+export interface OperationWithRetry extends Operation {
   retryCount?: number;
 }
 
@@ -77,7 +77,7 @@ export const retryExchange = ({
               ...op.context,
               retryDelay: delayAmount,
             },
-            retryCount: op.retryCount ? op.retryCount + 1 : 0,
+            retryCount: op.retryCount != null ? op.retryCount + 1 : 1,
           }),
           // Exclude operations that have been retried more than the specified max
           // or if the delayAmount is over the max accepted delay
@@ -106,14 +106,7 @@ export const retryExchange = ({
       result$,
       // Only retry if there was a network error and the error passes the
       // conditional retryIf function (if passed)
-      filter(
-        res =>
-          !!(
-            res.error &&
-            res.error.networkError &&
-            (!retryIf || retryIf(res.error))
-          )
-      ),
+      filter(res => !!(res.error && (!retryIf || retryIf(res.error)))),
       // Send failed responses to be retried by calling next on the retry$ subject
       tap(op => nextRetryOperation(op.operation)),
       // Only let through the first failed response
