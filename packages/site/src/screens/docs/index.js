@@ -10,7 +10,7 @@ import Sidebar from '../../components/sidebar';
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
 
-const Container = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: row;
 
