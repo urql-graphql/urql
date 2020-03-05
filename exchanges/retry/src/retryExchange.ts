@@ -114,7 +114,7 @@ export const retryExchange = ({
             (!retryIf || retryIf(res.error))
           )
       ),
-      // Send failed responses to the retry$ subject
+      // Send failed responses to be retried by calling next on the retry$ subject
       tap(op => nextRetryOperation(op.operation)),
       // Only let through the first failed response
       filter(res => !res.operation.context.retryDelay)
