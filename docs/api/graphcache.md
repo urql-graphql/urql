@@ -92,13 +92,12 @@ interface UpdatesConfig {
 An `UpdateResolver` receives four arguments when it's called: `result`, `args`, `cache`, and
 `info`.
 
-| Argument                                              | Type     | Description                                                               |
-| ----------------------------------------------------- | -------- | ------------------------------------------------------------------------- |
-| result                                                | `any`    | Always the entire `data` object from the mutation or subscription.        |
-| args                                                  | `object` | The arguments for the given field the updater is executed on.             |
-| cache                                                 | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache) |
-| info                                                  | `Info`   | Additional metadata and information about the current                     |
-| operation and the current field. [See `Info`.](#info) |
+| Argument | Type     | Description                                                                                                 |
+| -------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| result   | `any`    | Always the entire `data` object from the mutation or subscription.                                          |
+| args     | `object` | The arguments for the given field the updater is executed on.                                               |
+| cache    | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| info     | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `updates` on the "Custom Updates"
 page.](../graphcache/custom-updates.md)
@@ -119,12 +118,11 @@ interface OptimisticMutationConfig {
 A `OptimisticMutationResolver` receives three arguments when it's called: `variables`, `cache`, and
 `info`.
 
-| Argument                                              | Type     | Description                                                               |
-| ----------------------------------------------------- | -------- | ------------------------------------------------------------------------- |
-| variables                                             | `object` | The variables that the given mutation received.                           |
-| cache                                                 | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache) |
-| info                                                  | `Info`   | Additional metadata and information about the current                     |
-| operation and the current field. [See `Info`.](#info) |
+| Argument  | Type     | Description                                                                                                 |
+| --------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| variables | `object` | The variables that the given mutation received.                                                             |
+| cache     | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| info      | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `optimistic` on the "Custom Updates"
 page.](../graphcache/custom-updates.md)
@@ -349,7 +347,7 @@ query data is uncached.
 We can also see that data can simply be mutated and doesn't have to be altered immutably. This is
 because all data from the cache is already a deep copy and hence we can do to it whatever we want.
 
-[Read more about using `updateQuery` on the ["Custom Updates"
+[Read more about using `updateQuery` on the "Custom Updates"
 page.](../graphcache/custom-updates.md#cacheupdatequery)
 
 ### invalidate
