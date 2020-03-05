@@ -10,7 +10,7 @@ const Container = styled.main.attrs(() => ({
   flex: 1;
   width: 100%;
   position: sticky;
-  display: ${p => (p.sidebarOpen ? 'none' : 'flex')};
+  display: flex;
   flex-direction: row-reverse;
 `;
 
@@ -20,9 +20,13 @@ const Content = styled.article.attrs(() => ({
   flex: 1;
   min-height: 100vh;
   background: ${p => p.theme.colors.bg};
-  padding: ${p => p.theme.spacing.lg};
-  padding-bottom: ${p => p.theme.spacing.md};
+  padding: ${p => p.theme.spacing.md};
 
+  @media ${p => p.theme.media.lg} {
+    padding: ${p => p.theme.spacing.lg};
+  }
+
+  padding-bottom: ${p => p.theme.spacing.md};
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -90,8 +94,8 @@ const SectionList = () => {
   );
 };
 
-const Article = ({ children, sidebarOpen }) => (
-  <Container sidebarOpen={sidebarOpen}>
+const Article = ({ children }) => (
+  <Container>
     <Legend>
       <SectionList />
     </Legend>

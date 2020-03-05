@@ -26,10 +26,11 @@ const OpenCloseSidebar = styled.img.attrs(props => ({
   cursor: pointer;
   display: block;
   margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 0;
   z-index: 1;
+
   @media ${p => p.theme.media.sm} {
     display: none;
   }
@@ -47,7 +48,7 @@ const Docs = props => {
           onClick={() => setSidebarOpen(prev => !prev)}
         />
         <Sidebar sidebarOpen={sidebarOpen} />
-        <Article sidebarOpen={sidebarOpen}>{props.children}</Article>
+        <Article>{props.children}</Article>
       </Container>
     </>
   );

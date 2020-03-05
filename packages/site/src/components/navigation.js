@@ -35,14 +35,20 @@ export const SidebarWrapper = styled.aside`
   z-index: 1;
   overflow-y: scroll;
   min-height: 100%;
-  width: 100%;
-  padding: ${p => p.theme.spacing.md};
-  padding-right: ${p => p.theme.spacing.sm};
-  padding-top: ${p => p.theme.spacing.lg};
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
 
+  padding: ${p => p.theme.spacing.md};
+  padding-right: ${p => p.theme.spacing.sm};
+
+  background-color: ${p => p.theme.colors.bg};
+  border-right: 1px solid ${p => p.theme.colors.border};
+  border-top: 1px solid ${p => p.theme.colors.border};
+
   @media ${({ theme }) => theme.media.sm} {
+    border: none;
+    background: none;
+    padding-top: ${p => p.theme.spacing.lg};
     width: ${p => p.theme.layout.sidebar};
   }
 `;
