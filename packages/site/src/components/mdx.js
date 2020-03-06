@@ -13,14 +13,17 @@ const getLanguage = className => {
 const Pre = styled.pre`
   background: ${p => p.theme.colors.codeBg};
   border: 1px solid ${p => p.theme.colors.border};
-  line-height: ${p => p.theme.lineHeights.code};
-  font-size: ${p => p.theme.fontSizes.code};
-  padding: ${p => p.theme.spacing.sm};
   border-radius: ${p => p.theme.spacing.xs};
-  -webkit-overflow-scrolling: touch;
-  overflow-x: auto;
-  position: relative;
+
+  font-size: ${p => p.theme.fontSizes.code};
+  line-height: ${p => p.theme.lineHeights.code};
+
   max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: ${p => p.theme.spacing.sm};
+  position: relative;
+  white-space: pre;
 `;
 
 const Code = styled.code`
