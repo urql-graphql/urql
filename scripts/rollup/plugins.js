@@ -30,12 +30,10 @@ export const makePlugins = ({ isProduction } = {}) => [
   typescript({
     browserlist: false,
     tsconfig: {
-      strict: true,
-      noImplicitAny: false,
-      noUnusedParameters: true,
+      ...settings.tsconfig.compilerOptions,
+      baseUrl: undefined,
       sourceMap: true,
       declaration: !isProduction,
-      target: 'esnext',
       paths: {
         shared: ['../../node_modules/shared/src'],
         urql: ['../../node_modules/urql/src'],

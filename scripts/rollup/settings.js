@@ -3,6 +3,7 @@ const path = require('path');
 export const cwd = process.cwd();
 export const pkg = require(path.resolve(cwd, './package.json'));
 export const types = path.resolve(cwd, 'dist/types/');
+export const tsconfig = require(path.resolve(cwd, '../../tsconfig.json'));
 
 const normalize = name => name
   .replace(/[@\s\/\.]+/g, ' ')
