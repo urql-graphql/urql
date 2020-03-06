@@ -34,6 +34,7 @@
     "formidable-oss-badges": "0.2.1",
     "history": "^4.7.2",
     "path": "^0.12.7",
+    "preact": "^10.3.3",
     "prism-react-renderer": "^1.0.2",
     "prop-types": "^15.6.2",
     "react": "^16.9.0",
