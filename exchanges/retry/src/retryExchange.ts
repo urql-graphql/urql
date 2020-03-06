@@ -10,7 +10,13 @@ import {
   mergeMap,
   takeUntil,
 } from 'wonka';
-import { Exchange, Operation, CombinedError } from '@urql/core';
+import {
+  Exchange,
+  Operation,
+  CombinedError,
+  OperationResult,
+} from '@urql/core';
+import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 
 interface RetryExchangeOptions {
   initialDelayMs?: number;
@@ -25,6 +31,10 @@ export interface OperationWithRetry extends Operation {
   retryCount?: number;
 }
 
+export interface OperationResultWithRetry extends OperationResult {
+  operation: OperationWithRetry;
+}
+
 export const retryExchange = ({
   initialDelayMs,
   maxDelayMs,
@@ -36,16 +46,23 @@ export const retryExchange = ({
   const MAX_DELAY = maxDelayMs || 15000;
   const MAX_ATTEMPTS = maxNumberAttempts || Infinity;
 
+  const networkErrorOrRetryIf = err =>
+    (retryIf && retryIf(err)) || err.networkError;
+
   return ({ forward }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
     const { source: retry$, next: nextRetryOperation } = makeSubject<
       OperationWithRetry
     >();
+    let maxNumberAttemptsExceeded = false;
 
     const retryWithBackoff$ = pipe(
       retry$,
       mergeMap((op: OperationWithRetry) => {
-        const { key, context } = op;
+        const { key, context, retryCount } = op;
+        if (retryCount && retryCount > MAX_ATTEMPTS) {
+          maxNumberAttemptsExceeded = true;
+        }
         let delayAmount = context.retryDelay || MIN_DELAY;
 
         const backoffFactor = Math.random() + 1.5;
@@ -77,11 +94,9 @@ export const retryExchange = ({
               ...op.context,
               retryDelay: delayAmount,
             },
-            retryCount: op.retryCount != null ? op.retryCount + 1 : 1,
+            retryCount: retryCount != null ? retryCount + 1 : 1,
           }),
-          // Exclude operations that have been retried more than the specified max
-          // or if the delayAmount is over the max accepted delay
-          filter(op => op.retryCount < MAX_ATTEMPTS && delayAmount < MAX_DELAY),
+          filter(op => op.retryCount < MAX_ATTEMPTS),
           // Here's the actual delay
           delay(delayAmount),
           // Stop retry if a teardown comes in
@@ -94,23 +109,26 @@ export const retryExchange = ({
       merge([sharedOps$, retryWithBackoff$]),
       forward,
       share
-    );
+    ) as sourceT<OperationResultWithRetry>;
 
     const successResult$ = pipe(
       result$,
-      // We let through all non-network-failed results
-      filter(res => !res.error || !res.error.networkError)
+      // We let through all results that don't fit the criteria
+      filter(res => !res.error || !networkErrorOrRetryIf(res.error))
     );
 
     const failedResult$ = pipe(
       result$,
-      // Only retry if there was a network error and the error passes the
-      // conditional retryIf function (if passed)
-      filter(res => !!(res.error && (!retryIf || retryIf(res.error)))),
+      // Only retry if the error passes the conditional retryIf function (if passed)
+      // or if the error contains a networkError
+      filter(res => !!(res.error && networkErrorOrRetryIf(res.error))),
       // Send failed responses to be retried by calling next on the retry$ subject
-      tap(op => nextRetryOperation(op.operation)),
-      // Only let through the first failed response
-      filter(res => !res.operation.context.retryDelay)
+      // Exclude operations that have been retried more than the specified max
+      tap(op => {
+        if (!maxNumberAttemptsExceeded) {
+          nextRetryOperation(op.operation);
+        }
+      })
     );
 
     return merge([successResult$, failedResult$]);
