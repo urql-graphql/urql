@@ -5,7 +5,8 @@
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],
       "@urql/exchange-*": ["exchanges/*/src"],
-      "@urql/*": ["packages/*-urql/src", "packages/*/src"]
+      "@urql/*": ["packages/*-urql/src", "packages/*/src"],
+      "shared": ["exchanges/shared/src"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

@@ -7,11 +7,13 @@ process.on('unhandledRejection', error => {
 
 jest.restoreAllMocks();
 
+const originalConsole = console;
 global.console = {
-  ...console,
-  log: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(message => {
-    throw new Error(message);
-  }),
+  ...originalConsole,
+  warn() { /* noop */ },
+  error(message) { throw new Error(message); }
 };
+
+jest.spyOn(console, 'log');
+jest.spyOn(console, 'warn');
+jest.spyOn(console, 'error');

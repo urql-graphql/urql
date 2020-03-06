@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
 
 import Highlight, { Prism } from 'prism-react-renderer';
@@ -11,16 +11,19 @@ const getLanguage = className => {
 };
 
 const Pre = styled.pre`
-  background: ${p => p.theme.colors.passiveBg};
+  background: ${p => p.theme.colors.codeBg};
   border: 1px solid ${p => p.theme.colors.border};
-  line-height: ${p => p.theme.lineHeights.code};
-  font-size: ${p => p.theme.fontSizes.code};
-  padding: ${p => p.theme.spacing.sm};
   border-radius: ${p => p.theme.spacing.xs};
-  -webkit-overflow-scrolling: touch;
-  overflow-x: auto;
-  position: relative;
+
+  font-size: ${p => p.theme.fontSizes.code};
+  line-height: ${p => p.theme.lineHeights.code};
+
   max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: ${p => p.theme.spacing.sm};
+  position: relative;
+  white-space: pre;
 `;
 
 const Code = styled.code`
@@ -32,8 +35,11 @@ const Code = styled.code`
   white-space: pre;
 `;
 
-const InlineCode = styled.code`
-  background: ${p => p.theme.colors.passiveBg};
+const InlineCode = styled(props => {
+  const children = props.children.replace(/\\\|/g, '|');
+  return <code {...props}>{children}</code>;
+})`
+  background: ${p => p.theme.colors.codeBg};
   color: ${p => p.theme.colors.code};
   font-family: ${p => p.theme.fonts.code};
   font-size: ${p => p.theme.fontSizes.small};
@@ -45,6 +51,18 @@ const InlineCode = styled.code`
   font-feature-settings: normal;
   padding: 0 0.2em;
   margin: 0;
+
+  a > & {
+    text-decoration: underline;
+  }
+`;
+
+const InlineImage = styled.img`
+  display: inline-block;
+  margin: 0 ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md} 0;
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border: 1px solid ${p => p.theme.colors.border};
+  border-radius: ${p => p.theme.spacing.xs};
 `;
 
 const ImageWrapper = styled.div`
@@ -69,16 +87,21 @@ const ImageAlt = styled.span.attrs(() => ({
   display: block;
   padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
   border-top: 1px solid ${p => p.theme.colors.border};
-  background: ${p => p.theme.colors.passiveBg};
+  background: ${p => p.theme.colors.codeBg};
   font-size: ${p => p.theme.fontSizes.small};
 `;
 
-const Image = ({ alt, src }) => (
-  <ImageWrapper>
-    <img alt={alt} src={src} />
-    <ImageAlt>{alt}</ImageAlt>
-  </ImageWrapper>
-);
+const Image = props => {
+  const { height, width, alt, src } = props;
+  if (height || width) return <InlineImage {...props} />;
+
+  return (
+    <ImageWrapper>
+      <img alt={alt} src={src} />
+      <ImageAlt>{alt}</ImageAlt>
+    </ImageWrapper>
+  );
+};
 
 const HighlightCode = ({ className = '', children }) => {
   const language = getLanguage(className);
@@ -119,12 +142,79 @@ const Blockquote = styled.blockquote`
   }
 `;
 
+const sharedTableCellStyling = css`
+  padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
+  border-left: 1px solid ${p => p.theme.colors.passiveBg};
+  border-bottom: 1px solid ${p => p.theme.colors.passiveBg};
+`;
+
+const TableHeader = styled.th`
+  text-align: left;
+  white-space: nowrap;
+  ${sharedTableCellStyling}
+`;
+
+const TableCell = styled.td`
+  width: min-content;
+  ${sharedTableCellStyling}
+
+  ${p => {
+    const isCodeOnly = React.Children.toArray(p.children).every(
+      x => x.props && x.props.mdxType === 'inlineCode'
+    );
+    return (
+      isCodeOnly &&
+      css`
+        background-color: ${p.theme.colors.codeBg};
+
+        & > ${InlineCode} {
+          background: none;
+          padding: 0;
+          margin: 0;
+        }
+      `
+    );
+  }}
+
+  &:last-child {
+    min-width: 20rem;
+    width: max-content;
+  }
+
+  &:first-child {
+    white-space: nowrap;
+  }
+
+  &:nth-child(2) {
+    overflow-wrap: break-word;
+    min-width: 20rem;
+  }
+`;
+
+const TableOverflow = styled.div`
+  overflow-x: scroll;
+`;
+
+const Table = styled.table`
+  border: 1px solid ${p => p.theme.colors.passiveBg};
+  border-collapse: collapse;
+`;
+
+const TableWithOverflow = props => (
+  <TableOverflow>
+    <Table {...props} />
+  </TableOverflow>
+);
+
 const components = {
   pre: Pre,
   img: Image,
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
+  table: TableWithOverflow,
+  th: TableHeader,
+  td: TableCell,
 };
 
 export const MDXComponents = ({ children }) => (

@@ -34,6 +34,17 @@ query's result is removed from the cache.
 This is an aggressive form of cache invalidation. However, it works well for content-driven sites,
 although it doesn't deal with normalized data or IDs.
 
+## Request Policies
+
+[We previously covered request policies on the "Queries" page.](./queries.md)
+
+The _request policy_ that is defined will alter what the default document cache does. By default the
+cache will prefer cached results and will otherwise send a request, which is called `cache-first`,
+but there's also `cache-and-network`, `cache-only`, and `network-only`.
+
+[Read more about which request policies are available in the API
+docs.](../api/core.md#requestpolicy-type)
+
 ## Document Cache Gotchas
 
 This cache has a small trade-off! If we request a list of data and the API returns an empty list,

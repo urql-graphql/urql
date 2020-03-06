@@ -1,0 +1,61 @@
+{
+  "name": "@urql/exchange-populate",
+  "version": "0.1.0",
+  "description": "An exchange that automaticcally populates the mutation selection body",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "exchanges/populate"
+  },
+  "keywords": [
+    "urql",
+    "formidablelabs",
+    "exchanges"
+  ],
+  "main": "dist/urql-exchange-populate.cjs.js",
+  "module": "dist/urql-exchange-populate.esm.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "dist/urql-exchange-populate.esm.js",
+      "require": "dist/urql-exchange-populate.cjs.js",
+      "types": "dist/types/index.d.ts",
+      "source": "src/index.ts"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/",
+    "extras/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist extras",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean test build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "dependencies": {
+    "wonka": "^3.2.1 || ^4.0.0",
+    "@urql/core": ">=1.9.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
+  },
+  "devDependencies": {
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1"
+  }
+}

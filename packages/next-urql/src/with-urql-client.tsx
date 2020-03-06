@@ -67,7 +67,7 @@ export function withUrqlClient(
       }
 
       // Run the wrapped component's getInitialProps function.
-      let pageProps;
+      let pageProps = {} as any;
       if (AppOrPage.getInitialProps) {
         pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
       }

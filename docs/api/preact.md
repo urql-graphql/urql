@@ -5,4 +5,5 @@ order: 2
 
 # @urql/preact
 
-Please refer to [the React API section](/api/urql) for details of the Preact API.
+The `@urql/preact` API is the same as the React `urql` API.
+Please refer to [the "urql" API docs](./urql.md) for details on the Preact API.

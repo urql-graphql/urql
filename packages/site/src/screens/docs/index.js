@@ -10,18 +10,13 @@ import Sidebar from '../../components/sidebar';
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
 
-const Container = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: row;
 
   width: 100%;
   max-width: ${p => p.theme.layout.page};
   margin: 0 auto;
-
-  background: ${p => p.theme.colors.bg};
-  border-left: 1px solid ${p => p.theme.colors.border};
-  border-right: 1px solid ${p => p.theme.colors.border};
-
   margin-top: ${p => p.theme.layout.header};
 `;
 
@@ -31,10 +26,11 @@ const OpenCloseSidebar = styled.img.attrs(props => ({
   cursor: pointer;
   display: block;
   margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 0;
   z-index: 1;
+
   @media ${p => p.theme.media.sm} {
     display: none;
   }
@@ -52,7 +48,7 @@ const Docs = props => {
           onClick={() => setSidebarOpen(prev => !prev)}
         />
         <Sidebar sidebarOpen={sidebarOpen} />
-        <Article sidebarOpen={sidebarOpen}>{props.children}</Article>
+        <Article>{props.children}</Article>
       </Container>
     </>
   );

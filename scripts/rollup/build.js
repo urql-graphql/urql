@@ -6,9 +6,9 @@ const execa = require('execa');
 
 const workspaceRoot = path.resolve(__dirname, '../../');
 
-let packages = glob('{packages,exchanges}/*/package.json').map(pkg => {
-  return path.resolve(pkg, '../');
-});
+let packages = glob('{packages,exchanges}/*/package.json')
+  .filter(pkg => !require(path.join(workspaceRoot, pkg)).private)
+  .map(pkg => path.resolve(pkg, '../'));
 
 // CircleCI parallelism
 // See: https://github.com/facebook/react/blob/901d76bc5c8dcd0fa15bb32d1dfe05709aa5d273/scripts/rollup/build.js#L705-L710

@@ -14,7 +14,8 @@ const systemFonts = [
 ];
 
 export const colors = {
-  passiveBg: '#f6f6f6',
+  passiveBg: '#f2f2f2',
+  codeBg: '#f0f7fb',
   bg: '#ffffff',
   border: '#ececec',
   activeBorder: '#a2b1ff',
@@ -28,10 +29,9 @@ export const colors = {
 export const layout = {
   page: '144rem',
   header: '4.8rem',
-  stripes: '0.9rem',
+  stripes: '1rem',
   sidebar: '28rem',
-  legend: '100%',
-  legendMaxWidth: '25rem',
+  legend: '22rem',
   logo: '12rem',
 };
 
@@ -63,6 +63,7 @@ export const lineHeights = {
 };
 
 export const shadows = {
+  header: 'rgba(0, 0, 0, 0.09) 0px 2px 10px -3px',
   input: 'rgba(0, 0, 0, 0.09) 0px 2px 10px -3px',
 };
 

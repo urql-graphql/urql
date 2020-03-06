@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
   position: absolute;
+
   @media ${({ theme }) => theme.media.sm} {
     display: block;
-    position: static;
+    position: relative;
     width: ${p => p.theme.layout.sidebar};
   }
 `;
@@ -14,9 +15,9 @@ export const SidebarContainer = styled.div`
 export const SideBarStripes = styled.div`
   border-left: ${p => p.theme.layout.stripes} solid #8196ff;
   border-right: ${p => p.theme.layout.stripes} solid #bcc6fa;
+  position: absolute;
   height: 100%;
   width: 0;
-  position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
@@ -34,14 +35,20 @@ export const SidebarWrapper = styled.aside`
   z-index: 1;
   overflow-y: scroll;
   min-height: 100%;
-  width: 100%;
-  padding: ${p => p.theme.spacing.md};
-  padding-right: ${p => p.theme.spacing.sm};
-  background: ${p => p.theme.colors.bg};
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
 
+  padding: ${p => p.theme.spacing.md};
+  padding-right: ${p => p.theme.spacing.sm};
+
+  background-color: ${p => p.theme.colors.bg};
+  border-right: 1px solid ${p => p.theme.colors.border};
+  border-top: 1px solid ${p => p.theme.colors.border};
+
   @media ${({ theme }) => theme.media.sm} {
+    border: none;
+    background: none;
+    padding-top: ${p => p.theme.spacing.lg};
     width: ${p => p.theme.layout.sidebar};
   }
 `;
@@ -57,7 +64,6 @@ export const SidebarNavItem = styled(Link)`
 
 export const SidebarNavSubItemWrapper = styled.div`
   padding-left: ${p => p.theme.spacing.sm};
-  border-left: 1px solid ${p => p.theme.colors.activeBorder};
   margin-bottom: ${p => p.theme.spacing.xs};
 `;
 

@@ -1,45 +1,64 @@
-import { RequestPolicy, OperationContext, createRequest } from '@urql/core';
+import { RequestPolicy, OperationContext, CombinedError } from '@urql/core';
+import { pipe, fromValue, concat, scan, map, subscribe } from 'wonka';
+import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
-import { getClient } from '../context';
-import { observe } from './observe';
 
-export interface QueryArguments<Variables> {
+import { getClient } from '../context';
+import { initialState } from './constants';
+
+export interface QueryArguments<V> {
   query: string | DocumentNode;
-  variables?: Variables;
+  variables?: V;
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
   context?: Partial<OperationContext>;
-  pause?: boolean;
 }
 
-export const query = <Variables = object>(args: QueryArguments<Variables>) => {
+export interface QueryResult<T> {
+  fetching: boolean;
+  stale: boolean;
+  data?: T;
+  error?: CombinedError;
+  extensions?: Record<string, any>;
+}
+
+export const query = <T = any, V = object>(
+  args: QueryArguments<V>
+): Readable<QueryResult<T>> => {
   const client = getClient();
-  const request = createRequest(args.query, args.variables as any);
 
-  // Temp solution since I haven't had the chance yet to see how a sync result would look like in svelte
-  let initialValue;
-  client
-    .query(args.query, args.variables as any, { requestPolicy: 'cache-only' })
-    .toPromise()
-    .then(i => {
-      initialValue = i;
-    });
-
-  if (args.pause) {
-    // TODO: this is a tough cookie since we still have to return a .subscribe
-    // We can return the initialValue fetched above!
-  }
-
-  const result = observe(
-    client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      pollInterval: args.pollInterval,
-      ...args.context,
-    }),
-    initialValue
+  const queryResult$ = pipe(
+    concat([
+      fromValue({ fetching: true, stale: false }),
+      pipe(
+        client.query<T>(args.query, args.variables, {
+          requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
+          ...args.context,
+        }),
+        map(({ stale, data, error, extensions }) => ({
+          fetching: false,
+          stale: !!stale,
+          data,
+          error,
+          extensions,
+        }))
+      ),
+      fromValue({ fetching: false, stale: false }),
+    ]),
+    scan(
+      (result, partial) => ({
+        ...result,
+        ...partial,
+      }),
+      initialState
+    )
   );
 
   return {
-    subscribe: result.subscribe,
+    subscribe(onValue) {
+      const { unsubscribe } = pipe(queryResult$, subscribe(onValue));
+      return unsubscribe as () => void;
+    },
   };
 };

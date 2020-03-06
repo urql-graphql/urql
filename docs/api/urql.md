@@ -5,173 +5,142 @@ order: 1
 
 # React API
 
-## Hooks
+## useQuery
 
-### useQuery
+Accepts a single required options object as an input with the following properties:
 
-#### useQuery Parameters
-Accepts a single required `options` object as an input with the following properties:
+| Prop          | Type                     | Description                                                                                              |
+| ------------- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| query         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
+| variables     | `?object`                | The variables to be used with the GraphQL request.                                                       |
+| requestPolicy | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
+| pause         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
+| pollInterval  | `?number`                | Every `pollInterval` milliseconds the query will be reexecuted.                                          |
+| context       | `?object`                | Holds the contextual information for the query.                                                          |
 
-| Prop          | Type                     | Description                                                                                                           | Required |  |
-| ------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------- |
-| query         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    | Yes      |
-| variables     | `object`                 | The variables to be used with the GraphQL request.                                                                    | No       |
-| requestPolicy | `RequestPolicy`          | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. | No       |
-| pause         | `boolean`                | A boolean flag instructing `Query` to pause execution of the subsequent query operation.                              | No       |
-| pollInterval  | `number`                 | Every `pollInterval` milliseconds the query will be refetched.                                                        | No       |
-| context       | `object`                 | Holds the contextual information for the query.                                                                       | No       |
+This hook returns a tuple of the shape `[result, executeQuery]`.
 
-#### useQuery Returned Data
+- The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult) with
+  an added `fetching: boolean` property, indicating whether the query is currently being fetched.
+- The `executeQuery` function optionally accepts
+  [`Partial<OperationContext>`](./core.md#operationcontext) and reexecutes the current query when
+  it's called. When `pause` is set to `true` this executes the query, overriding the otherwise
+  paused hook.
 
-A tuple is returned with item one being the current query's state object and item two being an `executeQuery` function.
+[Read more about how to use the `useQuery` API on the "Queries" page.](../basics/queries.md)
 
-The shape of the current state is an [OperationResult Type](/api/core#operationresult-type)
+## useMutation
 
-&nbsp;
+Accepts a single `query` argument of type `string | DocumentNode` and returns a tuple of the shape
+`[result, executeMutation]`.
 
-The `executeQuery` function optionally accepts a partial `OperationContext`.
+- The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult) with
+  an added `fetching: boolean` property, indicating whether the mutation is currently being executed.
+- The `executeMutation` function accepts variables and optionally
+  [`Partial<OperationContext>`](./core.md#operationcontext) and may be used to start executing a
+  mutation. It returns a `Promise` resolving to an [`OperationResult`](./core.md#operationresult).
 
-[More information on how to use this hook can be found in the Basics section.](/basics/querying-data#queries)
+[Read more about how to use the `useMutation` API on the "Mutations" page.](../basics/mutations.md)
 
-### useMutation
+## useSubscription
 
-#### useMutation Parameters
+Accepts a single required options object as an input with the following properties:
 
-Accepts a single `query` argument of type `string`. 
+| Prop      | Type                     | Description                                                                                 |
+| --------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.          |
+| variables | `?object`                | The variables to be used with the GraphQL request.                                          |
+| pause     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery). |
+| context   | `?object`                | Holds the contextual information for the query.                                             |
 
-#### useMutation Returned Data
-
-A tuple is returned with item one being the current query's state object and item two being an `executeQuery` function.
-
-The shape of the current state is an [OperationResult Type](/api/core#operationresult-type)
-&nbsp;
-
-The `executeQuery` function optionally accepts a partial `OperationContext`.
-
-[More information on how to use this hook can be found in the Basics section.](/basics/mutating-data#mutations)
-
-### useSubscription
-
-#### useSubscription Parameters
-Accepts an `options` object as the required first parameter, and a second optional parameter that is the subscription's handler function.
-
-The `options` object's property breakdown:
-
-| Prop      | Type                     | Description                                                                        | Required |  |
-| --------- | ------------------------ | ---------------------------------------------------------------------------------- | -------- |
-| query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. | Yes      |
-| variables | `object`                 | The variables to be used with the GraphQL request.                                 | No       |
-| context   | `object`                 | Holds the contextual information for the query.                                    | No       |
-
-&nbsp;
-
-The subscription handler's type signature:
+The hook optionally accepts a second argument, which may be a handler function with a type signature
+of:
 
 ```js
-type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
+type SubscriptionHandler<T, R> = (previousData: R | undefined, data: T) => R;
 ```
 
-This means that the subscription handler receives the previous data or undefined
-and the current, incoming subscription event data.
+This function will be called with the previous data (or `undefined`) and the new data that's
+incoming from a subscription event, and may be used to "reduce" the data over time, altering the
+value of `result.data`.
 
-#### useSubscription Returned Data
+This hook returns a tuple of the shape `[result, executeQuery]`.
 
-The shape of the current state is an [OperationResult Type](/api/core#operationresult-type) without the first `operation` prop.
+- The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult).
+- The `executeSubscription` function optionally accepts
+  [`Partial<OperationContext>`](./core.md#operationcontext) and restarts the current subscription when
+  it's called. When `pause` is set to `true` this starts the subscription, overriding the otherwise
+  paused hook.
 
-More information can be found in the [Subscriptions](/advanced/subscriptions) section.
+Since a subscription may proactively closed by the server, the additional `fetching: boolean`
+property on the `result` may update to `false` when the server ends the subscription.
+By default `urql` is not able to start subscriptions, since this requires some additional setup.
 
-## Components
+[Read more about how to use the `useSubscription` API on the "Subscriptions"
+page.](../advanced/subscriptions.md)
 
-### Query
+## Query Component
 
-#### Props
+This component is a wrapper around [`useQuery`](#usequery), exposing a [render prop
+API](https://reactjs.org/docs/render-props.html) for cases where hooks aren't desirable.
 
-| Prop          | Type                       | Description                                                                                           | Required |
-| ------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- | -------- |
-| query         | `string`                   | The GraphQL request's query                                                                           | Yes      |
-| variables     | `object`                   | The GraphQL request's variables                                                                       | Yes      |
-| context       | `?object`                  | The GraphQL request's context                                                                         | No       |
-| requestPolicy | `?RequestPolicy`           | An optional request policy that should be used                                                        | No       |
-| pause         | `?boolean`                 | A boolean flag instructing `Query` to pause execution of the subsequent query operation               | No       |
-| pollInterval  | `?number`                  | Every `pollInterval` milliseconds the query will be refetched                                         | No       |
-| children      | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows | N/A      |
+The API of the `Query` component mirrors the API of [`useQuery`](#usequery). The props that `<Query>`
+accepts are the same as `useQuery`'s options object.
 
-#### Render Props
+A function callback must be passed to `children` that receives the query result and must return a
+React element. The second argument of the hook's tuple, `executeQuery` is passed as an added property
+on the query result.
 
-| Prop         | Type                                | Description                                                                                             |
-| ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| fetching     | `boolean`                           | Whether the `Query` is currently waiting for a GraphQL result                                           |
-| data         | `?any`                              | The GraphQL request's result                                                                            |
-| error        | `?CombinedError`                    | The `CombinedError` containing any errors that might've occured                                         |
-| extensions   | `?Record<string, any>`              | Optional extensions that the GraphQL server may have returned.                                          |
-| executeQuery | `Partial<OperationContext> => void` | A function that can force the operation to be sent again with the given context (Useful for refetching) |
+## Mutation Component
 
-&nbsp;
+This component is a wrapper around [`useMutation`](#usemutation), exposing a [render prop
+API](https://reactjs.org/docs/render-props.html) for cases where hooks aren't desirable.
 
-[More information on how to use this hook can be found in the Basics section.](/basics/querying-data#queries)
+The `Mutation` component accepts a `query` prop and a function callback must be passed to `children`
+that receives the mutation result and must return a React element. The second argument of
+`useMutation`'s returned tuple, `executeMutation` is passed as an added property on the mutation
+result object.
 
-### Mutation
+## Subscription Component
 
-#### Props
+This component is a wrapper around [`useSubscription`](#usesubscription), exposing a [render prop
+API](https://reactjs.org/docs/render-props.html) for cases where hooks aren't desirable.
 
-| Prop     | Type                       | Description                                                                                           |
-| -------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query    | `string`                   | The GraphQL request's query                                                                           |
-| children | `RenderProps => ReactNode` | A function that follows the typical render props pattern. The shape of the render props is as follows |
+The API of the `Subscription` component mirrors the API of [`useSubscription`](#usesubscription).
+The props that `<Mutation>` accepts are the same as `useSubscription`'s options object, with an
+added, optional `handler` prop that may be passed, which for the `useSubscription` hook is instead
+the second argument.
 
-#### Render Props
+A function callback must be passed to `children` that receives the subscription result and must
+return a React element. The second argument of the hook's tuple, `executeSubscription` is passed as
+an added property on the subscription result.
 
-| Prop            | Type                                                               | Description                                                      |
-| --------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| fetching        | `boolean`                                                          | Whether the `Mutation` is currently waiting for a GraphQL result |
-| data            | `?any`                                                             | The GraphQL request's result                                     |
-| error           | `?CombinedError`                                                   | The `CombinedError` containing any errors that might've occured  |
-| extensions      | `?Record<string, any>`                                             | Optional extensions that the GraphQL server may have returned.   |
-| executeMutation | `(variables: object, context?: Partial<OperationContext>) => void` | A function that accepts variables and starts the mutation        |
+## Context
 
-[More information on how to use this hook can be found in the Basics section.](/basics/mutating-data#mutations)
+`urql` is used in React by adding a provider around where the [`Client`](./core.md#client) is
+supposed to be used. Internally this means that `urql` creates a
+[React Context](https://reactjs.org/docs/context.html).
 
-### Subscription
+All created parts of this context are exported by `urql`, namely:
 
-[More information on how to use this component can be found in the Basics section.](https://formidable.com/open-source/urql/docs/basics#subscriptions)
+- `Context`
+- `Provider`
+- `Consumer`
 
-#### Props
+To keep examples brief, `urql` creates a default client with the `url` set to `'/graphql'`. This
+client will be used when no `Provider` wraps any of `urql`'s hooks. However, to prevent this default
+client from being used accidentally, a warning is output in the console for the default client.
 
-| Prop      | Type                                                | Description                                                                                           |
-| --------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| query     | `string`                                            | The GraphQL subscription's query                                                                      |
-| variables | `object`                                            | The GraphQL subscriptions' variables                                                                  |
-| context   | `?Partial<OperationContext>`                        | The GraphQL subscriptions' context                                                                    |
-| handler   | `undefined \| (prev: R \| undefined, data: T) => R` | The handler that should combine/update the subscription's data with incoming data                     |
-| children  | `RenderProps => ReactNode`                          | A function that follows the typical render props pattern. The shape of the render props is as follows |
+### useClient
 
-#### Render Props
-
-| Prop       | Type                   | Description                                                     |
-| ---------- | ---------------------- | --------------------------------------------------------------- |
-| fetching   | `boolean`              | Whether the `Subscription` is currently ongoing                 |
-| data       | `?any`                 | The GraphQL subscription's data                                 |
-| error      | `?CombinedError`       | The `CombinedError` containing any errors that might've occured |
-| extensions | `?Record<string, any>` | Optional extensions that the GraphQL server may have returned.  |
-
-More information can be found in the [Subscriptions](/advanced/subscriptions) section.
-
-### Context
-
-`urql` comes with the two context components `Consumer` and `Provider` as returned
-by React's `createContext` utility. It also exports the `Context` itself which can
-be used in combination with the `useContext` hook.
-
-E.g.
+`urql` also exports a `useClient` hook, which is a convenience wrapper like the following:
 
 ```js
-<App>
-  <UrqlProvider>
-    <UrqlConsumer>
-      {urqlData => (
-        <MyComponent data={urqlData} />
-      )}
-    </UrqlConsumer>
-  </UrqlProvider>
-</App>
+import React from 'react';
+import { Context } from 'urql';
+
+const useClient = () => React.useContext(Context);
 ```
+
+However, this hook is also responsible for outputting the default client warning that's mentioned
+above, and should thus be preferred over manually using `useContext` with `urql`'s `Context`.

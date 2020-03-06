@@ -1,8 +1,11 @@
-version: 2
+version: 2.1
+
+executors:
+  node:
+    docker:
+      - image: circleci/node:12-buster
 
 aliases:
-  - &docker
-    - image: circleci/node:12-buster
   - &yarn_cache
     restore_cache:
       name: Restore Yarn cache
@@ -16,7 +19,7 @@ aliases:
 
 jobs:
   setup:
-    docker: *docker
+    executor: node
     steps:
       - checkout
       - *yarn_cache
@@ -28,7 +31,7 @@ jobs:
             - ~/.cache/yarn
 
   lint:
-    docker: *docker
+    executor: node
     steps:
       - checkout
       - *yarn_cache
@@ -38,7 +41,7 @@ jobs:
           command: yarn run lint
 
   typescript:
-    docker: *docker
+    executor: node
     steps:
       - checkout
       - *yarn_cache
@@ -48,7 +51,7 @@ jobs:
           command: yarn run check
 
   test:
-    docker: *docker
+    executor: node
     steps:
       - checkout
       - *yarn_cache
@@ -58,7 +61,7 @@ jobs:
           command: yarn run test --maxWorkers=2
 
   build:
-    docker: *docker
+    executor: node
     parallelism: 4
     steps:
       - checkout
@@ -67,6 +70,35 @@ jobs:
       - run:
           name: Build
           command: yarn run build
+
+  staging_site:
+    executor: node
+    steps:
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: Deploy Staging Site
+          command: |
+            cd packages/site
+            yarn run build --staging
+            node scripts/deploy/surge.js
+
+  production_site:
+    executor: node
+    steps:
+      - run:
+          name: Install AWS CLI
+          command: sudo apt-get -y -qq install awscli
+      - checkout
+      - *yarn_cache
+      - *yarn
+      - run:
+          name: Deploy Production Site
+          command: |
+            cd packages/site
+            yarn run build
+            node scripts/deploy/aws.js
 
 workflows:
   version: 2
@@ -83,5 +115,17 @@ workflows:
           requires:
             - setup
       - build:
+          requires:
+            - setup
+      - staging_site:
+          filters:
+            branches:
+              ignore: master
+          requires:
+            - setup
+      - production_site:
+          filters:
+            branches:
+              only: master
           requires:
             - setup
