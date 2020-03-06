@@ -26,7 +26,6 @@ const Content = styled.article.attrs(() => ({
     padding: ${p => p.theme.spacing.lg};
   }
 
-  padding-bottom: ${p => p.theme.spacing.md};
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;

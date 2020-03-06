@@ -174,6 +174,7 @@ const TableCell = styled.td`
   }}
 
   &:last-child {
+    min-width: 20rem;
     width: max-content;
   }
 
@@ -187,11 +188,20 @@ const TableCell = styled.td`
   }
 `;
 
+const TableOverflow = styled.div`
+  overflow-x: scroll;
+`;
+
 const Table = styled.table`
-  width: 100%;
   border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
 `;
+
+const TableWithOverflow = props => (
+  <TableOverflow>
+    <Table {...props} />
+  </TableOverflow>
+);
 
 const components = {
   pre: Pre,
@@ -199,7 +209,7 @@ const components = {
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
-  table: Table,
+  table: TableWithOverflow,
   th: TableHeader,
   td: TableCell,
 };
