@@ -28,6 +28,7 @@ export const makePlugins = ({ isProduction } = {}) => [
     } : {},
   }),
   typescript({
+    transpileOnly: true,
     browserlist: false,
     tsconfig: {
       ...settings.tsconfig.compilerOptions,
@@ -35,10 +36,7 @@ export const makePlugins = ({ isProduction } = {}) => [
       sourceMap: true,
       declaration: !isProduction,
       paths: {
-        shared: ['../../node_modules/shared/src'],
-        urql: ['../../node_modules/urql/src'],
-        '*-urql': ['../../node_modules/*-urql/src'],
-        '@urql/*': ['../../node_modules/@urql/*/src'],
+        shared: ['../../node_modules/shared/src']
       }
     },
   }),

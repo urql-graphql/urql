@@ -1,3 +1,5 @@
+import { Exchange } from '../types';
+
 export { ssrExchange } from './ssr';
 export { cacheExchange } from './cache';
 export { subscriptionExchange } from './subscription';
@@ -11,4 +13,8 @@ import { cacheExchange } from './cache';
 import { dedupExchange } from './dedup';
 import { fetchExchange } from './fetch';
 
-export const defaultExchanges = [dedupExchange, cacheExchange, fetchExchange];
+export const defaultExchanges: Exchange[] = [
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+];
