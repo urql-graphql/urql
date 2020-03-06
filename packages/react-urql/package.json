@@ -21,7 +21,7 @@
   ],
   "main": "dist/urql.cjs.js",
   "module": "dist/urql.esm.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql.esm.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",

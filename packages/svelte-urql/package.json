@@ -21,7 +21,7 @@
   ],
   "main": "dist/urql-svelte.cjs.js",
   "module": "dist/urql-svelte.esm.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-svelte.esm.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",

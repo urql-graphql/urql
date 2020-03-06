@@ -4,6 +4,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "shared": ["../../node_modules/shared/src"],
       "urql": ["../../node_modules/urql/src"],
       "*-urql": ["../../node_modules/*-urql/src"],
       "@urql/*": ["../../node_modules/@urql/*/src"]

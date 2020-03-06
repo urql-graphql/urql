@@ -21,19 +21,19 @@
   ],
   "main": "dist/urql-exchange-graphcache.cjs.js",
   "module": "dist/urql-exchange-graphcache.esm.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-graphcache.esm.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "dist/urql-exchange-graphcache.esm.js",
       "require": "dist/urql-exchange-graphcache.cjs.js",
-      "types": "dist/types/index.d.ts",
+      "types": "dist/urql-exchange-graphcache.esm.d.ts",
       "source": "src/index.ts"
     },
     "./extras": {
       "import": "dist/urql-exchange-graphcache-extras.esm.js",
       "require": "dist/urql-exchange-graphcache-extras.cjs.js",
-      "types": "dist/types/extras/index.d.ts",
+      "types": "dist/urql-exchange-graphcache-extras.esm.d.ts",
       "source": "src/extras/index.ts"
     }
   },

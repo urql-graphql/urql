@@ -1,7 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
-import sucrase from '@rollup/plugin-sucrase';
+import typescript from '@wessberg/rollup-plugin-ts';
 import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from 'rollup-plugin-babel';
@@ -28,29 +27,23 @@ export const makePlugins = ({ isProduction } = {}) => [
       react: Object.keys(require('react'))
     } : {},
   }),
-  settings.isCI
-    ? sucrase({
-      exclude: ['node_modules/**'],
-      transforms: ['jsx', 'typescript']
-    })
-    : typescript({
-      useTsconfigDeclarationDir: true,
-      objectHashIgnoreUnknownHack: true,
-      tsconfigOverride: {
-        exclude: [
-          'src/**/*.test.ts',
-          'src/**/*.test.tsx',
-          'src/**/test-utils/*'
-        ],
-        compilerOptions: {
-          sourceMap: true,
-          noEmit: false,
-          declaration: !isProduction,
-          declarationDir: settings.types,
-          target: 'esnext',
-        },
-      },
-    }),
+  typescript({
+    browserlist: false,
+    tsconfig: {
+      strict: true,
+      noImplicitAny: false,
+      noUnusedParameters: true,
+      sourceMap: true,
+      declaration: !isProduction,
+      target: 'esnext',
+      paths: {
+        shared: ['../../node_modules/shared/src'],
+        urql: ['../../node_modules/urql/src'],
+        '*-urql': ['../../node_modules/*-urql/src'],
+        '@urql/*': ['../../node_modules/@urql/*/src'],
+      }
+    },
+  }),
   buble({
     transforms: {
       unicodeRegExp: false,

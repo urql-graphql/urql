@@ -37,9 +37,7 @@ invariant(
 );
 
 invariant(
-  path.normalize(pkg.types) === 'dist/types/'
-    + path.relative('src', pkg.source || 'src/index.ts')
-      .replace(/\.ts$/, '.d.ts'),
+  path.normalize(pkg.types) === `dist/${name}.esm.d.ts`,
   'package.json:types path must be valid'
 );
 
@@ -90,8 +88,7 @@ if (pkg.exports) {
     );
 
     invariant(
-      path.normalize(entry.types) === 'dist/types/'
-        + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
+      path.normalize(entry.types) === `dist/${bundleName}.esm.d.ts`,
       'package.json:types path must be valid'
     );
   }
