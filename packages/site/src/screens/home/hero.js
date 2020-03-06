@@ -28,11 +28,12 @@ const HeroContent = styled.div`
 
 const HeroTitle = styled.h1`
   font-size: 5rem;
-  letter-spacing: 0.15em;
   margin: 0 0 2rem;
   text-align: center;
   text-transform: uppercase;
   width: 100%;
+  color: #fff;
+
   @media (min-width: 768px) {
     font-size: 5.8rem;
     margin: 4rem 0 2rem;
@@ -41,8 +42,6 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroBody = styled.p`
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  letter-spacing: 0.08em;
   font-size: 2rem;
   line-height: 3rem;
   text-align: left;
@@ -115,7 +114,6 @@ const HeroNPMCopy = styled.p`
   padding: 0.33rem 1.5rem;
   line-height: 3.44rem;
   font-size: 14px;
-  letter-spacing: 0.2px;
   margin: 0;
 `;
 const HeroNPMButton = styled.button`
@@ -127,7 +125,6 @@ const HeroNPMButton = styled.button`
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
-  letter-spacing: 1px;
   color: #383838;
   border: 0;
   text-transform: uppercase;
@@ -146,7 +143,6 @@ export const HeroDocsButton = styled(Link)`
   line-height: 4rem;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 1px;
   color: #383838;
   border: 0;
   margin-top: 5rem;
@@ -186,9 +182,9 @@ const HeroNavList = styled.ul`
     color: white;
     display: inline-block;
     font-size: 1.7rem;
-    letter-spacing: 0.05em;
     transition: opacity 0.4s;
     text-transform: uppercase;
+    text-decoration: none;
   }
   & li a:hover {
     color: #8196ff;

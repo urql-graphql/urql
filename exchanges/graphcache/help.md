@@ -1,8 +1,3 @@
----
-title: Help
-order: 6
----
-
 # Help!
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**
@@ -271,7 +266,7 @@ by the `populateExchange`.
 ## (19) Can't generate a key for invalidate(...)
 
 > Can't generate a key for invalidate(...).
-> You need to pass in a valid key (__typename:id) or an object with the "__typename" property and an "id" or "_id" property.
+> You need to pass in a valid key (**typename:id) or an object with the "**typename" property and an "id" or "\_id" property.
 
 You probably have called `cache.invalidate` with data that the cache can't generate a key for.
 

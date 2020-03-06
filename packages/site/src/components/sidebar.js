@@ -24,6 +24,7 @@ const HeroLogo = styled.img.attrs(() => ({
   width: ${p => p.theme.layout.logo};
   margin-bottom: ${p => p.theme.spacing.sm};
   align-self: center;
+
   @media ${p => p.theme.media.sm} {
     display: block;
   }
@@ -34,11 +35,14 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   padding-top: ${p => p.theme.spacing.xs};
   padding-bottom: ${p => p.theme.spacing.lg};
+  padding-left: ${p => p.theme.spacing.sm};
 `;
 
 const relative = (from, to) => {
   if (!from || !to) return null;
   let pathname = path.relative(path.dirname(from), to);
+  if (!pathname)
+    pathname = path.join(path.relative(from, to), path.basename(to));
   if (from.endsWith('/')) pathname = '../' + pathname;
   return { pathname };
 };
@@ -53,7 +57,12 @@ const Sidebar = ({ sidebarOpen }) => {
       return null;
     }
 
-    return tree.children.map(page => {
+    let children = tree.children;
+    if (tree.frontmatter && tree.originalPath) {
+      children = [{ ...tree, children: undefined }, ...children];
+    }
+
+    return children.map(page => {
       return (
         <Fragment key={page.key}>
           <SidebarNavItem to={relative(pathname, page.path)}>

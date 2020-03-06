@@ -4,29 +4,26 @@ import { Link } from 'react-router-dom';
 
 import formidableLogo from '../../assets/logos/logo-formidable.svg';
 
-const Fixed = styled.div`
+const Fixed = styled.header`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
   z-index: 1;
+
+  background: ${p => p.theme.colors.bg};
+  border-bottom: 1px solid ${p => p.theme.colors.border};
+  padding: 0 ${p => p.theme.spacing.md};
+  box-shadow: ${p => p.theme.shadows.header};
 `;
 
-const Wrapper = styled.header`
+const Wrapper = styled.div`
   width: 100%;
   max-width: ${p => p.theme.layout.page};
   margin: 0 auto;
-  background: ${p => p.theme.colors.bg};
-
   height: ${p => p.theme.layout.header};
-  padding: 0 ${p => p.theme.spacing.md};
   padding-top: 2px;
-
-  border-bottom: 1px solid ${p => p.theme.colors.border};
-  border-left: 1px solid ${p => p.theme.colors.border};
-  border-right: 1px solid ${p => p.theme.colors.border};
-
   display: flex;
   flex-direction: row;
   align-items: center;
