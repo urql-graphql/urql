@@ -9,7 +9,7 @@ const basePath = 'open-source/urql';
 export default {
   plugins: [
     resolve(__dirname, 'plugins/monorepo-fix/'),
-
+    resolve(__dirname, 'plugins/preact'),
     [
       'react-static-plugin-md-pages',
       {
