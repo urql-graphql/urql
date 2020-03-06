@@ -23,7 +23,7 @@ interface RetryExchangeOptions {
   maxDelayMs?: number;
   randomDelay?: boolean;
   maxNumberAttempts?: number;
-  // Optional function to determine whether an error should be retried
+  /** Conditionally determine whether an error should be retried */
   retryIf?: (e: CombinedError) => boolean;
 }
 
