@@ -7,8 +7,10 @@ import {
   valueFromASTUntyped,
   Kind,
 } from 'graphql';
-import { invariant, getName } from 'shared';
 
+import { getName } from './node';
+
+import { invariant } from '../helpers/help';
 import { Fragments, Variables } from '../types';
 
 const isFragmentNode = (node: DefinitionNode): node is FragmentDefinitionNode =>

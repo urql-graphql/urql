@@ -9,7 +9,7 @@ import {
   GraphQLUnionType,
 } from 'graphql';
 
-import { warn, invariant } from 'shared';
+import { warn, invariant } from '../helpers/help';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,

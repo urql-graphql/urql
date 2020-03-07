@@ -5,9 +5,8 @@ import {
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
-  warn,
-  pushDebugNode,
-} from 'shared';
+} from '../ast';
+import { warn, pushDebugNode } from '../helpers/help';
 
 import {
   getFragments,
