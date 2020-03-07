@@ -14,8 +14,8 @@ import {
   Kind,
   visit,
 } from 'graphql';
-import { getName, getSelectionSet, unwrapType } from './node';
-import { invariant, warn } from './help';
+import { getName, getSelectionSet, unwrapType } from './helpers/node';
+import { invariant, warn } from './helpers/help';
 
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
