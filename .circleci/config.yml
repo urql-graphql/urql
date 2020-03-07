@@ -78,10 +78,14 @@ jobs:
       - *yarn_cache
       - *yarn
       - run:
-          name: Deploy Staging Site
+          name: Build Staging Site
           command: |
             cd packages/site
             yarn run build --staging
+      - deploy:
+          name: Deploy Staging Site
+          command: |
+            cd packages/site
             node scripts/deploy/surge.js
 
   production_site:
@@ -94,10 +98,14 @@ jobs:
       - *yarn_cache
       - *yarn
       - run:
-          name: Deploy Production Site
+          name: Build Production Site
           command: |
             cd packages/site
             yarn run build
+      - deploy:
+          name: Deploy Production Site
+          command: |
+            cd packages/site
             node scripts/deploy/aws.js
 
 workflows:
