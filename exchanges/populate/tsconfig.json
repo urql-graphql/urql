@@ -7,8 +7,7 @@
     "paths": {
       "urql": ["../../node_modules/urql/src"],
       "*-urql": ["../../node_modules/*-urql/src"],
-      "@urql/*": ["../../node_modules/@urql/*/src"],
-      "shared": ["../../node_modules/shared/src"]
+      "@urql/*": ["../../node_modules/@urql/*/src"]
     }
   }
 }

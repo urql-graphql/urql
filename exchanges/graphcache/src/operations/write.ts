@@ -6,17 +6,18 @@ import {
   normalizeVariables,
   getFieldArguments,
   isFieldAvailableOnType,
-} from '../ast';
-import {
   getSelectionSet,
   getName,
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
+} from '../ast';
+
+import {
   invariant,
   warn,
   pushDebugNode,
-} from 'shared';
+} from '../helpers/help';
 
 import {
   NullArray,
