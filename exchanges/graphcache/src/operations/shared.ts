@@ -7,10 +7,7 @@ import {
   SelectionSet,
   isFieldNode,
 } from '../ast';
-import {
-  warn,
-  pushDebugNode,
-} from '../helpers/help';
+import { warn, pushDebugNode } from '../helpers/help';
 
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';

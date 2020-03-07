@@ -6,10 +6,7 @@ import {
   getFragmentTypeName,
   getFieldAlias,
 } from '../ast';
-import {
-  warn,
-  pushDebugNode,
-} from '../helpers/help';
+import { warn, pushDebugNode } from '../helpers/help';
 
 import {
   getFragments,

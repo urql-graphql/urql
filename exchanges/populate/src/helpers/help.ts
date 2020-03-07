@@ -32,7 +32,7 @@ export function invariant(
   code: ErrorCode
 ): asserts condition {
   if (!condition) {
-    let errorMessage = message || 'Minfied Error #' + code + '\n';
+    const errorMessage = message || 'Minfied Error #' + code + '\n';
 
     const error = new Error(errorMessage + helpUrl + code);
     error.name = 'Graphcache Error';

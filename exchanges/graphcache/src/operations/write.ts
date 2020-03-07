@@ -13,11 +13,7 @@ import {
   getFieldAlias,
 } from '../ast';
 
-import {
-  invariant,
-  warn,
-  pushDebugNode,
-} from '../helpers/help';
+import { invariant, warn, pushDebugNode } from '../helpers/help';
 
 import {
   NullArray,
