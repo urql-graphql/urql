@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.9.2
+
+### Patch Changes
+
+- Prevent active teardowns for queries on subscriptionExchange, by [@kitten](https://github.com/kitten) (See [#577](https://github.com/FormidableLabs/urql/pull/577))
+
 ## 1.9.1
 
 ### Patch Changes
