@@ -27,8 +27,7 @@ export type ErrorCode =
 
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 
-const helpUrl =
-  '\nhttps://github.com/FormidableLabs/urql/tree/master/exchanges/graphcache/help.md#';
+const helpUrl = '\nhttps://bit.ly/38yWDau#';
 const cache = new Set<string>();
 
 export const currentDebugStack: string[] = [];
