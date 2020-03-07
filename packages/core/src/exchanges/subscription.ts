@@ -85,10 +85,12 @@ export const subscriptionExchange = ({
           complete: () => {
             if (!isComplete) {
               isComplete = true;
-              client.reexecuteOperation({
-                ...operation,
-                operationName: 'teardown',
-              });
+              if (operation.operationName === 'subscription') {
+                client.reexecuteOperation({
+                  ...operation,
+                  operationName: 'teardown',
+                });
+              }
 
               complete();
             }
