@@ -136,6 +136,130 @@ it('updates related queries when their data changes', () => {
   expect(result).toHaveBeenCalledTimes(3);
 });
 
+it('updates related queries when a mutation update touches query data', () => {
+  jest.useFakeTimers();
+
+  const balanceFragment = gql`
+    fragment BalanceFragment on User {
+      id
+      balance {
+        amount
+      }
+    }
+  `;
+
+  const userQuery = gql`
+    query {
+      user {
+        id
+        ...BalanceFragment
+      }
+    }
+
+    ${balanceFragment}
+  `;
+
+  const userQueryData = {
+    __typename: 'Query',
+    user: {
+      __typename: 'User',
+      id: '1',
+      balance: {
+        __typename: 'Balance',
+        amount: 100,
+      },
+    },
+  };
+
+  const mutation = gql`
+    mutation($userId: ID!, $amount: Int!) {
+      updateBalance(userId: $userId, amount: $amount) {
+        userId
+        balance {
+          amount
+        }
+      }
+    }
+  `;
+
+  const mutationData = {
+    __typename: 'Mutation',
+    updateBalance: {
+      __typename: 'UpdateBalanceResult',
+      userId: '1',
+      balance: {
+        __typename: 'Balance',
+        amount: 200,
+      },
+    },
+  };
+
+  const client = createClient({ url: 'http://0.0.0.0' });
+  const { source: ops$, next } = makeSubject<Operation>();
+
+  const reexec = jest
+    .spyOn(client, 'reexecuteOperation')
+    .mockImplementation(next);
+
+  const opOne = client.createRequestOperation('query', {
+    key: 1,
+    query: userQuery,
+  });
+
+  const opMutation = client.createRequestOperation('mutation', {
+    key: 2,
+    query: mutation,
+    variables: { userId: '1', amount: 200 },
+  });
+
+  const response = jest.fn(
+    (forwardOp: Operation): OperationResult => {
+      if (forwardOp.key === 1) {
+        return { operation: opOne, data: userQueryData };
+      } else if (forwardOp.key === 2) {
+        return { operation: opMutation, data: mutationData };
+      }
+
+      return undefined as any;
+    }
+  );
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+  const updates = {
+    Mutation: {
+      updateBalance: jest.fn((result, _args, cache) => {
+        const {
+          updateBalance: { userId, balance },
+        } = result;
+        cache.writeFragment(balanceFragment, { id: userId, balance });
+      }),
+    },
+  };
+
+  const keys = {
+    Balance: () => null,
+  };
+
+  pipe(
+    cacheExchange({ updates, keys })({ forward, client })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(opOne);
+  jest.runAllTimers();
+  expect(response).toHaveBeenCalledTimes(1);
+
+  next(opMutation);
+  jest.runAllTimers();
+
+  expect(response).toHaveBeenCalledTimes(2);
+  expect(updates.Mutation.updateBalance).toHaveBeenCalledTimes(1);
+  expect(reexec).toHaveBeenCalledTimes(1);
+});
+
 it('does nothing when no related queries have changed', () => {
   const queryUnrelated = gql`
     {
