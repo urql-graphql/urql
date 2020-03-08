@@ -1,7 +1,7 @@
 {
   "name": "@urql/exchange-multipart-fetch",
   "version": "0.1.1",
-  "description": "An exchange that automaticcally populates the mutation selection body",
+  "description": "An exchange that allows regular fetch and will transition to multipart when files are included",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/FormidableLabs/urql/issues",
@@ -9,21 +9,21 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "exchanges/populate"
+    "directory": "exchanges/multipart-fetch"
   },
   "keywords": [
     "urql",
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-populate.cjs.js",
-  "module": "dist/urql-exchange-populate.esm.js",
+  "main": "dist/urql-exchange-multipart-fetch.cjs.js",
+  "module": "dist/urql-exchange-multipart-fetch.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-populate.esm.js",
-      "require": "dist/urql-exchange-populate.cjs.js",
+      "import": "dist/urql-exchange-multipart-fetch.esm.js",
+      "require": "dist/urql-exchange-multipart-fetch.cjs.js",
       "types": "dist/types/index.d.ts",
       "source": "src/index.ts"
     }

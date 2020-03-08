@@ -1,4 +1,4 @@
-# @urql/exchange-populate
+# @urql/exchange-multipart-fetch
 
 ## 0.1.0
 

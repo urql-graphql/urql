@@ -2,7 +2,13 @@
 import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { extractFiles } from 'extract-files';
-import { Exchange, Operation, OperationResult, makeResult, makeErrorResult } from '@urql/core';
+import {
+  Exchange,
+  Operation,
+  OperationResult,
+  makeResult,
+  makeErrorResult,
+} from '@urql/core';
 
 interface Body {
   query: string;
@@ -107,27 +113,27 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
     };
 
     if (isFileUpload) {
-      fetchOptions.body = new FormData()
+      fetchOptions.body = new FormData();
       fetchOptions.headers['content-type'] = 'multipart/form-data';
       fetchOptions.body.append(
         'operations',
         JSON.stringify({
           query: print(operation.query),
           variables: Object.assign({}, operation.variables),
-        }),
+        })
       );
 
-      const map = {}
-      let i = 0
+      const map = {};
+      let i = 0;
       files.forEach(paths => {
-        map[++i] = paths
+        map[++i] = paths;
       });
 
       fetchOptions.body.append('map', JSON.stringify(map));
 
-      i = 0
+      i = 0;
       files.forEach((_paths, file) => {
-        (fetchOptions.body as FormData).append(`${++i}`, file, file.name)
+        (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
       });
     } else if (shouldUseGet) {
       operation.context.url = convertToGet(operation.context.url, body);
