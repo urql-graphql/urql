@@ -214,6 +214,8 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    expect(data.optimisticOrder).toEqual([]);
   });
 
   it('creates optimistic layers that may be removed using clearLayer', () => {
@@ -239,6 +241,8 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+
+    expect(data.optimisticOrder).toEqual([]);
   });
 
   it('overrides data using optimistic layers', () => {
@@ -261,6 +265,8 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
+
+    expect(data.optimisticOrder).toEqual([3, 2, 1]);
   });
 
   it('avoids optimistic layers when only one layer is pending', () => {
@@ -277,6 +283,8 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+
+    expect(data.optimisticOrder).toEqual([]);
   });
 
   it('continues applying optimistic layers even if the first one completes', () => {
@@ -312,5 +320,7 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
+
+    expect(data.optimisticOrder).toEqual([]);
   });
 });

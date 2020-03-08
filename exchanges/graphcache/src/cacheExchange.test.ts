@@ -140,7 +140,7 @@ it('updates related queries when a mutation update touches query data', () => {
   jest.useFakeTimers();
 
   const balanceFragment = gql`
-    fragment BalanceFragment on User {
+    fragment BalanceFragment on Author {
       id
       balance {
         amount
@@ -148,10 +148,11 @@ it('updates related queries when a mutation update touches query data', () => {
     }
   `;
 
-  const userQuery = gql`
-    query {
-      user {
+  const queryById = gql`
+    query($id: ID!) {
+      author(id: $id) {
         id
+        name
         ...BalanceFragment
       }
     }
@@ -159,14 +160,28 @@ it('updates related queries when a mutation update touches query data', () => {
     ${balanceFragment}
   `;
 
-  const userQueryData = {
+  const queryByIdDataA = {
     __typename: 'Query',
-    user: {
-      __typename: 'User',
+    author: {
+      __typename: 'Author',
       id: '1',
+      name: 'Author 1',
       balance: {
         __typename: 'Balance',
         amount: 100,
+      },
+    },
+  };
+
+  const queryByIdDataB = {
+    __typename: 'Query',
+    author: {
+      __typename: 'Author',
+      id: '2',
+      name: 'Author 2',
+      balance: {
+        __typename: 'Balance',
+        amount: 200,
       },
     },
   };
@@ -189,7 +204,7 @@ it('updates related queries when a mutation update touches query data', () => {
       userId: '1',
       balance: {
         __typename: 'Balance',
-        amount: 200,
+        amount: 1000,
       },
     },
   };
@@ -203,20 +218,29 @@ it('updates related queries when a mutation update touches query data', () => {
 
   const opOne = client.createRequestOperation('query', {
     key: 1,
-    query: userQuery,
+    query: queryById,
+    variables: { id: 1 },
+  });
+
+  const opTwo = client.createRequestOperation('query', {
+    key: 2,
+    query: queryById,
+    variables: { id: 2 },
   });
 
   const opMutation = client.createRequestOperation('mutation', {
-    key: 2,
+    key: 3,
     query: mutation,
-    variables: { userId: '1', amount: 200 },
+    variables: { userId: '1', amount: 1000 },
   });
 
   const response = jest.fn(
     (forwardOp: Operation): OperationResult => {
       if (forwardOp.key === 1) {
-        return { operation: opOne, data: userQueryData };
+        return { operation: opOne, data: queryByIdDataA };
       } else if (forwardOp.key === 2) {
+        return { operation: opTwo, data: queryByIdDataB };
+      } else if (forwardOp.key === 3) {
         return { operation: opMutation, data: mutationData };
       }
 
@@ -248,16 +272,27 @@ it('updates related queries when a mutation update touches query data', () => {
     publish
   );
 
-  next(opOne);
+  next(opTwo);
   jest.runAllTimers();
   expect(response).toHaveBeenCalledTimes(1);
+
+  next(opOne);
+  jest.runAllTimers();
+  expect(response).toHaveBeenCalledTimes(2);
 
   next(opMutation);
   jest.runAllTimers();
 
-  expect(response).toHaveBeenCalledTimes(2);
+  expect(response).toHaveBeenCalledTimes(3);
   expect(updates.Mutation.updateBalance).toHaveBeenCalledTimes(1);
+
   expect(reexec).toHaveBeenCalledTimes(1);
+  expect(reexec.mock.calls[0][0].key).toBe(1);
+
+  expect(result.mock.calls[2][0]).toHaveProperty(
+    'data.author.balance.amount',
+    1000
+  );
 });
 
 it('does nothing when no related queries have changed', () => {
