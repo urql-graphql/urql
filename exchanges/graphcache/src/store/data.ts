@@ -100,16 +100,15 @@ export const clearDataState = () => {
     const commutativeIndex =
       data.optimisticOrder.length - data.commutativeKeys.size;
 
-    // Find `i` to be the lowest commutative layer that can be squashed
+    // Squash all layers in reverse order (low priority upwards) that have
+    // been written already
     let i = data.optimisticOrder.length;
     while (--i >= commutativeIndex) {
-      if (!data.refLock[data.optimisticOrder[i]]) break;
-    }
-
-    // Squash all layers down to `i`, in order
-    let j = data.optimisticOrder.length;
-    while (--j > i) {
-      squashLayer(data.optimisticOrder[j]);
+      if (data.refLock[data.optimisticOrder[i]]) {
+        squashLayer(data.optimisticOrder[i]);
+      } else {
+        break;
+      }
     }
   }
 
