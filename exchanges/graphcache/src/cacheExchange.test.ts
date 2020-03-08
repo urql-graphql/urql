@@ -10,6 +10,7 @@ import {
   pipe,
   map,
   mergeMap,
+  filter,
   fromValue,
   makeSubject,
   tap,
@@ -1043,16 +1044,21 @@ it('applies results that come in out-of-order commutatively and consistently', (
     data = result.data;
   });
 
-  pipe(
-    cacheExchange()({ forward: ops$ => pipe(ops$, mergeMap(result)), client })(
-      ops$
-    ),
-    tap(output),
-    publish
-  );
+  const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+    pipe(
+      ops$,
+      filter(op => op.operationName !== 'teardown'),
+      mergeMap(result)
+    );
+
+  pipe(cacheExchange()({ forward, client })(ops$), tap(output), publish);
 
   next(client.createRequestOperation('query', { key: 1, query }));
   next(client.createRequestOperation('query', { key: 2, query }));
+
+  // This shouldn't have any effect:
+  next(client.createRequestOperation('teardown', { key: 2, query }));
+
   next(client.createRequestOperation('query', { key: 3, query }));
 
   jest.advanceTimersByTime(5);

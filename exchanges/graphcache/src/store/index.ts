@@ -1,6 +1,7 @@
 export {
   initDataState,
   clearDataState,
+  noopDataState,
   reserveLayer,
   clearLayer,
   getCurrentDependencies,

@@ -323,4 +323,15 @@ describe('commutative changes', () => {
 
     expect(data.optimisticOrder).toEqual([]);
   });
+
+  it('allows noopDataState to clear layers only if necessary', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.noopDataState(data, 2);
+    expect(data.optimisticOrder).toEqual([2, 1]);
+
+    InMemoryData.noopDataState(data, 1);
+    expect(data.optimisticOrder).toEqual([]);
+  });
 });

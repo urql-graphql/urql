@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, clearLayer, reserveLayer } from './store';
+import { Store, noopDataState, clearLayer, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -174,7 +174,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     if (operation.operationName === 'query') {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
-      clearLayer(store.data, operation.key);
+      noopDataState(store.data, operation.key);
     }
   };
 
