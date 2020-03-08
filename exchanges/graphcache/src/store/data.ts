@@ -93,28 +93,23 @@ export const clearDataState = () => {
   const optimisticKey = currentOptimisticKey;
   currentOptimisticKey = null;
 
+  // Determine whether the current operation has been a commutative layer
   if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
+    // Find the lowest index of the commutative layers
+    // The first part of `optimisticOrder` are the non-commutative layers
     const commutativeIndex =
       data.optimisticOrder.length - data.commutativeKeys.size;
-    const blockingKey = data.optimisticOrder[data.optimisticOrder.length - 1];
-    // If this is a Query operation that is in the list of commutative keys
-    // and is the "first" one and hence blocking all others, we squash all
-    // results and empty the list of commutative keys
-    if (blockingKey === optimisticKey) {
-      const squash: number[] = [];
-      const orderSize = data.optimisticOrder.length;
-      // Collect all completed, commutative layers until and excluding the first
-      // pending one that overrides the others
-      for (let i = commutativeIndex; i < orderSize; i++) {
-        const layerKey = data.optimisticOrder[i];
-        if (!data.refLock[layerKey]) break;
-        squash.unshift(layerKey);
-      }
 
-      // Apply all completed, commutative layers
-      for (let i = 0, l = squash.length; i < l; i++) {
-        squashLayer(squash[i]);
-      }
+    // Find `i` to be the lowest commutative layer that can be squashed
+    let i = data.optimisticOrder.length;
+    while (--i >= commutativeIndex) {
+      if (!data.refLock[data.optimisticOrder[i]]) break;
+    }
+
+    // Squash all layers down to `i`, in order
+    let j = data.optimisticOrder.length;
+    while (--j > i) {
+      squashLayer(data.optimisticOrder[j]);
     }
   }
 

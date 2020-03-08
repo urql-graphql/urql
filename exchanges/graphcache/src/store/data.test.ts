@@ -287,7 +287,7 @@ describe('commutative changes', () => {
     expect(data.optimisticOrder).toEqual([]);
   });
 
-  it('continues applying optimistic layers even if the first one completes', () => {
+  it.only('continues applying optimistic layers even if the first one completes', () => {
     InMemoryData.reserveLayer(data, 1);
     InMemoryData.reserveLayer(data, 2);
     InMemoryData.reserveLayer(data, 3);
