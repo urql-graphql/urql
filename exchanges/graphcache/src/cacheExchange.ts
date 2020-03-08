@@ -265,6 +265,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       } else {
         data = query(store, operation, data).data;
       }
+    } else {
+      noopDataState(store.data, operation.key);
     }
 
     // Collect all write dependencies and query dependencies for queries
