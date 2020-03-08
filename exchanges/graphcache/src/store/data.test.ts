@@ -329,7 +329,9 @@ describe('commutative changes', () => {
     InMemoryData.reserveLayer(data, 2);
 
     InMemoryData.noopDataState(data, 2);
-
     expect(data.optimisticOrder).toEqual([2, 1]);
+
+    InMemoryData.noopDataState(data, 1);
+    expect(data.optimisticOrder).toEqual([]);
   });
 });
