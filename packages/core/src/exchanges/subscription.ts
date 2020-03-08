@@ -55,11 +55,14 @@ export interface SubscriptionExchangeOpts {
 
   /** This flag may be turned on to allow your subscriptions-transport to handle all operation types */
   enableAllOperations?: boolean;
+
+  skipOperation?: (operation: Operation) => boolean;
 }
 
 export const subscriptionExchange = ({
   forwardSubscription,
   enableAllOperations,
+  skipOperation,
 }: SubscriptionExchangeOpts): Exchange => ({ client, forward }) => {
   const createSubscriptionSource = (
     operation: Operation
@@ -110,7 +113,9 @@ export const subscriptionExchange = ({
     return (
       operationName === 'subscription' ||
       (!!enableAllOperations &&
-        (operationName === 'query' || operationName === 'mutation'))
+        (operationName === 'query' || operationName === 'mutation') &&
+        // When we have no skipOperation or skipOperation returns true we should not use this exchange
+        (!skipOperation || !skipOperation(operation)))
     );
   };
 
