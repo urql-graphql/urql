@@ -76,7 +76,7 @@ export function withUrqlClient(
       // getInitialProps runs on the server for initial render, and on the client for navigation.
       // We only want to run the prepass step on the server.
       if (typeof window !== 'undefined') {
-        return pageProps;
+        return { ...pageProps, urqlClient };
       }
 
       const props = { ...pageProps, urqlClient };
