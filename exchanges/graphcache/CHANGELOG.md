@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 2.2.2
+
+### Patch Changes
+
+- ⚠️ Fix commutative layer edge case when lowest-priority layer comes back earlier than others, by [@kitten](https://github.com/kitten) (See [#587](https://github.com/FormidableLabs/urql/pull/587))
+- Externalise @urql/exchange-populate from bundle, by [@kitten](https://github.com/kitten) (See [#590](https://github.com/FormidableLabs/urql/pull/590))
+- ⚠️ Fix teardown events leading to broken commutativity, by [@kitten](https://github.com/kitten) (See [#588](https://github.com/FormidableLabs/urql/pull/588))
+
 ## 2.2.1
 
 ### Patch Changes
