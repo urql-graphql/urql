@@ -82,7 +82,6 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
 
     const { context } = operation;
     const { files } = extractFiles(operation.variables);
-    const isFileUpload = !!files.size;
 
     const extraOptions =
       typeof context.fetchOptions === 'function'
@@ -111,27 +110,23 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
         abortController !== undefined ? abortController.signal : undefined,
     };
 
-    if (isFileUpload) {
+    if (!!files.size) {
       fetchOptions.body = new FormData();
-      fetchOptions.headers['content-type'] = 'multipart/form-data';
-      fetchOptions.body.append(
-        'operations',
-        JSON.stringify({
-          query: print(operation.query),
-          variables: Object.assign({}, operation.variables),
-        })
-      );
+      fetchOptions.method = 'POST';
+      // Make fetch auto-append this for correctness
+      delete fetchOptions.headers['content-type'];
+
+      fetchOptions.body.append('operations', JSON.stringify(body));
 
       const map = {};
       let i = 0;
       files.forEach(paths => {
-        map[++i] = paths;
+        map[++i] = paths.map(path => `variables.${path}`);
       });
-
       fetchOptions.body.append('map', JSON.stringify(map));
 
       i = 0;
-      files.forEach((_paths, file) => {
+      files.forEach((_, file) => {
         (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
       });
     } else if (shouldUseGet) {

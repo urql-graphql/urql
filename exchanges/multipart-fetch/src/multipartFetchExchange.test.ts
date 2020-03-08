@@ -67,9 +67,7 @@ describe('on success', () => {
 
     expect(data).toMatchSnapshot();
     expect(fetchOptions).toHaveBeenCalled();
-    expect(fetch.mock.calls[0][1].headers).toEqual({
-      'content-type': 'multipart/form-data',
-    });
+    expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
     expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
   });
 

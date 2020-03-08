@@ -530,4 +530,6 @@ Object {
 }
 `;
 
-exports[`on success uses a file when given 2`] = `FormData {}`;
+exports[`on success uses a file when given 2`] = `Object {}`;
+
+exports[`on success uses a file when given 3`] = `FormData {}`;
