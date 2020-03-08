@@ -5,7 +5,8 @@
     "packages/preact-urql",
     "packages/svelte-urql",
     "exchanges/graphcache",
-    "exchanges/suspense"
+    "exchanges/suspense",
+    "exchanges/multipart-fetch"
   ],
   "sandboxes": ["urql-issue-template-client-iui0o"],
   "buildCommand": "build",
