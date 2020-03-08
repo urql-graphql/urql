@@ -287,7 +287,7 @@ describe('commutative changes', () => {
     expect(data.optimisticOrder).toEqual([]);
   });
 
-  it.only('continues applying optimistic layers even if the first one completes', () => {
+  it('continues applying optimistic layers even if the first one completes', () => {
     InMemoryData.reserveLayer(data, 1);
     InMemoryData.reserveLayer(data, 2);
     InMemoryData.reserveLayer(data, 3);
@@ -322,5 +322,14 @@ describe('commutative changes', () => {
     expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
 
     expect(data.optimisticOrder).toEqual([]);
+  });
+
+  it('allows noopDataState to clear layers only if necessary', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.noopDataState(data, 2);
+
+    expect(data.optimisticOrder).toEqual([2, 1]);
   });
 });

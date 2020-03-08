@@ -135,6 +135,12 @@ export const clearDataState = () => {
   }
 };
 
+/** Initialises then resets the data state, which may squash this layer if necessary */
+export const noopDataState = (data: InMemoryData, layerKey: number | null) => {
+  initDataState(data, layerKey);
+  clearDataState();
+};
+
 /** As we're writing, we keep around all the records and links we've read or have written to */
 export const getCurrentDependencies = (): Set<string> => {
   invariant(
