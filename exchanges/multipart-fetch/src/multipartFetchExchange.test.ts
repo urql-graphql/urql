@@ -1,10 +1,10 @@
 import { Client, OperationResult, OperationType } from '@urql/core';
-import { queryOperation } from '@urql/core/src/test-utils';
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 import gql from 'graphql-tag';
 import { print } from 'graphql';
 
 import { multipartFetchExchange, convertToGet } from './multipartFetchExchange';
+import { uploadOperation, queryOperation } from './utils';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -48,6 +48,29 @@ describe('on success', () => {
       status: 200,
       json: jest.fn().mockResolvedValue(response),
     });
+  });
+
+  it('uses a file when given', async () => {
+    const fetchOptions = jest.fn().mockReturnValue({});
+
+    const data = await pipe(
+      fromValue({
+        ...uploadOperation,
+        context: {
+          ...uploadOperation.context,
+          fetchOptions,
+        },
+      }),
+      multipartFetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(fetchOptions).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][1].headers).toEqual({
+      'content-type': 'multipart/form-data',
+    });
+    expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
   });
 
   it('returns response data', async () => {
