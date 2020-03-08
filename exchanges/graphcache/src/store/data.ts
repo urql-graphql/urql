@@ -490,8 +490,8 @@ export const clearLayer = (data: InMemoryData, layerKey: number) => {
 /** Merges an optimistic layer of links and records into the base data */
 const squashLayer = (layerKey: number) => {
   // Hide current dependencies from squashing operations
-  // const prevDependencies = currentDependencies;
-  // currentDependencies = new Set();
+  const prevDependencies = currentDependencies;
+  currentDependencies = new Set();
 
   const links = currentData!.links.optimistic[layerKey];
   if (links) {
@@ -509,7 +509,7 @@ const squashLayer = (layerKey: number) => {
     });
   }
 
-  // currentDependencies = prevDependencies;
+  currentDependencies = prevDependencies;
   clearLayer(currentData!, layerKey);
 };
 
