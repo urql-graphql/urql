@@ -93,27 +93,21 @@ export const clearDataState = () => {
   const optimisticKey = currentOptimisticKey;
   currentOptimisticKey = null;
 
+  // Determine whether the current operation has been a commutative layer
   if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
+    // Find the lowest index of the commutative layers
+    // The first part of `optimisticOrder` are the non-commutative layers
     const commutativeIndex =
       data.optimisticOrder.length - data.commutativeKeys.size;
-    const blockingKey = data.optimisticOrder[data.optimisticOrder.length - 1];
-    // If this is a Query operation that is in the list of commutative keys
-    // and is the "first" one and hence blocking all others, we squash all
-    // results and empty the list of commutative keys
-    if (blockingKey === optimisticKey) {
-      const squash: number[] = [];
-      const orderSize = data.optimisticOrder.length;
-      // Collect all completed, commutative layers until and excluding the first
-      // pending one that overrides the others
-      for (let i = commutativeIndex; i < orderSize; i++) {
-        const layerKey = data.optimisticOrder[i];
-        if (!data.refLock[layerKey]) break;
-        squash.unshift(layerKey);
-      }
 
-      // Apply all completed, commutative layers
-      for (let i = 0, l = squash.length; i < l; i++) {
-        squashLayer(squash[i]);
+    // Squash all layers in reverse order (low priority upwards) that have
+    // been written already
+    let i = data.optimisticOrder.length;
+    while (--i >= commutativeIndex) {
+      if (data.refLock[data.optimisticOrder[i]]) {
+        squashLayer(data.optimisticOrder[i]);
+      } else {
+        break;
       }
     }
   }
@@ -494,6 +488,10 @@ export const clearLayer = (data: InMemoryData, layerKey: number) => {
 
 /** Merges an optimistic layer of links and records into the base data */
 const squashLayer = (layerKey: number) => {
+  // Hide current dependencies from squashing operations
+  const prevDependencies = currentDependencies;
+  currentDependencies = new Set();
+
   const links = currentData!.links.optimistic[layerKey];
   if (links) {
     links.forEach((keyMap, entityKey) => {
@@ -510,6 +508,7 @@ const squashLayer = (layerKey: number) => {
     });
   }
 
+  currentDependencies = prevDependencies;
   clearLayer(currentData!, layerKey);
 };
 
