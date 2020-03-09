@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useBasepath } from 'react-static';
 
 import formidableLogo from '../../assets/logos/logo-formidable.svg';
 
@@ -53,13 +54,15 @@ const FormidableLogo = styled.img.attrs(() => ({
 `;
 
 const Header = () => {
+  const basepath = useBasepath() || '';
+
   return (
     <Fixed>
       <Wrapper>
         <BlockLink href="https://formidable.com/">
           <FormidableLogo />
         </BlockLink>
-        <ProjectWording to="/">urql</ProjectWording>
+        <ProjectWording to={`/${basepath}/`}>urql</ProjectWording>
       </Wrapper>
     </Fixed>
   );
