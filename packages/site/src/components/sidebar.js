@@ -48,9 +48,13 @@ const relative = (from, to) => {
 };
 
 const Sidebar = ({ sidebarOpen }) => {
-  const { pathname } = useLocation();
+  const location = useLocation();
   const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
+
+  const pathname = location.pathname.endsWith('/')
+    ? currentPage.path + '/'
+    : currentPage.path;
 
   const sidebarItems = useMemo(() => {
     if (!currentPage || !tree || !tree.children) {
