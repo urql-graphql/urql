@@ -15,43 +15,41 @@ interface Body {
   operationName?: string;
 }
 
-export const multipartFetchExchange: Exchange = ({ forward }) => {
-  const isOperationFetchable = (operation: Operation) => {
-    const { operationName } = operation;
-    return operationName === 'query' || operationName === 'mutation';
-  };
+const isOperationFetchable = (operation: Operation) =>
+  operation.operationName === 'query' || operation.operationName === 'mutation';
 
-  return ops$ => {
-    const sharedOps$ = share(ops$);
-    const fetchResults$ = pipe(
-      sharedOps$,
-      filter(isOperationFetchable),
-      mergeMap(operation => {
-        const { key } = operation;
-        const teardown$ = pipe(
-          sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
-        );
+export const multipartFetchExchange: Exchange = ({ forward }) => ops$ => {
+  const sharedOps$ = share(ops$);
 
-        return pipe(
-          createFetchSource(
-            operation,
-            operation.operationName === 'query' &&
-              !!operation.context.preferGetMethod
-          ),
-          takeUntil(teardown$)
-        );
-      })
-    );
+  const fetchResults$ = pipe(
+    sharedOps$,
+    filter(isOperationFetchable),
+    mergeMap(operation => {
+      const teardown$ = pipe(
+        sharedOps$,
+        filter(
+          op => op.operationName === 'teardown' && op.key === operation.key
+        )
+      );
 
-    const forward$ = pipe(
-      sharedOps$,
-      filter(op => !isOperationFetchable(op)),
-      forward
-    );
+      return pipe(
+        createFetchSource(
+          operation,
+          operation.operationName === 'query' &&
+            !!operation.context.preferGetMethod
+        ),
+        takeUntil(teardown$)
+      );
+    })
+  );
 
-    return merge([fetchResults$, forward$]);
-  };
+  const forward$ = pipe(
+    sharedOps$,
+    filter(op => !isOperationFetchable(op)),
+    forward
+  );
+
+  return merge([fetchResults$, forward$]);
 };
 
 const getOperationName = (query: DocumentNode): string | null => {
