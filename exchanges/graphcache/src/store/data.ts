@@ -103,13 +103,8 @@ export const clearDataState = () => {
     // Squash all layers in reverse order (low priority upwards) that have
     // been written already
     let i = data.optimisticOrder.length;
-    while (--i >= commutativeIndex) {
-      if (data.refLock[data.optimisticOrder[i]]) {
-        squashLayer(data.optimisticOrder[i]);
-      } else {
-        break;
-      }
-    }
+    while (--i >= commutativeIndex && data.refLock[data.optimisticOrder[i]])
+      squashLayer(data.optimisticOrder[i]);
   }
 
   currentData = null;
