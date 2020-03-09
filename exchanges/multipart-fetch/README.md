@@ -13,7 +13,8 @@ yarn add @urql/exchange-multipart-fetch
 npm install --save @urql/exchange-multipart-fetch
 ```
 
-You'll then need to add the `multipartFetchExchange`, that this package exposes.
+You'll then need to add the `multipartFetchExchange` method, that this package exposes,
+to your `exchanges`.
 
 ```js
 import { createClient, dedupExchange, cacheExchange } from 'urql';
@@ -21,12 +22,8 @@ import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
-  exchanges: [
-    dedupExchange,
-    cacheExchange,
-    multipartFetchExchange,
-  ],
+  exchanges: [dedupExchange, cacheExchange, multipartFetchExchange],
 });
 ```
 
-now we can start uploading files to our server!
+Now we can start uploading files to our server!
