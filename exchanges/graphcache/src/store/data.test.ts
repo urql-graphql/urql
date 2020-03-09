@@ -231,6 +231,7 @@ describe('commutative changes', () => {
 
     // Actively clearing out layer 2
     InMemoryData.clearLayer(data, 2);
+    InMemoryData.noopDataState(data, 2);
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(undefined);

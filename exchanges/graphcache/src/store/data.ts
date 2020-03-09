@@ -60,7 +60,7 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
 export const initDataState = (
   data: InMemoryData,
   layerKey: number | null,
-  forceOptimistic?: boolean
+  isOptimistic?: boolean
 ) => {
   currentData = data;
   currentDependencies = new Set();
@@ -71,9 +71,17 @@ export const initDataState = (
   if (!layerKey) {
     currentOptimisticKey = null;
   } else if (
-    forceOptimistic ||
-    (data.commutativeKeys.size > 1 && data.commutativeKeys.has(layerKey))
+    isOptimistic ||
+    (data.optimisticOrder.length > 1 &&
+      data.optimisticOrder.indexOf(layerKey) > -1)
   ) {
+    // If this operation isn't optimistic and we see it for the first time,
+    // then it must've been optimistic in the past, so we can proactively
+    // clear the optimistic data before writing
+    if (!isOptimistic && !data.commutativeKeys.has(layerKey)) {
+      clearLayer(data, layerKey);
+      data.commutativeKeys.add(layerKey);
+    }
     // An optimistic update of a mutation may force an optimistic layer,
     // or this Query update may be applied optimistically since it's part
     // of a commutate chain
@@ -83,18 +91,18 @@ export const initDataState = (
     // Otherwise we don't create an optimistic layer and clear the
     // operation's one if it already exists
     currentOptimisticKey = null;
-    clearLayer(data, layerKey);
+    deleteLayer(data, layerKey);
   }
 };
 
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
   const data = currentData!;
-  const optimisticKey = currentOptimisticKey;
+  const layerKey = currentOptimisticKey;
   currentOptimisticKey = null;
 
   // Determine whether the current operation has been a commutative layer
-  if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
+  if (layerKey && data.optimisticOrder.indexOf(layerKey) > -1) {
     // Find the lowest index of the commutative layers
     // The first part of `optimisticOrder` are the non-commutative layers
     const commutativeIndex =
@@ -103,8 +111,12 @@ export const clearDataState = () => {
     // Squash all layers in reverse order (low priority upwards) that have
     // been written already
     let i = data.optimisticOrder.length;
-    while (--i >= commutativeIndex && data.refLock[data.optimisticOrder[i]])
-      squashLayer(data.optimisticOrder[i]);
+    while (--i >= commutativeIndex && data.refLock[data.optimisticOrder[i]]) {
+      // We ignore optimistic layers here
+      if (data.commutativeKeys.has(data.optimisticOrder[i])) {
+        squashLayer(data.optimisticOrder[i]);
+      }
+    }
   }
 
   currentData = null;
@@ -131,8 +143,12 @@ export const clearDataState = () => {
 };
 
 /** Initialises then resets the data state, which may squash this layer if necessary */
-export const noopDataState = (data: InMemoryData, layerKey: number | null) => {
-  initDataState(data, layerKey);
+export const noopDataState = (
+  data: InMemoryData,
+  layerKey: number | null,
+  isOptimistic?: boolean
+) => {
+  initDataState(data, layerKey, isOptimistic);
   clearDataState();
 };
 
@@ -304,8 +320,8 @@ export const gc = (data: InMemoryData) => {
     const rc = data.refCount[entityKey] || 0;
     if (rc <= 0) {
       // Each optimistic layer may also still contain some references to marked entities
-      for (const optimisticKey in data.refLock) {
-        const refCount = data.refLock[optimisticKey];
+      for (const layerKey in data.refLock) {
+        const refCount = data.refLock[layerKey];
         const locks = refCount[entityKey] || 0;
         // If the optimistic layer has any references to the entity, don't GC it,
         // otherwise delete the reference count from the optimistic layer
@@ -450,11 +466,7 @@ export const reserveLayer = (data: InMemoryData, layerKey: number) => {
   if (!data.commutativeKeys.has(layerKey)) {
     // The new layer needs to be reserved in front of all other commutative
     // keys but after all non-commutative keys (which are added by `forceUpdate`)
-    data.optimisticOrder.splice(
-      data.optimisticOrder.length - data.commutativeKeys.size,
-      0,
-      layerKey
-    );
+    data.optimisticOrder.unshift(layerKey);
     data.commutativeKeys.add(layerKey);
   }
 };
@@ -472,19 +484,24 @@ const createLayer = (data: InMemoryData, layerKey: number) => {
   }
 };
 
-/** Removes an optimistic layer of links and records */
+/** Clears all links and records of an optimistic layer */
 export const clearLayer = (data: InMemoryData, layerKey: number) => {
+  if (data.refLock[layerKey]) {
+    delete data.refLock[layerKey];
+    delete data.records.optimistic[layerKey];
+    delete data.links.optimistic[layerKey];
+  }
+};
+
+/** Deletes links and records of an optimistic layer, and the layer itself */
+const deleteLayer = (data: InMemoryData, layerKey: number) => {
   const index = data.optimisticOrder.indexOf(layerKey);
   if (index > -1) {
     data.optimisticOrder.splice(index, 1);
     data.commutativeKeys.delete(layerKey);
   }
 
-  if (data.refLock[layerKey]) {
-    delete data.refLock[layerKey];
-    delete data.records.optimistic[layerKey];
-    delete data.links.optimistic[layerKey];
-  }
+  clearLayer(data, layerKey);
 };
 
 /** Merges an optimistic layer of links and records into the base data */
@@ -510,7 +527,7 @@ const squashLayer = (layerKey: number) => {
   }
 
   currentDependencies = prevDependencies;
-  clearLayer(currentData!, layerKey);
+  deleteLayer(currentData!, layerKey);
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */

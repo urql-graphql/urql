@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, noopDataState, clearLayer, reserveLayer } from './store';
+import { Store, noopDataState, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -171,7 +171,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This registers queries with the data layer to ensure commutativity
   const prepareCacheForResult = (operation: Operation) => {
-    if (operation.operationName === 'query') {
+    if (isQueryOperation(operation)) {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
@@ -180,8 +180,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This executes an optimistic update for mutations and registers it if necessary
   const optimisticUpdate = (operation: Operation) => {
+    const { key } = operation;
     if (isOptimisticMutation(operation)) {
-      const { key } = operation;
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
         optimisticKeysToDependencies.set(key, dependencies);
@@ -189,6 +189,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
       }
+    } else {
+      noopDataState(store.data, key, true);
     }
   };
 
@@ -250,7 +252,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
-      clearLayer(store.data, key);
     }
 
     let writeDependencies: Set<string> | void;
