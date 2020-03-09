@@ -533,3 +533,132 @@ Object {
 exports[`on success uses a file when given 2`] = `Object {}`;
 
 exports[`on success uses a file when given 3`] = `FormData {}`;
+
+exports[`on success uses multiple files when given 1`] = `
+Object {
+  "data": Object {
+    "data": Object {
+      "user": 1200,
+    },
+  },
+  "error": undefined,
+  "extensions": undefined,
+  "operation": Object {
+    "context": Object {
+      "fetchOptions": [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+        "results": Array [
+          Object {
+            "type": "return",
+            "value": Object {},
+          },
+        ],
+      },
+      "requestPolicy": "cache-first",
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": 3,
+    "operationName": "mutation",
+    "query": Object {
+      "definitions": Array [
+        Object {
+          "directives": Array [],
+          "kind": "OperationDefinition",
+          "name": Object {
+            "kind": "Name",
+            "value": "uploadProfilePictures",
+          },
+          "operation": "mutation",
+          "selectionSet": Object {
+            "kind": "SelectionSet",
+            "selections": Array [
+              Object {
+                "alias": undefined,
+                "arguments": Array [
+                  Object {
+                    "kind": "Argument",
+                    "name": Object {
+                      "kind": "Name",
+                      "value": "pictures",
+                    },
+                    "value": Object {
+                      "kind": "Variable",
+                      "name": Object {
+                        "kind": "Name",
+                        "value": "pictures",
+                      },
+                    },
+                  },
+                ],
+                "directives": Array [],
+                "kind": "Field",
+                "name": Object {
+                  "kind": "Name",
+                  "value": "uploadProfilePicture",
+                },
+                "selectionSet": Object {
+                  "kind": "SelectionSet",
+                  "selections": Array [
+                    Object {
+                      "alias": undefined,
+                      "arguments": Array [],
+                      "directives": Array [],
+                      "kind": "Field",
+                      "name": Object {
+                        "kind": "Name",
+                        "value": "location",
+                      },
+                      "selectionSet": undefined,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+          "variableDefinitions": Array [
+            Object {
+              "defaultValue": undefined,
+              "directives": Array [],
+              "kind": "VariableDefinition",
+              "type": Object {
+                "kind": "ListType",
+                "type": Object {
+                  "kind": "NamedType",
+                  "name": Object {
+                    "kind": "Name",
+                    "value": "File",
+                  },
+                },
+              },
+              "variable": Object {
+                "kind": "Variable",
+                "name": Object {
+                  "kind": "Name",
+                  "value": "pictures",
+                },
+              },
+            },
+          ],
+        },
+      ],
+      "kind": "Document",
+      "loc": Object {
+        "end": 140,
+        "start": 0,
+      },
+    },
+    "variables": Object {
+      "picture": Array [
+        File {},
+        File {},
+      ],
+    },
+  },
+}
+`;
+
+exports[`on success uses multiple files when given 2`] = `Object {}`;
+
+exports[`on success uses multiple files when given 3`] = `FormData {}`;

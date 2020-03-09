@@ -25,7 +25,12 @@ const queryGql: GraphQLRequest = {
   },
 };
 
-const file = new File(['foo'], 'index.ts');
+const obj = { hello: 'world' };
+const file = new File(
+  [new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })],
+  'index.ts'
+);
+const files = [file, file];
 
 const upload: GraphQLRequest = {
   key: 3,
@@ -41,8 +46,28 @@ const upload: GraphQLRequest = {
   },
 };
 
+const uploads: GraphQLRequest = {
+  key: 3,
+  query: gql`
+    mutation uploadProfilePictures($pictures: [File]) {
+      uploadProfilePicture(pictures: $pictures) {
+        location
+      }
+    }
+  `,
+  variables: {
+    picture: files,
+  },
+};
+
 export const uploadOperation: Operation = {
   ...upload,
+  operationName: 'mutation',
+  context,
+};
+
+export const multipleUploadOperation: Operation = {
+  ...uploads,
   operationName: 'mutation',
   context,
 };

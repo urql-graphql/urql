@@ -59,7 +59,7 @@ const getOperationName = (query: DocumentNode): string | null => {
     }
   );
 
-  return node !== undefined && node.name ? node.name.value : null;
+  return node && node.name ? node.name.value : null;
 };
 
 const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {

@@ -4,7 +4,11 @@ import gql from 'graphql-tag';
 import { print } from 'graphql';
 
 import { multipartFetchExchange, convertToGet } from './multipartFetchExchange';
-import { uploadOperation, queryOperation } from './utils';
+import {
+  uploadOperation,
+  queryOperation,
+  multipleUploadOperation,
+} from './test-utils';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -58,6 +62,27 @@ describe('on success', () => {
         ...uploadOperation,
         context: {
           ...uploadOperation.context,
+          fetchOptions,
+        },
+      }),
+      multipartFetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(fetchOptions).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+  });
+
+  it('uses multiple files when given', async () => {
+    const fetchOptions = jest.fn().mockReturnValue({});
+
+    const data = await pipe(
+      fromValue({
+        ...multipleUploadOperation,
+        context: {
+          ...multipleUploadOperation.context,
           fetchOptions,
         },
       }),
