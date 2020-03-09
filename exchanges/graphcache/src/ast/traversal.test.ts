@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import { getSelectionSet } from './node';
+
 import { getMainOperation, shouldInclude } from './traversal';
 
 describe('getMainOperation', () => {

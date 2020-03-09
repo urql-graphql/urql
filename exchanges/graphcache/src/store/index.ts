@@ -1,7 +1,9 @@
 export {
   initDataState,
   clearDataState,
-  clearOptimistic,
+  noopDataState,
+  reserveLayer,
+  clearLayer,
   getCurrentDependencies,
 } from './data';
 

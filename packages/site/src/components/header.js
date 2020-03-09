@@ -32,12 +32,12 @@ const HeaderContainer = styled.a`
   width: 12rem;
   flex-direction: column;
   color: #ffffff;
-  p {
-  }
+  text-decoration: none;
 `;
 
 const HeaderText = styled.p`
   text-transform: uppercase;
+  font-size: 1.5rem;
   margin-left: 14px;
   line-height: 1.9rem;
   margin-bottom: 0;

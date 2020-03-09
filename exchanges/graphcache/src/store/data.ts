@@ -18,19 +18,32 @@ type OptimisticMap<T> = Record<number, T>;
 interface NodeMap<T> {
   optimistic: OptimisticMap<KeyMap<Dict<T | undefined>>>;
   base: KeyMap<Dict<T>>;
-  keys: number[];
 }
 
 export interface InMemoryData {
+  /** Ensure persistence is never scheduled twice at a time */
   persistenceScheduled: boolean;
+  /** Batches changes to the data layer that'll be written to `storage` */
   persistenceBatch: SerializedEntries;
+  /** Ensure garbage collection is never scheduled twice at a time */
   gcScheduled: boolean;
+  /** A list of entities that have been flagged for gargabe collection since no references to them are left */
   gcBatch: Set<string>;
+  /** The API's "Query" typename which is needed to filter dependencies */
   queryRootKey: string;
+  /** Number of references to each entity (except "Query") */
   refCount: Dict<number>;
+  /** Number of references to each entity on optimistic layers */
   refLock: OptimisticMap<Dict<number>>;
+  /** A map of entity fields (key-value entries per entity) */
   records: NodeMap<EntityField>;
+  /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  /** A set of Query operation keys that are in-flight and awaiting a result */
+  commutativeKeys: Set<number>;
+  /** The order of optimistic layers */
+  optimisticOrder: number[];
+  /** This may be a persistence adapter that will receive changes in a batch */
   storage: StorageAdapter | null;
 }
 
@@ -41,25 +54,69 @@ let currentOptimisticKey: null | number = null;
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
   base: new Map(),
-  keys: [],
 });
 
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
   data: InMemoryData,
-  optimisticKey: number | null
+  layerKey: number | null,
+  forceOptimistic?: boolean
 ) => {
   currentData = data;
   currentDependencies = new Set();
-  currentOptimisticKey = optimisticKey;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
+  }
+
+  if (!layerKey) {
+    currentOptimisticKey = null;
+  } else if (
+    forceOptimistic ||
+    (data.commutativeKeys.size > 1 && data.commutativeKeys.has(layerKey))
+  ) {
+    // An optimistic update of a mutation may force an optimistic layer,
+    // or this Query update may be applied optimistically since it's part
+    // of a commutate chain
+    currentOptimisticKey = layerKey;
+    createLayer(data, layerKey);
+  } else {
+    // Otherwise we don't create an optimistic layer and clear the
+    // operation's one if it already exists
+    currentOptimisticKey = null;
+    clearLayer(data, layerKey);
   }
 };
 
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
   const data = currentData!;
+  const optimisticKey = currentOptimisticKey;
+  currentOptimisticKey = null;
+
+  // Determine whether the current operation has been a commutative layer
+  if (optimisticKey && data.commutativeKeys.has(optimisticKey)) {
+    // Find the lowest index of the commutative layers
+    // The first part of `optimisticOrder` are the non-commutative layers
+    const commutativeIndex =
+      data.optimisticOrder.length - data.commutativeKeys.size;
+
+    // Squash all layers in reverse order (low priority upwards) that have
+    // been written already
+    let i = data.optimisticOrder.length;
+    while (--i >= commutativeIndex) {
+      if (data.refLock[data.optimisticOrder[i]]) {
+        squashLayer(data.optimisticOrder[i]);
+      } else {
+        break;
+      }
+    }
+  }
+
+  currentData = null;
+  currentDependencies = null;
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
 
   if (!data.gcScheduled && data.gcBatch.size > 0) {
     data.gcScheduled = true;
@@ -76,13 +133,12 @@ export const clearDataState = () => {
       data.persistenceBatch = makeDict();
     });
   }
+};
 
-  currentData = null;
-  currentDependencies = null;
-  currentOptimisticKey = null;
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.length = 0;
-  }
+/** Initialises then resets the data state, which may squash this layer if necessary */
+export const noopDataState = (data: InMemoryData, layerKey: number | null) => {
+  initDataState(data, layerKey);
+  clearDataState();
 };
 
 /** As we're writing, we keep around all the records and links we've read or have written to */
@@ -108,6 +164,8 @@ export const make = (queryRootKey: string): InMemoryData => ({
   refLock: makeDict(),
   links: makeNodeMap(),
   records: makeNodeMap(),
+  commutativeKeys: new Set(),
+  optimisticOrder: [],
   storage: null,
 });
 
@@ -120,19 +178,9 @@ const setNode = <T>(
 ) => {
   // Optimistic values are written to a map in the optimistic dict
   // All other values are written to the base map
-  let keymap: KeyMap<Dict<T | undefined>>;
-  if (currentOptimisticKey) {
-    // If the optimistic map doesn't exist yet, it' created, and
-    // the optimistic key is stored (in order of priority)
-    if (map.optimistic[currentOptimisticKey] === undefined) {
-      map.optimistic[currentOptimisticKey] = new Map();
-      map.keys.unshift(currentOptimisticKey);
-    }
-
-    keymap = map.optimistic[currentOptimisticKey];
-  } else {
-    keymap = map.base;
-  }
+  const keymap: KeyMap<Dict<T | undefined>> = currentOptimisticKey
+    ? map.optimistic[currentOptimisticKey]
+    : map.base;
 
   // On the map itself we get or create the entity as a dict
   let entity = keymap.get(entityKey) as Dict<T | undefined>;
@@ -156,30 +204,24 @@ const getNode = <T>(
   entityKey: string,
   fieldKey: string
 ): T | undefined => {
+  let node: Dict<T | undefined> | undefined;
+
   // This first iterates over optimistic layers (in order)
-  for (let i = 0, l = map.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[map.keys[i]];
-    const node = optimistic.get(entityKey);
+  for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
     // If the node and node value exists it is returned, including undefined
-    if (node !== undefined && fieldKey in node) {
+    if (
+      optimistic &&
+      (node = optimistic.get(entityKey)) !== undefined &&
+      fieldKey in node
+    ) {
       return node[fieldKey];
     }
   }
 
   // Otherwise we read the non-optimistic base value
-  const node = map.base.get(entityKey);
+  node = map.base.get(entityKey);
   return node !== undefined ? node[fieldKey] : undefined;
-};
-
-/** Clears an optimistic layers from a NodeMap */
-const clearOptimisticNodes = <T>(map: NodeMap<T>, optimisticKey: number) => {
-  // Check whether the optimistic layer exists on the NodeMap
-  const index = map.keys.indexOf(optimisticKey);
-  if (index > -1) {
-    // Then delete it and splice out the optimisticKey
-    delete map.optimistic[optimisticKey];
-    map.keys.splice(index, 1);
-  }
 };
 
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gcBatch */
@@ -188,7 +230,7 @@ const updateRCForEntity = (
   refCount: Dict<number>,
   entityKey: string,
   by: number
-) => {
+): void => {
   // Retrieve the reference count
   const count = refCount[entityKey] !== undefined ? refCount[entityKey] : 0;
   // Adjust it by the "by" value
@@ -207,7 +249,7 @@ const updateRCForLink = (
   refCount: Dict<number>,
   link: Link | undefined,
   by: number
-) => {
+): void => {
   if (typeof link === 'string') {
     updateRCForEntity(gcBatch, refCount, link, by);
   } else if (Array.isArray(link)) {
@@ -225,7 +267,7 @@ const extractNodeFields = <T>(
   fieldInfos: FieldInfo[],
   seenFieldKeys: Set<string>,
   node: Dict<T> | undefined
-) => {
+): void => {
   if (node !== undefined) {
     for (const fieldKey in node) {
       if (!seenFieldKeys.has(fieldKey)) {
@@ -249,8 +291,8 @@ const extractNodeMapFields = <T>(
   extractNodeFields(fieldInfos, seenFieldKeys, map.base.get(entityKey));
 
   // Then extracts FieldInfo for the entity from the optimistic maps
-  for (let i = 0, l = map.keys.length; i < l; i++) {
-    const optimistic = map.optimistic[map.keys[i]];
+  for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
+    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
     extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
   }
 };
@@ -408,12 +450,72 @@ export const writeLink = (
   updateRCForLink(gcBatch, refCount, link, 1);
 };
 
+/** Reserves an optimistic layer and preorders it */
+export const reserveLayer = (data: InMemoryData, layerKey: number) => {
+  if (!data.commutativeKeys.has(layerKey)) {
+    // The new layer needs to be reserved in front of all other commutative
+    // keys but after all non-commutative keys (which are added by `forceUpdate`)
+    data.optimisticOrder.splice(
+      data.optimisticOrder.length - data.commutativeKeys.size,
+      0,
+      layerKey
+    );
+    data.commutativeKeys.add(layerKey);
+  }
+};
+
+/** Creates an optimistic layer of links and records */
+const createLayer = (data: InMemoryData, layerKey: number) => {
+  if (data.optimisticOrder.indexOf(layerKey) === -1) {
+    data.optimisticOrder.unshift(layerKey);
+  }
+
+  if (!data.refLock[layerKey]) {
+    data.refLock[layerKey] = makeDict();
+    data.links.optimistic[layerKey] = new Map();
+    data.records.optimistic[layerKey] = new Map();
+  }
+};
+
 /** Removes an optimistic layer of links and records */
-export const clearOptimistic = (data: InMemoryData, optimisticKey: number) => {
-  // We also delete the optimistic reference locks
-  delete data.refLock[optimisticKey];
-  clearOptimisticNodes(data.records, optimisticKey);
-  clearOptimisticNodes(data.links, optimisticKey);
+export const clearLayer = (data: InMemoryData, layerKey: number) => {
+  const index = data.optimisticOrder.indexOf(layerKey);
+  if (index > -1) {
+    data.optimisticOrder.splice(index, 1);
+    data.commutativeKeys.delete(layerKey);
+  }
+
+  if (data.refLock[layerKey]) {
+    delete data.refLock[layerKey];
+    delete data.records.optimistic[layerKey];
+    delete data.links.optimistic[layerKey];
+  }
+};
+
+/** Merges an optimistic layer of links and records into the base data */
+const squashLayer = (layerKey: number) => {
+  // Hide current dependencies from squashing operations
+  const prevDependencies = currentDependencies;
+  currentDependencies = new Set();
+
+  const links = currentData!.links.optimistic[layerKey];
+  if (links) {
+    links.forEach((keyMap, entityKey) => {
+      for (const fieldKey in keyMap)
+        writeLink(entityKey, fieldKey, keyMap[fieldKey]);
+    });
+  }
+
+  const records = currentData!.records.optimistic[layerKey];
+  if (records) {
+    records.forEach((keyMap, entityKey) => {
+      for (const fieldKey in keyMap)
+        writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
+    });
+  }
+
+  currentDependencies = prevDependencies;
+  clearLayer(currentData!, layerKey);
 };
 
 /** Return an array of FieldInfo (info on all the fields and their arguments) for a given entity */
@@ -435,7 +537,7 @@ export const hydrateData = (
   storage: StorageAdapter,
   entries: SerializedEntries
 ) => {
-  initDataState(data, 0);
+  initDataState(data, null);
   for (const key in entries) {
     const dotIndex = key.indexOf('.');
     const entityKey = key.slice(2, dotIndex);

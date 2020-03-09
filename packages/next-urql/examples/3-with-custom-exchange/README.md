@@ -4,9 +4,36 @@ This example is a small reference of how to implement and use a custom exchange 
 
 ### Installation
 
-To get the example project running, follow these two steps:
+To get the example project running, follow these steps:
+
+1. Install dependencies in the root of the `urql` monorepo:
 
 ```sh
+# From urql repo root:
+yarn
+```
+
+2. Build the `core` package in the `urql` monorepo:
+
+```sh
+# From urql repo root:
+cd packages/core
+yarn build
+```
+
+3. Build the `react-urql` package in the `urql` monorepo:
+
+```sh
+# From urql repo root:
+cd packages/react-urql
+yarn build
+```
+
+4. Navigate to this directory, install dependencies, and start the project:
+
+```sh
+# From urql repo root:
+cd packages/next-urql/examples/3-with-custom-exchange
 yarn
 yarn start
 ```

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+### Patch Changes
+
+- Remove type import from internal urql package file that has been removed, by [@parkerziegler](https://github.com/parkerziegler) (See [#557](https://github.com/FormidableLabs/urql/pull/557))
+- Ensure empty object gets returned in withUrqlClient's getInitialProps. Update next-urql examples to run in the urql monorepo, by [@parkerziegler](https://github.com/parkerziegler) (See [#563](https://github.com/FormidableLabs/urql/pull/563))
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

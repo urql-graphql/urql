@@ -1,6 +1,16 @@
 {
-  "packages": ["packages/core", "exchanges/graphcache", "packages/react-urql"],
-  "sandboxes": ["urql-issue-template-client-iui0o"],
+  "packages": [
+    "packages/core",
+    "packages/react-urql",
+    "packages/preact-urql",
+    "packages/svelte-urql",
+    "exchanges/graphcache",
+    "exchanges/retry",
+    "exchanges/suspense"
+  ],
+  "sandboxes": [
+    "urql-issue-template-client-iui0o"
+  ],
   "buildCommand": "build",
   "silent": true
 }

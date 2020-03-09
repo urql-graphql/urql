@@ -4,12 +4,30 @@
 // You can read more about the messages themselves in `docs/help.md`
 
 import { Kind, ExecutableDefinitionNode, InlineFragmentNode } from 'graphql';
-import { ErrorCode } from '../types';
+
+export type ErrorCode =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 15
+  | 16
+  | 17
+  | 18
+  | 19;
 
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 
-const helpUrl =
-  '\nhttps://github.com/FormidableLabs/urql/blob/master/docs/graphcache/help.md#';
+const helpUrl = '\nhttps://bit.ly/38yWDau#';
 const cache = new Set<string>();
 
 export const currentDebugStack: string[] = [];

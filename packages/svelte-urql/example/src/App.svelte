@@ -1,9 +1,11 @@
 <script>
-  import { createSvelteClient, query } from '../../dist/es';
-  let i = 0;
-  const client = createSvelteClient({ url: "https://0ufyz.sse.codesandbox.io" });
+  import { initClient, query } from '../..';
 
-  $: getTodos = query({
+  initClient({ url: "https://0ufyz.sse.codesandbox.io" });
+
+  let i = 0;
+
+  $: todos = query({
     query: `
       query {
         todos {
@@ -12,18 +14,23 @@
           complete
         }
       }
-    `, variables: { i },
+    `,
+    variables: { i },
   });
+
   const increment = () => i = i + 1;
 </script>
 
-{#await $getTodos}
-Loading...
-{:then result}
-  {#each result.data.todos as todo}
-    <p>{todo.text}</p>
-  {/each}
-{:catch error}
-  Error: {error}
-{/await}
+{#if $todos.fetching}
+  Loading...
+{:else if $todos.error}
+  Oh no! {$todos.error.message}
+{:else}
+  <ul>
+    {#each $todos.data.todos as todo}
+      <li>{todo.text}</li>
+    {/each}
+  </ul>
+{/if}
+
 <button on:click={increment}>Increment {i}</button>

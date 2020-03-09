@@ -1,38 +1,47 @@
 ---
-title: Computed-queries
+title: Computed Queries
 order: 2
 ---
 
-# Resolvers
+# Computed Queries
 
-`resolvers` are a way to alter the response you'll receive from the cache.
-Let's look at an example to get a better understanding.
+When dealing with data we could have special cases where we want to format a date
+or if we for instance have a list of a certain entity in cache and next we want
+to query a specific entity, chances are this will already be (partially) available
+in that list.
+
+These cases can be solved with the concept of `resolvers`.
+
+## Resolvers
+
+Let's look at how we can introduce these `resolvers` to our `cacheExchange`.
 
 ```js
 const cache = cacheExchange({
   resolvers: {
-    Todo: { text: () => 'Secret' },
+    Todo: { updatedAt: ({ date }) => Date.format(date) },
   },
 });
 ```
 
 Now when we query our `todos` every time we encounter an object with `Todo`
-as the `__typename` it will change the `text` to `'Secret'`. In this way we
+as the `__typename` it will format the `updatedAt` property. This way we
 can effectively change how we handle a certain property on an entity.
 
-This may seem pretty useless right now, but let's look at the arguments
-passed to `resolvers` to get a better sense of how powerful they are.
-
-A `resolver` gets four arguments:
+Let's look at the arguments passed to `resolvers` to get a better sense of
+what we can do, there are four arguments (these are in order):
 
 - `parent` – The original entity in the cache. In the example above, this
   would be the full `Todo` object.
 - `arguments` – The arguments used in this field.
-- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods;
-  see more about this [below](#cache.resolve).
+- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods,
+  read more about this [below](#cache.resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.
 
 ## Cache parameter
+
+This is the main point of communication with the cache, it will give us access to
+all cached data.
 
 ### resolve
 
@@ -44,8 +53,8 @@ Our cache methods have three arguments:
 - `field` – The field you want data for. This can be a relation or a single property.
 - `arguments` – The arguments to include on the field.
 
-To get a better grasp let's look at a few examples.
-Consider the following data structure:
+To get a better grasp let's look at a few examples,
+consider the following data structure:
 
 ```js
 todos: [
@@ -64,7 +73,7 @@ todos: [
 ];
 ```
 
-Using `cache.resolve` to get the author would look like this:
+Let's get the `author` for a todo.
 
 ```js
 const parent = {
@@ -74,8 +83,8 @@ const parent = {
   author: undefined,
   __typename: 'Todo',
 };
-const result = cache.resolve(parent, 'author');
-console.log(result); // 'Author:2'
+
+console.log(cache.resolve(parent, 'author')); // 'Author:2'
 ```
 
 Now we have a stringed key that identifies our author. We
@@ -100,7 +109,12 @@ const cache = cacheExchange({
 });
 ```
 
-will do the trick.
+Returning a `__typename` and `key` (`id`/`_id`/custom key) is sufficient to make the
+cache resolve this to the full entity.
+
+Note that resolving from a list to details can lead to partial data, this will result in
+a network-request to get the full data when fields are missing.
+When graphcache isn't [aware of your schema](./schema-awareness.md) it won't show partial data.
 
 ### Reading a query
 
@@ -108,31 +122,42 @@ Another method the cache allows is to let you read a full query, this method
 accepts an object of `query` and optionally `variables`.
 
 ```js
-const data = cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
+cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
 ```
 
-This way we'll get the stored data for the `TodosQuery` with given variables.
+This way we'll get the stored data for the `TodosQuery` for the given `variables`.
 
 ### Reading a fragment
 
 The store allows the user to also read a fragment for a certain entity, this function
 accepts a `fragment` and an `id`. This looks like the following.
 
-```js
-const data = cache.readFragment(gql`
-  fragment _ on Todo {
-    id
-    text
-  }
-`, '1');
+```js
+import gql from 'graphql-tag';
+
+const data = cache.readFragment(
+  gql`
+    fragment _ on Todo {
+      id
+      text
+    }
+  `,
+  '1'
+);
 ```
+
+> **Note:** In the above example, we've used
+> [graphql-tag](https://github.com/apollographql/graphql-tag) because `writeFragment` only accepts
+> GraphQL `DocumentNode`s as inputs, and not strings.
 
 This way we'll get the Todo with id 1 and the relevant data we are askng for in the
 fragment.
 
 ## Pagination
 
-### Simple
+`Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination.
+
+### Simple Pagination
 
 Given you have a schema that uses some form of `offset` and `limit` based pagination you can use the
 `simplePagination` exported from `@urql/exchange-graphcache/extras` to achieve an endless scroller.
@@ -157,7 +182,7 @@ options in here `limitArgument` and `offsetArgument` these will default to `limi
 and `skip` respectively. This way you can use the keywords that you are using in
 your queries.
 
-### Relay
+### Relay Pagination
 
 Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
 on your backend we offer the possibility of endless data resolving.
@@ -201,3 +226,7 @@ last: 1, before: c => node 89, startCursor: d
 
 With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
 And with outwards merging: `[..., 89, 99, 1, 2, ...]`
+
+### Reading on
+
+[On the next page we'll learn about "Custom updates".](./custom-updates.md)

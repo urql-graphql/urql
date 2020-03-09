@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "next dev",
-    "prestart": "npm run build --prefix ../../"
+    "prestart": "cd ../../ && yarn build && cd examples/3-with-custom-exchange"
   },
   "dependencies": {
     "graphql": "^14.5.8",
@@ -12,6 +12,5 @@
     "isomorphic-unfetch": "^3.0.0",
     "next": "^9.2.0",
     "wonka": "^4.0.7"
-  },
-  "devDependencies": {}
+  }
 }

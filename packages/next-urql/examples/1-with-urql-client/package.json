@@ -1,10 +1,10 @@
 {
-  "name": "example",
-  "version": "0.2.0",
+  "name": "1-with-urql-client",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "next dev",
-    "prestart": "npm run build --prefix ../../"
+    "prestart": "cd ../../ && yarn build && cd examples/1-with-urql-client"
   },
   "dependencies": {
     "graphql": "^14.5.8",

@@ -1,16 +1,19 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 import {
-  getFieldAlias,
   getFragments,
   getMainOperation,
-  getSelectionSet,
   normalizeVariables,
-  getFragmentTypeName,
-  getName,
   getFieldArguments,
   isFieldAvailableOnType,
+  getSelectionSet,
+  getName,
+  SelectionSet,
+  getFragmentTypeName,
+  getFieldAlias,
 } from '../ast';
+
+import { invariant, warn, pushDebugNode } from '../helpers/help';
 
 import {
   NullArray,
@@ -18,7 +21,6 @@ import {
   Variables,
   Data,
   Link,
-  SelectionSet,
   OperationRequest,
 } from '../types';
 
@@ -33,7 +35,6 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { invariant, warn, pushDebugNode } from '../helpers/help';
 import { SelectionIterator, ensureData } from './shared';
 
 export interface WriteResult {
@@ -55,9 +56,10 @@ interface Context {
 export const write = (
   store: Store,
   request: OperationRequest,
-  data: Data
+  data: Data,
+  key?: number
 ): WriteResult => {
-  initDataState(store.data, 0);
+  initDataState(store.data, key || null);
   const result = startWrite(store, request, data);
   clearDataState();
   return result;
@@ -100,9 +102,9 @@ export const startWrite = (
 export const writeOptimistic = (
   store: Store,
   request: OperationRequest,
-  optimisticKey: number
+  key: number
 ): WriteResult => {
-  initDataState(store.data, optimisticKey);
+  initDataState(store.data, key, true);
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };

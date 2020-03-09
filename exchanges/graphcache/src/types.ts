@@ -1,17 +1,8 @@
-import {
-  DocumentNode,
-  FragmentDefinitionNode,
-  SelectionNode,
-  GraphQLOutputType,
-  GraphQLWrappingType,
-} from 'graphql';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
 export type NullArray<T> = Array<null | T>;
 
-// GraphQL helper types
-export type SelectionSet = ReadonlyArray<SelectionNode>;
-export type GraphQLFlatType = Exclude<GraphQLOutputType, GraphQLWrappingType>;
 export interface Fragments {
   [fragmentName: string]: void | FragmentDefinitionNode;
 }
@@ -102,6 +93,9 @@ export interface Cache {
   /** invalidateQuery() invalidates all data of a given query */
   invalidateQuery(query: DocumentNode, variables?: Variables): void;
 
+  /** invalidate() invalidates an entity */
+  invalidate(entity: Data | string): void;
+
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery(
     input: QueryInput,
@@ -182,22 +176,3 @@ export interface StorageAdapter {
   read(): Promise<SerializedEntries>;
   write(data: SerializedEntries): Promise<void>;
 }
-
-export type ErrorCode =
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 15
-  | 16
-  | 17
-  | 18;

@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, clearOptimistic } from './store';
+import { Store, noopDataState, clearLayer, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -169,6 +169,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     });
   };
 
+  // This registers queries with the data layer to ensure commutativity
+  const prepareCacheForResult = (operation: Operation) => {
+    if (operation.operationName === 'query') {
+      reserveLayer(store.data, operation.key);
+    } else if (operation.operationName === 'teardown') {
+      noopDataState(store.data, operation.key);
+    }
+  };
+
   // This executes an optimistic update for mutations and registers it if necessary
   const optimisticUpdate = (operation: Operation) => {
     if (isOptimisticMutation(operation)) {
@@ -234,17 +243,20 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Clear old optimistic values from the store
     const { key } = operation;
     const pendingOperations = new Set<number>();
-    collectPendingOperations(
-      pendingOperations,
-      optimisticKeysToDependencies.get(key)
-    );
-    optimisticKeysToDependencies.delete(key);
-    clearOptimistic(store.data, key);
+
+    if (!isQuery) {
+      collectPendingOperations(
+        pendingOperations,
+        optimisticKeysToDependencies.get(key)
+      );
+      optimisticKeysToDependencies.delete(key);
+      clearLayer(store.data, key);
+    }
 
     let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
     if (data !== null && data !== undefined) {
-      writeDependencies = write(store, operation, data).dependencies;
+      writeDependencies = write(store, operation, data, key).dependencies;
 
       if (isQuery) {
         const queryResult = query(store, operation);
@@ -253,6 +265,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       } else {
         data = query(store, operation, data).data;
       }
+    } else {
+      noopDataState(store.data, operation.key);
     }
 
     // Collect all write dependencies and query dependencies for queries
@@ -350,6 +364,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         cacheOps$,
       ]),
       filter(op => op.context.requestPolicy !== 'cache-only'),
+      tap(prepareCacheForResult),
       forward,
       map(updateCacheWithResult)
     );

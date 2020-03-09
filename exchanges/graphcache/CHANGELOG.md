@@ -1,5 +1,34 @@
 # @urql/exchange-graphcache
 
+## 2.2.2
+
+### Patch Changes
+
+- ⚠️ Fix commutative layer edge case when lowest-priority layer comes back earlier than others, by [@kitten](https://github.com/kitten) (See [#587](https://github.com/FormidableLabs/urql/pull/587))
+- Externalise @urql/exchange-populate from bundle, by [@kitten](https://github.com/kitten) (See [#590](https://github.com/FormidableLabs/urql/pull/590))
+- ⚠️ Fix teardown events leading to broken commutativity, by [@kitten](https://github.com/kitten) (See [#588](https://github.com/FormidableLabs/urql/pull/588))
+
+## 2.2.1
+
+### Patch Changes
+
+- Remove the shared package, this will fix the types file generation for graphcache, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#579](https://github.com/FormidableLabs/urql/pull/579))
+- Updated dependencies (See [#577](https://github.com/FormidableLabs/urql/pull/577))
+  - @urql/core@1.9.2
+
+## 2.2.0
+
+### Minor Changes
+
+- Add `cache.invalidate` to invalidate an entity directly to remove it from the cache and all subsequent cache results, e.g. `cache.invalidate({ __typename: 'Todo', id: 1 })`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#566](https://github.com/FormidableLabs/urql/pull/566))
+
+### Patch Changes
+
+- ⚠️ Fix `cache-only` operations being forwarded and triggering fetch requests, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#551](https://github.com/FormidableLabs/urql/pull/551))
+- Apply Query results in-order and commutatively even when results arrive out-of-order, by [@kitten](https://github.com/kitten) (See [#565](https://github.com/FormidableLabs/urql/pull/565))
+- Updated dependencies (See [#551](https://github.com/FormidableLabs/urql/pull/551), [#542](https://github.com/FormidableLabs/urql/pull/542), and [#544](https://github.com/FormidableLabs/urql/pull/544))
+  - @urql/core@1.9.1
+
 ## 2.1.1
 
 ### Patch Changes

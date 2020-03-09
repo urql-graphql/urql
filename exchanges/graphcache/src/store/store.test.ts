@@ -86,7 +86,7 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       ],
     };
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     write(store, { query: Todos }, todosData);
     InMemoryData.initDataState(store.data, null);
   });
@@ -132,7 +132,7 @@ describe('Store with OptimisticMutationConfig', () => {
   it('should be able to invalidate data (one relation key)', () => {
     let { data } = query(store, { query: Todos });
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     expect((data as any).todos).toHaveLength(3);
     expect(InMemoryData.readRecord('Todo:0', 'text')).toBe('Go to the shops');
     store.invalidateQuery(Todos);
@@ -141,7 +141,7 @@ describe('Store with OptimisticMutationConfig', () => {
     ({ data } = query(store, { query: Todos }));
     expect(data).toBe(null);
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
   });
 
@@ -168,7 +168,7 @@ describe('Store with OptimisticMutationConfig', () => {
     });
     expect((data as any).appointment.info).toBe('urql meeting');
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(
       'urql meeting'
     );
@@ -181,12 +181,12 @@ describe('Store with OptimisticMutationConfig', () => {
     }));
     expect(data).toBe(null);
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(undefined);
   });
 
   it('should be able to write a fragment', () => {
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
 
     store.writeFragment(
       gql`
@@ -223,7 +223,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a fragment', () => {
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     const result = store.readFragment(
       gql`
         fragment _ on Todo {
@@ -249,7 +249,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to update a query', () => {
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     store.updateQuery({ query: Todos }, data => ({
       ...data,
       todos: [
@@ -309,7 +309,7 @@ describe('Store with OptimisticMutationConfig', () => {
       }
     );
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     store.updateQuery({ query: Appointment, variables: { id: '1' } }, data => ({
       ...data,
       appointment: {
@@ -334,7 +334,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a query', () => {
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     const result = store.readQuery({ query: Todos });
 
     const deps = InMemoryData.getCurrentDependencies();
@@ -399,11 +399,19 @@ describe('Store with OptimisticMutationConfig', () => {
       ],
     });
 
-    InMemoryData.clearOptimistic(store.data, 1);
+    InMemoryData.clearLayer(store.data, 1);
     ({ data } = query(store, { query: Todos }));
     expect(data).toEqual({
       __typename: 'Query',
       todos: todosData.todos,
+    });
+  });
+
+  describe('Invalidating an entity', () => {
+    it('removes an entity from a list.', () => {
+      store.invalidate(todosData.todos[1]);
+      const { data } = query(store, { query: Todos });
+      expect(data).toBe(null);
     });
   });
 });
@@ -477,7 +485,7 @@ describe('Store with storage', () => {
       expectedData
     );
 
-    InMemoryData.initDataState(store.data, 0);
+    InMemoryData.initDataState(store.data, null);
     InMemoryData.writeLink(
       'Query',
       store.keyOfField('appointment', { id: '1' }),

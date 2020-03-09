@@ -1,21 +1,14 @@
 import { FieldNode } from 'graphql';
+import { getSelectionSet, getName, SelectionSet } from '../ast/node';
 
 import {
   getMainOperation,
   normalizeVariables,
   getFragments,
-  getSelectionSet,
-  getName,
   getFieldArguments,
 } from '../ast';
 
-import {
-  EntityField,
-  OperationRequest,
-  Variables,
-  Fragments,
-  SelectionSet,
-} from '../types';
+import { EntityField, OperationRequest, Variables, Fragments } from '../types';
 
 import * as InMemoryData from '../store/data';
 import { Store, keyOfField } from '../store';

@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
+    "rootDirs": ["./", "../shared", "../populate"],
     "baseUrl": "./",
     "paths": {
       "urql": ["../../node_modules/urql/src"],

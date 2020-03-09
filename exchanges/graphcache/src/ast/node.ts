@@ -9,9 +9,11 @@ import {
   GraphQLOutputType,
   Kind,
   isWrappingType,
+  GraphQLWrappingType,
 } from 'graphql';
 
-import { SelectionSet, GraphQLFlatType } from '../types';
+export type SelectionSet = ReadonlyArray<SelectionNode>;
+export type GraphQLFlatType = Exclude<GraphQLOutputType, GraphQLWrappingType>;
 
 /** Returns the name of a given node */
 export const getName = (node: { name: NameNode }): string => node.name.value;

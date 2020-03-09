@@ -10,8 +10,7 @@ const Container = styled.main.attrs(() => ({
   flex: 1;
   width: 100%;
   position: sticky;
-
-  display: ${p => (p.sidebarOpen ? 'none' : 'flex')};
+  display: flex;
   flex-direction: row-reverse;
 `;
 
@@ -20,8 +19,17 @@ const Content = styled.article.attrs(() => ({
 }))`
   flex: 1;
   min-height: 100vh;
-  margin: 0 ${p => p.theme.spacing.md};
-  padding: ${p => p.theme.spacing.md} 0;
+  background: ${p => p.theme.colors.bg};
+  padding: ${p => p.theme.spacing.md};
+
+  @media ${p => p.theme.media.lg} {
+    padding: ${p => p.theme.spacing.lg};
+  }
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 `;
 
 const Legend = styled.aside`
@@ -32,10 +40,10 @@ const Legend = styled.aside`
     position: sticky;
     top: ${p => p.theme.layout.header};
     max-height: 100vh;
-    width: ${p => p.theme.layout.legend};
-    max-width: ${p => p.theme.layout.legendMaxWidth};
-    padding: ${p => p.theme.spacing.md} 0;
-    margin: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
+    width: 100%;
+    max-width: ${p => p.theme.layout.legend};
+    margin: 0 ${p => p.theme.spacing.md};
+    padding: ${p => p.theme.spacing.lg} 0;
   }
 `;
 
@@ -48,16 +56,20 @@ const LegendTitle = styled.h3`
 const HeadingList = styled.ul`
   list-style-type: none;
   margin: 0;
-  padding-left: ${p => p.theme.spacing.sm};
-  border-left: 1px solid ${p => p.theme.colors.border};
+  padding: 0;
 `;
 
-const HeadingItem = styled.a`
-  font-size: ${p => p.theme.fontSizes.small};
-  font-weight: ${p => p.theme.fontWeights.body};
-  color: ${p => p.theme.colors.heading};
-  text-decoration: none;
-  opacity: 0.7;
+const HeadingItem = styled.li`
+  line-height: ${p => p.theme.lineHeights.heading};
+  margin-bottom: ${p => p.theme.spacing.xs};
+
+  > a {
+    font-size: ${p => p.theme.fontSizes.small};
+    font-weight: ${p => p.theme.fontWeights.body};
+    color: ${p => p.theme.colors.heading};
+    text-decoration: none;
+    opacity: 0.7;
+  }
 `;
 
 const SectionList = () => {
@@ -65,23 +77,24 @@ const SectionList = () => {
   if (!page) return null;
 
   const headings = page.headings.filter(x => x.depth > 1);
+  if (headings.length === 0) return null;
 
   return (
     <>
       <LegendTitle>In this section</LegendTitle>
       <HeadingList>
         {headings.map(heading => (
-          <li key={heading.slug}>
-            <HeadingItem href={`#${heading.slug}`}>{heading.value}</HeadingItem>
-          </li>
+          <HeadingItem key={heading.slug}>
+            <a href={`#${heading.slug}`}>{heading.value}</a>
+          </HeadingItem>
         ))}
       </HeadingList>
     </>
   );
 };
 
-const Article = ({ children, sidebarOpen }) => (
-  <Container sidebarOpen={sidebarOpen}>
+const Article = ({ children }) => (
+  <Container>
     <Legend>
       <SectionList />
     </Legend>

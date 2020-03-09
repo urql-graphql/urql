@@ -2,6 +2,7 @@ import React from 'react';
 import { NextComponentType } from 'next';
 import Head from 'next/head';
 import { withUrqlClient, NextUrqlPageContext } from 'next-urql';
+import fetch from 'isomorphic-unfetch';
 import PokémonList from '../components/pokemon_list';
 
 interface InitialProps {
@@ -37,5 +38,6 @@ export default withUrqlClient((ctx: NextUrqlPageContext) => {
         Authorization: `Bearer ${ctx?.req?.headers?.authorization ?? ''}`,
       },
     },
+    fetch,
   };
 })(Home);
