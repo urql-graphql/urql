@@ -12,7 +12,8 @@
     "stage:build": "react-static build --staging",
     "stage:deploy": "node scripts/deploy/surge.js",
     "prod:build": "react-static build",
-    "prod:deploy": "node scripts/deploy/aws.js"
+    "prod:deploy": "node scripts/deploy/aws.js",
+    "prod:serve": "serve -l 3000"
   },
   "babel": {
     "presets": [
