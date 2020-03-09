@@ -5,9 +5,12 @@
     "packages/preact-urql",
     "packages/svelte-urql",
     "exchanges/graphcache",
+    "exchanges/retry",
     "exchanges/suspense"
   ],
-  "sandboxes": ["urql-issue-template-client-iui0o"],
+  "sandboxes": [
+    "urql-issue-template-client-iui0o"
+  ],
   "buildCommand": "build",
   "silent": true
 }
