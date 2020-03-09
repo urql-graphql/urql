@@ -31,6 +31,14 @@ You'll then need to add the `retryExchange`, that this package exposes, to your
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 import { retryExchange } from '@urql/exchange-retry';
 
+const options = {
+  initialDelayMs: 50,
+  maxDelayMs: 500,
+  randomDelay: true,
+  maxNumberAttempts: 10,
+  retryIf: err => err.message === '[GraphQL] Error Message A',
+};
+
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [

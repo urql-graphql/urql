@@ -38,13 +38,14 @@ export interface OperationResultWithRetry extends OperationResult {
 export const retryExchange = ({
   initialDelayMs,
   maxDelayMs,
-  randomDelay = true,
+  randomDelay,
   maxNumberAttempts,
   retryIf,
 }: RetryExchangeOptions): Exchange => {
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
   const MAX_ATTEMPTS = maxNumberAttempts || Infinity;
+  const RANDOM_DELAY = randomDelay || true;
 
   const networkErrorOrRetryIf = err =>
     (retryIf && retryIf(err)) || err.networkError;
@@ -68,7 +69,7 @@ export const retryExchange = ({
         const backoffFactor = Math.random() + 1.5;
         // if randomDelay is enabled and it won't exceed the max delay, apply a random
         // amount to the delay to avoid thundering herd problem
-        if (randomDelay && delayAmount * backoffFactor < MAX_DELAY) {
+        if (RANDOM_DELAY && delayAmount * backoffFactor < MAX_DELAY) {
           delayAmount *= backoffFactor;
         }
 
