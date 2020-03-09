@@ -5,6 +5,7 @@
     "packages/preact-urql",
     "packages/svelte-urql",
     "exchanges/graphcache",
+    "exchanges/multipart-fetch",
     "exchanges/retry",
     "exchanges/suspense"
   ],
