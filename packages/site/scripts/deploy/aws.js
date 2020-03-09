@@ -1,6 +1,3 @@
-// TODO: Currently disabled to prevent oopsies
-process.exit(0);
-
 /**
  * Upload docs to appropriate s3 subdirectory.
  */

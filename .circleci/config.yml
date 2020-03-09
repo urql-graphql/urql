@@ -106,7 +106,7 @@ jobs:
           name: Deploy Production Site
           command: |
             cd packages/site
-            node scripts/deploy/aws.js
+            node scripts/deploy/aws.js --dryrun
 
 workflows:
   version: 2
