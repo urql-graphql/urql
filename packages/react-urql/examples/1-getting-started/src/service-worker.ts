@@ -16,13 +16,15 @@ self.addEventListener('fetch', event => {
 
   (event as any).respondWith(
     Promise.resolve().then(async () => {
-      const json = await (await request.clone()).json();
+      const { query, variables } = await (await request.clone()).json();
 
-      const response = await execute({
+      const response = await execute(
         schema,
+        gql(query),
         rootValue,
-        document: gql(json.query),
-      });
+        variables,
+        variables
+      );
 
       return new Response(JSON.stringify(response), {
         headers: { 'Content-Type': 'application/json' },

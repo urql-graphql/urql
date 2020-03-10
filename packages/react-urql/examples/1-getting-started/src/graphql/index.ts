@@ -20,20 +20,19 @@ export const schema = buildSchema(`
     complete: Boolean
   }
 
+  type Query {
+    todos: [Todo]
+  }
+
   type Mutation {
     toggleTodo(id: ID!): Todo
     addTodo(text: String!): Todo
     deleteTodo(id: ID!): Todo
   }
-
-  type Query {
-    todos: [Todo]
-  }
 `);
 
 export const rootValue = {
   todos: async () => {
-    console.log('getting todos');
     const db = await database;
     return db
       .transaction(['todos'], 'readonly')
@@ -41,23 +40,35 @@ export const rootValue = {
       .getAll();
   },
   toggleTodo: async (root: any, { id }: any) => {
-    console.log('toggling todos');
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
-    const oldTodo = await txTodos.get(id);
+    const oldTodo = await txTodos.get(Number(id));
     const newTodo = { ...oldTodo, complete: !oldTodo.complete };
 
     await txTodos.put(newTodo);
     await txTodos.transaction.done;
 
-    console.log(newTodo);
     return newTodo;
   },
-  addTodo: () => {
-    return null;
+  addTodo: async (root: any, args: any) => {
+    const db = await database;
+    const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
+
+    const id = await txTodos.put(args);
+    const todo = await txTodos.get(id);
+    await txTodos.transaction.done;
+
+    return todo;
   },
-  deleteTodo: () => {
-    return null;
+  deleteTodo: async (root: any, { id }: any) => {
+    const db = await database;
+    const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
+
+    const todo = await txTodos.get(Number(id));
+    await txTodos.delete(Number(id));
+    await txTodos.transaction.done;
+
+    return todo;
   },
 };

@@ -14,7 +14,7 @@ interface QueryResponse {
 }
 
 const ToggleTodo = gql`
-  mutation($id: ID!) {
+  mutation ToggleTodo($id: ID!) {
     toggleTodo(id: $id) {
       id
       complete
