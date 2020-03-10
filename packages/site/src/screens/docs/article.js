@@ -77,7 +77,11 @@ const SectionList = () => {
   let page = null;
   try {
     page = useMarkdownPage();
-  } catch (_err) {}
+  } catch (err) {
+    if (err && typeof err.then === 'function') {
+      throw err;
+    }
+  }
 
   if (!page || !page.headings) return null;
 

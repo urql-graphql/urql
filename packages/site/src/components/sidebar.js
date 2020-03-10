@@ -59,7 +59,11 @@ const Sidebar = ({ sidebarOpen }) => {
   try {
     currentPage = useMarkdownPage();
     tree = useMarkdownTree();
-  } catch (_err) {}
+  } catch (err) {
+    if (err && typeof err.then === 'function') {
+      throw err;
+    }
+  }
 
   const sidebarItems = useMemo(() => {
     if (!currentPage || !tree || !tree.children || !location) {
