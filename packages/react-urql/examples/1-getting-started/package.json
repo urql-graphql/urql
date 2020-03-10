@@ -1,37 +1,24 @@
 {
-  "name": "@urql/example-getting-started",
+  "name": "1-getting-started",
   "version": "1.0.0",
-  "private": true,
+  "main": "src/index.html",
   "license": "MIT",
   "scripts": {
-    "start:server": "node ./src/server/index.js",
-    "start:client": "webpack-dev-server --hot --inline",
-    "prestart": "npm run build --prefix ../../",
-    "start": "run-p start:server start:client"
+    "start": "parcel src/index.html"
   },
   "devDependencies": {
-    "@urql/devtools": "0.0.3",
-    "awesome-typescript-loader": "^5.2.1",
-    "css-loader": "^3.2.0",
-    "npm-run-all": "^4.1.5",
-    "source-map-loader": "^0.2.4",
-    "style-loader": "^1.0.0",
-    "typescript": "^3.5.3",
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7",
-    "webpack-dev-server": "^3.8.0"
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "apollo-server-express": "^2.9.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "graphql": "^14.5.3",
-    "graphql-playground-middleware-express": "^1.7.12",
-    "graphql-subscriptions": "^1.1.0",
-    "graphql-tag": "^2.10.1",
-    "isomorphic-fetch": "^2.2.1",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "urql": "link:../../"
+    "@urql/devtools": "^0.1.2",
+    "graphql": "^14.6.0",
+    "graphql-tag": "^2.10.3",
+    "idb": "^5.0.1",
+    "react": ">= 16.8.0",
+    "react-dom": "^16.13.0",
+    "urql": ">= 1.2.0"
   }
 }

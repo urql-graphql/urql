@@ -2,8 +2,18 @@ import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { createClient, Provider, defaultExchanges } from 'urql';
 import { devtoolsExchange } from '@urql/devtools';
-import { Home } from './Home';
+import { Home } from './pages';
 import './index.css';
+
+(async () => {
+  if ((await navigator.serviceWorker.getRegistrations()).length > 0) {
+    return;
+  }
+
+  navigator.serviceWorker
+    .register('./service-worker.ts', { scope: '/' })
+    .then(() => location.reload());
+})();
 
 const client = createClient({
   url: 'http://localhost:3001/graphql',
