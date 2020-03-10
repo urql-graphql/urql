@@ -17,8 +17,8 @@
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.3",
     "idb": "^5.0.1",
-    "react": ">= 16.8.0",
+    "react": "^16.13.0",
     "react-dom": "^16.13.0",
-    "urql": ">= 1.2.0"
+    "urql": "latest"
   }
 }
