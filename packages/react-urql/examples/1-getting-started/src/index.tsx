@@ -5,7 +5,7 @@ import { devtoolsExchange } from '@urql/devtools';
 import { Home } from './pages';
 import './index.css';
 
-navigator.serviceWorker.register('./service-worker.ts', { scope: '/sw' });
+navigator.serviceWorker.register('./sw/index.js', { scope: '/sw' });
 
 const client = createClient({
   url: '/sw/graphql',
