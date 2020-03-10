@@ -35,7 +35,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   padding-top: ${p => p.theme.spacing.xs};
   padding-bottom: ${p => p.theme.spacing.lg};
-  padding-left: ${p => p.theme.spacing.sm};
 `;
 
 const relative = (from, to) => {
@@ -91,13 +90,15 @@ const Sidebar = ({ sidebarOpen }) => {
   }, [currentPage, tree, pathname]);
 
   return (
-    <SidebarContainer hidden={!sidebarOpen}>
+    <>
       <SideBarStripes />
-      <SidebarWrapper>
-        <HeroLogo />
-        <ContentWrapper>{sidebarItems}</ContentWrapper>
-      </SidebarWrapper>
-    </SidebarContainer>
+      <SidebarContainer hidden={!sidebarOpen}>
+        <SidebarWrapper>
+          <HeroLogo />
+          <ContentWrapper>{sidebarItems}</ContentWrapper>
+        </SidebarWrapper>
+      </SidebarContainer>
+    </>
   );
 };
 

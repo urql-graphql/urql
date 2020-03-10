@@ -11,6 +11,7 @@ import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
 
 export const Container = styled.div`
+  position: relative;
   display: flex;
   flex-direction: row;
 

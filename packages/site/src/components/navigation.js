@@ -9,6 +9,7 @@ export const SidebarContainer = styled.div`
     display: block;
     position: relative;
     width: ${p => p.theme.layout.sidebar};
+    margin-left: calc(2 * ${p => p.theme.layout.stripes});
   }
 `;
 
@@ -38,9 +39,7 @@ export const SidebarWrapper = styled.aside`
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
 
-  padding: ${p => p.theme.spacing.md};
-  padding-right: ${p => p.theme.spacing.sm};
-
+  padding: ${p => p.theme.spacing.sm};
   background-color: ${p => p.theme.colors.bg};
   border-right: 1px solid ${p => p.theme.colors.border};
   border-top: 1px solid ${p => p.theme.colors.border};
@@ -48,7 +47,7 @@ export const SidebarWrapper = styled.aside`
   @media ${({ theme }) => theme.media.sm} {
     border: none;
     background: none;
-    padding-top: ${p => p.theme.spacing.lg};
+    padding-top: ${p => p.theme.spacing.md};
     width: ${p => p.theme.layout.sidebar};
   }
 `;
