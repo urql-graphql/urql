@@ -1,5 +1,5 @@
-const { buildSchema } = require('graphql');
-const { openDB } = require('idb');
+import { buildSchema } from 'graphql';
+import { openDB } from 'idb';
 
 const database = openDB('SW_STATE_DB', 2, {
   upgrade: async db => {
@@ -39,7 +39,7 @@ export const rootValue = {
       .objectStore('todos')
       .getAll();
   },
-  toggleTodo: async (root, { id }) => {
+  toggleTodo: async (root: any, { id }: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
@@ -51,7 +51,7 @@ export const rootValue = {
 
     return newTodo;
   },
-  addTodo: async (root, args) => {
+  addTodo: async (root: any, args: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
@@ -61,7 +61,7 @@ export const rootValue = {
 
     return todo;
   },
-  deleteTodo: async (root, { id }) => {
+  deleteTodo: async (root: any, { id }: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 

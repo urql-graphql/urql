@@ -1,13 +1,14 @@
-const { execute } = require('graphql');
-const { rootValue, schema } = require('./graphql');
-const gql = require('graphql-tag');
+import { execute } from 'graphql';
+import { rootValue, schema } from './graphql';
+import gql from 'graphql-tag';
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event: any) => {
   console.log('GraphQL service worker installed.');
+  // @ts-ignore
   event.waitUntil(self.skipWaiting());
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event: any) => {
   const request = event.request;
 
   if (!/\/graphql$/.test(request.url)) {
