@@ -2,6 +2,8 @@
 
 `populate` is an exchange for auto-populating fields in your mutations.
 
+Read more about [populate](https://formidable.com/open-source/urql/docs/advanced/auto-populate-mutations.md)
+
 ## Quick Start Guide
 
 First install `@urql/exchange-populate` alongside `urql`:
@@ -20,19 +22,13 @@ import { populateExchange } from '@urql/exchange-populate';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
-  exchanges: [
-    dedupExchange,
-    populateExchange,
-    cacheExchange,
-    fetchExchange,
-  ],
+  exchanges: [dedupExchange, populateExchange, cacheExchange, fetchExchange],
 });
 ```
 
 ## Example usage
 
 Consider the following queries which have been requested in other parts of your application:
-
 
 ```graphql
 # Query 1
