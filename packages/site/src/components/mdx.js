@@ -214,12 +214,14 @@ const MdLink = ({ href, children }) => {
 
   if (!/^\w+:/.test(href)) {
     let to = href;
-    if (location.pathname.endsWith('/')) {
-      to = '../' + to;
-    } else if (
-      to.startsWith('../') &&
-      /readme|index$/i.test(currentPage.originalPath)
-    ) {
+    const isIndexPage = /readme|index$/i.test(currentPage.originalPath);
+    if (location.pathname.endsWith('/') && !isIndexPage) {
+      if (to.startsWith('./')) {
+        to = '.' + to;
+      } else {
+        to = '../' + to;
+      }
+    } else if (to.startsWith('../') && isIndexPage) {
       to = to.slice(1);
     }
 
