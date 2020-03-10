@@ -3,6 +3,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
+import { ScrollToTop } from '../../components/scroll-to-top';
 
 import { MDXComponents } from '../../components/mdx';
 
@@ -98,14 +99,17 @@ const SectionList = () => {
 };
 
 const Article = ({ children }) => (
-  <Container>
-    <Legend>
-      <SectionList />
-    </Legend>
-    <Content>
-      <MDXComponents>{children}</MDXComponents>
-    </Content>
-  </Container>
+  <>
+    <ScrollToTop />
+    <Container>
+      <Legend>
+        <SectionList />
+      </Legend>
+      <Content>
+        <MDXComponents>{children}</MDXComponents>
+      </Content>
+    </Container>
+  </>
 );
 
 export default Article;
