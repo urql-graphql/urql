@@ -5,18 +5,10 @@ import { devtoolsExchange } from '@urql/devtools';
 import { Home } from './pages';
 import './index.css';
 
-(async () => {
-  if ((await navigator.serviceWorker.getRegistrations()).length > 0) {
-    return;
-  }
-
-  navigator.serviceWorker
-    .register('./service-worker.ts', { scope: '/' })
-    .then(() => location.reload());
-})();
+navigator.serviceWorker.register('./service-worker.ts', { scope: '/sw' });
 
 const client = createClient({
-  url: '/graphql',
+  url: '/sw/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
 });
 
