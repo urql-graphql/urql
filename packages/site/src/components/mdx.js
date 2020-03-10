@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
+import { useLocation, Link } from 'react-router-dom';
 
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
@@ -206,6 +207,22 @@ const TableWithOverflow = props => (
   </TableOverflow>
 );
 
+const MdLink = ({ href, children }) => {
+  const location = useLocation();
+  if (!/^\w+:/.test(href)) {
+    let to = href;
+    if (location.pathname.endsWith('/')) {
+      to += '/';
+    } else if (to.startsWith('../')) {
+      to = to.slice(1);
+    }
+
+    return <Link to={to}>{children}</Link>;
+  }
+
+  return <a href={href}>{children}</a>;
+};
+
 const components = {
   pre: Pre,
   img: Image,
@@ -215,6 +232,7 @@ const components = {
   table: TableWithOverflow,
   th: TableHeader,
   td: TableCell,
+  a: MdLink,
 };
 
 export const MDXComponents = ({ children }) => (

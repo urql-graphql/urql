@@ -43,7 +43,7 @@ const relative = (from, to) => {
   let pathname = path.relative(path.dirname(from), to);
   if (!pathname)
     pathname = path.join(path.relative(from, to), path.basename(to));
-  if (from.endsWith('/')) pathname = '../' + pathname;
+  if (from.endsWith('/')) pathname = '../' + pathname + '/';
   return { pathname };
 };
 
