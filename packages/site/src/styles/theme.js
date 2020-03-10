@@ -44,6 +44,7 @@ export const fonts = {
 export const fontSizes = {
   small: '0.9em',
   body: '1.8rem',
+  bodySmall: '1.5rem',
   code: '0.8em',
   h1: '3.45em',
   h2: '2.11em',
