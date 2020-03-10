@@ -7,7 +7,9 @@ export interface QueryProps<T, V> extends UseQueryArgs<V> {
 }
 
 export interface QueryState<T> extends UseQueryState<T> {
-  executeQuery: (opts?: Partial<OperationContext>) => void;
+  executeQuery: (
+    opts?: Partial<OperationContext & { additionalTypenames?: string[] }>
+  ) => void;
 }
 
 export function Query<T = any, V = any>(props: QueryProps<T, V>): VNode<any> {

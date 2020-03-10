@@ -21,7 +21,7 @@ export interface UseQueryArgs<V> {
   variables?: V;
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
-  context?: Partial<OperationContext>;
+  context?: Partial<OperationContext & { additionalTypenames?: string[] }>;
   pause?: boolean;
 }
 
@@ -35,7 +35,9 @@ export interface UseQueryState<T> {
 
 export type UseQueryResponse<T> = [
   UseQueryState<T>,
-  (opts?: Partial<OperationContext>) => void
+  (
+    opts?: Partial<OperationContext & { additionalTypenames?: string[] }>
+  ) => void
 ];
 
 // eslint-disable-next-line
