@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { usePrefetch } from 'react-static';
+import { useMarkdownTree } from 'react-static-plugin-md-pages';
 
 import Features from './features';
 import GetStarted from './get-started';
@@ -12,21 +14,22 @@ const Container = styled.div`
   width: 100%;
 `;
 
-class Home extends React.Component {
-  render() {
-    return (
-      <Container>
-        <Header />
-        <Features
-          featureArray={content.features}
-          components={content.components}
-        />
-        <GetStarted getStartedObj={content.getStarted} />
-        <MoreOSS ossArray={content.oss} />
-        <Footer />
-      </Container>
-    );
-  }
-}
+const Home = () => {
+  const ref = usePrefetch('docs');
+  useMarkdownTree();
+
+  return (
+    <Container ref={ref}>
+      <Header />
+      <Features
+        featureArray={content.features}
+        components={content.components}
+      />
+      <GetStarted getStartedObj={content.getStarted} />
+      <MoreOSS ossArray={content.oss} />
+      <Footer />
+    </Container>
+  );
+};
 
 export default Home;
