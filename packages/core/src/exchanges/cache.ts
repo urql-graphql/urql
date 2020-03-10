@@ -162,13 +162,10 @@ const afterQuery = (
 
   resultCache.set(operation.key, { operation, data, error });
 
-  collectTypesFromResponse(response.data).forEach(typeName => {
-    const operations =
-      operationCache[typeName] || (operationCache[typeName] = new Set());
-    operations.add(operation.key);
-  });
-
-  (additionalTypenames || []).forEach(typeName => {
+  [
+    ...collectTypesFromResponse(response.data),
+    ...(additionalTypenames || []),
+  ].forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.add(operation.key);
