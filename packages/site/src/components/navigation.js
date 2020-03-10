@@ -41,7 +41,7 @@ export const SidebarWrapper = styled.aside`
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
 
-  padding: ${p => p.theme.spacing.sm};
+  padding: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
   background-color: ${p => p.theme.colors.bg};
   border-right: 1px solid ${p => p.theme.colors.border};
   border-top: 1px solid ${p => p.theme.colors.border};
