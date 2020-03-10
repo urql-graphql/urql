@@ -16,7 +16,7 @@ import './index.css';
 })();
 
 const client = createClient({
-  url: 'http://localhost:3001/graphql',
+  url: '/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
 });
 
