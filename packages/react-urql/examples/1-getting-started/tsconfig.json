@@ -4,9 +4,11 @@
     "target": "ES5",
     "moduleResolution": "node",
     "strict": true,
-    "lib": ["dom", "es2018", "esnext.asynciterable", "esnext.array"],
+    "lib": ["dom"],
     "jsx": "react",
-    "esModuleInterop": false
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
   "include": ["src"]
 }
