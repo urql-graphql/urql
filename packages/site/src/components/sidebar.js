@@ -40,12 +40,14 @@ const ContentWrapper = styled.div`
   padding-bottom: ${p => p.theme.spacing.lg};
 `;
 
-const relative = (from, to) => {
+export const relative = (from, to) => {
   if (!from || !to) return null;
-  let pathname = path.relative(path.dirname(from), to);
+  let [toPath, hash] = to.split('#');
+  let pathname = path.relative(path.dirname(from), toPath);
   if (!pathname)
-    pathname = path.join(path.relative(from, to), path.basename(to));
+    pathname = path.join(path.relative(from, toPath), path.basename(toPath));
   if (from.endsWith('/')) pathname = '../' + pathname + '/';
+  if (hash) pathname += `#${hash}`;
   return { pathname };
 };
 

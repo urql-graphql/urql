@@ -1,8 +1,9 @@
 import React from 'react';
+import * as path from 'path';
 import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
 import { useLocation, Link } from 'react-router-dom';
-
+import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
 
@@ -209,11 +210,16 @@ const TableWithOverflow = props => (
 
 const MdLink = ({ href, children }) => {
   const location = useLocation();
+  const currentPage = useMarkdownPage();
+
   if (!/^\w+:/.test(href)) {
     let to = href;
     if (location.pathname.endsWith('/')) {
-      to += '/';
-    } else if (to.startsWith('../')) {
+      to = '../' + to;
+    } else if (
+      to.startsWith('../') &&
+      /readme|index$/i.test(currentPage.originalPath)
+    ) {
       to = to.slice(1);
     }
 
