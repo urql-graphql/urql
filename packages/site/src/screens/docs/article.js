@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import React from 'react';
 import styled from 'styled-components';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -71,8 +73,12 @@ const HeadingItem = styled.li`
 `;
 
 const SectionList = () => {
-  const page = useMarkdownPage();
-  if (!page) return null;
+  let page = null;
+  try {
+    page = useMarkdownPage();
+  } catch (_err) {}
+
+  if (!page || !page.headings) return null;
 
   const headings = page.headings.filter(x => x.depth > 1);
   if (headings.length === 0) return null;

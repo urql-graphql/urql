@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import { withRouteData } from 'react-static';
 
 import Article from './article';
 import Header from './header';
@@ -10,7 +8,7 @@ import Sidebar from '../../components/sidebar';
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
 
-export const Container = styled.div`
+const Container = styled.div`
   position: relative;
   display: flex;
   flex-direction: row;
@@ -55,16 +53,4 @@ const Docs = props => {
   );
 };
 
-Docs.propTypes = {
-  location: PropTypes.object,
-  params: PropTypes.object,
-  sidebarHeaders: PropTypes.array,
-  slug: PropTypes.string,
-  toc: PropTypes.object,
-};
-
-Docs.defaultProps = {
-  params: null,
-};
-
-export default withRouteData(Docs);
+export default Docs;

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import React, { Fragment, useMemo } from 'react';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
@@ -49,17 +51,22 @@ const relative = (from, to) => {
 
 const Sidebar = ({ sidebarOpen }) => {
   const location = useLocation();
-  const currentPage = useMarkdownPage();
-  const tree = useMarkdownTree();
 
-  const pathname = location.pathname.endsWith('/')
-    ? currentPage.path + '/'
-    : currentPage.path;
+  let currentPage = null;
+  let tree = null;
+  try {
+    currentPage = useMarkdownPage();
+    tree = useMarkdownTree();
+  } catch (_err) {}
 
   const sidebarItems = useMemo(() => {
-    if (!currentPage || !tree || !tree.children) {
+    if (!currentPage || !tree || !tree.children || !location) {
       return null;
     }
+
+    const pathname = location.pathname.endsWith('/')
+      ? currentPage.path + '/'
+      : currentPage.path;
 
     let children = tree.children;
     if (tree.frontmatter && tree.originalPath) {
@@ -99,7 +106,7 @@ const Sidebar = ({ sidebarOpen }) => {
         </Fragment>
       );
     });
-  }, [currentPage, tree, pathname]);
+  }, [currentPage, tree, location]);
 
   return (
     <>
