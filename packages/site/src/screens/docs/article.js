@@ -66,9 +66,8 @@ const HeadingItem = styled.li`
   > a {
     font-size: ${p => p.theme.fontSizes.small};
     font-weight: ${p => p.theme.fontWeights.body};
-    color: ${p => p.theme.colors.heading};
+    color: ${p => p.theme.colors.passive};
     text-decoration: none;
-    opacity: 0.7;
   }
 `;
 

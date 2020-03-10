@@ -69,11 +69,10 @@ export const SidebarNavSubItemWrapper = styled.div`
 
 export const SidebarNavSubItem = styled(Link)`
   display: block;
-  color: ${p => p.theme.colors.heading};
+  color: ${p => p.theme.colors.passive};
   font-weight: ${p => p.theme.fontWeights.body};
   text-decoration: none;
   margin-top: ${p => p.theme.spacing.xs};
-  opacity: 0.7;
 
   &:first-child {
     margin-top: 0;

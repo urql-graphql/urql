@@ -20,10 +20,10 @@ export const colors = {
   border: '#ececec',
   activeBorder: '#a2b1ff',
   text: '#000000',
-  heading: '#050617',
+  heading: '#444444',
   accent: '#566ac8',
   code: '#403f53',
-  passive: '#9999a6',
+  passive: '#444444',
 };
 
 export const layout = {
