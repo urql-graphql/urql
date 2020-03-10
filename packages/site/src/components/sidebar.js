@@ -12,6 +12,7 @@ import {
   SidebarContainer,
   SidebarWrapper,
   SideBarStripes,
+  ChevronItem,
 } from './navigation';
 
 import logoSidebar from '../assets/sidebar-badge.svg';
@@ -66,16 +67,27 @@ const Sidebar = ({ sidebarOpen }) => {
     }
 
     return children.map(page => {
+      const pageChildren = page.children || [];
+
+      const isActive = pageChildren.length
+        ? currentPage.path.startsWith(page.path)
+        : currentPage.path === page.path;
+
       return (
         <Fragment key={page.key}>
-          <SidebarNavItem to={relative(pathname, page.path)}>
+          <SidebarNavItem
+            to={relative(pathname, page.path)}
+            isActive={() => isActive}
+          >
             {page.frontmatter.title}
+            {pageChildren.length ? <ChevronItem /> : null}
           </SidebarNavItem>
 
-          {page.children && page.children.length ? (
+          {pageChildren.length && isActive ? (
             <SidebarNavSubItemWrapper>
-              {page.children.map(childPage => (
+              {pageChildren.map(childPage => (
                 <SidebarNavSubItem
+                  isActive={() => childPage.path === currentPage.path}
                   to={relative(pathname, childPage.path)}
                   key={childPage.key}
                 >

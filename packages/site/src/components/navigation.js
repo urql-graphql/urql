@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+
+import ChevronIcon from '../assets/chevron';
 
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
@@ -52,13 +54,41 @@ export const SidebarWrapper = styled.aside`
   }
 `;
 
-export const SidebarNavItem = styled(Link)`
+export const SidebarNavItem = styled(NavLink).attrs(() => ({
+  activeClassName: 'active',
+}))`
   display: block;
   margin: ${p => p.theme.spacing.xs} 0;
-  color: ${p => p.theme.colors.accent};
+  color: ${p => p.theme.colors.text};
   font-weight: ${p => p.theme.fontWeights.heading};
   text-decoration: none;
   width: 100%;
+
+  &:hover {
+    color: ${p => p.theme.colors.accent};
+  }
+
+  &.active {
+    color: ${p => p.theme.colors.accent};
+  }
+`;
+
+export const ChevronItem = styled(ChevronIcon)`
+  display: inline-block;
+  color: inherit;
+  vertical-align: baseline;
+  margin-top: 0.08em;
+  margin-left: 0.3em;
+  padding: 0.08em;
+  width: 1em;
+  height: 1em;
+
+  position: relative;
+  top: 0.16em;
+
+  ${SidebarNavItem}.active & {
+    transform: rotate(180deg);
+  }
 `;
 
 export const SidebarNavSubItemWrapper = styled.div`
@@ -66,7 +96,7 @@ export const SidebarNavSubItemWrapper = styled.div`
   margin-bottom: ${p => p.theme.spacing.xs};
 `;
 
-export const SidebarNavSubItem = styled(Link)`
+export const SidebarNavSubItem = styled(NavLink).attrs(() => ({}))`
   display: block;
   color: ${p => p.theme.colors.passive};
   font-weight: ${p => p.theme.fontWeights.body};
@@ -75,5 +105,14 @@ export const SidebarNavSubItem = styled(Link)`
 
   &:first-child {
     margin-top: 0;
+  }
+
+  &:hover {
+    color: ${p => p.theme.colors.accent};
+  }
+
+  &.active {
+    color: ${p => p.theme.colors.accent};
+    font-weight: ${p => p.theme.fontWeights.heading};
   }
 `;
