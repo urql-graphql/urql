@@ -9,9 +9,9 @@ const Container = styled.main.attrs(() => ({
 }))`
   flex: 1;
   width: 100%;
-  position: sticky;
   display: flex;
   flex-direction: row-reverse;
+  align-items: flex-start;
 `;
 
 const Content = styled.article.attrs(() => ({
@@ -39,11 +39,10 @@ const Legend = styled.aside`
     display: block;
     position: sticky;
     top: ${p => p.theme.layout.header};
-    max-height: 100vh;
     width: 100%;
     max-width: ${p => p.theme.layout.legend};
-    margin: 0 ${p => p.theme.spacing.md};
-    padding: ${p => p.theme.spacing.lg} 0;
+    padding: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
+    margin: 0;
   }
 `;
 
