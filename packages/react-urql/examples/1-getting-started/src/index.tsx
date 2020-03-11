@@ -2,11 +2,13 @@ import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { createClient, Provider, defaultExchanges } from 'urql';
 import { devtoolsExchange } from '@urql/devtools';
-import { Home } from './Home';
+import { Home } from './pages';
 import './index.css';
 
+navigator.serviceWorker.register('./service-worker.ts', { scope: '/' });
+
 const client = createClient({
-  url: 'http://localhost:3001/graphql',
+  url: '/sw/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
 });
 
