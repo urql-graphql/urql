@@ -9,7 +9,7 @@ import { GlobalStyle } from './styles/global';
 import * as theme from './styles/theme';
 import Analytics from './google-analytics';
 import { Loading } from './components/loading';
-// TODO: import NotFound from './screens/404';
+import { Switch, Route } from 'react-router-dom';
 
 const App = () => {
   return (
@@ -18,7 +18,9 @@ const App = () => {
         <GlobalStyle />
         <React.Suspense fallback={<Loading />}>
           <Analytics id={constants.googleAnalyticsId}>
-            <Routes />
+            <Switch>
+              <Route render={() => <Routes />} />
+            </Switch>
           </Analytics>
         </React.Suspense>
       </ThemeProvider>
