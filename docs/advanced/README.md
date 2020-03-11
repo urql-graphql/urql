@@ -7,7 +7,7 @@ order: 3
 
 In this chapter we'll dive into various topics of "advanced" `urql` usage. This is admittedly a
 catch-all chapter of various use-cases that can only be covered after [the "Concepts"
-chapter.](../coconcepts/README.md)
+chapter.](../concepts/README.md)
 
 - **Subscriptions** covers how to use `useSubscription` and how to set up GraphQL subscriptions with
   `urql`.

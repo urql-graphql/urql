@@ -31,12 +31,16 @@ export const GlobalStyle = createGlobalStyle`
     background: ${p => p.theme.colors.passiveBg};
     color: ${p => p.theme.colors.text};
     font-family: ${p => p.theme.fonts.body};
-    font-size: ${p => p.theme.fontSizes.body};
     line-height: ${p => p.theme.lineHeights.body};
     font-weight: ${p => p.theme.fontWeights.body};
     text-rendering: optimizeLegibility;
     margin: 0;
     padding: 0;
+
+    font-size: ${p => p.theme.fontSizes.bodySmall};
+    @media ${p => p.theme.media.lg} {
+      font-size: ${p => p.theme.fontSizes.body};
+    }
   }
 
   a {

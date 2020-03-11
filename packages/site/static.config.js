@@ -49,5 +49,9 @@ export default {
       path: '/',
       template: require.resolve('./src/screens/home'),
     },
+    {
+      path: '404',
+      template: require.resolve('./src/screens/404'),
+    },
   ],
 };

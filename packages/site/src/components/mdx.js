@@ -1,9 +1,13 @@
 import React from 'react';
+import * as path from 'path';
 import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
-
+import { useLocation, Link } from 'react-router-dom';
+import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
+
+import { relative } from './sidebar';
 
 const getLanguage = className => {
   const res = className.match(/language-(\w+)/);
@@ -206,6 +210,22 @@ const TableWithOverflow = props => (
   </TableOverflow>
 );
 
+const MdLink = ({ href, children }) => {
+  const location = useLocation();
+  const currentPage = useMarkdownPage();
+
+  if (!/^\w+:/.test(href) && !href.startsWith('#')) {
+    const hasTrailingSlash = location.pathname.endsWith('/');
+    const from = !hasTrailingSlash ? currentPage.path + '/' : currentPage.path;
+    const to = hasTrailingSlash
+      ? path.join(path.dirname(currentPage.originalPath), href)
+      : path.join(currentPage.path, href);
+    return <Link to={relative(from, to)}>{children}</Link>;
+  }
+
+  return <a href={href}>{children}</a>;
+};
+
 const components = {
   pre: Pre,
   img: Image,
@@ -215,6 +235,7 @@ const components = {
   table: TableWithOverflow,
   th: TableHeader,
   td: TableCell,
+  a: MdLink,
 };
 
 export const MDXComponents = ({ children }) => (

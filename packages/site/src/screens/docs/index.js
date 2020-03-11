@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import { withRouteData } from 'react-static';
 
-import Article from './article';
+import Article, { ArticleStyling } from './article';
 import Header from './header';
-import Sidebar from '../../components/sidebar';
+import Sidebar, { SidebarStyling } from '../../components/sidebar';
 
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
 
-export const Container = styled.div`
+const Container = styled.div`
+  position: relative;
   display: flex;
   flex-direction: row;
 
@@ -36,7 +35,7 @@ const OpenCloseSidebar = styled.img.attrs(props => ({
   }
 `;
 
-const Docs = props => {
+const Docs = ({ isLoading, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -47,23 +46,21 @@ const Docs = props => {
           sidebarOpen={sidebarOpen}
           onClick={() => setSidebarOpen(prev => !prev)}
         />
-        <Sidebar sidebarOpen={sidebarOpen} />
-        <Article>{props.children}</Article>
+        {/* load just the styles if Suspense fallback in use */}
+        {isLoading ? (
+          <>
+            <SidebarStyling sidebarOpen={sidebarOpen} />
+            <ArticleStyling>{children}</ArticleStyling>
+          </>
+        ) : (
+          <>
+            <Sidebar sidebarOpen={sidebarOpen} />
+            <Article>{children}</Article>
+          </>
+        )}
       </Container>
     </>
   );
 };
 
-Docs.propTypes = {
-  location: PropTypes.object,
-  params: PropTypes.object,
-  sidebarHeaders: PropTypes.array,
-  slug: PropTypes.string,
-  toc: PropTypes.object,
-};
-
-Docs.defaultProps = {
-  params: null,
-};
-
-export default withRouteData(Docs);
+export default Docs;

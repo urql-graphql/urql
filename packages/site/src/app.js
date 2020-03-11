@@ -9,7 +9,6 @@ import { GlobalStyle } from './styles/global';
 import * as theme from './styles/theme';
 import Analytics from './google-analytics';
 import { Loading } from './components/loading';
-// TODO: import NotFound from './screens/404';
 
 const App = () => {
   return (

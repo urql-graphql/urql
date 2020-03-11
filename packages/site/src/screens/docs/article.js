@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import React from 'react';
 import styled from 'styled-components';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
+import { ScrollToTop } from '../../components/scroll-to-top';
 
 import { MDXComponents } from '../../components/mdx';
 
@@ -9,9 +12,9 @@ const Container = styled.main.attrs(() => ({
 }))`
   flex: 1;
   width: 100%;
-  position: sticky;
   display: flex;
   flex-direction: row-reverse;
+  align-items: flex-start;
 `;
 
 const Content = styled.article.attrs(() => ({
@@ -39,11 +42,10 @@ const Legend = styled.aside`
     display: block;
     position: sticky;
     top: ${p => p.theme.layout.header};
-    max-height: 100vh;
     width: 100%;
     max-width: ${p => p.theme.layout.legend};
-    margin: 0 ${p => p.theme.spacing.md};
-    padding: ${p => p.theme.spacing.lg} 0;
+    padding: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
+    margin: 0;
   }
 `;
 
@@ -66,15 +68,14 @@ const HeadingItem = styled.li`
   > a {
     font-size: ${p => p.theme.fontSizes.small};
     font-weight: ${p => p.theme.fontWeights.body};
-    color: ${p => p.theme.colors.heading};
+    color: ${p => p.theme.colors.passive};
     text-decoration: none;
-    opacity: 0.7;
   }
 `;
 
 const SectionList = () => {
   const page = useMarkdownPage();
-  if (!page) return null;
+  if (!page || !page.headings) return null;
 
   const headings = page.headings.filter(x => x.depth > 1);
   if (headings.length === 0) return null;
@@ -93,15 +94,20 @@ const SectionList = () => {
   );
 };
 
-const Article = ({ children }) => (
+export const ArticleStyling = ({ children, SectionList }) => (
   <Container>
-    <Legend>
-      <SectionList />
-    </Legend>
-    <Content>
-      <MDXComponents>{children}</MDXComponents>
-    </Content>
+    <Legend>{SectionList && <SectionList />}</Legend>
+    <Content>{children}</Content>
   </Container>
+);
+
+const Article = ({ children }) => (
+  <>
+    <ScrollToTop />
+    <ArticleStyling SectionList={SectionList}>
+      <MDXComponents>{children}</MDXComponents>
+    </ArticleStyling>
+  </>
 );
 
 export default Article;

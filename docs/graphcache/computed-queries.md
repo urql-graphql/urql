@@ -35,7 +35,7 @@ what we can do, there are four arguments (these are in order):
   would be the full `Todo` object.
 - `arguments` – The arguments used in this field.
 - `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods,
-  read more about this [below](#cache.resolve).
+  read more about this [below](#resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.
 
 ## Cache parameter

@@ -1,17 +1,18 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Container as DocsContainer } from '../screens/docs';
-import Header from '../screens/docs/header';
+import Docs from '../screens/docs';
 
 const Container = styled.div`
   height: 100vh;
   width: 100%;
 `;
+
 const Loader = styled.div`
   position: relative;
   margin: 0 auto;
   width: ${p => p.theme.spacing.xl};
   top: calc(50% - ${p => p.theme.spacing.xl});
+
   &:before {
     content: '';
     display: block;
@@ -61,25 +62,22 @@ const Circle = styled.circle`
   stroke-linecap: round;
 `;
 
-export const Loading = () => {
-  return (
-    <DocsContainer>
-      <Container>
-        <Header />
-        <Loader>
-          <Svg className="circular" viewBox="25 25 50 50">
-            <Circle
-              className="path"
-              cx="50"
-              cy="50"
-              r="20"
-              fill="none"
-              strokeWidth="2"
-              strokeMiterlimit="10"
-            />
-          </Svg>
-        </Loader>
-      </Container>
-    </DocsContainer>
-  );
-};
+export const Loading = () => (
+  <Docs isLoading>
+    <Container>
+      <Loader>
+        <Svg className="circular" viewBox="25 25 50 50">
+          <Circle
+            className="path"
+            cx="50"
+            cy="50"
+            r="20"
+            fill="none"
+            strokeWidth="2"
+            strokeMiterlimit="10"
+          />
+        </Svg>
+      </Loader>
+    </Container>
+  </Docs>
+);

@@ -20,17 +20,17 @@ export const colors = {
   border: '#ececec',
   activeBorder: '#a2b1ff',
   text: '#000000',
-  heading: '#050617',
+  heading: '#444444',
   accent: '#566ac8',
   code: '#403f53',
-  passive: '#9999a6',
+  passive: '#444444',
 };
 
 export const layout = {
   page: '144rem',
   header: '4.8rem',
-  stripes: '1rem',
-  sidebar: '28rem',
+  stripes: '0.7rem',
+  sidebar: '26rem',
   legend: '22rem',
   logo: '12rem',
 };
@@ -44,6 +44,7 @@ export const fonts = {
 export const fontSizes = {
   small: '0.9em',
   body: '1.8rem',
+  bodySmall: '1.5rem',
   code: '0.8em',
   h1: '3.45em',
   h2: '2.11em',

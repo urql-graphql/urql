@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+
+import ChevronIcon from '../assets/chevron';
 
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
@@ -9,6 +11,7 @@ export const SidebarContainer = styled.div`
     display: block;
     position: relative;
     width: ${p => p.theme.layout.sidebar};
+    margin-left: calc(2 * ${p => p.theme.layout.stripes});
   }
 `;
 
@@ -38,9 +41,7 @@ export const SidebarWrapper = styled.aside`
   line-height: ${p => p.theme.lineHeights.body};
   font-size: ${p => p.theme.fontSizes.small};
 
-  padding: ${p => p.theme.spacing.md};
-  padding-right: ${p => p.theme.spacing.sm};
-
+  padding: ${p => p.theme.spacing.sm} ${p => p.theme.spacing.md};
   background-color: ${p => p.theme.colors.bg};
   border-right: 1px solid ${p => p.theme.colors.border};
   border-top: 1px solid ${p => p.theme.colors.border};
@@ -48,18 +49,46 @@ export const SidebarWrapper = styled.aside`
   @media ${({ theme }) => theme.media.sm} {
     border: none;
     background: none;
-    padding-top: ${p => p.theme.spacing.lg};
+    padding-top: ${p => p.theme.spacing.md};
     width: ${p => p.theme.layout.sidebar};
   }
 `;
 
-export const SidebarNavItem = styled(Link)`
+export const SidebarNavItem = styled(NavLink).attrs(() => ({
+  activeClassName: 'active',
+}))`
   display: block;
   margin: ${p => p.theme.spacing.xs} 0;
-  color: ${p => p.theme.colors.accent};
+  color: ${p => p.theme.colors.text};
   font-weight: ${p => p.theme.fontWeights.heading};
   text-decoration: none;
   width: 100%;
+
+  &:hover {
+    color: ${p => p.theme.colors.accent};
+  }
+
+  &.active {
+    color: ${p => p.theme.colors.accent};
+  }
+`;
+
+export const ChevronItem = styled(ChevronIcon)`
+  display: inline-block;
+  color: inherit;
+  vertical-align: baseline;
+  margin-top: 0.08em;
+  margin-left: 0.3em;
+  padding: 0.08em;
+  width: 1em;
+  height: 1em;
+
+  position: relative;
+  top: 0.16em;
+
+  ${SidebarNavItem}.active & {
+    transform: rotate(180deg);
+  }
 `;
 
 export const SidebarNavSubItemWrapper = styled.div`
@@ -67,15 +96,23 @@ export const SidebarNavSubItemWrapper = styled.div`
   margin-bottom: ${p => p.theme.spacing.xs};
 `;
 
-export const SidebarNavSubItem = styled(Link)`
+export const SidebarNavSubItem = styled(NavLink).attrs(() => ({}))`
   display: block;
-  color: ${p => p.theme.colors.heading};
+  color: ${p => p.theme.colors.passive};
   font-weight: ${p => p.theme.fontWeights.body};
   text-decoration: none;
   margin-top: ${p => p.theme.spacing.xs};
-  opacity: 0.7;
 
   &:first-child {
     margin-top: 0;
+  }
+
+  &:hover {
+    color: ${p => p.theme.colors.accent};
+  }
+
+  &.active {
+    color: ${p => p.theme.colors.accent};
+    font-weight: ${p => p.theme.fontWeights.heading};
   }
 `;

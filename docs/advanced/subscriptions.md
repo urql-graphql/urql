@@ -75,7 +75,7 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 ## React & Preact
 
 The `useSubscription` hooks comes with a similar API to `useQuery`, which [we've learned about in
-the "Queries" page in the "Basics" section.](../basics/querying-data.md)
+the "Queries" page in the "Basics" section.](../basics/queries.md)
 
 Its usage is extremely similar in that it accepts options, which may contain `query` and
 `variables`. However, it also accepts a second argument, which is a reducer function, similar to
