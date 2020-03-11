@@ -49,18 +49,14 @@ We want to place the `retryExchange` after the `fetchExchange` so that retries a
 
 ## The Options
 
-We have a set of options allowing us to control the `retry` mechanism, let's take a look, we have the `initialDelayMs` to
-specify at what interval the `retrying` should start, this means that if we specify `1000` that when our `operation` fails
-we'll wait 1 second and then retry it.
+There are a set of optional options that allow for fine-grained control over the `retry` mechanism:
 
-Next up is the `maxDelayMs`, our `retryExchange` will keep increasing the time between retries so we don't spam our server with
-requests it can't complete, this option ensures we don't exceed a certain threshold. This time between requests
-will increase with a random `back-off` factor multiplied by the `initialDelayMs`, read more about the [thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem).
+- `initialDelayMs`: Specify at what interval the `retrying` should start, this means that if we specify `1000` that when our `operation` fails we'll wait 1 second and then retry it.
 
-Talking about increasing the `delay` randomly, `randomDelay` allows us to disable this. When this option is set to `false` we'll only increase
-the time between attempts with the `initialDelayMs`. This means if we fail the first time we'll have 1 second wait, next fail we'll have 2 seconds and so on.
-
-We don't want to infinitley attempt an `operation`, we can declare how many times it should attempt the `operation` with `maxNumberAttempts`.
+- `maxDelayMs`: The maximum delay between retries. The `retryExchange` will keep increasing the time between retries so that the server doesn't receive simultaneous requests it can't complete. This time between requests will increase with a random `back-off` factor applied to the `initialDelayMs`, read more about the [thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem).
+- `randomDelay`: Allows the randomized delay described above to be disabled. When this option is set to `false` there will be exactly a `initialDelayMs` wait between each retry.
+- `maxNumberAttempts`: Allows the max number of retries to be defined.
+- `retryIf`: Apply a custom test to the returned error to determine whether it should be retried.
 
 ## Reacting to Different Errors
 
