@@ -3,19 +3,15 @@ import styled, { keyframes } from 'styled-components';
 import Docs from '../screens/docs';
 
 const Container = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
 `;
 
 const Loader = styled.div`
   position: relative;
   margin: 0 auto;
   width: ${p => p.theme.spacing.xl};
+  top: calc(50% - ${p => p.theme.spacing.xl});
 
   &:before {
     content: '';
@@ -67,7 +63,7 @@ const Circle = styled.circle`
 `;
 
 export const Loading = () => (
-  <Docs>
+  <Docs isLoading>
     <Container>
       <Loader>
         <Svg className="circular" viewBox="25 25 50 50">

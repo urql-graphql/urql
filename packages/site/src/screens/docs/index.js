@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import Article from './article';
+import Article, { ArticleStyling } from './article';
 import Header from './header';
-import Sidebar from '../../components/sidebar';
+import Sidebar, { SidebarStyling } from '../../components/sidebar';
 
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
@@ -35,7 +35,7 @@ const OpenCloseSidebar = styled.img.attrs(props => ({
   }
 `;
 
-const Docs = props => {
+const Docs = ({ isLoading, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -46,8 +46,18 @@ const Docs = props => {
           sidebarOpen={sidebarOpen}
           onClick={() => setSidebarOpen(prev => !prev)}
         />
-        <Sidebar sidebarOpen={sidebarOpen} />
-        <Article>{props.children}</Article>
+        {/* load just the styles if Suspense fallback in use */}
+        {isLoading ? (
+          <>
+            <SidebarStyling sidebarOpen={sidebarOpen} />
+            <ArticleStyling>{children}</ArticleStyling>
+          </>
+        ) : (
+          <>
+            <Sidebar sidebarOpen={sidebarOpen} />
+            <Article>{children}</Article>
+          </>
+        )}
       </Container>
     </>
   );

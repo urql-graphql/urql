@@ -102,18 +102,23 @@ const SectionList = () => {
   );
 };
 
-const Article = ({ children }) => (
+export const ArticleStyling = ({ children, SectionList }) => (
   <>
     <ScrollToTop />
     <Container>
-      <Legend>
-        <SectionList />
-      </Legend>
-      <Content>
-        <MDXComponents>{children}</MDXComponents>
-      </Content>
+      <Legend>{SectionList && <SectionList />}</Legend>
+      <Content>{children}</Content>
     </Container>
   </>
+);
+
+const Article = ({ children }) => (
+  <ArticleStyling SectionList={SectionList}>
+    <Legend />
+    <Content>
+      <MDXComponents>{children}</MDXComponents>
+    </Content>
+  </ArticleStyling>
 );
 
 export default Article;
