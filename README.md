@@ -42,14 +42,16 @@ yarn add urql graphql
 npm install --save urql graphql
 ```
 
-## 📃 [Documentation](https://formidable.com/open-source/urql/docs)
+## 📃 [Documentation](https://formidable.com/open-source/urql/docs/)
 
-[The documentation contains everything you need to know about `urql`](https://formidable.com/open-source/urql/docs)
+The documentation contains everything you need to know about `urql`, and contains several sections in order of importance
+when you first get started:
 
-- [Basic usage](https://formidable.com/open-source/urql/docs/basics/)
-- [Architecture](https://formidable.com/open-source/urql/docs/concepts/)
-- [Advanced](https://formidable.com/open-source/urql/docs/advanced/)
-- [API](https://formidable.com/open-source/urql/docs/api)
+- **[Basics](https://formidable.com/open-source/urql/docs/basics/)** — contains the ["Getting Started" guide](https://formidable.com/open-source/urql/docs/basics/getting-started/) and all you need to know when first using `urql`.
+- **[Main Concepts](https://formidable.com/open-source/urql/docs/concepts/)** — explains how `urql` functions and is built and covers GraphQL clients in general, on the ["Philosophy" page](https://formidable.com/open-source/urql/docs/concepts/philosophy).
+- **[Advanced](https://formidable.com/open-source/urql/docs/advanced/)** — covers more uncommon use-cases and things you don't immediately need when getting started.
+- **[Graphcache](https://formidable.com/open-source/urql/docs/graphcache/)** — documents ["Normalized Caching" support](https://formidable.com/open-source/urql/docs/graphcache/normalized-caching/) which enables more complex apps and use-cases.
+- **[API](https://formidable-com-urql-staging-595.surge.sh/docs/api/)** — the API documentation for each individual package.
 
 _You can find the raw markdown files inside this repository's `docs` folder._
 
