@@ -2,7 +2,8 @@
 
 import React, { Fragment, useMemo } from 'react';
 import styled from 'styled-components';
-import { useLocation } from 'react-router-dom';
+import { useBasepath } from 'react-static';
+import { Link, useLocation } from 'react-router-dom';
 import * as path from 'path';
 
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
@@ -19,14 +20,20 @@ import {
 
 import logoSidebar from '../assets/sidebar-badge.svg';
 
+const HeroLogoLink = styled(Link)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: ${p => p.theme.spacing.sm};
+  align-self: center;
+`;
+
 const HeroLogo = styled.img.attrs(() => ({
   src: logoSidebar,
   alt: 'urql',
 }))`
   display: none;
   width: ${p => p.theme.layout.logo};
-  margin-bottom: ${p => p.theme.spacing.sm};
-  align-self: center;
 
   @media ${p => p.theme.media.sm} {
     display: block;
@@ -52,17 +59,24 @@ export const relative = (from, to) => {
   return { pathname };
 };
 
-export const SidebarStyling = ({ children, sidebarOpen }) => (
-  <>
-    <SideBarStripes />
-    <SidebarContainer hidden={!sidebarOpen}>
-      <SidebarWrapper>
-        <HeroLogo />
-        <ContentWrapper>{children}</ContentWrapper>
-      </SidebarWrapper>
-    </SidebarContainer>
-  </>
-);
+export const SidebarStyling = ({ children, sidebarOpen }) => {
+  const basepath = useBasepath() || '';
+  const homepage = basepath ? `/${basepath}/` : '/';
+
+  return (
+    <>
+      <SideBarStripes />
+      <SidebarContainer hidden={!sidebarOpen}>
+        <SidebarWrapper>
+          <HeroLogoLink to={homepage}>
+            <HeroLogo />
+          </HeroLogoLink>
+          <ContentWrapper>{children}</ContentWrapper>
+        </SidebarWrapper>
+      </SidebarContainer>
+    </>
+  );
+};
 
 const Sidebar = props => {
   const location = useLocation();

@@ -55,6 +55,7 @@ const FormidableLogo = styled.img.attrs(() => ({
 
 const Header = () => {
   const basepath = useBasepath() || '';
+  const homepage = basepath ? `/${basepath}/` : '/';
 
   return (
     <Fixed>
@@ -62,7 +63,7 @@ const Header = () => {
         <BlockLink href="https://formidable.com/">
           <FormidableLogo />
         </BlockLink>
-        <ProjectWording to={`/${basepath}/`}>urql</ProjectWording>
+        <ProjectWording to={homepage}>urql</ProjectWording>
       </Wrapper>
     </Fixed>
   );
