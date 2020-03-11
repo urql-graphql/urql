@@ -7,6 +7,8 @@ import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
 
+import { relative } from './sidebar';
+
 const getLanguage = className => {
   const res = className.match(/language-(\w+)/);
   return res ? res[1] : null;
@@ -213,19 +215,10 @@ const MdLink = ({ href, children }) => {
   const currentPage = useMarkdownPage();
 
   if (!/^\w+:/.test(href)) {
-    let to = href;
-    const isIndexPage = /readme|index$/i.test(currentPage.originalPath);
-    if (location.pathname.endsWith('/') && !isIndexPage) {
-      if (to.startsWith('./')) {
-        to = '.' + to;
-      } else {
-        to = '../' + to;
-      }
-    } else if (to.startsWith('../') && isIndexPage) {
-      to = to.slice(1);
-    }
-
-    return <Link to={to}>{children}</Link>;
+    const hasTrailingSlash = location.pathname.endsWith('/');
+    const from = !hasTrailingSlash ? currentPage.path + '/' : currentPage.path;
+    const to = hasTrailingSlash ? href : path.join(currentPage.path, href);
+    return <Link to={relative(from, to)}>{children}</Link>;
   }
 
   return <a href={href}>{children}</a>;

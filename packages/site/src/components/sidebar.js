@@ -47,6 +47,7 @@ export const relative = (from, to) => {
   if (!pathname)
     pathname = path.join(path.relative(from, toPath), path.basename(toPath));
   if (from.endsWith('/')) pathname = '../' + pathname + '/';
+  if (!pathname.endsWith('/')) pathname += '/';
   if (hash) pathname += `#${hash}`;
   return { pathname };
 };
