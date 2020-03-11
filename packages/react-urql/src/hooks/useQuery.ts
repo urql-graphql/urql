@@ -13,7 +13,7 @@ export interface UseQueryArgs<V> {
   variables?: V;
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
-  context?: Partial<OperationContext & { additionalTypenames?: string[] }>;
+  context?: Partial<OperationContext>;
   pause?: boolean;
 }
 
@@ -27,9 +27,7 @@ export interface UseQueryState<T> {
 
 export type UseQueryResponse<T> = [
   UseQueryState<T>,
-  (
-    opts?: Partial<OperationContext & { additionalTypenames?: string[] }>
-  ) => void
+  (opts?: Partial<OperationContext>) => void
 ];
 
 export const useQuery = <T = any, V = object>(

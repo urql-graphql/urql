@@ -129,8 +129,12 @@ export const afterMutation = (
   client: Client
 ) => (response: OperationResult) => {
   const pendingOperations = new Set<number>();
+  const { additionalTypenames } = response.operation.context;
 
-  collectTypesFromResponse(response.data).forEach(typeName => {
+  [
+    ...collectTypesFromResponse(response.data),
+    ...(additionalTypenames || []),
+  ].forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {

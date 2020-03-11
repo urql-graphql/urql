@@ -11,7 +11,7 @@ export interface QueryArguments<V> {
   variables?: V;
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
-  context?: Partial<OperationContext & { additionalTypenames?: string[] }>;
+  context?: Partial<OperationContext>;
 }
 
 export interface QueryResult<T> {
