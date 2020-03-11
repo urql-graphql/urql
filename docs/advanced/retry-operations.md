@@ -1,9 +1,9 @@
 ---
-title: Retrying operations
+title: Retrying Operations
 order: 4
 ---
 
-# Retrying operations
+# Retrying Operations
 
 The `retryExchange` lets us retry specific operation, by default it will
 retry only `network errors` but we can specify additional options to add
@@ -47,7 +47,7 @@ const client = createClient({
 
 We want to place the `retryExchange` after the `fetchExchange` so that retries are only performed _after_ the operation has passed through the cache and has attempted to fetch.
 
-## The options
+## The Options
 
 We have a set of options allowing us to control the `retry` mechanism, let's take a look, we have the `initialDelayMs` to
 specify at what interval the `retrying` should start, this means that if we specify `1000` that when our `operation` fails
@@ -62,7 +62,7 @@ the time between attempts with the `initialDelayMs`. This means if we fail the f
 
 We don't want to infinitley attempt an `operation`, we can declare how many times it should attempt the `operation` with `maxNumberAttempts`.
 
-## Reacting to different errors
+## Reacting to Different Errors
 
 We can introduce specific triggers for the `retryExchange` to start retrying operations,
 let's look at an example:

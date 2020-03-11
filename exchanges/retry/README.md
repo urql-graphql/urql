@@ -12,4 +12,4 @@ yarn add @urql/exchange-retry
 npm install --save @urql/exchange-retry
 ```
 
-Read more about the [exchange](https://formidable.com/open-source/urql/docs/advanced/retry-operations)
+Read more about the [retry exchange](https://formidable.com/open-source/urql/docs/advanced/retry-operations).
