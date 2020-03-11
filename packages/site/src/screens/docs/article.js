@@ -74,15 +74,7 @@ const HeadingItem = styled.li`
 `;
 
 const SectionList = () => {
-  let page = null;
-  try {
-    page = useMarkdownPage();
-  } catch (err) {
-    if (err && typeof err.then === 'function') {
-      throw err;
-    }
-  }
-
+  const page = useMarkdownPage();
   if (!page || !page.headings) return null;
 
   const headings = page.headings.filter(x => x.depth > 1);

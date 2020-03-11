@@ -5,8 +5,6 @@ import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
 import * as path from 'path';
 
-import { useRouteData } from 'react-static';
-
 import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
 
 import {
@@ -67,17 +65,8 @@ export const SidebarStyling = ({ children, sidebarOpen }) => (
 
 const Sidebar = props => {
   const location = useLocation();
-
-  let currentPage = null;
-  let tree = null;
-  try {
-    currentPage = useMarkdownPage();
-    tree = useMarkdownTree();
-  } catch (err) {
-    if (err && typeof err.then === 'function') {
-      throw err;
-    }
-  }
+  const currentPage = useMarkdownPage();
+  const tree = useMarkdownTree();
 
   const sidebarItems = useMemo(() => {
     if (!currentPage || !tree || !tree.children || !location) {
