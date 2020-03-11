@@ -194,16 +194,17 @@ data that can be passed from almost all API methods in `urql` that deal with
 Some of these options are set when the `Client` is initialised, so in the following list of
 properties you'll likely see some options that exist on the `Client` as well.
 
-| Prop            | Type                                  | Description                                                                                                           |
-| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| fetchOptions    | `?RequestInit \| (() => RequestInit)` | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
-| fetch           | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
-| requestPolicy   | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
-| url             | `string`                              | The GraphQL endpoint                                                                                                  |
-| pollInterval    | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
-| meta            | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
-| suspense        | `?boolean`                            | Whether suspense is enabled.                                                                                          |
-| preferGetMethod | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
+| Prop                | Type                                  | Description                                                                                                           |
+| ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| fetchOptions        | `?RequestInit \| (() => RequestInit)` | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| fetch               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
+| requestPolicy       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| url                 | `string`                              | The GraphQL endpoint                                                                                                  |
+| pollInterval        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
+| meta                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
+| suspense            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
+| preferGetMethod     | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
+| additionalTypenames | `?number`                             | Allows you to tell the operation that it has dependencies on certain typenames (used in document-cache.)              |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.
