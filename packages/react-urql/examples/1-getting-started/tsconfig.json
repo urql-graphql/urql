@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "baseUrl": "./src",
-    "strict": false,
-    "lib": ["dom", "es2018", "esnext.asynciterable", "esnext.array"],
+    "module": "es2015",
+    "target": "ES5",
+    "moduleResolution": "node",
+    "strict": true,
+    "lib": ["dom"],
     "jsx": "react",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
-  "include": ["**/.ts", "**/*.tsx"]
+  "include": ["src"]
 }

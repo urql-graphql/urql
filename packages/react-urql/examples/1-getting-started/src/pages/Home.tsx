@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'urql';
-import { Error, Loading, Todo, NewTodo } from './components';
+import { Error, Loading, Todo, NewTodo } from '../components';
 
 interface ITodo {
   id: string;
@@ -13,8 +13,8 @@ interface QueryResponse {
   todos: ITodo[];
 }
 
-const ToggleTodo = `
-  mutation($id: ID!) {
+const ToggleTodo = gql`
+  mutation ToggleTodo($id: ID!) {
     toggleTodo(id: $id) {
       id
       complete
@@ -22,7 +22,7 @@ const ToggleTodo = `
   }
 `;
 
-const DeleteTodo = `
+const DeleteTodo = gql`
   mutation($id: ID!) {
     deleteTodo(id: $id) {
       id
