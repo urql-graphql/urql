@@ -217,7 +217,9 @@ const MdLink = ({ href, children }) => {
   if (!/^\w+:/.test(href)) {
     const hasTrailingSlash = location.pathname.endsWith('/');
     const from = !hasTrailingSlash ? currentPage.path + '/' : currentPage.path;
-    const to = hasTrailingSlash ? href : path.join(currentPage.path, href);
+    const to = hasTrailingSlash
+      ? path.join(path.dirname(currentPage.originalPath), href)
+      : path.join(currentPage.path, href);
     return <Link to={relative(from, to)}>{children}</Link>;
   }
 
