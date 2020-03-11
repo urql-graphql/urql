@@ -2,17 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
 
-import styled from 'styled-components';
-
-const ScrollToHash = styled.a``;
 export const ScrollToTop = () => {
-  const { hash } = useLocation();
-
-  let md;
-  try {
-    md = useMarkdownPage(); // eslint-disable-line react-hooks/rules-of-hooks
-  } catch (_e) {}
   const inputRef = useRef(null);
+  const location = useLocation();
+  const md = useMarkdownPage();
+
+  const hash =
+    location.hash ||
+    (location.pathname && location.pathname.match(/#[a-z|-]+/));
 
   useEffect(() => {
     if (hash && md) {
@@ -22,5 +19,5 @@ export const ScrollToTop = () => {
     }
   }, [hash, md]);
 
-  return <ScrollToHash href={hash} ref={inputRef} />;
+  return <a href={hash} ref={inputRef} />;
 };
