@@ -114,10 +114,7 @@ export const ArticleStyling = ({ children, SectionList }) => (
 
 const Article = ({ children }) => (
   <ArticleStyling SectionList={SectionList}>
-    <Legend />
-    <Content>
-      <MDXComponents>{children}</MDXComponents>
-    </Content>
+    <MDXComponents>{children}</MDXComponents>
   </ArticleStyling>
 );
 
