@@ -25,14 +25,9 @@ it to deliver partial results and match fragments deterministically!
 
 `urql` is already quite a comprehensive GraphQL client. However in several cases it may be
 desirable to have data update across the entirety of an app when a response updates some
-known pieces of data. This cache also provides configurable APIs to:
+known pieces of data.
 
-- resolve Query data from the offline cache
-- update Query data after mutations/subscriptions responses
-- provide optimistic Mutation responses
-
-> ⚠️ Note: Documentation for some parts of `@urql/exchange-graphcache` are still being worked on!
-> For help or features requests, please join our [Spectrum](https://spectrum.chat/urql).
+[Learn more about Graphcache and normalized caching on our docs!](https://formidable.com/open-source/urql/docs/graphcache/)
 
 ## Quick Start Guide
 
@@ -49,7 +44,6 @@ by replacing the default cache exchange with it:
 
 ```js
 import { createClient, dedupExchange, fetchExchange } from 'urql';
-
 import { cacheExchange } from '@urql/exchange-graphcache';
 
 const client = createClient({
@@ -58,7 +52,7 @@ const client = createClient({
     dedupExchange,
     // Replace the default cacheExchange with the new one
     cacheExchange({
-      /* config */
+      /* optional config */
     }),
     fetchExchange,
   ],
@@ -74,84 +68,6 @@ const client = createClient({
 - [x] Optimistic updates
 - [ ] Basic offline and persistence support
 - [ ] Advanced fragment and entity invalidation
-
-This cache defaults to **delivering safe results** by marking results as incomplete
-when any field is missing, triggering a `network-only` operation (a request), when
-it encounters uncached fields.
-
-Furthermore there's one case in caching where only having the `__typename` field
-leads to potentially unsafe behaviour: **interfaces**. When the cache encounters a
-fragment that tries to get data for an interface, it can't tell whether the
-cached type matches the interface. In this case we resort to a heuristic
-by default. When all fields of the fragment are on the target type, then the
-fragment matches successfully and we log a warning.
-
-Schema awareness has been introduced to the cache to improve this behaviour.
-When you pass your API's GraphQL schema to the cache, it becomes able to
-deliver **partial results**. When the cache has enough information so that
-only **optional fields** in a given query are missing, then it delivers
-a partial result from the cached data. Subsequently it still issues a network
-request (like with `cache-and-network`) to ensure that all information will
-still be delivered eventually.
-
-With a schema the cache can also match fragments that refer to interfaces
-**deterministically**, since it can look at the schema to match fragments
-against types.
-
-Schema awareness is also an important stepping stone for offline support.
-Without partial results it becomes difficult to deliver an offline UI
-safely, when just some bits of information are missing.
-
-Read more about the [architecture](../../docs/graphcache/architecture.md)
-
-## Usage
-
-You can currently configure:
-
-- `resolvers`: A nested `['__typename'][fieldName]` map to resolve results from cache
-- `updates`: A Mutation/Subscription field map to apply side-effect updates to the cache
-- `optimistic`: A mutation field map to supply optimistic mutation responses
-- `keys`: A `__typename` map of functions to generate keys with
-- `schema`: An introspected GraphQL schema in JSON format. When it's passed the cache will
-  deliver partial results and enable deterministic fragment matching.
-
-> Note that you don't need any of these options to get started
-
-### Keys
-
-Keys are used when you need a slight alteration to the value of your identifier or
-when the identifier is a non-traditional property.
-
-[Read more](../../docs/graphcache/keys.md)
-
-### Resolvers
-
-Resolvers are needed when you want to do additional resolving, for example do some
-custom date formatting.
-
-[Read more](../../docs/graphcache/resolvers.md)
-
-### Updates
-
-The graph cache will automatically handle updates but some things are quite hard to
-incorporate. Let's say you delete/add an item, it's hard for us to know you wanted to
-delete or where to add an item in a list.
-
-[Read more](../../docs/graphcache/updates.md)
-
-### Optimistic
-
-Here you can configure optimistic responses, this means that we don't wait for the server
-to respond but offer the user to instantly replace the data with the variables from the
-mutation.
-
-[Read more](../../docs/graphcache/optimistic.md)
-
-### Schema
-
-Our way to see what your backend schema looks like, this offers additional functionality.
-
-[Read more](../../docs/graphcache/schema.md)
 
 ## Maintenance Status
 

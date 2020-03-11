@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "An exchange that automaticcally populates the mutation selection body",
   "sideEffects": false,
-  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "homepage": "https://formidable.com/open-source/urql/docs/advanced/auto-populate-mutations",
   "bugs": "https://github.com/FormidableLabs/urql/issues",
   "license": "MIT",
   "repository": {
