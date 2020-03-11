@@ -2,7 +2,7 @@
 
 `populate` is an exchange for auto-populating fields in your mutations.
 
-Read more about [populate](https://formidable.com/open-source/urql/docs/advanced/auto-populate-mutations.md)
+[Read more about the `populateExchange` on our docs!](https://formidable.com/open-source/urql/docs/advanced/auto-populate-mutations)
 
 ## Quick Start Guide
 
