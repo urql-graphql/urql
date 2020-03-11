@@ -27,7 +27,7 @@ it to deliver partial results and match fragments deterministically!
 desirable to have data update across the entirety of an app when a response updates some
 known pieces of data.
 
-Read more about [normalized-caching](https://formidable.com/open-source/urql/docs/graphcache)
+[Learn more about Graphcache and normalized caching on our docs!](https://formidable.com/open-source/urql/docs/graphcache/)
 
 ## Quick Start Guide
 
