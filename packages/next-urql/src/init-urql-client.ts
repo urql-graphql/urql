@@ -32,7 +32,7 @@ export function initUrqlClient(
 
     urqlClient = createClient({
       ...clientOptions,
-      suspense: isServer,
+      suspense: isServer || clientOptions.suspense,
       exchanges: mergeExchanges(ssrCache),
     });
   }

@@ -2,10 +2,7 @@ import { NextPageContext } from 'next';
 import { ClientOptions, Exchange, Client } from 'urql';
 import { AppContext } from 'next/app';
 
-export type NextUrqlClientOptions = Omit<
-  ClientOptions,
-  'exchanges' | 'suspense'
->;
+export type NextUrqlClientOptions = Omit<ClientOptions, 'exchanges'>;
 
 export type NextUrqlClientConfig =
   | NextUrqlClientOptions
