@@ -181,6 +181,29 @@ cache, since we're passing `requestPolicy: 'network-only'`.
 Furthermore the `reexecuteQuery` function can also be used to programmatically start a query even
 when `pause` is set to `true`, which would usually stop all automatic queries.
 
+### Adding typenames
+
+There are moments where [document-caching](./document-caching.md) won't be able to get the dependencies
+for a certain query.
+
+Example where this would occur:
+
+```js
+const query = `query { todos { id name } }`;
+const result = { todos: [] };
+```
+
+At this point we don't know what types are possible for this query, so a best practice when using
+the default cache is to add `additionalTypenames` for this query.
+
+```js
+// Keep the reference stable.
+const context = useMemo(() => ({ additionalTypenames: ['Todo'] }), []);
+const [result] = useQuery({ query, context });
+```
+
+Now the cache will know when to invalidate this query even when the list is empty.
+
 ### Reading on
 
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
