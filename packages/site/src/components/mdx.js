@@ -226,6 +226,27 @@ const MdLink = ({ href, children }) => {
   return <a href={href}>{children}</a>;
 };
 
+const targetOffset = css`
+  &:target::before {
+    content: '';
+    display: block;
+    height: ${p => p.theme.layout.header};
+    margin: -${p => p.theme.layout.header} 0 0;
+  }
+`;
+
+const OffsetH1 = styled.h1`
+  ${targetOffset}
+`;
+
+const OffsetH2 = styled.h2`
+  ${targetOffset}
+`;
+
+const OffsetH3 = styled.h3`
+  ${targetOffset}
+`;
+
 const components = {
   pre: Pre,
   img: Image,
@@ -236,6 +257,9 @@ const components = {
   th: TableHeader,
   td: TableCell,
   a: MdLink,
+  h1: OffsetH1,
+  h2: OffsetH2,
+  h3: OffsetH3,
 };
 
 export const MDXComponents = ({ children }) => (

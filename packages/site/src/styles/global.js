@@ -74,12 +74,4 @@ export const GlobalStyle = createGlobalStyle`
   img {
     max-width: 100%;
   }
-
-  /* fix markdown link anchors due to fixed header */
-  :target::before {
-    content: "";
-    display: block;
-    height: ${p => p.theme.layout.header};
-    margin: -${p => p.theme.layout.header} 0 0;
-}
 `;
