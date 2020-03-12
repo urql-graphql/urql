@@ -35,7 +35,6 @@ export const makePlugins = ({ isProduction } = {}) => [
     })
     : typescript({
       useTsconfigDeclarationDir: true,
-      objectHashIgnoreUnknownHack: true,
       tsconfigOverride: {
         exclude: [
           'src/**/*.test.ts',
