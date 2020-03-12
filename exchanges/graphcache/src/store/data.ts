@@ -49,6 +49,7 @@ export interface InMemoryData {
 
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Set<string> = null;
+let previousDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
@@ -63,6 +64,7 @@ export const initDataState = (
   isOptimistic?: boolean
 ) => {
   currentData = data;
+  previousDependencies = currentDependencies;
   currentDependencies = new Set();
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -121,6 +123,7 @@ export const clearDataState = () => {
   }
 
   currentData = null;
+  previousDependencies = currentDependencies;
   currentDependencies = null;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -164,6 +167,16 @@ export const getCurrentDependencies = (): Set<string> => {
   );
 
   return currentDependencies;
+};
+
+export const forkDependencies = (): Set<string> => {
+  previousDependencies = currentDependencies;
+  return (currentDependencies = new Set());
+};
+
+export const unforkDependencies = () => {
+  currentDependencies = previousDependencies;
+  previousDependencies = null;
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
@@ -508,8 +521,7 @@ const deleteLayer = (data: InMemoryData, layerKey: number) => {
 /** Merges an optimistic layer of links and records into the base data */
 const squashLayer = (layerKey: number) => {
   // Hide current dependencies from squashing operations
-  const prevDependencies = currentDependencies;
-  currentDependencies = new Set();
+  forkDependencies();
 
   const links = currentData!.links.optimistic[layerKey];
   if (links) {
@@ -527,7 +539,7 @@ const squashLayer = (layerKey: number) => {
     });
   }
 
-  currentDependencies = prevDependencies;
+  unforkDependencies();
   deleteLayer(currentData!, layerKey);
 };
 

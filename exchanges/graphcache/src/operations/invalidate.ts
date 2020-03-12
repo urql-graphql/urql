@@ -1,94 +1,25 @@
-import { FieldNode } from 'graphql';
-import { getSelectionSet, getName, SelectionSet } from '../ast/node';
-
-import {
-  getMainOperation,
-  normalizeVariables,
-  getFragments,
-  getFieldArguments,
-} from '../ast';
-
-import { EntityField, OperationRequest, Variables, Fragments } from '../types';
-
 import * as InMemoryData from '../store/data';
-import { Store, keyOfField } from '../store';
-import { isFieldAvailableOnType } from '../ast';
-import { SelectionIterator } from './shared';
-
-interface Context {
-  store: Store;
-  variables: Variables;
-  fragments: Fragments;
-}
+import { OperationRequest } from '../types';
+import { Store } from '../store';
+import { read } from './query';
 
 export const invalidate = (store: Store, request: OperationRequest) => {
-  const operation = getMainOperation(request.query);
+  const dependencies = InMemoryData.forkDependencies();
+  read(store, request);
 
-  const ctx: Context = {
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    store,
-  };
+  const queryKey = store.data.queryRootKey;
+  const queryField = `${queryKey}.`;
 
-  invalidateSelection(
-    ctx,
-    ctx.store.getRootKey('query'),
-    getSelectionSet(operation)
-  );
-};
-
-export const invalidateSelection = (
-  ctx: Context,
-  entityKey: string,
-  select: SelectionSet
-) => {
-  const isQuery = entityKey === 'Query';
-
-  let typename: EntityField;
-  if (!isQuery) {
-    typename = InMemoryData.readRecord(entityKey, '__typename');
-    if (typeof typename !== 'string') {
-      return;
+  dependencies.forEach(dependency => {
+    if (dependency.startsWith(queryField)) {
+      const fieldKey = dependency.slice(queryField.length);
+      InMemoryData.writeLink(queryKey, fieldKey, undefined);
+      InMemoryData.writeRecord(queryKey, fieldKey, undefined);
     } else {
-      InMemoryData.writeRecord(entityKey, '__typename', undefined);
+      store.invalidate(dependency);
     }
-  } else {
-    typename = entityKey;
-  }
+  });
 
-  const iter = new SelectionIterator(typename, entityKey, select, ctx);
-
-  let node: FieldNode | void;
-  while ((node = iter.next()) !== undefined) {
-    const fieldName = getName(node);
-    const fieldKey = keyOfField(
-      fieldName,
-      getFieldArguments(node, ctx.variables)
-    );
-
-    if (process.env.NODE_ENV !== 'production' && ctx.store.schema && typename) {
-      isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
-    }
-
-    if (node.selectionSet === undefined) {
-      InMemoryData.writeRecord(entityKey, fieldKey, undefined);
-    } else {
-      const fieldSelect = getSelectionSet(node);
-      const link = InMemoryData.readLink(entityKey, fieldKey);
-
-      InMemoryData.writeLink(entityKey, fieldKey, undefined);
-      InMemoryData.writeRecord(entityKey, fieldKey, undefined);
-
-      if (Array.isArray(link)) {
-        for (let i = 0, l = link.length; i < l; i++) {
-          const childLink = link[i];
-          if (childLink !== null) {
-            invalidateSelection(ctx, childLink, fieldSelect);
-          }
-        }
-      } else if (link) {
-        invalidateSelection(ctx, link, fieldSelect);
-      }
-    }
-  }
+  InMemoryData.unforkDependencies();
+  InMemoryData.gc(store.data);
 };
