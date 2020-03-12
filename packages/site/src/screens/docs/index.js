@@ -61,10 +61,7 @@ const Docs = ({ isLoading, children }) => {
           </>
         ) : (
           <>
-            <Sidebar
-              sidebarOpen={sidebarOpen}
-              closeSidebar={closeSidebar}
-            />
+            <Sidebar sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
             <Article>{children}</Article>
           </>
         )}

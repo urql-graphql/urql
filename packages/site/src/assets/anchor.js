@@ -11,4 +11,3 @@ const SvgAnchor = props => (
 );
 
 export default SvgAnchor;
-

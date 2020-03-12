@@ -224,7 +224,11 @@ const MdLink = ({ href, children }) => {
     return <Link to={relative(from, to)}>{children}</Link>;
   }
 
-  return <a rel="external" href={href}>{children}</a>;
+  return (
+    <a rel="external" href={href}>
+      {children}
+    </a>
+  );
 };
 
 const HeadingText = styled.h1`
