@@ -7,6 +7,7 @@ import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
 
+import AnchorSvg from '../assets/anchor';
 import { relative } from './sidebar';
 
 const getLanguage = className => {
@@ -226,26 +227,45 @@ const MdLink = ({ href, children }) => {
   return <a rel="external" href={href}>{children}</a>;
 };
 
-const targetOffset = css`
-  &:target::before {
+const HeadingText = styled.h1`
+  &:target:before {
     content: '';
     display: block;
-    height: ${p => p.theme.layout.header};
-    margin: -${p => p.theme.layout.header} 0 0;
+    height: 1.5em;
+    margin: -1.5em 0 0;
   }
 `;
 
-const OffsetH1 = styled.h1`
-  ${targetOffset}
+const AnchorLink = styled.a`
+  display: inline-block;
+  color: ${p => p.theme.colors.accent};
+  padding-right: 0.5rem;
+  width: 2rem;
+
+  @media ${({ theme }) => theme.media.sm} {
+    margin-left: -2rem;
+    display: none;
+
+    ${HeadingText}:hover > & {
+      display: inline-block;
+    }
+  }
 `;
 
-const OffsetH2 = styled.h2`
-  ${targetOffset}
+const AnchorIcon = styled(AnchorSvg)`
+  height: 100%;
 `;
 
-const OffsetH3 = styled.h3`
-  ${targetOffset}
-`;
+const Header = tag => ({ id, children }) => {
+  return (
+    <HeadingText as={tag} id={id}>
+      <AnchorLink href={`#${id}`}>
+        <AnchorIcon />
+      </AnchorLink>
+      {children}
+    </HeadingText>
+  );
+};
 
 const components = {
   pre: Pre,
@@ -257,9 +277,9 @@ const components = {
   th: TableHeader,
   td: TableCell,
   a: MdLink,
-  h1: OffsetH1,
-  h2: OffsetH2,
-  h3: OffsetH3,
+  h1: HeadingText,
+  h2: Header('h2'),
+  h3: Header('h3'),
 };
 
 export const MDXComponents = ({ children }) => (

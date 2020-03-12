@@ -77,7 +77,9 @@ export const SidebarNavItem = styled(NavLink).attrs(() => ({
   }
 `;
 
-export const ChevronItem = styled(ChevronIcon)`
+export const ChevronItem = styled(ChevronIcon).attrs(() => ({
+  'aria-hidden': 'true',
+}))`
   display: inline-block;
   color: inherit;
   vertical-align: baseline;
