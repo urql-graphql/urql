@@ -59,14 +59,14 @@ export const relative = (from, to) => {
   return { pathname };
 };
 
-export const SidebarStyling = ({ children, sidebarOpen }) => {
+export const SidebarStyling = ({ children, sidebarOpen, closeSidebar }) => {
   const basepath = useBasepath() || '';
   const homepage = basepath ? `/${basepath}/` : '/';
 
   return (
     <>
       <SideBarStripes />
-      <SidebarContainer hidden={!sidebarOpen}>
+      <SidebarContainer hidden={!sidebarOpen} onClick={closeSidebar}>
         <SidebarWrapper>
           <HeroLogoLink to={homepage}>
             <HeroLogo />

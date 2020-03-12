@@ -6,6 +6,10 @@ import ChevronIcon from '../assets/chevron';
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
   position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 100%;
 
   @media ${({ theme }) => theme.media.sm} {
     display: block;

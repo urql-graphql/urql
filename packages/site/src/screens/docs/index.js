@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 
 import Article, { ArticleStyling } from './article';
@@ -38,6 +38,10 @@ const OpenCloseSidebar = styled.img.attrs(props => ({
 const Docs = ({ isLoading, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const closeSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, [setSidebarOpen]);
+
   return (
     <>
       <Header />
@@ -49,12 +53,18 @@ const Docs = ({ isLoading, children }) => {
         {/* load just the styles if Suspense fallback in use */}
         {isLoading ? (
           <>
-            <SidebarStyling sidebarOpen={sidebarOpen} />
+            <SidebarStyling
+              sidebarOpen={sidebarOpen}
+              closeSidebar={closeSidebar}
+            />
             <ArticleStyling>{children}</ArticleStyling>
           </>
         ) : (
           <>
-            <Sidebar sidebarOpen={sidebarOpen} />
+            <Sidebar
+              sidebarOpen={sidebarOpen}
+              closeSidebar={closeSidebar}
+            />
             <Article>{children}</Article>
           </>
         )}
