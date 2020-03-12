@@ -15,14 +15,7 @@ import {
 
 import { invariant, warn, pushDebugNode } from '../helpers/help';
 
-import {
-  NullArray,
-  Fragments,
-  Variables,
-  Data,
-  Link,
-  OperationRequest,
-} from '../types';
+import { NullArray, Variables, Data, Link, OperationRequest } from '../types';
 
 import {
   Store,
@@ -35,21 +28,10 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { SelectionIterator, ensureData } from './shared';
+import { Context, SelectionIterator, ensureData, makeContext } from './shared';
 
 export interface WriteResult {
   dependencies: Set<string>;
-}
-
-interface Context {
-  parentTypeName: string;
-  parentKey: string;
-  parentFieldKey: string;
-  fieldName: string;
-  store: Store;
-  variables: Variables;
-  fragments: Fragments;
-  optimistic?: boolean;
 }
 
 /** Writes a request given its response to the store */
@@ -76,15 +58,13 @@ export const startWrite = (
   const select = getSelectionSet(operation);
   const operationName = store.getRootKey(operation.operation);
 
-  const ctx: Context = {
-    parentTypeName: operationName,
-    parentKey: operationName,
-    parentFieldKey: '',
-    fieldName: '',
+  const ctx = makeContext(
     store,
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-  };
+    normalizeVariables(operation, request.variables),
+    getFragments(request.query),
+    operationName,
+    operationName
+  );
 
   if (process.env.NODE_ENV !== 'production') {
     pushDebugNode(operationName, operation);
@@ -122,16 +102,14 @@ export const writeOptimistic = (
     pushDebugNode(operationName, operation);
   }
 
-  const ctx: Context = {
-    parentTypeName: mutationRootKey,
-    parentKey: mutationRootKey,
-    parentFieldKey: '',
-    fieldName: '',
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
+  const ctx = makeContext(
     store,
-    optimistic: true,
-  };
+    normalizeVariables(operation, request.variables),
+    getFragments(request.query),
+    mutationRootKey,
+    mutationRootKey,
+    true
+  );
 
   const data = makeDict();
   const iter = new SelectionIterator(
@@ -202,15 +180,13 @@ export const writeFragment = (
     pushDebugNode(typename, fragment);
   }
 
-  const ctx: Context = {
-    parentTypeName: typename,
-    parentKey: entityKey,
-    parentFieldKey: '',
-    fieldName: '',
-    variables: variables || {},
-    fragments,
+  const ctx = makeContext(
     store,
-  };
+    variables || {},
+    fragments,
+    typename,
+    entityKey
+  );
 
   writeSelection(ctx, entityKey, getSelectionSet(fragment), writeData);
 };

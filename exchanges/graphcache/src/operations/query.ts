@@ -6,7 +6,6 @@ import {
   getFragmentTypeName,
   getFieldAlias,
 } from '../ast';
-import { warn, pushDebugNode } from '../helpers/help';
 
 import {
   getFragments,
@@ -16,7 +15,6 @@ import {
 } from '../ast';
 
 import {
-  Fragments,
   Variables,
   Data,
   DataField,
@@ -35,8 +33,9 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
+import { warn, pushDebugNode } from '../helpers/help';
 import { makeDict } from '../helpers/dict';
-import { SelectionIterator, ensureData } from './shared';
+import { Context, SelectionIterator, ensureData, makeContext } from './shared';
 
 import {
   isFieldAvailableOnType,
@@ -48,17 +47,6 @@ export interface QueryResult {
   dependencies: Set<string>;
   partial: boolean;
   data: null | Data;
-}
-
-interface Context {
-  parentTypeName: string;
-  parentKey: string;
-  parentFieldKey: string;
-  fieldName: string;
-  store: Store;
-  variables: Variables;
-  fragments: Fragments;
-  partial: boolean;
 }
 
 export const query = (
@@ -81,16 +69,13 @@ export const read = (
   const rootKey = store.getRootKey(operation.operation);
   const rootSelect = getSelectionSet(operation);
 
-  const ctx: Context = {
-    parentTypeName: rootKey,
-    parentKey: rootKey,
-    parentFieldKey: '',
-    fieldName: '',
+  const ctx = makeContext(
     store,
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    partial: false,
-  };
+    normalizeVariables(operation, request.variables),
+    getFragments(request.query),
+    rootKey,
+    rootKey
+  );
 
   if (process.env.NODE_ENV !== 'production') {
     pushDebugNode(rootKey, operation);
@@ -209,16 +194,13 @@ export const readFragment = (
     pushDebugNode(typename, fragment);
   }
 
-  const ctx: Context = {
-    parentTypeName: typename,
-    parentKey: entityKey,
-    parentFieldKey: '',
-    fieldName: '',
-    variables: variables || {},
-    fragments,
-    partial: false,
+  const ctx = makeContext(
     store,
-  };
+    variables || {},
+    fragments,
+    typename,
+    entityKey
+  );
 
   return (
     readSelection(ctx, entityKey, getSelectionSet(fragment), makeDict()) || null
