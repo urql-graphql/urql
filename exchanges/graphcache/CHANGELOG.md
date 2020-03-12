@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 2.2.3
+
+### Patch Changes
+
+- Apply commutative layers to all operations, so now including mutations and subscriptions, to ensure that unordered data is written in the correct order, by [@kitten](https://github.com/kitten) (See [#593](https://github.com/FormidableLabs/urql/pull/593))
+- Updated dependencies (See [#607](https://github.com/FormidableLabs/urql/pull/607) and [#601](https://github.com/FormidableLabs/urql/pull/601))
+  - @urql/core@1.10.0
+
 ## 2.2.2
 
 ### Patch Changes

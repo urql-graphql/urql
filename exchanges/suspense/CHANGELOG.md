@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.4
+
+### Patch Changes
+
+- Enable users to configure suspense flag on `next-urql` and clean up suspense warning message, by [@ryan-gilb](https://github.com/ryan-gilb) (See [#603](https://github.com/FormidableLabs/urql/pull/603))
+- Updated dependencies (See [#607](https://github.com/FormidableLabs/urql/pull/607) and [#601](https://github.com/FormidableLabs/urql/pull/601))
+  - @urql/core@1.10.0
+
 ## 1.8.3
 
 ### Patch Changes

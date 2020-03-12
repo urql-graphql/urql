@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+### Patch Changes
+
+- Pass the `Client` down in `withUrqlClient.getInitialProps` to prevent it from being created twice, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#589](https://github.com/FormidableLabs/urql/pull/589))
+- Add missing GraphQLError serialization for extensions and path field to ssrExchange, by [@kitten](https://github.com/kitten) (See [#607](https://github.com/FormidableLabs/urql/pull/607))
+- Enable users to configure the `suspense` option and clean up suspense warning message, by [@ryan-gilb](https://github.com/ryan-gilb) (See [#603](https://github.com/FormidableLabs/urql/pull/603))
+
 ## 0.3.1
 
 ### Patch Changes

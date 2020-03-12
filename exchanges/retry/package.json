@@ -54,5 +54,8 @@
   "dependencies": {
     "@urql/core": ">=1.9.0",
     "wonka": "^4.0.7"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

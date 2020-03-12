@@ -52,5 +52,8 @@
   "devDependencies": {
     "graphql": "^14.5.8",
     "svelte": "^3.16.7"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
