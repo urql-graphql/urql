@@ -34,13 +34,15 @@ const options = {
   retryIf: err => err && err.networkError,
 };
 
+// Note the position of the retryExchange - it should be placed prior to the
+// fetchExchange and after the cacheExchange for it to function correctly
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
     dedupExchange,
     cacheExchange,
-    fetchExchange,
     retryExchange(options), // Use the retryExchange factory to add a new exchange
+    fetchExchange,
   ],
 });
 ```
