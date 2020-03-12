@@ -13,6 +13,9 @@ const Fixed = styled.header`
   width: 100%;
   z-index: 1;
 
+  box-sizing: border-box;
+  height: ${p => p.theme.layout.header};
+
   background: ${p => p.theme.colors.bg};
   border-bottom: 1px solid ${p => p.theme.colors.border};
   padding: 0 ${p => p.theme.spacing.md};
@@ -21,9 +24,9 @@ const Fixed = styled.header`
 
 const Wrapper = styled.div`
   width: 100%;
+  height: 100%;
   max-width: ${p => p.theme.layout.page};
   margin: 0 auto;
-  height: ${p => p.theme.layout.header};
   padding-top: 2px;
   display: flex;
   flex-direction: row;
