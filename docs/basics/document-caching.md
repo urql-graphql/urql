@@ -50,6 +50,41 @@ docs.](../api/core.md#requestpolicy-type)
 This cache has a small trade-off! If we request a list of data and the API returns an empty list,
 the cache won't be able to see the `__typename` of said list and won't invalidate.
 
-Once you've encountered this problem you've likely hit the limits of the _Document Caching_
-approach, and you may want to [switch to "Normalized Caching"
-instead.](../graphcache/normalized-caching.md)
+There are two ways to fix this issue, supplying `additionalTypenames` to the context of your query or [switch to "Normalized Caching"
+instead](../graphcache/normalized-caching.md).
+
+### Adding typenames
+
+This will elaborate about the first fix for empty lists, the `additionalTypenames`.
+
+Example where this would occur:
+
+```js
+const query = `query { todos { id name } }`;
+const result = { todos: [] };
+```
+
+At this point we don't know what types are possible for this query, so a best practice when using
+the default cache is to add `additionalTypenames` for this query.
+
+```js
+// Keep the reference stable.
+const context = useMemo(() => ({ additionalTypenames: ['Todo'] }), []);
+const [result] = useQuery({ query, context });
+```
+
+Now the cache will know when to invalidate this query even when the list is empty.
+
+We also have the possibility to use this for `mutations`.
+There are moments where a mutation can cause a side-effect on your server side and it needs
+to invalidate an additional entity.
+
+```js
+const [result, execute] = useMutation(`mutation($name: String!) { createUser(name: $name) }`);
+
+const onClick = () => {
+  execute({ context: { additionalTypenames: ['Wallet'] } });
+};
+```
+
+Now our `mutation` knows that when it completes it has an additional type to invalidate.

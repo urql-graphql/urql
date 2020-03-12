@@ -197,6 +197,37 @@ describe('on mutation', () => {
 
     expect(reexecuteOperation).toBeCalledTimes(1);
   });
+
+  it('retriggers query operation with additionalTypenames', () => {
+    const typename = 'ExampleType';
+    const resultCache = new Map([[123, queryResponse]]);
+    const operationCache = { [`${typename}-2`]: new Set([123]) };
+
+    afterMutation(
+      resultCache,
+      operationCache,
+      exchangeArgs.client
+    )({
+      ...mutationResponse,
+      operation: {
+        ...mutationResponse.operation,
+        context: {
+          ...mutationResponse.operation.context,
+          additionalTypenames: [`${typename}-2`],
+        },
+      },
+      data: {
+        todos: [
+          {
+            id: 1,
+            __typename: typename,
+          },
+        ],
+      },
+    });
+
+    expect(reexecuteOperation).toBeCalledTimes(1);
+  });
 });
 
 describe('on subscription', () => {

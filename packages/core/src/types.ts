@@ -44,6 +44,7 @@ export interface OperationDebugMeta {
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
   [key: string]: any;
+  additionalTypenames?: string[];
   fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;

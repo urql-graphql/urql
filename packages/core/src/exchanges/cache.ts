@@ -129,8 +129,12 @@ export const afterMutation = (
   client: Client
 ) => (response: OperationResult) => {
   const pendingOperations = new Set<number>();
+  const { additionalTypenames } = response.operation.context;
 
-  collectTypesFromResponse(response.data).forEach(typeName => {
+  [
+    ...collectTypesFromResponse(response.data),
+    ...(additionalTypenames || []),
+  ].forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {
@@ -154,6 +158,7 @@ const afterQuery = (
   operationCache: OperationCache
 ) => (response: OperationResult) => {
   const { operation, data, error } = response;
+  const { additionalTypenames } = operation.context;
 
   if (data === undefined || data === null) {
     return;
@@ -161,7 +166,10 @@ const afterQuery = (
 
   resultCache.set(operation.key, { operation, data, error });
 
-  collectTypesFromResponse(response.data).forEach(typeName => {
+  [
+    ...collectTypesFromResponse(response.data),
+    ...(additionalTypenames || []),
+  ].forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.add(operation.key);
