@@ -6,7 +6,7 @@ order: 4
 # Retrying Operations
 
 The `retryExchange` lets us retry specific operation, by default it will
-retry only `network errors` but we can specify additional options to add
+retry only network errors but we can specify additional options to add
 functionality.
 
 ## Installation and Setup
@@ -61,7 +61,7 @@ Talking about increasing the `delay` randomly, `randomDelay` allows us to disabl
 
 We don't want to infinitley attempt an `operation`, we can declare how many times it should attempt the `operation` with `maxNumberAttempts`.
 
-[For more information on the available options check out the API Docs.](../api/retryExchange.md)
+[For more information on the available options check out the API Docs.](../api/retry-exchange.md)
 
 ## Reacting to Different Errors
 

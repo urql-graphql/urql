@@ -5,7 +5,14 @@ order: 0
 
 # Retry Exchange
 
-## Available Options
+The `@urql/exchange-retry` package contains an addon `retryExchange` for `urql` that may be used to
+let failed operations be retried, typically when a previous operation has failed with a network
+error.
+
+[Read more about how to use and configure the `retryExchange` on the "Retry Operations"
+page.](../advanced/retry-operations.md)
+
+## Options
 
 | Option              | Description                                                                                                                                                                                                                                                                                                                                                                                      |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
