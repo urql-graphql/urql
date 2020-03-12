@@ -76,8 +76,8 @@ export interface OperationResult<Data = any> {
 
 /** Input parameters for to an Exchange factory function. */
 export interface ExchangeInput {
-  forward: ExchangeIO;
   client: Client;
+  forward: ExchangeIO;
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
@@ -85,3 +85,14 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
+
+/** Debug event types (interfaced for declaration merging). */
+export interface DebugEventTypes {
+  dedup: { operation: Operation };
+  cacheHit: { operation: Operation; value: any };
+  cacheInvalidation: { value: string[] };
+}
+
+export type DebugEvent<
+  T extends keyof DebugEventTypes = keyof DebugEventTypes
+> = { type: T; message: string; data: DebugEventTypes[T] };

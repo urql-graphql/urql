@@ -57,6 +57,15 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
+
+        if (cachedResult) {
+          client.eventTarget.dispatchEvent({
+            type: 'cacheHit',
+            message: 'A cache hit has occured',
+            data: { operation: operation, value: cachedResult },
+          });
+        }
+
         const result: OperationResult = {
           ...cachedResult,
           operation: addMetadata(operation, {
@@ -131,10 +140,18 @@ export const afterMutation = (
   const pendingOperations = new Set<number>();
   const { additionalTypenames } = response.operation.context;
 
-  [
+  const invalidTypeNames = [
     ...collectTypesFromResponse(response.data),
     ...(additionalTypenames || []),
-  ].forEach(typeName => {
+  ];
+
+  client.eventTarget.dispatchEvent({
+    type: 'cacheInvalidation',
+    message: `The following typenames have been invalidated: ${invalidTypeNames}`,
+    data: { value: invalidTypeNames },
+  });
+
+  invalidTypeNames.forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {
