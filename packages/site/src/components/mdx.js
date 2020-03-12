@@ -223,7 +223,7 @@ const MdLink = ({ href, children }) => {
     return <Link to={relative(from, to)}>{children}</Link>;
   }
 
-  return <a href={href}>{children}</a>;
+  return <a rel="external" href={href}>{children}</a>;
 };
 
 const targetOffset = css`
