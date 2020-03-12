@@ -160,6 +160,30 @@ yarn
 yarn run check
 ```
 
+## When and how do I add a changeset?
+
+Our changelogs and releases are maintained using `changeset`. For each PR that actively changes the
+behaviour of one or more packages in our monorepo it allows you to log the change and classify it
+per package as either `patch`, `minor`, or `major`.
+
+You won't need to add a changeset if you're simply making "non-visible" changes to the docs or other
+files that aren't published to `npm`.
+
+If you are however making visible changes you can track a change by calling the `changeset` CLI.
+
+```sh
+# In the root of the urql repository call:
+yarn changeset
+```
+
+This will open an interactive CLI that asks you to track your changes and enter a change message.
+You should always add to the message, what you've changed (not which package if it's only for a
+single package though) and what the impact is. If it's a breaking change it should also include some
+instructions on how users should update their code.
+
+This will create a new "changeset file" in the `.changeset` folder, which you should commit and
+push, so that it's added to your PR.
+
 ## How do I release new versions of our packages?
 
 The process of releasing versions is automated using `changeset`. This moves a lot of
@@ -169,12 +193,38 @@ applied and our `CHANGELOG`s are updated.
 
 First check what changes you're about to release with `yarn changeset status`.
 
-Then the process is similar to using `yarn version` and `yarn publish`:
+Then the process is similar to using `yarn version` and `yarn publish`.
+
+First we'll run `yarn changeset version` to bump all packages' versions and update CHANGELOG files:
 
 ```sh
 # This will automatically bump versions as necessary and update CHANGELOG files:
 yarn changeset version
-# Please check all versions and CHANGELOGs manually.
+```
+
+> **Note:** This command requires you to create a [GitHub Personal Access Token](https://github.com/settings/tokens/new)
+> and have it set on the `GITHUB_TOKEN` environment variable, either globally, e.g. in your
+> `~/.profile` file, or locally in a `.env` file.
+
+Then verify that the updated `package.json` and `CHANGELOG.md` files look correct and commit the
+changes:
+
+```sh
+# Commit all updated files
+git commit -a -m 'Version Packages'
+```
+
+At this point we have a new commit with packages that have been updated and should be published.
+Please don't push this commit before publishing so that we keep `master` in a pre-release state, in
+case the publish actually fails!
+
+```
 # Then publish all new packages / versions:
 yarn changeset publish
+# And push the "Version Packages" commit and all tags afterwards:
+git push && git push --tags
 ```
+
+Publishing the packages will also create the tags, it won't however push them automatically. After
+you've pushed the new tags, please make sure to update releases with the new content in each
+`CHANGELOG.md`, like so: https://github.com/FormidableLabs/urql/releases/tag/%40urql%2Fexchange-graphcache%402.2.2
