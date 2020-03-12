@@ -16,6 +16,13 @@ const normalize = name => name
 
 const name = normalize(pkg.name);
 
+if (pkg.name.startsWith('@urql/')) {
+  invariant(
+    pkg.publishConfig.access === 'public',
+    'package.json:publishConfig.access must be set to public for @urql/* packages'
+  );
+}
+
 invariant(
   path.normalize(cwd) !== path.normalize(workspaceRoot),
   'prepare-pkg must be run in a package.'
