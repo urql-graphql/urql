@@ -92,23 +92,6 @@ const Todo = ({ id, title }) => {
 };
 ```
 
-### Adding typenames
-
-There are moments where a mutation can cause a side-effect on your server side and it needs
-to invalidate an additional entity.
-
-For this scenario you can pass `additionalTypenames` to the context.
-
-```js
-const [result, execute] = useMutation(`mutation($name: String!) { createUser(name: $name) }`);
-
-const onClick = () => {
-  execute({ context: { additionalTypenames: ['Wallet'] } });
-};
-```
-
-Now our `mutation` knows that when it completes it has an additional type to invalidate.
-
 ### Reading on
 
 There are some more tricks we can use with `useMutation`. [Read more about its API in the API docs for
