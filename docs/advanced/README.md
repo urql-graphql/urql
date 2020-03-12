@@ -14,4 +14,5 @@ chapter.](../concepts/README.md)
 - [**Server-side Rendering**](./server-side-rendering.md) guides us through how to set up server-side rendering and rehydration.
 - [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon which can make it easier to
   update normalized data after mutations.
+- [**Retrying operations**](./retry-operations.md) shows the `retryExchange` which allows you to retry operations when they've failed.
 - [**Testing**](./testing.md) covers how to test components that use `urql` particularly in React.

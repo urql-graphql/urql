@@ -204,7 +204,7 @@ properties you'll likely see some options that exist on the `Client` as well.
 | meta                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
 | suspense            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
 | preferGetMethod     | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
-| additionalTypenames | `?number`                             | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)              |
+| additionalTypenames | `?number`                             | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.

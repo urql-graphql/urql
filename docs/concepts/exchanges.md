@@ -20,6 +20,13 @@ The default set of exchanges that `@urql/core` contains and applies to a `Client
 - `cacheExchange`: The default caching logic with ["Document Caching"](../basics/document-caching.md)
 - `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
 
+Other available exchanges:
+
+- `retryExchange`: Allows operations to be retried
+- `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
+- `multipartFetchExchange`: Provides multipart file upload capability
+- `suspenseExchange` (experimental): Allows the use of React Suspense on the client-side with `urql`'s built-in suspense mode
+
 It is also possible to apply custom exchanges to override the default logic.
 
 ## An Exchange Signature
