@@ -51,4 +51,4 @@ This cache has a small trade-off! If we request a list of data and the API retur
 the cache won't be able to see the `__typename` of said list and won't invalidate.
 
 There are two ways to fix this issue, supplying `additionalTypenames` to the context of your query or [switch to "Normalized Caching"
-instead.](../graphcache/normalized-caching.md).
+instead](../graphcache/normalized-caching.md).
