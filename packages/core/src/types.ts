@@ -25,12 +25,20 @@ export type RequestPolicy =
 /** How the operation has */
 export type CacheOutcome = 'miss' | 'partial' | 'hit';
 
+/** Serialisable GraphQL primitives */
+type Primitive = PrimitiveMap | number | boolean | string | null | undefined;
+
+/** A map of primitives and primitive maps */
+interface PrimitiveMap {
+  [key: string]: Primitive | Primitive[] | PrimitiveMap;
+}
+
 /** A Graphql query, mutation, or subscription. */
 export interface GraphQLRequest {
   /** Unique identifier of the request. */
   key: number;
   query: DocumentNode;
-  variables?: object;
+  variables?: PrimitiveMap;
 }
 
 /** Metadata that is only available in development for devtools. */
@@ -60,7 +68,7 @@ export interface Operation extends GraphQLRequest {
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface OperationResult<Data = any> {
+export interface OperationResult<Data extends PrimitiveMap = PrimitiveMap> {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation;
   /** The data returned from the Graphql server. */
