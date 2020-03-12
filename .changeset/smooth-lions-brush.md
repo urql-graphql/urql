@@ -1,5 +1,5 @@
 ---
-'next-urql': minor
+'next-urql': patch
 '@urql/exchange-suspense': patch
 ---
 
