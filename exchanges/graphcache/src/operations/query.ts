@@ -1,4 +1,5 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+
 import {
   getSelectionSet,
   getName,
@@ -35,7 +36,14 @@ import {
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode } from '../helpers/help';
 import { makeDict } from '../helpers/dict';
-import { Context, SelectionIterator, ensureData, makeContext } from './shared';
+
+import {
+  Context,
+  SelectionIterator,
+  ensureData,
+  makeContext,
+  updateContext,
+} from './shared';
 
 import {
   isFieldAvailableOnType,
@@ -251,10 +259,7 @@ const readSelection = (
     if (resolvers !== undefined && typeof resolvers[fieldName] === 'function') {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
-      ctx.parentTypeName = typename;
-      ctx.parentKey = entityKey;
-      ctx.parentFieldKey = key;
-      ctx.fieldName = fieldName;
+      updateContext(ctx, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
@@ -436,7 +441,7 @@ const readResolverResult = (
     // a partial query result
     if (
       dataFieldValue === undefined &&
-      store.schema !== undefined &&
+      store.schema &&
       isFieldNullable(store.schema, typename, fieldName)
     ) {
       // The field is uncached but we have a schema that says it's nullable

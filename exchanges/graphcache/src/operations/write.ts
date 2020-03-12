@@ -28,7 +28,13 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { makeDict } from '../helpers/dict';
-import { Context, SelectionIterator, ensureData, makeContext } from './shared';
+import {
+  Context,
+  SelectionIterator,
+  ensureData,
+  makeContext,
+  updateContext,
+} from './shared';
 
 export interface WriteResult {
   dependencies: Set<string>;
@@ -126,10 +132,18 @@ export const writeOptimistic = (
       const resolver = ctx.store.optimisticMutations[fieldName];
 
       if (resolver !== undefined) {
-        // We have to update the context to reflect up-to-date ResolveInfo
-        ctx.fieldName = fieldName;
-
         const fieldArgs = getFieldArguments(node, ctx.variables);
+        const fieldKey = keyOfField(fieldName, fieldArgs);
+
+        // We have to update the context to reflect up-to-date ResolveInfo
+        updateContext(
+          ctx,
+          mutationRootKey,
+          mutationRootKey,
+          fieldKey,
+          fieldName
+        );
+
         const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
         const resolverData = ensureData(resolverValue);
         writeRootField(ctx, resolverData, getSelectionSet(node));
@@ -333,10 +347,7 @@ const writeRoot = (
 
     if (isRootField) {
       // We have to update the context to reflect up-to-date ResolveInfo
-      ctx.parentTypeName = typename;
-      ctx.parentKey = typename;
-      ctx.parentFieldKey = fieldKey;
-      ctx.fieldName = fieldName;
+      updateContext(ctx, typename, typename, fieldKey, fieldName);
 
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary

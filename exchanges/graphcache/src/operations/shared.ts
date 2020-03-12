@@ -47,6 +47,19 @@ export const makeContext = (
   optimistic: !!optimistic,
 });
 
+export const updateContext = (
+  ctx: Context,
+  typename: string,
+  entityKey: string,
+  fieldKey: string,
+  fieldName: string
+) => {
+  ctx.parentTypeName = typename;
+  ctx.parentKey = entityKey;
+  ctx.parentFieldKey = fieldKey;
+  ctx.fieldName = fieldName;
+};
+
 const isFragmentHeuristicallyMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,
   typename: void | string,
