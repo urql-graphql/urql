@@ -18,8 +18,8 @@ render-props components.](../api/urql.md#components)
 
 ### Run a first query
 
-For the following examples imagine we are querying data from a GraphQL API that contains todo items
-Let's dive right into an example!
+For the following examples, we'll imagine that we're querying data from a GraphQL API that contains
+todo items. Let's dive right into it!
 
 ```jsx
 import { useQuery } from 'urql';
@@ -53,19 +53,19 @@ const Todos = () => {
 };
 ```
 
-Here we have implemented our first GraphQL query to fetch todos. We see that using `useQuery`
-accepts options — in this case we've set `query` to our GraphQL query — and returns a tuple — an
-array that contains a result and a reexecute function.
+Here we have implemented our first GraphQL query to fetch todos. We see that `useQuery` accepts
+options and returns a tuple. In this case we've set the `query` option to our GraphQL query. The
+tuple we then get in return is an array that contains a result object and a re-execute function.
 
-The result contains several properties. The `fetching` field indicates whether we're currently loading
-data, `data` contains the actual `data` from the API's result, and `error` is set when either the
-request to the API has failed or when our result contained some `GraphQLError`s, which
+The result object contains several properties. The `fetching` field indicates whether we're currently
+loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
+the request to the API has failed or when our API result contained some `GraphQLError`s, which
 we'll get into later on the ["Errors" page](./errors.md).
 
 ### Variables
 
-Typically we'll also need to pass variables to our queries, for instance What if we are dealing with
-pagination? For this purpose the `useQuery` hook also accepts a `variables` option, which we can use
+Typically we'll also need to pass variables to our queries, for instance, if we are dealing with
+pagination. For this purpose the `useQuery` hook also accepts a `variables` option, which we can use
 to supply variables to our query.
 
 ```jsx
@@ -89,24 +89,27 @@ const Todos = ({ from, limit }) => {
 ```
 
 As when we're sending GraphQL queries manually using `fetch`, the variables will be attached to the
-`POST` request that is sent to our GraphQL API.
+`POST` request body that is sent to our GraphQL API.
 
-Whenever the `variables` (or the `query`) option on
-the `useQuery` hook changes `fetching` will return to being `true` and a new request will be sent to
-our API, unless a result has already been cached previously.
+Whenever the `variables` (or the `query`) option on the `useQuery` hook changes `fetching` will
+switch to `true` and a new request will be sent to our API, unless a result has already been cached
+previously.
 
 ### Pausing `useQuery`
 
-In some cases we may want `useQuery` to execute a query when a precondition has been met. For
-instance, we may be building a form and want validation to only take place when a field has been
-filled out.
+In some cases we may want `useQuery` to execute a query when a pre-condition has been met, and not
+execute the query otherwise. For instance, we may be building a form and want a validation query to
+only take place when a field has been filled out.
+
+Since hooks in React can't just be commented out, the `useQuery` hook accepts a `pause` option that
+temporarily _freezes_ all changes and stops requests.
 
 In the previous example we've defined a query with mandatory arguments. The `$from` and `$limit`
 variables have been defined to be non-nullable `Int!` values.
 
 Let's pause the query we've just
 written to not execute when these variables are empty, to prevent `null` variables from being
-executed. We can do this by means of the `pause` option.
+executed. We can do this by means of setting the `pause` option to `true`:
 
 ```jsx
 const Todos = ({ from, limit }) => {
@@ -149,6 +152,9 @@ the background.
 
 For this reason there's another field on results, `result.stale`, which indicates that the cached
 result is either outdated or that another request is being sent in the background.
+
+Request policies aren't specific to `urql`'s React API, but are a common feature in its core. [You
+can learn more about request policies on the API docs.](../api/core.md#requestpolicy)
 
 ### Reexecuting Queries
 
