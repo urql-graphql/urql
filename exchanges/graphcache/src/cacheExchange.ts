@@ -29,7 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
-import { Store, noopDataState, clearLayer, reserveLayer } from './store';
+import { Store, noopDataState, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -77,6 +77,10 @@ const isQueryOperation = (op: Operation): boolean =>
 // Returns whether an operation is a mutation
 const isMutationOperation = (op: Operation): boolean =>
   op.operationName === 'mutation';
+
+// Returns whether an operation is a subscription
+const isSubscriptionOperation = (op: Operation): boolean =>
+  op.operationName === 'subscription';
 
 // Returns whether an operation can potentially be read from cache
 const isCacheableQuery = (op: Operation): boolean => {
@@ -171,7 +175,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This registers queries with the data layer to ensure commutativity
   const prepareCacheForResult = (operation: Operation) => {
-    if (operation.operationName === 'query') {
+    if (isQueryOperation(operation)) {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
@@ -180,8 +184,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This executes an optimistic update for mutations and registers it if necessary
   const optimisticUpdate = (operation: Operation) => {
+    const { key } = operation;
     if (isOptimisticMutation(operation)) {
-      const { key } = operation;
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
         optimisticKeysToDependencies.set(key, dependencies);
@@ -189,6 +193,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
       }
+    } else {
+      noopDataState(store.data, key, true);
     }
   };
 
@@ -244,13 +250,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const { key } = operation;
     const pendingOperations = new Set<number>();
 
-    if (!isQuery) {
+    if (isMutationOperation(operation)) {
       collectPendingOperations(
         pendingOperations,
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
-      clearLayer(store.data, key);
+    } else if (isSubscriptionOperation(operation)) {
+      // If we're writing a subscription, we ad-hoc reserve a layer
+      reserveLayer(store.data, operation.key);
     }
 
     let writeDependencies: Set<string> | void;
