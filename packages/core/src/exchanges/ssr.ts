@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { pipe, share, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
 import { CombinedError } from '../utils';
@@ -5,8 +6,8 @@ import { CombinedError } from '../utils';
 export interface SerializedResult {
   data?: any;
   error?: {
+    graphQLErrors: Array<Partial<GraphQLError> | string>;
     networkError?: string;
-    graphQLErrors: string[];
   };
 }
 
@@ -35,9 +36,17 @@ const serializeResult = ({
   error,
 }: OperationResult): SerializedResult => {
   const result: SerializedResult = { data, error: undefined };
-  if (error !== undefined) {
+  if (error) {
     result.error = {
-      graphQLErrors: error.graphQLErrors.map(x => x.message),
+      graphQLErrors: error.graphQLErrors.map(error => {
+        if (!error.path && !error.extensions) return error.message;
+
+        return {
+          message: error.message,
+          path: error.path,
+          extensions: error.extensions,
+        };
+      }),
       networkError: error.networkError ? '' + error.networkError : undefined,
     };
   }
