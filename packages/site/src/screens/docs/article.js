@@ -21,7 +21,7 @@ const Content = styled.article.attrs(() => ({
   id: 'page-content',
 }))`
   flex: 1;
-  min-height: 100vh;
+  min-height: calc(100vh - ${p => p.theme.layout.header});
   background: ${p => p.theme.colors.bg};
   padding: ${p => p.theme.spacing.md};
 

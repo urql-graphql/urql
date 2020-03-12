@@ -6,6 +6,10 @@ import ChevronIcon from '../assets/chevron';
 export const SidebarContainer = styled.div`
   display: ${p => (p.hidden ? 'none' : 'block')};
   position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 100%;
 
   @media ${({ theme }) => theme.media.sm} {
     display: block;
@@ -73,7 +77,9 @@ export const SidebarNavItem = styled(NavLink).attrs(() => ({
   }
 `;
 
-export const ChevronItem = styled(ChevronIcon)`
+export const ChevronItem = styled(ChevronIcon).attrs(() => ({
+  'aria-hidden': 'true',
+}))`
   display: inline-block;
   color: inherit;
   vertical-align: baseline;

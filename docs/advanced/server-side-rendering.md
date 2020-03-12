@@ -12,8 +12,8 @@ through the `ssrExchange.`
 ## The SSR Exchange
 
 The `ssrExchange` has two functions. On the server-side it's able to gather all results as they're
-being fetched, which can then be serialised and sent to the client. On the client-side it's able to
-use these serialised results to rehydrate and render the application without refetching this data.
+being fetched, which can then be serialized and sent to the client. On the client-side it's able to
+use these serialized results to rehydrate and render the application without refetching this data.
 
 To start out with the `ssrExchange` we have to add the exchange to our `Client`:
 
@@ -28,7 +28,7 @@ import {
 
 const isServerSide = typeof window === 'undefined';
 
-// The `ssrExchange` must be initialised with `isClient` and `initialState`
+// The `ssrExchange` must be initialized with `isClient` and `initialState`
 const ssr = ssrExchange({
   isClient: !isServerSide,
   initialState: !isServerSide ? window.__URQL_DATA__ : undefined,
@@ -44,11 +44,11 @@ const client createClient({
 });
 ```
 
-The `ssrExchange` must be initialised with the `isClient` and `initialState` options. The `isClient`
+The `ssrExchange` must be initialized with the `isClient` and `initialState` options. The `isClient`
 option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`.
 
-The `initialState` option should be set to the serialised data you retrieve on your server-side.
-This data may be retrieved using methods on `ssrExchange()`. You can retrive the serialised data
+The `initialState` option should be set to the serialized data you retrieve on your server-side.
+This data may be retrieved using methods on `ssrExchange()`. You can retrive the serialized data
 after server-side rendering using `ssr.extractData()`:
 
 ```js

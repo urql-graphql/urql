@@ -200,7 +200,7 @@ generated using `cache.keyOfField`.
 cache.resolveFieldByKey({ __typename: 'Query' }, cache.keyOfField('todo', { id: 1 })); // 'Todo:1'
 ```
 
-This specialised method is likely only going to be useful in combination with
+This specialized method is likely only going to be useful in combination with
 [`cache.inspectFields`](#inspectfields).
 
 ### inspectFields

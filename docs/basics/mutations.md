@@ -11,7 +11,7 @@ API [previously on the "Queries" page.](./queries.md)
 
 ## React & Preact
 
-This guide covers how to query data with React and Preact, which share almost the same API.
+This guide covers how to send mutations in React and Preact, which share almost the same API.
 
 Both libraries offer a `useMutation` hook and a `Mutation` component. The latter accepts the same
 parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
@@ -19,14 +19,15 @@ render-props components.](../api/urql.md#components)
 
 ### Sending a mutation
 
-Let's pick up an example in an imaginary todo items GraphQL API and dive into an example!
-We'll set up a mutation that _updates_ a todo item.
+Let's again pick up an example with an imaginary GraphQL API for todo items, and dive into an
+example! We'll set up a mutation that _updates_ a todo item's title.
 
 ```jsx
 const UpdateTodo = `
   mutation ($id: ID!, $title: String!) {
     updateTodo (id: $id, title: $title) {
       id
+      title
     }
   }
 `;
