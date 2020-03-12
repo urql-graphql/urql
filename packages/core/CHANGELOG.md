@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.10.1
+
+### Patch Changes
+
+- ⚠️ Fix Rollup bundle output being written to .es.js instead of .esm.js, by [@kitten](https://github.com/kitten) (See [#609](https://github.com/FormidableLabs/urql/pull/609))
+
 ## 1.10.0
 
 ### Minor Changes
