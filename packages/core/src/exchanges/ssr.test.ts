@@ -71,6 +71,35 @@ it('caches errored query results correctly', () => {
   });
 });
 
+it('caches complex GraphQLErrors in query results correctly', () => {
+  output.mockReturnValueOnce({
+    ...queryResponse,
+    data: null,
+    error: new CombinedError({
+      graphQLErrors: [
+        {
+          message: 'Oh no!',
+          path: ['Query'],
+          extensions: { test: true },
+        },
+      ],
+    }),
+  });
+
+  const ssr = ssrExchange();
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+
+  const error = ssr.extractData()[queryOperation.key].error;
+
+  expect(error).toHaveProperty('graphQLErrors.0.message', 'Oh no!');
+  expect(error).toHaveProperty('graphQLErrors.0.path', ['Query']);
+  expect(error).toHaveProperty('graphQLErrors.0.extensions.test', true);
+});
+
 it('resolves cached query results correctly', () => {
   const onPush = jest.fn();
 

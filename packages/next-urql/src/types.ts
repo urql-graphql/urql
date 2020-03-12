@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { NextPageContext } from 'next';
 import { ClientOptions, Exchange, Client } from 'urql';
 import { AppContext } from 'next/app';
@@ -38,8 +39,8 @@ export interface WithUrqlProps extends WithUrqlClient, WithUrqlState {
 export interface SerializedResult {
   data?: any;
   error?: {
+    graphQLErrors: Array<Partial<GraphQLError> | string>;
     networkError?: string;
-    graphQLErrors: string[];
   };
 }
 
