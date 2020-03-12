@@ -9,6 +9,7 @@ import {
   Source,
   pipe,
   map,
+  merge,
   mergeMap,
   filter,
   fromValue,
@@ -1081,5 +1082,288 @@ describe('commutativity', () => {
     jest.advanceTimersByTime(30);
     expect(output).toHaveBeenCalledTimes(3);
     expect(data.index).toBe(3);
+  });
+
+  it('applies optimistic updates on top of commutative queries', () => {
+    let data: any;
+    const client = createClient({ url: 'http://0.0.0.0', });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(nextOp);
+
+    const query = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(ops$, filter(() => false)) as any,
+        res$,
+      ]);
+
+    const optimistic = {
+      node: () => ({
+        __typename: 'Node',
+        id: 'node',
+        name: 'optimistic',
+      })
+    };
+
+    pipe(
+      cacheExchange({ optimistic })({ forward, client })(ops$),
+      tap(result => {
+        if (result.operation.operationName === 'query') {
+          data = result.data;
+        }
+      }),
+      publish
+    );
+
+    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+    const queryOpB = client.createRequestOperation('query', { key: 3, query });
+
+    expect(data).toBe(undefined);
+
+    nextOp(queryOpA);
+
+    nextRes({
+      operation: queryOpA,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query a',
+        }
+      }
+    });
+
+    expect(data).toHaveProperty('node.name', 'query a');
+
+    nextOp(mutationOp);
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(data).toHaveProperty('node.name', 'optimistic');
+
+    nextOp(queryOpB);
+    nextRes({
+      operation: queryOpB,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query b',
+        }
+      }
+    });
+
+    expect(data).toHaveProperty('node.name', 'query b');
+  });
+
+  it('applies mutation results on top of commutative queries', () => {
+    let data: any;
+    const client = createClient({ url: 'http://0.0.0.0', });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(nextOp);
+
+    const query = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(ops$, filter(() => false)) as any,
+        res$,
+      ]);
+
+    pipe(
+      cacheExchange()({ forward, client })(ops$),
+      tap(result => {
+        if (result.operation.operationName === 'query') {
+          data = result.data;
+        }
+      }),
+      publish
+    );
+
+    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+    const queryOpB = client.createRequestOperation('query', { key: 3, query });
+
+    expect(data).toBe(undefined);
+
+    nextOp(queryOpA);
+    nextOp(mutationOp);
+    nextOp(queryOpB);
+
+    nextRes({
+      operation: queryOpA,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query a',
+        }
+      }
+    });
+
+    expect(data).toHaveProperty('node.name', 'query a');
+
+    nextRes({
+      operation: mutationOp,
+      data: {
+        __typename: 'Mutation',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'mutation',
+        }
+      }
+    });
+
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(data).toHaveProperty('node.name', 'mutation');
+
+    nextRes({
+      operation: queryOpB,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query b',
+        }
+      }
+    });
+
+    expect(reexec).toHaveBeenCalledTimes(2);
+    expect(data).toHaveProperty('node.name', 'query b');
+  });
+
+  it('applies optimistic updates on top of commutative queries', () => {
+    let data: any;
+    const client = createClient({ url: 'http://0.0.0.0', });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(nextOp);
+
+    const query = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        node {
+          id
+          name
+          optimistic
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(ops$, filter(() => false)) as any,
+        res$,
+      ]);
+
+    const optimistic = {
+      node: () => ({
+        __typename: 'Node',
+        id: 'node',
+        name: 'optimistic',
+      })
+    };
+
+    pipe(
+      cacheExchange({ optimistic })({ forward, client })(ops$),
+      tap(result => {
+        if (result.operation.operationName === 'query') {
+          data = result.data;
+        }
+      }),
+      publish
+    );
+
+    const queryOp = client.createRequestOperation('query', { key: 1, query });
+    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+
+    expect(data).toBe(undefined);
+
+    nextOp(queryOp);
+    nextOp(mutationOp);
+
+    nextRes({
+      operation: queryOp,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query a',
+        }
+      }
+    });
+
+    expect(data).toHaveProperty('node.name', 'optimistic');
+
+    nextRes({
+      operation: mutationOp,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'mutation',
+        }
+      }
+    });
+
+    expect(data).toHaveProperty('node.name', 'mutation');
   });
 });
