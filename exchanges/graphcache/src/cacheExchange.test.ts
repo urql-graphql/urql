@@ -1086,7 +1086,7 @@ describe('commutativity', () => {
 
   it('applies optimistic updates on top of commutative queries', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', });
+    const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -1114,7 +1114,10 @@ describe('commutativity', () => {
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
       merge([
-        pipe(ops$, filter(() => false)) as any,
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
         res$,
       ]);
 
@@ -1123,7 +1126,7 @@ describe('commutativity', () => {
         __typename: 'Node',
         id: 'node',
         name: 'optimistic',
-      })
+      }),
     };
 
     pipe(
@@ -1137,7 +1140,10 @@ describe('commutativity', () => {
     );
 
     const queryOpA = client.createRequestOperation('query', { key: 1, query });
-    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+    });
     const queryOpB = client.createRequestOperation('query', { key: 3, query });
 
     expect(data).toBe(undefined);
@@ -1152,8 +1158,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query a',
-        }
-      }
+        },
+      },
     });
 
     expect(data).toHaveProperty('node.name', 'query a');
@@ -1171,8 +1177,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query b',
-        }
-      }
+        },
+      },
     });
 
     expect(data).toHaveProperty('node.name', 'query b');
@@ -1180,7 +1186,7 @@ describe('commutativity', () => {
 
   it('applies mutation results on top of commutative queries', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', });
+    const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -1208,7 +1214,10 @@ describe('commutativity', () => {
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
       merge([
-        pipe(ops$, filter(() => false)) as any,
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
         res$,
       ]);
 
@@ -1223,7 +1232,10 @@ describe('commutativity', () => {
     );
 
     const queryOpA = client.createRequestOperation('query', { key: 1, query });
-    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+    });
     const queryOpB = client.createRequestOperation('query', { key: 3, query });
 
     expect(data).toBe(undefined);
@@ -1240,8 +1252,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query a',
-        }
-      }
+        },
+      },
     });
 
     expect(data).toHaveProperty('node.name', 'query a');
@@ -1254,8 +1266,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'mutation',
-        }
-      }
+        },
+      },
     });
 
     expect(reexec).toHaveBeenCalledTimes(1);
@@ -1269,8 +1281,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query b',
-        }
-      }
+        },
+      },
     });
 
     expect(reexec).toHaveBeenCalledTimes(2);
@@ -1279,13 +1291,11 @@ describe('commutativity', () => {
 
   it('applies optimistic updates on top of commutative queries', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', });
+    const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest
-      .spyOn(client, 'reexecuteOperation')
-      .mockImplementation(nextOp);
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const query = gql`
       {
@@ -1308,7 +1318,10 @@ describe('commutativity', () => {
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
       merge([
-        pipe(ops$, filter(() => false)) as any,
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
         res$,
       ]);
 
@@ -1317,7 +1330,7 @@ describe('commutativity', () => {
         __typename: 'Node',
         id: 'node',
         name: 'optimistic',
-      })
+      }),
     };
 
     pipe(
@@ -1331,7 +1344,10 @@ describe('commutativity', () => {
     );
 
     const queryOp = client.createRequestOperation('query', { key: 1, query });
-    const mutationOp = client.createRequestOperation('mutation', { key: 2, query: mutation });
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+    });
 
     expect(data).toBe(undefined);
 
@@ -1346,8 +1362,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query a',
-        }
-      }
+        },
+      },
     });
 
     expect(data).toHaveProperty('node.name', 'optimistic');
@@ -1360,8 +1376,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'mutation',
-        }
-      }
+        },
+      },
     });
 
     expect(data).toHaveProperty('node.name', 'mutation');
@@ -1369,13 +1385,11 @@ describe('commutativity', () => {
 
   it('allows subscription results to be commutative when necessary', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', });
+    const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest
-      .spyOn(client, 'reexecuteOperation')
-      .mockImplementation(nextOp);
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const query = gql`
       {
@@ -1397,7 +1411,10 @@ describe('commutativity', () => {
 
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
       merge([
-        pipe(ops$, filter(() => false)) as any,
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
         res$,
       ]);
 
@@ -1412,7 +1429,10 @@ describe('commutativity', () => {
     );
 
     const queryOpA = client.createRequestOperation('query', { key: 1, query });
-    const subscriptionOp = client.createRequestOperation('subscription', { key: 3, query: subscription });
+    const subscriptionOp = client.createRequestOperation('subscription', {
+      key: 3,
+      query: subscription,
+    });
 
     nextOp(queryOpA);
     // Force commutative layers to be created:
@@ -1427,8 +1447,8 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'query a',
-        }
-      }
+        },
+      },
     });
 
     nextRes({
@@ -1438,10 +1458,9 @@ describe('commutativity', () => {
           __typename: 'Node',
           id: 'node',
           name: 'subscription',
-        }
-      }
+        },
+      },
     });
-
 
     expect(data).toHaveProperty('node.name', 'subscription');
   });
