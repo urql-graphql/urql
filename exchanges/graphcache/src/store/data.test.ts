@@ -218,11 +218,10 @@ describe('commutative changes', () => {
     expect(data.optimisticOrder).toEqual([]);
   });
 
-  it('creates optimistic layers that may be removed using clearLayer', () => {
+  it('creates optimistic layers that may be removed later', () => {
     InMemoryData.reserveLayer(data, 1);
-    InMemoryData.reserveLayer(data, 2);
 
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState(data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
@@ -230,7 +229,6 @@ describe('commutative changes', () => {
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
     // Actively clearing out layer 2
-    InMemoryData.clearLayer(data, 2);
     InMemoryData.noopDataState(data, 2);
 
     InMemoryData.initDataState(data, null);
@@ -334,5 +332,78 @@ describe('commutative changes', () => {
 
     InMemoryData.noopDataState(data, 1);
     expect(data.optimisticOrder).toEqual([]);
+  });
+
+  it('respects non-reserved optimistic layers', () => {
+    InMemoryData.reserveLayer(data, 1);
+
+    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.reserveLayer(data, 3);
+
+    expect(data.optimisticOrder).toEqual([3, 2, 1]);
+    expect([...data.commutativeKeys]).toEqual([1, 3]);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([3, 2]);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    InMemoryData.initDataState(data, 3);
+    InMemoryData.writeRecord('Query', 'index', 3);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([3, 2]);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
+  });
+
+  it('squashes when optimistic layers are completed', () => {
+    InMemoryData.reserveLayer(data, 1);
+
+    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([2, 1]);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([2]);
+
+    // Delete optimistic layer
+    InMemoryData.noopDataState(data, 2);
+    expect(data.optimisticOrder).toEqual([]);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+  });
+
+  it('squashes when optimistic layers are replaced with actual data', () => {
+    InMemoryData.reserveLayer(data, 1);
+
+    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([2, 1]);
+
+    InMemoryData.initDataState(data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([2]);
+
+    // Convert optimistic layer to commutative layer
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([]);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
   });
 });
