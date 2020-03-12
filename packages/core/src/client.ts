@@ -44,6 +44,7 @@ import {
 } from './utils';
 
 import { DocumentNode } from 'graphql';
+import { Target } from './utils/Target';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -73,6 +74,9 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
+  // Event target for monitoring
+  target = new Target();
+
   // These are variables derived from ClientOptions
   url: string;
   fetch?: typeof fetch;
@@ -324,4 +328,8 @@ export class Client {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
+
+  public get eventTarget() {
+    return this.target;
+  }
 }
