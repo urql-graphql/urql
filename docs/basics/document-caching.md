@@ -11,28 +11,31 @@ to a GraphQL API repeatedly by caching the result of each query.
 This works like the cache in a browser. `urql` creates a key for each request that is sent based on
 a query and its variables.
 
+The default _document caching_ logic is implemented in the default `cacheExchange`. We'll learn more
+about ["Exchanges" on a later page.](../concepts/exchanges.md)
+
 ## Operation Keys
 
 ![Keys for GraphQL Requests](../assets/urql-operation-keys.png)
 
-Once a result comes in it's cached indefinitely by their key. This means that each unique request
+Once a result comes in it's cached indefinitely by its key. This means that each unique request
 can have exactly one cached result.
 
-However, we also need to invalidate the cache result so new requests for the same data can be
-sent when we know that some results are outdated. A result may be outdated because a mutation has
-been executed on data that has been queried previously.
+However, we also need to invalidate the cached results so that requests are sent again and updated,
+when we know that some results are out-of-date. With document caching we assume that a result may
+be invalidated by a mutation that executes on data that has been queried previously.
 
-In GraphQL the client can request additional type information on a query by adding the `__typename`
-field. This field return the name of the type of a piece of data in a requests, and we use it
-to detect commonalities and data dependencies between queries and mutations.
+In GraphQL the client can request additional type information by adding the `__typename` field to a
+query's _selection set_. This field returns the name of the type for an object in the results, and
+we use it to detect commonalities and data dependencies between queries and mutations.
 
 ![Document Caching](../assets/urql-document-caching.png)
 
-When we send a mutation that contains types that another query's results contains as well, that
-query's result is removed from the cache.
+In short, when we send a mutation that contains types that another query's results contains as well,
+that query's result is removed from the cache.
 
 This is an aggressive form of cache invalidation. However, it works well for content-driven sites,
-although it doesn't deal with normalized data or IDs.
+while it doesn't deal with normalized data or IDs.
 
 ## Request Policies
 
