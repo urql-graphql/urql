@@ -78,6 +78,10 @@ const isQueryOperation = (op: Operation): boolean =>
 const isMutationOperation = (op: Operation): boolean =>
   op.operationName === 'mutation';
 
+// Returns whether an operation is a subscription
+const isSubscriptionOperation = (op: Operation): boolean =>
+  op.operationName === 'subscription';
+
 // Returns whether an operation can potentially be read from cache
 const isCacheableQuery = (op: Operation): boolean => {
   return isQueryOperation(op) && getRequestPolicy(op) !== 'network-only';
@@ -246,12 +250,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const { key } = operation;
     const pendingOperations = new Set<number>();
 
-    if (!isQuery) {
+    if (isMutationOperation(operation)) {
       collectPendingOperations(
         pendingOperations,
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
+    } else if (isSubscriptionOperation(operation)) {
+      // If we're writing a subscription, we ad-hoc reserve a layer
+      reserveLayer(store.data, operation.key);
     }
 
     let writeDependencies: Set<string> | void;

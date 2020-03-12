@@ -1366,4 +1366,83 @@ describe('commutativity', () => {
 
     expect(data).toHaveProperty('node.name', 'mutation');
   });
+
+  it('allows subscription results to be commutative when necessary', () => {
+    let data: any;
+    const client = createClient({ url: 'http://0.0.0.0', });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(nextOp);
+
+    const query = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const subscription = gql`
+      subscription {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(ops$, filter(() => false)) as any,
+        res$,
+      ]);
+
+    pipe(
+      cacheExchange()({ forward, client })(ops$),
+      tap(result => {
+        if (result.operation.operationName === 'query') {
+          data = result.data;
+        }
+      }),
+      publish
+    );
+
+    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const subscriptionOp = client.createRequestOperation('subscription', { key: 3, query: subscription });
+
+    nextOp(queryOpA);
+    // Force commutative layers to be created:
+    nextOp(client.createRequestOperation('query', { key: 2, query }));
+    nextOp(subscriptionOp);
+
+    nextRes({
+      operation: queryOpA,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query a',
+        }
+      }
+    });
+
+    nextRes({
+      operation: subscriptionOp,
+      data: {
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'subscription',
+        }
+      }
+    });
+
+
+    expect(data).toHaveProperty('node.name', 'subscription');
+  });
 });
