@@ -10,13 +10,13 @@ inner workings of the `Client`, and how to write extensions and addons, also kno
 
 Each page goes a little further in explaning a core concept of `urql`.
 
-- **Philosophy** gives a quick overview of the different aspects of GraphQL clients and `urql` in
+- [**Philosophy**](./philosophy.md) gives a quick overview of the different aspects of GraphQL clients and `urql` in
   particular, which shines a light on why you may want to use `urql`.
-- **Stream Pattern** explains the inner working of `urql`, which is _stream-based_, also known as
+- [**Stream Pattern**](./stream-patterns.md) explains the inner working of `urql`, which is _stream-based_, also known as
   Observable patterns in JS.
-- **Core Package** defines why a shared package exists that contains the main logic of `urql`, and
+- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main logic of `urql`, and
   how we can use it directly in Node.js.
-- **Exchanges** finally introduces _Exchanges_ and how to write extensions or addons and use them
+- [**Exchanges**](./exchanges.md) finally introduces _Exchanges_ and how to write extensions or addons and use them
   in `urql`.
 
 Finally, some _Exchanges_ are covered in different sections of the documentation, like
