@@ -1,6 +1,6 @@
 ---
 title: @urql/exchange-retry
-order: 0
+order: 4
 ---
 
 # Retry Exchange
