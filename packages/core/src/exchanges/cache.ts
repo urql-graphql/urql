@@ -148,7 +148,7 @@ export const afterMutation = (
   client.eventTarget.dispatchEvent({
     type: 'cacheInvalidation',
     message: `The following typenames have been invalidated: ${invalidTypeNames}`,
-    data: { value: invalidTypeNames },
+    data: { typenames: invalidTypeNames, response },
   });
 
   invalidTypeNames.forEach(typeName => {
