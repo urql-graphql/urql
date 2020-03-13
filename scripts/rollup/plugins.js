@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
@@ -6,6 +8,7 @@ import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from 'rollup-plugin-babel';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
+import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import babelPluginTransformPipe from '../babel/transform-pipe';
@@ -92,7 +95,11 @@ export const makePlugins = ({ isProduction } = {}) => [
     formatting: 'PRETTY_PRINT',
     compilation_level: 'SIMPLE_OPTIMIZATIONS'
   }),
-  isProduction ? terserMinified : terserPretty
+  isProduction ? terserMinified : terserPretty,
+  isProduction && settings.isAnalyze && visualizer({
+    filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
+    sourcemap: true,
+  }),
 ].filter(Boolean);
 
 const terserPretty = terser({

@@ -86,6 +86,7 @@
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.26.0",
+    "rollup-plugin-visualizer": "^3.3.1",
     "terser": "^4.6.6",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
