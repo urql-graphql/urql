@@ -1,6 +1,8 @@
-import { DebugEvent } from '../types';
+import { DebugEvent, DebugEventTypes } from '../types';
 
-type EventListener = (e: DebugEvent) => void;
+type EventListener = <T extends keyof DebugEventTypes | string>(
+  e: DebugEvent<T>
+) => void;
 
 export class Target {
   private listeners: EventListener[] = [];
@@ -13,7 +15,9 @@ export class Target {
     this.listeners = this.listeners.filter(listener => listener !== l);
   };
 
-  public dispatchEvent = (e: DebugEvent) => {
+  public dispatchEvent = <T extends string | keyof DebugEventTypes>(
+    e: DebugEvent<T>
+  ) => {
     this.listeners.forEach(l => l(e));
   };
 }

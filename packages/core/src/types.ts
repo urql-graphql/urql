@@ -88,12 +88,15 @@ export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
 /** Debug event types (interfaced for declaration merging). */
 export interface DebugEventTypes {
-  [key: string]: object;
   dedup: { operation: Operation };
   cacheHit: { operation: Operation; value: any };
-  cacheInvalidation: { value: string[] };
+  cacheInvalidation: {
+    typenames: string[];
+    response: OperationResult;
+  };
 }
 
-export type DebugEvent<
-  T extends keyof DebugEventTypes = keyof DebugEventTypes
-> = { type: T; message: string; data: DebugEventTypes[T] };
+export type DebugEvent<T extends keyof DebugEventTypes | string> = {
+  type: T;
+  message: string;
+} & { data: T extends keyof DebugEventTypes ? DebugEventTypes[T] : any };
