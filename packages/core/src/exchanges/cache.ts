@@ -140,7 +140,7 @@ export const afterMutation = (
   const pendingOperations = new Set<number>();
   const { additionalTypenames } = response.operation.context;
 
-  const invalidTypeNames = [
+  const typeNamesToBeInvalidated = [
     ...collectTypesFromResponse(response.data),
     ...(additionalTypenames || []),
   ];
@@ -151,7 +151,7 @@ export const afterMutation = (
     data: { typenames: invalidTypeNames, response },
   });
 
-  invalidTypeNames.forEach(typeName => {
+  typeNamesToBeInvalidated.forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {
