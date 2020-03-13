@@ -49,6 +49,7 @@ export interface InMemoryData {
 
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Set<string> = null;
+let previousDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
@@ -63,6 +64,7 @@ export const initDataState = (
   isOptimistic?: boolean
 ) => {
   currentData = data;
+  previousDependencies = currentDependencies;
   currentDependencies = new Set();
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -103,16 +105,11 @@ export const clearDataState = () => {
 
   // Determine whether the current operation has been a commutative layer
   if (layerKey && data.optimisticOrder.indexOf(layerKey) > -1) {
-    // Find the lowest index of the commutative layers
-    // The first part of `optimisticOrder` are the non-commutative layers
-    const commutativeIndex =
-      data.optimisticOrder.length - data.commutativeKeys.size;
-
     // Squash all layers in reverse order (low priority upwards) that have
     // been written already
     let i = data.optimisticOrder.length;
     while (
-      --i >= commutativeIndex &&
+      --i >= 0 &&
       data.refLock[data.optimisticOrder[i]] &&
       data.commutativeKeys.has(data.optimisticOrder[i])
     ) {
@@ -164,6 +161,16 @@ export const getCurrentDependencies = (): Set<string> => {
   );
 
   return currentDependencies;
+};
+
+export const forkDependencies = (): Set<string> => {
+  previousDependencies = currentDependencies;
+  return (currentDependencies = new Set());
+};
+
+export const unforkDependencies = () => {
+  currentDependencies = previousDependencies;
+  previousDependencies = null;
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
@@ -404,7 +411,7 @@ export const readLink = (
 export const writeRecord = (
   entityKey: string,
   fieldKey: string,
-  value: EntityField
+  value?: EntityField
 ) => {
   updateDependencies(entityKey, fieldKey);
   setNode(currentData!.records, entityKey, fieldKey, value);
@@ -422,7 +429,7 @@ export const hasField = (entityKey: string, fieldKey: string): boolean =>
 export const writeLink = (
   entityKey: string,
   fieldKey: string,
-  link: Link | undefined
+  link?: Link | undefined
 ) => {
   const data = currentData!;
   // Retrieve the reference counting dict or the optimistic reference locking dict
@@ -449,8 +456,8 @@ export const writeLink = (
   }
 
   // Retrieve the previous link for this field
-  const prevLinkNode = links !== undefined ? links.get(entityKey) : undefined;
-  const prevLink = prevLinkNode !== undefined ? prevLinkNode[fieldKey] : null;
+  const prevLinkNode = links && links.get(entityKey);
+  const prevLink = prevLinkNode && prevLinkNode[fieldKey];
 
   // Update dependencies
   updateDependencies(entityKey, fieldKey);
@@ -508,8 +515,7 @@ const deleteLayer = (data: InMemoryData, layerKey: number) => {
 /** Merges an optimistic layer of links and records into the base data */
 const squashLayer = (layerKey: number) => {
   // Hide current dependencies from squashing operations
-  const prevDependencies = currentDependencies;
-  currentDependencies = new Set();
+  forkDependencies();
 
   const links = currentData!.links.optimistic[layerKey];
   if (links) {
@@ -527,7 +533,7 @@ const squashLayer = (layerKey: number) => {
     });
   }
 
-  currentDependencies = prevDependencies;
+  unforkDependencies();
   deleteLayer(currentData!, layerKey);
 };
 

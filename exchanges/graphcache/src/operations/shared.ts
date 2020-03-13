@@ -16,11 +16,49 @@ import { Fragments, Variables, DataField, NullArray, Data } from '../types';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
-interface Context {
+export interface Context {
   store: Store;
   variables: Variables;
   fragments: Fragments;
+  parentTypeName: string;
+  parentKey: string;
+  parentFieldKey: string;
+  fieldName: string;
+  partial: boolean;
+  optimistic: boolean;
 }
+
+export const makeContext = (
+  store: Store,
+  variables: Variables,
+  fragments: Fragments,
+  typename: string,
+  entityKey: string,
+  optimistic?: boolean
+): Context => ({
+  store,
+  variables,
+  fragments,
+  parentTypeName: typename,
+  parentKey: entityKey,
+  parentFieldKey: '',
+  fieldName: '',
+  partial: false,
+  optimistic: !!optimistic,
+});
+
+export const updateContext = (
+  ctx: Context,
+  typename: string,
+  entityKey: string,
+  fieldKey: string,
+  fieldName: string
+) => {
+  ctx.parentTypeName = typename;
+  ctx.parentKey = entityKey;
+  ctx.parentFieldKey = fieldKey;
+  ctx.fieldName = fieldName;
+};
 
 const isFragmentHeuristicallyMatching = (
   node: InlineFragmentNode | FragmentDefinitionNode,

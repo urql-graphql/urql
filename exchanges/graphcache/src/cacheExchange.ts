@@ -61,37 +61,6 @@ const addCacheOutcome = (op: Operation, outcome: CacheOutcome): Operation => ({
   },
 });
 
-// Returns the given operation with added __typename fields on its query
-const addTypeNames = (op: Operation): Operation => ({
-  ...op,
-  query: formatDocument(op.query),
-});
-
-// Retrieves the requestPolicy from an operation
-const getRequestPolicy = (op: Operation) => op.context.requestPolicy;
-
-// Returns whether an operation is a query
-const isQueryOperation = (op: Operation): boolean =>
-  op.operationName === 'query';
-
-// Returns whether an operation is a mutation
-const isMutationOperation = (op: Operation): boolean =>
-  op.operationName === 'mutation';
-
-// Returns whether an operation is a subscription
-const isSubscriptionOperation = (op: Operation): boolean =>
-  op.operationName === 'subscription';
-
-// Returns whether an operation can potentially be read from cache
-const isCacheableQuery = (op: Operation): boolean => {
-  return isQueryOperation(op) && getRequestPolicy(op) !== 'network-only';
-};
-
-// Returns whether an operation potentially triggers an optimistic update
-const isOptimisticMutation = (op: Operation): boolean => {
-  return isMutationOperation(op) && getRequestPolicy(op) !== 'network-only';
-};
-
 // Copy an operation and change the requestPolicy to skip the cache
 const toRequestPolicy = (
   operation: Operation,
@@ -129,9 +98,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   let hydration: void | Promise<void>;
   if (opts.storage) {
-    const storage = opts.storage;
-    hydration = storage.read().then(entries => {
-      hydrateData(store.data, storage, entries);
+    hydration = opts.storage.read().then(entries => {
+      hydrateData(store.data, opts!.storage!, entries);
     });
   }
 
@@ -143,11 +111,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     pendingOperations: Set<number>,
     dependencies: void | Set<string>
   ) => {
-    if (dependencies !== undefined) {
+    if (dependencies) {
       // Collect operations that will be updated due to cache changes
       dependencies.forEach(dep => {
         const keys = deps[dep];
-        if (keys !== undefined) {
+        if (keys) {
           deps[dep] = [];
           for (let i = 0, l = keys.length; i < l; i++) {
             pendingOperations.add(keys[i]);
@@ -165,7 +133,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     pendingOperations.forEach(key => {
       if (key !== operation.key) {
         const op = ops.get(key);
-        if (op !== undefined) {
+        if (op) {
           ops.delete(key);
           client.reexecuteOperation(toRequestPolicy(op, 'cache-first'));
         }
@@ -175,7 +143,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This registers queries with the data layer to ensure commutativity
   const prepareCacheForResult = (operation: Operation) => {
-    if (isQueryOperation(operation)) {
+    if (operation.operationName === 'query') {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
@@ -185,7 +153,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   // This executes an optimistic update for mutations and registers it if necessary
   const optimisticUpdate = (operation: Operation) => {
     const { key } = operation;
-    if (isOptimisticMutation(operation)) {
+    if (
+      operation.operationName === 'mutation' &&
+      operation.context.requestPolicy !== 'network-only'
+    ) {
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
         optimisticKeysToDependencies.set(key, dependencies);
@@ -201,13 +172,12 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   // This updates the known dependencies for the passed operation
   const updateDependencies = (op: Operation, dependencies: Set<string>) => {
     dependencies.forEach(dep => {
-      const keys = deps[dep] || (deps[dep] = []);
-      keys.push(op.key);
+      (deps[dep] || (deps[dep] = [])).push(op.key);
 
       if (!ops.has(op.key)) {
         ops.set(
           op.key,
-          getRequestPolicy(op) === 'network-only'
+          op.context.requestPolicy === 'network-only'
             ? toRequestPolicy(op, 'cache-and-network')
             : op
         );
@@ -220,78 +190,71 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
-    const { data, dependencies, partial } = query(store, operation);
-    let cacheOutcome: CacheOutcome;
+    const res = query(store, operation);
+    const cacheOutcome: CacheOutcome = res.data
+      ? !res.partial || operation.context.requestPolicy === 'cache-only'
+        ? 'hit'
+        : 'partial'
+      : 'miss';
 
-    if (data === null) {
-      cacheOutcome = 'miss';
-    } else {
-      updateDependencies(operation, dependencies);
-      cacheOutcome =
-        !partial || getRequestPolicy(operation) === 'cache-only'
-          ? 'hit'
-          : 'partial';
+    if (res.data) {
+      updateDependencies(operation, res.dependencies);
     }
 
     return {
       outcome: cacheOutcome,
       operation,
-      data,
+      data: res.data,
     };
   };
 
   // Take any OperationResult and update the cache with it
   const updateCacheWithResult = (result: OperationResult): OperationResult => {
     const { operation, error, extensions } = result;
-    const isQuery = isQueryOperation(operation);
-    let { data } = result;
 
     // Clear old optimistic values from the store
     const { key } = operation;
     const pendingOperations = new Set<number>();
 
-    if (isMutationOperation(operation)) {
+    if (operation.operationName === 'mutation') {
+      // Collect previous dependencies that have been written for optimistic updates
       collectPendingOperations(
         pendingOperations,
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
-    } else if (isSubscriptionOperation(operation)) {
+    } else if (operation.operationName === 'subscription') {
       // If we're writing a subscription, we ad-hoc reserve a layer
       reserveLayer(store.data, operation.key);
     }
 
-    let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
-    if (data !== null && data !== undefined) {
-      writeDependencies = write(store, operation, data, key).dependencies;
+    if (result.data) {
+      // Write the result to cache and collect all dependencies that need to be
+      // updated
+      const writeDependencies = write(store, operation, result.data, key)
+        .dependencies;
+      collectPendingOperations(pendingOperations, writeDependencies);
 
-      if (isQuery) {
-        const queryResult = query(store, operation);
-        data = queryResult.data;
+      const queryResult = query(store, operation, result.data);
+      result.data = queryResult.data;
+      if (operation.operationName === 'query') {
+        // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
-      } else {
-        data = query(store, operation, data).data;
+        collectPendingOperations(pendingOperations, queryDependencies);
       }
     } else {
       noopDataState(store.data, operation.key);
     }
 
-    // Collect all write dependencies and query dependencies for queries
-    collectPendingOperations(pendingOperations, writeDependencies);
-    if (isQuery) {
-      collectPendingOperations(pendingOperations, queryDependencies);
-    }
-
     // Execute all pending operations related to changed dependencies
     executePendingOperations(result.operation, pendingOperations);
-
     // Update this operation's dependencies if it's a query
-    if (isQuery && queryDependencies !== undefined) {
+    if (queryDependencies) {
       updateDependencies(result.operation, queryDependencies);
     }
 
-    return { data, error, extensions, operation };
+    return { data: result.data, error, extensions, operation };
   };
 
   return ops$ => {
@@ -310,7 +273,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     const inputOps$ = pipe(
       concat([bufferedOps$, sharedOps$]),
-      map(addTypeNames),
+      // Returns the given operation with added __typename fields on its query
+      map(op => ({
+        ...op,
+        query: formatDocument(op.query),
+      })),
       tap(optimisticUpdate),
       share
     );
@@ -318,7 +285,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
       inputOps$,
-      filter(op => isCacheableQuery(op)),
+      filter(
+        op =>
+          op.operationName === 'query' &&
+          op.context.requestPolicy !== 'network-only'
+      ),
       map(operationResultFromCache),
       share
     );
@@ -327,7 +298,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const cacheOps$ = pipe(
       cache$,
       filter(res => res.outcome === 'miss'),
-      map(res => addCacheOutcome(res.operation, res.outcome))
+      map(res => addCacheOutcome(res.operation, 'miss'))
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
@@ -338,7 +309,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       map(
         (res: OperationResultWithMeta): OperationResult => {
           const { operation, outcome } = res;
-          const policy = getRequestPolicy(operation);
           const result: OperationResult = {
             operation: addCacheOutcome(operation, outcome),
             data: res.data,
@@ -347,8 +317,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           };
 
           if (
-            policy === 'cache-and-network' ||
-            (policy === 'cache-first' && outcome === 'partial')
+            operation.context.requestPolicy === 'cache-and-network' ||
+            (operation.context.requestPolicy === 'cache-first' &&
+              outcome === 'partial')
           ) {
             result.stale = true;
             client.reexecuteOperation(
@@ -367,7 +338,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       merge([
         pipe(
           inputOps$,
-          filter(op => !isCacheableQuery(op))
+          filter(
+            op =>
+              !(
+                op.operationName === 'query' &&
+                op.context.requestPolicy !== 'network-only'
+              )
+          )
         ),
         cacheOps$,
       ]),

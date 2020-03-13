@@ -1,4 +1,5 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+
 import {
   getSelectionSet,
   getName,
@@ -6,7 +7,6 @@ import {
   getFragmentTypeName,
   getFieldAlias,
 } from '../ast';
-import { warn, pushDebugNode } from '../helpers/help';
 
 import {
   getFragments,
@@ -16,7 +16,6 @@ import {
 } from '../ast';
 
 import {
-  Fragments,
   Variables,
   Data,
   DataField,
@@ -35,8 +34,16 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
+import { warn, pushDebugNode } from '../helpers/help';
 import { makeDict } from '../helpers/dict';
-import { SelectionIterator, ensureData } from './shared';
+
+import {
+  Context,
+  SelectionIterator,
+  ensureData,
+  makeContext,
+  updateContext,
+} from './shared';
 
 import {
   isFieldAvailableOnType,
@@ -48,17 +55,6 @@ export interface QueryResult {
   dependencies: Set<string>;
   partial: boolean;
   data: null | Data;
-}
-
-interface Context {
-  parentTypeName: string;
-  parentKey: string;
-  parentFieldKey: string;
-  fieldName: string;
-  store: Store;
-  variables: Variables;
-  fragments: Fragments;
-  partial: boolean;
 }
 
 export const query = (
@@ -78,19 +74,16 @@ export const read = (
   input?: Data
 ): QueryResult => {
   const operation = getMainOperation(request.query);
-  const rootKey = store.getRootKey(operation.operation);
+  const rootKey = store.rootFields[operation.operation];
   const rootSelect = getSelectionSet(operation);
 
-  const ctx: Context = {
-    parentTypeName: rootKey,
-    parentKey: rootKey,
-    parentFieldKey: '',
-    fieldName: '',
+  const ctx = makeContext(
     store,
-    variables: normalizeVariables(operation, request.variables),
-    fragments: getFragments(request.query),
-    partial: false,
-  };
+    normalizeVariables(operation, request.variables),
+    getFragments(request.query),
+    rootKey,
+    rootKey
+  );
 
   if (process.env.NODE_ENV !== 'production') {
     pushDebugNode(rootKey, operation);
@@ -98,7 +91,7 @@ export const read = (
 
   let data = input || makeDict();
   data =
-    rootKey !== ctx.store.getRootKey('query')
+    rootKey !== ctx.store.rootFields['query']
       ? readRoot(ctx, rootKey, rootSelect, data)
       : readSelection(ctx, rootKey, rootSelect, data);
 
@@ -209,16 +202,13 @@ export const readFragment = (
     pushDebugNode(typename, fragment);
   }
 
-  const ctx: Context = {
-    parentTypeName: typename,
-    parentKey: entityKey,
-    parentFieldKey: '',
-    fieldName: '',
-    variables: variables || {},
-    fragments,
-    partial: false,
+  const ctx = makeContext(
     store,
-  };
+    variables || {},
+    fragments,
+    typename,
+    entityKey
+  );
 
   return (
     readSelection(ctx, entityKey, getSelectionSet(fragment), makeDict()) || null
@@ -227,21 +217,38 @@ export const readFragment = (
 
 const readSelection = (
   ctx: Context,
-  entityKey: string,
+  key: string,
   select: SelectionSet,
-  data: Data
+  data: Data,
+  result?: Data
 ): Data | undefined => {
   const { store } = ctx;
-  const isQuery = entityKey === store.getRootKey('query');
+  const isQuery = key === store.rootFields['query'];
 
-  // Get the __typename field for a given entity to check that it exists
+  const entityKey = (result && store.keyOfEntity(result)) || key;
   const typename = !isQuery
-    ? InMemoryData.readRecord(entityKey, '__typename')
-    : entityKey;
-  if (typeof typename !== 'string') {
+    ? InMemoryData.readRecord(entityKey, '__typename') ||
+      (result && result.__typename)
+    : key;
+
+  if (
+    typeof typename !== 'string' ||
+    (result && typename !== result.__typename)
+  ) {
+    // TODO: This may be an invalid error for resolvers that return interfaces
+    warn(
+      'Invalid resolver data: The resolver at `' +
+        entityKey +
+        '` returned an ' +
+        'invalid typename that could not be reconciled with the cache.',
+      8
+    );
+
     return undefined;
   }
 
+  // The following closely mirrors readSelection, but differs only slightly for the
+  // sake of resolving from an existing resolver result
   data.__typename = typename;
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
@@ -254,8 +261,10 @@ const readSelection = (
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
     const fieldKey = keyOfField(fieldName, fieldArgs);
-    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const key = joinKeys(entityKey, fieldKey);
+    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
+    const resultValue = result ? result[fieldName] : undefined;
+    const resolvers = store.resolvers[typename];
 
     if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
       isFieldAvailableOnType(store.schema, typename, fieldName);
@@ -265,14 +274,13 @@ const readSelection = (
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
 
-    const resolvers = store.resolvers[typename];
-    if (resolvers !== undefined && typeof resolvers[fieldName] === 'function') {
+    if (resultValue !== undefined && node.selectionSet === undefined) {
+      // The field is a scalar and can be retrieved directly from the result
+      dataFieldValue = resultValue;
+    } else if (resolvers && typeof resolvers[fieldName] === 'function') {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
-      ctx.parentTypeName = typename;
-      ctx.parentKey = entityKey;
-      ctx.parentFieldKey = key;
-      ctx.fieldName = fieldName;
+      updateContext(ctx, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
@@ -311,11 +319,23 @@ const readSelection = (
         return undefined;
       }
     } else if (node.selectionSet === undefined) {
-      // The field is a scalar and can be retrieved directly
+      // The field is a scalar but isn't on the result, so it's retrieved from the cache
       dataFieldValue = fieldValue;
+    } else if (resultValue !== undefined) {
+      // We start walking the nested resolver result here
+      dataFieldValue = resolveResolverResult(
+        ctx,
+        typename,
+        fieldName,
+        key,
+        getSelectionSet(node),
+        data[fieldAlias] as Data,
+        resultValue
+      );
     } else {
-      // We have a selection set which means that we'll be checking for links
+      // Otherwise we attempt to get the missing field from the cache
       const link = InMemoryData.readLink(entityKey, fieldKey);
+
       if (link !== undefined) {
         dataFieldValue = resolveLink(
           ctx,
@@ -355,124 +375,6 @@ const readSelection = (
 
   if (hasPartials) ctx.partial = true;
   return isQuery && hasPartials && !hasFields ? undefined : data;
-};
-
-const readResolverResult = (
-  ctx: Context,
-  key: string,
-  select: SelectionSet,
-  data: Data,
-  result: Data
-): Data | undefined => {
-  const { store } = ctx;
-  const entityKey = store.keyOfEntity(result) || key;
-  const resolvedTypename = result.__typename;
-  const typename =
-    InMemoryData.readRecord(entityKey, '__typename') || resolvedTypename;
-
-  if (
-    typeof typename !== 'string' ||
-    (resolvedTypename && typename !== resolvedTypename)
-  ) {
-    // TODO: This may be an invalid error for resolvers that return interfaces
-    warn(
-      'Invalid resolver data: The resolver at `' +
-        entityKey +
-        '` returned an ' +
-        'invalid typename that could not be reconciled with the cache.',
-      8
-    );
-
-    return undefined;
-  }
-
-  // The following closely mirrors readSelection, but differs only slightly for the
-  // sake of resolving from an existing resolver result
-  data.__typename = typename;
-  const iter = new SelectionIterator(typename, entityKey, select, ctx);
-
-  let node: FieldNode | void;
-  let hasFields = false;
-  let hasPartials = false;
-  while ((node = iter.next()) !== undefined) {
-    // Derive the needed data from our node.
-    const fieldName = getName(node);
-    const fieldAlias = getFieldAlias(node);
-    const fieldKey = keyOfField(
-      fieldName,
-      getFieldArguments(node, ctx.variables)
-    );
-    const key = joinKeys(entityKey, fieldKey);
-    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-    const resultValue = result[fieldName];
-
-    if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
-      isFieldAvailableOnType(store.schema, typename, fieldName);
-    }
-
-    // We temporarily store the data field in here, but undefined
-    // means that the value is missing from the cache
-    let dataFieldValue: void | DataField;
-    if (resultValue !== undefined && node.selectionSet === undefined) {
-      // The field is a scalar and can be retrieved directly from the result
-      dataFieldValue = resultValue;
-    } else if (node.selectionSet === undefined) {
-      // The field is a scalar but isn't on the result, so it's retrieved from the cache
-      dataFieldValue = fieldValue;
-    } else if (resultValue !== undefined) {
-      // We start walking the nested resolver result here
-      dataFieldValue = resolveResolverResult(
-        ctx,
-        typename,
-        fieldName,
-        key,
-        getSelectionSet(node),
-        data[fieldAlias] as Data,
-        resultValue
-      );
-    } else {
-      // Otherwise we attempt to get the missing field from the cache
-      const link = InMemoryData.readLink(entityKey, fieldKey);
-
-      if (link !== undefined) {
-        dataFieldValue = resolveLink(
-          ctx,
-          link,
-          typename,
-          fieldName,
-          getSelectionSet(node),
-          data[fieldAlias] as Data
-        );
-      } else if (typeof fieldValue === 'object' && fieldValue !== null) {
-        // The entity on the field was invalid but can still be recovered
-        dataFieldValue = fieldValue;
-      }
-    }
-
-    // Now that dataFieldValue has been retrieved it'll be set on data
-    // If it's uncached (undefined) but nullable we can continue assembling
-    // a partial query result
-    if (
-      dataFieldValue === undefined &&
-      store.schema !== undefined &&
-      isFieldNullable(store.schema, typename, fieldName)
-    ) {
-      // The field is uncached but we have a schema that says it's nullable
-      // Set the field to null and continue
-      hasPartials = true;
-      data[fieldAlias] = null;
-    } else if (dataFieldValue === undefined) {
-      // The field is uncached and not nullable; return undefined
-      return undefined;
-    } else {
-      // Otherwise continue as usual
-      hasFields = true;
-      data[fieldAlias] = dataFieldValue;
-    }
-  }
-
-  if (hasPartials) ctx.partial = true;
-  return !hasFields ? undefined : data;
 };
 
 const resolveResolverResult = (
@@ -518,7 +420,7 @@ const resolveResolverResult = (
     const data = prevData === undefined ? makeDict() : prevData;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
-      : readResolverResult(ctx, key, select, data, result);
+      : readSelection(ctx, key, select, data, result);
   } else {
     warn(
       'Invalid resolver value: The field at `' +

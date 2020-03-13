@@ -58,58 +58,35 @@ export class Store implements Cache {
       Subscription: (updates && updates.Subscription) || {},
     } as UpdatesConfig;
 
+    let queryName = 'Query';
+    let mutationName = 'Mutation';
+    let subscriptionName = 'Subscription';
     if (rawSchema) {
       const schema = (this.schema = buildClientSchema(rawSchema));
-
       const queryType = schema.getQueryType();
       const mutationType = schema.getMutationType();
       const subscriptionType = schema.getSubscriptionType();
-
-      const queryName = queryType ? queryType.name : 'Query';
-      const mutationName = mutationType ? mutationType.name : 'Mutation';
-      const subscriptionName = subscriptionType
-        ? subscriptionType.name
-        : 'Subscription';
-
-      this.rootFields = {
-        query: queryName,
-        mutation: mutationName,
-        subscription: subscriptionName,
-      };
-
-      this.rootNames = {
-        [queryName]: 'query',
-        [mutationName]: 'mutation',
-        [subscriptionName]: 'subscription',
-      };
-    } else {
-      this.rootFields = {
-        query: 'Query',
-        mutation: 'Mutation',
-        subscription: 'Subscription',
-      };
-
-      this.rootNames = {
-        Query: 'query',
-        Mutation: 'mutation',
-        Subscription: 'subscription',
-      };
+      if (queryType) queryName = queryType.name;
+      if (mutationType) mutationName = mutationType.name;
+      if (subscriptionType) subscriptionName = subscriptionType.name;
     }
 
-    this.data = InMemoryData.make(this.getRootKey('query'));
-  }
+    this.rootFields = {
+      query: queryName,
+      mutation: mutationName,
+      subscription: subscriptionName,
+    };
 
-  gcScheduled = false;
-  gc = () => {
-    InMemoryData.gc(this.data);
-    this.gcScheduled = false;
-  };
+    this.rootNames = {
+      [queryName]: 'query',
+      [mutationName]: 'mutation',
+      [subscriptionName]: 'subscription',
+    };
+
+    this.data = InMemoryData.make(queryName);
+  }
 
   keyOfField = keyOfField;
-
-  getRootKey(name: RootField) {
-    return this.rootFields[name];
-  }
 
   keyOfEntity(data: Data) {
     const { __typename: typename, id, _id } = data;
