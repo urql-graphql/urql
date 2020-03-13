@@ -74,7 +74,7 @@ export const read = (
   input?: Data
 ): QueryResult => {
   const operation = getMainOperation(request.query);
-  const rootKey = store.getRootKey(operation.operation);
+  const rootKey = store.rootFields[operation.operation];
   const rootSelect = getSelectionSet(operation);
 
   const ctx = makeContext(
@@ -91,7 +91,7 @@ export const read = (
 
   let data = input || makeDict();
   data =
-    rootKey !== ctx.store.getRootKey('query')
+    rootKey !== ctx.store.rootFields['query']
       ? readRoot(ctx, rootKey, rootSelect, data)
       : readSelection(ctx, rootKey, rootSelect, data);
 
@@ -223,7 +223,7 @@ const readSelection = (
   result?: Data
 ): Data | undefined => {
   const { store } = ctx;
-  const isQuery = key === store.getRootKey('query');
+  const isQuery = key === store.rootFields['query'];
 
   const entityKey = (result && store.keyOfEntity(result)) || key;
   const typename = !isQuery

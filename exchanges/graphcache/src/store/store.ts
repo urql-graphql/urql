@@ -83,14 +83,10 @@ export class Store implements Cache {
       [subscriptionName]: 'subscription',
     };
 
-    this.data = InMemoryData.make(this.getRootKey('query'));
+    this.data = InMemoryData.make(queryName);
   }
 
   keyOfField = keyOfField;
-
-  getRootKey(name: RootField) {
-    return this.rootFields[name];
-  }
 
   keyOfEntity(data: Data) {
     const { __typename: typename, id, _id } = data;

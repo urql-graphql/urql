@@ -60,8 +60,7 @@ export const startWrite = (
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
-
-  const operationName = store.getRootKey(operation.operation);
+  const operationName = store.rootFields[operation.operation];
 
   const ctx = makeContext(
     store,
@@ -89,11 +88,10 @@ export const writeOptimistic = (
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
+  const operationName = store.rootFields[operation.operation];
 
-  const mutationRootKey = store.getRootKey('mutation');
-  const operationName = store.getRootKey(operation.operation);
   invariant(
-    operationName === mutationRootKey,
+    operationName === store.rootFields['mutation'],
     'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
       'This case is unsupported and should never occur.',
     10
@@ -107,8 +105,8 @@ export const writeOptimistic = (
     store,
     normalizeVariables(operation, request.variables),
     getFragments(request.query),
-    mutationRootKey,
-    mutationRootKey,
+    operationName,
+    operationName,
     true
   );
 
@@ -131,18 +129,12 @@ export const writeOptimistic = (
         const fieldKey = keyOfField(fieldName, fieldArgs);
 
         // We have to update the context to reflect up-to-date ResolveInfo
-        updateContext(
-          ctx,
-          mutationRootKey,
-          mutationRootKey,
-          fieldKey,
-          fieldName
-        );
+        updateContext(ctx, operationName, operationName, fieldKey, fieldName);
 
         const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
         writeField(ctx, getSelectionSet(node), ensureData(resolverValue));
         data[fieldName] = resolverValue;
-        const updater = ctx.store.updates[mutationRootKey][fieldName];
+        const updater = ctx.store.updates.Mutation[fieldName];
         if (updater) {
           updater(data, fieldArgs || makeDict(), ctx.store, ctx);
         }
