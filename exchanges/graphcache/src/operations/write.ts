@@ -111,37 +111,7 @@ export const writeOptimistic = (
   );
 
   const data = makeDict();
-  const iter = new SelectionIterator(
-    operationName,
-    operationName,
-    getSelectionSet(operation),
-    ctx
-  );
-
-  let node: FieldNode | void;
-  while ((node = iter.next())) {
-    if (node.selectionSet) {
-      const fieldName = getName(node);
-      const resolver = ctx.store.optimisticMutations[fieldName];
-
-      if (resolver) {
-        const fieldArgs = getFieldArguments(node, ctx.variables);
-        const fieldKey = keyOfField(fieldName, fieldArgs);
-
-        // We have to update the context to reflect up-to-date ResolveInfo
-        updateContext(ctx, operationName, operationName, fieldKey, fieldName);
-
-        const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
-        writeField(ctx, getSelectionSet(node), ensureData(resolverValue));
-        data[fieldName] = resolverValue;
-        const updater = ctx.store.updates.Mutation[fieldName];
-        if (updater) {
-          updater(data, fieldArgs || makeDict(), ctx.store, ctx);
-        }
-      }
-    }
-  }
-
+  writeSelection(ctx, operationName, getSelectionSet(operation), data);
   clearDataState();
   return result;
 };
@@ -221,7 +191,7 @@ const writeSelection = (
     const fieldValue = data[getFieldAlias(node)];
 
     if (process.env.NODE_ENV !== 'production') {
-      if (fieldValue === undefined) {
+      if (!isRoot && fieldValue === undefined) {
         const advice = ctx.optimistic
           ? '\nYour optimistic result may be missing a field!'
           : '';
@@ -248,14 +218,29 @@ const writeSelection = (
     }
 
     if (node.selectionSet) {
-      // Process the field and write links for the child entities that have been written
-      const fieldData = ensureData(fieldValue);
-      const key =
-        entityKey && !isRoot ? joinKeys(entityKey, fieldKey) : undefined;
-      const link = writeField(ctx, getSelectionSet(node), fieldData, key);
+      let fieldData: Data | NullArray<Data> | null;
+      // Process optimistic updates, if this is a `writeOptimistic` operation
+      // otherwise read the field value from data and write it
+      if (ctx.optimistic && isRoot) {
+        const resolver = ctx.store.optimisticMutations[fieldName];
+        if (!resolver) continue;
+        // We have to update the context to reflect up-to-date ResolveInfo
+        updateContext(ctx, typename, typename, fieldKey, fieldName);
+        fieldData = ensureData(
+          resolver(fieldArgs || makeDict(), ctx.store, ctx)
+        );
+        data[fieldName] = fieldData;
+      } else {
+        fieldData = ensureData(fieldValue);
+      }
 
+      // Process the field and write links for the child entities that have been written
       if (entityKey && !isRoot) {
+        const key = joinKeys(entityKey, fieldKey);
+        const link = writeField(ctx, getSelectionSet(node), fieldData, key);
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
+      } else {
+        writeField(ctx, getSelectionSet(node), fieldData);
       }
     } else if (entityKey && !isRoot) {
       // This is a leaf node, so we're setting the field's value directly
