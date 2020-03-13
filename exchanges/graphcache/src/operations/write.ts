@@ -201,19 +201,16 @@ export const writeFragment = (
 
 const writeSelection = (
   ctx: Context,
-  entityKey: void | string,
+  entityKey: undefined | string,
   select: SelectionSet,
   data: Data
 ) => {
-  const isQuery = entityKey === ctx.store.getRootKey('query');
-  const isRootField =
-    isQuery ||
-    entityKey === ctx.store.getRootKey('mutation') ||
-    entityKey === ctx.store.getRootKey('subscription');
-  const typename = isRootField ? entityKey : data.__typename;
+  const isQuery = entityKey === ctx.store.rootFields['query'];
+  const isRoot = !isQuery && !!ctx.store.rootNames[entityKey!];
+  const typename = isRoot || isQuery ? entityKey : data.__typename;
   if (!typename) {
     return;
-  } else if (!isRootField && entityKey) {
+  } else if (!isRoot && !isQuery && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
@@ -262,20 +259,18 @@ const writeSelection = (
       // Process the field and write links for the child entities that have been written
       const fieldData = ensureData(fieldValue);
       const key =
-        entityKey && (!isRootField || isQuery)
-          ? joinKeys(entityKey, fieldKey)
-          : undefined;
+        entityKey && !isRoot ? joinKeys(entityKey, fieldKey) : undefined;
       const link = writeField(ctx, getSelectionSet(node), fieldData, key);
 
-      if (entityKey && (!isRootField || isQuery)) {
+      if (entityKey && !isRoot) {
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       }
-    } else if (entityKey && (!isRootField || isQuery)) {
+    } else if (entityKey && !isRoot) {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
     }
 
-    if (isRootField && !isQuery) {
+    if (isRoot) {
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(
         ctx,
