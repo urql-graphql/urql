@@ -105,16 +105,11 @@ export const clearDataState = () => {
 
   // Determine whether the current operation has been a commutative layer
   if (layerKey && data.optimisticOrder.indexOf(layerKey) > -1) {
-    // Find the lowest index of the commutative layers
-    // The first part of `optimisticOrder` are the non-commutative layers
-    const commutativeIndex =
-      data.optimisticOrder.length - data.commutativeKeys.size;
-
     // Squash all layers in reverse order (low priority upwards) that have
     // been written already
     let i = data.optimisticOrder.length;
     while (
-      --i >= commutativeIndex &&
+      --i >= 0 &&
       data.refLock[data.optimisticOrder[i]] &&
       data.commutativeKeys.has(data.optimisticOrder[i])
     ) {
@@ -123,7 +118,6 @@ export const clearDataState = () => {
   }
 
   currentData = null;
-  previousDependencies = currentDependencies;
   currentDependencies = null;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -462,8 +456,8 @@ export const writeLink = (
   }
 
   // Retrieve the previous link for this field
-  const prevLinkNode = links !== undefined ? links.get(entityKey) : undefined;
-  const prevLink = prevLinkNode !== undefined ? prevLinkNode[fieldKey] : null;
+  const prevLinkNode = links && links.get(entityKey);
+  const prevLink = prevLinkNode && prevLinkNode[fieldKey];
 
   // Update dependencies
   updateDependencies(entityKey, fieldKey);
