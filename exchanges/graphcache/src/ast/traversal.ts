@@ -46,29 +46,24 @@ export const shouldInclude = (
   vars: Variables
 ): boolean => {
   const { directives } = node;
-  if (directives === undefined) {
-    return true;
-  }
+  if (!directives) return true;
 
   // Finds any @include or @skip directive that forces the node to be skipped
   for (let i = 0, l = directives.length; i < l; i++) {
     const directive = directives[i];
     const name = getName(directive);
 
-    // Ignore other directives
-    const isInclude = name === 'include';
-    if (!isInclude && name !== 'skip') continue;
-
-    // Get the first argument and expect it to be named "if"
-    const arg = directive.arguments ? directive.arguments[0] : null;
-    if (!arg || getName(arg) !== 'if') continue;
-
-    const value = valueFromASTUntyped(arg.value, vars);
-    if (typeof value !== 'boolean' && value !== null) continue;
-
-    // Return whether this directive forces us to skip
-    // `@include(if: false)` or `@skip(if: true)`
-    return isInclude ? !!value : !value;
+    if (
+      (name === 'include' || name === 'skip') &&
+      directive.arguments &&
+      directive.arguments[0] &&
+      getName(directive.arguments[0]) === 'if'
+    ) {
+      // Return whether this directive forces us to skip
+      // `@include(if: false)` or `@skip(if: true)`
+      const value = valueFromASTUntyped(directive.arguments[0].value, vars);
+      return name === 'include' ? !!value : !value;
+    }
   }
 
   return true;
