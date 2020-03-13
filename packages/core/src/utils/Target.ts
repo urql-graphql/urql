@@ -18,6 +18,10 @@ export class Target {
   public dispatchEvent = <T extends string | keyof DebugEventTypes>(
     e: DebugEvent<T>
   ) => {
+    if (process && process.env && process.env.NODE_ENV === 'production') {
+      return;
+    }
+
     this.listeners.forEach(l => l(e));
   };
 }
