@@ -314,7 +314,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
       inputOps$,
-      filter(op => isCacheableQuery(op)),
+      filter(isCacheableQuery),
       map(operationResultFromCache),
       share
     );
