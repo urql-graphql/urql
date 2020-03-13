@@ -153,7 +153,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   // This executes an optimistic update for mutations and registers it if necessary
   const optimisticUpdate = (operation: Operation) => {
     const { key } = operation;
-    if (operation.operationName === 'mutation' && operation.context.requestPolicy !== 'network-only') {
+    if (
+      operation.operationName === 'mutation' &&
+      operation.context.requestPolicy !== 'network-only'
+    ) {
       const { dependencies } = writeOptimistic(store, operation, key);
       if (dependencies.size !== 0) {
         optimisticKeysToDependencies.set(key, dependencies);
@@ -188,9 +191,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     operation: Operation
   ): OperationResultWithMeta => {
     const res = query(store, operation);
-    const cacheOutcome: CacheOutcome = res.data ?
-      (!res.partial || operation.context.requestPolicy === 'cache-only' ? 'hit' : 'partial') :
-      'miss';
+    const cacheOutcome: CacheOutcome = res.data
+      ? !res.partial || operation.context.requestPolicy === 'cache-only'
+        ? 'hit'
+        : 'partial'
+      : 'miss';
 
     if (res.data) {
       updateDependencies(operation, res.dependencies);
@@ -227,7 +232,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     if (result.data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
-      const writeDependencies = write(store, operation, result.data, key).dependencies;
+      const writeDependencies = write(store, operation, result.data, key)
+        .dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
       const queryResult = query(store, operation, result.data);
@@ -268,7 +274,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const inputOps$ = pipe(
       concat([bufferedOps$, sharedOps$]),
       // Returns the given operation with added __typename fields on its query
-      map((op) => ({
+      map(op => ({
         ...op,
         query: formatDocument(op.query),
       })),
@@ -279,7 +285,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cache$ = pipe(
       inputOps$,
-      filter((op) => op.operationName === 'query' && op.context.requestPolicy !== 'network-only'),
+      filter(
+        op =>
+          op.operationName === 'query' &&
+          op.context.requestPolicy !== 'network-only'
+      ),
       map(operationResultFromCache),
       share
     );
@@ -308,7 +318,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
           if (
             operation.context.requestPolicy === 'cache-and-network' ||
-            (operation.context.requestPolicy === 'cache-first' && outcome === 'partial')
+            (operation.context.requestPolicy === 'cache-first' &&
+              outcome === 'partial')
           ) {
             result.stale = true;
             client.reexecuteOperation(
@@ -327,7 +338,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       merge([
         pipe(
           inputOps$,
-          filter(op => !(op.operationName === 'query' && op.context.requestPolicy !== 'network-only'))
+          filter(
+            op =>
+              !(
+                op.operationName === 'query' &&
+                op.context.requestPolicy !== 'network-only'
+              )
+          )
         ),
         cacheOps$,
       ]),
