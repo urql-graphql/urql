@@ -37,6 +37,7 @@ import {
 } from './shared';
 
 export interface WriteResult {
+  data: null | Data;
   dependencies: Set<string>;
 }
 
@@ -59,7 +60,7 @@ export const startWrite = (
   data: Data
 ) => {
   const operation = getMainOperation(request.query);
-  const result: WriteResult = { dependencies: getCurrentDependencies() };
+  const result: WriteResult = { data, dependencies: getCurrentDependencies() };
   const operationName = store.rootFields[operation.operation];
 
   const ctx = makeContext(
@@ -75,7 +76,6 @@ export const startWrite = (
   }
 
   writeSelection(ctx, operationName, getSelectionSet(operation), data);
-
   return result;
 };
 
@@ -87,7 +87,10 @@ export const writeOptimistic = (
   initDataState(store.data, key, true);
 
   const operation = getMainOperation(request.query);
-  const result: WriteResult = { dependencies: getCurrentDependencies() };
+  const result: WriteResult = {
+    data: makeDict(),
+    dependencies: getCurrentDependencies(),
+  };
   const operationName = store.rootFields[operation.operation];
 
   invariant(
@@ -110,8 +113,7 @@ export const writeOptimistic = (
     true
   );
 
-  const data = makeDict();
-  writeSelection(ctx, operationName, getSelectionSet(operation), data);
+  writeSelection(ctx, operationName, getSelectionSet(operation), result.data!);
   clearDataState();
   return result;
 };
