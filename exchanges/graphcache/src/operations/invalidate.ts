@@ -7,14 +7,11 @@ export const invalidate = (store: Store, request: OperationRequest) => {
   const dependencies = InMemoryData.forkDependencies();
   read(store, request);
 
-  const queryKey = store.data.queryRootKey;
-  const queryField = `${queryKey}.`;
-
   dependencies.forEach(dependency => {
-    if (dependency.startsWith(queryField)) {
-      const fieldKey = dependency.slice(queryField.length);
-      InMemoryData.writeLink(queryKey, fieldKey, undefined);
-      InMemoryData.writeRecord(queryKey, fieldKey, undefined);
+    if (dependency.startsWith(`${store.data.queryRootKey}.`)) {
+      const fieldKey = dependency.slice(`${store.data.queryRootKey}.`.length);
+      InMemoryData.writeLink(store.data.queryRootKey, fieldKey);
+      InMemoryData.writeRecord(store.data.queryRootKey, fieldKey);
     } else {
       store.invalidate(dependency);
     }

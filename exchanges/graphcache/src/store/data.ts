@@ -411,7 +411,7 @@ export const readLink = (
 export const writeRecord = (
   entityKey: string,
   fieldKey: string,
-  value: EntityField
+  value?: EntityField
 ) => {
   updateDependencies(entityKey, fieldKey);
   setNode(currentData!.records, entityKey, fieldKey, value);
@@ -429,7 +429,7 @@ export const hasField = (entityKey: string, fieldKey: string): boolean =>
 export const writeLink = (
   entityKey: string,
   fieldKey: string,
-  link: Link | undefined
+  link?: Link | undefined
 ) => {
   const data = currentData!;
   // Retrieve the reference counting dict or the optimistic reference locking dict
