@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 2.2.5
+
+### Patch Changes
+
+- Refactor parts of Graphcache for a minor performance boost and bundlesize reductions, by [@kitten](https://github.com/kitten) (See [#611](https://github.com/FormidableLabs/urql/pull/611))
+
 ## 2.2.4
 
 ### Patch Changes
