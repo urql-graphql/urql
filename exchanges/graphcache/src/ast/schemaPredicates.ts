@@ -17,8 +17,7 @@ export const isFieldNullable = (
   fieldName: string
 ): boolean => {
   const field = getField(schema, typename, fieldName);
-  if (field === undefined) return false;
-  return isNullableType(field.type);
+  return !!field && isNullableType(field.type);
 };
 
 export const isListNullable = (
@@ -27,7 +26,7 @@ export const isListNullable = (
   fieldName: string
 ): boolean => {
   const field = getField(schema, typename, fieldName);
-  if (field === undefined) return false;
+  if (!field) return false;
   const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
   return isListType(ofType) && isNullableType(ofType.ofType);
 };
@@ -69,7 +68,7 @@ const getField = (
   expectObjectType(object, typename);
 
   const field = object.getFields()[fieldName];
-  if (field === undefined) {
+  if (!field) {
     warn(
       'Invalid field: The field `' +
         fieldName +
@@ -80,8 +79,6 @@ const getField = (
         'Traversal will continue, however this may lead to undefined behavior!',
       4
     );
-
-    return undefined;
   }
 
   return field;
