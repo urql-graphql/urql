@@ -140,18 +140,18 @@ export const afterMutation = (
   const pendingOperations = new Set<number>();
   const { additionalTypenames } = response.operation.context;
 
-  const typeNamesToBeInvalidated = [
+  const typenames = [
     ...collectTypesFromResponse(response.data),
     ...(additionalTypenames || []),
   ];
 
   client.eventTarget.dispatchEvent({
     type: 'cacheInvalidation',
-    message: `The following typenames have been invalidated: ${invalidTypeNames}`,
-    data: { typenames: invalidTypeNames, response },
+    message: `The following typenames have been invalidated: ${typenames}`,
+    data: { typenames, response },
   });
 
-  typeNamesToBeInvalidated.forEach(typeName => {
+  typenames.forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {
