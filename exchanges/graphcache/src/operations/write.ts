@@ -61,7 +61,6 @@ export const startWrite = (
   const operation = getMainOperation(request.query);
   const result: WriteResult = { dependencies: getCurrentDependencies() };
 
-  const select = getSelectionSet(operation);
   const operationName = store.getRootKey(operation.operation);
 
   const ctx = makeContext(
@@ -77,9 +76,7 @@ export const startWrite = (
   }
 
   if (operationName === ctx.store.getRootKey('query')) {
-    writeSelection(ctx, operationName, select, data);
-  } else {
-    writeRoot(ctx, operationName, select, data);
+    writeSelection(ctx, operationName, getSelectionSet(operation), data);
   }
 
   return result;
@@ -126,12 +123,12 @@ export const writeOptimistic = (
   );
 
   let node: FieldNode | void;
-  while ((node = iter.next()) !== undefined) {
-    if (node.selectionSet !== undefined) {
+  while ((node = iter.next())) {
+    if (node.selectionSet) {
       const fieldName = getName(node);
       const resolver = ctx.store.optimisticMutations[fieldName];
 
-      if (resolver !== undefined) {
+      if (resolver) {
         const fieldArgs = getFieldArguments(node, ctx.variables);
         const fieldKey = keyOfField(fieldName, fieldArgs);
 
@@ -148,7 +145,7 @@ export const writeOptimistic = (
         writeField(ctx, getSelectionSet(node), ensureData(resolverValue));
         data[fieldName] = resolverValue;
         const updater = ctx.store.updates[mutationRootKey][fieldName];
-        if (updater !== undefined) {
+        if (updater) {
           updater(data, fieldArgs || makeDict(), ctx.store, ctx);
         }
       }
@@ -211,15 +208,16 @@ const writeSelection = (
   data: Data
 ) => {
   const isQuery = entityKey === ctx.store.getRootKey('query');
+  const isRootField = !!ctx.store.getRootKey(entityKey as any);
   const typename = isQuery ? entityKey : data.__typename;
   if (typeof typename !== 'string') return;
 
-  InMemoryData.writeRecord(entityKey, '__typename', typename);
+  if (!isRootField) { InMemoryData.writeRecord(entityKey, '__typename', typename); }
 
   const iter = new SelectionIterator(typename, entityKey, select, ctx);
 
   let node: FieldNode | void;
-  while ((node = iter.next()) !== undefined) {
+  while ((node = iter.next())) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
@@ -253,14 +251,26 @@ const writeSelection = (
       }
     }
 
-    if (node.selectionSet === undefined) {
-      // This is a leaf node, so we're setting the field's value directly
-      InMemoryData.writeRecord(entityKey, fieldKey, fieldValue);
-    } else {
+    if (node.selectionSet) {
       // Process the field and write links for the child entities that have been written
       const fieldData = ensureData(fieldValue);
-      const link = writeField(ctx, getSelectionSet(node), fieldData, key);
+      const link = writeField(ctx, getSelectionSet(node), fieldData, isRootField && !isQuery ? undefined : key);
       InMemoryData.writeLink(entityKey, fieldKey, link);
+    } else {
+      // This is a leaf node, so we're setting the field's value directly
+      InMemoryData.writeRecord(entityKey, fieldKey, fieldValue);
+    }
+
+    if (isRootField && !isQuery) {
+      // We have to update the context to reflect up-to-date ResolveInfo
+      updateContext(ctx, typename, typename, key, fieldName);
+
+      // We run side-effect updates after the default, normalized updates
+      // so that the data is already available in-store if necessary
+      const updater = ctx.store.updates[typename][fieldName];
+      if (updater) {
+        updater(data, fieldArgs || makeDict(), ctx.store, ctx);
+      }
     }
   }
 };
@@ -323,47 +333,11 @@ const writeField = (
     writeSelection(ctx, entityKey, select, data);
     return entityKey;
   } else if (!parentFieldKey) {
-    writeRoot(ctx, typename, select, data);
+    // TODO: check this again now test
+    writeSelection(ctx, typename, select, data);
     return null;
   } else {
     writeSelection(ctx, parentFieldKey, select, data);
     return parentFieldKey;
-  }
-};
-
-// This is like writeSelection but assumes no parent entity exists
-const writeRoot = (
-  ctx: Context,
-  typename: string,
-  select: SelectionSet,
-  data: Data
-) => {
-  const isRootField =
-    typename === ctx.store.getRootKey('mutation') ||
-    typename === ctx.store.getRootKey('subscription');
-
-  const iter = new SelectionIterator(typename, typename, select, ctx);
-
-  let node: FieldNode | void;
-  while ((node = iter.next()) !== undefined) {
-    const fieldName = getName(node);
-    const fieldArgs = getFieldArguments(node, ctx.variables);
-    const fieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
-    if (node.selectionSet !== undefined) {
-      const fieldValue = ensureData(data[getFieldAlias(node)]);
-      writeField(ctx, getSelectionSet(node), fieldValue);
-    }
-
-    if (isRootField) {
-      // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(ctx, typename, typename, fieldKey, fieldName);
-
-      // We run side-effect updates after the default, normalized updates
-      // so that the data is already available in-store if necessary
-      const updater = ctx.store.updates[typename][fieldName];
-      if (updater !== undefined) {
-        updater(data, fieldArgs || makeDict(), ctx.store, ctx);
-      }
-    }
   }
 };
