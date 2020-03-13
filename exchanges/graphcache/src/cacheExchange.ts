@@ -143,7 +143,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     pendingOperations: Set<number>,
     dependencies: void | Set<string>
   ) => {
-    if (dependencies !== undefined) {
+    if (dependencies) {
       // Collect operations that will be updated due to cache changes
       dependencies.forEach(dep => {
         const keys = deps[dep];
@@ -165,7 +165,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     pendingOperations.forEach(key => {
       if (key !== operation.key) {
         const op = ops.get(key);
-        if (op !== undefined) {
+        if (op) {
           ops.delete(key);
           client.reexecuteOperation(toRequestPolicy(op, 'cache-first'));
         }
@@ -244,13 +244,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const updateCacheWithResult = (result: OperationResult): OperationResult => {
     const { operation, error, extensions } = result;
     const isQuery = isQueryOperation(operation);
-    let { data } = result;
 
     // Clear old optimistic values from the store
     const { key } = operation;
     const pendingOperations = new Set<number>();
 
     if (isMutationOperation(operation)) {
+      // Collect previous dependencies that have been written for optimistic updates
       collectPendingOperations(
         pendingOperations,
         optimisticKeysToDependencies.get(key)
@@ -261,33 +261,29 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       reserveLayer(store.data, operation.key);
     }
 
-    let writeDependencies: Set<string> | void;
     let queryDependencies: Set<string> | void;
+    let { data } = result;
     if (data !== null && data !== undefined) {
-      writeDependencies = write(store, operation, data, key).dependencies;
+      // Write the result to cache and collect all dependencies that need to be
+      // updated
+      const writeDependencies = write(store, operation, data, key).dependencies;
+      collectPendingOperations(pendingOperations, writeDependencies);
 
+      const queryResult = query(store, operation, data);
+      data = queryResult.data;
       if (isQuery) {
-        const queryResult = query(store, operation);
-        data = queryResult.data;
+        // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
-      } else {
-        data = query(store, operation, data).data;
+        collectPendingOperations(pendingOperations, queryDependencies);
       }
     } else {
       noopDataState(store.data, operation.key);
     }
 
-    // Collect all write dependencies and query dependencies for queries
-    collectPendingOperations(pendingOperations, writeDependencies);
-    if (isQuery) {
-      collectPendingOperations(pendingOperations, queryDependencies);
-    }
-
     // Execute all pending operations related to changed dependencies
     executePendingOperations(result.operation, pendingOperations);
-
     // Update this operation's dependencies if it's a query
-    if (isQuery && queryDependencies !== undefined) {
+    if (queryDependencies) {
       updateDependencies(result.operation, queryDependencies);
     }
 
@@ -327,7 +323,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const cacheOps$ = pipe(
       cache$,
       filter(res => res.outcome === 'miss'),
-      map(res => addCacheOutcome(res.operation, res.outcome))
+      map(res => addCacheOutcome(res.operation, 'miss'))
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
