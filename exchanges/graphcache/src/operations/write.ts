@@ -145,8 +145,7 @@ export const writeOptimistic = (
         );
 
         const resolverValue = resolver(fieldArgs || makeDict(), ctx.store, ctx);
-        const resolverData = ensureData(resolverValue);
-        writeRootField(ctx, resolverData, getSelectionSet(node));
+        writeField(ctx, getSelectionSet(node), ensureData(resolverValue));
         data[fieldName] = resolverValue;
         const updater = ctx.store.updates[mutationRootKey][fieldName];
         if (updater !== undefined) {
@@ -260,7 +259,7 @@ const writeSelection = (
     } else {
       // Process the field and write links for the child entities that have been written
       const fieldData = ensureData(fieldValue);
-      const link = writeField(ctx, key, getSelectionSet(node), fieldData);
+      const link = writeField(ctx, getSelectionSet(node), fieldData, key);
       InMemoryData.writeLink(entityKey, fieldKey, link);
     }
   }
@@ -268,18 +267,20 @@ const writeSelection = (
 
 const writeField = (
   ctx: Context,
-  parentFieldKey: string,
   select: SelectionSet,
-  data: null | Data | NullArray<Data>
+  data: null | Data | NullArray<Data>,
+  parentFieldKey?: string
 ): Link => {
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
       const item = data[i];
       // Append the current index to the parentFieldKey fallback
-      const indexKey = joinKeys(parentFieldKey, `${i}`);
+      const indexKey = parentFieldKey
+        ? joinKeys(parentFieldKey, `${i}`)
+        : undefined;
       // Recursively write array data
-      const links = writeField(ctx, indexKey, select, item);
+      const links = writeField(ctx, select, item, indexKey);
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
     }
@@ -290,10 +291,10 @@ const writeField = (
   }
 
   const entityKey = ctx.store.keyOfEntity(data);
-  const key = entityKey !== null ? entityKey : parentFieldKey;
   const typename = data.__typename;
 
   if (
+    parentFieldKey &&
     ctx.store.keys[data.__typename] === undefined &&
     entityKey === null &&
     typeof typename === 'string' &&
@@ -318,8 +319,16 @@ const writeField = (
     );
   }
 
-  writeSelection(ctx, key, select, data);
-  return key;
+  if (entityKey) {
+    writeSelection(ctx, entityKey, select, data);
+    return entityKey;
+  } else if (!parentFieldKey) {
+    writeRoot(ctx, typename, select, data);
+    return null;
+  } else {
+    writeSelection(ctx, parentFieldKey, select, data);
+    return parentFieldKey;
+  }
 };
 
 // This is like writeSelection but assumes no parent entity exists
@@ -342,7 +351,7 @@ const writeRoot = (
     const fieldKey = joinKeys(typename, keyOfField(fieldName, fieldArgs));
     if (node.selectionSet !== undefined) {
       const fieldValue = ensureData(data[getFieldAlias(node)]);
-      writeRootField(ctx, fieldValue, getSelectionSet(node));
+      writeField(ctx, getSelectionSet(node), fieldValue);
     }
 
     if (isRootField) {
@@ -356,30 +365,5 @@ const writeRoot = (
         updater(data, fieldArgs || makeDict(), ctx.store, ctx);
       }
     }
-  }
-};
-
-// This is like writeField but doesn't fall back to a generated key
-const writeRootField = (
-  ctx: Context,
-  data: null | Data | NullArray<Data>,
-  select: SelectionSet
-) => {
-  if (Array.isArray(data)) {
-    const newData = new Array(data.length);
-    for (let i = 0, l = data.length; i < l; i++)
-      newData[i] = writeRootField(ctx, data[i], select);
-    return newData;
-  } else if (data === null) {
-    return;
-  }
-
-  // Write entity to key that falls back to the given parentFieldKey
-  const entityKey = ctx.store.keyOfEntity(data);
-  if (entityKey !== null) {
-    writeSelection(ctx, entityKey, select, data);
-  } else {
-    const typename = data.__typename;
-    writeRoot(ctx, typename, select, data);
   }
 };
