@@ -88,6 +88,7 @@ export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
 /** Debug event types (interfaced for declaration merging). */
 export interface DebugEventTypes {
+  [key: string]: object;
   dedup: { operation: Operation };
   cacheHit: { operation: Operation; value: any };
   cacheInvalidation: { value: string[] };
