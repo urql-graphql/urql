@@ -210,10 +210,10 @@ const writeSelection = (
     isQuery ||
     entityKey === ctx.store.getRootKey('mutation') ||
     entityKey === ctx.store.getRootKey('subscription');
-  const typename = (isRootField && entityKey) || data.__typename;
-  if (typeof typename !== 'string') return;
-
-  if (!isRootField && entityKey) {
+  const typename = isRootField ? entityKey : data.__typename;
+  if (!typename) {
+    return;
+  } else if (!isRootField && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
@@ -262,15 +262,15 @@ const writeSelection = (
       // Process the field and write links for the child entities that have been written
       const fieldData = ensureData(fieldValue);
       const key =
-        entityKey || isQuery
-          ? joinKeys(entityKey || typename, fieldKey)
+        entityKey && (!isRootField || isQuery)
+          ? joinKeys(entityKey, fieldKey)
           : undefined;
       const link = writeField(ctx, getSelectionSet(node), fieldData, key);
 
       if (entityKey && (!isRootField || isQuery)) {
-        InMemoryData.writeLink(entityKey, fieldKey, link);
+        InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       }
-    } else if (entityKey || isQuery) {
+    } else if (entityKey && (!isRootField || isQuery)) {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
     }
