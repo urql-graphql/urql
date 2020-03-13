@@ -1,5 +1,5 @@
 export * from './types';
-export { query, write, read, writeOptimistic } from './operations';
+export { query, write, writeOptimistic } from './operations';
 export {
   Store,
   noopDataState,
