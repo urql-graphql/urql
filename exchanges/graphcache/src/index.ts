@@ -1,10 +1,8 @@
 export * from './types';
-export * from './operations';
+export { query, write, read, writeOptimistic } from './operations';
 export {
   Store,
   noopDataState,
-  initDataState,
-  clearDataState,
   reserveLayer,
 } from './store';
 export { cacheExchange } from './cacheExchange';
