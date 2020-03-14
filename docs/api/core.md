@@ -20,7 +20,7 @@ It accepts several options on creation.
 
 `@urql/core` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-| Input           | Type                               | Description                                                                                                                                                                            |
+| Input           | Type                               | Description                                                                                                                  v                                                          |
 | --------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | exchanges       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                           |
 | url             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                                         |
@@ -196,7 +196,7 @@ properties you'll likely see some options that exist on the `Client` as well.
 
 | Prop                | Type                                  | Description                                                                                                           |
 | ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| fetchOptions        | `?RequestInit \| (() => RequestInit)` | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| fetchOptions        | `?RequestInit \| (() => RequestInit)` |Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.       |
 | fetch               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
 | requestPolicy       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
 | url                 | `string`                              | The GraphQL endpoint                                                                                                  |
