@@ -20,7 +20,7 @@ It accepts several options on creation.
 
 `@urql/core` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-| Input           | Type                               | Description                                                                                                                  v                                                          |
+| Input           | Type                               | Description                                                                                                                                                                            |
 | --------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | exchanges       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                           |
 | url             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                                         |
