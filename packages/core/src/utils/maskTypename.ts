@@ -10,7 +10,7 @@ export const maskTypename = (data: any): any => {
       });
     } else if (Array.isArray(value)) {
       acc[key] = value.map(maskTypename);
-    } else if (typeof value === 'object' && '__typename' in value) {
+    } else if (value && typeof value === 'object' && '__typename' in value) {
       acc[key] = maskTypename(value);
     } else {
       acc[key] = value;
