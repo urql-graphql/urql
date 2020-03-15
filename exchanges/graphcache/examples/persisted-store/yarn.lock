@@ -177,10 +177,27 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@urql/exchange-graphcache@link:../..":
-  version "2.0.0"
+"@urql/core@>=1.10.1", "@urql/core@>=1.9.2":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-1.10.1.tgz#58ba478434e0cfec324bcdd0365627a961c820b7"
+  integrity sha512-N1Lh7sn8y2DXhi5NUIefvfvAQgPr2vpUCfDmHx6jalYEDCedIzP4FHZoQyB1X4p2FXQStLLgHIjfyGw74zBeWA==
   dependencies:
-    wonka "^3.2.1"
+    wonka "^4.0.7"
+
+"@urql/exchange-graphcache@link:../..":
+  version "2.2.5"
+  dependencies:
+    "@urql/core" ">=1.10.1"
+    "@urql/exchange-populate" ">=0.1.1"
+    wonka "^3.2.1 || ^4.0.0"
+
+"@urql/exchange-populate@>=0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-populate/-/exchange-populate-0.1.1.tgz#ae179613db0a0329952b15beedd150f759def8ea"
+  integrity sha512-nckFh7CadoO7S22GsE0RxKcmFAedw1nqC/O+IBKMRGnFUfoFdjZDHviIVOO1iJnPcmFnSXFHD0ALjEf3VFspBg==
+  dependencies:
+    "@urql/core" ">=1.9.2"
+    wonka "^3.2.1 || ^4.0.0"
 
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
@@ -354,9 +371,9 @@ acorn-dynamic-import@^4.0.0:
   integrity sha512-d3OEjQV4ROpoflsnUA8HozoIR504TFxNivYEUi6uwz0IYhBkTDXGuWlNdMtybRt3nqVx/L6XqMt0FxkXuWKZhw==
 
 acorn@^6.0.5:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
-  integrity sha512-MW/FjM+IvU9CgBzjO3UIPCE2pyEwUsoFl+VGdczOPEdxfGFjuKny/gN54mOuX7Qxmb9Rg9MCn2oKiSUeW+pjrw==
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.4.1.tgz#531e58ba3f51b9dacb9a6646ca4debf5b14ca474"
+  integrity sha512-ZVA9k326Nwrj3Cj9jlh3wGFutC2ZornPNARZwsNYqQYgN0EsV2d53w5RN/co65Ohn4sUAUtb1rSUAOD6XN9idA==
 
 ajv-errors@^1.0.0:
   version "1.0.1"
@@ -4835,6 +4852,11 @@ wonka@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.2.tgz#4d5c79fee2e6042066ba7aa86bd2f180487cc0c3"
   integrity sha512-btmYyFDuDpJXJfELkFkoTjfyn0M+/a54/kjqt3qGN/h/90A8Ynq8qxG4b0uXBAOvJNRnWnL8+d0C3r6Clt8PYA==
+
+"wonka@^3.2.1 || ^4.0.0", wonka@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.7.tgz#b4934685bd2449367bd72ce7770bfe3e6cc8a68b"
+  integrity sha512-Uhyl2cgWCUksYtU0Jt8MSzKUqK4BVUrewWxnn1YlKL3Zco4sDcCUDkbgH0i762HJs1rtsq03cfzsCWxJKaDgVg==
 
 worker-farm@^1.5.2:
   version "1.6.0"
