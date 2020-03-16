@@ -86,12 +86,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   forward,
   client,
 }) => {
-  if (!opts) opts = {};
-
   const store = new Store(opts);
 
   let hydration: void | Promise<void>;
-  if (opts.storage) {
+  if (opts && opts.storage) {
     hydration = opts.storage.read().then(entries => {
       hydrateData(store.data, opts!.storage!, entries);
     });
