@@ -2,7 +2,6 @@
   "$schema": "https://unpkg.com/@changesets/config@0.3.0/schema.json",
   "changelog": "../scripts/changesets/changelog.js",
   "commit": false,
-  "linked": [["urql", "@urql/core"]],
   "access": "public",
   "baseBranch": "master"
 }
