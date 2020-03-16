@@ -1,4 +1,6 @@
-import './graphql/handler';
+ // NOTE: This demo runs a GraphQL server inside a service worker
+ // Go to `./api/graphql.ts` to modify the GraphQL schema and resolvers.
+import './api/handler';
 
 import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';

@@ -1,3 +1,9 @@
+/* NOTE:
+ * This demo is running a mock API in a service worker!
+ * In this file you can find the service worker. It doesn't
+ * execute GraphQL requests itself. Rather, it'll send them
+ * back to the client-side, which creates the response.
+ */
 
 const channel = new BroadcastChannel("cs-graphql");
 

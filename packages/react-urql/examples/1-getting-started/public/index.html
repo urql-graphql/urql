@@ -7,12 +7,14 @@
 
     <script>
       navigator.serviceWorker.getRegistrations().then(registrations => {
+        // Unregister all possible CodeSandbox or other service-workers
         for (const ctx of registrations) {
           if (ctx.active && !ctx.active.scriptURL.endsWith("sw.js")) {
             ctx.unregister();
           }
         }
 
+        // Register the mock API service-worker then close all registrations
         navigator.serviceWorker.register("/sw.js", { scope: "./" });
         navigator.serviceWorker.register = () => Promise.resolve({});
       });

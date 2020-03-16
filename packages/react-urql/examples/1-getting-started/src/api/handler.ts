@@ -1,5 +1,15 @@
+/* NOTE:
+ * This demo is running a mock API in a service worker!
+ * In this file you can find the GraphQL handler. The
+ * service worker will call our BroadcastChannel with
+ * incoming GraphQL requests, which are handled here.
+ * For all intents and purposes _this_ is your GraphQL
+ * server file.
+ * You can find the resolvers and schema in `./graphql.ts`.
+ */
+
 import { parse, execute } from 'graphql';
-import { rootValue, schema } from './schema';
+import { rootValue, schema } from './graphql';
 
 const channel = new BroadcastChannel("cs-graphql");
 
