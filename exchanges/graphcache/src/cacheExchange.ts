@@ -88,13 +88,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 }) => {
   if (!opts) opts = {};
 
-  const store = new Store(
-    opts.schema,
-    opts.resolvers,
-    opts.updates,
-    opts.optimistic,
-    opts.keys
-  );
+  const store = new Store(opts);
 
   let hydration: void | Promise<void>;
   if (opts.storage) {

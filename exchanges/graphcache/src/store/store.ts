@@ -30,6 +30,14 @@ import * as InMemoryData from './data';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
+export interface StoreOpts {
+  updates?: Partial<UpdatesConfig>;
+  resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
+  schema?: IntrospectionQuery;
+}
+
 export class Store implements Cache {
   data: InMemoryData.InMemoryData;
 
@@ -42,27 +50,23 @@ export class Store implements Cache {
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(
-    rawSchema?: IntrospectionQuery,
-    resolvers?: ResolverConfig,
-    updates?: Partial<UpdatesConfig>,
-    optimisticMutations?: OptimisticMutationConfig,
-    keys?: KeyingConfig
-  ) {
-    this.resolvers = resolvers || {};
-    this.optimisticMutations = optimisticMutations || {};
-    this.keys = keys || {};
+  constructor(opts?: StoreOpts) {
+    if (!opts) opts = {};
+
+    this.resolvers = opts.resolvers || {};
+    this.optimisticMutations = opts.optimistic || {};
+    this.keys = opts.keys || {};
 
     this.updates = {
-      Mutation: (updates && updates.Mutation) || {},
-      Subscription: (updates && updates.Subscription) || {},
+      Mutation: (opts.updates && opts.updates.Mutation) || {},
+      Subscription: (opts.updates && opts.updates.Subscription) || {},
     } as UpdatesConfig;
 
     let queryName = 'Query';
     let mutationName = 'Mutation';
     let subscriptionName = 'Subscription';
-    if (rawSchema) {
-      const schema = (this.schema = buildClientSchema(rawSchema));
+    if (opts.schema) {
+      const schema = (this.schema = buildClientSchema(opts.schema));
       const queryType = schema.getQueryType();
       const mutationType = schema.getMutationType();
       const subscriptionType = schema.getSubscriptionType();
