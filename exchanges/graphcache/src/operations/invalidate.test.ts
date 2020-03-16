@@ -29,7 +29,7 @@ describe('Query', () => {
   });
 
   beforeEach(() => {
-    store = new Store(schema);
+    store = new Store({ schema });
     write(
       store,
       { query: TODO_QUERY },

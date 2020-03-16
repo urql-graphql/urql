@@ -34,9 +34,11 @@ const Todos = gql`
 
 describe('Store with KeyingConfig', () => {
   it('generates keys from custom keying function', () => {
-    const store = new Store(undefined, undefined, undefined, undefined, {
-      User: () => 'me',
-      None: () => null,
+    const store = new Store({
+      keys: {
+        User: () => 'me',
+        None: () => null,
+      },
     });
 
     expect(store.keyOfEntity({ __typename: 'Any', id: '123' })).toBe('Any:123');
@@ -53,11 +55,13 @@ describe('Store with OptimisticMutationConfig', () => {
   let store, todosData;
 
   beforeEach(() => {
-    store = new Store(undefined, undefined, undefined, {
-      addTodo: variables => {
-        return {
-          ...variables,
-        } as Data;
+    store = new Store({
+      optimistic: {
+        addTodo: variables => {
+          return {
+            ...variables,
+          } as Data;
+        },
       },
     });
     todosData = {
