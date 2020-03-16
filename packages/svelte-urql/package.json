@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "graphql": "^14.5.8",
-    "svelte": "^3.16.7"
+    "svelte": "^3.20.0"
   },
   "publishConfig": {
     "access": "public"
