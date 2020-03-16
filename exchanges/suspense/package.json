@@ -44,8 +44,8 @@
   "devDependencies": {
     "@types/react": "^16.9.19",
     "graphql": "^14.6.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
