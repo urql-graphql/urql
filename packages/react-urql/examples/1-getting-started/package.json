@@ -1,15 +1,15 @@
 {
   "name": "1-getting-started",
   "version": "1.0.0",
-  "main": "index.html",
+  "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "parcel index.html"
+    "start": "react-scripts start"
   },
   "devDependencies": {
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
-    "parcel-bundler": "^1.12.4",
+    "react-scripts": "^3.4.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="charset" value="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>urql Example: 1. Getting Started</title>
+
+    <script>
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (const ctx of registrations) {
+          if (ctx.active && !ctx.active.scriptURL.endsWith("sw.js")) {
+            ctx.unregister();
+          }
+        }
+
+        navigator.serviceWorker.register("/sw.js", { scope: "./" });
+        navigator.serviceWorker.register = () => Promise.resolve({});
+      });
+    </script>
+  </head>
+
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+  </body>
+</html>

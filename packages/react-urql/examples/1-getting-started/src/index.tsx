@@ -1,3 +1,5 @@
+import './graphql/handler';
+
 import React, { FC, StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { createClient, Provider, defaultExchanges } from 'urql';
@@ -6,7 +8,7 @@ import { Home } from './pages';
 import './index.css';
 
 const client = createClient({
-  url: '/sw/graphql',
+  url: '/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
 });
 
@@ -24,10 +26,3 @@ export const App: FC = () => (
 App.displayName = 'App';
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register(
-    './service-worker.ts',
-    { scope: '/' }
-  );
-}
