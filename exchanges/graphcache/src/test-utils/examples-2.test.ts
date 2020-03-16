@@ -52,28 +52,30 @@ const Pagination = gql`
 `;
 
 it('allows custom resolvers to resolve nested, unkeyed data', () => {
-  const store = new Store(undefined, {
-    Query: {
-      todos: () => ({
-        __typename: 'TodosConnection',
-        edges: [
-          {
-            __typename: 'TodoEdge',
-            node: {
-              __typename: 'Todo',
-              id: '1',
-              // The `complete` field will be overwritten here, but we're
-              // leaving out the `text` field
-              complete: true,
+  const store = new Store({
+    resolvers: {
+      Query: {
+        todos: () => ({
+          __typename: 'TodosConnection',
+          edges: [
+            {
+              __typename: 'TodoEdge',
+              node: {
+                __typename: 'Todo',
+                id: '1',
+                // The `complete` field will be overwritten here, but we're
+                // leaving out the `text` field
+                complete: true,
+              },
             },
+          ],
+          pageInfo: {
+            __typename: 'PageInfo',
+            hasNextPage: true,
+            endCursor: '1',
           },
-        ],
-        pageInfo: {
-          __typename: 'PageInfo',
-          hasNextPage: true,
-          endCursor: '1',
-        },
-      }),
+        }),
+      },
     },
   });
 
@@ -120,23 +122,25 @@ it('allows custom resolvers to resolve nested, unkeyed data', () => {
 });
 
 it('allows custom resolvers to resolve nested, unkeyed data with embedded links', () => {
-  const store = new Store(undefined, {
-    Query: {
-      todos: (_, __, cache) => ({
-        __typename: 'TodosConnection',
-        edges: [
-          {
-            __typename: 'TodoEdge',
-            // This is a key instead of the full entity:
-            node: cache.keyOfEntity({ __typename: 'Todo', id: '1' }),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        todos: (_, __, cache) => ({
+          __typename: 'TodosConnection',
+          edges: [
+            {
+              __typename: 'TodoEdge',
+              // This is a key instead of the full entity:
+              node: cache.keyOfEntity({ __typename: 'Todo', id: '1' }),
+            },
+          ],
+          pageInfo: {
+            __typename: 'PageInfo',
+            hasNextPage: true,
+            endCursor: '1',
           },
-        ],
-        pageInfo: {
-          __typename: 'PageInfo',
-          hasNextPage: true,
-          endCursor: '1',
-        },
-      }),
+        }),
+      },
     },
   });
 
@@ -181,15 +185,17 @@ it('allows custom resolvers to resolve nested, unkeyed data with embedded links'
 });
 
 it('allows custom resolvers to resolve mixed data (keyable and unkeyable)', () => {
-  const store = new Store(undefined, {
-    Query: {
-      todo: () => ({
-        __typename: 'Todo',
-        id: '1',
-        details: {
-          __typename: 'TodoDetails',
-        },
-      }),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        todo: () => ({
+          __typename: 'Todo',
+          id: '1',
+          details: {
+            __typename: 'TodoDetails',
+          },
+        }),
+      },
     },
   });
 

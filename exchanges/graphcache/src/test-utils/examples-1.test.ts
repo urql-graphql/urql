@@ -55,7 +55,7 @@ const NestedClearNameTodo = gql`
 `;
 
 it('passes the "getting-started" example', () => {
-  const store = new Store(undefined);
+  const store = new Store();
   const todosData = {
     __typename: 'Query',
     todos: [
@@ -163,10 +163,12 @@ it('resolves missing, nullable arguments on fields', () => {
 });
 
 it('should link entities', () => {
-  const store = new Store(undefined, {
-    Query: {
-      todo: (_parent, args) => {
-        return { __typename: 'Todo', ...args };
+  const store = new Store({
+    resolvers: {
+      Query: {
+        todo: (_parent, args) => {
+          return { __typename: 'Todo', ...args };
+        },
       },
     },
   });
@@ -194,8 +196,10 @@ it('should link entities', () => {
 });
 
 it('respects property-level resolvers when given', () => {
-  const store = new Store(undefined, {
-    Todo: { text: () => 'hi' },
+  const store = new Store({
+    resolvers: {
+      Todo: { text: () => 'hi' },
+    },
   });
   const todosData = {
     __typename: 'Query',
@@ -254,31 +258,33 @@ it('respects property-level resolvers when given', () => {
 });
 
 it('respects Mutation update functions', () => {
-  const store = new Store(undefined, undefined, {
-    Mutation: {
-      toggleTodo: function toggleTodo(result, _, cache) {
-        cache.updateQuery({ query: Todos }, data => {
-          if (
-            data &&
-            data.todos &&
-            result &&
-            result.toggleTodo &&
-            (result.toggleTodo as any).id === '1'
-          ) {
-            data.todos[1] = {
-              id: '1',
-              text: `${data.todos[1].text} (Updated)`,
-              complete: (result.toggleTodo as any).complete,
-              __typename: 'Todo',
-            };
-          } else if (data && data.todos) {
-            data.todos[Number((result.toggleTodo as any).id)] = {
-              ...data.todos[Number((result.toggleTodo as any).id)],
-              complete: (result.toggleTodo as any).complete,
-            };
-          }
-          return data as Data;
-        });
+  const store = new Store({
+    updates: {
+      Mutation: {
+        toggleTodo: function toggleTodo(result, _, cache) {
+          cache.updateQuery({ query: Todos }, data => {
+            if (
+              data &&
+              data.todos &&
+              result &&
+              result.toggleTodo &&
+              (result.toggleTodo as any).id === '1'
+            ) {
+              data.todos[1] = {
+                id: '1',
+                text: `${data.todos[1].text} (Updated)`,
+                complete: (result.toggleTodo as any).complete,
+                __typename: 'Todo',
+              };
+            } else if (data && data.todos) {
+              data.todos[Number((result.toggleTodo as any).id)] = {
+                ...data.todos[Number((result.toggleTodo as any).id)],
+                complete: (result.toggleTodo as any).complete,
+              };
+            }
+            return data as Data;
+          });
+        },
       },
     },
   });
@@ -342,15 +348,17 @@ it('respects Mutation update functions', () => {
 });
 
 it('correctly resolves optimistic updates on Relay schemas', () => {
-  const store = new Store(undefined, undefined, undefined, {
-    updateItem: variables => ({
-      __typename: 'UpdateItemPayload',
-      item: {
-        __typename: 'Item',
-        id: variables.id as string,
-        name: 'Offline',
-      },
-    }),
+  const store = new Store({
+    optimistic: {
+      updateItem: variables => ({
+        __typename: 'UpdateItemPayload',
+        item: {
+          __typename: 'Item',
+          id: variables.id as string,
+          name: 'Offline',
+        },
+      }),
+    },
   });
 
   const queryData = {

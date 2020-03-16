@@ -14,9 +14,11 @@ it('works with simple pagination', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      persons: simplePagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination(),
+      },
     },
   });
 
@@ -82,9 +84,11 @@ it('handles duplicates', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      persons: simplePagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination(),
+      },
     },
   });
 
@@ -138,9 +142,11 @@ it('should not return previous result when adding a parameter', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      persons: simplePagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination(),
+      },
     },
   });
 
@@ -187,9 +193,11 @@ it('should preserve the correct order', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      persons: simplePagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination(),
+      },
     },
   });
 
@@ -243,9 +251,11 @@ it('prevents overlapping of pagination on different arguments', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      persons: simplePagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination(),
+      },
     },
   });
 

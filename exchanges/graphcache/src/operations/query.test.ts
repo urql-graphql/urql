@@ -34,7 +34,7 @@ describe('Query', () => {
   });
 
   beforeEach(() => {
-    store = new Store(schema);
+    store = new Store({ schema });
     write(
       store,
       { query: TODO_QUERY },
@@ -120,7 +120,7 @@ describe('Query', () => {
       }
     `;
     // Use new store to ensure bug reproduction
-    const store = new Store(schema);
+    const store = new Store({ schema });
 
     let { data } = query(store, { query: VALID_QUERY });
     expect(data).toEqual(null);
@@ -151,7 +151,7 @@ describe('Query', () => {
       }
     `;
 
-    const store = new Store(alteredRoot);
+    const store = new Store({ schema: alteredRoot });
 
     let { data } = query(store, { query: QUERY });
     expect(data).toEqual(null);

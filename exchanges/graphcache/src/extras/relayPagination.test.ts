@@ -34,9 +34,11 @@ it('works with forward pagination', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -102,9 +104,11 @@ it('works with backwards pagination', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -170,9 +174,11 @@ it('handles duplicate edges', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -244,9 +250,11 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination({ mergeMode: 'outwards' }),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination({ mergeMode: 'outwards' }),
+      },
     },
   });
 
@@ -360,9 +368,11 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination({ mergeMode: 'inwards' }),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination({ mergeMode: 'inwards' }),
+      },
     },
   });
 
@@ -474,9 +484,11 @@ it('prevents overlapping of pagination on different arguments', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -544,9 +556,11 @@ it('returns an empty array of edges when the cache has zero edges stored', () =>
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -581,9 +595,11 @@ it('returns other fields on the same level as the edges', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
@@ -632,14 +648,14 @@ it('returns a subset of the cached items if the query requests less items than t
     }
   `;
 
-  const store = new Store(
-    require('../test-utils/relayPagination_schema.json'),
-    {
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
       Query: {
         items: relayPagination({ mergeMode: 'outwards' }),
       },
-    }
-  );
+    },
+  });
 
   const results = {
     __typename: 'Query',
@@ -690,14 +706,14 @@ it("returns the cached items even if they don't fullfil the query", () => {
     }
   `;
 
-  const store = new Store(
-    require('../test-utils/relayPagination_schema.json'),
-    {
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
       Query: {
         items: relayPagination(),
       },
-    }
-  );
+    },
+  });
 
   const results = {
     __typename: 'Query',
@@ -752,14 +768,14 @@ it('returns the cached items even when they come from a different query', () => 
     }
   `;
 
-  const store = new Store(
-    require('../test-utils/relayPagination_schema.json'),
-    {
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
       Query: {
         items: relayPagination(),
       },
-    }
-  );
+    },
+  });
 
   const results = {
     __typename: 'Query',
@@ -810,14 +826,14 @@ it('caches and retrieves correctly queries with inwards pagination', () => {
     }
   `;
 
-  const store = new Store(
-    require('../test-utils/relayPagination_schema.json'),
-    {
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
       Query: {
         items: relayPagination(),
       },
-    }
-  );
+    },
+  });
 
   const results = {
     __typename: 'Query',
@@ -872,9 +888,11 @@ it('does not include a previous result when adding parameters', () => {
     }
   `;
 
-  const store = new Store(undefined, {
-    Query: {
-      items: relayPagination(),
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
     },
   });
 
