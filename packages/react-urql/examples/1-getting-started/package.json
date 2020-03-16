@@ -1,10 +1,10 @@
 {
   "name": "1-getting-started",
   "version": "1.0.0",
-  "main": "src/index.html",
+  "main": "index.html",
   "license": "MIT",
   "scripts": {
-    "start": "parcel src/index.html"
+    "start": "parcel index.html"
   },
   "devDependencies": {
     "@types/react": "^16.9.23",

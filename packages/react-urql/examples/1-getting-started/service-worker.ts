@@ -1,5 +1,5 @@
 import { execute } from 'graphql';
-import { rootValue, schema } from './graphql';
+import { rootValue, schema } from './src/graphql';
 import gql from 'graphql-tag';
 
 self.addEventListener('install', (event: any) => {

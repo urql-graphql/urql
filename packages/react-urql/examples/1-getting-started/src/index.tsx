@@ -5,8 +5,6 @@ import { devtoolsExchange } from '@urql/devtools';
 import { Home } from './pages';
 import './index.css';
 
-navigator.serviceWorker.register('./service-worker.ts', { scope: '/' });
-
 const client = createClient({
   url: '/sw/graphql',
   exchanges: [devtoolsExchange, ...defaultExchanges],
@@ -26,3 +24,10 @@ export const App: FC = () => (
 App.displayName = 'App';
 
 ReactDOM.render(<App />, document.getElementById('root'));
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(
+    './service-worker.ts',
+    { scope: '/' }
+  );
+}

@@ -1,5 +1,0 @@
-yarn.lock
-package-lock.json
-.cache
-dist
-node_modules

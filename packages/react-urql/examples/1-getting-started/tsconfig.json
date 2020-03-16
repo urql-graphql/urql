@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
     "module": "es2015",
-    "target": "ES5",
     "moduleResolution": "node",
+    "target": "es5",
     "strict": true,
-    "lib": ["dom"],
+    "lib": ["dom", "esnext"],
     "jsx": "react",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"]
 }
