@@ -61,7 +61,7 @@
     "react": ">= 16.8.0"
   },
   "dependencies": {
-    "@urql/core": "^1.10.0",
+    "@urql/core": "^1.10.1",
     "use-subscription": "^1.4.0",
     "wonka": "^4.0.7"
   }
