@@ -406,4 +406,21 @@ describe('commutative changes', () => {
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
   });
+
+  it('prevents inspectFields from failing for uninitialised layers', () => {
+    InMemoryData.initDataState(data, null);
+    InMemoryData.writeRecord('Query', 'test', true);
+    InMemoryData.clearDataState();
+
+    InMemoryData.reserveLayer(data, 1);
+
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.inspectFields('Query')).toEqual([
+      {
+        arguments: null,
+        fieldKey: 'test',
+        fieldName: 'test',
+      },
+    ]);
+  });
 });
