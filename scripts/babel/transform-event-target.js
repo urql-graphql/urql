@@ -7,7 +7,6 @@ const warningDevCheckTemplate = `
 const visited = 'visitedByEventTargetTransformer';
 const calleeProperty = 'dispatchEvent';
 const calleeObject = 'eventTarget';
-const client = 'client';
 
 const plugin = ({ template, types: t }) => {
   const wrapWithDevCheck = template(
@@ -22,8 +21,6 @@ const plugin = ({ template, types: t }) => {
           !path.node[visited] &&
           path.node.expression.callee &&
           path.node.expression.callee.object &&
-          path.node.expression.callee.object.object &&
-          path.node.expression.callee.object.object.name === client &&
           path.node.expression.callee.object.property.name === calleeObject &&
           path.node.expression.callee.property.name === calleeProperty
        	) {
