@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useMemo, useEffect } from 'react';
-import { Subscription, Unsubscribe, useSubscription } from 'use-subscription';
+import { useMemo, useEffect, useState } from 'react';
 
 import {
   Source,
@@ -18,53 +16,38 @@ import {
 
 import { useClient } from '../context';
 
-let currentSourceId: null | {} = null;
+let currentInit = false;
 
-export const useSource = <T>(source: Source<T>, init: T): T =>
-  useSubscription(
-    useMemo((): Subscription<T> => {
-      let hasUpdate = false;
-      let currentValue: T = init;
-      const id = {};
+export const useSource = <T>(source: Source<T>, init: T): T => {
+  const [state, setState] = useState(() => {
+    currentInit = true;
+    let initialValue = init;
 
-      return {
-        // getCurrentValue may be implemented by subscribing to the
-        // given source and immediately unsubscribing. Only synchronous
-        // values will therefore reach our `onPush` callback.
-        getCurrentValue(): T {
-          if (!hasUpdate) {
-            currentSourceId = id;
-            pipe(
-              source,
-              onPush(value => {
-                currentValue = value;
-              }),
-              publish
-            ).unsubscribe();
-            currentSourceId = null;
-          }
+    pipe(
+      source,
+      onPush(value => {
+        initialValue = value;
+      }),
+      publish
+    ).unsubscribe();
 
-          return currentValue;
-        },
-        // subscribe is just a regular subscription, but it also tracks
-        // `hasUpdate`. If we're subscribed and receive a new value we
-        // set `hasUpdate` to avoid `getCurrentValue` trying to subscribe
-        // again.
-        subscribe(onValue: () => void): Unsubscribe {
-          hasUpdate = true;
-          return pipe(
-            source,
-            subscribe(value => {
-              if (currentSourceId === null) {
-                currentValue = value;
-                onValue();
-              }
-            })
-          ).unsubscribe as () => void;
-        },
-      };
-    }, [source])
-  );
+    currentInit = false;
+    return initialValue;
+  });
+
+  useEffect(() => {
+    return pipe(
+      source,
+      subscribe(value => {
+        if (!currentInit) {
+          setState(value);
+        }
+      })
+    ).unsubscribe as () => void;
+  }, [source]);
+
+  return state;
+};
 
 export const useBehaviourSubject = <T>(value: T) => {
   const client = useClient();
