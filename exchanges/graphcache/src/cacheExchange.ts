@@ -29,6 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
+import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, reserveLayer } from './store';
 
 import {
@@ -134,12 +135,23 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // This registers queries with the data layer to ensure commutativity
-  const prepareCacheForResult = (operation: Operation) => {
+  const prepareForwardedOperation = (operation: Operation) => {
     if (operation.operationName === 'query') {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
     }
+
+    return {
+      ...operation,
+      variables: operation.variables
+        ? filterVariables(
+            getMainOperation(operation.query),
+            operation.variables
+          )
+        : operation.variables,
+      query: formatDocument(operation.query),
+    };
   };
 
   // This executes an optimistic update for mutations and registers it if necessary
@@ -184,7 +196,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   ): OperationResultWithMeta => {
     const res = query(store, operation);
     const cacheOutcome: CacheOutcome = res.data
-      ? !res.partial || operation.context.requestPolicy === 'cache-only'
+      ? !res.partial
         ? 'hit'
         : 'partial'
       : 'miss';
@@ -275,29 +287,49 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     );
 
     // Filter by operations that are cacheable and attempt to query them from the cache
-    const cache$ = pipe(
+    const cacheOps$ = pipe(
       inputOps$,
-      filter(
-        op =>
+      filter(op => {
+        return (
           op.operationName === 'query' &&
           op.context.requestPolicy !== 'network-only'
-      ),
+        );
+      }),
       map(operationResultFromCache),
       share
     );
 
+    const nonCacheOps$ = pipe(
+      inputOps$,
+      filter(op => {
+        return (
+          op.operationName !== 'query' ||
+          op.context.requestPolicy === 'network-only'
+        );
+      })
+    );
+
     // Rebound operations that are incomplete, i.e. couldn't be queried just from the cache
-    const cacheOps$ = pipe(
-      cache$,
-      filter(res => res.outcome === 'miss'),
+    const cacheMissOps$ = pipe(
+      cacheOps$,
+      filter(res => {
+        return (
+          res.outcome === 'miss' &&
+          res.operation.context.requestPolicy !== 'cache-only'
+        );
+      }),
       map(res => addCacheOutcome(res.operation, 'miss'))
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
     // a network request if the current operation's policy is cache-and-network
     const cacheResult$ = pipe(
-      cache$,
-      filter(res => res.outcome !== 'miss'),
+      cacheOps$,
+      filter(
+        res =>
+          res.outcome !== 'miss' ||
+          res.operation.context.requestPolicy === 'cache-only'
+      ),
       map(
         (res: OperationResultWithMeta): OperationResult => {
           const { operation, outcome } = res;
@@ -327,21 +359,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Forward operations that aren't cacheable and rebound operations
     // Also update the cache with any network results
     const result$ = pipe(
-      merge([
-        pipe(
-          inputOps$,
-          filter(
-            op =>
-              !(
-                op.operationName === 'query' &&
-                op.context.requestPolicy !== 'network-only'
-              )
-          )
-        ),
-        cacheOps$,
-      ]),
-      filter(op => op.context.requestPolicy !== 'cache-only'),
-      tap(prepareCacheForResult),
+      merge([nonCacheOps$, cacheMissOps$]),
+      map(prepareForwardedOperation),
       forward,
       map(updateCacheWithResult)
     );
