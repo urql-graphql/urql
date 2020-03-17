@@ -74,6 +74,44 @@ describe('data dependencies', () => {
     );
   });
 
+  it('respects cache-only operations', () => {
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const op = client.createRequestOperation(
+      'query',
+      {
+        key: 1,
+        query: queryOne,
+      },
+      {
+        requestPolicy: 'cache-only',
+      }
+    );
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        expect(forwardOp.key).toBe(op.key);
+        return { operation: forwardOp, data: queryOneData };
+      }
+    );
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
+
+    next(op);
+    expect(response).toHaveBeenCalledTimes(0);
+    expect(result).toHaveBeenCalledTimes(1);
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'miss'
+    );
+
+    expect(result.mock.calls[0][0].data).toBe(null);
+  });
+
   it('updates related queries when their data changes', () => {
     const queryMultiple = gql`
       {
