@@ -75,7 +75,7 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
   // Event target for monitoring
-  _debugTarget = new Target();
+  debugTarget?: Target;
 
   // These are variables derived from ClientOptions
   url: string;
@@ -94,6 +94,10 @@ export class Client {
   activeOperations = Object.create(null) as ActiveOperations;
 
   constructor(opts: ClientOptions) {
+    if (process.env.NODE_ENV !== 'production') {
+      this.debugTarget = new Target();
+    }
+
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
       throw new Error('You are creating an urql-client without a url.');
     }
@@ -328,8 +332,4 @@ export class Client {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
-
-  public get debugTarget() {
-    return this._debugTarget;
-  }
 }

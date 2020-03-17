@@ -47,6 +47,7 @@ beforeEach(() => {
 
   const client = {
     reexecuteOperation: reexecuteOperation as any,
+    debugTarget: { dispatchEvent: jest.fn() } as any,
   } as Client;
 
   exchangeArgs = { forward, client };
@@ -266,6 +267,7 @@ describe('on empty query response', () => {
 
     const client = {
       reexecuteOperation: reexecuteOperation as any,
+      debugTarget: { dispatchEvent: jest.fn() } as any,
     } as Client;
 
     exchangeArgs = { forward, client };

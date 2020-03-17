@@ -10,6 +10,7 @@ import { terser } from 'rollup-plugin-terser';
 
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
+import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
 
 import * as settings from './settings';
 
@@ -67,6 +68,7 @@ export const makePlugins = ({ isProduction } = {}) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
+      babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
       'babel-plugin-closure-elimination',
