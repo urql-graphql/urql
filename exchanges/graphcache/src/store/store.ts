@@ -24,7 +24,7 @@ import { invariant } from '../helpers/help';
 
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
-import { invalidate } from '../operations/invalidate';
+import { invalidate, invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
@@ -136,7 +136,7 @@ export class Store implements Cache {
     invalidate(this, createRequest(query, variables));
   }
 
-  invalidate(entity: Data | string) {
+  invalidate(entity: Data | string, field?: string, args?: Variables) {
     const entityKey =
       typeof entity === 'string' ? entity : this.keyOfEntity(entity);
 
@@ -151,18 +151,7 @@ export class Store implements Cache {
       19
     );
 
-    const fields = this.inspectFields(entityKey);
-    for (const field of fields) {
-      if (InMemoryData.readLink(entityKey as string, field.fieldKey)) {
-        InMemoryData.writeLink(entityKey as string, field.fieldKey, undefined);
-      } else {
-        InMemoryData.writeRecord(
-          entityKey as string,
-          field.fieldKey,
-          undefined
-        );
-      }
-    }
+    invalidateEntity(entityKey, field, args);
   }
 
   inspectFields(entity: Data | string | null): FieldInfo[] {
