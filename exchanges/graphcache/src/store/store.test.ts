@@ -25,12 +25,71 @@ const Todos = gql`
       text
       complete
       author {
+        __typename
         id
         name
       }
     }
   }
 `;
+
+const TodosWithoutTypename = gql`
+  query {
+    todos {
+      id
+      text
+      complete
+      author {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const todosData = {
+  __typename: 'Query',
+  todos: [
+    {
+      id: '0',
+      text: 'Go to the shops',
+      complete: false,
+      __typename: 'Todo',
+      author: { id: '0', name: 'Jovi', __typename: 'Author' },
+    },
+    {
+      id: '1',
+      text: 'Pick up the kids',
+      complete: true,
+      __typename: 'Todo',
+      author: { id: '1', name: 'Phil', __typename: 'Author' },
+    },
+    {
+      id: '2',
+      text: 'Install urql',
+      complete: false,
+      __typename: 'Todo',
+      author: { id: '0', name: 'Jovi', __typename: 'Author' },
+    },
+  ],
+} as any;
+
+describe('Store', () => {
+  it('supports unformatted query documents', () => {
+    const store = new Store();
+
+    InMemoryData.initDataState(store.data, null);
+    // NOTE: This is the query without __typename annotations
+    write(store, { query: TodosWithoutTypename }, todosData);
+    InMemoryData.initDataState(store.data, null);
+
+    InMemoryData.initDataState(store.data, null);
+    const result = query(store, { query: TodosWithoutTypename });
+    InMemoryData.initDataState(store.data, null);
+
+    expect(result.data).toEqual(todosData);
+  });
+});
 
 describe('Store with KeyingConfig', () => {
   it('generates keys from custom keying function', () => {
@@ -52,7 +111,7 @@ describe('Store with KeyingConfig', () => {
 });
 
 describe('Store with OptimisticMutationConfig', () => {
-  let store, todosData;
+  let store;
 
   beforeEach(() => {
     store = new Store({
@@ -64,32 +123,6 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       },
     });
-    todosData = {
-      __typename: 'Query',
-      todos: [
-        {
-          id: '0',
-          text: 'Go to the shops',
-          complete: false,
-          __typename: 'Todo',
-          author: { id: '0', name: 'Jovi', __typename: 'Author' },
-        },
-        {
-          id: '1',
-          text: 'Pick up the kids',
-          complete: true,
-          __typename: 'Todo',
-          author: { id: '1', name: 'Phil', __typename: 'Author' },
-        },
-        {
-          id: '2',
-          text: 'Install urql',
-          complete: false,
-          __typename: 'Todo',
-          author: { id: '0', name: 'Jovi', __typename: 'Author' },
-        },
-      ],
-    };
     InMemoryData.initDataState(store.data, null);
     write(store, { query: Todos }, todosData);
     InMemoryData.initDataState(store.data, null);
