@@ -36,3 +36,5 @@ maintainers, and supporters. This page is specifically dedicated to all of you!
   Apollo-style persisted queries.
 - [`urql-computed-queries`](https://github.com/Drawbotics/urql-computed-exchange): An exchange to
   compute fields on-the-fly using the `@computed` directive.
+- [`graphql-code-generator`](https://graphql-code-generator.com/docs/plugins/typescript-urql): A plugin
+  that helps you make typesafe hooks/components with urql.
