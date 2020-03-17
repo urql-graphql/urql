@@ -75,7 +75,7 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
   // Event target for monitoring
-  debugTarget: Target;
+  debugTarget?: Target;
 
   // These are variables derived from ClientOptions
   url: string;
