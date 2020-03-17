@@ -51,22 +51,16 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
         // set `hasUpdate` to avoid `getCurrentValue` trying to subscribe
         // again.
         subscribe(onValue: () => void): Unsubscribe {
-          const { unsubscribe } = pipe(
+          hasUpdate = true;
+          return pipe(
             source,
             subscribe(value => {
               if (currentSourceId === null) {
                 currentValue = value;
-                hasUpdate = true;
                 onValue();
-                hasUpdate = false;
               }
             })
-          );
-
-          return () => {
-            unsubscribe();
-            hasUpdate = false;
-          };
+          ).unsubscribe as () => void;
         },
       };
     }, [source])
