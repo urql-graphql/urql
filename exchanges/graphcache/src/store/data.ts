@@ -312,7 +312,9 @@ const extractNodeMapFields = <T>(
   // Then extracts FieldInfo for the entity from the optimistic maps
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
-    extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
+    if (optimistic !== undefined) {
+      extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
+    }
   }
 };
 
