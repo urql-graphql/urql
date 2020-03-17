@@ -6,7 +6,7 @@ const warningDevCheckTemplate = `
 
 const visited = 'visitedByEventTargetTransformer';
 const calleeProperty = 'dispatchEvent';
-const calleeObject = 'eventTarget';
+const calleeObject = 'debugTarget';
 
 const plugin = ({ template, types: t }) => {
   const wrapWithDevCheck = template(
