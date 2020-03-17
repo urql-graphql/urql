@@ -93,8 +93,8 @@ export interface Cache {
   /** @deprecated Use invalidate() instead */
   invalidateQuery(query: DocumentNode, variables?: Variables): void;
 
-  /** invalidate() invalidates an entity */
-  invalidate(entity: Data | string): void;
+  /** invalidate() invalidates an entity or a specific field of an entity */
+  invalidate(entity: Data | string, fieldName?: string, args?: Variables): void;
 
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery(
