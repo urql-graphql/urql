@@ -94,7 +94,7 @@ export class Client {
   activeOperations = Object.create(null) as ActiveOperations;
 
   constructor(opts: ClientOptions) {
-    if (process.env.NODE_ENV !== 'producction') {
+    if (process.env.NODE_ENV !== 'production') {
       this.eventTarget = new Target();
     }
 
