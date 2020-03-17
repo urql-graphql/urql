@@ -355,16 +355,29 @@ page.](../graphcache/custom-updates.md#cacheupdatequery)
 The `cache.invalidate` method can be used to delete (i.e. "evict") an entity from the cache
 entirely. This will cause it to disappear from all queries in _Graphcache_.
 
+Its arguments are identical to [`cache.resolve`](#resolve).
+
 Since deleting an entity will lead to some queries containing missing and uncached data, calling
 `invalidate` may lead to additional GraphQL requests being sent, unless you're using [_Graphcache_'s
 "Schema Awareness" feature](../graphcache/schema-awareness.md), which takes optional fields into
 account.
 
-This method accepts a partial entity or an entity key as its only argument, similar to
+This method accepts a partial entity or an entity key as its first argument, similar to
 [`cache.resolve`](#resolve)'s first argument.
 
 ```js
 cache.invalidate({ __typename: 'Todo', id: 1 }); // Invalidates Todo:1
+```
+
+Additionally `cache.invalidate` may be used to delete specific fields only, which can be useful when
+for instance a list is supposed to be evicted from cache, where a full invalidation may be
+impossible. This is often the case when a field on the root `Query` needs to be deleted.
+
+This method therefore accepts two additional arguments, similar to [`cache.resolve`](#resolve).
+
+```js
+// Invalidates `Query.todos` with the `first: 10` argument:
+cache.invalidate('Query', 'todos', { first: 10 });
 ```
 
 ## Info
