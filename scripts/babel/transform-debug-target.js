@@ -21,6 +21,7 @@ const plugin = ({ template, types: t }) => {
           !path.node[visited] &&
           path.node.expression.callee &&
           path.node.expression.callee.object &&
+          path.node.expression.callee.object.property &&
           path.node.expression.callee.object.property.name === calleeObject &&
           path.node.expression.callee.property.name === calleeProperty
        	) {
