@@ -59,7 +59,7 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
         const cachedResult = resultCache.get(operation.key);
 
         if (cachedResult) {
-          client.eventTarget.dispatchEvent({
+          client.eventTarget!.dispatchEvent({
             type: 'cacheHit',
             message: 'A cache hit has occured',
             data: { value: cachedResult },
@@ -146,7 +146,7 @@ export const afterMutation = (
     ...(additionalTypenames || []),
   ];
 
-  client.eventTarget.dispatchEvent({
+  client.eventTarget!.dispatchEvent({
     type: 'cacheInvalidation',
     message: `The following typenames have been invalidated: ${typenames}`,
     operation: response.operation,
