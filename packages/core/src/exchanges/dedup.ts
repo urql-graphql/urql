@@ -20,7 +20,7 @@ export const dedupExchange: Exchange = ({ forward, client }) => {
     inFlightKeys.add(key);
 
     if (isInFlight) {
-      client.eventTarget.dispatchEvent({
+      client.debugTarget.dispatchEvent({
         type: 'dedup',
         message: 'An operation has been deduped.',
         operation,
