@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { getMainOperation } from './traversal';
-import { normalizeVariables } from './variables';
+import { normalizeVariables, filterVariables } from './variables';
 
 describe('normalizeVariables', () => {
   it('normalizes variables', () => {
@@ -53,5 +53,58 @@ describe('normalizeVariables', () => {
     (operation as any).variableDefinitions = undefined;
     const normalized = normalizeVariables(operation, {});
     expect(normalized).toEqual({});
+  });
+
+  it('preserves missing variables', () => {
+    const operation = getMainOperation(
+      gql`
+        query {
+          field
+        }
+      `
+    );
+    (operation as any).variableDefinitions = undefined;
+    const normalized = normalizeVariables(operation, { test: true });
+    expect(normalized).toEqual({ test: true });
+  });
+});
+
+describe('filterVariables', () => {
+  it('returns undefined when no variables are defined', () => {
+    const operation = getMainOperation(
+      gql`
+        query {
+          field
+        }
+      `
+    );
+    const vars = filterVariables(operation, { test: true });
+    expect(vars).toBe(undefined);
+  });
+
+  it('filters out missing vars', () => {
+    const input = { x: true, y: false };
+    const operation = getMainOperation(
+      gql`
+        query($x: Int!) {
+          field
+        }
+      `
+    );
+    const vars = filterVariables(operation, input);
+    expect(vars).toEqual({ x: true });
+  });
+
+  it('ignores defaults', () => {
+    const input = { x: undefined };
+    const operation = getMainOperation(
+      gql`
+        query($x: Int! = 42) {
+          field
+        }
+      `
+    );
+    const vars = filterVariables(operation, input);
+    expect(vars).toEqual({ x: undefined });
   });
 });
