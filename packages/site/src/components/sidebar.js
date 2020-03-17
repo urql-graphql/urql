@@ -34,6 +34,7 @@ const HeroLogo = styled.img.attrs(() => ({
 }))`
   display: none;
   width: ${p => p.theme.layout.logo};
+  height: ${p => p.theme.layout.logo};
 
   @media ${p => p.theme.media.sm} {
     display: block;
