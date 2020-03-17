@@ -23,7 +23,7 @@ export const dedupExchange: Exchange = ({ forward, client }) => {
       client.eventTarget.dispatchEvent({
         type: 'dedup',
         message: 'An operation has been deduped.',
-        data: { operation },
+        operation,
       });
     }
 
