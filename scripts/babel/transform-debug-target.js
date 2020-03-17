@@ -4,7 +4,7 @@ const warningDevCheckTemplate = `
   }
 `.trim();
 
-const visited = 'visitedByEventTargetTransformer';
+const visited = 'visitedByDebugTargetTransformer';
 const calleeProperty = 'dispatchEvent';
 const calleeObject = 'debugTarget';
 
