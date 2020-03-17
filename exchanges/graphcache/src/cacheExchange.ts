@@ -134,12 +134,17 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // This registers queries with the data layer to ensure commutativity
-  const prepareCacheForResult = (operation: Operation) => {
+  const prepareForwardedOperation = (operation: Operation) => {
     if (operation.operationName === 'query') {
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
     }
+
+    return {
+      ...operation,
+      query: formatDocument(operation.query),
+    };
   };
 
   // This executes an optimistic update for mutations and registers it if necessary
@@ -348,7 +353,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // Also update the cache with any network results
     const result$ = pipe(
       merge([nonCacheOps$, cacheMissOps$]),
-      tap(prepareCacheForResult),
+      map(prepareForwardedOperation),
       forward,
       map(updateCacheWithResult)
     );
