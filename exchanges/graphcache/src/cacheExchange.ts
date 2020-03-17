@@ -29,6 +29,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
 import { makeDict } from './helpers/dict';
+import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, reserveLayer } from './store';
 
 import {
@@ -143,6 +144,12 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     return {
       ...operation,
+      variables: operation.variables
+        ? filterVariables(
+            getMainOperation(operation.query),
+            operation.variables
+          )
+        : operation.variables,
       query: formatDocument(operation.query),
     };
   };

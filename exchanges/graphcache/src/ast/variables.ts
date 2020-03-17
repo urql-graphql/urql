@@ -30,24 +30,45 @@ export const getFieldArguments = (
   return argsSize > 0 ? args : null;
 };
 
+/** Returns a filtered form of variables with values missing that the query doesn't require */
+export const filterVariables = (
+  node: OperationDefinitionNode,
+  input: void | object
+) => {
+  if (!input || !node.variableDefinitions) {
+    return undefined;
+  }
+
+  const vars = makeDict();
+  for (let i = 0, l = node.variableDefinitions.length; i < l; i++) {
+    const name = getName(node.variableDefinitions[i].variable);
+    vars[name] = input[name];
+  }
+
+  return vars;
+};
+
 /** Returns a normalized form of variables with defaulted values */
 export const normalizeVariables = (
   node: OperationDefinitionNode,
   input: void | object
 ): Variables => {
-  const args: Variables = (input as Variables) || {};
   const vars = makeDict();
+  if (!input) return vars;
+
   if (node.variableDefinitions) {
     for (let i = 0, l = node.variableDefinitions.length; i < l; i++) {
       const def = node.variableDefinitions[i];
       const name = getName(def.variable);
-      let value = args[name];
-      if (value === undefined && def.defaultValue) {
-        value = valueFromASTUntyped(def.defaultValue, args);
-      }
-
-      vars[name] = value;
+      vars[name] =
+        input[name] === undefined && def.defaultValue
+          ? valueFromASTUntyped(def.defaultValue, input)
+          : input[name];
     }
+  }
+
+  for (const key in input) {
+    if (!(key in vars)) vars[key] = input[key];
   }
 
   return vars;
