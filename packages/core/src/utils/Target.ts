@@ -19,7 +19,7 @@ export class Target {
     e: DebugEvent<T>
   ) => {
     this.listeners.forEach(l => {
-      l(e)
+      l(e);
     });
   };
 }
