@@ -18,26 +18,32 @@ import {
 
 import { useClient } from '../context';
 
+let currentSourceId: null | {} = null;
+
 export const useSource = <T>(source: Source<T>, init: T): T =>
   useSubscription(
     useMemo((): Subscription<T> => {
       let hasUpdate = false;
       let currentValue: T = init;
-
-      // Wrap the source and track its `currentValue`
-      const updateValue = pipe(
-        source,
-        onPush(value => {
-          currentValue = value;
-        })
-      );
+      const id = {};
 
       return {
         // getCurrentValue may be implemented by subscribing to the
         // given source and immediately unsubscribing. Only synchronous
         // values will therefore reach our `onPush` callback.
         getCurrentValue(): T {
-          if (!hasUpdate) publish(updateValue).unsubscribe();
+          if (!hasUpdate) {
+            currentSourceId = id;
+            pipe(
+              source,
+              onPush(value => {
+                currentValue = value;
+              }),
+              publish
+            ).unsubscribe();
+            currentSourceId = null;
+          }
+
           return currentValue;
         },
         // subscribe is just a regular subscription, but it also tracks
@@ -45,8 +51,18 @@ export const useSource = <T>(source: Source<T>, init: T): T =>
         // set `hasUpdate` to avoid `getCurrentValue` trying to subscribe
         // again.
         subscribe(onValue: () => void): Unsubscribe {
-          hasUpdate = true;
-          const { unsubscribe } = pipe(updateValue, subscribe(onValue));
+          const { unsubscribe } = pipe(
+            source,
+            subscribe(value => {
+              if (currentSourceId === null) {
+                currentValue = value;
+                hasUpdate = true;
+                onValue();
+                hasUpdate = false;
+              }
+            })
+          );
+
           return () => {
             unsubscribe();
             hasUpdate = false;
