@@ -38,9 +38,11 @@ beforeEach(() => {
     );
   };
 
-  exchangeArgs = { forward, subject: {
+  const client = {
     debugTarget: { dispatchEvent: jest.fn() } as any,
-  } as Client };
+  } as Client;
+
+  exchangeArgs = { forward, client };
 });
 
 it('forwards query operations correctly', async () => {
