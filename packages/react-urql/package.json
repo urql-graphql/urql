@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "A highly customizable and versatile GraphQL client for React",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -37,7 +37,7 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.js",
     "prepare": "../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean test build"
+    "prepublishOnly": "run-s clean build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset"
@@ -60,7 +60,7 @@
     "react": ">= 16.8.0"
   },
   "dependencies": {
-    "@urql/core": "^1.10.1",
+    "@urql/core": "^1.10.2",
     "wonka": "^4.0.7"
   }
 }

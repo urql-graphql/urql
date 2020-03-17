@@ -1,5 +1,17 @@
 # @urql/exchange-graphcache
 
+## 2.2.6
+
+### Patch Changes
+
+- ⚠️ Fix cache.inspectFields causing an undefined error for uninitialised or cleared commutative layers, by [@kitten](https://github.com/kitten) (See [#626](https://github.com/FormidableLabs/urql/pull/626))
+- Improve Store constructor to accept an options object instead of separate arguments, identical to the cacheExchange options. (This is a patch, not a minor, since we consider Store part of the private API), by [@kitten](https://github.com/kitten) (See [#622](https://github.com/FormidableLabs/urql/pull/622))
+- Allow a single field to be invalidated using cache.invalidate using two additional arguments, similar to store.resolve; This is a very small addition, so it's marked as a patch, by [@kitten](https://github.com/kitten) (See [#627](https://github.com/FormidableLabs/urql/pull/627))
+- Prevent variables from being filtered and queries from being altered before they're forwarded, which prevented additional untyped variables from being used inside updater functions, by [@kitten](https://github.com/kitten) (See [#629](https://github.com/FormidableLabs/urql/pull/629))
+- Expose generated result data on writeOptimistic and passthrough data on write operations, by [@kitten](https://github.com/kitten) (See [#613](https://github.com/FormidableLabs/urql/pull/613))
+- Updated dependencies (See [#621](https://github.com/FormidableLabs/urql/pull/621))
+  - @urql/core@1.10.2
+
 ## 2.2.5
 
 ### Patch Changes

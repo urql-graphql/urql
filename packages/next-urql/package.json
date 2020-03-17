@@ -27,7 +27,7 @@
     "check": "tsc --noEmit",
     "build": "rollup -c ../../scripts/rollup/config.js",
     "prepare": "../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean test build"
+    "prepublishOnly": "run-s clean build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset",

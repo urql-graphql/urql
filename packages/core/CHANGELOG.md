@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.10.2
+
+### Patch Changes
+
+- Add a guard to "maskTypenames" so a null value isn't considered an object, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#621](https://github.com/FormidableLabs/urql/pull/621))
+
 ## 1.10.1
 
 ### Patch Changes

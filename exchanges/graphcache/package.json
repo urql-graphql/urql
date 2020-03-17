@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-graphcache",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "A normalized and configurable cache exchange for urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/graphcache",
@@ -51,14 +51,14 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.js",
     "prepare": "../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean test build"
+    "prepublishOnly": "run-s clean build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
     "wonka": "^3.2.1 || ^4.0.0",
-    "@urql/core": ">=1.10.1",
+    "@urql/core": ">=1.10.2",
     "@urql/exchange-populate": ">=0.1.1"
   },
   "peerDependencies": {

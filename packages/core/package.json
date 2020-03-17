@@ -1,6 +1,6 @@
 {
   "name": "@urql/core",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "The shared core for the highly customizable and versatile GraphQL client",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -34,7 +34,7 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.js",
     "prepare": "../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean test build"
+    "prepublishOnly": "run-s clean build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset"
