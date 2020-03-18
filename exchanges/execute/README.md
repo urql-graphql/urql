@@ -33,19 +33,17 @@ You'll then need to add the `executeExchange`, that this package exposes, to you
 by replacing the default cache exchange with it:
 
 ```js
-import { createClient, dedupExchange, fetchExchange } from 'urql';
-
-import { cacheExchange } from '@urql/exchange-execute';
+import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { executeExchange } from '@urql/exchange-execute';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
   exchanges: [
     dedupExchange,
-    // Replace the default cacheExchange with the new one
+    cacheExchange,
     executeExchange({
       /* config */
     }),
-    fetchExchange,
   ],
 });
 ```
