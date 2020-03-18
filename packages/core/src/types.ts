@@ -30,6 +30,7 @@ type Primitive = PrimitiveMap | number | boolean | string | null | undefined;
 
 /** A map of primitives and primitive maps */
 interface PrimitiveMap {
+  __typename?: string;
   [key: string]: Primitive | Primitive[] | PrimitiveMap;
 }
 
