@@ -17,12 +17,12 @@
     "exchanges"
   ],
   "main": "dist/urql-exchange-populate.cjs.js",
-  "module": "dist/urql-exchange-populate.esm.js",
+  "module": "dist/urql-exchange-populate.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-populate.esm.js",
+      "import": "./dist/urql-exchange-populate.esm.mjs",
       "require": "./dist/urql-exchange-populate.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

@@ -12,12 +12,12 @@
     "directory": "packages/next-urql"
   },
   "main": "dist/next-urql.cjs.js",
-  "module": "dist/next-urql.esm.js",
+  "module": "dist/next-urql.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/next-urql.esm.js",
+      "import": "./dist/next-urql.esm.mjs",
       "require": "./dist/next-urql.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

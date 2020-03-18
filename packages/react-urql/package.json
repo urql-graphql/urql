@@ -20,12 +20,12 @@
     "react"
   ],
   "main": "dist/urql.cjs.js",
-  "module": "dist/urql.esm.js",
+  "module": "dist/urql.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql.esm.js",
+      "import": "./dist/urql.esm.mjs",
       "require": "./dist/urql.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

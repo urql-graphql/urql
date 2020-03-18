@@ -20,12 +20,12 @@
     "retry"
   ],
   "main": "dist/urql-exchange-retry.cjs.js",
-  "module": "dist/urql-exchange-retry.esm.js",
+  "module": "dist/urql-exchange-retry.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-retry.esm.js",
+      "import": "./dist/urql-exchange-retry.esm.mjs",
       "require": "./dist/urql-exchange-retry.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

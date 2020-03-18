@@ -17,12 +17,12 @@
     "exchanges"
   ],
   "main": "dist/urql-exchange-multipart-fetch.cjs.js",
-  "module": "dist/urql-exchange-multipart-fetch.esm.js",
+  "module": "dist/urql-exchange-multipart-fetch.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-multipart-fetch.esm.js",
+      "import": "./dist/urql-exchange-multipart-fetch.esm.mjs",
       "require": "./dist/urql-exchange-multipart-fetch.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

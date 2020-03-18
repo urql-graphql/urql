@@ -20,12 +20,12 @@
     "svelte"
   ],
   "main": "dist/urql-svelte.cjs.js",
-  "module": "dist/urql-svelte.esm.js",
+  "module": "dist/urql-svelte.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-svelte.esm.js",
+      "import": "./dist/urql-svelte.esm.mjs",
       "require": "./dist/urql-svelte.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"

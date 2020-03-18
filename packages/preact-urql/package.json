@@ -20,12 +20,12 @@
     "preact"
   ],
   "main": "dist/urql-preact.cjs.js",
-  "module": "dist/urql-preact.esm.js",
+  "module": "dist/urql-preact.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-preact.esm.js",
+      "import": "./dist/urql-preact.esm.mjs",
       "require": "./dist/urql-preact.cjs.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
