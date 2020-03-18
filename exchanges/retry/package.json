@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@urql/core": ">=1.10.3",
-    "wonka": "^4.0.8"
+    "wonka": "^4.0.9"
   },
   "publishConfig": {
     "access": "public"

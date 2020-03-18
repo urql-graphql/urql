@@ -15033,10 +15033,10 @@ winston@0.8.x:
     pkginfo "0.3.x"
     stack-trace "0.0.x"
 
-wonka@^4.0.8:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.8.tgz#edab5fb3bcb060242b7a47d2aaab57a45ef69c35"
-  integrity sha512-7JHs16U9/OxkkoytluIRfxRLML7erwWuDkE5Qgw+12ctIBjUwq+wIifzTvJXi9NDSO+Hr9I6t/huiLaeWg89vA==
+wonka@^4.0.9:
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.9.tgz#b21d93621e1d5f3b45ca96d99d03711c7c1f7c55"
+  integrity sha512-he7Nn1254ToUN03zLbJok6QxKdRJd46/QHm8nUcJNViXQnCutCuUgAbZvzoxrX+VXzGb4sCFolC4XhkHsmvdaA==
 
 word-wrap@~1.2.3:
   version "1.2.3"
