@@ -34,12 +34,12 @@ invariant(
 );
 
 invariant(
-  path.normalize(pkg.main) === `dist/${name}.cjs.js`,
+  path.normalize(pkg.main) === `dist/${name}.js`,
   'package.json:main path must be valid'
 );
 
 invariant(
-  path.normalize(pkg.module) === `dist/${name}.esm.mjs`,
+  path.normalize(pkg.module) === `dist/${name}.mjs`,
   'package.json:module path must be valid'
 );
 
@@ -86,12 +86,12 @@ for (const key in pkg.exports) {
   );
 
   invariant(
-    entry.require === `./dist/${bundleName}.cjs.js`,
+    entry.require === `./dist/${bundleName}.js`,
     `package.json:exports["${key}"].require must be valid`
   );
 
   invariant(
-    entry.import === `./dist/${bundleName}.esm.mjs`,
+    entry.import === `./dist/${bundleName}.mjs`,
     `package.json:exports["${key}"].import must be valid`
   );
 

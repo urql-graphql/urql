@@ -19,14 +19,14 @@
     "react",
     "retry"
   ],
-  "main": "dist/urql-exchange-retry.cjs.js",
-  "module": "dist/urql-exchange-retry.esm.mjs",
+  "main": "dist/urql-exchange-retry",
+  "module": "dist/urql-exchange-retry.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-retry.esm.mjs",
-      "require": "./dist/urql-exchange-retry.cjs.js",
+      "import": "./dist/urql-exchange-retry.mjs",
+      "require": "./dist/urql-exchange-retry.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }

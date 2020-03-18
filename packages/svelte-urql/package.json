@@ -19,14 +19,14 @@
     "exchanges",
     "svelte"
   ],
-  "main": "dist/urql-svelte.cjs.js",
-  "module": "dist/urql-svelte.esm.mjs",
+  "main": "dist/urql-svelte",
+  "module": "dist/urql-svelte.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-svelte.esm.mjs",
-      "require": "./dist/urql-svelte.cjs.js",
+      "import": "./dist/urql-svelte.mjs",
+      "require": "./dist/urql-svelte.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }

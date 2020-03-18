@@ -16,14 +16,14 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-populate.cjs.js",
-  "module": "dist/urql-exchange-populate.esm.mjs",
+  "main": "dist/urql-exchange-populate",
+  "module": "dist/urql-exchange-populate.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-populate.esm.mjs",
-      "require": "./dist/urql-exchange-populate.cjs.js",
+      "import": "./dist/urql-exchange-populate.mjs",
+      "require": "./dist/urql-exchange-populate.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }

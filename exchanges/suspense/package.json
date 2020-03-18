@@ -19,14 +19,14 @@
     "react",
     "suspense"
   ],
-  "main": "dist/urql-exchange-suspense.cjs.js",
-  "module": "dist/urql-exchange-suspense.esm.mjs",
+  "main": "dist/urql-exchange-suspense",
+  "module": "dist/urql-exchange-suspense.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-suspense.esm.mjs",
-      "require": "./dist/urql-exchange-suspense.cjs.js",
+      "import": "./dist/urql-exchange-suspense.mjs",
+      "require": "./dist/urql-exchange-suspense.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }

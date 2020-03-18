@@ -19,20 +19,20 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-graphcache.cjs.js",
-  "module": "dist/urql-exchange-graphcache.esm.mjs",
+  "main": "dist/urql-exchange-graphcache",
+  "module": "dist/urql-exchange-graphcache.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-graphcache.esm.mjs",
-      "require": "./dist/urql-exchange-graphcache.cjs.js",
+      "import": "./dist/urql-exchange-graphcache.mjs",
+      "require": "./dist/urql-exchange-graphcache.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     },
     "./extras": {
-      "import": "./dist/urql-exchange-graphcache-extras.esm.mjs",
-      "require": "./dist/urql-exchange-graphcache-extras.cjs.js",
+      "import": "./dist/urql-exchange-graphcache-extras.mjs",
+      "require": "./dist/urql-exchange-graphcache-extras.js",
       "types": "./dist/types/extras/index.d.ts",
       "source": "./src/extras/index.ts"
     }

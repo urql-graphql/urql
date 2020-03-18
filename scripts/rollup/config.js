@@ -37,8 +37,8 @@ const config = {
 };
 
 const output = (format = 'cjs', ext = '.js') => ({
-  chunkFileNames: '[hash].' + format + ext,
-  entryFileNames: '[name].' + format + ext,
+  chunkFileNames: '[hash].' + ext,
+  entryFileNames: '[name].' + ext,
   dir: './dist',
   exports: 'named',
   externalLiveBindings: false,

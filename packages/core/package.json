@@ -18,14 +18,14 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-core.cjs.js",
-  "module": "dist/urql-core.esm.mjs",
+  "main": "dist/urql-core",
+  "module": "dist/urql-core.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-core.esm.mjs",
-      "require": "./dist/urql-core.cjs.js",
+      "import": "./dist/urql-core.mjs",
+      "require": "./dist/urql-core.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }

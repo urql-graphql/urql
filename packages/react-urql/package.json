@@ -19,14 +19,14 @@
     "exchanges",
     "react"
   ],
-  "main": "dist/urql.cjs.js",
-  "module": "dist/urql.esm.mjs",
+  "main": "dist/urql",
+  "module": "dist/urql.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql.esm.mjs",
-      "require": "./dist/urql.cjs.js",
+      "import": "./dist/urql.mjs",
+      "require": "./dist/urql.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }
