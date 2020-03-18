@@ -1206,7 +1206,9 @@ describe('commutativity', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(data).toHaveProperty('node.name', 'optimistic');
 
-    nextOp(queryOpB);
+    // NOTE: We purposefully skip the following:
+    // nextOp(queryOpB);
+
     nextRes({
       operation: queryOpB,
       data: {
