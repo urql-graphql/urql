@@ -115,10 +115,13 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
       // Make fetch auto-append this for correctness
       delete fetchOptions.headers['content-type'];
 
-      fetchOptions.body.append('operations', JSON.stringify({
-        ...body,
-        variables: clone,
-      }));
+      fetchOptions.body.append(
+        'operations',
+        JSON.stringify({
+          ...body,
+          variables: clone,
+        })
+      );
 
       const map = {};
       let i = 0;
