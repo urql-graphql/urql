@@ -39,7 +39,7 @@ export const filterVariables = (
     return undefined;
   }
 
-  const vars = makeDict();
+  const vars = {};
   for (let i = 0, l = node.variableDefinitions.length; i < l; i++) {
     const name = getName(node.variableDefinitions[i].variable);
     vars[name] = input[name];

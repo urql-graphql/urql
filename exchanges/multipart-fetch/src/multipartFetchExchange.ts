@@ -79,7 +79,8 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
         : undefined;
 
     const { context } = operation;
-    const { files } = extractFiles(operation.variables);
+    // Spreading operation.variables here in case someone made a variables with Object.create(null).
+    const { files, clone } = extractFiles({ ...operation.variables });
 
     const extraOptions =
       typeof context.fetchOptions === 'function'
@@ -114,7 +115,13 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
       // Make fetch auto-append this for correctness
       delete fetchOptions.headers['content-type'];
 
-      fetchOptions.body.append('operations', JSON.stringify(body));
+      fetchOptions.body.append(
+        'operations',
+        JSON.stringify({
+          ...body,
+          variables: clone,
+        })
+      );
 
       const map = {};
       let i = 0;
