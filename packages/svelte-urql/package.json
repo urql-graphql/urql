@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@urql/core": "^1.10.2",
-    "wonka": "^4.0.7"
+    "wonka": "^4.0.8"
   },
   "devDependencies": {
     "graphql": "^14.5.8",
