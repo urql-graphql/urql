@@ -34,7 +34,7 @@ invariant(
 );
 
 invariant(
-  path.normalize(pkg.main) === `dist/${name}.js`,
+  path.normalize(pkg.main) === `dist/${name}`,
   'package.json:main path must be valid'
 );
 
