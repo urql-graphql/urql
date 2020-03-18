@@ -80,24 +80,25 @@ if (pkg.exports) {
     const entry = pkg.exports[key];
     const entryName = normalize(key);
     const bundleName = entryName ? `${name}-${entryName}` : name;
-
+    console.log('bundle', bundleName)
     invariant(
       fs.existsSync(entry.source),
       `package.json:exports["${key}"].source must exist`
     );
 
+    console.log(path.normalize(entry.require), `dist/${bundleName}.cjs.js`)
     invariant(
-      path.normalize(entry.require) === `./dist/${bundleName}.cjs.js`,
+      path.normalize(entry.require) === `dist/${bundleName}.cjs.js`,
       `package.json:exports["${key}"].require must be valid`
     );
 
     invariant(
-      path.normalize(entry.import) === `./dist/${bundleName}.esm.mjs`,
+      path.normalize(entry.import) === `dist/${bundleName}.esm.mjs`,
       `package.json:exports["${key}"].import must be valid`
     );
 
     invariant(
-      path.normalize(entry.types) === './dist/types/'
+      path.normalize(entry.types) === 'dist/types/'
         + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
       'package.json:types path must be valid'
     );
