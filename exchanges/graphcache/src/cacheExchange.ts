@@ -15,7 +15,6 @@ import {
   merge,
   pipe,
   share,
-  tap,
   fromPromise,
   fromArray,
   buffer,
@@ -140,6 +139,23 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
+    } else if (operation.operationName === 'mutation') {
+      // This executes an optimistic update for mutations and registers it if necessary
+      if (operation.context.requestPolicy !== 'network-only') {
+        const { dependencies } = writeOptimistic(
+          store,
+          operation,
+          operation.key
+        );
+        if (dependencies.size !== 0) {
+          optimisticKeysToDependencies.set(operation.key, dependencies);
+          const pendingOperations = new Set<number>();
+          collectPendingOperations(pendingOperations, dependencies);
+          executePendingOperations(operation, pendingOperations);
+        }
+      } else {
+        reserveLayer(store.data, operation.key);
+      }
     }
 
     return {
@@ -152,25 +168,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         : operation.variables,
       query: formatDocument(operation.query),
     };
-  };
-
-  // This executes an optimistic update for mutations and registers it if necessary
-  const optimisticUpdate = (operation: Operation) => {
-    const { key } = operation;
-    if (
-      operation.operationName === 'mutation' &&
-      operation.context.requestPolicy !== 'network-only'
-    ) {
-      const { dependencies } = writeOptimistic(store, operation, key);
-      if (dependencies.size !== 0) {
-        optimisticKeysToDependencies.set(key, dependencies);
-        const pendingOperations = new Set<number>();
-        collectPendingOperations(pendingOperations, dependencies);
-        executePendingOperations(operation, pendingOperations);
-      }
-    } else {
-      noopDataState(store.data, key, true);
-    }
   };
 
   // This updates the known dependencies for the passed operation
@@ -227,8 +224,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
-    } else if (operation.operationName === 'subscription') {
-      // If we're writing a subscription, we ad-hoc reserve a layer
+    } else {
       reserveLayer(store.data, operation.key);
     }
 
@@ -275,16 +271,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         )
       : (empty as Source<Operation>);
 
-    const inputOps$ = pipe(
-      concat([bufferedOps$, sharedOps$]),
-      // Returns the given operation with added __typename fields on its query
-      map(op => ({
-        ...op,
-        query: formatDocument(op.query),
-      })),
-      tap(optimisticUpdate),
-      share
-    );
+    const inputOps$ = pipe(concat([bufferedOps$, sharedOps$]), share);
 
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cacheOps$ = pipe(

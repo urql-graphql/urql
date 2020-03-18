@@ -1206,7 +1206,9 @@ describe('commutativity', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(data).toHaveProperty('node.name', 'optimistic');
 
-    nextOp(queryOpB);
+    // NOTE: We purposefully skip the following:
+    // nextOp(queryOpB);
+
     nextRes({
       operation: queryOpB,
       data: {
@@ -1501,5 +1503,126 @@ describe('commutativity', () => {
     });
 
     expect(data).toHaveProperty('node.name', 'subscription');
+  });
+
+  it('allows subscription results to be commutative above mutations', () => {
+    let data: any;
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+
+    const query = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const subscription = gql`
+      subscription {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const mutation = gql`
+      mutation {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
+        res$,
+      ]);
+
+    pipe(
+      cacheExchange()({ forward, client })(ops$),
+      tap(result => {
+        if (result.operation.operationName === 'query') {
+          data = result.data;
+        }
+      }),
+      publish
+    );
+
+    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+
+    const subscriptionOp = client.createRequestOperation('subscription', {
+      key: 2,
+      query: subscription,
+    });
+
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 3,
+      query: mutation,
+    });
+
+    nextOp(queryOpA);
+    // Force commutative layers to be created:
+    nextOp(client.createRequestOperation('query', { key: 2, query }));
+    nextOp(subscriptionOp);
+
+    nextRes({
+      operation: queryOpA,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'query a',
+        },
+      },
+    });
+
+    nextOp(mutationOp);
+
+    nextRes({
+      operation: mutationOp,
+      data: {
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'mutation',
+        },
+      },
+    });
+
+    nextRes({
+      operation: subscriptionOp,
+      data: {
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'subscription a',
+        },
+      },
+    });
+
+    nextRes({
+      operation: subscriptionOp,
+      data: {
+        node: {
+          __typename: 'Node',
+          id: 'node',
+          name: 'subscription b',
+        },
+      },
+    });
+
+    expect(data).toHaveProperty('node.name', 'subscription b');
   });
 });
