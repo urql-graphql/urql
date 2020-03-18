@@ -1,5 +1,18 @@
 # @urql/exchange-graphcache
 
+## 2.2.7
+
+### Patch Changes
+
+- ⚠️ Fix critical ordering bug in commutative queries and mutations. Subscriptions and queries would ad-hoc be receiving an empty optimistic layer accidentally. This leads to subscription results potentially being cleared, queries from being erased on a second write, and layers from sticking around on every second write or indefinitely. This affects versions `> 2.2.2` so please upgrade!, by [@kitten](https://github.com/kitten) (See [#638](https://github.com/FormidableLabs/urql/pull/638))
+- ⚠️ Fix multipart conversion, in the `extract-files` dependency (used by multipart-fetch) there is an explicit check for the constructor property of an object. This made the files unretrievable, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#639](https://github.com/FormidableLabs/urql/pull/639))
+- ⚠️ Fix Node.js Module support for v13 (experimental-modules) and v14. If your bundler doesn't support
+  `.mjs` files and fails to resolve the new version, please double check your configuration for
+  Webpack, or similar tools, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+- Updated dependencies (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+  - @urql/exchange-populate@0.1.2
+  - @urql/core@1.10.3
+
 ## 2.2.6
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # urql
 
+## 1.9.2
+
+### Patch Changes
+
+- ⚠️ Fix Node.js Module support for v13 (experimental-modules) and v14. If your bundler doesn't support
+  `.mjs` files and fails to resolve the new version, please double check your configuration for
+  Webpack, or similar tools, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+- Updated dependencies (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+  - @urql/core@1.10.3
+
 ## 1.9.1
 
 ### Patch Changes

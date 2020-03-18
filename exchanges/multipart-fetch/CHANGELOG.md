@@ -1,5 +1,16 @@
 # @urql/exchange-multipart-fetch
 
+## 0.1.2
+
+### Patch Changes
+
+- ⚠️ Fix multipart conversion, in the `extract-files` dependency (used by multipart-fetch) there is an explicit check for the constructor property of an object. This made the files unretrievable, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#639](https://github.com/FormidableLabs/urql/pull/639))
+- ⚠️ Fix Node.js Module support for v13 (experimental-modules) and v14. If your bundler doesn't support
+  `.mjs` files and fails to resolve the new version, please double check your configuration for
+  Webpack, or similar tools, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+- Updated dependencies (See [#637](https://github.com/FormidableLabs/urql/pull/637))
+  - @urql/core@1.10.3
+
 ## 0.1.1
 
 ### Patch Changes
