@@ -1,12 +1,11 @@
 import { pipe, share, filter, map, fromPromise, mergeMap, merge } from 'wonka';
-import { Exchange } from '../types';
 import {
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
   execute,
 } from 'graphql';
-import { makeResult, makeErrorResult } from '../utils';
+import { Exchange, makeResult, makeErrorResult } from '@urql/core';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;

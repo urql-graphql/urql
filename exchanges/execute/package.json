@@ -1,0 +1,68 @@
+{
+  "name": "@urql/exchange-execute",
+  "version": "1.0.0",
+  "description": "An exchange for executing queries against a local schema in urql",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "exchanges/execute"
+  },
+  "keywords": [
+    "urql",
+    "exchange",
+    "execute",
+    "executable schema",
+    "formidablelabs",
+    "exchanges"
+  ],
+  "main": "dist/urql-exchange-execute.cjs.js",
+  "module": "dist/urql-exchange-execute.esm.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "dist/urql-exchange-execute.esm.js",
+      "require": "dist/urql-exchange-execute.cjs.js",
+      "types": "dist/types/index.d.ts",
+      "source": "src/index.ts"
+    },
+    "./extras": {
+      "import": "dist/urql-exchange-execute-extras.esm.js",
+      "require": "dist/urql-exchange-execute-extras.cjs.js",
+      "types": "dist/types/extras/index.d.ts",
+      "source": "src/extras/index.ts"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/",
+    "extras/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "check": "tsc --noEmit",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean test build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "dependencies": {
+    "wonka": "^3.2.1 || ^4.0.0",
+    "@urql/core": ">=1.9.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
+  },
+  "devDependencies": {
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1"
+  }
+}

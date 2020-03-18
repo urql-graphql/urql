@@ -4,8 +4,8 @@ import { executeExchange } from './execute';
 import { execute, print } from 'graphql';
 import { pipe, fromValue, toPromise, take, makeSubject } from 'wonka';
 import { mocked } from 'ts-jest/utils';
-import { queryOperation } from '../test-utils';
-import { makeErrorResult } from '../utils';
+import { queryOperation } from '@urql/core/src/test-utils';
+import { makeErrorResult } from '@urql/core';
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {
