@@ -80,13 +80,11 @@ if (pkg.exports) {
     const entry = pkg.exports[key];
     const entryName = normalize(key);
     const bundleName = entryName ? `${name}-${entryName}` : name;
-    console.log('bundle', bundleName)
     invariant(
       fs.existsSync(entry.source),
       `package.json:exports["${key}"].source must exist`
     );
 
-    console.log(path.normalize(entry.require), `dist/${bundleName}.cjs.js`)
     invariant(
       path.normalize(entry.require) === `dist/${bundleName}.cjs.js`,
       `package.json:exports["${key}"].require must be valid`
