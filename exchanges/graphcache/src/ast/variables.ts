@@ -53,7 +53,7 @@ export const normalizeVariables = (
   node: OperationDefinitionNode,
   input: void | object
 ): Variables => {
-  const vars = {};
+  const vars = makeDict();
   if (!input) return vars;
 
   if (node.variableDefinitions) {
