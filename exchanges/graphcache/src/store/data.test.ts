@@ -423,4 +423,21 @@ describe('commutative changes', () => {
       },
     ]);
   });
+
+  it('allows reserveLayer to be called repeatedly', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 1);
+    expect(data.optimisticOrder).toEqual([1]);
+    expect([...data.commutativeKeys]).toEqual([1]);
+  });
+
+  it('allows reserveLayer to be called after registering an optimistc layer', () => {
+    InMemoryData.noopDataState(data, 1, true);
+    expect(data.optimisticOrder).toEqual([1]);
+    expect(data.commutativeKeys.size).toBe(0);
+
+    InMemoryData.reserveLayer(data, 1);
+    expect(data.optimisticOrder).toEqual([1]);
+    expect([...data.commutativeKeys]).toEqual([1]);
+  });
 });
