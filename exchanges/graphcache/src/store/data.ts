@@ -473,12 +473,13 @@ export const writeLink = (
 
 /** Reserves an optimistic layer and preorders it */
 export const reserveLayer = (data: InMemoryData, layerKey: number) => {
-  if (!data.commutativeKeys.has(layerKey)) {
+  if (data.optimisticOrder.indexOf(layerKey) === -1) {
     // The new layer needs to be reserved in front of all other commutative
     // keys but after all non-commutative keys (which are added by `forceUpdate`)
     data.optimisticOrder.unshift(layerKey);
-    data.commutativeKeys.add(layerKey);
   }
+
+  data.commutativeKeys.add(layerKey);
 };
 
 /** Creates an optimistic layer of links and records */
