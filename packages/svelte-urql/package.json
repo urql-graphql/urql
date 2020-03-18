@@ -23,6 +23,14 @@
   "module": "dist/urql-svelte.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-svelte.esm.js",
+      "require": "./dist/urql-svelte.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",

@@ -15,6 +15,14 @@
   "module": "dist/next-urql.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/next-urql.esm.js",
+      "require": "./dist/next-urql.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",

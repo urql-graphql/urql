@@ -23,6 +23,14 @@
   "module": "dist/urql-preact.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-preact.esm.js",
+      "require": "./dist/urql-preact.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",

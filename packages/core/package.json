@@ -22,6 +22,14 @@
   "module": "dist/urql-core.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-core.esm.js",
+      "require": "./dist/urql-core.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "README.md",

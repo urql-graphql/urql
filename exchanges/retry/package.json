@@ -23,6 +23,14 @@
   "module": "dist/urql-exchange-retry.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-exchange-retry.esm.js",
+      "require": "./dist/urql-exchange-retry.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",

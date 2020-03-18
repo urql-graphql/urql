@@ -23,6 +23,14 @@
   "module": "dist/urql-exchange-suspense.esm.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-exchange-suspense.esm.js",
+      "require": "./dist/urql-exchange-suspense.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",

@@ -22,10 +22,10 @@
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-multipart-fetch.esm.js",
-      "require": "dist/urql-exchange-multipart-fetch.cjs.js",
-      "types": "dist/types/index.d.ts",
-      "source": "src/index.ts"
+      "import": "./dist/urql-exchange-multipart-fetch.esm.js",
+      "require": "./dist/urql-exchange-multipart-fetch.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
     }
   },
   "files": [
