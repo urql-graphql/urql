@@ -17,15 +17,15 @@
     "exchanges"
   ],
   "main": "dist/urql-exchange-multipart-fetch.cjs.js",
-  "module": "dist/urql-exchange-multipart-fetch.esm.js",
+  "module": "dist/urql-exchange-multipart-fetch.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-multipart-fetch.esm.js",
-      "require": "dist/urql-exchange-multipart-fetch.cjs.js",
-      "types": "dist/types/index.d.ts",
-      "source": "src/index.ts"
+      "import": "./dist/urql-exchange-multipart-fetch.esm.mjs",
+      "require": "./dist/urql-exchange-multipart-fetch.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
     }
   },
   "files": [
@@ -50,7 +50,7 @@
   "dependencies": {
     "@urql/core": ">=1.10.1",
     "extract-files": "^7.0.0",
-    "wonka": "^3.2.1 || ^4.0.0"
+    "wonka": "^4.0.8"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"

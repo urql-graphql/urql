@@ -20,21 +20,21 @@
     "exchanges"
   ],
   "main": "dist/urql-exchange-graphcache.cjs.js",
-  "module": "dist/urql-exchange-graphcache.esm.js",
+  "module": "dist/urql-exchange-graphcache.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-graphcache.esm.js",
-      "require": "dist/urql-exchange-graphcache.cjs.js",
-      "types": "dist/types/index.d.ts",
-      "source": "src/index.ts"
+      "import": "./dist/urql-exchange-graphcache.esm.mjs",
+      "require": "./dist/urql-exchange-graphcache.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
     },
     "./extras": {
-      "import": "dist/urql-exchange-graphcache-extras.esm.js",
-      "require": "dist/urql-exchange-graphcache-extras.cjs.js",
-      "types": "dist/types/extras/index.d.ts",
-      "source": "src/extras/index.ts"
+      "import": "./dist/urql-exchange-graphcache-extras.esm.mjs",
+      "require": "./dist/urql-exchange-graphcache-extras.cjs.js",
+      "types": "./dist/types/extras/index.d.ts",
+      "source": "./src/extras/index.ts"
     }
   },
   "files": [
@@ -57,7 +57,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "wonka": "^3.2.1 || ^4.0.0",
+    "wonka": "^4.0.8",
     "@urql/core": ">=1.10.2",
     "@urql/exchange-populate": ">=0.1.1"
   },

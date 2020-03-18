@@ -19,9 +19,17 @@
     "exchanges"
   ],
   "main": "dist/urql-core.cjs.js",
-  "module": "dist/urql-core.esm.js",
+  "module": "dist/urql-core.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-core.esm.mjs",
+      "require": "./dist/urql-core.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    }
+  },
   "files": [
     "LICENSE",
     "README.md",
@@ -47,7 +55,7 @@
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
   },
   "dependencies": {
-    "wonka": "^4.0.7"
+    "wonka": "^4.0.8"
   },
   "publishConfig": {
     "access": "public"

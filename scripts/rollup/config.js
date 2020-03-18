@@ -57,7 +57,7 @@ export default [
     plugins,
     output: [
       output('cjs', '.js'),
-      output('esm', '.js'),
+      output('esm', '.mjs'),
     ],
   },
   !settings.isCI && {
@@ -65,7 +65,7 @@ export default [
     plugins: makePlugins({ isProduction: true }),
     output: [
       output('cjs', '.min.js'),
-      output('esm', '.min.js'),
+      output('esm', '.min.mjs'),
     ],
   },
 ].filter(Boolean);

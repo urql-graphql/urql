@@ -39,7 +39,7 @@ invariant(
 );
 
 invariant(
-  path.normalize(pkg.module) === `dist/${name}.esm.js`,
+  path.normalize(pkg.module) === `dist/${name}.esm.mjs`,
   'package.json:module path must be valid'
 );
 
@@ -73,35 +73,33 @@ invariant(
   'package.json:files must include "dist" and "LICENSE"'
 );
 
-if (pkg.exports) {
-  invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
+invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
+invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
 
-  for (const key in pkg.exports) {
-    const entry = pkg.exports[key];
-    const entryName = normalize(key);
-    const bundleName = entryName ? `${name}-${entryName}` : name;
+for (const key in pkg.exports) {
+  const entry = pkg.exports[key];
+  const entryName = normalize(key);
+  const bundleName = entryName ? `${name}-${entryName}` : name;
+  invariant(
+    fs.existsSync(entry.source),
+    `package.json:exports["${key}"].source must exist`
+  );
 
-    invariant(
-      fs.existsSync(entry.source),
-      `package.json:exports["${key}"].source must exist`
-    );
+  invariant(
+    entry.require === `./dist/${bundleName}.cjs.js`,
+    `package.json:exports["${key}"].require must be valid`
+  );
 
-    invariant(
-      path.normalize(entry.require) === `dist/${bundleName}.cjs.js`,
-      `package.json:exports["${key}"].require must be valid`
-    );
+  invariant(
+    entry.import === `./dist/${bundleName}.esm.mjs`,
+    `package.json:exports["${key}"].import must be valid`
+  );
 
-    invariant(
-      path.normalize(entry.import) === `dist/${bundleName}.esm.js`,
-      `package.json:exports["${key}"].import must be valid`
-    );
-
-    invariant(
-      path.normalize(entry.types) === 'dist/types/'
-        + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
-      'package.json:types path must be valid'
-    );
-  }
+  invariant(
+    entry.types === './dist/types/'
+      + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
+    'package.json:types path must be valid'
+  );
 }
 
 fs.copyFileSync(

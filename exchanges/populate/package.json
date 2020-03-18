@@ -17,15 +17,15 @@
     "exchanges"
   ],
   "main": "dist/urql-exchange-populate.cjs.js",
-  "module": "dist/urql-exchange-populate.esm.js",
+  "module": "dist/urql-exchange-populate.esm.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-populate.esm.js",
-      "require": "dist/urql-exchange-populate.cjs.js",
-      "types": "dist/types/index.d.ts",
-      "source": "src/index.ts"
+      "import": "./dist/urql-exchange-populate.esm.mjs",
+      "require": "./dist/urql-exchange-populate.cjs.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
     }
   },
   "files": [
@@ -48,7 +48,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "wonka": "^3.2.1 || ^4.0.0",
+    "wonka": "^4.0.8",
     "@urql/core": ">=1.9.2"
   },
   "peerDependencies": {
