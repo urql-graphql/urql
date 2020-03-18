@@ -12,4 +12,5 @@
 '@urql/svelte': patch
 ---
 
-This fixes node-resolution when using Webpack, this bugged out when resolving nested modules since it would start to use pkg.json[main] instead of module.
+Fix node resolution when using Webpack, which experiences a bug where it only resolves
+`package.json:main` instead of `module` when an `.mjs` file imports a package.
