@@ -7,6 +7,7 @@ const fs = require('fs');
 const cwd = process.cwd();
 const workspaceRoot = path.resolve(__dirname, '../../');
 const pkg = require(path.resolve(cwd, 'package.json'));
+const hasReact = !!pkg.dependencies.react || !!pkg.peerDependencies.react;
 
 const normalize = name => name
   .replace(/[@\s\/\.]+/g, ' ')
@@ -33,15 +34,27 @@ invariant(
   'package.json:source must exist'
 );
 
-invariant(
-  path.normalize(pkg.main) === `dist/${name}`,
-  'package.json:main path must be valid'
-);
+if (hasReact) {
+  invariant(
+    path.normalize(pkg.main) === `dist/${name}.js`,
+    'package.json:main path must end in `.js` for packages depending on React.'
+  );
 
-invariant(
-  path.normalize(pkg.module) === `dist/${name}.mjs`,
-  'package.json:module path must be valid'
-);
+  invariant(
+    path.normalize(pkg.module) === `dist/${name}.es.js`,
+    'package.json:main path must end in `.es.js` for packages depending on React.'
+  );
+} else {
+  invariant(
+    path.normalize(pkg.main) === `dist/${name}`,
+    'package.json:main path must be valid and have no extension'
+  );
+
+  invariant(
+    path.normalize(pkg.module) === `dist/${name}.mjs`,
+    'package.json:module path must be valid and ending in .mjs'
+  );
+}
 
 invariant(
   path.normalize(pkg.types) === 'dist/types/'
@@ -73,33 +86,37 @@ invariant(
   'package.json:files must include "dist" and "LICENSE"'
 );
 
-invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
-invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
+if (hasReact) {
+  invariant(!!pkg.exports, 'package.json:exports must not be added for packages depending on React.');
+} else {
+  invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
+  invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
 
-for (const key in pkg.exports) {
-  const entry = pkg.exports[key];
-  const entryName = normalize(key);
-  const bundleName = entryName ? `${name}-${entryName}` : name;
-  invariant(
-    fs.existsSync(entry.source),
-    `package.json:exports["${key}"].source must exist`
-  );
+  for (const key in pkg.exports) {
+    const entry = pkg.exports[key];
+    const entryName = normalize(key);
+    const bundleName = entryName ? `${name}-${entryName}` : name;
+    invariant(
+      fs.existsSync(entry.source),
+      `package.json:exports["${key}"].source must exist`
+    );
 
-  invariant(
-    entry.require === `./dist/${bundleName}.js`,
-    `package.json:exports["${key}"].require must be valid`
-  );
+    invariant(
+      entry.require === `./dist/${bundleName}.js`,
+      `package.json:exports["${key}"].require must be valid`
+    );
 
-  invariant(
-    entry.import === `./dist/${bundleName}.mjs`,
-    `package.json:exports["${key}"].import must be valid`
-  );
+    invariant(
+      entry.import === `./dist/${bundleName}.mjs`,
+      `package.json:exports["${key}"].import must be valid`
+    );
 
-  invariant(
-    entry.types === './dist/types/'
-      + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
-    'package.json:types path must be valid'
-  );
+    invariant(
+      entry.types === './dist/types/'
+        + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
+      'package.json:types path must be valid'
+    );
+  }
 }
 
 fs.copyFileSync(

@@ -19,18 +19,10 @@
     "exchanges",
     "react"
   ],
-  "main": "dist/urql",
-  "module": "dist/urql.mjs",
+  "main": "dist/urql.js",
+  "module": "dist/urql.es.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/urql.mjs",
-      "require": "./dist/urql.js",
-      "types": "./dist/types/index.d.ts",
-      "source": "./src/index.ts"
-    }
-  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",
