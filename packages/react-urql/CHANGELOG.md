@@ -1,5 +1,11 @@
 # urql
 
+## 1.9.4
+
+### Patch Changes
+
+- ⚠️ Fix bundling for packages depending on React, as it doesn't have native ESM bundles, by [@kitten](https://github.com/kitten) (See [#646](https://github.com/FormidableLabs/urql/pull/646))
+
 ## 1.9.3
 
 ### Patch Changes
