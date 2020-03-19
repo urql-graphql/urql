@@ -65,7 +65,7 @@ export default [
     plugins: makePlugins({ isProduction: true }),
     output: [
       output('cjs', '.min.js'),
-      output('esm', '.min.mjs'),
+      output('esm', settings.hasReact ? '.min.es.js' : '.min.mjs'),
     ],
   },
 ].filter(Boolean);
