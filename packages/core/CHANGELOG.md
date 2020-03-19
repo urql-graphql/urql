@@ -1,5 +1,12 @@
 # @urql/core
 
+## 1.10.4
+
+### Patch Changes
+
+- ⚠️ Fix node resolution when using Webpack, which experiences a bug where it only resolves
+  `package.json:main` instead of `module` when an `.mjs` file imports a package, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#642](https://github.com/FormidableLabs/urql/pull/642))
+
 ## 1.10.3
 
 ### Patch Changes
