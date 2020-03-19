@@ -59,16 +59,6 @@ const client = createClient({
 });
 ```
 
-## Features and Roadmap
-
-- [x] Normalized resolving and updates
-- [x] Schema awareness and deterministic fragment matching
-- [x] Partial query results when the cache is schema aware
-- [x] Customization using custom resolvers, updates, and keying functions
-- [x] Optimistic updates
-- [ ] Basic offline and persistence support
-- [ ] Advanced fragment and entity invalidation
-
 ## Maintenance Status
 
 **Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
