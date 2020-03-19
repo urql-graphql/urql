@@ -11,18 +11,10 @@
     "url": "https://github.com/FormidableLabs/urql.git",
     "directory": "packages/next-urql"
   },
-  "main": "dist/next-urql",
-  "module": "dist/next-urql.mjs",
+  "main": "dist/next-urql.js",
+  "module": "dist/next-urql.es.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/next-urql.mjs",
-      "require": "./dist/next-urql.js",
-      "types": "./dist/types/index.d.ts",
-      "source": "./src/index.ts"
-    }
-  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",
