@@ -21,12 +21,10 @@ it('stringifies scalars', () => {
   expect(stringifyVariables(1 / 0)).toBe('null');
 });
 
-it('throws for circular structures', () => {
-  expect(() => {
-    const x = { x: null } as any;
-    x.x = x;
-    stringifyVariables(x);
-  }).toThrow();
+it('returns null for circular structures', () => {
+  const x = { x: null } as any;
+  x.x = x;
+  expect(stringifyVariables(x)).toBe('{"x":null}');
 });
 
 it('stringifies dates correctly', () => {
