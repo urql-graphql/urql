@@ -57,7 +57,7 @@ export default [
     plugins,
     output: [
       output('cjs', '.js'),
-      output('esm', hasReact ? '.es.js' : '.mjs'),
+      output('esm', settings.hasReact ? '.es.js' : '.mjs'),
     ],
   },
   !settings.isCI && {

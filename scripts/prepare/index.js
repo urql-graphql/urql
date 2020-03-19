@@ -87,7 +87,7 @@ invariant(
 );
 
 if (hasReact) {
-  invariant(!!pkg.exports, 'package.json:exports must not be added for packages depending on React.');
+  invariant(!pkg.exports, 'package.json:exports must not be added for packages depending on React.');
 } else {
   invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
   invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
