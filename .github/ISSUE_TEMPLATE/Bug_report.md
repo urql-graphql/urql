@@ -3,7 +3,9 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: "bug \U0001F41B"
----<!--
+---
+
+<!--
   Please describe your bug clearly and concisely.
   Include a screenshot or a reproduction to illustrate
   the bug and how to reproduce it.
