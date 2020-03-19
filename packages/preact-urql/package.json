@@ -19,14 +19,14 @@
     "exchanges",
     "preact"
   ],
-  "main": "dist/urql-preact.cjs.js",
-  "module": "dist/urql-preact.esm.mjs",
+  "main": "dist/urql-preact",
+  "module": "dist/urql-preact.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-preact.esm.mjs",
-      "require": "./dist/urql-preact.cjs.js",
+      "import": "./dist/urql-preact.mjs",
+      "require": "./dist/urql-preact.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@urql/core": "^1.10.3",
-    "wonka": "^4.0.8"
+    "wonka": "^4.0.9"
   },
   "publishConfig": {
     "access": "public"

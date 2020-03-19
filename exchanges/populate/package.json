@@ -16,14 +16,14 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-populate.cjs.js",
-  "module": "dist/urql-exchange-populate.esm.mjs",
+  "main": "dist/urql-exchange-populate",
+  "module": "dist/urql-exchange-populate.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-populate.esm.mjs",
-      "require": "./dist/urql-exchange-populate.cjs.js",
+      "import": "./dist/urql-exchange-populate.mjs",
+      "require": "./dist/urql-exchange-populate.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }
@@ -48,8 +48,8 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "wonka": "^4.0.8",
-    "@urql/core": ">=1.10.3"
+    "@urql/core": ">=1.10.3",
+    "wonka": "^4.0.9"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"

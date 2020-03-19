@@ -16,14 +16,14 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-multipart-fetch.cjs.js",
-  "module": "dist/urql-exchange-multipart-fetch.esm.mjs",
+  "main": "dist/urql-exchange-multipart-fetch",
+  "module": "dist/urql-exchange-multipart-fetch.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-multipart-fetch.esm.mjs",
-      "require": "./dist/urql-exchange-multipart-fetch.cjs.js",
+      "import": "./dist/urql-exchange-multipart-fetch.mjs",
+      "require": "./dist/urql-exchange-multipart-fetch.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     }
@@ -50,7 +50,7 @@
   "dependencies": {
     "@urql/core": ">=1.10.3",
     "extract-files": "^7.0.0",
-    "wonka": "^4.0.8"
+    "wonka": "^4.0.9"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
