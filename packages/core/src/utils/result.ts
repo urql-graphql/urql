@@ -15,9 +15,7 @@ export const makeResult = (
       })
     : undefined,
   extensions:
-    typeof result.extensions === 'object' && result.extensions !== null
-      ? result.extensions
-      : undefined,
+    (typeof result.extensions === 'object' && result.extensions) || undefined,
 });
 
 export const makeErrorResult = (
