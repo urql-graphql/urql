@@ -7,6 +7,24 @@ const formatTypeNames = (query: string) => {
 };
 
 describe('formatTypeNames', () => {
+  it('creates a new instance when adding typenames', () => {
+    const doc = parse(`{ todos { id } }`) as any;
+    const newDoc = formatDocument(doc) as any;
+    expect(doc).not.toBe(newDoc);
+    expect(doc.definitions).not.toBe(newDoc.definitions);
+    expect(doc.definitions[0]).not.toBe(newDoc.definitions[0]);
+    expect(doc.definitions[0].selectionSet).not.toBe(
+      newDoc.definitions[0].selectionSet
+    );
+    expect(doc.definitions[0].selectionSet.selections).not.toBe(
+      newDoc.definitions[0].selectionSet.selections
+    );
+    // Here we're equal again:
+    expect(doc.definitions[0].selectionSet.selections[0]).toBe(
+      newDoc.definitions[0].selectionSet.selections[0]
+    );
+  });
+
   it('adds typenames to a query string', () => {
     expect(formatTypeNames(`{ todos { id } }`)).toMatchInlineSnapshot(`
       "{
