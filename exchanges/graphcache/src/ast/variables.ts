@@ -6,7 +6,6 @@ import {
 
 import { getName } from './node';
 
-import { makeDict } from '../helpers/dict';
 import { Variables } from '../types';
 
 /** Evaluates a fields arguments taking vars into account */
@@ -14,7 +13,7 @@ export const getFieldArguments = (
   node: FieldNode,
   vars: Variables
 ): null | Variables => {
-  const args = makeDict();
+  const args = {};
   let argsSize = 0;
   if (node.arguments && node.arguments.length) {
     for (let i = 0, l = node.arguments.length; i < l; i++) {
@@ -53,7 +52,7 @@ export const normalizeVariables = (
   node: OperationDefinitionNode,
   input: void | object
 ): Variables => {
-  const vars = makeDict();
+  const vars = {};
   if (!input) return vars;
 
   if (node.variableDefinitions) {
