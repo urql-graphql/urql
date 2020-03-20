@@ -29,7 +29,19 @@ it('throws for circular structures', () => {
   }).toThrow();
 });
 
-it('stringifies date correctly', () => {
+it('stringifies dates correctly', () => {
   const date = new Date('2019-12-11T04:20:00');
   expect(stringifyVariables(date)).toBe(date.toJSON());
+});
+
+it('stringifies files correctly', () => {
+  const file = new File([0] as any, 'test.js');
+  Object.defineProperty(file, 'lastModified', { value: 123 });
+
+  expect(stringifyVariables(file)).toBe(
+    stringifyVariables({
+      name: 'test.js',
+      lastModified: 123,
+    })
+  );
 });

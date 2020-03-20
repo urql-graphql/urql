@@ -26,6 +26,8 @@ const stringify = (x: any): string => {
     return out;
   } else if (seen.has(x)) {
     throw new TypeError('Converting circular structure to JSON');
+  } else if (typeof File === 'function' && x instanceof File) {
+    return stringify({ name: x.name, lastModified: x.lastModified });
   }
 
   const keys = Object.keys(x).sort();
