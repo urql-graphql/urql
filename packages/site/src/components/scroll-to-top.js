@@ -2,14 +2,17 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
 
+const parsePathname = pathname => {
+  const match = pathname && pathname.match(/#[a-z|-]+/);
+  return match && match[1];
+};
+
 export const ScrollToTop = () => {
   const inputRef = useRef(null);
   const location = useLocation();
   const md = useMarkdownPage();
 
-  const hash =
-    location.hash ||
-    (location.pathname && location.pathname.match(/#[a-z|-]+/));
+  const hash = location.hash || parsePathname(location.pathname);
 
   useEffect(() => {
     if (hash && md) {
