@@ -249,7 +249,7 @@ const writeSelection = (
       InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
     }
 
-    if (isRoot) {
+    if (isRoot && (!ctx.optimistic || (ctx.optimistic && ctx.store.optimisticMutations[fieldName]))) {
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(
         ctx,
