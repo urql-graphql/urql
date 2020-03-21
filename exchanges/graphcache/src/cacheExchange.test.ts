@@ -414,9 +414,7 @@ describe('data dependencies', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    jest
-      .spyOn(client, 'reexecuteOperation')
-      .mockImplementation(next);
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(next);
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 1,
@@ -439,7 +437,7 @@ describe('data dependencies', () => {
     const updates = {
       Mutation: {
         concealAuthor: jest.fn(),
-      }
+      },
     };
 
     pipe(
