@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { pipe, toPromise } from 'wonka';
 
 import {
@@ -31,6 +31,7 @@ export type UseMutationResponse<T, V> = [
 export const useMutation = <T = any, V = object>(
   query: DocumentNode | string
 ): UseMutationResponse<T, V> => {
+  const isMounted = useRef(true);
   const client = useClient();
 
   const [state, setState] = useState<UseMutationState<T>>(initialState);
@@ -46,18 +47,26 @@ export const useMutation = <T = any, V = object>(
         ),
         toPromise
       ).then(result => {
-        setState({
-          fetching: false,
-          stale: !!result.stale,
-          data: result.data,
-          error: result.error,
-          extensions: result.extensions,
-        });
+        if (isMounted.current) {
+          setState({
+            fetching: false,
+            stale: !!result.stale,
+            data: result.data,
+            error: result.error,
+            extensions: result.extensions,
+          });
+        }
         return result;
       });
     },
     [client, query, setState]
   );
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return [state, executeMutation];
 };
