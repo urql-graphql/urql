@@ -19,7 +19,7 @@
     "react",
     "suspense"
   ],
-  "main": "dist/urql-exchange-suspense",
+  "main": "dist/urql-exchange-suspense.js",
   "module": "dist/urql-exchange-suspense.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
