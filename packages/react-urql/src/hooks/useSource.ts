@@ -40,8 +40,8 @@ export const useSource = <T>(source: Source<T>, init: T): T => {
   useEffect(() => {
     return () => {
       isMounted.current = false;
-    }
-  })
+    };
+  }, []);
 
   useEffect(() => {
     return pipe(
