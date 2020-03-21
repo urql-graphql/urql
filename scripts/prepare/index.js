@@ -42,7 +42,7 @@ if (hasReact) {
 
   invariant(
     path.normalize(pkg.module) === `dist/${name}.es.js`,
-    'package.json:main path must end in `.es.js` for packages depending on React.'
+    'package.json:module path must end in `.es.js` for packages depending on React.'
   );
 } else {
   invariant(
