@@ -219,43 +219,34 @@ const writeSelection = (
       }
     }
 
+    let fieldData: Data | NullArray<Data> | null;
+    if (ctx.optimistic && isRoot) {
+      const resolver = ctx.store.optimisticMutations[fieldName];
+      if (!resolver) continue;
+      // We have to update the context to reflect up-to-date ResolveInfo
+      updateContext(ctx, typename, typename, fieldKey, fieldName);
+      fieldData = ensureData(resolver(fieldArgs || makeDict(), ctx.store, ctx));
+      data[fieldName] = fieldData;
+    }
+
     if (node.selectionSet) {
-      let fieldData: Data | NullArray<Data> | null;
       // Process optimistic updates, if this is a `writeOptimistic` operation
       // otherwise read the field value from data and write it
-      if (ctx.optimistic && isRoot) {
-        const resolver = ctx.store.optimisticMutations[fieldName];
-        if (!resolver) continue;
-        // We have to update the context to reflect up-to-date ResolveInfo
-        updateContext(ctx, typename, typename, fieldKey, fieldName);
-        fieldData = ensureData(
-          resolver(fieldArgs || makeDict(), ctx.store, ctx)
-        );
-        data[fieldName] = fieldData;
-      } else {
+      if (!ctx.optimistic || !isRoot) {
         fieldData = ensureData(fieldValue);
       }
 
       // Process the field and write links for the child entities that have been written
       if (entityKey && !isRoot) {
         const key = joinKeys(entityKey, fieldKey);
-        const link = writeField(ctx, getSelectionSet(node), fieldData, key);
+        const link = writeField(ctx, getSelectionSet(node), fieldData!, key);
         InMemoryData.writeLink(entityKey || typename, fieldKey, link);
       } else {
-        writeField(ctx, getSelectionSet(node), fieldData);
+        writeField(ctx, getSelectionSet(node), fieldData!);
       }
     } else if (entityKey && !isRoot) {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
-    } else if (ctx.optimistic && isRoot) {
-      // We are dealing with a scalar root
-      const resolver = ctx.store.optimisticMutations[fieldName];
-      if (!resolver) continue;
-      // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(ctx, typename, typename, fieldKey, fieldName);
-      data[fieldName] = ensureData(
-        resolver(fieldArgs || makeDict(), ctx.store, ctx)
-      );
     }
 
     if (isRoot) {
