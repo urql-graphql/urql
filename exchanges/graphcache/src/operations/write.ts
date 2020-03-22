@@ -247,7 +247,16 @@ const writeSelection = (
     } else if (entityKey && !isRoot) {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
-    } else if (ctx.optimistic && isRoot) continue;
+    } else if (ctx.optimistic && isRoot) {
+      // We are dealing with a scalar root
+      const resolver = ctx.store.optimisticMutations[fieldName];
+      if (!resolver) continue;
+      // We have to update the context to reflect up-to-date ResolveInfo
+      updateContext(ctx, typename, typename, fieldKey, fieldName);
+      data[fieldName] = ensureData(
+        resolver(fieldArgs || makeDict(), ctx.store, ctx)
+      );
+    }
 
     if (isRoot) {
       // We have to update the context to reflect up-to-date ResolveInfo
