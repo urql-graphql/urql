@@ -513,6 +513,72 @@ describe('data dependencies', () => {
     jest.runAllTimers();
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(2);
   });
+
+  it('respects aliases in the optimistic update data that is written', () => {
+    jest.useFakeTimers();
+
+    const mutation = gql`
+      mutation {
+        concealed: concealAuthor
+      }
+    `;
+
+    const mutationData = {
+      __typename: 'Mutation',
+      concealed: true,
+    };
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(next);
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 1,
+      query: mutation,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: opMutation, data: mutationData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+    const updates = {
+      Mutation: {
+        concealAuthor: jest.fn(),
+      },
+    };
+
+    const optimistic = {
+      concealAuthor: jest.fn(() => true) as any,
+    };
+
+    pipe(
+      cacheExchange({ updates, optimistic })({ forward, client })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opMutation);
+    expect(optimistic.concealAuthor).toHaveBeenCalledTimes(1);
+    expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(1);
+
+    const data = updates.Mutation.concealAuthor.mock.calls[0][0];
+    // Expect both fields to exist
+    expect(data.concealed).toBe(true);
+    expect(data.concealAuthor).toBe(true);
+
+    jest.runAllTimers();
+    expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('optimistic updates', () => {

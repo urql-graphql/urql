@@ -190,7 +190,8 @@ const writeSelection = (
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
-    let fieldValue = data[getFieldAlias(node)];
+    const fieldAlias = getFieldAlias(node);
+    let fieldValue = data[fieldAlias];
 
     if (process.env.NODE_ENV !== 'production') {
       if (!isRoot && fieldValue === undefined) {
@@ -224,7 +225,7 @@ const writeSelection = (
       if (!resolver) continue;
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(ctx, typename, typename, fieldKey, fieldName);
-      fieldValue = data[fieldName] = ensureData(
+      fieldValue = data[fieldAlias] = ensureData(
         resolver(fieldArgs || makeDict(), ctx.store, ctx)
       );
     }
@@ -262,6 +263,7 @@ const writeSelection = (
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
       if (updater) {
+        data[fieldName] = fieldValue;
         updater(data, fieldArgs || makeDict(), ctx.store, ctx);
       }
     }
