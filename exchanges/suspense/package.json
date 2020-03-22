@@ -23,14 +23,6 @@
   "module": "dist/urql-exchange-suspense.es.js",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/urql-exchange-suspense.mjs",
-      "require": "./dist/urql-exchange-suspense.js",
-      "types": "./dist/types/index.d.ts",
-      "source": "./src/index.ts"
-    }
-  },
   "files": [
     "LICENSE",
     "CHANGELOG.md",
