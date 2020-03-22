@@ -1,4 +1,5 @@
 const seen = new Set();
+const cache = new WeakMap();
 
 const stringify = (x: any): string => {
   if (x === undefined) {
@@ -29,6 +30,15 @@ const stringify = (x: any): string => {
   }
 
   const keys = Object.keys(x).sort();
+  if (!keys.length && x.constructor && x.constructor !== Object) {
+    const key =
+      cache.get(x) ||
+      Math.random()
+        .toString(36)
+        .slice(2);
+    cache.set(x, key);
+    return `{"__key":"${key}"}`;
+  }
 
   seen.add(x);
   out = '{';
