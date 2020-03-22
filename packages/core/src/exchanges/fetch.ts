@@ -12,16 +12,16 @@ interface Body {
 
 /** A default exchange for fetching GraphQL requests. */
 export const fetchExchange: Exchange = ({ forward }) => {
-  const isOperationFetchable = (operation: Operation) => {
-    const { operationName } = operation;
-    return operationName === 'query' || operationName === 'mutation';
-  };
-
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(isOperationFetchable),
+      filter(operation => {
+        return (
+          operation.operationName === 'query' ||
+          operation.operationName === 'mutation'
+        );
+      }),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
@@ -42,7 +42,12 @@ export const fetchExchange: Exchange = ({ forward }) => {
 
     const forward$ = pipe(
       sharedOps$,
-      filter(op => !isOperationFetchable(op)),
+      filter(operation => {
+        return (
+          operation.operationName !== 'query' &&
+          operation.operationName !== 'mutation'
+        );
+      }),
       forward
     );
 
@@ -57,7 +62,7 @@ const getOperationName = (query: DocumentNode): string | null => {
     }
   );
 
-  return node !== undefined && node.name ? node.name.value : null;
+  return node ? node.name!.value : null;
 };
 
 const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {

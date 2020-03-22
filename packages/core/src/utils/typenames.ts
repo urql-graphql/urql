@@ -2,6 +2,8 @@ import {
   DocumentNode,
   FieldNode,
   InlineFragmentNode,
+  SelectionSetNode,
+  SelectionNode,
   Kind,
   visit,
 } from 'graphql';
@@ -18,13 +20,11 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
     });
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        const val = obj[key];
-        if (key === '__typename' && typeof val === 'string') {
-          types.push(val);
-        } else if (typeof val === 'object' && val !== null) {
-          collectTypes(val, types);
-        }
+      const val = obj[key];
+      if (key === '__typename' && typeof val === 'string') {
+        types.push(val);
+      } else {
+        collectTypes(val, types);
       }
     }
   }
@@ -35,39 +35,33 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
 export const collectTypesFromResponse = (response: object) =>
   collectTypes(response as EntityLike).filter((v, i, a) => a.indexOf(v) === i);
 
-const formatNode = (n: FieldNode | InlineFragmentNode) => {
-  if (n.selectionSet === undefined) {
-    return false;
-  }
-
-  if (
-    n.selectionSet.selections.some(
-      s => s.kind === 'Field' && s.name.value === '__typename'
-    )
-  ) {
-    return n;
-  }
-
-  return {
-    ...n,
-    selectionSet: {
-      ...n.selectionSet,
-      selections: [
-        ...n.selectionSet.selections,
-        {
-          kind: Kind.FIELD,
-          name: {
-            kind: Kind.NAME,
-            value: '__typename',
-          },
-        },
-      ],
-    },
-  };
+const hasTypenameField = (set: SelectionSetNode) => {
+  return set.selections.some(node => {
+    return node.kind === Kind.FIELD && node.name.value === '__typename';
+  });
 };
 
-export const formatDocument = (astNode: DocumentNode) =>
-  visit(astNode, {
+const formatNode = (node: FieldNode | InlineFragmentNode) => {
+  if (!node.selectionSet) {
+    return false;
+  } else if (!hasTypenameField(node.selectionSet)) {
+    // NOTE: It's fine to mutate here as long as we return the node,
+    // which will instruct visit() to clone the AST upwards
+    (node.selectionSet.selections as SelectionNode[]).push({
+      kind: Kind.FIELD,
+      name: {
+        kind: Kind.NAME,
+        value: '__typename',
+      },
+    });
+
+    return node;
+  }
+};
+
+export const formatDocument = (node: DocumentNode) => {
+  return visit(node, {
     Field: formatNode,
     InlineFragment: formatNode,
   });
+};
