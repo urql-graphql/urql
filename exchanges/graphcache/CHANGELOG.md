@@ -1,5 +1,18 @@
 # @urql/exchange-graphcache
 
+## 2.3.0
+
+### Minor Changes
+
+- Support optimistic values for mutations without a selectionset, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#657](https://github.com/FormidableLabs/urql/pull/657))
+
+### Patch Changes
+
+- Refactor to replace dictionary-based (`Object.create(null)`) results with regular objects, by [@kitten](https://github.com/kitten) (See [#651](https://github.com/FormidableLabs/urql/pull/651))
+- ⚠️ Fix case where a mutation-rootfield would cause an empty call to the cache.updates[mutationRootField], by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#654](https://github.com/FormidableLabs/urql/pull/654))
+- Updated dependencies (See [#658](https://github.com/FormidableLabs/urql/pull/658) and [#650](https://github.com/FormidableLabs/urql/pull/650))
+  - @urql/core@1.10.5
+
 ## 2.2.8
 
 ### Patch Changes

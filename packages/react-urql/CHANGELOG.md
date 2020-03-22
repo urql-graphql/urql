@@ -1,5 +1,13 @@
 # urql
 
+## 1.9.5
+
+### Patch Changes
+
+- Avoid setting state on an unmounted component when useMutation is used, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#656](https://github.com/FormidableLabs/urql/pull/656))
+- Updated dependencies (See [#658](https://github.com/FormidableLabs/urql/pull/658) and [#650](https://github.com/FormidableLabs/urql/pull/650))
+  - @urql/core@1.10.5
+
 ## 1.9.4
 
 ### Patch Changes
