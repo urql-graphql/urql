@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 
 import {
   Source,
@@ -19,6 +19,8 @@ import { useClient } from '../context';
 let currentInit = false;
 
 export const useSource = <T>(source: Source<T>, init: T): T => {
+  const isMounted = useRef(true);
+
   const [state, setState] = useState(() => {
     currentInit = true;
     let initialValue = init;
@@ -36,10 +38,16 @@ export const useSource = <T>(source: Source<T>, init: T): T => {
   });
 
   useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     return pipe(
       source,
       subscribe(value => {
-        if (!currentInit) {
+        if (!currentInit && isMounted.current) {
           setState(value);
         }
       })
