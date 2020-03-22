@@ -1,4 +1,5 @@
 const seen = new Set();
+const cache = new WeakMap();
 
 const stringify = (x: any): string => {
   if (x === undefined) {
@@ -26,11 +27,18 @@ const stringify = (x: any): string => {
     return out;
   } else if (seen.has(x)) {
     throw new TypeError('Converting circular structure to JSON');
-  } else if (typeof File === 'function' && x instanceof File) {
-    return stringify({ name: x.name, lastModified: x.lastModified });
   }
 
   const keys = Object.keys(x).sort();
+  if (!keys.length && x.constructor && x.constructor !== Object) {
+    const key =
+      cache.get(x) ||
+      Math.random()
+        .toString(36)
+        .slice(2);
+    cache.set(x, key);
+    return `{"__key":"${key}"}`;
+  }
 
   seen.add(x);
   out = '{';

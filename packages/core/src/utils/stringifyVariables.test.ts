@@ -34,14 +34,17 @@ it('stringifies dates correctly', () => {
   expect(stringifyVariables(date)).toBe(date.toJSON());
 });
 
+it('stringifies dictionaries (Object.create(null)) correctly', () => {
+  expect(stringifyVariables(Object.create(null))).toBe('{}');
+});
+
 it('stringifies files correctly', () => {
   const file = new File([0] as any, 'test.js');
   Object.defineProperty(file, 'lastModified', { value: 123 });
+  const str = stringifyVariables(file);
+  expect(str).toBe(stringifyVariables(file));
 
-  expect(stringifyVariables(file)).toBe(
-    stringifyVariables({
-      name: 'test.js',
-      lastModified: 123,
-    })
-  );
+  const otherFile = new File([0] as any, 'otherFile.js');
+  Object.defineProperty(otherFile, 'lastModified', { value: 234 });
+  expect(str).not.toBe(stringifyVariables(otherFile));
 });
