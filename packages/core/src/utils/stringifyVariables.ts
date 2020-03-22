@@ -2,17 +2,14 @@ const seen = new Set();
 const cache = new WeakMap();
 
 const stringify = (x: any): string => {
-  if (x === null) {
+  if (x === null || seen.has(x)) {
     return 'null';
   } else if (typeof x !== 'object') {
     return JSON.stringify(x) || '';
   } else if (x.toJSON) {
     return x.toJSON();
-  }
-
-  let out = '';
-  if (Array.isArray(x)) {
-    out = '[';
+  } else if (Array.isArray(x)) {
+    let out = '[';
     for (let i = 0, l = x.length; i < l; i++) {
       if (i > 0) out += ',';
       const value = stringify(x[i]);
@@ -21,8 +18,6 @@ const stringify = (x: any): string => {
 
     out += ']';
     return out;
-  } else if (seen.has(x)) {
-    return 'null';
   }
 
   const keys = Object.keys(x).sort();
@@ -37,7 +32,7 @@ const stringify = (x: any): string => {
   }
 
   seen.add(x);
-  out = '{';
+  let out = '{';
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i];
     const value = stringify(x[key]);
