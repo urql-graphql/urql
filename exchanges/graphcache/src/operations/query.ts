@@ -35,7 +35,6 @@ import {
 
 import * as InMemoryData from '../store/data';
 import { warn, pushDebugNode } from '../helpers/help';
-import { makeDict } from '../helpers/dict';
 
 import {
   Context,
@@ -89,7 +88,7 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  let data = input || makeDict();
+  let data: Data | undefined = input || ({} as Data);
   data =
     rootKey !== ctx.store.rootFields['query']
       ? readRoot(ctx, rootKey, rootSelect, data)
@@ -113,7 +112,7 @@ const readRoot = (
   }
 
   const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
-  const data = makeDict();
+  const data = {} as Data;
   data.__typename = originalData.__typename;
 
   let node: FieldNode | void;
@@ -150,7 +149,7 @@ const readRootField = (
   if (entityKey !== null) {
     // We assume that since this is used for result data this can never be undefined,
     // since the result data has already been written to the cache
-    const fieldValue = readSelection(ctx, entityKey, select, makeDict());
+    const fieldValue = readSelection(ctx, entityKey, select, {} as Data);
     return fieldValue === undefined ? null : fieldValue;
   } else {
     return readRoot(ctx, originalData.__typename, select, originalData);
@@ -211,7 +210,7 @@ export const readFragment = (
   );
 
   return (
-    readSelection(ctx, entityKey, getSelectionSet(fragment), makeDict()) || null
+    readSelection(ctx, entityKey, getSelectionSet(fragment), {} as Data) || null
   );
 };
 
@@ -290,7 +289,7 @@ const readSelection = (
 
       dataFieldValue = resolvers[fieldName](
         data,
-        fieldArgs || makeDict(),
+        fieldArgs || ({} as Data),
         store,
         ctx
       );
@@ -304,7 +303,7 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          (data[fieldAlias] as Data) || makeDict(),
+          (data[fieldAlias] || {}) as Data,
           dataFieldValue
         );
       }
@@ -417,7 +416,7 @@ const resolveResolverResult = (
   } else if (result === null || result === undefined) {
     return result;
   } else if (isDataOrKey(result)) {
-    const data = prevData === undefined ? makeDict() : prevData;
+    const data = (prevData === undefined ? {} : prevData) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -471,7 +470,7 @@ const resolveLink = (
       ctx,
       link,
       select,
-      prevData === undefined ? makeDict() : prevData
+      prevData === undefined ? ({} as any) : prevData
     );
   }
 };

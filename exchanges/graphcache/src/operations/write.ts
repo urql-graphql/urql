@@ -27,7 +27,6 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
-import { makeDict } from '../helpers/dict';
 import {
   Context,
   SelectionIterator,
@@ -88,7 +87,7 @@ export const writeOptimistic = (
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = {
-    data: makeDict(),
+    data: {} as Data,
     dependencies: getCurrentDependencies(),
   };
   const operationName = store.rootFields[operation.operation];
@@ -226,7 +225,7 @@ const writeSelection = (
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(ctx, typename, typename, fieldKey, fieldName);
       fieldValue = data[fieldAlias] = ensureData(
-        resolver(fieldArgs || makeDict(), ctx.store, ctx)
+        resolver(fieldArgs || {}, ctx.store, ctx)
       );
     }
 
@@ -264,7 +263,7 @@ const writeSelection = (
       const updater = ctx.store.updates[typename][fieldName];
       if (updater) {
         data[fieldName] = fieldValue;
-        updater(data, fieldArgs || makeDict(), ctx.store, ctx);
+        updater(data, fieldArgs || {}, ctx.store, ctx);
       }
     }
   }
