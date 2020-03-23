@@ -58,14 +58,19 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
 
-        if (cachedResult) {
-          client.debugTarget!.dispatchEvent({
-            type: 'cacheHit',
-            message: 'A cache hit has occured',
-            data: { value: cachedResult },
-            operation,
-          });
-        }
+        client.debugTarget!.dispatchEvent({
+          operation,
+          ...(cachedResult
+            ? {
+                type: 'cacheHit',
+                message: 'The result was successfully retried from the cache',
+                data: { value: cachedResult },
+              }
+            : {
+                type: 'cacheMiss',
+                message: 'The result could not be retrieved from the cache',
+              }),
+        });
 
         const result: OperationResult = {
           ...cachedResult,

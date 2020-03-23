@@ -322,7 +322,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       map(res => {
         client.debugTarget!.dispatchEvent({
           type: 'graphcacheMiss',
-          message: 'The operation could not be queried from the cache',
+          message: 'The result could not be retrieved from the cache',
           operation: res.operation,
         });
         return addCacheOutcome(res.operation, res.outcome);
