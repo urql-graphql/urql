@@ -77,7 +77,7 @@ export const retryExchange = ({
 
         client.debugTarget!.dispatchEvent({
           type: 'retryRetrying',
-          message: 'Retrying the operation',
+          message: `The operation has failed and a retry has been triggered (${retryCount} / ${MAX_ATTEMPTS})`,
           operation: op,
           data: {
             retryCount,
@@ -123,7 +123,7 @@ export const retryExchange = ({
         }
 
         client.debugTarget!.dispatchEvent({
-          type: 'retryMaxAttemptsReached',
+          type: 'retryExhausted',
           message:
             'Maximum number of retries has been reached. No further retries will be performed.',
           operation: res.operation,
