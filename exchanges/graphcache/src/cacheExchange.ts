@@ -287,7 +287,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   return ops$ => {
-    const dispatchEvent = client.debugTarget!.dispatchEvent;
     const sharedOps$ = pipe(ops$, share);
 
     // Buffer operations while waiting on hydration to finish
@@ -321,7 +320,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       cache$,
       filter(res => res.outcome === 'miss'),
       map(res => {
-        dispatchEvent({
+        client.debugTarget!.dispatchEvent({
           type: 'graphcacheMiss',
           message: 'The operation could not be queried from the cache',
           operation: res.operation,
@@ -352,14 +351,16 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             (policy === 'cache-first' && outcome === 'partial')
           ) {
             debugMessage +=
-              outcome === 'partial' && policy === 'cache-first' ? ' but is being retried due to the result being partial.' : ' but is being retried due to "cache-and-network.';
+              outcome === 'partial' && policy === 'cache-first'
+                ? ' but is being retried due to the result being partial.'
+                : ' but is being retried due to "cache-and-network".';
             result.stale = true;
             client.reexecuteOperation(
               toRequestPolicy(operation, 'network-only')
             );
           }
 
-          dispatchEvent({
+          client.debugTarget!.dispatchEvent({
             type: 'graphcacheHit',
             message: debugMessage,
             operation: res.operation,
