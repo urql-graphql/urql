@@ -1,18 +1,26 @@
 import { filter, pipe, tap } from 'wonka';
-import { ExchangeIO, Operation } from '../types';
+import { Operation, ExchangeIO } from '../types';
+import { Client } from 'src/client';
 
 /** This is always the last exchange in the chain; No operation should ever reach it */
-export const fallbackExchangeIO: ExchangeIO = ops$ =>
+export const fallbackExchange: ({ client: Client }) => ExchangeIO = ({
+  client,
+}) => ops$ =>
   pipe(
     ops$,
-    tap<Operation>(({ operationName }) => {
+    tap<Operation>(operation => {
       if (
-        operationName !== 'teardown' &&
+        operation.operationName !== 'teardown' &&
         process.env.NODE_ENV !== 'production'
       ) {
-        console.warn(
-          `No exchange has handled operations of type "${operationName}". Check whether you've added an exchange responsible for these operations.`
-        );
+        const message = `No exchange has handled operations of type "${operation.operationName}". Check whether you've added an exchange responsible for these operations.`;
+
+        client.debugTarget?.dispatchEvent({
+          type: 'fallbackCatch',
+          message,
+          operation,
+        });
+        console.warn(message);
       }
     }),
     /* All operations that skipped through the entire exchange chain should be filtered from the output */

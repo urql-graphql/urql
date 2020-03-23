@@ -68,7 +68,6 @@ export interface OperationResult<Data = any> {
   data?: Data;
   /** Any errors resulting from the operation. */
   error?: CombinedError;
-  edError;
   /** Optional extensions return by the Graphql server. */
   extensions?: Record<string, any>;
   /** Optional stale flag added by exchanges that return stale results. */
