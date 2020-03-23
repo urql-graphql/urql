@@ -145,10 +145,9 @@ const executeFetch = (
   opts: RequestInit
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
-  const dispatchEvent = client.debugTarget!.dispatchEvent;
   let response: Response | undefined;
 
-  dispatchEvent({
+  client.debugTarget!.dispatchEvent({
     type: 'fetchRequest',
     message: 'A fetch request is being executed.',
     operation,
@@ -171,7 +170,7 @@ const executeFetch = (
       }
     })
     .then(result => {
-      dispatchEvent({
+      client.debugTarget!.dispatchEvent({
         type: 'fetchSuccess',
         message: 'A successful fetch response has been returned.',
         operation,
@@ -189,7 +188,7 @@ const executeFetch = (
         return;
       }
 
-      dispatchEvent({
+      client.debugTarget!.dispatchEvent({
         type: 'fetchError',
         message: err.name,
         operation,

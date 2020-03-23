@@ -3,7 +3,6 @@ import { Exchange, Operation, OperationResult } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
 export const dedupExchange: Exchange = ({ forward, client }) => {
-  const dispatchEvent = client.debugTarget!.dispatchEvent;
   const inFlightKeys = new Set<number>();
 
   const filterIncomingOperation = (operation: Operation) => {
@@ -21,7 +20,7 @@ export const dedupExchange: Exchange = ({ forward, client }) => {
     inFlightKeys.add(key);
 
     if (isInFlight) {
-      dispatchEvent({
+      client.debugTarget!.dispatchEvent({
         type: 'dedup',
         message: 'An operation has been deduped.',
         operation,

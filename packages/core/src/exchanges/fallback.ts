@@ -1,6 +1,5 @@
 import { filter, pipe, tap } from 'wonka';
 import { Operation, ExchangeIO } from '../types';
-import { Client } from 'src/client';
 
 /** This is always the last exchange in the chain; No operation should ever reach it */
 export const fallbackExchange: ({ client: Client }) => ExchangeIO = ({
@@ -15,7 +14,7 @@ export const fallbackExchange: ({ client: Client }) => ExchangeIO = ({
       ) {
         const message = `No exchange has handled operations of type "${operation.operationName}". Check whether you've added an exchange responsible for these operations.`;
 
-        client.debugTarget?.dispatchEvent({
+        client.debugTarget!.dispatchEvent({
           type: 'fallbackCatch',
           message,
           operation,
