@@ -352,7 +352,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             (policy === 'cache-first' && outcome === 'partial')
           ) {
             debugMessage +=
-              ' but is being retried due to the policy or outcome';
+              outcome === 'partial' && policy === 'cache-first' ? ' but is being retried due to the result being partial.' : ' but is being retried due to "cache-and-network.';
             result.stale = true;
             client.reexecuteOperation(
               toRequestPolicy(operation, 'network-only')
