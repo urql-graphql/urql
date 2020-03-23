@@ -51,7 +51,7 @@ export const retryExchange = ({
       retry$,
       mergeMap((op: Operation) => {
         const { key, context } = op;
-        const retryCount = context.retryCount++ || 1;
+        const retryCount = (context.retryCount || 0) + 1;
         let delayAmount = context.retryDelay || MIN_DELAY;
 
         const backoffFactor = Math.random() + 1.5;
