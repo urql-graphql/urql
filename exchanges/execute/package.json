@@ -35,8 +35,7 @@
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
-    "dist/",
-    "extras/"
+    "dist/"
   ],
   "scripts": {
     "test": "jest",
