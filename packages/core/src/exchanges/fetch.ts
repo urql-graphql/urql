@@ -3,6 +3,7 @@ import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
+import { Client } from '../client';
 
 interface Body {
   query: string;
@@ -11,7 +12,7 @@ interface Body {
 }
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward }) => {
+export const fetchExchange: Exchange = ({ forward, client }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
@@ -31,6 +32,7 @@ export const fetchExchange: Exchange = ({ forward }) => {
 
         return pipe(
           createFetchSource(
+            client,
             operation,
             operation.operationName === 'query' &&
               !!operation.context.preferGetMethod
@@ -65,7 +67,11 @@ const getOperationName = (query: DocumentNode): string | null => {
   return node ? node.name!.value : null;
 };
 
-const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
+const createFetchSource = (
+  client: Client,
+  operation: Operation,
+  shouldUseGet: boolean
+) => {
   if (
     process.env.NODE_ENV !== 'production' &&
     operation.operationName === 'subscription'
@@ -118,7 +124,9 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
     let ended = false;
 
     Promise.resolve()
-      .then(() => (ended ? undefined : executeFetch(operation, fetchOptions)))
+      .then(() =>
+        ended ? undefined : executeFetch(client, operation, fetchOptions)
+      )
       .then((result: OperationResult | undefined) => {
         if (!ended) {
           ended = true;
@@ -137,11 +145,22 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
 };
 
 const executeFetch = (
+  client: Client,
   operation: Operation,
   opts: RequestInit
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let response: Response | undefined;
+
+  client.debugTarget!.dispatchEvent({
+    type: 'fetchRequest',
+    message: 'A fetch request is being executed.',
+    operation,
+    data: {
+      url,
+      fetchOptions: opts,
+    },
+  });
 
   return (fetcher || fetch)(url, opts)
     .then(res => {
@@ -155,11 +174,37 @@ const executeFetch = (
         return res.json();
       }
     })
-    .then(result => makeResult(operation, result, response))
+    .then(result => {
+      client.debugTarget!.dispatchEvent({
+        type: 'fetchSuccess',
+        message: 'A successful fetch response has been returned.',
+        operation,
+        data: {
+          url,
+          fetchOptions: opts,
+          value: result,
+        },
+      });
+
+      return makeResult(operation, result, response);
+    })
     .catch(err => {
-      if (err.name !== 'AbortError') {
-        return makeErrorResult(operation, err, response);
+      if (err.name === 'AbortError') {
+        return;
       }
+
+      client.debugTarget!.dispatchEvent({
+        type: 'fetchError',
+        message: err.name,
+        operation,
+        data: {
+          url,
+          fetchOptions: opts,
+          value: err,
+        },
+      });
+
+      return makeErrorResult(operation, err, response);
     });
 };
 
