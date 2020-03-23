@@ -29,12 +29,6 @@
       "require": "dist/urql-exchange-execute.cjs.js",
       "types": "dist/types/index.d.ts",
       "source": "src/index.ts"
-    },
-    "./extras": {
-      "import": "dist/urql-exchange-execute-extras.esm.js",
-      "require": "dist/urql-exchange-execute-extras.cjs.js",
-      "types": "dist/types/extras/index.d.ts",
-      "source": "src/extras/index.ts"
     }
   },
   "files": [
