@@ -109,6 +109,15 @@ export interface DebugEventTypes {
     fetchOptions: RequestInit;
     value: Error;
   };
+  // Retry exchange
+  retryRetrying: {
+    retryCount: number;
+  };
+  // Graphcache Exchnage
+  graphcacheHit: {
+    policy: RequestPolicy;
+    value: OperationResult;
+  };
 }
 
 export type DebugEvent<T extends keyof DebugEventTypes | string> = {

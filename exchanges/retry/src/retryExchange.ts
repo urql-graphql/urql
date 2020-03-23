@@ -41,7 +41,7 @@ export const retryExchange = ({
   const retryIf =
     retryIfOption || ((err: CombinedError) => err && err.networkError);
 
-  return ({ forward }) => ops$ => {
+  return ({ forward, client }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
     const { source: retry$, next: nextRetryOperation } = makeSubject<
       Operation
@@ -51,7 +51,7 @@ export const retryExchange = ({
       retry$,
       mergeMap((op: Operation) => {
         const { key, context } = op;
-        const retryCount = context.retryCount || 0;
+        const retryCount = (context.retryCount || 0) + 1;
         let delayAmount = context.retryDelay || MIN_DELAY;
 
         const backoffFactor = Math.random() + 1.5;
@@ -75,6 +75,15 @@ export const retryExchange = ({
           })
         );
 
+        client.debugTarget!.dispatchEvent({
+          type: 'retryRetrying',
+          message: `The operation has failed and a retry has been triggered (${retryCount} / ${MAX_ATTEMPTS})`,
+          operation: op,
+          data: {
+            retryCount,
+          },
+        });
+
         // Add new retryDelay and retryCount to operation
         return pipe(
           fromValue({
@@ -82,7 +91,7 @@ export const retryExchange = ({
             context: {
               ...op.context,
               retryDelay: delayAmount,
-              retryCount: retryCount + 1,
+              retryCount,
             },
           }),
           delay(delayAmount),
@@ -97,18 +106,30 @@ export const retryExchange = ({
       forward,
       share,
       filter(res => {
-        const maxNumberAttemptsExceeded =
-          (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
         // Only retry if the error passes the conditional retryIf function (if passed)
         // or if the error contains a networkError
-        if (res.error && retryIf(res.error) && !maxNumberAttemptsExceeded) {
+        if (!res.error || !retryIf(res.error)) {
+          return true;
+        }
+
+        const maxNumberAttemptsExceeded =
+          (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
+
+        if (!maxNumberAttemptsExceeded) {
           // Send failed responses to be retried by calling next on the retry$ subject
           // Exclude operations that have been retried more than the specified max
           nextRetryOperation(res.operation);
           return false;
-        } else {
-          return true;
         }
+
+        client.debugTarget!.dispatchEvent({
+          type: 'retryExhausted',
+          message:
+            'Maximum number of retries has been reached. No further retries will be performed.',
+          operation: res.operation,
+        });
+
+        return true;
       })
     ) as sourceT<OperationResult>;
 

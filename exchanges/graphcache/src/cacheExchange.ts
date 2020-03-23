@@ -305,7 +305,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           res.operation.context.requestPolicy !== 'cache-only'
         );
       }),
-      map(res => addCacheOutcome(res.operation, 'miss'))
+      map(res => {
+        client.debugTarget!.dispatchEvent({
+          type: 'graphcacheMiss',
+          message: 'The result could not be retrieved from the cache',
+          operation: res.operation,
+        });
+        return addCacheOutcome(res.operation, 'miss');
+      })
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
@@ -327,16 +334,31 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             extensions: res.extensions,
           };
 
+          let debugMessage = 'A cache hit occured';
           if (
             operation.context.requestPolicy === 'cache-and-network' ||
             (operation.context.requestPolicy === 'cache-first' &&
               outcome === 'partial')
           ) {
+            debugMessage +=
+              outcome === 'partial' && policy === 'cache-first'
+                ? ' but is being retried due to the result being partial.'
+                : ' but is being retried due to "cache-and-network".';
             result.stale = true;
             client.reexecuteOperation(
               toRequestPolicy(operation, 'network-only')
             );
           }
+
+          client.debugTarget!.dispatchEvent({
+            type: 'graphcacheHit',
+            message: debugMessage,
+            operation: res.operation,
+            data: {
+              policy,
+              value: result,
+            },
+          });
 
           return result;
         }
