@@ -88,10 +88,26 @@ export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
 /** Debug event types (interfaced for declaration merging). */
 export interface DebugEventTypes {
+  // Cache exchange
   cacheHit: { value: any };
   cacheInvalidation: {
     typenames: string[];
     response: OperationResult;
+  };
+  // Fetch exchange
+  fetchRequest: {
+    url: string;
+    fetchOptions: RequestInit;
+  };
+  fetchSuccess: {
+    url: string;
+    fetchOptions: RequestInit;
+    value: object;
+  };
+  fetchError: {
+    url: string;
+    fetchOptions: RequestInit;
+    value: Error;
   };
 }
 
@@ -100,5 +116,5 @@ export type DebugEvent<T extends keyof DebugEventTypes | string> = {
   message: string;
   operation: Operation;
 } & (T extends keyof DebugEventTypes
-  ? { data: T extends keyof DebugEventTypes ? DebugEventTypes[T] : never }
+  ? { data: DebugEventTypes[T] }
   : { data?: any });

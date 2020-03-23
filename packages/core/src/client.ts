@@ -22,7 +22,7 @@ import {
 import {
   composeExchanges,
   defaultExchanges,
-  fallbackExchangeIO,
+  fallbackExchange,
 } from './exchanges';
 
 import {
@@ -147,7 +147,7 @@ export class Client {
     this.results$ = share(
       this.exchange({
         client: this,
-        forward: fallbackExchangeIO,
+        forward: fallbackExchange({ client: this }),
       })(this.operations$)
     );
 
