@@ -287,6 +287,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   return ops$ => {
+    const dispatchEvent = client.debugTarget!.dispatchEvent;
     const sharedOps$ = pipe(ops$, share);
 
     // Buffer operations while waiting on hydration to finish
@@ -319,7 +320,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const cacheOps$ = pipe(
       cache$,
       filter(res => res.outcome === 'miss'),
-      map(res => addCacheOutcome(res.operation, res.outcome))
+      map(res => {
+        dispatchEvent({
+          type: 'graphcacheMiss',
+          message: 'The operation could not be queried from the cache',
+          operation: res.operation,
+        });
+        return addCacheOutcome(res.operation, res.outcome);
+      })
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
@@ -338,15 +346,28 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             extensions: res.extensions,
           };
 
+          let debugMessage = 'A cache hit occured';
           if (
             policy === 'cache-and-network' ||
             (policy === 'cache-first' && outcome === 'partial')
           ) {
+            debugMessage +=
+              ' but is being retried due to the policy or outcome';
             result.stale = true;
             client.reexecuteOperation(
               toRequestPolicy(operation, 'network-only')
             );
           }
+
+          dispatchEvent({
+            type: 'graphcacheHit',
+            message: debugMessage,
+            operation: res.operation,
+            data: {
+              policy,
+              value: result,
+            },
+          });
 
           return result;
         }
