@@ -44,6 +44,7 @@ const response = {
 const exchangeArgs = {
   forward: () => empty as Source<OperationResult>,
   client: {} as Client,
+  dispatchDebug: jest.fn(),
 };
 
 describe('on success', () => {

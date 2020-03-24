@@ -12,6 +12,8 @@ import {
 import { createClient, Operation, OperationResult } from 'urql';
 import { suspenseExchange } from './suspenseExchange';
 
+const dispatchDebug = jest.fn();
+
 beforeEach(() => {
   jest.useFakeTimers();
 });
@@ -28,7 +30,7 @@ it('logs a warning if suspense mode is not activated', () => {
   const forward = jest.fn(() => fromArray([]));
   const ops = fromArray([]);
 
-  suspenseExchange({ client, forward })(ops);
+  suspenseExchange({ client, forward, dispatchDebug })(ops);
   expect(forward).toHaveBeenCalledWith(ops);
   expect(warn).toHaveBeenCalled();
   warn.mockRestore();
@@ -47,7 +49,7 @@ it('forwards skipped operations', () => {
     );
 
   const res = pipe(
-    suspenseExchange({ client, forward })(fromValue(operation)),
+    suspenseExchange({ client, forward, dispatchDebug })(fromValue(operation)),
     toArray
   );
 
@@ -69,7 +71,7 @@ it('resolves synchronous results immediately', () => {
   const { source: ops, next: dispatch } = makeSubject<Operation>();
 
   pipe(
-    suspenseExchange({ client, forward })(ops),
+    suspenseExchange({ client, forward, dispatchDebug })(ops),
     forEach(result => (prevResult = result))
   );
 
@@ -99,7 +101,7 @@ it('caches asynchronous results once for suspense', () => {
   const { source: ops, next: dispatch } = makeSubject<Operation>();
 
   pipe(
-    suspenseExchange({ client, forward })(ops),
+    suspenseExchange({ client, forward, dispatchDebug })(ops),
     forEach(result => (prevResult = result))
   );
 
