@@ -11752,10 +11752,10 @@ react-ssr-prepass@^1.1.2:
   dependencies:
     object-is "^1.0.2"
 
-react-static-plugin-md-pages@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.1.7.tgz#13f3daf1ce32fef9a77d037600572aeb752340c8"
-  integrity sha512-Y17VFyrOBMi2FqfumB5a50RHu2TbckC9LL2GMotJjL0PhbdpJBhgL6vbjEdJXoJxjk2JR93/dyZZcJmXhSL5MA==
+react-static-plugin-md-pages@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.2.0.tgz#5d5b70dff9fbb276da4ac76680536fa093c0da3d"
+  integrity sha512-PtcKa48bJSMvKQSA/8Pz8rxL9ZgTXIvci/BCT6OKunC7iQimSWLv1XvLr88a54SY7xq9/pPe+UkmJGNl5w+egg==
   dependencies:
     "@mdx-js/mdx" "^1.5.5"
     "@mdx-js/react" "^1.5.5"
