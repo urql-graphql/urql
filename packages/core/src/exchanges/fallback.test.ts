@@ -4,11 +4,8 @@ import { fallbackExchange } from './fallback';
 
 const consoleWarn = console.warn;
 
-const client = {
-  debugTarget: {
-    dispatchEvent: jest.fn(),
-  },
-} as any;
+const dispatchDebug = jest.fn();
+const client = {} as any;
 
 beforeEach(() => {
   console.warn = jest.fn();
@@ -22,7 +19,7 @@ it('filters all results and warns about input', () => {
   const res: any[] = [];
 
   pipe(
-    fallbackExchange({ client })(fromValue(queryOperation)),
+    fallbackExchange({ client, dispatchDebug })(fromValue(queryOperation)),
     forEach(x => res.push(x))
   );
 
@@ -34,7 +31,7 @@ it('filters all results and warns about input', () => {
   const res: any[] = [];
 
   pipe(
-    fallbackExchange({ client })(fromValue(teardownOperation)),
+    fallbackExchange({ client, dispatchDebug })(fromValue(teardownOperation)),
     forEach(x => res.push(x))
   );
 
