@@ -36,7 +36,7 @@ export const collectTypesFromResponse = (response: object) =>
 const formatNode = (node: FieldNode | InlineFragmentNode) => {
   if (
     node.selectionSet &&
-    node.selectionSet.selections.some(
+    !node.selectionSet.selections.some(
       node => node.kind === Kind.FIELD && node.name.value === '__typename'
     )
   ) {
