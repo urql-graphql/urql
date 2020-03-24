@@ -84,10 +84,11 @@ export class Client {
   maskTypename: boolean;
 
   // These are internals to be used to keep track of operations
-  dispatchOperation: (operation: Operation) => void;
+  dispatchOperation: (operation?: Operation) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
   activeOperations = Object.create(null) as ActiveOperations;
+  queue: Operation[] = [];
 
   constructor(opts: ClientOptions) {
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
@@ -109,20 +110,13 @@ export class Client {
     >();
     this.operations$ = operations$;
 
-    // Internally operations aren't always dispatched immediately
-    // Since exchanges can dispatch and reexecute operations themselves,
-    // if we're inside an exchange we instead queue the operation and flush
-    // them in order after
-    const queuedOperations: Operation[] = [];
     let isDispatching = false;
-
-    this.dispatchOperation = (operation: Operation) => {
-      queuedOperations.push(operation);
+    this.dispatchOperation = (operation?: Operation) => {
+      if (operation) nextOperation(operation);
       if (!isDispatching) {
         isDispatching = true;
-        let queued;
-        while ((queued = queuedOperations.shift()) !== undefined)
-          nextOperation(queued);
+        let queued: Operation | void;
+        while ((queued = this.queue.shift())) nextOperation(queued);
         isDispatching = false;
       }
     };
@@ -246,7 +240,8 @@ export class Client {
     // Reexecute operation only if any subscribers are still subscribed to the
     // operation's exchange results
     if ((this.activeOperations[operation.key] || 0) > 0) {
-      this.dispatchOperation(operation);
+      this.queue.push(operation);
+      this.dispatchOperation();
     }
   };
 
