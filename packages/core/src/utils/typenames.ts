@@ -20,11 +20,10 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
     });
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
-      const val = obj[key];
-      if (key === '__typename' && typeof val === 'string') {
-        types.push(val);
+      if (key === '__typename' && typeof obj[key] === 'string') {
+        types.push(obj[key] as string);
       } else {
-        collectTypes(val, types);
+        collectTypes(obj[key], types);
       }
     }
   }
@@ -42,9 +41,7 @@ const hasTypenameField = (set: SelectionSetNode) => {
 };
 
 const formatNode = (node: FieldNode | InlineFragmentNode) => {
-  if (!node.selectionSet) {
-    return false;
-  } else if (!hasTypenameField(node.selectionSet)) {
+  if (node.selectionSet && !hasTypenameField(node.selectionSet)) {
     // NOTE: It's fine to mutate here as long as we return the node,
     // which will instruct visit() to clone the AST upwards
     (node.selectionSet.selections as SelectionNode[]).push({
