@@ -3,7 +3,6 @@ import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
-import { Client } from '../client';
 
 interface Body {
   query: string;

@@ -38,6 +38,8 @@ const queryOneData = {
   },
 };
 
+const dispatchDebug = jest.fn();
+
 describe('data dependencies', () => {
   it('writes queries to the cache', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
@@ -57,7 +59,11 @@ describe('data dependencies', () => {
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
 
     next(op);
     next(op);
@@ -98,7 +104,11 @@ describe('data dependencies', () => {
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
 
     next(op);
     expect(response).toHaveBeenCalledTimes(0);
@@ -165,7 +175,11 @@ describe('data dependencies', () => {
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
     const result = jest.fn();
 
-    pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
 
     next(opOne);
     expect(response).toHaveBeenCalledTimes(1);
@@ -308,7 +322,9 @@ describe('data dependencies', () => {
     };
 
     pipe(
-      cacheExchange({ updates, keys })({ forward, client })(ops$),
+      cacheExchange({ updates, keys })({ forward, client, dispatchDebug })(
+        ops$
+      ),
       tap(result),
       publish
     );
@@ -385,7 +401,11 @@ describe('data dependencies', () => {
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
     const result = jest.fn();
 
-    pipe(cacheExchange({})({ forward, client })(ops$), tap(result), publish);
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
 
     next(opOne);
     expect(response).toHaveBeenCalledTimes(1);
@@ -441,7 +461,7 @@ describe('data dependencies', () => {
     };
 
     pipe(
-      cacheExchange({ updates })({ forward, client })(ops$),
+      cacheExchange({ updates })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -501,7 +521,11 @@ describe('data dependencies', () => {
     };
 
     pipe(
-      cacheExchange({ updates, optimistic })({ forward, client })(ops$),
+      cacheExchange({ updates, optimistic })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
       tap(result),
       publish
     );
@@ -562,7 +586,11 @@ describe('data dependencies', () => {
     };
 
     pipe(
-      cacheExchange({ updates, optimistic })({ forward, client })(ops$),
+      cacheExchange({ updates, optimistic })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
       tap(result),
       publish
     );
@@ -649,7 +677,7 @@ describe('optimistic updates', () => {
     };
 
     pipe(
-      cacheExchange({ optimistic })({ forward, client })(ops$),
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -761,7 +789,11 @@ describe('optimistic updates', () => {
     };
 
     pipe(
-      cacheExchange({ optimistic, updates })({ forward, client })(ops$),
+      cacheExchange({ optimistic, updates })({
+        forward,
+        client,
+        dispatchDebug,
+      })(ops$),
       tap(result),
       publish
     );
@@ -818,7 +850,7 @@ describe('custom resolvers', () => {
             },
           },
         },
-      })({ forward, client })(ops$),
+      })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -899,7 +931,7 @@ describe('custom resolvers', () => {
             },
           },
         },
-      })({ forward, client })(ops$),
+      })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -1049,7 +1081,7 @@ describe('custom resolvers', () => {
             },
           },
         },
-      })({ forward, client })(ops$),
+      })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -1180,7 +1212,7 @@ describe('schema awareness', () => {
       cacheExchange({
         // eslint-disable-next-line
         schema: require('./test-utils/simple_schema.json'),
-      })({ forward, client })(ops$),
+      })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
@@ -1282,7 +1314,11 @@ describe('commutativity', () => {
         mergeMap(result)
       );
 
-    pipe(cacheExchange()({ forward, client })(ops$), tap(output), publish);
+    pipe(
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
+      tap(output),
+      publish
+    );
 
     next(client.createRequestOperation('query', { key: 1, query }));
     next(client.createRequestOperation('query', { key: 2, query }));
@@ -1351,7 +1387,7 @@ describe('commutativity', () => {
     };
 
     pipe(
-      cacheExchange({ optimistic })({ forward, client })(ops$),
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
       tap(result => {
         if (result.operation.operationName === 'query') {
           data = result.data;
@@ -1445,7 +1481,7 @@ describe('commutativity', () => {
       ]);
 
     pipe(
-      cacheExchange()({ forward, client })(ops$),
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
         if (result.operation.operationName === 'query') {
           data = result.data;
@@ -1557,7 +1593,7 @@ describe('commutativity', () => {
     };
 
     pipe(
-      cacheExchange({ optimistic })({ forward, client })(ops$),
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
       tap(result => {
         if (result.operation.operationName === 'query') {
           data = result.data;
@@ -1642,7 +1678,7 @@ describe('commutativity', () => {
       ]);
 
     pipe(
-      cacheExchange()({ forward, client })(ops$),
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
         if (result.operation.operationName === 'query') {
           data = result.data;
@@ -1733,7 +1769,7 @@ describe('commutativity', () => {
       ]);
 
     pipe(
-      cacheExchange()({ forward, client })(ops$),
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
         if (result.operation.operationName === 'query') {
           data = result.data;

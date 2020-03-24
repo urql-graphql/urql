@@ -34,7 +34,6 @@ import {
   OperationType,
   RequestPolicy,
   PromisifiedSource,
-  ExchangeInput,
 } from './types';
 
 import {
