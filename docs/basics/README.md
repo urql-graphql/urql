@@ -1,6 +1,6 @@
 ---
 title: Basics
-order: 1
+order: 2
 ---
 
 # Basics
