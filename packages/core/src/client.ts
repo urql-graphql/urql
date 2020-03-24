@@ -34,6 +34,7 @@ import {
   OperationType,
   RequestPolicy,
   PromisifiedSource,
+  ExchangeInput,
 } from './types';
 
 import {
@@ -82,7 +83,6 @@ export class Client {
   url: string;
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
-  exchange: Exchange;
   suspense: boolean;
   preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
@@ -141,22 +141,17 @@ export class Client {
 
     // All exchange are composed into a single one and are called using the constructed client
     // and the fallback exchange stream
-    this.exchange = composeExchanges(exchanges);
+    const composedExchanges = composeExchanges(exchanges);
 
     // All operations run through the exchanges in a pipeline-like fashion
     // and this observable then combines all their results
     this.results$ = share(
-      this.exchange({
+      composedExchanges({
         client: this,
-        forward: fallbackExchange({
+        forward: composeExchanges([fallbackExchange])({
           client: this,
-          dispatchDebug: e =>
-            this.debugTarget!.dispatchEvent({
-              ...e,
-              source: 'fallbackExchange',
-            }),
+          forward: noop as any, // Forward not required for 'fallbackExchange'
         }),
-        dispatchDebug: noop,
       })(this.operations$)
     );
 

@@ -1,22 +1,20 @@
-import { Exchange } from '../types';
+import { Exchange, ExchangeInput } from '../types';
 
 /** This composes an array of Exchanges into a single ExchangeIO function */
-export const composeExchanges = (exchanges: Exchange[]): Exchange => {
-  if (exchanges.length === 1) {
-    return exchanges[0];
-  }
-
-  return payload => {
-    return exchanges.reduceRight((forward, exchange) => {
-      return exchange({
-        client: payload.client,
+export const composeExchanges = (exchanges: Exchange[]) => ({
+  client,
+  forward,
+}: Omit<ExchangeInput, 'dispatchDebug'>) =>
+  exchanges.reduceRight(
+    (forward, exchange) =>
+      exchange({
+        client,
         forward,
         dispatchDebug: e =>
-          payload.client.debugTarget!.dispatchEvent({
+          client.debugTarget!.dispatchEvent({
             ...e,
             source: exchange.name,
           }),
-      });
-    }, payload.forward);
-  };
-};
+      }),
+    forward
+  );
