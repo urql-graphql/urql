@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
 import { Client } from '../client';
 
@@ -12,7 +12,7 @@ interface Body {
 }
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward, client }) => {
+export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
@@ -32,7 +32,7 @@ export const fetchExchange: Exchange = ({ forward, client }) => {
 
         return pipe(
           createFetchSource(
-            client,
+            dispatchDebug,
             operation,
             operation.operationName === 'query' &&
               !!operation.context.preferGetMethod
@@ -68,7 +68,7 @@ const getOperationName = (query: DocumentNode): string | null => {
 };
 
 const createFetchSource = (
-  client: Client,
+  dispatchDebug: ExchangeInput['dispatchDebug'],
   operation: Operation,
   shouldUseGet: boolean
 ) => {
@@ -125,7 +125,7 @@ const createFetchSource = (
 
     Promise.resolve()
       .then(() =>
-        ended ? undefined : executeFetch(client, operation, fetchOptions)
+        ended ? undefined : executeFetch(dispatchDebug, operation, fetchOptions)
       )
       .then((result: OperationResult | undefined) => {
         if (!ended) {
@@ -145,14 +145,14 @@ const createFetchSource = (
 };
 
 const executeFetch = (
-  client: Client,
+  dispatchDebug: ExchangeInput['dispatchDebug'],
   operation: Operation,
   opts: RequestInit
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let response: Response | undefined;
 
-  client.debugTarget!.dispatchEvent({
+  dispatchDebug({
     type: 'fetchRequest',
     message: 'A fetch request is being executed.',
     operation,
@@ -175,7 +175,7 @@ const executeFetch = (
       }
     })
     .then(result => {
-      client.debugTarget!.dispatchEvent({
+      dispatchDebug({
         type: 'fetchSuccess',
         message: 'A successful fetch response has been returned.',
         operation,
@@ -193,7 +193,7 @@ const executeFetch = (
         return;
       }
 
-      client.debugTarget!.dispatchEvent({
+      dispatchDebug({
         type: 'fetchError',
         message: err.name,
         operation,

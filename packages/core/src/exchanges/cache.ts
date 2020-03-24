@@ -2,7 +2,7 @@
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
 import {
   addMetadata,
   collectTypesFromResponse,
@@ -18,7 +18,7 @@ interface OperationCache {
 const shouldSkip = ({ operationName }: Operation) =>
   operationName !== 'mutation' && operationName !== 'query';
 
-export const cacheExchange: Exchange = ({ forward, client }) => {
+export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache = new Map() as ResultCache;
   const operationCache = Object.create(null) as OperationCache;
 
@@ -31,7 +31,8 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
   const handleAfterMutation = afterMutation(
     resultCache,
     operationCache,
-    client
+    client,
+    dispatchDebug
   );
 
   const handleAfterQuery = afterQuery(resultCache, operationCache);
@@ -58,13 +59,12 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
 
-        client.debugTarget!.dispatchEvent({
+        dispatchDebug({
           operation,
           ...(cachedResult
             ? {
                 type: 'cacheHit',
                 message: 'The result was successfully retried from the cache',
-                data: { value: cachedResult },
               }
             : {
                 type: 'cacheMiss',
@@ -141,7 +141,8 @@ const reexecuteOperation = (client: Client, operation: Operation) => {
 export const afterMutation = (
   resultCache: ResultCache,
   operationCache: OperationCache,
-  client: Client
+  client: Client,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ) => (response: OperationResult) => {
   const pendingOperations = new Set<number>();
   const { additionalTypenames } = response.operation.context;
@@ -151,7 +152,7 @@ export const afterMutation = (
     ...(additionalTypenames || []),
   ];
 
-  client.debugTarget!.dispatchEvent({
+  dispatchDebug({
     type: 'cacheInvalidation',
     message: `The following typenames have been invalidated: ${typenames}`,
     operation: response.operation,

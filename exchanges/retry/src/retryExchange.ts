@@ -41,7 +41,7 @@ export const retryExchange = ({
   const retryIf =
     retryIfOption || ((err: CombinedError) => err && err.networkError);
 
-  return ({ forward, client }) => ops$ => {
+  return ({ forward, client, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
     const { source: retry$, next: nextRetryOperation } = makeSubject<
       Operation
@@ -75,7 +75,7 @@ export const retryExchange = ({
           })
         );
 
-        client.debugTarget!.dispatchEvent({
+        dispatchDebug({
           type: 'retryRetrying',
           message: `The operation has failed and a retry has been triggered (${retryCount} / ${MAX_ATTEMPTS})`,
           operation: op,
@@ -122,7 +122,7 @@ export const retryExchange = ({
           return false;
         }
 
-        client.debugTarget!.dispatchEvent({
+        dispatchDebug({
           type: 'retryExhausted',
           message:
             'Maximum number of retries has been reached. No further retries will be performed.',

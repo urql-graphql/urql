@@ -148,7 +148,14 @@ export class Client {
     this.results$ = share(
       this.exchange({
         client: this,
-        forward: fallbackExchange({ client: this }),
+        forward: fallbackExchange({
+          client: this,
+          dispatchDebug: e =>
+            this.debugTarget!.dispatchEvent({
+              ...e,
+              source: 'fallbackExchange',
+            }),
+        }),
         dispatchDebug: noop,
       })(this.operations$)
     );

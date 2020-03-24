@@ -2,7 +2,7 @@ import { filter, pipe, tap } from 'wonka';
 import { Exchange, Operation, OperationResult } from '../types';
 
 /** A default exchange for debouncing GraphQL requests. */
-export const dedupExchange: Exchange = ({ forward, client }) => {
+export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
   const inFlightKeys = new Set<number>();
 
   const filterIncomingOperation = (operation: Operation) => {
@@ -20,7 +20,7 @@ export const dedupExchange: Exchange = ({ forward, client }) => {
     inFlightKeys.add(key);
 
     if (isInFlight) {
-      client.debugTarget!.dispatchEvent({
+      dispatchDebug({
         type: 'dedup',
         message: 'An operation has been deduped.',
         operation,

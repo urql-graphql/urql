@@ -85,6 +85,7 @@ export interface CacheExchangeOpts {
 export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   forward,
   client,
+  dispatchDebug,
 }) => {
   const store = new Store(opts);
 
@@ -306,7 +307,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         );
       }),
       map(res => {
-        client.debugTarget!.dispatchEvent({
+        dispatchDebug({
           type: 'graphcacheMiss',
           message: 'The result could not be retrieved from the cache',
           operation: res.operation,
@@ -334,28 +335,22 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             extensions: res.extensions,
           };
 
-          let debugMessage = 'A cache hit occured';
           if (
             operation.context.requestPolicy === 'cache-and-network' ||
             (operation.context.requestPolicy === 'cache-first' &&
               outcome === 'partial')
           ) {
-            debugMessage +=
-              outcome === 'partial' && policy === 'cache-first'
-                ? ' but is being retried due to the result being partial.'
-                : ' but is being retried due to "cache-and-network".';
             result.stale = true;
             client.reexecuteOperation(
               toRequestPolicy(operation, 'network-only')
             );
           }
 
-          client.debugTarget!.dispatchEvent({
-            type: 'graphcacheHit',
-            message: debugMessage,
+          dispatchDebug({
+            type: 'cacheHit',
+            message: `A requested operation was found and returned from the cache.`,
             operation: res.operation,
             data: {
-              policy,
               value: result,
             },
           });
