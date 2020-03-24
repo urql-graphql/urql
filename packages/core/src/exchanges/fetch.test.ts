@@ -39,6 +39,7 @@ const response = {
 };
 
 const exchangeArgs = {
+  dispatchDebug: jest.fn(),
   forward: () => empty as Source<OperationResult>,
   client: ({
     debugTarget: {
