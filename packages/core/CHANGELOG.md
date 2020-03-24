@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.10.6
+
+### Patch Changes
+
+- ⚠️ Fix critical bug in operation queueing that can lead to unexpected teardowns and swallowed operations. This would happen when a teardown operation kicks off the queue, by [@kitten](https://github.com/kitten) (See [#662](https://github.com/FormidableLabs/urql/pull/662))
+
 ## 1.10.5
 
 ### Patch Changes
