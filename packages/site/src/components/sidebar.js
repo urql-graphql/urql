@@ -90,7 +90,7 @@ const Sidebar = props => {
       return null;
     }
     pathname = pathname[0];
-    const pathnameWithoutSlash = pathname.replace(/\/$/, '');
+    const trimmedPathname = pathname.replace(/(\/$)|(\/#.+)/, '');
 
     let children = tree.children;
     if (tree.frontmatter && tree.originalPath) {
@@ -101,8 +101,8 @@ const Sidebar = props => {
       const pageChildren = page.children || [];
 
       const isActive = pageChildren.length
-        ? pathnameWithoutSlash.startsWith(page.path)
-        : !!page.path.match(new RegExp(`${pathnameWithoutSlash}$`, 'g'));
+        ? trimmedPathname.startsWith(page.path)
+        : !!page.path.match(new RegExp(`${trimmedPathname}$`, 'g'));
 
       return (
         <Fragment key={page.key}>
@@ -120,7 +120,7 @@ const Sidebar = props => {
                 <SidebarNavSubItem
                   isActive={() =>
                     !!childPage.path.match(
-                      new RegExp(`${pathnameWithoutSlash}$`, 'g')
+                      new RegExp(`${trimmedPathname}$`, 'g')
                     )
                   }
                   to={relative(pathname, childPage.path)}
