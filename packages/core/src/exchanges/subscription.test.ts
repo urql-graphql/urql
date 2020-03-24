@@ -15,6 +15,7 @@ import { subscriptionExchange, SubscriptionForwarder } from './subscription';
 
 it('should return response data from forwardSubscription observable', async () => {
   const exchangeArgs = {
+    dispatchDebug: jest.fn(),
     forward: () => empty as Source<OperationResult>,
     client: {} as Client,
   };
@@ -52,6 +53,7 @@ it('should tear down the operation if the source subscription ends', async () =>
   const unsubscribe = jest.fn();
 
   const exchangeArgs = {
+    dispatchDebug: jest.fn(),
     forward: () => empty as Source<OperationResult>,
     client: { reexecuteOperation: reexecuteOperation as any } as Client,
   };
