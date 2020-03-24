@@ -41,7 +41,7 @@ export const retryExchange = ({
   const retryIf =
     retryIfOption || ((err: CombinedError) => err && err.networkError);
 
-  return ({ forward, client, dispatchDebug }) => ops$ => {
+  return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
     const { source: retry$, next: nextRetryOperation } = makeSubject<
       Operation

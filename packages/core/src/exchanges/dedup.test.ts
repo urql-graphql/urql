@@ -7,7 +7,6 @@ import {
   Source,
   Subject,
 } from 'wonka';
-import { Client } from '../client';
 import {
   mutationOperation,
   queryOperation,
@@ -16,6 +15,7 @@ import {
 import { Operation } from '../types';
 import { dedupExchange } from './dedup';
 
+const dispatchDebug = jest.fn();
 let shouldRespond = false;
 let exchangeArgs;
 let forwardedOperations: Operation[];
@@ -38,11 +38,7 @@ beforeEach(() => {
     );
   };
 
-  const client = {
-    debugTarget: { dispatchEvent: jest.fn() } as any,
-  } as Client;
-
-  exchangeArgs = { forward, client };
+  exchangeArgs = { forward, client: {}, dispatchDebug };
 });
 
 it('forwards query operations correctly', async () => {
