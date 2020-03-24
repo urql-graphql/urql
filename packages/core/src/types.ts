@@ -5,9 +5,6 @@ import { CombinedError } from './utils/error';
 
 export { ExecutionResult } from 'graphql';
 
-/** Utility type to Omit keys from an interface/object type */
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
 };
@@ -78,6 +75,9 @@ export interface OperationResult<Data = any> {
 export interface ExchangeInput {
   client: Client;
   forward: ExchangeIO;
+  dispatchDebug: <T extends keyof DebugEventTypes | string>(
+    t: DebugEventArg<T>
+  ) => void;
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
@@ -113,17 +113,16 @@ export interface DebugEventTypes {
   retryRetrying: {
     retryCount: number;
   };
-  // Graphcache Exchnage
-  graphcacheHit: {
-    policy: RequestPolicy;
-    value: OperationResult;
-  };
 }
 
-export type DebugEvent<T extends keyof DebugEventTypes | string> = {
+export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
   type: T;
   message: string;
   operation: Operation;
 } & (T extends keyof DebugEventTypes
   ? { data: DebugEventTypes[T] }
   : { data?: any });
+
+export type DebugEvent<
+  T extends keyof DebugEventTypes | string
+> = DebugEventArg<T> & { source: string };

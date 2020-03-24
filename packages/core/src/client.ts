@@ -41,6 +41,7 @@ import {
   toSuspenseSource,
   withPromise,
   maskTypename,
+  noop,
 } from './utils';
 
 import { DocumentNode } from 'graphql';
@@ -148,6 +149,7 @@ export class Client {
       this.exchange({
         client: this,
         forward: fallbackExchange({ client: this }),
+        dispatchDebug: noop,
       })(this.operations$)
     );
 

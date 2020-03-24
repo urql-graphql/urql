@@ -8,7 +8,15 @@ export const composeExchanges = (exchanges: Exchange[]): Exchange => {
 
   return payload => {
     return exchanges.reduceRight((forward, exchange) => {
-      return exchange({ client: payload.client, forward });
+      return exchange({
+        client: payload.client,
+        forward,
+        dispatchDebug: e =>
+          payload.client.debugTarget!.dispatchEvent({
+            ...e,
+            source: exchange.name,
+          }),
+      });
     }, payload.forward);
   };
 };
