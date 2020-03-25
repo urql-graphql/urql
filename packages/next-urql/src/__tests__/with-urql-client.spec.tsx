@@ -1,10 +1,12 @@
 import React from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { Client, defaultExchanges, composeExchanges } from 'urql';
+import { Client, defaultExchanges } from 'urql';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
+
+beforeEach(jest.clearAllMocks);
 
 const MockApp: React.FC<any> = () => {
   return <div />;
@@ -21,11 +23,6 @@ describe('withUrqlClient', () => {
 
   beforeAll(() => {
     configure({ adapter: new Adapter() });
-  });
-
-  afterEach(() => {
-    spyInitUrqlClient.mockClear();
-    mockMergeExchanges.mockClear();
   });
 
   describe('with client options', () => {
@@ -110,22 +107,38 @@ describe('withUrqlClient', () => {
   });
 
   describe('with mergeExchanges provided', () => {
+    const exchange = jest.fn(() => op => op);
+
     beforeEach(() => {
+      mockMergeExchanges.mockImplementation(() => [exchange] as any[]);
       Component = withUrqlClient(
         { url: 'http://localhost:3000' },
         mockMergeExchanges
       )(MockApp);
     });
 
-    it('should call the user-supplied mergeExchanges function', () => {
+    it('calls the user-supplied mergeExchanges function', () => {
       const tree = shallow(<Component />);
       const app = tree.find(MockApp);
 
-      expect(app.props().urqlClient).toBeInstanceOf(Client);
-      expect(app.props().urqlClient.exchange.toString()).toEqual(
-        composeExchanges(defaultExchanges).toString()
-      );
+      const client = app.props().urqlClient;
+      expect(client).toBeInstanceOf(Client);
       expect(mockMergeExchanges).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses exchanges returned from mergeExchanges', () => {
+      const tree = shallow(<Component />);
+      const app = tree.find(MockApp);
+
+      const client = app.props().urqlClient;
+      client.query(`
+        {
+          users {
+            id
+          }
+        }
+      `);
+      expect(exchange).toBeCalledTimes(1);
     });
   });
 });
