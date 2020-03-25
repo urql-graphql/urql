@@ -1,14 +1,15 @@
 import { empty, Source } from 'wonka';
-import { Client } from '../client';
 import { Exchange } from '../types';
 import { composeExchanges } from './compose';
 
-const mockClient = {} as Client;
-const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
+const mockClient = {
+  debugTarget: {
+    dispatchEvent: jest.fn(),
+  },
+} as any;
+const forward = jest.fn();
 
-it('returns the first exchange if it is the only input', () => {
-  expect(composeExchanges([noopExchange])).toBe(noopExchange);
-});
+const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
 
 it('composes exchanges correctly', () => {
   let counter = 0;
@@ -39,4 +40,22 @@ it('composes exchanges correctly', () => {
   exchange({ client: mockClient, forward: outerFw })(empty as Source<any>);
   expect(outerFw).toHaveBeenCalled();
   expect(counter).toBe(4);
+});
+
+describe('on dispatchDebug', () => {
+  it('dispatches debug event with exchange source name', () => {
+    const debugArgs = {
+      type: 'test',
+      message: 'Hello',
+    } as any;
+    const testExchange = ({ dispatchDebug }) => dispatchDebug(debugArgs);
+
+    composeExchanges([testExchange])({ client: mockClient, forward });
+
+    expect(mockClient.debugTarget.dispatchEvent).toBeCalledTimes(1);
+    expect(mockClient.debugTarget.dispatchEvent).toBeCalledWith({
+      ...debugArgs,
+      source: 'testExchange',
+    });
+  });
 });
