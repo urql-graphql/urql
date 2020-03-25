@@ -3,8 +3,10 @@ import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
 
-import { map, pipe, subscribe, tap } from 'wonka';
+import { map, pipe, subscribe, filter, toArray, tap } from 'wonka';
+import { Exchange, Operation, OperationResult } from './types';
 import { createClient } from './client';
+import { queryOperation } from './test-utils';
 
 const url = 'https://hostname.com';
 
@@ -300,5 +302,78 @@ describe('executeSubscription', () => {
     );
 
     expect(receivedOps[0]).toHaveProperty('operationName', 'subscription');
+  });
+});
+
+describe('queuing behavior', () => {
+  it('queues reexecuteOperation, which dispatchOperation consumes', () => {
+    const output: Array<Operation | OperationResult> = [];
+
+    const exchange: Exchange = ({ client }) => ops$ => {
+      return pipe(
+        ops$,
+        filter(op => op.operationName !== 'teardown'),
+        tap(op => {
+          output.push(op);
+          if (
+            op.key === queryOperation.key &&
+            op.context.requestPolicy === 'cache-first'
+          ) {
+            client.reexecuteOperation({
+              ...op,
+              context: {
+                ...op.context,
+                requestPolicy: 'network-only',
+              },
+            });
+          }
+        }),
+        map(op => ({
+          data: op.key,
+          operation: op,
+        }))
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    pipe(
+      client.results$,
+      subscribe(result => {
+        output.push(result);
+      })
+    );
+
+    const results = pipe(
+      client.executeRequestOperation(queryOperation),
+      toArray
+    );
+
+    expect(output.length).toBe(4);
+    expect(results.length).toBe(2);
+
+    expect(output[0]).toHaveProperty('key', queryOperation.key);
+    expect(output[0]).toHaveProperty('context.requestPolicy', 'cache-first');
+
+    expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[1]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    expect(output[2]).toHaveProperty('key', queryOperation.key);
+    expect(output[2]).toHaveProperty('context.requestPolicy', 'network-only');
+
+    expect(output[3]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[3]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'network-only'
+    );
+
+    expect(output[1]).toBe(results[0]);
+    expect(output[3]).toBe(results[1]);
   });
 });
