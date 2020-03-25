@@ -1,11 +1,11 @@
+const visited = 'visitedByDebugTargetTransformer';
+const dispatchProperty = 'dispatchDebug';
+
 const warningDevCheckTemplate = `
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && typeof ${dispatchProperty} !== 'undefined') {
     NODE;
   }
 `.trim();
-
-const visited = 'visitedByDebugTargetTransformer';
-const dispatchProperty = 'dispatchDebug';
 
 const plugin = ({ template, types: t }) => {
   const wrapWithDevCheck = template(
@@ -18,7 +18,7 @@ const plugin = ({ template, types: t }) => {
       ObjectProperty(path) {
         if (path.node.key && path.node.key.name === dispatchProperty && !path.node[visited]) {
           path.node[visited] = true;
-		  path.node.value = t.conditionalExpression(
+		      path.node.value = t.conditionalExpression(
             t.binaryExpression(
               '!==',
               t.memberExpression(
