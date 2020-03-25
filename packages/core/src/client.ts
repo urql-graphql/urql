@@ -88,10 +88,11 @@ export class Client {
   maskTypename: boolean;
 
   // These are internals to be used to keep track of operations
-  dispatchOperation: (operation: Operation) => void;
+  dispatchOperation: (operation?: Operation) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
   activeOperations = Object.create(null) as ActiveOperations;
+  queue: Operation[] = [];
 
   constructor(opts: ClientOptions) {
     if (process.env.NODE_ENV !== 'production') {
@@ -117,27 +118,21 @@ export class Client {
     >();
     this.operations$ = operations$;
 
-    // Internally operations aren't always dispatched immediately
-    // Since exchanges can dispatch and reexecute operations themselves,
-    // if we're inside an exchange we instead queue the operation and flush
-    // them in order after
-    const queuedOperations: Operation[] = [];
     let isDispatching = false;
-
-    this.dispatchOperation = (operation: Operation) => {
-      queuedOperations.push(operation);
+    this.dispatchOperation = (operation?: Operation) => {
       if (!isDispatching) {
         isDispatching = true;
-        let queued;
-        while ((queued = queuedOperations.shift()) !== undefined)
-          nextOperation(queued);
+        if (operation) nextOperation(operation);
+        let queued: Operation | void;
+        while ((queued = this.queue.shift())) nextOperation(queued);
         isDispatching = false;
+      } else if (operation) {
+        nextOperation(operation);
       }
     };
 
     const exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
     // All exchange are composed into a single one and are called using the constructed client
     // and the fallback exchange stream
     const composedExchanges = composeExchanges(exchanges);
@@ -257,7 +252,8 @@ export class Client {
     // Reexecute operation only if any subscribers are still subscribed to the
     // operation's exchange results
     if ((this.activeOperations[operation.key] || 0) > 0) {
-      this.dispatchOperation(operation);
+      this.queue.push(operation);
+      this.dispatchOperation();
     }
   };
 

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import Article, { ArticleStyling } from './article';
 import Header from './header';
-import Sidebar, { SidebarStyling } from '../../components/sidebar';
+import Sidebar from '../../components/sidebar';
 
 import burger from '../../assets/burger.svg';
 import closeButton from '../../assets/close.svg';
@@ -51,19 +51,11 @@ const Docs = ({ isLoading, children }) => {
           onClick={() => setSidebarOpen(prev => !prev)}
         />
         {/* load just the styles if Suspense fallback in use */}
+        <Sidebar sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
         {isLoading ? (
-          <>
-            <SidebarStyling
-              sidebarOpen={sidebarOpen}
-              closeSidebar={closeSidebar}
-            />
-            <ArticleStyling>{children}</ArticleStyling>
-          </>
+          <ArticleStyling>{children}</ArticleStyling>
         ) : (
-          <>
-            <Sidebar sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
-            <Article>{children}</Article>
-          </>
+          <Article>{children}</Article>
         )}
       </Container>
     </>

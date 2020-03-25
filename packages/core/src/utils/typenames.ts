@@ -2,7 +2,6 @@ import {
   DocumentNode,
   FieldNode,
   InlineFragmentNode,
-  SelectionSetNode,
   SelectionNode,
   Kind,
   visit,
@@ -20,11 +19,10 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
     });
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
-      const val = obj[key];
-      if (key === '__typename' && typeof val === 'string') {
-        types.push(val);
+      if (key === '__typename' && typeof obj[key] === 'string') {
+        types.push(obj[key] as string);
       } else {
-        collectTypes(val, types);
+        collectTypes(obj[key], types);
       }
     }
   }
@@ -35,16 +33,13 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
 export const collectTypesFromResponse = (response: object) =>
   collectTypes(response as EntityLike).filter((v, i, a) => a.indexOf(v) === i);
 
-const hasTypenameField = (set: SelectionSetNode) => {
-  return set.selections.some(node => {
-    return node.kind === Kind.FIELD && node.name.value === '__typename';
-  });
-};
-
 const formatNode = (node: FieldNode | InlineFragmentNode) => {
-  if (!node.selectionSet) {
-    return false;
-  } else if (!hasTypenameField(node.selectionSet)) {
+  if (
+    node.selectionSet &&
+    !node.selectionSet.selections.some(
+      node => node.kind === Kind.FIELD && node.name.value === '__typename'
+    )
+  ) {
     // NOTE: It's fine to mutate here as long as we return the node,
     // which will instruct visit() to clone the AST upwards
     (node.selectionSet.selections as SelectionNode[]).push({

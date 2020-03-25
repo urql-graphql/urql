@@ -81,17 +81,16 @@ export const SidebarStyling = ({ children, sidebarOpen, closeSidebar }) => {
 
 const Sidebar = props => {
   const location = useLocation();
-  const currentPage = useMarkdownPage();
   const tree = useMarkdownTree();
 
   const sidebarItems = useMemo(() => {
-    if (!currentPage || !tree || !tree.children || !location) {
+    let pathname = location.pathname.match(/docs\/?(.+)?/);
+
+    if (!pathname || !tree || !tree.children || !location) {
       return null;
     }
-
-    const pathname = location.pathname.endsWith('/')
-      ? currentPage.path + '/'
-      : currentPage.path;
+    pathname = pathname[0];
+    const trimmedPathname = pathname.replace(/(\/$)|(\/#.+)/, '');
 
     let children = tree.children;
     if (tree.frontmatter && tree.originalPath) {
@@ -102,8 +101,8 @@ const Sidebar = props => {
       const pageChildren = page.children || [];
 
       const isActive = pageChildren.length
-        ? currentPage.path.startsWith(page.path)
-        : currentPage.path === page.path;
+        ? trimmedPathname.startsWith(page.path)
+        : !!page.path.match(new RegExp(`${trimmedPathname}$`, 'g'));
 
       return (
         <Fragment key={page.key}>
@@ -119,7 +118,11 @@ const Sidebar = props => {
             <SidebarNavSubItemWrapper>
               {pageChildren.map(childPage => (
                 <SidebarNavSubItem
-                  isActive={() => childPage.path === currentPage.path}
+                  isActive={() =>
+                    !!childPage.path.match(
+                      new RegExp(`${trimmedPathname}$`, 'g')
+                    )
+                  }
                   to={relative(pathname, childPage.path)}
                   key={childPage.key}
                 >
@@ -131,7 +134,7 @@ const Sidebar = props => {
         </Fragment>
       );
     });
-  }, [currentPage, tree, location]);
+  }, [location, tree]);
 
   return <SidebarStyling {...props}>{sidebarItems}</SidebarStyling>;
 };

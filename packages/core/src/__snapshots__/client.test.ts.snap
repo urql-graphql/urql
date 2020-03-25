@@ -20,6 +20,7 @@ Client {
   "maskTypename": false,
   "operations$": [Function],
   "preferGetMethod": false,
+  "queue": Array [],
   "reexecuteOperation": [Function],
   "requestPolicy": "cache-first",
   "results$": [Function],
