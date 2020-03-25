@@ -216,11 +216,9 @@ const MdLink = ({ href, children }) => {
   const currentPage = useMarkdownPage();
 
   if (!/^\w+:/.test(href) && !href.startsWith('#')) {
-    const hasTrailingSlash = location.pathname.endsWith('/');
-    const from = !hasTrailingSlash ? currentPage.path + '/' : currentPage.path;
-    const to = hasTrailingSlash
-      ? path.join(path.dirname(currentPage.originalPath), href)
-      : path.join(currentPage.path, href);
+    const from = currentPage.path.replace(/\/$/, '');
+    const to = path.join(path.dirname(currentPage.originalPath), href);
+
     return <Link to={relative(from, to)}>{children}</Link>;
   }
 
