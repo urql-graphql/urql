@@ -8,7 +8,7 @@ const warningDevCheckTemplate = `
 
 const dispatchDebugTemplate = `dispatchDebug: process.env.NODE_ENV !== 'production' ? NODE : () => {}`.trim();
 
-const plugin = ({ template, types: t }) => {
+const plugin = ({ template }) => {
   const wrapWithDevCheck = template(
     warningDevCheckTemplate,
     { placeholderPattern: /^NODE$/ }
