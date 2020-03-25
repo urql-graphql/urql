@@ -58,4 +58,4 @@ const plugin = ({ template, types: t }) => {
   };
 };
 
-module.exports = plugin;
+export default plugin;
