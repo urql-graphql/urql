@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { Client, defaultExchanges, composeExchanges } from 'urql';
+import { Client, defaultExchanges } from 'urql';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
@@ -122,9 +122,6 @@ describe('withUrqlClient', () => {
       const app = tree.find(MockApp);
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
-      expect(app.props().urqlClient.exchange.toString()).toEqual(
-        composeExchanges(defaultExchanges).toString()
-      );
       expect(mockMergeExchanges).toHaveBeenCalledTimes(1);
     });
   });
