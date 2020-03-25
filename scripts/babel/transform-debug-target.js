@@ -7,12 +7,18 @@ const warningDevCheckTemplate = `
   }
 `.trim();
 
+
 const plugin = ({ template, types: t }) => {
   const wrapWithDevCheck = template(
-    warningDevCheckTemplate,
-    { placeholderPattern: /^NODE$/ }
+    `
+      if (process.env.NODE_ENV !== 'production') {
+        NODE;
+      }
+    `.trim(),
+    {
+      placeholderPattern: /^NODE$/,
+    }
   );
-
   return {
     visitor: {
       ObjectProperty(path) {
@@ -44,9 +50,12 @@ const plugin = ({ template, types: t }) => {
           path.node[visited] = true;
           path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
         }
-      }
-    }
+
+        path.node.visitedByDebugTargetTransformer = true;
+        path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
+      },
+    },
   };
 };
 
-export default plugin;
+module.exports = plugin;
