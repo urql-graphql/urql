@@ -77,7 +77,6 @@ export class Client {
   url: string;
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
-  exchange: Exchange;
   suspense: boolean;
   preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
@@ -112,26 +111,27 @@ export class Client {
 
     let isDispatching = false;
     this.dispatchOperation = (operation?: Operation) => {
-      if (operation) nextOperation(operation);
       if (!isDispatching) {
         isDispatching = true;
+        if (operation) nextOperation(operation);
         let queued: Operation | void;
         while ((queued = this.queue.shift())) nextOperation(queued);
         isDispatching = false;
+      } else if (operation) {
+        nextOperation(operation);
       }
     };
 
     const exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
     // All exchange are composed into a single one and are called using the constructed client
     // and the fallback exchange stream
-    this.exchange = composeExchanges(exchanges);
+    const exchange = composeExchanges(exchanges);
 
     // All operations run through the exchanges in a pipeline-like fashion
     // and this observable then combines all their results
     this.results$ = share(
-      this.exchange({
+      exchange({
         client: this,
         forward: fallbackExchangeIO,
       })(this.operations$)
