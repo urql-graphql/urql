@@ -11,6 +11,10 @@ const forward = jest.fn();
 
 const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
 
+beforeEach(() => {
+  jest.spyOn(Date, 'now').mockReturnValue(1234);
+});
+
 it('composes exchanges correctly', () => {
   let counter = 0;
 
@@ -55,6 +59,7 @@ describe('on dispatchDebug', () => {
     expect(mockClient.debugTarget.dispatchEvent).toBeCalledTimes(1);
     expect(mockClient.debugTarget.dispatchEvent).toBeCalledWith({
       ...debugArgs,
+      timestamp: Date.now(),
       source: 'testExchange',
     });
   });
