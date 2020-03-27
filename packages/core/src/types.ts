@@ -126,7 +126,6 @@ export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
 export type DebugEvent<
   T extends keyof DebugEventTypes | string
 > = DebugEventArg<T> & {
-  id: number;
   timestamp: number;
   source: string;
 };
