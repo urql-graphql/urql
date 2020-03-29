@@ -1,0 +1,47 @@
+---
+title: Common questions
+order: 5
+---
+
+# Common questions
+
+## How do we achieve asynchronous fetchOptions?
+
+If you need `async fetchOptions` you can add an exchange that looks like the following:
+
+```js
+export const fetchOptionsExchange = (fn: any): Exchange => ({
+  forward
+}) => ops$ => {
+  return pipe(
+    ops$,
+    mergeMap((operation: Operation) => {
+      const result = fn(operation.context.fetchOptions);
+      return pipe(
+        typeof result.then === 'function' ? fromPromise(result) : fromValue(result),
+        map((fetchOptions: RequestInit | (() => RequestInit)) => ({
+          ...operation,
+          context: { ...operation.context, fetchOptions }
+        }))
+      );
+    }),
+    forward
+  );
+};
+```
+
+If we add the above exchange before our `fetchExchange` our `fetchOptions` will be handled.
+
+```js
+const client = createClient({
+  url: "http://yourUrl.dev/",
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    fetchOptionsExchange,
+    fetchExchange,
+  ]
+});
+```
+
+[Credits to @RodolfoSilva](https://github.com/FormidableLabs/urql/issues/234#issuecomment-602305153)
