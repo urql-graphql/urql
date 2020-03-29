@@ -7,7 +7,7 @@ order: 5
 
 ## How do we achieve asynchronous fetchOptions?
 
-If you need `async fetchOptions` you can add an exchange that looks like the following:
+If you need `async fetchOptions` you can add an exchange that looks like this:
 
 ```js
 export const fetchOptionsExchange = (fn: any): Exchange => ({
@@ -43,5 +43,8 @@ const client = createClient({
   ]
 });
 ```
+
+This scenario can for instance occur when dealing with React-native AsyncStorage, this way we can
+asynchronously get a value from there.
 
 [Credits to @RodolfoSilva](https://github.com/FormidableLabs/urql/issues/234#issuecomment-602305153)
