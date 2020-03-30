@@ -505,4 +505,42 @@ describe('Store with storage', () => {
 
     expect(data).toEqual(expectedData);
   });
+
+  it('persists commutative layers and ignores optimistic layers', () => {
+    const storage: StorageAdapter = {
+      read: jest.fn(),
+      write: jest.fn(),
+    };
+
+    store.data.storage = storage;
+
+    InMemoryData.reserveLayer(store.data, 1);
+
+    InMemoryData.initDataState(store.data, 1);
+    InMemoryData.writeRecord('Query', 'base', true);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(store.data, 2, true);
+    InMemoryData.writeRecord('Query', 'base', false);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(store.data, null);
+    expect(InMemoryData.readRecord('Query', 'base')).toBe(false);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
+
+    expect(storage.write).toHaveBeenCalled();
+    const serialisedStore = (storage.write as any).mock.calls[0][0];
+
+    expect(serialisedStore).toEqual({
+      'Query\tbase': 'true',
+    });
+
+    store = new Store();
+    InMemoryData.hydrateData(store.data, storage, serialisedStore);
+
+    InMemoryData.initDataState(store.data, null);
+    expect(InMemoryData.readRecord('Query', 'base')).toBe(true);
+    InMemoryData.clearDataState();
+  });
 });
