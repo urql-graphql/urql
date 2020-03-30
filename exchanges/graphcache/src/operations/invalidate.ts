@@ -18,7 +18,6 @@ export const invalidate = (store: Store, request: OperationRequest) => {
   });
 
   InMemoryData.unforkDependencies();
-  InMemoryData.gc(store.data);
 };
 
 interface PartialFieldInfo {

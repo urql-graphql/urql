@@ -9,7 +9,7 @@ import {
 import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
 import { fieldInfoOfKey, joinKeys } from './keys';
-import { defer } from './timing';
+import { scheduleTask } from './defer';
 
 type Dict<T> = Record<string, T>;
 type KeyMap<T> = Map<string, T>;
@@ -21,8 +21,8 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
-  /** Ensure garbage collection is never scheduled twice at a time */
-  gcScheduled: boolean;
+  /** Flag for whether deferred tasks have been scheduled yet */
+  defer: boolean;
   /** A list of entities that have been flagged for gargabe collection since no references to them are left */
   gcBatch: Set<string>;
   /** The API's "Query" typename which is needed to filter dependencies */
@@ -95,6 +95,11 @@ export const initDataState = (
 
 /** Reset the data state after read/write is complete */
 export const clearDataState = () => {
+  // NOTE: This is only called to check for the invariant to pass
+  if (process.env.NODE_ENV !== 'production') {
+    getCurrentDependencies();
+  }
+
   const data = currentData!;
   const layerKey = currentOptimisticKey;
   currentOptimisticKey = null;
@@ -113,17 +118,19 @@ export const clearDataState = () => {
     }
   }
 
+  // Schedule deferred tasks if we haven't already
+  if (process.env.NODE_ENV !== 'test' && !data.defer) {
+    data.defer = true;
+    scheduleTask(() => {
+      gc(data);
+      data.defer = false;
+    });
+  }
+
   currentData = null;
   currentDependencies = null;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
-  }
-
-  if (!data.gcScheduled && data.gcBatch.size > 0) {
-    data.gcScheduled = true;
-    defer(() => {
-      gc(data);
-    });
   }
 };
 
@@ -161,9 +168,9 @@ export const unforkDependencies = () => {
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
-  gcScheduled: false,
-  queryRootKey,
+  defer: false,
   gcBatch: new Set(),
+  queryRootKey,
   refCount: makeDict(),
   refLock: makeDict(),
   links: makeNodeMap(),
@@ -305,42 +312,43 @@ const extractNodeMapFields = <T>(
 
 /** Garbage collects all entities that have been marked as having no references */
 export const gc = (data: InMemoryData) => {
-  // Reset gcScheduled flag
-  data.gcScheduled = false;
+  initDataState(data, null);
+
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  data.gcBatch.forEach(entityKey => {
+  data.gcBatch.forEach((entityKey: string, _, batch: Set<string>) => {
     // Check first whether the reference count is still 0
-    const rc = data.refCount[entityKey] || 0;
+    const rc = currentData!.refCount[entityKey] || 0;
     if (rc > 0) {
-      data.gcBatch.delete(entityKey);
-    } else {
-      // Each optimistic layer may also still contain some references to marked entities
-      for (const layerKey in data.refLock) {
-        const refCount = data.refLock[layerKey];
-        const locks = refCount[entityKey] || 0;
-        // If the optimistic layer has any references to the entity, don't GC it,
-        // otherwise delete the reference count from the optimistic layer
-        if (locks > 0) return;
-        delete refCount[entityKey];
-      }
+      batch.delete(entityKey);
+      return;
+    }
 
-      // All conditions are met: The entity can be deleted
+    // Each optimistic layer may also still contain some references to marked entities
+    for (const layerKey in currentData!.refLock) {
+      const refCount = currentData!.refLock[layerKey];
+      const locks = refCount[entityKey] || 0;
+      // If the optimistic layer has any references to the entity, don't GC it,
+      // otherwise delete the reference count from the optimistic layer
+      if (locks > 0) return;
+      delete refCount[entityKey];
+    }
 
-      // Delete the reference count, and delete the entity from the GC batch
-      delete data.refCount[entityKey];
-      data.gcBatch.delete(entityKey);
-
-      data.records.base.delete(entityKey);
-      const linkNode = data.links.base.get(entityKey);
-      if (linkNode) {
-        data.links.base.delete(entityKey);
-        for (const fieldKey in linkNode)
-          updateRCForLink(data.gcBatch, data.refCount, linkNode[fieldKey], -1);
+    // Delete the reference count, and delete the entity from the GC batch
+    delete currentData!.refCount[entityKey];
+    batch.delete(entityKey);
+    currentData!.records.base.delete(entityKey);
+    const linkNode = data.links.base.get(entityKey);
+    if (linkNode) {
+      currentData!.links.base.delete(entityKey);
+      for (const fieldKey in linkNode) {
+        updateRCForLink(batch, currentData!.refCount, linkNode[fieldKey], -1);
       }
     }
   });
+
+  clearDataState();
 };
 
 const updateDependencies = (entityKey: string, fieldKey?: string) => {

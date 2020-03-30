@@ -42,7 +42,6 @@ describe('Query', () => {
       }
     );
 
-    InMemoryData.initDataState(store.data, null);
     jest.clearAllMocks();
   });
 
@@ -56,10 +55,17 @@ describe('Query', () => {
         }
       }
     `;
+
+    InMemoryData.initDataState(store.data, null);
     invalidate(store, { query: INVALID_TODO_QUERY });
+    InMemoryData.clearDataState();
     expect(console.warn).toHaveBeenCalledTimes(1);
+
+    InMemoryData.initDataState(store.data, null);
     invalidate(store, { query: INVALID_TODO_QUERY });
+    InMemoryData.clearDataState();
     expect(console.warn).toHaveBeenCalledTimes(1);
+
     expect((console.warn as any).mock.calls[0][0]).toMatch(/incomplete/);
   });
 
@@ -75,10 +81,17 @@ describe('Query', () => {
         }
       }
     `;
+
+    InMemoryData.initDataState(store.data, null);
     invalidate(store, { query: INVALID_TODO_QUERY });
+    InMemoryData.clearDataState();
     expect(console.warn).toHaveBeenCalledTimes(1);
+
+    InMemoryData.initDataState(store.data, null);
     invalidate(store, { query: INVALID_TODO_QUERY });
+    InMemoryData.clearDataState();
     expect(console.warn).toHaveBeenCalledTimes(1);
+
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
 });
