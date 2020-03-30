@@ -1,3 +1,5 @@
+import { stringifyVariables } from '@urql/core';
+
 import {
   Link,
   EntityField,
@@ -6,14 +8,15 @@ import {
   SerializedEntries,
 } from '../types';
 
-import { makeDict } from '../helpers/dict';
-import { invariant, currentDebugStack } from '../helpers/help';
 import {
   fieldInfoOfKey,
   joinKeys,
   serializeKeys,
   indexOfSeparator,
 } from './keys';
+
+import { makeDict } from '../helpers/dict';
+import { invariant, currentDebugStack } from '../helpers/help';
 import { scheduleTask } from './defer';
 
 type Dict<T> = Record<string, T>;
@@ -546,9 +549,9 @@ export const persistData = () => {
         const fieldKey = key.slice(sepIndex + 1);
         let x: void | Link | EntityField;
         if ((x = readLink(entityKey, fieldKey)) !== undefined) {
-          entries[key] = `:${JSON.stringify(x)}`;
+          entries[key] = `:${stringifyVariables(x)}`;
         } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
-          entries[key] = JSON.stringify(x);
+          entries[key] = stringifyVariables(x);
         } else {
           entries[key] = undefined;
         }
