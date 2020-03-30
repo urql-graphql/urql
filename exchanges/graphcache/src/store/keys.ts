@@ -24,5 +24,6 @@ export const fieldInfoOfKey = (fieldKey: string): FieldInfo => {
 export const joinKeys = (parentKey: string, key: string) =>
   `${parentKey}.${key}`;
 
-/** Prefix key with its owner type Link / Record */
-export const prefixKey = (owner: 'l' | 'r', key: string) => `${owner}|${key}`;
+export const serializeKeys = (entityKey: string, fieldKey: string) =>
+  `${entityKey}\t${fieldKey}`;
+export const indexOfSeparator = (key: string) => key.indexOf('\t');

@@ -15,12 +15,12 @@ describe('garbage collection', () => {
     InMemoryData.writeRecord('Query', '__typename', 'Query');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'todo')).toBe('Todo:1');
 
     InMemoryData.writeLink('Query', 'todo', undefined);
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
@@ -39,7 +39,7 @@ describe('garbage collection', () => {
     InMemoryData.writeLink('Query', 'todo', undefined);
     InMemoryData.writeLink('Query', 'newTodo', 'Todo:1');
 
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'newTodo')).toBe('Todo:1');
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
@@ -60,7 +60,7 @@ describe('garbage collection', () => {
     InMemoryData.writeLink('Query', 'todoB', 'Todo:1');
     InMemoryData.writeLink('Query', 'todoA', undefined);
 
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readLink('Query', 'todoA')).toBe(undefined);
     expect(InMemoryData.readLink('Query', 'todoB')).toBe('Todo:1');
@@ -83,12 +83,12 @@ describe('garbage collection', () => {
     InMemoryData.initDataState(data, 0, true);
 
     InMemoryData.writeLink('Query', 'todo', undefined);
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
     InMemoryData.clearLayer(data, 1);
-    InMemoryData.gc(data);
+    InMemoryData.gc();
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 
     expect([...InMemoryData.getCurrentDependencies()]).toEqual([
@@ -106,7 +106,7 @@ describe('garbage collection', () => {
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
     InMemoryData.writeLink('Query', 'todo', undefined);
-    InMemoryData.gc(data);
+    InMemoryData.gc();
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
     expect(InMemoryData.readRecord('Author:1', 'id')).toBe(undefined);
