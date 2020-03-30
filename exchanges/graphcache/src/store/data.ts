@@ -8,7 +8,7 @@ import {
 
 import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
-import { fieldInfoOfKey, joinKeys, prefixKey } from './keys';
+import { fieldInfoOfKey, joinKeys } from './keys';
 import { defer } from './timing';
 
 type Dict<T> = Record<string, T>;
@@ -21,10 +21,6 @@ interface NodeMap<T> {
 }
 
 export interface InMemoryData {
-  /** Ensure persistence is never scheduled twice at a time */
-  persistenceScheduled: boolean;
-  /** Batches changes to the data layer that'll be written to `storage` */
-  persistenceBatch: SerializedEntries;
   /** Ensure garbage collection is never scheduled twice at a time */
   gcScheduled: boolean;
   /** A list of entities that have been flagged for gargabe collection since no references to them are left */
@@ -129,15 +125,6 @@ export const clearDataState = () => {
       gc(data);
     });
   }
-
-  if (data.storage && !data.persistenceScheduled) {
-    data.persistenceScheduled = true;
-    defer(() => {
-      data.storage!.write(data.persistenceBatch);
-      data.persistenceScheduled = false;
-      data.persistenceBatch = makeDict();
-    });
-  }
 };
 
 /** Initialises then resets the data state, which may squash this layer if necessary */
@@ -174,8 +161,6 @@ export const unforkDependencies = () => {
 };
 
 export const make = (queryRootKey: string): InMemoryData => ({
-  persistenceScheduled: false,
-  persistenceBatch: makeDict(),
   gcScheduled: false,
   queryRootKey,
   gcBatch: new Set(),
@@ -328,7 +313,9 @@ export const gc = (data: InMemoryData) => {
   data.gcBatch.forEach(entityKey => {
     // Check first whether the reference count is still 0
     const rc = data.refCount[entityKey] || 0;
-    if (rc <= 0) {
+    if (rc > 0) {
+      data.gcBatch.delete(entityKey);
+    } else {
       // Each optimistic layer may also still contain some references to marked entities
       for (const layerKey in data.refLock) {
         const refCount = data.refLock[layerKey];
@@ -345,38 +332,13 @@ export const gc = (data: InMemoryData) => {
       delete data.refCount[entityKey];
       data.gcBatch.delete(entityKey);
 
-      // Delete the record and for each of its fields, delete them on the persistence
-      // layer if one is present
-      // No optimistic data needs to be deleted, as the entity is not being referenced by
-      // anything and optimistic layers will eventually be deleted anyway
-      const recordsNode = data.records.base.get(entityKey);
-      if (recordsNode !== undefined) {
-        data.records.base.delete(entityKey);
-        if (data.storage) {
-          for (const fieldKey in recordsNode) {
-            const key = prefixKey('r', joinKeys(entityKey, fieldKey));
-            data.persistenceBatch[key] = undefined;
-          }
-        }
-      }
-
-      // Delete all the entity's links, but also update the reference count
-      // for those links (which can lead to an unrolled recursive GC of the children)
+      data.records.base.delete(entityKey);
       const linkNode = data.links.base.get(entityKey);
-      if (linkNode !== undefined) {
+      if (linkNode) {
         data.links.base.delete(entityKey);
-        for (const fieldKey in linkNode) {
-          // Delete all links from the persistence layer if one is present
-          if (data.storage) {
-            const key = prefixKey('l', joinKeys(entityKey, fieldKey));
-            data.persistenceBatch[key] = undefined;
-          }
-
+        for (const fieldKey in linkNode)
           updateRCForLink(data.gcBatch, data.refCount, linkNode[fieldKey], -1);
-        }
       }
-    } else {
-      data.gcBatch.delete(entityKey);
     }
   });
 };
@@ -417,10 +379,6 @@ export const writeRecord = (
 ) => {
   updateDependencies(entityKey, fieldKey);
   setNode(currentData!.records, entityKey, fieldKey, value);
-  if (currentData!.storage && !currentOptimisticKey) {
-    const key = prefixKey('r', joinKeys(entityKey, fieldKey));
-    currentData!.persistenceBatch[key] = value;
-  }
 };
 
 export const hasField = (entityKey: string, fieldKey: string): boolean =>
@@ -448,10 +406,6 @@ export const writeLink = (
       (data.refLock[currentOptimisticKey] = makeDict());
     links = data.links.optimistic[currentOptimisticKey];
   } else {
-    if (data.storage) {
-      const key = prefixKey('l', joinKeys(entityKey, fieldKey));
-      data.persistenceBatch[key] = link;
-    }
     refCount = data.refCount;
     links = data.links.base;
     gcBatch = data.gcBatch;
@@ -557,22 +511,10 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
 export const hydrateData = (
   data: InMemoryData,
   storage: StorageAdapter,
-  entries: SerializedEntries
+  _entries: SerializedEntries
 ) => {
   initDataState(data, null);
-  for (const key in entries) {
-    const dotIndex = key.indexOf('.');
-    const entityKey = key.slice(2, dotIndex);
-    const fieldKey = key.slice(dotIndex + 1);
-    switch (key.charCodeAt(0)) {
-      case 108:
-        writeLink(entityKey, fieldKey, entries[key] as Link);
-        break;
-      case 114:
-        writeRecord(entityKey, fieldKey, entries[key]);
-        break;
-    }
-  }
+  // TODO: Hydrate entries
   clearDataState();
   data.storage = storage;
 };
