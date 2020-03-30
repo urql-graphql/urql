@@ -453,8 +453,9 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 });
 
-// TODO: Implement persistence
-describe.skip('Store with storage', () => {
+describe('Store with storage', () => {
+  let store: Store;
+
   const expectedData = {
     __typename: 'Query',
     appointment: {
@@ -465,7 +466,7 @@ describe.skip('Store with storage', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    store = new Store();
   });
 
   it('should be able to store and rehydrate data', () => {
@@ -474,8 +475,7 @@ describe.skip('Store with storage', () => {
       write: jest.fn(),
     };
 
-    let store = new Store();
-    InMemoryData.hydrateData(store.data, storage, Object.create(null));
+    store.data.storage = storage;
 
     write(
       store,
@@ -486,9 +486,10 @@ describe.skip('Store with storage', () => {
       expectedData
     );
 
-    expect(storage.write).not.toHaveBeenCalled();
+    InMemoryData.initDataState(store.data, null);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
 
-    jest.runAllTimers();
     expect(storage.write).toHaveBeenCalled();
 
     const serialisedStore = (storage.write as any).mock.calls[0][0];

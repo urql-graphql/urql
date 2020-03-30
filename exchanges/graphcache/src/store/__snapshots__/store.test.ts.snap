@@ -2,9 +2,9 @@
 
 exports[`Store with storage should be able to store and rehydrate data 1`] = `
 Object {
-  "l|Query.appointment({\\"id\\":\\"1\\"})": "Appointment:1",
-  "r|Appointment:1.__typename": "Appointment",
-  "r|Appointment:1.id": "1",
-  "r|Appointment:1.info": "urql meeting",
+  "Appointment:1	__typename": "\\"Appointment\\"",
+  "Appointment:1	id": "\\"1\\"",
+  "Appointment:1	info": "\\"urql meeting\\"",
+  "Query	appointment({\\"id\\":\\"1\\"})": ":\\"Appointment:1\\"",
 }
 `;

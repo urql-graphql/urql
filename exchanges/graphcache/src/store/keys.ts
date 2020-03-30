@@ -23,3 +23,7 @@ export const fieldInfoOfKey = (fieldKey: string): FieldInfo => {
 
 export const joinKeys = (parentKey: string, key: string) =>
   `${parentKey}.${key}`;
+
+export const serializeKeys = (entityKey: string, fieldKey: string) =>
+  `${entityKey}\t${fieldKey}`;
+export const indexOfSeparator = (key: string) => key.indexOf('\t');

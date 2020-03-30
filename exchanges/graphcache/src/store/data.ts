@@ -8,7 +8,12 @@ import {
 
 import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
-import { fieldInfoOfKey, joinKeys } from './keys';
+import {
+  fieldInfoOfKey,
+  joinKeys,
+  serializeKeys,
+  indexOfSeparator,
+} from './keys';
 import { scheduleTask } from './defer';
 
 type Dict<T> = Record<string, T>;
@@ -24,7 +29,9 @@ export interface InMemoryData {
   /** Flag for whether deferred tasks have been scheduled yet */
   defer: boolean;
   /** A list of entities that have been flagged for gargabe collection since no references to them are left */
-  gcBatch: Set<string>;
+  gc: Set<string>;
+  /** A list of entity+field keys that will be persisted */
+  persist: Set<string>;
   /** The API's "Query" typename which is needed to filter dependencies */
   queryRootKey: string;
   /** Number of references to each entity (except "Query") */
@@ -47,6 +54,7 @@ let currentData: null | InMemoryData = null;
 let currentDependencies: null | Set<string> = null;
 let previousDependencies: null | Set<string> = null;
 let currentOptimisticKey: null | number = null;
+let currentIgnoreOptimistic = false;
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
@@ -62,6 +70,7 @@ export const initDataState = (
   currentData = data;
   previousDependencies = currentDependencies;
   currentDependencies = new Set();
+  currentIgnoreOptimistic = false;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -124,6 +133,7 @@ export const clearDataState = () => {
     scheduleTask(() => {
       initDataState(data, null);
       gc();
+      persistData();
       clearDataState();
       data.defer = false;
     });
@@ -171,7 +181,8 @@ export const unforkDependencies = () => {
 
 export const make = (queryRootKey: string): InMemoryData => ({
   defer: false,
-  gcBatch: new Set(),
+  gc: new Set(),
+  persist: new Set(),
   queryRootKey,
   refCount: makeDict(),
   refLock: makeDict(),
@@ -221,10 +232,13 @@ const getNode = <T>(
 
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
-    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
+    const layerKey = currentData!.optimisticOrder[i];
+    const optimistic = map.optimistic[layerKey];
     // If the node and node value exists it is returned, including undefined
     if (
       optimistic &&
+      (!currentIgnoreOptimistic ||
+        currentData!.commutativeKeys.has(layerKey)) &&
       (node = optimistic.get(entityKey)) !== undefined &&
       fieldKey in node
     ) {
@@ -237,9 +251,9 @@ const getNode = <T>(
   return node !== undefined ? node[fieldKey] : undefined;
 };
 
-/** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gcBatch */
+/** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gc */
 const updateRCForEntity = (
-  gcBatch: void | Set<string>,
+  gc: void | Set<string>,
   refCount: Dict<number>,
   entityKey: string,
   by: number
@@ -250,26 +264,26 @@ const updateRCForEntity = (
   const newCount = (refCount[entityKey] = (count + by) | 0);
   // Add it to the garbage collection batch if it needs to be deleted or remove it
   // from the batch if it needs to be kept
-  if (gcBatch !== undefined) {
-    if (newCount <= 0) gcBatch.add(entityKey);
-    else if (count <= 0 && newCount > 0) gcBatch.delete(entityKey);
+  if (gc !== undefined) {
+    if (newCount <= 0) gc.add(entityKey);
+    else if (count <= 0 && newCount > 0) gc.delete(entityKey);
   }
 };
 
-/** Adjusts the reference counts of all entities of a link on a refCount dict by "by" and updates the gcBatch */
+/** Adjusts the reference counts of all entities of a link on a refCount dict by "by" and updates the gc */
 const updateRCForLink = (
-  gcBatch: void | Set<string>,
+  gc: void | Set<string>,
   refCount: Dict<number>,
   link: Link | undefined,
   by: number
 ): void => {
   if (typeof link === 'string') {
-    updateRCForEntity(gcBatch, refCount, link, by);
+    updateRCForEntity(gc, refCount, link, by);
   } else if (Array.isArray(link)) {
     for (let i = 0, l = link.length; i < l; i++) {
       const entityKey = link[i];
       if (entityKey) {
-        updateRCForEntity(gcBatch, refCount, entityKey, by);
+        updateRCForEntity(gc, refCount, entityKey, by);
       }
     }
   }
@@ -317,7 +331,7 @@ export const gc = () => {
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  currentData!.gcBatch.forEach((entityKey: string, _, batch: Set<string>) => {
+  currentData!.gc.forEach((entityKey: string, _, batch: Set<string>) => {
     // Check first whether the reference count is still 0
     const rc = currentData!.refCount[entityKey] || 0;
     if (rc > 0) {
@@ -359,6 +373,11 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
   }
 };
 
+const updatePersist = (entityKey: string, fieldKey: string) => {
+  if (currentData!.storage)
+    currentData!.persist.add(serializeKeys(entityKey, fieldKey));
+};
+
 /** Reads an entity's field (a "record") from data */
 export const readRecord = (
   entityKey: string,
@@ -384,6 +403,7 @@ export const writeRecord = (
   value?: EntityField
 ) => {
   updateDependencies(entityKey, fieldKey);
+  updatePersist(entityKey, fieldKey);
   setNode(currentData!.records, entityKey, fieldKey, value);
 };
 
@@ -403,7 +423,7 @@ export const writeLink = (
   // Retrive the link NodeMap from either an optimistic or the base layer
   let links: KeyMap<Dict<Link | undefined>> | undefined;
   // Set the GC batch if we're not optimistically updating
-  let gcBatch: void | Set<string>;
+  let gc: void | Set<string>;
   if (currentOptimisticKey) {
     // The refLock counters are also reference counters, but they prevent
     // garbage collection instead of being used to trigger it
@@ -414,21 +434,22 @@ export const writeLink = (
   } else {
     refCount = data.refCount;
     links = data.links.base;
-    gcBatch = data.gcBatch;
+    gc = data.gc;
   }
 
   // Retrieve the previous link for this field
   const prevLinkNode = links && links.get(entityKey);
   const prevLink = prevLinkNode && prevLinkNode[fieldKey];
 
-  // Update dependencies
+  // Update persistence batch and dependencies
   updateDependencies(entityKey, fieldKey);
+  updatePersist(entityKey, fieldKey);
   // Update the link
   setNode(data.links, entityKey, fieldKey, link);
   // First decrease the reference count for the previous link
-  updateRCForLink(gcBatch, refCount, prevLink, -1);
+  updateRCForLink(gc, refCount, prevLink, -1);
   // Then increase the reference count for the new link
-  updateRCForLink(gcBatch, refCount, link, 1);
+  updateRCForLink(gc, refCount, link, 1);
 };
 
 /** Reserves an optimistic layer and preorders it */
@@ -514,13 +535,53 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
   return fieldInfos;
 };
 
+export const persistData = () => {
+  if (currentData!.storage) {
+    const entries: SerializedEntries = makeDict();
+    currentIgnoreOptimistic = true;
+    currentData!.persist.forEach(key => {
+      const sepIndex = indexOfSeparator(key);
+      if (sepIndex > -1) {
+        const entityKey = key.slice(0, sepIndex);
+        const fieldKey = key.slice(sepIndex + 1);
+        let x: void | Link | EntityField;
+        if ((x = readLink(entityKey, fieldKey)) !== undefined) {
+          entries[key] = `:${JSON.stringify(x)}`;
+        } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
+          entries[key] = JSON.stringify(x);
+        } else {
+          entries[key] = undefined;
+        }
+      }
+    });
+
+    currentIgnoreOptimistic = false;
+    currentData!.storage.write(entries);
+    currentData!.persist.clear();
+  }
+};
+
 export const hydrateData = (
   data: InMemoryData,
   storage: StorageAdapter,
-  _entries: SerializedEntries
+  entries: SerializedEntries
 ) => {
   initDataState(data, null);
-  // TODO: Hydrate entries
+
+  for (const key in entries) {
+    const value = entries[key];
+    const sepIndex = indexOfSeparator(key);
+    if (value && sepIndex > -1) {
+      const entityKey = key.slice(0, sepIndex);
+      const fieldKey = key.slice(sepIndex + 1);
+      if (value[0] === ':') {
+        writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
+      } else {
+        writeRecord(entityKey, fieldKey, JSON.parse(value));
+      }
+    }
+  }
+
   clearDataState();
   data.storage = storage;
 };
