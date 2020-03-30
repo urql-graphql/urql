@@ -29,6 +29,7 @@ export const invalidateEntity = (
 export const invalidate = (store: Store, request: OperationRequest) => {
   const dependencies = InMemoryData.forkDependencies();
   read(store, request);
+  InMemoryData.unforkDependencies();
 
   dependencies.forEach(dependency => {
     if (dependency.startsWith(`${store.data.queryRootKey}.`)) {
@@ -40,6 +41,5 @@ export const invalidate = (store: Store, request: OperationRequest) => {
     }
   });
 
-  InMemoryData.unforkDependencies();
   InMemoryData.gc();
 };
