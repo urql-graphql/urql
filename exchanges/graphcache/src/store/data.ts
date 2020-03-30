@@ -122,7 +122,9 @@ export const clearDataState = () => {
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
     scheduleTask(() => {
-      gc(data);
+      initDataState(data, null);
+      gc();
+      clearDataState();
       data.defer = false;
     });
   }
@@ -311,13 +313,11 @@ const extractNodeMapFields = <T>(
 };
 
 /** Garbage collects all entities that have been marked as having no references */
-export const gc = (data: InMemoryData) => {
-  initDataState(data, null);
-
+export const gc = () => {
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  data.gcBatch.forEach((entityKey: string, _, batch: Set<string>) => {
+  currentData!.gcBatch.forEach((entityKey: string, _, batch: Set<string>) => {
     // Check first whether the reference count is still 0
     const rc = currentData!.refCount[entityKey] || 0;
     if (rc > 0) {
@@ -339,7 +339,7 @@ export const gc = (data: InMemoryData) => {
     delete currentData!.refCount[entityKey];
     batch.delete(entityKey);
     currentData!.records.base.delete(entityKey);
-    const linkNode = data.links.base.get(entityKey);
+    const linkNode = currentData!.links.base.get(entityKey);
     if (linkNode) {
       currentData!.links.base.delete(entityKey);
       for (const fieldKey in linkNode) {
@@ -347,8 +347,6 @@ export const gc = (data: InMemoryData) => {
       }
     }
   });
-
-  clearDataState();
 };
 
 const updateDependencies = (entityKey: string, fieldKey?: string) => {
