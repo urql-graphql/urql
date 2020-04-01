@@ -51,6 +51,7 @@ export class CombinedError extends Error {
   }: {
     networkError?: Error;
     graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
+    errors?: Array<string | Partial<GraphQLError> | Error>;
     response?: any;
   }) {
     const normalizedGraphQLErrors = (graphQLErrors || []).map(

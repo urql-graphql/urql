@@ -10,7 +10,7 @@ export const makeResult = (
   data: result.data,
   error: Array.isArray(result.errors)
     ? new CombinedError({
-        graphQLErrors: result.errors,
+        graphQLErrors: response.errors || result.errors,
         response,
       })
     : undefined,
@@ -25,9 +25,16 @@ export const makeErrorResult = (
 ): OperationResult => ({
   operation,
   data: undefined,
-  error: new CombinedError({
-    networkError: error,
-    response,
-  }),
+  error: new CombinedError(
+    response.errors
+      ? {
+          graphQLErrors: response.errors,
+          response,
+        }
+      : {
+          networkError: error,
+          response,
+        }
+  ),
   extensions: undefined,
 });

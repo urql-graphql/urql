@@ -145,17 +145,20 @@ const executeFetch = (
 
   return (fetcher || fetch)(url, opts)
     .then(res => {
-      const { status } = res;
-      const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
       response = res;
-
-      if (status < 200 || status >= statusRangeEnd) {
-        throw new Error(res.statusText);
+      return res.json();
+    })
+    .then(result => {
+      if (
+        response!.status < 200 ||
+        response!.status >= (opts.redirect === 'manual' ? 400 : 300)
+      ) {
+        response = result;
+        throw new Error(result.statusText);
       } else {
-        return res.json();
+        return makeResult(operation, result, response);
       }
     })
-    .then(result => makeResult(operation, result, response))
     .catch(err => {
       if (err.name !== 'AbortError') {
         return makeErrorResult(operation, err, response);
