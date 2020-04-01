@@ -76,7 +76,7 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
-      json: jest.fn().mockResolvedValue(response),
+      json: jest.fn().mockResolvedValue({}),
     });
   });
 
@@ -106,6 +106,21 @@ describe('on error', () => {
     );
 
     expect(data).toMatchSnapshot();
+  });
+
+  it('ignores the error when a result is available', async () => {
+    fetch.mockResolvedValue({
+      status: 400,
+      json: jest.fn().mockResolvedValue(response),
+    });
+
+    const data = await pipe(
+      fromValue(queryOperation),
+      fetchExchange(exchangeArgs),
+      toPromise
+    );
+
+    expect(data.data).toEqual(response.data);
   });
 });
 
