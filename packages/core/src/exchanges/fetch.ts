@@ -153,7 +153,7 @@ const executeFetch = (
       return res.json();
     })
     .then((result: any) => {
-      if (!('data' in result) || !('errors' in result)) {
+      if (!('data' in result) && !('errors' in result)) {
         throw new Error('No Content');
       }
 
