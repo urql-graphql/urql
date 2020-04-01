@@ -141,27 +141,31 @@ const executeFetch = (
   opts: RequestInit
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
-
+  let statusNotOk = false;
   let response: Response;
 
   return (fetcher || fetch)(url, opts)
     .then((res: Response) => {
-      const { status } = res;
-      const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
       response = res;
-
-      return res.json().catch((error: Error) => {
-        return Promise.reject(
-          status < 200 || status >= statusRangeEnd
-            ? new Error(response.statusText)
-            : error
-        );
-      });
+      statusNotOk =
+        res.status < 200 ||
+        res.status >= (opts.redirect === 'manual' ? 400 : 300);
+      return res.json();
     })
-    .then((result: object) => makeResult(operation, result, response))
+    .then((result: any) => {
+      if (!('data' in result) || !('errors' in result)) {
+        throw new Error('No Content');
+      }
+
+      return makeResult(operation, result, response);
+    })
     .catch((error: Error) => {
       if (error.name !== 'AbortError') {
-        return makeErrorResult(operation, error, response);
+        return makeErrorResult(
+          operation,
+          statusNotOk ? new Error(response.statusText) : error,
+          response
+        );
       }
     });
 };
