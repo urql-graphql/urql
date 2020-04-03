@@ -53,7 +53,7 @@ The above would look like the following once we normalized the data:
 }
 ```
 
-This is vewry similar to how we'd go about creating a state management store manually, except that
+This is very similar to how we'd go about creating a state management store manually, except that
 _Graphcache_ can use the GraphQL document and the `__typename` field to perform this normalization
 automatically.
 
