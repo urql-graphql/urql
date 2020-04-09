@@ -24,6 +24,7 @@
   },
   "prettier": {
     "singleQuote": true,
+    "arrowParens": "avoid",
     "trailingComma": "es5"
   },
   "lint-staged": {
