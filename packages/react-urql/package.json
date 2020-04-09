@@ -43,11 +43,11 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "@testing-library/react": "^9.4.0",
+    "@testing-library/react": "^10.0.2",
     "@testing-library/react-hooks": "^3.2.1",
     "@types/react": "^16.9.19",
     "@types/react-test-renderer": "^16.9.2",
-    "graphql": "^14.6.0",
+    "graphql": "^15.0.0",
     "graphql-tag": "^2.10.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
@@ -56,7 +56,7 @@
     "react-test-renderer": "^16.12.0"
   },
   "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0",
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0",
     "react": ">= 16.8.0"
   },
   "dependencies": {
