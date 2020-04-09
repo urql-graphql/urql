@@ -30,17 +30,7 @@ jobs:
           paths:
             - ~/.cache/yarn
 
-  lint:
-    executor: node
-    steps:
-      - checkout
-      - *yarn_cache
-      - *yarn
-      - run:
-          name: ESLint
-          command: yarn run lint
-
-  typescript:
+  check:
     executor: node
     steps:
       - checkout
@@ -49,16 +39,12 @@ jobs:
       - run:
           name: TypeScript
           command: yarn run check
-
-  test:
-    executor: node
-    steps:
-      - checkout
-      - *yarn_cache
-      - *yarn
       - run:
           name: Unit Tests
           command: yarn run test --maxWorkers=2
+      - run:
+          name: ESLint
+          command: yarn run lint
 
   build:
     executor: node
@@ -113,13 +99,7 @@ workflows:
   stable:
     jobs:
       - setup
-      - lint:
-          requires:
-            - setup
-      - typescript:
-          requires:
-            - setup
-      - test:
+      - check:
           requires:
             - setup
       - build:
