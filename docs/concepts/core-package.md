@@ -37,7 +37,7 @@ _Exchanges_ are discussed in more detail on the [next page](./exchanges.md).
 The largest part of `urql` itself and the core package is the aforementioned `Client`. It's often
 used directly when using `urql` in Node.js without any other integration.
 
-[We've previously seen how we can use the `Client`'s stream methods directly, in [Stream
+We've previously seen how we can use the `Client`'s stream methods directly, in [Stream
 Patterns](./stream-patterns.md). However, the [`Client`](../api/core.md#client) also has plenty of
 convenience methods that make interacting with the `Client` directly a lot easier.
 
