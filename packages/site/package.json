@@ -41,6 +41,7 @@
     "react-dom": "^16.13.1",
     "react-ga": "^2.4.1",
     "react-inlinesvg": "^1.2.0",
+    "react-is": "^16.13.1",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-router-ga": "^1.2.3",
