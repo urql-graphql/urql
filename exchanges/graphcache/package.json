@@ -57,7 +57,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=1.10.5",
+    "@urql/core": ">=1.10.7",
     "@urql/exchange-populate": ">=0.1.3",
     "wonka": "^4.0.9"
   },
