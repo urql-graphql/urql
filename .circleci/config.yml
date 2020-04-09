@@ -6,36 +6,38 @@ executors:
       - image: circleci/node:12-buster
 
 aliases:
-  - &yarn_cache
-    restore_cache:
-      name: Restore Yarn cache
-      keys:
-        - yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
-        - yarn-{{ .Branch }}-
-  - &yarn
-    run:
-      name: Install Packages
-      command: yarn --frozen-lockfile --non-interactive
+  - &node_modules
+    attach_workspace:
+      at: .
 
 jobs:
   setup:
     executor: node
     steps:
       - checkout
-      - *yarn_cache
-      - *yarn
+      - restore_cache:
+          name: Restore Yarn cache
+          keys:
+            - yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-{{ .Branch }}-
+      - run:
+          name: Install Packages
+          command: yarn --frozen-lockfile --non-interactive
       - save_cache:
           name: Save Yarn cache
           key: yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
 
   check:
     executor: node
     steps:
       - checkout
-      - *yarn_cache
-      - *yarn
+      - *node_modules
       - run:
           name: TypeScript
           command: yarn run check
@@ -51,8 +53,7 @@ jobs:
     parallelism: 4
     steps:
       - checkout
-      - *yarn_cache
-      - *yarn
+      - *node_modules
       - run:
           name: Build
           command: yarn run build
@@ -61,8 +62,7 @@ jobs:
     executor: node
     steps:
       - checkout
-      - *yarn_cache
-      - *yarn
+      - *node_modules
       - run:
           name: Build Staging Site
           command: |
@@ -81,8 +81,7 @@ jobs:
           name: Install AWS CLI
           command: sudo apt-get -y -qq install awscli
       - checkout
-      - *yarn_cache
-      - *yarn
+      - *node_modules
       - run:
           name: Build Production Site
           command: |
