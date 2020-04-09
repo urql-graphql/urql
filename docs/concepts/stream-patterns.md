@@ -24,7 +24,7 @@ Internally the `Client` is an event hub. It defines a stream of operations as in
 through a layer that will ultimately send GraphQL requests to an API, and then send the corresponding results
 to another stream.
 
-As a user working with framewrk code we never interact with these streams directly, but it's helpful to know that they describe
+As a user working with framework code we never interact with these streams directly, but it's helpful to know that they describe
 every interaction between the declarative queries we write and the way that `urql` fulfills them.
 
 ## Streams in JavaScript
