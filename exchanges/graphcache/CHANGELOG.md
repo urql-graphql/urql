@@ -1,5 +1,20 @@
 # @urql/exchange-graphcache
 
+## 2.3.1
+
+### Patch Changes
+
+- Add graphql@^15.0.0 to peer dependency range, by [@kitten](https://github.com/kitten) (See [#688](https://github.com/FormidableLabs/urql/pull/688))
+- Forcefully bump @urql/core package in all bindings and in @urql/exchange-graphcache.
+  We're aware that in some cases users may not have upgraded to @urql/core, even though that's within
+  the typical patch range. Since the latest @urql/core version contains a patch that is required for
+  `cache-and-network` to work, we're pushing another patch that now forcefully bumps everyone to the
+  new version that includes this fix, by [@kitten](https://github.com/kitten) (See [#684](https://github.com/FormidableLabs/urql/pull/684))
+- Reimplement persistence support to take commutative layers into account, by [@kitten](https://github.com/kitten) (See [#674](https://github.com/FormidableLabs/urql/pull/674))
+- Updated dependencies (See [#688](https://github.com/FormidableLabs/urql/pull/688) and [#678](https://github.com/FormidableLabs/urql/pull/678))
+  - @urql/exchange-populate@0.1.4
+  - @urql/core@1.10.8
+
 ## 2.3.0
 
 ### Minor Changes

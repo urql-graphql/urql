@@ -1,6 +1,6 @@
 {
   "name": "@urql/svelte",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A highly customizable and versatile GraphQL client for Svelte",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -54,7 +54,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "@urql/core": "^1.10.7",
+    "@urql/core": "^1.10.8",
     "wonka": "^4.0.9"
   },
   "devDependencies": {

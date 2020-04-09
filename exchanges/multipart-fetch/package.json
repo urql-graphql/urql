@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-multipart-fetch",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "An exchange that allows regular fetch and will transition to multipart when files are included",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -48,7 +48,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=1.10.4",
+    "@urql/core": ">=1.10.8",
     "extract-files": "^8.1.0",
     "wonka": "^4.0.9"
   },
