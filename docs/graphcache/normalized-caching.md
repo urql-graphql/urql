@@ -46,7 +46,7 @@ The above would look like the following once we normalized the data:
     "author": "Author:1" // link
   },
   "Author:1": {
-    "__typename": "Todo",
+    "__typename": "Author",
     "id": "1", // record
     "name": "urql-team" // record
   }
