@@ -21,17 +21,29 @@ The way in which they do this is by making calls to the client via context.
 - `useMutation` calls `executeMutation`
 - `useSubscription` calls `executeSubscription`
 
+You saw in the section [Stream Patterns](../concepts/stream-patterns.md), that all these operations return a stream. Thanks to the `wonka` library you are able to generate different types of stream. By doing so you can mock the different state of your operation (`fetching`, `error`, `success`)
+
+You probably use one of those utility to generate streams :
+
+- `empty`: It doesn’t emit any values when subscribed to and immediately completes. Useful to test if the operation have been call or not
+- `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
+- `fromValue`: It emit the value you passed in and completes immediately afterwards. Useful to test the response of the operation
+- `makeSubject`: Allow you to create a source and push some response. Useful to test subscription and simulating changes
+
+Create a mock client is pretty straightfoward. You just have to set a mock function to each `execute<OperationName>` and return the stream that fits the best with your test. After you created the mock client you can wrap your component with the `Provider` from `urql` and adding the client as it value.
+
 Here's an example client mock being used while testing a component.
 
 ```tsx
 import { mount } from 'enzyme';
 import { Provider } from 'urql';
+import { empty } from 'wonka';
 import { MyComponent } from './MyComponent';
 
 const mockClient = {
-  executeQuery: jest.fn(),
-  executeMutation: jest.fn(),
-  executeSubscription: jest.fn(),
+  executeQuery: jest.fn(() => empty),
+  executeMutation: jest.fn(() => empty),
+  executeSubscription: jest.fn(() => empty),
 };
 
 it('renders', () => {
