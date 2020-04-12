@@ -181,6 +181,43 @@ const mockClient = () => {
 };
 ```
 
+## Subscriptions
+
+Testing subscription can be done by simulating the arriving of new data after an amount of time. To do that you can use `interval` from `wonka` and for each value we can set the response that we want to mock.
+
+If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility fron `wonka`. You can see more details in the next section.
+
+Here's an example of testing a list component which use subscription.
+
+```tsx
+const mockClient = {
+  executeSubscription: jest.fn(() =>
+    pipe(
+      interval(200),
+      map((i: number) => ({
+        data: { post: { id: i, title: 'Post title', content: 'This is a post' } },
+      }))
+    )
+  ),
+};
+
+it('should update the list', done => {
+  let index = 0;
+
+  const wrapper = mount(
+    <Provider value={mockClient}>
+      <MyComponent />
+    </Provider>
+  );
+
+  setTimeout(() => {
+    expect(wrapper.find('.list').children()).toHaveLength(index + 1); // See how many items are in the list
+    index++;
+    if (index === 2) done();
+  }, 200);
+});
+```
+
 ## Simulating changes
 
 Simulating multiple responses can be useful, particularly testing `useEffect` calls dependent on changing query responses.
@@ -196,10 +233,10 @@ import { Provider } from 'urql';
 import { makeSubject } from 'wonka';
 import { MyComponent } from './MyComponent';
 
-const [stream, pushResponse] = makeSubject();
+const { source: stream, next: pushResponse } = makeSubject();
 
 const mockedClient = {
-  executeQuery: () => stream,
+  executeQuery: jest.fn(() => stream),
 };
 
 it('shows notification on updated data', () => {
