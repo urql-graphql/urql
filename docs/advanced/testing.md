@@ -21,7 +21,7 @@ The way in which they do this is by making calls to the client via context.
 - `useMutation` calls `executeMutation`
 - `useSubscription` calls `executeSubscription`
 
-You saw in the section [Stream Patterns](../concepts/stream-patterns.md), that all these operations return a stream. Thanks to the `wonka` library you are able to generate different types of stream. By doing so you can mock the different state of your operation (`fetching`, `error`, `success`)
+You saw in the section [Stream Patterns](../concepts/stream-patterns.md), that all these operations return a stream. Thanks to the `wonka` library you are able to generate different types of them. By doing so you can mock the different state of your operation (`fetching`, `error`, `success`)
 
 You probably use one of those utility to generate streams :
 
