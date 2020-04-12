@@ -195,8 +195,8 @@ describe('Store with OptimisticMutationConfig', () => {
       store,
       {
         query: connection,
-        // @ts-ignore
       },
+      // @ts-ignore
       {
         exercisesConnection: null,
       }
