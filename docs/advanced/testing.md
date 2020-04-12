@@ -23,7 +23,7 @@ The way in which they do this is by making calls to the client via context.
 
 You saw in the section [Stream Patterns](../concepts/stream-patterns.md), that all these operations return a stream. Thanks to the `wonka` library you are able to generate different types of them. By doing so you can mock the different state of your operation (`fetching`, `error`, `success`)
 
-You probably use one of those utility to generate streams :
+You'll probably use one of those utility to generate streams :
 
 - `empty`: It doesn’t emit any values when subscribed to and immediately completes. Useful to test if the operation have been call or not
 - `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
@@ -185,7 +185,7 @@ const mockClient = () => {
 
 Testing subscription can be done by simulating the arriving of new data after an amount of time. To do that you can use `interval` from `wonka` and for each value we can set the response that we want to mock.
 
-If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility fron `wonka`. You can see more details in the next section.
+If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from `wonka`. You can see more details in the next section.
 
 Here's an example of testing a list component which use subscription.
 
@@ -195,7 +195,7 @@ const mockClient = {
     pipe(
       interval(200),
       map((i: number) => ({
-        data: { post: { id: i, title: 'Post title', content: 'This is a post' } },
+        data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
       }))
     )
   ),
