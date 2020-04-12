@@ -182,6 +182,38 @@ describe('Store with OptimisticMutationConfig', () => {
     expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
   });
 
+
+  it('should invalidate null keys correctly', () => {
+    const connection = gql`
+      query test {
+        exercisesConnection(page: { after: null, first: 10 }) {
+          id
+        }
+      }
+    `
+
+    write(store, {
+      query: connection,
+      // @ts-ignore
+    }, {
+      exercisesConnection: null
+    })
+    let { data } = query(store, { query: connection });
+
+    InMemoryData.initDataState(store.data, null);
+    expect((data as any).exercisesConnection).toEqual(null);
+    const fields = store.inspectFields({ __typename: 'Query' });
+    fields.forEach(({ fieldName, arguments: args }) => {
+      if (fieldName === 'exercisesConnection') {
+        store.invalidate('Query', fieldName, args);
+      }
+    })
+    InMemoryData.clearDataState();
+
+    ({ data } = query(store, { query: connection }));
+    expect(data).toBe(null);
+  });
+
   it('should be able to invalidate data with arguments', () => {
     write(
       store,

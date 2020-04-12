@@ -18,7 +18,7 @@ export const invalidateEntity = (
 
   for (let i = 0, l = fields.length; i < l; i++) {
     const { fieldKey } = fields[i];
-    if (InMemoryData.readLink(entityKey, fieldKey)) {
+    if (InMemoryData.readLink(entityKey, fieldKey) !== undefined) {
       InMemoryData.writeLink(entityKey, fieldKey, undefined);
     } else {
       InMemoryData.writeRecord(entityKey, fieldKey, undefined);
