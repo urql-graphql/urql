@@ -182,7 +182,6 @@ describe('Store with OptimisticMutationConfig', () => {
     expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
   });
 
-
   it('should invalidate null keys correctly', () => {
     const connection = gql`
       query test {
@@ -190,14 +189,18 @@ describe('Store with OptimisticMutationConfig', () => {
           id
         }
       }
-    `
+    `;
 
-    write(store, {
-      query: connection,
-      // @ts-ignore
-    }, {
-      exercisesConnection: null
-    })
+    write(
+      store,
+      {
+        query: connection,
+        // @ts-ignore
+      },
+      {
+        exercisesConnection: null,
+      }
+    );
     let { data } = query(store, { query: connection });
 
     InMemoryData.initDataState(store.data, null);
@@ -207,7 +210,7 @@ describe('Store with OptimisticMutationConfig', () => {
       if (fieldName === 'exercisesConnection') {
         store.invalidate('Query', fieldName, args);
       }
-    })
+    });
     InMemoryData.clearDataState();
 
     ({ data } = query(store, { query: connection }));
