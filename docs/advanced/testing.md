@@ -36,7 +36,7 @@ Here's an example client mock being used while testing a component.
 ```tsx
 import { mount } from 'enzyme';
 import { Provider } from 'urql';
-import { empty } from 'wonka';
+import { never } from 'wonka';
 import { MyComponent } from './MyComponent';
 
 const mockClient = {
