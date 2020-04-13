@@ -29,7 +29,7 @@ You'll probably use one of these utility functions to create streams:
 - `fromValue`: This utility function accepts a value and emits it immediately, which we can use to mock a result from the server.
 - `makeSubject`: Allows us to create a source and imperatively push responses, which is useful to test subscription and simulate changes, i.e. multiple states.
 
-Create a mock client is pretty straightfoward. You just have to set a mock function to each `execute<OperationName>` and return the stream that fits the best with your test. After you created the mock client you can wrap your component with the `Provider` from `urql` and adding the client as it value.
+Creating a mock `Client` is pretty quick as we'll create an object that contains the `Client`'s methods that the React `urql` hooks use. We'll mock the appropriate `execute` functions that we need to mock a set of hooks. After we've created the mock `Client` we can wrap components with the `Provider` from `urql` and pass it.
 
 Here's an example client mock being used while testing a component.
 
