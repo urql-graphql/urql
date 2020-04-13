@@ -27,7 +27,7 @@ You'll probably use one of these utility functions to create streams:
 
 - `never`: This stream doesn’t emit any values and never completes, which puts our `urql` code in a permanent `fetching: true` state.
 - `fromValue`: This utility function accepts a value and emits it immediately, which we can use to mock a result from the server.
-- `makeSubject`: Allow you to create a source and push some response. Useful to test subscription and simulating changes
+- `makeSubject`: Allows us to create a source and imperatively push responses, which is useful to test subscription and simulate changes, i.e. multiple states.
 
 Create a mock client is pretty straightfoward. You just have to set a mock function to each `execute<OperationName>` and return the stream that fits the best with your test. After you created the mock client you can wrap your component with the `Provider` from `urql` and adding the client as it value.
 
