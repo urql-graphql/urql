@@ -40,9 +40,9 @@ import { never } from 'wonka';
 import { MyComponent } from './MyComponent';
 
 const mockClient = {
-  executeQuery: jest.fn(() => empty),
-  executeMutation: jest.fn(() => empty),
-  executeSubscription: jest.fn(() => empty),
+  executeQuery: jest.fn(() => never),
+  executeMutation: jest.fn(() => never),
+  executeSubscription: jest.fn(() => never),
 };
 
 it('renders', () => {
