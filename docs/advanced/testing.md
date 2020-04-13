@@ -26,7 +26,7 @@ In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, tha
 You'll probably use one of these utility functions to create streams:
 
 - `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
-- `fromValue`: It emit the value you passed in and completes immediately afterwards. Useful to test the response of the operation
+- `fromValue`: This utility function accepts a value and emits it immediately, which we can use to mock a result from the server.
 - `makeSubject`: Allow you to create a source and push some response. Useful to test subscription and simulating changes
 
 Create a mock client is pretty straightfoward. You just have to set a mock function to each `execute<OperationName>` and return the stream that fits the best with your test. After you created the mock client you can wrap your component with the `Provider` from `urql` and adding the client as it value.
