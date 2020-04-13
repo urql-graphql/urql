@@ -192,10 +192,16 @@ Here's an example of testing a list component which uses a subscription.
 
 ```tsx
 const mockClient = {
-  executeSubscription: jest.fn(() =>
+  executeSubscription: jest.fn(query =>
     pipe(
       interval(200),
       map((i: number) => ({
+        // To mock a full result, we need to pass a mock operation back as well
+        operation: {
+          operationName: 'subscription,
+          context: {},
+          ...query,
+        },
         data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
       }))
     )
