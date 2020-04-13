@@ -187,7 +187,7 @@ Testing subscription can be done by simulating the arriving of new data after an
 
 If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from `wonka`. You can see more details in the next section.
 
-Here's an example of testing a list component which use subscription.
+Here's an example of testing a list component which uses a subscription.
 
 ```tsx
 const mockClient = {
