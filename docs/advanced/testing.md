@@ -184,7 +184,7 @@ The above client we've created mocks all three operations — queries, mutations
 
 ## Subscriptions
 
-Testing subscription can be done by simulating the arriving of new data after an amount of time. To do that you can use `interval` from `wonka` and for each value we can set the response that we want to mock.
+Testing subscriptions can be done by simulating the arrival of new data over time. To do this we may use the `interval` utility from `wonka`, which emits values on a timer, and for each value we can map over the response that we'd like to mock.
 
 If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from `wonka`. You can see more details in the next section.
 
