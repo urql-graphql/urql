@@ -23,7 +23,7 @@ The way in which they do this is by making calls to the client via context.
 
 In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, that all methods on the client operate with and return streams. These streams are created using the `wonka` library and we're able to create streams ourselves to mock the different states of our operations, e.g. fetching, errors, or success with data.
 
-You'll probably use one of those utility to generate streams :
+You'll probably use one of these utility functions to create streams:
 
 - `empty`: It doesn’t emit any values when subscribed to and immediately completes. Useful to test if the operation have been call or not
 - `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
