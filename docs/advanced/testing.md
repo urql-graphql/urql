@@ -180,6 +180,8 @@ const mockClient = () => {
 };
 ```
 
+The above client we've created mocks all three operations — queries, mutations, and subscriptions — to always remain in the `fetching: true` state.
+
 ## Subscriptions
 
 Testing subscription can be done by simulating the arriving of new data after an amount of time. To do that you can use `interval` from `wonka` and for each value we can set the response that we want to mock.
