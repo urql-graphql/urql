@@ -25,7 +25,6 @@ In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, tha
 
 You'll probably use one of these utility functions to create streams:
 
-- `empty`: It doesn’t emit any values when subscribed to and immediately completes. Useful to test if the operation have been call or not
 - `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
 - `fromValue`: It emit the value you passed in and completes immediately afterwards. Useful to test the response of the operation
 - `makeSubject`: Allow you to create a source and push some response. Useful to test subscription and simulating changes
