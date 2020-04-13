@@ -25,7 +25,7 @@ In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, tha
 
 You'll probably use one of these utility functions to create streams:
 
-- `never`: It doesn’t emit any values and never completes. Useful to test the fectching state.
+- `never`: This stream doesn’t emit any values and never completes, which puts our `urql` code in a permanent `fetching: true` state.
 - `fromValue`: This utility function accepts a value and emits it immediately, which we can use to mock a result from the server.
 - `makeSubject`: Allow you to create a source and push some response. Useful to test subscription and simulating changes
 
