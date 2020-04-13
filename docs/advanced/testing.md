@@ -21,17 +21,28 @@ The way in which they do this is by making calls to the client via context.
 - `useMutation` calls `executeMutation`
 - `useSubscription` calls `executeSubscription`
 
+In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, that all methods on the client operate with and return streams. These streams are created using the `wonka` library and we're able to create streams ourselves to mock the different states of our operations, e.g. fetching, errors, or success with data.
+
+You'll probably use one of these utility functions to create streams:
+
+- `never`: This stream doesn’t emit any values and never completes, which puts our `urql` code in a permanent `fetching: true` state.
+- `fromValue`: This utility function accepts a value and emits it immediately, which we can use to mock a result from the server.
+- `makeSubject`: Allows us to create a source and imperatively push responses, which is useful to test subscription and simulate changes, i.e. multiple states.
+
+Creating a mock `Client` is pretty quick as we'll create an object that contains the `Client`'s methods that the React `urql` hooks use. We'll mock the appropriate `execute` functions that we need to mock a set of hooks. After we've created the mock `Client` we can wrap components with the `Provider` from `urql` and pass it.
+
 Here's an example client mock being used while testing a component.
 
 ```tsx
 import { mount } from 'enzyme';
 import { Provider } from 'urql';
+import { never } from 'wonka';
 import { MyComponent } from './MyComponent';
 
 const mockClient = {
-  executeQuery: jest.fn(),
-  executeMutation: jest.fn(),
-  executeSubscription: jest.fn(),
+  executeQuery: jest.fn(() => never),
+  executeMutation: jest.fn(() => never),
+  executeSubscription: jest.fn(() => never),
 };
 
 it('renders', () => {
@@ -169,6 +180,51 @@ const mockClient = () => {
 };
 ```
 
+The above client we've created mocks all three operations — queries, mutations, and subscriptions — to always remain in the `fetching: true` state.
+
+## Subscriptions
+
+Testing subscriptions can be done by simulating the arrival of new data over time. To do this we may use the `interval` utility from `wonka`, which emits values on a timer, and for each value we can map over the response that we'd like to mock.
+
+If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from `wonka`. You can see more details in the next section.
+
+Here's an example of testing a list component which uses a subscription.
+
+```tsx
+const mockClient = {
+  executeSubscription: jest.fn(query =>
+    pipe(
+      interval(200),
+      map((i: number) => ({
+        // To mock a full result, we need to pass a mock operation back as well
+        operation: {
+          operationName: 'subscription,
+          context: {},
+          ...query,
+        },
+        data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
+      }))
+    )
+  ),
+};
+
+it('should update the list', done => {
+  let index = 0;
+
+  const wrapper = mount(
+    <Provider value={mockClient}>
+      <MyComponent />
+    </Provider>
+  );
+
+  setTimeout(() => {
+    expect(wrapper.find('.list').children()).toHaveLength(index + 1); // See how many items are in the list
+    index++;
+    if (index === 2) done();
+  }, 200);
+});
+```
+
 ## Simulating changes
 
 Simulating multiple responses can be useful, particularly testing `useEffect` calls dependent on changing query responses.
@@ -184,10 +240,10 @@ import { Provider } from 'urql';
 import { makeSubject } from 'wonka';
 import { MyComponent } from './MyComponent';
 
-const [stream, pushResponse] = makeSubject();
+const { source: stream, next: pushResponse } = makeSubject();
 
 const mockedClient = {
-  executeQuery: () => stream,
+  executeQuery: jest.fn(() => stream),
 };
 
 it('shows notification on updated data', () => {
