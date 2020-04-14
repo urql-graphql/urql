@@ -82,7 +82,7 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
     // We have to make sure the operation is fully spread in here so we don't lose the query on our cloned object.
     // Spreading operation.variables here in case someone made a variables with Object.create(null).
     const { files, clone } = extractFiles({
-      ...operation,
+      query: print(operation.query),
       variables: { ...operation.variables },
     });
 
