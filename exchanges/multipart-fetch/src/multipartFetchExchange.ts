@@ -81,10 +81,7 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
     const { context } = operation;
     // We have to make sure the operation is fully spread in here so we don't lose the query on our cloned object.
     // Spreading operation.variables here in case someone made a variables with Object.create(null).
-    const { files, clone } = extractFiles({
-      query: print(operation.query),
-      variables: { ...operation.variables },
-    });
+    const { files, clone } = extractFiles({ ...operation.variables });
 
     const extraOptions =
       typeof context.fetchOptions === 'function'
@@ -119,7 +116,10 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
       // Make fetch auto-append this for correctness
       delete fetchOptions.headers['content-type'];
 
-      fetchOptions.body.append('operations', JSON.stringify({ ...clone }));
+      fetchOptions.body.append(
+        'operations',
+        JSON.stringify({ variables: clone, query: body.query })
+      );
 
       const map = {};
       let i = 0;
