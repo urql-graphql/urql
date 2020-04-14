@@ -2,7 +2,7 @@ import { pipe, tap } from 'wonka';
 import { Exchange } from '../types';
 
 export const debugExchange: Exchange = ({ forward }) => {
-  if (process.env && process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     return ops$ => forward(ops$);
   } else {
     return ops$ =>
