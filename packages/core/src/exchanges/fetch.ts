@@ -189,18 +189,18 @@ const executeFetch = (
       return makeResult(operation, result, response);
     })
     .catch((error: Error) => {
-      if (err.name === 'AbortError') {
+      if (error.name === 'AbortError') {
         return;
       }
 
       dispatchDebug({
         type: 'fetchError',
-        message: err.name,
+        message: error.name,
         operation,
         data: {
           url,
           fetchOptions: opts,
-          value: err,
+          value: error,
         },
       });    
 
