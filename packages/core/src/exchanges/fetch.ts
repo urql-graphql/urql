@@ -175,7 +175,7 @@ const executeFetch = (
     })
     .then(result => {
       dispatchDebug({
-        type: 'fetchSuccess',
+        type: result.errors ? 'fetchError' : 'fetchSuccess',
         message: 'A successful fetch response has been returned.',
         operation,
         data: {
