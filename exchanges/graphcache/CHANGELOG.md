@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 2.3.2
+
+### Patch Changes
+
+- Pick modules from graphql package, instead of importing from graphql/index.mjs, by [@kitten](https://github.com/kitten) (See [#700](https://github.com/FormidableLabs/urql/pull/700))
+- Change invalidation to check for undefined links since null is a valid value in graphql, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#694](https://github.com/FormidableLabs/urql/pull/694))
+- Updated dependencies (See [#700](https://github.com/FormidableLabs/urql/pull/700))
+  - @urql/exchange-populate@0.1.5
+  - @urql/core@1.10.9
+
 ## 2.3.1
 
 ### Patch Changes

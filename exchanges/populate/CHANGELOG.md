@@ -1,5 +1,13 @@
 # @urql/exchange-populate
 
+## 0.1.5
+
+### Patch Changes
+
+- Pick modules from graphql package, instead of importing from graphql/index.mjs, by [@kitten](https://github.com/kitten) (See [#700](https://github.com/FormidableLabs/urql/pull/700))
+- Updated dependencies (See [#700](https://github.com/FormidableLabs/urql/pull/700))
+  - @urql/core@1.10.9
+
 ## 0.1.4
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.10.9
+
+### Patch Changes
+
+- Pick modules from graphql package, instead of importing from graphql/index.mjs, by [@kitten](https://github.com/kitten) (See [#700](https://github.com/FormidableLabs/urql/pull/700))
+
 ## 1.10.8
 
 ### Patch Changes
