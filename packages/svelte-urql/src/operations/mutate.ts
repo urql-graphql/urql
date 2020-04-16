@@ -3,10 +3,14 @@ import { DocumentNode } from 'graphql';
 
 import { getClient } from '../context';
 
+export interface MutationArguments<V> {
+  query: string | DocumentNode;
+  variables?: V;
+  context?: Partial<OperationContext>;
+}
+
 export const mutate = <T = any, V = object>(
-  query: string | DocumentNode,
-  variables?: V,
-  context?: Partial<OperationContext>
+  args: MutationArguments<V>
 ): PromiseLike<OperationResult<T>> => {
   const client = getClient();
   let promise: Promise<OperationResult<T>>;
@@ -14,7 +18,9 @@ export const mutate = <T = any, V = object>(
   return {
     then(onValue) {
       if (!promise) {
-        promise = client.mutation(query, variables as any, context).toPromise();
+        promise = client
+          .mutation(args.query, args.variables as any, args.context)
+          .toPromise();
       }
 
       return promise.then(onValue);
