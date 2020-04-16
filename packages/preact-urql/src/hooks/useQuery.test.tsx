@@ -257,7 +257,11 @@ describe('useQuery', () => {
           children: [h(QueryUser, { ...props })],
         })
       );
-      act(() => unmount());
+
+      act(() => {
+        unmount();
+      });
+
       expect(start).toBeCalledTimes(1);
       expect(unsubscribe).toBeCalledTimes(1);
     });

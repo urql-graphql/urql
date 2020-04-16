@@ -3,24 +3,6 @@ import { Variables, OperationRequest } from '../types';
 import { Store, keyOfField } from '../store';
 import { read } from './query';
 
-export const invalidate = (store: Store, request: OperationRequest) => {
-  const dependencies = InMemoryData.forkDependencies();
-  read(store, request);
-
-  dependencies.forEach(dependency => {
-    if (dependency.startsWith(`${store.data.queryRootKey}.`)) {
-      const fieldKey = dependency.slice(`${store.data.queryRootKey}.`.length);
-      InMemoryData.writeLink(store.data.queryRootKey, fieldKey);
-      InMemoryData.writeRecord(store.data.queryRootKey, fieldKey);
-    } else {
-      store.invalidate(dependency);
-    }
-  });
-
-  InMemoryData.unforkDependencies();
-  InMemoryData.gc(store.data);
-};
-
 interface PartialFieldInfo {
   fieldKey: string;
 }
@@ -36,10 +18,28 @@ export const invalidateEntity = (
 
   for (let i = 0, l = fields.length; i < l; i++) {
     const { fieldKey } = fields[i];
-    if (InMemoryData.readLink(entityKey, fieldKey)) {
+    if (InMemoryData.readLink(entityKey, fieldKey) !== undefined) {
       InMemoryData.writeLink(entityKey, fieldKey, undefined);
     } else {
       InMemoryData.writeRecord(entityKey, fieldKey, undefined);
     }
   }
+};
+
+export const invalidate = (store: Store, request: OperationRequest) => {
+  const dependencies = InMemoryData.forkDependencies();
+  read(store, request);
+  InMemoryData.unforkDependencies();
+
+  dependencies.forEach(dependency => {
+    if (dependency.startsWith(`${store.data.queryRootKey}.`)) {
+      const fieldKey = dependency.slice(`${store.data.queryRootKey}.`.length);
+      InMemoryData.writeLink(store.data.queryRootKey, fieldKey);
+      InMemoryData.writeRecord(store.data.queryRootKey, fieldKey);
+    } else {
+      invalidateEntity(dependency);
+    }
+  });
+
+  InMemoryData.gc();
 };

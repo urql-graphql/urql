@@ -149,7 +149,8 @@ const executeFetch = (
   opts: RequestInit
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
-  let response: Response | undefined;
+  let statusNotOk = false;
+  let response: Response;
 
   dispatchDebug({
     type: 'fetchRequest',
@@ -162,21 +163,21 @@ const executeFetch = (
   });
 
   return (fetcher || fetch)(url, opts)
-    .then(res => {
-      const { status } = res;
-      const statusRangeEnd = opts.redirect === 'manual' ? 400 : 300;
+    .then((res: Response) => {
       response = res;
-
-      if (status < 200 || status >= statusRangeEnd) {
-        throw new Error(res.statusText);
-      } else {
-        return res.json();
-      }
+      statusNotOk =
+        res.status < 200 ||
+        res.status >= (opts.redirect === 'manual' ? 400 : 300);
+      return res.json();
     })
-    .then(result => {
+    .then((result: any) => {
+      if (!('data' in result) && !('errors' in result)) {
+        throw new Error('No Content');
+      }
+
       dispatchDebug({
         type: result.errors ? 'fetchError' : 'fetchSuccess',
-        message: 'A successful fetch response has been returned.',
+        message: `A ${result.errors ? 'failed' : 'successful'} fetch response has been returned.`,
         operation,
         data: {
           url,
@@ -187,7 +188,7 @@ const executeFetch = (
 
       return makeResult(operation, result, response);
     })
-    .catch(err => {
+    .catch((error: Error) => {
       if (err.name === 'AbortError') {
         return;
       }
@@ -201,9 +202,13 @@ const executeFetch = (
           fetchOptions: opts,
           value: err,
         },
-      });
+      });    
 
-      return makeErrorResult(operation, err, response);
+      return makeErrorResult(
+        operation,
+        statusNotOk ? new Error(response.statusText) : error,
+        response
+      );
     });
 };
 

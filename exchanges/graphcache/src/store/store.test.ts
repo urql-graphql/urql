@@ -182,6 +182,41 @@ describe('Store with OptimisticMutationConfig', () => {
     expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
   });
 
+  it('should invalidate null keys correctly', () => {
+    const connection = gql`
+      query test {
+        exercisesConnection(page: { after: null, first: 10 }) {
+          id
+        }
+      }
+    `;
+
+    write(
+      store,
+      {
+        query: connection,
+      },
+      // @ts-ignore
+      {
+        exercisesConnection: null,
+      }
+    );
+    let { data } = query(store, { query: connection });
+
+    InMemoryData.initDataState(store.data, null);
+    expect((data as any).exercisesConnection).toEqual(null);
+    const fields = store.inspectFields({ __typename: 'Query' });
+    fields.forEach(({ fieldName, arguments: args }) => {
+      if (fieldName === 'exercisesConnection') {
+        store.invalidate('Query', fieldName, args);
+      }
+    });
+    InMemoryData.clearDataState();
+
+    ({ data } = query(store, { query: connection }));
+    expect(data).toBe(null);
+  });
+
   it('should be able to invalidate data with arguments', () => {
     write(
       store,
@@ -454,6 +489,8 @@ describe('Store with OptimisticMutationConfig', () => {
 });
 
 describe('Store with storage', () => {
+  let store: Store;
+
   const expectedData = {
     __typename: 'Query',
     appointment: {
@@ -464,7 +501,7 @@ describe('Store with storage', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    store = new Store();
   });
 
   it('should be able to store and rehydrate data', () => {
@@ -473,8 +510,7 @@ describe('Store with storage', () => {
       write: jest.fn(),
     };
 
-    let store = new Store();
-    InMemoryData.hydrateData(store.data, storage, Object.create(null));
+    store.data.storage = storage;
 
     write(
       store,
@@ -485,9 +521,10 @@ describe('Store with storage', () => {
       expectedData
     );
 
-    expect(storage.write).not.toHaveBeenCalled();
+    InMemoryData.initDataState(store.data, null);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
 
-    jest.runAllTimers();
     expect(storage.write).toHaveBeenCalled();
 
     const serialisedStore = (storage.write as any).mock.calls[0][0];
@@ -504,37 +541,41 @@ describe('Store with storage', () => {
     expect(data).toEqual(expectedData);
   });
 
-  it('writes removals based on GC to storage', () => {
+  it('persists commutative layers and ignores optimistic layers', () => {
     const storage: StorageAdapter = {
       read: jest.fn(),
       write: jest.fn(),
     };
 
-    const store = new Store();
-    InMemoryData.hydrateData(store.data, storage, Object.create(null));
+    store.data.storage = storage;
 
-    write(
-      store,
-      {
-        query: Appointment,
-        variables: { id: '1' },
-      },
-      expectedData
-    );
+    InMemoryData.reserveLayer(store.data, 1);
 
-    InMemoryData.initDataState(store.data, null);
-    InMemoryData.writeLink(
-      'Query',
-      store.keyOfField('appointment', { id: '1' }),
-      undefined
-    );
-    InMemoryData.gc(store.data);
+    InMemoryData.initDataState(store.data, 1);
+    InMemoryData.writeRecord('Query', 'base', true);
     InMemoryData.clearDataState();
 
-    jest.runAllTimers();
+    InMemoryData.initDataState(store.data, 2, true);
+    InMemoryData.writeRecord('Query', 'base', false);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(store.data, null);
+    expect(InMemoryData.readRecord('Query', 'base')).toBe(false);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
 
     expect(storage.write).toHaveBeenCalled();
     const serialisedStore = (storage.write as any).mock.calls[0][0];
-    expect(serialisedStore).toMatchSnapshot();
+
+    expect(serialisedStore).toEqual({
+      'Query\tbase': 'true',
+    });
+
+    store = new Store();
+    InMemoryData.hydrateData(store.data, storage, serialisedStore);
+
+    InMemoryData.initDataState(store.data, null);
+    expect(InMemoryData.readRecord('Query', 'base')).toBe(true);
+    InMemoryData.clearDataState();
   });
 });

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.8
+
+### Patch Changes
+
+- Add graphql@^15.0.0 to peer dependency range, by [@kitten](https://github.com/kitten) (See [#688](https://github.com/FormidableLabs/urql/pull/688))
+- Updated dependencies (See [#688](https://github.com/FormidableLabs/urql/pull/688) and [#678](https://github.com/FormidableLabs/urql/pull/678))
+  - @urql/core@1.10.8
+
 ## 1.8.7
 
 ### Patch Changes

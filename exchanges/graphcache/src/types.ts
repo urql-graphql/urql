@@ -169,7 +169,7 @@ export interface KeyingConfig {
 export type SerializedEntry = EntityField | Connection[] | Link;
 
 export interface SerializedEntries {
-  [key: string]: SerializedEntry;
+  [key: string]: string | undefined;
 }
 
 export interface StorageAdapter {

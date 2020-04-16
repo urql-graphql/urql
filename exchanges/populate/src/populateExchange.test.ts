@@ -369,19 +369,19 @@ describe('on query -> (mutation w/ interface return type)', () => {
       expect(print(response[1].query)).toMatchInlineSnapshot(`
         "mutation MyMutation {
           removeTodo {
-            ...Todo_PopulateFragment_0
             ...User_PopulateFragment_0
+            ...Todo_PopulateFragment_0
           }
-        }
-
-        fragment Todo_PopulateFragment_0 on Todo {
-          id
-          name
         }
 
         fragment User_PopulateFragment_0 on User {
           id
           text
+        }
+
+        fragment Todo_PopulateFragment_0 on Todo {
+          id
+          name
         }
         "
       `);

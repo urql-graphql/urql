@@ -46,14 +46,14 @@ The above would look like the following once we normalized the data:
     "author": "Author:1" // link
   },
   "Author:1": {
-    "__typename": "Todo",
+    "__typename": "Author",
     "id": "1", // record
     "name": "urql-team" // record
   }
 }
 ```
 
-This is vewry similar to how we'd go about creating a state management store manually, except that
+This is very similar to how we'd go about creating a state management store manually, except that
 _Graphcache_ can use the GraphQL document and the `__typename` field to perform this normalization
 automatically.
 

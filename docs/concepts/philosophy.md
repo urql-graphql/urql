@@ -10,7 +10,7 @@ order: 1
 
 By default, we aim to provide features that allow you to build your app quickly with minimal
 configuration. `urql` is designed to be a client that grows with you. As you go from building your first
-GraphQL app to a utilising the full functionality, the toopls are available to extend and customize `urql` based on
+GraphQL app to a utilising the full functionality, the tools are available to extend and customize `urql` based on
 your needs.
 
 In this guide, we will walk through how `urql` is set up internally and how all pieces of the puzzle

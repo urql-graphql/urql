@@ -73,6 +73,7 @@ export const makePlugins = ({ isProduction } = {}) => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
+      'babel-plugin-modular-graphql',
       'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
