@@ -76,7 +76,7 @@ export const retryExchange = ({
         );
 
         dispatchDebug({
-          type: 'retryRetrying',
+          type: 'retryAttempt',
           message: `The operation has failed and a retry has been triggered (${retryCount} / ${MAX_ATTEMPTS})`,
           operation: op,
           data: {
