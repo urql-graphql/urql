@@ -31,10 +31,10 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
 
         return pipe(
           createFetchSource(
-            dispatchDebug,
             operation,
             operation.operationName === 'query' &&
-              !!operation.context.preferGetMethod
+              !!operation.context.preferGetMethod,
+            dispatchDebug
           ),
           takeUntil(teardown$)
         );
@@ -67,9 +67,9 @@ const getOperationName = (query: DocumentNode): string | null => {
 };
 
 const createFetchSource = (
-  dispatchDebug: ExchangeInput['dispatchDebug'],
   operation: Operation,
-  shouldUseGet: boolean
+  shouldUseGet: boolean,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ) => {
   if (
     process.env.NODE_ENV !== 'production' &&
@@ -176,7 +176,7 @@ const executeFetch = (
       }
 
       dispatchDebug({
-        type: result.errors ? 'fetchError' : 'fetchSuccess',
+        type: result.errors && !result.data ? 'fetchError' : 'fetchSuccess',
         message: `A ${
           result.errors ? 'failed' : 'successful'
         } fetch response has been returned.`,
@@ -191,26 +191,24 @@ const executeFetch = (
       return makeResult(operation, result, response);
     })
     .catch((error: Error) => {
-      if (error.name === 'AbortError') {
-        return;
+      if (error.name !== 'AbortError') {
+        dispatchDebug({
+          type: 'fetchError',
+          message: error.name,
+          operation,
+          data: {
+            url,
+            fetchOptions: opts,
+            value: error,
+          },
+        });
+
+        return makeErrorResult(
+          operation,
+          statusNotOk ? new Error(response.statusText) : error,
+          response
+        );
       }
-
-      dispatchDebug({
-        type: 'fetchError',
-        message: error.name,
-        operation,
-        data: {
-          url,
-          fetchOptions: opts,
-          value: error,
-        },
-      });
-
-      return makeErrorResult(
-        operation,
-        statusNotOk ? new Error(response.statusText) : error,
-        response
-      );
     });
 };
 
