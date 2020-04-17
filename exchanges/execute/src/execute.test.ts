@@ -105,7 +105,7 @@ describe('on unsupporte doperation', () => {
   } as const;
 
   it('returns operation result', async () => {
-    const [stream, next] = makeSubject<any>();
+    const { stream, next } = makeSubject<any>();
 
     const response = pipe(
       stream,
