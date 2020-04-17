@@ -1,12 +1,13 @@
 import { filter, pipe, tap } from 'wonka';
-import { Operation, ExchangeIO, DebugEvent } from '../types';
+import { Operation, ExchangeIO, ExchangeInput } from '../types';
+import { noop } from '../utils';
 
 /** This is always the last exchange in the chain; No operation should ever reach it */
 export const fallbackExchange: ({
   dispatchDebug,
-}: {
-  dispatchDebug: (event: DebugEvent) => void;
-}) => ExchangeIO = ({ dispatchDebug }) => ops$ =>
+}: Pick<ExchangeInput, 'dispatchDebug'>) => ExchangeIO = ({
+  dispatchDebug,
+}) => ops$ =>
   pipe(
     ops$,
     tap<Operation>(operation => {
@@ -27,3 +28,7 @@ export const fallbackExchange: ({
     /* All operations that skipped through the entire exchange chain should be filtered from the output */
     filter<any>(() => false)
   );
+
+export const fallbackExchangeIO: ExchangeIO = fallbackExchange({
+  dispatchDebug: noop,
+});

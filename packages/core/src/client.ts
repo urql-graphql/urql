@@ -20,11 +20,8 @@ import {
   Subscription,
 } from 'wonka';
 
-import {
-  composeExchanges,
-  defaultExchanges,
-  fallbackExchange,
-} from './exchanges';
+import { composeExchanges, defaultExchanges } from './exchanges';
+import { fallbackExchange } from './exchanges/fallback';
 
 import {
   Exchange,

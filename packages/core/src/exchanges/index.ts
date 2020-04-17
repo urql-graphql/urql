@@ -4,7 +4,7 @@ export { subscriptionExchange } from './subscription';
 export { debugExchange } from './debug';
 export { dedupExchange } from './dedup';
 export { fetchExchange } from './fetch';
-export { fallbackExchange } from './fallback';
+export { fallbackExchangeIO } from './fallback';
 export { composeExchanges } from './compose';
 
 import { cacheExchange } from './cache';
