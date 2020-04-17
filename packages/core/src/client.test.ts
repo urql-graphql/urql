@@ -391,9 +391,8 @@ describe('debugSource', () => {
     } as any;
     const subscriber = jest.fn();
 
-    pipe(client.debugSource as any, subscribe(subscriber));
-
-    client.debugSubject!.next(event);
+    client.debugTarget!.subscribe(subscriber);
+    client.debugTarget!.dispatchEvent(event);
 
     expect(subscriber).toBeCalledTimes(1);
     expect(subscriber).toBeCalledWith(event);

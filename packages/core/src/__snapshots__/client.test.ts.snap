@@ -5,10 +5,9 @@ Client {
   "activeOperations": Object {},
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
-  "debugSubject": Object {
-    "complete": [Function],
-    "next": [Function],
-    "source": [Function],
+  "debugTarget": Object {
+    "dispatchEvent": [Function],
+    "subscribe": [Function],
   },
   "dispatchOperation": [Function],
   "executeMutation": [Function],

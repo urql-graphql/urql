@@ -11,7 +11,7 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
         client,
         forward,
         dispatchDebug: e =>
-          client.debugSubject!.next({
+          client.debugTarget!.dispatchEvent({
             ...e,
             timestamp: Date.now(),
             source: exchange.name,

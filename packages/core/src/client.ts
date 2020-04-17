@@ -17,7 +17,6 @@ import {
   publish,
   subscribe,
   map,
-  Subject,
 } from 'wonka';
 
 import {
@@ -47,6 +46,7 @@ import {
 } from './utils';
 
 import { DocumentNode } from 'graphql';
+import { subscriptionT } from 'wonka/dist/types/src/Wonka_types.gen';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -77,7 +77,10 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
   // Event target for monitoring
-  debugSubject?: Subject<DebugEvent>;
+  debugTarget?: {
+    dispatchEvent: (e: DebugEvent) => void;
+    subscribe: (callback: (e: DebugEvent) => void) => subscriptionT;
+  };
 
   // These are variables derived from ClientOptions
   url: string;
@@ -97,7 +100,11 @@ export class Client {
 
   constructor(opts: ClientOptions) {
     if (process.env.NODE_ENV !== 'production') {
-      this.debugSubject = makeSubject<DebugEvent>();
+      const { next, source } = makeSubject<DebugEvent>();
+      this.debugTarget = {
+        dispatchEvent: next,
+        subscribe: cb => pipe(source, subscribe(cb)),
+      };
     }
 
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
@@ -332,8 +339,4 @@ export class Client {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
-
-  get debugSource() {
-    return this.debugSubject ? this.debugSubject.source : undefined;
-  }
 }
