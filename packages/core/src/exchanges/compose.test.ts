@@ -1,14 +1,15 @@
 import { empty, Source } from 'wonka';
 import { Exchange } from '../types';
 import { composeExchanges } from './compose';
+import { noop } from '../utils';
 
 const mockClient = {
   debugTarget: {
     dispatchEvent: jest.fn(),
   },
 } as any;
-const forward = jest.fn();
 
+const forward = jest.fn();
 const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
 
 beforeEach(() => {
@@ -41,23 +42,31 @@ it('composes exchanges correctly', () => {
   const exchange = composeExchanges([firstExchange, secondExchange]);
   const outerFw = jest.fn(() => noopExchange) as any;
 
-  exchange({ client: mockClient, forward: outerFw })(empty as Source<any>);
+  exchange({ client: mockClient, forward: outerFw, dispatchDebug: noop })(
+    empty as Source<any>
+  );
   expect(outerFw).toHaveBeenCalled();
   expect(counter).toBe(4);
 });
 
 describe('on dispatchDebug', () => {
   it('dispatches debug event with exchange source name', () => {
+    const dispatchDebug = jest.fn();
     const debugArgs = {
       type: 'test',
       message: 'Hello',
     } as any;
+
     const testExchange = ({ dispatchDebug }) => dispatchDebug(debugArgs);
 
-    composeExchanges([testExchange])({ client: mockClient, forward });
+    composeExchanges([testExchange])({
+      client: mockClient,
+      forward,
+      dispatchDebug,
+    });
 
-    expect(mockClient.debugTarget.dispatchEvent).toBeCalledTimes(1);
-    expect(mockClient.debugTarget.dispatchEvent).toBeCalledWith({
+    expect(dispatchEvent).toBeCalledTimes(1);
+    expect(dispatchEvent).toBeCalledWith({
       ...debugArgs,
       timestamp: Date.now(),
       source: 'testExchange',
