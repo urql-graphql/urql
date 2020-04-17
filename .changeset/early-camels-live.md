@@ -1,5 +1,6 @@
 ---
 '@urql/exchange-graphcache': patch
+'@urql/exchange-multipart-fetch': patch
 '@urql/exchange-retry': patch
 '@urql/core': minor
 ---
