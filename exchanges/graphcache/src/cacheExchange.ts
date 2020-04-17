@@ -308,7 +308,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       }),
       map(res => {
         dispatchDebug({
-          type: 'graphcacheMiss',
+          type: 'cacheMiss',
           message: 'The result could not be retrieved from the cache',
           operation: res.operation,
         });
