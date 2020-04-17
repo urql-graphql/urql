@@ -17,6 +17,7 @@ import {
   publish,
   subscribe,
   map,
+  Subscription,
 } from 'wonka';
 
 import {
@@ -46,7 +47,6 @@ import {
 } from './utils';
 
 import { DocumentNode } from 'graphql';
-import { subscriptionT } from 'wonka/dist/types/src/Wonka_types.gen';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -79,7 +79,7 @@ export class Client {
   // Event target for monitoring
   debugTarget?: {
     dispatchEvent: (e: DebugEvent) => void;
-    subscribe: (callback: (e: DebugEvent) => void) => subscriptionT;
+    subscribe: (callback: (e: DebugEvent) => void) => Subscription;
   };
 
   // These are variables derived from ClientOptions
