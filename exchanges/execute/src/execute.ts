@@ -24,7 +24,7 @@ export const executeExchange = ({
 }: ExecuteExchangeArgs): Exchange => ({ forward }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
-    const targetOperationTypes = ['query', 'mutation', 'subscription'];
+    const targetOperationTypes = ['query', 'mutation'];
 
     const executedOps$ = pipe(
       sharedOps$,
