@@ -377,3 +377,25 @@ describe('queuing behavior', () => {
     expect(output[3]).toBe(results[1]);
   });
 });
+
+describe('debugSource', () => {
+  it('publishes debug events', () => {
+    const client = createClient({
+      url: 'test',
+      exchanges: [],
+    });
+
+    const event = {
+      type: 'DEBUG',
+      message: 'Hello',
+    } as any;
+    const subscriber = jest.fn();
+
+    pipe(client.debugSource as any, subscribe(subscriber));
+
+    client.debugSubject!.next(event);
+
+    expect(subscriber).toBeCalledTimes(1);
+    expect(subscriber).toBeCalledWith(event);
+  });
+});

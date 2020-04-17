@@ -3,8 +3,8 @@ import { Exchange } from '../types';
 import { composeExchanges } from './compose';
 
 const mockClient = {
-  debugTarget: {
-    dispatchEvent: jest.fn(),
+  debugSubject: {
+    next: jest.fn(),
   },
 } as any;
 const forward = jest.fn();
@@ -56,8 +56,8 @@ describe('on dispatchDebug', () => {
 
     composeExchanges([testExchange])({ client: mockClient, forward });
 
-    expect(mockClient.debugTarget.dispatchEvent).toBeCalledTimes(1);
-    expect(mockClient.debugTarget.dispatchEvent).toBeCalledWith({
+    expect(mockClient.debugSubject.next).toBeCalledTimes(1);
+    expect(mockClient.debugSubject.next).toBeCalledWith({
       ...debugArgs,
       timestamp: Date.now(),
       source: 'testExchange',

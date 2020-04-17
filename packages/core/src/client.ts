@@ -17,6 +17,7 @@ import {
   publish,
   subscribe,
   map,
+  Subject,
 } from 'wonka';
 
 import {
@@ -34,6 +35,7 @@ import {
   OperationType,
   RequestPolicy,
   PromisifiedSource,
+  DebugEvent,
 } from './types';
 
 import {
@@ -45,7 +47,6 @@ import {
 } from './utils';
 
 import { DocumentNode } from 'graphql';
-import { Target } from './utils/Target';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -76,7 +77,7 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
   // Event target for monitoring
-  debugTarget?: Target;
+  debugSubject?: Subject<DebugEvent>;
 
   // These are variables derived from ClientOptions
   url: string;
@@ -96,7 +97,7 @@ export class Client {
 
   constructor(opts: ClientOptions) {
     if (process.env.NODE_ENV !== 'production') {
-      this.debugTarget = new Target();
+      this.debugSubject = makeSubject<DebugEvent>();
     }
 
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
@@ -331,4 +332,8 @@ export class Client {
     const operation = this.createRequestOperation('mutation', query, opts);
     return this.executeRequestOperation(operation);
   };
+
+  get debugSource() {
+    return this.debugSubject ? this.debugSubject.source : undefined;
+  }
 }
