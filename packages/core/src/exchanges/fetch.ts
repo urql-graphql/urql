@@ -124,7 +124,7 @@ const createFetchSource = (
 
     Promise.resolve()
       .then(() =>
-        ended ? undefined : executeFetch(dispatchDebug, operation, fetchOptions)
+        ended ? undefined : executeFetch(operation, fetchOptions, dispatchDebug)
       )
       .then((result: OperationResult | undefined) => {
         if (!ended) {
@@ -144,9 +144,9 @@ const createFetchSource = (
 };
 
 const executeFetch = (
-  dispatchDebug: ExchangeInput['dispatchDebug'],
   operation: Operation,
   opts: RequestInit
+  dispatchDebug: ExchangeInput['dispatchDebug'],
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let statusNotOk = false;
