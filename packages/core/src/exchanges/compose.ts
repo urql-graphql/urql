@@ -4,18 +4,20 @@ import { Exchange, ExchangeInput } from '../types';
 export const composeExchanges = (exchanges: Exchange[]) => ({
   client,
   forward,
-}: Omit<ExchangeInput, 'dispatchDebug'>) =>
+  dispatchDebug,
+}: ExchangeInput) =>
   exchanges.reduceRight(
     (forward, exchange) =>
       exchange({
         client,
         forward,
-        dispatchDebug: e =>
-          client.debugTarget!.dispatchEvent({
-            ...e,
+        dispatchDebug(event) {
+          dispatchDebug({
+            ...event,
             timestamp: Date.now(),
             source: exchange.name,
-          }),
+          });
+        },
       }),
     forward
   );
