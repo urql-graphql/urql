@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 0.2.0
+
+### Minor Changes
+
+- Update `mutate()` API to accept an options argument, instead of separate arguments, to increase consistency, by [@kitten](https://github.com/kitten) (See [#705](https://github.com/FormidableLabs/urql/pull/705))
+
 ## 0.1.3
 
 ### Patch Changes

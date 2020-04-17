@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 2.3.3
+
+### Patch Changes
+
+- ⚠️ Fix @urql/exchange-populate visitWithTypeInfo import by bumping babel-plugin-modular-graphql, by [@kitten](https://github.com/kitten) (See [#709](https://github.com/FormidableLabs/urql/pull/709))
+- Updated dependencies (See [#709](https://github.com/FormidableLabs/urql/pull/709))
+  - @urql/exchange-populate@0.1.6
+
 ## 2.3.2
 
 ### Patch Changes
