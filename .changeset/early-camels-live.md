@@ -1,6 +1,6 @@
 ---
-'@urql/exchange-graphcache': minor
-'@urql/exchange-retry': minor
+'@urql/exchange-graphcache': patch
+'@urql/exchange-retry': patch
 '@urql/core': minor
 ---
 
