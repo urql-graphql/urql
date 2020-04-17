@@ -5,11 +5,9 @@ Client {
   "activeOperations": Object {},
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
-  "debugTarget": Target {
-    "addEventListener": [Function],
+  "debugTarget": Object {
     "dispatchEvent": [Function],
-    "listeners": Array [],
-    "removeEventListener": [Function],
+    "subscribe": [Function],
   },
   "dispatchOperation": [Function],
   "executeMutation": [Function],

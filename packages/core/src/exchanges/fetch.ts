@@ -145,8 +145,8 @@ const createFetchSource = (
 
 const executeFetch = (
   operation: Operation,
-  opts: RequestInit
-  dispatchDebug: ExchangeInput['dispatchDebug'],
+  opts: RequestInit,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let statusNotOk = false;
@@ -177,7 +177,9 @@ const executeFetch = (
 
       dispatchDebug({
         type: result.errors ? 'fetchError' : 'fetchSuccess',
-        message: `A ${result.errors ? 'failed' : 'successful'} fetch response has been returned.`,
+        message: `A ${
+          result.errors ? 'failed' : 'successful'
+        } fetch response has been returned.`,
         operation,
         data: {
           url,
@@ -202,7 +204,7 @@ const executeFetch = (
           fetchOptions: opts,
           value: error,
         },
-      });    
+      });
 
       return makeErrorResult(
         operation,
