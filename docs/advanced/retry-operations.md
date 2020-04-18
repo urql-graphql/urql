@@ -77,7 +77,6 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    fetchExchange,
     retryExchange({
       retryIf: error => {
         if ((error && error.graphQLErrors.length > 0) || error.networkError) {
@@ -85,6 +84,7 @@ const client = createClient({
         }
       },
     }),
+    fetchExchange,
   ],
 });
 ```
