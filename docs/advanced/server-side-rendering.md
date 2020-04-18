@@ -34,7 +34,7 @@ const ssr = ssrExchange({
   initialState: !isServerSide ? window.__URQL_DATA__ : undefined,
 });
 
-const client createClient({
+const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
