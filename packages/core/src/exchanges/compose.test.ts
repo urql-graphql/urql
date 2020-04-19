@@ -3,11 +3,7 @@ import { Exchange } from '../types';
 import { composeExchanges } from './compose';
 import { noop } from '../utils';
 
-const mockClient = {
-  debugTarget: {
-    dispatchEvent: jest.fn(),
-  },
-} as any;
+const mockClient = {} as any;
 
 const forward = jest.fn();
 const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
@@ -57,7 +53,10 @@ describe('on dispatchDebug', () => {
       message: 'Hello',
     } as any;
 
-    const testExchange = ({ dispatchDebug }) => dispatchDebug(debugArgs);
+    const testExchange: Exchange = ({ dispatchDebug }) => {
+      dispatchDebug(debugArgs);
+      return () => empty as Source<any>;
+    };
 
     composeExchanges([testExchange])({
       client: mockClient,
@@ -65,8 +64,8 @@ describe('on dispatchDebug', () => {
       dispatchDebug,
     });
 
-    expect(dispatchEvent).toBeCalledTimes(1);
-    expect(dispatchEvent).toBeCalledWith({
+    expect(dispatchDebug).toBeCalledTimes(1);
+    expect(dispatchDebug).toBeCalledWith({
       ...debugArgs,
       timestamp: Date.now(),
       source: 'testExchange',
