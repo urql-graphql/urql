@@ -29,14 +29,15 @@ export function withUrqlClient(
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
+        if (urqlClient) {
+          return urqlClient;
+        }
+
         const clientOptions =
           typeof clientConfig === 'function' ? clientConfig() : clientConfig;
 
-        return (
-          urqlClient ||
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]!
-        );
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -85,9 +86,16 @@ export function withUrqlClient(
       // Run the prepass step on AppTree. This will run all urql queries on the server.
       await ssrPrepass(<AppTree {...appTreeProps} />);
 
+      // Serialize the urqlClient to null on the client-side.
+      // This ensures we don't share client and server instances of the urqlClient.
+      (urqlClient as any).toJSON = () => {
+        return null;
+      };
+
       return {
         ...pageProps,
         urqlState: ssrCache ? ssrCache.extractData() : undefined,
+        urqlClient,
       };
     };
 
