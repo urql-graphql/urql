@@ -73,7 +73,7 @@ be conveniently converted to a promise.
 ```js
 import { pipe, subscribe } from 'wonka';
 
-const { subscribe } = pipe(
+const { unsubscribe } = pipe(
   client.query('{ test }', {
     /* vars */
   }),
@@ -87,6 +87,7 @@ client
   .query('{ test }', {
     /* vars */
   })
+  .toPromise()
   .then(result => {
     console.log(result); // OperationResult
   });
