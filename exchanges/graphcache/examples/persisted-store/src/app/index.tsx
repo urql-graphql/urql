@@ -12,8 +12,16 @@ const storage = {
     db = await openDB('myApplication', 1, {
       upgrade: db => db.createObjectStore('keyval'),
     });
-    const result = (await db.getAll('keyval')) as SerializedEntries;
-    return result;
+
+    return Promise.all([
+      db.getAllKeys("keyval"),
+      db.getAll("keyval"),
+    ]).then(([keys, values]) => {
+      return keys.reduce((acc: SerializedEntries, key, i) => {
+        acc[key] = values[i];
+        return acc;
+      }, {});
+    });
   },
   write: async batch => {
     for (const key in batch) {
