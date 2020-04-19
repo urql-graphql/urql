@@ -45,6 +45,11 @@ export interface FieldInfo {
   arguments: Variables | null;
 }
 
+export interface KeyInfo {
+  entityKey: string;
+  fieldKey: string;
+}
+
 // This is an input operation
 export interface OperationRequest {
   query: DocumentNode;
