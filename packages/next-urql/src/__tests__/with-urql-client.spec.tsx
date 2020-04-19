@@ -66,9 +66,7 @@ describe('withUrqlClient', () => {
 
   describe('with ctx callback to create client options', () => {
     // Simulate a token that might be passed in a request to the server-rendered application.
-    const token = Math.random()
-      .toString(36)
-      .slice(-10);
+    const token = Math.random().toString(36).slice(-10);
 
     const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,

@@ -22,11 +22,7 @@ const stringify = (x: any): string => {
 
   const keys = Object.keys(x).sort();
   if (!keys.length && x.constructor && x.constructor !== Object) {
-    const key =
-      cache.get(x) ||
-      Math.random()
-        .toString(36)
-        .slice(2);
+    const key = cache.get(x) || Math.random().toString(36).slice(2);
     cache.set(x, key);
     return `{"__key":"${key}"}`;
   }
