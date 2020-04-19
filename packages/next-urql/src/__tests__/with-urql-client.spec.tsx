@@ -50,7 +50,7 @@ describe('withUrqlClient', () => {
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
     });
 
-    it('should create the urql client instance server-side inside getInitialProps and client-side in the component', async () => {
+    it('should create the urql client instance server-side inside getInitialProps', async () => {
       const props =
         Component.getInitialProps &&
         (await Component.getInitialProps(mockContext));
@@ -59,7 +59,6 @@ describe('withUrqlClient', () => {
       const tree = shallow(<Component {...props} />);
       const app = tree.find(MockApp);
 
-      expect(spyInitUrqlClient).toHaveBeenCalledTimes(2);
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.url).toEqual('http://localhost:3000');
     });
@@ -67,7 +66,9 @@ describe('withUrqlClient', () => {
 
   describe('with ctx callback to create client options', () => {
     // Simulate a token that might be passed in a request to the server-rendered application.
-    const token = Math.random().toString(36).slice(-10);
+    const token = Math.random()
+      .toString(36)
+      .slice(-10);
 
     const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,
