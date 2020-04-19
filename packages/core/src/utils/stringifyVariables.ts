@@ -7,7 +7,7 @@ const stringify = (x: any): string => {
   } else if (typeof x !== 'object') {
     return JSON.stringify(x) || '';
   } else if (x.toJSON) {
-    return x.toJSON();
+    return stringify(x.toJSON());
   } else if (Array.isArray(x)) {
     let out = '[';
     for (let i = 0, l = x.length; i < l; i++) {
