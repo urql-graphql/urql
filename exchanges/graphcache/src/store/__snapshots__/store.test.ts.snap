@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Store with storage should be able to persist embedded data 1`] = `
+Object {
+  "Query%2eappointment({\\"id\\":\\"1\\"}).__typename": "\\"Appointment\\"",
+  "Query%2eappointment({\\"id\\":\\"1\\"}).info": "\\"urql meeting\\"",
+  "Query.appointment({\\"id\\":\\"1\\"})": ":\\"Query.appointment({\\\\\\"id\\\\\\":\\\\\\"1\\\\\\"})\\"",
+}
+`;
+
 exports[`Store with storage should be able to store and rehydrate data 1`] = `
 Object {
   "Appointment:1.__typename": "\\"Appointment\\"",

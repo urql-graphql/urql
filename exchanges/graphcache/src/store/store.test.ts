@@ -541,6 +541,60 @@ describe('Store with storage', () => {
     expect(data).toEqual(expectedData);
   });
 
+  it('should be able to persist embedded data', () => {
+    const EmbeddedAppointment = gql`
+      query appointment($id: String) {
+        appointment(id: $id) {
+          __typename
+          info
+        }
+      }
+    `;
+
+    const embeddedData = {
+      ...expectedData,
+      appointment: {
+        ...expectedData.appointment,
+        id: undefined,
+      },
+    } as any;
+
+    const storage: StorageAdapter = {
+      read: jest.fn(),
+      write: jest.fn(),
+    };
+
+    store.data.storage = storage;
+
+    write(
+      store,
+      {
+        query: EmbeddedAppointment,
+        variables: { id: '1' },
+      },
+      embeddedData
+    );
+
+    InMemoryData.initDataState(store.data, null);
+    InMemoryData.persistData();
+    InMemoryData.clearDataState();
+
+    expect(storage.write).toHaveBeenCalled();
+
+    const serialisedStore = (storage.write as any).mock.calls[0][0];
+    expect(serialisedStore).toMatchSnapshot();
+
+    store = new Store();
+    InMemoryData.hydrateData(store.data, storage, serialisedStore);
+
+    const { data } = query(store, {
+      query: EmbeddedAppointment,
+      variables: { id: '1' },
+    });
+
+    expect(data).toEqual(embeddedData);
+  });
+
   it('persists commutative layers and ignores optimistic layers', () => {
     const storage: StorageAdapter = {
       read: jest.fn(),
