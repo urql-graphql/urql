@@ -29,7 +29,7 @@ it('returns null for circular structures', () => {
 
 it('stringifies dates correctly', () => {
   const date = new Date('2019-12-11T04:20:00');
-  expect(stringifyVariables(date)).toBe(date.toJSON());
+  expect(stringifyVariables(date)).toBe(`"${date.toJSON()}"`);
 });
 
 it('stringifies dictionaries (Object.create(null)) correctly', () => {
