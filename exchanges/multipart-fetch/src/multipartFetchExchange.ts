@@ -48,6 +48,19 @@ export const multipartFetchExchange: Exchange = ({
         fetchOptions.method = 'POST';
         fetchOptions.body = new FormData();
         fetchOptions.body.append('operations', JSON.stringify(body));
+
+        const map = {};
+        let i = 0;
+        files.forEach(paths => {
+          map[++i] = paths.map(path => `variables.${path}`);
+        });
+
+        fetchOptions.body.append('map', JSON.stringify(map));
+
+        i = 0;
+        files.forEach((_, file) => {
+          (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
+        });
       } else {
         fetchOptions = makeFetchOptions(operation, body);
         url = makeFetchURL(operation, body);
