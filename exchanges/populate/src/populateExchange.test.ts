@@ -66,6 +66,7 @@ beforeEach(jest.clearAllMocks);
 const exchangeArgs = {
   forward: a => a as any,
   client: {} as Client,
+  dispatchDebug: jest.fn(),
 };
 
 describe('on mutation', () => {

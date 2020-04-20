@@ -5,9 +5,6 @@ import { CombinedError } from './utils/error';
 
 export { ExecutionResult } from 'graphql';
 
-/** Utility type to Omit keys from an interface/object type */
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
 };
@@ -76,8 +73,11 @@ export interface OperationResult<Data = any> {
 
 /** Input parameters for to an Exchange factory function. */
 export interface ExchangeInput {
-  forward: ExchangeIO;
   client: Client;
+  forward: ExchangeIO;
+  dispatchDebug: <T extends keyof DebugEventTypes | string>(
+    t: DebugEventArg<T>
+  ) => void;
 }
 
 /** Function responsible for listening for streamed [operations]{@link Operation}. */
@@ -85,3 +85,47 @@ export type Exchange = (input: ExchangeInput) => ExchangeIO;
 
 /** Function responsible for receiving an observable [operation]{@link Operation} and returning a [result]{@link OperationResult}. */
 export type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
+
+/** Debug event types (interfaced for declaration merging). */
+export interface DebugEventTypes {
+  // Cache exchange
+  cacheHit: { value: any };
+  cacheInvalidation: {
+    typenames: string[];
+    response: OperationResult;
+  };
+  // Fetch exchange
+  fetchRequest: {
+    url: string;
+    fetchOptions: RequestInit;
+  };
+  fetchSuccess: {
+    url: string;
+    fetchOptions: RequestInit;
+    value: object;
+  };
+  fetchError: {
+    url: string;
+    fetchOptions: RequestInit;
+    value: Error;
+  };
+  // Retry exchange
+  retryRetrying: {
+    retryCount: number;
+  };
+}
+
+export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
+  type: T;
+  message: string;
+  operation: Operation;
+} & (T extends keyof DebugEventTypes
+  ? { data: DebugEventTypes[T] }
+  : { data?: any });
+
+export type DebugEvent<
+  T extends keyof DebugEventTypes | string = string
+> = DebugEventArg<T> & {
+  timestamp: number;
+  source: string;
+};

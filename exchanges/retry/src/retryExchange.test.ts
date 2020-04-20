@@ -10,6 +10,8 @@ import {
 } from '@urql/core';
 import { retryExchange } from './retryExchange';
 
+const dispatchDebug = jest.fn();
+
 beforeEach(() => {
   jest.useFakeTimers();
 });
@@ -105,6 +107,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
     })({
       forward,
       client,
+      dispatchDebug,
     })(ops$),
     tap(result),
     publish
@@ -163,6 +166,7 @@ it('should retry x number of times and then return the successful result', () =>
     })({
       forward,
       client,
+      dispatchDebug,
     })(ops$),
     tap(result),
     publish
@@ -207,6 +211,7 @@ it(`should still retry if retryIf undefined but there is a networkError`, () => 
     })({
       forward,
       client,
+      dispatchDebug,
     })(ops$),
     tap(result),
     publish

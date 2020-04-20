@@ -17,16 +17,15 @@ import {
   publish,
   subscribe,
   map,
+  Subscription,
 } from 'wonka';
 
-import {
-  composeExchanges,
-  defaultExchanges,
-  fallbackExchangeIO,
-} from './exchanges';
+import { composeExchanges, defaultExchanges } from './exchanges';
+import { fallbackExchange } from './exchanges/fallback';
 
 import {
   Exchange,
+  ExchangeInput,
   GraphQLRequest,
   Operation,
   OperationContext,
@@ -34,6 +33,7 @@ import {
   OperationType,
   RequestPolicy,
   PromisifiedSource,
+  DebugEvent,
 } from './types';
 
 import {
@@ -41,6 +41,7 @@ import {
   toSuspenseSource,
   withPromise,
   maskTypename,
+  noop,
 } from './utils';
 
 import { DocumentNode } from 'graphql';
@@ -73,6 +74,9 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
+  // Event target for monitoring
+  subscribeToDebugTarget?: (onEvent: (e: DebugEvent) => void) => Subscription;
+
   // These are variables derived from ClientOptions
   url: string;
   fetch?: typeof fetch;
@@ -92,6 +96,14 @@ export class Client {
   constructor(opts: ClientOptions) {
     if (process.env.NODE_ENV !== 'production' && !opts.url) {
       throw new Error('You are creating an urql-client without a url.');
+    }
+
+    let dispatchDebug: ExchangeInput['dispatchDebug'] = noop;
+    if (process.env.NODE_ENV !== 'production') {
+      const { next, source } = makeSubject<DebugEvent>();
+      this.subscribeToDebugTarget = (onEvent: (e: DebugEvent) => void) =>
+        pipe(source, subscribe(onEvent));
+      dispatchDebug = next as ExchangeInput['dispatchDebug'];
     }
 
     this.url = opts.url;
@@ -124,16 +136,19 @@ export class Client {
 
     const exchanges =
       opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
+
     // All exchange are composed into a single one and are called using the constructed client
     // and the fallback exchange stream
-    const exchange = composeExchanges(exchanges);
+    const composedExchange = composeExchanges(exchanges);
 
-    // All operations run through the exchanges in a pipeline-like fashion
-    // and this observable then combines all their results
+    // All exchanges receive inputs using which they can forward operations to the next exchange
+    // and receive a stream of results in return, access the client, or dispatch debugging events
+    // All operations then run through the Exchange IOs in a pipeline-like fashion
     this.results$ = share(
-      exchange({
+      composedExchange({
         client: this,
-        forward: fallbackExchangeIO,
+        dispatchDebug,
+        forward: fallbackExchange({ dispatchDebug }),
       })(this.operations$)
     );
 

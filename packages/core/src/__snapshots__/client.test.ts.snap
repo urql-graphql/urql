@@ -18,6 +18,7 @@ Client {
   "reexecuteOperation": [Function],
   "requestPolicy": "cache-first",
   "results$": [Function],
+  "subscribeToDebugTarget": [Function],
   "suspense": false,
   "url": "https://hostname.com",
 }

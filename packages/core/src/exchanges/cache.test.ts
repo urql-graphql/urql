@@ -19,19 +19,22 @@ import {
   subscriptionResult,
   undefinedQueryResponse,
 } from '../test-utils';
-import { Operation, OperationResult } from '../types';
+import { Operation, OperationResult, ExchangeInput } from '../types';
 import { afterMutation, cacheExchange } from './cache';
 
+const reexecuteOperation = jest.fn();
+const dispatchDebug = jest.fn();
+
 let response;
-let exchangeArgs;
+let exchangeArgs: ExchangeInput;
 let forwardedOperations: Operation[];
-let reexecuteOperation;
 let input: Subject<Operation>;
+
+beforeEach(jest.clearAllMocks);
 
 beforeEach(() => {
   response = queryResponse;
   forwardedOperations = [];
-  reexecuteOperation = jest.fn();
   input = makeSubject<Operation>();
 
   // Collect all forwarded operations
@@ -49,7 +52,7 @@ beforeEach(() => {
     reexecuteOperation: reexecuteOperation as any,
   } as Client;
 
-  exchangeArgs = { forward, client };
+  exchangeArgs = { forward, client, dispatchDebug };
 });
 
 describe('on query', () => {
@@ -182,7 +185,8 @@ describe('on mutation', () => {
     afterMutation(
       resultCache,
       operationCache,
-      exchangeArgs.client
+      exchangeArgs.client,
+      dispatchDebug
     )({
       ...mutationResponse,
       data: {
@@ -206,7 +210,8 @@ describe('on mutation', () => {
     afterMutation(
       resultCache,
       operationCache,
-      exchangeArgs.client
+      exchangeArgs.client,
+      dispatchDebug
     )({
       ...mutationResponse,
       operation: {
@@ -250,7 +255,6 @@ describe('on empty query response', () => {
   beforeEach(() => {
     response = undefinedQueryResponse;
     forwardedOperations = [];
-    reexecuteOperation = jest.fn();
     input = makeSubject<Operation>();
 
     // Collect all forwarded operations
@@ -268,7 +272,7 @@ describe('on empty query response', () => {
       reexecuteOperation: reexecuteOperation as any,
     } as Client;
 
-    exchangeArgs = { forward, client };
+    exchangeArgs = { forward, client, dispatchDebug };
   });
 
   it('does not cache response', () => {

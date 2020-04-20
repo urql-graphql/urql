@@ -39,8 +39,13 @@ const response = {
 };
 
 const exchangeArgs = {
+  dispatchDebug: jest.fn(),
   forward: () => empty as Source<OperationResult>,
-  client: {} as Client,
+  client: ({
+    debugTarget: {
+      dispatchEvent: jest.fn(),
+    },
+  } as any) as Client,
 };
 
 describe('on success', () => {

@@ -1,8 +1,10 @@
 import { forEach, fromValue, pipe } from 'wonka';
 import { queryOperation, teardownOperation } from '../test-utils';
-import { fallbackExchangeIO } from './fallback';
+import { fallbackExchange } from './fallback';
 
 const consoleWarn = console.warn;
+
+const dispatchDebug = jest.fn();
 
 beforeEach(() => {
   console.warn = jest.fn();
@@ -16,7 +18,7 @@ it('filters all results and warns about input', () => {
   const res: any[] = [];
 
   pipe(
-    fallbackExchangeIO(fromValue(queryOperation)),
+    fallbackExchange({ dispatchDebug })(fromValue(queryOperation)),
     forEach(x => res.push(x))
   );
 
@@ -28,7 +30,7 @@ it('filters all results and warns about input', () => {
   const res: any[] = [];
 
   pipe(
-    fallbackExchangeIO(fromValue(teardownOperation)),
+    fallbackExchange({ dispatchDebug })(fromValue(teardownOperation)),
     forEach(x => res.push(x))
   );
 

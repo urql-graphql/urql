@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
 
 interface Body {
@@ -11,7 +11,7 @@ interface Body {
 }
 
 /** A default exchange for fetching GraphQL requests. */
-export const fetchExchange: Exchange = ({ forward }) => {
+export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
@@ -33,7 +33,8 @@ export const fetchExchange: Exchange = ({ forward }) => {
           createFetchSource(
             operation,
             operation.operationName === 'query' &&
-              !!operation.context.preferGetMethod
+              !!operation.context.preferGetMethod,
+            dispatchDebug
           ),
           takeUntil(teardown$)
         );
@@ -65,7 +66,11 @@ const getOperationName = (query: DocumentNode): string | null => {
   return node ? node.name!.value : null;
 };
 
-const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
+const createFetchSource = (
+  operation: Operation,
+  shouldUseGet: boolean,
+  dispatchDebug: ExchangeInput['dispatchDebug']
+) => {
   if (
     process.env.NODE_ENV !== 'production' &&
     operation.operationName === 'subscription'
@@ -118,7 +123,9 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
     let ended = false;
 
     Promise.resolve()
-      .then(() => (ended ? undefined : executeFetch(operation, fetchOptions)))
+      .then(() =>
+        ended ? undefined : executeFetch(operation, fetchOptions, dispatchDebug)
+      )
       .then((result: OperationResult | undefined) => {
         if (!ended) {
           ended = true;
@@ -138,11 +145,22 @@ const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
 
 const executeFetch = (
   operation: Operation,
-  opts: RequestInit
+  opts: RequestInit,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ): Promise<OperationResult> => {
   const { url, fetch: fetcher } = operation.context;
   let statusNotOk = false;
   let response: Response;
+
+  dispatchDebug({
+    type: 'fetchRequest',
+    message: 'A fetch request is being executed.',
+    operation,
+    data: {
+      url,
+      fetchOptions: opts,
+    },
+  });
 
   return (fetcher || fetch)(url, opts)
     .then((res: Response) => {
@@ -157,10 +175,34 @@ const executeFetch = (
         throw new Error('No Content');
       }
 
+      dispatchDebug({
+        type: result.errors && !result.data ? 'fetchError' : 'fetchSuccess',
+        message: `A ${
+          result.errors ? 'failed' : 'successful'
+        } fetch response has been returned.`,
+        operation,
+        data: {
+          url,
+          fetchOptions: opts,
+          value: result,
+        },
+      });
+
       return makeResult(operation, result, response);
     })
     .catch((error: Error) => {
       if (error.name !== 'AbortError') {
+        dispatchDebug({
+          type: 'fetchError',
+          message: error.name,
+          operation,
+          data: {
+            url,
+            fetchOptions: opts,
+            value: error,
+          },
+        });
+
         return makeErrorResult(
           operation,
           statusNotOk ? new Error(response.statusText) : error,

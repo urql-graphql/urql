@@ -2,7 +2,7 @@
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
 import {
   addMetadata,
   collectTypesFromResponse,
@@ -18,7 +18,7 @@ interface OperationCache {
 const shouldSkip = ({ operationName }: Operation) =>
   operationName !== 'mutation' && operationName !== 'query';
 
-export const cacheExchange: Exchange = ({ forward, client }) => {
+export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache = new Map() as ResultCache;
   const operationCache = Object.create(null) as OperationCache;
 
@@ -31,7 +31,8 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
   const handleAfterMutation = afterMutation(
     resultCache,
     operationCache,
-    client
+    client,
+    dispatchDebug
   );
 
   const handleAfterQuery = afterQuery(resultCache, operationCache);
@@ -57,6 +58,20 @@ export const cacheExchange: Exchange = ({ forward, client }) => {
       filter(op => !shouldSkip(op) && isOperationCached(op)),
       map(operation => {
         const cachedResult = resultCache.get(operation.key);
+
+        dispatchDebug({
+          operation,
+          ...(cachedResult
+            ? {
+                type: 'cacheHit',
+                message: 'The result was successfully retried from the cache',
+              }
+            : {
+                type: 'cacheMiss',
+                message: 'The result could not be retrieved from the cache',
+              }),
+        });
+
         const result: OperationResult = {
           ...cachedResult,
           operation: addMetadata(operation, {
@@ -126,15 +141,25 @@ const reexecuteOperation = (client: Client, operation: Operation) => {
 export const afterMutation = (
   resultCache: ResultCache,
   operationCache: OperationCache,
-  client: Client
+  client: Client,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ) => (response: OperationResult) => {
   const pendingOperations = new Set<number>();
   const { additionalTypenames } = response.operation.context;
 
-  [
+  const typenames = [
     ...collectTypesFromResponse(response.data),
     ...(additionalTypenames || []),
-  ].forEach(typeName => {
+  ];
+
+  dispatchDebug({
+    type: 'cacheInvalidation',
+    message: `The following typenames have been invalidated: ${typenames}`,
+    operation: response.operation,
+    data: { typenames, response },
+  });
+
+  typenames.forEach(typeName => {
     const operations =
       operationCache[typeName] || (operationCache[typeName] = new Set());
     operations.forEach(key => {

@@ -85,6 +85,7 @@ export interface CacheExchangeOpts {
 export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   forward,
   client,
+  dispatchDebug,
 }) => {
   const store = new Store(opts);
 
@@ -305,7 +306,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           res.operation.context.requestPolicy !== 'cache-only'
         );
       }),
-      map(res => addCacheOutcome(res.operation, 'miss'))
+      map(res => {
+        dispatchDebug({
+          type: 'cacheMiss',
+          message: 'The result could not be retrieved from the cache',
+          operation: res.operation,
+        });
+        return addCacheOutcome(res.operation, 'miss');
+      })
     );
 
     // Resolve OperationResults that the cache was able to assemble completely and trigger
@@ -337,6 +345,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               toRequestPolicy(operation, 'network-only')
             );
           }
+
+          dispatchDebug({
+            type: 'cacheHit',
+            message: `A requested operation was found and returned from the cache.`,
+            operation: res.operation,
+            data: {
+              value: result,
+            },
+          });
 
           return result;
         }
