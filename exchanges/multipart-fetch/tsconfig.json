@@ -6,6 +6,7 @@
     "paths": {
       "urql": ["../../node_modules/urql/src"],
       "*-urql": ["../../node_modules/*-urql/src"],
+      "@urql/core/internal": ["../../node_modules/@urql/core/src/internal"],
       "@urql/*": ["../../node_modules/@urql/*/src"]
     }
   }

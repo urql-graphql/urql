@@ -1,4 +1,3 @@
-import { Kind, DocumentNode, OperationDefinitionNode } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { extractFiles } from 'extract-files';
 
