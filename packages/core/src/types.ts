@@ -42,6 +42,7 @@ export interface OperationDebugMeta {
 export interface OperationContext {
   [key: string]: any;
   additionalTypenames?: string[];
+  fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;

@@ -200,7 +200,7 @@ const executeFetch = (
           response
         );
       }
-    });
+    }) as Promise<OperationResult>;
 };
 
 export const convertToGet = (uri: string, body: Body): string => {
