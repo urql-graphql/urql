@@ -568,7 +568,7 @@ describe('Store with storage', () => {
     const serialisedStore = (storage.write as any).mock.calls[0][0];
 
     expect(serialisedStore).toEqual({
-      'Query\tbase': 'true',
+      'Query.base': 'true',
     });
 
     store = new Store();

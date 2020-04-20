@@ -9,10 +9,10 @@ import {
 } from '../types';
 
 import {
+  serializeKeys,
+  deserializeKeyInfo,
   fieldInfoOfKey,
   joinKeys,
-  serializeKeys,
-  indexOfSeparator,
 } from './keys';
 
 import { makeDict } from '../helpers/dict';
@@ -543,18 +543,14 @@ export const persistData = () => {
     const entries: SerializedEntries = makeDict();
     currentIgnoreOptimistic = true;
     currentData!.persist.forEach(key => {
-      const sepIndex = indexOfSeparator(key);
-      if (sepIndex > -1) {
-        const entityKey = key.slice(0, sepIndex);
-        const fieldKey = key.slice(sepIndex + 1);
-        let x: void | Link | EntityField;
-        if ((x = readLink(entityKey, fieldKey)) !== undefined) {
-          entries[key] = `:${stringifyVariables(x)}`;
-        } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
-          entries[key] = stringifyVariables(x);
-        } else {
-          entries[key] = undefined;
-        }
+      const { entityKey, fieldKey } = deserializeKeyInfo(key);
+      let x: void | Link | EntityField;
+      if ((x = readLink(entityKey, fieldKey)) !== undefined) {
+        entries[key] = `:${stringifyVariables(x)}`;
+      } else if ((x = readRecord(entityKey, fieldKey)) !== undefined) {
+        entries[key] = stringifyVariables(x);
+      } else {
+        entries[key] = undefined;
       }
     });
 
@@ -573,10 +569,8 @@ export const hydrateData = (
 
   for (const key in entries) {
     const value = entries[key];
-    const sepIndex = indexOfSeparator(key);
-    if (value && sepIndex > -1) {
-      const entityKey = key.slice(0, sepIndex);
-      const fieldKey = key.slice(sepIndex + 1);
+    if (value !== undefined) {
+      const { entityKey, fieldKey } = deserializeKeyInfo(key);
       if (value[0] === ':') {
         writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
       } else {
