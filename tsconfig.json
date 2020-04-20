@@ -5,6 +5,7 @@
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],
       "@urql/exchange-*": ["exchanges/*/src"],
+      "@urql/core/*": ["packages/core/src/*"],
       "@urql/*": ["packages/*-urql/src", "packages/*/src"]
     },
     "esModuleInterop": true,

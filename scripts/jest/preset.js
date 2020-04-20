@@ -9,6 +9,7 @@ module.exports = {
   moduleNameMapper: {
     "^urql$": "<rootDir>/../../node_modules/urql/src",
     "^(.*-urql)$": "<rootDir>/../../node_modules/$1/src",
+    "^@urql/(.*)/(.*)$": "<rootDir>/../../node_modules/@urql/$1/src/$2",
     "^@urql/(.*)$": "<rootDir>/../../node_modules/@urql/$1/src",
   },
   watchPlugins: ['jest-watch-yarn-workspaces'],

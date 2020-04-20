@@ -1,9 +1,8 @@
 import { Client, OperationResult, OperationType } from '@urql/core';
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
-import gql from 'graphql-tag';
-import { print } from 'graphql';
 
-import { multipartFetchExchange, convertToGet } from './multipartFetchExchange';
+import { multipartFetchExchange } from './multipartFetchExchange';
+
 import {
   uploadOperation,
   queryOperation,
@@ -213,41 +212,5 @@ describe('on teardown', () => {
 
     expect(fetch).toHaveBeenCalledTimes(0);
     expect(abort).toHaveBeenCalledTimes(0);
-  });
-});
-
-describe('convert for GET', () => {
-  it('should do a basic conversion', () => {
-    const query = `query ($id: ID!) { node(id: $id) { id } }`;
-    const variables = { id: 2 };
-    expect(convertToGet('http://localhost:3000', { query, variables })).toBe(
-      `http://localhost:3000?query=${encodeURIComponent(
-        query
-      )}&variables=${encodeURIComponent(JSON.stringify(variables))}`
-    );
-  });
-
-  it('should do a basic conversion with fragments', () => {
-    const nodeFragment = gql`
-      fragment nodeFragment on Node {
-        id
-      }
-    `;
-
-    const variables = { id: 2 };
-    const query = print(gql`
-      query($id: ID!) {
-        node(id: $id) {
-          ...nodeFragment
-        }
-      }
-      ${nodeFragment}
-    `);
-
-    expect(convertToGet('http://localhost:3000', { query, variables })).toBe(
-      `http://localhost:3000?query=${encodeURIComponent(
-        query
-      )}&variables=${encodeURIComponent(JSON.stringify(variables))}`
-    );
   });
 });

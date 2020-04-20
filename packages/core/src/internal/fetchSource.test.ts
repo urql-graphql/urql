@@ -1,9 +1,7 @@
-import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
+import { pipe, subscribe, toPromise } from 'wonka';
 
-import { Client } from '../client';
 import { queryOperation } from '../test-utils';
-import { OperationResult, OperationType } from '../types';
-import { fetchExchange } from './fetch';
+import { makeFetchSource } from './fetchSource';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -36,16 +34,6 @@ const response = {
   },
 };
 
-const exchangeArgs = {
-  dispatchDebug: jest.fn(),
-  forward: () => empty as Source<OperationResult>,
-  client: ({
-    debugTarget: {
-      dispatchEvent: jest.fn(),
-    },
-  } as any) as Client,
-};
-
 describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
@@ -55,23 +43,44 @@ describe('on success', () => {
   });
 
   it('returns response data', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({});
-
+    const fetchOptions = {};
     const data = await pipe(
-      fromValue({
-        ...queryOperation,
-        context: {
-          ...queryOperation.context,
-          fetchOptions,
-        },
-      }),
-      fetchExchange(exchangeArgs),
+      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
       toPromise
     );
 
     expect(data).toMatchSnapshot();
-    expect(fetchOptions).toHaveBeenCalled();
-    expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+
+    expect(fetch).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][0]).toBe('https://test.com/graphql');
+    expect(fetch.mock.calls[0][1]).toBe(fetchOptions);
+  });
+
+  it('uses the mock fetch if given', async () => {
+    const fetchOptions = {};
+    const fetcher = jest.fn().mockResolvedValue({
+      status: 200,
+      json: jest.fn().mockResolvedValue(response),
+    });
+
+    const data = await pipe(
+      makeFetchSource(
+        {
+          ...queryOperation,
+          context: {
+            ...queryOperation.context,
+            fetch: fetcher,
+          },
+        },
+        'https://test.com/graphql',
+        fetchOptions
+      ),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(fetcher).toHaveBeenCalled();
   });
 });
 
@@ -84,9 +93,9 @@ describe('on error', () => {
   });
 
   it('returns error data', async () => {
+    const fetchOptions = {};
     const data = await pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
+      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
       toPromise
     );
 
@@ -94,17 +103,10 @@ describe('on error', () => {
   });
 
   it('returns error data with status 400 and manual redirect mode', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({ redirect: 'manual' });
-
     const data = await pipe(
-      fromValue({
-        ...queryOperation,
-        context: {
-          ...queryOperation.context,
-          fetchOptions,
-        },
+      makeFetchSource(queryOperation, 'https://test.com/graphql', {
+        redirect: 'manual',
       }),
-      fetchExchange(exchangeArgs),
       toPromise
     );
 
@@ -112,18 +114,12 @@ describe('on error', () => {
   });
 
   it('ignores the error when a result is available', async () => {
-    fetch.mockResolvedValue({
-      status: 400,
-      json: jest.fn().mockResolvedValue(response),
-    });
-
     const data = await pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
+      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
       toPromise
     );
 
-    expect(data.data).toEqual(response.data);
+    expect(data).toMatchSnapshot();
   });
 });
 
@@ -132,8 +128,7 @@ describe('on teardown', () => {
     fetch.mockRejectedValueOnce(abortError);
 
     const { unsubscribe } = pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
+      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
       subscribe(fail)
     );
 
@@ -146,8 +141,7 @@ describe('on teardown', () => {
     fetch.mockRejectedValueOnce(abortError);
 
     const { unsubscribe } = pipe(
-      fromValue(queryOperation),
-      fetchExchange(exchangeArgs),
+      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
       subscribe(fail)
     );
 
@@ -156,19 +150,5 @@ describe('on teardown', () => {
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(abort).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call the query', () => {
-    pipe(
-      fromValue({
-        ...queryOperation,
-        operationName: 'teardown' as OperationType,
-      }),
-      fetchExchange(exchangeArgs),
-      subscribe(fail)
-    );
-
-    expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(0);
   });
 });
