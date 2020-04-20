@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 2.3.5
+
+### Patch Changes
+
+- ⚠️ Fix data persistence for embedded fields, by [@kitten](https://github.com/kitten) (See [#727](https://github.com/FormidableLabs/urql/pull/727))
+
 ## 2.3.4
 
 ### Patch Changes
