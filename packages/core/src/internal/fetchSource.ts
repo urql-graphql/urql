@@ -4,10 +4,11 @@ import { make } from 'wonka';
 
 const executeFetch = (
   operation: Operation,
-  fetcher: typeof fetch | void,
   url: string,
   fetchOptions: RequestInit
 ): Promise<OperationResult> => {
+  const fetcher = operation.context.fetch;
+
   let statusNotOk = false;
   let response: Response;
 
@@ -39,7 +40,6 @@ const executeFetch = (
 
 export const makeFetchSource = (
   operation: Operation,
-  fetcher: typeof fetch | void,
   url: string,
   fetchOptions: RequestInit
 ) => {
@@ -57,7 +57,7 @@ export const makeFetchSource = (
           fetchOptions.signal = abortController.signal;
         }
 
-        return executeFetch(operation, fetcher, url, fetchOptions);
+        return executeFetch(operation, url, fetchOptions);
       })
       .then((result: OperationResult | undefined) => {
         if (!ended) {
