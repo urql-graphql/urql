@@ -43,12 +43,7 @@ export const multipartFetchExchange: Exchange = ({
       );
 
       return pipe(
-        createFetchSource(
-          operation,
-          operation.operationName === 'query' &&
-            !!operation.context.preferGetMethod,
-          dispatchDebug
-        ),
+        createFetchSource(operation, dispatchDebug),
         takeUntil(teardown$)
       );
     })
