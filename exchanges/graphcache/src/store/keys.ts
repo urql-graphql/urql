@@ -25,11 +25,11 @@ export const fieldInfoOfKey = (fieldKey: string): FieldInfo => {
 };
 
 export const serializeKeys = (entityKey: string, fieldKey: string) =>
-  `${entityKey.replace(/\./g, '\\.')}.${fieldKey}`;
+  `${entityKey.replace(/\./g, '%2e')}.${fieldKey}`;
 
 export const deserializeKeyInfo = (key: string): KeyInfo => {
   const dotIndex = key.indexOf('.');
-  const entityKey = key.slice(0, dotIndex).replace(/\\\./g, '.');
+  const entityKey = key.slice(0, dotIndex).replace(/%2e/g, '.');
   const fieldKey = key.slice(dotIndex + 1);
   return { entityKey, fieldKey };
 };
