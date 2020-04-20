@@ -1,0 +1,11 @@
+{
+  "name": "urql-core-internal",
+  "private": true,
+  "main": "../dist/urql-core-internal.js",
+  "module": "../dist/urql-core-internal.mjs",
+  "types": "../dist/types/internal/index.d.ts",
+  "source": "../src/internal/index.ts",
+  "dependencies": {
+    "wonka": "^4.0.9"
+  }
+}
