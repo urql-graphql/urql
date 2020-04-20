@@ -4,7 +4,7 @@ import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 
 import { getClient } from '../context';
-import { initialState } from './constants';
+import { initialState, batchReadable } from './utils';
 
 export interface SubscriptionArguments<V> {
   query: string | DocumentNode;
@@ -55,10 +55,10 @@ export const subscription = <T = any, R = T, V = object>(
     }, initialState)
   );
 
-  return {
+  return batchReadable({
     subscribe(onValue) {
       const { unsubscribe } = pipe(queryResult$, subscribe(onValue));
       return unsubscribe as () => void;
     },
-  };
+  });
 };
