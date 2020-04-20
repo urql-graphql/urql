@@ -2,4 +2,4 @@
 'next-urql': patch
 ---
 
-Check if urqlClient exists in useMemo on the server side to prevent calling clientConfig and initUrqlClient multiple times. Ensure urqlClient is serialized to null to maintain separate server and client instances.
+Ensure that the Next.js context is available during all stages of SSR. Previously a missing check in `useMemo` on the server-side caused `clientConfig` from being called repeatedly, and another issue may have caused the client from being serialized to initial props.
