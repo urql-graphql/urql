@@ -1,5 +1,11 @@
 # @urql/preact
 
+## 1.1.6
+
+### Patch Changes
+
+- Bump @urql/core to ensure exchanges have dispatchDebug, this could formerly result in a crash, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#726](https://github.com/FormidableLabs/urql/pull/726))
+
 ## 1.1.5
 
 ### Patch Changes

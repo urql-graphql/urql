@@ -1,5 +1,11 @@
 # urql
 
+## 1.9.7
+
+### Patch Changes
+
+- Bump @urql/core to ensure exchanges have dispatchDebug, this could formerly result in a crash, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#726](https://github.com/FormidableLabs/urql/pull/726))
+
 ## 1.9.6
 
 ### Patch Changes
