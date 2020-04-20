@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 2.3.4
+
+### Patch Changes
+
+- Add debugging events to exchanges that add more detailed information on what is happening
+  internally, which will be displayed by devtools like the urql [Chrome / Firefox extension](https://github.com/FormidableLabs/urql-devtools), by [@andyrichardson](https://github.com/andyrichardson) (See [#608](https://github.com/FormidableLabs/urql/pull/608))
+- ⚠️ Fix persistence using special tab character in serialized keys and add sanitization to persistence key serializer, by [@kitten](https://github.com/kitten) (See [#715](https://github.com/FormidableLabs/urql/pull/715))
+- Updated dependencies (See [#608](https://github.com/FormidableLabs/urql/pull/608), [#718](https://github.com/FormidableLabs/urql/pull/718), and [#722](https://github.com/FormidableLabs/urql/pull/722))
+  - @urql/core@1.11.0
+
 ## 2.3.3
 
 ### Patch Changes

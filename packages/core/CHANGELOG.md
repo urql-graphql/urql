@@ -1,5 +1,17 @@
 # @urql/core
 
+## 1.11.0
+
+### Minor Changes
+
+- Add debugging events to exchanges that add more detailed information on what is happening
+  internally, which will be displayed by devtools like the urql [Chrome / Firefox extension](https://github.com/FormidableLabs/urql-devtools), by [@andyrichardson](https://github.com/andyrichardson) (See [#608](https://github.com/FormidableLabs/urql/pull/608))
+- Add @urql/core/internal entrypoint for internally shared utilities and start sharing fetchExchange-related code, by [@kitten](https://github.com/kitten) (See [#722](https://github.com/FormidableLabs/urql/pull/722))
+
+### Patch Changes
+
+- ⚠️ Fix stringifyVariables breaking on x.toJSON scalars, by [@kitten](https://github.com/kitten) (See [#718](https://github.com/FormidableLabs/urql/pull/718))
+
 ## 1.10.9
 
 ### Patch Changes

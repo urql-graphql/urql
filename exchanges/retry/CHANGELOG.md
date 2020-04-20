@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- Add debugging events to exchanges that add more detailed information on what is happening
+  internally, which will be displayed by devtools like the urql [Chrome / Firefox extension](https://github.com/FormidableLabs/urql-devtools), by [@andyrichardson](https://github.com/andyrichardson) (See [#608](https://github.com/FormidableLabs/urql/pull/608))
+- Updated dependencies (See [#608](https://github.com/FormidableLabs/urql/pull/608), [#718](https://github.com/FormidableLabs/urql/pull/718), and [#722](https://github.com/FormidableLabs/urql/pull/722))
+  - @urql/core@1.11.0
+
 ## 0.1.4
 
 ### Patch Changes

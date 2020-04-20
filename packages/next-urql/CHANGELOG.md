@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.7
+
+### Patch Changes
+
+- Ensure that the Next.js context is available during all stages of SSR. Previously a missing check in `useMemo` on the server-side caused `clientConfig` from being called repeatedly, and another issue may have caused the client from being serialized to initial props, by [@parkerziegler](https://github.com/parkerziegler) (See [#719](https://github.com/FormidableLabs/urql/pull/719))
+
 ## 0.3.6
 
 ### Patch Changes
