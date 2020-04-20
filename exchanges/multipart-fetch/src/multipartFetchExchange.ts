@@ -1,4 +1,4 @@
-import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
+import { Kind, DocumentNode, OperationDefinitionNode } from 'graphql';
 import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { extractFiles } from 'extract-files';
 
@@ -10,6 +10,11 @@ import {
   makeResult,
   makeErrorResult,
 } from '@urql/core';
+import {
+  makeFetchBody,
+  makeFetchURL,
+  makeFetchOptions,
+} from '@urql/core/internal';
 
 interface Body {
   query: string;
@@ -58,19 +63,8 @@ export const multipartFetchExchange: Exchange = ({
   return merge([fetchResults$, forward$]);
 };
 
-const getOperationName = (query: DocumentNode): string | null => {
-  const node = query.definitions.find(
-    (node: any): node is OperationDefinitionNode => {
-      return node.kind === Kind.OPERATION_DEFINITION && node.name;
-    }
-  );
-
-  return node && node.name ? node.name.value : null;
-};
-
 const createFetchSource = (
   operation: Operation,
-  shouldUseGet: boolean,
   dispatchDebug: ExchangeInput['dispatchDebug']
 ) => {
   return make<OperationResult>(({ next, complete }) => {
@@ -79,36 +73,12 @@ const createFetchSource = (
         ? new AbortController()
         : undefined;
 
-    const { context } = operation;
     // Spreading operation.variables here in case someone made a variables with Object.create(null).
     const { files, clone } = extractFiles({ ...operation.variables });
 
-    const extraOptions =
-      typeof context.fetchOptions === 'function'
-        ? context.fetchOptions()
-        : context.fetchOptions || {};
-
-    const operationName = getOperationName(operation.query);
-
-    const body: Body = {
-      query: print(operation.query),
-      variables: operation.variables,
-    };
-
-    if (operationName !== null) {
-      body.operationName = operationName;
-    }
-
-    const fetchOptions = {
-      ...extraOptions,
-      method: shouldUseGet ? 'GET' : 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...extraOptions.headers,
-      },
-      signal:
-        abortController !== undefined ? abortController.signal : undefined,
-    };
+    const body = makeFetchBody(operation);
+    operation.context.url = makeFetchURL(operation, body);
+    const fetchOptions = makeFetchOptions(operation, body);
 
     if (!!files.size) {
       fetchOptions.body = new FormData();
@@ -135,10 +105,6 @@ const createFetchSource = (
       files.forEach((_, file) => {
         (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
       });
-    } else if (shouldUseGet) {
-      operation.context.url = convertToGet(operation.context.url, body);
-    } else {
-      fetchOptions.body = JSON.stringify(body);
     }
 
     let ended = false;
@@ -231,16 +197,4 @@ const executeFetch = (
         );
       }
     });
-};
-
-export const convertToGet = (uri: string, body: Body): string => {
-  const queryParams: string[] = [`query=${encodeURIComponent(body.query)}`];
-
-  if (body.variables) {
-    queryParams.push(
-      `variables=${encodeURIComponent(JSON.stringify(body.variables))}`
-    );
-  }
-
-  return uri + '?' + queryParams.join('&');
 };
