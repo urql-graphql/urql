@@ -6,7 +6,7 @@ import { Operation } from '../types';
 export interface FetchBody {
   query: string;
   operationName: string | undefined;
-  variables: string | undefined;
+  variables: undefined | Record<string, any>;
   extensions: undefined | Record<string, any>;
 }
 
@@ -25,34 +25,44 @@ const shouldUseGet = (operation: Operation): boolean => {
   );
 };
 
-export const makeFetchBody = (operation: Operation): FetchBody => ({
-  query: print(operation.query),
-  operationName: getOperationName(operation.query),
-  variables: operation.variables
-    ? stringifyVariables(operation.variables)
-    : undefined,
+export const makeFetchBody = (request: {
+  query: DocumentNode;
+  variables?: object;
+}): FetchBody => ({
+  query: print(request.query),
+  operationName: getOperationName(request.query),
+  variables: request.variables || undefined,
   extensions: undefined,
 });
 
-export const makeFetchURL = (operation: Operation, body: FetchBody): string => {
+export const makeFetchURL = (
+  operation: Operation,
+  body?: FetchBody
+): string => {
   const useGETMethod = shouldUseGet(operation);
   let url = operation.context.url;
-  if (!useGETMethod) return url;
+  if (!useGETMethod || !body) return url;
 
   url += `?query=${encodeURIComponent(body.query)}`;
 
-  if (body.variables) url += `&variables=${encodeURIComponent(body.variables)}`;
-  if (body.extensions)
+  if (body.variables) {
+    url += `&variables=${encodeURIComponent(
+      stringifyVariables(body.variables)
+    )}`;
+  }
+
+  if (body.extensions) {
     url += `&extensions=${encodeURIComponent(
       stringifyVariables(body.extensions)
     )}`;
+  }
 
   return url;
 };
 
 export const makeFetchOptions = (
   operation: Operation,
-  body: FetchBody
+  body?: FetchBody
 ): RequestInit => {
   const useGETMethod = shouldUseGet(operation);
 
@@ -63,7 +73,7 @@ export const makeFetchOptions = (
 
   return {
     ...extraOptions,
-    body: useGETMethod ? undefined : JSON.stringify(body),
+    body: !useGETMethod && body ? JSON.stringify(body) : undefined,
     method: useGETMethod ? 'GET' : 'POST',
     headers: {
       'content-type': 'application/json',
