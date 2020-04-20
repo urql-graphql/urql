@@ -54,7 +54,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "@urql/core": "^1.10.8",
+    "@urql/core": "^1.11.0",
     "wonka": "^4.0.9"
   },
   "devDependencies": {
