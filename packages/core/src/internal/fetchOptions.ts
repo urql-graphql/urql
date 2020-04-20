@@ -19,6 +19,12 @@ const getOperationName = (query: DocumentNode): string | undefined => {
   }
 };
 
+const shouldUseGet = (operation: Operation): boolean => {
+  return (
+    operation.operationName === 'query' && !!operation.context.preferGetMethod
+  );
+};
+
 export const makeBody = (operation: Operation): FetchBody => ({
   query: print(operation.query),
   operationName: getOperationName(operation.query),
@@ -29,11 +35,9 @@ export const makeBody = (operation: Operation): FetchBody => ({
 });
 
 export const makeURL = (operation: Operation, body: FetchBody): string => {
+  const useGETMethod = shouldUseGet(operation);
   let url = operation.context.url;
-  const useGETMethod = !!operation.context.preferGetMethod;
-  if (!useGETMethod) {
-    return url;
-  }
+  if (!useGETMethod) return url;
 
   url += `?query=${encodeURIComponent(body.query)}`;
 
@@ -47,13 +51,12 @@ export const makeURL = (operation: Operation, body: FetchBody): string => {
 };
 
 export const makeFetchOptions = (operation: Operation, body: FetchBody) => {
-  const { context } = operation;
-  const useGETMethod = !!context.preferGetMethod;
+  const useGETMethod = shouldUseGet(operation);
 
   const extraOptions =
-    typeof context.fetchOptions === 'function'
-      ? context.fetchOptions()
-      : context.fetchOptions || {};
+    typeof operation.context.fetchOptions === 'function'
+      ? operation.context.fetchOptions()
+      : operation.context.fetchOptions || {};
 
   return {
     ...extraOptions,
