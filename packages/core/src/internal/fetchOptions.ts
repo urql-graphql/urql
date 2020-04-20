@@ -50,7 +50,10 @@ export const makeURL = (operation: Operation, body: FetchBody): string => {
   return url;
 };
 
-export const makeFetchOptions = (operation: Operation, body: FetchBody) => {
+export const makeFetchOptions = (
+  operation: Operation,
+  body: FetchBody
+): RequestInit => {
   const useGETMethod = shouldUseGet(operation);
 
   const extraOptions =
