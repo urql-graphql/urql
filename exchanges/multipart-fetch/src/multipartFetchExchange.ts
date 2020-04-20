@@ -16,12 +16,6 @@ import {
   makeFetchOptions,
 } from '@urql/core/internal';
 
-interface Body {
-  query: string;
-  variables: void | object;
-  operationName?: string;
-}
-
 const isOperationFetchable = (operation: Operation) =>
   operation.operationName === 'query' || operation.operationName === 'mutation';
 
@@ -74,6 +68,7 @@ const createFetchSource = (
     const body = makeFetchBody(operation);
     operation.context.url = makeFetchURL(operation, body);
     const fetchOptions = makeFetchOptions(operation, body);
+    fetchOptions.signal = abortController && abortController.signal;
 
     if (!!files.size) {
       fetchOptions.body = new FormData();
@@ -129,7 +124,7 @@ const executeFetch = (
   operation: Operation,
   opts: RequestInit,
   dispatchDebug: ExchangeInput['dispatchDebug']
-): Promise<OperationResult> => {
+): Promise<OperationResult | undefined> => {
   const { url, fetch: fetcher } = operation.context;
   let statusNotOk = false;
   let response: Response;
