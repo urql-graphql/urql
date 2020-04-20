@@ -25,7 +25,7 @@ const shouldUseGet = (operation: Operation): boolean => {
   );
 };
 
-export const makeBody = (operation: Operation): FetchBody => ({
+export const makeFetchBody = (operation: Operation): FetchBody => ({
   query: print(operation.query),
   operationName: getOperationName(operation.query),
   variables: operation.variables
@@ -34,7 +34,7 @@ export const makeBody = (operation: Operation): FetchBody => ({
   extensions: undefined,
 });
 
-export const makeURL = (operation: Operation, body: FetchBody): string => {
+export const makeFetchURL = (operation: Operation, body: FetchBody): string => {
   const useGETMethod = shouldUseGet(operation);
   let url = operation.context.url;
   if (!useGETMethod) return url;
