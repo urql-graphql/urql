@@ -73,15 +73,6 @@ const createFetchSource = (
   shouldUseGet: boolean,
   dispatchDebug: ExchangeInput['dispatchDebug']
 ) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    operation.operationName === 'subscription'
-  ) {
-    throw new Error(
-      'Received a subscription operation in the httpExchange. You are probably trying to create a subscription. Have you added a subscriptionExchange?'
-    );
-  }
-
   return make<OperationResult>(({ next, complete }) => {
     const abortController =
       typeof AbortController !== 'undefined'
