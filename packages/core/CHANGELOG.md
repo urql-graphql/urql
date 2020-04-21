@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.11.2
+
+### Patch Changes
+
+- Make the extension of the main export unknown, which fixes a Webpack issue where the resolver won't pick `module` fields in `package.json` files once it's importing from another `.mjs` file, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#733](https://github.com/FormidableLabs/urql/pull/733))
+
 ## 1.11.1
 
 ### Patch Changes

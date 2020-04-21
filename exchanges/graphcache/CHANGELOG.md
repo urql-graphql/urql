@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 2.3.6
+
+### Patch Changes
+
+- Make the extension of the main export unknown, which fixes a Webpack issue where the resolver won't pick `module` fields in `package.json` files once it's importing from another `.mjs` file, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#733](https://github.com/FormidableLabs/urql/pull/733))
+- Updated dependencies (See [#733](https://github.com/FormidableLabs/urql/pull/733))
+  - @urql/core@1.11.2
+
 ## 2.3.5
 
 ### Patch Changes
