@@ -1,0 +1,13 @@
+{
+  "name": "urql-exchange-graphcache-extras",
+  "private": true,
+  "main": "../dist/urql-exchange-graphcache-extras.js",
+  "module": "../dist/urql-exchange-graphcache-extras.mjs",
+  "types": "../dist/types/extras/index.d.ts",
+  "source": "../src/extras/index.ts",
+  "dependencies": {
+    "@urql/core": ">=1.11.0",
+    "@urql/exchange-populate": ">=0.1.6",
+    "wonka": "^4.0.9"
+  }
+}
