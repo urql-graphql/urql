@@ -1,6 +1,6 @@
 # @urql/exchange-graphcache
 
-## 2.3.6
+## 2.3.7
 
 ### Patch Changes
 
