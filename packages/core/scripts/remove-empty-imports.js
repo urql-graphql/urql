@@ -8,13 +8,6 @@ const nonMinified = [
   `${process.cwd()}/dist/urql-core-internal.mjs`,
 ];
 
-const minified = [
-  `${process.cwd()}/dist/urql-core.min.js`,
-  `${process.cwd()}/dist/urql-core.min.mjs`,
-  `${process.cwd()}/dist/urql-core-internal.min.js`,
-  `${process.cwd()}/dist/urql-core-internal.min.mjs`,
-];
-
 const removeEmptyImports = (babel) => {
   const { types: t } = babel;
 
@@ -41,10 +34,5 @@ const removeEmptyImports = (babel) => {
 
 nonMinified.forEach(loc => {
   const { code: newCode } = transform(fs.readFileSync(loc), { plugins: [removeEmptyImports], babelrc: false });
-  fs.writeFileSync(loc, newCode);
-});
-
-minified.forEach(loc => {
-  const { code: newCode } = transform(fs.readFileSync(loc), { plugins: [removeEmptyImports], babelrc: false, minified: true });
   fs.writeFileSync(loc, newCode);
 });
