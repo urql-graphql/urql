@@ -5,6 +5,14 @@
   "module": "../dist/urql-exchange-graphcache-extras.mjs",
   "types": "../dist/types/extras/index.d.ts",
   "source": "../src/extras/index.ts",
+  "exports": {
+    ".": {
+      "import": "../dist/urql-exchange-graphcache-extras.mjs",
+      "require": "../dist/urql-exchange-graphcache-extras.js",
+      "types": "../dist/types/extras/index.d.ts",
+      "source": "../src/extras/index.ts"
+    }
+  },
   "dependencies": {
     "@urql/core": ">=1.11.0",
     "@urql/exchange-populate": ">=0.1.6",
