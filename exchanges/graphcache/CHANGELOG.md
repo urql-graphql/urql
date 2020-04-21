@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 2.3.8
+
+### Patch Changes
+
+Sorry for the many updates; Please only upgrade to `>=2.3.8` and don't use the deprecated `2.3.7`
+and `2.3.6` release.
+
+- ⚠️ Fix nested package path for @urql/core/internal and @urql/exchange-graphcache/extras, by [@kitten](https://github.com/kitten) (See [#734](https://github.com/FormidableLabs/urql/pull/734))
+- Updated dependencies (See [#734](https://github.com/FormidableLabs/urql/pull/734))
+  - @urql/core@1.11.4
+
 ## 2.3.7
 
 ### Patch Changes

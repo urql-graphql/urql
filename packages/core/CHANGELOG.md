@@ -1,5 +1,14 @@
 # @urql/core
 
+## 1.11.4
+
+### Patch Changes
+
+Sorry for the many updates; Please only upgrade to `>=1.11.4` and don't use the deprecated `1.11.3`
+and `1.11.2` release.
+
+- ⚠️ Fix nested package path for @urql/core/internal and @urql/exchange-graphcache/extras, by [@kitten](https://github.com/kitten) (See [#734](https://github.com/FormidableLabs/urql/pull/734))
+
 ## 1.11.3
 
 ### Patch Changes
