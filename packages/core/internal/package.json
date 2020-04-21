@@ -1,7 +1,7 @@
 {
   "name": "urql-core-internal",
   "private": true,
-  "main": "../dist/urql-core-internal.js",
+  "main": "../dist/urql-core-internal",
   "module": "../dist/urql-core-internal.mjs",
   "types": "../dist/types/internal/index.d.ts",
   "source": "../src/internal/index.ts",
