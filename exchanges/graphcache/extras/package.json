@@ -1,7 +1,7 @@
 {
   "name": "urql-exchange-graphcache-extras",
   "private": true,
-  "main": "../dist/urql-exchange-graphcache-extras.js",
+  "main": "../dist/urql-exchange-graphcache-extras",
   "module": "../dist/urql-exchange-graphcache-extras.mjs",
   "types": "../dist/types/extras/index.d.ts",
   "source": "../src/extras/index.ts",
