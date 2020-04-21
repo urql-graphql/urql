@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.11.1
+
+### Patch Changes
+
+- ⚠️ Fix missing `@urql/core/internal` entrypoint in the npm-release, which was previously not included, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#731](https://github.com/FormidableLabs/urql/pull/731))
+
 ## 1.11.0
 
 ### Minor Changes
