@@ -39,7 +39,8 @@
   "files": [
     "LICENSE",
     "README.md",
-    "dist/"
+    "dist/",
+    "internal/"
   ],
   "scripts": {
     "test": "jest",
