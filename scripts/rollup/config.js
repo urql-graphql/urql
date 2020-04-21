@@ -1,5 +1,5 @@
 import genPackageJson from 'rollup-plugin-generate-package-json';
-import { relative, join } from 'path';
+import { relative, join, dirname, basename } from 'path';
 import { makePlugins } from './plugins';
 import * as settings from './settings';
 
@@ -14,10 +14,18 @@ const input = settings.sources.reduce((acc, source) => {
       baseContents: {
         name: source.name,
         private: true,
-        main: join(rel, source.main),
+        main: join(rel, dirname(source.main), basename(source.main, '.js')),
         module: join(rel, source.module),
         types: join(rel, source.types),
         source: join(rel, source.source),
+        exports: {
+          '.': {
+            import: join(rel, source.module),
+            require: join(rel, source.main),
+            types: join(rel, source.types),
+            source: join(rel, source.source),
+          }
+        }
       }
     }));
   }
