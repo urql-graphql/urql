@@ -15,8 +15,7 @@ apps through ["Normalized Caching"](./graphcache/normalized-caching.md).
 
 ## Constituent Parts
 
-`urql` can be understood as a collection of connected parts and packages. When you [first get
-started](./basics/getting-started.md) you'll only need to install a single package for your
+`urql` can be understood as a collection of connected parts and packages. When [getting started](./basics/getting-started.md) we only need to install a single package for our
 framework of choice. We're then able to declaratively send GraphQL requests to our API.
 
 All framework packages — like `urql`, `@urql/preact`, and `@urql/svelte` — wrap the [core
