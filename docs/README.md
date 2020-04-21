@@ -5,7 +5,11 @@ order: 0
 
 # Quick start
 
-Here we'll see the quickest way to get started with `urql`.
+`urql` is a blazingly fast, lightweight, and customisable GraphQL client. We believe in usability and adaptability, `urql` is built with extensibility at its
+core, allowing you to to include just the key logic for a basic app, in addition to being able to grow to support dynamic single-app applications and highly
+customised infrastructure.
+
+In this page we'll take a look at the quickest route to get up and running with `urql`.
 
 ## Installation
 
