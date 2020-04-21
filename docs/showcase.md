@@ -22,6 +22,10 @@ maintainers, and supporters. This page is specifically dedicated to all of you!
   <img alt="Egghead" height="60" src="./assets/logos/egghead.png" />
 </a>
 
+<a href="https://gatsbyjs.org">
+  <img alt="Gatsby" height="60" src="./assets/logos/gatsby.png" />
+</a>
+
 ## Articles & Tutorials
 
 - [Egghead Course](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5)
