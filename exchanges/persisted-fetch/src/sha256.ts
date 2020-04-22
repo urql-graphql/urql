@@ -8,6 +8,13 @@ const cryptoSubtle = jsCrypto
 
 const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
   if (!cryptoSubtle) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[@urql/exchange-persisted-fetch]: The window.crypto.subtle API is not available.\n' +
+          'This is an unexpected error. Please report it by filing a GitHub Issue.'
+      );
+    }
+
     return Promise.resolve(new Uint8Array(0));
   }
 
