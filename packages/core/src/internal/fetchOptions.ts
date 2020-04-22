@@ -4,7 +4,7 @@ import { stringifyVariables } from '../utils';
 import { Operation } from '../types';
 
 export interface FetchBody {
-  query: string;
+  query?: string;
   operationName: string | undefined;
   variables: undefined | Record<string, any>;
   extensions: undefined | Record<string, any>;
@@ -40,24 +40,27 @@ export const makeFetchURL = (
   body?: FetchBody
 ): string => {
   const useGETMethod = shouldUseGet(operation);
-  let url = operation.context.url;
+  const url = operation.context.url;
   if (!useGETMethod || !body) return url;
 
-  url += `?query=${encodeURIComponent(body.query)}`;
+  const search: string[] = [];
+  if (body.query) {
+    search.push('query=' + encodeURIComponent(body.query));
+  }
 
   if (body.variables) {
-    url += `&variables=${encodeURIComponent(
-      stringifyVariables(body.variables)
-    )}`;
+    search.push(
+      'variables=' + encodeURIComponent(stringifyVariables(body.variables))
+    );
   }
 
   if (body.extensions) {
-    url += `&extensions=${encodeURIComponent(
-      stringifyVariables(body.extensions)
-    )}`;
+    search.push(
+      'extensions=' + encodeURIComponent(stringifyVariables(body.extensions))
+    );
   }
 
-  return url;
+  return `${url}?${search.join('&')}`;
 };
 
 export const makeFetchOptions = (

@@ -6,6 +6,7 @@
     "packages/svelte-urql",
     "exchanges/graphcache",
     "exchanges/multipart-fetch",
+    "exchanges/persisted-fetch",
     "exchanges/retry",
     "exchanges/suspense"
   ],
