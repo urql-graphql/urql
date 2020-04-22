@@ -33,6 +33,7 @@ const HeaderContainer = styled.a`
   flex-direction: column;
   color: #ffffff;
   text-decoration: none;
+  z-index: 2;
 `;
 
 const HeaderText = styled.p`

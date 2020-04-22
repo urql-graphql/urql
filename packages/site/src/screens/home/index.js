@@ -4,6 +4,7 @@ import { usePrefetch } from 'react-static';
 import { useMarkdownTree } from 'react-static-plugin-md-pages';
 
 import Features from './features';
+import Components from './components';
 import GetStarted from './get-started';
 import MoreOSS from './more-oss';
 import content from './_content';
@@ -21,11 +22,9 @@ const Home = () => {
   return (
     <Container ref={ref}>
       <Header />
-      <Features
-        featureArray={content.features}
-        components={content.components}
-      />
-      <GetStarted getStartedObj={content.getStarted} />
+      <Features featureArray={content.features} />
+      <Components components={content.components} />
+      <GetStarted content={content.getStarted} />
       <MoreOSS ossArray={content.oss} />
       <Footer />
     </Container>

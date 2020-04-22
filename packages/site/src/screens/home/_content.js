@@ -1,22 +1,22 @@
 const content = {
   features: [
     {
-      title: 'Fully functional GraphQL client with a single import',
+      title: 'Performant and functional GraphQL client',
       description:
         'Urql is a lightweight, powerful, and easy to use alternative to bulky GraphQL clients.',
       icon: require('../../assets/gql-tile.svg'),
-    },
-    {
-      title: 'Logical default behavior and caching',
-      description:
-        'Urql helps you to rapidly use GraphQL in your apps without complex configuration or large API overhead.',
-      icon: require('../../assets/clock-tile.svg'),
     },
     {
       title: 'Extensible library that grows with you',
       description:
         'Want to change how you fetch, cache, or subscribe to data? Urql Exchanges allow you to customize your data layer to suit your needs.',
       icon: require('../../assets/eagle-tile.svg'),
+    },
+    {
+      title: 'Logical default behavior and caching',
+      description:
+        'Urql helps you to rapidly use GraphQL in your apps without complex configuration or large API overhead.',
+      icon: require('../../assets/clock-tile.svg'),
     },
   ],
   components: {
@@ -31,7 +31,7 @@ const content = {
   },
   getStarted: {
     description:
-      'Dive into the documentation to see how you can get your urql client up and running.',
+      'Getting started with urql is a breeze. Dive into the documentation to see how you can get your urql client up and running in minutes.',
     link: '/docs',
   },
   // TODO: This needs to be shared content instead of hardcoded in each site

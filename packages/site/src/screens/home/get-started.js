@@ -4,17 +4,9 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { BodyCopy } from '../../components/body-copy';
 import { SectionTitle } from '../../components/section-title';
-import constants from '../../constants';
+import { PanelSectionWrapper } from '../../components/panel';
 
 import octoCat from '../../assets/github.svg';
-
-const OuterWrapper = styled.div`
-  background: ${constants.color};
-  border-bottom: 1rem solid rgba(0, 0, 0, 0.4);
-  box-shadow: inset 0 -1rem 0 rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: center;
-`;
 
 const GetStartedWrapper = styled.div`
   p {
@@ -26,7 +18,6 @@ const GetStartedWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 8rem;
 `;
 
 const GithubButton = styled.a`
@@ -95,7 +86,7 @@ const DocButton = styled(Link)`
   border: 0;
   margin-top: 2rem;
   @media (min-width: 768px) {
-    margin-left: 2rem;
+    margin-right: 2rem;
     width: 18rem;
     margin-top: 0;
   }
@@ -106,28 +97,28 @@ const DocButton = styled(Link)`
 
 class GetStarted extends React.Component {
   render() {
-    const { getStartedObj } = this.props;
+    const { content } = this.props;
 
     return (
-      <OuterWrapper>
+      <PanelSectionWrapper>
         <GetStartedWrapper>
           <GetStartedTitle>Get Started</GetStartedTitle>
-          <BodyCopy>{getStartedObj.description}</BodyCopy>
+          <BodyCopy>{content.description}</BodyCopy>
           <ButtonsWrapper>
+            <DocButton to="docs/">Quick Start Guide</DocButton>
             <GithubButton href="https://github.com/FormidableLabs/urql">
               <img src={octoCat} />
               <p>GitHub</p>
             </GithubButton>
-            <DocButton to="docs/">Documentation</DocButton>
           </ButtonsWrapper>
         </GetStartedWrapper>
-      </OuterWrapper>
+      </PanelSectionWrapper>
     );
   }
 }
 
 GetStarted.propTypes = {
-  getStartedObj: PropTypes.object,
+  content: PropTypes.object,
 };
 
 export default GetStarted;
