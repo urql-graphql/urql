@@ -1,6 +1,6 @@
 ---
 title: Common questions
-order: 5
+order: 6
 ---
 
 # Common questions
@@ -10,9 +10,7 @@ order: 5
 If you need `async fetchOptions` you can add an exchange that looks like this:
 
 ```js
-export const fetchOptionsExchange = (fn: any): Exchange => ({
-  forward
-}) => ops$ => {
+export const fetchOptionsExchange = (fn: any): Exchange => ({ forward }) => ops$ => {
   return pipe(
     ops$,
     mergeMap((operation: Operation) => {
@@ -21,7 +19,7 @@ export const fetchOptionsExchange = (fn: any): Exchange => ({
         typeof result.then === 'function' ? fromPromise(result) : fromValue(result),
         map((fetchOptions: RequestInit | (() => RequestInit)) => ({
           ...operation,
-          context: { ...operation.context, fetchOptions }
+          context: { ...operation.context, fetchOptions },
         }))
       );
     }),
@@ -34,13 +32,8 @@ If we add the above exchange before our `fetchExchange` our `fetchOptions` will 
 
 ```js
 const client = createClient({
-  url: "http://yourUrl.dev/",
-  exchanges: [
-    dedupExchange,
-    cacheExchange,
-    fetchOptionsExchange,
-    fetchExchange,
-  ]
+  url: 'http://yourUrl.dev/',
+  exchanges: [dedupExchange, cacheExchange, fetchOptionsExchange, fetchExchange],
 });
 ```
 
