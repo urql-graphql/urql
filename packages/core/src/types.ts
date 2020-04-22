@@ -114,6 +114,11 @@ export interface DebugEventTypes {
   retryRetrying: {
     retryCount: number;
   };
+  // persistedFetchExchange
+  persistedFetchError: {
+    url: string;
+    fetchOptions: RequestInit;
+  };
 }
 
 export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
