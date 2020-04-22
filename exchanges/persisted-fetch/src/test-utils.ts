@@ -50,5 +50,3 @@ export const mutationOperation: Operation = {
   operationName: 'mutation',
   context,
 };
-
-
