@@ -40,7 +40,7 @@ export const persistedFetchExchange: Exchange = ({ forward }) => {
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
-        if (!supportsPersistedQueries || operation.operationName !== 'query') {
+        if (!supportsPersistedQueries) {
           return pipe(makeNormalFetchSource(operation), takeUntil(teardown$));
         }
 

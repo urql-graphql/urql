@@ -17,11 +17,19 @@ You'll then need to add the `persistedFetchExchange` method, that this package e
 to your `exchanges`.
 
 ```js
-import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
 import { persistedFetchExchange } from '@urql/exchange-persisted-fetch';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
-  exchanges: [dedupExchange, cacheExchange, persistedFetchExchange],
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    persistedFetchExchange,
+    fetchExchange
+  ],
 });
 ```
+
+The `persistedFetchExchange` only handles queries, so for mutations we keep the
+`fetchExchange` around alongside of it.
