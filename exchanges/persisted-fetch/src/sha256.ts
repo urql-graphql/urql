@@ -1,10 +1,12 @@
 import { sha256 as sha256Standard } from 'js-sha256';
 
-const jsCrypto = typeof window !== 'undefined'
-  ? (window.crypto || (window as any).msCrypto)
-  : undefined;
-const cryptoSubtle = jsCrypto
-  && (jsCrypto.subtle || (jsCrypto as any).webkitSubtle);
+const jsCrypto =
+  typeof window !== 'undefined'
+    ? window.crypto || (window as any).msCrypto
+    : undefined;
+const cryptoSubtle =
+  jsCrypto && (jsCrypto.subtle || (jsCrypto as any).webkitSubtle);
+const isIE = !!(jsCrypto && (window as any).msCrypto);
 
 const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
   if (!cryptoSubtle) {
@@ -20,7 +22,7 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
 
   const hash = cryptoSubtle.digest({ name: 'SHA-256' }, bytes);
   return new Promise((resolve, reject) => {
-    if ((hash as any).oncomplete) {
+    if (isIE) {
       // IE11
       (hash as any).oncomplete = function onComplete(event) {
         resolve(new Uint8Array(event.target.result));
@@ -39,7 +41,7 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
         });
     }
   });
-}
+};
 
 export const hash = async (query: string): Promise<string> => {
   // Node.js support
