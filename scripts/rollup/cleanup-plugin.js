@@ -13,7 +13,7 @@ function removeEmptyImports({ types: t }) {
         if (
           t.isIdentifier(path.node.callee) &&
           path.node.callee.name === 'require' &&
-          path.parent.type === 'ExpressionStatement'
+          t.isExpressionStatement(path.parent)
         ) {
           path.remove();
         }
