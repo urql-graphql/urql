@@ -2,6 +2,7 @@
 import {
   Source,
   fromValue,
+  fromPromise,
   filter,
   merge,
   mergeMap,
@@ -78,18 +79,23 @@ const makePersistedFetchSource = (
   const body = makeFetchBody(operation);
   const query: string = body.query!;
 
-  body.query = undefined;
-  body.extensions = {
-    persistedQuery: {
-      version: 1,
-      sha256Hash: hash(query),
-    },
-  };
+  return pipe(
+    fromPromise(hash(query)),
+    mergeMap(sha256Hash => {
+      body.query = undefined;
+      body.extensions = {
+        persistedQuery: {
+          version: 1,
+          sha256Hash,
+        },
+      };
 
-  return makeFetchSource(
-    operation,
-    makeFetchURL(operation, { ...body, query: '' }),
-    makeFetchOptions(operation, body)
+      return makeFetchSource(
+        operation,
+        makeFetchURL(operation, { ...body, query: '' }),
+        makeFetchOptions(operation, body)
+      );
+    })
   );
 };
 
