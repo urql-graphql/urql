@@ -48,7 +48,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=1.11.4",
+    "@urql/core": ">=1.11.5",
     "wonka": "^4.0.9",
     "js-sha256": "^0.9.0"
   },

@@ -1,5 +1,12 @@
 # @urql/core
 
+## 1.11.5
+
+### Patch Changes
+
+- Hoist variables in unminified build output for Metro Bundler builds which otherwise fails for `process.env.NODE_ENV` if-clauses, by [@kitten](https://github.com/kitten) (See [#737](https://github.com/FormidableLabs/urql/pull/737))
+- Add a babel-plugin that removes empty imports from the final build output, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#735](https://github.com/FormidableLabs/urql/pull/735))
+
 ## 1.11.4
 
 ### Patch Changes
