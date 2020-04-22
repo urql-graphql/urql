@@ -9,6 +9,7 @@ import {
   share,
   takeUntil,
 } from 'wonka';
+
 import {
   CombinedError,
   Exchange,
@@ -87,7 +88,7 @@ const makePersistedFetchSource = (
 
   return makeFetchSource(
     operation,
-    makeFetchURL(operation, body),
+    makeFetchURL(operation, { ...body, query: '' }),
     makeFetchOptions(operation, body)
   );
 };
