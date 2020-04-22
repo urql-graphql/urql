@@ -48,7 +48,7 @@ export const hash = async (query: string): Promise<string> => {
     for (let i = 0, l = query.length; i < l; i++) {
       // NOTE: We assume that the input GraphQL Query only uses UTF-8 at most
       // since GraphQL mostly consists of ASCII, this is completely fine
-      buf[i] = query.charCodeAt(i) & 255;
+      buf[i] = query.charCodeAt(i);
     }
   }
 
