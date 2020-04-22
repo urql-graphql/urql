@@ -29,7 +29,10 @@ import {
 
 import { hash } from './sha256';
 
-export const persistedFetchExchange: Exchange = ({ forward, dispatchDebug }) => {
+export const persistedFetchExchange: Exchange = ({
+  forward,
+  dispatchDebug,
+}) => {
   let supportsPersistedQueries = true;
 
   return ops$ => {
@@ -45,7 +48,10 @@ export const persistedFetchExchange: Exchange = ({ forward, dispatchDebug }) => 
         );
 
         if (!supportsPersistedQueries) {
-          return pipe(makeNormalFetchSource(operation, dispatchDebug), takeUntil(teardown$));
+          return pipe(
+            makeNormalFetchSource(operation, dispatchDebug),
+            takeUntil(teardown$)
+          );
         }
 
         return pipe(
@@ -60,7 +66,7 @@ export const persistedFetchExchange: Exchange = ({ forward, dispatchDebug }) => 
 
             return fromValue(result);
           }),
-          takeUntil(teardown$),
+          takeUntil(teardown$)
         );
       })
     );
@@ -77,7 +83,7 @@ export const persistedFetchExchange: Exchange = ({ forward, dispatchDebug }) => 
 
 const makePersistedFetchSource = (
   operation: Operation,
-  dispatchDebug: ExchangeInput["dispatchDebug"]
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ): Source<OperationResult> => {
   const body = makeFetchBody(operation);
   const query: string = body.query!;
@@ -109,15 +115,23 @@ const makePersistedFetchSource = (
       return pipe(
         makeFetchSource(operation, url, fetchOptions),
         onPush(result => {
-          const persistFail = result.error
-            && (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
+          const persistFail =
+            result.error &&
+            (isPersistedMiss(result.error) ||
+              isPersistedUnsupported(result.error));
           const error = !result.data ? result.error : undefined;
 
           dispatchDebug({
-            type: persistFail ? 'persistedFetchError' : (error ? 'fetchError' : 'fetchSuccess'),
+            type: persistFail
+              ? 'persistedFetchError'
+              : error
+              ? 'fetchError'
+              : 'fetchSuccess',
             message: persistFail
               ? 'A Persisted Query request has failed. A normal GraphQL request will follow.'
-              : `A ${error ? 'failed' : 'successful'} fetch response has been returned.`,
+              : `A ${
+                  error ? 'failed' : 'successful'
+                } fetch response has been returned.`,
             operation,
             data: {
               url,
@@ -133,7 +147,7 @@ const makePersistedFetchSource = (
 
 const makeNormalFetchSource = (
   operation: Operation,
-  dispatchDebug: ExchangeInput["dispatchDebug"]
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ): Source<OperationResult> => {
   const body = makeFetchBody(operation);
   const url = makeFetchURL(operation, body);
