@@ -11,6 +11,7 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
+import cleanup from './cleanup-plugin.js'
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
@@ -98,6 +99,7 @@ export const makePlugins = ({ isProduction } = {}) => [
     formatting: 'PRETTY_PRINT',
     compilation_level: 'SIMPLE_OPTIMIZATIONS'
   }),
+  cleanup(),
   isProduction ? terserMinified : terserPretty,
   isProduction && settings.isAnalyze && visualizer({
     filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
