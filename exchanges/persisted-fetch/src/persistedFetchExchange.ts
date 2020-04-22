@@ -8,11 +8,13 @@ import {
   mergeMap,
   pipe,
   share,
+  onPush,
   takeUntil,
 } from 'wonka';
 
 import {
   CombinedError,
+  ExchangeInput,
   Exchange,
   Operation,
   OperationResult,
@@ -27,7 +29,7 @@ import {
 
 import { hash } from './sha256';
 
-export const persistedFetchExchange: Exchange = ({ forward }) => {
+export const persistedFetchExchange: Exchange = ({ forward, dispatchDebug }) => {
   let supportsPersistedQueries = true;
 
   return ops$ => {
@@ -43,22 +45,22 @@ export const persistedFetchExchange: Exchange = ({ forward }) => {
         );
 
         if (!supportsPersistedQueries) {
-          return pipe(makeNormalFetchSource(operation), takeUntil(teardown$));
+          return pipe(makeNormalFetchSource(operation, dispatchDebug), takeUntil(teardown$));
         }
 
         return pipe(
-          makePersistedFetchSource(operation),
+          makePersistedFetchSource(operation, dispatchDebug),
           mergeMap(result => {
             if (result.error && isPersistedUnsupported(result.error)) {
               supportsPersistedQueries = false;
-              return makeNormalFetchSource(operation);
+              return makeNormalFetchSource(operation, dispatchDebug);
             } else if (result.error && isPersistedMiss(result.error)) {
-              return makeNormalFetchSource(operation);
+              return makeNormalFetchSource(operation, dispatchDebug);
             }
 
             return fromValue(result);
           }),
-          takeUntil(teardown$)
+          takeUntil(teardown$),
         );
       })
     );
@@ -74,7 +76,8 @@ export const persistedFetchExchange: Exchange = ({ forward }) => {
 };
 
 const makePersistedFetchSource = (
-  operation: Operation
+  operation: Operation,
+  dispatchDebug: ExchangeInput["dispatchDebug"]
 ): Source<OperationResult> => {
   const body = makeFetchBody(operation);
   const query: string = body.query!;
@@ -90,24 +93,80 @@ const makePersistedFetchSource = (
         },
       };
 
-      return makeFetchSource(
+      const url = makeFetchURL(operation, { ...body, query: '' });
+      const fetchOptions = makeFetchOptions(operation, body);
+
+      dispatchDebug({
+        type: 'fetchRequest',
+        message: 'A fetch request for a persisted query is being executed.',
         operation,
-        makeFetchURL(operation, { ...body, query: '' }),
-        makeFetchOptions(operation, body)
+        data: {
+          url,
+          fetchOptions,
+        },
+      });
+
+      return pipe(
+        makeFetchSource(operation, url, fetchOptions),
+        onPush(result => {
+          const persistFail = result.error
+            && (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
+          const error = !result.data ? result.error : undefined;
+
+          dispatchDebug({
+            type: persistFail ? 'persistedFetchError' : (error ? 'fetchError' : 'fetchSuccess'),
+            message: persistFail
+              ? 'A Persisted Query request has failed. A normal GraphQL request will follow.'
+              : `A ${error ? 'failed' : 'successful'} fetch response has been returned.`,
+            operation,
+            data: {
+              url,
+              fetchOptions,
+              value: error || result,
+            },
+          });
+        })
       );
     })
   );
 };
 
 const makeNormalFetchSource = (
-  operation: Operation
+  operation: Operation,
+  dispatchDebug: ExchangeInput["dispatchDebug"]
 ): Source<OperationResult> => {
   const body = makeFetchBody(operation);
+  const url = makeFetchURL(operation, body);
+  const fetchOptions = makeFetchOptions(operation, body);
 
-  return makeFetchSource(
+  dispatchDebug({
+    type: 'fetchRequest',
+    message: 'A fetch request is being executed.',
     operation,
-    makeFetchURL(operation, body),
-    makeFetchOptions(operation, body)
+    data: {
+      url,
+      fetchOptions,
+    },
+  });
+
+  return pipe(
+    makeFetchSource(operation, url, fetchOptions),
+    onPush(result => {
+      const error = !result.data ? result.error : undefined;
+
+      dispatchDebug({
+        type: error ? 'fetchError' : 'fetchSuccess',
+        message: `A ${
+          error ? 'failed' : 'successful'
+        } fetch response has been returned.`,
+        operation,
+        data: {
+          url,
+          fetchOptions,
+          value: error || result,
+        },
+      });
+    })
   );
 };
 
