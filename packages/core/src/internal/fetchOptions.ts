@@ -40,26 +40,27 @@ export const makeFetchURL = (
   body?: FetchBody
 ): string => {
   const useGETMethod = shouldUseGet(operation);
-  let url = operation.context.url;
+  const url = operation.context.url;
   if (!useGETMethod || !body) return url;
 
+  const search: string[] = [];
   if (body.query) {
-    url += `?query=${encodeURIComponent(body.query)}`;
+    search.push('query=' + encodeURIComponent(body.query));
   }
 
   if (body.variables) {
-    url += `&variables=${encodeURIComponent(
-      stringifyVariables(body.variables)
-    )}`;
+    search.push(
+      'variables=' + encodeURIComponent(stringifyVariables(body.variables))
+    );
   }
 
   if (body.extensions) {
-    url += `&extensions=${encodeURIComponent(
-      stringifyVariables(body.extensions)
-    )}`;
+    search.push(
+      'extensions=' + encodeURIComponent(stringifyVariables(body.extensions))
+    );
   }
 
-  return url;
+  return `${url}?${search.join('&')}`;
 };
 
 export const makeFetchOptions = (
