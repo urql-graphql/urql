@@ -109,4 +109,4 @@ const isPersistedMiss = (error: CombinedError): boolean =>
   error.graphQLErrors.some(x => x.message === 'PersistedQueryNotFound');
 
 const isPersistedUnsupported = (error: CombinedError): boolean =>
-  error.graphQLErrors.some(x => x.message === 'PersistedQueryNotFound');
+  error.graphQLErrors.some(x => x.message === 'PersistedQueryNotSupported');
