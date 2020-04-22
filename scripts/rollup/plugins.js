@@ -112,6 +112,9 @@ const terserPretty = terser({
   keep_fnames: true,
   ie8: false,
   compress: {
+    // We need to hoist vars for process.env.NODE_ENV if-clauses for Metro:
+    hoist_vars: true,
+    hoist_funs: true,
     pure_getters: true,
     toplevel: true,
     booleans_as_integers: false,
