@@ -23,51 +23,7 @@ import {
   makeFetchSource,
 } from '@urql/core/internal';
 
-interface Body {
-  query: string;
-  variables: void | object;
-  operationName?: string;
-}
-
-// @ts-ignore
-(window as any).crypto = window.crypto || window.msCrypto; //for IE11
-// @ts-ignore
-if (window.crypto && window.crypto.webkitSubtle) {
-  // @ts-ignore
-  window.crypto.subtle = window.crypto.webkitSubtle; //for Safari
-}
-
-function sha256(bytes: Uint8Array): Promise<Uint8Array> {
-  const hash = window.crypto.subtle.digest({ name: 'SHA-256' }, bytes);
-  return new Promise((resolve, reject) => {
-    // IE11
-    if (hash.oncomplete) {
-      hash.oncomplete = function (e) {
-        resolve(new Uint8Array(e.target.result));
-      };
-      hash.onerror = function (e) {
-        reject(undefined, e);
-      };
-    }
-    // standard promise-based
-    else {
-      hash
-        .then(function (result) {
-          resolve(new Uint8Array(result));
-        })
-        .catch(function (error) {
-          reject(undefined, error);
-        });
-    }
-  });
-}
-
-const hash = async (query: string) => {
-  const msgUint8 = new TextEncoder().encode(query);
-  return Array.from(await sha256(msgUint8))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-};
+import { hash } from './sha256';
 
 export const persistedFetchExchange: Exchange = ({ forward }) => {
   let supportsPersistedQueries = true;

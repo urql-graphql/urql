@@ -49,7 +49,8 @@
   },
   "dependencies": {
     "@urql/core": ">=1.11.0",
-    "wonka": "^4.0.9"
+    "wonka": "^4.0.9",
+    "js-sha256": "^0.9.0"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
