@@ -82,7 +82,7 @@ const makePersistedFetchSource = (
   body.extensions = {
     persistedQuery: {
       version: 1,
-      sha256hash: hash(query),
+      sha256Hash: hash(query),
     },
   };
 
