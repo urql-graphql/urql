@@ -1,13 +1,27 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Kind, DocumentNode, OperationDefinitionNode, print } from 'graphql';
-import { filter, make, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import {
+  Source,
+  fromValue,
+  filter,
+  merge,
+  mergeMap,
+  pipe,
+  share,
+  takeUntil,
+} from 'wonka';
+import {
+  CombinedError,
   Exchange,
   Operation,
   OperationResult,
-  makeResult,
-  makeErrorResult,
 } from '@urql/core';
+
+import {
+  makeFetchBody,
+  makeFetchURL,
+  makeFetchOptions,
+  makeFetchSource,
+} from '@urql/core/internal';
 
 interface Body {
   query: string;
@@ -28,20 +42,20 @@ function sha256(bytes: Uint8Array): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     // IE11
     if (hash.oncomplete) {
-      hash.oncomplete = function(e) {
+      hash.oncomplete = function (e) {
         resolve(new Uint8Array(e.target.result));
       };
-      hash.onerror = function(e) {
+      hash.onerror = function (e) {
         reject(undefined, e);
       };
     }
     // standard promise-based
     else {
       hash
-        .then(function(result) {
+        .then(function (result) {
           resolve(new Uint8Array(result));
         })
-        .catch(function(error) {
+        .catch(function (error) {
           reject(undefined, error);
         });
     }
@@ -55,25 +69,38 @@ const hash = async (query: string) => {
     .join('');
 };
 
-// TODO: consider making this a HOC that allows for custom hash function.
 export const fetchExchange: Exchange = ({ forward }) => {
+  let supportsPersistedQueries = true;
+
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
       filter(operation => operation.operationName === 'query'),
       mergeMap(operation => {
+        const { key } = operation;
+        const teardown$ = pipe(
+          sharedOps$,
+          filter(op => op.operationName === 'teardown' && op.key === key)
+        );
+
+        if (!supportsPersistedQueries || operation.operationName !== 'query') {
+          return pipe(makeNormalFetchSource(operation), takeUntil(teardown$));
+        }
+
         return pipe(
-          createFetchSource(operation, !!operation.context.preferGetMethod),
-          takeUntil(
-            pipe(
-              sharedOps$,
-              filter(
-                op =>
-                  op.operationName === 'teardown' && op.key === operation.key
-              )
-            )
-          )
+          makePersistedFetchSource(operation),
+          mergeMap(result => {
+            if (result.error && isPersistedUnsupported(result.error)) {
+              supportsPersistedQueries = false;
+              return makeNormalFetchSource(operation);
+            } else if (result.error && isPersistedMiss(result.error)) {
+              return makeNormalFetchSource(operation);
+            }
+
+            return fromValue(result);
+          }),
+          takeUntil(teardown$)
         );
       })
     );
@@ -88,128 +115,41 @@ export const fetchExchange: Exchange = ({ forward }) => {
   };
 };
 
-const getOperationName = (query: DocumentNode): string | null => {
-  const node = query.definitions.find(
-    (node: any): node is OperationDefinitionNode => {
-      return node.kind === Kind.OPERATION_DEFINITION && node.name;
-    }
+const makePersistedFetchSource = (
+  operation: Operation
+): Source<OperationResult> => {
+  const body = makeFetchBody(operation);
+  const query: string = body.query!;
+
+  body.query = undefined;
+  body.extensions = {
+    persistedQuery: {
+      version: 1,
+      sha256hash: hash(query),
+    },
+  };
+
+  return makeFetchSource(
+    operation,
+    makeFetchURL(operation, body),
+    makeFetchOptions(operation, body)
   );
-
-  return node ? node.name!.value : null;
 };
 
-const createFetchSource = (operation: Operation, shouldUseGet: boolean) => {
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    (operation.operationName === 'subscription' ||
-      operation.operationName === 'mutation')
-  ) {
-    throw new Error(
-      `Received a ${operation.operationName} operation in the persistedQueryExchange.`
-    );
-  }
+const makeNormalFetchSource = (
+  operation: Operation
+): Source<OperationResult> => {
+  const body = makeFetchBody(operation);
 
-  return make<OperationResult>(({ next, complete }) => {
-    const abortController =
-      typeof AbortController !== 'undefined'
-        ? new AbortController()
-        : undefined;
-
-    const extraOptions =
-      typeof operation.context.fetchOptions === 'function'
-        ? operation.context.fetchOptions()
-        : operation.context.fetchOptions || {};
-
-    const operationName = getOperationName(operation.query);
-
-    const body: Body = {
-      query: await hash(print(operation.query)),
-      variables: operation.variables,
-    };
-
-    if (operationName !== null) {
-      body.operationName = operationName;
-    }
-
-    const fetchOptions = {
-      ...extraOptions,
-      body: shouldUseGet ? undefined : JSON.stringify(body),
-      method: shouldUseGet ? 'GET' : 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...extraOptions.headers,
-      },
-      signal:
-        abortController !== undefined ? abortController.signal : undefined,
-    };
-
-    if (shouldUseGet) {
-      operation.context.url = convertToGet(operation.context.url, body);
-    }
-
-    let ended = false;
-
-    Promise.resolve()
-      .then(() => (ended ? undefined : executeFetch(operation, fetchOptions)))
-      .then((result: OperationResult | undefined) => {
-        if (!ended) {
-          ended = true;
-          if (result) next(result);
-          complete();
-        }
-      });
-
-    return () => {
-      ended = true;
-      if (abortController !== undefined) {
-        abortController.abort();
-      }
-    };
-  });
+  return makeFetchSource(
+    operation,
+    makeFetchURL(operation, body),
+    makeFetchOptions(operation, body)
+  );
 };
 
-const executeFetch = (
-  operation: Operation,
-  opts: RequestInit
-): Promise<OperationResult> => {
-  const { url, fetch: fetcher } = operation.context;
-  let statusNotOk = false;
-  let response: Response;
+const isPersistedMiss = (error: CombinedError): boolean =>
+  error.graphQLErrors.some(x => x.message === 'PersistedQueryNotFound');
 
-  return (fetcher || fetch)(url, opts)
-    .then((res: Response) => {
-      response = res;
-      statusNotOk =
-        res.status < 200 ||
-        res.status >= (opts.redirect === 'manual' ? 400 : 300);
-      return res.json();
-    })
-    .then((result: any) => {
-      if (!('data' in result) && !('errors' in result)) {
-        throw new Error('No Content');
-      }
-
-      return makeResult(operation, result, response);
-    })
-    .catch((error: Error) => {
-      if (error.name !== 'AbortError') {
-        return makeErrorResult(
-          operation,
-          statusNotOk ? new Error(response.statusText) : error,
-          response
-        );
-      }
-    });
-};
-
-export const convertToGet = (uri: string, body: Body): string => {
-  const queryParams: string[] = [`query=${encodeURIComponent(body.query)}`];
-
-  if (body.variables) {
-    queryParams.push(
-      `variables=${encodeURIComponent(JSON.stringify(body.variables))}`
-    );
-  }
-
-  return uri + '?' + queryParams.join('&');
-};
+const isPersistedUnsupported = (error: CombinedError): boolean =>
+  error.graphQLErrors.some(x => x.message === 'PersistedQueryNotFound');

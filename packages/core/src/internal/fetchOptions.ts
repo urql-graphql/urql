@@ -4,7 +4,7 @@ import { stringifyVariables } from '../utils';
 import { Operation } from '../types';
 
 export interface FetchBody {
-  query: string;
+  query?: string;
   operationName: string | undefined;
   variables: undefined | Record<string, any>;
   extensions: undefined | Record<string, any>;
@@ -43,7 +43,9 @@ export const makeFetchURL = (
   let url = operation.context.url;
   if (!useGETMethod || !body) return url;
 
-  url += `?query=${encodeURIComponent(body.query)}`;
+  if (body.query) {
+    url += `?query=${encodeURIComponent(body.query)}`;
+  }
 
   if (body.variables) {
     url += `&variables=${encodeURIComponent(
