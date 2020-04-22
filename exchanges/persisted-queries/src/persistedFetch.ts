@@ -69,7 +69,7 @@ const hash = async (query: string) => {
     .join('');
 };
 
-export const fetchExchange: Exchange = ({ forward }) => {
+export const persistedFetchExchange: Exchange = ({ forward }) => {
   let supportsPersistedQueries = true;
 
   return ops$ => {
