@@ -1,0 +1,1 @@
+# @urql/exchange-persisted-fetch
