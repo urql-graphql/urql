@@ -1,4 +1,4 @@
-import { sha256 as sha256Standard } from 'js-sha256';
+import sha256Standard from 'js-sha256';
 
 const jsCrypto =
   typeof window !== 'undefined'
@@ -46,7 +46,7 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
 export const hash = async (query: string): Promise<string> => {
   // Node.js support
   if (typeof window === 'undefined') {
-    return Promise.resolve(sha256Standard(query));
+    return Promise.resolve(sha256Standard.sha256(query));
   }
 
   let buf: Uint8Array;
