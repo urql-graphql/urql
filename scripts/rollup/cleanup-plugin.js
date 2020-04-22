@@ -1,0 +1,46 @@
+import { transformSync as transform } from '@babel/core';
+import { createFilter } from 'rollup-pluginutils';
+
+function removeEmptyImports({ types: t }) {
+  return {
+    visitor: {
+      ImportDeclaration(path) {
+        if (path.node.specifiers.length === 0) {
+          path.remove();
+        }
+      },
+      CallExpression(path) {
+        if (
+          t.isIdentifier(path.node.callee) &&
+          path.node.callee.name === 'require' &&
+          path.parent.type === 'ExpressionStatement'
+        ) {
+          path.remove();
+        }
+      }
+    }
+  };
+}
+
+function cleanup(opts = {}) {
+  const filter = createFilter(opts.include, opts.exclude, {
+    resolve: false
+  });
+
+  return {
+    name: "cleanup",
+
+    renderChunk(code, chunk) {
+      if (!filter(chunk.fileName)) {
+        return null;
+      }
+
+      return transform(code, {
+        plugins: [removeEmptyImports],
+        babelrc: false
+      });
+    }
+  };
+}
+
+export default cleanup;
