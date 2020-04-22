@@ -122,13 +122,10 @@ const makePersistedFetchSource = (
           const error = !result.data ? result.error : undefined;
 
           dispatchDebug({
-            type: persistFail
-              ? 'persistedFetchError'
-              : error
-              ? 'fetchError'
-              : 'fetchSuccess',
+            // TODO: Assign a new name to this once @urql/devtools supports it
+            type: persistFail || error ? 'fetchError' : 'fetchSuccess',
             message: persistFail
-              ? 'A Persisted Query request has failed. A normal GraphQL request will follow.'
+              ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
               : `A ${
                   error ? 'failed' : 'successful'
                 } fetch response has been returned.`,
@@ -136,7 +133,7 @@ const makePersistedFetchSource = (
             data: {
               url,
               fetchOptions,
-              value: error || result,
+              value: persistFail ? result.error! : error || result,
             },
           });
         })
