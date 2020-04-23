@@ -32,6 +32,8 @@ const cache = new Set<string>();
 
 export const currentDebugStack: string[] = [];
 
+export const popDebugNode = () => currentDebugStack.pop();
+
 export const pushDebugNode = (typename: void | string, node: DebugNode) => {
   let identifier = '';
   if (node.kind === Kind.INLINE_FRAGMENT) {

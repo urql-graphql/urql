@@ -13,7 +13,7 @@ import {
   getFieldAlias,
 } from '../ast';
 
-import { invariant, warn, pushDebugNode } from '../helpers/help';
+import { invariant, warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import { NullArray, Variables, Data, Link, OperationRequest } from '../types';
 
@@ -75,6 +75,11 @@ export const startWrite = (
   }
 
   writeSelection(ctx, operationName, getSelectionSet(operation), data);
+
+  if (process.env.NODE_ENV !== 'production') {
+    popDebugNode();
+  }
+
   return result;
 };
 
@@ -113,6 +118,11 @@ export const writeOptimistic = (
   );
 
   writeSelection(ctx, operationName, getSelectionSet(operation), result.data!);
+
+  if (process.env.NODE_ENV !== 'production') {
+    popDebugNode();
+  }
+
   clearDataState();
   return result;
 };
@@ -160,6 +170,10 @@ export const writeFragment = (
   );
 
   writeSelection(ctx, entityKey, getSelectionSet(fragment), writeData);
+
+  if (process.env.NODE_ENV !== 'production') {
+    popDebugNode();
+  }
 };
 
 const writeSelection = (
@@ -221,6 +235,7 @@ const writeSelection = (
 
     if (ctx.optimistic && isRoot) {
       const resolver = ctx.store.optimisticMutations[fieldName];
+
       if (!resolver) continue;
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(ctx, typename, typename, fieldKey, fieldName);

@@ -7,7 +7,7 @@ import {
   SelectionSet,
   isFieldNode,
 } from '../ast';
-import { warn, pushDebugNode } from '../helpers/help';
+import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
@@ -150,6 +150,10 @@ export class SelectionIterator {
             if (isMatching) {
               this.indexStack.push(0);
               this.selectionStack.push(getSelectionSet(fragmentNode));
+            }
+
+            if (process.env.NODE_ENV !== 'production') {
+              popDebugNode();
             }
           }
 
