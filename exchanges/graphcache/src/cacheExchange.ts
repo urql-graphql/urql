@@ -170,15 +170,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const updateDependencies = (op: Operation, dependencies: Set<string>) => {
     dependencies.forEach(dep => {
       (deps[dep] || (deps[dep] = [])).push(op.key);
-
-      if (!ops.has(op.key)) {
-        ops.set(
-          op.key,
-          op.context.requestPolicy === 'network-only'
-            ? toRequestPolicy(op, 'cache-and-network')
-            : op
-        );
-      }
+      ops.set(op.key, op);
     });
   };
 
