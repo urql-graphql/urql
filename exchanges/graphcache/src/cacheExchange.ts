@@ -145,11 +145,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       operation.context.requestPolicy !== 'network-only'
     ) {
       // This executes an optimistic update for mutations and registers it if necessary
-      const { dependencies } = writeOptimistic(
-        store,
-        operation,
-        operation.key
-      );
+      const { dependencies } = writeOptimistic(store, operation, operation.key);
       if (dependencies.size !== 0) {
         optimisticKeysToDependencies.set(operation.key, dependencies);
         const pendingOperations = new Set<number>();

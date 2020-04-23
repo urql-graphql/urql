@@ -255,7 +255,6 @@ describe('commutative changes', () => {
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
-
     InMemoryData.initDataState(data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
