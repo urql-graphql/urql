@@ -80,16 +80,11 @@ export const initDataState = (
 
   if (!layerKey) {
     currentOptimisticKey = null;
-  } else if (
-    isOptimistic ||
-    (data.optimisticOrder.length > 1 &&
-      data.optimisticOrder.indexOf(layerKey) > -1)
-  ) {
+  } else if (isOptimistic || data.optimisticOrder.length > 0) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
     // clear the optimistic data before writing
     if (!isOptimistic && !data.commutativeKeys.has(layerKey)) {
-      clearLayer(data, layerKey);
       reserveLayer(data, layerKey);
     } else if (isOptimistic) {
       // NOTE: This optimally shouldn't happen as it implies that an optimistic
