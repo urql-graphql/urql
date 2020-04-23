@@ -140,22 +140,21 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
-    } else if (operation.operationName === 'mutation') {
+    } else if (
+      operation.operationName === 'mutation' &&
+      operation.context.requestPolicy !== 'network-only'
+    ) {
       // This executes an optimistic update for mutations and registers it if necessary
-      if (operation.context.requestPolicy !== 'network-only') {
-        const { dependencies } = writeOptimistic(
-          store,
-          operation,
-          operation.key
-        );
-        if (dependencies.size !== 0) {
-          optimisticKeysToDependencies.set(operation.key, dependencies);
-          const pendingOperations = new Set<number>();
-          collectPendingOperations(pendingOperations, dependencies);
-          executePendingOperations(operation, pendingOperations);
-        }
-      } else {
-        reserveLayer(store.data, operation.key);
+      const { dependencies } = writeOptimistic(
+        store,
+        operation,
+        operation.key
+      );
+      if (dependencies.size !== 0) {
+        optimisticKeysToDependencies.set(operation.key, dependencies);
+        const pendingOperations = new Set<number>();
+        collectPendingOperations(pendingOperations, dependencies);
+        executePendingOperations(operation, pendingOperations);
       }
     }
 
@@ -225,9 +224,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
-    } else {
-      reserveLayer(store.data, operation.key);
     }
+
+    reserveLayer(store.data, operation.key);
 
     let queryDependencies: Set<string> | void;
     if (result.data) {

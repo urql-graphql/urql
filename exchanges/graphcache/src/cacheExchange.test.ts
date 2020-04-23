@@ -1545,7 +1545,7 @@ describe('commutativity', () => {
     });
 
     expect(reexec).toHaveBeenCalledTimes(2);
-    expect(data).toHaveProperty('node.name', 'query b');
+    expect(data).toHaveProperty('node.name', 'mutation');
   });
 
   it('applies optimistic updates on top of commutative queries', () => {
