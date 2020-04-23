@@ -230,11 +230,9 @@ const readSelection = (
       (result && result.__typename)
     : key;
 
-  if (
-    typeof typename !== 'string' ||
-    (result && typename !== result.__typename)
-  ) {
-    // TODO: This may be an invalid error for resolvers that return interfaces
+  if (typeof typename !== 'string') {
+    return;
+  } else if (result && typename !== result.__typename) {
     warn(
       'Invalid resolver data: The resolver at `' +
         entityKey +
@@ -243,7 +241,7 @@ const readSelection = (
       8
     );
 
-    return undefined;
+    return;
   }
 
   // The following closely mirrors readSelection, but differs only slightly for the
