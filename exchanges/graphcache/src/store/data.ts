@@ -92,6 +92,8 @@ export const initDataState = (
       clearLayer(data, layerKey);
       reserveLayer(data, layerKey);
     } else if (isOptimistic) {
+      // NOTE: This optimally shouldn't happen as it implies that an optimistic
+      // write is being performed after a concrete write.
       data.commutativeKeys.delete(layerKey);
     }
 

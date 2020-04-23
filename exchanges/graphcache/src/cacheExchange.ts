@@ -220,9 +220,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         optimisticKeysToDependencies.get(key)
       );
       optimisticKeysToDependencies.delete(key);
+    } else {
+      reserveLayer(store.data, operation.key);
     }
-
-    reserveLayer(store.data, operation.key);
 
     let queryDependencies: Set<string> | void;
     if (result.data) {
