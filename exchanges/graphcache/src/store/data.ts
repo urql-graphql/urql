@@ -468,6 +468,9 @@ export const reserveLayer = (data: InMemoryData, layerKey: number) => {
     // keys but after all non-commutative keys (which are added by `forceUpdate`)
     data.optimisticOrder.unshift(layerKey);
   } else if (!data.commutativeKeys.has(layerKey)) {
+    // Protect optimistic layers from being turned into non-optimistic layers
+    // while preserving optimistic data
+    clearLayer(data, layerKey);
     // If the layer was an optimistic layer prior to this call, it'll be converted
     // to a new non-optimistic layer and shifted ahead
     data.optimisticOrder.splice(index, 1);
