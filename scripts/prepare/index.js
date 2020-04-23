@@ -17,9 +17,10 @@ const normalize = name => name
 
 const name = normalize(pkg.name);
 
-const is = (a, b) =>
-  path.normalize(a).replace(new RegExp(path.sep, 'g'), '/')
-    === path.normalize(b).replace(new RegExp(path.sep, 'g'), '/');
+const posixPath = x =>
+  path.normalize(x).split(path.sep).join('/');
+
+const is = (a, b) => posixPath(a) === posixPath(b);
 
 if (pkg.name.startsWith('@urql/')) {
   invariant(
