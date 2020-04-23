@@ -17,6 +17,11 @@ const normalize = name => name
 
 const name = normalize(pkg.name);
 
+const posixPath = x =>
+  path.normalize(x).split(path.sep).join('/');
+
+const is = (a, b) => posixPath(a) === posixPath(b);
+
 if (pkg.name.startsWith('@urql/')) {
   invariant(
     pkg.publishConfig.access === 'public',
@@ -25,7 +30,7 @@ if (pkg.name.startsWith('@urql/')) {
 }
 
 invariant(
-  path.normalize(cwd) !== path.normalize(workspaceRoot),
+  !is(cwd, workspaceRoot),
   'prepare-pkg must be run in a package.'
 );
 
@@ -36,36 +41,41 @@ invariant(
 
 if (hasReact) {
   invariant(
-    path.normalize(pkg.main) === `dist/${name}.js`,
+    is(pkg.main, path.join('dist', `${name}.js`)),
     'package.json:main path must end in `.js` for packages depending on React.'
   );
 
   invariant(
-    path.normalize(pkg.module) === `dist/${name}.es.js`,
+    is(pkg.module, path.join('dist', `${name}.es.js`)),
     'package.json:module path must end in `.es.js` for packages depending on React.'
   );
 } else {
   invariant(
-    path.normalize(pkg.main) === `dist/${name}`,
+    is(pkg.main, path.join('dist', `${name}`)),
     'package.json:main path must be valid and have no extension'
   );
 
   invariant(
-    path.normalize(pkg.module) === `dist/${name}.mjs`,
+    is(pkg.module, path.join('dist', `${name}.mjs`)),
     'package.json:module path must be valid and ending in .mjs'
   );
 }
 
 invariant(
-  path.normalize(pkg.types) === 'dist/types/'
-    + path.relative('src', pkg.source || 'src/index.ts')
-      .replace(/\.ts$/, '.d.ts'),
+  is(
+    pkg.types,
+    path.join('dist', 'types',
+      path.relative('src', pkg.source || path.join('src', 'index.ts'))
+        .replace(/\.ts$/, '.d.ts'))
+  ),
   'package.json:types path must be valid'
 );
 
 invariant(
-  path.normalize(pkg.repository.directory) ===
-    path.relative(workspaceRoot, cwd),
+  is(
+    pkg.repository.directory,
+    path.relative(workspaceRoot, cwd)
+  ),
   'package.json:repository.directory path is invalid'
 );
 
@@ -81,7 +91,7 @@ invariant(
 
 invariant(
   Array.isArray(pkg.files) &&
-    pkg.files.some(x => path.normalize(x) === 'dist/') &&
+    pkg.files.some(x => path.normalize(x).startsWith('dist')) &&
     pkg.files.some(x => path.normalize(x) === 'LICENSE'),
   'package.json:files must include "dist" and "LICENSE"'
 );
@@ -102,18 +112,21 @@ if (hasReact) {
     );
 
     invariant(
-      entry.require === `./dist/${bundleName}.js`,
+      is(entry.require, `./dist/${bundleName}.js`),
       `package.json:exports["${key}"].require must be valid`
     );
 
     invariant(
-      entry.import === `./dist/${bundleName}.mjs`,
+      is(entry.import, `./dist/${bundleName}.mjs`),
       `package.json:exports["${key}"].import must be valid`
     );
 
     invariant(
-      entry.types === './dist/types/'
-        + path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'),
+      is(
+        entry.types,
+        path.join('./dist/types/',
+          path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'))
+      ),
       'package.json:types path must be valid'
     );
   }
