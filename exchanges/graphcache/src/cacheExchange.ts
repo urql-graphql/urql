@@ -140,22 +140,17 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
       noopDataState(store.data, operation.key);
-    } else if (operation.operationName === 'mutation') {
+    } else if (
+      operation.operationName === 'mutation' &&
+      operation.context.requestPolicy !== 'network-only'
+    ) {
       // This executes an optimistic update for mutations and registers it if necessary
-      if (operation.context.requestPolicy !== 'network-only') {
-        const { dependencies } = writeOptimistic(
-          store,
-          operation,
-          operation.key
-        );
-        if (dependencies.size !== 0) {
-          optimisticKeysToDependencies.set(operation.key, dependencies);
-          const pendingOperations = new Set<number>();
-          collectPendingOperations(pendingOperations, dependencies);
-          executePendingOperations(operation, pendingOperations);
-        }
-      } else {
-        reserveLayer(store.data, operation.key);
+      const { dependencies } = writeOptimistic(store, operation, operation.key);
+      if (dependencies.size !== 0) {
+        optimisticKeysToDependencies.set(operation.key, dependencies);
+        const pendingOperations = new Set<number>();
+        collectPendingOperations(pendingOperations, dependencies);
+        executePendingOperations(operation, pendingOperations);
       }
     }
 
@@ -175,15 +170,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const updateDependencies = (op: Operation, dependencies: Set<string>) => {
     dependencies.forEach(dep => {
       (deps[dep] || (deps[dep] = [])).push(op.key);
-
-      if (!ops.has(op.key)) {
-        ops.set(
-          op.key,
-          op.context.requestPolicy === 'network-only'
-            ? toRequestPolicy(op, 'cache-and-network')
-            : op
-        );
-      }
+      ops.set(op.key, op);
     });
   };
 

@@ -80,18 +80,18 @@ export const initDataState = (
 
   if (!layerKey) {
     currentOptimisticKey = null;
-  } else if (
-    isOptimistic ||
-    (data.optimisticOrder.length > 1 &&
-      data.optimisticOrder.indexOf(layerKey) > -1)
-  ) {
+  } else if (isOptimistic || data.optimisticOrder.length > 0) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
     // clear the optimistic data before writing
     if (!isOptimistic && !data.commutativeKeys.has(layerKey)) {
-      clearLayer(data, layerKey);
-      data.commutativeKeys.add(layerKey);
+      reserveLayer(data, layerKey);
+    } else if (isOptimistic) {
+      // NOTE: This optimally shouldn't happen as it implies that an optimistic
+      // write is being performed after a concrete write.
+      data.commutativeKeys.delete(layerKey);
     }
+
     // An optimistic update of a mutation may force an optimistic layer,
     // or this Query update may be applied optimistically since it's part
     // of a commutate chain
@@ -457,9 +457,18 @@ export const writeLink = (
 
 /** Reserves an optimistic layer and preorders it */
 export const reserveLayer = (data: InMemoryData, layerKey: number) => {
-  if (data.optimisticOrder.indexOf(layerKey) === -1) {
+  const index = data.optimisticOrder.indexOf(layerKey);
+  if (index === -1) {
     // The new layer needs to be reserved in front of all other commutative
     // keys but after all non-commutative keys (which are added by `forceUpdate`)
+    data.optimisticOrder.unshift(layerKey);
+  } else if (!data.commutativeKeys.has(layerKey)) {
+    // Protect optimistic layers from being turned into non-optimistic layers
+    // while preserving optimistic data
+    clearLayer(data, layerKey);
+    // If the layer was an optimistic layer prior to this call, it'll be converted
+    // to a new non-optimistic layer and shifted ahead
+    data.optimisticOrder.splice(index, 1);
     data.optimisticOrder.unshift(layerKey);
   }
 

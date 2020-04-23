@@ -240,8 +240,41 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState(data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
+    InMemoryData.clearDataState();
 
     expect(data.optimisticOrder).toEqual([]);
+  });
+
+  it('discards optimistic order when concrete data is written', () => {
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+    InMemoryData.reserveLayer(data, 3);
+
+    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.writeRecord('Query', 'optimistic', true);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState(data, 3);
+    InMemoryData.writeRecord('Query', 'index', 3);
+    InMemoryData.clearDataState();
+
+    // Expect Layer 3
+    expect(data.optimisticOrder).toEqual([3, 2, 1]);
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
+    expect(InMemoryData.readRecord('Query', 'optimistic')).toBe(true);
+
+    // Write 2 again
+    InMemoryData.initDataState(data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    // 2 has moved in front of 3
+    expect(data.optimisticOrder).toEqual([2, 3, 1]);
+    InMemoryData.initDataState(data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+    expect(InMemoryData.readRecord('Query', 'optimistic')).toBe(undefined);
   });
 
   it('overrides data using optimistic layers', () => {
