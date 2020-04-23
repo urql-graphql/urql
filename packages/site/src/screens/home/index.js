@@ -21,11 +21,11 @@ const Home = () => {
 
   return (
     <Container ref={ref}>
-      <Header />
+      <Header content={content.header} />
       <Features featureArray={content.features} />
       <Components components={content.components} />
       <GetStarted content={content.getStarted} />
-      <MoreOSS ossArray={content.oss} />
+      <MoreOSS oss={content.oss} />
       <Footer />
     </Container>
   );

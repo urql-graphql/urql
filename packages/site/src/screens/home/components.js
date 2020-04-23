@@ -11,16 +11,11 @@ const ComponentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 28rem;
   text-align: center;
   > img {
     width: 100%;
     max-width: 10rem;
     margin-bottom: 20px;
-  }
-  @media (min-width: 768px) {
-    max-width: 116rem;
-    padding: 0 8rem;
   }
 `;
 
@@ -31,6 +26,7 @@ const SecondaryTitleCentred = styled(SecondaryTitle)`
 `;
 
 const BodyCopyCentred = styled(BodyCopy)`
+  margin-top: 2rem;
   max-width: 28rem;
 
   @media (min-width: 768px) {
@@ -47,9 +43,7 @@ const Components = props => {
     <PanelSectionWrapper isLight>
       <ComponentWrapper>
         <img src={props.components.icon} />
-        <SecondaryTitleCentred pop>
-          {props.components.title}
-        </SecondaryTitleCentred>
+        <SecondaryTitleCentred>{props.components.title}</SecondaryTitleCentred>
         <BodyCopyCentred>{props.components.description}</BodyCopyCentred>
       </ComponentWrapper>
     </PanelSectionWrapper>

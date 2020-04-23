@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { BodyCopy } from '../../components/body-copy';
+import { Button } from '../../components/button';
 import { SectionTitle } from '../../components/section-title';
 import { PanelSectionWrapper } from '../../components/panel';
 
-import octoCat from '../../assets/github.svg';
-
 const GetStartedWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 55rem;
   p {
     text-align: center;
   }
   h2 {
     margin-top: 0;
   }
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;
 
 const GithubButton = styled.a`
@@ -64,34 +64,10 @@ const GetStartedTitle = styled(SectionTitle)`
 const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 4rem;
+  margin-top: 6rem;
   flex-direction: column;
   @media (min-width: 768px) {
     flex-direction: row;
-    margin-top: 6rem;
-  }
-`;
-
-const DocButton = styled(Link)`
-  width: 18rem;
-  margin-left: 0rem;
-  height: 4rem;
-  font-size: 14px;
-  background-color: #ffffff;
-  line-height: 4rem;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #383838;
-  border: 0;
-  margin-top: 2rem;
-  @media (min-width: 768px) {
-    margin-right: 2rem;
-    width: 18rem;
-    margin-top: 0;
-  }
-  &:hover {
-    background-color: #f6f6f6;
   }
 `;
 
@@ -103,13 +79,9 @@ class GetStarted extends React.Component {
       <PanelSectionWrapper>
         <GetStartedWrapper>
           <GetStartedTitle>Get Started</GetStartedTitle>
-          <BodyCopy>{content.description}</BodyCopy>
+          <BodyCopy noMargin>{content.description}</BodyCopy>
           <ButtonsWrapper>
-            <DocButton to="docs/">Quick Start Guide</DocButton>
-            <GithubButton href="https://github.com/FormidableLabs/urql">
-              <img src={octoCat} />
-              <p>GitHub</p>
-            </GithubButton>
+            <Button to="docs/">Quick Start Guide</Button>
           </ButtonsWrapper>
         </GetStartedWrapper>
       </PanelSectionWrapper>

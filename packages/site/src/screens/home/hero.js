@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Wrapper } from '../../components/wrapper';
+import { Button } from '../../components/button';
 import styled from 'styled-components';
 
 import badge from '../../assets/sidebar-badge.svg';
@@ -116,36 +117,15 @@ const HeroNPMCopy = styled.p`
   font-size: 14px;
   margin: 0;
 `;
-const HeroNPMButton = styled.button`
+const HeroNPMButton = styled(Button)`
   width: 8rem;
-  height: 4rem;
-  background-color: #ffffff;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: normal;
-  color: #383838;
-  border: 0;
-  text-transform: uppercase;
   cursor: copy;
-  &:hover {
-    background-color: #f6f6f6;
-  }
+  text-decoration: none;
 `;
 
-export const HeroDocsButton = styled(Link)`
+export const HeroDocsButton = styled(Button)`
   width: 30rem;
-  margin-left: 0rem;
-  height: 4rem;
-  font-size: 14px;
-  background-color: #ffffff;
-  line-height: 4rem;
-  text-align: center;
-  text-transform: uppercase;
-  color: #383838;
-  border: 0;
-  margin-top: 5rem;
+  margin-top: 4rem;
   @media (min-width: 768px) {
     margin-top: 2rem;
     width: 30rem;
@@ -154,9 +134,6 @@ export const HeroDocsButton = styled(Link)`
     margin-top: 0;
     margin-left: 2rem;
     width: 18rem;
-  }
-  &:hover {
-    background-color: #f6f6f6;
   }
 `;
 
@@ -204,9 +181,11 @@ const HeroNavList = styled.ul`
   }
 `;
 
+const COPY_TEXT = 'npm install urql graphql';
+
 const copyFallBack = () => {
   const copyTextArea = document.createElement('textArea');
-  copyTextArea.value = 'npm install urql';
+  copyTextArea.value = COPY_TEXT;
 
   document.body.appendChild(copyTextArea);
 
@@ -232,7 +211,7 @@ class Hero extends React.Component {
       e.preventDefault();
       return;
     }
-    navigator.clipboard.writeText('npm install urql');
+    navigator.clipboard.writeText(COPY_TEXT);
   }
 
   render() {
@@ -249,8 +228,10 @@ class Hero extends React.Component {
           </HeroBody>
           <HeroButtonsWrapper>
             <HeroNPMWrapper>
-              <HeroNPMCopy>npm install urql graphql</HeroNPMCopy>
-              <HeroNPMButton onClick={this.handleCopy}>copy</HeroNPMButton>
+              <HeroNPMCopy>{COPY_TEXT}</HeroNPMCopy>
+              <HeroNPMButton onClick={this.handleCopy} isButton>
+                copy
+              </HeroNPMButton>
             </HeroNPMWrapper>
             <HeroDocsButton to="docs/">Documentation</HeroDocsButton>
           </HeroButtonsWrapper>

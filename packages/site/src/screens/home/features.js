@@ -18,7 +18,6 @@ const FeatureCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 0 4rem;
   width: 100%;
   max-width: 28rem;
   text-align: center;
@@ -26,7 +25,9 @@ const FeatureCard = styled.div`
     width: 100%;
     max-width: 28rem;
     box-shadow: -20px 20px 0 0 rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
+  }
+  &:not(:last-child) {
+    margin: 0 0 4rem;
   }
   @media (min-width: 768px) {
     margin: 0;
@@ -64,7 +65,7 @@ class Features extends React.Component {
           {this.props.featureArray.map(feature => (
             <FeatureCard key={feature.title}>
               <img src={feature.icon} />
-              <SecondaryTitleStyled pop>{feature.title}</SecondaryTitleStyled>
+              <SecondaryTitleStyled>{feature.title}</SecondaryTitleStyled>
               <BodyCopy>{feature.description}</BodyCopy>
             </FeatureCard>
           ))}
