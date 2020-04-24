@@ -211,9 +211,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         : 'partial'
       : 'miss';
 
-    if (res.data) {
-      updateDependencies(operation, res.dependencies);
-    }
+    updateDependencies(operation, res.dependencies);
 
     return {
       outcome: cacheOutcome,
@@ -312,7 +310,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       filter(res => {
         return (
           res.outcome === 'miss' &&
-          res.operation.context.requestPolicy !== 'cache-only'
+          res.operation.context.requestPolicy !== 'cache-only' &&
+          !isBlockedByOptimisticUpdate(res.dependencies)
         );
       }),
       map(res => {

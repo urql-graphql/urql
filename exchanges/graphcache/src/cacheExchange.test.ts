@@ -1727,7 +1727,7 @@ describe('commutativity', () => {
       },
     });
 
-    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(3);
     expect(data).toHaveProperty('node.name', 'mutation');
 
     nextRes({
@@ -1742,7 +1742,7 @@ describe('commutativity', () => {
       },
     });
 
-    expect(reexec).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(4);
     expect(data).toHaveProperty('node.name', 'mutation');
   });
 
