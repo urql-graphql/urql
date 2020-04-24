@@ -150,8 +150,12 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   // This registers queries with the data layer to ensure commutativity
   const prepareForwardedOperation = (operation: Operation) => {
     if (operation.operationName === 'query') {
+      // Pre-reserve the position of the result layer
       reserveLayer(store.data, operation.key);
     } else if (operation.operationName === 'teardown') {
+      // Delete reference to operation if any exists to release it
+      ops.delete(operation.key);
+      // Mark operation layer as done
       noopDataState(store.data, operation.key);
     } else if (
       operation.operationName === 'mutation' &&
