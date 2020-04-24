@@ -15,7 +15,7 @@ import {
 
 import { invariant, warn, pushDebugNode } from '../helpers/help';
 
-import { NullArray, Variables, Data, Link, OperationRequest } from '../types';
+import { NullArray, Variables, Data, Link, OperationRequest, Dependencies } from '../types';
 
 import {
   Store,
@@ -37,7 +37,7 @@ import {
 
 export interface WriteResult {
   data: null | Data;
-  dependencies: Set<string>;
+  dependencies: Dependencies;
 }
 
 /** Writes a request given its response to the store */

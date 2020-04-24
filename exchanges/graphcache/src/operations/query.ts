@@ -22,6 +22,7 @@ import {
   Link,
   OperationRequest,
   NullArray,
+  Dependencies,
 } from '../types';
 
 import {
@@ -51,7 +52,7 @@ import {
 } from '../ast';
 
 export interface QueryResult {
-  dependencies: Set<string>;
+  dependencies: Dependencies;
   partial: boolean;
   data: null | Data;
 }

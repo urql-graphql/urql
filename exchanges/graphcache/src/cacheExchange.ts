@@ -27,7 +27,7 @@ import {
 
 import { query, write, writeOptimistic } from './operations';
 import { hydrateData } from './store/data';
-import { makeDict } from './helpers/dict';
+import { makeDict, isDictEmpty } from './helpers/dict';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, reserveLayer } from './store';
 
@@ -37,6 +37,7 @@ import {
   OptimisticMutationConfig,
   KeyingConfig,
   StorageAdapter,
+  Dependencies,
 } from './types';
 
 type OperationResultWithMeta = OperationResult & {
@@ -96,17 +97,17 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     });
   }
 
-  const optimisticKeysToDependencies = new Map<number, Set<string>>();
+  const optimisticKeysToDependencies = new Map<number, Dependencies>();
   const ops: OperationMap = new Map();
   const deps: DependentOperations = makeDict();
 
   const collectPendingOperations = (
     pendingOperations: Set<number>,
-    dependencies: void | Set<string>
+    dependencies: void | Dependencies
   ) => {
     if (dependencies) {
       // Collect operations that will be updated due to cache changes
-      dependencies.forEach(dep => {
+      for (const dep in dependencies) {
         const keys = deps[dep];
         if (keys) {
           deps[dep] = [];
@@ -114,7 +115,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
             pendingOperations.add(keys[i]);
           }
         }
-      });
+      }
     }
   };
 
@@ -146,7 +147,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     ) {
       // This executes an optimistic update for mutations and registers it if necessary
       const { dependencies } = writeOptimistic(store, operation, operation.key);
-      if (dependencies.size !== 0) {
+      if (!isDictEmpty(dependencies)) {
         optimisticKeysToDependencies.set(operation.key, dependencies);
         const pendingOperations = new Set<number>();
         collectPendingOperations(pendingOperations, dependencies);
@@ -167,11 +168,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // This updates the known dependencies for the passed operation
-  const updateDependencies = (op: Operation, dependencies: Set<string>) => {
-    dependencies.forEach(dep => {
+  const updateDependencies = (op: Operation, dependencies: Dependencies) => {
+    for (const dep in dependencies) {
       (deps[dep] || (deps[dep] = [])).push(op.key);
       ops.set(op.key, op);
-    });
+    }
   };
 
   // Retrieves a query result from cache and adds an `isComplete` hint
@@ -216,7 +217,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       reserveLayer(store.data, operation.key);
     }
 
-    let queryDependencies: Set<string> | void;
+    let queryDependencies: void | Dependencies;
     if (result.data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
