@@ -28,7 +28,6 @@ So you're trying to debug your app and you don't know where to start?
 The quickest way is going to be using our [official devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via your running client.
 
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
-_The Urql Devtools timeline._
 
 Check out [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on how to get started.
 
