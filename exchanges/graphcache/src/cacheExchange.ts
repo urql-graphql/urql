@@ -395,7 +395,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         (result: OperationResult): Source<OperationResult> => {
           if (optimisticKeysToDependencies.has(result.operation.key)) {
             mutationResultBuffer.push(result);
-            if (optimisticKeysToDependencies.size > 1) {
+            if (
+              mutationResultBuffer.length < optimisticKeysToDependencies.size
+            ) {
               return empty;
             }
 
