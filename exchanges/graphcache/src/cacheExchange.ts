@@ -42,13 +42,13 @@ import {
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
+  dependencies: Dependencies;
 };
 
 type OperationMap = Map<number, Operation>;
-
-interface DependentOperations {
-  [key: string]: number[];
-}
+type OptimisticDependencies = Map<number, Dependencies>;
+type DependentOptimistic = Record<string, number>;
+type DependentOperations = Record<string, number[]>;
 
 // Returns the given operation result with added cacheOutcome meta field
 const addCacheOutcome = (op: Operation, outcome: CacheOutcome): Operation => ({
@@ -97,9 +97,26 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     });
   }
 
-  const optimisticKeysToDependencies = new Map<number, Dependencies>();
+  const optimisticKeysToDependencies: OptimisticDependencies = new Map();
   const ops: OperationMap = new Map();
+  const dependentOptimistic: DependentOptimistic = makeDict();
   const deps: DependentOperations = makeDict();
+
+  const markDependencies = (dependencies: void | Dependencies, add: number) => {
+    if (dependencies) {
+      for (const dep in dependencies) {
+        dependentOptimistic[dep] = (dependentOptimistic[dep] || 0) + add;
+      }
+    }
+  };
+
+  const hasOverlappingDependencies = (dependencies: Dependencies) => {
+    for (const dep in dependencies) {
+      if (dependentOptimistic[dep] > 0) {
+        return true;
+      }
+    }
+  };
 
   const collectPendingOperations = (
     pendingOperations: Set<number>,
@@ -150,6 +167,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       if (!isDictEmpty(dependencies)) {
         optimisticKeysToDependencies.set(operation.key, dependencies);
         const pendingOperations = new Set<number>();
+        markDependencies(dependencies, 1);
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
       }
@@ -195,6 +213,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       outcome: cacheOutcome,
       operation,
       data: res.data,
+      dependencies: res.dependencies,
     };
   };
 
@@ -208,10 +227,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     if (operation.operationName === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
-      collectPendingOperations(
-        pendingOperations,
-        optimisticKeysToDependencies.get(key)
-      );
+      const dependencies = optimisticKeysToDependencies.get(key);
+      collectPendingOperations(pendingOperations, dependencies);
+      markDependencies(dependencies, -1);
       optimisticKeysToDependencies.delete(key);
     } else {
       reserveLayer(store.data, operation.key);
@@ -315,7 +333,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       ),
       map(
         (res: OperationResultWithMeta): OperationResult => {
-          const { operation, outcome } = res;
+          const { operation, outcome, dependencies } = res;
           const result: OperationResult = {
             operation: addCacheOutcome(operation, outcome),
             data: res.data,
@@ -329,9 +347,11 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               outcome === 'partial')
           ) {
             result.stale = true;
-            client.reexecuteOperation(
-              toRequestPolicy(operation, 'network-only')
-            );
+            if (!hasOverlappingDependencies(dependencies)) {
+              client.reexecuteOperation(
+                toRequestPolicy(operation, 'network-only')
+              );
+            }
           }
 
           dispatchDebug({
