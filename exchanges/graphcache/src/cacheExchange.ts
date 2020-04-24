@@ -17,7 +17,6 @@ import {
   share,
   fromPromise,
   fromArray,
-  fromValue,
   buffer,
   take,
   mergeMap,
@@ -384,41 +383,47 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const result$ = pipe(
       merge([nonCacheOps$, cacheMissOps$]),
       map(prepareForwardedOperation),
-      forward
+      forward,
+      share
+    );
+
+    // Results that can immediately be resolved
+    const nonOptimisticResults$ = pipe(
+      result$,
+      filter(result => !optimisticKeysToDependencies.has(result.operation.key)),
+      map(updateCacheWithResult)
     );
 
     // Prevent mutations that were previously optimistic from being flushed
     // immediately and instead clear them out slowly
-    const resultWithUpdate$ = pipe(
+    const optimisticMutationCompletion$ = pipe(
       result$,
+      filter(result => optimisticKeysToDependencies.has(result.operation.key)),
       mergeMap(
         (result: OperationResult): Source<OperationResult> => {
-          if (optimisticKeysToDependencies.has(result.operation.key)) {
-            mutationResultBuffer.push(result);
-            if (
-              mutationResultBuffer.length < optimisticKeysToDependencies.size
-            ) {
-              return empty;
-            }
-
-            for (let i = 0; i < mutationResultBuffer.length; i++) {
-              clearLayer(store.data, mutationResultBuffer[i].operation.key);
-            }
-
-            const results: OperationResult[] = [];
-            let bufferedResult: OperationResult | void;
-            while ((bufferedResult = mutationResultBuffer.shift()))
-              results.push(updateCacheWithResult(bufferedResult));
-
-            return fromArray(results);
+          const length = mutationResultBuffer.push(result);
+          if (length < optimisticKeysToDependencies.size) {
+            return empty;
           }
 
-          return fromValue(updateCacheWithResult(result));
+          for (let i = 0; i < mutationResultBuffer.length; i++) {
+            clearLayer(store.data, mutationResultBuffer[i].operation.key);
+          }
+
+          const results: OperationResult[] = [];
+          let bufferedResult: OperationResult | void;
+          while ((bufferedResult = mutationResultBuffer.shift()))
+            results.push(updateCacheWithResult(bufferedResult));
+
+          return fromArray(results);
         }
-      ),
-      filter(result => !!result)
+      )
     );
 
-    return merge([resultWithUpdate$, cacheResult$]);
+    return merge([
+      nonOptimisticResults$,
+      optimisticMutationCompletion$,
+      cacheResult$,
+    ]);
   };
 };
