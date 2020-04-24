@@ -3,8 +3,8 @@ export {
   clearDataState,
   noopDataState,
   reserveLayer,
-  clearLayer,
   getCurrentDependencies,
+  hydrateData,
 } from './data';
 
 export * from './keys';

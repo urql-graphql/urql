@@ -433,7 +433,7 @@ it('correctly resolves optimistic updates on Relay schemas', () => {
 
   write(store, { query: getRoot }, queryData);
   writeOptimistic(store, { query: updateItem, variables: { id: '2' } }, 1);
-  InMemoryData.clearLayer(store.data, 1);
+  InMemoryData.noopDataState(store.data, 1);
   const queryRes = query(store, { query: getRoot });
 
   expect(queryRes.partial).toBe(false);

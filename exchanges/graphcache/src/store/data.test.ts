@@ -87,10 +87,10 @@ describe('garbage collection', () => {
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
-    InMemoryData.clearLayer(data, 1);
+    InMemoryData.reserveLayer(data, 1);
     InMemoryData.gc();
-    expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 
+    expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
     expect(InMemoryData.getCurrentDependencies()).toEqual({
       'Query.todo': true,
       'Todo:1': true,

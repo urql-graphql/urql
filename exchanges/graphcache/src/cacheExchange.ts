@@ -26,10 +26,9 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { hydrateData, clearLayer } from './store/data';
 import { makeDict, isDictEmpty } from './helpers/dict';
 import { filterVariables, getMainOperation } from './ast';
-import { Store, noopDataState, reserveLayer } from './store';
+import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 
 import {
   UpdatesConfig,
@@ -404,7 +403,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           }
 
           for (let i = 0; i < mutationResultBuffer.length; i++) {
-            clearLayer(store.data, mutationResultBuffer[i].operation.key);
+            reserveLayer(store.data, mutationResultBuffer[i].operation.key);
           }
 
           for (const dep in blockedDependencies) {
