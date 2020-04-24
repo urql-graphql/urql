@@ -17,6 +17,7 @@ import {
   share,
   fromPromise,
   fromArray,
+  fromValue,
   buffer,
   take,
   mergeMap,
@@ -26,7 +27,7 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { hydrateData } from './store/data';
+import { hydrateData, clearLayer } from './store/data';
 import { makeDict, isDictEmpty } from './helpers/dict';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, reserveLayer } from './store';
@@ -99,6 +100,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   }
 
   const optimisticKeysToDependencies: OptimisticDependencies = new Map();
+  const mutationResultBuffer: OperationResult[] = [];
   const ops: OperationMap = new Map();
   const dependentOptimistic: DependentOptimistic = makeDict();
   const requestedRefetch: Operations = new Set();
@@ -227,11 +229,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   // Take any OperationResult and update the cache with it
   const updateCacheWithResult = (result: OperationResult): OperationResult => {
     const { operation, error, extensions } = result;
-
-    // Clear old optimistic values from the store
     const { key } = operation;
-    const pendingOperations: Operations = new Set();
 
+    const pendingOperations: Operations = new Set();
     if (operation.operationName === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
       const dependencies = optimisticKeysToDependencies.get(key);
@@ -383,9 +383,36 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       merge([nonCacheOps$, cacheMissOps$]),
       map(prepareForwardedOperation),
       forward,
-      map(updateCacheWithResult)
     );
 
-    return merge([result$, cacheResult$]);
+    // Prevent mutations that were previously optimistic from being flushed
+    // immediately and instead clear them out slowly
+    const resultWithUpdate$ = pipe(
+      result$,
+      mergeMap((result: OperationResult): Source<OperationResult> => {
+        if (optimisticKeysToDependencies.has(result.operation.key)) {
+          mutationResultBuffer.push(result);
+          if (optimisticKeysToDependencies.size > 1) {
+            return empty;
+          }
+
+          for (let i = 0; i < mutationResultBuffer.length; i++) {
+            clearLayer(store.data, mutationResultBuffer[i].operation.key);
+          }
+
+          const results: OperationResult[] = [];
+          let bufferedResult: OperationResult | void;
+          while(bufferedResult = mutationResultBuffer.shift())
+            results.push(updateCacheWithResult(bufferedResult));
+
+          return fromArray(results);
+        }
+
+        return fromValue(updateCacheWithResult(result));
+      }),
+      filter(result => !!result),
+    );
+
+    return merge([resultWithUpdate$, cacheResult$]);
   };
 };
