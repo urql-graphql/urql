@@ -358,7 +358,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
               );
-            } else if (operation.context.requestPolicy === 'cache-and-network') {
+            } else if (
+              operation.context.requestPolicy === 'cache-and-network'
+            ) {
               requestedRefetch.add(operation.key);
             }
           }
@@ -382,35 +384,37 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const result$ = pipe(
       merge([nonCacheOps$, cacheMissOps$]),
       map(prepareForwardedOperation),
-      forward,
+      forward
     );
 
     // Prevent mutations that were previously optimistic from being flushed
     // immediately and instead clear them out slowly
     const resultWithUpdate$ = pipe(
       result$,
-      mergeMap((result: OperationResult): Source<OperationResult> => {
-        if (optimisticKeysToDependencies.has(result.operation.key)) {
-          mutationResultBuffer.push(result);
-          if (optimisticKeysToDependencies.size > 1) {
-            return empty;
+      mergeMap(
+        (result: OperationResult): Source<OperationResult> => {
+          if (optimisticKeysToDependencies.has(result.operation.key)) {
+            mutationResultBuffer.push(result);
+            if (optimisticKeysToDependencies.size > 1) {
+              return empty;
+            }
+
+            for (let i = 0; i < mutationResultBuffer.length; i++) {
+              clearLayer(store.data, mutationResultBuffer[i].operation.key);
+            }
+
+            const results: OperationResult[] = [];
+            let bufferedResult: OperationResult | void;
+            while ((bufferedResult = mutationResultBuffer.shift()))
+              results.push(updateCacheWithResult(bufferedResult));
+
+            return fromArray(results);
           }
 
-          for (let i = 0; i < mutationResultBuffer.length; i++) {
-            clearLayer(store.data, mutationResultBuffer[i].operation.key);
-          }
-
-          const results: OperationResult[] = [];
-          let bufferedResult: OperationResult | void;
-          while(bufferedResult = mutationResultBuffer.shift())
-            results.push(updateCacheWithResult(bufferedResult));
-
-          return fromArray(results);
+          return fromValue(updateCacheWithResult(result));
         }
-
-        return fromValue(updateCacheWithResult(result));
-      }),
-      filter(result => !!result),
+      ),
+      filter(result => !!result)
     );
 
     return merge([resultWithUpdate$, cacheResult$]);

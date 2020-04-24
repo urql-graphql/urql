@@ -166,7 +166,7 @@ describe('inspectFields', () => {
   it('returns an empty array when an entity is unknown', () => {
     expect(InMemoryData.inspectFields('Random')).toEqual([]);
 
-    expect(InMemoryData.getCurrentDependencies()).toEqual({ 'Random': true });
+    expect(InMemoryData.getCurrentDependencies()).toEqual({ Random: true });
   });
 
   it('returns field infos for all optimistic updates', () => {

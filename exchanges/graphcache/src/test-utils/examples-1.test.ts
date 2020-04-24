@@ -220,7 +220,7 @@ it('respects property-level resolvers when given', () => {
     'Query.todos': true,
     'Todo:0': true,
     'Todo:1': true,
-    'Todo:2': true
+    'Todo:2': true,
   });
 
   let queryRes = query(store, { query: Todos });

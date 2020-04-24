@@ -15,7 +15,14 @@ import {
 
 import { invariant, warn, pushDebugNode } from '../helpers/help';
 
-import { NullArray, Variables, Data, Link, OperationRequest, Dependencies } from '../types';
+import {
+  NullArray,
+  Variables,
+  Data,
+  Link,
+  OperationRequest,
+  Dependencies,
+} from '../types';
 
 import {
   Store,
