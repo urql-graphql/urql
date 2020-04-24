@@ -121,7 +121,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   const collectPendingOperations = (
-    pendingOperations: Set<number>,
+    pendingOperations: Operations,
     dependencies: void | Dependencies
   ) => {
     if (dependencies) {
@@ -140,7 +140,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   const executePendingOperations = (
     operation: Operation,
-    pendingOperations: Set<number>
+    pendingOperations: Operations
   ) => {
     // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
@@ -173,7 +173,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       const { dependencies } = writeOptimistic(store, operation, operation.key);
       if (!isDictEmpty(dependencies)) {
         optimisticKeysToDependencies.set(operation.key, dependencies);
-        const pendingOperations = new Set<number>();
+        const pendingOperations: Operations = new Set();
         markDependencies(dependencies, 1);
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
@@ -230,7 +230,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
     // Clear old optimistic values from the store
     const { key } = operation;
-    const pendingOperations = new Set<number>();
+    const pendingOperations: Operations = new Set();
 
     if (operation.operationName === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
