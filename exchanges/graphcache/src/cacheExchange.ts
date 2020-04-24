@@ -358,7 +358,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
               );
-            } else {
+            } else if (operation.context.requestPolicy === 'cache-and-network') {
               requestedRefetch.add(operation.key);
             }
           }
