@@ -181,3 +181,5 @@ export interface StorageAdapter {
   read(): Promise<SerializedEntries>;
   write(data: SerializedEntries): Promise<void>;
 }
+
+export type Dependencies = Record<string, true>;

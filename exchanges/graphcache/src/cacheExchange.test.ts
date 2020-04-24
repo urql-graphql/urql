@@ -696,6 +696,204 @@ describe('optimistic updates', () => {
     expect(result).toHaveBeenCalledTimes(4);
   });
 
+  it('batches optimistic mutation result application', () => {
+    jest.useFakeTimers();
+
+    const mutation = gql`
+      mutation {
+        concealAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const optimisticMutationData = {
+      __typename: 'Mutation',
+      concealAuthor: {
+        __typename: 'Author',
+        id: '123',
+        name: '[REDACTED OFFLINE]',
+      },
+    };
+
+    const mutationData = {
+      __typename: 'Mutation',
+      concealAuthor: {
+        __typename: 'Author',
+        id: '123',
+        name: '[REDACTED ONLINE]',
+      },
+    };
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opOne = client.createRequestOperation('query', {
+      key: 1,
+      query: queryOne,
+    });
+
+    const opMutationOne = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+    });
+
+    const opMutationTwo = client.createRequestOperation('mutation', {
+      key: 3,
+      query: mutation,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: opOne, data: queryOneData };
+        } else if (forwardOp.key === 2) {
+          return { operation: opMutationOne, data: mutationData };
+        } else if (forwardOp.key === 3) {
+          return { operation: opMutationTwo, data: mutationData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, delay(3), map(response));
+
+    const optimistic = {
+      concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
+    };
+
+    pipe(
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
+      filter(x => x.operation.operationName === 'mutation'),
+      tap(result),
+      publish
+    );
+
+    next(opOne);
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(0);
+
+    next(opMutationOne);
+    jest.advanceTimersByTime(1);
+    next(opMutationTwo);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(optimistic.concealAuthor).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(0);
+
+    jest.advanceTimersByTime(2);
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(0);
+
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(3);
+    expect(result).toHaveBeenCalledTimes(2);
+  });
+
+  it('blocks refetches of overlapping queries', () => {
+    jest.useFakeTimers();
+
+    const mutation = gql`
+      mutation {
+        concealAuthor {
+          id
+          name
+        }
+      }
+    `;
+
+    const optimisticMutationData = {
+      __typename: 'Mutation',
+      concealAuthor: {
+        __typename: 'Author',
+        id: '123',
+        name: '[REDACTED OFFLINE]',
+      },
+    };
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const opOne = client.createRequestOperation(
+      'query',
+      {
+        key: 1,
+        query: queryOne,
+      },
+      {
+        requestPolicy: 'cache-and-network',
+      }
+    );
+
+    const opMutation = client.createRequestOperation('mutation', {
+      key: 2,
+      query: mutation,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: opOne, data: queryOneData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ =>
+      pipe(
+        ops$,
+        delay(1),
+        filter(x => x.operationName !== 'mutation'),
+        map(response)
+      );
+
+    const optimistic = {
+      concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
+    };
+
+    pipe(
+      cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(opOne);
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+
+    next(opMutation);
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(optimistic.concealAuthor).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(1);
+
+    expect(reexec.mock.calls[0][0]).toHaveProperty(
+      'context.requestPolicy',
+      'cache-first'
+    );
+
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+
+    next(opOne);
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(1);
+  });
+
   it('correctly clears on error', () => {
     jest.useFakeTimers();
 
@@ -1529,7 +1727,7 @@ describe('commutativity', () => {
       },
     });
 
-    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(3);
     expect(data).toHaveProperty('node.name', 'mutation');
 
     nextRes({
@@ -1544,7 +1742,7 @@ describe('commutativity', () => {
       },
     });
 
-    expect(reexec).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(4);
     expect(data).toHaveProperty('node.name', 'mutation');
   });
 

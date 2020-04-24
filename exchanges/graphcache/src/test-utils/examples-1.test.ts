@@ -67,8 +67,12 @@ it('passes the "getting-started" example', () => {
 
   const writeRes = write(store, { query: Todos }, todosData);
 
-  const expectedSet = new Set(['Query.todos', 'Todo:0', 'Todo:1', 'Todo:2']);
-  expect(writeRes.dependencies).toEqual(expectedSet);
+  expect(writeRes.dependencies).toEqual({
+    'Query.todos': true,
+    'Todo:0': true,
+    'Todo:1': true,
+    'Todo:2': true,
+  });
 
   let queryRes = query(store, { query: Todos });
 
@@ -90,7 +94,7 @@ it('passes the "getting-started" example', () => {
     }
   );
 
-  expect(mutationRes.dependencies).toEqual(new Set(['Todo:2']));
+  expect(mutationRes.dependencies).toEqual({ 'Todo:2': true });
 
   queryRes = query(store, { query: Todos });
 
@@ -117,7 +121,7 @@ it('passes the "getting-started" example', () => {
     }
   );
 
-  expect(newMutationRes.dependencies).toEqual(new Set(['Todo:2']));
+  expect(newMutationRes.dependencies).toEqual({ 'Todo:2': true });
 
   queryRes = query(store, { query: Todos });
 
@@ -212,8 +216,12 @@ it('respects property-level resolvers when given', () => {
 
   const writeRes = write(store, { query: Todos }, todosData);
 
-  const expectedSet = new Set(['Query.todos', 'Todo:0', 'Todo:1', 'Todo:2']);
-  expect(writeRes.dependencies).toEqual(expectedSet);
+  expect(writeRes.dependencies).toEqual({
+    'Query.todos': true,
+    'Todo:0': true,
+    'Todo:1': true,
+    'Todo:2': true,
+  });
 
   let queryRes = query(store, { query: Todos });
 
@@ -242,7 +250,7 @@ it('respects property-level resolvers when given', () => {
     }
   );
 
-  expect(mutationRes.dependencies).toEqual(new Set(['Todo:2']));
+  expect(mutationRes.dependencies).toEqual({ 'Todo:2': true });
 
   queryRes = query(store, { query: Todos });
 
@@ -425,7 +433,7 @@ it('correctly resolves optimistic updates on Relay schemas', () => {
 
   write(store, { query: getRoot }, queryData);
   writeOptimistic(store, { query: updateItem, variables: { id: '2' } }, 1);
-  InMemoryData.clearLayer(store.data, 1);
+  InMemoryData.noopDataState(store.data, 1);
   const queryRes = query(store, { query: getRoot });
 
   expect(queryRes.partial).toBe(false);

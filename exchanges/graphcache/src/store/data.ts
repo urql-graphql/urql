@@ -6,6 +6,7 @@ import {
   FieldInfo,
   StorageAdapter,
   SerializedEntries,
+  Dependencies,
 } from '../types';
 
 import {
@@ -54,8 +55,8 @@ export interface InMemoryData {
 }
 
 let currentData: null | InMemoryData = null;
-let currentDependencies: null | Set<string> = null;
-let previousDependencies: null | Set<string> = null;
+let currentDependencies: null | Dependencies = null;
+let previousDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
 let currentIgnoreOptimistic = false;
 
@@ -72,7 +73,7 @@ export const initDataState = (
 ) => {
   currentData = data;
   previousDependencies = currentDependencies;
-  currentDependencies = new Set();
+  currentDependencies = makeDict();
   currentIgnoreOptimistic = false;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -160,7 +161,7 @@ export const noopDataState = (
 };
 
 /** As we're writing, we keep around all the records and links we've read or have written to */
-export const getCurrentDependencies = (): Set<string> => {
+export const getCurrentDependencies = (): Dependencies => {
   invariant(
     currentDependencies !== null,
     'Invalid Cache call: The cache may only be accessed or mutated during' +
@@ -172,9 +173,9 @@ export const getCurrentDependencies = (): Set<string> => {
   return currentDependencies;
 };
 
-export const forkDependencies = (): Set<string> => {
+export const forkDependencies = (): Dependencies => {
   previousDependencies = currentDependencies;
-  return (currentDependencies = new Set());
+  return (currentDependencies = makeDict());
 };
 
 export const unforkDependencies = () => {
@@ -369,9 +370,9 @@ export const gc = () => {
 const updateDependencies = (entityKey: string, fieldKey?: string) => {
   if (fieldKey !== '__typename') {
     if (entityKey !== currentData!.queryRootKey) {
-      currentDependencies!.add(entityKey);
+      currentDependencies![entityKey] = true;
     } else if (fieldKey !== undefined) {
-      currentDependencies!.add(joinKeys(entityKey, fieldKey));
+      currentDependencies![joinKeys(entityKey, fieldKey)] = true;
     }
   }
 };
@@ -489,7 +490,7 @@ const createLayer = (data: InMemoryData, layerKey: number) => {
 };
 
 /** Clears all links and records of an optimistic layer */
-export const clearLayer = (data: InMemoryData, layerKey: number) => {
+const clearLayer = (data: InMemoryData, layerKey: number) => {
   if (data.refLock[layerKey]) {
     delete data.refLock[layerKey];
     delete data.records.optimistic[layerKey];

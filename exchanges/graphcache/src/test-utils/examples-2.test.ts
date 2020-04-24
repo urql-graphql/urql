@@ -222,7 +222,7 @@ it('allows custom resolvers to resolve mixed data (keyable and unkeyable)', () =
 
   const res = query(store, { query: ItemDetailed });
   expect(res.partial).toBe(false);
-  expect(Array.from(res.dependencies).includes('Author:x')).toBe(true);
+  expect(res.dependencies).toHaveProperty('Author:x', true);
   expect(res.data).toEqual({
     __typename: 'Query',
     todo: {

@@ -25,10 +25,10 @@ describe('garbage collection', () => {
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Todo:1',
-      'Query.todo',
-    ]);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Todo:1': true,
+      'Query.todo': true,
+    });
   });
 
   it('keeps readopted entities', () => {
@@ -45,11 +45,11 @@ describe('garbage collection', () => {
     expect(InMemoryData.readLink('Query', 'todo')).toBe(undefined);
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Todo:1',
-      'Query.todo',
-      'Query.newTodo',
-    ]);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Todo:1': true,
+      'Query.todo': true,
+      'Query.newTodo': true,
+    });
   });
 
   it('keeps entities with multiple owners', () => {
@@ -66,11 +66,11 @@ describe('garbage collection', () => {
     expect(InMemoryData.readLink('Query', 'todoB')).toBe('Todo:1');
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Todo:1',
-      'Query.todoA',
-      'Query.todoB',
-    ]);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Todo:1': true,
+      'Query.todoA': true,
+      'Query.todoB': true,
+    });
   });
 
   it('skips entities with optimistic updates', () => {
@@ -87,14 +87,14 @@ describe('garbage collection', () => {
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
 
-    InMemoryData.clearLayer(data, 1);
+    InMemoryData.reserveLayer(data, 1);
     InMemoryData.gc();
-    expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Query.todo',
-      'Todo:1',
-    ]);
+    expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Query.todo': true,
+      'Todo:1': true,
+    });
   });
 
   it('erases child entities that are orphaned', () => {
@@ -111,11 +111,11 @@ describe('garbage collection', () => {
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe(undefined);
     expect(InMemoryData.readRecord('Author:1', 'id')).toBe(undefined);
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Author:1',
-      'Todo:1',
-      'Query.todo',
-    ]);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Author:1': true,
+      'Todo:1': true,
+      'Query.todo': true,
+    });
   });
 });
 
@@ -156,17 +156,17 @@ describe('inspectFields', () => {
       ]
     `);
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual([
-      'Query.todo({"id":"1"})',
-      'Query.hasTodo({"id":"1"})',
-      'Query.randomTodo',
-    ]);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({
+      'Query.todo({"id":"1"})': true,
+      'Query.hasTodo({"id":"1"})': true,
+      'Query.randomTodo': true,
+    });
   });
 
   it('returns an empty array when an entity is unknown', () => {
     expect(InMemoryData.inspectFields('Random')).toEqual([]);
 
-    expect([...InMemoryData.getCurrentDependencies()]).toEqual(['Random']);
+    expect(InMemoryData.getCurrentDependencies()).toEqual({ Random: true });
   });
 
   it('returns field infos for all optimistic updates', () => {
