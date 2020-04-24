@@ -19,9 +19,42 @@ This includes the user of your exchange and other exchanges (although the latter
 
 That's right! Debug events are a fire-and-forget mechanism and should not be used as a means for messaging in your app.
 
-## Dispatching debug events
+## Consuming debug events
 
-> Note: Users who are not making their own exchanges can [skip this section](#consuming-debug-events).
+So you're trying to debug your app and you don't know where to start?
+
+### Devtools
+
+The quickest way is going to be using our [official devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via your running client.
+
+![Urql Devtools Timeline](../assets/devtools-timeline.png)
+_The Urql Devtools timeline._
+
+Check out [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on how to get started.
+
+> Note: Devtools is unfortunately not currently supported for React Native but we're looking into it!
+
+### Manual consumption of events
+
+If you don't want to use a GUI to view events, you can subscribe to events directly via the client using `subscribeToDebugTarget`.
+
+Here's how you would print debug events to the console (with filtering).
+
+```ts
+const { unsubscribe } = client.subscribeToDebugTarget(event => {
+  if (event.source === 'dedupExchange') {
+    return;
+  }
+
+  console.log(event);
+});
+
+// ...
+// Unsubscribe from events
+unsubscribe();
+```
+
+## Dispatching debug events
 
 Debug events are a great way to share implementation details to consumers of your exchanges.
 
@@ -90,38 +123,3 @@ While it is possible, there isn't any value in doing this. Use the exchange pipe
 #### ❌ Don't send warnings in debug events
 
 Debug **events** are intended to document **events** inside an exchange, not as a way to send messages to the user. Use `console.warn` to send alerts to the user.
-
-## Consuming debug events
-
-So you're trying to debug your app and you don't know where to start?
-
-### Devtools
-
-The quickest way is going to be using our [official devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via your running client.
-
-![Urql Devtools Timeline](../assets/devtools-timeline.png)
-_The Urql Devtools timeline._
-
-Check out [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on how to get started.
-
-> Note: Devtools is unfortunately not currently supported for React Native but we're looking into it!
-
-### Manual consumption of events
-
-If you don't want to use a GUI to view events, you can subscribe to events directly via the client using `subscribeToDebugTarget`.
-
-Here's how you would print debug events to the console (with filtering).
-
-```ts
-const { unsubscribe } = client.subscribeToDebugTarget(event => {
-  if (event.source === 'dedupExchange') {
-    return;
-  }
-
-  console.log(event);
-});
-
-// ...
-// Unsubscribe from events
-unsubscribe();
-```
