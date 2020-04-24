@@ -48,7 +48,6 @@ type OperationResultWithMeta = OperationResult & {
 type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
-type DependentOptimistic = Record<string, number>;
 type DependentOperations = Record<string, number[]>;
 
 // Returns the given operation result with added cacheOutcome meta field
@@ -101,21 +100,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const optimisticKeysToDependencies: OptimisticDependencies = new Map();
   const mutationResultBuffer: OperationResult[] = [];
   const ops: OperationMap = new Map();
-  const dependentOptimistic: DependentOptimistic = makeDict();
+  const blockedDependencies: Dependencies = makeDict();
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = makeDict();
 
-  const markDependencies = (dependencies: void | Dependencies, add: number) => {
-    if (dependencies) {
-      for (const dep in dependencies) {
-        dependentOptimistic[dep] = (dependentOptimistic[dep] || 0) + add;
-      }
-    }
-  };
-
-  const hasOverlappingDependencies = (dependencies: Dependencies) => {
+  const isBlockedByOptimisticUpdate = (dependencies: Dependencies) => {
     for (const dep in dependencies) {
-      if (dependentOptimistic[dep] > 0) {
+      if (blockedDependencies[dep]) {
         return true;
       }
     }
@@ -173,9 +164,16 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       // This executes an optimistic update for mutations and registers it if necessary
       const { dependencies } = writeOptimistic(store, operation, operation.key);
       if (!isDictEmpty(dependencies)) {
+        // Update blocked optimistic dependencies
+        for (const dep in dependencies) {
+          blockedDependencies[dep] = true;
+        }
+
+        // Store optimistic dependencies for update
         optimisticKeysToDependencies.set(operation.key, dependencies);
+
+        // Update related queries
         const pendingOperations: Operations = new Set();
-        markDependencies(dependencies, 1);
         collectPendingOperations(pendingOperations, dependencies);
         executePendingOperations(operation, pendingOperations);
       }
@@ -235,7 +233,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       // Collect previous dependencies that have been written for optimistic updates
       const dependencies = optimisticKeysToDependencies.get(key);
       collectPendingOperations(pendingOperations, dependencies);
-      markDependencies(dependencies, -1);
       optimisticKeysToDependencies.delete(key);
     } else {
       reserveLayer(store.data, operation.key);
@@ -353,7 +350,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               outcome === 'partial')
           ) {
             result.stale = true;
-            if (!hasOverlappingDependencies(dependencies)) {
+            if (!isBlockedByOptimisticUpdate(dependencies)) {
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
               );
@@ -408,6 +405,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
           for (let i = 0; i < mutationResultBuffer.length; i++) {
             clearLayer(store.data, mutationResultBuffer[i].operation.key);
+          }
+
+          for (const dep in blockedDependencies) {
+            delete blockedDependencies[dep];
           }
 
           const results: OperationResult[] = [];
