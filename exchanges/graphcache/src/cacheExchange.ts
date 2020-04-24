@@ -103,12 +103,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = makeDict();
 
-  const isBlockedByOptimisticUpdate = (dependencies: Dependencies) => {
-    for (const dep in dependencies) {
-      if (blockedDependencies[dep]) {
-        return true;
-      }
-    }
+  const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
+    for (const dep in dependencies) if (blockedDependencies[dep]) return true;
+    return false;
   };
 
   const collectPendingOperations = (
