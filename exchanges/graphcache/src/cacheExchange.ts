@@ -224,7 +224,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // Take any OperationResult and update the cache with it
-  const updateCacheWithResult = (result: OperationResult, pendingOperations: Operations): OperationResult => {
+  const updateCacheWithResult = (
+    result: OperationResult,
+    pendingOperations: Operations
+  ): OperationResult => {
     const { operation, error, extensions } = result;
     const { key } = operation;
 
@@ -420,7 +423,9 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
           let bufferedResult: OperationResult | void;
           while ((bufferedResult = mutationResultBuffer.shift()))
-            results.push(updateCacheWithResult(bufferedResult, pendingOperations));
+            results.push(
+              updateCacheWithResult(bufferedResult, pendingOperations)
+            );
 
           // Execute all dependent queries as a single batch
           executePendingOperations(result.operation, pendingOperations);

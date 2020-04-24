@@ -71,7 +71,7 @@
     "glob": "^7.1.6",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.10.1",
-    "husky": "^4.2.3",
+    "husky": "^4.2.5",
     "invariant": "^2.2.4",
     "jest": "^25.3.0",
     "jest-watch-yarn-workspaces": "^1.1.0",
