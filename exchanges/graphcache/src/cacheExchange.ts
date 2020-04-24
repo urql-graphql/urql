@@ -45,6 +45,7 @@ type OperationResultWithMeta = OperationResult & {
   dependencies: Dependencies;
 };
 
+type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOptimistic = Record<string, number>;
@@ -100,6 +101,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   const optimisticKeysToDependencies: OptimisticDependencies = new Map();
   const ops: OperationMap = new Map();
   const dependentOptimistic: DependentOptimistic = makeDict();
+  const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = makeDict();
 
   const markDependencies = (dependencies: void | Dependencies, add: number) => {
@@ -146,7 +148,12 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
         const op = ops.get(key);
         if (op) {
           ops.delete(key);
-          client.reexecuteOperation(toRequestPolicy(op, 'cache-first'));
+          let policy: RequestPolicy = 'cache-first';
+          if (requestedRefetch.has(key)) {
+            requestedRefetch.delete(key);
+            policy = 'cache-and-network';
+          }
+          client.reexecuteOperation(toRequestPolicy(op, policy));
         }
       }
     });
@@ -351,6 +358,8 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
               );
+            } else {
+              requestedRefetch.add(operation.key);
             }
           }
 
