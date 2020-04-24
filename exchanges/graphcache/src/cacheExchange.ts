@@ -224,11 +224,10 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
   };
 
   // Take any OperationResult and update the cache with it
-  const updateCacheWithResult = (result: OperationResult): OperationResult => {
+  const updateCacheWithResult = (result: OperationResult, pendingOperations: Operations): OperationResult => {
     const { operation, error, extensions } = result;
     const { key } = operation;
 
-    const pendingOperations: Operations = new Set();
     if (operation.operationName === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
       const dependencies = optimisticKeysToDependencies.get(key);
@@ -257,8 +256,6 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       noopDataState(store.data, operation.key);
     }
 
-    // Execute all pending operations related to changed dependencies
-    executePendingOperations(result.operation, pendingOperations);
     // Update this operation's dependencies if it's a query
     if (queryDependencies) {
       updateDependencies(result.operation, queryDependencies);
@@ -388,7 +385,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const nonOptimisticResults$ = pipe(
       result$,
       filter(result => !optimisticKeysToDependencies.has(result.operation.key)),
-      map(updateCacheWithResult)
+      map(result => {
+        const pendingOperations: Operations = new Set();
+        // Update the cache with the incoming API result
+        const cacheResult = updateCacheWithResult(result, pendingOperations);
+        // Execute all dependent queries
+        executePendingOperations(result.operation, pendingOperations);
+        return cacheResult;
+      })
     );
 
     // Prevent mutations that were previously optimistic from being flushed
@@ -412,9 +416,14 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
           }
 
           const results: OperationResult[] = [];
+          const pendingOperations: Operations = new Set();
+
           let bufferedResult: OperationResult | void;
           while ((bufferedResult = mutationResultBuffer.shift()))
-            results.push(updateCacheWithResult(bufferedResult));
+            results.push(updateCacheWithResult(bufferedResult, pendingOperations));
+
+          // Execute all dependent queries as a single batch
+          executePendingOperations(result.operation, pendingOperations);
 
           return fromArray(results);
         }
