@@ -5,39 +5,39 @@ order: 6
 
 # Debugging
 
-We've tried to make debugging in `urql` as seamless as possible by creating great tools for both basic users and those trying to create their own exchanges.
+We've tried to make debugging in `urql` as seamless as possible by creating tools for both basic users and those trying to create their own exchanges.
 
 ## Debug events
 
-Debug events allow you to inspect what's going on in your Urql exchanges. Before you get started, here are a few things you should be aware of.
+Debug events are a means for seeing what's going on inside of Urql exchanges. Before getting started, here are a few things to be aware of.
 
 ### Anyone with client access can listen
 
-This includes the user of your exchange and other exchanges (although the latter is not advised).
+This includes the creator of an `urql` client and any of it's exchanges (although the latter is not advised).
 
 ### Debug events are disabled in production
 
-That's right! Debug events are a fire-and-forget mechanism and should not be used as a means for messaging in your app.
+Debug events are a fire-and-forget mechanism and should not be used as a means for messaging in your app.
 
 ## Consuming debug events
 
-So you're trying to debug your app and you don't know where to start?
+Debugging events can be inspected either graphically using our devtools or manually by subscribing to events on the client.
 
 ### Devtools
 
-The quickest way is going to be using our [official devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via your running client.
+The quickest way is going to be using our [devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via the running client.
 
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
 
-Check out [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on how to get started.
+Visit [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on getting started.
 
 > Note: Devtools is unfortunately not currently supported for React Native but we're looking into it!
 
 ### Manual consumption of events
 
-If you don't want to use a GUI to view events, you can subscribe to events directly via the client using `subscribeToDebugTarget`.
+For those not looking to use a GUI to view events, the client has a `subscribeToDebugTarget` function.
 
-Here's how you would print debug events to the console (with filtering).
+As demonstrated below, the `subscribeToDebugTarget` function takes a callback which is called with every debug event that is dispatched.
 
 ```ts
 const { unsubscribe } = client.subscribeToDebugTarget(event => {
@@ -55,17 +55,19 @@ unsubscribe();
 
 ## Dispatching debug events
 
-Debug events are a great way to share implementation details to consumers of your exchanges.
+Debug events are a means of sharing implementation details to consumers of an exchange.
 
-### How to send a debug event
+### Dispatching a debug event
 
 #### Identify key events
 
-The first thing you want to do is identify key events in your exchange. For example, if you are writing a [_fetchExchange_](https://github.com/FormidableLabs/urql/blob/master/packages/core/src/exchanges/fetch.ts) which triggers fetch requests, an event might be `fetchRequest`.
+The first step is to identify key events of the exchange in question.
+
+For example, a [_fetchExchange_](https://github.com/FormidableLabs/urql/blob/master/packages/core/src/exchanges/fetch.ts) which triggers fetch requests may have an event of type `fetchRequest`.
 
 #### Create an event type (optional)
 
-If you want to make your event type safe and prevent conflicts with other exchanges, you can [merge your event type](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
+For type safe events, and to prevent conflicts with other exchanges, [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used.
 
 ```ts
 // urql.d.ts
@@ -80,14 +82,16 @@ declare module '@urql/core' {
 
 #### Dispatch the event
 
-A _dispatchDebug_ function is now passed to every exchange. It expects an object with the following properties:
+A `dispatchDebug` function is now passed to every exchange and is used to dispatch debug events.
+
+It is called with an object containing the following properties:
 
 - `type` - a unique identifier for the event type.
 - `message` - a human readable description of the event.
 - `operation` - the operation in scope when the event occured.
 - `data` _(optional)_ - any additional data useful for debugging
 
-Here's a basic example of an exchange calling `dispatchDebug`
+Here, we call `dispatchDebug` with our `fetchRequest` event we declared earlier.
 
 ```ts
 export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
