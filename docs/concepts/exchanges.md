@@ -101,7 +101,7 @@ If we look at our previous `noopExchange` example in context, we can track what 
 import { Client, dedupExchange, fetchExchange } from 'urql';
 
 const noopExchange = ({ client, forward }) => {
-  return operation$ => {
+  return operations$ => {
     // <-- The ExchangeIO function
     // We receive a stream of Operations from `dedupExchange` which
     // we can modify before...
