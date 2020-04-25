@@ -81,7 +81,7 @@ For reference, this is a basic template for an exchange:
 
 ```js
 const noopExchange = ({ client, forward }) => {
-  return operation$ => {
+  return operations$ => {
     // <-- The ExchangeIO function
     const operationResult$ = forward(operations$);
     return operationResult$;
