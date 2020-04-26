@@ -54,7 +54,7 @@ few advantages that are specifically tailored for the `urql` library and ecosyst
 - It is extremely lightweight and treeshakeable, with a size of around 3.7kB minzipped.
 - It's cross-platform and cross-language compatible, having been written in
   [Reason](https://reasonml.github.io/) and provides support for [Flow](https://flow.org/)
-  and [TypeScript](typescriptlang.org/).
+  and [TypeScript](https://www.typescriptlang.org/v2/).
 - It's a predictable and iterable toolchain, emitting synchronous events whenever possible.
 
 Typical usage of Wonka will involve creating a _source_ of some values and a _sink_.
