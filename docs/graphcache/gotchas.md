@@ -5,20 +5,20 @@ order: 5
 
 # Gotchas
 
-When using this normalised cache there are a few gotcha's we need to point out,
-this will make it easier to define best practices and to avoid pitfalls.
+When using this normalised cache there are a few out of the box features
+we need to be aware of, being aware of these features will make it easier
+to define best practices and to avoid pitfalls.
 
 Most of the measures we'll cover are brought to life to ensure we can build out
 to a fully offline normalised cache.
 
 ## Commutativity
 
-By default we try to ensure idempotent and commutative results, the last part of this
-is the most relevant to be aware of for our users.
+By default the cache ensures idempotent and commutative results, the last part of this
+is the most relevant one to be aware of.
 
-Commutative internals mean that we'll keep the order of operations consistent, let's look
+Commutative guarantees mean that we'll keep the order of operations consistent, let's look
 at an example to clear this up.
-
 We are in our application and we queue up two queries, an `authorsQuery` and a `todosQuery`.
 
 When we dispatch `todosQuery` first and `authorsQuery` later but the `authorsQuery` returns a result
