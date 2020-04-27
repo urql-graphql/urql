@@ -12,5 +12,7 @@ export interface MutationArguments<V> {
 export const mutate = <T = any, V = object>(
   args: MutationArguments<V>
 ): Promise<OperationResult<T>> => {
-  return getClient().mutation(args.query, args.variables as any, args.context).toPromise();
+  return getClient()
+    .mutation(args.query, args.variables as any, args.context)
+    .toPromise();
 };
