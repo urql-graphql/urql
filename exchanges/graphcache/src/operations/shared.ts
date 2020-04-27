@@ -118,6 +118,9 @@ export class SelectionIterator {
       if (index >= select.length) {
         this.indexStack.pop();
         this.selectionStack.pop();
+        if (process.env.NODE_ENV !== 'production') {
+          popDebugNode();
+        }
         continue;
       } else {
         const node = select[index];
@@ -150,10 +153,6 @@ export class SelectionIterator {
             if (isMatching) {
               this.indexStack.push(0);
               this.selectionStack.push(getSelectionSet(fragmentNode));
-            }
-
-            if (process.env.NODE_ENV !== 'production') {
-              popDebugNode();
             }
           }
 
