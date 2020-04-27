@@ -2,4 +2,4 @@
 '@urql/svelte': patch
 ---
 
-Return the promise from mutation instead of the promise-like object
+Update `mutate` helper to return a Promise directly rather than a lazy Promise-like object.
