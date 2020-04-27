@@ -13,7 +13,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@urql/devtools": "^0.1.2",
+    "@urql/devtools": "latest",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.3",
     "idb": "^5.0.1",

@@ -39,7 +39,7 @@ export const rootValue = {
       .objectStore('todos')
       .getAll();
   },
-  toggleTodo: async (root: any, { id }: any) => {
+  toggleTodo: async ({ id }: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
@@ -51,7 +51,7 @@ export const rootValue = {
 
     return newTodo;
   },
-  addTodo: async (root: any, args: any) => {
+  addTodo: async (args: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
@@ -61,7 +61,7 @@ export const rootValue = {
 
     return todo;
   },
-  deleteTodo: async (root: any, { id }: any) => {
+  deleteTodo: async ({ id }: any) => {
     const db = await database;
     const txTodos = db.transaction(['todos'], 'readwrite').objectStore('todos');
 
