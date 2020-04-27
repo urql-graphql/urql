@@ -18,13 +18,7 @@ use these serialized results to rehydrate and render the application without ref
 To start out with the `ssrExchange` we have to add the exchange to our `Client`:
 
 ```js
-import {
-  createClient,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-  ssrExchange
-} from '@urql/core';
+import { createClient, dedupExchange, cacheExchange, fetchExchange, ssrExchange } from '@urql/core';
 
 const isServerSide = typeof window === 'undefined';
 
@@ -40,7 +34,7 @@ const client = createClient({
     cacheExchange,
     ssr, // Add `ssr` in front of the `fetchExchange`
     fetchExchange,
-  ]
+  ],
 });
 ```
 
@@ -48,7 +42,7 @@ The `ssrExchange` must be initialized with the `isClient` and `initialState` opt
 option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`.
 
 The `initialState` option should be set to the serialized data you retrieve on your server-side.
-This data may be retrieved using methods on `ssrExchange()`. You can retrive the serialized data
+This data may be retrieved using methods on `ssrExchange()`. You can retrieve the serialized data
 after server-side rendering using `ssr.extractData()`:
 
 ```js

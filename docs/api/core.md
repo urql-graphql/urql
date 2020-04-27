@@ -114,14 +114,14 @@ For an example, this method is used by the `cacheExchange` when an
 
 ## CombinedError
 
-The `CominedError` is used in `urql` to normalize network errors and `GraphQLError`s if anything
+The `CombinedError` is used in `urql` to normalize network errors and `GraphQLError`s if anything
 goes wrong during a GraphQL request.
 
-| Input         | Type                             | Description                                                                       |
-| ------------- | -------------------------------- | --------------------------------------------------------------------------------- |
-| networkError  | `?Error`                         | An unexpected error that might've occured when trying to send the GraphQL request |
-| graphQLErrors | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                     |
-| response      | `?any`                           | The raw response object (if any) from the `fetch` call                            |
+| Input         | Type                             | Description                                                                        |
+| ------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
+| networkError  | `?Error`                         | An unexpected error that might've occurred when trying to send the GraphQL request |
+| graphQLErrors | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                      |
+| response      | `?any`                           | The raw response object (if any) from the `fetch` call                             |
 
 [Read more about errors in `urql` on the "Error" page.](../basics/errors.md)
 
@@ -139,7 +139,7 @@ It consists of `query` and optionally `variables`.
 | variables | `?object`      | The variables to be used with the GraphQL request.                                                                    |
 
 The `key` property is a hash of both the `query` and the `variables`, to uniquely
-identify the request. When `variables` are passed it is ensured that they're stabily stringified so
+identify the request. When `variables` are passed it is ensured that they're stably stringified so
 that the same variables in a different order will result in the same `key`, since variables are
 order-independent in GraphQL.
 
@@ -197,7 +197,7 @@ properties you'll likely see some options that exist on the `Client` as well.
 
 | Prop                | Type                                  | Description                                                                                                           |
 | ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| fetchOptions        | `?RequestInit \| (() => RequestInit)` |Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.       |
+| fetchOptions        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                               |
 | fetch               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
 | requestPolicy       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
 | url                 | `string`                              | The GraphQL endpoint                                                                                                  |
@@ -231,7 +231,7 @@ This is the input that an [`Exchange`](#exchange) receives when it's initialized
 | Input   | Type         | Description                                                                                                             |
 | ------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | forward | `ExchangeIO` | The unction responsible for receiving an observable operation and returning a result                                    |
-| client  | `Client`     | The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. |
+| client  | `Client`     | The urql application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. |
 
 ### Exchange
 
@@ -334,7 +334,7 @@ The `fetchExchange` of type `Exchange` is responsible for sending operations of 
 ### stringifyVariables
 
 This function is a variation of `JSON.stringify` that sorts any object's keys that is being
-stringified to ensure that two objects with a different order of keys will be stabily stringified to
+stringified to ensure that two objects with a different order of keys will be stably stringified to
 the same string.
 
 ```js

@@ -2,7 +2,7 @@
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**
 
-Any unexpected behaviour, conditon, or error will be marked by an error or warning
+Any unexpected behaviour, condition, or error will be marked by an error or warning
 in development, which will output a helpful little message. Sometimes however, this
 message may not actually tell you everything about what's going on.
 
