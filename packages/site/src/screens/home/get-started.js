@@ -1,32 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { BodyCopy } from '../../components/body-copy';
+import { Link } from '../../components/link';
 import { SectionTitle } from '../../components/section-title';
-import constants from '../../constants';
-
-import octoCat from '../../assets/github.svg';
-
-const OuterWrapper = styled.div`
-  background: ${constants.color};
-  border-bottom: 1rem solid rgba(0, 0, 0, 0.4);
-  box-shadow: inset 0 -1rem 0 rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: center;
-`;
+import { PanelSectionWrapper } from '../../components/panel';
 
 const GetStartedWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 55rem;
   p {
     text-align: center;
   }
   h2 {
     margin-top: 0;
   }
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 8rem;
 `;
 
 const GithubButton = styled.a`
@@ -73,61 +63,33 @@ const GetStartedTitle = styled(SectionTitle)`
 const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 4rem;
+  margin-top: 6rem;
   flex-direction: column;
   @media (min-width: 768px) {
     flex-direction: row;
-    margin-top: 6rem;
-  }
-`;
-
-const DocButton = styled(Link)`
-  width: 18rem;
-  margin-left: 0rem;
-  height: 4rem;
-  font-size: 14px;
-  background-color: #ffffff;
-  line-height: 4rem;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #383838;
-  border: 0;
-  margin-top: 2rem;
-  @media (min-width: 768px) {
-    margin-left: 2rem;
-    width: 18rem;
-    margin-top: 0;
-  }
-  &:hover {
-    background-color: #f6f6f6;
   }
 `;
 
 class GetStarted extends React.Component {
   render() {
-    const { getStartedObj } = this.props;
+    const { content } = this.props;
 
     return (
-      <OuterWrapper>
+      <PanelSectionWrapper>
         <GetStartedWrapper>
           <GetStartedTitle>Get Started</GetStartedTitle>
-          <BodyCopy>{getStartedObj.description}</BodyCopy>
+          <BodyCopy noMargin>{content.description}</BodyCopy>
           <ButtonsWrapper>
-            <GithubButton href="https://github.com/FormidableLabs/urql">
-              <img src={octoCat} />
-              <p>GitHub</p>
-            </GithubButton>
-            <DocButton to="docs/">Documentation</DocButton>
+            <Link to="docs/">Quick Start Guide</Link>
           </ButtonsWrapper>
         </GetStartedWrapper>
-      </OuterWrapper>
+      </PanelSectionWrapper>
     );
   }
 }
 
 GetStarted.propTypes = {
-  getStartedObj: PropTypes.object,
+  content: PropTypes.object,
 };
 
 export default GetStarted;

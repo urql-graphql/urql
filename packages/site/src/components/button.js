@@ -1,25 +1,35 @@
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-export const Button = styled(Link)`
-  background: ${props => (props.light ? 'white' : '#202020')};
-  color: ${props => (props.light ? '#202020' : 'white')};
-  display: block;
-  font-size: 1.5rem;
+export const buttonLinkStyling = css`
+  background: white;
+  color: #383838;
+  font-weight: normal;
+  font-size: 1.4rem;
+  font-style: normal;
+  font-stretch: normal;
   height: 4rem;
-  letter-spacing: 0.05em;
   line-height: 4rem;
-  margin: ${props => (props.noMargin ? '0' : '5rem auto 3rem')};
-  max-width: 21rem;
-  min-width: 10rem;
+  padding: 0 2rem;
+  letter-spacing: 0.01rem;
   text-align: center;
   text-transform: uppercase;
-  transition: background 0.4s;
-  width: 100%;
+  transition: opacity 0.4s ease-out;
+
   &:hover {
-    background: ${props => (props.light ? '#f6f6f6' : '#333')};
+    opacity: 0.8;
   }
   &:active {
     opacity: 0.6;
   }
+`;
+
+const ButtonNoBorder = styled.button`
+  border: none;
+`;
+
+export const Button = styled(props => (
+  <ButtonNoBorder {...props}>{props.children}</ButtonNoBorder>
+))`
+  ${buttonLinkStyling}
 `;

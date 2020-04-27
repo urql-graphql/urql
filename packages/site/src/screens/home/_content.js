@@ -1,22 +1,27 @@
 const content = {
+  header: {
+    hero: {
+      copyText: 'npm install urql graphql',
+    },
+  },
   features: [
     {
-      title: 'Fully functional GraphQL client with a single import',
+      title: 'Performant and functional',
       description:
-        'Urql is a lightweight, powerful, and easy to use alternative to bulky GraphQL clients.',
+        'Lightweight, powerful, and easy to use; urql is a great alternative to bulky GraphQL clients.',
       icon: require('../../assets/gql-tile.svg'),
-    },
-    {
-      title: 'Logical default behavior and caching',
-      description:
-        'Urql helps you to rapidly use GraphQL in your apps without complex configuration or large API overhead.',
-      icon: require('../../assets/clock-tile.svg'),
     },
     {
       title: 'Extensible library that grows with you',
       description:
-        'Want to change how you fetch, cache, or subscribe to data? Urql Exchanges allow you to customize your data layer to suit your needs.',
+        'Want to change how you fetch, cache, or subscribe to data? The urql exchanges allow you to customize your data layer to suit your needs.',
       icon: require('../../assets/eagle-tile.svg'),
+    },
+    {
+      title: 'Logical default behavior and caching',
+      description:
+        'Adding urql enables you to rapidly use GraphQL in your apps without complex configuration or large API overhead.',
+      icon: require('../../assets/clock-tile.svg'),
     },
   ],
   components: {
@@ -30,50 +35,39 @@ const content = {
     media: '',
   },
   getStarted: {
-    description:
-      'Dive into the documentation to see how you can get your urql client up and running.',
+    description: `With it's intiuitive set of lightweight API's, getting started with urql is a breeze. Dive into the documentation to get up and running in minutes.`,
     link: '/docs',
   },
-  // TODO: This needs to be shared content instead of hardcoded in each site
-  /*
   oss: [
     {
       title: 'Victory',
       description:
         'An ecosystem of modular data visualization components for React. Friendly and flexible.',
-      logo: require('../../assets/logo_victory.svg'),
+      logo: require('../../assets/badge_victory.svg'),
       link: 'https://formidable.com/open-source/victory',
-      hasOwnLogo: true,
     },
     {
-      title: 'Development Dashboards',
+      title: 'urql',
       description:
-        'Dashboards to organize and intuitively display your dev server and tooling output.',
-      abbreviation: 'Dd',
-      color: '#8bd48b',
-      number: '17',
-      link: 'https://formidable.com/open-source/development-dashboards/',
+        'Universal React Query Library is a blazing-fast GraphQL client, exposed as a set of ReactJS components.',
+      logo: require('../../assets/sidebar-badge.svg'),
+      link: 'https://formidable.com/open-source/urql/',
     },
     {
-      title: 'React Animations',
+      title: 'Spectacle',
       description:
-        'A collection of animations that can be used with many inline style libraries, such as Radium or Aphrodite.',
-      abbreviation: 'Ra',
-      color: '#86b9e6',
-      number: '03',
-      link: 'https://formidable.com/open-source/react-animations',
+        'A React.js based library for creating sleek presentations using JSX syntax that gives you the ability to live demo your code.',
+      logo: require('../../assets/badge_spectacle.svg'),
+      link: 'https://formidable.com/open-source/spectacle/',
     },
     {
-      title: 'Enzyme Matchers',
+      title: 'Runpkg',
       description:
-        'Run common assertions on your React components using Enzyme in a Jest or Jasmine environment.',
-      abbreviation: 'Em',
-      color: '#e48055',
-      number: '09',
-      link: 'https://formidable.com/open-source/jest-enzyme/',
+        'The online package explorer. Runpkg turns any npm package into an interactive and informative browsing experience',
+      logo: require('../../assets/badge_runpkg.svg'),
+      link: 'https://www.runpkg.com/',
     },
   ],
-  */
 };
 
 export default content;

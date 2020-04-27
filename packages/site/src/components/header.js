@@ -1,7 +1,8 @@
 import React from 'react';
-import Hero from '../screens/home/hero';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
+import Hero from '../screens/home/hero';
 import logoFormidableWhite from '../assets/logo_formidable_white.svg';
 import LeftTriangles from '../assets/left-triangles.svg';
 import RightTriangles from '../assets/right-triangles.svg';
@@ -33,6 +34,7 @@ const HeaderContainer = styled.a`
   flex-direction: column;
   color: #ffffff;
   text-decoration: none;
+  z-index: 2;
 `;
 
 const HeaderText = styled.p`
@@ -68,7 +70,7 @@ const RightTrianglesImg = styled.img`
   }
 `;
 
-export const Header = () => (
+export const Header = ({ content }) => (
   <Container>
     <LeftTrianglesImg src={LeftTriangles} />
     <RightTrianglesImg src={RightTriangles} />
@@ -77,6 +79,12 @@ export const Header = () => (
       <HeaderText>Another oss project by </HeaderText>
       <HeaderLogo src={logoFormidableWhite} alt="Formidable Logo" />
     </HeaderContainer>
-    <Hero />
+    <Hero content={content.hero} />
   </Container>
 );
+
+Header.propTypes = {
+  content: PropTypes.shape({
+    hero: PropTypes.shape({ copyText: PropTypes.string }),
+  }).isRequired,
+};

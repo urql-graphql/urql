@@ -4,26 +4,7 @@ import styled from 'styled-components';
 import { BodyCopy } from '../../components/body-copy';
 import { SecondaryTitle } from '../../components/secondary-title';
 import { SectionTitle } from '../../components/section-title';
-
-const FullWidthContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  background-color: #0d1129;
-`;
-
-const FeaturesWrapper = styled.div`
-  flex-direction: column;
-  align-items: center;
-  display: flex;
-  background-color: #0d1129;
-  color: #a3abd4;
-  padding: 8rem 8rem;
-  width: 100%;
-  @media (min-width: 768px) {
-    flex-direction: column;
-    margin: 0 8rem;
-  }
-`;
+import { PanelSectionWrapper } from '../../components/panel';
 
 const FeatureWrapper = styled.div`
   display: flex;
@@ -37,7 +18,6 @@ const FeatureCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 0 4rem;
   width: 100%;
   max-width: 28rem;
   text-align: center;
@@ -45,52 +25,18 @@ const FeatureCard = styled.div`
     width: 100%;
     max-width: 28rem;
     box-shadow: -20px 20px 0 0 rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
+  }
+  &:not(:last-child) {
+    margin: 0 0 4rem;
   }
   @media (min-width: 768px) {
-    margin: 0 0 6rem;
+    margin: 0;
     width: calc(1 / 3 * 100% - (1 - 1 / 3) * 40px);
     align-items: flex-start;
     text-align: left;
   }
   @media (min-width: 1024px) {
     width: calc(1 / 3 * 100% - (1 - 1 / 3) * 80px);
-  }
-`;
-
-const ComponentWrapper = styled.div`
-  margin: 0 0 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 28rem;
-  text-align: center;
-  > img {
-    width: 100%;
-    max-width: 10rem;
-    margin-bottom: 20px;
-  }
-  @media (min-width: 768px) {
-    max-width: 116rem;
-    padding: 6rem 8rem 0 8rem;
-  }
-`;
-
-const BodyCopyCentred = styled(BodyCopy)`
-  max-width: 28rem;
-
-  @media (min-width: 768px) {
-    text-align: center;
-  }
-
-  @media (min-width: 1024px) {
-    max-width: 20vw;
-  }
-`;
-
-const SecondaryTitleCentred = styled(SecondaryTitle)`
-  @media (min-width: 768px) {
-    text-align: center;
   }
 `;
 
@@ -113,35 +59,23 @@ const SecondaryTitleStyled = styled(SecondaryTitle)`
 class Features extends React.Component {
   render() {
     return (
-      <FullWidthContainer>
-        <FeaturesWrapper>
-          <SectionTitleStyled>Features</SectionTitleStyled>
-          <FeatureWrapper>
-            {this.props.featureArray.map(feature => (
-              <FeatureCard key={feature.title}>
-                <img src={feature.icon} />
-                <SecondaryTitleStyled pop>{feature.title}</SecondaryTitleStyled>
-                <BodyCopy>{feature.description}</BodyCopy>
-              </FeatureCard>
-            ))}
-          </FeatureWrapper>
-          <ComponentWrapper>
-            <img src={this.props.components.icon} />
-            <SecondaryTitleCentred pop>
-              {this.props.components.title}
-            </SecondaryTitleCentred>
-            <BodyCopyCentred>
-              {this.props.components.description}
-            </BodyCopyCentred>
-          </ComponentWrapper>
-        </FeaturesWrapper>
-      </FullWidthContainer>
+      <PanelSectionWrapper>
+        <SectionTitleStyled>Features</SectionTitleStyled>
+        <FeatureWrapper>
+          {this.props.featureArray.map(feature => (
+            <FeatureCard key={feature.title}>
+              <img src={feature.icon} />
+              <SecondaryTitleStyled>{feature.title}</SecondaryTitleStyled>
+              <BodyCopy>{feature.description}</BodyCopy>
+            </FeatureCard>
+          ))}
+        </FeatureWrapper>
+      </PanelSectionWrapper>
     );
   }
 }
 
 Features.propTypes = {
-  components: PropTypes.object,
   featureArray: PropTypes.array,
 };
 
