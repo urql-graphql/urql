@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 0.2.2
+
+### Patch Changes
+
+- Update `mutate` helper to return a Promise directly rather than a lazy Promise-like object, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#758](https://github.com/FormidableLabs/urql/pull/758))
+
 ## 0.2.1
 
 ### Patch Changes

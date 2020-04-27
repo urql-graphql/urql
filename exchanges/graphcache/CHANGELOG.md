@@ -1,5 +1,23 @@
 # @urql/exchange-graphcache
 
+## 2.4.0
+
+This release heavily improves on the intuitiveness of how Optimistic Updates work. It ensures that
+optimistic updates aren't accidentally discarded, by temporarily blocking some refetches when
+necessary. It also prevents optimistic mutation updates from becoming permanent, which could
+previously happen if an updater read optimistic data and rewrote it again. This isn't possible
+anymore as mutation results are applied as a batch.
+
+### Minor Changes
+
+- Implement refetch blocking for queries that are affected by optimistic update. When a query would normally be refetched, either because it was partial or a cache-and-network operation, we now wait if it touched optimistic data for that optimistic mutation to complete. This prevents optimistic update data from unexpectedly disappearing, by [@kitten](https://github.com/kitten) (See [#750](https://github.com/FormidableLabs/urql/pull/750))
+- Implement optimistic mutation result flushing. Mutation results for mutation that have had optimistic updates will now wait for all optimistic mutations to complete at the same time before being applied to the cache. This sometimes does delay cache updates to until after multiple mutations have completed, but it does prevent optimistic data from being accidentally committed permanently, which is more intuitive, by [@kitten](https://github.com/kitten) (See [#750](https://github.com/FormidableLabs/urql/pull/750))
+
+### Patch Changes
+
+- Adjust mutation results priority to always override query results as they arrive, similarly to subscriptions. This will prevent race conditions when mutations are slow to execute at the cost of some consistency, by [@kitten](https://github.com/kitten) (See [#745](https://github.com/FormidableLabs/urql/pull/745))
+- Improve warning and error console output in development by cleaning up the GraphQL trace stack, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#751](https://github.com/FormidableLabs/urql/pull/751))
+
 ## 2.3.8
 
 ### Patch Changes
