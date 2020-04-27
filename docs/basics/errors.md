@@ -23,7 +23,7 @@ debugging purposes.
 
 ![Combined errors](../assets/urql-combined-error.png)
 
-It's worth noting that an `error` can coexit and be returned in a successful request alongside
+It's worth noting that an `error` can coexist and be returned in a successful request alongside
 `data`. This is because in GraphQL a query can have partially failed but still contain some data.
 In that case `CombinedError` will be passed to us with `graphQLErrors`, while `data` may still be
 set.

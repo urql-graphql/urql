@@ -35,7 +35,7 @@ const content = {
     media: '',
   },
   getStarted: {
-    description: `With it's intiuitive set of lightweight API's, getting started with urql is a breeze. Dive into the documentation to get up and running in minutes.`,
+    description: `With its intuitive set of lightweight API's, getting started with urql is a breeze. Dive into the documentation to get up and running in minutes.`,
     link: '/docs',
   },
   oss: [

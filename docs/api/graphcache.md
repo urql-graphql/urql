@@ -415,10 +415,10 @@ on the "Computed Queries" page.](../graphcache/computed-queries.md#pagination)
 Accepts a single object of optional options and returns a resolver that can be inserted into the
 [`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
 
-| Argument       | Type      | Description                                                                                                                                                         |
-| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| offsetArgument | `?string` | The field arguments's property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
-| limitArgument  | `?string` | The field arguments's property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
+| Argument       | Type      | Description                                                                                                                                                        |
+| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| offsetArgument | `?string` | The field arguments' property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
+| limitArgument  | `?string` | The field arguments' property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
 
 Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
 automatically. Queries to this resolvers will from then on only return the infinite, combined list
@@ -434,7 +434,7 @@ Accepts a single object of optional options and returns a resolver that can be i
 
 | Argument  | Type                      | Description                                                                                                                                                                                                                                                                      |
 | --------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mergeMode | `'outwards' \| 'inwards'` | With Relay pagination, pages can be queried forwards and backwards using `after` and `before` cursors. This option defines whether pages that have been quiered backwards should be concatenated before (outwards) or after (inwards) all pages that have been queried forwards. |
+| mergeMode | `'outwards' \| 'inwards'` | With Relay pagination, pages can be queried forwards and backwards using `after` and `before` cursors. This option defines whether pages that have been queried backwards should be concatenated before (outwards) or after (inwards) all pages that have been queried forwards. |
 
 Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
 automatically. Queries to this resolvers will from then on only return the infinite, combined list

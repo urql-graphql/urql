@@ -16,7 +16,7 @@ framework, or if we're using the "raw" `Client` in Node.js.
 ## Background
 
 The ["Philosophy"](./philosophy.md) page explains how `urql` solves some of problems encountered when different aspects
-of having a GraphQL client handle declarative querying and being a central point of extensibiliy.
+of having a GraphQL client handle declarative querying and being a central point of extensibility.
 
 By extension there are three parts of `urql` you'll come in contact with when you add it to your
 app:

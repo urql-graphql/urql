@@ -1,7 +1,7 @@
 import { print } from 'graphql';
 import gql from 'graphql-tag';
 
-/** NOTE: Testing in this file is designed to test both the client and it's interaction with default Exchanges */
+/** NOTE: Testing in this file is designed to test both the client and its interaction with default Exchanges */
 
 import { map, pipe, subscribe, filter, toArray, tap } from 'wonka';
 import { Exchange, Operation, OperationResult } from './types';

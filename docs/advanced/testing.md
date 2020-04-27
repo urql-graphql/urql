@@ -13,7 +13,7 @@ however the pattern itself can be adapted for any framework-bindings of `urql`.
 
 ## Mocking the client
 
-For the most part, Urql's hooks are just adapters for talking to the Urql client.
+For the most part, urql's hooks are just adapters for talking to the urql client.
 
 The way in which they do this is by making calls to the client via context.
 
@@ -21,7 +21,7 @@ The way in which they do this is by making calls to the client via context.
 - `useMutation` calls `executeMutation`
 - `useSubscription` calls `executeSubscription`
 
-In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, that all methods on the client operate with and return streams. These streams are created using the `wonka` library and we're able to create streams ourselves to mock the different states of our operations, e.g. fetching, errors, or success with data.
+In the section [Stream Patterns](../concepts/stream-patterns.md) we've seen, that all methods on the client operate with and return streams. These streams are created using the [Wonka](../concepts/stream-patterns.md#the-wonka-library) library and we're able to create streams ourselves to mock the different states of our operations, e.g. fetching, errors, or success with data.
 
 You'll probably use one of these utility functions to create streams:
 
@@ -184,9 +184,9 @@ The above client we've created mocks all three operations — queries, mutations
 
 ## Subscriptions
 
-Testing subscriptions can be done by simulating the arrival of new data over time. To do this we may use the `interval` utility from `wonka`, which emits values on a timer, and for each value we can map over the response that we'd like to mock.
+Testing subscriptions can be done by simulating the arrival of new data over time. To do this we may use the `interval` utility from Wonka, which emits values on a timer, and for each value we can map over the response that we'd like to mock.
 
-If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from `wonka`. You can see more details in the next section.
+If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from Wonka. You can see more details in the next section.
 
 Here's an example of testing a list component which uses a subscription.
 

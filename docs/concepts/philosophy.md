@@ -32,7 +32,7 @@ const client = new Client({
 });
 ```
 
-In `urql`, the client is the first step towards manging the complexity of GraphQL automatically.
+In `urql`, the client is the first step towards managing the complexity of GraphQL automatically.
 
 ## Using GraphQL Clients
 
@@ -93,7 +93,7 @@ updates in your UI!
 
 ## Extensibility and Integration
 
-With any kind of API there can be concerns outside of caching and state mangagement. For example,
+With any kind of API there can be concerns outside of caching and state management. For example,
 the global behavior or business logic of your application. For instance, you may want to add authentication, retry-logic for failed requests, or a global
 error handler.
 

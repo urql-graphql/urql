@@ -44,7 +44,7 @@ type ExchangeIO = (ops$: Source<Operation>) => Source<OperationResult>;
 
 The first parameter to an exchange is a `forward` function that refers to the next Exchange in the
 chain. The second second parameter is the `Client` being used. Exchanges always return an `ExchangeIO`
-function (this applies to the `forward` funtion as well), which accepts the source of
+function (this applies to the `forward` function as well), which accepts the source of
 [_Operations_](../api/core.md#operation) and returns a source of [_Operation
 Results_](../api/core.md#operationresult).
 
@@ -54,7 +54,7 @@ Results_](../api/core.md#operationresult).
 ## Using Exchanges
 
 The `Client` accepts an `exchanges` option that defaults to the three default exchanges mentioned above. When we pass a custom list of exchanges the `Client` uses the `composeExchanges`
-utiliy, which starts chaining these exchanges.
+utility, which starts chaining these exchanges.
 
 In essence these exchanges build a pipeline that runs in the order they're passed; _Operations_ flow
 in from the start to the end, and _Results_ are returned through the chain in reverse.
@@ -63,7 +63,7 @@ If we look at our list of default exchanges — `dedupExchange`, `cacheExchange`
 `fetchExchange` — an incoming operation is treated as follows:
 
 **First,** ongoing operations are deduplicated. It wouldn't make sense to send the
-same operation / request twice in parralel.
+same operation / request twice in parallel.
 
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`,
 cached results can be resolved instead and results from network requests are cached.
