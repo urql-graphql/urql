@@ -11,14 +11,17 @@
   <br />
   <br />
   <a href="https://circleci.com/gh/FormidableLabs/urql">
-    <img alt="Test Status" src="https://circleci.com/gh/FormidableLabs/urql.svg?style=shield" />
-  </a> <a href="https://github.com/FormidableLabs/urql#maintenance-status">
-    <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
+    <img alt="Test Status" src="https://badgen.net/github/status/FormidableLabs/urql/master/ci/circleci?label=circleci" />
+  </a>
+  <a href="https://www.npmjs.com/package/urql">
+    <img alt="Total downloads" src="https://badgen.net/npm/dt/urql?color=blue" />
   </a>
   <a href="https://spectrum.chat/urql">
-    <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
+    <img alt="Spectrum badge" src="https://badgen.net/badge/chat/spectrum/purple" />
   </a>
-
+  <a href="https://github.com/FormidableLabs/urql/blob/master/LICENSE">
+    <img alt="Licence MIT" src="https://badgen.net/github/license/FormidableLabs/urql" />
+  </a>
   <br />
   <br />
 </div>
