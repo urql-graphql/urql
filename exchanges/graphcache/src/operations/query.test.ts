@@ -116,7 +116,7 @@ describe('Query', () => {
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
 
-  it.only('should warn once for invalid sub-entities on an entity at the right stack', () => {
+  it('should warn once for invalid sub-entities on an entity at the right stack', () => {
     const INVALID_TODO_QUERY = gql`
       query InvalidTodo {
         todos {
