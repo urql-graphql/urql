@@ -27,9 +27,12 @@ self.addEventListener('fetch', (event: any) => {
         variables
       );
 
+      await delay(1000);
       return new Response(JSON.stringify(response), {
         headers: { 'Content-Type': 'application/json' },
       });
     })
   );
 });
+
+const delay = (t: number) => new Promise(resolve => setTimeout(resolve, t));
