@@ -1,6 +1,6 @@
 <div align="center">
   <img src="../../docs/assets/next-logo.png" alt="NextJS" height="200" width="200">
-  <img src="../../docs/assets/urql-logo.png" alt="urql" height="200" width="200">
+  <img src="../../packages/site/src/assets/sidebar-badge.svg" alt="urql" height="200" width="200">
   <br />
   <a href="https://npmjs.com/package/next-urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/next-urql.svg" />
