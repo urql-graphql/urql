@@ -22,9 +22,6 @@
   <a href="https://spectrum.chat/urql">
     <img alt="Spectrum badge" src="https://badgen.net/badge/spectrum/chat with us/purple" />
   </a>
-  <a href="https://github.com/FormidableLabs/urql/blob/master/LICENSE">
-    <img alt="Licence MIT" src="https://badgen.net/github/license/FormidableLabs/urql" />
-  </a>
   <br />
   <br />
 </div>
