@@ -11,19 +11,6 @@ export interface MutationArguments<V> {
 
 export const mutate = <T = any, V = object>(
   args: MutationArguments<V>
-): PromiseLike<OperationResult<T>> => {
-  const client = getClient();
-  let promise: Promise<OperationResult<T>>;
-
-  return {
-    then(onValue) {
-      if (!promise) {
-        promise = client
-          .mutation(args.query, args.variables as any, args.context)
-          .toPromise();
-      }
-
-      return promise.then(onValue);
-    },
-  };
+): Promise<OperationResult<T>> => {
+  return getClient().mutation(args.query, args.variables as any, args.context).toPromise();
 };
