@@ -92,30 +92,6 @@ describe('Query', () => {
     expect((console.warn as any).mock.calls[0][0]).toMatch(/incomplete/);
   });
 
-  it('should warn once for invalid sub-entities on an entity', () => {
-    const INVALID_TODO_QUERY = gql`
-      query InvalidTodo {
-        todos {
-          id
-          text
-          writer {
-            id
-          }
-        }
-      }
-    `;
-
-    query(store, { query: INVALID_TODO_QUERY });
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    expect((console.warn as any).mock.calls[0][0]).toMatch(
-      /Caused At: "InvalidTodo" query/
-    );
-
-    query(store, { query: INVALID_TODO_QUERY });
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
-  });
-
   it('should warn once for invalid sub-entities on an entity at the right stack', () => {
     const INVALID_TODO_QUERY = gql`
       query InvalidTodo {
