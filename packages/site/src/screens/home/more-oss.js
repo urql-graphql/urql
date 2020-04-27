@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { BodyCopy } from '../../components/body-copy';
-import { Button } from '../../components/button';
+import { Link } from '../../components/link';
 import { PanelSectionWrapper } from '../../components/panel';
 import { SectionTitle } from '../../components/section-title';
 import { SecondaryTitle } from '../../components/secondary-title';
@@ -112,7 +112,9 @@ const MoreOSS = ({ oss }) => (
         );
       })}
     </OSSCardContainer>
-    <Button to="https://formidable.com/open-source/">View All</Button>
+    <Link isExternal to="https://formidable.com/open-source/">
+      View All
+    </Link>
   </PanelSectionWrapper>
 );
 

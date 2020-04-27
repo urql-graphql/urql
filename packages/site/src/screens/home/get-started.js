@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { BodyCopy } from '../../components/body-copy';
-import { Button } from '../../components/button';
+import { Link } from '../../components/link';
 import { SectionTitle } from '../../components/section-title';
 import { PanelSectionWrapper } from '../../components/panel';
 
@@ -81,7 +80,7 @@ class GetStarted extends React.Component {
           <GetStartedTitle>Get Started</GetStartedTitle>
           <BodyCopy noMargin>{content.description}</BodyCopy>
           <ButtonsWrapper>
-            <Button to="docs/">Quick Start Guide</Button>
+            <Link to="docs/">Quick Start Guide</Link>
           </ButtonsWrapper>
         </GetStartedWrapper>
       </PanelSectionWrapper>

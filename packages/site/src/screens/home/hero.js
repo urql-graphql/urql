@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link as ReactRouterLink } from 'react-router-dom';
+
 import { Wrapper } from '../../components/wrapper';
 import { Button } from '../../components/button';
+import { Link } from '../../components/link';
 import styled from 'styled-components';
 
 import badge from '../../assets/sidebar-badge.svg';
@@ -123,7 +125,7 @@ const HeroNPMButton = styled(Button)`
   text-decoration: none;
 `;
 
-export const HeroDocsButton = styled(Button)`
+export const HeroDocsButton = styled(Link)`
   width: 30rem;
   margin-top: 4rem;
   @media (min-width: 768px) {
@@ -223,16 +225,14 @@ const Hero = props => {
         <HeroButtonsWrapper>
           <HeroNPMWrapper>
             <HeroNPMCopy>{props.content.copyText}</HeroNPMCopy>
-            <HeroNPMButton onClick={handleCopy} isButton>
-              copy
-            </HeroNPMButton>
+            <HeroNPMButton onClick={handleCopy}>copy</HeroNPMButton>
           </HeroNPMWrapper>
           <HeroDocsButton to="docs/">Documentation</HeroDocsButton>
         </HeroButtonsWrapper>
       </HeroContent>
       <HeroNavList>
         <li>
-          <Link to="docs/">Docs</Link>
+          <ReactRouterLink to="docs/">Docs</ReactRouterLink>
         </li>
         <li>
           <a

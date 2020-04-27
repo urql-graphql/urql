@@ -1,18 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
-const ButtonNoBorder = styled.button`
-  border: none;
-`;
-
-export const Button = styled(({ isButton, ...rest }) =>
-  isButton ? (
-    <ButtonNoBorder {...rest}>{rest.children}</ButtonNoBorder>
-  ) : (
-    <Link {...rest} />
-  )
-)`
+export const buttonLinkStyling = css`
   background: white;
   color: #383838;
   font-weight: normal;
@@ -33,4 +22,14 @@ export const Button = styled(({ isButton, ...rest }) =>
   &:active {
     opacity: 0.6;
   }
+`;
+
+const ButtonNoBorder = styled.button`
+  border: none;
+`;
+
+export const Button = styled(props => (
+  <ButtonNoBorder {...props}>{props.children}</ButtonNoBorder>
+))`
+  ${buttonLinkStyling}
 `;
