@@ -7,7 +7,7 @@ import {
   SelectionSet,
   isFieldNode,
 } from '../ast';
-import { warn, pushDebugNode } from '../helpers/help';
+import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
@@ -118,6 +118,9 @@ export class SelectionIterator {
       if (index >= select.length) {
         this.indexStack.pop();
         this.selectionStack.pop();
+        if (process.env.NODE_ENV !== 'production') {
+          popDebugNode();
+        }
         continue;
       } else {
         const node = select[index];

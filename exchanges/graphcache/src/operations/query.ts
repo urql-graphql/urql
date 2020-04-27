@@ -35,7 +35,7 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
-import { warn, pushDebugNode } from '../helpers/help';
+import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import {
   Context,
@@ -94,6 +94,10 @@ export const read = (
     rootKey !== ctx.store.rootFields['query']
       ? readRoot(ctx, rootKey, rootSelect, data)
       : readSelection(ctx, rootKey, rootSelect, data);
+
+  if (process.env.NODE_ENV !== 'production') {
+    popDebugNode();
+  }
 
   return {
     dependencies: getCurrentDependencies(),
@@ -210,9 +214,15 @@ export const readFragment = (
     entityKey
   );
 
-  return (
-    readSelection(ctx, entityKey, getSelectionSet(fragment), {} as Data) || null
-  );
+  const result =
+    readSelection(ctx, entityKey, getSelectionSet(fragment), {} as Data) ||
+    null;
+
+  if (process.env.NODE_ENV !== 'production') {
+    popDebugNode();
+  }
+
+  return result;
 };
 
 const readSelection = (

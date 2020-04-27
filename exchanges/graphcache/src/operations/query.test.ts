@@ -4,7 +4,7 @@ import { write } from './write';
 import { query } from './query';
 
 const TODO_QUERY = gql`
-  query todos {
+  query Todos {
     todos {
       id
       text
@@ -22,15 +22,10 @@ const TODO_QUERY = gql`
 
 describe('Query', () => {
   let schema, store, alteredRoot;
-  const spy: { console?: any } = {};
 
   beforeAll(() => {
     schema = require('../test-utils/simple_schema.json');
     alteredRoot = require('../test-utils/altered_root_schema.json');
-  });
-
-  afterEach(() => {
-    spy.console.mockRestore();
   });
 
   beforeEach(() => {
@@ -46,7 +41,8 @@ describe('Query', () => {
         ],
       }
     );
-    spy.console = jest.spyOn(console, 'warn');
+
+    jest.resetAllMocks();
   });
 
   it('test partial results', () => {
@@ -75,7 +71,7 @@ describe('Query', () => {
 
   it('should warn once for invalid fields on an entity', () => {
     const INVALID_TODO_QUERY = gql`
-      query {
+      query InvalidTodo {
         todos {
           id
           text
@@ -83,27 +79,47 @@ describe('Query', () => {
         }
       }
     `;
+
     query(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
+    expect((console.warn as any).mock.calls[0][0]).toMatch(
+      /Caused At: "InvalidTodo" query/
+    );
+
     query(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
+
     expect((console.warn as any).mock.calls[0][0]).toMatch(/incomplete/);
   });
 
-  it('should warn once for invalid sub-entities on an entity', () => {
+  it('should warn once for invalid sub-entities on an entity at the right stack', () => {
     const INVALID_TODO_QUERY = gql`
-      query {
+      query InvalidTodo {
         todos {
+          ...ValidTodo
+          ...InvalidFields
+        }
+      }
+
+      fragment ValidTodo on Todo {
+        id
+        text
+      }
+
+      fragment InvalidFields on Todo {
+        id
+        writer {
           id
-          text
-          writer {
-            id
-          }
         }
       }
     `;
+
     query(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
+    expect((console.warn as any).mock.calls[0][0]).toMatch(
+      /Caused At: "InvalidTodo" query, "InvalidFields" Fragment/
+    );
+
     query(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
