@@ -16,8 +16,11 @@
   <a href="https://www.npmjs.com/package/urql">
     <img alt="Total downloads" src="https://badgen.net/npm/dt/urql?color=blue" />
   </a>
+  <a href="https://formidable.com/open-source/urql/docs/">
+    <img alt="Spectrum badge" src="https://badgen.net/badge/docs/visit site/orange" />
+  </a>
   <a href="https://spectrum.chat/urql">
-    <img alt="Spectrum badge" src="https://badgen.net/badge/chat/spectrum/purple" />
+    <img alt="Spectrum badge" src="https://badgen.net/badge/spectrum/chat with us/purple" />
   </a>
   <a href="https://github.com/FormidableLabs/urql/blob/master/LICENSE">
     <img alt="Licence MIT" src="https://badgen.net/github/license/FormidableLabs/urql" />
