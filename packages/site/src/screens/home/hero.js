@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Wrapper } from '../../components/wrapper';
 import { Button } from '../../components/button';
@@ -181,11 +181,9 @@ const HeroNavList = styled.ul`
   }
 `;
 
-const COPY_TEXT = 'npm install urql graphql';
-
-const copyFallBack = () => {
+const copyFallBack = copyText => {
   const copyTextArea = document.createElement('textArea');
-  copyTextArea.value = COPY_TEXT;
+  copyTextArea.value = copyText;
 
   document.body.appendChild(copyTextArea);
 
@@ -195,68 +193,63 @@ const copyFallBack = () => {
   copyTextArea.remove();
 };
 
-class Hero extends React.Component {
-  constructor() {
-    super(...arguments);
+const Hero = props => {
+  const [animating, setAnimating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    this.state = {
-      animating: false,
-      copied: false,
-    };
-  }
+  const handleCopy = useCallback(
+    e => {
+      if (!navigator.clipboard) {
+        copyFallBack(props.content.copyText);
+        e.preventDefault();
+        return;
+      }
+      navigator.clipboard.writeText(props.content.copyText);
+    },
+    [props.content.copyText]
+  );
 
-  handleCopy(e) {
-    if (!navigator.clipboard) {
-      copyFallBack();
-      e.preventDefault();
-      return;
-    }
-    navigator.clipboard.writeText(COPY_TEXT);
-  }
-
-  render() {
-    return (
-      <WrapperStyled noPadding>
-        <HeroContent>
-          <HeroLogoContainer>
-            <HeroLogo src={badge} />
-          </HeroLogoContainer>
-          <HeroTitle>urql</HeroTitle>
-          <HeroBody>
-            urql is a blazing-fast GraphQL client that supports React, Preact,
-            and Svelte (alpha).
-          </HeroBody>
-          <HeroButtonsWrapper>
-            <HeroNPMWrapper>
-              <HeroNPMCopy>{COPY_TEXT}</HeroNPMCopy>
-              <HeroNPMButton onClick={this.handleCopy} isButton>
-                copy
-              </HeroNPMButton>
-            </HeroNPMWrapper>
-            <HeroDocsButton to="docs/">Documentation</HeroDocsButton>
-          </HeroButtonsWrapper>
-        </HeroContent>
-        <HeroNavList>
-          <li>
-            <Link to="docs/">Docs</Link>
-          </li>
-          <li>
-            <a
-              title="Issues"
-              href="https://www.github.com/FormidableLabs/urql/issues"
-            >
-              Issues
-            </a>
-          </li>
-          <li>
-            <a title="GitHub" href="https://github.com/FormidableLabs/urql">
-              GitHub
-            </a>
-          </li>
-        </HeroNavList>
-      </WrapperStyled>
-    );
-  }
-}
+  return (
+    <WrapperStyled noPadding>
+      <HeroContent>
+        <HeroLogoContainer>
+          <HeroLogo src={badge} />
+        </HeroLogoContainer>
+        <HeroTitle>urql</HeroTitle>
+        <HeroBody>
+          urql is a blazing-fast GraphQL client that supports React, Preact, and
+          Svelte (alpha).
+        </HeroBody>
+        <HeroButtonsWrapper>
+          <HeroNPMWrapper>
+            <HeroNPMCopy>{props.content.copyText}</HeroNPMCopy>
+            <HeroNPMButton onClick={handleCopy} isButton>
+              copy
+            </HeroNPMButton>
+          </HeroNPMWrapper>
+          <HeroDocsButton to="docs/">Documentation</HeroDocsButton>
+        </HeroButtonsWrapper>
+      </HeroContent>
+      <HeroNavList>
+        <li>
+          <Link to="docs/">Docs</Link>
+        </li>
+        <li>
+          <a
+            title="Issues"
+            href="https://www.github.com/FormidableLabs/urql/issues"
+          >
+            Issues
+          </a>
+        </li>
+        <li>
+          <a title="GitHub" href="https://github.com/FormidableLabs/urql">
+            GitHub
+          </a>
+        </li>
+      </HeroNavList>
+    </WrapperStyled>
+  );
+};
 
 export default Hero;

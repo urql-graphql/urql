@@ -112,9 +112,7 @@ const MoreOSS = ({ oss }) => (
         );
       })}
     </OSSCardContainer>
-    <Button light to="https://formidable.com/open-source/">
-      View All
-    </Button>
+    <Button to="https://formidable.com/open-source/">View All</Button>
   </PanelSectionWrapper>
 );
 
