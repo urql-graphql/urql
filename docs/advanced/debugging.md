@@ -25,7 +25,7 @@ Debugging events can be inspected either graphically using our devtools or manua
 
 ### Devtools
 
-The quickest way is going to be using our [devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom querys via the running client.
+The quickest way is going to be using our [devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom queries via the running client.
 
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
 
