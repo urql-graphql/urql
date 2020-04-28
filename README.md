@@ -13,6 +13,9 @@
   <a href="https://circleci.com/gh/FormidableLabs/urql">
     <img alt="Test Status" src="https://badgen.net/github/status/FormidableLabs/urql/master/ci/circleci?label=circleci" />
   </a>
+  <a href="https://github.com/FormidableLabs/urql#maintenance-status">
+    <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
+  </a>
   <a href="https://www.npmjs.com/package/urql">
     <img alt="Total downloads" src="https://badgen.net/npm/dm/urql?color=blue" />
   </a>
