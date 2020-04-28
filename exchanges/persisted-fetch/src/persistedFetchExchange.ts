@@ -21,6 +21,7 @@ import {
 } from '@urql/core';
 
 import {
+  FetchBody,
   makeFetchBody,
   makeFetchURL,
   makeFetchOptions,
@@ -47,21 +48,44 @@ export const persistedFetchExchange: Exchange = ({
           filter(op => op.operationName === 'teardown' && op.key === key)
         );
 
+        const body = makeFetchBody(operation);
         if (!supportsPersistedQueries) {
+          // Runs the usual non-persisted fetchExchange query logic
           return pipe(
-            makeNormalFetchSource(operation, dispatchDebug),
+            makePersistedFetchSource(operation, body, dispatchDebug),
             takeUntil(teardown$)
           );
         }
 
+        const query: string = body.query!;
+
         return pipe(
-          makePersistedFetchSource(operation, dispatchDebug),
+          // Hash the given GraphQL query
+          fromPromise(hash(query)),
+          mergeMap(sha256Hash => {
+            // Attach SHA256 hash and remove query from body
+            body.query = undefined;
+            body.extensions = {
+              persistedQuery: {
+                version: 1,
+                sha256Hash,
+              },
+            };
+
+            return makePersistedFetchSource(operation, body, dispatchDebug);
+          }),
           mergeMap(result => {
             if (result.error && isPersistedUnsupported(result.error)) {
+              // Reset the body back to its non-persisted state
+              body.query = query;
+              body.extensions = undefined;
+              // Disable future persisted queries
               supportsPersistedQueries = false;
-              return makeNormalFetchSource(operation, dispatchDebug);
+              return makePersistedFetchSource(operation, body, dispatchDebug);
             } else if (result.error && isPersistedMiss(result.error)) {
-              return makeNormalFetchSource(operation, dispatchDebug);
+              // Add query to the body but leave SHA256 hash intact
+              body.query = query;
+              return makePersistedFetchSource(operation, body, dispatchDebug);
             }
 
             return fromValue(result);
@@ -83,76 +107,20 @@ export const persistedFetchExchange: Exchange = ({
 
 const makePersistedFetchSource = (
   operation: Operation,
+  body: FetchBody,
   dispatchDebug: ExchangeInput['dispatchDebug']
 ): Source<OperationResult> => {
-  const body = makeFetchBody(operation);
-  const query: string = body.query!;
-
-  return pipe(
-    fromPromise(hash(query)),
-    mergeMap(sha256Hash => {
-      body.query = undefined;
-      body.extensions = {
-        persistedQuery: {
-          version: 1,
-          sha256Hash,
-        },
-      };
-
-      const url = makeFetchURL(operation, { ...body, query: '' });
-      const fetchOptions = makeFetchOptions(operation, body);
-
-      dispatchDebug({
-        type: 'fetchRequest',
-        message: 'A fetch request for a persisted query is being executed.',
-        operation,
-        data: {
-          url,
-          fetchOptions,
-        },
-      });
-
-      return pipe(
-        makeFetchSource(operation, url, fetchOptions),
-        onPush(result => {
-          const persistFail =
-            result.error &&
-            (isPersistedMiss(result.error) ||
-              isPersistedUnsupported(result.error));
-          const error = !result.data ? result.error : undefined;
-
-          dispatchDebug({
-            // TODO: Assign a new name to this once @urql/devtools supports it
-            type: persistFail || error ? 'fetchError' : 'fetchSuccess',
-            message: persistFail
-              ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
-              : `A ${
-                  error ? 'failed' : 'successful'
-                } fetch response has been returned.`,
-            operation,
-            data: {
-              url,
-              fetchOptions,
-              value: persistFail ? result.error! : error || result,
-            },
-          });
-        })
-      );
-    })
+  const url = makeFetchURL(
+    operation,
+    body.query ? body : { ...body, query: '' }
   );
-};
-
-const makeNormalFetchSource = (
-  operation: Operation,
-  dispatchDebug: ExchangeInput['dispatchDebug']
-): Source<OperationResult> => {
-  const body = makeFetchBody(operation);
-  const url = makeFetchURL(operation, body);
   const fetchOptions = makeFetchOptions(operation, body);
 
   dispatchDebug({
     type: 'fetchRequest',
-    message: 'A fetch request is being executed.',
+    message: !body.query
+      ? 'A fetch request for a persisted query is being executed.'
+      : 'A fetch request is being executed.',
     operation,
     data: {
       url,
@@ -163,18 +131,24 @@ const makeNormalFetchSource = (
   return pipe(
     makeFetchSource(operation, url, fetchOptions),
     onPush(result => {
+      const persistFail =
+        result.error &&
+        (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
       const error = !result.data ? result.error : undefined;
 
       dispatchDebug({
-        type: error ? 'fetchError' : 'fetchSuccess',
-        message: `A ${
-          error ? 'failed' : 'successful'
-        } fetch response has been returned.`,
+        // TODO: Assign a new name to this once @urql/devtools supports it
+        type: persistFail || error ? 'fetchError' : 'fetchSuccess',
+        message: persistFail
+          ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
+          : `A ${
+              error ? 'failed' : 'successful'
+            } fetch response has been returned.`,
         operation,
         data: {
           url,
           fetchOptions,
-          value: error || result,
+          value: persistFail ? result.error! : error || result,
         },
       });
     })
