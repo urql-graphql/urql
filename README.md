@@ -14,7 +14,7 @@
     <img alt="Test Status" src="https://badgen.net/github/status/FormidableLabs/urql/master/ci/circleci?label=circleci" />
   </a>
   <a href="https://www.npmjs.com/package/urql">
-    <img alt="Total downloads" src="https://badgen.net/npm/dt/urql?color=blue" />
+    <img alt="Total downloads" src="https://badgen.net/npm/dm/urql?color=blue" />
   </a>
   <a href="https://formidable.com/open-source/urql/docs/">
     <img alt="Visit docs" src="https://badgen.net/badge/docs/visit site/orange" />
