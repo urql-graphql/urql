@@ -4,7 +4,7 @@ import { useMarkdownPage } from 'react-static-plugin-md-pages';
 
 const parsePathname = pathname => {
   const match = pathname && pathname.match(/#[a-z|-]+/);
-  return match && match[1];
+  return match && match[0];
 };
 
 export const ScrollToTop = () => {

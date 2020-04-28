@@ -14,7 +14,7 @@ This guide covers how to query data with React and Preact, which share almost th
 
 Both libraries offer a `useQuery` hook and a `Query` component. The latter accepts the same
 parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
-render-props components.](../api/urql.md#components)
+render-props components.](../api/urql.md#query-component)
 
 ### Run a first query
 
