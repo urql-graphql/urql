@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="urql" width="250" src="docs/assets/urql-logo.png" />
+  <img alt="urql" width="250" src="packages/site/src/assets/sidebar-badge.svg" />
 
   <br />
   <br />
