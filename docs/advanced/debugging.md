@@ -57,8 +57,6 @@ unsubscribe();
 
 Debug events are a means of sharing implementation details to consumers of an exchange.
 
-### Dispatching a debug event
-
 #### Identify key events
 
 The first step is to identify key events of the exchange in question.
