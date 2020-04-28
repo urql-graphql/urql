@@ -5,7 +5,7 @@ order: 6
 
 # Debugging
 
-We've tried to make debugging in `urql` as seamless as possible by creating tools for our users using urql and our users creating their own exchanges.
+We've tried to make debugging in `urql` as seamless as possible by creating tools for users of urql and those creating their own exchanges.
 
 ## Debug events
 
