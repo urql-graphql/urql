@@ -21,7 +21,7 @@ Debug events are a fire-and-forget mechanism and should not be used as a means f
 
 ## Consuming debug events
 
-Debugging events can be inspected either graphically using our devtools or manually by subscribing to events on the client.
+Debugging events can be inspected either graphically using our [devtools](https://github.com/FormidableLabs/urql-devtools) or manually by subscribing to events on the client.
 
 ### Devtools
 
