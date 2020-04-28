@@ -17,7 +17,7 @@
     <img alt="Maintenance Status" src="https://badgen.net/badge/maintenance/active/green" />
   </a>
   <a href="https://www.npmjs.com/package/urql">
-    <img alt="Total downloads" src="https://badgen.net/npm/dw/urql?color=blue" />
+    <img alt="Weekly downloads" src="https://badgen.net/npm/dw/urql?color=blue" />
   </a>
   <a href="https://formidable.com/open-source/urql/docs/">
     <img alt="Visit docs" src="https://badgen.net/badge/docs/visit site/orange" />
