@@ -30,7 +30,7 @@ then the data from the `authorsQuery` to ensure the actual data is consistent.
 ## Optimistic results & refetches
 
 Optimistic updates can temporarily update the data after incoming mutations, which will trigger on screen queries to update.
-However, if we also use `cache-and-network` at the same time, some queries can refetch and overwrite our optimistic data,
+However, if we also use [`cache-and-network`](https://formidable.com/open-source/urql/docs/basics/queries/#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
 causing an unintended state where the intended optimistic update is destroyed.
 Such an unintended refetch can also happen if after an optimistic update a query is refetched when it’s not or
 only partially available in the cache.
