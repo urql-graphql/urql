@@ -9,7 +9,7 @@ We've tried to make debugging in `urql` as seamless as possible by creating tool
 
 ## Debug events
 
-Debug events are a means for seeing what's going on inside of Urql exchanges. Before getting started, here are a few things to be aware of.
+Debug events are a means for seeing what's going on inside of urql exchanges. Before getting started, here are a few things to be aware of.
 
 ### Anyone with client access can listen
 
