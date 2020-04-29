@@ -16,7 +16,7 @@ const plugin = ({ template, types: t }) => {
   return {
     visitor: {
       ExportNamedDeclaration(path) {
-        if (path.node.declaration && path.node.declaration.declarations[0] && path.node.declaration.declarations[0].id) {
+        if (path.node.declaration && path.node.declaration.declarations && path.node.declaration.declarations[0] && path.node.declaration.declarations[0].id) {
           const exportName = path.node.declaration.declarations[0].id.name;
           if (/Exchange$/i.test(exportName)) name = exportName;
         }
