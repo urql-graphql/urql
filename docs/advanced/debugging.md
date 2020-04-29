@@ -16,37 +16,10 @@ extension.](https://github.com/FormidableLabs/urql-devtools/).
 It offers tools to inspect internal ["Debug Events"](#debug-events) as they happen, to explore data
 as your app is seeing it, and to quickly trigger GraphQL queries.
 
+[For instructions on how to set up the devtools, check out `@urql/devtools`'s readme in its
+repository.](https://github.com/FormidableLabs/urql-devtools)
+
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
-
-### Installation and Setup
-
-First, we can add the devtools by installing either the [Chrome
-Extension](https://chrome.google.com/webstore/detail/urql-devtools/mcfphkbpmkbeofnkjehahlmidmceblmm)
-or the [Firefox Addon](https://addons.mozilla.org/en-GB/firefox/addon/urql-devtools/).
-
-Then we'll have to install the `@urql/devtools` package:
-
-```sh
-yarn add --dev @urql/devtools
-# or
-npm install --save-dev @urql/devtools
-```
-
-And lastly, we'll need to add the `devtoolsExchange` to our list of exchanges. Typically we'd want
-to add it as either the first exchange or at least in front of the `dedupExchange`:
-
-```js
-import { createClient, defaultExchanges } from 'urql';
-import { devtoolsExchange } from '@urql/devtools';
-
-const client = createClient({
-  url: 'http://localhost:3000/graphql',
-  // First `devtoolsExchange` then the rest:
-  exchanges: [devtoolsExchange, ...defaultExchanges],
-});
-```
-
-[Read more about the `urql` devtools setup on its repository.](https://github.com/FormidableLabs/urql-devtools)
 
 ## Debug events
 
