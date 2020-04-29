@@ -1,4 +1,4 @@
-import { DocumentNode, GraphQLError } from 'graphql';
+import { DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
