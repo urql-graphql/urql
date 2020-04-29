@@ -9,4 +9,4 @@
 '@urql/svelte': patch
 ---
 
-Add the package.json entry to the exports for Node 14
+Add a `"./package.json"` entry to the `package.json`'s `"exports"` field for Node 14. This seems to be required by packages like `rollup-plugin-svelte` to function properly.
