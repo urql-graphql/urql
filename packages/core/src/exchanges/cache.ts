@@ -125,6 +125,8 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
     return merge([cachedOps$, forwardedOps$]);
   };
 };
+// @ts-ignore
+cacheExchange.name = 'cacheExchange';
 
 // Reexecutes a given operation with the default requestPolicy
 const reexecuteOperation = (client: Client, operation: Operation) => {

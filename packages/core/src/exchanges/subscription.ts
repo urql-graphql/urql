@@ -139,3 +139,5 @@ export const subscriptionExchange = ({
     return merge([subscriptionResults$, forward$]);
   };
 };
+// @ts-ignore
+subscriptionExchange.name = 'subscriptionExchange';

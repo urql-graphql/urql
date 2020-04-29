@@ -79,3 +79,5 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     return merge([fetchResults$, forward$]);
   };
 };
+// @ts-ignore
+fetchExchange.name = 'fetchExchange';

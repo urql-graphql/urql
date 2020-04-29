@@ -39,3 +39,5 @@ export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
     return pipe(forward(forward$), tap(afterOperationResult));
   };
 };
+// @ts-ignore
+dedupExchange.name = 'dedupExchange';

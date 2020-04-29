@@ -104,6 +104,8 @@ export const persistedFetchExchange: Exchange = ({
     return merge([fetchResults$, forward$]);
   };
 };
+// @ts-ignore
+persistedFetchExchange.name = 'persistedFetchExchange';
 
 const makePersistedFetchSource = (
   operation: Operation,

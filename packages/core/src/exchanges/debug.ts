@@ -18,3 +18,5 @@ export const debugExchange: Exchange = ({ forward }) => {
       );
   }
 };
+// @ts-ignore
+debugExchange.name = 'debugExchange';

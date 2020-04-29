@@ -136,3 +136,5 @@ export const retryExchange = ({
     return result$;
   };
 };
+// @ts-ignore
+retryExchange.name = 'retryExchange';

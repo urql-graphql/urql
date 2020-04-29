@@ -114,6 +114,8 @@ export const populateExchange = ({
     );
   };
 };
+// @ts-ignore
+populateExchange.name = 'populateExchange';
 
 type UserFragmentMap<T extends string = string> = Record<
   T,

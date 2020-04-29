@@ -441,3 +441,5 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     ]);
   };
 };
+// @ts-ignore
+cacheExchange.name = 'cacheExchange';

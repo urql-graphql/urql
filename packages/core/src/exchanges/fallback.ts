@@ -28,6 +28,8 @@ export const fallbackExchange: ({
     /* All operations that skipped through the entire exchange chain should be filtered from the output */
     filter<any>(() => false)
   );
+// @ts-ignore
+fallbackExchange.name = 'fallbackExchange';
 
 export const fallbackExchangeIO: ExchangeIO = fallbackExchange({
   dispatchDebug: noop,
