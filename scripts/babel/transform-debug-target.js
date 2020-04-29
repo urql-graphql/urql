@@ -11,8 +11,16 @@ const plugin = ({ template, types: t }) => {
     { placeholderPattern: /^NODE$/ }
   );
 
+  let name = 'unknownExchange';
+
   return {
     visitor: {
+      ExportNamedDeclaration(path) {
+        if (path.node.declaration && path.node.declaration.declarations && path.node.declaration.declarations[0] && path.node.declaration.declarations[0].id) {
+          const exportName = path.node.declaration.declarations[0].id.name;
+          if (/Exchange$/i.test(exportName)) name = exportName;
+        }
+      },
       CallExpression(path) {
         if (
           !path.node[visited] &&
@@ -20,6 +28,15 @@ const plugin = ({ template, types: t }) => {
           path.node.callee.name === dispatchProperty
         ) {
           path.node[visited] = true;
+          if (t.isObjectExpression(path.node.arguments[0])) {
+            path.node.arguments[0].properties.push(
+              t.objectProperty(
+                t.stringLiteral('source'),
+                t.stringLiteral(name)
+              )
+             );
+          }
+
           path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
         }
       }
