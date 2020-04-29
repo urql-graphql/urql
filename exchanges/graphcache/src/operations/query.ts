@@ -410,7 +410,7 @@ const resolveResolverResult = (
         joinKeys(key, `${i}`),
         select,
         // Get the inner previous data from prevData
-        prevData ? prevData[i] : undefined,
+        prevData != null ? prevData[i] : undefined,
         result[i]
       );
 
@@ -466,7 +466,7 @@ const resolveLink = (
         typename,
         fieldName,
         select,
-        prevData ? prevData[i] : undefined
+        prevData != null ? prevData[i] : undefined
       );
       if (childLink === undefined && !_isListNullable) {
         return undefined;
