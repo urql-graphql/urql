@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 2.4.1
+
+### Patch Changes
+
+- Add a `"./package.json"` entry to the `package.json`'s `"exports"` field for Node 14. This seems to be required by packages like `rollup-plugin-svelte` to function properly, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#771](https://github.com/FormidableLabs/urql/pull/771))
+- ⚠️ Fix traversal issue, where when a prior selection set has set a nested result field to `null`, a subsequent traversal of this field attempts to access `prevData` on `null`, by [@kitten](https://github.com/kitten) (See [#772](https://github.com/FormidableLabs/urql/pull/772))
+- Updated dependencies (See [#771](https://github.com/FormidableLabs/urql/pull/771) and [#771](https://github.com/FormidableLabs/urql/pull/771))
+  - @urql/exchange-populate@0.1.7
+  - @urql/core@1.11.6
+
 ## 2.4.0
 
 This release heavily improves on the intuitiveness of how Optimistic Updates work. It ensures that

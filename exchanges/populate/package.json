@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-populate",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "An exchange that automaticcally populates the mutation selection body",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/advanced/auto-populate-mutations",
@@ -49,7 +49,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=1.10.9",
+    "@urql/core": ">=1.11.6",
     "wonka": "^4.0.10"
   },
   "peerDependencies": {
