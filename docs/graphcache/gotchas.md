@@ -14,19 +14,20 @@ Most of these hidden features and mechanisms in this section exist to ensure con
 
 By default the cache ensures that results from the API are applied commutatively.
 
-Commutative guarantees means that the cache will keep the order of operations consistent, let's look
-at an example to clear this up.
-We are in our application and we queue up two queries, an `authorsQuery` and a `todosQuery`.
+Commutativity is a guarantee that means that Graphcache will attempt to keep the order of cache changes consistent, when results arrive out-of-order from the API, for instance due to network latency. When a query is dispatched first and another second, their results can still arrive in reverse, but Graphcache will still make sure that the cache results are applied in order, as if the results arrived in the right order.
+Let's look at an example to understand this.
+Suppose our application queues up two queries, an `authorsQuery` and a `todosQuery`.
 
-We dispatch the `todosQuery` first and the `authorsQuery` later, the `authorsQuery` returns a result
-before the `todosQuery`. The cache will put this result from the `authorsQuery` in a
-layer (this means it isn't actually in the real data) until the `todosQuery` arrives.
-When the `todosQuery` does arrive. The cache will commit the data from the `todosQuery` first and
-then the data from the `authorsQuery` to ensure the actual data is consistent.
+We dispatch the `todosQuery` first and the `authorsQuery` later, but because of network latency the `authorsQuery`'s result arrived before the `todosQuery`'s result.
+The cache will put the out-of-order result from the `authorsQuery` onto a layer until the other result arrives.
+This layer contains the out-of-order result's data, but hasn't been committed yet to the permanent in-memory data.
+When the `todosQuery` does arrive and all out-of-order results have been stored on layers, the cache will start committing in order to ensure the actual data is consistent.
+This layering approach means that Graphcache is able to temporarily reorder results as they arrive, ensuring that the results don't overwrite each other in a random order.
 
 ## Optimistic results & refetches
 
-Optimistic updates can temporarily update the data after incoming mutations, which will trigger on screen queries to update.
+We've previously learned about [how to create "Optimistic Updates" in an earlier section.](./custom-updates.md#optimistic-updates)
+Optimistic updates can temporarily update cached data after incoming mutations, which will trigger on screen queries to update.
 However, if we also use [the `cache-and-network` request policy](../basics/queries.md#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
 causing an unintended state where the intended optimistic update is destroyed.
 Such an unintended refetch can also happen if after an optimistic update a query is refetched when it’s not or
@@ -37,6 +38,6 @@ Once all mutations with optimistic updates complete however, all results will be
 and refetched that may update the mutation data will be rerun.
 
 Let's look at an example, the cache has a list of an entity (for instance `Todos`), we click delete on four of them and we use `optimistic` to
-delete these before the network-request actually returns. This puts our UI in an inconsistent state since the list is `partial`
-so it would trigger a refetch, if these mutations would be slow and the fetch would be quick this would make our UI jump
-to prevent this, this fetch will be deferred until those four mutations complete.
+Usually, if the list is using a query with `cache-and-network`, this means that the optimistic update would automatically trigger a refetch of the list, which would make the deleted item reappear, although it shouldn't.
+
+To prevent this, Graphcache waits for the mutation to complete instead, as it detects that the query overlaps with the optimistic update, and retriggers the refetch only when all mutations have completed.
