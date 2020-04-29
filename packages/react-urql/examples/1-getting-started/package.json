@@ -4,7 +4,8 @@
   "main": "src/index.html",
   "license": "MIT",
   "scripts": {
-    "start": "parcel src/index.html"
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
   },
   "devDependencies": {
     "@types/react": "^16.9.23",
