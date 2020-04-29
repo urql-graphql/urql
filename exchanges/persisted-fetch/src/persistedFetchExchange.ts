@@ -8,7 +8,6 @@ import {
   mergeMap,
   pipe,
   share,
-  onPush,
   takeUntil,
 } from 'wonka';
 

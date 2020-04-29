@@ -43,9 +43,15 @@ describe('on success', () => {
   });
 
   it('returns response data', async () => {
+    const dispatchDebug = jest.fn();
     const fetchOptions = {};
     const data = await pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        fetchOptions,
+        dispatchDebug
+      ),
       toPromise
     );
 
@@ -57,6 +63,7 @@ describe('on success', () => {
   });
 
   it('uses the mock fetch if given', async () => {
+    const dispatchDebug = jest.fn();
     const fetchOptions = {};
     const fetcher = jest.fn().mockResolvedValue({
       status: 200,
@@ -73,7 +80,8 @@ describe('on success', () => {
           },
         },
         'https://test.com/graphql',
-        fetchOptions
+        fetchOptions,
+        dispatchDebug
       ),
       toPromise
     );
@@ -93,9 +101,15 @@ describe('on error', () => {
   });
 
   it('returns error data', async () => {
+    const dispatchDebug = jest.fn();
     const fetchOptions = {};
     const data = await pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        fetchOptions,
+        dispatchDebug
+      ),
       toPromise
     );
 
@@ -103,10 +117,16 @@ describe('on error', () => {
   });
 
   it('returns error data with status 400 and manual redirect mode', async () => {
+    const dispatchDebug = jest.fn();
     const data = await pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', {
-        redirect: 'manual',
-      }),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        {
+          redirect: 'manual',
+        },
+        dispatchDebug
+      ),
       toPromise
     );
 
@@ -114,8 +134,14 @@ describe('on error', () => {
   });
 
   it('ignores the error when a result is available', async () => {
+    const dispatchDebug = jest.fn();
     const data = await pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        {},
+        dispatchDebug
+      ),
       toPromise
     );
 
@@ -125,10 +151,16 @@ describe('on error', () => {
 
 describe('on teardown', () => {
   it('does not start the outgoing request on immediate teardowns', () => {
+    const dispatchDebug = jest.fn();
     fetch.mockRejectedValueOnce(abortError);
 
     const { unsubscribe } = pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        {},
+        dispatchDebug
+      ),
       subscribe(fail)
     );
 
@@ -138,10 +170,16 @@ describe('on teardown', () => {
   });
 
   it('aborts the outgoing request', async () => {
+    const dispatchDebug = jest.fn();
     fetch.mockRejectedValueOnce(abortError);
 
     const { unsubscribe } = pipe(
-      makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
+      makeFetchSource(
+        queryOperation,
+        'https://test.com/graphql',
+        {},
+        dispatchDebug
+      ),
       subscribe(fail)
     );
 

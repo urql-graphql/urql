@@ -1,4 +1,4 @@
-import { filter, merge, mergeMap, pipe, share, takeUntil, onPush } from 'wonka';
+import { filter, merge, mergeMap, pipe, share, takeUntil } from 'wonka';
 import { extractFiles } from 'extract-files';
 import { Exchange } from '@urql/core';
 

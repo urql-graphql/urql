@@ -34,6 +34,7 @@ describe('Mutation', () => {
         children: [
           // @ts-ignore
           h(
+            // @ts-ignore
             Mutation,
             { query },
             ({ data, fetching, error, executeMutation }) => {
