@@ -1,9 +1,9 @@
 ---
-title: Gotchas
+title: Under the hood
 order: 5
 ---
 
-# Gotchas
+# Under the hood
 
 Graphcache has a couple of hidden features behind the scenes, that handle how it deals with certain edge cases.
 Being aware of these features and edge cases makes it easier to define best practices and to avoid pitfalls.
