@@ -32,8 +32,8 @@ describe('Mutation', () => {
       return h(Provider, {
         value: client,
         children: [
+          // @ts-ignore
           h(
-            // @ts-ignore
             Mutation,
             { query },
             ({ data, fetching, error, executeMutation }) => {
