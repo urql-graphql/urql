@@ -77,7 +77,7 @@ export interface ExchangeInput {
   client: Client;
   forward: ExchangeIO;
   dispatchDebug: <T extends keyof DebugEventTypes | string>(
-    t: DebugEvent<T>
+    t: DebugEventArg<T>
   ) => void;
 }
 
@@ -116,12 +116,17 @@ export interface DebugEventTypes {
   };
 }
 
-export type DebugEvent<T extends keyof DebugEventTypes | string> = {
+export type DebugEventArg<T extends keyof DebugEventTypes | string> = {
   type: T;
   message: string;
   operation: Operation;
-  timestamp?: number;
-  source?: string;
 } & (T extends keyof DebugEventTypes
   ? { data: DebugEventTypes[T] }
   : { data?: any });
+
+export type DebugEvent<
+  T extends keyof DebugEventTypes | string = string
+> = DebugEventArg<T> & {
+  timestamp: number;
+  source: string;
+};
