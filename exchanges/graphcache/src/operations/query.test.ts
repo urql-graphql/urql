@@ -187,4 +187,54 @@ describe('Query', () => {
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
   });
+
+  it('supports double-traversing null entities', () => {
+    const QUERY = gql`
+      query getTodos {
+        todos {
+          id
+          a: author {
+            id
+          }
+          b: author {
+            id
+          }
+        }
+      }
+    `;
+
+    const store = new Store({ schema: alteredRoot });
+
+    let { data } = query(store, { query: QUERY });
+    expect(data).toEqual(null);
+
+    write(
+      store,
+      { query: QUERY },
+      {
+        todos: [
+          {
+            __typename: 'Todo',
+            id: '0',
+            a: null,
+            b: null,
+          },
+        ],
+        __typename: 'query_root',
+      }
+    );
+
+    ({ data } = query(store, { query: QUERY }));
+    expect(data).toEqual({
+      __typename: 'query_root',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '0',
+          a: null,
+          b: null,
+        },
+      ],
+    });
+  });
 });
