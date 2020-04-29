@@ -12,8 +12,7 @@ Most of these hidden features and mechanisms in this section exist to ensure con
 
 ## Commutativity
 
-By default the cache ensures idempotent and commutative results, the last part of this
-is the most relevant one to be aware of.
+By default the cache ensures that results from the API are applied commutatively.
 
 Commutative guarantees means that the cache will keep the order of operations consistent, let's look
 at an example to clear this up.
