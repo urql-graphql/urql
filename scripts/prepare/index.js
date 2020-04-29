@@ -101,9 +101,12 @@ if (hasReact) {
 } else {
   invariant(!!pkg.exports, 'package.json:exports must be added and have a "." entry');
   invariant(!!pkg.exports['.'], 'package.json:exports must have a "." entry');
+  invariant(!!pkg.exports['./package.json'], 'package.json:exports must have a "./package.json" entry')
 
   for (const key in pkg.exports) {
     const entry = pkg.exports[key];
+    if (entry === './package.json') continue;
+
     const entryName = normalize(key);
     const bundleName = entryName ? `${name}-${entryName}` : name;
     invariant(

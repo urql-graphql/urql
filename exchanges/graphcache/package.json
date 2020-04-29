@@ -30,6 +30,7 @@
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     },
+    "./package.json": "./package.json",
     "./extras": {
       "import": "./dist/urql-exchange-graphcache-extras.mjs",
       "require": "./dist/urql-exchange-graphcache-extras.js",
