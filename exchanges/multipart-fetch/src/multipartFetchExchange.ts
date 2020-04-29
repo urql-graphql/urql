@@ -66,48 +66,9 @@ export const multipartFetchExchange: Exchange = ({
         url = makeFetchURL(operation, body);
       }
 
-      dispatchDebug({
-        type: 'fetchRequest',
-        message: 'A fetch request is being executed.',
-        operation,
-        data: {
-          url,
-          fetchOptions,
-        },
-      });
-
       return pipe(
-        makeFetchSource(operation, url, fetchOptions),
-        takeUntil(teardown$),
-        onPush(result => {
-          if (!result.data && result.error && result.error.networkError) {
-            dispatchDebug({
-              type: 'fetchError',
-              message: 'A failed fetch response has been returned.',
-              operation,
-              data: {
-                url,
-                fetchOptions,
-                value: result.error.networkError,
-              },
-            });
-          } else {
-            dispatchDebug({
-              type: 'fetchSuccess',
-              message: 'A successful fetch response has been returned.',
-              operation,
-              data: {
-                url,
-                fetchOptions,
-                value: {
-                  data: result.data,
-                  errors: result.error ? result.error.graphQLErrors : undefined,
-                  extensions: result.extensions,
-                },
-              },
-            });
-          }
-        })
+        makeFetchSource(operation, url, fetchOptions, dispatchDebug),
+        takeUntil(teardown$)
       );
     })
   );

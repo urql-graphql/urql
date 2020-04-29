@@ -103,16 +103,12 @@ export interface DebugEventTypes {
   fetchSuccess: {
     url: string;
     fetchOptions: RequestInit;
-    value: {
-      data?: object;
-      errors?: GraphQLError[];
-      extensions?: Record<string, any>;
-    };
+    value: object;
   };
   fetchError: {
     url: string;
     fetchOptions: RequestInit;
-    value: Error;
+    value: object;
   };
   // Retry exchange
   retryRetrying: {

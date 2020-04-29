@@ -116,57 +116,7 @@ const makePersistedFetchSource = (
   );
   const fetchOptions = makeFetchOptions(operation, body);
 
-  dispatchDebug({
-    type: 'fetchRequest',
-    message: !body.query
-      ? 'A fetch request for a persisted query is being executed.'
-      : 'A fetch request is being executed.',
-    operation,
-    data: {
-      url,
-      fetchOptions,
-    },
-  });
-
-  return pipe(
-    makeFetchSource(operation, url, fetchOptions),
-    onPush(result => {
-      const persistFail =
-        result.error &&
-        (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
-
-      if (persistFail || (!result.data && result.error)) {
-        dispatchDebug({
-          // TODO: Assign a new name to this once @urql/devtools supports it
-          type: 'fetchError',
-          message: persistFail
-            ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
-            : 'A failed fetch response has been returned.',
-          operation,
-          data: {
-            url,
-            fetchOptions,
-            value: result.error!.networkError || result.error!,
-          },
-        });
-      } else {
-        dispatchDebug({
-          type: 'fetchSuccess',
-          message: 'A successful fetch response has been returned.',
-          operation,
-          data: {
-            url,
-            fetchOptions,
-            value: {
-              data: result.data,
-              errors: result.error ? result.error.graphQLErrors : undefined,
-              extensions: result.extensions,
-            },
-          },
-        });
-      }
-    })
-  );
+  return makeFetchSource(operation, url, fetchOptions, dispatchDebug);
 };
 
 const isPersistedMiss = (error: CombinedError): boolean =>

@@ -13,6 +13,16 @@ const executeFetch = (
   let statusNotOk = false;
   let response: Response;
 
+  dispatchDebug({
+    type: 'fetchRequest',
+    message: 'A fetch request is being executed.',
+    operation,
+    data: {
+      url,
+      fetchOptions,
+    },
+  });
+
   return (fetcher || fetch)(url, fetchOptions)
     .then((res: Response) => {
       response = res;
@@ -64,7 +74,8 @@ const executeFetch = (
 export const makeFetchSource = (
   operation: Operation,
   url: string,
-  fetchOptions: RequestInit
+  fetchOptions: RequestInit,
+  dispatchDebug: ExchangeInput['dispatchDebug']
 ) => {
   return make<OperationResult>(({ next, complete }) => {
     const abortController =
@@ -80,7 +91,7 @@ export const makeFetchSource = (
           fetchOptions.signal = abortController.signal;
         }
 
-        return executeFetch(operation, url, fetchOptions);
+        return executeFetch(operation, url, fetchOptions, dispatchDebug);
       })
       .then((result: OperationResult | undefined) => {
         if (!ended) {
