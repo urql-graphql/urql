@@ -29,6 +29,7 @@
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     },
+    "./package.json": "./package.json",
     "./internal": {
       "import": "./dist/urql-core-internal.mjs",
       "require": "./dist/urql-core-internal.js",
