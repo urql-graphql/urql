@@ -10,8 +10,7 @@ and those creating their own exchanges.
 
 ## Devtools
 
-The quickest way to debug `urql` is to use the [`urql` devtools]
-extension.](https://github.com/FormidableLabs/urql-devtools/).
+The quickest way to debug `urql` is to use the [`urql` devtools.](https://github.com/FormidableLabs/urql-devtools/)
 
 It offers tools to inspect internal ["Debug Events"](#debug-events) as they happen, to explore data
 as your app is seeing it, and to quickly trigger GraphQL queries.
