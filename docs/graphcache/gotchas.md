@@ -37,7 +37,7 @@ To prevent this, Graphcache will temporarily pause refetches that may overwrite 
 Once all mutations with optimistic updates complete however, all results will be applied at once,
 and refetched that may update the mutation data will be rerun.
 
-Let's look at an example, the has a list of an entity (for instance `Todos`), we click delete on four of them and we use `optimistic` to
+Let's look at an example, the cache has a list of an entity (for instance `Todos`), we click delete on four of them and we use `optimistic` to
 delete these before the network-request actually returns. This puts our UI in an inconsistent state since the list is `partial`
 so it would trigger a refetch, if these mutations would be slow and the fetch would be quick this would make our UI jump
 to prevent this, this fetch will be deferred until those four mutations complete.
