@@ -30,12 +30,12 @@
     ]
   },
   "dependencies": {
-    "@mdx-js/react": "^1.5.8",
-    "formidable-oss-badges": "0.3.2",
+    "@mdx-js/react": "^1.6.0",
+    "formidable-oss-badges": "0.3.4",
     "history": "^4.7.2",
     "path": "^0.12.7",
-    "preact": "^10.4.0",
-    "prism-react-renderer": "^1.0.2",
+    "preact": "^10.4.1",
+    "prism-react-renderer": "^1.1.0",
     "prop-types": "^15.6.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
