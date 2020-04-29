@@ -14,6 +14,7 @@ export const name = normalize(pkg.name);
 
 export const sources = pkg.exports
   ? Object.keys(pkg.exports).map(entry => {
+    if (entry === './package.json') return undefined;
     const exports = pkg.exports[entry];
     const dir = normalize(entry);
     return {
@@ -24,7 +25,7 @@ export const sources = pkg.exports
       types: exports.types,
       source: exports.source,
     };
-  }) : [{
+  }).filter(Boolean) : [{
     name,
     source: pkg.source || './src/index.ts'
   }];

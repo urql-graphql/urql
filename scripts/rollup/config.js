@@ -24,7 +24,8 @@ const input = settings.sources.reduce((acc, source) => {
             require: join(rel, source.main),
             types: join(rel, source.types),
             source: join(rel, source.source),
-          }
+          },
+          './package.json': './package.json'
         }
       }
     }));
