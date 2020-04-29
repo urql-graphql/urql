@@ -37,7 +37,8 @@ To prevent this, Graphcache will temporarily pause refetches that may overwrite 
 Once all mutations with optimistic updates complete however, all results will be applied at once,
 and refetched that may update the mutation data will be rerun.
 
-Let's look at an example, the cache has a list of an entity (for instance `Todos`), we click delete on four of them and we use `optimistic` to
+Let's look at an example. Suppose our app has a list of entities (for instance `Todo`s).
+We've written an optimistic update so that when the user deletes an item from the list, we make it disappear immediately.
 Usually, if the list is using a query with `cache-and-network`, this means that the optimistic update would automatically trigger a refetch of the list, which would make the deleted item reappear, although it shouldn't.
 
 To prevent this, Graphcache waits for the mutation to complete instead, as it detects that the query overlaps with the optimistic update, and retriggers the refetch only when all mutations have completed.
