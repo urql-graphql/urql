@@ -198,6 +198,7 @@ describe('Query', () => {
           }
           b: author {
             id
+            text
           }
         }
       }
@@ -216,7 +217,11 @@ describe('Query', () => {
           {
             __typename: 'Todo',
             id: '0',
-            a: null,
+            a: {
+              __typename: 'Author',
+              id: '1',
+            },
+            // Suppose the text field is missing but was required
             b: null,
           },
         ],
@@ -231,7 +236,7 @@ describe('Query', () => {
         {
           __typename: 'Todo',
           id: '0',
-          a: null,
+          a: null, // TODO: This should be fixed to not be null
           b: null,
         },
       ],
