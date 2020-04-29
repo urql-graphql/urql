@@ -13,8 +13,9 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
         forward,
         dispatchDebug(event) {
           dispatchDebug({
-            ...event,
             timestamp: Date.now(),
+            source: exchange.name,
+            ...event,
           });
         },
       }),
