@@ -144,6 +144,7 @@ const terserMinified = terser({
   ie8: false,
   toplevel: true,
   compress: {
+    keep_fnames: true,
     keep_infinity: true,
     pure_getters: true,
     passes: 10
