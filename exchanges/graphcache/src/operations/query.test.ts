@@ -42,7 +42,7 @@ describe('Query', () => {
       }
     );
 
-    // jest.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   it('test partial results', () => {
@@ -188,7 +188,7 @@ describe('Query', () => {
     });
   });
 
-  it.only('should allow subsequent read when first result was null', () => {
+  it('should allow subsequent read when first result was null', () => {
     const QUERY_WRITE = gql`
       query writeTodos {
         todos {
@@ -245,14 +245,7 @@ describe('Query', () => {
     ({ data } = query(store, { query: QUERY_READ }));
     expect(data).toEqual({
       __typename: 'query_root',
-      todos: [
-        {
-          __typename: 'Todo',
-          id: '0',
-          // TODO: By the spec this should actually be `null`
-          // text: null,
-        },
-      ],
+      todos: [null],
     });
   });
 });

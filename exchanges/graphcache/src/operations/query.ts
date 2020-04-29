@@ -424,6 +424,10 @@ const resolveResolverResult = (
     return data;
   } else if (result === null || result === undefined) {
     return result;
+  } else if (prevData === null) {
+    // If we've previously set this piece of data to be null,
+    // we skip it and return null immediately
+    return null;
   } else if (isDataOrKey(result)) {
     const data = (prevData || {}) as Data;
     return typeof result === 'string'
@@ -472,7 +476,9 @@ const resolveLink = (
     }
 
     return newLink;
-  } else if (link === null) {
+  } else if (link === null || prevData === null) {
+    // If the link is set to null or we previously set this piece of data to be null,
+    // we skip it and return null immediately
     return null;
   } else {
     return readSelection(ctx, link, select, (prevData || {}) as Data);
