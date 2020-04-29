@@ -32,15 +32,11 @@ describe('Subscription', () => {
       return h(Provider, {
         value: client,
         children: [
-          h(
-            // @ts-ignore
-            Subscription,
-            { query },
-            ({ data, fetching, error }) => {
-              props = { data, fetching, error };
-              return h(Test, {});
-            }
-          ),
+          // @ts-ignore
+          h(Subscription, { query }, ({ data, fetching, error }) => {
+            props = { data, fetching, error };
+            return h(Test, {});
+          }),
         ],
       });
     };

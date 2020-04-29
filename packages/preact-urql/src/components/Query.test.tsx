@@ -36,15 +36,11 @@ describe('Query', () => {
       return h(Provider, {
         value: client,
         children: [
-          h(
-            // @ts-ignore
-            Query,
-            { query, variables },
-            ({ data, fetching, error }) => {
-              props = { data, fetching, error };
-              return h(Test, {});
-            }
-          ),
+          // @ts-ignore
+          h(Query, { query, variables }, ({ data, fetching, error }) => {
+            props = { data, fetching, error };
+            return h(Test, {});
+          }),
         ],
       });
     };
