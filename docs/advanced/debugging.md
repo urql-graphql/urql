@@ -13,13 +13,8 @@ and those creating their own exchanges.
 The quickest way to debug `urql` is to use the [`urql` devtools Chrome and Firefox
 extension.](https://github.com/FormidableLabs/urql-devtools/).
 
-It displays consists of three tools, the "Explorer", the "Events" tab, and the "Request" tab, which
-allow you to:
-
-- visualize events on a timeline as they happen
-- filter and inspect events (which are more granular than Operations and Operation Results)
-- inspect all previously fetched data, as it would be seen by a cache exchange
-- trigger custom GraphQL queries on the running Client
+It offers tools to inspect internal ["Debug Events"](#debug-events) as they happen, to explore data
+as your app is seeing it, and to quickly trigger GraphQL queries.
 
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
 
