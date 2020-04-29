@@ -7,4 +7,4 @@
 '@urql/core': patch
 ---
 
-Adds source to our dispatchDebug calls to see what exchange has dispatched them
+Add `source` debug name to all `dispatchDebug` calls during build time to identify events by which exchange dispatched them
