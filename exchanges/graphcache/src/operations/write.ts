@@ -291,6 +291,9 @@ const writeSelection = (
   }
 };
 
+// A pattern to match typenames of types that are likely never keyable
+const KEYLESS_TYPE_RE = /^__|PageInfo|(Connection|Edge)$/;
+
 const writeField = (
   ctx: Context,
   select: SelectionSet,
@@ -324,9 +327,7 @@ const writeField = (
     ctx.store.keys[data.__typename] === undefined &&
     entityKey === null &&
     typeof typename === 'string' &&
-    !typename.endsWith('Connection') &&
-    !typename.endsWith('Edge') &&
-    typename !== 'PageInfo'
+    !KEYLESS_TYPE_RE.test(typename)
   ) {
     warn(
       'Invalid key: The GraphQL query at the field at `' +
