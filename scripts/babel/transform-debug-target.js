@@ -28,12 +28,15 @@ const plugin = ({ template, types: t }) => {
           path.node.callee.name === dispatchProperty
         ) {
           path.node[visited] = true;
-          path.node.arguments[0].properties.push(
-            t.objectProperty(
-              t.stringLiteral('source'),
-              t.stringLiteral(name)
-            )
-           );
+          if (t.isObjectExpression(path.node.arguments[0])) {
+            path.node.arguments[0].properties.push(
+              t.objectProperty(
+                t.stringLiteral('source'),
+                t.stringLiteral(name)
+              )
+             );
+          }
+
           path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
         }
       }
