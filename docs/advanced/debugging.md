@@ -8,9 +8,9 @@ order: 6
 We've tried to make debugging in `urql` as seamless as possible by creating tools for users of `urql`
 and those creating their own exchanges.
 
-## Browser Devtools
+## Devtools
 
-The quickest way to debug `urql` is to use the [`urql` devtools Chrome and Firefox
+The quickest way to debug `urql` is to use the [`urql` devtools]
 extension.](https://github.com/FormidableLabs/urql-devtools/).
 
 It offers tools to inspect internal ["Debug Events"](#debug-events) as they happen, to explore data
