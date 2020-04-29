@@ -35,6 +35,7 @@
 - ⚙️ Fully **customisable** behaviour [via "exchanges"](https://formidable.com/open-source/urql/docs/concepts/exchanges)
 - 🗂 Logical but simple default behaviour and document caching
 - 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://formidable.com/open-source/urql/docs/graphcache)
+- 🔬 Easy debugging with the [`urql` devtools browser extensions](https://formidable.com/open-source/urql/docs/advanced/debugging/)
 
 `urql` is a GraphQL client that exposes a set of helpers for several frameworks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
