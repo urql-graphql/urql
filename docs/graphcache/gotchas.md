@@ -5,12 +5,10 @@ order: 5
 
 # Gotchas
 
-When using the normalised cache there are a few out of the box features
-we need to be aware of, being aware of these features will make it easier
-to define best practices and to avoid pitfalls.
+Graphcache has a couple of hidden features behind the scenes, that handle how it deals with certain edge cases.
+Being aware of these features and edge cases makes it easier to define best practices and to avoid pitfalls.
 
-Most of the measures we'll cover are brought to life to ensure we can build out
-to a fully offline normalised cache.
+Most of these hidden features and mechanisms in this section exist to ensure consistent behavior for Graphcache's (future) offline and persistence features.
 
 ## Commutativity
 
@@ -30,7 +28,7 @@ then the data from the `authorsQuery` to ensure the actual data is consistent.
 ## Optimistic results & refetches
 
 Optimistic updates can temporarily update the data after incoming mutations, which will trigger on screen queries to update.
-However, if we also use [`cache-and-network`](https://formidable.com/open-source/urql/docs/basics/queries/#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
+However, if we also use [the `cache-and-network` request policy](../basics/queries.md#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
 causing an unintended state where the intended optimistic update is destroyed.
 Such an unintended refetch can also happen if after an optimistic update a query is refetched when it’s not or
 only partially available in the cache.
