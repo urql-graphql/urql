@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 2.4.2
+
+### Patch Changes
+
+- Add `source` debug name to all `dispatchDebug` calls during build time to identify events by which exchange dispatched them, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#780](https://github.com/FormidableLabs/urql/pull/780))
+- ⚠️ Fix Introspection Queries (or internal types in general) triggering lots of warnings for unkeyed entities, by [@kitten](https://github.com/kitten) (See [#779](https://github.com/FormidableLabs/urql/pull/779))
+- Updated dependencies (See [#780](https://github.com/FormidableLabs/urql/pull/780))
+  - @urql/core@1.11.7
+
 ## 2.4.1
 
 ### Patch Changes

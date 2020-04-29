@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.11.7
+
+### Patch Changes
+
+- Add `source` debug name to all `dispatchDebug` calls during build time to identify events by which exchange dispatched them, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#780](https://github.com/FormidableLabs/urql/pull/780))
+
 ## 1.11.6
 
 ### Patch Changes
