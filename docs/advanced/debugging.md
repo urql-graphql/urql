@@ -5,67 +5,142 @@ order: 6
 
 # Debugging
 
-We've tried to make debugging in `urql` as seamless as possible by creating tools for users of `urql` and those creating their own exchanges.
+We've tried to make debugging in `urql` as seamless as possible by creating tools for users of `urql`
+and those creating their own exchanges.
 
-## Debug events
+## Browser Devtools
 
-Debug events are a means for seeing what's going on inside of `urql` exchanges. Before getting started, here are a few things to be aware of.
+The quickest way to debug `urql` is to use the [`urql` devtools Chrome and Firefox
+extension.](https://github.com/FormidableLabs/urql-devtools/).
 
-### Anyone with client access can listen
+It displays consists of three tools, the "Explorer", the "Events" tab, and the "Request" tab, which
+allow you to:
 
-This includes the creator of an `urql` client and any of it's exchanges (although the latter is not advised).
-
-### Debug events are disabled in production
-
-Debug events are a fire-and-forget mechanism and should not be used as a means for messaging in your app.
-
-## Consuming debug events
-
-Debugging events can be inspected either graphically using our [devtools](https://github.com/FormidableLabs/urql-devtools) or manually by subscribing to events on the client.
-
-### Devtools
-
-The quickest way is going to be using our [devtools extension](https://github.com/FormidableLabs/urql-devtools/) which visualizes events on a timeline and provides tools to filter events, inspect the cache, and trigger custom queries via the running client.
+- visualize events on a timeline as they happen
+- filter and inspect events (which are more granular than Operations and Operation Results)
+- inspect all previously fetched data, as it would be seen by a cache exchange
+- trigger custom GraphQL queries on the running Client
 
 ![Urql Devtools Timeline](../assets/devtools-timeline.png)
 
-Visit [the repo](https://github.com/FormidableLabs/urql-devtools/) for instructions on getting started.
+### Installation and Setup
 
-> Note: Devtools is unfortunately not currently supported for React Native but we're looking into it!
+First, we can add the devtools by installing either the [Chrome
+Extension](https://chrome.google.com/webstore/detail/urql-devtools/mcfphkbpmkbeofnkjehahlmidmceblmm)
+or the [Firefox Addon](https://addons.mozilla.org/en-GB/firefox/addon/urql-devtools/).
 
-### Manual consumption of events
+Then we'll have to install the `@urql/devtools` package:
 
-For those not looking to use a GUI to view events, the client has a `subscribeToDebugTarget` function.
-
-As demonstrated below, the `subscribeToDebugTarget` function takes a callback which is called with every debug event that is dispatched.
-
-```ts
-const { unsubscribe } = client.subscribeToDebugTarget(event => {
-  if (event.source === 'dedupExchange') {
-    return;
-  }
-
-  console.log(event);
-});
-
-// ...
-// Unsubscribe from events
-unsubscribe();
+```sh
+yarn add --dev @urql/devtools
+# or
+npm install --save-dev @urql/devtools
 ```
 
-## Dispatching debug events
+And lastly, we'll need to add the `devtoolsExchange` to our list of exchanges. Typically we'd want
+to add it as either the first exchange or at least in front of the `dedupExchange`:
 
-Debug events are a means of sharing implementation details to consumers of an exchange.
+```js
+import { createClient, defaultExchanges } from 'urql';
+import { devtoolsExchange } from '@urql/devtools';
 
-#### Identify key events
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  // First `devtoolsExchange` then the rest:
+  exchanges: [devtoolsExchange, ...defaultExchanges],
+});
+```
 
-The first step is to identify key events of the exchange in question.
+[Read more about the `urql` devtools setup on its repository.](https://github.com/FormidableLabs/urql-devtools)
 
-For example, a [_fetchExchange_](https://github.com/FormidableLabs/urql/blob/master/packages/core/src/exchanges/fetch.ts) which triggers fetch requests may have an event of type `fetchRequest`.
+## Debug events
 
-#### Create an event type (optional)
+The "Debug Events" are internally what displays more information to the user on the devtools'
+"Events" tab than just [Operations](../api/core.md#operation) and [Operation
+Results](../api/core.md#operationresult).
 
-For type safe events, and to prevent conflicts with other exchanges, [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used.
+Events may be fired inside exchanges to add additional development logging to an exchange.
+The `fetchExchange` for instance will fire a `fetchRequest` event when a request is initiated and
+either a `fetchError` or `fetchSuccess` event when a result comes back from the GraphQL API.
+
+The [Devtools](#browser-devtools) aren't the only way to observe these internal events.
+Anyone can start listening to these events for debugging events by calling the
+[`Client`'s](../api/core.md#client) `client.subscribeToDebugTarget()` method.
+
+Unlike `Operation`s these events are fire-and-forget events that are only used for debugging. Hence,
+they shouldn't be used for anything but logging and not for messaging. **Debug events are also
+entirely disabled in production.**
+
+### Subscribing to Debug Events
+
+Internally the `devtoolsExchange` calls the `client.subscribeToDebugTarget`, but if we're looking to
+build custom debugging tools, it's also possible to call this function directly and to replace the
+`devtoolsExchange`.
+
+```
+const { unsubscribe } = client.subscribeToDebugTarget(event => {
+  if (event.source === 'dedupExchange')
+    return;
+  console.log(event); // { type, message, operation, data, source, timestamp }
+});
+```
+
+As demonstrated above, the `client.subscribeToDebugTarget` accepts a callback function and returns
+a subscription with an `unsubscribe` method. We've seen this pattern in the prior ["Stream Patterns"
+section.](../concepts/stream-patterns.md#the-wonka-library)
+
+## Adding your own Debug Events
+
+Debug events are a means of sharing implementation details to consumers of an exchange. If you're
+creating an exchange and want to share relevant information with the `devtools`, then you may want
+to start adding your own events.
+
+#### Dispatching an event
+
+In the ["Exchanges" section](../concepts/exchanges.md) we've learned about the [`ExchangeInput`
+object](../api/core.md#exchangeinput), which comes with a `client` and a `forward` property.
+It also contains a `dispatchDebug` property.
+
+It is called with an object containing the following properties:
+
+| Prop      | Type        | Description                                                                           |
+| --------- | ----------- | ------------------------------------------------------------------------------------- |
+| type      | `string`    | A unique type identifier for the Debug Event.                                         |
+| message   | `string`    | A human readable description of the event.                                            |
+| operation | `Operation` | The [`Operation`](../api/core.md#operation) that the event targets.                   |
+| data      | `?object`   | This is an optional payload to include any data that may become useful for debugging. |
+
+For instance, we may call `dispatchDebug` with our `fetchRequest` event. This is the event that the
+`fetchExchange` uses to notify us that a request has commenced:
+
+```ts
+export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
+  // ...
+
+  return ops$ => {
+    return pipe(
+      ops$,
+      // ...
+      mergeMap(operation => {
+        dispatchDebug({
+          type: 'fetchRequest',
+          message: 'A network request has been triggered',
+          operation,
+          data: {
+            /* ... */
+          },
+        });
+
+        // ...
+      })
+    );
+  };
+};
+```
+
+If we're adding new events that aren't included in the main `urql` repository and are using
+TypeScript, we may also declare a fixed type for the `data` property, so we can guarantee a
+consistent payload for our Debug Events. This also prevents accidental conflicts.
 
 ```ts
 // urql.d.ts
@@ -73,54 +148,26 @@ import '@urql/core';
 
 declare module '@urql/core' {
   interface DebugEventTypes {
-    fetchRequest: { targetUrl: string };
+    customEventType: { somePayload: string };
   }
 }
 ```
 
-#### Dispatch the event
-
-A `dispatchDebug` function is now passed to every exchange and is used to dispatch debug events.
-
-It is called with an object containing the following properties:
-
-- `type` - a unique identifier for the event type.
-- `message` - a human readable description of the event.
-- `operation` - the operation in scope when the event occured.
-- `data` _(optional)_ - any additional data useful for debugging
-
-Here, we call `dispatchDebug` with our `fetchRequest` event we declared earlier.
-
-```ts
-export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
-  // ...
-  dispatchDebug({
-    type: 'fetchRequest',
-    message: 'A network request has been triggered',
-    operation,
-    data: { targetUrl },
-  });
-};
-```
-
-> Note: for a real world example, see the [_fetchExchange_](https://github.com/FormidableLabs/urql/blob/master/packages/core/src/exchanges/fetch.ts).
+Read more about extending types, like `urql`'s `DebugEventTypes` on the [TypeScript docs on
+declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
 
 ### Tips
 
-In summary, here are a few do's and don'ts.
+Lastly, in summary, here are a few tips, dos, and don'ts that are important when we're adding new
+Debug Events to custom exchanges.
 
-#### ✅ Do share internal details
-
-Frequent debug messages on key events inside your exchange is very useful for consumers.
-
-#### ✅ Do create unique event types
-
-Key events should be easy to identify and differentiate, so have a unique name and data format for each unique event and use that format consistently.
-
-#### ❌ Don't listen to debug events inside your exchange
-
-While it is possible, there isn't any value in doing this. Use the exchange pipeline to communicate with other exchanges.
-
-#### ❌ Don't send warnings in debug events
-
-Debug **events** are intended to document **events** inside an exchange, not as a way to send messages to the user. Use `console.warn` to send alerts to the user.
+- ✅ **Share internal details**: Frequent debug messages on key events inside your exchange are very
+  useful when later inspecting them, e.g. in the `devtools`.
+- ✅ **Create unique event types** : Key events should be easily identifiable and have a unique
+  names.
+- ❌ **Don't listen to debug events inside your exchange**: While it's possible to call
+  `client.subscsubscribeToDebugTarget` in an exchange it's only valuable when creating a debugging
+  exchange, like the `devtoolsExchange`.
+- ❌ **Don't send warnings in debug events**: Informing your user about warnings isn't effective
+  when the event isn't seen. You should still rely on `console.warn` so all users see your important
+  warnings.
