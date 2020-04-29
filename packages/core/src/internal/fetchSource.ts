@@ -35,6 +35,7 @@ const executeFetch = (
       if (!('data' in result) && !('errors' in result)) {
         throw new Error('No Content');
       }
+
       dispatchDebug({
         type: result.errors && !result.data ? 'fetchError' : 'fetchSuccess',
         message: `A ${
