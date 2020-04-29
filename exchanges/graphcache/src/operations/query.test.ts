@@ -187,4 +187,65 @@ describe('Query', () => {
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
   });
+
+  it('should allow subsequent read when first result was null', () => {
+    const QUERY_WRITE = gql`
+      query writeTodos {
+        todos {
+          ...ValidRead
+        }
+      }
+
+      fragment ValidRead on Todo {
+        id
+      }
+    `;
+
+    const QUERY_READ = gql`
+      query getTodos {
+        todos {
+          ...MissingRead
+        }
+        todos {
+          id
+        }
+      }
+
+      fragment ValidRead on Todo {
+        id
+      }
+
+      fragment MissingRead on Todo {
+        id
+        text
+      }
+    `;
+
+    const store = new Store({
+      schema: alteredRoot,
+    });
+
+    let { data } = query(store, { query: QUERY_READ });
+    expect(data).toEqual(null);
+
+    write(
+      store,
+      { query: QUERY_WRITE },
+      {
+        todos: [
+          {
+            __typename: 'Todo',
+            id: '0',
+          },
+        ],
+        __typename: 'Query',
+      }
+    );
+
+    ({ data } = query(store, { query: QUERY_READ }));
+    expect(data).toEqual({
+      __typename: 'query_root',
+      todos: [null],
+    });
+  });
 });
