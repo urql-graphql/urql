@@ -391,7 +391,7 @@ const resolveResolverResult = (
   fieldName: string,
   key: string,
   select: SelectionSet,
-  prevData: void | Data | Data[],
+  prevData: void | null | Data | Data[],
   result: void | DataField
 ): DataField | void => {
   if (Array.isArray(result)) {
@@ -410,7 +410,7 @@ const resolveResolverResult = (
         joinKeys(key, `${i}`),
         select,
         // Get the inner previous data from prevData
-        prevData !== undefined ? prevData[i] : undefined,
+        prevData ? prevData[i] : undefined,
         result[i]
       );
 
@@ -425,7 +425,7 @@ const resolveResolverResult = (
   } else if (result === null || result === undefined) {
     return result;
   } else if (isDataOrKey(result)) {
-    const data = (prevData === undefined ? {} : prevData) as Data;
+    const data = (prevData || {}) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -448,7 +448,7 @@ const resolveLink = (
   typename: string,
   fieldName: string,
   select: SelectionSet,
-  prevData: void | Data | Data[]
+  prevData: void | null | Data | Data[]
 ): DataField | undefined => {
   if (Array.isArray(link)) {
     const { store } = ctx;
@@ -462,7 +462,7 @@ const resolveLink = (
         typename,
         fieldName,
         select,
-        prevData !== undefined ? prevData[i] : undefined
+        prevData ? prevData[i] : undefined
       );
       if (childLink === undefined && !_isListNullable) {
         return undefined;
@@ -475,12 +475,7 @@ const resolveLink = (
   } else if (link === null) {
     return null;
   } else {
-    return readSelection(
-      ctx,
-      link,
-      select,
-      prevData === undefined ? ({} as any) : prevData
-    );
+    return readSelection(ctx, link, select, (prevData || {}) as Data);
   }
 };
 

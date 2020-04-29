@@ -42,7 +42,7 @@ describe('Query', () => {
       }
     );
 
-    jest.resetAllMocks();
+    // jest.resetAllMocks();
   });
 
   it('test partial results', () => {
@@ -188,56 +188,69 @@ describe('Query', () => {
     });
   });
 
-  it('supports double-traversing null entities', () => {
-    const QUERY = gql`
-      query getTodos {
+  it.only('should allow subsequent read when first result was null', () => {
+    const QUERY_WRITE = gql`
+      query writeTodos {
         todos {
-          id
-          a: author {
-            id
-          }
-          b: author {
-            id
-            text
-          }
+          ...ValidRead
         }
+      }
+
+      fragment ValidRead on Todo {
+        id
       }
     `;
 
-    const store = new Store({ schema: alteredRoot });
+    const QUERY_READ = gql`
+      query getTodos {
+        todos {
+          ...MissingRead
+        }
+        todos {
+          id
+        }
+      }
 
-    let { data } = query(store, { query: QUERY });
+      fragment ValidRead on Todo {
+        id
+      }
+
+      fragment MissingRead on Todo {
+        id
+        text
+      }
+    `;
+
+    const store = new Store({
+      schema: alteredRoot,
+    });
+
+    let { data } = query(store, { query: QUERY_READ });
     expect(data).toEqual(null);
 
     write(
       store,
-      { query: QUERY },
+      { query: QUERY_WRITE },
       {
         todos: [
           {
             __typename: 'Todo',
             id: '0',
-            a: {
-              __typename: 'Author',
-              id: '1',
-            },
-            // Suppose the text field is missing but was required
-            b: null,
           },
         ],
-        __typename: 'query_root',
+        __typename: 'Query',
       }
     );
 
-    ({ data } = query(store, { query: QUERY }));
+    ({ data } = query(store, { query: QUERY_READ }));
     expect(data).toEqual({
       __typename: 'query_root',
       todos: [
         {
           __typename: 'Todo',
           id: '0',
-          a: null, // TODO: This should be fixed to not be null
-          b: null,
+          // TODO: By the spec this should actually be `null`
+          // text: null,
         },
       ],
     });
