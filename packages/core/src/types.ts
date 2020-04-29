@@ -1,4 +1,4 @@
-import { DocumentNode } from 'graphql';
+import { DocumentNode, GraphQLError } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -103,7 +103,11 @@ export interface DebugEventTypes {
   fetchSuccess: {
     url: string;
     fetchOptions: RequestInit;
-    value: object;
+    value: {
+      data?: object;
+      errors?: GraphQLError[];
+      extensions?: Record<string, any>;
+    };
   };
   fetchError: {
     url: string;

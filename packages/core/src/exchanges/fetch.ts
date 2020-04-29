@@ -46,20 +46,35 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
           makeFetchSource(operation, url, fetchOptions),
           takeUntil(teardown$),
           onPush(result => {
-            const error = !result.data ? result.error : undefined;
-
-            dispatchDebug({
-              type: error ? 'fetchError' : 'fetchSuccess',
-              message: `A ${
-                error ? 'failed' : 'successful'
-              } fetch response has been returned.`,
-              operation,
-              data: {
-                url,
-                fetchOptions,
-                value: error || result,
-              },
-            });
+            if (!result.data && result.error && result.error.networkError) {
+              dispatchDebug({
+                type: 'fetchError',
+                message: 'A failed fetch response has been returned.',
+                operation,
+                data: {
+                  url,
+                  fetchOptions,
+                  value: result.error.networkError,
+                },
+              });
+            } else {
+              dispatchDebug({
+                type: 'fetchSuccess',
+                message: 'A successful fetch response has been returned.',
+                operation,
+                data: {
+                  url,
+                  fetchOptions,
+                  value: {
+                    data: result.data,
+                    errors: result.error
+                      ? result.error.graphQLErrors
+                      : undefined,
+                    extensions: result.extensions,
+                  },
+                },
+              });
+            }
           })
         );
       })

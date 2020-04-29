@@ -134,23 +134,37 @@ const makePersistedFetchSource = (
       const persistFail =
         result.error &&
         (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
-      const error = !result.data ? result.error : undefined;
 
-      dispatchDebug({
-        // TODO: Assign a new name to this once @urql/devtools supports it
-        type: persistFail || error ? 'fetchError' : 'fetchSuccess',
-        message: persistFail
-          ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
-          : `A ${
-              error ? 'failed' : 'successful'
-            } fetch response has been returned.`,
-        operation,
-        data: {
-          url,
-          fetchOptions,
-          value: persistFail ? result.error! : error || result,
-        },
-      });
+      if (persistFail || (!result.data && result.error)) {
+        dispatchDebug({
+          // TODO: Assign a new name to this once @urql/devtools supports it
+          type: 'fetchError',
+          message: persistFail
+            ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
+            : 'A failed fetch response has been returned.',
+          operation,
+          data: {
+            url,
+            fetchOptions,
+            value: result.error!.networkError || result.error!,
+          },
+        });
+      } else {
+        dispatchDebug({
+          type: 'fetchSuccess',
+          message: 'A successful fetch response has been returned.',
+          operation,
+          data: {
+            url,
+            fetchOptions,
+            value: {
+              data: result.data,
+              errors: result.error ? result.error.graphQLErrors : undefined,
+              extensions: result.extensions,
+            },
+          },
+        });
+      }
     })
   );
 };
