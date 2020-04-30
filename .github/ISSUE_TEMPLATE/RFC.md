@@ -17,8 +17,8 @@ labels: "future \U0001F52E"
 ## Summary
 
 <!--
-  Describe in a couple of words WHAT you're proposing.
-  If relevant, include WHY this should be addressed now.
+  Describe in a couple of words *what* you're proposing.
+  If relevant, include *why* this should be addressed now.
   The problem should be clearly stated and the solution
   should be summarised.
 -->
@@ -27,17 +27,16 @@ labels: "future \U0001F52E"
 
 <!--
   Explain the solution you're proposing in detail.
-  HOW will this change be implemented?
-  HOW does it work?
+  *How* will this change be implemented, and how does it work?
 -->
 
 ## Requirements
 
 <!--
-  This section is OPTIONAL.
+  This section is *optional*.
   But if your proposed solution has multiple ways
   of being implemented, you don't want to state how
   it may be implemented, or you don't know yet how
   it will be implemented, then:
-  List what the implementation needs to do at the very least.
+  *List* what the implementation needs to achieve to fulfil this RFC;
 -->
