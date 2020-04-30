@@ -1,6 +1,6 @@
 ---
 name: 'RFC'
-about: Create a proposal for an enhancement and start a discussion
+about: Propose an enhancement / feature and start a discussion
 title: 'RFC: Your Proposal'
 labels: "future \U0001F52E"
 ---
