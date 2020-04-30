@@ -81,6 +81,7 @@ export class Client {
   url: string;
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
+  exchanges: Exchange[];
   suspense: boolean;
   preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
@@ -113,6 +114,8 @@ export class Client {
     this.requestPolicy = opts.requestPolicy || 'cache-first';
     this.preferGetMethod = !!opts.preferGetMethod;
     this.maskTypename = !!opts.maskTypename;
+    this.exchanges =
+      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
 
     // This subject forms the input of operations; executeOperation may be
     // called to dispatch a new operation on the subject
@@ -134,12 +137,9 @@ export class Client {
       }
     };
 
-    const exchanges =
-      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
     // All exchange are composed into a single one and are called using the constructed client
     // and the fallback exchange stream
-    const composedExchange = composeExchanges(exchanges);
+    const composedExchange = composeExchanges(this.exchanges);
 
     // All exchanges receive inputs using which they can forward operations to the next exchange
     // and receive a stream of results in return, access the client, or dispatch debugging events
