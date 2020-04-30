@@ -8,6 +8,10 @@ self.addEventListener('install', (event: any) => {
   event.waitUntil(self.skipWaiting());
 });
 
+self.addEventListener('activate', (event) => {
+  self.clients.claim();
+});
+
 self.addEventListener('fetch', (event: any) => {
   const request = event.request;
 
