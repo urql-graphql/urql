@@ -14613,9 +14613,9 @@ winston@0.8.x:
     stack-trace "0.0.x"
 
 wonka@^4.0.10:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.10.tgz#9739002b18fbc09dfc6cf1986743d35cdbd2fbe9"
-  integrity sha512-mPBDKeU69lgH+OPd2x+mAb/ARwe2gMhRnQR05LDbZ4U7psq3l6m4QL38ET/JhYr0wtBWkHvW6PYTnqmwqqi76Q==
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.13.tgz#8d188160bd5742870c78ede7a4eba686d089a33f"
+  integrity sha512-aWg92IVvbP/kp+q9rw+k/Uw3C/S2J0dTDNhEhivGVH3GXJZgpFk2nuyVtiS7Y1d0UG3m4jvOrR7bPXim6D/TBg==
 
 word-wrap@~1.2.3:
   version "1.2.3"
