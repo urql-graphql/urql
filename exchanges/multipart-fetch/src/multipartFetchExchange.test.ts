@@ -179,7 +179,7 @@ describe('on teardown', () => {
       subscribe(fail)
     );
 
-    unsubscribe(undefined);
+    unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(0);
     expect(abort).toHaveBeenCalledTimes(1);
   });
@@ -195,7 +195,7 @@ describe('on teardown', () => {
 
     await Promise.resolve();
 
-    unsubscribe(undefined);
+    unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(abort).toHaveBeenCalledTimes(1);
   });

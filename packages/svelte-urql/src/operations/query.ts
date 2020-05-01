@@ -57,8 +57,7 @@ export const query = <T = any, V = object>(
 
   return {
     subscribe(onValue) {
-      const { unsubscribe } = pipe(queryResult$, subscribe(onValue));
-      return unsubscribe as () => void;
+      return pipe(queryResult$, subscribe(onValue)).unsubscribe;
     },
   };
 };
