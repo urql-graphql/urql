@@ -30,6 +30,7 @@ export default {
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
     devDist: 'node_modules/.cache/react-static/dist/',
     temp: 'node_modules/.cache/react-static/temp/',
+    public: 'public', // The public directory (files copied to dist during build)
   },
 
   basePath: 'open-source/urql',
