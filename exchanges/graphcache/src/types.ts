@@ -177,6 +177,7 @@ export interface SerializedEntries {
 export interface StorageAdapter {
   read(): Promise<SerializedEntries>;
   write(data: SerializedEntries): Promise<void>;
+  onOnline?(cb: () => void): any;
 }
 
 export type Dependencies = Record<string, true>;
