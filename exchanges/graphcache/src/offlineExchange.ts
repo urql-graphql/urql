@@ -1,6 +1,13 @@
 import { pipe, filter } from 'wonka';
-import { SelectionNode } from 'graphql';
-import { Operation, Exchange, CombinedError } from '@urql/core';
+import { print, SelectionNode } from 'graphql';
+
+import {
+  Operation,
+  Exchange,
+  CombinedError,
+  createRequest,
+  stringifyVariables,
+} from '@urql/core';
 
 import {
   getMainOperation,
@@ -56,9 +63,39 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
   client,
   dispatchDebug,
 }) => {
-  if (opts.storage && opts.storage.onOnline) {
+  const { storage } = opts;
+
+  if (
+    storage &&
+    storage.onOnline &&
+    storage.readMetadata &&
+    storage.writeMetadata
+  ) {
     const optimisticMutations = opts.optimistic || {};
     const failedQueue: Operation[] = [];
+
+    const updateMetadata = () => {
+      const mutations = failedQueue.map(op => ({
+        query: print(op.query),
+        variables: op.variables,
+      }));
+      storage.writeMetadata!(stringifyVariables(mutations));
+    };
+
+    let _flushing = false;
+    const flushQueue = () => {
+      if (!_flushing) {
+        _flushing = true;
+
+        let operation: void | Operation;
+        while ((operation = failedQueue.shift())) {
+          operation = client.createRequestOperation('mutation', operation);
+          client.dispatchOperation(operation);
+        }
+
+        updateMetadata();
+      }
+    };
 
     forward = ops$ => {
       return pipe(
@@ -70,6 +107,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
             failedQueue.push(res.operation);
+            updateMetadata();
             return false;
           }
 
@@ -78,15 +116,22 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
       );
     };
 
-    const flushQueue = () => {
-      for (let i = 0; i < failedQueue.length; i++) {
-        let operation = failedQueue[i];
-        operation = client.createRequestOperation('mutation', operation);
-        client.dispatchOperation(operation);
-      }
-    };
+    storage.onOnline(flushQueue);
+    storage.readMetadata().then(json => {
+      try {
+        const metadata = JSON.parse(json);
+        const mutations = Array.isArray(metadata.mutations)
+          ? metadata.mutations
+          : [];
+        failedQueue.push(
+          ...mutations.map((queued: any) =>
+            createRequest(queued.query, queued.variables)
+          )
+        );
+      } catch (_err) {}
 
-    opts.storage.onOnline(flushQueue);
+      flushQueue();
+    });
   }
 
   return cacheExchange(opts)({
