@@ -1,18 +1,8 @@
-<h2 align="center">@urql/exchange-suspense</h2>
+<h2 align="center">@urql/exchange-suspense <strong>(deprecated)</strong></h2>
 <p align="center">
 <strong>An exchange for client-side React Suspense support in <code>urql</code></strong>
-<br /><br />
-<a href="https://npmjs.com/package/@urql/exchange-suspense">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-suspense.svg" />
-</a>
-<a href="https://bundlephobia.com/result?p=@urql/exchange-suspense">
-  <img alt="Minified gzip size"
-  src="https://img.shields.io/bundlephobia/minzip/@urql/exchange-suspense.svg?label=gzip%20size" />
-</a>
-<a href="https://github.com/FormidableLabs/urql-exchange-suspense#maintenance-status">
-  <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-experimental-blueviolet.svg" />
-</a>
 </p>
+<br />
 
 `@urql/exchange-suspense` is an exchange for the [`urql`](../../README.md) GraphQL client that allows the
 use of React Suspense on the client-side with `urql`'s built-in suspense mode.
@@ -23,10 +13,13 @@ suspense on the server.
 But since `<Suspense>` is mainly intended for client-side use it made sense to build and publish
 this exchange, which allows you to try out `urql` and suspense in your React app!
 
-> ⚠️ Note: React's Suspense feature is currently unstable and may still change.
-> This exchange is experimental and demonstrates how `urql` already supports and
-> interacts with client-side suspense and how it may behave in the future, when React
-> Suspense ships and becomes stable. You may use it, but do so at your own risk!
+> ⚠️ **\*Deprecated**:
+> This package is deprecated! Usage of client-side suspense with `urql` isn't recommended anymore
+> and this packages has been marked as _deprecated_ after being _experimental_, since all it allows
+> for is to use Suspense as a fancier loading boundary, which isn't its intended use.
+> This exchange may still be useful when used with care, but it's worth keeping in mind that the
+> suspense patterns in `urql` for the client-side may change.
+> Suspense-mode usage for SSR remains unchanged and undeprecated however.
 
 ## Quick Start Guide
 
@@ -157,7 +150,3 @@ const client = createClient({
   ].filter(Boolean),
 });
 ```
-
-## Maintenance Status
-
-**Experimental:** This project is quite new. We're not sure what our ongoing maintenance plan for this project will be. Bug reports, feature requests and pull requests are welcome. If you like this project, let us know by starring the repo!
