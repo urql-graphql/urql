@@ -554,7 +554,7 @@ export const persistData = () => {
     });
 
     currentIgnoreOptimistic = false;
-    currentData!.storage.write(entries);
+    currentData!.storage.writeData(entries);
     currentData!.persist.clear();
   }
 };
