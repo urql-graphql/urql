@@ -153,7 +153,7 @@ it('resolves missing, nullable arguments on fields', () => {
     }
   `;
 
-  const writeData = {
+  const dataToWrite = {
     __typename: 'Query',
     todo: {
       __typename: 'Todo',
@@ -161,9 +161,9 @@ it('resolves missing, nullable arguments on fields', () => {
     },
   };
 
-  write(store, { query: GetWithVariables }, writeData);
+  write(store, { query: GetWithVariables }, dataToWrite);
   const { data } = query(store, { query: GetWithoutVariables });
-  expect(data).toEqual(writeData);
+  expect(data).toEqual(dataToWrite);
 });
 
 it('should link entities', () => {
