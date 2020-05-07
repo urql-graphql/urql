@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0
+
+### Minor Changes
+
+- Add deprecation notice, as exchange isn't as useful as expected and unstable, by [@kitten](https://github.com/kitten) (See [#789](https://github.com/FormidableLabs/urql/pull/789))
+
+### Patch Changes
+
+- ⚠️ Fix subscription operations from being affected by the `suspenseExchange`, by [@kitten](https://github.com/kitten) (See [#789](https://github.com/FormidableLabs/urql/pull/789))
+
 ## 1.8.9
 
 ### Patch Changes

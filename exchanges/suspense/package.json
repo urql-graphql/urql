@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-suspense",
-  "version": "1.8.9",
+  "version": "1.9.0",
   "description": "An exchange for client-side React Suspense support in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
