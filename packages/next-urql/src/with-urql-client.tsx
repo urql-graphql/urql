@@ -17,7 +17,7 @@ function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
-export function withUrqlClient(getClientConfig: NextUrqlClientConfig) {
+export function withUrqlClient(getClientConfig: NextUrqlClientConfig, ssr?: boolean) {
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -52,7 +52,7 @@ export function withUrqlClient(getClientConfig: NextUrqlClientConfig) {
     // Set the displayName to indicate use of withUrqlClient.
     withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
-    if (AppOrPage.getInitialProps) {
+    if (AppOrPage.getInitialProps || ssr) {
       withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const { AppTree } = appOrPageCtx;
 
