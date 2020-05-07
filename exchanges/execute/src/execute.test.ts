@@ -22,9 +22,11 @@ beforeEach(() => {
 
 describe('on operation', () => {
   it('calls execute with args', async () => {
+    const contextValue = 'USER_ID=123';
+
     await pipe(
       fromValue(queryOperation),
-      executeExchange({ schema })(exchangeArgs),
+      executeExchange({ schema, contextValue })(exchangeArgs),
       take(1),
       toPromise
     );
@@ -34,7 +36,30 @@ describe('on operation', () => {
       schema,
       queryOperation.query,
       undefined,
+      contextValue,
+      queryOperation.variables,
+      queryOperation.operationName,
       undefined,
+      undefined
+    );
+  });
+
+  it('calls execute after executing contextValue as a function', async () => {
+    const contextValue = () => 'CALCULATED_USER_ID=' + 8 * 10;
+
+    await pipe(
+      fromValue(queryOperation),
+      executeExchange({ schema, contextValue })(exchangeArgs),
+      take(1),
+      toPromise
+    );
+
+    expect(mocked(execute)).toBeCalledTimes(1);
+    expect(mocked(execute)).toBeCalledWith(
+      schema,
+      queryOperation.query,
+      undefined,
+      'CALCULATED_USER_ID=80',
       queryOperation.variables,
       queryOperation.operationName,
       undefined,

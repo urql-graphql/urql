@@ -39,7 +39,7 @@ export const executeExchange = ({
             schema,
             operation.query,
             rootValue,
-            contextValue,
+            typeof contextValue === 'function' ? contextValue() : contextValue,
             operation.variables,
             operation.operationName,
             fieldResolver,
