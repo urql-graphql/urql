@@ -10,7 +10,7 @@ export interface FetchBody {
   extensions: undefined | Record<string, any>;
 }
 
-export const getOperationName = (query: DocumentNode): string | undefined => {
+const getOperationName = (query: DocumentNode): string | undefined => {
   for (let i = 0, l = query.definitions.length; i < l; i++) {
     const node = query.definitions[i];
     if (node.kind === Kind.OPERATION_DEFINITION && node.name) {

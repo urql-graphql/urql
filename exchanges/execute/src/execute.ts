@@ -1,12 +1,22 @@
 import { pipe, share, filter, map, fromPromise, mergeMap, merge } from 'wonka';
 import {
+  DocumentNode,
+  Kind,
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
   execute,
 } from 'graphql';
 import { Exchange, makeResult, makeErrorResult, Operation } from '@urql/core';
-import { getOperationName } from '@urql/core/internal';
+
+export const getOperationName = (query: DocumentNode): string | undefined => {
+  for (let i = 0, l = query.definitions.length; i < l; i++) {
+    const node = query.definitions[i];
+    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
+      return node.name.value;
+    }
+  }
+};
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
