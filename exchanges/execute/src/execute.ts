@@ -14,6 +14,9 @@ interface ExecuteExchangeArgs {
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
 }
+
+const SUPPORTED_OPERATION_TYPES = ['query', 'mutation'];
+
 /** Exchange for executing queries locally on a schema using graphql-js. */
 export const executeExchange = ({
   schema,
@@ -24,34 +27,38 @@ export const executeExchange = ({
 }: ExecuteExchangeArgs): Exchange => ({ forward }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
-    const targetOperationTypes = ['query', 'mutation'];
 
     const executedOps$ = pipe(
       sharedOps$,
-      filter(f => targetOperationTypes.includes(f.operationName)),
-      map(async o => {
+      filter(operation =>
+        SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
+      ),
+      map(async operation => {
         try {
-          const r = await execute(
+          const result = await execute(
             schema,
-            o.query,
+            operation.query,
             rootValue,
             contextValue,
-            o.variables,
-            o.operationName,
+            operation.variables,
+            operation.operationName,
             fieldResolver,
             typeResolver
           );
-          return makeResult(o, r);
+          return makeResult(operation, result);
         } catch (err) {
-          return makeErrorResult(o, err);
+          return makeErrorResult(operation, err);
         }
       }),
-      mergeMap(p => fromPromise(p))
+      mergeMap(pipe => fromPromise(pipe))
     );
 
     const forwardedOps$ = pipe(
       sharedOps$,
-      filter(o => !targetOperationTypes.includes(o.operationName)),
+      filter(
+        operation =>
+          !SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
+      ),
       forward
     );
 
