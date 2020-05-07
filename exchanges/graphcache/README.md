@@ -1,20 +1,6 @@
 <h2 align="center">@urql/exchange-graphcache</h2>
-<p align="center">
-<strong>An exchange for normalized caching support in <code>urql</code></strong>
-<br /><br />
-<a href="https://npmjs.com/package/@urql/exchange-graphcache">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-graphcache.svg" />
-</a>
-<a href="https://bundlephobia.com/result?p=@urql/exchange-graphcache">
-  <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/@urql/exchange-graphcache.svg?label=gzip%20size" />
-</a>
-<a href="https://github.com/FormidableLabs/urql-exchange-graphcache#maintenance-status">
-  <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
-</a>
-<a href="https://spectrum.chat/urql">
-  <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
-</a>
-</p>
+
+<p align="center"><strong>An exchange for normalized caching support in <code>urql</code></strong></p>
 
 `@urql/exchange-graphcache` is a normalized cache exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client.
 This is a drop-in replacement for the default `cacheExchange` that, instead of document
