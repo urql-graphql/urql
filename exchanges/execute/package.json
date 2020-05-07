@@ -19,17 +19,18 @@
     "formidablelabs",
     "exchanges"
   ],
-  "main": "dist/urql-exchange-execute.cjs.js",
-  "module": "dist/urql-exchange-execute.esm.js",
+  "main": "dist/urql-exchange-execute",
+  "module": "dist/urql-exchange-execute.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "dist/urql-exchange-execute.esm.js",
-      "require": "dist/urql-exchange-execute.cjs.js",
-      "types": "dist/types/index.d.ts",
-      "source": "src/index.ts"
-    }
+      "import": "./dist/urql-exchange-execute.mjs",
+      "require": "./dist/urql-exchange-execute.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "LICENSE",
@@ -39,23 +40,28 @@
   ],
   "scripts": {
     "test": "jest",
+    "clean": "rimraf dist extras",
     "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.js",
-    "prepare": "../../scripts/prepare/index.js",
-    "prepublishOnly": "run-s clean test build"
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
   },
   "jest": {
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "wonka": "^3.2.1 || ^4.0.0",
-    "@urql/core": ">=1.9.0"
+    "@urql/core": ">=1.11.7",
+    "wonka": "^4.0.10"
   },
   "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0"
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
   },
   "devDependencies": {
-    "graphql": "^14.5.8",
+    "graphql": "^15.0.0",
     "graphql-tag": "^2.10.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
