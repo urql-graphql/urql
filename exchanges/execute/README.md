@@ -30,7 +30,7 @@ npm install --save @urql/exchange-execute
 ```
 
 You'll then need to add the `executeExchange`, that this package exposes, to your `urql` Client,
-by replacing the default cache exchange with it:
+by replacing the default fetch exchange with it:
 
 ```js
 import { createClient, dedupExchange, cacheExchange } from 'urql';
@@ -41,6 +41,7 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
+    // Replace the default fetchExchange with the new one.
     executeExchange({
       /* config */
     }),
