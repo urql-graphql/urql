@@ -8,11 +8,10 @@
     "exchanges/multipart-fetch",
     "exchanges/persisted-fetch",
     "exchanges/retry",
-    "exchanges/suspense"
+    "exchanges/suspense",
+    "exchanges/execute"
   ],
-  "sandboxes": [
-    "urql-issue-template-client-iui0o"
-  ],
+  "sandboxes": ["urql-issue-template-client-iui0o"],
   "buildCommand": "build",
   "silent": true
 }
