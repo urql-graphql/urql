@@ -1,20 +1,6 @@
 <h2 align="center">@urql/exchange-execute</h2>
-<p align="center">
-<strong>An exchange for executing queries against a local schema in <code>urql</code></strong>
-<br /><br />
-<a href="https://npmjs.com/package/@urql/exchange-graphcache">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/@urql/exchange-graphcache.svg" />
-</a>
-<a href="https://bundlephobia.com/result?p=@urql/exchange-graphcache">
-  <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/@urql/exchange-graphcache.svg?label=gzip%20size" />
-</a>
-<a href="https://github.com/FormidableLabs/urql-exchange-graphcache#maintenance-status">
-  <img alt="Maintenance Status" src="https://img.shields.io/badge/maintenance-active-green.svg" />
-</a>
-<a href="https://spectrum.chat/urql">
-  <img alt="Spectrum badge" src="https://withspectrum.github.io/badge/badge.svg" />
-</a>
-</p>
+
+<p align="center"><strong>An exchange for executing queries against a local schema in <code>urql</code></strong></p>
 
 `@urql/exchange-execute` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client which executes queries against a local schema.
 This is a replacement for the default _fetchExchange_ which sends queries over HTTP/S to be executed remotely.

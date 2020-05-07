@@ -5,12 +5,13 @@ import {
   GraphQLTypeResolver,
   execute,
 } from 'graphql';
-import { Exchange, makeResult, makeErrorResult } from '@urql/core';
+import { Exchange, makeResult, makeErrorResult, Operation } from '@urql/core';
+import { getOperationName } from '@urql/core/internal';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
   rootValue?: any;
-  contextValue?: any;
+  context?: ((op: Operation) => void) | any;
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
 }
@@ -21,7 +22,7 @@ const SUPPORTED_OPERATION_TYPES = ['query', 'mutation'];
 export const executeExchange = ({
   schema,
   rootValue,
-  contextValue,
+  context,
   fieldResolver,
   typeResolver,
 }: ExecuteExchangeArgs): Exchange => ({ forward }) => {
@@ -30,18 +31,20 @@ export const executeExchange = ({
 
     const executedOps$ = pipe(
       sharedOps$,
-      filter(operation =>
+      filter((operation: Operation) =>
         SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
       ),
-      map(async operation => {
+      map(async (operation: Operation) => {
         try {
+          const calculatedContext =
+            typeof context === 'function' ? context(operation) : context;
           const result = await execute(
             schema,
             operation.query,
             rootValue,
-            typeof contextValue === 'function' ? contextValue() : contextValue,
+            calculatedContext,
             operation.variables,
-            operation.operationName,
+            getOperationName(operation.query),
             fieldResolver,
             typeResolver
           );
@@ -56,7 +59,7 @@ export const executeExchange = ({
     const forwardedOps$ = pipe(
       sharedOps$,
       filter(
-        operation =>
+        (operation: Operation) =>
           !SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
       ),
       forward

@@ -6,12 +6,15 @@ import { pipe, fromValue, toPromise, take, makeSubject } from 'wonka';
 import { mocked } from 'ts-jest/utils';
 import { queryOperation } from '@urql/core/test-utils';
 import { makeErrorResult } from '@urql/core';
+import { getOperationName } from '@urql/core/internal';
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {
   forward: a => a,
   client: {},
 } as any;
+
+const expectedOperationName = getOperationName(queryOperation.query);
 
 beforeEach(jest.clearAllMocks);
 
@@ -22,11 +25,11 @@ beforeEach(() => {
 
 describe('on operation', () => {
   it('calls execute with args', async () => {
-    const contextValue = 'USER_ID=123';
+    const context = 'USER_ID=123';
 
     await pipe(
       fromValue(queryOperation),
-      executeExchange({ schema, contextValue })(exchangeArgs),
+      executeExchange({ schema, context })(exchangeArgs),
       take(1),
       toPromise
     );
@@ -36,20 +39,23 @@ describe('on operation', () => {
       schema,
       queryOperation.query,
       undefined,
-      contextValue,
+      context,
       queryOperation.variables,
-      queryOperation.operationName,
+      expectedOperationName,
       undefined,
       undefined
     );
   });
 
-  it('calls execute after executing contextValue as a function', async () => {
-    const contextValue = () => 'CALCULATED_USER_ID=' + 8 * 10;
+  it('calls execute after executing context as a function', async () => {
+    const context = operation => {
+      expect(operation).toBe(queryOperation);
+      return 'CALCULATED_USER_ID=' + 8 * 10;
+    };
 
     await pipe(
       fromValue(queryOperation),
-      executeExchange({ schema, contextValue })(exchangeArgs),
+      executeExchange({ schema, context })(exchangeArgs),
       take(1),
       toPromise
     );
@@ -61,7 +67,7 @@ describe('on operation', () => {
       undefined,
       'CALCULATED_USER_ID=80',
       queryOperation.variables,
-      queryOperation.operationName,
+      expectedOperationName,
       undefined,
       undefined
     );
