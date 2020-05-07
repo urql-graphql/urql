@@ -1,11 +1,22 @@
 jest.mock('graphql');
 
+import { fetchExchange } from 'urql';
 import { executeExchange, getOperationName } from './execute';
 import { execute, print } from 'graphql';
-import { pipe, fromValue, toPromise, take, makeSubject } from 'wonka';
+import {
+  pipe,
+  fromValue,
+  toPromise,
+  take,
+  makeSubject,
+  empty,
+  Source,
+} from 'wonka';
 import { mocked } from 'ts-jest/utils';
 import { queryOperation } from '@urql/core/test-utils';
 import { makeErrorResult } from '@urql/core';
+import { Client } from '@urql/core/client';
+import { OperationResult } from '@urql/core/types';
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {
@@ -15,11 +26,18 @@ const exchangeArgs = {
 
 const expectedOperationName = getOperationName(queryOperation.query);
 
+const fetchMock = (global as any).fetch as jest.Mock;
+afterEach(() => {
+  fetchMock.mockClear();
+});
+
+const mockHttpResponseData = { key: 'value' };
+
 beforeEach(jest.clearAllMocks);
 
 beforeEach(() => {
   mocked(print).mockImplementation(a => a as any);
-  mocked(execute).mockResolvedValue({ data: { key: 'value' } });
+  mocked(execute).mockResolvedValue({ data: mockHttpResponseData });
 });
 
 describe('on operation', () => {
@@ -71,6 +89,38 @@ describe('on operation', () => {
       undefined
     );
   });
+
+  it('should return the same data as the fetch exchange', async () => {
+    const context = 'USER_ID=123';
+
+    const responseFromExecuteExchange = await pipe(
+      fromValue(queryOperation),
+      executeExchange({ schema, context })(exchangeArgs),
+      take(1),
+      toPromise
+    );
+
+    fetchMock.mockResolvedValue({
+      status: 200,
+      json: jest.fn().mockResolvedValue({ data: mockHttpResponseData }),
+    });
+
+    const responseFromFetchExchange = await pipe(
+      fromValue(queryOperation),
+      fetchExchange({
+        dispatchDebug: jest.fn(),
+        forward: () => empty as Source<OperationResult>,
+        client: {} as Client,
+      }),
+      toPromise
+    );
+
+    expect(responseFromExecuteExchange.data).toEqual(
+      responseFromFetchExchange.data
+    );
+    expect(mocked(execute)).toBeCalledTimes(1);
+    expect(fetchMock).toBeCalledTimes(1);
+  });
 });
 
 describe('on success response', () => {
@@ -84,7 +134,7 @@ describe('on success response', () => {
 
     expect(response).toEqual({
       operation: queryOperation,
-      data: { key: 'value' },
+      data: mockHttpResponseData,
     });
   });
 });
