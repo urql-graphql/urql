@@ -1,4 +1,14 @@
-import { pipe, share, filter, map, fromPromise, mergeMap, merge } from 'wonka';
+import {
+  pipe,
+  share,
+  filter,
+  fromPromise,
+  takeUntil,
+  onEnd,
+  mergeMap,
+  merge,
+} from 'wonka';
+
 import {
   DocumentNode,
   Kind,
@@ -7,6 +17,7 @@ import {
   GraphQLTypeResolver,
   execute,
 } from 'graphql';
+
 import { Exchange, makeResult, makeErrorResult, Operation } from '@urql/core';
 
 export const getOperationName = (query: DocumentNode): string | undefined => {
@@ -26,8 +37,6 @@ interface ExecuteExchangeArgs {
   typeResolver?: GraphQLTypeResolver<any, any>;
 }
 
-const SUPPORTED_OPERATION_TYPES = ['query', 'mutation'];
-
 /** Exchange for executing queries locally on a schema using graphql-js. */
 export const executeExchange = ({
   schema,
@@ -41,37 +50,60 @@ export const executeExchange = ({
 
     const executedOps$ = pipe(
       sharedOps$,
-      filter((operation: Operation) =>
-        SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
-      ),
-      map(async (operation: Operation) => {
-        try {
-          const calculatedContext =
-            typeof context === 'function' ? context(operation) : context;
-          const result = await execute(
-            schema,
-            operation.query,
-            rootValue,
-            calculatedContext,
-            operation.variables,
-            getOperationName(operation.query),
-            fieldResolver,
-            typeResolver
-          );
-          return makeResult(operation, result);
-        } catch (err) {
-          return makeErrorResult(operation, err);
-        }
+      filter((operation: Operation) => {
+        return (
+          operation.operationName === 'query' ||
+          operation.operationName === 'mutation'
+        );
       }),
-      mergeMap(pipe => fromPromise(pipe))
+      mergeMap((operation: Operation) => {
+        const { key } = operation;
+        const teardown$ = pipe(
+          sharedOps$,
+          filter(op => op.operationName === 'teardown' && op.key === key)
+        );
+
+        const calculatedContext =
+          typeof context === 'function' ? context(operation) : context;
+
+        let ended = false;
+
+        const result = Promise.resolve()
+          .then(() => {
+            if (ended) return;
+
+            return execute(
+              schema,
+              operation.query,
+              rootValue,
+              calculatedContext,
+              operation.variables,
+              getOperationName(operation.query),
+              fieldResolver,
+              typeResolver
+            );
+          })
+          .then(result => makeResult(operation, result))
+          .catch(err => makeErrorResult(operation, err));
+
+        return pipe(
+          fromPromise(result),
+          onEnd(() => {
+            ended = true;
+          }),
+          takeUntil(teardown$)
+        );
+      })
     );
 
     const forwardedOps$ = pipe(
       sharedOps$,
-      filter(
-        (operation: Operation) =>
-          !SUPPORTED_OPERATION_TYPES.includes(operation.operationName)
-      ),
+      filter((operation: Operation) => {
+        return (
+          operation.operationName !== 'query' &&
+          operation.operationName !== 'mutation'
+        );
+      }),
       forward
     );
 
