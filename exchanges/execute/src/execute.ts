@@ -37,7 +37,7 @@ export const executeExchange = ({
             rootValue,
             contextValue,
             o.variables,
-            null,
+            o.operationName,
             fieldResolver,
             typeResolver
           );

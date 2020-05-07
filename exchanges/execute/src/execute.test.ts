@@ -4,7 +4,7 @@ import { executeExchange } from './execute';
 import { execute, print } from 'graphql';
 import { pipe, fromValue, toPromise, take, makeSubject } from 'wonka';
 import { mocked } from 'ts-jest/utils';
-import { queryOperation } from '@urql/core/src/test-utils';
+import { queryOperation } from '@urql/core/test-utils';
 import { makeErrorResult } from '@urql/core';
 
 const schema = 'STUB_SCHEMA' as any;
@@ -17,7 +17,7 @@ beforeEach(jest.clearAllMocks);
 
 beforeEach(() => {
   mocked(print).mockImplementation(a => a as any);
-  mocked(execute).mockReturnValue(Promise.resolve({ data: {} }));
+  mocked(execute).mockResolvedValue({ data: { key: 'value' } });
 });
 
 describe('on operation', () => {
@@ -54,7 +54,7 @@ describe('on success response', () => {
 
     expect(response).toEqual({
       operation: queryOperation,
-      data: {},
+      data: { key: 'value' },
     });
   });
 });
@@ -98,17 +98,17 @@ describe('on thrown error', () => {
   });
 });
 
-describe('on unsupporte doperation', () => {
+describe('on unsupported operation', () => {
   const operation = {
     ...queryOperation,
     operationName: 'teardown',
   } as const;
 
   it('returns operation result', async () => {
-    const { stream, next } = makeSubject<any>();
+    const { source, next } = makeSubject<any>();
 
     const response = pipe(
-      stream,
+      source,
       executeExchange({ schema })(exchangeArgs),
       take(1),
       toPromise
