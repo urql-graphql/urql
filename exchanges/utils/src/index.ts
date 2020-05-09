@@ -1,1 +1,1 @@
-export { mapFetchOptionsExchange } from './mapFetchOptionsExchange';
+export { mapContextExchange } from './mapContextExchange';
