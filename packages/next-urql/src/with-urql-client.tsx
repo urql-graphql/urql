@@ -52,7 +52,13 @@ export function withUrqlClient(getClientConfig: NextUrqlClientConfig, ssr?: bool
     // Set the displayName to indicate use of withUrqlClient.
     withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
+<<<<<<< HEAD
     if (AppOrPage.getInitialProps || ssr) {
+=======
+    // TODO: this should probably become (AppOrPage.getInitialProps || ssr) in
+    // the next major bump.
+    if (AppOrPage.getInitialProps || !noSsr) {
+>>>>>>> add docs and changeset
       withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const { AppTree } = appOrPageCtx;
 
