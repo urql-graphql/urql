@@ -73,10 +73,12 @@ export function withUrqlClient(
         pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
       }
 
-      // Check the window object to determine whether or not we are on the server.
+      // Check the process.browser property to determine whether or not we are on the server.
       // getInitialProps runs on the server for initial render, and on the client for navigation.
       // We only want to run the prepass step on the server.
-      if ((process as any).browser === 'false') {
+      if ((process as any).browser) {
+        return { ...pageProps, urqlClient };
+      } else {
         const props = { ...pageProps, urqlClient };
         const appTreeProps = isApp ? props : { pageProps: props };
 
@@ -85,9 +87,7 @@ export function withUrqlClient(
 
         // Serialize the urqlClient to null on the client-side.
         // This ensures we don't share client and server instances of the urqlClient.
-        (urqlClient as any).toJSON = () => {
-          return null;
-        };
+        (urqlClient as any).toJSON = () => null;
 
         return {
           ...pageProps,
@@ -95,8 +95,6 @@ export function withUrqlClient(
           urqlClient,
         };
       }
-
-      return { ...pageProps, urqlClient };
     };
 
     return withUrql;
