@@ -76,10 +76,7 @@ export function withUrqlClient(
       // Check the window object to determine whether or not we are on the server.
       // getInitialProps runs on the server for initial render, and on the client for navigation.
       // We only want to run the prepass step on the server.
-      if (typeof window !== 'undefined') {
-      }
-
-      if (process.browser) {
+      if ((process as any).browser === 'false') {
         const props = { ...pageProps, urqlClient };
         const appTreeProps = isApp ? props : { pageProps: props };
 
