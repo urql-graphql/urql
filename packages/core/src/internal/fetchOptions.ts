@@ -44,6 +44,10 @@ export const makeFetchURL = (
   if (!useGETMethod || !body) return url;
 
   const search: string[] = [];
+  if (body.operationName) {
+    search.push('operationName=' + encodeURIComponent(body.operationName));
+  }
+
   if (body.query) {
     search.push('query=' + encodeURIComponent(body.query));
   }
