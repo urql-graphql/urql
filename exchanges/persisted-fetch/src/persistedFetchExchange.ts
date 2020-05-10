@@ -30,10 +30,15 @@ import {
 
 import { hash } from './sha256';
 
-export const persistedFetchExchange: Exchange = ({
-  forward,
-  dispatchDebug,
-}) => {
+interface PersistedFetchExchangeOptions {
+  preferGetForPersistedQueries?: boolean;
+}
+
+export const persistedFetchExchange = (
+  options?: PersistedFetchExchangeOptions
+): Exchange => ({ forward, dispatchDebug }) => {
+  if (!options) options = {};
+
   let supportsPersistedQueries = true;
 
   return ops$ => {
@@ -72,6 +77,8 @@ export const persistedFetchExchange: Exchange = ({
               },
             };
 
+            operation.context.preferGetMethod = !!(options as PersistedFetchExchangeOptions)
+              .preferGetForPersistedQueries;
             return makePersistedFetchSource(operation, body, dispatchDebug);
           }),
           mergeMap(result => {

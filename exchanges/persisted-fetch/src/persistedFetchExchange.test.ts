@@ -48,7 +48,7 @@ it('accepts successful persisted query responses', async () => {
 
   const actual = await pipe(
     fromValue(queryOperation),
-    persistedFetchExchange(exchangeArgs),
+    persistedFetchExchange()(exchangeArgs),
     toPromise
   );
 
@@ -74,13 +74,42 @@ it('supports cache-miss persisted query errors', async () => {
 
   const actual = await pipe(
     fromValue(queryOperation),
-    persistedFetchExchange(exchangeArgs),
+    persistedFetchExchange()(exchangeArgs),
     toPromise
   );
 
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
   expect(fetch.mock.calls[1][1].body).toMatchSnapshot();
+  expect(actual.data).not.toBeUndefined();
+});
+
+it('supports GET exclusively for persisted queries', async () => {
+  const expectedMiss = {
+    errors: [{ message: 'PersistedQueryNotFound' }],
+  };
+
+  const expectedRetry = {
+    data: {
+      test: true,
+    },
+  };
+
+  fetch
+    .mockResolvedValueOnce({ json: () => expectedMiss })
+    .mockResolvedValueOnce({ json: () => expectedRetry });
+
+  const actual = await pipe(
+    fromValue(queryOperation),
+    persistedFetchExchange({ preferGetForPersistedQueries: true })(
+      exchangeArgs
+    ),
+    toPromise
+  );
+
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(fetch.mock.calls[0][1].method).toEqual('GET');
+  expect(fetch.mock.calls[1][1].method).toEqual('GET');
   expect(actual.data).not.toBeUndefined();
 });
 
@@ -102,7 +131,7 @@ it('supports unsupported persisted query errors', async () => {
 
   const actual = await pipe(
     fromArray([queryOperation, queryOperation]),
-    persistedFetchExchange(exchangeArgs),
+    persistedFetchExchange()(exchangeArgs),
     toPromise
   );
 
@@ -118,7 +147,7 @@ it('ignores mutations', async () => {
 
   pipe(
     fromValue(mutationOperation),
-    persistedFetchExchange(exchangeArgs),
+    persistedFetchExchange()(exchangeArgs),
     subscribe(result)
   );
 
@@ -143,7 +172,7 @@ it('correctly generates an SHA256 hash', async () => {
 
   await pipe(
     fromValue(queryOperation),
-    persistedFetchExchange(exchangeArgs),
+    persistedFetchExchange()(exchangeArgs),
     toPromise
   );
 
