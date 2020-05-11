@@ -2,3 +2,4 @@ node_modules
 .next
 .build
 lib
+yarn.lock

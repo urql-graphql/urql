@@ -6,9 +6,7 @@ const { ApolloServer } = require('apollo-server-express');
 const cors = require('cors');
 const express = require('express');
 const { typeDefs, resolvers } = require('./schema');
-
-const PORT = 4000;
-const WS_PORT = 4001;
+const { SERVER_PORT, WS_PORT } = require('../config');
 
 // Setup websocket server
 const websocketServer = createServer((request, response) => {
@@ -45,8 +43,8 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.listen({ port: PORT }, () =>
+app.listen({ port: SERVER_PORT }, () =>
   console.log(
-    `server listening at http://localhost:${PORT}${server.graphqlPath}`
+    `server listening at http://localhost:${SERVER_PORT}${server.graphqlPath}`
   )
 );
