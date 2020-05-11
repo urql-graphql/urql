@@ -109,7 +109,7 @@ it('supports GET exclusively for persisted queries', async () => {
 
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(fetch.mock.calls[0][1].method).toEqual('GET');
-  expect(fetch.mock.calls[1][1].method).toEqual('GET');
+  expect(fetch.mock.calls[1][1].method).toEqual('POST');
   expect(actual.data).not.toBeUndefined();
 });
 

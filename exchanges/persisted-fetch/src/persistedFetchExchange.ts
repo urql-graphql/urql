@@ -105,8 +105,7 @@ export const persistedFetchExchange = (
                 operation,
                 body,
                 dispatchDebug,
-                !!(options as PersistedFetchExchangeOptions)
-                  .preferGetForPersistedQueries
+                false
               );
             }
 
