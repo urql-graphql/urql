@@ -30,10 +30,15 @@ import {
 
 import { hash } from './sha256';
 
-export const persistedFetchExchange: Exchange = ({
-  forward,
-  dispatchDebug,
-}) => {
+interface PersistedFetchExchangeOptions {
+  preferGetForPersistedQueries?: boolean;
+}
+
+export const persistedFetchExchange = (
+  options?: PersistedFetchExchangeOptions
+): Exchange => ({ forward, dispatchDebug }) => {
+  if (!options) options = {};
+
   let supportsPersistedQueries = true;
 
   return ops$ => {
@@ -52,7 +57,7 @@ export const persistedFetchExchange: Exchange = ({
         if (!supportsPersistedQueries) {
           // Runs the usual non-persisted fetchExchange query logic
           return pipe(
-            makePersistedFetchSource(operation, body, dispatchDebug),
+            makePersistedFetchSource(operation, body, dispatchDebug, false),
             takeUntil(teardown$)
           );
         }
@@ -72,7 +77,13 @@ export const persistedFetchExchange: Exchange = ({
               },
             };
 
-            return makePersistedFetchSource(operation, body, dispatchDebug);
+            return makePersistedFetchSource(
+              operation,
+              body,
+              dispatchDebug,
+              !!(options as PersistedFetchExchangeOptions)
+                .preferGetForPersistedQueries
+            );
           }),
           mergeMap(result => {
             if (result.error && isPersistedUnsupported(result.error)) {
@@ -81,11 +92,21 @@ export const persistedFetchExchange: Exchange = ({
               body.extensions = undefined;
               // Disable future persisted queries
               supportsPersistedQueries = false;
-              return makePersistedFetchSource(operation, body, dispatchDebug);
+              return makePersistedFetchSource(
+                operation,
+                body,
+                dispatchDebug,
+                false
+              );
             } else if (result.error && isPersistedMiss(result.error)) {
               // Add query to the body but leave SHA256 hash intact
               body.query = query;
-              return makePersistedFetchSource(operation, body, dispatchDebug);
+              return makePersistedFetchSource(
+                operation,
+                body,
+                dispatchDebug,
+                false
+              );
             }
 
             return fromValue(result);
@@ -108,20 +129,28 @@ export const persistedFetchExchange: Exchange = ({
 const makePersistedFetchSource = (
   operation: Operation,
   body: FetchBody,
-  dispatchDebug: ExchangeInput['dispatchDebug']
+  dispatchDebug: ExchangeInput['dispatchDebug'],
+  useGet: boolean
 ): Source<OperationResult> => {
+  const newOperation = {
+    ...operation,
+    context: {
+      ...operation.context,
+      preferGetMethod: useGet || operation.context.preferGetMethod,
+    },
+  };
   const url = makeFetchURL(
-    operation,
+    newOperation,
     body.query ? body : { ...body, query: '' }
   );
-  const fetchOptions = makeFetchOptions(operation, body);
+  const fetchOptions = makeFetchOptions(newOperation, body);
 
   dispatchDebug({
     type: 'fetchRequest',
     message: !body.query
       ? 'A fetch request for a persisted query is being executed.'
       : 'A fetch request is being executed.',
-    operation,
+    operation: newOperation,
     data: {
       url,
       fetchOptions,
@@ -129,7 +158,7 @@ const makePersistedFetchSource = (
   });
 
   return pipe(
-    makeFetchSource(operation, url, fetchOptions),
+    makeFetchSource(newOperation, url, fetchOptions),
     onPush(result => {
       const persistFail =
         result.error &&
