@@ -30,16 +30,21 @@ const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
   });
 };
 
+const nodeCrypto =
+  typeof window === 'undefined' ? eval("require('crypto')") : null;
+
 export const hash = async (query: string): Promise<string> => {
   if (
     typeof window === 'undefined'
-      ? (typeof crypto !== 'undefined' && typeof (crypto as any).createHash === 'function')
+      ? !nodeCrypto || !nodeCrypto.createHash
       : !!cryptoSubtle
   ) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
         '[@urql/exchange-persisted-fetch]: The ' +
-          (typeof window === 'undefined' ? 'Node Crypto' : 'window.crypto.subtle') +
+          (typeof window === 'undefined'
+            ? 'Node Crypto'
+            : 'window.crypto.subtle') +
           ' API is not available.\n' +
           'This is an unexpected error. Please report it by filing a GitHub Issue.'
       );
@@ -51,7 +56,7 @@ export const hash = async (query: string): Promise<string> => {
   // Node.js support
   if (typeof window === 'undefined') {
     return Promise.resolve(
-      '' + (crypto as any).createHash('sha256').update(query).digest('hex')
+      '' + nodeCrypto.createHash('sha256').update(query).digest('hex')
     );
   }
 
