@@ -1,5 +1,3 @@
-import sha256Standard from 'js-sha256';
-
 const jsCrypto =
   typeof window !== 'undefined'
     ? window.crypto || (window as any).msCrypto
@@ -8,26 +6,15 @@ const cryptoSubtle =
   jsCrypto && (jsCrypto.subtle || (jsCrypto as any).webkitSubtle);
 const isIE = !!(jsCrypto && (window as any).msCrypto);
 
-const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
-  if (!cryptoSubtle) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        '[@urql/exchange-persisted-fetch]: The window.crypto.subtle API is not available.\n' +
-          'This is an unexpected error. Please report it by filing a GitHub Issue.'
-      );
-    }
-
-    return Promise.resolve(new Uint8Array(0));
-  }
-
-  const hash = cryptoSubtle.digest({ name: 'SHA-256' }, bytes);
+const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
+  const hash = cryptoSubtle!.digest({ name: 'SHA-256' }, bytes);
   return new Promise((resolve, reject) => {
     if (isIE) {
       // IE11
-      (hash as any).oncomplete = function onComplete(event) {
+      (hash as any).oncomplete = function onComplete(event: any) {
         resolve(new Uint8Array(event.target.result));
       };
-      (hash as any).onerror = function onError(error) {
+      (hash as any).onerror = function onError(error: Error) {
         reject(error);
       };
     } else {
@@ -43,10 +30,34 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
   });
 };
 
+const nodeCrypto =
+  typeof window === 'undefined' ? eval("require('crypto')") : null;
+
 export const hash = async (query: string): Promise<string> => {
+  if (
+    typeof window === 'undefined'
+      ? !nodeCrypto || !nodeCrypto.createHash
+      : !cryptoSubtle
+  ) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[@urql/exchange-persisted-fetch]: The ' +
+          (typeof window === 'undefined'
+            ? 'Node Crypto'
+            : 'window.crypto.subtle') +
+          ' API is not available.\n' +
+          'This is an unexpected error. Please report it by filing a GitHub Issue.'
+      );
+    }
+
+    return Promise.resolve('');
+  }
+
   // Node.js support
   if (typeof window === 'undefined') {
-    return Promise.resolve(sha256Standard.sha256(query));
+    return Promise.resolve(
+      '' + nodeCrypto.createHash('sha256').update(query).digest('hex')
+    );
   }
 
   let buf: Uint8Array;
@@ -61,7 +72,7 @@ export const hash = async (query: string): Promise<string> => {
     }
   }
 
-  const out = await sha256(buf);
+  const out = await sha256Browser(buf);
 
   let hash = '';
   for (let i = 0, l = out.length; i < l; i++) {
