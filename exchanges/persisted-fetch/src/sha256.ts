@@ -1,5 +1,3 @@
-import sha256Standard from 'js-sha256';
-
 const jsCrypto =
   typeof window !== 'undefined'
     ? window.crypto || (window as any).msCrypto
@@ -8,7 +6,7 @@ const cryptoSubtle =
   jsCrypto && (jsCrypto.subtle || (jsCrypto as any).webkitSubtle);
 const isIE = !!(jsCrypto && (window as any).msCrypto);
 
-const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
+const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
   if (!cryptoSubtle) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
@@ -24,10 +22,10 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
   return new Promise((resolve, reject) => {
     if (isIE) {
       // IE11
-      (hash as any).oncomplete = function onComplete(event) {
+      (hash as any).oncomplete = function onComplete(event: any) {
         resolve(new Uint8Array(event.target.result));
       };
-      (hash as any).onerror = function onError(error) {
+      (hash as any).onerror = function onError(error: Error) {
         reject(error);
       };
     } else {
@@ -45,8 +43,14 @@ const sha256 = (bytes: Uint8Array): Promise<Uint8Array> => {
 
 export const hash = async (query: string): Promise<string> => {
   // Node.js support
-  if (typeof window === 'undefined') {
-    return Promise.resolve(sha256Standard.sha256(query));
+  if (
+    typeof window === 'undefined' &&
+    typeof crypto !== 'undefined' &&
+    typeof (crypto as any).createHash === 'function'
+  ) {
+    return Promise.resolve(
+      '' + (crypto as any).createHash('sha256').update(query).digest('hex')
+    );
   }
 
   let buf: Uint8Array;
@@ -61,7 +65,7 @@ export const hash = async (query: string): Promise<string> => {
     }
   }
 
-  const out = await sha256(buf);
+  const out = await sha256Browser(buf);
 
   let hash = '';
   for (let i = 0, l = out.length; i < l; i++) {
