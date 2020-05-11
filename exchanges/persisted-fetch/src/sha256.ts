@@ -37,7 +37,7 @@ export const hash = async (query: string): Promise<string> => {
   if (
     typeof window === 'undefined'
       ? !nodeCrypto || !nodeCrypto.createHash
-      : !!cryptoSubtle
+      : !cryptoSubtle
   ) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
