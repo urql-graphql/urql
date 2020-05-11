@@ -7,18 +7,7 @@ const cryptoSubtle =
 const isIE = !!(jsCrypto && (window as any).msCrypto);
 
 const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
-  if (!cryptoSubtle) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        '[@urql/exchange-persisted-fetch]: The window.crypto.subtle API is not available.\n' +
-          'This is an unexpected error. Please report it by filing a GitHub Issue.'
-      );
-    }
-
-    return Promise.resolve(new Uint8Array(0));
-  }
-
-  const hash = cryptoSubtle.digest({ name: 'SHA-256' }, bytes);
+  const hash = cryptoSubtle!.digest({ name: 'SHA-256' }, bytes);
   return new Promise((resolve, reject) => {
     if (isIE) {
       // IE11
@@ -42,12 +31,25 @@ const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
 };
 
 export const hash = async (query: string): Promise<string> => {
-  // Node.js support
   if (
-    typeof window === 'undefined' &&
-    typeof crypto !== 'undefined' &&
-    typeof (crypto as any).createHash === 'function'
+    typeof window === 'undefined'
+      ? (typeof crypto !== 'undefined' && typeof (crypto as any).createHash === 'function')
+      : !!cryptoSubtle
   ) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[@urql/exchange-persisted-fetch]: The ' +
+          (typeof window === 'undefined' ? 'Node Crypto' : 'window.crypto.subtle') +
+          ' API is not available.\n' +
+          'This is an unexpected error. Please report it by filing a GitHub Issue.'
+      );
+    }
+
+    return Promise.resolve('');
+  }
+
+  // Node.js support
+  if (typeof window === 'undefined') {
     return Promise.resolve(
       '' + (crypto as any).createHash('sha256').update(query).digest('hex')
     );
