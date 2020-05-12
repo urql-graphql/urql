@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/index.html",
+    "postinstall": "yarn install --cwd ../../ && npm run build --prefix ../../"
   },
   "devDependencies": {
     "@types/react": "^16.9.23",
@@ -15,7 +16,7 @@
   },
   "dependencies": {
     "@urql/devtools": "latest",
-    "graphql": "^14.6.0",
+    "graphql": "^15.0.0",
     "graphql-tag": "^2.10.3",
     "idb": "^5.0.1",
     "react": "^16.13.0",

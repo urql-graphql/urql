@@ -18,25 +18,31 @@ if (process.env.CIRCLE_NODE_TOTAL) {
   packages = packages.filter((_, i) => i % nodeTotal === nodeIndex);
 }
 
-(async () => {
-  for (const package of packages) {
-    const packageName = path.relative(workspaceRoot, package);
-    console.log('> Building', packageName);
+const builds = packages.map(async package => {
+  const packageName = path.relative(workspaceRoot, package);
+  console.log('> Building', packageName);
 
-    try {
-      await execa(
-        'run-s',
-        ['build'],
-        {
-          preferLocal: true,
-          localDir: workspaceRoot,
-          cwd: package,
-        }
-      );
-    } catch (error) {
-      console.error('> Build failed', packageName);
-      console.error(error.message);
-      process.exit(-1);
-    }
+  try {
+    await execa(
+      'run-s',
+      ['build'],
+      {
+        preferLocal: true,
+        localDir: workspaceRoot,
+        cwd: package,
+      }
+    );
+  } catch (error) {
+    console.error('> Build failed', packageName);
+    console.error(error);
+    throw error;
+  }
+});
+
+(async () => {
+  try {
+    await Promise.all(builds);
+  } catch (e) {
+    process.exit(1);
   }
 })();

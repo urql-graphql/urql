@@ -4,8 +4,8 @@
     "start": "node ./nodeClient.js"
   },
   "dependencies": {
-    "isomorphic-fetch": "2.2.1",
-    "graphql-tag": "2.10.1",
-    "wonka": "3.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "graphql-tag": "^2.10.1",
+    "wonka": "^4.0.10"
   }
 }

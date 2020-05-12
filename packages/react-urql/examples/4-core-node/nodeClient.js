@@ -47,6 +47,6 @@ pipe(
       console.warn('Error', error);
     }
 
-    console.warn('Data', data);
+    console.log('Data', JSON.stringify(data, ' ', 2));
   })
 );

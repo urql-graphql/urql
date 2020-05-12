@@ -12,14 +12,15 @@ import {
 } from 'urql';
 import './index.css';
 import { Messages } from './Messages';
+import { SERVER_PORT, WS_PORT } from '../config';
 
 const subscriptionClient = new SubscriptionClient(
-  'ws://localhost:4001/graphql',
+  `ws://localhost:${WS_PORT}/graphql`,
   {}
 );
 
 const client = createClient({
-  url: 'http://localhost:4000/graphql',
+  url: `http://localhost:${SERVER_PORT}/graphql`,
   exchanges: [
     dedupExchange,
     debugExchange,

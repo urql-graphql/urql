@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "yarn install --cwd ../../ && npm run build --prefix ../../"
   },
   "prettier": {
     "singleQuote": true,
@@ -18,10 +19,11 @@
     "graphql-tag": "^2.10.1",
     "isomorphic-unfetch": "^3.0.0",
     "next": "latest",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "react-is": "^16.9.0",
-    "react-ssr-prepass": "1.0.6",
-    "styled-components": "^4.3.2"
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-is": "^16.13.0",
+    "react-ssr-prepass": "1.2.0",
+    "styled-components": "^4.3.2",
+    "urql": "^1.9.7"
   }
 }
