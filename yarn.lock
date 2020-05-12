@@ -11255,14 +11255,7 @@ react-side-effect@^1.1.0:
   dependencies:
     shallowequal "^1.0.1"
 
-react-ssr-prepass@^1.1.2:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.2.0.tgz#e16efd472237ffd0c8086146e02ed6c3d46c1383"
-  integrity sha512-KwZ+nuQWLQyfJpNIEzuipGyJDffDiQEk0z1/RpoN/PySH/YbQ7J+Yf1h5sUM66nlJ5SQCBn9AjUJaOUnnIuSLQ==
-  dependencies:
-    object-is "^1.1.2"
-
-react-ssr-prepass@^1.2.1:
+react-ssr-prepass@^1.1.2, react-ssr-prepass@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.2.1.tgz#ba867bbe60714f42977dbe1ef9b8ff469b950602"
   integrity sha512-8hMhx9zXyEZ+t4oI0chPInxm/HpjrmvNuZxI5TmIXbORYmIV2CnK4WVPTdm/7Iq+3/6RAiNxTNZSQyUu5irX4Q==
