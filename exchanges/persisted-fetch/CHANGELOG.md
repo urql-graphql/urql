@@ -1,5 +1,45 @@
 # @urql/exchange-persisted-fetch
 
+## 1.0.0
+
+### Major Changes
+
+- Change the `persistedFetchExchange` to be an exchange factory. The `persistedFetchExchange` now
+  expects to be called with options. An optional option, `preferGetForPersistedQueries`, may now
+  be passed to send persisted queries as a GET request, even when the `Client`'s `preferGetMethod`
+  option is `false`.
+
+To migrate you will have to update your usage of `persistedFetchExchange` from
+
+```js
+import { persistedFetchExchange } from '@urql/exchange-persisted-fetch';
+
+createClient({
+  exchanges: [
+    persistedFetchExchange
+  ],
+});
+```
+
+to the following:
+
+````js
+import { persistedFetchExchange } from '@urql/exchange-persisted-fetch';
+
+createClient({
+  exchanges: [
+    // Call the exchange and pass optional options:
+    persistedFetchExchange()
+  ],
+});
+````
+
+### Patch Changes
+
+- Replace `js-sha256` polyfill for Node.js support with Node's Native Crypto API, by [@kitten](https://github.com/kitten) (See [#807](https://github.com/FormidableLabs/urql/pull/807))
+- Updated dependencies (See [#798](https://github.com/FormidableLabs/urql/pull/798))
+  - @urql/core@1.11.8
+
 ## 0.1.3
 
 ### Patch Changes

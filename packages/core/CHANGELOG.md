@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.11.8
+
+### Patch Changes
+
+- Add operationName to GET queries, by [@jakubriedl](https://github.com/jakubriedl) (See [#798](https://github.com/FormidableLabs/urql/pull/798))
+
 ## 1.11.7
 
 ### Patch Changes

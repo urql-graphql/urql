@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8
+
+### Patch Changes
+
+- Bump `react-ssr-prepass` so it can get eliminated in the client-side bundle, this because the 1.2.1 version added "sideEffects:false", by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#809](https://github.com/FormidableLabs/urql/pull/809))
+
 ## 0.3.7
 
 ### Patch Changes

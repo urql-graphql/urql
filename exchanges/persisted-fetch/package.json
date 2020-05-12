@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-persisted-fetch",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "description": "An exchange that allows for persisted queries support when fetching queries",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -49,7 +49,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=1.11.7",
+    "@urql/core": ">=1.11.8",
     "wonka": "^4.0.10"
   },
   "peerDependencies": {
