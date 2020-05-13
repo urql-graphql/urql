@@ -292,7 +292,7 @@ const readSelection = (
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (
-      !opts?.skipResolvers &&
+      !(opts && opts.skipResolvers) &&
       resolvers &&
       typeof resolvers[fieldName] === 'function'
     ) {
