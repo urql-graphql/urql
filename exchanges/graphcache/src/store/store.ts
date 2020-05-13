@@ -191,7 +191,9 @@ export class Store implements Cache {
     updater: (data: Data | null) => DataFields | null
   ): void {
     const request = createRequest(input.query, input.variables);
-    const output = updater(this.readQuery(request as QueryInput));
+    const output = updater(
+      read(this, request, undefined, { skipResolvers: true }).data
+    );
     if (output !== null) {
       startWrite(this, request, output as Data);
     }
