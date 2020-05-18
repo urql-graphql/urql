@@ -20,13 +20,10 @@ export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
           return urqlClient;
         }
 
-        const clientOptions =
-          typeof clientConfig === 'function'
-            ? clientConfig(ssrExchange({ initialState: urqlState }))
-            : clientConfig;
-
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(clientOptions)[0]!;
+        return initUrqlClient(
+          clientConfig(ssrExchange({ initialState: urqlState }))
+        )!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -48,11 +45,8 @@ export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
         ? (appOrPageCtx as AppContext).ctx
         : (appOrPageCtx as NextPageContext);
 
-      const opts =
-        typeof clientConfig === 'function'
-          ? clientConfig(ssrExchange({ initialState: undefined }), ctx)
-          : clientConfig;
-      const [urqlClient, ssrCache] = initUrqlClient(opts);
+      const ssrCache = ssrExchange({ initialState: undefined });
+      const urqlClient = initUrqlClient(clientConfig(ssrCache, ctx));
 
       if (urqlClient) {
         (ctx as NextUrqlContext).urqlClient = urqlClient;

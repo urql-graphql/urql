@@ -1,13 +1,9 @@
 import { createClient, Client, ClientOptions } from 'urql';
 import 'isomorphic-unfetch';
-import { SSRExchange } from './types';
 
 let urqlClient: Client | null = null;
-const ssrCache: SSRExchange | null = null;
 
-export function initUrqlClient(
-  clientOptions: ClientOptions
-): [Client | null, SSRExchange | null] {
+export function initUrqlClient(clientOptions: ClientOptions): Client | null {
   // Create a new Client for every server-side rendered request.
   // This ensures we reset the state for each rendered page.
   // If there is an exising client instance on the client-side, use it.
@@ -20,5 +16,5 @@ export function initUrqlClient(
   }
 
   // Return both the Client instance and the ssrCache.
-  return [urqlClient, ssrCache];
+  return urqlClient;
 }

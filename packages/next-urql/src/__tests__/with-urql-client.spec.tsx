@@ -85,7 +85,7 @@ describe('withUrqlClient', () => {
         fetchOptions: {
           headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
         },
-        exchanges: [ssrExchange, ...defaultExchanges],
+        exchanges: [ssrExchange],
       }))(MockApp);
     });
 
@@ -95,6 +95,7 @@ describe('withUrqlClient', () => {
       expect(spyInitUrqlClient).toHaveBeenCalledWith({
         url: 'http://localhost:3000',
         fetchOptions: { headers: { Authorization: token } },
+        exchanges: [ssrExchange],
       });
     });
   });
