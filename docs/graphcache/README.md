@@ -47,6 +47,8 @@ default.
 - 📡 **Offline support** (work in progress) _Graphcache_ can persist and rehydrate its entire state,
   allowing an offline application to be built that is able to execute queries against the cache
   although the device is offline.
+- 🐛 [**Errors and warnings**](./errors.md). All potential errors are documented with information on
+  how you may be able to fix them.
 
 ## Installation and Setup
 

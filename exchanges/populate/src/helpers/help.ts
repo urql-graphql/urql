@@ -1,7 +1,7 @@
 // These are guards that are used throughout the codebase to warn or error on
 // unexpected behaviour or conditions.
 // Every warning and error comes with a number that uniquely identifies them.
-// You can read more about the messages themselves in `docs/help.md`
+// You can read more about the messages themselves in `docs/graphcache/errors.md`
 export type ErrorCode =
   | 1
   | 2
@@ -22,7 +22,8 @@ export type ErrorCode =
   | 18
   | 19;
 
-const helpUrl = '\nhttps://bit.ly/38yWDau#';
+// URL unfurls to https://formidable.com/open-source/urql/docs/graphcache/errors/
+const helpUrl = '\nhttps://bit.ly/2XbVrpR#';
 const cache = new Set<string>();
 
 export function invariant(
