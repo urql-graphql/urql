@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { Client, defaultExchanges } from 'urql';
+import { Client } from 'urql';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
@@ -65,6 +65,7 @@ describe('withUrqlClient', () => {
   describe('with ctx callback to create client options', () => {
     // Simulate a token that might be passed in a request to the server-rendered application.
     const token = Math.random().toString(36).slice(-10);
+    let mockSsrExchange;
 
     const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,
@@ -85,7 +86,7 @@ describe('withUrqlClient', () => {
         fetchOptions: {
           headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
         },
-        exchanges: [ssrExchange],
+        exchanges: [(mockSsrExchange = ssrExchange)],
       }))(MockApp);
     });
 
@@ -95,7 +96,7 @@ describe('withUrqlClient', () => {
       expect(spyInitUrqlClient).toHaveBeenCalledWith({
         url: 'http://localhost:3000',
         fetchOptions: { headers: { Authorization: token } },
-        exchanges: [ssrExchange],
+        exchanges: [mockSsrExchange],
       });
     });
   });
