@@ -18,7 +18,6 @@ const MockAppTree: React.FC<any> = () => {
 
 describe('withUrqlClient', () => {
   const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
-  const mockMergeExchanges = jest.fn(() => defaultExchanges);
   let Component: any;
 
   beforeAll(() => {
@@ -27,7 +26,9 @@ describe('withUrqlClient', () => {
 
   describe('with client options', () => {
     beforeEach(() => {
-      Component = withUrqlClient({ url: 'http://localhost:3000' })(MockApp);
+      Component = withUrqlClient(() => ({ url: 'http://localhost:3000' }))(
+        MockApp
+      );
     });
 
     const mockContext: NextUrqlPageContext = {
@@ -79,27 +80,22 @@ describe('withUrqlClient', () => {
     };
 
     beforeEach(() => {
-      Component = withUrqlClient(
-        ctx => ({
-          url: 'http://localhost:3000',
-          fetchOptions: {
-            headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
-          },
-        }),
-        mockMergeExchanges
-      )(MockApp);
+      Component = withUrqlClient((ssrExchange, ctx) => ({
+        url: 'http://localhost:3000',
+        fetchOptions: {
+          headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
+        },
+        exchanges: [ssrExchange, ...defaultExchanges],
+      }))(MockApp);
     });
 
     it('should allow a user to access the ctx object from Next on the server', async () => {
       Component.getInitialProps &&
         (await Component.getInitialProps(mockContext));
-      expect(spyInitUrqlClient).toHaveBeenCalledWith(
-        {
-          url: 'http://localhost:3000',
-          fetchOptions: { headers: { Authorization: token } },
-        },
-        mockMergeExchanges
-      );
+      expect(spyInitUrqlClient).toHaveBeenCalledWith({
+        url: 'http://localhost:3000',
+        fetchOptions: { headers: { Authorization: token } },
+      });
     });
   });
 
@@ -107,11 +103,10 @@ describe('withUrqlClient', () => {
     const exchange = jest.fn(() => op => op);
 
     beforeEach(() => {
-      mockMergeExchanges.mockImplementation(() => [exchange] as any[]);
-      Component = withUrqlClient(
-        { url: 'http://localhost:3000' },
-        mockMergeExchanges
-      )(MockApp);
+      Component = withUrqlClient(() => ({
+        url: 'http://localhost:3000',
+        exchanges: [exchange] as any[],
+      }))(MockApp);
     });
 
     it('calls the user-supplied mergeExchanges function', () => {
@@ -120,7 +115,6 @@ describe('withUrqlClient', () => {
 
       const client = app.props().urqlClient;
       expect(client).toBeInstanceOf(Client);
-      expect(mockMergeExchanges).toHaveBeenCalledTimes(1);
     });
 
     it('uses exchanges returned from mergeExchanges', () => {

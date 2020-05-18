@@ -2,29 +2,16 @@ import React from 'react';
 import { NextPage, NextPageContext } from 'next';
 import NextApp, { AppContext } from 'next/app';
 import ssrPrepass from 'react-ssr-prepass';
-import { Provider, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { Provider, ssrExchange } from 'urql';
 
 import { initUrqlClient } from './init-urql-client';
-import {
-  NextUrqlClientConfig,
-  MergeExchanges,
-  NextUrqlContext,
-  WithUrqlProps,
-} from './types';
+import { NextUrqlClientConfig, NextUrqlContext, WithUrqlProps } from './types';
 
 function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
-export function withUrqlClient(
-  clientConfig: NextUrqlClientConfig,
-  mergeExchanges: MergeExchanges = ssrExchange => [
-    dedupExchange,
-    cacheExchange,
-    ssrExchange,
-    fetchExchange,
-  ]
-) {
+export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -34,10 +21,12 @@ export function withUrqlClient(
         }
 
         const clientOptions =
-          typeof clientConfig === 'function' ? clientConfig() : clientConfig;
+          typeof clientConfig === 'function'
+            ? clientConfig(ssrExchange({ initialState: urqlState }))
+            : clientConfig;
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]!;
+        return initUrqlClient(clientOptions)[0]!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -60,8 +49,10 @@ export function withUrqlClient(
         : (appOrPageCtx as NextPageContext);
 
       const opts =
-        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
-      const [urqlClient, ssrCache] = initUrqlClient(opts, mergeExchanges);
+        typeof clientConfig === 'function'
+          ? clientConfig(ssrExchange({ initialState: undefined }), ctx)
+          : clientConfig;
+      const [urqlClient, ssrCache] = initUrqlClient(opts);
 
       if (urqlClient) {
         (ctx as NextUrqlContext).urqlClient = urqlClient;

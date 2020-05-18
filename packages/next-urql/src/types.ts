@@ -3,13 +3,10 @@ import { NextPageContext } from 'next';
 import { ClientOptions, Exchange, Client } from 'urql';
 import { AppContext } from 'next/app';
 
-export type NextUrqlClientOptions = Omit<ClientOptions, 'exchanges'>;
-
-export type NextUrqlClientConfig =
-  | NextUrqlClientOptions
-  | ((ctx?: NextPageContext) => NextUrqlClientOptions);
-
-export type MergeExchanges = (ssrExchange: SSRExchange) => Exchange[];
+export type NextUrqlClientConfig = (
+  ssrExchange: SSRExchange,
+  ctx?: NextPageContext
+) => ClientOptions;
 
 export interface NextUrqlPageContext extends NextPageContext {
   urqlClient: Client;
