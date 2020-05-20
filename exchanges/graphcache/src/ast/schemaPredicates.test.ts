@@ -1,6 +1,10 @@
 import { buildClientSchema } from 'graphql';
 import * as SchemaPredicates from './schemaPredicates';
 
+let warnSpy: jest.SpyInstance;
+beforeEach(() => (warnSpy = jest.spyOn(console, 'warn')));
+afterEach(() => warnSpy.mockRestore());
+
 describe('SchemaPredicates', () => {
   // eslint-disable-next-line
   const schema = buildClientSchema(require('../test-utils/simple_schema.json'));
@@ -52,5 +56,24 @@ describe('SchemaPredicates', () => {
     expect(
       SchemaPredicates.isInterfaceOfType(schema, 'Todo', 'NoTodosError')
     ).toBeFalsy();
+  });
+
+  it('should throw if a requested type does not exist', () => {
+    expect(() =>
+      SchemaPredicates.isFieldNullable(schema, 'SomeInvalidType', 'complete')
+    ).toThrow(
+      'The type `SomeInvalidType` is not an object in the defined schema, but the GraphQL document is traversing it.\nhttps://bit.ly/2XbVrpR#3'
+    );
+  });
+
+  it('should warn in console if a requested field does not exist', () => {
+    expect(
+      SchemaPredicates.isFieldNullable(schema, 'Todo', 'goof')
+    ).toBeFalsy();
+
+    expect(warnSpy).toBeCalledTimes(1);
+    const warnMessage = warnSpy.mock.calls[0][0];
+    expect(warnMessage).toContain('The field `goof` does not exist on `Todo`');
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#4');
   });
 });
