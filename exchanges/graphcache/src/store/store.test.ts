@@ -74,6 +74,10 @@ const todosData = {
   ],
 } as any;
 
+let warnSpy: jest.SpyInstance;
+beforeEach(() => (warnSpy = jest.spyOn(console, 'warn')));
+afterEach(() => warnSpy.mockRestore());
+
 describe('Store', () => {
   it('supports unformatted query documents', () => {
     const store = new Store();
@@ -107,6 +111,34 @@ describe('Store with KeyingConfig', () => {
     expect(store.keyOfEntity({ __typename: 'Any' })).toBe(null);
     expect(store.keyOfEntity({ __typename: 'User' })).toBe('User:me');
     expect(store.keyOfEntity({ __typename: 'None' })).toBe(null);
+  });
+
+  it('should not warn if keys do exist in the schema', function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      keys: {
+        Todo: () => 'Todo',
+      },
+    });
+
+    expect(warnSpy).not.toBeCalled();
+  });
+
+  it("should warn if a key doesn't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      keys: {
+        Todo: () => 'todo',
+        NotInSchema: () => 'foo',
+      },
+    });
+
+    expect(warnSpy).toBeCalledTimes(1);
+    const warnMessage = warnSpy.mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'The type `NotInSchema` is not an object in the defined schema, but the `keys` option is referencing it'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#20');
   });
 });
 

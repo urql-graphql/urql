@@ -27,6 +27,7 @@ import { writeFragment, startWrite } from '../operations/write';
 import { invalidate, invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
+import * as SchemaPredicates from '../ast/schemaPredicates';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
@@ -73,6 +74,10 @@ export class Store implements Cache {
       if (queryType) queryName = queryType.name;
       if (mutationType) mutationName = mutationType.name;
       if (subscriptionType) subscriptionName = subscriptionType.name;
+
+      if (this.keys) {
+        SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
+      }
     }
 
     this.rootFields = {
