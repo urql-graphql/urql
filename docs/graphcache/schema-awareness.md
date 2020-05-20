@@ -6,10 +6,10 @@ order: 4
 # Schema Awareness
 
 As mentioned in the docs we allow for the schema to be passed
-to the `cacheExchange` this allows for partial results and deterministic
+to the `cacheExchange`. This allows for partial results and deterministic
 fragment matching.
 With deterministic fragment matching we mean that if you use an interface
-or a union we will be 100% sure you're allowed to do so, we'll check if the
+or a union we will be 100% sure you're allowed to do so, therefore we'll check if the
 type you request can actually be returned from this union/interface.
 
 ## Getting your schema
