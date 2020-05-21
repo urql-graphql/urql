@@ -46,6 +46,7 @@ describe('withUrqlClient', () => {
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.url).toBe('http://localhost:3000');
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
+      expect(spyInitUrqlClient.mock.calls[0][0].exchanges).toHaveLength(4);
     });
 
     it('should create the urql client instance server-side inside getInitialProps', async () => {
@@ -101,7 +102,7 @@ describe('withUrqlClient', () => {
     });
   });
 
-  describe('with mergeExchanges provided', () => {
+  describe('with exchanges provided', () => {
     const exchange = jest.fn(() => op => op);
 
     beforeEach(() => {
@@ -111,15 +112,7 @@ describe('withUrqlClient', () => {
       }))(MockApp);
     });
 
-    it('calls the user-supplied mergeExchanges function', () => {
-      const tree = shallow(<Component />);
-      const app = tree.find(MockApp);
-
-      const client = app.props().urqlClient;
-      expect(client).toBeInstanceOf(Client);
-    });
-
-    it('uses exchanges returned from mergeExchanges', () => {
+    it('uses exchanges defined in the client config', () => {
       const tree = shallow(<Component />);
       const app = tree.find(MockApp);
 

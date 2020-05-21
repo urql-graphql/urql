@@ -9,13 +9,4 @@ describe('initUrqlClient', () => {
     expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
     expect(urqlClient).toHaveProperty('suspense', true);
   });
-
-  it('should accept an optional mergeExchanges function to allow for exchange composition', () => {
-    const urqlClient = initUrqlClient({
-      url: 'http://localhost:3000',
-    });
-
-    expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
-    expect(urqlClient).toHaveProperty('suspense', true);
-  });
 });
