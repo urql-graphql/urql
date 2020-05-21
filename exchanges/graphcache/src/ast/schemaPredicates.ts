@@ -10,7 +10,7 @@ import {
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
-import { KeyingConfig } from '../types';
+import { KeyingConfig, UpdatesConfig } from '../types';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,
@@ -129,5 +129,51 @@ export function expectValidKeyingConfig(
         );
       }
     });
+  }
+}
+
+export function expectValidUpdatesConfig(
+  schema: GraphQLSchema,
+  updates: UpdatesConfig
+): void {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  /* eslint-disable prettier/prettier */
+  const schemaMutations = schema.getMutationType()
+    ? Object.keys((schema.getMutationType() as GraphQLObjectType).toConfig().fields)
+    : [];
+  const schemaSubscriptions = schema.getSubscriptionType()
+    ? Object.keys((schema.getSubscriptionType() as GraphQLObjectType).toConfig().fields)
+    : [];
+  const givenMutations = updates.Mutation
+    ? Object.keys(updates.Mutation)
+    : [];
+  const givenSubscriptions = updates.Subscription
+    ? Object.keys(updates.Subscription)
+    : [];
+  /* eslint-enable prettier/prettier */
+
+  for (const givenMutation of givenMutations) {
+    if (schemaMutations.indexOf(givenMutation) === -1) {
+      warn(
+        'Invalid mutation field: `' +
+          givenMutation +
+          '` is not in the defined schema, but the `updates.Mutation` option is referencing it.',
+        21
+      );
+    }
+  }
+
+  for (const givenSubscription of givenSubscriptions) {
+    if (schemaSubscriptions.indexOf(givenSubscription) === -1) {
+      warn(
+        'Invalid subscription field: `' +
+          givenSubscription +
+          '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
+        22
+      );
+    }
   }
 }

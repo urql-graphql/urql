@@ -5,6 +5,7 @@ import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
 import { Store } from './store';
+import { noop } from '../test-utils/utils';
 
 const Appointment = gql`
   query appointment($id: String) {
@@ -88,6 +89,85 @@ describe('Store', () => {
     InMemoryData.initDataState(store.data, null);
 
     expect(result.data).toEqual(todosData);
+  });
+});
+
+describe('Store with UpdatesConfig', () => {
+  it("sets the store's updates field to the given argument", () => {
+    const updatesOption = {
+      Mutation: {
+        toggleTodo: noop,
+      },
+      Subscription: {
+        newTodo: noop,
+      },
+    };
+
+    const store = new Store({
+      updates: updatesOption,
+    });
+
+    expect(store.updates.Mutation).toBe(updatesOption.Mutation);
+    expect(store.updates.Subscription).toBe(updatesOption.Subscription);
+  });
+
+  it("sets the store's updates field to an empty default if not provided", () => {
+    const store = new Store({});
+
+    expect(store.updates.Mutation).toEqual({});
+    expect(store.updates.Subscription).toEqual({});
+  });
+
+  it('should not warn if Mutation/Subscription operations do exist in the schema', function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          toggleTodo: noop,
+        },
+        Subscription: {
+          newTodo: noop,
+        },
+      },
+    });
+
+    expect(console.warn).not.toBeCalled();
+  });
+
+  it("should warn if Mutation operations don't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          doTheChaChaSlide: noop,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid mutation field: `doTheChaChaSlide` is not in the defined schema, but the `updates.Mutation` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#21');
+  });
+
+  it("should warn if Subscription operations don't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Subscription: {
+          someoneDidTheChaChaSlide: noop,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid subscription field: `someoneDidTheChaChaSlide` is not in the defined schema, but the `updates.Subscription` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#22');
   });
 });
 
