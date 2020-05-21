@@ -86,7 +86,7 @@ to invalidate an additional entity.
 const [result, execute] = useMutation(`mutation($name: String!) { createUser(name: $name) }`);
 
 const onClick = () => {
-  execute({ context: { additionalTypenames: ['Wallet'] } });
+  execute({ name: 'newName' }, { additionalTypenames: ['Wallet'] });
 };
 ```
 
