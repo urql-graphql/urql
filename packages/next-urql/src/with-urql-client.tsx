@@ -17,7 +17,7 @@ function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
-export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
+export function withUrqlClient(getClientConfig: NextUrqlClientConfig) {
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -27,14 +27,19 @@ export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
         }
 
         const ssr = ssrExchange({ initialState: urqlState });
-        const client = clientConfig(ssr);
-        if (!client.exchanges) {
+        const clientConfig = getClientConfig(ssr);
+        if (!clientConfig.exchanges) {
           // When the user does not provide exchanges we make the default assumption.
-          client.exchanges = [dedupExchange, cacheExchange, ssr, fetchExchange];
+          clientConfig.exchanges = [
+            dedupExchange,
+            cacheExchange,
+            ssr,
+            fetchExchange,
+          ];
         }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(client)!;
+        return initUrqlClient(clientConfig)!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -57,17 +62,17 @@ export function withUrqlClient(clientConfig: NextUrqlClientConfig) {
         : (appOrPageCtx as NextPageContext);
 
       const ssrCache = ssrExchange({ initialState: undefined });
-      const client = clientConfig(ssrCache, ctx);
-      if (!client.exchanges) {
+      const clientConfig = getClientConfig(ssrCache, ctx);
+      if (!clientConfig.exchanges) {
         // When the user does not provide exchanges we make the default assumption.
-        client.exchanges = [
+        clientConfig.exchanges = [
           dedupExchange,
           cacheExchange,
           ssrCache,
           fetchExchange,
         ];
       }
-      const urqlClient = initUrqlClient(client);
+      const urqlClient = initUrqlClient(clientConfig);
 
       if (urqlClient) {
         (ctx as NextUrqlContext).urqlClient = urqlClient;
