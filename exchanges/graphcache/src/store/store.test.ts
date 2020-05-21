@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-
+import { mocked } from 'ts-jest/utils';
 import { Data, StorageAdapter } from '../types';
 import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
@@ -74,10 +74,6 @@ const todosData = {
   ],
 } as any;
 
-let warnSpy: jest.SpyInstance;
-beforeEach(() => (warnSpy = jest.spyOn(console, 'warn')));
-afterEach(() => warnSpy.mockRestore());
-
 describe('Store', () => {
   it('supports unformatted query documents', () => {
     const store = new Store();
@@ -121,7 +117,7 @@ describe('Store with KeyingConfig', () => {
       },
     });
 
-    expect(warnSpy).not.toBeCalled();
+    expect(console.warn).not.toBeCalled();
   });
 
   it("should warn if a key doesn't exist in the schema", function () {
@@ -133,8 +129,8 @@ describe('Store with KeyingConfig', () => {
       },
     });
 
-    expect(warnSpy).toBeCalledTimes(1);
-    const warnMessage = warnSpy.mock.calls[0][0];
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
     expect(warnMessage).toContain(
       'The type `NotInSchema` is not an object in the defined schema, but the `keys` option is referencing it'
     );

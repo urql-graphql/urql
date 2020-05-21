@@ -1,9 +1,6 @@
 import { buildClientSchema } from 'graphql';
+import { mocked } from 'ts-jest/utils';
 import * as SchemaPredicates from './schemaPredicates';
-
-let warnSpy: jest.SpyInstance;
-beforeEach(() => (warnSpy = jest.spyOn(console, 'warn')));
-afterEach(() => warnSpy.mockRestore());
 
 describe('SchemaPredicates', () => {
   // eslint-disable-next-line
@@ -71,8 +68,8 @@ describe('SchemaPredicates', () => {
       SchemaPredicates.isFieldNullable(schema, 'Todo', 'goof')
     ).toBeFalsy();
 
-    expect(warnSpy).toBeCalledTimes(1);
-    const warnMessage = warnSpy.mock.calls[0][0];
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
     expect(warnMessage).toContain('The field `goof` does not exist on `Todo`');
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#4');
   });

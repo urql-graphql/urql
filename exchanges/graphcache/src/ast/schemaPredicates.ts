@@ -117,15 +117,17 @@ export function expectValidKeyingConfig(
   schema: GraphQLSchema,
   keys: KeyingConfig
 ): void {
-  const types = Object.keys(schema.getTypeMap());
-  Object.keys(keys).forEach(key => {
-    if (types.indexOf(key) === -1) {
-      warn(
-        'Invalid Object type: The type `' +
-          key +
-          '` is not an object in the defined schema, but the `keys` option is referencing it.',
-        20
-      );
-    }
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    const types = Object.keys(schema.getTypeMap());
+    Object.keys(keys).forEach(key => {
+      if (types.indexOf(key) === -1) {
+        warn(
+          'Invalid Object type: The type `' +
+            key +
+            '` is not an object in the defined schema, but the `keys` option is referencing it.',
+          20
+        );
+      }
+    });
+  }
 }
