@@ -10,6 +10,7 @@ import {
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
+import { KeyingConfig } from '../types';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,
@@ -110,4 +111,23 @@ function expectAbstractType(
       'but a fragment in the GraphQL document is using it as a type condition.',
     5
   );
+}
+
+export function expectValidKeyingConfig(
+  schema: GraphQLSchema,
+  keys: KeyingConfig
+): void {
+  if (process.env.NODE_ENV !== 'production') {
+    const types = Object.keys(schema.getTypeMap());
+    Object.keys(keys).forEach(key => {
+      if (types.indexOf(key) === -1) {
+        warn(
+          'Invalid Object type: The type `' +
+            key +
+            '` is not an object in the defined schema, but the `keys` option is referencing it.',
+          20
+        );
+      }
+    });
+  }
 }

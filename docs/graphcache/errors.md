@@ -272,3 +272,15 @@ You probably have called `cache.invalidate` with data that the cache can't gener
 
 This may either happen because you're missing the `__typename` and `id` or `_id` field or if the last two
 aren't applicable to this entity a custom `keys` entry.
+
+## (20) Invalid Object type <a id="20"></a>
+
+> Invalid Object type: The type `???` is not an object in the defined schema,
+> but the `keys` option is referencing it.
+
+When you're passing an introspected schema to the cache exchange, it is
+able to check whether your `opts.keys` is valid.
+This error occurs when an unknown type is found in `opts.keys`.
+
+Check whether your schema is up-to-date, or whether you're using an invalid
+typename in `opts.keys`, maybe due to a typo.
