@@ -1,7 +1,7 @@
 import { initUrqlClient } from '../init-urql-client';
 
 describe('initUrqlClient', () => {
-  it('should return the urqlClient instance and ssrCache', () => {
+  it('should return the urqlClient instance', () => {
     const urqlClient = initUrqlClient({
       url: 'http://localhost:3000',
     });
