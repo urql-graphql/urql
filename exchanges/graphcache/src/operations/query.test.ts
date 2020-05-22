@@ -41,8 +41,6 @@ describe('Query', () => {
         ],
       }
     );
-
-    jest.resetAllMocks();
   });
 
   it('test partial results', () => {

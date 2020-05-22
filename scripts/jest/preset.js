@@ -3,6 +3,7 @@ module.exports = {
   setupFiles: [
     require.resolve('./setup.js')
   ],
+  clearMocks: true,
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
