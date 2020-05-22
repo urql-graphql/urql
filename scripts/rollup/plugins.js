@@ -15,6 +15,7 @@ import cleanup from './cleanup-plugin.js'
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
+import babelPluginTransformEsmCompatability from '../babel/transform-esm-compatability';
 
 import * as settings from './settings';
 
@@ -71,9 +72,10 @@ export const makePlugins = ({ isProduction } = {}) => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
-      babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
+      babelPluginTransformDebugTarget,
       babelPluginTransformInvariant,
+      babelPluginTransformEsmCompatability,
       'babel-plugin-modular-graphql',
       'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
