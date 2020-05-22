@@ -14,6 +14,8 @@ message may not actually tell you everything about what's going on.
 This is a supporting document that explains every error and attempts to give more
 information on how you may be able to fix some issues or avoid these errors/warnings.
 
+<a id="1"></a>
+
 ## (1) Invalid GraphQL document
 
 > Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition
@@ -26,6 +28,8 @@ hooks like `useQuery`.
 Your queries must always contain a main operation, so either a query, mutation, or
 subscription. This error occurs when this is missing, because the `DocumentNode`
 is maybe empty or only contains fragments.
+
+<a id="2"></a>
 
 ## (2) Invalid Cache call
 
