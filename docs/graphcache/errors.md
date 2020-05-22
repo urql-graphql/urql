@@ -1,3 +1,8 @@
+---
+title: Errors
+order: 6
+---
+
 # Help!
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**
@@ -9,7 +14,7 @@ message may not actually tell you everything about what's going on.
 This is a supporting document that explains every error and attempts to give more
 information on how you may be able to fix some issues or avoid these errors/warnings.
 
-## (1) Invalid GraphQL document <a id="1"></a>
+## (1) Invalid GraphQL document
 
 > Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition
 > node for a query, subscription, or mutation.
@@ -22,7 +27,7 @@ Your queries must always contain a main operation, so either a query, mutation, 
 subscription. This error occurs when this is missing, because the `DocumentNode`
 is maybe empty or only contains fragments.
 
-## (2) Invalid Cache call <a id="2"></a>
+## (2) Invalid Cache call
 
 > Invalid Cache call: The cache may only be accessed or mutated during
 > operations like write or query, or as part of its resolvers, updaters,
@@ -42,7 +47,7 @@ initialised correctly.
 This is a safe-guard to prevent any asynchronous work to take place, or to
 avoid mutating the cache outside of any normal operation.
 
-## (3) Invalid Object type <a id="3"></a>
+## (3) Invalid Object type
 
 > Invalid Object type: The type `???` is not an object in the defined schema,
 > but the GraphQL document is traversing it.
@@ -55,7 +60,7 @@ fragment.
 Check whether your schema is up-to-date or whether you're using an invalid
 typename somewhere, maybe due to a typo.
 
-## (4) Invalid field <a id="4"></a>
+## (4) Invalid field
 
 > Invalid field: The field `???` does not exist on `???`,
 > but the GraphQL document expects it to exist.<br />
@@ -72,7 +77,7 @@ field somewhere, maybe due to a typo.
 As the warning states, this won't lead any operation to abort or an error
 to be thrown!
 
-## (5) Invalid Abstract type <a id="5"></a>
+## (5) Invalid Abstract type
 
 > Invalid Abstract type: The type `???` is not an Interface or Union type
 > in the defined schema, but a fragment in the GraphQL document is using it
@@ -88,7 +93,7 @@ This applies to full fragments (`fragment _ on Interface`) or inline fragments
 Check whether your schema is up-to-date or whether you're using an invalid
 field somewhere, maybe due to a typo.
 
-## (6) readFragment(...) was called with an empty fragment <a id="6"></a>
+## (6) readFragment(...) was called with an empty fragment
 
 > readFragment(...) was called with an empty fragment.
 > You have to call it with at least one fragment in your GraphQL document.
@@ -102,7 +107,7 @@ is maybe empty or does not contain fragments.
 When you're calling a fragment method, please ensure that you're only passing fragments
 in your GraphQL document. The first fragment will be used to start writing data.
 
-## (7) Can't generate a key for readFragment(...) <a id="7"></a>
+## (7) Can't generate a key for readFragment(...)
 
 > Can't generate a key for readFragment(...).
 > You have to pass an `id` or `_id` field or create a custom `keys` config for `???`.
@@ -116,7 +121,7 @@ fields for your custom `keys` config.
 Please make sure that you include enough properties on your data so that `readFragment`
 can generate a key.
 
-## (8) Invalid resolver data <a id="8"></a>
+## (8) Invalid resolver data
 
 > Invalid resolver value: The resolver at `???` returned an invalid typename that
 > could not be reconciled with the cache.
@@ -130,7 +135,7 @@ possible to return a different type for a single field.
 Please check your schema for the type that your resolver has to return, then add a
 `__typename` field to your returned resolver value that matches this type.
 
-## (9) Invalid resolver value <a id="9"></a>
+## (9) Invalid resolver value
 
 > Invalid resolver value: The field at `???` is a scalar (number, boolean, etc),
 > but the GraphQL query expects a selection set for this field.
@@ -144,7 +149,7 @@ received a number, boolean, or another scalar from your resolver.
 Please check that your resolvers return scalars where there's no selection set,
 and entities where there is one.
 
-## (10) writeOptimistic(...) was called with an operation that isn't a mutation <a id="10"></a>
+## (10) writeOptimistic(...) was called with an operation that isn't a mutation
 
 > writeOptimistic(...) was called with an operation that is not a mutation.
 > This case is unsupported and should never occur.
@@ -152,7 +157,7 @@ and entities where there is one.
 This should never happen, please open an issue if it does. This occurs when `writeOptimistic`
 attempts to write an optimistic result for a query or subscription, instead of a mutation.
 
-## (11) writeFragment(...) was called with an empty fragment <a id="11"></a>
+## (11) writeFragment(...) was called with an empty fragment
 
 > writeFragment(...) was called with an empty fragment.
 > You have to call it with at least one fragment in your GraphQL document.
@@ -166,7 +171,7 @@ is maybe empty or does not contain fragments.
 When you're calling a fragment method, please ensure that you're only passing fragments
 in your GraphQL document. The first fragment will be used to start writing data.
 
-## (12) Can't generate a key for writeFragment(...) <a id="12"></a>
+## (12) Can't generate a key for writeFragment(...)
 
 > Can't generate a key for writeFragment(...) data.
 > You have to pass an `id` or `_id` field or create a custom `keys` config for `???`.
@@ -180,7 +185,7 @@ fields for your custom `keys` config.
 Please make sure that you include enough properties on your data so that `writeFragment`
 can generate a key.
 
-## (13) Invalid undefined <a id="13"></a>
+## (13) Invalid undefined
 
 > Invalid undefined: The field at `???` is `undefined`, but the GraphQL query expects a
 > scalar (number, boolean, etc) / selection set for this field.
@@ -189,7 +194,7 @@ As data is written to the cache, this warning is issued when `undefined` is enco
 GraphQL results should never contain an `undefined` value, so this warning will let you
 know which part of your result did contain `undefined`.
 
-## (15) Invalid key <a id="15"></a>
+## (15) Invalid key
 
 > Invalid key: The GraphQL query at the field at `???` has a selection set,
 > but no key could be generated for the data at this field.
@@ -212,7 +217,7 @@ have to create a custom `keys` config. This `keys` function either needs to
 return a unique ID for your entity or it needs to explicitly return `null` to silence
 this warning.
 
-## (16) Heuristic Fragment Matching <a id="16"></a>
+## (16) Heuristic Fragment Matching
 
 > Heuristic Fragment Matching: A fragment is trying to match against the `???` type,
 > but the type condition is `???`. Since GraphQL allows for interfaces `???` may be
@@ -235,7 +240,7 @@ in the cache, which is then treated as a fragment match.
 When you pass an introspected schema to the cache, this warning will never be displayed
 as the cache can then do deterministic fragment matching using schema information.
 
-## (17) Invalid type <a id="17"></a>
+## (17) Invalid type
 
 > Invalid type: The type `???` is used with @populate but does not exist.
 
@@ -249,7 +254,7 @@ on the schema or does not match expectations then this warning is logged.
 Check whether your schema is up-to-date or whether you're using an invalid
 field somewhere, maybe due to a typo.
 
-## (18) Invalid TypeInfo state <a id="18"></a>
+## (18) Invalid TypeInfo state
 
 > Invalid TypeInfo state: Found no flat schema type when one was expected.
 
@@ -273,7 +278,7 @@ You probably have called `cache.invalidate` with data that the cache can't gener
 This may either happen because you're missing the `__typename` and `id` or `_id` field or if the last two
 aren't applicable to this entity a custom `keys` entry.
 
-## (20) Invalid Object type <a id="20"></a>
+## (20) Invalid Object type
 
 > Invalid Object type: The type `???` is not an object in the defined schema,
 > but the `keys` option is referencing it.
