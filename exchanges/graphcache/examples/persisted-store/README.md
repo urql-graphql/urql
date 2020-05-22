@@ -28,4 +28,6 @@ yarn start
 
 #### 4. Open your browser
 
-Navigate to example at [http://localhost:3000/](http://localhost:3000/).
+Navigate to the example at [http://localhost:3000/](http://localhost:3000/).
+
+(A GraphQL backend will also run at [http://localhost:4000/graphql](http://localhost:4000/graphql)).

@@ -68,5 +68,9 @@ module.exports = {
     hot: true,
     https: false,
     noInfo: true,
+    onListening(server) {
+      const port = server.listeningApp.address().port;
+      console.log(`Frontend server listening at http://localhost:${port}`);
+    },
   },
 };
