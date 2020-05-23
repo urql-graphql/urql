@@ -49,7 +49,7 @@ const Pokemon = () => {
   return <h1>{result.data.pokemon.name}</h1>;
 };
 
-export default withUrqlClient({
+export default withUrqlClient(() => ({
   url: 'https://graphql-pokemon.now.sh',
   fetch,
-})(Pokemon);
+}))(Pokemon);

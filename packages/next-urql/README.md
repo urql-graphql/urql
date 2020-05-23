@@ -60,7 +60,7 @@ const Root = () => (
   </div>
 );
 
-export default withUrqlClient({ url: 'https://graphql-pokemon.now.sh' })(Root);
+export default withUrqlClient(() => ({ url: 'https://graphql-pokemon.now.sh' }))(Root);
 ```
 
 Read more below in the [API](#API) section to learn more about the arguments that can be passed to `withUrqlClient`.
@@ -78,9 +78,7 @@ Next allows you to override the root of your application using a special page ca
 The `clientOptions` argument is required. It represents all of the options you want to enable on your `urql` Client instance. It has the following union type:
 
 ```typescript
-type NextUrqlClientConfig =
-  | Omit<ClientOptions, 'exchanges' | 'suspense'>
-  | ((ctx: NextPageContext) => Omit<ClientOptions, 'exchanges' | 'suspense'>);
+type NextUrqlClientConfig = (ssrExchange: SSRExchange, ctx?: NextPageContext) => ClientOptions;
 ```
 
 The `ClientOptions` `interface` comes from `urql` itself and has the following type:
@@ -93,7 +91,7 @@ interface ClientOptions {
   fetchOptions?: RequestInit | (() => RequestInit);
   /** An alternative fetch implementation. */
   fetch?: typeof fetch;
-  /** The exchanges used by the Client. See mergeExchanges below for information on modifying exchanges in next-urql. */
+  /** The exchanges used by the Client. */
   exchanges?: Exchange[];
   /** A flag to enable suspense on the server. next-urql handles this for you. */
   suspense?: boolean;
@@ -106,22 +104,10 @@ interface ClientOptions {
 }
 ```
 
-This means you have two options for creating your `urql` Client. The first involves just passing the options as an object directly:
+You can create a client by passing a function which receives the `ssrExchange` and Next's context object, `ctx`, as arguments and returns `urql`'s Client options. This is helpful if you need to access some part of Next's context to instantiate your Client options. **Note: `ctx` is _only_ available on the initial server-side render and _not_ on client-side navigation**. This is necessary to allow for different Client configurations between server and client.
 
 ```typescript
-withUrqlClient({
-  url: 'http://localhost:3000',
-  fetchOptions: {
-    referrer: 'no-referrer',
-    redirect: 'follow',
-  },
-});
-```
-
-The second involves passing a function, which receives Next's context object, `ctx`, as an argument and returns `urql`'s Client options. This is helpful if you need to access some part of Next's context to instantiate your Client options. **Note: `ctx` is _only_ available on the initial server-side render and _not_ on client-side navigation**. This is necessary to allow for different Client configurations between server and client.
-
-```typescript
-withUrqlClient(ctx => ({
+withUrqlClient((_ssrExchange, ctx) => ({
   url: 'http://localhost:3000',
   fetchOptions: {
     headers: {
@@ -135,15 +121,11 @@ withUrqlClient(ctx => ({
 
 In client-side SPAs using `urql`, you typically configure the Client yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` set up for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
 
-#### `mergeExchanges` (Optional)
+#### `exchanges`
 
-The `mergeExchanges` argument is optional. This is a function that takes the `ssrExchange` created by `next-urql` as its only argument and allows you to configure your exchanges as you wish. It has the following type signature:
+When you're using `withUrqlClient` and you don't return an `exchanges` property we'll assume you wanted the default exchanges, these contain: `dedupExchange`, `cacheExchange`, `ssrExchange` (the one you received as a first argument) and the `fetchExchange`.
 
-```typescript
-(ssrExchange: SSRExchange) => Exchange[]
-```
-
-By default, `next-urql` will incorprate the `ssrExchange` into your `exchanges` array in the correct location (after any other caching exchanges, but _before_ the `fetchExchange` – read more [here](https://formidable.com/open-source/urql/docs/basics/#setting-up-the-client)). Use this argument if you want to configure your Client with additional custom `exchanges`, or access the `ssrCache` directly to extract or restore data from its cache.
+When you yourself want to pass exchanges don't forget to include the `ssrExchange` you received as the first argument.
 
 ### Different Client configurations on the client and the server
 

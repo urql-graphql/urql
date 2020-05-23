@@ -213,7 +213,7 @@ const Index = () => {
   // ...
 };
 
-export default withUrqlClient(ctx => ({
+export default withUrqlClient((_ssrExchange, ctx) => ({
   // ...add your Client options here
   url: 'http://localhost:3000/graphql',
 }))(Index);
@@ -225,15 +225,15 @@ object or a function that receives the Next.js' `getInitialProps` context.
 
 One added caveat is that these options may not include the `exchanges` option because `next-urql`
 injects the `ssrExchange` automatically at the right location. If you're setting up custom exchanges
-you'll need to instead provide them in a custom `mergeExchanges` function as the second argument:
+you'll need to instead provide them in the `exchanges` property of the returned client object.
 
 ```js
 import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
 
 import { withUrqlClient } from 'next-urql';
 
-// Modify this array to include custom exchanges:
-const mergeExchanges = ssrExchange => [dedupExchange, cacheExchange, ssrExchange, fetchExchange];
-
-export default withUrqlClient({ url: 'http://localhost:3000/graphql' }, mergeExchanges)(Index);
+export default withUrqlClient(ssrExchange => ({
+  url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
+}))(Index);
 ```

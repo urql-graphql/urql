@@ -15,7 +15,7 @@ const Home: NextComponentType<NextUrqlPageContext> = () => (
   </div>
 );
 
-export default withUrqlClient((ctx: NextUrqlPageContext) => {
+export default withUrqlClient((_ssr: object, ctx: NextUrqlPageContext) => {
   return {
     url: 'https://graphql-pokemon.now.sh',
     fetchOptions: {

@@ -18,13 +18,14 @@ const Home: React.FC = () => (
   </div>
 );
 
-export default withUrqlClient(
-  { url: 'https://graphql-pokemon.now.sh', fetch },
-  (ssrExchange: SSRExchange) => [
+export default withUrqlClient((ssrExchange) => ({
+  exchanges: [
     dedupExchange,
     urlExchange,
     cacheExchange,
     ssrExchange,
     fetchExchange,
-  ]
-)(Home);
+  ],
+  url: 'https://graphql-pokemon.now.sh',
+  fetch,
+}))(Home);

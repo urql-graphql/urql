@@ -2,29 +2,22 @@ import React from 'react';
 import { NextPage, NextPageContext } from 'next';
 import NextApp, { AppContext } from 'next/app';
 import ssrPrepass from 'react-ssr-prepass';
-import { Provider, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import {
+  Provider,
+  ssrExchange,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+} from 'urql';
 
 import { initUrqlClient } from './init-urql-client';
-import {
-  NextUrqlClientConfig,
-  MergeExchanges,
-  NextUrqlContext,
-  WithUrqlProps,
-} from './types';
+import { NextUrqlClientConfig, NextUrqlContext, WithUrqlProps } from './types';
 
 function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
-export function withUrqlClient(
-  clientConfig: NextUrqlClientConfig,
-  mergeExchanges: MergeExchanges = ssrExchange => [
-    dedupExchange,
-    cacheExchange,
-    ssrExchange,
-    fetchExchange,
-  ]
-) {
+export function withUrqlClient(getClientConfig: NextUrqlClientConfig) {
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -33,11 +26,20 @@ export function withUrqlClient(
           return urqlClient;
         }
 
-        const clientOptions =
-          typeof clientConfig === 'function' ? clientConfig() : clientConfig;
+        const ssr = ssrExchange({ initialState: urqlState });
+        const clientConfig = getClientConfig(ssr);
+        if (!clientConfig.exchanges) {
+          // When the user does not provide exchanges we make the default assumption.
+          clientConfig.exchanges = [
+            dedupExchange,
+            cacheExchange,
+            ssr,
+            fetchExchange,
+          ];
+        }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(clientOptions, mergeExchanges, urqlState)[0]!;
+        return initUrqlClient(clientConfig)!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -59,9 +61,18 @@ export function withUrqlClient(
         ? (appOrPageCtx as AppContext).ctx
         : (appOrPageCtx as NextPageContext);
 
-      const opts =
-        typeof clientConfig === 'function' ? clientConfig(ctx) : clientConfig;
-      const [urqlClient, ssrCache] = initUrqlClient(opts, mergeExchanges);
+      const ssrCache = ssrExchange({ initialState: undefined });
+      const clientConfig = getClientConfig(ssrCache, ctx);
+      if (!clientConfig.exchanges) {
+        // When the user does not provide exchanges we make the default assumption.
+        clientConfig.exchanges = [
+          dedupExchange,
+          cacheExchange,
+          ssrCache,
+          fetchExchange,
+        ];
+      }
+      const urqlClient = initUrqlClient(clientConfig);
 
       if (urqlClient) {
         (ctx as NextUrqlContext).urqlClient = urqlClient;
