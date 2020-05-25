@@ -23,6 +23,7 @@ import {
   OperationRequest,
   Dependencies,
   EntityField,
+  OperationType,
 } from '../types';
 
 import {
@@ -55,7 +56,7 @@ export const write = (
   data: Data,
   key?: number
 ): WriteResult => {
-  initDataState(store.data, key || null);
+  initDataState(OperationType.Write, store.data, key || null);
   const result = startWrite(store, request, data);
   clearDataState();
   return result;
@@ -96,7 +97,7 @@ export const writeOptimistic = (
   request: OperationRequest,
   key: number
 ): WriteResult => {
-  initDataState(store.data, key, true);
+  initDataState(OperationType.Write, store.data, key, true);
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = {

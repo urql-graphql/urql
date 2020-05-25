@@ -23,6 +23,7 @@ import {
   OperationRequest,
   NullArray,
   Dependencies,
+  OperationType,
 } from '../types';
 
 import {
@@ -62,7 +63,7 @@ export const query = (
   request: OperationRequest,
   data?: Data
 ): QueryResult => {
-  initDataState(store.data, null);
+  initDataState(OperationType.Read, store.data, null);
   const result = read(store, request, data);
   clearDataState();
   return result;
