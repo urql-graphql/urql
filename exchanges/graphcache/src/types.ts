@@ -180,3 +180,8 @@ export interface StorageAdapter {
 }
 
 export type Dependencies = Record<string, true>;
+
+export enum OperationType {
+  Read = 'READ',
+  Write = 'WRITE',
+}
