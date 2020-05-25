@@ -28,6 +28,7 @@ import {
 
 import {
   Store,
+  getCurrentOperation,
   getCurrentDependencies,
   initDataState,
   clearDataState,
@@ -286,7 +287,11 @@ const readSelection = (
     if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
-    } else if (resolvers && typeof resolvers[fieldName] === 'function') {
+    } else if (
+      getCurrentOperation() !== OperationType.Read &&
+      resolvers &&
+      typeof resolvers[fieldName] === 'function'
+    ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
       updateContext(ctx, typename, entityKey, key, fieldName);
