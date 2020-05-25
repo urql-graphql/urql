@@ -23,7 +23,6 @@ import {
   OperationRequest,
   NullArray,
   Dependencies,
-  OperationType,
 } from '../types';
 
 import {
@@ -64,7 +63,7 @@ export const query = (
   request: OperationRequest,
   data?: Data
 ): QueryResult => {
-  initDataState(OperationType.Read, store.data, null);
+  initDataState('read', store.data, null);
   const result = read(store, request, data);
   clearDataState();
   return result;
@@ -288,7 +287,7 @@ const readSelection = (
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (
-      getCurrentOperation() === OperationType.Read &&
+      getCurrentOperation() === 'read' &&
       resolvers &&
       typeof resolvers[fieldName] === 'function'
     ) {

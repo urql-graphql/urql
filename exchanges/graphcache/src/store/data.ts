@@ -137,7 +137,7 @@ export const clearDataState = () => {
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
     scheduleTask(() => {
-      initDataState(OperationType.Read, data, null);
+      initDataState('read', data, null);
       gc();
       persistData();
       clearDataState();
@@ -159,7 +159,7 @@ export const noopDataState = (
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
-  initDataState(OperationType.Read, data, layerKey, isOptimistic);
+  initDataState('read', data, layerKey, isOptimistic);
   clearDataState();
 };
 
@@ -581,7 +581,7 @@ export const hydrateData = (
   storage: StorageAdapter,
   entries: SerializedEntries
 ) => {
-  initDataState(OperationType.Read, data, null);
+  initDataState('read', data, null);
 
   for (const key in entries) {
     const value = entries[key];
