@@ -68,15 +68,10 @@ export const query = (
   return result;
 };
 
-export interface ReadOpts {
-  skipResolvers?: boolean;
-}
-
 export const read = (
   store: Store,
   request: OperationRequest,
-  input?: Data,
-  opts?: ReadOpts
+  input?: Data
 ): QueryResult => {
   const operation = getMainOperation(request.query);
   const rootKey = store.rootFields[operation.operation];
@@ -98,7 +93,7 @@ export const read = (
   data =
     rootKey !== ctx.store.rootFields['query']
       ? readRoot(ctx, rootKey, rootSelect, data)
-      : readSelection(ctx, rootKey, rootSelect, data, undefined, opts);
+      : readSelection(ctx, rootKey, rootSelect, data);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -235,8 +230,7 @@ const readSelection = (
   key: string,
   select: SelectionSet,
   data: Data,
-  result?: Data,
-  opts?: ReadOpts
+  result?: Data
 ): Data | undefined => {
   const { store } = ctx;
   const isQuery = key === store.rootFields['query'];
@@ -291,11 +285,7 @@ const readSelection = (
     if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
-    } else if (
-      !(opts && opts.skipResolvers) &&
-      resolvers &&
-      typeof resolvers[fieldName] === 'function'
-    ) {
+    } else if (resolvers && typeof resolvers[fieldName] === 'function') {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
       updateContext(ctx, typename, entityKey, key, fieldName);
