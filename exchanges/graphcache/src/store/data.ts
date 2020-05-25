@@ -137,7 +137,7 @@ export const clearDataState = () => {
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
     scheduleTask(() => {
-      initDataState('read', data, null);
+      initDataState('write', data, null);
       gc();
       persistData();
       clearDataState();
