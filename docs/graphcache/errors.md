@@ -310,3 +310,14 @@ This error occurs when an unknown subscription field is found in `opts.updates.S
 
 Check whether your schema is up-to-date, or whether you're using an invalid
 subscription name in `opts.updates.Subscription`, maybe due to a typo.
+
+## (23) Invalid resolver
+
+> Invalid resolver: `???` is not in the defined schema, but the `resolvers`
+> option is referencing it.
+
+When you're passing an introspected schema to the cache exchange, it is
+able to check whether your `opts.resolvers` is valid.
+This error occurs when an unknown query, type or field is found in `opts.resolvers`.
+
+Check whether your schema is up-to-date, or whether you've got a typo in `opts.resolvers`.

@@ -10,7 +10,7 @@ import {
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
-import { KeyingConfig, UpdatesConfig } from '../types';
+import { KeyingConfig, UpdatesConfig, ResolverConfig } from '../types';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,
@@ -174,6 +174,54 @@ export function expectValidUpdatesConfig(
           '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
         22
       );
+    }
+  }
+}
+
+function warnAboutResolver(name: string): void {
+  warn(
+    `Invalid resolver: \`${name}\` is not in the defined schema, but the \`resolvers\` option is referencing it.`,
+    23
+  );
+}
+
+export function expectValidResolversConfig(
+  schema: GraphQLSchema,
+  resolvers: ResolverConfig
+): void {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  const validTypes = Object.keys(schema.getTypeMap());
+
+  for (const key in resolvers) {
+    if (key === 'Query') {
+      const queryType = schema.getQueryType();
+      if (queryType) {
+        const validQueries = Object.keys(queryType.toConfig().fields);
+        for (const resolverQuery in resolvers.Query) {
+          if (validQueries.indexOf(resolverQuery) === -1) {
+            warnAboutResolver('Query.' + resolverQuery);
+          }
+        }
+      } else {
+        warnAboutResolver('Query');
+      }
+    } else {
+      if (validTypes.indexOf(key) === -1) {
+        warnAboutResolver(key);
+      } else {
+        const validTypeProperties = Object.keys(
+          (schema.getType(key) as GraphQLObjectType).getFields()
+        );
+        const resolverProperties = Object.keys(resolvers[key]);
+        for (const resolverProperty of resolverProperties) {
+          if (validTypeProperties.indexOf(resolverProperty) === -1) {
+            warnAboutResolver(key + '.' + resolverProperty);
+          }
+        }
+      }
     }
   }
 }

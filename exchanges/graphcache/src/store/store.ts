@@ -86,6 +86,13 @@ export class Store implements Cache {
         if (hasUpdates) {
           SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
         }
+
+        if (this.resolvers) {
+          SchemaPredicates.expectValidResolversConfig(
+            this.schema,
+            this.resolvers
+          );
+        }
       }
     }
 
