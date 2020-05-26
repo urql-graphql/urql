@@ -105,9 +105,9 @@ page.](../concepts/core-package.md#one-off-queries-and-mutations)
 
 ### client.subscription
 
-This is similar to [`client.query`](#clientquery), but provides raw stream without `toPromise` method.
+This is similar to [`client.query`](#clientquery), but does not provide a `toPromise()` helper method on the streams it returns.
 
-[Read more about how to use setup subscriptions](../advanced/subscriptions.md)
+[Read more about how to use this API on the "Subscriptions" page.](../advanced/subscriptions.md)
 
 #### client.reexecuteOperation
 
