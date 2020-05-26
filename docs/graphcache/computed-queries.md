@@ -5,27 +5,37 @@ order: 2
 
 # Computed Queries
 
-When dealing with data we could have special cases where we want to format a date
-or if we for instance have a list of a certain entity in cache and next we want
-to query a specific entity, chances are this will already be (partially) available
-in that list.
+When dealing with data we could have special cases where we want to transform
+the data between the API and frontend logic, for example:
+
+- alter the format of a date, perhaps from a UNIX timestamp to a `Date` object.
+- if we have a list of a certain entity in the cache and next we want to query a
+  specific entity, chances are this will already be (partially) available in the
+  cache's list.
 
 These cases can be solved with the concept of `resolvers`.
 
 ## Resolvers
 
-Let's look at how we can introduce these `resolvers` to our `cacheExchange`.
+Let's look at how we can introduce these `resolvers` to our Graphcache exchange.
+Let's say we have a `Todo` type with an `updatedAt` property which is a UNIX timestamp.
 
 ```js
+import { cacheExchange } from '@urql/exchange-graphcache';
+
 const cache = cacheExchange({
   resolvers: {
-    Todo: { updatedAt: ({ date }) => Date.format(date) },
+    Todo: {
+      updatedAt(parent, args, cache, info) {
+        return new Date(parent.updatedAt);
+      },
+    },
   },
 });
 ```
 
 Now when we query our `todos` every time we encounter an object with `Todo`
-as the `__typename` it will format the `updatedAt` property. This way we
+as the `__typename` it will convert the `parent.updatedAt` property to a `Date`. This way we
 can effectively change how we handle a certain property on an entity.
 
 Let's look at the arguments passed to `resolvers` to get a better sense of
@@ -33,7 +43,7 @@ what we can do, there are four arguments (these are in order):
 
 - `parent` – The original entity in the cache. In the example above, this
   would be the full `Todo` object.
-- `arguments` – The arguments used in this field.
+- `args` – The arguments used in this field.
 - `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods,
   read more about this [below](#resolve).
 - `info` – This contains the fragments used in the query and the field arguments in the query.

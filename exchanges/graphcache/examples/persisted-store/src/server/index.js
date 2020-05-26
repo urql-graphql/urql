@@ -19,6 +19,6 @@ server.applyMiddleware({ app });
 
 app.listen({ port: PORT }, () =>
   console.log(
-    `server listening at http://localhost:${PORT}${server.graphqlPath}`
+    `Backend server listening at http://localhost:${PORT}${server.graphqlPath}`
   )
 );
