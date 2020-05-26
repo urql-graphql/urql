@@ -314,10 +314,6 @@ export class Client {
     variables?: Variables,
     context?: Partial<OperationContext>
   ): Source<OperationResult<Data>> {
-    if (!context || typeof context.suspense !== 'boolean') {
-      context = { ...context, suspense: false };
-    }
-
     return this.executeSubscription(createRequest(query, variables), context);
   }
 
