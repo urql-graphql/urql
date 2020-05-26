@@ -309,6 +309,18 @@ export class Client {
     return response$;
   };
 
+  subscription<Data = any, Variables extends object = {}>(
+    query: DocumentNode | string,
+    variables?: Variables,
+    context?: Partial<OperationContext>
+  ): Source<OperationResult<Data>> {
+    if (!context || typeof context.suspense !== 'boolean') {
+      context = { ...context, suspense: false };
+    }
+
+    return this.executeSubscription(createRequest(query, variables), context);
+  }
+
   executeSubscription = (
     query: GraphQLRequest,
     opts?: Partial<OperationContext>

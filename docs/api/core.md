@@ -53,7 +53,7 @@ repeatedly in the interval you pass.
 ### client.executeSubscription
 
 This is functionally the same as `client.executeQuery`, but creates operations for subscriptions
-instead, with `operationName` set to `'mutation'`.
+instead, with `operationName` set to `'subscription'`.
 
 ### client.executeMutation
 
@@ -102,6 +102,12 @@ This is similar to [`client.query`](#clientquery), but dispatches mutations inst
 
 [Read more about how to use this API on the "Core Package"
 page.](../concepts/core-package.md#one-off-queries-and-mutations)
+
+### client.subscription
+
+This is similar to [`client.query`](#clientquery), but provides raw stream without `toPromise` method.
+
+[Read more about how to use setup subscriptions](../advanced/subscriptions.md)
 
 #### client.reexecuteOperation
 

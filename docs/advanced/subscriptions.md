@@ -48,10 +48,7 @@ package](https://github.com/apollographql/subscriptions-transport-ws).
 import { Client, defaultExchanges, subscriptionExchange } from 'urql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
-const subscriptionClient = new SubscriptionClient(
-  'wss://localhost/graphql',
-  { reconnect: true }
-);
+const subscriptionClient = new SubscriptionClient('wss://localhost/graphql', { reconnect: true });
 
 const client = new Client({
   url: '/graphql',
@@ -132,3 +129,9 @@ As we can see, the `result.data` is being updated and transformed by
 the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
+
+## Directly with @urql/core
+
+To consume subscriptions without any level of abstraction you should
+use `client.subscription` method for the subscription exchange to
+correctly pick it up. Or you can use `client.executeSubscription(createRequest(query, variables))`.
