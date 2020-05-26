@@ -2,4 +2,4 @@
 '@urql/core': minor
 ---
 
-Expose `client.subscription` to be correctly recognized by exchange
+Expose a `client.subscription`shortcut method, similar to `client.query` and `client.mutation`

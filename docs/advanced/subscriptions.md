@@ -130,8 +130,28 @@ the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
 
-## Directly with @urql/core
+## One-off Subscriptions
 
-To consume subscriptions without any level of abstraction you should
-use `client.subscription` method for the subscription exchange to
-correctly pick it up. Or you can use `client.executeSubscription(createRequest(query, variables))`.
+Whe you're using subscriptions directly without `urql`'s framework bindings, you can use the `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for mutations and subscriptions [that we've seen before on the "Core Package" page.](../concepts/core-package.md#one-off-queries-and-mutations)
+
+This method will always [returns a Wonka stream](../concepts/stream-patterns.md#the-wonka-library) and doesn't have a `.toPromise()` shortcut method, since promises won't return the multiple values that a subscription may deliver. Let's convert the above example to one without framework code, as we may use subscriptions in a Node.js environment.
+
+```js
+import { pipe, subscribe } from 'wonka';
+
+const newMessages = `
+  subscription MessageSub {
+    newMessages {
+      id
+      from
+      text
+    }
+  }
+`;
+
+const { unsubscribe } = pipe(
+  client.subscription(MessageSub),
+  subscribe(result => {
+    console.log(result); // { data: ... }
+  })
+);
