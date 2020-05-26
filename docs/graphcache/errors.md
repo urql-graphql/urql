@@ -321,3 +321,14 @@ able to check whether your `opts.resolvers` is valid.
 This error occurs when an unknown query, type or field is found in `opts.resolvers`.
 
 Check whether your schema is up-to-date, or whether you've got a typo in `opts.resolvers`.
+
+## (24) Invalid optimistic mutation
+
+> Invalid optimistic mutation field: `???` is not a mutation field in the defined schema,
+> but the `optimistic` option is referencing it.
+
+When you're passing an introspected schema to the cache exchange, it is
+able to check whether your `opts.optimistic` is valid.
+This error occurs when a field in `opts.optimistic` is not in the schema's `Mutation` fields.
+
+Check whether your schema is up-to-date, or whether you've got a typo in `Mutation` or `opts.optimistic`.

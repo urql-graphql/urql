@@ -338,7 +338,7 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.initDataState(store.data, null);
   });
 
-  it('Should resolve a property', () => {
+  it('should resolve a property', () => {
     const todoResult = store.resolve({ __typename: 'Todo', id: '0' }, 'text');
     expect(todoResult).toEqual('Go to the shops');
     const authorResult = store.resolve(
@@ -362,7 +362,7 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.clearDataState();
   });
 
-  it('Should resolve a link property', () => {
+  it('should resolve a link property', () => {
     const parent = {
       id: '0',
       text: 'test',
@@ -840,5 +840,28 @@ describe('Store with storage', () => {
     InMemoryData.initDataState(store.data, null);
     expect(InMemoryData.readRecord('Query', 'base')).toBe(true);
     InMemoryData.clearDataState();
+  });
+
+  it("should warn if an optimistic field doesn't exist in the schema's mutations", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          toggleTodo: noop,
+        },
+      },
+      optimistic: {
+        toggleTodo: () => null,
+        // This field should be warned about.
+        deleteTodo: () => null,
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid optimistic mutation field: `deleteTodo` is not a mutation field in the defined schema, but the `optimistic` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
   });
 });

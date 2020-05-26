@@ -10,7 +10,12 @@ import {
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
-import { KeyingConfig, UpdatesConfig, ResolverConfig } from '../types';
+import {
+  KeyingConfig,
+  UpdatesConfig,
+  ResolverConfig,
+  OptimisticMutationConfig,
+} from '../types';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,
@@ -222,6 +227,30 @@ export function expectValidResolversConfig(
           }
         }
       }
+    }
+  }
+}
+
+export function expectValidOptimisticMutationsConfig(
+  schema: GraphQLSchema,
+  optimisticMutations: OptimisticMutationConfig
+): void {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  const validMutations = schema.getMutationType()
+    ? Object.keys(
+        (schema.getMutationType() as GraphQLObjectType).toConfig().fields
+      )
+    : [];
+
+  for (const mutation in optimisticMutations) {
+    if (validMutations.indexOf(mutation) === -1) {
+      warn(
+        `Invalid optimistic mutation field: \`${mutation}\` is not a mutation field in the defined schema, but the \`optimistic\` option is referencing it.`,
+        24
+      );
     }
   }
 }

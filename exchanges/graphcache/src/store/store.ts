@@ -93,6 +93,13 @@ export class Store implements Cache {
             this.resolvers
           );
         }
+
+        if (this.optimisticMutations) {
+          SchemaPredicates.expectValidOptimisticMutationsConfig(
+            this.schema,
+            this.optimisticMutations
+          );
+        }
       }
     }
 
