@@ -48,10 +48,7 @@ package](https://github.com/apollographql/subscriptions-transport-ws).
 import { Client, defaultExchanges, subscriptionExchange } from 'urql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
-const subscriptionClient = new SubscriptionClient(
-  'wss://localhost/graphql',
-  { reconnect: true }
-);
+const subscriptionClient = new SubscriptionClient('wss://localhost/graphql', { reconnect: true });
 
 const client = new Client({
   url: '/graphql',
@@ -132,3 +129,29 @@ As we can see, the `result.data` is being updated and transformed by
 the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
+
+## One-off Subscriptions
+
+Whe you're using subscriptions directly without `urql`'s framework bindings, you can use the `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for mutations and subscriptions [that we've seen before on the "Core Package" page.](../concepts/core-package.md#one-off-queries-and-mutations)
+
+This method will always [returns a Wonka stream](../concepts/stream-patterns.md#the-wonka-library) and doesn't have a `.toPromise()` shortcut method, since promises won't return the multiple values that a subscription may deliver. Let's convert the above example to one without framework code, as we may use subscriptions in a Node.js environment.
+
+```js
+import { pipe, subscribe } from 'wonka';
+
+const newMessages = `
+  subscription MessageSub {
+    newMessages {
+      id
+      from
+      text
+    }
+  }
+`;
+
+const { unsubscribe } = pipe(
+  client.subscription(MessageSub),
+  subscribe(result => {
+    console.log(result); // { data: ... }
+  })
+);
