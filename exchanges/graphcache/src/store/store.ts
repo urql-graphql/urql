@@ -75,8 +75,31 @@ export class Store implements Cache {
       if (mutationType) mutationName = mutationType.name;
       if (subscriptionType) subscriptionName = subscriptionType.name;
 
-      if (this.keys) {
-        SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.keys) {
+          SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
+        }
+
+        const hasUpdates =
+          Object.keys(this.updates.Mutation).length > 0 ||
+          Object.keys(this.updates.Subscription).length > 0;
+        if (hasUpdates) {
+          SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
+        }
+
+        if (this.resolvers) {
+          SchemaPredicates.expectValidResolversConfig(
+            this.schema,
+            this.resolvers
+          );
+        }
+
+        if (this.optimisticMutations) {
+          SchemaPredicates.expectValidOptimisticMutationsConfig(
+            this.schema,
+            this.optimisticMutations
+          );
+        }
       }
     }
 

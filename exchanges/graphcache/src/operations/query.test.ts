@@ -41,8 +41,6 @@ describe('Query', () => {
         ],
       }
     );
-
-    jest.resetAllMocks();
   });
 
   it('test partial results', () => {
@@ -155,6 +153,9 @@ describe('Query', () => {
       __typename: 'Query',
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
+
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('should respect altered root types', () => {
@@ -186,6 +187,9 @@ describe('Query', () => {
       __typename: 'query_root',
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
+
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('should allow subsequent read when first result was null', () => {
@@ -247,5 +251,8 @@ describe('Query', () => {
       __typename: 'query_root',
       todos: [null],
     });
+
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 });

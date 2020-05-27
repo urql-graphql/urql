@@ -5,6 +5,7 @@ import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
 import { Store } from './store';
+import { noop } from '../test-utils/utils';
 
 const Appointment = gql`
   query appointment($id: String) {
@@ -91,6 +92,85 @@ describe('Store', () => {
   });
 });
 
+describe('Store with UpdatesConfig', () => {
+  it("sets the store's updates field to the given argument", () => {
+    const updatesOption = {
+      Mutation: {
+        toggleTodo: noop,
+      },
+      Subscription: {
+        newTodo: noop,
+      },
+    };
+
+    const store = new Store({
+      updates: updatesOption,
+    });
+
+    expect(store.updates.Mutation).toBe(updatesOption.Mutation);
+    expect(store.updates.Subscription).toBe(updatesOption.Subscription);
+  });
+
+  it("sets the store's updates field to an empty default if not provided", () => {
+    const store = new Store({});
+
+    expect(store.updates.Mutation).toEqual({});
+    expect(store.updates.Subscription).toEqual({});
+  });
+
+  it('should not warn if Mutation/Subscription operations do exist in the schema', function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          toggleTodo: noop,
+        },
+        Subscription: {
+          newTodo: noop,
+        },
+      },
+    });
+
+    expect(console.warn).not.toBeCalled();
+  });
+
+  it("should warn if Mutation operations don't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          doTheChaChaSlide: noop,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid mutation field: `doTheChaChaSlide` is not in the defined schema, but the `updates.Mutation` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#21');
+  });
+
+  it("should warn if Subscription operations don't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Subscription: {
+          someoneDidTheChaChaSlide: noop,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid subscription field: `someoneDidTheChaChaSlide` is not in the defined schema, but the `updates.Subscription` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#22');
+  });
+});
+
 describe('Store with KeyingConfig', () => {
   it('generates keys from custom keying function', () => {
     const store = new Store({
@@ -138,6 +218,108 @@ describe('Store with KeyingConfig', () => {
   });
 });
 
+describe('Store with ResolverConfig', () => {
+  it("sets the store's resolvers field to the given argument", () => {
+    const resolversOption = {
+      Query: {
+        latestTodo: () => 'todo',
+      },
+    };
+
+    const store = new Store({
+      resolvers: resolversOption,
+    });
+
+    expect(store.resolvers).toBe(resolversOption);
+  });
+
+  it("sets the store's resolvers field to an empty default if not provided", () => {
+    const store = new Store({});
+
+    expect(store.resolvers).toEqual({});
+  });
+
+  it('should not warn if resolvers do exist in the schema', function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      resolvers: {
+        Query: {
+          latestTodo: () => 'todo',
+          todos: () => ['todo 1', 'todo 2'],
+        },
+        Todo: {
+          text: todo => (todo.text as string).toUpperCase(),
+          author: todo => (todo.author as string).toUpperCase(),
+        },
+      },
+    });
+
+    expect(console.warn).not.toBeCalled();
+  });
+
+  it("should warn if a Query doesn't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      resolvers: {
+        Query: {
+          todos: () => ['todo 1', 'todo 2'],
+          // This query should be warned about.
+          findDeletedTodos: () => ['todo 1', 'todo 2'],
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid resolver: `Query.findDeletedTodos` is not in the defined schema, but the `resolvers` option is referencing it'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#23');
+  });
+
+  it("should warn if a type doesn't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      resolvers: {
+        Todo: {
+          complete: () => true,
+        },
+        // This type should be warned about.
+        Dinosaur: {
+          isExtinct: () => true,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid resolver: `Dinosaur` is not in the defined schema, but the `resolvers` option is referencing it'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#23');
+  });
+
+  it("should warn if a type's property doesn't exist in the schema", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      resolvers: {
+        Todo: {
+          complete: () => true,
+          // This property should be warned about.
+          isAboutDinosaurs: () => true,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid resolver: `Todo.isAboutDinosaurs` is not in the defined schema, but the `resolvers` option is referencing it'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#23');
+  });
+});
+
 describe('Store with OptimisticMutationConfig', () => {
   let store;
 
@@ -156,7 +338,7 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.initDataState(store.data, null);
   });
 
-  it('Should resolve a property', () => {
+  it('should resolve a property', () => {
     const todoResult = store.resolve({ __typename: 'Todo', id: '0' }, 'text');
     expect(todoResult).toEqual('Go to the shops');
     const authorResult = store.resolve(
@@ -180,7 +362,7 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.clearDataState();
   });
 
-  it('Should resolve a link property', () => {
+  it('should resolve a link property', () => {
     const parent = {
       id: '0',
       text: 'test',
@@ -658,5 +840,28 @@ describe('Store with storage', () => {
     InMemoryData.initDataState(store.data, null);
     expect(InMemoryData.readRecord('Query', 'base')).toBe(true);
     InMemoryData.clearDataState();
+  });
+
+  it("should warn if an optimistic field doesn't exist in the schema's mutations", function () {
+    new Store({
+      schema: require('../test-utils/simple_schema.json'),
+      updates: {
+        Mutation: {
+          toggleTodo: noop,
+        },
+      },
+      optimistic: {
+        toggleTodo: () => null,
+        // This field should be warned about.
+        deleteTodo: () => null,
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid optimistic mutation field: `deleteTodo` is not a mutation field in the defined schema, but the `optimistic` option is referencing it.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
   });
 });

@@ -24,7 +24,11 @@ export type ErrorCode =
   | 17
   | 18
   | 19
-  | 20;
+  | 20
+  | 21
+  | 22
+  | 23
+  | 24;
 
 type DebugNode = ExecutableDefinitionNode | InlineFragmentNode;
 

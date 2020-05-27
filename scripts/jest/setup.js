@@ -1,11 +1,11 @@
+// This script is run before each `.test.ts` file.
+
 global.AbortController = undefined;
 global.fetch = jest.fn();
 
 process.on('unhandledRejection', error => {
   throw error;
 });
-
-jest.restoreAllMocks();
 
 const originalConsole = console;
 global.console = {
