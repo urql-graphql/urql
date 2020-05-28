@@ -7,7 +7,7 @@ const checkForTypeCheck = (node) => {
   return false;
 };
 
-const name = 'esm-compatability-transform'
+const name = 'esm-compatibility-transform'
 
 const plugin = ({ template, types: t }) => {
   const typeCheckNode = template.expression.ast`typeof process !== 'undefined'`;
