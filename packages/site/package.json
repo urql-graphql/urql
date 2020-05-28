@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@mdx-js/react": "^1.6.0",
-    "formidable-oss-badges": "0.3.4",
+    "formidable-oss-badges": "0.3.5",
     "history": "^4.7.2",
     "path": "^0.12.7",
     "preact": "^10.4.1",
