@@ -22,6 +22,7 @@ import {
   Link,
   OperationRequest,
   Dependencies,
+  EntityField,
 } from '../types';
 
 import {
@@ -137,7 +138,7 @@ export const writeOptimistic = (
 export const writeFragment = (
   store: Store,
   query: DocumentNode,
-  data: Data,
+  data: Partial<Data>,
   variables?: Variables
 ) => {
   const fragments = getFragments(query);
@@ -267,7 +268,11 @@ const writeSelection = (
       }
     } else if (entityKey && !isRoot) {
       // This is a leaf node, so we're setting the field's value directly
-      InMemoryData.writeRecord(entityKey || typename, fieldKey, fieldValue);
+      InMemoryData.writeRecord(
+        entityKey || typename,
+        fieldKey,
+        fieldValue as EntityField
+      );
     }
 
     if (isRoot) {

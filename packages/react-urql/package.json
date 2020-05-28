@@ -35,8 +35,7 @@
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
-    "build": "npx rollup -c ../../scripts/rollup/config.js",
-    "prepare": "node ../../scripts/prepare/index.js",
+    "build": "rollup -c ../../scripts/rollup/config.js",
     "prepublishOnly": "run-s clean build"
   },
   "jest": {
