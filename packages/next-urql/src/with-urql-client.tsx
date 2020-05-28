@@ -11,13 +11,22 @@ import {
 } from 'urql';
 
 import { initUrqlClient } from './init-urql-client';
-import { NextUrqlClientConfig, NextUrqlContext, WithUrqlProps } from './types';
+import {
+  NextUrqlClientConfig,
+  NextUrqlContext,
+  WithUrqlProps,
+  WithUrqlClientOptions,
+} from './types';
 
 function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
-export function withUrqlClient(getClientConfig: NextUrqlClientConfig, ssr?: boolean) {
+export function withUrqlClient(
+  getClientConfig: NextUrqlClientConfig,
+  options?: WithUrqlClientOptions
+) {
+  if (!options) options = {};
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -52,7 +61,7 @@ export function withUrqlClient(getClientConfig: NextUrqlClientConfig, ssr?: bool
     // Set the displayName to indicate use of withUrqlClient.
     withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
-    if (AppOrPage.getInitialProps || ssr) {
+    if (AppOrPage.getInitialProps || options!.ssr) {
       withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const { AppTree } = appOrPageCtx;
 
