@@ -91,6 +91,6 @@
     "rollup-plugin-visualizer": "^4.0.4",
     "terser": "^4.7.0",
     "ts-jest": "^25.4.0",
-    "typescript": "~3.8.3"
+    "typescript": "^3.9.3"
   }
 }

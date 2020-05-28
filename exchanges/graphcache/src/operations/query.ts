@@ -164,7 +164,7 @@ const readRootField = (
 export const readFragment = (
   store: Store,
   query: DocumentNode,
-  entity: Data | string,
+  entity: Partial<Data> | string,
   variables?: Variables
 ): Data | null => {
   const fragments = getFragments(query);
