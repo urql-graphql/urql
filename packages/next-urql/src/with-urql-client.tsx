@@ -113,21 +113,6 @@ export function withUrqlClient(
           return null;
         };
 
-        // Check the window object to determine whether or not we are on the server.
-        // getInitialProps runs on the server for initial render, and on the client for navigation.
-        // We only want to run the prepass step on the server.
-        if (typeof window !== 'undefined') {
-          return { ...pageProps, urqlClient };
-        }
-
-        await ssrPrepass(<AppTree {...appTreeProps} />);
-
-        // Serialize the urqlClient to null on the client-side.
-        // This ensures we don't share client and server instances of the urqlClient.
-        (urqlClient as any).toJSON = () => {
-          return null;
-        };
-
         return {
           ...pageProps,
           urqlState: ssrCache ? ssrCache.extractData() : undefined,
