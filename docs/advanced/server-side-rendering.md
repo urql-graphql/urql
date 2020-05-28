@@ -238,7 +238,6 @@ export default withUrqlClient(ssrExchange => ({
 }))(Index);
 ```
 
-The `withUrqlClient` higher-order component function accepts a third parameter in case you are using
-[`getStaticProps`](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation),
-this third `boolean` parameter allows you to opt-out of binding `getInitialProps` to the component-tree.
-This means that only the `client` will be provided.
+The `withUrqlClient` higher-order component function accepts a second parameter called the `options`,
+these have one option for now, `ssr`, we can use this when the wrapped `page` does not implement
+`getInitialProps` but children down the tree do.
