@@ -63,11 +63,12 @@ const isOfflineError = (error: undefined | CombinedError) =>
     ));
 
 export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
-  forward,
+  forward: outerForward,
   client,
   dispatchDebug,
 }) => {
   const { storage } = opts;
+  let forward = outerForward;
 
   if (
     storage &&
@@ -103,7 +104,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
 
     forward = ops$ => {
       return pipe(
-        forward(ops$),
+        outerForward(ops$),
         filter(res => {
           if (
             res.operation.operationName !== 'subscription' &&

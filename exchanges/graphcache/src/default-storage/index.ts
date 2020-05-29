@@ -57,7 +57,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): StorageAdapter => {
 
             return new Promise(resolve => {
               request.onsuccess = () => {
-                resolve(request.result);
+                resolve(request.result || []);
               };
             });
           }
