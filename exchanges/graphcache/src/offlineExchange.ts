@@ -107,7 +107,10 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
       return pipe(
         forward(ops$),
         filter(res => {
-          if (isOfflineError(res.error)) {
+          if (
+            res.operation.operationName !== 'subscription' &&
+            isOfflineError(res.error)
+          ) {
             if (isOptimisticMutation(optimisticMutations, res.operation)) {
               failedQueue.push(res.operation);
               updateMetadata();
@@ -123,13 +126,10 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
 
     storage.onOnline(flushQueue);
     storage.readMetadata().then(mutations => {
-      try {
-        for (let i = 0; i < mutations.length; i++) {
-          const mutation = mutations[i];
-          failedQueue.push(createRequest(mutation.query, mutation.variables));
-        }
-      } catch (_err) {}
-
+      for (let i = 0; i < mutations.length; i++)
+        failedQueue.push(
+          createRequest(mutations[i].query, mutations[i].variables)
+        );
       flushQueue();
     });
   }
