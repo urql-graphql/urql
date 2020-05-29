@@ -92,6 +92,8 @@ export const readData = (): Promise<SerializedEntries> => {
             chunks[index] = request.result;
           }
         };
+      } else if (key) {
+        store.delete(key);
       }
     };
 
