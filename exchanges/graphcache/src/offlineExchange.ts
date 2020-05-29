@@ -3,10 +3,10 @@ import { print, SelectionNode } from 'graphql';
 
 import {
   Operation,
+  GraphQLRequest,
   Exchange,
   CombinedError,
   createRequest,
-  stringifyVariables,
 } from '@urql/core';
 
 import {
@@ -28,6 +28,10 @@ const isOptimisticMutation = (
   config: OptimisticMutationConfig,
   operation: Operation
 ) => {
+  if (operation.operationName !== 'mutation') {
+    return false;
+  }
+
   const vars: Variables = operation.variables || makeDict();
   const fragments = getFragments(operation.query);
   const selections = [...getSelectionSet(getMainOperation(operation.query))];
@@ -72,14 +76,15 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     storage.writeMetadata
   ) {
     const optimisticMutations = opts.optimistic || {};
-    const failedQueue: Operation[] = [];
+    const failedQueue: GraphQLRequest[] = [];
 
     const updateMetadata = () => {
-      const mutations = failedQueue.map(op => ({
-        query: print(op.query),
-        variables: op.variables,
-      }));
-      storage.writeMetadata!(stringifyVariables(mutations));
+      storage.writeMetadata!(
+        failedQueue.map(op => ({
+          query: print(op.query),
+          variables: op.variables,
+        }))
+      );
     };
 
     let _flushing = false;
@@ -87,10 +92,11 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
       if (!_flushing) {
         _flushing = true;
 
-        let operation: void | Operation;
-        while ((operation = failedQueue.shift())) {
-          operation = client.createRequestOperation('mutation', operation);
-          client.dispatchOperation(operation);
+        let request: void | GraphQLRequest;
+        while ((request = failedQueue.shift())) {
+          client.dispatchOperation(
+            client.createRequestOperation('mutation', request)
+          );
         }
 
         updateMetadata();
@@ -101,13 +107,12 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
       return pipe(
         forward(ops$),
         filter(res => {
-          if (
-            res.operation.operationName === 'mutation' &&
-            isOfflineError(res.error) &&
-            isOptimisticMutation(optimisticMutations, res.operation)
-          ) {
-            failedQueue.push(res.operation);
-            updateMetadata();
+          if (isOfflineError(res.error)) {
+            if (isOptimisticMutation(optimisticMutations, res.operation)) {
+              failedQueue.push(res.operation);
+              updateMetadata();
+            }
+
             return false;
           }
 
@@ -117,17 +122,12 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     };
 
     storage.onOnline(flushQueue);
-    storage.readMetadata().then(json => {
+    storage.readMetadata().then(mutations => {
       try {
-        const metadata = JSON.parse(json);
-        const mutations = Array.isArray(metadata.mutations)
-          ? metadata.mutations
-          : [];
-        failedQueue.push(
-          ...mutations.map((queued: any) =>
-            createRequest(queued.query, queued.variables)
-          )
-        );
+        for (let i = 0; i < mutations.length; i++) {
+          const mutation = mutations[i];
+          failedQueue.push(createRequest(mutation.query, mutation.variables));
+        }
       } catch (_err) {}
 
       flushQueue();

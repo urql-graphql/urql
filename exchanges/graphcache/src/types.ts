@@ -174,11 +174,16 @@ export interface SerializedEntries {
   [key: string]: string | undefined;
 }
 
+export interface SerializedRequest {
+  query: string;
+  variables?: object;
+}
+
 export interface StorageAdapter {
   readData(): Promise<SerializedEntries>;
   writeData(delta: SerializedEntries): Promise<void>;
-  readMetadata?(): Promise<string>;
-  writeMetadata?(json: string): void;
+  readMetadata?(): Promise<SerializedRequest[]>;
+  writeMetadata?(json: SerializedRequest[]): void;
   onOnline?(cb: () => void): any;
 }
 
