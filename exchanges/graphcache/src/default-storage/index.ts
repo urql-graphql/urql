@@ -30,7 +30,7 @@ export const readMetadata = (): Promise<SerializedRequest[]> =>
           'readonly'
         );
         const store = transaction.objectStore(METADATA_STORE_NAME);
-        const request = store.get('metadata');
+        const request = store.get(METADATA_STORE_NAME);
 
         return new Promise(resolve => {
           request.onsuccess = () => {
@@ -46,7 +46,7 @@ export const writeMetadata = (metadata: SerializedRequest[]) => {
     .then(database => {
       const transaction = database.transaction(METADATA_STORE_NAME, 'readonly');
       const store = transaction.objectStore(METADATA_STORE_NAME);
-      store.put(metadata, 'metadata');
+      store.put(metadata, METADATA_STORE_NAME);
     })
     .catch(() => {
       /* noop */
