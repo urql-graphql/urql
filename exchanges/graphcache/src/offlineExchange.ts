@@ -89,18 +89,16 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
 
     let _flushing = false;
     const flushQueue = () => {
-      if (!_flushing) {
+      let request: void | GraphQLRequest;
+      while (!_flushing && (request = failedQueue.shift())) {
         _flushing = true;
-
-        let request: void | GraphQLRequest;
-        while ((request = failedQueue.shift())) {
-          client.dispatchOperation(
-            client.createRequestOperation('mutation', request)
-          );
-        }
-
-        updateMetadata();
+        client.dispatchOperation(
+          client.createRequestOperation('mutation', request)
+        );
+        _flushing = false;
       }
+
+      updateMetadata();
     };
 
     forward = ops$ => {
