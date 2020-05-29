@@ -376,22 +376,6 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.clearDataState();
   });
 
-  it('should be able to invalidate data (one relation key)', () => {
-    let { data } = query(store, { query: Todos });
-
-    InMemoryData.initDataState(store.data, null);
-    expect((data as any).todos).toHaveLength(3);
-    expect(InMemoryData.readRecord('Todo:0', 'text')).toBe('Go to the shops');
-    store.invalidateQuery(Todos);
-    InMemoryData.clearDataState();
-
-    ({ data } = query(store, { query: Todos }));
-    expect(data).toBe(null);
-
-    InMemoryData.initDataState(store.data, null);
-    expect(InMemoryData.readRecord('Todo:0', 'text')).toBe(undefined);
-  });
-
   it('should invalidate null keys correctly', () => {
     const connection = gql`
       query test {
@@ -425,46 +409,6 @@ describe('Store with OptimisticMutationConfig', () => {
 
     ({ data } = query(store, { query: connection }));
     expect(data).toBe(null);
-  });
-
-  it('should be able to invalidate data with arguments', () => {
-    write(
-      store,
-      {
-        query: Appointment,
-        variables: { id: '1' },
-      },
-      {
-        __typename: 'Query',
-        appointment: {
-          __typename: 'Appointment',
-          id: '1',
-          info: 'urql meeting',
-        },
-      }
-    );
-
-    let { data } = query(store, {
-      query: Appointment,
-      variables: { id: '1' },
-    });
-    expect((data as any).appointment.info).toBe('urql meeting');
-
-    InMemoryData.initDataState(store.data, null);
-    expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(
-      'urql meeting'
-    );
-    store.invalidateQuery(Appointment, { id: '1' });
-    InMemoryData.clearDataState();
-
-    ({ data } = query(store, {
-      query: Appointment,
-      variables: { id: '1' },
-    }));
-    expect(data).toBe(null);
-
-    InMemoryData.initDataState(store.data, null);
-    expect(InMemoryData.readRecord('Appointment:1', 'info')).toBe(undefined);
   });
 
   it('should be able to write a fragment', () => {

@@ -95,9 +95,6 @@ export interface Cache {
   /** inspectFields() retrieves all known fields for a given entity */
   inspectFields(entity: Data | string | null): FieldInfo[];
 
-  /** @deprecated Use invalidate() instead */
-  invalidateQuery(query: DocumentNode, variables?: Variables): void;
-
   /** invalidate() invalidates an entity or a specific field of an entity */
   invalidate(entity: Data | string, fieldName?: string, args?: Variables): void;
 
