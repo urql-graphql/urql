@@ -1,3 +1,4 @@
+import { stringifyVariables } from '@urql/core';
 import { SerializedEntries, SerializedRequest, StorageAdapter } from '../types';
 
 export interface StorageOptions {
@@ -35,7 +36,13 @@ export const makeDefaultStorage = (opts?: StorageOptions): StorageAdapter => {
 
   const serializeBatch = (): string => {
     let data = '';
-    for (const key in batch) data += `"${key}":${batch[key] || 'null'},`;
+    for (const key in batch) {
+      const value = batch[key];
+      data += `${stringifyVariables(key)}:${
+        value !== undefined ? stringifyVariables(value) : 'null'
+      },`;
+    }
+
     return data;
   };
 
