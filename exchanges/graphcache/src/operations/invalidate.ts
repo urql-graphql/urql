@@ -1,7 +1,6 @@
 import * as InMemoryData from '../store/data';
-import { Variables, OperationRequest } from '../types';
-import { Store, keyOfField } from '../store';
-import { read } from './query';
+import { Variables } from '../types';
+import { keyOfField } from '../store';
 
 interface PartialFieldInfo {
   fieldKey: string;
@@ -24,22 +23,4 @@ export const invalidateEntity = (
       InMemoryData.writeRecord(entityKey, fieldKey, undefined);
     }
   }
-};
-
-export const invalidate = (store: Store, request: OperationRequest) => {
-  const dependencies = InMemoryData.forkDependencies();
-  read(store, request);
-  InMemoryData.unforkDependencies();
-
-  for (const dependency in dependencies) {
-    if (dependency.startsWith(`${store.data.queryRootKey}.`)) {
-      const fieldKey = dependency.slice(`${store.data.queryRootKey}.`.length);
-      InMemoryData.writeLink(store.data.queryRootKey, fieldKey);
-      InMemoryData.writeRecord(store.data.queryRootKey, fieldKey);
-    } else {
-      invalidateEntity(dependency);
-    }
-  }
-
-  InMemoryData.gc();
 };

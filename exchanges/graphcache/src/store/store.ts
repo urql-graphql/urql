@@ -4,7 +4,6 @@ import {
   IntrospectionQuery,
   GraphQLSchema,
 } from 'graphql';
-
 import { createRequest } from '@urql/core';
 
 import {
@@ -24,7 +23,7 @@ import { invariant } from '../helpers/help';
 
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
-import { invalidate, invalidateEntity } from '../operations/invalidate';
+import { invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 import * as SchemaPredicates from '../ast/schemaPredicates';
@@ -158,10 +157,6 @@ export class Store implements Cache {
     args?: Variables
   ): DataField {
     return this.resolveFieldByKey(entity, keyOfField(field, args));
-  }
-
-  invalidateQuery(query: string | DocumentNode, variables?: Variables) {
-    invalidate(this, createRequest(query, variables));
   }
 
   invalidate(entity: Data | string, field?: string, args?: Variables) {
