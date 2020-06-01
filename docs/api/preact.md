@@ -1,5 +1,5 @@
 ---
-title: @urql/preact
+title: '@urql/preact'
 order: 2
 ---
 

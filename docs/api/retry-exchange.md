@@ -1,5 +1,5 @@
 ---
-title: @urql/exchange-retry
+title: '@urql/exchange-retry'
 order: 4
 ---
 

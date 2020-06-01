@@ -1,5 +1,5 @@
 ---
-title: @urql/core
+title: '@urql/core'
 order: 0
 ---
 
