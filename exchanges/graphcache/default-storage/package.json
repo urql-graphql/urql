@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@urql/core": ">=1.11.7",
-    "@urql/exchange-populate": ">=0.1.7",
     "wonka": "^4.0.10"
   }
 }
