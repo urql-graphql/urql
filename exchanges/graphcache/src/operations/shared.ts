@@ -1,4 +1,5 @@
-import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
+import { InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
+
 import {
   isInlineFragment,
   getTypeCondition,
@@ -7,13 +8,11 @@ import {
   SelectionSet,
   isFieldNode,
 } from '../ast';
-import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
+import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
-
 import { Fragments, Variables, DataField, NullArray, Data } from '../types';
-
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
 export interface Context {
@@ -91,83 +90,74 @@ const isFragmentHeuristicallyMatching = (
   });
 };
 
-export class SelectionIterator {
-  typename: void | string;
-  entityKey: string;
-  indexStack: number[];
-  context: Context;
-  selectionStack: SelectionSet[];
+export const makeSelectionIterator = (
+  typename: void | string,
+  entityKey: string,
+  select: SelectionSet,
+  ctx: Context
+) => {
+  const indexStack: number[] = [0];
+  const selectionStack: SelectionSet[] = [select];
 
-  constructor(
-    typename: void | string,
-    entityKey: string,
-    select: SelectionSet,
-    ctx: Context
-  ) {
-    this.typename = typename;
-    this.entityKey = entityKey;
-    this.context = ctx;
-    this.indexStack = [0];
-    this.selectionStack = [select];
-  }
-
-  next(): void | FieldNode {
-    while (this.indexStack.length !== 0) {
-      const index = this.indexStack[this.indexStack.length - 1]++;
-      const select = this.selectionStack[this.selectionStack.length - 1];
-      if (index >= select.length) {
-        this.indexStack.pop();
-        this.selectionStack.pop();
-        if (process.env.NODE_ENV !== 'production') {
-          popDebugNode();
-        }
-        continue;
-      } else {
-        const node = select[index];
-        if (!shouldInclude(node, this.context.variables)) {
-          continue;
-        } else if (!isFieldNode(node)) {
-          // A fragment is either referred to by FragmentSpread or inline
-          const fragmentNode = !isInlineFragment(node)
-            ? this.context.fragments[getName(node)]
-            : node;
-
-          if (fragmentNode !== undefined) {
-            if (process.env.NODE_ENV !== 'production') {
-              pushDebugNode(this.typename, fragmentNode);
-            }
-
-            const isMatching = this.context.store.schema
-              ? isInterfaceOfType(
-                  this.context.store.schema,
-                  getTypeCondition(fragmentNode),
-                  this.typename
-                )
-              : isFragmentHeuristicallyMatching(
-                  fragmentNode,
-                  this.typename,
-                  this.entityKey,
-                  this.context.variables
-                );
-
-            if (isMatching) {
-              this.indexStack.push(0);
-              this.selectionStack.push(getSelectionSet(fragmentNode));
-            }
+  return {
+    next() {
+      while (indexStack.length !== 0) {
+        const index = indexStack[indexStack.length - 1]++;
+        const select = selectionStack[selectionStack.length - 1];
+        if (index >= select.length) {
+          indexStack.pop();
+          selectionStack.pop();
+          if (process.env.NODE_ENV !== 'production') {
+            popDebugNode();
           }
-
-          continue;
-        } else if (getName(node) === '__typename') {
           continue;
         } else {
-          return node;
+          const node = select[index];
+          if (!shouldInclude(node, ctx.variables)) {
+            continue;
+          } else if (!isFieldNode(node)) {
+            // A fragment is either referred to by FragmentSpread or inline
+            const fragmentNode = !isInlineFragment(node)
+              ? ctx.fragments[getName(node)]
+              : node;
+
+            if (fragmentNode !== undefined) {
+              if (process.env.NODE_ENV !== 'production') {
+                pushDebugNode(typename, fragmentNode);
+              }
+
+              const isMatching = ctx.store.schema
+                ? isInterfaceOfType(
+                    ctx.store.schema,
+                    getTypeCondition(fragmentNode),
+                    typename
+                  )
+                : isFragmentHeuristicallyMatching(
+                    fragmentNode,
+                    typename,
+                    entityKey,
+                    ctx.variables
+                  );
+
+              if (isMatching) {
+                indexStack.push(0);
+                selectionStack.push(getSelectionSet(fragmentNode));
+              }
+            }
+
+            continue;
+          } else if (getName(node) === '__typename') {
+            continue;
+          } else {
+            return node;
+          }
         }
       }
-    }
 
-    return undefined;
-  }
-}
+      return undefined;
+    },
+  };
+};
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x === undefined ? null : (x as Data | NullArray<Data>);

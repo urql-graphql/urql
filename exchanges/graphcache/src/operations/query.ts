@@ -39,7 +39,7 @@ import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 
 import {
   Context,
-  SelectionIterator,
+  makeSelectionIterator,
   ensureData,
   makeContext,
   updateContext,
@@ -116,7 +116,7 @@ const readRoot = (
     return originalData;
   }
 
-  const iter = new SelectionIterator(entityKey, entityKey, select, ctx);
+  const iter = makeSelectionIterator(entityKey, entityKey, select, ctx);
   const data = {} as Data;
   data.__typename = originalData.__typename;
 
@@ -258,7 +258,7 @@ const readSelection = (
   // The following closely mirrors readSelection, but differs only slightly for the
   // sake of resolving from an existing resolver result
   data.__typename = typename;
-  const iter = new SelectionIterator(typename, entityKey, select, ctx);
+  const iter = makeSelectionIterator(typename, entityKey, select, ctx);
 
   let node: FieldNode | void;
   let hasFields = false;

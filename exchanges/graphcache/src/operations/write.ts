@@ -37,7 +37,7 @@ import {
 import * as InMemoryData from '../store/data';
 import {
   Context,
-  SelectionIterator,
+  makeSelectionIterator,
   ensureData,
   makeContext,
   updateContext,
@@ -199,7 +199,7 @@ const writeSelection = (
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
-  const iter = new SelectionIterator(
+  const iter = makeSelectionIterator(
     typename,
     entityKey || typename,
     select,
