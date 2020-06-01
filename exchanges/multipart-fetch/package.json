@@ -51,7 +51,7 @@
   "dependencies": {
     "@urql/core": ">=1.11.7",
     "extract-files": "^8.1.0",
-    "wonka": "^4.0.10"
+    "wonka": "^4.0.14"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
