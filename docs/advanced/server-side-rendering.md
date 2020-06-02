@@ -238,6 +238,5 @@ export default withUrqlClient(ssrExchange => ({
 }))(Index);
 ```
 
-The `withUrqlClient` higher-order component function accepts a second parameter called the `options`,
-these have one option for now, `ssr`, we can use this when the wrapped `page` does not implement
-`getInitialProps` but children down the tree do.
+Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
+server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.
