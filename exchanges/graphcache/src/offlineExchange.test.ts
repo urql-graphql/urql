@@ -77,3 +77,59 @@ describe('storage', () => {
     });
   });
 });
+
+describe('offline', () => {
+  const storage = {
+    onOnline: jest.fn(),
+    writeData: jest.fn(),
+    writeMetadata: jest.fn(),
+    readData: jest.fn(),
+    readMetadata: jest.fn(),
+  };
+
+  beforeEach(() => {
+    (navigator as any).onLine = false;
+  });
+
+  afterEach(() => {
+    (navigator as any).onLine = true;
+  });
+
+  it('should intercept errored mutations', () => {
+    // TODO: query --> mutation --> error response --> query (expect optimistic data)
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const op = client.createRequestOperation('mutation', {
+      key: 1,
+      query: mutationOne,
+      variables: {},
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        expect(forwardOp.key).toBe(op.key);
+        // @ts-ignore
+        return { operation: forwardOp, error: new Error('') };
+      }
+    );
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    storage.readData.mockReturnValueOnce({ then: () => undefined });
+    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
+
+    pipe(
+      offlineExchange({
+        storage,
+        optimistic: {
+          addAuthor: () => ({ id: '123', name: 'URQL', __typename: 'Author' }),
+        },
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(op);
+  });
+});
