@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@urql/exchange-graphcache": "link:../../",
-    "apollo-server-express": "^2.3.3",
+    "apollo-server-express": "^2.14.2",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "graphql": "^14.1.1",
