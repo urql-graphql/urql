@@ -129,9 +129,9 @@ describe('offline', () => {
           return { operation: forwardOp, data: queryOneData };
         } else {
           onlineSpy.mockReturnValueOnce(false);
-          // @ts-ignore
           return {
             operation: forwardOp,
+            // @ts-ignore
             error: { networkError: new Error('failed to fetch') },
           };
         }
@@ -184,7 +184,7 @@ describe('offline', () => {
 
     next(queryOp);
     expect(result).toBeCalledTimes(2);
-    expect(result.mock.calls[0][0].data).toEqual({
+    expect(result.mock.calls[1][0].data).toEqual({
       __typename: 'Query',
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
     });
