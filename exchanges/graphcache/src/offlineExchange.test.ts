@@ -189,4 +189,81 @@ describe('offline', () => {
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
     });
   });
+
+  it('should flush the queue when we become online', () => {
+    let flush: () => {};
+    storage.onOnline.mockImplementation(cb => {
+      flush = cb;
+    });
+
+    const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const dispatchOperationSpy = jest
+      .spyOn(client, 'dispatchOperation')
+      .mockImplementation(() => undefined);
+
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 1,
+      query: mutationOne,
+      variables: {},
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        onlineSpy.mockReturnValueOnce(false);
+        return {
+          operation: forwardOp,
+          // @ts-ignore
+          error: { networkError: new Error('failed to fetch') },
+        };
+      }
+    );
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    storage.readData.mockReturnValueOnce({ then: () => undefined });
+    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
+    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
+
+    pipe(
+      offlineExchange({
+        storage,
+        optimistic: {
+          updateAuthor: () => ({
+            id: '123',
+            name: 'URQL',
+            __typename: 'Author',
+          }),
+        },
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(mutationOp);
+    expect(storage.writeMetadata).toBeCalledTimes(1);
+    expect(storage.writeMetadata).toHaveBeenCalledWith([
+      {
+        query: `mutation {
+  updateAuthor {
+    id
+    name
+    __typename
+  }
+}
+`,
+        variables: {},
+      },
+    ]);
+
+    flush!();
+    expect(dispatchOperationSpy).toHaveBeenCalledTimes(1);
+    expect(dispatchOperationSpy.mock.calls[0][0]!.key).toEqual(1);
+    expect(dispatchOperationSpy.mock.calls[0][0]!.query).toEqual(
+      mutationOp.query
+    );
+  });
 });
