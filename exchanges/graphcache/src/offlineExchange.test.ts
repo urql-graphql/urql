@@ -10,7 +10,7 @@ import { offlineExchange } from './offlineExchange';
 
 const mutationOne = gql`
   mutation {
-    addAuthor {
+    updateAuthor {
       id
       name
     }
@@ -19,11 +19,31 @@ const mutationOne = gql`
 
 const mutationOneData = {
   __typename: 'Mutation',
-  addAuthor: {
+  updateAuthor: {
     __typename: 'Author',
     id: '123',
     name: 'Author',
   },
+};
+
+const queryOne = gql`
+  query {
+    authors {
+      id
+      name
+    }
+  }
+`;
+
+const queryOneData = {
+  __typename: 'Query',
+  authors: [
+    {
+      __typename: 'Author',
+      id: '123',
+      name: 'Me',
+    },
+  ],
 };
 
 const dispatchDebug = jest.fn();
@@ -87,28 +107,31 @@ describe('offline', () => {
     readMetadata: jest.fn(),
   };
 
-  beforeEach(() => {
-    (navigator as any).onLine = false;
-  });
-
-  afterEach(() => {
-    (navigator as any).onLine = true;
-  });
-
   it('should intercept errored mutations', () => {
-    // TODO: query --> mutation --> error response --> query (expect optimistic data)
+    const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
+
     const client = createClient({ url: 'http://0.0.0.0' });
-    const op = client.createRequestOperation('mutation', {
+    const queryOp = client.createRequestOperation('query', {
       key: 1,
+      query: queryOne,
+    });
+    // TODO: query --> mutation --> error response --> query (expect optimistic data)
+    const mutationOp = client.createRequestOperation('mutation', {
+      key: 2,
       query: mutationOne,
       variables: {},
     });
 
     const response = jest.fn(
       (forwardOp: Operation): OperationResult => {
-        expect(forwardOp.key).toBe(op.key);
-        // @ts-ignore
-        return { operation: forwardOp, error: new Error('') };
+        if (forwardOp.key === queryOp.key) {
+          onlineSpy.mockReturnValueOnce(true);
+          return { operation: forwardOp, data: queryOneData };
+        } else {
+          onlineSpy.mockReturnValueOnce(false);
+          // @ts-ignore
+          return { operation: forwardOp, error: new Error('') };
+        }
       }
     );
 
@@ -123,13 +146,31 @@ describe('offline', () => {
       offlineExchange({
         storage,
         optimistic: {
-          addAuthor: () => ({ id: '123', name: 'URQL', __typename: 'Author' }),
+          updateAuthor: () => ({
+            id: '123',
+            name: 'URQL',
+            __typename: 'Author',
+          }),
         },
       })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
 
-    next(op);
+    next(queryOp);
+    expect(result).toBeCalledTimes(1);
+    expect(result.mock.calls[0][0].data).toEqual(queryOneData);
+
+    next(mutationOp);
+    expect(result).toBeCalledTimes(2);
+    expect(result.mock.calls[1][0].data).toBeUndefined();
+    expect(result.mock.calls[1][0].error).toBeDefined();
+
+    next(queryOp);
+    expect(result).toBeCalledTimes(3);
+    expect(result.mock.calls[0][0].data).toEqual({
+      __typename: 'Query',
+      authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
+    });
   });
 });
