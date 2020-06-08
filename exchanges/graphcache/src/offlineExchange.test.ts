@@ -115,7 +115,7 @@ describe('offline', () => {
       key: 1,
       query: queryOne,
     });
-    // TODO: query --> mutation --> error response --> query (expect optimistic data)
+
     const mutationOp = client.createRequestOperation('mutation', {
       key: 2,
       query: mutationOne,
@@ -130,7 +130,10 @@ describe('offline', () => {
         } else {
           onlineSpy.mockReturnValueOnce(false);
           // @ts-ignore
-          return { operation: forwardOp, error: new Error('') };
+          return {
+            operation: forwardOp,
+            error: { networkError: new Error('failed to fetch') },
+          };
         }
       }
     );
@@ -141,6 +144,7 @@ describe('offline', () => {
 
     storage.readData.mockReturnValueOnce({ then: () => undefined });
     storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
+    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
 
     pipe(
       offlineExchange({
@@ -162,12 +166,24 @@ describe('offline', () => {
     expect(result.mock.calls[0][0].data).toEqual(queryOneData);
 
     next(mutationOp);
-    expect(result).toBeCalledTimes(2);
-    expect(result.mock.calls[1][0].data).toBeUndefined();
-    expect(result.mock.calls[1][0].error).toBeDefined();
+    expect(result).toBeCalledTimes(1);
+    expect(storage.writeMetadata).toBeCalledTimes(1);
+    expect(storage.writeMetadata).toHaveBeenCalledWith([
+      {
+        query: `mutation {
+  updateAuthor {
+    id
+    name
+    __typename
+  }
+}
+`,
+        variables: {},
+      },
+    ]);
 
     next(queryOp);
-    expect(result).toBeCalledTimes(3);
+    expect(result).toBeCalledTimes(2);
     expect(result.mock.calls[0][0].data).toEqual({
       __typename: 'Query',
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
