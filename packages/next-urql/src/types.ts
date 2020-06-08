@@ -48,3 +48,7 @@ export interface SSRExchange extends Exchange {
   /** Extracts cached data */
   extractData(): SSRData;
 }
+
+export interface WithUrqlClientOptions {
+  ssr?: boolean;
+}

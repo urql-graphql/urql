@@ -237,3 +237,6 @@ export default withUrqlClient(ssrExchange => ({
   exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
 }))(Index);
 ```
+
+Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
+server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.

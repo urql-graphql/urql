@@ -127,6 +127,12 @@ When you're using `withUrqlClient` and you don't return an `exchanges` property 
 
 When you yourself want to pass exchanges don't forget to include the `ssrExchange` you received as the first argument.
 
+#### `withUrqlClientOptions`
+
+The second argument for `withUrqlClient` is an options object, this contains one `boolean` property named `ssr`, you can use this to tell
+`withUrqlClient` that the wrapped component does not use `getInitialProps` but the children of this wrapped component do. This opts you into
+`ssr` for these children.
+
 ### Different Client configurations on the client and the server
 
 There are use cases where you may need different configurations for your `urql` Client on the client-side and the server-side; for example, you may want to interact with one GraphQL endpoint on the server-side and another on the client-side. `next-urql` supports this as of v0.3.0. We recommend using `typeof window === 'undefined'` or a `process.browser` check.
@@ -205,4 +211,7 @@ You can see simple example projects using `next-urql` in the `examples` director
 
 ### Caveats
 
-`withUrqlClient` implements Next's unique `getInitialProps` method under the hood. This means that any page containing a component wrapped by `withUrqlClient` will be opted out of [automatic static optimization](https://nextjs.org/docs#automatic-static-optimization). Automatic static optimization was added in Next v9, so you shouldn't worry about this if using an earlier version of Next. This is **not** unique to `next-urql` – any implementation of `getInitialProps` by any component in your application will cause Next to opt out of automatic static optimization.
+Using `withUrqlClient` on a page that has `getInitialProps` will opt that component and it's children into a prepass that does a first pass of all queries, when that
+component has children using `getInitialProps` but that component itself is not and you want to opt in to this behavior you'll have to set the second argument of
+`withUrqlClient`, this means `withUrqlClient(() => clientOptiosn, { ssr:true })`.
+This measure is available so we can support `getStaticProps`, ...
