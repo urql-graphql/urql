@@ -22,6 +22,8 @@ function getDisplayName(Component: React.ComponentType<any>) {
   return Component.displayName || Component.name || 'Component';
 }
 
+let ssr;
+
 export function withUrqlClient(
   getClientConfig: NextUrqlClientConfig,
   options?: WithUrqlClientOptions
@@ -35,7 +37,7 @@ export function withUrqlClient(
           return urqlClient;
         }
 
-        const ssr = ssrExchange({ initialState: urqlState });
+        if (!ssr) ssr = ssrExchange({ initialState: urqlState });
         const clientConfig = getClientConfig(ssr);
         if (!clientConfig.exchanges) {
           // When the user does not provide exchanges we make the default assumption.
