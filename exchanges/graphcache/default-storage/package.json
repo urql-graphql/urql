@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "@urql/core": ">=1.11.7",
-    "wonka": "^4.0.10"
+    "wonka": "^4.0.14"
   }
 }
