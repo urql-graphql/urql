@@ -1,19 +1,25 @@
 import { stringifyVariables } from '@urql/core';
 import { SerializedEntries, SerializedRequest, StorageAdapter } from '../types';
 
-const getRequestPromise = <T>(
-  request: IDBRequest<T> | IDBTransaction
-): Promise<T> => {
+const getRequestPromise = <T>(request: IDBRequest<T>): Promise<T> => {
   return new Promise((resolve, reject) => {
     request.onerror = () => {
       reject(request.error);
     };
 
-    (request as IDBRequest<
-      T
-    >).onsuccess = (request as IDBTransaction).oncomplete = () => {
-      resolve((request as IDBRequest<T>).result);
+    request.onsuccess = () => {
+      resolve(request.result);
     };
+  });
+};
+
+const getTransactionPromise = (transaction: IDBTransaction): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    transaction.onerror = () => {
+      reject(transaction.error);
+    };
+
+    transaction.oncomplete = resolve;
   });
 };
 
@@ -74,7 +80,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
         );
         transaction.objectStore(METADATA_STORE_NAME).clear();
         transaction.objectStore(ENTRIES_STORE_NAME).clear();
-        return getRequestPromise(transaction);
+        return getTransactionPromise(transaction);
       });
     },
 
@@ -155,7 +161,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
             }
           };
 
-          return getRequestPromise(transaction);
+          return getTransactionPromise(transaction);
         })
         .then(
           () => deserializeBatch(chunks.join('')),
