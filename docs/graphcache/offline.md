@@ -1,6 +1,6 @@
 ---
 title: Offline Support
-order: 7
+order: 6
 ---
 
 # Offline Support
