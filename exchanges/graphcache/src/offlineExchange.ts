@@ -124,10 +124,11 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
 
     storage.onOnline(flushQueue);
     storage.readMetadata().then(mutations => {
-      for (let i = 0; i < mutations.length; i++)
-        failedQueue.push(
-          createRequest(mutations[i].query, mutations[i].variables)
-        );
+      if (mutations)
+        for (let i = 0; i < mutations.length; i++)
+          failedQueue.push(
+            createRequest(mutations[i].query, mutations[i].variables)
+          );
       flushQueue();
     });
   }

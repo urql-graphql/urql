@@ -84,7 +84,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
       });
     },
 
-    readMetadata(): Promise<SerializedRequest[]> {
+    readMetadata(): Promise<null | SerializedRequest[]> {
       return database$.then(
         database => {
           return getRequestPromise<SerializedRequest[]>(
@@ -94,7 +94,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
               .get(METADATA_STORE_NAME)
           );
         },
-        () => []
+        () => null
       );
     },
 

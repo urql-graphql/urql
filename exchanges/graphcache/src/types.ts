@@ -182,7 +182,7 @@ export interface SerializedRequest {
 export interface StorageAdapter {
   readData(): Promise<SerializedEntries>;
   writeData(delta: SerializedEntries): Promise<any>;
-  readMetadata?(): Promise<SerializedRequest[]>;
+  readMetadata?(): Promise<null | SerializedRequest[]>;
   writeMetadata?(json: SerializedRequest[]): void;
   onOnline?(cb: () => void): any;
 }
