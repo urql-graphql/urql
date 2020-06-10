@@ -89,3 +89,27 @@ const client = createClient({
   exchanges: [dedupExchange, cache, fetchExchange],
 });
 ```
+
+## Offline Behavior
+
+_Graphcache_ applies several mechanisms that improve the consistency of the cache and how it behaves
+when it's used in highly cached-dependent scenarios, including when it's used with its offline
+support. We've previously read about some of these guarantees on the ["Under the hood"
+page.](./underunder-the-hood.md)
+
+While the client is offline, _Graphcache_ will also apply some opinionated mechanisms to queries and
+mutations.
+
+When a query fails with a Network Error, which indicates that the client is
+offline — either because `navigator.onLine` is `false` or because the error message indicates an
+offline error — the `offlineExchange` won't deliver the error for this query to avoid it from being
+surfaced to the user. This works particularly well in combination with ["Schema
+Awareness"](./schema-awareness.md) which will deliver as much of a partial query result as possible.
+In combination with the [`cache-and-network` request policy](../basics/queries.md#request-policies)
+we can now ensure that we display as much data as possible when the user is offline while still
+keeping the cache up-to-date when the user is online.
+
+A similar mechanism is applied to optimistic mutations when the user is offline. Normal
+non-optimistic mutations are executed as usual and may fail with a network error. Optimistic
+mutations however will be queued up and may be retried when the app is restarted or when the user
+comes back online.
