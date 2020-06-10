@@ -41,7 +41,7 @@
     "@types/react-dom": "^16.9.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "graphql": "^15.0.0",
+    "graphql": "^15.1.0",
     "graphql-tag": "^2.10.3",
     "isomorphic-unfetch": "^3.0.0",
     "next": "^9.2.1",

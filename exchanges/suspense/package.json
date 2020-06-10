@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@types/react": "^16.9.19",
-    "graphql": "^15.0.0",
+    "graphql": "^15.1.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
   },
