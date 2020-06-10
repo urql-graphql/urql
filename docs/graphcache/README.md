@@ -44,7 +44,7 @@ default.
   API, allowing an app to render everything that's cached before receiving all missing data. It also
   allows _Graphcache_ to output more helpful warnings and to handle interfaces and enums correctly
   without heuristics.
-- 📡 **Offline support** (work in progress) _Graphcache_ can persist and rehydrate its entire state,
+- 📡 [**Offline support**](./offline.md) _Graphcache_ can persist and rehydrate its entire state,
   allowing an offline application to be built that is able to execute queries against the cache
   although the device is offline.
 - 🐛 [**Errors and warnings**](./errors.md). All potential errors are documented with information on

@@ -174,9 +174,17 @@ export interface SerializedEntries {
   [key: string]: string | undefined;
 }
 
+export interface SerializedRequest {
+  query: string;
+  variables?: object;
+}
+
 export interface StorageAdapter {
-  read(): Promise<SerializedEntries>;
-  write(data: SerializedEntries): Promise<void>;
+  readData(): Promise<SerializedEntries>;
+  writeData(delta: SerializedEntries): Promise<any>;
+  readMetadata?(): Promise<null | SerializedRequest[]>;
+  writeMetadata?(json: SerializedRequest[]): void;
+  onOnline?(cb: () => void): any;
 }
 
 export type Dependencies = Record<string, true>;

@@ -24,7 +24,11 @@ options and returns an [`Exchange`](./core.md#exchange).
 | _resolvers_  | A nested mapping of resolvers, which are used to override the record or entity that _Graphcache_ resolves for a given field for a type.                                                                                       |
 | _updates_    | A nested mapping of updater functions for mutation and subscription fields, which may be used to add side-effects that update other parts of the cache when the given subscription or mutation field is written to the cache. |
 | _optimistic_ | A mapping of mutation fields to resolvers that may be used to provide _Graphcache_ with an optimistic result for a given mutation field that should be applied to the cached data temporarily.                                |
-| _schema_     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, to resolve interfaces and enums, and to provide helpful warnings.                                                                           |
+| _schema_     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, interfaces, and enums. The schema also used to provide helpful warnings for [schema awareness](../graphcache/schema-awareness.md).          |
+| _storage_    | A persisted storage interface that may be provided to preserve cache data for [offline support](../graphcache/offline.md).                                                                                                    |
+
+The `@urql/exchange-graphcache` package also exports the `offlineExchange`; which is identical to
+the `cacheExchange` but activates [offline support](../graphcache/offline.md) when the `storage` option is passed.
 
 ### `keys` option
 
@@ -136,6 +140,43 @@ required fields are missing.
 
 [Read more about how to use the `schema` option on the "Schema Awareness"
 page.](../graphcache/schema-awareness.md)
+
+### `storage` option
+
+The `storage` option is an interface of methods that are used by the `offlineExchange` to persist
+the cache's data to persisted storage on the user's device. it
+
+> **NOTE:** Offline Support is currently experimental! It hasn't been extensively tested yet and
+> may not always behave as expected. Please try it out with caution!
+
+| Method        | Type                                          | Description                                                                                                                                                                            |
+| ------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| writeData     | `(delta: SerializedEntries) => Promise<void>` | This provided method must be able to accept an object of key-value entries that will be persisted to the storage. This method is called as a batch of updated entries becomes ready.   |
+| readData      | `() => Promise<SerializedEntries>`            | This provided method must be able to return a single combined object of previous key-value entries that have been previously preserved using `writeData`. It's only called on startup. |
+| writeMetadata | `(json: SerializedRequest[]) => void`         | This provided method must be able to persist metdata for the cache. For backwards compatibility it should be able to accept any JSON data.                                             |
+| readMetadata  | `() => Promise<null | SerializedRequest[]>`   | This provided method must be able to read the persisted metdata that has previously been written using `writeMetadata`. It's only called on startup.                                   |
+| onOnline      | `(cb: () => void) => void`                    | This method must be able to accept a callback that is called when the user's device comes back online.                                                                                 |
+
+These options are split into three parts:
+
+- The `writeMetadata` and `readMetadata` methods are used to persist in-progress optimistic
+  mutations to a storage so that they may be retried if the app has been closed while some
+  optimistic mutations were still in progress.
+- The `writeData` and `readData` methods are used to persist any cache data. This is the normalized
+  data that _Graphcache_ usually keeps in memory. The `cacheExchange` will frequently call
+  `writeData` with a partial object of its cache data, which `readData` must then be able to return
+  in a single combined object on startup. We call the partial objects that `writeData` is called
+  with "deltas".
+- The `onOnline` method is only used to receive a trigger that determines whether the user's device
+  has come back online, which is used to retry optimistic mutations that have previously failed due
+  to being offline.
+
+The `storage` option may also be used with the `cacheExchange` instead of the `offlineExchange`, but
+will then only use `readData` and `writeData` to persist its cache data. This is not full offline
+support, but will rather be "persistence support".
+
+[Read more about how to use the `storage` option on the "Offline Support"
+page.](../graphcache/offline.md)
 
 ## Cache
 
@@ -442,3 +483,17 @@ of all pages.
 
 [Read more about `relayPagnation` on the "Computed Queries"
 page.](../graphcache/computed-queries.md#relay-pagination)
+
+## The `/default-storage` import
+
+The `default-storage` subpackage is published with _Graphcache_ and contains a default storage
+interface that may be used with the [`storage` option.](#storage-option)
+
+It contains the `makeDefaultStorage` export which is a factory function that accepts a few options
+and returns a full [storage interface](#storage-option). This storage by default persists to
+[IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
+
+| Argument | Type     | Description                                                                                                                                       |
+| -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| idbName  | `string` | The name of the IndexedDB database that is used and created if needed. By default this is set to `"graphcache-v3"`                                |
+| maxAge   | `number` | The maximum age of entries that the storage should use in whole days. By default the storage will discard entries that are older than seven days. |
