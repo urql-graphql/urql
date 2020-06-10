@@ -113,3 +113,78 @@ A similar mechanism is applied to optimistic mutations when the user is offline.
 non-optimistic mutations are executed as usual and may fail with a network error. Optimistic
 mutations however will be queued up and may be retried when the app is restarted or when the user
 comes back online.
+
+## Custom Storages
+
+In the [Setup section](#setup) we've learned how to use the default storage engine to store
+persisted cache data in IndexedDB. You can also write custom storage engines, if the default one
+doesn't align with your expectations or requirements.
+One limitation of our default storage engine is for instance that data is stored time limited with a
+maximum age, which prevents the database from becoming too full, but a custom storage engine may
+have different strategies for dealing with this.
+
+[The API docs list the entire interface for the `storage` option.](../api/graphcache.md#storage-option)
+There we can see which methods we need to implement to implement a custom storage engine.
+
+Following is an example of the simplest possible storage engine, which uses the browser's
+[Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+Initially we'll implement the basic persistence methods, `readData` and `writeData`.
+
+```js
+const makeLocalStorage = () => {
+  const cache = {};
+
+  return {
+    writeData(delta) {
+      return Promise.resolve().then(() => {
+        Object.assign(cache, delta);
+        localStorage.setItem('data', JSON.stringify(cache));
+      });
+    },
+    readData() {
+      return Promise.resolve().then(() => {
+        const local = localStorage.getItem('data') || null;
+        Object.assign(cache, JSON.parse(local));
+        return cache;
+      });
+    },
+  };
+};
+```
+
+As we can see, the `writeData` method only sends us "deltas", partial objects that only describe
+updated cache data rather than all cache data. The implementation of `writeMetadata` and
+`readMetadata` will however be even simpler, since it always sends us complete data.
+
+```js
+const makeLocalStorage = () => {
+  return {
+    /* ... */
+    writeMetadata(data) {
+      localStorage.setItem('metadata', JSON.stringify(data));
+    },
+    readMetadata() {
+      return Promise.resolve().then(() => {
+        const metadataJson = localStorage.getItem('metadata') || null;
+        return JSON.parse(metadataJson);
+      });
+    },
+  };
+};
+```
+
+Lastly, the `onOnline` method will likely always look the same, as long as your `storage` is
+intended to work for browsers only:
+
+```js
+const makeLocalStorage = () => {
+  return {
+    /* ... */
+    onOnline(cb: () => void) {
+      window.addEventListener('online', () => {
+        cb();
+      });
+    },
+  };
+};
+```
