@@ -7,6 +7,7 @@ import {
   StorageAdapter,
   SerializedEntries,
   Dependencies,
+  OperationType,
 } from '../types';
 
 import {
@@ -54,6 +55,7 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
+let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
@@ -66,10 +68,12 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
 
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
+  operationType: OperationType,
   data: InMemoryData,
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
+  currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
   currentIgnoreOptimistic = false;
@@ -133,7 +137,7 @@ export const clearDataState = () => {
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
     scheduleTask(() => {
-      initDataState(data, null);
+      initDataState('write', data, null);
       gc();
       persistData();
       clearDataState();
@@ -141,6 +145,7 @@ export const clearDataState = () => {
     });
   }
 
+  currentOperation = null;
   currentData = null;
   currentDependencies = null;
   if (process.env.NODE_ENV !== 'production') {
@@ -154,8 +159,20 @@ export const noopDataState = (
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
-  initDataState(data, layerKey, isOptimistic);
+  initDataState('read', data, layerKey, isOptimistic);
   clearDataState();
+};
+
+export const getCurrentOperation = (): OperationType => {
+  invariant(
+    currentOperation !== null,
+    'Invalid Cache call: The cache may only be accessed or mutated during' +
+      'operations like write or query, or as part of its resolvers, updaters, ' +
+      'or optimistic configs.',
+    2
+  );
+
+  return currentOperation;
 };
 
 /** As we're writing, we keep around all the records and links we've read or have written to */
@@ -564,7 +581,7 @@ export const hydrateData = (
   storage: StorageAdapter,
   entries: SerializedEntries
 ) => {
-  initDataState(data, null);
+  initDataState('read', data, null);
 
   for (const key in entries) {
     const value = entries[key];

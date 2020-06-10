@@ -5,7 +5,7 @@ let data: InMemoryData.InMemoryData;
 
 beforeEach(() => {
   data = InMemoryData.make('Query');
-  InMemoryData.initDataState(data, null);
+  InMemoryData.initDataState('write', data, null);
 });
 
 describe('garbage collection', () => {
@@ -78,11 +78,12 @@ describe('garbage collection', () => {
     InMemoryData.writeRecord('Todo:1', 'id', '1');
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    InMemoryData.initDataState(data, 1, true);
+    InMemoryData.initDataState('write', data, 1, true);
     InMemoryData.writeLink('Query', 'temp', 'Todo:1');
-    InMemoryData.initDataState(data, 0, true);
 
+    InMemoryData.initDataState('write', data, 0, true);
     InMemoryData.writeLink('Query', 'todo', undefined);
+
     InMemoryData.gc();
 
     expect(InMemoryData.readRecord('Todo:1', 'id')).toBe('1');
@@ -170,7 +171,7 @@ describe('inspectFields', () => {
   });
 
   it('returns field infos for all optimistic updates', () => {
-    InMemoryData.initDataState(data, 1, true);
+    InMemoryData.initDataState('write', data, 1, true);
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
     expect(InMemoryData.inspectFields('Random')).toMatchInlineSnapshot(
@@ -181,7 +182,7 @@ describe('inspectFields', () => {
   it('avoids duplicate field infos', () => {
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    InMemoryData.initDataState(data, 1, true);
+    InMemoryData.initDataState('write', data, 1, true);
     InMemoryData.writeLink('Query', 'todo', 'Todo:2');
 
     expect(InMemoryData.inspectFields('Query')).toMatchInlineSnapshot(`
@@ -201,18 +202,18 @@ describe('commutative changes', () => {
     InMemoryData.reserveLayer(data, 1);
     InMemoryData.reserveLayer(data, 2);
 
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
     expect(data.optimisticOrder).toEqual([]);
@@ -221,24 +222,24 @@ describe('commutative changes', () => {
   it('creates optimistic layers that may be removed later', () => {
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.initDataState('write', data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
     // Actively clearing out layer 2
     InMemoryData.noopDataState(data, 2);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(undefined);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('write', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
     InMemoryData.clearDataState();
 
@@ -250,29 +251,29 @@ describe('commutative changes', () => {
     InMemoryData.reserveLayer(data, 2);
     InMemoryData.reserveLayer(data, 3);
 
-    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.initDataState('write', data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.writeRecord('Query', 'optimistic', true);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, 3);
+    InMemoryData.initDataState('read', data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
 
     // Expect Layer 3
     expect(data.optimisticOrder).toEqual([3, 2, 1]);
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
     expect(InMemoryData.readRecord('Query', 'optimistic')).toBe(true);
 
     // Write 2 again
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
     // 2 has moved in front of 3
     expect(data.optimisticOrder).toEqual([2, 3, 1]);
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
     expect(InMemoryData.readRecord('Query', 'optimistic')).toBe(undefined);
   });
@@ -282,20 +283,20 @@ describe('commutative changes', () => {
     InMemoryData.reserveLayer(data, 2);
     InMemoryData.reserveLayer(data, 3);
 
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, 3);
+    InMemoryData.initDataState('write', data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
 
     // Regular write that isn't optimistic
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('write', data, null);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
 
     expect(data.optimisticOrder).toEqual([3, 2, 1]);
@@ -304,16 +305,16 @@ describe('commutative changes', () => {
   it('avoids optimistic layers when only one layer is pending', () => {
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
     // This will be applied and visible since the above write isn't optimistic
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('write', data, null);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
 
     expect(data.optimisticOrder).toEqual([]);
@@ -325,32 +326,32 @@ describe('commutative changes', () => {
     InMemoryData.reserveLayer(data, 3);
     InMemoryData.reserveLayer(data, 4);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
 
-    InMemoryData.initDataState(data, 3);
+    InMemoryData.initDataState('write', data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
 
-    InMemoryData.initDataState(data, 4);
+    InMemoryData.initDataState('write', data, 4);
     InMemoryData.writeRecord('Query', 'index', 4);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
 
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(4);
 
     expect(data.optimisticOrder).toEqual([]);
@@ -370,7 +371,7 @@ describe('commutative changes', () => {
   it('respects non-reserved optimistic layers', () => {
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.initDataState('write', data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
@@ -379,32 +380,32 @@ describe('commutative changes', () => {
     expect(data.optimisticOrder).toEqual([3, 2, 1]);
     expect([...data.commutativeKeys]).toEqual([1, 3]);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([3, 2]);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
-    InMemoryData.initDataState(data, 3);
+    InMemoryData.initDataState('write', data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([3, 2]);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(3);
   });
 
   it('squashes when optimistic layers are completed', () => {
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.initDataState('write', data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([2, 1]);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([2]);
@@ -413,41 +414,41 @@ describe('commutative changes', () => {
     InMemoryData.noopDataState(data, 2);
     expect(data.optimisticOrder).toEqual([]);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(1);
   });
 
   it('squashes when optimistic layers are replaced with actual data', () => {
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, 2, true);
+    InMemoryData.initDataState('write', data, 2, true);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([2, 1]);
 
-    InMemoryData.initDataState(data, 1);
+    InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([2]);
 
     // Convert optimistic layer to commutative layer
-    InMemoryData.initDataState(data, 2);
+    InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
     expect(data.optimisticOrder).toEqual([]);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
   });
 
   it('prevents inspectFields from failing for uninitialised layers', () => {
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('write', data, null);
     InMemoryData.writeRecord('Query', 'test', true);
     InMemoryData.clearDataState();
 
     InMemoryData.reserveLayer(data, 1);
 
-    InMemoryData.initDataState(data, null);
+    InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.inspectFields('Query')).toEqual([
       {
         arguments: null,

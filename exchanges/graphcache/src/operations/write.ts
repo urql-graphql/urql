@@ -55,7 +55,7 @@ export const write = (
   data: Data,
   key?: number
 ): WriteResult => {
-  initDataState(store.data, key || null);
+  initDataState('write', store.data, key || null);
   const result = startWrite(store, request, data);
   clearDataState();
   return result;
@@ -96,7 +96,7 @@ export const writeOptimistic = (
   request: OperationRequest,
   key: number
 ): WriteResult => {
-  initDataState(store.data, key, true);
+  initDataState('write', store.data, key, true);
 
   const operation = getMainOperation(request.query);
   const result: WriteResult = {

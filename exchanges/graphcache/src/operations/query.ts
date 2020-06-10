@@ -27,6 +27,7 @@ import {
 
 import {
   Store,
+  getCurrentOperation,
   getCurrentDependencies,
   initDataState,
   clearDataState,
@@ -62,7 +63,7 @@ export const query = (
   request: OperationRequest,
   data?: Data
 ): QueryResult => {
-  initDataState(store.data, null);
+  initDataState('read', store.data, null);
   const result = read(store, request, data);
   clearDataState();
   return result;
@@ -285,7 +286,11 @@ const readSelection = (
     if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
-    } else if (resolvers && typeof resolvers[fieldName] === 'function') {
+    } else if (
+      getCurrentOperation() === 'read' &&
+      resolvers &&
+      typeof resolvers[fieldName] === 'function'
+    ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
       updateContext(ctx, typename, entityKey, key, fieldName);

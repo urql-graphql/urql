@@ -181,7 +181,7 @@ describe('Query', () => {
       /The field `field` does not exist on `Query`/
     );
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     // The field must still be `'test'`
     expect(InMemoryData.readRecord('Query', 'field')).toBe('test');
   });

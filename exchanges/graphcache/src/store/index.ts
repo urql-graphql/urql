@@ -3,6 +3,7 @@ export {
   clearDataState,
   noopDataState,
   reserveLayer,
+  getCurrentOperation,
   getCurrentDependencies,
   hydrateData,
 } from './data';

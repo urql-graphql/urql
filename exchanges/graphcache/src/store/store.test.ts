@@ -79,15 +79,9 @@ describe('Store', () => {
   it('supports unformatted query documents', () => {
     const store = new Store();
 
-    InMemoryData.initDataState(store.data, null);
     // NOTE: This is the query without __typename annotations
     write(store, { query: TodosWithoutTypename }, todosData);
-    InMemoryData.initDataState(store.data, null);
-
-    InMemoryData.initDataState(store.data, null);
     const result = query(store, { query: TodosWithoutTypename });
-    InMemoryData.initDataState(store.data, null);
-
     expect(result.data).toEqual(todosData);
   });
 });
@@ -333,9 +327,10 @@ describe('Store with OptimisticMutationConfig', () => {
         },
       },
     });
-    InMemoryData.initDataState(store.data, null);
+
     write(store, { query: Todos }, todosData);
-    InMemoryData.initDataState(store.data, null);
+
+    InMemoryData.initDataState('read', store.data, null);
   });
 
   it('should resolve a property', () => {
@@ -397,7 +392,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
     let { data } = query(store, { query: connection });
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     expect((data as any).exercisesConnection).toEqual(null);
     const fields = store.inspectFields({ __typename: 'Query' });
     fields.forEach(({ fieldName, arguments: args }) => {
@@ -412,7 +407,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to write a fragment', () => {
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
 
     store.writeFragment(
       gql`
@@ -449,7 +444,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a fragment', () => {
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     const result = store.readFragment(
       gql`
         fragment _ on Todo {
@@ -475,7 +470,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to update a query', () => {
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     store.updateQuery({ query: Todos }, data => ({
       ...data,
       todos: [
@@ -535,7 +530,7 @@ describe('Store with OptimisticMutationConfig', () => {
       }
     );
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     store.updateQuery({ query: Appointment, variables: { id: '1' } }, data => ({
       ...data,
       appointment: {
@@ -560,7 +555,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to read a query', () => {
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     const result = store.readQuery({ query: Todos });
 
     const deps = InMemoryData.getCurrentDependencies();
@@ -674,7 +669,7 @@ describe('Store with storage', () => {
       expectedData
     );
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     InMemoryData.persistData();
     InMemoryData.clearDataState();
 
@@ -728,7 +723,7 @@ describe('Store with storage', () => {
       embeddedData
     );
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     InMemoryData.persistData();
     InMemoryData.clearDataState();
 
@@ -758,15 +753,15 @@ describe('Store with storage', () => {
 
     InMemoryData.reserveLayer(store.data, 1);
 
-    InMemoryData.initDataState(store.data, 1);
+    InMemoryData.initDataState('write', store.data, 1);
     InMemoryData.writeRecord('Query', 'base', true);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(store.data, 2, true);
+    InMemoryData.initDataState('write', store.data, 2, true);
     InMemoryData.writeRecord('Query', 'base', false);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     expect(InMemoryData.readRecord('Query', 'base')).toBe(false);
     InMemoryData.persistData();
     InMemoryData.clearDataState();
@@ -781,7 +776,7 @@ describe('Store with storage', () => {
     store = new Store();
     InMemoryData.hydrateData(store.data, storage, serialisedStore);
 
-    InMemoryData.initDataState(store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     expect(InMemoryData.readRecord('Query', 'base')).toBe(true);
     InMemoryData.clearDataState();
   });
