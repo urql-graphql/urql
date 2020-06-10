@@ -28,10 +28,6 @@ const isOptimisticMutation = (
   config: OptimisticMutationConfig,
   operation: Operation
 ) => {
-  if (operation.operationName !== 'mutation') {
-    return false;
-  }
-
   const vars: Variables = operation.variables || makeDict();
   const fragments = getFragments(operation.query);
   const selections = [...getSelectionSet(getMainOperation(operation.query))];
@@ -107,18 +103,21 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
         outerForward(ops$),
         filter(res => {
           if (
-            res.operation.operationName !== 'subscription' &&
-            isOfflineError(res.error)
+            res.operation.operationName === 'subscription' ||
+            !isOfflineError(res.error)
           ) {
+            return true;
+          } else if (res.operation.operationName === 'mutation') {
             if (isOptimisticMutation(optimisticMutations, res.operation)) {
               failedQueue.push(res.operation);
               updateMetadata();
+              return false;
+            } else {
+              return true;
             }
-
+          } else {
             return false;
           }
-
-          return true;
         })
       );
     };
