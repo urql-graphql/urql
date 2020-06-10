@@ -37,7 +37,9 @@ export function withUrqlClient(
           return urqlClient;
         }
 
-        if (!ssr || typeof window === 'undefined') ssr = ssrExchange({ initialState: urqlState });
+        if (!ssr || typeof window === 'undefined')
+          ssr = ssrExchange({ initialState: urqlState });
+
         const clientConfig = getClientConfig(ssr);
         if (!clientConfig.exchanges) {
           // When the user does not provide exchanges we make the default assumption.
