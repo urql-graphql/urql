@@ -24,11 +24,11 @@ options and returns an [`Exchange`](./core.md#exchange).
 | _resolvers_  | A nested mapping of resolvers, which are used to override the record or entity that _Graphcache_ resolves for a given field for a type.                                                                                       |
 | _updates_    | A nested mapping of updater functions for mutation and subscription fields, which may be used to add side-effects that update other parts of the cache when the given subscription or mutation field is written to the cache. |
 | _optimistic_ | A mapping of mutation fields to resolvers that may be used to provide _Graphcache_ with an optimistic result for a given mutation field that should be applied to the cached data temporarily.                                |
-| _schema_     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, to resolve interfaces and enums, and to provide helpful warnings, for [schema awareness](../graphcache/schema-awareness.md).                |
+| _schema_     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, interfaces, and enums. The schema also used to provide helpful warnings for [schema awareness](../graphcache/schema-awareness.md).          |
 | _storage_    | A persisted storage interface that may be provided to preserve cache data for [offline support](../graphcache/offline.md).                                                                                                    |
 
-The `@urql/exchange-graphcache` package also exports the `offlineExchange`, which is identical to
-the `cacheExchange`, but activates [offline support](../graphcache/offline.md) when the `storage` option is passed.
+The `@urql/exchange-graphcache` package also exports the `offlineExchange`; which is identical to
+the `cacheExchange` but activates [offline support](../graphcache/offline.md) when the `storage` option is passed.
 
 ### `keys` option
 
@@ -144,7 +144,7 @@ page.](../graphcache/schema-awareness.md)
 ### `storage` option
 
 The `storage` option is an interface of methods that are used by the `offlineExchange` to persist
-the cache's data to a persisted storage on the user's device. it
+the cache's data to persisted storage on the user's device. it
 
 > **NOTE:** Offline Support is currently experimental! It hasn't been extensively tested yet and
 > may not always behave as expected. Please try it out with caution!
@@ -489,7 +489,7 @@ page.](../graphcache/computed-queries.md#relay-pagination)
 The `default-storage` subpackage is published with _Graphcache_ and contains a default storage
 interface that may be used with the [`storage` option.](#storage-option)
 
-It contains the `makeDefaultStorage` export which is a factory function that accepts a few option
+It contains the `makeDefaultStorage` export which is a factory function that accepts a few options
 and returns a full [storage interface](#storage-option). This storage by default persists to
 [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 

@@ -20,19 +20,19 @@ optimistically executed mutations.
 Everything that's needed to set up offline-support is already packaged in the
 `@urql/exchange-graphcache` package.
 
-It's first recommended for us to set up [Schema Awareness](./schema-awareness.md). This adds our
+We initially recommend setting up the [Schema Awareness](./schema-awareness.md). This adds our
 server-side schema information to the cache, which allows it to make decisions on what partial data
 complies with the schema. This is useful since the offline cache may often be lacking some data but
 may then be used to display the partial data we do have, as long as missing data is actually marked
 as optional in the schema.
 
 Furthermore, if we have any mutations that the user doesn't interact with after triggering them (for
-instance, "liking a post" would be such an action), we may set up [Optimistic
+instance, "liking a post"), we can set up [Optimistic
 Updates](./custom-updates.md#optimistic-updates) for these mutations, which allows them to be
 reflected in our UI before sending a request to the API.
 
 To actually now set up offline support, we'll swap out the `cacheExchange` with the
-`offlineExchange`, that's also exported by `@urql/exchange-graphcache`.
+`offlineExchange` that's also exported by `@urql/exchange-graphcache`.
 
 ```js
 import { createClient, dedupExchange, fetchExchange } from 'urql';
