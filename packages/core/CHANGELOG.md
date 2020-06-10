@@ -1,5 +1,18 @@
 # @urql/core
 
+## 1.12.0
+
+As always, please ensure that you deduplicate `@urql/core` when upgrading. Additionally
+deduplicating the versions of `wonka` that you have installed may also reduce your bundlesize.
+
+### Minor Changes
+
+- Expose a `client.subscription` shortcut method, similar to `client.query` and `client.mutation`, by [@FredyC](https://github.com/FredyC) (See [#838](https://github.com/FormidableLabs/urql/pull/838))
+
+### Patch Changes
+
+- Upgrade to a minimum version of wonka@^4.0.14 to work around issues with React Native's minification builds, which use uglify-es and could lead to broken bundles, by [@kitten](https://github.com/kitten) (See [#842](https://github.com/FormidableLabs/urql/pull/842))
+
 ## 1.11.8
 
 ### Patch Changes

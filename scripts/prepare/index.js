@@ -137,5 +137,6 @@ if (hasReact) {
 
 fs.copyFileSync(
   path.resolve(workspaceRoot, 'LICENSE'),
-  path.resolve(cwd, 'LICENSE'), cwd
+  path.resolve(cwd, 'LICENSE'),
+  0
 );

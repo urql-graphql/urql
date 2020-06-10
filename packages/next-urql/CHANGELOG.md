@@ -1,5 +1,44 @@
 # Changelog
 
+## 1.0.0
+
+To migrate to the new version, you will now have to pass a single function argument, instead
+of two arguments to the `withUrqlClient` HOC helper. For instance, you would have to transform this:
+
+```js
+export default withUrqlClient(
+  ctx => ({
+    url: '',
+  }),
+  ssrExchange => [dedupExchange, cacheExchange, ssrExchange, fetchExchange]
+);
+```
+
+To look like the following:
+
+```js
+export default withUrqlClient((ssrExchange, ctx) => ({
+  url: '',
+  exchanges: [exchanges],
+  exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange]
+}), { ssr; true });
+```
+
+The second argument may now be used to pass `{ ssr: true }` explicitly, when you are
+wrapping a page without another `getInitialProps` method. This gives you better support
+when you're implement custom methods like `getStaticProps`.
+
+### Major Changes
+
+- Change `getInitialProps` to be applied when the wrapped page `getInitialProps` or when `{ ssr: true }` is passed as a second options object. This is to better support alternative methods like `getStaticProps`. By [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#797](https://github.com/FormidableLabs/urql/pull/797))
+- Update the `withUrqlClient` function to remove the second argument formerly called `mergeExchanges` and merges it with the first argument.
+
+### Patch Changes
+
+- Reuse the ssrExchange when there is one present on the client-side, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#855](https://github.com/FormidableLabs/urql/pull/855))
+- Updated dependencies (See [#842](https://github.com/FormidableLabs/urql/pull/842))
+  - urql@1.9.8
+
 ## 0.3.8
 
 ### Patch Changes

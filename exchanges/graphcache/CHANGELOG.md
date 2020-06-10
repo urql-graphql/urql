@@ -1,5 +1,35 @@
 # @urql/exchange-graphcache
 
+## 3.0.0
+
+This major release comes with a couple of fixes and new **experimental offline support**, which
+we're very excited for! Please give it a try if your application is targeting Offline First!
+
+To migrate to this new major version, check the major breaking changes below. Mainly you will have
+to watch out for `cache.invalidateQuery` which has been removed. Instead you should now invalidate
+individual entities and fields using `cache.invalidate`. [Learn more about this method on our
+docs.](https://formidable.com/open-source/urql/docs/graphcache/custom-updates/#cacheinvalidate)
+
+### Major Changes
+
+- Remove the deprecated `populateExchange` export from `@urql/exchange-graphcache`.
+  If you're using the `populateExchange`, please install the seprate `@urql/exchange-populate` package and import it from there, by [@kitten](https://github.com/kitten) (See [#840](https://github.com/FormidableLabs/urql/pull/840))
+- The deprecated `cache.invalidateQuery()` method has been removed. Please migrate over to `cache.invalidate()` instead, which operates on individual fields instead of queries, by [@kitten](https://github.com/kitten) (See [#840](https://github.com/FormidableLabs/urql/pull/840))
+
+### Minor Changes
+
+- Implement experimental Offline Support in Graphcache.
+  [Read more about how to use the Offline Support in our docs.](https://formidable.com/open-source/urql/docs/graphcache/offline/), by [@kitten](https://github.com/kitten) (See [#793](https://github.com/FormidableLabs/urql/pull/793))
+- Issue warnings when an unknown type or field has been included in Graphcache's `opts` configuration to help spot typos.
+  Checks `opts.keys`, `opts.updates`, `opts.resolvers` and `opts.optimistic`. (See [#820](https://github.com/FormidableLabs/urql/pull/820) and [#826](https://github.com/FormidableLabs/urql/pull/826))
+
+### Patch Changes
+
+- ⚠️ Fix resolvers being executed for data even when data is currently written. This behaviour could lead to interference with custom updaters that update fragments or queries, e.g. an updater that was receiving paginated data due to a pagination resolver. We've determined that generally it is undesirable to have any resolvers run during the cache update (writing) process, since it may lead to resolver data being accidentally written to the cache or for resolvers to interfere with custom user updates, by [@olistic](https://github.com/olistic) (See [#812](https://github.com/FormidableLabs/urql/pull/812))
+- Upgrade to a minimum version of wonka@^4.0.14 to work around issues with React Native's minification builds, which use uglify-es and could lead to broken bundles, by [@kitten](https://github.com/kitten) (See [#842](https://github.com/FormidableLabs/urql/pull/842))
+- Updated dependencies (See [#838](https://github.com/FormidableLabs/urql/pull/838) and [#842](https://github.com/FormidableLabs/urql/pull/842))
+  - @urql/core@1.12.0
+
 ## 2.4.2
 
 ### Patch Changes
