@@ -101,10 +101,12 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     writeMetadata(metadata: SerializedRequest[]) {
       database$.then(
         database => {
-          database
-            .transaction(METADATA_STORE_NAME, 'readonly')
-            .objectStore(METADATA_STORE_NAME)
-            .put(metadata, METADATA_STORE_NAME);
+          return getRequestPromise(
+            database
+              .transaction(METADATA_STORE_NAME, 'readwrite')
+              .objectStore(METADATA_STORE_NAME)
+              .put(metadata, METADATA_STORE_NAME)
+          );
         },
         () => {
           /* noop */
