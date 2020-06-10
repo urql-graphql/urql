@@ -16,6 +16,15 @@ const Todos = gql`
   }
 `;
 
+const TodoFragment = gql`
+  fragment _ on Todo {
+    __typename
+    id
+    text
+    complete
+  }
+`;
+
 const Todo = gql`
   query($id: ID!) {
     __typename
@@ -196,6 +205,47 @@ it('should link entities', () => {
       complete: false,
       __typename: 'Todo',
     },
+  });
+});
+
+it('should not link entities when writing', () => {
+  const store = new Store({
+    resolvers: {
+      Todo: {
+        text: () => '[redacted]',
+      },
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', text: 'Go to the shops', complete: false, __typename: 'Todo' },
+      { id: '1', text: 'Pick up the kids', complete: true, __typename: 'Todo' },
+      { id: '2', text: 'Install urql', complete: false, __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+
+  InMemoryData.initDataState('write', store.data, null);
+  let data = store.readFragment(TodoFragment, { __typename: 'Todo', id: '0' });
+
+  expect(data).toEqual({
+    id: '0',
+    text: 'Go to the shops',
+    complete: false,
+    __typename: 'Todo',
+  });
+
+  InMemoryData.initDataState('read', store.data, null);
+  data = store.readFragment(TodoFragment, { __typename: 'Todo', id: '0' });
+
+  expect(data).toEqual({
+    id: '0',
+    text: '[redacted]',
+    complete: false,
+    __typename: 'Todo',
   });
 });
 
