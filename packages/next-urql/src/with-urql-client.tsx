@@ -111,12 +111,6 @@ export function withUrqlClient(
         // Run the prepass step on AppTree. This will run all urql queries on the server.
         await ssrPrepass(<AppTree {...appTreeProps} />);
 
-        // Serialize the urqlClient to null on the client-side.
-        // This ensures we don't share client and server instances of the urqlClient.
-        (urqlClient as any).toJSON = () => {
-          return null;
-        };
-
         return {
           ...pageProps,
           urqlState: ssrCache ? ssrCache.extractData() : undefined,
