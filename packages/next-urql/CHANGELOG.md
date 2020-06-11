@@ -19,9 +19,8 @@ To look like the following:
 ```js
 export default withUrqlClient((ssrExchange, ctx) => ({
   url: '',
-  exchanges: [exchanges],
   exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange]
-}), { ssr; true });
+}), { ssr: true });
 ```
 
 The second argument may now be used to pass `{ ssr: true }` explicitly, when you are
