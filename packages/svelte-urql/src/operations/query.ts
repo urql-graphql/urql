@@ -7,11 +7,14 @@ import {
   concat,
   scan,
   map,
+  take,
   share,
   subscribe,
+  toPromise,
 } from 'wonka';
 
 import { RequestPolicy, OperationContext, CombinedError } from '@urql/core';
+
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 
@@ -36,7 +39,8 @@ export interface QueryResult<T> {
 }
 
 export interface QueryStore<T = any, V = object>
-  extends Readable<QueryResult<T>> {
+  extends Readable<QueryResult<T>>,
+    PromiseLike<QueryResult<T>> {
   (args: Partial<QueryArguments<V>>): QueryStore<T>;
 }
 
@@ -86,6 +90,13 @@ export const query = <T = any, V = object>(
   );
 
   const queryStore = (baseArgs: QueryArguments<V>): QueryStore<T, V> => {
+    const result$ = pipe(
+      queryResult$,
+      onStart(() => {
+        nextArgs({ ...baseArgs, ...args });
+      })
+    );
+
     function query$(args: Partial<QueryArguments<V>>) {
       return queryStore({
         ...baseArgs,
@@ -95,13 +106,11 @@ export const query = <T = any, V = object>(
     }
 
     query$.subscribe = (onValue: (result: QueryResult<T>) => void) => {
-      return pipe(
-        queryResult$,
-        onStart(() => {
-          nextArgs({ ...baseArgs, ...args });
-        }),
-        subscribe(onValue)
-      ).unsubscribe;
+      return pipe(result$, subscribe(onValue)).unsubscribe;
+    };
+
+    query$.then = (onValue: (result: QueryResult<T>) => any): Promise<any> => {
+      return pipe(result$, take(1), toPromise).then(onValue);
     };
 
     return query$ as any;

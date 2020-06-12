@@ -12,7 +12,8 @@ export interface MutationArguments<V> {
 }
 
 export interface MutationStore<T = any, V = object>
-  extends Readable<OperationResult<T>> {
+  extends Readable<OperationResult<T>>,
+    PromiseLike<OperationResult<T>> {
   (additionalArgs?: Partial<MutationArguments<V>>): Promise<OperationResult<T>>;
 }
 
@@ -37,6 +38,12 @@ export const mutate = <T = any, V = object>(
       client.mutation(args.query, args.variables as any, args.context),
       subscribe(onValue)
     ).unsubscribe;
+  };
+
+  mutate$.then = (
+    onValue: (result: OperationResult<T>) => any
+  ): Promise<any> => {
+    return mutate$().then(onValue);
   };
 
   return mutate$ as any;
