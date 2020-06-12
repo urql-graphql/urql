@@ -261,8 +261,8 @@ describe('offline', () => {
 
     flush!();
     expect(dispatchOperationSpy).toHaveBeenCalledTimes(1);
-    expect(dispatchOperationSpy.mock.calls[0][0]!.key).toEqual(1);
-    expect(dispatchOperationSpy.mock.calls[0][0]!.query).toEqual(
+    expect((dispatchOperationSpy.mock.calls[0][0] as any).key).toEqual(1);
+    expect((dispatchOperationSpy.mock.calls[0][0] as any).query).toEqual(
       mutationOp.query
     );
   });
