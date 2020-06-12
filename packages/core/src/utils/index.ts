@@ -6,6 +6,7 @@ export * from './toSuspenseSource';
 export * from './stringifyVariables';
 export * from './maskTypename';
 export * from './withPromise';
+export * from './defer';
 
 export const noop = () => {
   /* noop */

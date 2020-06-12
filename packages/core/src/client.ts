@@ -41,6 +41,7 @@ import {
   toSuspenseSource,
   withPromise,
   maskTypename,
+  scheduleTask,
   noop,
 } from './utils';
 
@@ -74,6 +75,9 @@ export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
 export class Client {
+  /** Start an operation from an exchange */
+  reexecuteOperation: (operation: Operation) => void;
+
   // Event target for monitoring
   subscribeToDebugTarget?: (onEvent: (e: DebugEvent) => void) => Subscription;
 
@@ -121,16 +125,20 @@ export class Client {
     >();
     this.operations$ = operations$;
 
-    let isDispatching = false;
+    let isOperationBatchActive = false;
     this.dispatchOperation = (operation?: Operation) => {
-      if (!isDispatching) {
-        isDispatching = true;
-        if (operation) nextOperation(operation);
-        let queued: Operation | void;
-        while ((queued = this.queue.shift())) nextOperation(queued);
-        isDispatching = false;
-      } else if (operation) {
-        nextOperation(operation);
+      isOperationBatchActive = true;
+      if (operation) nextOperation(operation);
+      while ((operation = this.queue.shift())) nextOperation(operation);
+      isOperationBatchActive = false;
+    };
+
+    this.reexecuteOperation = (operation: Operation) => {
+      // Reexecute operation only if any subscribers are still subscribed to the
+      // operation's exchange results
+      if ((this.activeOperations[operation.key] || 0) > 0) {
+        this.queue.push(operation);
+        if (!isOperationBatchActive) scheduleTask(this.dispatchOperation);
       }
     };
 
@@ -250,15 +258,6 @@ export class Client {
       ? toSuspenseSource<OperationResult>(result$ as Source<OperationResult>)
       : (result$ as Source<OperationResult>);
   }
-
-  reexecuteOperation = (operation: Operation) => {
-    // Reexecute operation only if any subscribers are still subscribed to the
-    // operation's exchange results
-    if ((this.activeOperations[operation.key] || 0) > 0) {
-      this.queue.push(operation);
-      this.dispatchOperation();
-    }
-  };
 
   query<Data = any, Variables extends object = {}>(
     query: DocumentNode | string,
