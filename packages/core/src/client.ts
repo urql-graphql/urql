@@ -41,7 +41,6 @@ import {
   toSuspenseSource,
   withPromise,
   maskTypename,
-  scheduleTask,
   noop,
 } from './utils';
 
@@ -91,7 +90,7 @@ export class Client {
   maskTypename: boolean;
 
   // These are internals to be used to keep track of operations
-  dispatchOperation: (operation?: Operation) => void;
+  dispatchOperation: (operation?: Operation | void) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
   activeOperations = Object.create(null) as ActiveOperations;
@@ -126,7 +125,7 @@ export class Client {
     this.operations$ = operations$;
 
     let isOperationBatchActive = false;
-    this.dispatchOperation = (operation?: Operation) => {
+    this.dispatchOperation = (operation?: Operation | void) => {
       isOperationBatchActive = true;
       if (operation) nextOperation(operation);
       while ((operation = this.queue.shift())) nextOperation(operation);
@@ -138,7 +137,9 @@ export class Client {
       // operation's exchange results
       if ((this.activeOperations[operation.key] || 0) > 0) {
         this.queue.push(operation);
-        if (!isOperationBatchActive) scheduleTask(this.dispatchOperation);
+        if (!isOperationBatchActive) {
+          Promise.resolve().then(this.dispatchOperation);
+        }
       }
     };
 
