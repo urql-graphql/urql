@@ -19,7 +19,6 @@ import {
 
 import { makeDict } from '../helpers/dict';
 import { invariant, currentDebugStack } from '../helpers/help';
-import { scheduleTask } from './defer';
 
 type Dict<T> = Record<string, T>;
 type KeyMap<T> = Map<string, T>;
@@ -136,7 +135,7 @@ export const clearDataState = () => {
   // Schedule deferred tasks if we haven't already
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
-    scheduleTask(() => {
+    Promise.resolve().then(() => {
       initDataState('write', data, null);
       gc();
       persistData();
