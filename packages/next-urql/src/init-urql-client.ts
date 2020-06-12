@@ -13,6 +13,9 @@ export function initUrqlClient(clientOptions: ClientOptions): Client | null {
       ...clientOptions,
       suspense: isServer || clientOptions.suspense,
     });
+    // Serialize the urqlClient to null on the client-side.
+    // This ensures we don't share client and server instances of the urqlClient.
+    (urqlClient as any).toJSON = () => null;
   }
 
   // Return both the Client instance and the ssrCache.
