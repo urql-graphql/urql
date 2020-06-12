@@ -87,7 +87,11 @@ export const query = <T = any, V = object>(
 
   const queryStore = (baseArgs: QueryArguments<V>): QueryStore<T, V> => {
     function query$(args: Partial<QueryArguments<V>>) {
-      return queryStore({ ...baseArgs, ...args });
+      return queryStore({
+        ...baseArgs,
+        ...args,
+        pause: baseArgs.pause && args.pause !== true,
+      });
     }
 
     query$.subscribe = (onValue: (result: QueryResult<T>) => void) => {

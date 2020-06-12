@@ -90,7 +90,11 @@ export const subscription = <T = any, R = T, V = object>(
     baseArgs: SubscriptionArguments<V>
   ): SubscriptionStore<T, R, V> => {
     function subscription$(args: Partial<SubscriptionArguments<V>>) {
-      return subscriptionStore({ ...baseArgs, ...args });
+      return subscriptionStore({
+        ...baseArgs,
+        ...args,
+        pause: baseArgs.pause && args.pause !== true,
+      });
     }
 
     subscription$.subscribe = (
