@@ -332,3 +332,36 @@ able to check whether your `opts.optimistic` is valid.
 This error occurs when a field in `opts.optimistic` is not in the schema's `Mutation` fields.
 
 Check whether your schema is up-to-date, or whether you've got a typo in `Mutation` or `opts.optimistic`.
+
+## (25) Invalid root traversal
+
+> Invalid root traversel: A selection was being read on `???` which is an uncached root type.
+> The `Mutation` and `Subscription` types are special Operation Root Types and cannot be read back
+> from the cache.
+
+In GraphQL every schema has three [Operation Root
+Types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types). The `Query` type is the only
+one that is cached in Graphcache's normalized cache, since it's the root of all normalized cache
+data, i.e. all data is linked and connects back to the `Query` type.
+
+The `Subscription` and `Mutation` types are special and uncached; they may link to entities that
+will be updated in the normalized cache data, but are themselves not cached, since they're never
+directly queried.
+
+When your schema treats `Mutation` or `Subscription` like regular entity types you may get this
+warning. This may happen because you've used the default reserved names `Mutation` or `Subscription`
+for entities rather than as special Operation Root Types, and haven't specified this in the schema.
+Hence this issue can often be fixed by either enabling
+[Schema Awareness](https://formidable.com/open-source/urql/docs/graphcache/schema-awareness/) or by
+adding a `schema` definition to your GraphQL Schema like so:
+
+```graphql
+schema {
+  query: Query
+  mutation: YourMutation
+  subscription: YourSubscription
+}
+```
+
+Where `YourMutation` and `YourSubscription` are your custom Operation Root Types, instead of relying
+on the default names `"Mutation"` and `"Subscription"`.
