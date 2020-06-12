@@ -237,6 +237,21 @@ const readSelection = (
   const isQuery = key === store.rootFields['query'];
 
   const entityKey = (result && store.keyOfEntity(result)) || key;
+  if (!isQuery && !!ctx.store.rootNames[entityKey]) {
+    warn(
+      'Invalid root traversal: A selection was being read on `' +
+        entityKey +
+        '` which is an uncached root type.\n' +
+        'The `' +
+        ctx.store.rootFields.mutation +
+        '` and `' +
+        ctx.store.rootFields.subscription +
+        '` types are special ' +
+        'Operation Root Types and cannot be read back from the cache.',
+      25
+    );
+  }
+
   const typename = !isQuery
     ? InMemoryData.readRecord(entityKey, '__typename') ||
       (result && result.__typename)
