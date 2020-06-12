@@ -335,7 +335,7 @@ Check whether your schema is up-to-date, or whether you've got a typo in `Mutati
 
 ## (25) Invalid root traversal
 
-> Invalid root traversel: A selection was being read on `???` which is an uncached root type.
+> Invalid root traversal: A selection was being read on `???` which is an uncached root type.
 > The `Mutation` and `Subscription` types are special Operation Root Types and cannot be read back
 > from the cache.
 

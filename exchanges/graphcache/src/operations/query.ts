@@ -239,7 +239,7 @@ const readSelection = (
   const entityKey = (result && store.keyOfEntity(result)) || key;
   if (!isQuery && !!ctx.store.rootNames[entityKey]) {
     warn(
-      'Invalid root traversel: A selection was being read on `' +
+      'Invalid root traversal: A selection was being read on `' +
         entityKey +
         '` which is an uncached root type.\n' +
         'The `' +
