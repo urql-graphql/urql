@@ -1,5 +1,17 @@
+import {
+  pipe,
+  makeSubject,
+  fromValue,
+  switchMap,
+  onStart,
+  concat,
+  scan,
+  map,
+  share,
+  subscribe,
+} from 'wonka';
+
 import { RequestPolicy, OperationContext, CombinedError } from '@urql/core';
-import { pipe, fromValue, concat, scan, map, subscribe } from 'wonka';
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 
@@ -11,6 +23,7 @@ export interface QueryArguments<V> {
   variables?: V;
   requestPolicy?: RequestPolicy;
   pollInterval?: number;
+  pause?: boolean;
   context?: Partial<OperationContext>;
 }
 
@@ -22,42 +35,73 @@ export interface QueryResult<T> {
   extensions?: Record<string, any>;
 }
 
+export interface QueryStore<T = any, V = object>
+  extends Readable<QueryResult<T>> {
+  (args: Partial<QueryArguments<V>>): QueryStore<T>;
+}
+
 export const query = <T = any, V = object>(
   args: QueryArguments<V>
-): Readable<QueryResult<T>> => {
+): QueryStore<T, V> => {
   const client = getClient();
+  const { source: args$, next: nextArgs } = makeSubject<QueryArguments<V>>();
 
   const queryResult$ = pipe(
-    concat([
-      fromValue({ fetching: true, stale: false }),
-      pipe(
-        client.query<T>(args.query, args.variables, {
-          requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
-          ...args.context,
-        }),
-        map(({ stale, data, error, extensions }) => ({
-          fetching: false,
-          stale: !!stale,
-          data,
-          error,
-          extensions,
-        }))
-      ),
-      fromValue({ fetching: false, stale: false }),
-    ]),
+    args$,
+    switchMap(args => {
+      if (args.pause) {
+        return fromValue({ fetching: false, stale: false });
+      }
+
+      return concat([
+        // Initially set fetching to true
+        fromValue({ fetching: true, stale: false }),
+        pipe(
+          client.query<T>(args.query, args.variables, {
+            requestPolicy: args.requestPolicy,
+            pollInterval: args.pollInterval,
+            ...args.context,
+          }),
+          map(({ stale, data, error, extensions }) => ({
+            fetching: false,
+            stale: !!stale,
+            data,
+            error,
+            extensions,
+          }))
+        ),
+        // When the source proactively closes, fetching is set to false
+        fromValue({ fetching: false, stale: false }),
+      ]);
+    }),
+    // The individual partial results are merged into each previous result
     scan(
       (result, partial) => ({
         ...result,
         ...partial,
       }),
       initialState
-    )
+    ),
+    share
   );
 
-  return {
-    subscribe(onValue) {
-      return pipe(queryResult$, subscribe(onValue)).unsubscribe;
-    },
+  const queryStore = (baseArgs: QueryArguments<V>): QueryStore<T, V> => {
+    function query$(args: Partial<QueryArguments<V>>) {
+      return queryStore({ ...baseArgs, ...args });
+    }
+
+    query$.subscribe = (onValue: (result: QueryResult<T>) => void) => {
+      return pipe(
+        queryResult$,
+        onStart(() => {
+          nextArgs({ ...baseArgs, ...args });
+        }),
+        subscribe(onValue)
+      ).unsubscribe;
+    };
+
+    return query$ as any;
   };
+
+  return queryStore(args);
 };
