@@ -54,12 +54,10 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
   const serializeBatch = (): string => {
     let data = '';
     for (const key in batch) {
-      const value = batch[key];
-      data += `${stringifyVariables(key)}:${
-        value !== undefined ? stringifyVariables(value) : 'null'
-      },`;
+      if (batch[key] !== undefined) {
+        data += `${stringifyVariables(key)}:${stringifyVariables(batch[key])},`;
+      }
     }
-
     return data;
   };
 
