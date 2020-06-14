@@ -1,4 +1,3 @@
-import { stringifyVariables } from '@urql/core';
 import { SerializedEntries, SerializedRequest, StorageAdapter } from '../types';
 
 const getRequestPromise = <T>(request: IDBRequest<T>): Promise<T> => {
@@ -51,24 +50,48 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     req.result.createObjectStore(METADATA_STORE_NAME);
   };
 
+  const serializeEntry = (entry: string): string => entry.replace(/:/g, '%3a');
+
+  const deserializeEntry = (entry: string): string =>
+    entry.replace(/%3a/g, ':');
+
   const serializeBatch = (): string => {
     let data = '';
     for (const key in batch) {
       const value = batch[key];
-      data += `${stringifyVariables(key)}:${
-        value !== undefined ? stringifyVariables(value) : 'null'
-      },`;
+      data += serializeEntry(key);
+      data += ':';
+      if (value) data += serializeEntry(value);
+      data += ':';
     }
 
     return data;
   };
 
   const deserializeBatch = (input: string) => {
-    try {
-      return JSON.parse(`{${input.slice(0, -1)}}`);
-    } catch (_error) {
-      return {};
+    const data = {};
+    let char = '',
+      key = '',
+      entry = '',
+      mode = 0,
+      index = 0;
+
+    while (index < input.length) {
+      while ((char = input[index++]) !== ':') {
+        if (mode) entry += char;
+        else key += char;
+      }
+
+      if (mode) {
+        key = deserializeEntry(key);
+        entry = deserializeEntry(entry);
+        data[key] = entry || undefined;
+      } else {
+        mode = 1;
+      }
     }
+
+    return data;
   };
 
   return {
