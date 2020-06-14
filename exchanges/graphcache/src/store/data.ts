@@ -75,7 +75,7 @@ export const initDataState = (
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
-  currentIgnoreOptimistic = false;
+  currentIgnoreOptimistic = !!isOptimistic;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -116,6 +116,7 @@ export const clearDataState = () => {
 
   const data = currentData!;
   const layerKey = currentOptimisticKey;
+  currentIgnoreOptimistic = false;
   currentOptimisticKey = null;
 
   // Determine whether the current operation has been a commutative layer
@@ -132,6 +133,13 @@ export const clearDataState = () => {
     }
   }
 
+  currentOperation = null;
+  currentData = null;
+  currentDependencies = null;
+  if (process.env.NODE_ENV !== 'production') {
+    currentDebugStack.length = 0;
+  }
+
   // Schedule deferred tasks if we haven't already
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
@@ -142,13 +150,6 @@ export const clearDataState = () => {
       clearDataState();
       data.defer = false;
     });
-  }
-
-  currentOperation = null;
-  currentData = null;
-  currentDependencies = null;
-  if (process.env.NODE_ENV !== 'production') {
-    currentDebugStack.length = 0;
   }
 };
 
@@ -382,8 +383,9 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
 };
 
 const updatePersist = (entityKey: string, fieldKey: string) => {
-  if (currentData!.storage)
+  if (!currentIgnoreOptimistic && currentData!.storage) {
     currentData!.persist.add(serializeKeys(entityKey, fieldKey));
+  }
 };
 
 /** Reads an entity's field (a "record") from data */
@@ -555,8 +557,8 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
 
 export const persistData = () => {
   if (currentData!.storage) {
-    const entries: SerializedEntries = makeDict();
     currentIgnoreOptimistic = true;
+    const entries: SerializedEntries = makeDict();
     currentData!.persist.forEach(key => {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
       let x: void | Link | EntityField;
