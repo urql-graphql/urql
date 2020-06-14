@@ -34,7 +34,7 @@ export interface DefaultStorage extends StorageAdapter {
 export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
   if (!opts) opts = {};
 
-  const DB_NAME = opts.idbName || 'graphcache-v3';
+  const DB_NAME = opts.idbName || 'graphcache-v4';
   const ENTRIES_STORE_NAME = 'entries';
   const METADATA_STORE_NAME = 'metadata';
 
