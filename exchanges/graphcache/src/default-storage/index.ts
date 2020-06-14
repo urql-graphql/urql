@@ -77,16 +77,13 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
       index = 0;
 
     while (index < input.length) {
-      while ((char = input[index++]) !== ':') {
-        if (mode) entry += char;
-        else key += char;
-      }
+      while ((char = input[index++]) !== ':') entry += char;
 
       if (mode) {
-        key = deserializeEntry(key);
-        entry = deserializeEntry(entry);
-        data[key] = entry || undefined;
+        data[key] = deserializeEntry(entry) || undefined;
       } else {
+        key = deserializeEntry(entry);
+        entry = '';
         mode = 1;
       }
     }
