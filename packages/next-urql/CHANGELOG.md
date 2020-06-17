@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Patch Changes
+
+- Prevent serialization of the `Client` for `withUrqlClient` even if the target component doesn't have a `getInitialProps` method. Before this caused the client to not be initialised correctly on the client-side, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#857](https://github.com/FormidableLabs/urql/pull/857))
+
 ## 1.0.0
 
 To migrate to the new version, you will now have to pass a single function argument, instead
@@ -17,10 +23,13 @@ export default withUrqlClient(
 To look like the following:
 
 ```js
-export default withUrqlClient((ssrExchange, ctx) => ({
-  url: '',
-  exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange]
-}), { ssr: true });
+export default withUrqlClient(
+  (ssrExchange, ctx) => ({
+    url: '',
+    exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
+  }),
+  { ssr: true }
+);
 ```
 
 The second argument may now be used to pass `{ ssr: true }` explicitly, when you are

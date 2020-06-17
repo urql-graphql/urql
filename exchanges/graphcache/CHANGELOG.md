@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 3.0.1
+
+### Patch Changes
+
+- Add warning for queries that traverse an Operation Root Type (Mutation / Subscription types occuring in a query result), by [@kitten](https://github.com/kitten) (See [#859](https://github.com/FormidableLabs/urql/pull/859))
+- ⚠️ Fix storage implementation not preserving deleted values correctly or erroneously checking optimistically written entries for changes. This is fixed by adding a new default serializer to the `@urql/exchange-graphcache/default-storage` implementation, which will be incompatible with the old one, by [@kitten](https://github.com/kitten) (See [#866](https://github.com/FormidableLabs/urql/pull/866))
+- Replace unnecessary `scheduleTask` polyfill with inline `Promise.resolve().then(fn)` calls, by [@kitten](https://github.com/kitten) (See [#861](https://github.com/FormidableLabs/urql/pull/861))
+- Updated dependencies (See [#860](https://github.com/FormidableLabs/urql/pull/860) and [#861](https://github.com/FormidableLabs/urql/pull/861))
+  - @urql/core@1.12.1
+
 ## 3.0.0
 
 This major release comes with a couple of fixes and new **experimental offline support**, which
