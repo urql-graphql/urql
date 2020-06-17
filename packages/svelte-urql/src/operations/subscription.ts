@@ -96,7 +96,6 @@ export const subscription = <T = any, R = T, V = object>(
       return subscriptionStore({
         ...baseArgs,
         ...args,
-        pause: baseArgs.pause && args && args.pause !== true,
       });
     }
 

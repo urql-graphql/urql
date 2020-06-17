@@ -104,7 +104,6 @@ export const query = <T = any, V = object>(
       return queryStore({
         ...baseArgs,
         ...args,
-        pause: baseArgs.pause && args && args.pause !== true,
       });
     }
 
