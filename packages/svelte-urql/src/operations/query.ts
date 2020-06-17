@@ -42,7 +42,7 @@ export interface QueryResult<T> {
 export interface QueryStore<T = any, V = object>
   extends Readable<QueryResult<T>>,
     PromiseLike<QueryResult<T>> {
-  (args: Partial<QueryArguments<V>>): QueryStore<T>;
+  (args?: Partial<QueryArguments<V>>): QueryStore<T>;
 }
 
 export const query = <T = any, V = object>(
@@ -100,11 +100,11 @@ export const query = <T = any, V = object>(
       })
     );
 
-    function query$(args: Partial<QueryArguments<V>>) {
+    function query$(args?: Partial<QueryArguments<V>>) {
       return queryStore({
         ...baseArgs,
         ...args,
-        pause: baseArgs.pause && args.pause !== true,
+        pause: baseArgs.pause && args && args.pause !== true,
       });
     }
 

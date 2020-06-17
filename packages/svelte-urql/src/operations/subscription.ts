@@ -38,7 +38,7 @@ export interface SubscriptionResult<T> {
 
 export interface SubscriptionStore<T = any, R = T, V = object>
   extends Readable<SubscriptionResult<T>> {
-  (args: Partial<SubscriptionArguments<V>>): SubscriptionStore<T, R, V>;
+  (args?: Partial<SubscriptionArguments<V>>): SubscriptionStore<T, R, V>;
 }
 
 export const subscription = <T = any, R = T, V = object>(
@@ -92,11 +92,11 @@ export const subscription = <T = any, R = T, V = object>(
   const subscriptionStore = (
     baseArgs: SubscriptionArguments<V>
   ): SubscriptionStore<T, R, V> => {
-    function subscription$(args: Partial<SubscriptionArguments<V>>) {
+    function subscription$(args?: Partial<SubscriptionArguments<V>>) {
       return subscriptionStore({
         ...baseArgs,
         ...args,
-        pause: baseArgs.pause && args.pause !== true,
+        pause: baseArgs.pause && args && args.pause !== true,
       });
     }
 
