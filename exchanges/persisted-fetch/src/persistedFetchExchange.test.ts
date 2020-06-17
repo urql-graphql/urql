@@ -193,3 +193,37 @@ it('correctly generates an SHA256 hash', async () => {
     },
   });
 });
+
+it('supports a custom hash function', async () => {
+  const expected = {
+    data: {
+      test: true,
+    },
+  };
+
+  fetch.mockResolvedValueOnce({
+    json: () => expected,
+  });
+
+  const hashFn = () => Promise.resolve('hello');
+  const queryHash = 'hello';
+
+  await pipe(
+    fromValue(queryOperation),
+    persistedFetchExchange({ generateHash: hashFn })(exchangeArgs),
+    toPromise
+  );
+
+  expect(fetch).toHaveBeenCalledTimes(1);
+
+  const body = JSON.parse(fetch.mock.calls[0][1].body);
+
+  expect(body).toMatchObject({
+    extensions: {
+      persistedQuery: {
+        version: 1,
+        sha256Hash: queryHash,
+      },
+    },
+  });
+});

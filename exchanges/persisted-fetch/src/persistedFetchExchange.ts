@@ -32,6 +32,7 @@ import { hash } from './sha256';
 
 interface PersistedFetchExchangeOptions {
   preferGetForPersistedQueries?: boolean;
+  generateHash?: (query: string) => Promise<string>;
 }
 
 export const persistedFetchExchange = (
@@ -39,6 +40,7 @@ export const persistedFetchExchange = (
 ): Exchange => ({ forward, dispatchDebug }) => {
   if (!options) options = {};
 
+  const hashFn = options.generateHash || hash;
   let supportsPersistedQueries = true;
 
   return ops$ => {
@@ -66,7 +68,7 @@ export const persistedFetchExchange = (
 
         return pipe(
           // Hash the given GraphQL query
-          fromPromise(hash(query)),
+          fromPromise(hashFn(query)),
           mergeMap(sha256Hash => {
             // Attach SHA256 hash and remove query from body
             body.query = undefined;
