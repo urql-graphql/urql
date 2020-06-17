@@ -1,5 +1,18 @@
-import { OperationContext, CombinedError, createRequest } from '@urql/core';
-import { pipe, fromValue, concat, scan, map, subscribe } from 'wonka';
+import {
+  pipe,
+  makeSubject,
+  fromValue,
+  switchMap,
+  onStart,
+  concat,
+  scan,
+  map,
+  share,
+  subscribe,
+  publish,
+} from 'wonka';
+
+import { OperationContext, CombinedError } from '@urql/core';
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 
@@ -9,6 +22,7 @@ import { initialState } from './constants';
 export interface SubscriptionArguments<V> {
   query: string | DocumentNode;
   variables?: V;
+  pause?: boolean;
   context?: Partial<OperationContext>;
 }
 
@@ -22,28 +36,45 @@ export interface SubscriptionResult<T> {
   extensions?: Record<string, any>;
 }
 
+export interface SubscriptionStore<T = any, R = T, V = object>
+  extends Readable<SubscriptionResult<T>> {
+  (args?: Partial<SubscriptionArguments<V>>): SubscriptionStore<T, R, V>;
+}
+
 export const subscription = <T = any, R = T, V = object>(
   args: SubscriptionArguments<V>,
   handler?: SubscriptionHandler<T, R>
-): Readable<SubscriptionResult<T>> => {
+): SubscriptionStore<T, R, V> => {
   const client = getClient();
-  const request = createRequest(args.query, args.variables as any);
+  const { source: args$, next: nextArgs } = makeSubject<
+    SubscriptionArguments<V>
+  >();
 
-  const queryResult$ = pipe(
-    concat([
-      fromValue({ fetching: true, stale: false }),
-      pipe(
-        client.executeSubscription(request, args.context),
-        map(({ stale, data, error, extensions }) => ({
-          fetching: false,
-          stale: !!stale,
-          data,
-          error,
-          extensions,
-        }))
-      ),
-      fromValue({ fetching: false, stale: false }),
-    ]),
+  const subscriptionResult$ = pipe(
+    args$,
+    switchMap(args => {
+      if (args.pause) {
+        return fromValue({ fetching: false, stale: false });
+      }
+
+      return concat([
+        // Initially set fetching to true
+        fromValue({ fetching: true, stale: false }),
+        pipe(
+          client.subscription<T>(args.query, args.variables, args.context),
+          map(({ stale, data, error, extensions }) => ({
+            fetching: false,
+            stale: !!stale,
+            data,
+            error,
+            extensions,
+          }))
+        ),
+        // When the source proactively closes, fetching is set to false
+        fromValue({ fetching: false, stale: false }),
+      ]);
+    }),
+    // The individual partial results are merged into each previous result
     scan((result, partial: any) => {
       const data =
         partial.data !== undefined
@@ -52,13 +83,36 @@ export const subscription = <T = any, R = T, V = object>(
             : partial.data
           : result.data;
       return { ...result, ...partial, data };
-    }, initialState)
+    }, initialState),
+    share
   );
 
-  return {
-    subscribe(onValue) {
-      const { unsubscribe } = pipe(queryResult$, subscribe(onValue));
-      return unsubscribe as () => void;
-    },
+  publish(subscriptionResult$);
+
+  const subscriptionStore = (
+    baseArgs: SubscriptionArguments<V>
+  ): SubscriptionStore<T, R, V> => {
+    function subscription$(args?: Partial<SubscriptionArguments<V>>) {
+      return subscriptionStore({
+        ...baseArgs,
+        ...args,
+      });
+    }
+
+    subscription$.subscribe = (
+      onValue: (result: SubscriptionResult<T>) => void
+    ) => {
+      return pipe(
+        subscriptionResult$,
+        onStart(() => {
+          nextArgs({ ...baseArgs, ...args });
+        }),
+        subscribe(onValue)
+      ).unsubscribe;
+    };
+
+    return subscription$ as any;
   };
+
+  return subscriptionStore(args);
 };
