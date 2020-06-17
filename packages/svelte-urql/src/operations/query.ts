@@ -10,6 +10,7 @@ import {
   take,
   share,
   subscribe,
+  publish,
   toPromise,
 } from 'wonka';
 
@@ -88,6 +89,8 @@ export const query = <T = any, V = object>(
     ),
     share
   );
+
+  publish(queryResult$);
 
   const queryStore = (baseArgs: QueryArguments<V>): QueryStore<T, V> => {
     const result$ = pipe(
