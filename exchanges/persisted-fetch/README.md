@@ -25,11 +25,18 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    persistedFetchExchange,
+    persistedFetchExchange({
+      /* optional config */
+    }),
     fetchExchange
   ],
 });
 ```
+
+The `persistedQueryExchange` supports two configuration options:
+
+- `preferGetForPersistedQueries`: Use `GET` for fetches with persisted queries
+- `generateHash`: A function that takes a GraphQL query and returns the hashed result. This defaults to the `window.crypto` API in the browser and the `crypto` module in node.
 
 The `persistedFetchExchange` only handles queries, so for mutations we keep the
 `fetchExchange` around alongside of it.
