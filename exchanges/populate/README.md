@@ -27,7 +27,7 @@ const client = createClient({
 ```
 
 The `schema` option is the introspection result for your backend graphql schema, more information
-about how to get your schema can be found [here](https://formidable.com/open-source/urql/docs/graphcache/schema-awareness/#getting-your-schema).
+about how to get your schema can be found [in the "Schema Awareness" Page of the Graphcache documentation.](https://formidable.com/open-source/urql/docs/graphcache/schema-awareness/#getting-your-schema).
 
 ## Example usage
 
