@@ -44,7 +44,7 @@ own. It should also be placed after the `dedupExchange` to avoid unnecessary wor
 Adding the `populateExchange` now enables us to use the `@populate` directive in our mutations.
 
 The `schema` option is the introspection result for your backend graphql schema, more information
-about how to get your schema can be found [here](../graphcache/schema-awareness.md#getting-your-schema).
+about how to get your schema can be found [in the "Schema Awareness" Page of the Graphcache documentation.](../graphcache/schema-awareness.md#getting-your-schema).
 
 ## Example usage
 
