@@ -206,7 +206,6 @@ it('supports a custom hash function', async () => {
   });
 
   const hashFn = () => Promise.resolve('hello');
-  const queryHash = 'hello';
 
   await pipe(
     fromValue(queryOperation),
@@ -222,7 +221,7 @@ it('supports a custom hash function', async () => {
     extensions: {
       persistedQuery: {
         version: 1,
-        sha256Hash: queryHash,
+        sha256Hash: 'hello',
       },
     },
   });
