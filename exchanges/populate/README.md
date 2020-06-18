@@ -22,9 +22,12 @@ import { populateExchange } from '@urql/exchange-populate';
 
 const client = createClient({
   url: 'http://localhost:1234/graphql',
-  exchanges: [dedupExchange, populateExchange, cacheExchange, fetchExchange],
+  exchanges: [dedupExchange, populateExchange({ schema }), cacheExchange, fetchExchange],
 });
 ```
+
+The `schema` option is the introspection result for your backend graphql schema, more information
+about how to get your schema can be found [in the "Schema Awareness" Page of the Graphcache documentation.](https://formidable.com/open-source/urql/docs/graphcache/schema-awareness/#getting-your-schema).
 
 ## Example usage
 
