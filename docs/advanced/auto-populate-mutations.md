@@ -33,7 +33,7 @@ import { populateExchange } from '@urql/exchange-graphcache';
 
 const client = createClient({
   // ...
-  exchanges: [dedupExchange, populateExchange({ scema }), cacheExchange, fetchExchange],
+  exchanges: [dedupExchange, populateExchange({ schema }), cacheExchange, fetchExchange],
 });
 ```
 
