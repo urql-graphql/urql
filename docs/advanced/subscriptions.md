@@ -31,7 +31,7 @@ const client = new Client({
 In the above example, we add the `subscriptionExchange` to the `Client` with the default exchanges
 add before it. The `subscriptionExchange` is a factory that accepts additional options and returns
 the actual `Exchange` function. It does not make any assumption over the transport protocol and
-scheme that is used. Instead we need to pass a `forwardSubscription` function which is called with
+scheme that is used. Instead, we need to pass a `forwardSubscription` function which is called with
 an "enriched" _Operation_ every time the `Client` attempts to execute a GraphQL Subscription.
 
 When we define this function it must return an "Observable-like" object, which needs to follow the
@@ -84,7 +84,7 @@ You can use this to accumulate the data over time, which is useful for a
 list for example.
 
 In the following example, we create a subscription that informs us of
-new messages. We will concatenate the incoming messages, so that we
+new messages. We will concatenate the incoming messages so that we
 can display all messages that have come in over the subscription across
 events.
 
@@ -132,7 +132,7 @@ messages.
 
 ## One-off Subscriptions
 
-Whe you're using subscriptions directly without `urql`'s framework bindings, you can use the `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for mutations and subscriptions [that we've seen before on the "Core Package" page.](../concepts/core-package.md#one-off-queries-and-mutations)
+When you're using subscriptions directly without `urql`'s framework bindings, you can use the `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for mutations and subscriptions [that we've seen before on the "Core Package" page.](../concepts/core-package.md#one-off-queries-and-mutations)
 
 This method will always [returns a Wonka stream](../concepts/stream-patterns.md#the-wonka-library) and doesn't have a `.toPromise()` shortcut method, since promises won't return the multiple values that a subscription may deliver. Let's convert the above example to one without framework code, as we may use subscriptions in a Node.js environment.
 
