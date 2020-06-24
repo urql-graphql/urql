@@ -40,23 +40,32 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
       node => node.kind === Kind.FIELD && node.name.value === '__typename'
     )
   ) {
-    // NOTE: It's fine to mutate here as long as we return the node,
-    // which will instruct visit() to clone the AST upwards
-    (node.selectionSet.selections as SelectionNode[]).push({
-      kind: Kind.FIELD,
-      name: {
-        kind: Kind.NAME,
-        value: '__typename',
+    return {
+      ...node,
+      selectionSet: {
+        ...node.selectionSet,
+        selections: [
+          ...(node.selectionSet.selections as SelectionNode[]),
+          {
+            kind: Kind.FIELD,
+            name: {
+              kind: Kind.NAME,
+              value: '__typename',
+            },
+          },
+        ],
       },
-    });
-
-    return node;
+    };
   }
 };
 
-export const formatDocument = (node: DocumentNode) => {
-  return visit(node, {
+export const formatDocument = (node: DocumentNode): DocumentNode => {
+  const result = visit(node, {
     Field: formatNode,
     InlineFragment: formatNode,
   });
+
+  // Ensure that the hash of the resulting document won't suddenly change
+  result.__key = (node as any).__key;
+  return result;
 };
