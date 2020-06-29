@@ -97,11 +97,14 @@ describe('withUrqlClient', () => {
     it('should allow a user to access the ctx object from Next on the server', async () => {
       Component.getInitialProps &&
         (await Component.getInitialProps(mockContext));
-      expect(spyInitUrqlClient).toHaveBeenCalledWith({
-        url: 'http://localhost:3000',
-        fetchOptions: { headers: { Authorization: token } },
-        exchanges: [mockSsrExchange],
-      });
+      expect(spyInitUrqlClient).toHaveBeenCalledWith(
+        {
+          url: 'http://localhost:3000',
+          fetchOptions: { headers: { Authorization: token } },
+          exchanges: [mockSsrExchange],
+        },
+        true
+      );
     });
   });
 
