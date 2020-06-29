@@ -1,10 +1,12 @@
-import gql from 'graphql-tag';
 import {
   createClient,
   ExchangeIO,
   Operation,
   OperationResult,
+  formatDocument,
 } from '@urql/core';
+
+import gql from 'graphql-tag';
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
 import { offlineExchange } from './offlineExchange';
 
@@ -263,7 +265,7 @@ describe('offline', () => {
     expect(dispatchOperationSpy).toHaveBeenCalledTimes(1);
     expect((dispatchOperationSpy.mock.calls[0][0] as any).key).toEqual(1);
     expect((dispatchOperationSpy.mock.calls[0][0] as any).query).toEqual(
-      mutationOp.query
+      formatDocument(mutationOp.query)
     );
   });
 });
