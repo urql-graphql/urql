@@ -84,6 +84,19 @@ const deserializeResult = (
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   const data: SSRData = {};
 
+  // On the client-side, we delete results from the cache as they're resolved
+  // this is delayed so that concurrent queries don't delete each other's data
+  const invalidateQueue: number[] = [];
+  const invalidate = (result: OperationResult) => {
+    invalidateQueue.push(result.operation.key);
+    if (invalidateQueue.length === 1) {
+      Promise.resolve().then(() => {
+        let key: number | void;
+        while ((key = invalidateQueue.shift())) delete data[key];
+      });
+    }
+  };
+
   const isCached = (operation: Operation) => {
     return !shouldSkip(operation) && data[operation.key] !== undefined;
   };
@@ -131,12 +144,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       );
     } else {
       // On the client we delete results from the cache as they're resolved
-      cachedOps$ = pipe(
-        cachedOps$,
-        tap((result: OperationResult) => {
-          delete data[result.operation.key];
-        })
-      );
+      cachedOps$ = pipe(cachedOps$, tap(invalidate));
     }
 
     return merge([forwardedOps$, cachedOps$]);

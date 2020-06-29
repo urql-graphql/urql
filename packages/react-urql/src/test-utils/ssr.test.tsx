@@ -148,12 +148,14 @@ describe('client-side rehydration', () => {
     });
   });
 
-  it('can rehydrate results on the client', () => {
+  it('can rehydrate results on the client', async () => {
     ssr.restoreData({ [queryOperation.key]: queryResponse });
 
     expect(() => {
       pipe(client.executeRequestOperation(queryOperation), publish);
     }).not.toThrow();
+
+    await Promise.resolve();
 
     const data = ssr.extractData();
     expect(Object.keys(data).length).toBe(0);
