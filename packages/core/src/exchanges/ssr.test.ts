@@ -119,7 +119,7 @@ it('resolves cached query results correctly', () => {
   expect(onPush).toHaveBeenCalledWith(queryResponse);
 });
 
-it('deletes cached results in non-suspense environments', () => {
+it('deletes cached results in non-suspense environments', async () => {
   client.suspense = false;
   const onPush = jest.fn();
   const ssr = ssrExchange();
@@ -132,6 +132,8 @@ it('deletes cached results in non-suspense environments', () => {
 
   pipe(exchange, forEach(onPush));
   next(queryOperation);
+
+  await Promise.resolve();
 
   expect(Object.keys(ssr.extractData()).length).toBe(0);
   expect(onPush).toHaveBeenCalledWith(queryResponse);
