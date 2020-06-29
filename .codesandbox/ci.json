@@ -1,6 +1,7 @@
 {
   "packages": [
     "packages/core",
+    "packages/next-urql",
     "packages/react-urql",
     "packages/preact-urql",
     "packages/svelte-urql",
