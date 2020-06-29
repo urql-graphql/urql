@@ -30,6 +30,10 @@ export function withUrqlClient(
 ) {
   if (!options) options = {};
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
+    const shouldBindGetInitialprops = Boolean(
+      AppOrPage.getInitialProps || options!.ssr
+    );
+
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
@@ -52,7 +56,7 @@ export function withUrqlClient(
         }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(clientConfig)!;
+        return initUrqlClient(clientConfig, shouldBindGetInitialprops)!;
       }, [urqlClient, urqlState]);
 
       return (
@@ -65,7 +69,7 @@ export function withUrqlClient(
     // Set the displayName to indicate use of withUrqlClient.
     withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
-    if (AppOrPage.getInitialProps || options!.ssr) {
+    if (shouldBindGetInitialprops) {
       withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const { AppTree } = appOrPageCtx;
 
@@ -86,7 +90,7 @@ export function withUrqlClient(
             fetchExchange,
           ];
         }
-        const urqlClient = initUrqlClient(clientConfig);
+        const urqlClient = initUrqlClient(clientConfig, true);
 
         if (urqlClient) {
           (ctx as NextUrqlContext).urqlClient = urqlClient;

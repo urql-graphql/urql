@@ -3,7 +3,10 @@ import 'isomorphic-unfetch';
 
 let urqlClient: Client | null = null;
 
-export function initUrqlClient(clientOptions: ClientOptions): Client | null {
+export function initUrqlClient(
+  clientOptions: ClientOptions,
+  canEnableSuspense: boolean
+): Client | null {
   // Create a new Client for every server-side rendered request.
   // This ensures we reset the state for each rendered page.
   // If there is an exising client instance on the client-side, use it.
@@ -11,7 +14,7 @@ export function initUrqlClient(clientOptions: ClientOptions): Client | null {
   if (isServer || !urqlClient) {
     urqlClient = createClient({
       ...clientOptions,
-      suspense: isServer || clientOptions.suspense,
+      suspense: canEnableSuspense && (isServer || clientOptions.suspense),
     });
     // Serialize the urqlClient to null on the client-side.
     // This ensures we don't share client and server instances of the urqlClient.
