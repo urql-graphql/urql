@@ -1,5 +1,6 @@
 import { parse, print } from 'graphql';
 import { collectTypesFromResponse, formatDocument } from './typenames';
+import { createRequest } from './request';
 
 const formatTypeNames = (query: string) => {
   const typedNode = formatDocument(parse(query));
@@ -8,7 +9,7 @@ const formatTypeNames = (query: string) => {
 
 describe('formatTypeNames', () => {
   it('creates a new instance when adding typenames', () => {
-    const doc = parse(`{ todos { id } }`) as any;
+    const doc = parse(`{ id todos { id } }`) as any;
     const newDoc = formatDocument(doc) as any;
     expect(doc).not.toBe(newDoc);
     expect(doc.definitions).not.toBe(newDoc.definitions);
@@ -23,6 +24,29 @@ describe('formatTypeNames', () => {
     expect(doc.definitions[0].selectionSet.selections[0]).toBe(
       newDoc.definitions[0].selectionSet.selections[0]
     );
+    // Not equal again:
+    expect(doc.definitions[0].selectionSet.selections[1]).not.toBe(
+      newDoc.definitions[0].selectionSet.selections[1]
+    );
+    expect(doc.definitions[0].selectionSet.selections[1].selectionSet).not.toBe(
+      newDoc.definitions[0].selectionSet.selections[1].selectionSet
+    );
+    // Equal again:
+    expect(
+      doc.definitions[0].selectionSet.selections[1].selectionSet.selections[0]
+    ).toBe(
+      newDoc.definitions[0].selectionSet.selections[1].selectionSet
+        .selections[0]
+    );
+  });
+
+  it('preserves the hashed key of the resulting query', () => {
+    const doc = parse(`{ id todos { id } }`) as any;
+    const expectedKey = createRequest(doc).key;
+    const formattedDoc = formatDocument(doc);
+    expect(formattedDoc).not.toBe(doc);
+    const actualKey = createRequest(formattedDoc).key;
+    expect(expectedKey).toBe(actualKey);
   });
 
   it('adds typenames to a query string', () => {
