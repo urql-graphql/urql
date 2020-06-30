@@ -5,10 +5,10 @@
     <img alt="Npm version" src="https://badgen.net/npm/v/@urql/preact" />
   </a>
   <a href="https://travis-ci.com/JoviDeCroock/preact-urql">
-    <img alt="Test Status" src="https://api.travis-ci.com/JoviDeCroock/preact-urql.svg?branch=master" />
+    <img alt="Test Status" src="https://api.travis-ci.com/JoviDeCroock/preact-urql.svg?branch=main" />
   </a>
   <a href="https://codecov.io/gh/JoviDeCroock/preact-urql">
-    <img alt="Test Coverage" src="https://codecov.io/gh/JoviDeCroock/preact-urql/branch/master/graph/badge.svg" />
+    <img alt="Test Coverage" src="https://codecov.io/gh/JoviDeCroock/preact-urql/branch/main/graph/badge.svg" />
   </a>
   <a href="https://bundlephobia.com/result?p=@urql/preact">
     <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/@urql/preact.svg?label=gzip%20size" />

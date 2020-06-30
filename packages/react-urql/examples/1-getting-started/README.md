@@ -8,7 +8,8 @@ A page displays a to-do list, and you can add items or mark them as complete.
 
 ## Usage
 
-> Note: The quickest way to get started is to visit the live [CodeSandbox example](https://codesandbox.io/s/github/FormidableLabs/urql/tree/master/packages/react-urql/examples/1-getting-started).
+> Note: The quickest way to get started is to visit the live [CodeSandbox
+> example](https://codesandbox.io/s/github/FormidableLabs/urql/tree/main/packages/react-urql/examples/1-getting-started).
 
 #### 1. Navigate to the example directory and install dependencies
 

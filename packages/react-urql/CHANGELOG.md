@@ -107,7 +107,7 @@ This release doesn't change any major feature aspects, but comes with bugfixes
 to our suspense and concurrent-mode handling. Due to an upgrade to `wonka@^4.0.0`
 this is a minor version though.
 
-In [v1.6.0](https://github.com/FormidableLabs/urql/blob/master/CHANGELOG.md#160) we believed to
+In [v1.6.0](https://github.com/FormidableLabs/urql/blob/main/CHANGELOG.md#160) we believed to
 have solved all issues related to suspense and concurrent mode. However there were
 still some remaining cases where concurrent mode behaved incorrectly. With the new
 `useOperator` hook in [`react-wonka@2.0.0`](https://github.com/kitten/react-wonka) we believe
