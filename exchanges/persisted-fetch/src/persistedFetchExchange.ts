@@ -27,12 +27,13 @@ import {
   makeFetchOptions,
   makeFetchSource,
 } from '@urql/core/internal';
+import { DocumentNode } from 'graphql';
 
 import { hash } from './sha256';
 
 interface PersistedFetchExchangeOptions {
   preferGetForPersistedQueries?: boolean;
-  generateHash?: (query: string) => Promise<string>;
+  generateHash?: (query: string, document: DocumentNode) => Promise<string>;
 }
 
 export const persistedFetchExchange = (
@@ -68,7 +69,7 @@ export const persistedFetchExchange = (
 
         return pipe(
           // Hash the given GraphQL query
-          fromPromise(hashFn(query)),
+          fromPromise(hashFn(query, operation.query)),
           mergeMap(sha256Hash => {
             // Attach SHA256 hash and remove query from body
             body.query = undefined;

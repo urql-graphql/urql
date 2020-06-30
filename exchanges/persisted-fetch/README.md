@@ -28,7 +28,7 @@ const client = createClient({
     persistedFetchExchange({
       /* optional config */
     }),
-    fetchExchange
+    fetchExchange,
   ],
 });
 ```
@@ -40,3 +40,25 @@ The `persistedQueryExchange` supports two configuration options:
 
 The `persistedFetchExchange` only handles queries, so for mutations we keep the
 `fetchExchange` around alongside of it.
+
+## Avoid hashing during runtime
+
+If you want to generate hashes at build-time you can use a [webpack-loader](https://github.com/leoasis/graphql-persisted-document-loader) to achieve this,
+when using this all you need to do in this exchange is the following:
+
+```js
+import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+import { persistedFetchExchange } from '@urql/exchange-persisted-fetch';
+
+const client = createClient({
+  url: 'http://localhost:1234/graphql',
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    persistedFetchExchange({
+      generateHash: (_, document) => document.documentId,
+    }),
+    fetchExchange,
+  ],
+});
+```

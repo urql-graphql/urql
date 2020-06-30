@@ -49,6 +49,12 @@ describe('formatTypeNames', () => {
     expect(expectedKey).toBe(actualKey);
   });
 
+  it('preserves custom properties', () => {
+    const doc = parse(`{ id todos { id } }`) as any;
+    doc.documentId = '123';
+    expect((formatDocument(doc) as any).documentId).toBe(doc.documentId);
+  });
+
   it('adds typenames to a query string', () => {
     expect(formatTypeNames(`{ todos { id } }`)).toMatchInlineSnapshot(`
       "{
