@@ -205,7 +205,7 @@ it('supports a custom hash function', async () => {
     json: () => expected,
   });
 
-  const hashFn = () => Promise.resolve('hello');
+  const hashFn = jest.fn(() => Promise.resolve('hello'));
 
   await pipe(
     fromValue(queryOperation),
@@ -225,4 +225,13 @@ it('supports a custom hash function', async () => {
       },
     },
   });
+  const queryString = `query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}
+`;
+  expect(hashFn).toBeCalledWith(queryString, queryOperation.query);
 });
