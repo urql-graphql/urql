@@ -1,5 +1,16 @@
 # @urql/exchange-persisted-fetch
 
+## 1.1.0
+
+### Minor Changes
+
+- Adds support for custom hash functions by adding a `generateHash` option to the exchange, by [@lorenries](https://github.com/lorenries) (See [#870](https://github.com/FormidableLabs/urql/pull/870))
+
+### Patch Changes
+
+- Updated dependencies (See [#880](https://github.com/FormidableLabs/urql/pull/880) and [#885](https://github.com/FormidableLabs/urql/pull/885))
+  - @urql/core@1.12.2
+
 ## 1.0.1
 
 ### Patch Changes

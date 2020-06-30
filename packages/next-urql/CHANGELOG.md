@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Patch Changes
+
+- Disable suspense on the `Client` when we aren't using `react-ssr-prepass`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#884](https://github.com/FormidableLabs/urql/pull/884))
+
 ## 1.0.1
 
 ### Patch Changes

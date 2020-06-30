@@ -1,5 +1,12 @@
 # @urql/core
 
+## 1.12.2
+
+### Patch Changes
+
+- ⚠️ Fix `formatDocument` mutating parts of the `DocumentNode` which may be shared by other documents and queries. Also ensure that a formatted document will always generate the same key in `createRequest` as the original document, by [@kitten](https://github.com/kitten) (See [#880](https://github.com/FormidableLabs/urql/pull/880))
+- ⚠️ Fix `ssrExchange` invalidating results on the client-side too eagerly, by delaying invalidation by a tick, by [@kitten](https://github.com/kitten) (See [#885](https://github.com/FormidableLabs/urql/pull/885))
+
 ## 1.12.1
 
 ### Patch Changes
