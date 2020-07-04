@@ -29,7 +29,7 @@ client options.
 
 ```ts
 import { createClient, dedupExchange, populateExchange, fetchExchange } from '@urql/core';
-import { populateExchange } from '@urql/exchange-graphcache';
+import { populateExchange } from '@urql/exchange-populate';
 
 const client = createClient({
   // ...
