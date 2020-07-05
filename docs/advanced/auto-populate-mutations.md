@@ -28,7 +28,7 @@ Afterwards we can set the `populateExchange` up by adding it to our list of `exc
 client options.
 
 ```ts
-import { createClient, dedupExchange, populateExchange, fetchExchange } from '@urql/core';
+import { createClient, dedupExchange, fetchExchange } from '@urql/core';
 import { populateExchange } from '@urql/exchange-populate';
 
 const client = createClient({
