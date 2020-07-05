@@ -119,7 +119,7 @@ withUrqlClient((_ssrExchange, ctx) => ({
 }));
 ```
 
-In client-side SPAs using `urql`, you typically configure the Client yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` set up for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory). If you need to customize your exchanges beyond the defaults `next-urql` provides, use the second argument to `withUrqlClient`, `mergeExchanges`.
+In client-side SPAs using `urql`, you typically configure the Client yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` set up for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory).
 
 #### `exchanges`
 
