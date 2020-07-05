@@ -3,6 +3,10 @@ import 'isomorphic-unfetch';
 
 let urqlClient: Client | null = null;
 
+export function resetClient() {
+  urqlClient = null;
+}
+
 export function initUrqlClient(
   clientOptions: ClientOptions,
   canEnableSuspense: boolean

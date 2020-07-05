@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NextPage, NextPageContext } from 'next';
 import NextApp, { AppContext } from 'next/app';
 import ssrPrepass from 'react-ssr-prepass';
@@ -10,7 +10,7 @@ import {
   fetchExchange,
 } from 'urql';
 
-import { initUrqlClient } from './init-urql-client';
+import { initUrqlClient, resetClient } from './init-urql-client';
 import {
   NextUrqlClientConfig,
   NextUrqlContext,
@@ -36,6 +36,9 @@ export function withUrqlClient(
 
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
+      const forceUpdate = useState(0);
+
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
         if (urqlClient) {
           return urqlClient;
@@ -57,11 +60,21 @@ export function withUrqlClient(
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return initUrqlClient(clientConfig, shouldBindGetInitialprops)!;
-      }, [urqlClient, urqlState]);
+      }, [urqlClient, urqlState, forceUpdate[0]]);
+
+      const resetUrqlClient = () => {
+        resetClient();
+        ssr = ssrExchange({ initialState: undefined });
+        forceUpdate[1](forceUpdate[0] + 1);
+      };
 
       return (
         <Provider value={client}>
-          <AppOrPage urqlClient={client} {...rest} />
+          <AppOrPage
+            urqlClient={client}
+            resetUrqlClient={resetUrqlClient}
+            {...rest}
+          />
         </Provider>
       );
     };
