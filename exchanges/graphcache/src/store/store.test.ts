@@ -6,6 +6,7 @@ import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
 import { Store } from './store';
 import { noop } from '../test-utils/utils';
+import { getIntrospectionQuery, parse } from 'graphql';
 
 const Appointment = gql`
   query appointment($id: String) {
@@ -385,10 +386,9 @@ describe('Store with OptimisticMutationConfig', () => {
       {
         query: connection,
       },
-      // @ts-ignore
       {
         exercisesConnection: null,
-      }
+      } as any
     );
     let { data } = query(store, { query: connection });
 
@@ -802,5 +802,14 @@ describe('Store with storage', () => {
       'Invalid optimistic mutation field: `deleteTodo` is not a mutation field in the defined schema, but the `optimistic` option is referencing it.'
     );
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
+  });
+
+  it('should not warn for an introspection result root', function () {
+    // eslint-disable-next-line
+    const schema = require('../test-utils/simple_schema.json');
+    const store = new Store({ schema });
+
+    query(store, { query: parse(getIntrospectionQuery()) }, schema);
+    expect(console.warn).toBeCalledTimes(0);
   });
 });
