@@ -22,6 +22,7 @@ export const isFieldNullable = (
   typename: string,
   fieldName: string
 ): boolean => {
+  if (fieldName === '__schema') return true;
   const field = getField(schema, typename, fieldName);
   return !!field && isNullableType(field.type);
 };
@@ -42,6 +43,7 @@ export const isFieldAvailableOnType = (
   typename: string,
   fieldName: string
 ): boolean => {
+  if (fieldName === '__schema') return true;
   return !!getField(schema, typename, fieldName);
 };
 
