@@ -205,7 +205,7 @@ properties you'll likely see some options that exist on the `Client` as well.
 | ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | fetchOptions        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                               |
 | fetch               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
-| requestPolicy       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| requestPolicy       | `RequestPolicy`                       | An optional [request policy](#requestpolicy) that should be used specifying the cache strategy. |
 | url                 | `string`                              | The GraphQL endpoint                                                                                                  |
 | pollInterval        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
 | meta                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
