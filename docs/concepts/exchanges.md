@@ -25,7 +25,8 @@ Other available exchanges:
 - `retryExchange`: Allows operations to be retried
 - `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
 - `multipartFetchExchange`: Provides multipart file upload capability
-- `suspenseExchange` (experimental): Allows the use of React Suspense on the client-side with `urql`'s built-in suspense mode
+- `suspenseExchange` (experimental): Allows the use of React Suspense on the client-side with `urql`'s built-in suspense modeµ
+- `requestPolicyExchange`: Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
 
 It is also possible to apply custom exchanges to override the default logic.
 
