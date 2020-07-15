@@ -240,3 +240,11 @@ export default withUrqlClient(ssrExchange => ({
 
 Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
 server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.
+
+### Resetting the client instance
+
+In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
+and we consider it "unsafe" so evaluate this carefully for yourself.
+
+When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetClient`
+property, when invoked this will create a new top-level client and reset all prior operations.
