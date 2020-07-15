@@ -1,0 +1,69 @@
+{
+  "name": "@urql/exchange-refocus",
+  "version": "0.1.8",
+  "description": "An exchange for operation retry support in urql",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "exchanges/retry"
+  },
+  "keywords": [
+    "urql",
+    "graphql client",
+    "formidablelabs",
+    "exchanges",
+    "react",
+    "retry"
+  ],
+  "main": "dist/urql-exchange-retry",
+  "module": "dist/urql-exchange-retry.mjs",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-exchange-retry.mjs",
+      "require": "./dist/urql-exchange-retry.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "graphql": "^15.1.0",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
+  },
+  "dependencies": {
+    "@urql/core": ">=1.12.0",
+    "wonka": "^4.0.14"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
