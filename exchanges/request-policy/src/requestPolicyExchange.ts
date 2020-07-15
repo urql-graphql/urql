@@ -21,21 +21,21 @@ export const requestPolicyExchange = (options): Exchange => ({ forward }) => {
     if (!operations.has(operation.key)) {
       operations.set(operation.key, new Date());
       return operation;
-    } else {
-      const lastOccurrence = operations.get(operation.key);
-      const currentTime = new Date().getTime();
-      if (currentTime - lastOccurrence.getTime() > TTL) {
-        operations.set(operation.key, new Date());
-        return {
-          ...operation,
-          context: {
-            ...operation.context,
-            requestPolicy: 'cache-and-network',
-          },
-        };
-      }
-      return operation;
     }
+    const lastOccurrence = operations.get(operation.key);
+    const currentTime = new Date().getTime();
+    if (currentTime - lastOccurrence.getTime() > TTL) {
+      operations.set(operation.key, new Date());
+      return {
+        ...operation,
+        context: {
+          ...operation.context,
+          requestPolicy: 'cache-and-network',
+        },
+      };
+    }
+
+    return operation;
   };
 
   return ops$ => {
