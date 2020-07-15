@@ -7,7 +7,9 @@ export interface Options {
   ttl: number;
 }
 
-export const requestPolicyExchange = (options): Exchange => ({ forward }) => {
+export const requestPolicyExchange = (options: Options): Exchange => ({
+  forward,
+}) => {
   const operations = new Map();
 
   const TTL = (options || {}).ttl || defaultTTL;
