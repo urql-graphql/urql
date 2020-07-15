@@ -182,6 +182,37 @@ const cache = cacheExchange({
 The above example deletes a `Todo` with a given `id` from the arguments, when `Mutation.deleteTodo`
 is executed. This will cause all queries that reference this `Todo` to automatically update.
 
+## cache.inspectFields
+
+There will be times where you need to see all active filters for a list, ....
+This can be done with the help of `inspectFields`, let's say we have a list of todo's that
+has a few different filters.
+
+```js
+const cache = cacheExchange({
+  updates: {
+    Mutation: {
+      addTodo: (result, args, cache, info) => {
+        // Get all children of query, this can also be Todo if we would be looking for for instance the author subquery
+        const allFields = cache.inspectFields("Query");
+        // Filter these children to the query you like, in our case query { todos }
+        const todoQueries = allFields.filter(x => x.fieldName === "todos");
+
+        todosQueries.forEach(({ arguments }) => {
+          cache.updateQuery(
+            { query: TODOS_QUERY, variables: x.arguments },
+            data => ({
+              ...data,
+              todos: [...data.todos, result.addTodo]
+            });
+          );
+        })
+      },
+    },
+  },
+});
+```
+
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
