@@ -49,7 +49,9 @@ export const makeFetchURL = (
   }
 
   if (body.query) {
-    search.push('query=' + encodeURIComponent(body.query));
+    search.push(
+      'query=' + encodeURIComponent(body.query.replace(/[\s,]+/g, ' ').trim())
+    );
   }
 
   if (body.variables) {
