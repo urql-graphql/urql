@@ -4,7 +4,8 @@ import { pipe, map } from 'wonka';
 const defaultTTL = 5 * 60 * 1000;
 
 export interface Options {
-  ttl: number;
+  shouldUpgrade?: (op: Operation) => boolean;
+  ttl?: number;
 }
 
 export const requestPolicyExchange = (options: Options): Exchange => ({
@@ -24,9 +25,13 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
       operations.set(operation.key, new Date());
       return operation;
     }
+
     const lastOccurrence = operations.get(operation.key);
     const currentTime = new Date().getTime();
-    if (currentTime - lastOccurrence.getTime() > TTL) {
+    if (
+      currentTime - lastOccurrence.getTime() > TTL &&
+      (options.shouldUpgrade ? options.shouldUpgrade(operation) : true)
+    ) {
       operations.set(operation.key, new Date());
       return {
         ...operation,
