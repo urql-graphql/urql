@@ -24,8 +24,10 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     requestPolicyExchange({
-      // The amount of time in ms that has to go by before upgrading, default is 5 minutes
+      // The amount of time in ms that has to go by before upgrading, default is 5 minutes.
       ttl: 60 * 1000, // 1 minute.
+      // An optional function that allows you to specify whether an operation should be upgraded.
+      shouldUpgrade: operation => operation.context.requestPolicy !== 'cache-only',
     }),
     cacheExchange,
     fetchExchange,

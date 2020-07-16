@@ -88,3 +88,49 @@ it(`upgrades to cache-and-network`, done => {
     done();
   }, 10);
 });
+
+it(`upgrades to cache-and-network`, done => {
+  const response = jest.fn(
+    (forwardOp: Operation): OperationResult => {
+      return {
+        operation: forwardOp,
+        data: queryOneData,
+      };
+    }
+  );
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  const shouldUpgrade = jest.fn(() => false);
+  pipe(
+    requestPolicyExchange({ ...mockOptions, shouldUpgrade })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+
+  expect(response).toHaveBeenCalledTimes(1);
+  expect(response.mock.calls[0][0].context.requestPolicy).toEqual(
+    'cache-first'
+  );
+  expect(result).toHaveBeenCalledTimes(1);
+
+  setTimeout(() => {
+    next(op);
+    expect(response).toHaveBeenCalledTimes(2);
+    expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
+      'cache-first'
+    );
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(shouldUpgrade).toBeCalledTimes(1);
+    done();
+  }, 10);
+});
