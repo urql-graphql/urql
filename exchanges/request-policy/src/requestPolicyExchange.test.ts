@@ -89,7 +89,7 @@ it(`upgrades to cache-and-network`, done => {
   }, 10);
 });
 
-it(`upgrades to cache-and-network`, done => {
+it(`doesn't upgrade when shouldUpgrade returns false`, done => {
   const response = jest.fn(
     (forwardOp: Operation): OperationResult => {
       return {
