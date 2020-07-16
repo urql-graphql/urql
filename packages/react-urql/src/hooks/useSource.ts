@@ -18,7 +18,7 @@ import { useClient } from '../context';
 
 let currentInit = false;
 
-export const useSource = <T>(source: Source<T>, init: T): T => {
+export function useSource<T>(source: Source<T>, init: T): T {
   const isMounted = useRef(true);
 
   const [state, setState] = useState(() => {
@@ -55,9 +55,9 @@ export const useSource = <T>(source: Source<T>, init: T): T => {
   }, [source]);
 
   return state;
-};
+}
 
-export const useBehaviourSubject = <T>(value: T) => {
+export function useBehaviourSubject<T>(value: T) {
   const client = useClient();
 
   const state = useMemo((): [Source<T>, (value: T) => void] => {
@@ -93,4 +93,4 @@ export const useBehaviourSubject = <T>(value: T) => {
   if (client.suspense) state[1](value);
 
   return state;
-};
+}

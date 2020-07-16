@@ -3,10 +3,10 @@ import { useRef, useMemo } from 'react';
 import { GraphQLRequest, createRequest } from '@urql/core';
 
 /** Creates a request from a query and variables but preserves reference equality if the key isn't changing */
-export const useRequest = (
+export function useRequest(
   query: string | DocumentNode,
   variables?: any
-): GraphQLRequest => {
+): GraphQLRequest {
   const prev = useRef<undefined | GraphQLRequest>(undefined);
 
   return useMemo(() => {
@@ -19,4 +19,4 @@ export const useRequest = (
       return request;
     }
   }, [query, variables]);
-};
+}

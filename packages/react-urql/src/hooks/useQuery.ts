@@ -30,9 +30,9 @@ export type UseQueryResponse<T> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-export const useQuery = <T = any, V = object>(
+export function useQuery<T = any, V = object>(
   args: UseQueryArgs<V>
-): UseQueryResponse<T> => {
+): UseQueryResponse<T> {
   const client = useClient();
 
   // This creates a request which will keep a stable reference
@@ -100,4 +100,4 @@ export const useQuery = <T = any, V = object>(
   );
 
   return [state, executeQuery];
-};
+}
