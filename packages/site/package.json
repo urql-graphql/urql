@@ -53,7 +53,7 @@
   "devDependencies": {
     "@babel/core": "^7.2.0",
     "@mdx-js/mdx": "^1.5.7",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "react-hot-loader": "^4.12.20",
     "react-static-plugin-react-router": "^7.2.3",
     "react-static-plugin-sitemap": "^7.0.0",
