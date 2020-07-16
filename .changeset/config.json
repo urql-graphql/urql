@@ -3,5 +3,5 @@
   "changelog": "../scripts/changesets/changelog.js",
   "commit": false,
   "access": "public",
-  "baseBranch": "master"
+  "baseBranch": "main"
 }
