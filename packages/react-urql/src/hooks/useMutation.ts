@@ -28,9 +28,9 @@ export type UseMutationResponse<T, V> = [
   ) => Promise<OperationResult<T>>
 ];
 
-export const useMutation = <T = any, V = object>(
+export function useMutation<T = any, V = object>(
   query: DocumentNode | string
-): UseMutationResponse<T, V> => {
+): UseMutationResponse<T, V> {
   const isMounted = useRef(true);
   const client = useClient();
 
@@ -69,4 +69,4 @@ export const useMutation = <T = any, V = object>(
   }, []);
 
   return [state, executeMutation];
-};
+}

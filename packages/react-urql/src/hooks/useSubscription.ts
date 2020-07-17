@@ -30,10 +30,10 @@ export type UseSubscriptionResponse<T> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-export const useSubscription = <T = any, R = T, V = object>(
+export function useSubscription<T = any, R = T, V = object>(
   args: UseSubscriptionArgs<V>,
   handler?: SubscriptionHandler<T, R>
-): UseSubscriptionResponse<R> => {
+): UseSubscriptionResponse<R> {
   const client = useClient();
 
   // Update handler on constant ref, since handler changes shouldn't
@@ -108,4 +108,4 @@ export const useSubscription = <T = any, R = T, V = object>(
   );
 
   return [state, executeSubscription];
-};
+}
