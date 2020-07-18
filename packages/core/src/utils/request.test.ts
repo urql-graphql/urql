@@ -76,7 +76,7 @@ it('should return a valid query object with variables', () => {
 
 it('should remove comments', () => {
   const doc = `
-    {
+    { #query
       # broken
       test
     }
