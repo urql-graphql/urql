@@ -177,27 +177,18 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@urql/core@>=1.10.1", "@urql/core@>=1.9.2":
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-1.10.1.tgz#58ba478434e0cfec324bcdd0365627a961c820b7"
-  integrity sha512-N1Lh7sn8y2DXhi5NUIefvfvAQgPr2vpUCfDmHx6jalYEDCedIzP4FHZoQyB1X4p2FXQStLLgHIjfyGw74zBeWA==
+"@urql/core@>=1.12.1":
+  version "1.12.2"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-1.12.2.tgz#88c031dc0e39da412964b05ae8e89c634fca0220"
+  integrity sha512-GGG9fzDRscuLdYVpJSTOfTPLHHEXadrUI/LNZ0vAIXrof5whWL8Nyxc2x2EhilrajZ+7DgZUuT+nuiVF4/Z7fA==
   dependencies:
-    wonka "^4.0.7"
+    wonka "^4.0.14"
 
 "@urql/exchange-graphcache@link:../..":
-  version "2.2.5"
+  version "3.0.1"
   dependencies:
-    "@urql/core" ">=1.10.1"
-    "@urql/exchange-populate" ">=0.1.1"
-    wonka "^3.2.1 || ^4.0.0"
-
-"@urql/exchange-populate@>=0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@urql/exchange-populate/-/exchange-populate-0.1.1.tgz#ae179613db0a0329952b15beedd150f759def8ea"
-  integrity sha512-nckFh7CadoO7S22GsE0RxKcmFAedw1nqC/O+IBKMRGnFUfoFdjZDHviIVOO1iJnPcmFnSXFHD0ALjEf3VFspBg==
-  dependencies:
-    "@urql/core" ">=1.9.2"
-    wonka "^3.2.1 || ^4.0.0"
+    "@urql/core" ">=1.12.1"
+    wonka "^4.0.14"
 
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
@@ -2726,9 +2717,9 @@ lodash.sortby@^4.7.0:
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
 lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.5:
-  version "4.17.11"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
-  integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
+  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
 log-symbols@^2.1.0:
   version "2.2.0"
@@ -4869,10 +4860,10 @@ wonka@^3.2.0:
   resolved "https://registry.yarnpkg.com/wonka/-/wonka-3.2.0.tgz#40b9ce8e0c375127437661290e98e5d9e5278440"
   integrity sha512-sHCLouGzTclUlp1sdXAhuTqGMIoAQfpBit9puepaINPVqDBRtC8DPWtTUHC0DJIdFSO+DsO86AFBFCDor7Sn0g==
 
-"wonka@^3.2.1 || ^4.0.0", wonka@^4.0.7:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.7.tgz#b4934685bd2449367bd72ce7770bfe3e6cc8a68b"
-  integrity sha512-Uhyl2cgWCUksYtU0Jt8MSzKUqK4BVUrewWxnn1YlKL3Zco4sDcCUDkbgH0i762HJs1rtsq03cfzsCWxJKaDgVg==
+wonka@^4.0.14:
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-4.0.14.tgz#77d680a84e575ed15a9f975eb87d6c530488f3a4"
+  integrity sha512-v9vmsTxpZjrA8CYfztbuoTQSHEsG3ZH+NCYfasHm0V3GqBupXrjuuz0RJyUaw2cRO7ouW2js0P6i853/qxlDcA==
 
 worker-farm@^1.5.2:
   version "1.6.0"
