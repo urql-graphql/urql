@@ -17,12 +17,14 @@ import {
   OptimisticMutationConfig,
 } from '../types';
 
+const BUILTIN_FIELD_RE = /^__/;
+
 export const isFieldNullable = (
   schema: GraphQLSchema,
   typename: string,
   fieldName: string
 ): boolean => {
-  if (fieldName === '__schema') return true;
+  if (BUILTIN_FIELD_RE.test(fieldName)) return true;
   const field = getField(schema, typename, fieldName);
   return !!field && isNullableType(field.type);
 };
@@ -43,7 +45,7 @@ export const isFieldAvailableOnType = (
   typename: string,
   fieldName: string
 ): boolean => {
-  if (fieldName === '__schema') return true;
+  if (BUILTIN_FIELD_RE.test(fieldName)) return true;
   return !!getField(schema, typename, fieldName);
 };
 
