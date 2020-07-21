@@ -1,7 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { CombinedError, OperationContext, RequestPolicy } from '@urql/core';
+import {
+  CombinedError,
+  OperationContext,
+  RequestPolicy,
+  Operation,
+} from '@urql/core';
 
 import { useClient } from '../context';
 import { useSource, useBehaviourSubject } from './useSource';
@@ -20,6 +25,7 @@ export interface UseQueryArgs<V> {
 export interface UseQueryState<T> {
   fetching: boolean;
   stale: boolean;
+  operation: Operation;
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
@@ -68,9 +74,10 @@ export function useQuery<T = any, V = object>(
             fromValue({ fetching: true, stale: false }),
             pipe(
               query$,
-              map(({ stale, data, error, extensions }) => ({
+              map(({ stale, operation, data, error, extensions }) => ({
                 fetching: false,
                 stale: !!stale,
+                operation,
                 data,
                 error,
                 extensions,
