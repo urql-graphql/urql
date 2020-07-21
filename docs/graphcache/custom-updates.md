@@ -184,9 +184,12 @@ is executed. This will cause all queries that reference this `Todo` to automatic
 
 ## cache.inspectFields
 
-There will be times where you need to see all active filters for a list, ....
-This can be done with the help of `inspectFields`, let's say we have a list of todo's that
-has a few different filters.
+It's possible that you may have to alter multiple parts of the normalized cache data all at once.
+For instance, you may want to see a field that has been called with different arguments, like a listing
+field. The `cache.inspectFields` method was made for this purpose and is able to return all fields
+that the cache has seen on a given type.
+
+In this example we'll alter all fields on `Query.todos`:
 
 ```js
 const cache = cacheExchange({
@@ -201,9 +204,9 @@ const cache = cacheExchange({
         todosQueries.forEach(({ arguments }) => {
           cache.updateQuery(
             { query: TODOS_QUERY, variables: x.arguments },
-            data => ({
-              ...data,
-              todos: [...data.todos, result.addTodo]
+            data => {
+              data.todos.push(result.addTodo);
+              return data;
             });
           );
         })
