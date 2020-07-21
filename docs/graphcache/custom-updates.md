@@ -182,6 +182,40 @@ const cache = cacheExchange({
 The above example deletes a `Todo` with a given `id` from the arguments, when `Mutation.deleteTodo`
 is executed. This will cause all queries that reference this `Todo` to automatically update.
 
+## cache.inspectFields
+
+It's possible that you may have to alter multiple parts of the normalized cache data all at once.
+For instance, you may want to see a field that has been called with different arguments, like a listing
+field. The `cache.inspectFields` method was made for this purpose and is able to return all fields
+that the cache has seen on a given type.
+
+In this example we'll alter all fields on `Query.todos`:
+
+```js
+const cache = cacheExchange({
+  updates: {
+    Mutation: {
+      addTodo: (result, args, cache, info) => {
+        // Get all children of query, this can also be Todo if we would be looking for for instance the author subquery
+        const allFields = cache.inspectFields("Query");
+        // Filter these children to the query you like, in our case query { todos }
+        const todoQueries = allFields.filter(x => x.fieldName === "todos");
+
+        todosQueries.forEach(({ arguments }) => {
+          cache.updateQuery(
+            { query: TODOS_QUERY, variables: x.arguments },
+            data => {
+              data.todos.push(result.addTodo);
+              return data;
+            });
+          );
+        })
+      },
+    },
+  },
+});
+```
+
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
