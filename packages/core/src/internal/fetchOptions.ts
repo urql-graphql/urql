@@ -49,7 +49,12 @@ export const makeFetchURL = (
   }
 
   if (body.query) {
-    search.push('query=' + encodeURIComponent(body.query));
+    search.push(
+      'query=' +
+        encodeURIComponent(
+          body.query.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim()
+        )
+    );
   }
 
   if (body.variables) {
