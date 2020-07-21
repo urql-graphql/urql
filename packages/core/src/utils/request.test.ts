@@ -73,3 +73,17 @@ it('should return a valid query object with variables', () => {
     variables: { test: 5 },
   });
 });
+
+it('should remove comments', () => {
+  const doc = `
+    { #query
+      # broken
+      test
+    }
+  `;
+  const val = createRequest(doc);
+  expect(print(val.query)).toBe(`{
+  test
+}
+`);
+});
