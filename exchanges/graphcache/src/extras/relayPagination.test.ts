@@ -3,13 +3,17 @@ import { query, write } from '../operations';
 import { Store } from '../store';
 import { relayPagination } from './relayPagination';
 
+function itemNode(numItem: number) {
+  return {
+    __typename: 'Item',
+    id: numItem + '',
+  };
+}
+
 function itemEdge(numItem: number) {
   return {
     __typename: 'ItemEdge',
-    node: {
-      __typename: 'Item',
-      id: numItem + '',
-    },
+    node: itemNode(numItem),
   };
 }
 
@@ -24,6 +28,10 @@ it('works with forward pagination', () => {
             __typename
             id
           }
+        }
+        nodes {
+          __typename
+          id
         }
         pageInfo {
           __typename
@@ -47,6 +55,7 @@ it('works with forward pagination', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(1)],
+      nodes: [itemNode(1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -60,6 +69,7 @@ it('works with forward pagination', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(2)],
+      nodes: [itemNode(2)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: false,
@@ -79,6 +89,7 @@ it('works with forward pagination', () => {
     items: {
       ...pageTwo.items,
       edges: [pageOne.items.edges[0], pageTwo.items.edges[0]],
+      nodes: [pageOne.items.nodes[0], pageTwo.items.nodes[0]],
     },
   });
 });
@@ -94,6 +105,10 @@ it('works with backwards pagination', () => {
             __typename
             id
           }
+        }
+        nodes {
+          __typename
+          id
         }
         pageInfo {
           __typename
@@ -117,6 +132,7 @@ it('works with backwards pagination', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(2)],
+      nodes: [itemNode(2)],
       pageInfo: {
         __typename: 'PageInfo',
         hasPreviousPage: true,
@@ -130,6 +146,7 @@ it('works with backwards pagination', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(1)],
+      nodes: [itemNode(1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasPreviousPage: false,
@@ -149,6 +166,7 @@ it('works with backwards pagination', () => {
     items: {
       ...pageTwo.items,
       edges: [pageTwo.items.edges[0], pageOne.items.edges[0]],
+      nodes: [pageTwo.items.nodes[0], pageOne.items.nodes[0]],
     },
   });
 });
@@ -164,6 +182,10 @@ it('handles duplicate edges', () => {
             __typename
             id
           }
+        }
+        nodes {
+          __typename
+          id
         }
         pageInfo {
           __typename
@@ -187,6 +209,7 @@ it('handles duplicate edges', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(1), itemNode(2)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -200,6 +223,7 @@ it('handles duplicate edges', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(2), itemEdge(3)],
+      nodes: [itemNode(2), itemNode(3)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: false,
@@ -223,6 +247,11 @@ it('handles duplicate edges', () => {
         pageTwo.items.edges[0],
         pageTwo.items.edges[1],
       ],
+      nodes: [
+        pageOne.items.nodes[0],
+        pageTwo.items.nodes[0],
+        pageTwo.items.nodes[1],
+      ],
     },
   });
 });
@@ -238,6 +267,10 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
             __typename
             id
           }
+        }
+        nodes {
+          __typename
+          id
         }
         pageInfo {
           __typename
@@ -263,6 +296,7 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(1)],
+      nodes: [itemNode(1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -278,6 +312,7 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(2)],
+      nodes: [itemNode(2)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -293,6 +328,7 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(-1)],
+      nodes: [itemNode(-1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: false,
@@ -334,6 +370,11 @@ it('works with simultaneous forward and backward pagination (outwards merging)',
         pageOne.items.edges[0],
         pageTwo.items.edges[0],
       ],
+      nodes: [
+        pageThree.items.nodes[0],
+        pageOne.items.nodes[0],
+        pageTwo.items.nodes[0],
+      ],
       pageInfo: {
         ...pageThree.items.pageInfo,
         hasPreviousPage: true,
@@ -356,6 +397,10 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
             __typename
             id
           }
+        }
+        nodes {
+          __typename
+          id
         }
         pageInfo {
           __typename
@@ -381,6 +426,7 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(1)],
+      nodes: [itemNode(1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -396,6 +442,7 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(2)],
+      nodes: [itemNode(2)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: true,
@@ -411,6 +458,7 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(-1)],
+      nodes: [itemNode(-1)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: false,
@@ -452,6 +500,11 @@ it('works with simultaneous forward and backward pagination (inwards merging)', 
         pageTwo.items.edges[0],
         pageThree.items.edges[0],
       ],
+      nodes: [
+        pageOne.items.nodes[0],
+        pageTwo.items.nodes[0],
+        pageThree.items.nodes[0],
+      ],
       pageInfo: {
         ...pageThree.items.pageInfo,
         hasPreviousPage: true,
@@ -475,6 +528,10 @@ it('prevents overlapping of pagination on different arguments', () => {
             id
           }
         }
+        nodes {
+          __typename
+          id
+        }
         pageInfo {
           __typename
           hasNextPage
@@ -497,6 +554,7 @@ it('prevents overlapping of pagination on different arguments', () => {
     items: {
       __typename: 'ItemsConnection',
       edges: [itemEdge(withId)],
+      nodes: [itemNode(withId)],
       pageInfo: {
         __typename: 'PageInfo',
         hasNextPage: false,
@@ -552,6 +610,9 @@ it('returns an empty array of edges when the cache has zero edges stored', () =>
         edges {
           __typename
         }
+        nodes {
+          __typename
+        }
       }
     }
   `;
@@ -572,6 +633,7 @@ it('returns an empty array of edges when the cache has zero edges stored', () =>
       items: {
         __typename: 'ItemsConnection',
         edges: [],
+        nodes: [],
       },
     }
   );
@@ -583,6 +645,7 @@ it('returns an empty array of edges when the cache has zero edges stored', () =>
   expect(res.data).toHaveProperty('items', {
     __typename: 'ItemsConnection',
     edges: [],
+    nodes: [],
   });
 });
 
@@ -626,6 +689,403 @@ it('returns other fields on the same level as the edges', () => {
 });
 
 it('returns a subset of the cached items if the query requests less items than the cached ones', () => {
+  const Pagination = gql`
+    query($first: Int, $last: Int, $before: String, $after: String) {
+      items(first: $first, last: $last, before: $before, after: $after) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
+      Query: {
+        items: relayPagination({ mergeMode: 'outwards' }),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
+      nodes: [itemNode(1), itemNode(2), itemNode(3), itemNode(4), itemNode(5)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '5',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 2 } }, results);
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { first: 2 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(results);
+});
+
+it("returns the cached items even if they don't fullfil the query", () => {
+  const Pagination = gql`
+    query($first: Int, $last: Int, $before: String, $after: String) {
+      items(first: $first, last: $last, before: $before, after: $after) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
+      nodes: [itemNode(1), itemNode(2), itemNode(3), itemNode(4), itemNode(5)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '5',
+      },
+    },
+  };
+
+  write(
+    store,
+    { query: Pagination, variables: { after: '3', first: 3, last: 3 } },
+    results
+  );
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { after: '3', first: 3, last: 3 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(results);
+});
+
+it('returns the cached items even when they come from a different query', () => {
+  const Pagination = gql`
+    query($first: Int, $last: Int, $before: String, $after: String) {
+      items(first: $first, last: $last, before: $before, after: $after) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
+      nodes: [itemNode(1), itemNode(2), itemNode(3), itemNode(4), itemNode(5)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '5',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 5 } }, results);
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { after: '3', first: 2, last: 2 },
+  });
+
+  expect(res.partial).toBe(true);
+  expect(res.data).toEqual(results);
+});
+
+it('caches and retrieves correctly queries with inwards pagination', () => {
+  const Pagination = gql`
+    query($first: Int, $last: Int, $before: String, $after: String) {
+      items(first: $first, last: $last, before: $before, after: $after) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
+      nodes: [itemNode(1), itemNode(2), itemNode(3), itemNode(4), itemNode(5)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '5',
+      },
+    },
+  };
+
+  write(
+    store,
+    { query: Pagination, variables: { after: '2', first: 2, last: 2 } },
+    results
+  );
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { after: '2', first: 2, last: 2 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(results);
+});
+
+it('does not include a previous result when adding parameters', () => {
+  const Pagination = gql`
+    query($first: Int, $filter: String) {
+      items(first: $first, filter: $filter) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(1), itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '2',
+      },
+    },
+  };
+
+  const results2 = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [],
+      nodes: [],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '2',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 2 } }, results);
+
+  write(
+    store,
+    { query: Pagination, variables: { first: 2, filter: 'b' } },
+    results2
+  );
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { first: 2, filter: 'b' },
+  });
+  expect(res.data).toEqual(results2);
+});
+
+it('Works with edges absent from query', () => {
+  const Pagination = gql`
+    query($first: Int, $last: Int, $before: String, $after: String) {
+      items(first: $first, last: $last, before: $before, after: $after) {
+        __typename
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    schema: require('../test-utils/relayPagination_schema.json'),
+    resolvers: {
+      Query: {
+        items: relayPagination({ mergeMode: 'outwards' }),
+      },
+    },
+  });
+
+  const results = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      nodes: [itemNode(1), itemNode(2), itemNode(3), itemNode(4), itemNode(5)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: '1',
+        endCursor: '5',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 2 } }, results);
+
+  const res = query(store, {
+    query: Pagination,
+    variables: { first: 2 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(results);
+});
+
+it('Works with nodes absent from query', () => {
   const Pagination = gql`
     query($first: Int, $last: Int, $before: String, $after: String) {
       items(first: $first, last: $last, before: $before, after: $after) {
@@ -681,262 +1141,4 @@ it('returns a subset of the cached items if the query requests less items than t
 
   expect(res.partial).toBe(false);
   expect(res.data).toEqual(results);
-});
-
-it("returns the cached items even if they don't fullfil the query", () => {
-  const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
-      items(first: $first, last: $last, before: $before, after: $after) {
-        __typename
-        edges {
-          __typename
-          node {
-            __typename
-            id
-          }
-        }
-        pageInfo {
-          __typename
-          hasPreviousPage
-          hasNextPage
-          startCursor
-          endCursor
-        }
-      }
-    }
-  `;
-
-  const store = new Store({
-    schema: require('../test-utils/relayPagination_schema.json'),
-    resolvers: {
-      Query: {
-        items: relayPagination(),
-      },
-    },
-  });
-
-  const results = {
-    __typename: 'Query',
-    items: {
-      __typename: 'ItemsConnection',
-      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
-      pageInfo: {
-        __typename: 'PageInfo',
-        hasNextPage: true,
-        hasPreviousPage: false,
-        startCursor: '1',
-        endCursor: '5',
-      },
-    },
-  };
-
-  write(
-    store,
-    { query: Pagination, variables: { after: '3', first: 3, last: 3 } },
-    results
-  );
-
-  const res = query(store, {
-    query: Pagination,
-    variables: { after: '3', first: 3, last: 3 },
-  });
-
-  expect(res.partial).toBe(false);
-  expect(res.data).toEqual(results);
-});
-
-it('returns the cached items even when they come from a different query', () => {
-  const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
-      items(first: $first, last: $last, before: $before, after: $after) {
-        __typename
-        edges {
-          __typename
-          node {
-            __typename
-            id
-          }
-        }
-        pageInfo {
-          __typename
-          hasPreviousPage
-          hasNextPage
-          startCursor
-          endCursor
-        }
-      }
-    }
-  `;
-
-  const store = new Store({
-    schema: require('../test-utils/relayPagination_schema.json'),
-    resolvers: {
-      Query: {
-        items: relayPagination(),
-      },
-    },
-  });
-
-  const results = {
-    __typename: 'Query',
-    items: {
-      __typename: 'ItemsConnection',
-      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
-      pageInfo: {
-        __typename: 'PageInfo',
-        hasNextPage: true,
-        hasPreviousPage: false,
-        startCursor: '1',
-        endCursor: '5',
-      },
-    },
-  };
-
-  write(store, { query: Pagination, variables: { first: 5 } }, results);
-
-  const res = query(store, {
-    query: Pagination,
-    variables: { after: '3', first: 2, last: 2 },
-  });
-
-  expect(res.partial).toBe(true);
-  expect(res.data).toEqual(results);
-});
-
-it('caches and retrieves correctly queries with inwards pagination', () => {
-  const Pagination = gql`
-    query($first: Int, $last: Int, $before: String, $after: String) {
-      items(first: $first, last: $last, before: $before, after: $after) {
-        __typename
-        edges {
-          __typename
-          node {
-            __typename
-            id
-          }
-        }
-        pageInfo {
-          __typename
-          hasPreviousPage
-          hasNextPage
-          startCursor
-          endCursor
-        }
-      }
-    }
-  `;
-
-  const store = new Store({
-    schema: require('../test-utils/relayPagination_schema.json'),
-    resolvers: {
-      Query: {
-        items: relayPagination(),
-      },
-    },
-  });
-
-  const results = {
-    __typename: 'Query',
-    items: {
-      __typename: 'ItemsConnection',
-      edges: [itemEdge(1), itemEdge(2), itemEdge(3), itemEdge(4), itemEdge(5)],
-      pageInfo: {
-        __typename: 'PageInfo',
-        hasNextPage: true,
-        hasPreviousPage: false,
-        startCursor: '1',
-        endCursor: '5',
-      },
-    },
-  };
-
-  write(
-    store,
-    { query: Pagination, variables: { after: '2', first: 2, last: 2 } },
-    results
-  );
-
-  const res = query(store, {
-    query: Pagination,
-    variables: { after: '2', first: 2, last: 2 },
-  });
-
-  expect(res.partial).toBe(false);
-  expect(res.data).toEqual(results);
-});
-
-it('does not include a previous result when adding parameters', () => {
-  const Pagination = gql`
-    query($first: Int, $filter: String) {
-      items(first: $first, filter: $filter) {
-        __typename
-        edges {
-          __typename
-          node {
-            __typename
-            id
-          }
-        }
-        pageInfo {
-          __typename
-          hasPreviousPage
-          hasNextPage
-          startCursor
-          endCursor
-        }
-      }
-    }
-  `;
-
-  const store = new Store({
-    resolvers: {
-      Query: {
-        items: relayPagination(),
-      },
-    },
-  });
-
-  const results = {
-    __typename: 'Query',
-    items: {
-      __typename: 'ItemsConnection',
-      edges: [itemEdge(1), itemEdge(2)],
-      pageInfo: {
-        __typename: 'PageInfo',
-        hasNextPage: true,
-        hasPreviousPage: false,
-        startCursor: '1',
-        endCursor: '2',
-      },
-    },
-  };
-
-  const results2 = {
-    __typename: 'Query',
-    items: {
-      __typename: 'ItemsConnection',
-      edges: [],
-      pageInfo: {
-        __typename: 'PageInfo',
-        hasNextPage: false,
-        hasPreviousPage: false,
-        startCursor: '1',
-        endCursor: '2',
-      },
-    },
-  };
-
-  write(store, { query: Pagination, variables: { first: 2 } }, results);
-
-  write(
-    store,
-    { query: Pagination, variables: { first: 2, filter: 'b' } },
-    results2
-  );
-
-  const res = query(store, {
-    query: Pagination,
-    variables: { first: 2, filter: 'b' },
-  });
-  expect(res.data).toEqual(results2);
 });

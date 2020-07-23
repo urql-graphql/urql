@@ -197,7 +197,7 @@ your queries.
 Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
 on your backend we offer the possibility of endless data resolving.
 This means that when you fetch the next page in your data
-received in `useQuery` you'll see the previous pages as well. This is usefull for
+received in `useQuery` you'll see the previous pages as well. This is useful for
 endless scrolling.
 
 You can achieve this by importing `relayPagination` from `@urql/exchange-graphcache/extras`.
@@ -236,6 +236,11 @@ last: 1, before: c => node 89, startCursor: d
 
 With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
 And with outwards merging: `[..., 89, 99, 1, 2, ...]`
+
+The helper happily supports schemata that return nodes rather than
+individually-cursored edges. For each paginated type, you must either
+always request nodes, or always request edges -- otherwise the lists
+cannot be stiched together.
 
 ### Reading on
 
