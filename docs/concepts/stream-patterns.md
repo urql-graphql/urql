@@ -40,7 +40,7 @@ Arrays because we're dealing with multiple items, and Promises because these ite
 asynchronously.
 
 Also most Observable libraries come with a toolkit of helper functions that are similar to the
-methods on arrays, so you're likely to see `map` and `filter` — amongst other utlities — in those
+methods on arrays, so you're likely to see `map` and `filter` — amongst other utilities — in those
 libraries.
 
 Read [this Gist](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) for a more in-depth

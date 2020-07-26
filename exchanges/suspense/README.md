@@ -116,7 +116,7 @@ errors.
 ### Usage with `ssrExchange`
 
 If you're also using the `ssrExchange` for server-side rendered data, you will have to use
-an additonal flag to indicate to it when it's running on the server-side and when it's running
+an additional flag to indicate to it when it's running on the server-side and when it's running
 on the client-side.
 
 By default, the `ssrExchange` will look at `client.suspense`. If the `urql` Client is in suspense

@@ -281,7 +281,7 @@ indefinitely in some cases.
 
 ## 1.1.1
 
-This release comes with two small patches. One being a crticial fix,
+This release comes with two small patches. One being a critical fix,
 where cancelled requests would be erroneously deduped, which meant
 a previously cancelled query would never be fetched.
 

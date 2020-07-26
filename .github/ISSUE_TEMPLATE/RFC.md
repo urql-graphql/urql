@@ -38,5 +38,5 @@ labels: "future \U0001F52E"
   of being implemented, you don't want to state how
   it may be implemented, or you don't know yet how
   it will be implemented, then:
-  *List* what the implementation needs to achieve to fulfil this RFC;
+  *List* what the implementation needs to achieve to fulfill this RFC;
 -->

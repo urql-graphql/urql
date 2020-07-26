@@ -40,7 +40,7 @@ export default withUrqlClient(
 
 The second argument may now be used to pass `{ ssr: true }` explicitly, when you are
 wrapping a page without another `getInitialProps` method. This gives you better support
-when you're implement custom methods like `getStaticProps`.
+when your implement custom methods like `getStaticProps`.
 
 ### Major Changes
 
@@ -197,7 +197,7 @@ https://github.com/FormidableLabs/next-urql/compare/v0.2.1...v0.2.2
 
 ## 0.2.1
 
-This release fixes a regression introduced in 0.2.0 involving circular structures created bt `withUrqlClient`'s `getInitialProps` method.
+This release fixes a regression introduced in 0.2.0 involving circular structures created by `withUrqlClient`'s `getInitialProps` method.
 
 ### Fixed
 

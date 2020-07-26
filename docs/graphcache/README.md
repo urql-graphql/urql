@@ -66,7 +66,7 @@ npm install --save @urql/exchange-graphcache
 
 The package exports the `cacheExchange` which replaces the default `cacheExchange` in `@urql/core`.
 This new `cacheExchange` must be instantiated using some options, which are used to customise
-_Graphcache_ as introduced in the ["Features" section above.](#features) Howver, you can get started
+_Graphcache_ as introduced in the ["Features" section above.](#features) However, you can get started
 without passing any options.
 
 ```js

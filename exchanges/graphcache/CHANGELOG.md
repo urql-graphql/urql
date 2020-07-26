@@ -23,7 +23,7 @@ docs.](https://formidable.com/open-source/urql/docs/graphcache/custom-updates/#c
 ### Major Changes
 
 - Remove the deprecated `populateExchange` export from `@urql/exchange-graphcache`.
-  If you're using the `populateExchange`, please install the seprate `@urql/exchange-populate` package and import it from there, by [@kitten](https://github.com/kitten) (See [#840](https://github.com/FormidableLabs/urql/pull/840))
+  If you're using the `populateExchange`, please install the separate `@urql/exchange-populate` package and import it from there, by [@kitten](https://github.com/kitten) (See [#840](https://github.com/FormidableLabs/urql/pull/840))
 - The deprecated `cache.invalidateQuery()` method has been removed. Please migrate over to `cache.invalidate()` instead, which operates on individual fields instead of queries, by [@kitten](https://github.com/kitten) (See [#840](https://github.com/FormidableLabs/urql/pull/840))
 
 ### Minor Changes
@@ -295,7 +295,7 @@ There are some breaking changes, if you're using `cache.resolveConnections` or `
 then you now need to use `inspectFields` and `resolveFieldByKey` instead. You may also now make
 use of `cache.keyOfField`. (More info on [#128](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/128))
 
-- ✨ Implement `populateExchange` (eee [#120](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/120))
+- ✨ Implement `populateExchange` (see [#120](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/120))
 - Improve type safety of `invariant` and `warning` (see [#121](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/121))
 - Reduce size of `populateExchange` (see [#122](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/122))
 - Move more code to KVMap (see [#125](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/125))
@@ -352,7 +352,7 @@ so that errors and warnings can be traced more easily.
 
 - Trims down the size by 100 bytes (see [#96](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/96))
 - Include the `/extras` build in the published version (see [#97](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/97))
-- Invariant and warnings will now have an error code associated with a more elabore explanation (see [#99](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/99))
+- Invariant and warnings will now have an error code associated with a more elaborate explanation (see [#99](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/99))
 - Invariant errors will now be included in your production bundle (see [#100](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/100))
 - Fixes the relayPagination helper to correctly return partial results (see [#101](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/101))
 - Add special case to relayPagination for first and last during inwards merge (see [#102](https://github.com/FormidableLabs/urql-exchange-graphcache/pull/102))
