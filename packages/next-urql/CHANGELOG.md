@@ -40,7 +40,7 @@ export default withUrqlClient(
 
 The second argument may now be used to pass `{ ssr: true }` explicitly, when you are
 wrapping a page without another `getInitialProps` method. This gives you better support
-when your implement custom methods like `getStaticProps`.
+when you implement custom methods like `getStaticProps`.
 
 ### Major Changes
 

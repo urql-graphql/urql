@@ -18,7 +18,7 @@ about ["Exchanges" on a later page.](../concepts/exchanges.md)
 
 ![Keys for GraphQL Requests](../assets/urql-operation-keys.png)
 
-Once a result comes in , it's cached indefinitely by its key. This means that each unique request
+Once a result comes in it's cached indefinitely by its key. This means that each unique request
 can have exactly one cached result.
 
 However, we also need to invalidate the cached results so that requests are sent again and updated,
