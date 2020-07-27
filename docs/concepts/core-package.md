@@ -89,7 +89,7 @@ result; // null or { data: ... }
 
 Since the streams in `urql` operate synchronously, internally this method subscribes to
 `client.executeQuery` and unsubscribes immediately. If a result is available in the cache it will be
-resolved synchronosuly prior to the unsubscribe. If not, the query is cancelled and no request will be sent to the GraphQL API.
+resolved synchronously prior to the unsubscribe. If not, the query is cancelled and no request will be sent to the GraphQL API.
 
 ## Common Utilities in Core
 

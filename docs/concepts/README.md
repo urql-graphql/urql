@@ -8,7 +8,7 @@ order: 3
 In this chapter we'll learn about the motivation behind `urql`, the architecture that drives it, the
 inner workings of the `Client`, and how to write extensions and addons, also known as _Exchanges_.
 
-Each page goes a little further in explaning a core concept of `urql`.
+Each page goes a little further in explaining a core concept of `urql`.
 
 - [**Philosophy**](./philosophy.md) gives a quick overview of the different aspects of GraphQL clients and `urql` in
   particular, which shines a light on why you may want to use `urql`.

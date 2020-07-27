@@ -176,7 +176,7 @@ It extends the [GraphQLRequest](#graphqlrequest) type and contains these additio
 | context       | `OperationContext` | Additional metadata passed to exchange.       |
 
 > **Note:** In `urql` the `operationName` on the `Operation` isn't the actual name of an operation
-> and dervied from the GraphQL `DocumentNode`, but instead a type of operation, like `'query'` or
+> and derived from the GraphQL `DocumentNode`, but instead a type of operation, like `'query'` or
 > `'teardown'`
 
 ### RequestPolicy
