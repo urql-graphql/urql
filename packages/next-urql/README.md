@@ -247,7 +247,7 @@ component has children using `getInitialProps` but that component itself is not 
 `withUrqlClient`, this means `withUrqlClient(() => clientOptiosn, { ssr:true })`.
 This measure is available so we can support `getStaticProps`, ...
 
-When you are using `getStaticProps`, `getServerProps`, ... You should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in
+When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`,  you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
 your `withUrqlClient`.
-This because when we are doing a prepass of your component tree we can't know what these functions will inject in the props and this injection
-could change the `variables` used in your `useQuery`, ... Making these throw during the subsequent `toString` pass which isn't supported in React 16.
+During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
+could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.
