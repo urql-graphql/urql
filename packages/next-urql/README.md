@@ -126,7 +126,7 @@ In client-side SPAs using `urql`, you typically configure the Client yourself an
 In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
 and we consider it "unsafe" so evaluate this carefully for yourself.
 
-When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetClient`
+When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
 property, when invoked this will create a new top-level client and reset all prior operations.
 
 #### `exchanges`
