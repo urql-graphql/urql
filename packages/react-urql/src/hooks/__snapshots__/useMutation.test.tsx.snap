@@ -6,6 +6,7 @@ Object {
   "error": undefined,
   "extensions": undefined,
   "fetching": false,
+  "operation": undefined,
   "stale": false,
 }
 `;
