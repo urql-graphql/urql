@@ -246,3 +246,8 @@ Using `withUrqlClient` on a page that has `getInitialProps` will opt that compon
 component has children using `getInitialProps` but that component itself is not and you want to opt in to this behavior you'll have to set the second argument of
 `withUrqlClient`, this means `withUrqlClient(() => clientOptiosn, { ssr:true })`.
 This measure is available so we can support `getStaticProps`, ...
+
+When you are using `getStaticProps`, `getServerProps`, ... You should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in
+your `withUrqlClient`.
+This because when we are doing a prepass of your component tree we can't know what these functions will inject in the props and this injection
+could change the `variables` used in your `useQuery`, ... Making these throw during the subsequent `toString` pass which isn't supported in React 16.

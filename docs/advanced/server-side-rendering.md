@@ -241,6 +241,11 @@ export default withUrqlClient(ssrExchange => ({
 Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
 server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.
 
+When you are using `getStaticProps`, `getServerProps`, ... You should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in
+your `withUrqlClient`.
+This because when we are doing a prepass of your component tree we can't know what these functions will inject in the props and this injection
+could change the `variables` used in your `useQuery`, ... Making these throw during the subsequent `toString` pass which isn't supported in React 16.
+
 ### Resetting the client instance
 
 In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
