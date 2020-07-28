@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { CombinedError, OperationContext } from '@urql/core';
+import { CombinedError, OperationContext, Operation } from '@urql/core';
 
 import { useClient } from '../context';
 import { useSource, useBehaviourSubject } from './useSource';
@@ -23,6 +23,7 @@ export interface UseSubscriptionState<T> {
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
+  operation?: Operation;
 }
 
 export type UseSubscriptionResponse<T> = [
@@ -72,12 +73,13 @@ export function useSubscription<T = any, R = T, V = object>(
             fromValue({ fetching: true, stale: false }),
             pipe(
               subscription$,
-              map(({ stale, data, error, extensions }) => ({
+              map(({ stale, data, error, extensions, operation }) => ({
                 fetching: true,
                 stale: !!stale,
                 data,
                 error,
                 extensions,
+                operation,
               }))
             ),
             // When the source proactively closes, fetching is set to false

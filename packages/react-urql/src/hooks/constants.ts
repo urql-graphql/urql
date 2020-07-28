@@ -4,4 +4,5 @@ export const initialState = {
   error: undefined,
   data: undefined,
   extensions: undefined,
+  operation: undefined,
 };

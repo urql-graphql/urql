@@ -14,7 +14,12 @@ import {
   toPromise,
 } from 'wonka';
 
-import { RequestPolicy, OperationContext, CombinedError } from '@urql/core';
+import {
+  RequestPolicy,
+  OperationContext,
+  CombinedError,
+  Operation,
+} from '@urql/core';
 
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
@@ -37,6 +42,7 @@ export interface QueryResult<T> {
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
+  operation?: Operation;
 }
 
 export interface QueryStore<T = any, V = object>
@@ -67,12 +73,13 @@ export const query = <T = any, V = object>(
             pollInterval: args.pollInterval,
             ...args.context,
           }),
-          map(({ stale, data, error, extensions }) => ({
+          map(({ stale, data, error, extensions, operation }) => ({
             fetching: false,
             stale: !!stale,
             data,
             error,
             extensions,
+            operation,
           }))
         ),
         // When the source proactively closes, fetching is set to false

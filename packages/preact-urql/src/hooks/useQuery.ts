@@ -1,7 +1,12 @@
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 import { useRef, useCallback } from 'preact/hooks';
-import { OperationContext, RequestPolicy, CombinedError } from '@urql/core';
+import {
+  OperationContext,
+  RequestPolicy,
+  CombinedError,
+  Operation,
+} from '@urql/core';
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
@@ -13,6 +18,7 @@ export const initialState: UseQueryState<any> = {
   stale: false,
   data: undefined,
   error: undefined,
+  operation: undefined,
   extensions: undefined,
 };
 
@@ -31,6 +37,7 @@ export interface UseQueryState<T> {
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
+  operation?: Operation;
 }
 
 export type UseQueryResponse<T> = [
@@ -75,6 +82,7 @@ export const useQuery = <T = any, V = object>(
             error: result.error,
             extensions: result.extensions,
             stale: !!result.stale,
+            operation: result.operation,
           });
         })
       );

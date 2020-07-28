@@ -3,5 +3,6 @@ export const initialState = {
   stale: false,
   error: undefined,
   data: undefined,
+  operation: undefined,
   extensions: undefined,
 };
