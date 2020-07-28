@@ -32,7 +32,7 @@ export function withUrqlClient(
 
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
     const shouldEnableSuspense = Boolean(
-      AppOrPage.getInitialProps || (options!.ssr && !options!.neverSuspend)
+      (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
 
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
