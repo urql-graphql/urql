@@ -51,4 +51,5 @@ export interface SSRExchange extends Exchange {
 
 export interface WithUrqlClientOptions {
   ssr?: boolean;
+  neverSuspend?: boolean;
 }
