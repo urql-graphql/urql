@@ -121,6 +121,14 @@ withUrqlClient((_ssrExchange, ctx) => ({
 
 In client-side SPAs using `urql`, you typically configure the Client yourself and pass it as the `value` prop to `urql`'s context `Provider`. `withUrqlClient` handles setting all of this up for you under the hood. By default, you'll be opted into server-side `Suspense` and have the necessary `exchanges` set up for you, including the [`ssrExchange`](https://formidable.com/open-source/urql/docs/api/#ssrexchange-exchange-factory).
 
+### Resetting the client instance
+
+In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
+and we consider it "unsafe" so evaluate this carefully for yourself.
+
+When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
+property, when invoked this will create a new top-level client and reset all prior operations.
+
 #### `exchanges`
 
 When you're using `withUrqlClient` and you don't return an `exchanges` property we'll assume you wanted the default exchanges, these contain: `dedupExchange`, `cacheExchange`, `ssrExchange` (the one you received as a first argument) and the `fetchExchange`.
