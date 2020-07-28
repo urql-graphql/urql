@@ -12,7 +12,7 @@ import {
   publish,
 } from 'wonka';
 
-import { OperationContext, CombinedError } from '@urql/core';
+import { OperationContext, CombinedError, Operation } from '@urql/core';
 import { Readable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 
@@ -24,6 +24,7 @@ export interface SubscriptionArguments<V> {
   variables?: V;
   pause?: boolean;
   context?: Partial<OperationContext>;
+  operation?: Operation;
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
@@ -62,12 +63,13 @@ export const subscription = <T = any, R = T, V = object>(
         fromValue({ fetching: true, stale: false }),
         pipe(
           client.subscription<T>(args.query, args.variables, args.context),
-          map(({ stale, data, error, extensions }) => ({
+          map(({ stale, data, error, extensions, operation }) => ({
             fetching: false,
             stale: !!stale,
             data,
             error,
             extensions,
+            operation,
           }))
         ),
         // When the source proactively closes, fetching is set to false

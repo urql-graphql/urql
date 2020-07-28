@@ -2,10 +2,11 @@ import { useCallback } from 'preact/hooks';
 import { DocumentNode } from 'graphql';
 import { pipe, toPromise } from 'wonka';
 import {
-  OperationResult,
+  Operation,
   OperationContext,
   CombinedError,
   createRequest,
+  OperationResult,
 } from '@urql/core';
 import { useClient } from '../context';
 import { useImmediateState } from './useImmediateState';
@@ -17,6 +18,7 @@ export interface UseMutationState<T> {
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
+  operation?: Operation;
 }
 
 export type UseMutationResponse<T, V> = [
@@ -56,6 +58,7 @@ export const useMutation = <T = any, V = object>(
           data: result.data,
           error: result.error,
           extensions: result.extensions,
+          operation: result.operation,
         });
         return result;
       });

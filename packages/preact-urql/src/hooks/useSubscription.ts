@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef } from 'preact/hooks';
 import { pipe, onEnd, subscribe } from 'wonka';
-import { CombinedError, OperationContext } from '@urql/core';
+import { CombinedError, OperationContext, Operation } from '@urql/core';
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { noop, initialState } from './useQuery';
@@ -23,6 +23,7 @@ export interface UseSubscriptionState<T> {
   data?: T;
   error?: CombinedError;
   extensions?: Record<string, any>;
+  operation?: Operation;
 }
 
 export type UseSubscriptionResponse<T> = [
@@ -72,6 +73,7 @@ export const useSubscription = <T = any, R = T, V = object>(
             error: result.error,
             extensions: result.extensions,
             stale: !!result.stale,
+            operation: result.operation,
           }));
         })
       );
