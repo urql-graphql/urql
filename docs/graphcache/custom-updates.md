@@ -216,6 +216,27 @@ const cache = cacheExchange({
 });
 ```
 
+Let's combine the above example with invalidating fields, imagine the scenario where we add a todo but
+rather than manually pushing it on all the lists we just want to refetch the lists.
+
+```js
+const cache = cacheExchange({
+  updates: {
+    Mutation: {
+      addTodo: (result, args, cache, info) => {
+        const todoQueries = cache.inspectFields('Query').filter(x => x.fieldName === 'todos');
+
+        todosQueries.forEach(({ fieldName, arguments: variables }) => {
+          cache.invalidate('Query', fieldName, variables);
+        });
+      },
+    },
+  },
+});
+```
+
+Now when we come onto a list we'll know that this list needs to be refetched.
+
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
