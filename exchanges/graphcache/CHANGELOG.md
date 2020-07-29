@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 3.0.2
+
+### Patch Changes
+
+- Add special-case for fetching an introspection result in our schema-checking, this avoids an error when urql-devtools fetches the backend graphql schema, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#893](https://github.com/FormidableLabs/urql/pull/893))
+- Mute warning when using built-in GraphQL fields, like `__type`, by [@kitten](https://github.com/kitten) (See [#919](https://github.com/FormidableLabs/urql/pull/919))
+- ⚠️ Fix return type for resolvers to allow data objects to be returned with `__typename` as expected, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#927](https://github.com/FormidableLabs/urql/pull/927))
+- Updated dependencies (See [#911](https://github.com/FormidableLabs/urql/pull/911) and [#908](https://github.com/FormidableLabs/urql/pull/908))
+  - @urql/core@1.12.3
+
 ## 3.0.1
 
 ### Patch Changes

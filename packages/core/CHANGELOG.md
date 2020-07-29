@@ -1,5 +1,12 @@
 # @urql/core
 
+## 1.12.3
+
+### Patch Changes
+
+- Remove whitespace and comments from string-queries, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#911](https://github.com/FormidableLabs/urql/pull/911))
+- Remove redundant whitespaces when using GET for graphql queries, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#908](https://github.com/FormidableLabs/urql/pull/908))
+
 ## 1.12.2
 
 ### Patch Changes

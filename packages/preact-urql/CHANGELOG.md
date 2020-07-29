@@ -1,5 +1,16 @@
 # @urql/preact
 
+## 1.2.0
+
+### Minor Changes
+
+- Add the operation to the query, mutation and subscription result, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#924](https://github.com/FormidableLabs/urql/pull/924))
+
+### Patch Changes
+
+- Updated dependencies (See [#911](https://github.com/FormidableLabs/urql/pull/911) and [#908](https://github.com/FormidableLabs/urql/pull/908))
+  - @urql/core@1.12.3
+
 ## 1.1.8
 
 ### Patch Changes

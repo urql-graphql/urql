@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Add the option to reset the client on a next-urql application, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#894](https://github.com/FormidableLabs/urql/pull/894))
+
+### Patch Changes
+
+- Updated dependencies (See [#924](https://github.com/FormidableLabs/urql/pull/924) and [#904](https://github.com/FormidableLabs/urql/pull/904))
+  - urql@1.10.0
+
 ## 1.0.2
 
 ### Patch Changes
