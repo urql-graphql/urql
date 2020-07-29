@@ -1264,6 +1264,10 @@ describe('custom resolvers', () => {
     pipe(
       cacheExchange({
         resolvers: {
+          Query: {
+            // TS-check
+            author: (_parent, args) => ({ __typename: 'Author', id: args.id }),
+          },
           Author: {
             name: parent => {
               called.push(parent.name);
