@@ -122,13 +122,19 @@ export interface Cache {
   ): void;
 }
 
+type ResolverResult =
+  | DataField
+  | (DataFields & { __typename?: string })
+  | null
+  | undefined;
+
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver = (
   parent: Data,
   args: Variables,
   cache: Cache,
   info: ResolveInfo
-) => DataField | (DataFields & { __typename?: string }) | undefined;
+) => ResolverResult;
 
 export interface ResolverConfig {
   [typeName: string]: {
