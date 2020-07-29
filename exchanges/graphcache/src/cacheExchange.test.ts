@@ -1266,7 +1266,7 @@ describe('custom resolvers', () => {
         resolvers: {
           Query: {
             // TS-check
-            course: (_parent, args) => ({ __typename: 'Course', id: args.id }),
+            author: (_parent, args) => ({ __typename: 'Author', id: args.id }),
           },
           Author: {
             name: parent => {
