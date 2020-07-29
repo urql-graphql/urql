@@ -128,7 +128,7 @@ export type Resolver = (
   args: Variables,
   cache: Cache,
   info: ResolveInfo
-) => DataField | undefined;
+) => DataField | (DataFields & { __typename?: string }) | undefined;
 
 export interface ResolverConfig {
   [typeName: string]: {
