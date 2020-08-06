@@ -71,7 +71,7 @@ export const persistedFetchExchange = (
           // Hash the given GraphQL query
           fromPromise(hashFn(query, operation.query)),
           mergeMap(sha256Hash => {
-            // if the hashing operation was successful, add the persisted query exception
+            // if the hashing operation was successful, add the persisted query extension
             if (sha256Hash) {
               // Attach SHA256 hash and remove query from body
               body.query = undefined;
