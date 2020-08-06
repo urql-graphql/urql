@@ -71,22 +71,32 @@ export const persistedFetchExchange = (
           // Hash the given GraphQL query
           fromPromise(hashFn(query, operation.query)),
           mergeMap(sha256Hash => {
-            // Attach SHA256 hash and remove query from body
-            body.query = undefined;
-            body.extensions = {
-              persistedQuery: {
-                version: 1,
-                sha256Hash,
-              },
-            };
+            // if the hashing operation was successful, add the persisted query exception
+            if (sha256Hash) {
+              // Attach SHA256 hash and remove query from body
+              body.query = undefined;
+              body.extensions = {
+                persistedQuery: {
+                  version: 1,
+                  sha256Hash,
+                },
+              };
 
-            return makePersistedFetchSource(
-              operation,
-              body,
-              dispatchDebug,
-              !!(options as PersistedFetchExchangeOptions)
-                .preferGetForPersistedQueries
-            );
+              return makePersistedFetchSource(
+                operation,
+                body,
+                dispatchDebug,
+                !!(options as PersistedFetchExchangeOptions)
+                  .preferGetForPersistedQueries
+              );
+            } else {
+              return makePersistedFetchSource(
+                operation,
+                body,
+                dispatchDebug,
+                false
+              );
+            }
           }),
           mergeMap(result => {
             if (result.error && isPersistedUnsupported(result.error)) {
