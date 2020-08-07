@@ -81,22 +81,16 @@ export const persistedFetchExchange = (
                   sha256Hash,
                 },
               };
-
-              return makePersistedFetchSource(
-                operation,
-                body,
-                dispatchDebug,
-                !!(options as PersistedFetchExchangeOptions)
-                  .preferGetForPersistedQueries
-              );
-            } else {
-              return makePersistedFetchSource(
-                operation,
-                body,
-                dispatchDebug,
-                false
-              );
             }
+            return makePersistedFetchSource(
+              operation,
+              body,
+              dispatchDebug,
+              !!(
+                (options as PersistedFetchExchangeOptions)
+                  .preferGetForPersistedQueries && sha256Hash
+              )
+            );
           }),
           mergeMap(result => {
             if (result.error && isPersistedUnsupported(result.error)) {
