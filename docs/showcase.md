@@ -11,19 +11,23 @@ maintainers, and supporters. This page is specifically dedicated to all of you!
 ## Used by folks at
 
 <a href="https://tripadvisor.com">
-  <img alt="TripAdvisor" height="60" src="./assets/logos/tripadvisor.png" />
+<img alt="TripAdvisor" height="60" src="./assets/logos/tripadvisor.png" />
 </a>
 
 <a href="https://github.com">
-  <img alt="GitHub" height="60" src="./assets/logos/github.png" />
+<img alt="GitHub" height="60" src="./assets/logos/github.png" />
 </a>
 
 <a href="https://egghead.io">
-  <img alt="Egghead" height="60" src="./assets/logos/egghead.png" />
+<img alt="Egghead" height="60" src="./assets/logos/egghead.png" />
 </a>
 
 <a href="https://gatsbyjs.org">
-  <img alt="Gatsby" height="60" src="./assets/logos/gatsby.png" />
+<img alt="Gatsby" height="60" src="./assets/logos/gatsby.png" />
+</a>
+
+<a href="https://theatlantic.com/science/">
+<img alt="The Atlantic" height="60" src="./assets/logos/the-atlantic.png" />
 </a>
 
 ## Articles & Tutorials
