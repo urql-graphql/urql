@@ -237,6 +237,31 @@ const cache = cacheExchange({
 
 Now when we come onto a list we'll know that this list needs to be refetched.
 
+### Inspecting a sub-field
+
+We've seeen how to inspect fields for a root-field in the above, but what if your query looks like this:
+
+```
+query {
+  todo(id: "x") {
+    id
+    authors {
+      id
+      name
+    }
+  }
+}
+```
+
+Now we'd need to traverse all the `todos` to find which we need, but there's another solution.
+Rather than `cache.inspectFields('Query') which would give us all queried`todo`fields with their arguments we'll ask for all`Todo` types for a given id.
+
+```
+cache.inspectFields({ __typename: 'Todo', id: args.id })
+```
+
+Now wee'll get all fields for the given `todo` and can freely update the `authors`.
+
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
