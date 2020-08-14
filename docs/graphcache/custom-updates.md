@@ -254,13 +254,13 @@ query {
 ```
 
 Now we'd need to traverse all the `todos` to find which we need, but there's another solution.
-Rather than `cache.inspectFields('Query') which would give us all queried`todo`fields with their arguments we'll ask for all`Todo` types for a given id.
+Rather than use `cache.inspectFields('Query')`, which would give us all queried `todo` fields with their arguments, we can instead provide an object as the argument to `inspectFields` asking for all `Todo` types for a given id.
 
-```
+```js
 cache.inspectFields({ __typename: 'Todo', id: args.id })
 ```
 
-Now wee'll get all fields for the given `todo` and can freely update the `authors`.
+Now we'll get all fields for the given `todo` and can freely update the `authors`.
 
 ## Optimistic updates
 
