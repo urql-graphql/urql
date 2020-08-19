@@ -46,3 +46,5 @@ maintainers, and supporters. This page is specifically dedicated to all of you!
   compute fields on-the-fly using the `@computed` directive.
 - [`graphql-code-generator`](https://graphql-code-generator.com/docs/plugins/typescript-urql): A plugin
   that helps you make typesafe hooks/components with urql.
+- [`urql-custom-scalars-exchange`](https://github.com/clentfort/urql-custom-scalars-exchange): An exchange
+  to automatically convert scalars.
