@@ -33,7 +33,19 @@ If we add the above exchange before our `fetchExchange` our `fetchOptions` will 
 ```js
 const client = createClient({
   url: 'http://yourUrl.dev/',
-  exchanges: [dedupExchange, cacheExchange, fetchOptionsExchange, fetchExchange],
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    fetchOptionsExchange(async (fetchOptions: any) => {
+      return Promise.resolve({
+        ...fetchOptions,
+        headers: {
+          Authorization: 'Bearer mySuperToken',
+        },
+      });
+    }),
+    fetchExchange,
+  ],
 });
 ```
 
