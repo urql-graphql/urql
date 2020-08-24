@@ -31,10 +31,18 @@ describe('on request', () => {
     const res = await pipe(
       fromValue(queryOperation),
       authExchange({
-        getAuthStateFromStorage: () => ({ token: 'my-token' }),
-        getAuthHeader: ({ authState }) => ({
-          Authorization: `Bearer ${authState.token}`,
-        }),
+        getInitialAuthState: () => ({ token: 'my-token' }),
+        addAuthToOperation: ({ authState, operation }) => {
+          return Object.assign(operation, {
+            context: {
+              fetchOptions: {
+                headers: {
+                  Authorization: `Bearer ${authState.token}`,
+                },
+              },
+            },
+          });
+        },
       })(exchangeArgs),
       take(1),
       toPromise
@@ -60,14 +68,22 @@ describe('on request', () => {
     const res = await pipe(
       fromValue(queryOperation),
       authExchange({
-        getAuthStateFromStorage: async () => {
-          return await new Promise(resolve =>
+        getInitialAuthState: async () => {
+          return await new Promise<{ token: string }>(resolve =>
             setTimeout(() => resolve({ token: 'async-token' }), 500)
           );
         },
-        getAuthHeader: ({ authState }) => ({
-          Authorization: authState.token,
-        }),
+        addAuthToOperation: ({ authState, operation }) => {
+          return Object.assign(operation, {
+            context: {
+              fetchOptions: {
+                headers: {
+                  Authorization: authState.token,
+                },
+              },
+            },
+          });
+        },
       })(exchangeArgs),
       take(1),
       toPromise
@@ -97,10 +113,18 @@ describe('on request', () => {
     await pipe(
       source,
       authExchange({
-        getAuthStateFromStorage: () => ({ token: 'my-token' }),
-        getAuthHeader: ({ authState }) => ({
-          Authorization: `Bearer ${authState.token}`,
-        }),
+        getInitialAuthState: () => ({ token: 'my-token' }),
+        addAuthToOperation: ({ authState, operation }) => {
+          return Object.assign(operation, {
+            context: {
+              fetchOptions: {
+                headers: {
+                  Authorization: `Bearer ${authState.token}`,
+                },
+              },
+            },
+          });
+        },
       })(exchangeArgs),
       tap(result),
       publish
