@@ -15,6 +15,27 @@ const exchangeArgs = {
   client: {},
 } as any;
 
+const withAuthHeader = (operation, token) => {
+  const fetchOptions =
+    typeof operation.context.fetchOptions === 'function'
+      ? operation.context.fetchOptions()
+      : operation.context.fetchOptions || {};
+
+  return {
+    ...operation,
+    context: {
+      ...operation.context,
+      fetchOptions: {
+        ...fetchOptions,
+        headers: {
+          ...fetchOptions.headers,
+          Authorization: token,
+        },
+      },
+    },
+  };
+};
+
 describe('on request', () => {
   it('does nothing when no parameters are passed in', async () => {
     const res = await pipe(
@@ -24,7 +45,15 @@ describe('on request', () => {
       toPromise
     );
 
-    expect(res).toEqual(queryOperation);
+    const withAuthAttempt = {
+      ...queryOperation,
+      context: {
+        ...queryOperation.context,
+        authAttempt: 0,
+      },
+    };
+
+    expect(res).toEqual(withAuthAttempt);
   });
 
   it('adds the auth header correctly', async () => {
@@ -33,15 +62,7 @@ describe('on request', () => {
       authExchange({
         getInitialAuthState: () => ({ token: 'my-token' }),
         addAuthToOperation: ({ authState, operation }) => {
-          return Object.assign(operation, {
-            context: {
-              fetchOptions: {
-                headers: {
-                  Authorization: `Bearer ${authState.token}`,
-                },
-              },
-            },
-          });
+          return withAuthHeader(operation, authState.token);
         },
       })(exchangeArgs),
       take(1),
@@ -52,10 +73,11 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
+        authAttempt: 0,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
-            Authorization: 'Bearer my-token',
+            Authorization: 'my-token',
           },
         },
       },
@@ -74,15 +96,7 @@ describe('on request', () => {
           );
         },
         addAuthToOperation: ({ authState, operation }) => {
-          return Object.assign(operation, {
-            context: {
-              fetchOptions: {
-                headers: {
-                  Authorization: authState.token,
-                },
-              },
-            },
-          });
+          return withAuthHeader(operation, authState.token);
         },
       })(exchangeArgs),
       take(1),
@@ -93,6 +107,7 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
+        authAttempt: 0,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
@@ -115,15 +130,7 @@ describe('on request', () => {
       authExchange({
         getInitialAuthState: () => ({ token: 'my-token' }),
         addAuthToOperation: ({ authState, operation }) => {
-          return Object.assign(operation, {
-            context: {
-              fetchOptions: {
-                headers: {
-                  Authorization: `Bearer ${authState.token}`,
-                },
-              },
-            },
-          });
+          return withAuthHeader(operation, authState.token);
         },
       })(exchangeArgs),
       tap(result),
@@ -144,10 +151,11 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
+        authAttempt: 0,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
-            Authorization: 'Bearer my-token',
+            Authorization: 'my-token',
           },
         },
       },
@@ -157,10 +165,11 @@ describe('on request', () => {
       ...secondQuery,
       context: {
         ...secondQuery.context,
+        authAttempt: 0,
         fetchOptions: {
           ...(secondQuery.context.fetchOptions || {}),
           headers: {
-            Authorization: 'Bearer my-token',
+            Authorization: 'my-token',
           },
         },
       },

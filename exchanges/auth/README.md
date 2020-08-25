@@ -26,16 +26,46 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     authExchange({
-      getAuthStateFromStorage: () => {
+      getInitialAuthState: () => {
         // fetch your auth state from storage. This can be async
         return { token: 'token', refreshToken: 'refresh-token' };
       },
-      getAuthHeader: ({ authState }) => {
-        // use the auth state as constructed above to create an auth header
+      addAuthToOperation: ({ authState, operation }) => {
         const token = authState?.token;
-        return {
-          Authorization: token ? `Bearer ${token}` : '',
+        const authHeader = {
+          Authorization: token || "",
         };
+
+        const fetchOptions =
+          typeof operation.context.fetchOptions === "function"
+            ? operation.context.fetchOptions()
+            : operation.context.fetchOptions || {};
+
+        return {
+          ...operation,
+          context: {
+            ...operation.context,
+            fetchOptions: {
+              ...fetchOptions,
+              headers: {
+                ...fetchOptions.headers,
+                ...authHeader,
+              },
+            },
+          },
+        };
+      },
+      isAuthError: error =>
+          error.graphQLErrors.some(e => e.extensions?.code === "FORBIDDEN"),
+      refetchAuth: async ({ authState, attempt }) => {
+        if (attempt === 0) {
+          // fetch new token if possible
+          const newAuthState = { token: 'new-token' };
+          return newAuthState;
+        }
+        // if the auth has already been refreshed and still failing with an auth error, time to log the user out
+        logout();
+        return null;
       },
     }),
     fetchExchange
