@@ -40,7 +40,10 @@ describe('on request', () => {
   it('does nothing when no parameters are passed in', async () => {
     const res = await pipe(
       fromValue(queryOperation),
-      authExchange({})(exchangeArgs),
+      authExchange({
+        getAuth: async () => null,
+        willAuthError: () => false,
+      })(exchangeArgs),
       take(1),
       toPromise
     );
@@ -49,7 +52,7 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
-        authAttempt: 0,
+        authAttempt: false,
       },
     };
 
@@ -60,9 +63,10 @@ describe('on request', () => {
     const res = await pipe(
       fromValue(queryOperation),
       authExchange({
-        getInitialAuthState: () => ({ token: 'my-token' }),
+        getAuth: async () => ({ token: 'my-token' }),
+        willAuthError: () => false,
         addAuthToOperation: ({ authState, operation }) => {
-          return withAuthHeader(operation, authState.token);
+          return withAuthHeader(operation, authState!.token);
         },
       })(exchangeArgs),
       take(1),
@@ -73,7 +77,7 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
-        authAttempt: 0,
+        authAttempt: false,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
@@ -90,13 +94,14 @@ describe('on request', () => {
     const res = await pipe(
       fromValue(queryOperation),
       authExchange({
-        getInitialAuthState: async () => {
+        getAuth: async () => {
           return await new Promise<{ token: string }>(resolve =>
             setTimeout(() => resolve({ token: 'async-token' }), 500)
           );
         },
+        willAuthError: () => false,
         addAuthToOperation: ({ authState, operation }) => {
-          return withAuthHeader(operation, authState.token);
+          return withAuthHeader(operation, authState!.token);
         },
       })(exchangeArgs),
       take(1),
@@ -107,7 +112,7 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
-        authAttempt: 0,
+        authAttempt: false,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
@@ -128,9 +133,10 @@ describe('on request', () => {
     await pipe(
       source,
       authExchange({
-        getInitialAuthState: () => ({ token: 'my-token' }),
+        getAuth: async () => ({ token: 'my-token' }),
+        willAuthError: () => false,
         addAuthToOperation: ({ authState, operation }) => {
-          return withAuthHeader(operation, authState.token);
+          return withAuthHeader(operation, authState!.token);
         },
       })(exchangeArgs),
       tap(result),
@@ -151,7 +157,7 @@ describe('on request', () => {
       ...queryOperation,
       context: {
         ...queryOperation.context,
-        authAttempt: 0,
+        authAttempt: false,
         fetchOptions: {
           ...(queryOperation.context.fetchOptions || {}),
           headers: {
@@ -165,7 +171,7 @@ describe('on request', () => {
       ...secondQuery,
       context: {
         ...secondQuery.context,
-        authAttempt: 0,
+        authAttempt: false,
         fetchOptions: {
           ...(secondQuery.context.fetchOptions || {}),
           headers: {

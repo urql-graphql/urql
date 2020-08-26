@@ -4,59 +4,64 @@ import {
   mergeMap,
   fromPromise,
   fromValue,
-  tap,
+  filter,
   makeSubject,
   merge,
 } from 'wonka';
 import { Operation, CombinedError, Exchange } from 'urql';
 
 type AuthConfig<T> = {
-  getInitialAuthState?: () => T | Promise<T>;
   getAuthHeader?: ({
     authState,
   }: {
-    authState: T;
+    authState: T | null;
   }) => { [key: string]: string };
   addAuthToOperation?: ({
     authState,
     operation,
   }: {
-    authState: T;
+    authState: T | null;
     operation: Operation;
   }) => Operation;
-  isAuthError?: (error: CombinedError) => boolean;
-  refetchAuth?: ({
+  didAuthError?: ({
+    error,
     authState,
-    attempt,
   }: {
-    authState: T;
-    attempt: number;
-  }) => Promise<T | null>;
+    error: CombinedError;
+    authState: T | null;
+  }) => boolean;
+  getAuth: ({ authState }: { authState: T | null }) => Promise<T | null>;
+  willAuthError: ({
+    operation,
+    authState,
+  }: {
+    operation: Operation;
+    authState: T | null;
+  }) => boolean;
 };
 
-const addAuthAttemptToOperation = (operation: Operation) => ({
+const addAuthAttemptToOperation = (
+  operation: Operation,
+  hasAttempted: boolean
+) => ({
   ...operation,
   context: {
     ...operation.context,
-    authAttempt:
-      typeof operation.context.authAttempt === 'number'
-        ? operation.context.authAttempt + 1
-        : 0,
+    authAttempt: hasAttempted,
   },
 });
 
 export function authExchange<T>({
-  getInitialAuthState,
   addAuthToOperation,
-  refetchAuth,
-  isAuthError,
+  getAuth,
+  didAuthError,
 }: AuthConfig<T>): Exchange {
-  let authState: T;
+  let authState: T | null;
   let pendingPromise: Promise<any> | any;
 
   const initAuthState = async () => {
-    if (getInitialAuthState) {
-      const state = await getInitialAuthState();
+    if (getAuth) {
+      const state = await getAuth({ authState: null });
       authState = state;
     }
     pendingPromise = undefined;
@@ -75,7 +80,7 @@ export function authExchange<T>({
       const pendingOps$ = pipe(
         operations$,
         mergeMap((operation: Operation) => {
-          const withAuthAttempt = addAuthAttemptToOperation(operation);
+          const withAuthAttempt = addAuthAttemptToOperation(operation, false);
 
           if (withAuthAttempt.operationName !== 'teardown' && pendingPromise) {
             return pipe(
@@ -103,36 +108,37 @@ export function authExchange<T>({
       return pipe(
         merge([pendingOps$, retrySource$]),
         forward,
-        tap(async ({ error, operation }) => {
-          if (error) {
-            if (isAuthError && refetchAuth && isAuthError(error)) {
+        filter(({ error, operation }) => {
+          if (error && didAuthError && didAuthError({ error, authState })) {
+            const authAttempt = operation.context.authAttempt as number;
+            if (!authAttempt) {
               // add to retry queue to try again later
-              retryQueue.push(operation);
+              retryQueue.push(addAuthAttemptToOperation(operation, true));
 
               // check that another operation isn't already doing refresh
               if (!pendingPromise) {
-                pendingPromise = refetchAuth({
-                  authState,
-                  attempt: operation.context.authAttempt,
-                });
-
-                const newAuthState = await pendingPromise;
-                authState = newAuthState;
-                pendingPromise = undefined;
-
-                retryQueue.forEach(op => {
-                  const withAuthAttempt = addAuthAttemptToOperation(op);
-                  const withToken = addAuthToOperation
-                    ? addAuthToOperation({
-                        operation: withAuthAttempt,
-                        authState,
-                      })
-                    : withAuthAttempt;
-                  retryOperation(withToken);
+                pendingPromise = getAuth({ authState }).then(newAuthState => {
+                  authState = newAuthState;
+                  pendingPromise = undefined;
+                  if (!authState) {
+                    retryQueue.forEach(operation => {
+                      const operationWithToken = addAuthToOperation
+                        ? addAuthToOperation({
+                            operation,
+                            authState,
+                          })
+                        : operation;
+                      retryOperation(operationWithToken);
+                    });
+                  }
                 });
               }
+
+              return false;
             }
           }
+
+          return true;
         })
       );
     };
