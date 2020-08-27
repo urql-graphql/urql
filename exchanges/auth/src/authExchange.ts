@@ -7,16 +7,13 @@ import {
   filter,
   makeSubject,
   merge,
+  share,
+  takeUntil,
 } from 'wonka';
 import { Operation, CombinedError, Exchange } from 'urql';
 
 type AuthConfig<T> = {
-  getAuthHeader?: ({
-    authState,
-  }: {
-    authState: T | null;
-  }) => { [key: string]: string };
-  addAuthToOperation?: ({
+  addAuthToOperation: ({
     authState,
     operation,
   }: {
@@ -55,85 +52,98 @@ export function authExchange<T>({
   addAuthToOperation,
   getAuth,
   didAuthError,
+  willAuthError,
 }: AuthConfig<T>): Exchange {
-  let authState: T | null;
-  let pendingPromise: Promise<any> | any;
-
-  const initAuthState = async () => {
-    if (getAuth) {
-      const state = await getAuth({ authState: null });
-      authState = state;
-    }
-    pendingPromise = undefined;
-  };
-
-  pendingPromise = initAuthState();
-
-  const { source: retrySource$, next: retryOperation } = makeSubject<
-    Operation
-  >();
-
   return ({ forward }) => {
     const retryQueue: Operation[] = [];
+    let authState: T | null = null;
+
+    const updateAuthState = (newAuthState: T | null) => {
+      authState = newAuthState;
+      pendingPromise = undefined;
+      retryQueue.forEach(retryOperation);
+      retryQueue.length = 0;
+    };
+
+    let pendingPromise: Promise<any> | void = getAuth({ authState }).then(
+      updateAuthState
+    );
+
+    const refreshAuth = (operation: Operation): Promise<any> => {
+      // add to retry queue to try again later
+      retryQueue.push(addAuthAttemptToOperation(operation, true));
+
+      // check that another operation isn't already doing refresh
+      if (!pendingPromise) {
+        pendingPromise = getAuth({ authState })
+          .then(updateAuthState)
+          .catch(() => updateAuthState(null));
+      }
+
+      return pendingPromise;
+    };
+
+    const { source: retrySource$, next: retryOperation } = makeSubject<
+      Operation
+    >();
 
     return operations$ => {
-      const pendingOps$ = pipe(
-        operations$,
-        mergeMap((operation: Operation) => {
-          const withAuthAttempt = addAuthAttemptToOperation(operation, false);
+      const sharedOps$ = pipe(operations$, share);
 
-          if (withAuthAttempt.operationName !== 'teardown' && pendingPromise) {
-            return pipe(
-              fromPromise(pendingPromise),
-              map(() => {
-                if (addAuthToOperation) {
-                  return addAuthToOperation({
-                    operation: withAuthAttempt,
-                    authState,
-                  });
-                }
-                return withAuthAttempt;
-              })
-            );
-          }
-          if (addAuthToOperation) {
-            return fromValue(
-              addAuthToOperation({ operation: withAuthAttempt, authState })
-            );
-          }
-          return fromValue(withAuthAttempt);
+      const teardownOps$ = pipe(
+        sharedOps$,
+        filter((operation: Operation) => {
+          return operation.operationName === 'teardown';
         })
       );
 
+      const pendingOps$ = pipe(
+        sharedOps$,
+        filter((operation: Operation) => {
+          return operation.operationName !== 'teardown';
+        })
+      );
+
+      const opsWithAuth$ = pipe(
+        merge([
+          retrySource$,
+          pipe(
+            pendingOps$,
+            mergeMap(operation => {
+              if (!pendingPromise && willAuthError({ operation, authState })) {
+                pendingPromise = refreshAuth(operation);
+              } else if (!pendingPromise) {
+                return fromValue(addAuthAttemptToOperation(operation, false));
+              }
+
+              const teardown$ = pipe(
+                sharedOps$,
+                filter(op => {
+                  return (
+                    op.operationName === 'teardown' && op.key === operation.key
+                  );
+                })
+              );
+
+              return pipe(
+                fromPromise(pendingPromise),
+                map(() => addAuthAttemptToOperation(operation, false)),
+                takeUntil(teardown$)
+              );
+            })
+          ),
+        ]),
+        map(operation => addAuthToOperation({ operation, authState }))
+      );
+
       return pipe(
-        merge([pendingOps$, retrySource$]),
+        merge([opsWithAuth$, teardownOps$]),
         forward,
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
             const authAttempt = operation.context.authAttempt as number;
             if (!authAttempt) {
-              // add to retry queue to try again later
-              retryQueue.push(addAuthAttemptToOperation(operation, true));
-
-              // check that another operation isn't already doing refresh
-              if (!pendingPromise) {
-                pendingPromise = getAuth({ authState }).then(newAuthState => {
-                  authState = newAuthState;
-                  pendingPromise = undefined;
-                  if (!authState) {
-                    retryQueue.forEach(operation => {
-                      const operationWithToken = addAuthToOperation
-                        ? addAuthToOperation({
-                            operation,
-                            authState,
-                          })
-                        : operation;
-                      retryOperation(operationWithToken);
-                    });
-                  }
-                });
-              }
-
+              pendingPromise = refreshAuth(operation);
               return false;
             }
           }

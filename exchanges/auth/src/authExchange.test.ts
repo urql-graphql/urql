@@ -6,12 +6,17 @@ import {
   makeSubject,
   tap,
   publish,
+  map,
 } from 'wonka';
 import { authExchange } from './authExchange';
 import { queryOperation } from '@urql/core/test-utils';
 
 const exchangeArgs = {
-  forward: a => a,
+  forward: op$ =>
+    pipe(
+      op$,
+      map(operation => ({ operation }))
+    ),
   client: {},
 } as any;
 
@@ -37,28 +42,6 @@ const withAuthHeader = (operation, token) => {
 };
 
 describe('on request', () => {
-  it('does nothing when no parameters are passed in', async () => {
-    const res = await pipe(
-      fromValue(queryOperation),
-      authExchange({
-        getAuth: async () => null,
-        willAuthError: () => false,
-      })(exchangeArgs),
-      take(1),
-      toPromise
-    );
-
-    const withAuthAttempt = {
-      ...queryOperation,
-      context: {
-        ...queryOperation.context,
-        authAttempt: false,
-      },
-    };
-
-    expect(res).toEqual(withAuthAttempt);
-  });
-
   it('adds the auth header correctly', async () => {
     const res = await pipe(
       fromValue(queryOperation),
@@ -87,7 +70,7 @@ describe('on request', () => {
       },
     };
 
-    expect(res).toEqual(expectedOperation);
+    expect(res).toEqual({ operation: expectedOperation });
   });
 
   it('adds the auth header correctly when it is fetched asynchronously', async () => {
@@ -122,7 +105,7 @@ describe('on request', () => {
       },
     };
 
-    expect(res).toEqual(expectedOperation);
+    expect(res).toEqual({ operation: expectedOperation });
   });
 
   it('adds the same token to subsequent operations', async () => {
@@ -154,28 +137,32 @@ describe('on request', () => {
     next(secondQuery);
     expect(result).toHaveBeenCalledTimes(2);
     expect(result).nthCalledWith(1, {
-      ...queryOperation,
-      context: {
-        ...queryOperation.context,
-        authAttempt: false,
-        fetchOptions: {
-          ...(queryOperation.context.fetchOptions || {}),
-          headers: {
-            Authorization: 'my-token',
+      operation: {
+        ...queryOperation,
+        context: {
+          ...queryOperation.context,
+          authAttempt: false,
+          fetchOptions: {
+            ...(queryOperation.context.fetchOptions || {}),
+            headers: {
+              Authorization: 'my-token',
+            },
           },
         },
       },
     });
 
     expect(result).nthCalledWith(2, {
-      ...secondQuery,
-      context: {
-        ...secondQuery.context,
-        authAttempt: false,
-        fetchOptions: {
-          ...(secondQuery.context.fetchOptions || {}),
-          headers: {
-            Authorization: 'my-token',
+      operation: {
+        ...secondQuery,
+        context: {
+          ...secondQuery.context,
+          authAttempt: false,
+          fetchOptions: {
+            ...(secondQuery.context.fetchOptions || {}),
+            headers: {
+              Authorization: 'my-token',
+            },
           },
         },
       },

@@ -26,10 +26,6 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     authExchange({
-      getInitialAuthState: () => {
-        // fetch your auth state from storage. This can be async
-        return { token: 'token', refreshToken: 'refresh-token' };
-      },
       addAuthToOperation: ({ authState, operation }) => {
         const token = authState?.token;
         const authHeader = {
@@ -55,17 +51,27 @@ const client = createClient({
           },
         };
       },
-      isAuthError: error =>
-          error.graphQLErrors.some(e => e.extensions?.code === "FORBIDDEN"),
-      refetchAuth: async ({ authState, attempt }) => {
-        if (attempt === 0) {
-          // fetch new token if possible
-          const newAuthState = { token: 'new-token' };
-          return newAuthState;
+      willAuthError: ({ operation, authState }) => {
+        if (!authState) return true;
+        // e.g. check for expiration, existence of auth etc
+        return false;
+      },
+      didAuthError: ({ error, authState }) => {
+        // check if the error was an auth error (this can be implemented in various ways, e.g. 401 or a speciall error code)
+        return error.graphQLErrors.some(
+          e => e.extensions?.code === "FORBIDDEN",
+        );
+      },
+      getAuth: async ({ authState }) => {
+        // for initial launch, fetch the auth state from storage (local storage, async storage etx)
+        if (!authState) {
+          const token = await SInfo.getItem(TOKEN_KEY, {});
+          const refreshToken = await SInfo.getItem(REFRESH_TOKEN_KEY, {});
+          return { token, refreshToken };
         }
-        // if the auth has already been refreshed and still failing with an auth error, time to log the user out
-        logout();
-        return null;
+
+        // otherwise fetch the new auth state async, e.g. from an api using a refresh token
+        return { token: "new-token", refreshToken: "new-refresh" };
       },
     }),
     fetchExchange
