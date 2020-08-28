@@ -18,6 +18,7 @@ interface PageInfo {
 interface Page {
   __typename: string;
   edges: NullArray<string>;
+  nodes: NullArray<string>;
   pageInfo: PageInfo;
 }
 
@@ -54,6 +55,28 @@ const concatEdges = (
   }
 
   return newEdges;
+};
+
+const concatNodes = (
+  leftNodes: NullArray<string>,
+  rightNodes: NullArray<string>
+) => {
+  const ids = new Set<string>();
+  for (let i = 0, l = leftNodes.length; i < l; i++) {
+    const node = leftNodes[i];
+    if (typeof node === 'string') ids.add(node);
+  }
+
+  const newNodes = leftNodes.slice();
+  for (let i = 0, l = rightNodes.length; i < l; i++) {
+    const node = rightNodes[i];
+    if (typeof node === 'string' && !ids.has(node)) {
+      ids.add(node);
+      newNodes.push(node);
+    }
+  }
+
+  return newNodes;
 };
 
 const compareArgs = (
@@ -110,6 +133,7 @@ const getPage = (
 
   const typename = cache.resolve(link, '__typename') as string;
   const edges = (cache.resolve(link, 'edges') || []) as NullArray<string>;
+  const nodes = (cache.resolve(link, 'nodes') || []) as NullArray<string>;
   if (typeof typename !== 'string') {
     return null;
   }
@@ -117,6 +141,7 @@ const getPage = (
   const page: Page = {
     __typename: typename,
     edges,
+    nodes,
     pageInfo: defaultPageInfo,
   };
 
@@ -173,6 +198,8 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
     let typename: string | null = null;
     let startEdges: NullArray<string> = [];
     let endEdges: NullArray<string> = [];
+    let startNodes: NullArray<string> = [];
+    let endNodes: NullArray<string> = [];
     let pageInfo: PageInfo = { ...defaultPageInfo };
 
     for (let i = 0; i < size; i++) {
@@ -193,24 +220,32 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       ) {
         const firstEdges = page.edges.slice(0, args.first + 1);
         const lastEdges = page.edges.slice(-args.last);
+        const firstNodes = page.nodes.slice(0, args.first + 1);
+        const lastNodes = page.nodes.slice(-args.last);
 
         startEdges = concatEdges(cache, startEdges, firstEdges);
         endEdges = concatEdges(cache, lastEdges, endEdges);
+        startNodes = concatNodes(startNodes, firstNodes);
+        endNodes = concatNodes(lastNodes, endNodes);
 
         pageInfo = page.pageInfo;
       } else if (args.after) {
         startEdges = concatEdges(cache, startEdges, page.edges);
+        startNodes = concatNodes(startNodes, page.nodes);
         pageInfo.endCursor = page.pageInfo.endCursor;
         pageInfo.hasNextPage = page.pageInfo.hasNextPage;
       } else if (args.before) {
         endEdges = concatEdges(cache, page.edges, endEdges);
+        endNodes = concatNodes(page.nodes, endNodes);
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
       } else if (typeof args.last === 'number') {
         endEdges = concatEdges(cache, endEdges, page.edges);
+        endNodes = concatNodes(endNodes, page.nodes);
         pageInfo = page.pageInfo;
       } else {
         startEdges = concatEdges(cache, startEdges, page.edges);
+        startNodes = concatNodes(startNodes, page.nodes);
         pageInfo = page.pageInfo;
       }
 
@@ -240,6 +275,10 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
         mergeMode === 'inwards'
           ? concatEdges(cache, startEdges, endEdges)
           : concatEdges(cache, endEdges, startEdges),
+      nodes:
+        mergeMode === 'inwards'
+          ? concatNodes(startNodes, endNodes)
+          : concatNodes(endNodes, startNodes),
       pageInfo: {
         __typename: pageInfo.__typename,
         endCursor: pageInfo.endCursor,

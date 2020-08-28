@@ -335,6 +335,20 @@ and is still waiting for a result.
 The `fetchExchange` of type `Exchange` is responsible for sending operations of type `'query'` and
 `'mutation'` to a GraphQL API using `fetch`.
 
+### errorExchange
+
+An exchange that lets you inspect errors. This can be useful for logging, or reacting to
+different types of errors (e.g. logging the user out in case of a permission error).
+
+```ts
+errorExchange({
+  onError: (error: CombinedError, operation: Operation) => {
+    console.log("An error!", error);
+  }
+})
+
+```
+
 ## Utilities
 
 ### stringifyVariables

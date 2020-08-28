@@ -237,6 +237,11 @@ last: 1, before: c => node 89, startCursor: d
 With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
 And with outwards merging: `[..., 89, 99, 1, 2, ...]`
 
+The helper happily supports schemata that return nodes rather than
+individually-cursored edges. For each paginated type, you must either
+always request nodes, or always request edges -- otherwise the lists
+cannot be stiched together.
+
 ### Reading on
 
 [On the next page we'll learn about "Custom updates".](./custom-updates.md)

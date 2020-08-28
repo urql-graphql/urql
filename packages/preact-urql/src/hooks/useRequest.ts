@@ -12,7 +12,7 @@ export const useRequest = (
   return useMemo(() => {
     const request = createRequest(query, variables);
     // We manually ensure reference equality if the key hasn't changed
-    if (prev.current !== undefined && prev.current.key === request.key) {
+    if (prev.current != null && prev.current.key === request.key) {
       return prev.current;
     } else {
       return (prev.current = request);
