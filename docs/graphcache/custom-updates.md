@@ -5,8 +5,10 @@ order: 3
 
 # Custom Updates
 
-_Graphcache_ will attempt to automatically react to your mutations' and subscriptions' results
-but sometimes this isn't possible. While it will update all normalized entities that it finds in
+Every time a `subscription` triggeres or a `mutation` receives a response GraphCache will look at the response and see
+if it can get a key from the response. This key is by default derived from the `__typename` and `id`/`_id`, unless
+customized in your `keys` configuration, this entity will then be added to the cache this means that
+an existing entity with the found key will be updated.. While it will update all normalized entities that it finds in
 those results, it can't for instance tell whether a new item should be appended or removed from a
 list.
 
@@ -257,7 +259,7 @@ Now we'd need to traverse all the `todos` to find which we need, but there's ano
 Rather than use `cache.inspectFields('Query')`, which would give us all queried `todo` fields with their arguments, we can instead provide an object as the argument to `inspectFields` asking for all `Todo` types for a given id.
 
 ```js
-cache.inspectFields({ __typename: 'Todo', id: args.id })
+cache.inspectFields({ __typename: 'Todo', id: args.id });
 ```
 
 Now we'll get all fields for the given `todo` and can freely update the `authors`.
@@ -267,6 +269,9 @@ Now we'll get all fields for the given `todo` and can freely update the `authors
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
 The _Optimistic Updates_ configuration allows us to set up "temporary" results for mutations, which
 will be applied immediately. This is a great solution to reduce the waiting time for the user.
+
+> Note that an optimistic response is meant to be a temporary update to an entity until the server responds to your mutation.
+> This means that what you return here should reflect the shape of what the server would return.
 
 This technique is often used with one-off mutations that are assumed to succeed, like starring a
 repository, or liking a tweet. In such cases it's often desirable to make the interaction feel

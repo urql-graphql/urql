@@ -62,6 +62,29 @@ Multiple results may refer to the same piece of data — a mutation for instance
 later on in the app. This would automatically cause _Graphcache_ to update any related queries in
 the entire app, because all references to each each entity are shared.
 
+## Terminology
+
+A few terms that will be used throughout the GraphCache documentation that are important to know
+to get a full understanding.
+
+### Entity
+
+This is an object for which the cache can generate a key, like `Todo:1`.
+
+### Records
+
+These are properties that relate to an Entity, in the above case this would be `title`, ...
+internally these will be represented as `Todo:1.title`
+
+### Link
+
+This is the connection between entities or the base `Query` field.
+
+a few examples would be:
+
+- `Query.todos: an array of ids`
+- `Todo:1.author: a string id`
+
 ## Key Generation
 
 As we saw in the previous example, by default _Graphcache_ will attempt to generate a key by
