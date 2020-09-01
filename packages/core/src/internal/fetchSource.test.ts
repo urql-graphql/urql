@@ -39,7 +39,7 @@ describe('on success', () => {
     const fetchResponse = {
       status: 200,
       json: jest.fn().mockResolvedValue(response),
-      clonse: jest.fn(() => fetchResponse),
+      clone: jest.fn(() => fetchResponse),
     };
     fetch.mockResolvedValue(fetchResponse);
   });
