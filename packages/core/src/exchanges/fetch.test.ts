@@ -48,10 +48,12 @@ const exchangeArgs = {
 
 describe('on success', () => {
   beforeEach(() => {
-    fetch.mockResolvedValue({
+    const fetchResponse = {
       status: 200,
       json: jest.fn().mockResolvedValue(response),
-    });
+      clone: jest.fn(() => fetchResponse),
+    };
+    fetch.mockResolvedValue(fetchResponse);
   });
 
   it('returns response data', async () => {
@@ -77,10 +79,12 @@ describe('on success', () => {
 
 describe('on error', () => {
   beforeEach(() => {
-    fetch.mockResolvedValue({
+    const fetchResponse = {
       status: 400,
       json: jest.fn().mockResolvedValue({}),
-    });
+      clone: jest.fn(() => fetchResponse),
+    };
+    fetch.mockResolvedValue(fetchResponse);
   });
 
   it('returns error data', async () => {
@@ -112,10 +116,12 @@ describe('on error', () => {
   });
 
   it('ignores the error when a result is available', async () => {
-    fetch.mockResolvedValue({
+    const fetchResponse = {
       status: 400,
       json: jest.fn().mockResolvedValue(response),
-    });
+      clone: jest.fn(() => fetchResponse),
+    };
+    fetch.mockResolvedValue(fetchResponse);
 
     const data = await pipe(
       fromValue(queryOperation),

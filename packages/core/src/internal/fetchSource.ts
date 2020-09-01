@@ -18,7 +18,7 @@ const executeFetch = (
       statusNotOk =
         res.status < 200 ||
         res.status >= (fetchOptions.redirect === 'manual' ? 400 : 300);
-      return res.json();
+      return res.clone().json();
     })
     .then((result: any) => {
       if (!('data' in result) && !('errors' in result)) {

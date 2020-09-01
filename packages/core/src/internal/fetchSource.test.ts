@@ -36,10 +36,12 @@ const response = {
 
 describe('on success', () => {
   beforeEach(() => {
-    fetch.mockResolvedValue({
+    const fetchResponse = {
       status: 200,
       json: jest.fn().mockResolvedValue(response),
-    });
+      clonse: jest.fn(() => fetchResponse),
+    };
+    fetch.mockResolvedValue(fetchResponse);
   });
 
   it('returns response data', async () => {
@@ -58,10 +60,12 @@ describe('on success', () => {
 
   it('uses the mock fetch if given', async () => {
     const fetchOptions = {};
-    const fetcher = jest.fn().mockResolvedValue({
+    const fetchResponse = {
       status: 200,
       json: jest.fn().mockResolvedValue(response),
-    });
+      clone: jest.fn(() => fetchResponse),
+    };
+    const fetcher = jest.fn().mockResolvedValue(fetchResponse);
 
     const data = await pipe(
       makeFetchSource(
@@ -86,10 +90,12 @@ describe('on success', () => {
 
 describe('on error', () => {
   beforeEach(() => {
-    fetch.mockResolvedValue({
+    const fetchResponse = {
       status: 400,
       json: jest.fn().mockResolvedValue({}),
-    });
+      clonse: jest.fn(() => fetchResponse),
+    };
+    fetch.mockResolvedValue(fetchResponse);
   });
 
   it('returns error data', async () => {

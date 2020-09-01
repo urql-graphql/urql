@@ -100,10 +100,13 @@ describe('on operation', () => {
       toPromise
     );
 
-    fetchMock.mockResolvedValue({
+    const fetchResponse = {
       status: 200,
       json: jest.fn().mockResolvedValue({ data: mockHttpResponseData }),
-    });
+      clone: jest.fn(() => fetchResponse),
+    };
+
+    fetchMock.mockResolvedValue(fetchResponse);
 
     const responseFromFetchExchange = await pipe(
       fromValue(queryOperation),
