@@ -42,9 +42,11 @@ it('accepts successful persisted query responses', async () => {
     },
   };
 
-  fetch.mockResolvedValueOnce({
+  const fetchResponse = {
     json: () => expected,
-  });
+    clone: () => fetchResponse,
+  };
+  fetch.mockResolvedValueOnce(fetchResponse);
 
   const actual = await pipe(
     fromValue(queryOperation),
@@ -68,9 +70,19 @@ it('supports cache-miss persisted query errors', async () => {
     },
   };
 
+  const expectedMissResponse = {
+    json: () => expectedMiss,
+    clone: () => expectedMissResponse,
+  };
+
+  const expectedRetryResponse = {
+    json: () => expectedRetry,
+    clone: () => expectedRetryResponse,
+  };
+
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce(expectedMissResponse)
+    .mockResolvedValueOnce(expectedRetryResponse);
 
   const actual = await pipe(
     fromValue(queryOperation),
@@ -95,9 +107,19 @@ it('supports GET exclusively for persisted queries', async () => {
     },
   };
 
+  const expectedMissResponse = {
+    json: () => expectedMiss,
+    clone: () => expectedMissResponse,
+  };
+
+  const expectedRetryResponse = {
+    json: () => expectedRetry,
+    clone: () => expectedRetryResponse,
+  };
+
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce(expectedMissResponse)
+    .mockResolvedValueOnce(expectedRetryResponse);
 
   const actual = await pipe(
     fromValue(queryOperation),
@@ -124,10 +146,20 @@ it('supports unsupported persisted query errors', async () => {
     },
   };
 
+  const expectedMissResponse = {
+    json: () => expectedMiss,
+    clone: () => expectedMissResponse,
+  };
+
+  const expectedRetryResponse = {
+    json: () => expectedRetry,
+    clone: () => expectedRetryResponse,
+  };
+
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce(expectedMissResponse)
+    .mockResolvedValueOnce(expectedRetryResponse)
+    .mockResolvedValueOnce(expectedRetryResponse);
 
   const actual = await pipe(
     fromArray([queryOperation, queryOperation]),

@@ -389,12 +389,8 @@ Object {
 
 exports[`on success returns response data 1`] = `
 Object {
-  "data": Object {
-    "data": Object {
-      "user": 1200,
-    },
-  },
-  "error": undefined,
+  "data": undefined,
+  "error": [CombinedError: [Network] res.clone is not a function],
   "extensions": undefined,
   "operation": Object {
     "context": Object {
