@@ -64,8 +64,7 @@ the entire app, because all references to each each entity are shared.
 
 ## Terminology
 
-A few terms that will be used throughout the GraphCache documentation that are important to know
-to get a full understanding.
+A few terms that will be used throughout the Graphcache documentation that are important to understand in order to get a full understanding.
 
 ### Entity
 
@@ -73,7 +72,7 @@ This is an object for which the cache can generate a key, like `Todo:1`.
 
 ### Records
 
-These are properties that relate to an Entity, in the above case this would be `title`, ...
+These are properties that relate to an entity, in the above case this would be `title`, ...
 internally these will be represented as `Todo:1.title`
 
 ### Link

@@ -5,10 +5,10 @@ order: 3
 
 # Custom Updates
 
-Every time a `subscription` triggeres or a `mutation` receives a response GraphCache will look at the response and see
+Every time Graphcache sees a result from the API for a `subscription` or a `mutation` it will look at the response and traverse it.
 if it can get a key from the response. This key is by default derived from the `__typename` and `id`/`_id`, unless
 customized in your `keys` configuration, this entity will then be added to the cache this means that
-an existing entity with the found key will be updated.. While it will update all normalized entities that it finds in
+This means that existing entities with a found key will be updated and new ones will be written. While it will update all normalized entities that it finds in
 those results, it can't for instance tell whether a new item should be appended or removed from a
 list.
 
@@ -271,7 +271,7 @@ The _Optimistic Updates_ configuration allows us to set up "temporary" results f
 will be applied immediately. This is a great solution to reduce the waiting time for the user.
 
 > Note that an optimistic response is meant to be a temporary update to an entity until the server responds to your mutation.
-> This means that what you return here should reflect the shape of what the server would return.
+> This means that what you return here should reflect the shape of what the server will return.
 
 This technique is often used with one-off mutations that are assumed to succeed, like starring a
 repository, or liking a tweet. In such cases it's often desirable to make the interaction feel
