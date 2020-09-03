@@ -14,10 +14,10 @@ yarn add @urql/exchange-auth
 npm install --save @urql/exchange-auth
 ```
 
-You'll then need to add the `authExchange`, that this package exposes, to your `urql` Client
+You'll then need to add the `authExchange`, that this package exposes, (and `errorExchange`) to your `urql` Client
 
 ```js
-import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { createClient, dedupExchange, cacheExchange, errorExchange } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 
 const client = createClient({
@@ -25,6 +25,18 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
+    errorExchange({
+      onError: ({ error }) => {
+        // We only get an auth error here when the auth excahnge had attempted to refresh auth and getting an auth error again for the second time
+        const isAuthError = error.graphQLErrors.some(
+          e => e.extensions?.code === "FORBIDDEN",
+        );
+
+        if (isAuthError) {
+          // log the user out
+        }
+      }
+    }),
     authExchange({
       addAuthToOperation: ({ authState, operation }) => {
         const token = authState?.token;
