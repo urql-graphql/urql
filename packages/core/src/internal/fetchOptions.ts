@@ -87,9 +87,8 @@ export const makeFetchOptions = (
     ...extraOptions,
     body: !useGETMethod && body ? JSON.stringify(body) : undefined,
     method: useGETMethod ? 'GET' : 'POST',
-    headers: {
-      'content-type': 'application/json',
-      ...extraOptions.headers,
-    },
+    headers: useGETMethod
+      ? extraOptions.headers
+      : { 'content-type': 'application/json', ...extraOptions.headers },
   };
 };
