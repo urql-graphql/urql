@@ -154,7 +154,6 @@ export const extractSelectionsFromQuery = (
       if (selection.kind === Kind.FIELD) {
         if (validTypeProperties.includes(selection.name.value)) {
           if (selection.selectionSet) {
-            // @ts-ignore
             selections.push({
               ...selection,
               selectionSet: sanitizeSelectionSet(
