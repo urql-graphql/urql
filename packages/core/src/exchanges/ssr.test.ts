@@ -2,7 +2,7 @@ import { makeSubject, pipe, map, publish, forEach, Subject } from 'wonka';
 
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
-import { ExchangeIO, Operation } from '../types';
+import { ExchangeIO, Operation, OperationResult } from '../types';
 import { CombinedError } from '../utils';
 import { ssrExchange } from './ssr';
 
@@ -34,6 +34,42 @@ it('caches query results correctly', () => {
 
   publish(exchange);
   next(queryOperation);
+
+  const data = ssr.extractData();
+  expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
+
+  expect(data).toEqual({
+    [queryOperation.key]: {
+      data: serializedQueryResponse.data,
+      error: undefined,
+    },
+  });
+});
+
+it('serializes query results quickly', () => {
+  const queryResponse: OperationResult = {
+    operation: queryOperation,
+    data: {
+      user: {
+        name: 'Clive',
+      },
+    },
+  };
+
+  const serializedQueryResponse = {
+    ...queryResponse,
+    data: JSON.stringify(queryResponse.data),
+  };
+
+  output.mockReturnValueOnce(queryResponse);
+
+  const ssr = ssrExchange();
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+  queryResponse.data.user.name = 'Not Clive';
 
   const data = ssr.extractData();
   expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
