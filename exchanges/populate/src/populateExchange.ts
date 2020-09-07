@@ -158,7 +158,7 @@ export const extractSelectionsFromQuery = (
               ...selection,
               selectionSet: sanitizeSelectionSet(
                 selection.selectionSet,
-                validTypes[selection.name.value].type.toString()
+                unwrapType(validTypes[selection.name.value].type)!.toString()
               ),
             });
           } else {
