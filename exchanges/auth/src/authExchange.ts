@@ -106,10 +106,9 @@ export function authExchange<T>({
         retryQueue.clear();
       };
 
-      let pendingPromise: Promise<any> | void = getAuth({
-        authState,
-        mutate,
-      }).then(updateAuthState);
+      let pendingPromise: Promise<any> | void = Promise.resolve()
+        .then(() => getAuth({ authState, mutate }))
+        .then(updateAuthState);
 
       const refreshAuth = (operation: Operation): Promise<any> => {
         // add to retry queue to try again later
