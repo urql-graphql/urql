@@ -26,20 +26,6 @@ export type ErrorCode =
 const helpUrl = '\nhttps://bit.ly/2XbVrpR#';
 const cache = new Set<string>();
 
-export function invariant(
-  condition: any,
-  message: string,
-  code: ErrorCode
-): asserts condition {
-  if (!condition) {
-    const errorMessage = message || 'Minfied Error #' + code + '\n';
-
-    const error = new Error(errorMessage + helpUrl + code);
-    error.name = 'Graphcache Error';
-    throw error;
-  }
-}
-
 export function warn(message: string, code: ErrorCode) {
   if (!cache.has(message)) {
     console.warn(message + helpUrl + code);
