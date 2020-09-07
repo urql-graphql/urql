@@ -1,4 +1,5 @@
 import {
+  Source,
   pipe,
   fromValue,
   toPromise,
@@ -16,13 +17,15 @@ import { queryOperation } from '@urql/core/test-utils';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
-  const result = jest.fn(operation => ({ operation }));
+  const result = jest.fn(
+    (operation: Operation): OperationResult => ({ operation })
+  );
 
   return {
     operations,
     result,
     exchangeArgs: {
-      forward: op$ =>
+      forward: (op$: Source<Operation>) =>
         pipe(
           op$,
           tap(op => operations.push(op)),
@@ -290,6 +293,63 @@ it('triggers authentication when an operation did error', async () => {
     'initial-token'
   );
   expect(operations[1]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'final-token'
+  );
+});
+
+it('triggers authentication when an operation will error', async () => {
+  const { exchangeArgs, result, operations } = makeExchangeArgs();
+  const { source, next } = makeSubject<any>();
+
+  let initialAuth;
+  let afterErrorAuth;
+
+  const willAuthError = jest
+    .fn()
+    .mockReturnValueOnce(true)
+    .mockReturnValue(false);
+
+  const getAuth = jest
+    .fn()
+    .mockImplementationOnce(() => {
+      initialAuth = Promise.resolve({ token: 'initial-token' });
+      return initialAuth;
+    })
+    .mockImplementationOnce(() => {
+      afterErrorAuth = Promise.resolve({ token: 'final-token' });
+      return afterErrorAuth;
+    });
+
+  pipe(
+    source,
+    authExchange<{ token: string }>({
+      getAuth,
+      willAuthError,
+      didAuthError: () => false,
+      addAuthToOperation: ({ authState, operation }) => {
+        return withAuthHeader(operation, authState?.token);
+      },
+    })(exchangeArgs),
+    publish
+  );
+
+  await Promise.resolve();
+  expect(getAuth).toHaveBeenCalledTimes(1);
+  await initialAuth;
+  await Promise.resolve();
+  await Promise.resolve();
+
+  next(queryOperation);
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(willAuthError).toHaveBeenCalledTimes(1);
+  expect(getAuth).toHaveBeenCalledTimes(2);
+
+  await afterErrorAuth;
+
+  expect(result).toHaveBeenCalledTimes(1);
+  expect(operations.length).toBe(1);
+  expect(operations[0]).toHaveProperty(
     'context.fetchOptions.headers.Authorization',
     'final-token'
   );
