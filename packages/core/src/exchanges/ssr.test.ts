@@ -12,6 +12,11 @@ let client: Client;
 let input: Subject<Operation>;
 let output;
 
+const serializedQueryResponse = {
+  ...queryResponse,
+  data: JSON.stringify(queryResponse.data),
+};
+
 beforeEach(() => {
   input = makeSubject<Operation>();
   output = jest.fn();
@@ -35,7 +40,7 @@ it('caches query results correctly', () => {
 
   expect(data).toEqual({
     [queryOperation.key]: {
-      data: queryResponse.data,
+      data: serializedQueryResponse.data,
       error: undefined,
     },
   });
@@ -62,7 +67,7 @@ it('caches errored query results correctly', () => {
 
   expect(data).toEqual({
     [queryOperation.key]: {
-      data: null,
+      data: 'null',
       error: {
         graphQLErrors: ['Oh no!'],
         networkError: undefined,
@@ -104,7 +109,7 @@ it('resolves cached query results correctly', () => {
   const onPush = jest.fn();
 
   const ssr = ssrExchange({
-    initialState: { [queryOperation.key]: queryResponse as any },
+    initialState: { [queryOperation.key]: serializedQueryResponse as any },
   });
 
   const { source: ops$, next } = input;
@@ -124,7 +129,7 @@ it('deletes cached results in non-suspense environments', async () => {
   const onPush = jest.fn();
   const ssr = ssrExchange();
 
-  ssr.restoreData({ [queryOperation.key]: queryResponse as any });
+  ssr.restoreData({ [queryOperation.key]: serializedQueryResponse as any });
   expect(Object.keys(ssr.extractData()).length).toBe(1);
 
   const { source: ops$, next } = input;
