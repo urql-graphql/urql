@@ -1,0 +1,67 @@
+{
+  "name": "@urql/exchange-auth",
+  "version": "0.1.0",
+  "description": "An exchange for managing authentication and token refresh in urql",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "exchanges/auth"
+  },
+  "keywords": [
+    "urql",
+    "exchange",
+    "auth",
+    "authentication",
+    "formidablelabs",
+    "exchanges"
+  ],
+  "main": "dist/urql-exchange-auth",
+  "module": "dist/urql-exchange-auth.mjs",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-exchange-auth.mjs",
+      "require": "./dist/urql-exchange-auth.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist extras",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "dependencies": {
+    "@urql/core": ">=1.12.0",
+    "wonka": "^4.0.14"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
+  },
+  "devDependencies": {
+    "graphql": "^15.1.0",
+    "graphql-tag": "^2.10.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
