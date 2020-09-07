@@ -13,9 +13,12 @@ import {
   isAbstractType,
   Kind,
   visit,
+  SelectionSetNode,
+  GraphQLObjectType,
+  SelectionNode,
 } from 'graphql';
 import { getName, getSelectionSet, unwrapType } from './helpers/node';
-import { invariant, warn } from './helpers/help';
+import { warn } from './helpers/help';
 
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
@@ -138,21 +141,61 @@ export const extractSelectionsFromQuery = (
   const newFragments: FragmentDefinitionNode[] = [];
   const typeInfo = new TypeInfo(schema);
 
+  const sanitizeSelectionSet = (
+    selectionSet: SelectionSetNode,
+    type: string
+  ) => {
+    const selections: SelectionNode[] = [];
+    const validTypeProperties = Object.keys(
+      (schema.getType(type) as GraphQLObjectType).getFields()
+    );
+
+    selectionSet.selections.forEach(selection => {
+      if (selection.kind === Kind.FIELD) {
+        if (validTypeProperties.includes(selection.name.value)) {
+          selections.push(selection);
+        }
+      } else {
+        selections.push(selection);
+      }
+    });
+    return { ...selectionSet, selections };
+  };
+
   visit(
     query,
     visitWithTypeInfo(typeInfo, {
       Field: node => {
         if (node.selectionSet) {
-          const type = getTypeName(typeInfo);
-          newFragments.push({
-            kind: Kind.FRAGMENT_DEFINITION,
-            typeCondition: {
-              kind: Kind.NAMED_TYPE,
-              name: nameNode(type),
-            },
-            name: nameNode(`${type}_PopulateFragment_`),
-            selectionSet: node.selectionSet,
-          });
+          const type = unwrapType(typeInfo.getType());
+          // @ts-ignore
+          if (isAbstractType(type)) {
+            const types = schema.getPossibleTypes(type);
+            types.forEach(t => {
+              newFragments.push({
+                kind: Kind.FRAGMENT_DEFINITION,
+                typeCondition: {
+                  kind: Kind.NAMED_TYPE,
+                  name: nameNode(t.toString()),
+                },
+                name: nameNode(`${t.toString()}_PopulateFragment_`),
+                selectionSet: sanitizeSelectionSet(
+                  node.selectionSet as SelectionSetNode,
+                  t.toString()
+                ),
+              });
+            });
+          } else if (type) {
+            newFragments.push({
+              kind: Kind.FRAGMENT_DEFINITION,
+              typeCondition: {
+                kind: Kind.NAMED_TYPE,
+                name: nameNode(type!.toString()),
+              },
+              name: nameNode(`${type!.toString()}_PopulateFragment_`),
+              selectionSet: node.selectionSet,
+            });
+          }
         }
       },
       FragmentDefinition: node => {
@@ -295,18 +338,6 @@ const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
   }
 
   return isAbstractType(type) ? schema.getPossibleTypes(type) : [type];
-};
-
-/** Get name of non-abstract type for adding to 'activeTypeFragments'. */
-const getTypeName = (typeInfo: TypeInfo) => {
-  const type = unwrapType(typeInfo.getType());
-  invariant(
-    type && !isAbstractType(type),
-    'Invalid TypeInfo state: Found no flat schema type when one was expected.',
-    18
-  );
-
-  return type.toString();
 };
 
 /** Get fragment names referenced by node. */

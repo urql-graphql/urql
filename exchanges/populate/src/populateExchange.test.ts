@@ -33,15 +33,36 @@ const schemaDef = `
 
   union UnionType = User | Todo
 
+  interface Product {
+    id: ID!
+    name: String!
+    price: Int!
+  }
+
+  type SimpleProduct implements Product {
+    id: ID!
+    name: String!
+    price: Int!
+  }
+
+  type ComplexProduct implements Product {
+    id: ID!
+    name: String!
+    price: Int!
+    tax: Int!
+  }
+
   type Query {
     todos: [Todo!]
     users: [User!]!
+    products: [Product]!
   }
 
   type Mutation {
     addTodo: [Todo]
     removeTodo: [Node]
     updateTodo: [UnionType]
+    addProduct: Product
   }
 `;
 
@@ -505,5 +526,61 @@ describe('on query -> teardown -> mutation', () => {
         expect(field.name.value).toMatch(/addTodo|__typename/);
       });
     });
+  });
+});
+
+describe('union of interfaces', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        products {
+          id
+          text
+          price
+          tax
+        }
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addProduct @populate
+      }
+    `,
+  } as Operation;
+
+  it('should work', () => {
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp, mutationOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[1].query)).toMatchInlineSnapshot(`
+      "mutation MyMutation {
+        addProduct {
+          ...SimpleProduct_PopulateFragment_0
+          ...ComplexProduct_PopulateFragment_0
+        }
+      }
+
+      fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
+        id
+        price
+      }
+
+      fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
+        id
+        price
+        tax
+      }
+      "
+    `);
   });
 });
