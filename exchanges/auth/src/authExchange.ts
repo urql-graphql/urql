@@ -10,7 +10,8 @@ import {
   share,
   takeUntil,
 } from 'wonka';
-import { Operation, CombinedError, Exchange } from 'urql';
+
+import { Operation, CombinedError, Exchange } from '@urql/core';
 
 export interface AuthConfig<T> {
   /** addAuthToOperation() must be provided to add the custom `authState` to an Operation's context, so that it may be picked up by the `fetchExchange`. */
