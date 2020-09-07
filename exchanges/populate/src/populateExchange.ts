@@ -18,7 +18,7 @@ import {
   SelectionNode,
 } from 'graphql';
 import { getName, getSelectionSet, unwrapType } from './helpers/node';
-import { warn } from './helpers/help';
+import { warn, invariant } from './helpers/help';
 
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
@@ -178,7 +178,13 @@ export const extractSelectionsFromQuery = (
       Field: node => {
         if (node.selectionSet) {
           const type = unwrapType(typeInfo.getType());
-          // @ts-ignore
+
+          invariant(
+            type,
+            'Invalid TypeInfo state: Found no flat schema type when one was expected.',
+            18
+          );
+
           if (isAbstractType(type)) {
             const types = schema.getPossibleTypes(type);
             types.forEach(t => {
@@ -195,14 +201,14 @@ export const extractSelectionsFromQuery = (
                 ),
               });
             });
-          } else if (type) {
+          } else {
             newFragments.push({
               kind: Kind.FRAGMENT_DEFINITION,
               typeCondition: {
                 kind: Kind.NAMED_TYPE,
-                name: nameNode(type!.toString()),
+                name: nameNode(type.toString()),
               },
-              name: nameNode(`${type!.toString()}_PopulateFragment_`),
+              name: nameNode(`${type.toString()}_PopulateFragment_`),
               selectionSet: node.selectionSet,
             });
           }
