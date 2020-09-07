@@ -146,14 +146,25 @@ export const extractSelectionsFromQuery = (
     type: string
   ) => {
     const selections: SelectionNode[] = [];
-    const validTypeProperties = Object.keys(
-      (schema.getType(type) as GraphQLObjectType).getFields()
-    );
+    const validTypes = (schema.getType(type) as GraphQLObjectType).getFields();
+
+    const validTypeProperties = Object.keys(validTypes);
 
     selectionSet.selections.forEach(selection => {
       if (selection.kind === Kind.FIELD) {
         if (validTypeProperties.includes(selection.name.value)) {
-          selections.push(selection);
+          if (selection.selectionSet) {
+            // @ts-ignore
+            selections.push({
+              ...selection,
+              selectionSet: sanitizeSelectionSet(
+                selection.selectionSet,
+                validTypes[selection.name.value].type
+              ),
+            });
+          } else {
+            selections.push(selection);
+          }
         }
       } else {
         selections.push(selection);
