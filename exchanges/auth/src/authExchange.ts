@@ -12,30 +12,25 @@ import {
 } from 'wonka';
 import { Operation, CombinedError, Exchange } from 'urql';
 
-type AuthConfig<T> = {
-  addAuthToOperation: ({
-    authState,
-    operation,
-  }: {
+export interface AuthConfig<T> {
+  /** addAuthToOperation() must be provided to add the custom `authState` to an Operation's context, so that it may be picked up by the `fetchExchange`. */
+  addAuthToOperation(params: {
     authState: T | null;
     operation: Operation;
-  }) => Operation;
-  didAuthError?: ({
-    error,
-    authState,
-  }: {
-    error: CombinedError;
+  }): Operation;
+
+  /** didAuthError() may be provided to tweak the detection of an authentication error that this exchange should handle. */
+  didAuthError?(params: { error: CombinedError; authState: T | null }): boolean;
+
+  /** willAuthError() may be provided to detect a potential operation that'll receive authentication error so that getAuth() can be run proactively. */
+  willAuthError?(params: {
     authState: T | null;
-  }) => boolean;
-  getAuth: ({ authState }: { authState: T | null }) => Promise<T | null>;
-  willAuthError: ({
-    operation,
-    authState,
-  }: {
     operation: Operation;
-    authState: T | null;
-  }) => boolean;
-};
+  }): boolean;
+
+  /** getAuth() handles how the application refreshes or reauthenticates given a stale `authState` and should return a new `authState` or `null`. */
+  getAuth(params: { authState: T | null }): Promise<T | null>;
+}
 
 const addAuthAttemptToOperation = (
   operation: Operation,
@@ -110,7 +105,11 @@ export function authExchange<T>({
           pipe(
             pendingOps$,
             mergeMap(operation => {
-              if (!pendingPromise && willAuthError({ operation, authState })) {
+              if (
+                !pendingPromise &&
+                willAuthError &&
+                willAuthError({ operation, authState })
+              ) {
                 pendingPromise = refreshAuth(operation);
               } else if (!pendingPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
