@@ -4,7 +4,7 @@ import { Exchange, OperationResult, Operation } from '../types';
 import { CombinedError } from '../utils';
 
 export interface SerializedResult {
-  data?: any;
+  data?: string | undefined; // JSON string of data
   error?: {
     graphQLErrors: Array<Partial<GraphQLError> | string>;
     networkError?: string;
@@ -35,7 +35,11 @@ const serializeResult = ({
   data,
   error,
 }: OperationResult): SerializedResult => {
-  const result: SerializedResult = { data, error: undefined };
+  const result: SerializedResult = {
+    data: JSON.stringify(data),
+    error: undefined,
+  };
+
   if (error) {
     result.error = {
       graphQLErrors: error.graphQLErrors.map(error => {
@@ -59,10 +63,11 @@ const deserializeResult = (
   operation: Operation,
   result: SerializedResult
 ): OperationResult => {
-  const { error, data } = result;
+  const { error, data: dataJson } = result;
+
   const deserialized: OperationResult = {
     operation,
-    data,
+    data: dataJson ? JSON.parse(dataJson) : undefined,
     extensions: undefined,
     error: error
       ? new CombinedError({

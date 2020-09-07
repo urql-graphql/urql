@@ -2,7 +2,7 @@ import { makeSubject, pipe, map, publish, forEach, Subject } from 'wonka';
 
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
-import { ExchangeIO, Operation } from '../types';
+import { ExchangeIO, Operation, OperationResult } from '../types';
 import { CombinedError } from '../utils';
 import { ssrExchange } from './ssr';
 
@@ -11,6 +11,11 @@ let exchangeInput;
 let client: Client;
 let input: Subject<Operation>;
 let output;
+
+const serializedQueryResponse = {
+  ...queryResponse,
+  data: JSON.stringify(queryResponse.data),
+};
 
 beforeEach(() => {
   input = makeSubject<Operation>();
@@ -35,7 +40,43 @@ it('caches query results correctly', () => {
 
   expect(data).toEqual({
     [queryOperation.key]: {
-      data: queryResponse.data,
+      data: serializedQueryResponse.data,
+      error: undefined,
+    },
+  });
+});
+
+it('serializes query results quickly', () => {
+  const queryResponse: OperationResult = {
+    operation: queryOperation,
+    data: {
+      user: {
+        name: 'Clive',
+      },
+    },
+  };
+
+  const serializedQueryResponse = {
+    ...queryResponse,
+    data: JSON.stringify(queryResponse.data),
+  };
+
+  output.mockReturnValueOnce(queryResponse);
+
+  const ssr = ssrExchange();
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+  queryResponse.data.user.name = 'Not Clive';
+
+  const data = ssr.extractData();
+  expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
+
+  expect(data).toEqual({
+    [queryOperation.key]: {
+      data: serializedQueryResponse.data,
       error: undefined,
     },
   });
@@ -62,7 +103,7 @@ it('caches errored query results correctly', () => {
 
   expect(data).toEqual({
     [queryOperation.key]: {
-      data: null,
+      data: 'null',
       error: {
         graphQLErrors: ['Oh no!'],
         networkError: undefined,
@@ -104,7 +145,7 @@ it('resolves cached query results correctly', () => {
   const onPush = jest.fn();
 
   const ssr = ssrExchange({
-    initialState: { [queryOperation.key]: queryResponse as any },
+    initialState: { [queryOperation.key]: serializedQueryResponse as any },
   });
 
   const { source: ops$, next } = input;
@@ -124,7 +165,7 @@ it('deletes cached results in non-suspense environments', async () => {
   const onPush = jest.fn();
   const ssr = ssrExchange();
 
-  ssr.restoreData({ [queryOperation.key]: queryResponse as any });
+  ssr.restoreData({ [queryOperation.key]: serializedQueryResponse as any });
   expect(Object.keys(ssr.extractData()).length).toBe(1);
 
   const { source: ops$, next } = input;
