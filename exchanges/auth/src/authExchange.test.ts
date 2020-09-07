@@ -1,24 +1,37 @@
-import { pipe, fromValue, toPromise, take, makeSubject, tap, map } from 'wonka';
+import {
+  pipe,
+  fromValue,
+  toPromise,
+  take,
+  makeSubject,
+  publish,
+  tap,
+  map,
+} from 'wonka';
 
 import { print } from 'graphql';
 import { authExchange } from './authExchange';
-import { Client, Operation, OperationResult } from '@urql/core';
+import { CombinedError, Client, Operation, OperationResult } from '@urql/core';
 import { queryOperation } from '@urql/core/test-utils';
 
-const operations: Operation[] = [];
-const exchangeArgs = {
-  forward: op$ =>
-    pipe(
-      op$,
-      map(
-        (operation: Operation): OperationResult => {
-          operations.push(operation);
-          return { operation };
-        }
-      )
-    ),
-  client: new Client({ url: '/api' }),
-} as any;
+const makeExchangeArgs = () => {
+  const operations: Operation[] = [];
+  const result = jest.fn(operation => ({ operation }));
+
+  return {
+    operations,
+    result,
+    exchangeArgs: {
+      forward: op$ =>
+        pipe(
+          op$,
+          tap(op => operations.push(op)),
+          map(result)
+        ),
+      client: new Client({ url: '/api' }),
+    } as any,
+  };
+};
 
 const withAuthHeader = (operation, token) => {
   const fetchOptions =
@@ -41,11 +54,9 @@ const withAuthHeader = (operation, token) => {
   };
 };
 
-beforeEach(() => {
-  operations.length = 0;
-});
-
 it('adds the auth header correctly', async () => {
+  const { exchangeArgs } = makeExchangeArgs();
+
   const res = await pipe(
     fromValue(queryOperation),
     authExchange({
@@ -77,6 +88,8 @@ it('adds the auth header correctly', async () => {
 });
 
 it('adds the auth header correctly when it is fetched asynchronously', async () => {
+  const { exchangeArgs } = makeExchangeArgs();
+
   const res = await pipe(
     fromValue(queryOperation),
     authExchange<{ token: string }>({
@@ -111,6 +124,8 @@ it('adds the auth header correctly when it is fetched asynchronously', async () 
 });
 
 it('supports calls to the mutate() method in getAuth()', async () => {
+  const { exchangeArgs } = makeExchangeArgs();
+
   const res = await pipe(
     fromValue(queryOperation),
     authExchange<{ token: string }>({
@@ -146,6 +161,7 @@ it('supports calls to the mutate() method in getAuth()', async () => {
 });
 
 it('adds the same token to subsequent operations', async () => {
+  const { exchangeArgs } = makeExchangeArgs();
   const { source, next } = makeSubject<any>();
 
   const result = jest.fn();
@@ -212,4 +228,69 @@ it('adds the same token to subsequent operations', async () => {
       },
     },
   });
+});
+
+it('triggers authentication when an operation did error', async () => {
+  const { exchangeArgs, result, operations } = makeExchangeArgs();
+  const { source, next } = makeSubject<any>();
+
+  let initialAuth;
+  let afterErrorAuth;
+
+  const didAuthError = jest.fn().mockReturnValueOnce(true);
+
+  const getAuth = jest
+    .fn()
+    .mockImplementationOnce(() => {
+      initialAuth = Promise.resolve({ token: 'initial-token' });
+      return initialAuth;
+    })
+    .mockImplementationOnce(() => {
+      afterErrorAuth = Promise.resolve({ token: 'final-token' });
+      return afterErrorAuth;
+    });
+
+  pipe(
+    source,
+    authExchange<{ token: string }>({
+      getAuth,
+      didAuthError,
+      willAuthError: () => false,
+      addAuthToOperation: ({ authState, operation }) => {
+        return withAuthHeader(operation, authState?.token);
+      },
+    })(exchangeArgs),
+    publish
+  );
+
+  await Promise.resolve();
+  expect(getAuth).toHaveBeenCalledTimes(1);
+  await initialAuth;
+  await Promise.resolve();
+  await Promise.resolve();
+
+  result.mockReturnValueOnce({
+    operation: queryOperation,
+    error: new CombinedError({
+      graphQLErrors: [{ message: 'Oops' }],
+    }),
+  });
+
+  next(queryOperation);
+  expect(result).toHaveBeenCalledTimes(1);
+  expect(didAuthError).toHaveBeenCalledTimes(1);
+  expect(getAuth).toHaveBeenCalledTimes(2);
+
+  await afterErrorAuth;
+
+  expect(result).toHaveBeenCalledTimes(2);
+  expect(operations.length).toBe(2);
+  expect(operations[0]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'initial-token'
+  );
+  expect(operations[1]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'final-token'
+  );
 });
