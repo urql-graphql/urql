@@ -50,14 +50,14 @@ export function authExchange<T>({
   willAuthError,
 }: AuthConfig<T>): Exchange {
   return ({ forward }) => {
-    const retryQueue: Operation[] = [];
+    const retryQueue: Map<number, Operation> = new Map();
     let authState: T | null = null;
 
     const updateAuthState = (newAuthState: T | null) => {
       authState = newAuthState;
       pendingPromise = undefined;
       retryQueue.forEach(retryOperation);
-      retryQueue.length = 0;
+      retryQueue.clear();
     };
 
     let pendingPromise: Promise<any> | void = getAuth({ authState }).then(
@@ -66,7 +66,7 @@ export function authExchange<T>({
 
     const refreshAuth = (operation: Operation): Promise<any> => {
       // add to retry queue to try again later
-      retryQueue.push(addAuthAttemptToOperation(operation, true));
+      retryQueue.set(operation.key, addAuthAttemptToOperation(operation, true));
 
       // check that another operation isn't already doing refresh
       if (!pendingPromise) {
@@ -140,8 +140,7 @@ export function authExchange<T>({
         forward,
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
-            const authAttempt = operation.context.authAttempt as number;
-            if (!authAttempt) {
+            if (!operation.context.authAttempt) {
               pendingPromise = refreshAuth(operation);
               return false;
             }
