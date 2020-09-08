@@ -14,6 +14,7 @@ import {
   GraphQLObjectType,
   SelectionNode,
   GraphQLFieldMap,
+  ASTNode,
 } from 'graphql';
 import { getName, getSelectionSet, unwrapType } from './helpers/node';
 import { warn } from './helpers/help';
@@ -171,52 +172,51 @@ export const extractSelectionsFromQuery = (
 
   const visits: string[] = [];
 
-  visit(query, {
-    Field: {
-      enter: node => {
-        if (node.selectionSet) {
-          const type = unwrapType(
-            resolvePosition(schema, visits)[node.name.value].type
-          );
-          visits.push(node.name.value);
+  traverse(
+    query,
+    node => {
+      if (node.kind === Kind.FRAGMENT_DEFINITION) {
+        extractedFragments.push(node);
+      } else if (node.kind === Kind.FIELD && node.selectionSet) {
+        const type = unwrapType(
+          resolvePosition(schema, visits)[node.name.value].type
+        );
 
-          if (isAbstractType(type)) {
-            const types = schema.getPossibleTypes(type);
-            types.forEach(t => {
-              newFragments.push({
-                kind: Kind.FRAGMENT_DEFINITION,
-                typeCondition: {
-                  kind: Kind.NAMED_TYPE,
-                  name: nameNode(t.toString()),
-                },
-                name: nameNode(`${t.toString()}_PopulateFragment_`),
-                selectionSet: sanitizeSelectionSet(
-                  node.selectionSet as SelectionSetNode,
-                  t.toString()
-                ),
-              });
-            });
-          } else if (type) {
+        visits.push(node.name.value);
+
+        if (isAbstractType(type)) {
+          const types = schema.getPossibleTypes(type);
+          types.forEach(t => {
             newFragments.push({
               kind: Kind.FRAGMENT_DEFINITION,
               typeCondition: {
                 kind: Kind.NAMED_TYPE,
-                name: nameNode(type.toString()),
+                name: nameNode(t.toString()),
               },
-              name: nameNode(`${type.toString()}_PopulateFragment_`),
-              selectionSet: node.selectionSet,
+              name: nameNode(`${t.toString()}_PopulateFragment_`),
+              selectionSet: sanitizeSelectionSet(
+                node.selectionSet as SelectionSetNode,
+                t.toString()
+              ),
             });
-          }
+          });
+        } else if (type) {
+          newFragments.push({
+            kind: Kind.FRAGMENT_DEFINITION,
+            typeCondition: {
+              kind: Kind.NAMED_TYPE,
+              name: nameNode(type.toString()),
+            },
+            name: nameNode(`${type.toString()}_PopulateFragment_`),
+            selectionSet: node.selectionSet,
+          });
         }
-      },
-      leave: node => {
-        if (node.selectionSet) visits.pop();
-      },
+      }
     },
-    FragmentDefinition: node => {
-      extractedFragments.push(node);
-    },
-  });
+    node => {
+      if (node.kind === Kind.FIELD && node.selectionSet) visits.pop();
+    }
+  );
 
   return [extractedFragments, newFragments];
 };
@@ -361,17 +361,27 @@ const getUsedFragments = (node: FragmentDefinitionNode) => {
 };
 
 const traverse = (
-  node: any,
-  enter?: (n: SelectionNode) => void,
-  exit?: (n: SelectionNode) => void
+  node: ASTNode,
+  enter?: (n: ASTNode | SelectionNode) => void,
+  exit?: (n: ASTNode | SelectionNode) => void
 ) => {
-  if (node.selectionSet) {
-    node.selectionSet.selections.forEach(n => {
-      if (enter) enter(n);
-      traverse(n, enter, exit);
-      if (exit) exit(n);
-    });
+  if (enter) enter(node);
+
+  switch (node.kind) {
+    case Kind.DOCUMENT: {
+      node.definitions.forEach(n => traverse(n, enter, exit));
+      break;
+    }
+    default: {
+      if ((node as any).selectionSet) {
+        (node as any).selectionSet.selections.forEach(n => {
+          traverse(n, enter, exit);
+        });
+      }
+    }
   }
+
+  if (exit) exit(node);
 };
 
 const resolvePosition = (
