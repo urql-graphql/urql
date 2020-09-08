@@ -111,7 +111,6 @@ export const populateExchange = ({
       ops$,
       tap(handleIncomingQuery),
       tap(handleIncomingTeardown),
-      // @ts-ignore
       map(handleIncomingMutation),
       forward
     );
@@ -228,7 +227,7 @@ export const addFragmentsToQuery = (
   query: DocumentNode,
   activeTypeFragments: TypeFragmentMap,
   userFragments: UserFragmentMap
-) => {
+): DocumentNode => {
   const requiredUserFragments: Record<
     string,
     FragmentDefinitionNode
@@ -367,7 +366,7 @@ const traverse = (
   node: ASTNode,
   enter?: (n: ASTNode) => ASTNode | void,
   exit?: (n: ASTNode) => ASTNode | void
-): ASTNode => {
+): any => {
   if (enter) {
     node = enter(node) || node;
   }
