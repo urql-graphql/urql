@@ -176,10 +176,10 @@ export const extractSelectionsFromQuery = (
     Field: {
       enter: node => {
         if (node.selectionSet) {
-          visits.push(node.name.value);
           const type = unwrapType(
             resolvePosition(schema, visits)[node.name.value].type
           );
+          visits.push(node.name.value);
 
           if (isAbstractType(type)) {
             const types = schema.getPossibleTypes(type);
@@ -211,10 +211,7 @@ export const extractSelectionsFromQuery = (
         }
       },
       leave: node => {
-        const index = visits.indexOf(node.name.value);
-        if (index !== -1) {
-          visits.splice(index, 1);
-        }
+        if (node.selectionSet) visits.pop();
       },
     },
     FragmentDefinition: node => {
@@ -368,23 +365,21 @@ const resolvePosition = (
 ): GraphQLFieldMap<any, any> => {
   let currentFields = schema.getQueryType()!.getFields();
 
-  if (visits.length > 1) {
-    for (let i = 0; i < visits.length - 1; i++) {
-      const t = unwrapType(currentFields[visits[i]].type);
+  for (let i = 0; i < visits.length; i++) {
+    const t = unwrapType(currentFields[visits[i]].type);
 
-      if (isAbstractType(t)) {
-        currentFields = {};
-        schema.getPossibleTypes(t).forEach(implementedType => {
-          currentFields = {
-            ...currentFields,
-            // @ts-ignore
-            ...schema.getType(implementedType.name)!.toConfig().fields,
-          };
-        });
-      } else {
-        // @ts-ignore
-        currentFields = schema.getType(t!.name)!.toConfig().fields;
-      }
+    if (isAbstractType(t)) {
+      currentFields = {};
+      schema.getPossibleTypes(t).forEach(implementedType => {
+        currentFields = {
+          ...currentFields,
+          // @ts-ignore
+          ...schema.getType(implementedType.name)!.toConfig().fields,
+        };
+      });
+    } else {
+      // @ts-ignore
+      currentFields = schema.getType(t!.name)!.toConfig().fields;
     }
   }
 
