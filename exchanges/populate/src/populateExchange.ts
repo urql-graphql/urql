@@ -256,6 +256,7 @@ export const addFragmentsToQuery = (
       const type = unwrapType(
         schema.getMutationType()!.getFields()[node.name.value].type
       );
+
       let possibleTypes: readonly GraphQLObjectType<any, any>[] = [];
       if (!isCompositeType(type)) {
         warn(
@@ -302,7 +303,7 @@ export const addFragmentsToQuery = (
       const existingSelections = getSelectionSet(node);
 
       const selections =
-        existingSelections.length + newSelections.length !== 0
+        existingSelections.length || newSelections.length
           ? [...newSelections, ...existingSelections]
           : [
               {
@@ -323,20 +324,21 @@ export const addFragmentsToQuery = (
     Document: {
       enter: node => {
         node.definitions.reduce((set, definition) => {
-          if (definition.kind === 'FragmentDefinition') {
+          if (definition.kind === Kind.FRAGMENT_DEFINITION) {
             set.add(definition.name.value);
           }
+
           return set;
         }, existingFragmentsForQuery);
       },
-      leave: node => {
-        const definitions = [...node.definitions];
-        for (const key in additionalFragments)
-          definitions.push(additionalFragments[key]);
-        for (const key in requiredUserFragments)
-          definitions.push(requiredUserFragments[key]);
-        return { ...node, definitions };
-      },
+      leave: node => ({
+        ...node,
+        definitions: [
+          ...node.definitions,
+          ...Object.values(additionalFragments),
+          ...Object.values(requiredUserFragments),
+        ],
+      }),
     },
   });
 };
