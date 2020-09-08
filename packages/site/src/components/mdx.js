@@ -258,8 +258,8 @@ const AnchorIcon = styled(AnchorSvg)`
   height: 100%;
 `;
 
-const Header = tag => ({ id, children }) => {
-  return (
+const Header = tag => {
+  const HeaderComponent = ({ id, children }) => (
     <HeadingText as={tag} id={id}>
       <AnchorLink href={`#${id}`}>
         <AnchorIcon />
@@ -267,6 +267,9 @@ const Header = tag => ({ id, children }) => {
       {children}
     </HeadingText>
   );
+
+  HeaderComponent.displayName = `Header(${tag})`;
+  return HeaderComponent;
 };
 
 const components = {
