@@ -22,11 +22,17 @@ The default set of exchanges that `@urql/core` contains and applies to a `Client
 
 Other available exchanges:
 
-- `retryExchange`: Allows operations to be retried
+- [`errorExchange`](../api/core.md#errorexchange): Allows a global callback to be called when any error occursz
+- [`ssrExchange`](../advanced/server-side-rendering.md): Allows for a server-side renderer to
+  collect results for client-side rehydration.
+- [`retryExchange`](../api/retry-exchange.md): Allows operations to be retried
+- [`multipartFetchExchange`](../api/multipart-fetch-exchange.md): Provides multipart file upload capability
+- [`persistedFetchExchange`](../api/persisted-fetch-exchange.md): Provides support for Automatic
+  Persisted Queries
+- [`authExchange`](../api/auth-exchange.md): Allows complex authentication flows to be implemented
+  easily.
+- [`requestPolicyExchange`](../api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
 - `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
-- `multipartFetchExchange`: Provides multipart file upload capability
-- `suspenseExchange` (experimental): Allows the use of React Suspense on the client-side with `urql`'s built-in suspense modeµ
-- `requestPolicyExchange`: Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
 
 It is also possible to apply custom exchanges to override the default logic.
 

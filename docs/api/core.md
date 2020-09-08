@@ -343,10 +343,9 @@ different types of errors (e.g. logging the user out in case of a permission err
 ```ts
 errorExchange({
   onError: (error: CombinedError, operation: Operation) => {
-    console.log("An error!", error);
-  }
-})
-
+    console.log('An error!', error);
+  },
+});
 ```
 
 ## Utilities
