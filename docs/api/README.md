@@ -17,3 +17,6 @@ more about the core package on the "Core Package" page.](../concepts/core-packag
 - [`@urql/exchange-graphcache` API docs](./graphcache.md)
 - [`@urql/exchange-retry` API docs](./retry-exchange.md)
 - [`@urql/exchange-execute` API docs](./execute-exchange.md)
+- [`@urql/exchange-multipart-fetch` API docs](./multipart-fetch-exchange.md)
+- [`@urql/exchange-persisted-fetch` API docs](./persisted-fetch-exchange.md)
+- [`@urql/exchange-request-policy` API docs](./request-policy-exchange.md)
