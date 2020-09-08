@@ -1,8 +1,6 @@
 import {
   DocumentNode,
   buildClientSchema,
-  visitWithTypeInfo,
-  TypeInfo,
   FragmentDefinitionNode,
   GraphQLSchema,
   IntrospectionQuery,
@@ -16,6 +14,7 @@ import {
   SelectionSetNode,
   GraphQLObjectType,
   SelectionNode,
+  GraphQLFieldMap,
 } from 'graphql';
 import { getName, getSelectionSet, unwrapType } from './helpers/node';
 import { warn } from './helpers/help';
@@ -139,7 +138,6 @@ export const extractSelectionsFromQuery = (
 ) => {
   const extractedFragments: FragmentDefinitionNode[] = [];
   const newFragments: FragmentDefinitionNode[] = [];
-  const typeInfo = new TypeInfo(schema);
 
   const sanitizeSelectionSet = (
     selectionSet: SelectionSetNode,
@@ -172,12 +170,16 @@ export const extractSelectionsFromQuery = (
     return { ...selectionSet, selections };
   };
 
-  visit(
-    query,
-    visitWithTypeInfo(typeInfo, {
-      Field: node => {
+  const visits: string[] = [];
+
+  visit(query, {
+    Field: {
+      enter: node => {
         if (node.selectionSet) {
-          const type = unwrapType(typeInfo.getType());
+          visits.push(node.name.value);
+          const type = unwrapType(
+            resolvePosition(schema, visits)[node.name.value].type
+          );
 
           if (isAbstractType(type)) {
             const types = schema.getPossibleTypes(type);
@@ -208,11 +210,17 @@ export const extractSelectionsFromQuery = (
           }
         }
       },
-      FragmentDefinition: node => {
-        extractedFragments.push(node);
+      leave: node => {
+        const index = visits.indexOf(node.name.value);
+        if (index !== -1) {
+          visits.splice(index, 1);
+        }
       },
-    })
-  );
+    },
+    FragmentDefinition: node => {
+      extractedFragments.push(node);
+    },
+  });
 
   return [extractedFragments, newFragments];
 };
@@ -224,8 +232,6 @@ export const addFragmentsToQuery = (
   activeTypeFragments: TypeFragmentMap,
   userFragments: UserFragmentMap
 ) => {
-  const typeInfo = new TypeInfo(schema);
-
   const requiredUserFragments: Record<
     string,
     FragmentDefinitionNode
@@ -239,116 +245,109 @@ export const addFragmentsToQuery = (
   /** Fragments provided and used by the current query */
   const existingFragmentsForQuery: Set<string> = new Set();
 
-  return visit(
-    query,
-    visitWithTypeInfo(typeInfo, {
-      Field: {
-        enter: node => {
-          if (!node.directives) {
-            return;
+  return visit(query, {
+    Field: node => {
+      if (!node.directives) {
+        return;
+      }
+
+      const directives = node.directives.filter(d => getName(d) !== 'populate');
+      if (directives.length === node.directives.length) {
+        return;
+      }
+
+      const type = unwrapType(
+        schema.getMutationType()!.getFields()[node.name.value].type
+      );
+      let possibleTypes: readonly GraphQLObjectType<any, any>[] = [];
+      if (!isCompositeType(type)) {
+        warn(
+          'Invalid type: The type ` + type + ` is used with @populate but does not exist.',
+          17
+        );
+      } else {
+        possibleTypes = isAbstractType(type)
+          ? schema.getPossibleTypes(type)
+          : [type];
+      }
+
+      const newSelections = possibleTypes.reduce((p, possibleType) => {
+        const typeFrags = activeTypeFragments[possibleType.name];
+        if (!typeFrags) {
+          return p;
+        }
+
+        for (let i = 0, l = typeFrags.length; i < l; i++) {
+          const { fragment } = typeFrags[i];
+          const fragmentName = getName(fragment);
+          const usedFragments = getUsedFragments(fragment);
+
+          // Add used fragment for insertion at Document node
+          for (let j = 0, l = usedFragments.length; j < l; j++) {
+            const name = usedFragments[j];
+            if (!existingFragmentsForQuery.has(name)) {
+              requiredUserFragments[name] = userFragments[name];
+            }
           }
 
-          const directives = node.directives.filter(
-            d => getName(d) !== 'populate'
-          );
-          if (directives.length === node.directives.length) {
-            return;
+          // Add fragment for insertion at Document node
+          additionalFragments[fragmentName] = fragment;
+
+          p.push({
+            kind: Kind.FRAGMENT_SPREAD,
+            name: nameNode(fragmentName),
+          });
+        }
+
+        return p;
+      }, [] as FragmentSpreadNode[]);
+
+      const existingSelections = getSelectionSet(node);
+
+      const selections =
+        existingSelections.length + newSelections.length !== 0
+          ? [...newSelections, ...existingSelections]
+          : [
+              {
+                kind: Kind.FIELD,
+                name: nameNode('__typename'),
+              },
+            ];
+
+      return {
+        ...node,
+        directives,
+        selectionSet: {
+          kind: Kind.SELECTION_SET,
+          selections,
+        },
+      };
+    },
+    Document: {
+      enter: node => {
+        node.definitions.reduce((set, definition) => {
+          if (definition.kind === 'FragmentDefinition') {
+            set.add(definition.name.value);
           }
-
-          const possibleTypes = getTypes(schema, typeInfo);
-          const newSelections = possibleTypes.reduce((p, possibleType) => {
-            const typeFrags = activeTypeFragments[possibleType.name];
-            if (!typeFrags) {
-              return p;
-            }
-
-            for (let i = 0, l = typeFrags.length; i < l; i++) {
-              const { fragment } = typeFrags[i];
-              const fragmentName = getName(fragment);
-              const usedFragments = getUsedFragments(fragment);
-
-              // Add used fragment for insertion at Document node
-              for (let j = 0, l = usedFragments.length; j < l; j++) {
-                const name = usedFragments[j];
-                if (!existingFragmentsForQuery.has(name)) {
-                  requiredUserFragments[name] = userFragments[name];
-                }
-              }
-
-              // Add fragment for insertion at Document node
-              additionalFragments[fragmentName] = fragment;
-
-              p.push({
-                kind: Kind.FRAGMENT_SPREAD,
-                name: nameNode(fragmentName),
-              });
-            }
-
-            return p;
-          }, [] as FragmentSpreadNode[]);
-
-          const existingSelections = getSelectionSet(node);
-
-          const selections =
-            existingSelections.length + newSelections.length !== 0
-              ? [...newSelections, ...existingSelections]
-              : [
-                  {
-                    kind: Kind.FIELD,
-                    name: nameNode('__typename'),
-                  },
-                ];
-
-          return {
-            ...node,
-            directives,
-            selectionSet: {
-              kind: Kind.SELECTION_SET,
-              selections,
-            },
-          };
-        },
+          return set;
+        }, existingFragmentsForQuery);
       },
-      Document: {
-        enter: node => {
-          node.definitions.reduce((set, definition) => {
-            if (definition.kind === 'FragmentDefinition') {
-              set.add(definition.name.value);
-            }
-            return set;
-          }, existingFragmentsForQuery);
-        },
-        leave: node => {
-          const definitions = [...node.definitions];
-          for (const key in additionalFragments)
-            definitions.push(additionalFragments[key]);
-          for (const key in requiredUserFragments)
-            definitions.push(requiredUserFragments[key]);
-          return { ...node, definitions };
-        },
+      leave: node => {
+        const definitions = [...node.definitions];
+        for (const key in additionalFragments)
+          definitions.push(additionalFragments[key]);
+        for (const key in requiredUserFragments)
+          definitions.push(requiredUserFragments[key]);
+        return { ...node, definitions };
       },
-    })
-  );
+    },
+  });
 };
 
 const nameNode = (value: string): NameNode => ({
   kind: Kind.NAME,
   value,
 });
-
-/** Get all possible types for node with TypeInfo. */
-const getTypes = (schema: GraphQLSchema, typeInfo: TypeInfo) => {
-  const type = unwrapType(typeInfo.getType());
-  if (!isCompositeType(type)) {
-    warn(
-      'Invalid type: The type ` + type + ` is used with @populate but does not exist.',
-      17
-    );
-    return [];
-  }
-
-  return isAbstractType(type) ? schema.getPossibleTypes(type) : [type];
-};
 
 /** Get fragment names referenced by node. */
 const getUsedFragments = (node: ASTNode) => {
@@ -361,4 +360,33 @@ const getUsedFragments = (node: ASTNode) => {
   });
 
   return names;
+};
+
+const resolvePosition = (
+  schema: GraphQLSchema,
+  visits: string[]
+): GraphQLFieldMap<any, any> => {
+  let currentFields = schema.getQueryType()!.getFields();
+
+  if (visits.length > 1) {
+    for (let i = 0; i < visits.length - 1; i++) {
+      const t = unwrapType(currentFields[visits[i]].type);
+
+      if (isAbstractType(t)) {
+        currentFields = {};
+        schema.getPossibleTypes(t).forEach(implementedType => {
+          currentFields = {
+            ...currentFields,
+            // @ts-ignore
+            ...schema.getType(implementedType.name)!.toConfig().fields,
+          };
+        });
+      } else {
+        // @ts-ignore
+        currentFields = schema.getType(t!.name)!.toConfig().fields;
+      }
+    }
+  }
+
+  return currentFields;
 };
