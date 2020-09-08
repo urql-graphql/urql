@@ -14,6 +14,7 @@ import {
   SelectionNode,
   GraphQLFieldMap,
   ASTNode,
+  DefinitionNode,
 } from 'graphql';
 import { getName, getSelectionSet, unwrapType } from './helpers/node';
 import { warn } from './helpers/help';
@@ -367,28 +368,35 @@ const traverse = (
   enter?: (n: ASTNode) => ASTNode | void,
   exit?: (n: ASTNode) => ASTNode | void
 ): ASTNode => {
-  node = { ...node };
   if (enter) {
     node = enter(node) || node;
   }
 
   switch (node.kind) {
     case Kind.DOCUMENT: {
-      // @ts-ignore
-      node.definitions = node.definitions.map(n => traverse(n, enter, exit));
+      node = {
+        ...node,
+        definitions: node.definitions.map(
+          n => traverse(n, enter, exit) as DefinitionNode
+        ),
+      };
       break;
     }
-    default: {
-      if ((node as any).selectionSet) {
-        // @ts-ignore
-        node.selectionSet = {
-          ...node.selectionSet,
-          seleections: [...node.selectionSet.selections],
+    case Kind.OPERATION_DEFINITION:
+    case Kind.FIELD:
+    case Kind.FRAGMENT_DEFINITION: {
+      if (node.selectionSet) {
+        node = {
+          ...node,
+          selectionSet: {
+            ...node.selectionSet,
+            selections: node.selectionSet.selections.map(
+              n => traverse(n, enter, exit) as SelectionNode
+            ),
+          },
         };
-        (node as any).selectionSet.selections = (node as any).selectionSet.selections.map(
-          n => traverse(n, enter, exit)
-        );
       }
+      break;
     }
   }
 
