@@ -5,22 +5,28 @@ import {
   GraphQLSchema,
   IntrospectionQuery,
   FragmentSpreadNode,
-  NameNode,
   isCompositeType,
   isAbstractType,
   Kind,
   SelectionSetNode,
   GraphQLObjectType,
   SelectionNode,
-  GraphQLFieldMap,
-  ASTNode,
-  DefinitionNode,
 } from 'graphql';
-import { getName, getSelectionSet, unwrapType } from './helpers/node';
-import { warn } from './helpers/help';
-
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation } from '@urql/core';
+
+import { warn } from './helpers/help';
+import {
+  getName,
+  getSelectionSet,
+  unwrapType,
+  createNameNode,
+} from './helpers/node';
+import {
+  traverse,
+  resolveFields,
+  getUsedFragmentNames,
+} from './helpers/traverse';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
@@ -179,7 +185,7 @@ export const extractSelectionsFromQuery = (
         extractedFragments.push(node);
       } else if (node.kind === Kind.FIELD && node.selectionSet) {
         const type = unwrapType(
-          resolvePosition(schema, visits)[node.name.value].type
+          resolveFields(schema, visits)[node.name.value].type
         );
 
         visits.push(node.name.value);
@@ -191,9 +197,9 @@ export const extractSelectionsFromQuery = (
               kind: Kind.FRAGMENT_DEFINITION,
               typeCondition: {
                 kind: Kind.NAMED_TYPE,
-                name: nameNode(t.toString()),
+                name: createNameNode(t.toString()),
               },
-              name: nameNode(`${t.toString()}_PopulateFragment_`),
+              name: createNameNode(`${t.toString()}_PopulateFragment_`),
               selectionSet: sanitizeSelectionSet(
                 node.selectionSet as SelectionSetNode,
                 t.toString()
@@ -205,9 +211,9 @@ export const extractSelectionsFromQuery = (
             kind: Kind.FRAGMENT_DEFINITION,
             typeCondition: {
               kind: Kind.NAMED_TYPE,
-              name: nameNode(type.toString()),
+              name: createNameNode(type.toString()),
             },
-            name: nameNode(`${type.toString()}_PopulateFragment_`),
+            name: createNameNode(`${type.toString()}_PopulateFragment_`),
             selectionSet: node.selectionSet,
           });
         }
@@ -285,7 +291,7 @@ export const addFragmentsToQuery = (
           for (let i = 0, l = typeFrags.length; i < l; i++) {
             const { fragment } = typeFrags[i];
             const fragmentName = getName(fragment);
-            const usedFragments = getUsedFragments(fragment);
+            const usedFragments = getUsedFragmentNames(fragment);
 
             // Add used fragment for insertion at Document node
             for (let j = 0, l = usedFragments.length; j < l; j++) {
@@ -300,7 +306,7 @@ export const addFragmentsToQuery = (
 
             p.push({
               kind: Kind.FRAGMENT_SPREAD,
-              name: nameNode(fragmentName),
+              name: createNameNode(fragmentName),
             });
           }
 
@@ -315,7 +321,7 @@ export const addFragmentsToQuery = (
             : [
                 {
                   kind: Kind.FIELD,
-                  name: nameNode('__typename'),
+                  name: createNameNode('__typename'),
                 },
               ];
 
@@ -342,93 +348,4 @@ export const addFragmentsToQuery = (
       }
     }
   );
-};
-
-const nameNode = (value: string): NameNode => ({
-  kind: Kind.NAME,
-  value,
-});
-
-/** Get fragment names referenced by node. */
-const getUsedFragments = (node: FragmentDefinitionNode) => {
-  const names: string[] = [];
-
-  traverse(node, n => {
-    if (n.kind === Kind.FRAGMENT_SPREAD) {
-      names.push(getName(n as FragmentSpreadNode));
-    }
-  });
-
-  return names;
-};
-
-const traverse = (
-  node: ASTNode,
-  enter?: (n: ASTNode) => ASTNode | void,
-  exit?: (n: ASTNode) => ASTNode | void
-): any => {
-  if (enter) {
-    node = enter(node) || node;
-  }
-
-  switch (node.kind) {
-    case Kind.DOCUMENT: {
-      node = {
-        ...node,
-        definitions: node.definitions.map(
-          n => traverse(n, enter, exit) as DefinitionNode
-        ),
-      };
-      break;
-    }
-    case Kind.OPERATION_DEFINITION:
-    case Kind.FIELD:
-    case Kind.FRAGMENT_DEFINITION: {
-      if (node.selectionSet) {
-        node = {
-          ...node,
-          selectionSet: {
-            ...node.selectionSet,
-            selections: node.selectionSet.selections.map(
-              n => traverse(n, enter, exit) as SelectionNode
-            ),
-          },
-        };
-      }
-      break;
-    }
-  }
-
-  if (exit) {
-    node = exit(node) || node;
-  }
-
-  return node;
-};
-
-const resolvePosition = (
-  schema: GraphQLSchema,
-  visits: string[]
-): GraphQLFieldMap<any, any> => {
-  let currentFields = schema.getQueryType()!.getFields();
-
-  for (let i = 0; i < visits.length; i++) {
-    const t = unwrapType(currentFields[visits[i]].type);
-
-    if (isAbstractType(t)) {
-      currentFields = {};
-      schema.getPossibleTypes(t).forEach(implementedType => {
-        currentFields = {
-          ...currentFields,
-          // @ts-ignore TODO: proper casting
-          ...schema.getType(implementedType.name)!.toConfig().fields,
-        };
-      });
-    } else {
-      // @ts-ignore TODO: proper casting
-      currentFields = schema.getType(t!.name)!.toConfig().fields;
-    }
-  }
-
-  return currentFields;
 };
