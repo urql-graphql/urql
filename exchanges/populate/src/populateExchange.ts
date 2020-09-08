@@ -151,7 +151,6 @@ export const extractSelectionsFromQuery = (
   ) => {
     const selections: SelectionNode[] = [];
     const validTypes = (schema.getType(type) as GraphQLObjectType).getFields();
-
     const validTypeProperties = Object.keys(validTypes);
 
     selectionSet.selections.forEach(selection => {
@@ -173,6 +172,7 @@ export const extractSelectionsFromQuery = (
         selections.push(selection);
       }
     });
+
     return { ...selectionSet, selections };
   };
 
@@ -273,7 +273,9 @@ export const addFragmentsToQuery = (
         let possibleTypes: readonly GraphQLObjectType<any, any>[] = [];
         if (!isCompositeType(type)) {
           warn(
-            'Invalid type: The type ` + type + ` is used with @populate but does not exist.',
+            'Invalid type: The type `' +
+              type +
+              '` is used with @populate but does not exist.',
             17
           );
         } else {
@@ -341,8 +343,12 @@ export const addFragmentsToQuery = (
           ...node,
           definitions: [
             ...node.definitions,
-            ...Object.values(additionalFragments),
-            ...Object.values(requiredUserFragments),
+            ...Object.keys(additionalFragments).map(
+              key => additionalFragments[key]
+            ),
+            ...Object.keys(requiredUserFragments).map(
+              key => requiredUserFragments[key]
+            ),
           ],
         };
       }
