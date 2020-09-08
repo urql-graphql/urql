@@ -375,12 +375,12 @@ const resolvePosition = (
       schema.getPossibleTypes(t).forEach(implementedType => {
         currentFields = {
           ...currentFields,
-          // @ts-ignore
+          // @ts-ignore TODO: proper casting
           ...schema.getType(implementedType.name)!.toConfig().fields,
         };
       });
     } else {
-      // @ts-ignore
+      // @ts-ignore TODO: proper casting
       currentFields = schema.getType(t!.name)!.toConfig().fields;
     }
   }
