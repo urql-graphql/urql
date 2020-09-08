@@ -1,5 +1,14 @@
 # @urql/exchange-persisted-fetch
 
+## 1.2.1
+
+### Patch Changes
+
+- Omit the `Content-Type: application/json` HTTP header when using GET in the `fetchExchange`, `persistedFetchExchange`, or `multipartFetchExchange`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#957](https://github.com/FormidableLabs/urql/pull/957))
+- Stops sending a persisted query if the hashing function fails, by [@lorenries](https://github.com/lorenries) (See [#934](https://github.com/FormidableLabs/urql/pull/934))
+- Updated dependencies (See [#947](https://github.com/FormidableLabs/urql/pull/947), [#962](https://github.com/FormidableLabs/urql/pull/962), and [#957](https://github.com/FormidableLabs/urql/pull/957))
+  - @urql/core@1.13.0
+
 ## 1.2.0
 
 ### Minor Changes

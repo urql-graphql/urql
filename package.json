@@ -44,7 +44,7 @@
     "@babel/plugin-transform-object-assign": "^7.10.4",
     "@babel/plugin-transform-react-jsx": "^7.10.4",
     "@changesets/cli": "^2.10.2",
-    "@changesets/get-github-info": "^0.4.4",
+    "@changesets/get-github-info": "0.4.3",
     "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",

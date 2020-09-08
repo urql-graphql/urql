@@ -1258,10 +1258,10 @@
     fs-extra "^7.0.1"
     semver "^5.4.1"
 
-"@changesets/get-github-info@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@changesets/get-github-info/-/get-github-info-0.4.4.tgz#a2911e93aa0809506cd8806f365180cf8833eb6f"
-  integrity sha512-WoVdRBQXLvJVg3jsMc0+aB8WAFzSGOG45HSo2ep46ixq5lBjM2D51MbgtSYHRGFGvYuAUu6kAfnVmoZYCZFsKQ==
+"@changesets/get-github-info@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@changesets/get-github-info/-/get-github-info-0.4.3.tgz#ed3c3ca76dcbaf4c98aa950a20fc5438da1a2f2c"
+  integrity sha512-hMtNDn4Kp2wDUohYipBIH3qGMxONZ3wEoaGtrflXHCSu57iulBcOSQ1oHRYSCJ9pO87dYQHA2XRUfrZUnqRfKA==
   dependencies:
     dataloader "^1.4.0"
     node-fetch "^2.5.0"

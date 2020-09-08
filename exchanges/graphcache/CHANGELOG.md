@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 3.1.0
+
+### Minor Changes
+
+- Add support for `nodes` fields to the `relayPagination` helper, instead of only supporting the standard `edges`. (See [#897](https://github.com/FormidableLabs/urql/pull/897))
+
+### Patch Changes
+
+- Updated dependencies (See [#947](https://github.com/FormidableLabs/urql/pull/947), [#962](https://github.com/FormidableLabs/urql/pull/962), and [#957](https://github.com/FormidableLabs/urql/pull/957))
+  - @urql/core@1.13.0
+
 ## 3.0.2
 
 ### Patch Changes

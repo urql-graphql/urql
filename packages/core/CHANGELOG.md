@@ -1,5 +1,21 @@
 # @urql/core
 
+## 1.13.0
+
+Please note that this release changes the data structure of the `ssrExchange`'s
+output. We don't treat this as a breaking change, since this data is considered
+a private structure, but if your tests or other code relies on this, please check
+the type changes and update it.
+
+### Minor Changes
+
+- Adds an error exchange to urql-core. This allows tapping into all graphql errors within the urql client. Useful for logging, debugging, handling authentication errors etc, by [@kadikraman](https://github.com/kadikraman) (See [#947](https://github.com/FormidableLabs/urql/pull/947))
+
+### Patch Changes
+
+- ⚠️ Fix condition where mutated result data would be picked up by the `ssrExchange`, for instance as a result of mutations by Graphcache. Instead the `ssrExchange` now serializes data early, by [@kitten](https://github.com/kitten) (See [#962](https://github.com/FormidableLabs/urql/pull/962))
+- Omit the `Content-Type: application/json` HTTP header when using GET in the `fetchExchange`, `persistedFetchExchange`, or `multipartFetchExchange`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#957](https://github.com/FormidableLabs/urql/pull/957))
+
 ## 1.12.3
 
 ### Patch Changes

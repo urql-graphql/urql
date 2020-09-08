@@ -1,5 +1,13 @@
 # @urql/preact
 
+## 1.2.1
+
+### Patch Changes
+
+- Handle a bug in Preact where the current request might be `null`, by [@jlengstorf](https://github.com/jlengstorf) (See [#944](https://github.com/FormidableLabs/urql/pull/944))
+- Updated dependencies (See [#947](https://github.com/FormidableLabs/urql/pull/947), [#962](https://github.com/FormidableLabs/urql/pull/962), and [#957](https://github.com/FormidableLabs/urql/pull/957))
+  - @urql/core@1.13.0
+
 ## 1.2.0
 
 ### Minor Changes
