@@ -6,7 +6,6 @@ import {
   IntrospectionQuery,
   FragmentSpreadNode,
   NameNode,
-  ASTNode,
   isCompositeType,
   isAbstractType,
   Kind,
