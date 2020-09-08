@@ -349,7 +349,7 @@ const nameNode = (value: string): NameNode => ({
 });
 
 /** Get fragment names referenced by node. */
-const getUsedFragments = (node: ASTNode) => {
+const getUsedFragments = (node: FragmentDefinitionNode) => {
   const names: string[] = [];
 
   traverse(node, n => {
@@ -361,7 +361,11 @@ const getUsedFragments = (node: ASTNode) => {
   return names;
 };
 
-const traverse = (node, enter, exit) => {
+const traverse = (
+  node: any,
+  enter?: (n: SelectionNode) => void,
+  exit?: (n: SelectionNode) => void
+) => {
   if (node.selectionSet) {
     node.selectionSet.selections.forEach(n => {
       if (enter) enter(n);
