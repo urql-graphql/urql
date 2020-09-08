@@ -1,5 +1,5 @@
 ---
-title: '@urql/exchange-multipart-fetch'
+title: '@urql/exchange-persisted-fetch'
 order: 7
 ---
 
