@@ -352,13 +352,23 @@ const nameNode = (value: string): NameNode => ({
 const getUsedFragments = (node: ASTNode) => {
   const names: string[] = [];
 
-  visit(node, {
-    FragmentSpread: f => {
-      names.push(getName(f));
-    },
+  traverse(node, n => {
+    if (n.kind === Kind.FRAGMENT_SPREAD) {
+      names.push(getName(n as FragmentSpreadNode));
+    }
   });
 
   return names;
+};
+
+const traverse = (node, enter, exit) => {
+  if (node.selectionSet) {
+    node.selectionSet.selections.forEach(n => {
+      if (enter) enter(n);
+      traverse(n, enter, exit);
+      if (exit) exit(n);
+    });
+  }
 };
 
 const resolvePosition = (
