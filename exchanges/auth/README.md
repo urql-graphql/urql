@@ -78,9 +78,9 @@ const client = createClient({
         }
 
         /**
-         * the following code gets exetuted when an auth error has occurred
+         * the following code gets executed when an auth error has occurred
          * we should refresh the token if possible and return a new auth state
-         * If refrsh fails, we should log out
+         * If refresh fails, we should log out
          **/
 
         // if your refresh logic is in graphQL, you must use this mutate function to call it
@@ -125,8 +125,8 @@ import { errorExchange } from 'urql';
 
 // this needs to be placed ABOVE the authExchange in the exchanges array, otherwise the auth error will show up hear before the auth exchange has had the chance to handle it
 errorExchange({
-  onError: ({ error }) => {
-    // we only get an auth error here when the auth excahnge had attempted to refresh auth and getting an auth error again for the second time
+  onError: (error) => {
+    // we only get an auth error here when the auth exchange had attempted to refresh auth and getting an auth error again for the second time
     const isAuthError = error.graphQLErrors.some(
       e => e.extensions?.code === 'FORBIDDEN',
     );
