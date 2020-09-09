@@ -1,5 +1,11 @@
 # urql
 
+## 1.10.1
+
+### Patch Changes
+
+- ⚠️ Fix React Fast Refresh beng broken due to an invalid effect, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#969](https://github.com/FormidableLabs/urql/pull/969))
+
 ## 1.10.0
 
 ### Minor Changes
