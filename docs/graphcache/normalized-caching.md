@@ -64,7 +64,7 @@ the entire app, because all references to each each entity are shared.
 
 ## Terminology
 
-A few terms that will be used throughout the Graphcache documentation that are important to understand in order to get a full understanding.
+A few terms that will be used throughout the _Graphcache_ documentation that are important to understand in order to get a full understanding.
 
 - **Entity**, this is an object for which the cache can generate a key, like `Todo:1`.
 - **Record**, this is a property that relate to an entity, in the above case this would be `title`, ...
