@@ -5,14 +5,14 @@ order: 8
 
 Most APIs include some type of authentication, usually in the form of an auth token that is sent with each request header.
 
-The purpose of the [`authExchange`](../api/auth-exchange) is to provide a flexible api that facilitates the typical
+The purpose of the [`authExchange`](../api/auth-exchange) is to provide a flexible API that facilitates the typical
 JWT-based authentication flow.
 
 ## Typical Authentication Flow
 
 1. Initial login
     The user opens the application and authenticates for the first time. They enter their credentials and receive an auth token.
-    The token is saved to storage that is persisted though sessions (e.g. `localStorage` on the web or `AsyncStorage` in React Native).
+    The token is saved to storage that is persisted though sessions, e.g. `localStorage` on the web or `AsyncStorage` in React Native.
     The token is added to each subsequent request in an auth header.
 
 2. Resume
@@ -29,17 +29,17 @@ JWT-based authentication flow.
     we want to clear any persisted storage, and redirect them to the application home or login page.
 
 4. User initiated log out
-    When the user chooses to log out of the application, we usually send a logout request to the api, then clear any tokens from persisted
+    When the user chooses to log out of the application, we usually send a logout request to the API, then clear any tokens from persisted
     storage, and redirect them to the application home or login page.
 
 5. Refresh (optional)
     This is not always implemented, but given that your API supports it, the user will receive both an auth token and a refresh token, where the auth token
-    is valid for a shrter duration of time (e.g. 1 week) than the refresh token (e.g. 6 months) and the latter can be used to request a new
+    is valid for a shorter duration of time (e.g. 1 week) than the refresh token (e.g. 6 months) and the latter can be used to request a new
     auth token if the auth token has expired.
 
-    The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date), or when an api
+    The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date), or when an API
     request returns with an unauthorized response. For graphQL APIs, it is usually an error code, instead of a 401 HTTP response, but both can be
-    supported. When the token as been successfully refreshed (this can be done as a mutation to the graphQL api or a request to a different api
+    supported. When the token as been successfully refreshed (this can be done as a mutation to the graphQL API or a request to a different API
     endpoint, depending on implementation), we will save the new token in persisted storage, and retry the failed request with the new auth header.
     The user should be logged out and persisted storage cleared if the refresh fails or if the re-executing the query with the new token fails with
     an auth error for the second time.
@@ -60,6 +60,7 @@ in front of all `fetchExchanges` but after all other synchronous exchanges, like
 ```js
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
 import { authExchange } from '@urql/exchange-auth';
+
 const client = createClient({
   url: '/graphql',
   exchanges: [
@@ -74,7 +75,7 @@ const client = createClient({
 ```
 
 Important! You'll need to ensure that a new instance of the urql client is recreated whenever the user's authentication state changes. Here's an example of
-doing this with a `useMemo`:
+how to do this with a `useMemo`:
 
 ```js
 const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
@@ -83,7 +84,7 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
       return null;
     }
   
-    return createClient(/* config */);
+    return createClient({ /* config */ });
   }, [isLoggedIn]);
 
   if (!client) {
@@ -98,24 +99,22 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
 }
 ```
 
-When the application launched, the first thing we should do is check whether the user has any authentication tokens in persisted storage. This will tell us
-whether to show the user the logged in or logged out view, and the `isLoggedIn` prop is set accordingly:
+When the application launches, the first thing we should do is check whether the user has any auth tokens in persisted storage. This will tell us
+whether to show the user the logged in or logged out view, and the `isLoggedIn` prop should be set accordingly:
 
 - `null` - auth state is still being verified
 - `true` - the user is authenticated
 - `false` - the user is not authenticated
 
-This `isLoggedIn` prop should be updated based on auth
-
-entication state change e.g. set to `true` after the use has authenticated and their tokens have been stored
-and set to `false` if the user has been logged out and their tokens have been cleared. It's importnt clear or add tokens to storage _before_ updating the prop
-in order for the auth exchange to work.
+The `isLoggedIn` prop should always be updated based on authentication state change e.g. set to `true` after the use has authenticated and their tokens have been
+added to storage, and set to `false` if the user has been logged out and their tokens have been cleared. It's important clear or add tokens to storage _before_
+updating the prop in order for the auth exchange to work.
 
 Next, we are going to discuss each of the [configuration options](../api/auth-exchange/#options) and how to use them.
 
 ### Configuring `getAuth` (fetch from storage)
 
-The `getAuth` option is used to fetch the auth state. Let's see how to configure this for initial launch in React:
+The `getAuth` option is used to fetch the auth state. This is how to configure it for fetching the tokens at initial launch in React:
 
 ```js
 const getAuth = async ({ authState }) => {
@@ -132,12 +131,12 @@ const getAuth = async ({ authState }) => {
 }
 ```
 
-Here we check that the `authState` doesn't already exist (this denotes that it's the first time the exchange is executed) and fetch it from
-storage. Here the structure of this auth state is an object with `token` and `refreshToken`, but it doesn't have to have that format. You can
-use different keys or store any additional auth-related information here, for example the token expiry date, which would save you from decoding
+We check that the `authState` doesn't already exist (this indicates that it is the first time this exchange is executed and not an auth failure) and fetch the auth state from
+storage. The structure of this particular`authState` is an object with keys for `token` and `refreshToken`, but this format is not required. You can
+use different keys or store any additional auth related information here. For example you could decode and store the token expiry date, which would save you from decoding
 your JWT every time you want to check whether your token is expired.
 
-In React Native, this is very similar, but because persisted storage in React Native is always asynhronous, so is this function:
+In React Native, this is very similar, but because persisted storage in React Native is always asynchronous, so is this function:
 
 ```js
 const getAuth = async ({ authState, mutate }) => {
@@ -156,7 +155,7 @@ const getAuth = async ({ authState, mutate }) => {
 
 ### Configuring `addAuthToOperation`
 
-The purpose of `addAuthToOperation` is to take apply your auth state to each outoing request. Note that the format of the `authState` will be whatever
+The purpose of `addAuthToOperation` is to take apply your auth state to each request. Note that the format of the `authState` will be whatever
 you've returned from `getAuth` and not at all constrained by the exchange:
 
 ```js
@@ -189,13 +188,13 @@ const addAuthToOperation = ({
 }
 ```
 
-First we check that we have an `authState` and a `token` and in this case apply it to the request `fetchOptions` as an `Authorization` header.
-The auth header format can vary based on the api (e.g `Bearer ${token}` instead of just `token`) which is why it'll be up to you to add the header
-in the expected format for your api.
+First we check that we have an `authState` and a `token`. Then we apply it to the request `fetchOptions` as an `Authorization` header.
+The header format can vary based on the API (e.g using `Bearer ${token}` instead of just `token`) which is why it'll be up to you to add the header
+in the expected format for your API.
 
 ### Configuring `didAuthError`
 
-This function lets the exchange know what is defined to be an api error for your API:
+This function lets the exchange know what is defined to be an API error for your API:
 
 ```js
 const didAuthError = ({ error }) => {
@@ -219,7 +218,7 @@ Then `didAuthError` returns `true`, it will trigger the exchange to trigger the 
 
 ### Configuring `getAuth` (after `didAuthError` returns `true`)
 
-If your api doesn't support any sort of token refresh, this is where you should simply log the user out.
+If your API doesn't support any sort of token refresh, this is where you should simply log the user out.
 
 ```js
 const getAuth = async ({ authState }) => {
@@ -238,9 +237,9 @@ const getAuth = async ({ authState }) => {
 }
 ```
 
-Here, `logout()` should clear your persisted storage of any tokens and set the `isLoggedIn` property as descived above to `false`.
+Here, `logout()` should clear your persisted storage of any tokens and set the `isLoggedIn` property as described above to `false`.
 
-If you do have a token refresh endpoint and a refresh token, you can attempt to get a new token for the user:
+If you do have a token refresh endpoint, and a refresh token, you can attempt to get a new token for the user:
 
 ```js
 const getAuth = async ({ authState, mutate }) => {
@@ -274,17 +273,56 @@ const getAuth = async ({ authState, mutate }) => {
 }
 ```
 
-Here we use the special mutate function provided by the auth exchange to do the token refresh. All other requests will be paused
-while `getAuth` returns. If your auth is not handled via graphQL, you can simply use `fetch` in this function.
+Here we use the special mutate function provided by the auth exchange to do the token refresh. If your auth is not handled via graphQL, you can
+use `fetch` in this function instead of a mutation. All other requests will be paused while `getAuth` returns, so you won't get multiple auth failures
+at the same time.
 
 ### Configuring `willAuthError`
 
-`willAuthError` is an optional parameter and is run _before_ the network request is made. You can use this to trigger the logic in
-`getAuth` without a network error. This could be used to indicate that the auth will fail because the JWT is invalid:
+`willAuthError` is an optional parameter and is run _before_ a network request is made. You can use it to trigger the logic in
+`getAuth` without the need to get a graphql error first. For example, you could use this indicate that the auth will fail because the JWT is invalid:
 
 ```js
 const willAuthError = ({ authState }) => {
-  if (!authState || authState.isTokenExpired) return true;
+  if (!authState || /* JWT is expired */) return true;
   return false;
 }
 ```
+
+## Handling Logout with the Error Exchange
+
+It is also possible to handle your logout logic in the error exchange instead of in the auth exchange. To do this, you'll need to add the
+`errorExchange` to the exchanges array, _before_ the `authExchange`. The order is very important here:
+
+```js
+import { createClient, dedupExchange, cacheExchange, fetchExchange, errorExchange } from 'urql';
+import { authExchange } from '@urql/exchange-auth';
+
+const client = createClient({
+  url: '/graphql',
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    errorExchange({
+      onError: ({ error }) => {
+        const isAuthError = error.graphQLErrors.some(
+          e => e.extensions?.code === 'FORBIDDEN',
+        );
+
+        if (isAuthError) {
+          logout();
+        }
+      }
+    }),
+    authExchange({
+      /* config */
+    }),
+    fetchExchange,
+  ],
+});
+```
+
+The `errorExchange` will only receive an auth error when the auth exchange as tried and failed to handle it. This means we have
+either failed to refresh the token, or there is no token refresh functionality. If you get an auth error in the `errorExchange` (as defined in
+the `didAuthError` configuration section above), then you can be confident that it is an auth error, the `authExchange` isn't able to recover
+from it, and the user should be logged out.
