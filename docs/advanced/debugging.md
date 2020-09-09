@@ -1,6 +1,6 @@
 ---
 title: Debugging
-order: 6
+order: 4
 ---
 
 # Debugging
