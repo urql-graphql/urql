@@ -21,3 +21,4 @@ chapter.](../concepts/README.md)
 - [**Testing**](./testing.md) covers how to test components that use `urql` particularly in React.
 - [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon which can make it easier to
   update normalized data after mutations.
+- [**Authentication**](./authentication.md) describes how to add implement authentication using the `authExchange`
