@@ -1,6 +1,6 @@
 ---
 title: Retrying Operations
-order: 4
+order: 5
 ---
 
 # Retrying Operations

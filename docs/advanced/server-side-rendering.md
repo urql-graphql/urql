@@ -1,6 +1,6 @@
 ---
 title: Server-side Rendering
-order: 2
+order: 3
 ---
 
 # Server-side Rendering
