@@ -106,3 +106,55 @@ persistedFetchExchange({
   },
 });
 ```
+
+[Read more about `@urql/persisted-fetch-exchange` in our API
+docs.](../api/persisted-fetch-exchange.md)
+
+## File Uploads
+
+GraphQL server frameworks like [Apollo Server support an unofficial spec for file
+uploads.](https://www.apollographql.com/docs/apollo-server/data/file-uploads/) This allows us to
+define mutations on our API that accept an `Upload` input, which on the client would be a variable
+that we can set to a [File](https://developer.mozilla.org/en-US/docs/Web/API/File), which we'd
+typically retrieve via a [file input for
+instance](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications).
+
+In `urql`, we may use the `@urql/exchange-multipart-fetch` package's `multipartFetchExchange` to
+support file uploads, which is a drop-in replacement for the default
+[`fetchExchange`](../api/core.md#fetchexchange). It may also be used [alongside the
+`persistedFetchExchange`](#automatic-persisted-queries).
+
+It works by using the [`extract-files` package](https://www.npmjs.com/package/extract-files). When
+the `multipartFetchExchange` sees at least one `File` in the variables it receives for a mutation,
+then it will send a `multipart/form-data` POST request instead of a standard `application/json`
+one. This is basically the same kind of request that we'd expect to send for regular HTML forms.
+
+### Installation & Setup
+
+First install `@urql/exchange-multipart-fetch` alongside `urql`:
+
+```sh
+yarn add @urql/exchange-multipart-fetch
+# or
+npm install --save @urql/exchange-multipart-fetch
+```
+
+The `multipartFetchExchange` is a drop-in replacement for the `fetchExchange`, which should be
+replaced in the list of `exchanges`:
+
+```js
+import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
+
+const client = createClient({
+  url: '/graphql',
+  exchanges: [dedupExchange, cacheExchange, multipartFetchExchange],
+});
+```
+
+If you're using the `persistedFetchExchange` then put the `persistedFetchExchange` in front of the
+`multipartFetchExchange`, since only the latter is a full replacement for the `fetchExchange` and
+the former only handled query operations.
+
+[Read more about `@urql/multipart-fetch-exchange` in our API
+docs.](../api/multipart-fetch-exchange.md)
