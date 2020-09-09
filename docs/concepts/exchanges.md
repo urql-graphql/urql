@@ -73,10 +73,50 @@ If we look at our list of default exchanges — `dedupExchange`, `cacheExchange`
 same operation / request twice in parallel.
 
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`,
-cached results can be resolved instead and results from network requests are cached.
+cached results can be resolved from here instead, which would mean that the cache sends back the
+result and the operation doesn't travel any further in the chain.
 
-**Third,** operations are sent to the API and the result is normalized. The normalized result then travels
-backwards through the stream.
+**Third,** operations are sent to the API and the result is turned into an `OperationResult`.
+
+**Lastly,** operation results then travel through the exchanges in _reverse order_, which is because
+exchanges are a pipeline where all operations travel forward deeper into the exchange chain, and
+then backwards. When these results pass through the cache then the `cacheExchange` stores the
+result.
+
+```js
+import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
+
+const client = createClient({
+  url: '/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+});
+```
+
+We can add more exchanges to this chain, for instance, we can add the `errorExchange`, which calls a
+global callback whenever it sees [a `CombinedError`](../basics/errors.md) on an `OperationResult`.
+
+```js
+import { createClient, dedupExchange, fetchExchange, cacheExchange, errorExchange } from 'urql';
+
+const client = createClient({
+  url: '/graphql',
+  exchanges: [
+    dedupExchange,
+    cacheExchange,
+    errorExchange({
+      onError(error) {
+        console.error(error);
+      },
+    }),
+    fetchExchange,
+  ],
+});
+```
+
+This is an example for adding a synchronous exchange to the chain that only reacts to results. It
+doesn't add any special behavior for operations travelling through it. An example for an
+asynchronous exchange that looks at both operations and results [we may look at the `retryExchange`
+which retries failed operations.](../advanced/retry-operations.md)
 
 ## The Rules of Exchanges
 
