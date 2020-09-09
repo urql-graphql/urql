@@ -6,13 +6,11 @@ order: 3
 # Custom Updates
 
 Every time Graphcache sees a result from the API for a `subscription` or a `mutation` it will look at the response and traverse it.
-if it can get a key from the response. This key is by default derived from the `__typename` and `id`/`_id`, unless
-customized in your `keys` configuration, this entity will then be added to the cache this means that
-This means that existing entities with a found key will be updated and new ones will be written. While it will update all normalized entities that it finds in
-those results, it can't for instance tell whether a new item should be appended or removed from a
-list.
+This process is the same as for queries but instead of starting at the Query root type,
+it will start searching for keyable entities, where an object's `__typename` and `id` or `_id` fields (or a custom keys config)
+are provided, so it can write normalized entities to the cache.
 
-Specifically, a normalized cache can't automatically assume that unrelated links have changed due to
+A normalized cache can't automatically assume that unrelated links have changed due to
 a mutation, since this is server-side specific logic. Instead, we may use the `updates`
 configuration to set up manual updates that react to mutations or subscriptions.
 

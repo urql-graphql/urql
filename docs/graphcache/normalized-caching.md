@@ -66,23 +66,11 @@ the entire app, because all references to each each entity are shared.
 
 A few terms that will be used throughout the Graphcache documentation that are important to understand in order to get a full understanding.
 
-### Entity
-
-This is an object for which the cache can generate a key, like `Todo:1`.
-
-### Records
-
-These are properties that relate to an entity, in the above case this would be `title`, ...
-internally these will be represented as `Todo:1.title`
-
-### Link
-
-This is the connection between entities or the base `Query` field.
-
-a few examples would be:
-
-- `Query.todos: an array of ids`
-- `Todo:1.author: a string id`
+- **Entity**, this is an object for which the cache can generate a key, like `Todo:1`.
+- **Record**, this is a property that relate to an entity, in the above case this would be `title`, ...
+  internally these will be represented as `Todo:1.title`.
+- **Link**, This is the connection between entities or the base `Query` field, this will link an entity key (ex: `Query`/`Todo:1`) to a single or an array
+  of keys
 
 ## Key Generation
 
