@@ -148,7 +148,29 @@ in the expected format for your API.
 
 ### Configuring `didAuthError`
 
-This function lets the exchange know what is defined to be an API error for your API:
+This function lets the exchange know what is defined to be an API error for your API. `didAuthError` receives an `error` which is of type
+[`CombinedError`](../api/core.md#combinederror) and we can use the `graphQLErrors` array in `CombinedError` to determine if an auth error has occurred.
+
+The GraphQL error looks like something like this:
+
+```js
+{
+  data: null,
+  errors: [
+    {
+      message: 'Unauthorized: Token has expired',
+      extensions: {
+        code: 'FORBIDDEN'
+      },
+      response: {
+        status: 200
+      }
+  ]
+}
+```
+
+Most GraphQL APIs will communicate auth errors via the [error code extension](https://www.apollographql.com/docs/apollo-server/data/errors/#codes) which
+is the recommended approach. We'll be able to determine whether any of the GraphQL errors were due to an unauthorized error code, which would indicate an auth failure:
 
 ```js
 const didAuthError = ({ error }) => {
@@ -158,7 +180,22 @@ const didAuthError = ({ error }) => {
 }
 ```
 
-For most GraphQL APIs, the auth error is communicated as an error code, however it may also be a 401 HTTP response:
+For some GraphQL APIs, the auth error is communicated via an 401 HTTP response as is common in RESTful APIs:
+
+```js
+{
+  data: null,
+  errors: [
+    {
+      message: 'Unauthorized: Token has expired',
+      response: {
+        status: 401
+      }
+  ]
+}
+```
+
+In this case we can determine the auth error based on the status code of the request:
 
 ```js
 const didAuthError = ({ error }) => {
@@ -168,7 +205,7 @@ const didAuthError = ({ error }) => {
 },
 ```
 
-Then `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for re-authentication via `getAuth`.
+If `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for re-authentication via `getAuth`.
 
 ### Configuring `getAuth` (triggered after an auth error has occurred)
 
