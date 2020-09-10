@@ -1,6 +1,6 @@
 ---
 title: Authentication
-order: 8
+order: 6
 ---
 
 # Authentication
@@ -12,39 +12,27 @@ JWT-based authentication flow.
 
 ## Typical Authentication Flow
 
-1. Initial login
-    The user opens the application and authenticates for the first time. They enter their credentials and receive an auth token.
-    The token is saved to storage that is persisted though sessions, e.g. `localStorage` on the web or `AsyncStorage` in React Native.
-    The token is added to each subsequent request in an auth header.
+**Initial login** - the user opens the application and authenticates for the first time. They enter their credentials and receive an auth token.
+The token is saved to storage that is persisted though sessions, e.g. `localStorage` on the web or `AsyncStorage` in React Native. The token is
+added to each subsequent request in an auth header.
 
-2. Resume
-    The user opens the application after having authenticated in the past. In this case, we should already have the token in persisted storage.
-    We fetch the token from storage and add to each request, usually as an auth header.
+**Resume** - the user opens the application after having authenticated in the past. In this case, we should already have the token in persisted
+storage. We fetch the token from storage and add to each request, usually as an auth header.
 
-3. Forced log out due to invalid token
-    The user's session could become invalid for a variety reasons:
-    - their token expired
-    - they requested to be signed out of all devices
-    - their session was invalidated remotely
+**Forced log out due to invalid token** - the user's session could become invalid for a variety reasons: their token expired, they requested to be
+signed out of all devices, or their session was invalidated remotely. In this case, we would want to also log them out in the application so they
+could have the opportunity to log in again. To do this, we want to clear any persisted storage, and redirect them to the application home or login page.
 
-    In this case, we would want to also log them out in the application so they could have the opportunity to log in again. To do this,
-    we want to clear any persisted storage, and redirect them to the application home or login page.
+**User initiated log out** - when the user chooses to log out of the application, we usually send a logout request to the API, then clear any tokens
+from persisted storage, and redirect them to the application home or login page.
 
-4. User initiated log out
-    When the user chooses to log out of the application, we usually send a logout request to the API, then clear any tokens from persisted
-    storage, and redirect them to the application home or login page.
-
-5. Refresh (optional)
-    This is not always implemented, but given that your API supports it, the user will receive both an auth token and a refresh token, where the auth token
-    is valid for a shorter duration of time (e.g. 1 week) than the refresh token (e.g. 6 months) and the latter can be used to request a new
-    auth token if the auth token has expired.
-
-    The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date), or when an API
-    request returns with an unauthorized response. For graphQL APIs, it is usually an error code, instead of a 401 HTTP response, but both can be
-    supported. When the token as been successfully refreshed (this can be done as a mutation to the graphQL API or a request to a different API
-    endpoint, depending on implementation), we will save the new token in persisted storage, and retry the failed request with the new auth header.
-    The user should be logged out and persisted storage cleared if the refresh fails or if the re-executing the query with the new token fails with
-    an auth error for the second time.
+**Refresh (optional)** - this is not always implemented, but given that your API supports it, the user will receive both an auth token and a refresh token,
+where the auth token is valid for a shorter duration of time (e.g. 1 week) than the refresh token (e.g. 6 months) and the latter can be used to request a new
+auth token if the auth token has expired. The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date),
+or when an API request returns with an unauthorized response. For graphQL APIs, it is usually an error code, instead of a 401 HTTP response, but both can be supported.
+When the token as been successfully refreshed (this can be done as a mutation to the graphQL API or a request to a different API endpoint, depending on implementation),
+we will save the new token in persisted storage, and retry the failed request with the new auth header. The user should be logged out and persisted storage cleared if
+the refresh fails or if the re-executing the query with the new token fails with an auth error for the second time.
 
 ## Installation & Setup
 
@@ -77,8 +65,8 @@ const client = createClient({
 ```
 
 ```suggestion
-If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of
-how we may do this in React if necessary:
+If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of how we may do this in React if necessary:
+```
 
 ```js
 const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
@@ -105,17 +93,13 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
 When the application launches, the first thing we should do is check whether the user has any auth tokens in persisted storage. This will tell us
 whether to show the user the logged in or logged out view, and the `isLoggedIn` prop should be set accordingly:
 
-- `null` - auth state is still being verified
-- `true` - the user is authenticated
-- `false` - the user is not authenticated
-
 The `isLoggedIn` prop should always be updated based on authentication state change e.g. set to `true` after the use has authenticated and their tokens have been
 added to storage, and set to `false` if the user has been logged out and their tokens have been cleared. It's important clear or add tokens to storage _before_
 updating the prop in order for the auth exchange to work.
 
 Next, we are going to discuss each of the [configuration options](../api/auth-exchange/#options) and how to use them.
 
-### Configuring `getAuth` (fetch from storage)
+### Configuring `getAuth` (initial load, fetch from storage)
 
 The `getAuth` option is used to fetch the auth state. This is how to configure it for fetching the tokens at initial launch in React:
 
@@ -217,9 +201,9 @@ const didAuthError = ({ error }) => {
 },
 ```
 
-Then `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for reauthentication via `getAuth`.
+Then `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for re-authentication via `getAuth`.
 
-### Configuring `getAuth` (after `didAuthError` returns `true`)
+### Configuring `getAuth` (triggered after an auth error has occurred)
 
 If your API doesn't support any sort of token refresh, this is where you should simply log the user out.
 
@@ -310,7 +294,7 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     errorExchange({
-      onError: (error) => {
+      onError: error => {
         const isAuthError = error.graphQLErrors.some(
           e => e.extensions?.code === 'FORBIDDEN',
         );

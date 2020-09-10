@@ -18,7 +18,7 @@ chapter.](../concepts/README.md)
   devtools](https://github.com/FormidableLabs/urql-devtools/) and how to add our own debug events
   for its event view.
 - [**Retrying operations**](./retry-operations.md) shows the `retryExchange` which allows you to retry operations when they've failed.
+- [**Authentication**](./authentication.md) describes how to implement authentication using the `authExchange`
 - [**Testing**](./testing.md) covers how to test components that use `urql` particularly in React.
 - [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon which can make it easier to
   update normalized data after mutations.
-- [**Authentication**](./authentication.md) describes how to add implement authentication using the `authExchange`
