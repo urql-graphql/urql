@@ -3,9 +3,11 @@ title: Authentication
 order: 8
 ---
 
+# Authentication
+
 Most APIs include some type of authentication, usually in the form of an auth token that is sent with each request header.
 
-The purpose of the [`authExchange`](../api/auth-exchange) is to provide a flexible API that facilitates the typical
+The purpose of the [`authExchange`](../api/auth-exchange.md) is to provide a flexible API that facilitates the typical
 JWT-based authentication flow.
 
 ## Typical Authentication Flow
@@ -44,7 +46,7 @@ JWT-based authentication flow.
     The user should be logged out and persisted storage cleared if the refresh fails or if the re-executing the query with the new token fails with
     an auth error for the second time.
 
-## Implementation
+## Installation & Setup
 
 First, install the `@urql/exchange-auth` alongside `urql`:
 
@@ -54,8 +56,8 @@ yarn add @urql/exchange-auth
 npm install --save @urql/exchange-auth
 ```
 
-You'll then need to add the `authExchange`, that this package exposes to your Client. The `authExchange` is an asynchronous exchange, so it must be placed
-in front of all `fetchExchanges` but after all other synchronous exchanges, like the `cacheExchange`.
+You'll then need to add the `authExchange`, that this package exposes to your `Client`. The `authExchange` is an asynchronous exchange, so it must be placed
+in front of all `fetchExchange`s but after all other synchronous exchanges, like the `cacheExchange`.
 
 ```js
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
@@ -74,8 +76,9 @@ const client = createClient({
 });
 ```
 
-Important! You'll need to ensure that a new instance of the urql client is recreated whenever the user's authentication state changes. Here's an example of
-how to do this with a `useMemo`:
+```suggestion
+If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of
+how we may do this in React if necessary:
 
 ```js
 const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
@@ -204,7 +207,7 @@ const didAuthError = ({ error }) => {
 }
 ```
 
-For most graphQL APIs, the auth error is communicated as an error code, however it may also be a 401 HTTP response:
+For most GraphQL APIs, the auth error is communicated as an error code, however it may also be a 401 HTTP response:
 
 ```js
 const didAuthError = ({ error }) => {
@@ -237,9 +240,9 @@ const getAuth = async ({ authState }) => {
 }
 ```
 
-Here, `logout()` should clear your persisted storage of any tokens and set the `isLoggedIn` property as described above to `false`.
+Here, `logout()` is a placeholder that is called when we got an error, so that we can redirect to a login page again and clear our tokens from local storage or otherwise.
 
-If you do have a token refresh endpoint, and a refresh token, you can attempt to get a new token for the user:
+If we had a way to refresh our token using a refresh token, we can attempt to get a new token for the user first:
 
 ```js
 const getAuth = async ({ authState, mutate }) => {
@@ -266,6 +269,7 @@ const getAuth = async ({ authState, mutate }) => {
     };
   }
 
+  // This is where auth has gone wrong and we need to clean up and redirect to a login page
   localStorage.clear();
   logout();
 
@@ -273,14 +277,14 @@ const getAuth = async ({ authState, mutate }) => {
 }
 ```
 
-Here we use the special mutate function provided by the auth exchange to do the token refresh. If your auth is not handled via graphQL, you can
-use `fetch` in this function instead of a mutation. All other requests will be paused while `getAuth` returns, so you won't get multiple auth failures
+Here we use the special mutate function provided by the auth exchange to do the token refresh. If your auth is not handled via GraphQL but a REST endpoint, you can
+use `fetch` in this function instead of a mutation. All other requests will be paused while `getAuth` returns, so we never have to handle multiple auth failures
 at the same time.
 
 ### Configuring `willAuthError`
 
-`willAuthError` is an optional parameter and is run _before_ a network request is made. You can use it to trigger the logic in
-`getAuth` without the need to get a graphql error first. For example, you could use this indicate that the auth will fail because the JWT is invalid:
+`willAuthError` is an optional parameter and is run _before_ a network request is made. We can use it to trigger the logic in
+`getAuth` without the need to send a request and get a GraphQL Error back. For example, we can use this to predict that the authentication will fail because our JWT is invalid already:
 
 ```js
 const willAuthError = ({ authState }) => {
@@ -289,9 +293,11 @@ const willAuthError = ({ authState }) => {
 }
 ```
 
+[Read more about `@urql/exchange-auth`'s API in our API docs.](../api/auth-exchange.md)
+
 ## Handling Logout with the Error Exchange
 
-It is also possible to handle your logout logic in the error exchange instead of in the auth exchange. To do this, you'll need to add the
+We can also handle authentication errors in an `errorExchange` instead of the `authExchange`. To do this, we'll need to add the
 `errorExchange` to the exchanges array, _before_ the `authExchange`. The order is very important here:
 
 ```js
@@ -304,7 +310,7 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     errorExchange({
-      onError: ({ error }) => {
+      onError: (error) => {
         const isAuthError = error.graphQLErrors.some(
           e => e.extensions?.code === 'FORBIDDEN',
         );
@@ -322,7 +328,7 @@ const client = createClient({
 });
 ```
 
-The `errorExchange` will only receive an auth error when the auth exchange as tried and failed to handle it. This means we have
-either failed to refresh the token, or there is no token refresh functionality. If you get an auth error in the `errorExchange` (as defined in
-the `didAuthError` configuration section above), then you can be confident that it is an auth error, the `authExchange` isn't able to recover
-from it, and the user should be logged out.
+The `errorExchange` will only receive an auth error when the auth exchange has already tried and failed to handle it. This means we have
+either failed to refresh the token, or there is no token refresh functionality. If we receive an auth error in the `errorExchange` (as defined in
+the `didAuthError` configuration section above), then we can be confident that it is an auth error that the `authExchange` isn't able to recover
+from, and the user should be logged out.
