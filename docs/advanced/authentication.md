@@ -64,40 +64,7 @@ const client = createClient({
 });
 ```
 
-```suggestion
-If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of how we may do this in React if necessary:
-```
-
-```js
-const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
-  const client = useMemo(() => {
-    if (isLoggedIn === null) {
-      return null;
-    }
-  
-    return createClient({ /* config */ });
-  }, [isLoggedIn]);
-
-  if (!client) {
-    return null;
-  }
-  
-  return {
-    <GraphQLProvider value={client}>
-      {/* app content  */}
-    <GraphQLProvider>
-  }
-}
-```
-
-When the application launches, the first thing we should do is check whether the user has any auth tokens in persisted storage. This will tell us
-whether to show the user the logged in or logged out view, and the `isLoggedIn` prop should be set accordingly:
-
-The `isLoggedIn` prop should always be updated based on authentication state change e.g. set to `true` after the use has authenticated and their tokens have been
-added to storage, and set to `false` if the user has been logged out and their tokens have been cleared. It's important clear or add tokens to storage _before_
-updating the prop in order for the auth exchange to work.
-
-Next, we are going to discuss each of the [configuration options](../api/auth-exchange/#options) and how to use them.
+Let's discuss each of the [configuration options](../api/auth-exchange/#options) and how to use them in turn.
 
 ### Configuring `getAuth` (initial load, fetch from storage)
 
@@ -196,7 +163,7 @@ For most GraphQL APIs, the auth error is communicated as an error code, however 
 ```js
 const didAuthError = ({ error }) => {
   return error.graphQLErrors.some(
-    e => error.response.status === 401,
+    e => e.response.status === 401,
   );
 },
 ```
@@ -316,3 +283,36 @@ The `errorExchange` will only receive an auth error when the auth exchange has a
 either failed to refresh the token, or there is no token refresh functionality. If we receive an auth error in the `errorExchange` (as defined in
 the `didAuthError` configuration section above), then we can be confident that it is an auth error that the `authExchange` isn't able to recover
 from, and the user should be logged out.
+
+## Cache Invalidation on Logout
+
+If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of how we may do this in React if necessary:
+
+```js
+const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
+  const client = useMemo(() => {
+    if (isLoggedIn === null) {
+      return null;
+    }
+  
+    return createClient({ /* config */ });
+  }, [isLoggedIn]);
+
+  if (!client) {
+    return null;
+  }
+  
+  return {
+    <GraphQLProvider value={client}>
+      {/* app content  */}
+    <GraphQLProvider>
+  }
+}
+```
+
+When the application launches, the first thing we do is check whether the user has any auth tokens in persisted storage. This will tell us
+whether to show the user the logged in or logged out view.
+
+The `isLoggedIn` prop should always be updated based on authentication state change e.g. set to `true` after the use has authenticated and their tokens have been
+added to storage, and set to `false` if the user has been logged out and their tokens have been cleared. It's important clear or add tokens to storage _before_
+updating the prop in order for the auth exchange to work correctly.
