@@ -88,14 +88,18 @@ const minifyIntrospectionType = (
                 })),
             } as any)
         ),
-        interfaces: type.interfaces.map(int => ({
-          kind: 'INTERFACE',
-          name: int.name,
-        })),
-        possibleTypes: type.possibleTypes.map(type => ({
-          kind: type.kind,
-          name: type.name,
-        })),
+        interfaces:
+          type.interfaces &&
+          type.interfaces.map(int => ({
+            kind: 'INTERFACE',
+            name: int.name,
+          })),
+        possibleTypes:
+          type.possibleTypes &&
+          type.possibleTypes.map(type => ({
+            kind: type.kind,
+            name: type.name,
+          })),
       };
     }
 
@@ -134,6 +138,8 @@ export const minifyIntrospectionQuery = (
         type.kind === 'UNION'
     )
     .map(minifyIntrospectionType);
+
+  minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
 
   return {
     __schema: {
