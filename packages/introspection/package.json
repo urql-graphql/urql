@@ -1,0 +1,61 @@
+{
+  "name": "@urql/introspection",
+  "version": "0.1.0",
+  "description": "Utilities for dealing with Introspection Queries and Client Schemas",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/introspection"
+  },
+  "keywords": [
+    "graphql client",
+    "graphql schema",
+    "schema",
+    "formidablelabs"
+  ],
+  "main": "dist/urql-introspection",
+  "module": "dist/urql-introspection.mjs",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-introspection.mjs",
+      "require": "./dist/urql-introspection.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "devDependencies": {
+    "graphql": "^15.1.0",
+    "graphql-tag": "^2.10.1"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"
+  },
+  "dependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}
