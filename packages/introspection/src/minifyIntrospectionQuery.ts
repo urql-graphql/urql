@@ -63,10 +63,12 @@ const minifyIntrospectionType = (
                 })),
             } as any)
         ),
-        interfaces: type.interfaces.map(int => ({
-          kind: 'INTERFACE',
-          name: int.name,
-        })),
+        interfaces:
+          type.interfaces &&
+          type.interfaces.map(int => ({
+            kind: 'INTERFACE',
+            name: int.name,
+          })),
       };
     }
 

@@ -103,7 +103,7 @@ fetch('http://localhost:3000/graphql', {
   .then(result => result.json())
   .then(({ data }) => {
     const minified = minifyIntrospectionQuery(getIntrospectedSchema(data));
-    fs.writeFile('./schema.json', JSON.stringify(minified));
+    fs.writeFileSync('./schema.json', JSON.stringify(minified));
   });
 ```
 
