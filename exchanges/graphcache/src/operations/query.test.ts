@@ -1,5 +1,9 @@
-import { Store } from '../store';
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import gql from 'graphql-tag';
+import { minifyIntrospectionQuery } from '@urql/introspection';
+
+import { Store } from '../store';
 import { write } from './write';
 import { query } from './query';
 
@@ -24,8 +28,12 @@ describe('Query', () => {
   let schema, store, alteredRoot;
 
   beforeAll(() => {
-    schema = require('../test-utils/simple_schema.json');
-    alteredRoot = require('../test-utils/altered_root_schema.json');
+    schema = minifyIntrospectionQuery(
+      require('../test-utils/simple_schema.json')
+    );
+    alteredRoot = minifyIntrospectionQuery(
+      require('../test-utils/altered_root_schema.json')
+    );
   });
 
   beforeEach(() => {

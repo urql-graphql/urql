@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import gql from 'graphql-tag';
+import { minifyIntrospectionQuery } from '@urql/introspection';
+
 import { write } from './write';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';
@@ -24,7 +28,9 @@ describe('Query', () => {
   let schema, store;
 
   beforeAll(() => {
-    schema = require('../test-utils/simple_schema.json');
+    schema = minifyIntrospectionQuery(
+      require('../test-utils/simple_schema.json')
+    );
   });
 
   beforeEach(() => {

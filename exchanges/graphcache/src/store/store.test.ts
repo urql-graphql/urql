@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import gql from 'graphql-tag';
+import { minifyIntrospectionQuery } from '@urql/introspection';
 import { mocked } from 'ts-jest/utils';
+
 import { Data, StorageAdapter } from '../types';
 import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
@@ -115,7 +119,9 @@ describe('Store with UpdatesConfig', () => {
 
   it('should not warn if Mutation/Subscription operations do exist in the schema', function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       updates: {
         Mutation: {
           toggleTodo: noop,
@@ -131,7 +137,9 @@ describe('Store with UpdatesConfig', () => {
 
   it("should warn if Mutation operations don't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       updates: {
         Mutation: {
           doTheChaChaSlide: noop,
@@ -149,7 +157,9 @@ describe('Store with UpdatesConfig', () => {
 
   it("should warn if Subscription operations don't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       updates: {
         Subscription: {
           someoneDidTheChaChaSlide: noop,
@@ -186,7 +196,9 @@ describe('Store with KeyingConfig', () => {
 
   it('should not warn if keys do exist in the schema', function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       keys: {
         Todo: () => 'Todo',
       },
@@ -197,7 +209,9 @@ describe('Store with KeyingConfig', () => {
 
   it("should warn if a key doesn't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       keys: {
         Todo: () => 'todo',
         NotInSchema: () => 'foo',
@@ -236,7 +250,9 @@ describe('Store with ResolverConfig', () => {
 
   it('should not warn if resolvers do exist in the schema', function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       resolvers: {
         Query: {
           latestTodo: () => 'todo',
@@ -254,7 +270,9 @@ describe('Store with ResolverConfig', () => {
 
   it("should warn if a Query doesn't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       resolvers: {
         Query: {
           todos: () => ['todo 1', 'todo 2'],
@@ -274,7 +292,9 @@ describe('Store with ResolverConfig', () => {
 
   it("should warn if a type doesn't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       resolvers: {
         Todo: {
           complete: () => true,
@@ -296,7 +316,9 @@ describe('Store with ResolverConfig', () => {
 
   it("should warn if a type's property doesn't exist in the schema", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       resolvers: {
         Todo: {
           complete: () => true,
@@ -783,7 +805,9 @@ describe('Store with storage', () => {
 
   it("should warn if an optimistic field doesn't exist in the schema's mutations", function () {
     new Store({
-      schema: require('../test-utils/simple_schema.json'),
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
       updates: {
         Mutation: {
           toggleTodo: noop,
@@ -805,6 +829,7 @@ describe('Store with storage', () => {
   });
 
   it('should not warn for an introspection result root', function () {
+    // NOTE: Do not wrap this require in `minifyIntrospectionQuery`!
     // eslint-disable-next-line
     const schema = require('../test-utils/simple_schema.json');
     const store = new Store({ schema });
