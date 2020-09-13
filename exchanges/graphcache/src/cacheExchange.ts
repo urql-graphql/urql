@@ -73,21 +73,24 @@ const toRequestPolicy = (
   },
 });
 
-export interface CacheExchangeOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
+export interface CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys> {
+  updates?: Partial<Updaters>;
+  resolvers?: Resolvers;
+  optimistic?: Optimistic;
+  keys?: Keys;
   schema?: IntrospectionQuery;
   storage?: StorageAdapter;
 }
 
-export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
-  forward,
-  client,
-  dispatchDebug,
-}) => {
-  const store = new Store(opts);
+export const cacheExchange = <
+  Updaters = UpdatesConfig,
+  Resolvers = ResolverConfig,
+  Optimistic = OptimisticMutationConfig,
+  Keys = KeyingConfig
+>(
+  opts?: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>
+): Exchange => ({ forward, client, dispatchDebug }) => {
+  const store = new Store<Updaters, Resolvers, Optimistic, Keys>(opts);
 
   let hydration: void | Promise<void>;
   if (opts && opts.storage) {

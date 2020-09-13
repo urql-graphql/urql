@@ -30,15 +30,20 @@ import * as SchemaPredicates from '../ast/schemaPredicates';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
+export interface StoreOpts<
+  Updaters = UpdatesConfig,
+  Resolvers = ResolverConfig,
+  Optimistic = OptimisticMutationConfig,
+  Keys = KeyingConfig
+> {
+  updates?: Partial<Updaters>;
+  resolvers?: Resolvers;
+  optimistic?: Optimistic;
+  keys?: Keys;
   schema?: IntrospectionQuery;
 }
 
-export class Store implements Cache {
+export class Store<Updaters, Resolvers, Optimistic, Keys> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -50,17 +55,12 @@ export class Store implements Cache {
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(opts?: StoreOpts) {
+  constructor(opts?: StoreOpts<Updaters, Resolvers, Optimistic, Keys>) {
     if (!opts) opts = {};
 
     this.resolvers = opts.resolvers || {};
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
-
-    this.updates = {
-      Mutation: (opts.updates && opts.updates.Mutation) || {},
-      Subscription: (opts.updates && opts.updates.Subscription) || {},
-    } as UpdatesConfig;
 
     let queryName = 'Query';
     let mutationName = 'Mutation';
@@ -70,9 +70,16 @@ export class Store implements Cache {
       const queryType = schema.getQueryType();
       const mutationType = schema.getMutationType();
       const subscriptionType = schema.getSubscriptionType();
+
       if (queryType) queryName = queryType.name;
       if (mutationType) mutationName = mutationType.name;
       if (subscriptionType) subscriptionName = subscriptionType.name;
+
+      this.updates = {
+        [mutationName]: (opts.updates && opts.updates[mutationName]) || {},
+        [subscriptionName]:
+          (opts.updates && opts.updates[subscriptionName]) || {},
+      } as UpdatesConfig;
 
       if (process.env.NODE_ENV !== 'production') {
         if (this.keys) {
@@ -80,8 +87,9 @@ export class Store implements Cache {
         }
 
         const hasUpdates =
-          Object.keys(this.updates.Mutation).length > 0 ||
-          Object.keys(this.updates.Subscription).length > 0;
+          Object.keys(this.updates[mutationName]).length > 0 ||
+          Object.keys(this.updates[subscriptionName]).length > 0;
+
         if (hasUpdates) {
           SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
         }
@@ -100,6 +108,12 @@ export class Store implements Cache {
           );
         }
       }
+    } else {
+      this.updates = {
+        [mutationName]: (opts.updates && opts.updates[mutationName]) || {},
+        [subscriptionName]:
+          (opts.updates && opts.updates[subscriptionName]) || {},
+      } as UpdatesConfig;
     }
 
     this.rootFields = {
