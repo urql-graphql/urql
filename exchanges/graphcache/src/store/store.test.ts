@@ -828,6 +828,45 @@ describe('Store with storage', () => {
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
   });
 
+  it('should use different rootConfigs', function () {
+    const fakeUpdater = jest.fn();
+
+    const store = new Store({
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
+      updates: {
+        Mutation: {
+          toggleTodo: fakeUpdater,
+        },
+      },
+    });
+
+    const mutationData = {
+      __typename: 'mutation_root',
+      toggleTodo: {
+        __typename: 'Todo',
+        id: 1,
+      },
+    };
+    write(store, { query: Todos }, todosData);
+    write(
+      store,
+      {
+        query: gql`
+          mutation {
+            toggleTodo(id: 1) {
+              id
+            }
+          }
+        `,
+      },
+      mutationData
+    );
+
+    expect(fakeUpdater).toBeCalledTimes(1);
+  });
+
   it('should not warn for an introspection result root', function () {
     // NOTE: Do not wrap this require in `minifyIntrospectionQuery`!
     // eslint-disable-next-line
