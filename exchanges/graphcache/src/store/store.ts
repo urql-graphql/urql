@@ -30,12 +30,7 @@ import * as SchemaPredicates from '../ast/schemaPredicates';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts<
-  Updaters = UpdatesConfig,
-  Resolvers = ResolverConfig,
-  Optimistic = OptimisticMutationConfig,
-  Keys = KeyingConfig
-> {
+export interface StoreOpts<Updaters, Resolvers, Optimistic, Keys> {
   updates?: Partial<Updaters>;
   resolvers?: Resolvers;
   optimistic?: Optimistic;
@@ -43,7 +38,12 @@ export interface StoreOpts<
   schema?: IntrospectionQuery;
 }
 
-export class Store<Updaters, Resolvers, Optimistic, Keys> implements Cache {
+export class Store<
+  Updaters = UpdatesConfig,
+  Resolvers = ResolverConfig,
+  Optimistic = OptimisticMutationConfig,
+  Keys = KeyingConfig
+> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;

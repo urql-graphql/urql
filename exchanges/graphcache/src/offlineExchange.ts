@@ -20,7 +20,13 @@ import {
 } from './ast';
 
 import { makeDict } from './helpers/dict';
-import { OptimisticMutationConfig, Variables } from './types';
+import {
+  OptimisticMutationConfig,
+  Variables,
+  UpdatesConfig,
+  ResolverConfig,
+  KeyingConfig,
+} from './types';
 import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
 
 /** Determines whether a given query contains an optimistic mutation field */
@@ -58,11 +64,14 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
-  forward: outerForward,
-  client,
-  dispatchDebug,
-}) => {
+export const offlineExchange = <
+  Updaters = UpdatesConfig,
+  Resolvers = ResolverConfig,
+  Optimistic = OptimisticMutationConfig,
+  Keys = KeyingConfig
+>(
+  opts: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>
+): Exchange => ({ forward: outerForward, client, dispatchDebug }) => {
   const { storage } = opts;
   let forward = outerForward;
 
