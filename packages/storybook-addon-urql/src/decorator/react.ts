@@ -3,7 +3,10 @@ import { createElement } from 'react';
 import { Provider, createClient } from 'urql';
 import { getStorybookExchange } from '../exchange';
 
-const decorator: Parameters<typeof addDecorator>[0] = (Story, context) => {
+export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
+  Story,
+  context
+) => {
   const client = createClient({
     url: 'storehhh',
     exchanges: [getStorybookExchange(context)],
@@ -11,5 +14,3 @@ const decorator: Parameters<typeof addDecorator>[0] = (Story, context) => {
 
   return createElement(Provider, { value: client, children: Story(context) });
 };
-
-export default decorator;
