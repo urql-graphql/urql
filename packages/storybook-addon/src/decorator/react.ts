@@ -1,6 +1,7 @@
 import { addDecorator } from '@storybook/react';
+import { createClient } from '@urql/core';
 import { createElement } from 'react';
-import { Provider, createClient } from 'urql';
+import { Provider } from 'urql';
 import { getStorybookExchange } from '../exchange';
 
 export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
