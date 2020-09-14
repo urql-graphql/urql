@@ -2,11 +2,13 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve"
   },
-  "include": ["src"]
+  "include": ["src/**/*.*"]
 }

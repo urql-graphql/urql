@@ -1,20 +1,22 @@
 {
   "name": "storybook-addon-urql",
-  "description": "Make great stories with Urql",
+  "description": "Make stories in Storybook with Urql",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc && cp src/storybook.d.ts dist"
+  },
   "devDependencies": {
-    "typescript": "^4.0.2"
-  },
-  "peerDependencies": {
-    "urql": ">= 1.9.0",
-    "@storybook/addons": ">= 6.0.0"
-  },
-  "optionalDependencies": {
+    "typescript": "^4.0.2",
     "@storybook/preact": "6.0.21",
     "@storybook/react": "^6.0.21",
     "preact": "^10.4.8",
     "react": "^16.13.1"
+  },
+  "peerDependencies": {
+    "urql": ">= 1.9.0",
+    "@storybook/addons": ">= 6.0.0"
   }
 }

@@ -10,6 +10,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.3",
+    "storybook-addon-urql": "../",
     "urql": "^1.10.0",
     "wonka": "^4.0.14"
   },

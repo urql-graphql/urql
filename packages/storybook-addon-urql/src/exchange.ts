@@ -9,7 +9,7 @@ export const getStorybookExchange = <T extends { parameters: any }>(
     map(operation => [operation, context.parameters.urql(operation)]),
     mergeMap(([operation, result]) =>
       'then' in result
-        ? fromPromise(result.then(r => makeResult(operation, r)))
+        ? fromPromise(result.then((r: any) => makeResult(operation, r)))
         : fromValue(makeResult(operation, result))
     )
   );
