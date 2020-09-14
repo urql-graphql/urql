@@ -1,12 +1,39 @@
 {
   "name": "@urql/storybook-addon",
-  "description": "Make stories in Storybook with urql",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Make stories in Storybook with urql",
+  "sideEffects": false,
+  "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/storybook-addon"
+  },
+  "keywords": [
+    "addon",
+    "storybook",
+    "urql",
+    "formidablelabs",
+    "preact",
+    "react"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
   "scripts": {
-    "build": "tsc && cp src/storybook.d.ts dist"
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist"
   },
   "devDependencies": {
     "urql": "latest",
@@ -19,5 +46,8 @@
   },
   "peerDependencies": {
     "@storybook/addons": ">= 6.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
