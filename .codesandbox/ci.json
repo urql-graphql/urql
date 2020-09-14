@@ -1,5 +1,5 @@
 {
-  "installCommand": "yarn install --frozen-lockfile",
+  "installCommand": "install-frozen",
   "packages": [
     "packages/core",
     "packages/next-urql",

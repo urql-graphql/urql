@@ -5,6 +5,7 @@
     "exchanges/*"
   ],
   "scripts": {
+    "install-frozen": "yarn install --frozen-lockfile",
     "test": "jest",
     "check": "tsc",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
