@@ -1,6 +1,6 @@
 # Storybook Addon Urql
 
-Easily create fixtures with all the states of your GraphQL requests.
+Create fixtures to model all the states of your GraphQL requests with Urql.
 
 ## Installation
 
@@ -10,19 +10,19 @@ npm i storybook-addon-urql
 
 ## Usage
 
-Add the addon to your config file at `.storybook/main`
+Add the decorator in your preview file at `.storybook/preview`
 
-```js
-module.exports = {
-  stories: ['../src/**/*.stories.*'],
-  addons: ['storybook-addon-urql'],
-};
+```tsx
+import { addDecorator } from '@storybook/react';
+import { urqlDecorator } from 'storybook-addon-urql';
+
+addDecorator(urqlDecorator);
 ```
 
 Mock states by using the `urql` parameter on your stories.
 
 ```tsx
-export const MyStory = () => <Users />;
+export const MyStory: Story = () => <Users />;
 
 MyStory.parameters = {
   urql: () => ({ data: { user: { id: 1234, name: 'Steve' } } }),
