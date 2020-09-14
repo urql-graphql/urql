@@ -16,7 +16,6 @@
     "react": "^16.13.1"
   },
   "peerDependencies": {
-    "urql": ">= 1.9.0",
     "@storybook/addons": ">= 6.0.0"
   }
 }
