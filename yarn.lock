@@ -2972,6 +2972,14 @@
     "@typescript-eslint/types" "4.1.0"
     eslint-visitor-keys "^2.0.0"
 
+"@urql/preact@latest":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@urql/preact/-/preact-1.2.1.tgz#241b7c8fb14e7045f7fdad7bbb7f1dedf73bc041"
+  integrity sha512-IzfMISEstz7a7HpsrXqMQ9xd/f0JwYtoIipVVrWc3aUzi2501V9gojAie1e4kQD7pQ9zDvXXcW5NITpMguHAvg==
+  dependencies:
+    "@urql/core" "^1.13.0"
+    wonka "^4.0.14"
+
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.9.0.tgz#bd850604b4042459a5a41cd7d338cbed695ed964"
@@ -16814,6 +16822,14 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+urql@latest:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-1.10.1.tgz#48353c0d02175481377fa95ff150b7449bd2f7c5"
+  integrity sha512-DMafjxLZfWUPSZRs39+wxmrHTqHm4LLfHvKQfSqkmkwneO/Ws5SLJsT/enZcQfLlH0ZWGvBOVHtVt3j0y8HbcQ==
+  dependencies:
+    "@urql/core" "^1.12.3"
+    wonka "^4.0.14"
 
 use-composed-ref@^1.0.0:
   version "1.0.0"

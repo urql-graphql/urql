@@ -1,6 +1,6 @@
 {
-  "name": "storybook-addon-urql",
-  "description": "Make stories in Storybook with Urql",
+  "name": "@urql/storybook-addon",
+  "description": "Make stories in Storybook with urql",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,8 @@
     "build": "tsc && cp src/storybook.d.ts dist"
   },
   "devDependencies": {
+    "urql": "latest",
+    "@urql/preact": "latest",
     "typescript": "^4.0.2",
     "@storybook/preact": "6.0.21",
     "@storybook/react": "^6.0.21",
