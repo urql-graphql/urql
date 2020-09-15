@@ -1,6 +1,6 @@
 {
   "name": "@urql/storybook-addon",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "Make stories in Storybook with urql",
   "sideEffects": false,
   "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
@@ -19,9 +19,9 @@
     "preact",
     "react"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "dist/urql-storybook-addon.js",
+  "module": "dist/urql-storybook-addon.mjs",
+  "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",
@@ -29,12 +29,26 @@
     "README.md",
     "dist/"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/urql-storybook-addon.js",
+      "require": "./dist/urql-storybook-addon.mjs",
+      "types": "./dist/types/decorator/react.d.ts",
+      "source": "./src/decorator/react.ts"
+    },
+    "./preact": {
+      "import": "./dist/urql-storybook-addon-preact.js",
+      "require": "./dist/urql-storybook-addon-preact.js",
+      "types": "./dist/types/decorator/preact.d.ts",
+      "source": "./src/decorator/preact.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
-    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist",
-    "prepublishOnly": "run-s clean build"
+    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist"
   },
   "devDependencies": {
     "@urql/preact": "latest",
@@ -42,9 +56,11 @@
     "@storybook/react": ">= 6.0.0",
     "preact": "^10.4.8",
     "react": "^16.13.1",
-    "urql": "latest"
+    "urql": "latest",
+    "graphql": "latest",
+    "wonka": "latest"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "@storybook/addons": ">= 6.0.0"
   },
   "publishConfig": {

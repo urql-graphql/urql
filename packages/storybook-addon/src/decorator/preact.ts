@@ -3,7 +3,7 @@ import { Provider, createClient } from '@urql/preact';
 import { createElement } from 'preact';
 import { getStorybookExchange } from '../exchange';
 
-export const urqlDecoratorPreact: Parameters<typeof addDecorator>[0] = (
+export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
   Story,
   context
 ) => {
