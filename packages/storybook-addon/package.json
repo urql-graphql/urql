@@ -36,10 +36,12 @@
     "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist"
   },
   "devDependencies": {
+    "@urql/preact": "latest",
     "@storybook/preact": ">= 6.0.0",
     "@storybook/react": ">= 6.0.0",
     "preact": "^10.4.8",
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "urql": "latest"
   },
   "peerDependencies": {
     "@storybook/addons": ">= 6.0.0"
