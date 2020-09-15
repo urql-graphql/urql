@@ -1,11 +1,12 @@
 {
+  "installCommand": "install-frozen",
   "packages": [
-    "packages/storybook-addon",
     "packages/core",
     "packages/next-urql",
     "packages/react-urql",
     "packages/preact-urql",
     "packages/svelte-urql",
+    "packages/storybook-addon",
     "exchanges/graphcache",
     "exchanges/multipart-fetch",
     "exchanges/persisted-fetch",
