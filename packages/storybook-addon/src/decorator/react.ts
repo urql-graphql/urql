@@ -1,3 +1,4 @@
+import "../storybook";
 import { addDecorator } from '@storybook/react';
 import { createElement } from 'react';
 import { Provider, createClient } from 'urql';

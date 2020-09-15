@@ -1,6 +1,6 @@
 {
   "name": "@urql/storybook-addon",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.2",
   "description": "Make stories in Storybook with urql",
   "sideEffects": false,
   "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
@@ -21,7 +21,7 @@
   ],
   "main": "dist/urql-storybook-addon.js",
   "module": "dist/urql-storybook-addon.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/types/storybook.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",
@@ -48,7 +48,7 @@
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
-    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist"
+    "build": "rollup -c ../../scripts/rollup/config.js"
   },
   "devDependencies": {
     "@urql/preact": "latest",
