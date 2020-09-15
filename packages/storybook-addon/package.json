@@ -33,7 +33,8 @@
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
-    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist"
+    "build": "rollup -c ../../scripts/rollup/config.js && cp src/storybook.d.ts dist",
+    "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
     "@urql/preact": "latest",

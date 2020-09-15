@@ -1,11 +1,11 @@
-# Storybook Addon Urql
+# Urql Storybook Addon
 
 Create fixtures to model all the states of your GraphQL requests with Urql.
 
 ## Installation
 
 ```sh
-npm i storybook-addon-urql
+npm i @urql/storybook-addon
 ```
 
 ## Usage
@@ -14,7 +14,7 @@ Add the decorator in your preview file at `.storybook/preview`
 
 ```tsx
 import { addDecorator } from '@storybook/react';
-import { urqlDecorator } from 'storybook-addon-urql';
+import { urqlDecorator } from '@urql/storybook-addon';
 
 addDecorator(urqlDecorator);
 ```
