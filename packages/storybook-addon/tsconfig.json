@@ -1,14 +1,12 @@
 {
+  "extends": "../../tsconfig.json",
+  "include": ["src"],
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "outDir": "dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve"
-  },
-  "include": ["src/**/*.*"]
+    "baseUrl": "./",
+    "paths": {
+      "urql": ["../../node_modules/urql/src"],
+      "*-urql": ["../../node_modules/*-urql/src"],
+      "@urql/*": ["../../node_modules/@urql/*/src"]
+    }
+  }
 }
