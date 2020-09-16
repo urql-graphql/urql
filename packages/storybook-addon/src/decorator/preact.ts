@@ -1,4 +1,3 @@
-import "../storybook"
 import { addDecorator } from '@storybook/preact';
 import { Provider, createClient } from '@urql/preact';
 import { createElement } from 'preact';
