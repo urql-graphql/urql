@@ -1,6 +1,6 @@
 {
   "name": "@urql/storybook-addon",
-  "version": "1.0.3-beta.2",
+  "version": "1.0.3",
   "description": "Make stories in Storybook with urql",
   "sideEffects": false,
   "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
@@ -27,7 +27,8 @@
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
-    "dist/"
+    "dist/",
+    "preact"
   ],
   "exports": {
     ".": {
