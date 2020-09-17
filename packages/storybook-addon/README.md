@@ -5,7 +5,7 @@ Create fixtures to model all the states of your GraphQL requests with Urql.
 ## Installation
 
 ```sh
-npm i @urql/storybook-addon
+npm i -D @urql/storybook-addon
 ```
 
 ## Usage
