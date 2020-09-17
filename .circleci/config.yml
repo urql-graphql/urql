@@ -9,9 +9,12 @@ aliases:
   - &node_modules
     attach_workspace:
       at: .
+  - &ramdisk
+    working_directory: /mnt/ramdisk
 
 jobs:
   setup:
+    <<: *ramdisk
     executor: node
     steps:
       - checkout
@@ -35,6 +38,7 @@ jobs:
             - node_modules
 
   check:
+    <<: *ramdisk
     executor: node
     steps:
       - checkout
@@ -50,6 +54,7 @@ jobs:
           command: yarn run lint
 
   build:
+    <<: *ramdisk
     executor: node
     parallelism: 4
     steps:
@@ -60,6 +65,7 @@ jobs:
           command: yarn run build
 
   staging_site:
+    <<: *ramdisk
     executor: node
     steps:
       - checkout
@@ -76,6 +82,7 @@ jobs:
             node scripts/deploy/surge.js
 
   production_site:
+    <<: *ramdisk
     executor: node
     steps:
       - run:
