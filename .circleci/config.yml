@@ -5,44 +5,34 @@ executors:
     docker:
       - image: circleci/node:12-buster
 
-aliases:
-  - &node_modules
-    attach_workspace:
-      at: .
-  - &ramdisk
-    working_directory: /mnt/ramdisk
-
 jobs:
   setup:
-    <<: *ramdisk
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
       - restore_cache:
-          name: Restore Yarn cache
           keys:
-            - yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-{{ .Branch }}-
-            - yarn-main-
+            - module_cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: Check for dependencies
+          command: "([[ -d node_modules ]] && circleci-agent step halt) || exit 0"
       - run:
           name: Install Packages
           command: yarn --frozen-lockfile --non-interactive
       - save_cache:
-          name: Save Yarn cache
-          key: yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
-      - persist_to_workspace:
-          root: .
+          key: module_cache-v1-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
 
   check:
-    <<: *ramdisk
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
-      - *node_modules
+      - restore_cache:
+          keys:
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: TypeScript
           command: yarn run check
@@ -54,22 +44,26 @@ jobs:
           command: yarn run lint
 
   build:
-    <<: *ramdisk
+    working_directory: /mnt/ramdisk
     executor: node
     parallelism: 4
     steps:
       - checkout
-      - *node_modules
+      - restore_cache:
+          keys:
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build
           command: yarn run build
 
   staging_site:
-    <<: *ramdisk
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
-      - *node_modules
+      - restore_cache:
+          keys:
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build Staging Site
           command: |
@@ -82,14 +76,16 @@ jobs:
             node scripts/deploy/surge.js
 
   production_site:
-    <<: *ramdisk
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - run:
           name: Install AWS CLI
           command: sudo apt-get -y -qq install awscli
       - checkout
-      - *node_modules
+      - restore_cache:
+          keys:
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build Production Site
           command: |
