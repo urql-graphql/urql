@@ -8,7 +8,7 @@ export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
   context
 ) => {
   const client = createClient({
-    url: 'storehhh',
+    url: '/graphql',
     exchanges: [getStorybookExchange(context)],
   });
 
