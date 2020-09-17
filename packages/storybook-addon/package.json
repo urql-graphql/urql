@@ -28,7 +28,7 @@
     "CHANGELOG.md",
     "README.md",
     "dist/",
-    "preact"
+    "preact/"
   ],
   "exports": {
     ".": {
