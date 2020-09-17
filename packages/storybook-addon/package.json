@@ -56,6 +56,7 @@
     "@urql/preact": "latest",
     "@storybook/preact": ">= 6.0.0",
     "@storybook/react": ">= 6.0.0",
+    "@types/webpack-env": "~1.15.3",
     "preact": "^10.4.8",
     "react": "^16.13.1",
     "urql": "latest",
