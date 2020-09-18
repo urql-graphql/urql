@@ -12,7 +12,7 @@ import {
 import { warn, invariant } from '../helpers/help';
 import {
   KeyingConfig,
-  UpdatesConfig,
+  UpdateResolver,
   ResolverConfig,
   OptimisticMutationConfig,
 } from '../types';
@@ -143,43 +143,35 @@ export function expectValidKeyingConfig(
 
 export function expectValidUpdatesConfig(
   schema: GraphQLSchema,
-  updates: UpdatesConfig
+  updates: Record<string, Record<string, UpdateResolver>>
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
 
-  /* eslint-disable prettier/prettier */
-  const schemaMutations = schema.getMutationType()
-    ? Object.keys((schema.getMutationType() as GraphQLObjectType).toConfig().fields)
-    : [];
-  const schemaSubscriptions = schema.getSubscriptionType()
-    ? Object.keys((schema.getSubscriptionType() as GraphQLObjectType).toConfig().fields)
-    : [];
-  const givenMutations = updates.Mutation
-    ? Object.keys(updates.Mutation)
-    : [];
-  const givenSubscriptions = updates.Subscription
-    ? Object.keys(updates.Subscription)
-    : [];
-  /* eslint-enable prettier/prettier */
+  const mutation = schema.getMutationType();
+  const subscription = schema.getSubscriptionType();
+  const mutationFields = mutation?.getFields() || {};
+  const subscriptionFields = subscription?.getFields() || {};
+  const givenMutations = (mutation && updates[mutation.name]) || {};
+  const givenSubscription = (subscription && updates[subscription.name]) || {};
 
-  for (const givenMutation of givenMutations) {
-    if (schemaMutations.indexOf(givenMutation) === -1) {
+  for (const fieldName in givenMutations) {
+    if (mutationFields[fieldName] === undefined) {
       warn(
         'Invalid mutation field: `' +
-          givenMutation +
+          fieldName +
           '` is not in the defined schema, but the `updates.Mutation` option is referencing it.',
         21
       );
     }
   }
 
-  for (const givenSubscription of givenSubscriptions) {
-    if (schemaSubscriptions.indexOf(givenSubscription) === -1) {
+  for (const fieldName in givenSubscription) {
+    if (subscriptionFields[fieldName] === undefined) {
       warn(
         'Invalid subscription field: `' +
-          givenSubscription +
+          fieldName +
           '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
         22
       );
