@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 3.1.1
+
+### Patch Changes
+
+- ⚠️ Fix updaters config not working when Mutation/Subscription root names were altered.
+  For instance, a Mutation named `mutation_root` could cause `store.updates` to be misread and cause a
+  runtime error, by [@kitten](https://github.com/kitten) (See [#984](https://github.com/FormidableLabs/urql/pull/984))
+- ⚠️ Fix operation results being obstructed by the `offlineExchange` when the network request has failed due to being offline and no cache result has been issued. Instead the `offlineExchange` will now retry with `cache-only` policy, by [@kitten](https://github.com/kitten) (See [#985](https://github.com/FormidableLabs/urql/pull/985))
+
 ## 3.1.0
 
 ### Minor Changes
