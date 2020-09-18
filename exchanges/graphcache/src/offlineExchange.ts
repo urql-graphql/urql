@@ -1,4 +1,4 @@
-import { pipe, merge, makeSubject, filter } from 'wonka';
+import { pipe, merge, makeSubject, share, filter } from 'wonka';
 import { print, SelectionNode } from 'graphql';
 
 import {
@@ -63,7 +63,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
   forward: outerForward,
   client,
   dispatchDebug,
-}) => {
+}) => ops$ => {
   const { storage } = opts;
   const { source: reboundOps$, next } = makeSubject<Operation>();
   let forward = outerForward;
@@ -119,7 +119,10 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
             return true;
           }
 
-          next(toRequestPolicy(res.operation, 'cache-only'));
+          Promise.resolve().then(() =>
+            next(toRequestPolicy(res.operation, 'cache-only'))
+          );
+
           return false;
         })
       );
@@ -136,12 +139,12 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     });
   }
 
-  return ops$ => {
-    const opsAndRebound$ = merge([ops$, reboundOps$]);
-    return cacheExchange(opts)({
-      forward,
-      client,
-      dispatchDebug,
-    })(opsAndRebound$);
-  };
+  const sharedOps$ = share(ops$);
+  const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
+
+  return cacheExchange(opts)({
+    forward,
+    client,
+    dispatchDebug,
+  })(opsAndRebound$);
 };
