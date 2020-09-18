@@ -15,12 +15,13 @@ import {
   Data,
   QueryInput,
   UpdatesConfig,
+  UpdateResolver,
   OptimisticMutationConfig,
   KeyingConfig,
   DataFields,
 } from '../types';
-import { invariant } from '../helpers/help';
 
+import { invariant } from '../helpers/help';
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
@@ -42,7 +43,7 @@ export class Store implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
-  updates: UpdatesConfig;
+  updates: Record<string, Record<string, UpdateResolver>>;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
   schema?: GraphQLSchema;
@@ -57,11 +58,6 @@ export class Store implements Cache {
     this.optimisticMutations = opts.optimistic || {};
     this.keys = opts.keys || {};
 
-    this.updates = {
-      Mutation: (opts.updates && opts.updates.Mutation) || {},
-      Subscription: (opts.updates && opts.updates.Subscription) || {},
-    } as UpdatesConfig;
-
     let queryName = 'Query';
     let mutationName = 'Mutation';
     let subscriptionName = 'Subscription';
@@ -73,34 +69,12 @@ export class Store implements Cache {
       if (queryType) queryName = queryType.name;
       if (mutationType) mutationName = mutationType.name;
       if (subscriptionType) subscriptionName = subscriptionType.name;
-
-      if (process.env.NODE_ENV !== 'production') {
-        if (this.keys) {
-          SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
-        }
-
-        const hasUpdates =
-          Object.keys(this.updates.Mutation).length > 0 ||
-          Object.keys(this.updates.Subscription).length > 0;
-        if (hasUpdates) {
-          SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
-        }
-
-        if (this.resolvers) {
-          SchemaPredicates.expectValidResolversConfig(
-            this.schema,
-            this.resolvers
-          );
-        }
-
-        if (this.optimisticMutations) {
-          SchemaPredicates.expectValidOptimisticMutationsConfig(
-            this.schema,
-            this.optimisticMutations
-          );
-        }
-      }
     }
+
+    this.updates = {
+      [mutationName]: (opts.updates && opts.updates.Mutation) || {},
+      [subscriptionName]: (opts.updates && opts.updates.Subscription) || {},
+    };
 
     this.rootFields = {
       query: queryName,
@@ -115,6 +89,16 @@ export class Store implements Cache {
     };
 
     this.data = InMemoryData.make(queryName);
+
+    if (this.schema && process.env.NODE_ENV !== 'production') {
+      SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
+      SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
+      SchemaPredicates.expectValidResolversConfig(this.schema, this.resolvers);
+      SchemaPredicates.expectValidOptimisticMutationsConfig(
+        this.schema,
+        this.optimisticMutations
+      );
+    }
   }
 
   keyOfField = keyOfField;
