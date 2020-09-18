@@ -19,10 +19,10 @@
     "preact",
     "react"
   ],
-  "main": "dist/urql-storybook-addon.js",
+  "main": "dist/urql-storybook-addon",
   "module": "dist/urql-storybook-addon.mjs",
-  "types": "dist/index.d.ts",
-  "source": "src/index.ts",
+  "types": "dist/types/decorator/react.d.ts",
+  "source": "src/decorator/react.ts",
   "files": [
     "LICENSE",
     "CHANGELOG.md",
@@ -31,8 +31,8 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/urql-storybook-addon.js",
-      "require": "./dist/urql-storybook-addon.mjs",
+      "import": "./dist/urql-storybook-addon.mjs",
+      "require": "./dist/urql-storybook-addon.js",
       "types": "./dist/types/decorator/react.d.ts",
       "source": "./src/decorator/react.ts"
     },
