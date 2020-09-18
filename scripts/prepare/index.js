@@ -7,7 +7,7 @@ const fs = require('fs');
 const cwd = process.cwd();
 const workspaceRoot = path.resolve(__dirname, '../../');
 const pkg = require(path.resolve(cwd, 'package.json'));
-const hasReact = ['dependencies', 'optionalDependencies', 'peerDependencies'].some((dep) => "dep" in pkg && "react" in pkg.dep);
+const hasReact = ['dependencies', 'optionalDependencies', 'peerDependencies'].some((dep) => dep in pkg && "react" in pkg.dep);
 
 const normalize = name => name
   .replace(/[@\s\/\.]+/g, ' ')
