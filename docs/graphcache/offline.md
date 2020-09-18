@@ -12,9 +12,6 @@ Updates](./custom-updates.md#optimistic-updates) this can be used to build an ap
 serves cached data entirely from memory when a user's device is offline and still display
 optimistically executed mutations.
 
-> **NOTE:** Offline Support is currently experimental! It hasn't been extensively tested yet and
-> may not always behave as expected. Please try it out with caution!
-
 ## Setup
 
 Everything that's needed to set up offline-support is already packaged in the
