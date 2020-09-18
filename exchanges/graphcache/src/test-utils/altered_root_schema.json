@@ -5,7 +5,8 @@
       "__typename": "__Type"
     },
     "mutationType": {
-      "name": "Mutation"
+      "name": "mutation_root",
+      "__typename": "__Type"
     },
     "subscriptionType": null,
     "types": [
@@ -160,7 +161,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Mutation",
+        "name": "mutation_root",
         "fields": [
           {
             "name": "toggleTodo",
