@@ -192,6 +192,63 @@ describe('offline', () => {
     });
   });
 
+  it('should intercept errored queries', async () => {
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const onlineSpy = jest
+      .spyOn(navigator, 'onLine', 'get')
+      .mockReturnValueOnce(false);
+
+    const queryOp = client.createRequestOperation('query', {
+      key: 1,
+      query: queryOne,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        onlineSpy.mockReturnValueOnce(false);
+        return {
+          operation: forwardOp,
+          // @ts-ignore
+          error: { networkError: new Error('failed to fetch') },
+        };
+      }
+    );
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    storage.readData.mockReturnValueOnce({ then: () => undefined });
+    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
+    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
+
+    pipe(
+      offlineExchange({ storage })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(queryOp);
+    expect(result).toBeCalledTimes(0);
+    expect(response).toBeCalledTimes(1);
+
+    await Promise.resolve();
+    expect(result).toBeCalledTimes(1);
+    expect(response).toBeCalledTimes(1);
+
+    expect(result.mock.calls[0][0]).toEqual({
+      data: null,
+      error: undefined,
+      extensions: undefined,
+      operation: expect.any(Object),
+    });
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'miss'
+    );
+  });
+
   it('should flush the queue when we become online', () => {
     let flush: () => {};
     storage.onOnline.mockImplementation(cb => {

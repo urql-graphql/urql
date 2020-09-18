@@ -1,4 +1,4 @@
-import { pipe, filter } from 'wonka';
+import { pipe, merge, makeSubject, share, filter } from 'wonka';
 import { print, SelectionNode } from 'graphql';
 
 import {
@@ -22,6 +22,7 @@ import {
 import { makeDict } from './helpers/dict';
 import { OptimisticMutationConfig, Variables } from './types';
 import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
+import { toRequestPolicy } from './helpers/operation';
 
 /** Determines whether a given query contains an optimistic mutation field */
 const isOptimisticMutation = (
@@ -62,8 +63,9 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
   forward: outerForward,
   client,
   dispatchDebug,
-}) => {
+}) => ops$ => {
   const { storage } = opts;
+  const { source: reboundOps$, next } = makeSubject<Operation>();
   let forward = outerForward;
 
   if (
@@ -112,12 +114,16 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
               failedQueue.push(res.operation);
               updateMetadata();
               return false;
-            } else {
-              return true;
             }
-          } else {
-            return false;
+
+            return true;
           }
+
+          Promise.resolve().then(() =>
+            next(toRequestPolicy(res.operation, 'cache-only'))
+          );
+
+          return false;
         })
       );
     };
@@ -133,9 +139,12 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     });
   }
 
+  const sharedOps$ = share(ops$);
+  const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
+
   return cacheExchange(opts)({
     forward,
     client,
     dispatchDebug,
-  });
+  })(opsAndRebound$);
 };
