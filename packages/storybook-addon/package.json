@@ -27,8 +27,7 @@
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
-    "dist/",
-    "preact/"
+    "dist/"
   ],
   "exports": {
     ".": {
@@ -36,12 +35,6 @@
       "require": "./dist/urql-storybook-addon.mjs",
       "types": "./dist/types/decorator/react.d.ts",
       "source": "./src/decorator/react.ts"
-    },
-    "./preact": {
-      "import": "./dist/urql-storybook-addon-preact.js",
-      "require": "./dist/urql-storybook-addon-preact.js",
-      "types": "./dist/types/decorator/preact.d.ts",
-      "source": "./src/decorator/preact.ts"
     },
     "./package.json": "./package.json"
   },
