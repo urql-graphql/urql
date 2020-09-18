@@ -1,4 +1,4 @@
-import { pipe, filter } from 'wonka';
+import { pipe, merge, makeSubject, filter } from 'wonka';
 import { print, SelectionNode } from 'graphql';
 
 import {
@@ -65,6 +65,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
   dispatchDebug,
 }) => {
   const { storage } = opts;
+  const { source: reboundOps$, next } = makeSubject<Operation>();
   let forward = outerForward;
 
   if (
@@ -118,10 +119,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
             return true;
           }
 
-          client.reexecuteOperation(
-            toRequestPolicy(res.operation, 'cache-only')
-          );
-
+          next(toRequestPolicy(res.operation, 'cache-only'));
           return false;
         })
       );
@@ -138,9 +136,12 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     });
   }
 
-  return cacheExchange(opts)({
-    forward,
-    client,
-    dispatchDebug,
-  });
+  return ops$ => {
+    const opsAndRebound$ = merge([ops$, reboundOps$]);
+    return cacheExchange(opts)({
+      forward,
+      client,
+      dispatchDebug,
+    })(opsAndRebound$);
+  };
 };

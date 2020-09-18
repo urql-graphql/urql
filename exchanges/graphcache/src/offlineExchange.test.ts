@@ -197,7 +197,6 @@ describe('offline', () => {
     const onlineSpy = jest
       .spyOn(navigator, 'onLine', 'get')
       .mockReturnValueOnce(false);
-    const reexecuteOperation = jest.spyOn(client, 'reexecuteOperation');
 
     const queryOp = client.createRequestOperation('query', {
       key: 1,
@@ -230,8 +229,20 @@ describe('offline', () => {
     );
 
     next(queryOp);
-    expect(result).toBeCalledTimes(0);
-    expect(reexecuteOperation).toBeCalledTimes(1);
+    expect(result).toBeCalledTimes(1);
+    expect(response).toBeCalledTimes(1);
+
+    expect(result.mock.calls[0][0]).toEqual({
+      data: null,
+      error: undefined,
+      extensions: undefined,
+      operation: expect.any(Object),
+    });
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'miss'
+    );
   });
 
   it('should flush the queue when we become online', () => {
