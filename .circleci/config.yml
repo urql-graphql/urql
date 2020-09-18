@@ -7,6 +7,7 @@ executors:
 
 jobs:
   setup:
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
@@ -20,17 +21,18 @@ jobs:
           name: Install Packages
           command: yarn --frozen-lockfile --non-interactive
       - save_cache:
-          key: module_cache-{{ checksum "yarn.lock" }}
+          key: module_cache-v1-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
 
   check:
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
       - restore_cache:
           keys:
-            - module_cache-{{ checksum "yarn.lock" }}
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: TypeScript
           command: yarn run check
@@ -42,24 +44,26 @@ jobs:
           command: yarn run lint
 
   build:
+    working_directory: /mnt/ramdisk
     executor: node
     parallelism: 4
     steps:
       - checkout
       - restore_cache:
           keys:
-            - module_cache-{{ checksum "yarn.lock" }}
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build
           command: yarn run build
 
   staging_site:
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - checkout
       - restore_cache:
           keys:
-            - module_cache-{{ checksum "yarn.lock" }}
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build Staging Site
           command: |
@@ -72,6 +76,7 @@ jobs:
             node scripts/deploy/surge.js
 
   production_site:
+    working_directory: /mnt/ramdisk
     executor: node
     steps:
       - run:
@@ -80,7 +85,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - module_cache-{{ checksum "yarn.lock" }}
+            - module_cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: Build Production Site
           command: |
