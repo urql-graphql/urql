@@ -66,9 +66,11 @@ export class Store implements Cache {
       const queryType = schema.getQueryType();
       const mutationType = schema.getMutationType();
       const subscriptionType = schema.getSubscriptionType();
-      if (queryType) queryName = queryType.name;
-      if (mutationType) mutationName = mutationType.name;
-      if (subscriptionType) subscriptionName = subscriptionType.name;
+      queryName = queryType ? queryType.name : queryName;
+      mutationName = mutationType ? mutationType.name : mutationName;
+      subscriptionName = subscriptionType
+        ? subscriptionType.name
+        : subscriptionName;
     }
 
     this.updates = {
