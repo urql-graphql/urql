@@ -82,7 +82,7 @@ export const makePlugins = ({ isProduction } = {}) => [
         pragmaFrag: 'React.Fragment',
         useBuiltIns: true
       }],
-      settings.hasPreact && ['@babel/plugin-transform-react-jsx', {
+      !settings.hasReact && settings.hasPreact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'h',
         useBuiltIns: true
       }],
