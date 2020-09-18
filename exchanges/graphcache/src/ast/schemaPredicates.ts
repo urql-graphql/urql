@@ -151,8 +151,8 @@ export function expectValidUpdatesConfig(
 
   const mutation = schema.getMutationType();
   const subscription = schema.getSubscriptionType();
-  const mutationFields = mutation?.getFields() || {};
-  const subscriptionFields = subscription?.getFields() || {};
+  const mutationFields = mutation ? mutation.getFields() : {};
+  const subscriptionFields = subscription ? subscription.getFields() : {};
   const givenMutations = (mutation && updates[mutation.name]) || {};
   const givenSubscription = (subscription && updates[subscription.name]) || {};
 
