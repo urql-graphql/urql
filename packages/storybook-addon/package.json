@@ -19,8 +19,8 @@
     "preact",
     "react"
   ],
-  "main": "dist/urql-storybook-addon",
-  "module": "dist/urql-storybook-addon.mjs",
+  "main": "dist/urql-storybook-addon.js",
+  "module": "dist/urql-storybook-addon.es.js",
   "types": "dist/types/decorator/react.d.ts",
   "source": "src/decorator/react.ts",
   "files": [
@@ -29,15 +29,6 @@
     "README.md",
     "dist/"
   ],
-  "exports": {
-    ".": {
-      "import": "./dist/urql-storybook-addon.mjs",
-      "require": "./dist/urql-storybook-addon.js",
-      "types": "./dist/types/decorator/react.d.ts",
-      "source": "./src/decorator/react.ts"
-    },
-    "./package.json": "./package.json"
-  },
   "scripts": {
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
