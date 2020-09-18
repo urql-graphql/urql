@@ -44,7 +44,6 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "rollup -c ../../scripts/rollup/config.js",
     "prepare": "node ../../scripts/prepare/index.js",
-    "postbuild": "cp src/index.d.ts dist/index.d.ts",
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
