@@ -48,18 +48,18 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@urql/preact": "latest",
-    "@storybook/preact": ">= 6.0.0",
-    "@storybook/react": ">= 6.0.0",
+    "@urql/preact": ">=1.2.1",
+    "@storybook/preact": ">=6.0.0",
+    "@storybook/react": ">=6.0.0",
     "@types/webpack-env": "~1.15.3",
-    "preact": "^10.4.8",
-    "react": "^16.13.1",
-    "urql": "latest",
-    "graphql": "latest",
+    "preact": "^10.3.4",
+    "react": "^16.13.0",
+    "urql": ">=1.10.0",
+    "graphql": "^15.1.0",
     "wonka": "latest"
   },
   "optionalDependencies": {
-    "@storybook/addons": ">= 6.0.0"
+    "@storybook/addons": ">=6.0.0"
   },
   "publishConfig": {
     "access": "public"
