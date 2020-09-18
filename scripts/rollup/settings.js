@@ -33,8 +33,12 @@ export const sources = pkg.exports
 export const externalModules = ['dns', 'fs', 'path', 'url'];
 if (pkg.peerDependencies)
   externalModules.push(...Object.keys(pkg.peerDependencies));
+if (pkg.devDependencies)
+  externalModules.push(...Object.keys(pkg.devDependencies));
 if (pkg.dependencies)
   externalModules.push(...Object.keys(pkg.dependencies));
+if (pkg.optionalDependencies)
+  externalModules.push(...Object.keys(pkg.optionalDependencies));
 
 const externalPredicate = new RegExp(`^(${externalModules.join('|')})($|/)`);
 

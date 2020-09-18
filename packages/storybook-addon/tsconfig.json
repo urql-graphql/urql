@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src"],
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "urql": ["../../node_modules/urql/src"],
+      "*-urql": ["../../node_modules/*-urql/src"],
+      "@urql/*": ["../../node_modules/@urql/*/src"]
+    }
+  }
+}
