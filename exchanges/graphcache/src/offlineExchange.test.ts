@@ -192,7 +192,7 @@ describe('offline', () => {
     });
   });
 
-  it('should intercept errored queries', () => {
+  it('should intercept errored queries', async () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const onlineSpy = jest
       .spyOn(navigator, 'onLine', 'get')
@@ -229,6 +229,10 @@ describe('offline', () => {
     );
 
     next(queryOp);
+    expect(result).toBeCalledTimes(0);
+    expect(response).toBeCalledTimes(1);
+
+    await Promise.resolve();
     expect(result).toBeCalledTimes(1);
     expect(response).toBeCalledTimes(1);
 
