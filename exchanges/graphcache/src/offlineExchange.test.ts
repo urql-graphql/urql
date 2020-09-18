@@ -192,6 +192,48 @@ describe('offline', () => {
     });
   });
 
+  it('should intercept errored queries', () => {
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const onlineSpy = jest
+      .spyOn(navigator, 'onLine', 'get')
+      .mockReturnValueOnce(false);
+    const reexecuteOperation = jest.spyOn(client, 'reexecuteOperation');
+
+    const queryOp = client.createRequestOperation('query', {
+      key: 1,
+      query: queryOne,
+    });
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        onlineSpy.mockReturnValueOnce(false);
+        return {
+          operation: forwardOp,
+          // @ts-ignore
+          error: { networkError: new Error('failed to fetch') },
+        };
+      }
+    );
+
+    const { source: ops$, next } = makeSubject<Operation>();
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    storage.readData.mockReturnValueOnce({ then: () => undefined });
+    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
+    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
+
+    pipe(
+      offlineExchange({ storage })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(queryOp);
+    expect(result).toBeCalledTimes(0);
+    expect(reexecuteOperation).toBeCalledTimes(1);
+  });
+
   it('should flush the queue when we become online', () => {
     let flush: () => {};
     storage.onOnline.mockImplementation(cb => {

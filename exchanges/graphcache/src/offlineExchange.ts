@@ -22,6 +22,7 @@ import {
 import { makeDict } from './helpers/dict';
 import { OptimisticMutationConfig, Variables } from './types';
 import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
+import { toRequestPolicy } from './helpers/operation';
 
 /** Determines whether a given query contains an optimistic mutation field */
 const isOptimisticMutation = (
@@ -112,12 +113,16 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
               failedQueue.push(res.operation);
               updateMetadata();
               return false;
-            } else {
-              return true;
             }
-          } else {
-            return false;
+
+            return true;
           }
+
+          client.reexecuteOperation(
+            toRequestPolicy(res.operation, 'cache-only')
+          );
+
+          return false;
         })
       );
     };

@@ -27,6 +27,7 @@ import {
 
 import { query, write, writeOptimistic } from './operations';
 import { makeDict, isDictEmpty } from './helpers/dict';
+import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 
@@ -48,30 +49,6 @@ type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
-
-// Returns the given operation result with added cacheOutcome meta field
-const addCacheOutcome = (op: Operation, outcome: CacheOutcome): Operation => ({
-  ...op,
-  context: {
-    ...op.context,
-    meta: {
-      ...op.context.meta,
-      cacheOutcome: outcome,
-    },
-  },
-});
-
-// Copy an operation and change the requestPolicy to skip the cache
-const toRequestPolicy = (
-  operation: Operation,
-  requestPolicy: RequestPolicy
-): Operation => ({
-  ...operation,
-  context: {
-    ...operation.context,
-    requestPolicy,
-  },
-});
 
 export interface CacheExchangeOpts {
   updates?: Partial<UpdatesConfig>;
