@@ -24,6 +24,7 @@ module.exports = {
   plugins: [
     'react-hooks',
     'prettier',
+    'es5',
   ],
   rules: {
     'react-hooks/rules-of-hooks': 'error',
@@ -35,12 +36,37 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'prefer-arrow/prefer-arrow-functions': 'off',
 
+    'es5/no-for-of': 'error',
+    'es5/no-generators': 'error',
+    'es5/no-typeof-symbol': 'error',
+    'es5/no-es6-methods': 'error',
+
+    'es5/no-es6-static-methods': ['error', {
+      exceptMethods: ['Object.assign']
+    }],
+
     'prettier/prettier': ['error', {
       singleQuote: true,
       arrowParens: 'avoid',
       trailingComma: 'es5',
     }],
   },
+
+  overrides: [
+    {
+      files: [
+        '*.test.ts',
+        '*.test.tsx',
+        '*.spec.ts',
+        '*.spec.tsx',
+      ],
+      rules: {
+        'es5/no-es6-methods': 'off',
+        'es5/no-es6-static-methods': 'off',
+      }
+    }
+  ],
+
   settings: {
     react: {
       version: 'detect',
