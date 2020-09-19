@@ -1,32 +1,9 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 9,
-    sourceType: 'module',
-    ecmaFeatures: {
-      modules: true,
-      jsx: true,
-    },
-  },
   extends: [
+    './common.js',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'prettier',
     'prettier/@typescript-eslint',
-  ],
-  ignorePatterns: [
-    'node_modules/',
-    'dist/',
-    'build/',
-    'coverage/',
-    'benchmark/',
-    'example/',
-    'examples/',
-    'scripts/'
-  ],
-  plugins: [
-    'react-hooks',
-    'prettier',
   ],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -41,25 +18,6 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/array-type': 'off',
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    'react/react-in-jsx-scope': 'off',
-    'react/prop-types': 'off',
-    'react/no-children-prop': 'off',
-    'sort-keys': 'off',
-    'no-console': ['error', { allow: ['warn', 'error'] }],
     'import/no-internal-modules': 'off',
-    'prefer-arrow/prefer-arrow-functions': 'off',
-
-    'prettier/prettier': ['error', {
-      singleQuote: true,
-      arrowParens: 'avoid',
-      trailingComma: 'es5',
-    }],
-  },
-  settings: {
-    react: {
-      version: 'detect',
-    },
   },
 };
