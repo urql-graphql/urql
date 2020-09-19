@@ -127,9 +127,9 @@ export function expectValidKeyingConfig(
   keys: KeyingConfig
 ): void {
   if (process.env.NODE_ENV !== 'production') {
-    const types = Object.keys(schema.getTypeMap());
-    Object.keys(keys).forEach(key => {
-      if (types.indexOf(key) === -1) {
+    const types = schema.getTypeMap();
+    for (const key in keys) {
+      if (!types[key]) {
         warn(
           'Invalid Object type: The type `' +
             key +
@@ -137,7 +137,7 @@ export function expectValidKeyingConfig(
           20
         );
       }
-    });
+    }
   }
 }
 
@@ -194,15 +194,14 @@ export function expectValidResolversConfig(
     return;
   }
 
-  const validTypes = Object.keys(schema.getTypeMap());
-
+  const validTypes = schema.getTypeMap();
   for (const key in resolvers) {
     if (key === 'Query') {
       const queryType = schema.getQueryType();
       if (queryType) {
-        const validQueries = Object.keys(queryType.toConfig().fields);
+        const validQueries = queryType.getFields();
         for (const resolverQuery in resolvers.Query) {
-          if (validQueries.indexOf(resolverQuery) === -1) {
+          if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
           }
         }
@@ -210,15 +209,14 @@ export function expectValidResolversConfig(
         warnAboutResolver('Query');
       }
     } else {
-      if (validTypes.indexOf(key) === -1) {
+      if (!validTypes[key]) {
         warnAboutResolver(key);
       } else {
-        const validTypeProperties = Object.keys(
-          (schema.getType(key) as GraphQLObjectType).getFields()
-        );
-        const resolverProperties = Object.keys(resolvers[key]);
-        for (const resolverProperty of resolverProperties) {
-          if (validTypeProperties.indexOf(resolverProperty) === -1) {
+        const validTypeProperties = (schema.getType(
+          key
+        ) as GraphQLObjectType).getFields();
+        for (const resolverProperty in resolvers[key]) {
+          if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
           }
         }
@@ -236,13 +234,11 @@ export function expectValidOptimisticMutationsConfig(
   }
 
   const validMutations = schema.getMutationType()
-    ? Object.keys(
-        (schema.getMutationType() as GraphQLObjectType).toConfig().fields
-      )
-    : [];
+    ? (schema.getMutationType() as GraphQLObjectType).getFields()
+    : {};
 
   for (const mutation in optimisticMutations) {
-    if (validMutations.indexOf(mutation) === -1) {
+    if (!validMutations[mutation]) {
       warn(
         `Invalid optimistic mutation field: \`${mutation}\` is not a mutation field in the defined schema, but the \`optimistic\` option is referencing it.`,
         24
