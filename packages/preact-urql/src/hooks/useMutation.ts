@@ -63,6 +63,7 @@ export const useMutation = <T = any, V = object>(
         return result;
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [client, query, setState]
   );
 

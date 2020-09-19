@@ -60,6 +60,7 @@ export function withUrqlClient(
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return initUrqlClient(clientConfig, shouldBindGetInitialprops)!;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [urqlClient, urqlState, forceUpdate[0]]);
 
       const resetUrqlClient = () => {
