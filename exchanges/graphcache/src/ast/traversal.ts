@@ -20,18 +20,18 @@ const isFragmentNode = (node: DefinitionNode): node is FragmentDefinitionNode =>
 export const getMainOperation = (
   doc: DocumentNode
 ): OperationDefinitionNode => {
-  const operation = doc.definitions.find(
-    node => node.kind === Kind.OPERATION_DEFINITION
-  ) as OperationDefinitionNode;
+  for (let i = 0; i < doc.definitions.length; i++) {
+    if (doc.definitions[i].kind === Kind.OPERATION_DEFINITION) {
+      return doc.definitions[i] as OperationDefinitionNode;
+    }
+  }
 
   invariant(
-    !!operation,
+    false,
     'Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition' +
       'node for a query, subscription, or mutation.',
     1
   );
-
-  return operation;
 };
 
 /** Returns a mapping from fragment names to their selections */
