@@ -22,8 +22,8 @@
   <a href="https://formidable.com/open-source/urql/docs/">
     <img alt="Visit docs" src="https://badgen.net/badge/docs/visit site/orange" />
   </a>
-  <a href="https://spectrum.chat/urql">
-    <img alt="Spectrum badge" src="https://badgen.net/badge/spectrum/chat with us/purple" />
+  <a href="https://github.com/FormidableLabs/urql/discussions">
+    <img alt="GitHub Discussions: Chat With Us" src="https://badgen.net/badge/discussions/chat%20with%20us/purple" />
   </a>
   <br />
   <br />
