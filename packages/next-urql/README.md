@@ -225,7 +225,7 @@ export const getServerSideProps = async (ctx) => {
     url: /graphql',
   }, false /* set to false to disable suspense */);
 
-  const result= await client.query(QUERY, {}).toPromise();
+  const result = await client.query(QUERY, {}).toPromise();
 
   return {
     props: { data: result.data }
