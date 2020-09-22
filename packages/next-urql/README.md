@@ -213,6 +213,38 @@ let default = (withUrqlClient(. clientOptions))(. make);
 
 The great part about writing thin bindings like this is that they are zero cost – in fact, the above bindings get totally compiled away by BuckleScript, so you get the full benefits of type safety with absolutely zero runtime cost!
 
+### Restricting Data Fetching to the Server
+
+If you want to use the Urql client in server-side-rendered mode of NextJS you have to load data in `getServerSideProps` lifecycle method. This will load your data while rendering a page on server.
+
+```
+// pages/index.tsx
+
+import { initUrqlClient, NextUrqlPageContext } from 'next-urql';
+
+export const getServerSideProps = async (ctx: NextUrqlPageContext): Promise<GetServerSidePropsResult<InitialProps>> => {
+  const graphQLClient = initUrqlClient({
+    url: 'https://graphql-pokemon.now.sh',
+    fetchOptions: {
+      headers: {
+        Authorization: `Bearer ${ctx?.req?.headers?.authorization ?? ''}`,
+      },
+    }
+  }, true) as Client;
+  const response = await graphQLClient.query(queryPokémon as unknown as string, { first: 20 }).toPromise();
+
+
+  return {
+    props: {
+      title: 'Pokédex',
+      data: response?.data?.pokemons
+    },
+  };
+};
+```
+
+The params passed into `initUrqlClient` function are the same you're passing into the `withUrqlClient` higher order component (it has the type of `ClientOptions`). See details here: [client options](https://github.com/FormidableLabs/urql/tree/main/packages/next-urql#clientoptions-required)
+
 ### Examples
 
 You can see simple example projects using `next-urql` in the `examples` directory or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
