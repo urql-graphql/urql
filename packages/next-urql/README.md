@@ -213,6 +213,29 @@ let default = (withUrqlClient(. clientOptions))(. make);
 
 The great part about writing thin bindings like this is that they are zero cost – in fact, the above bindings get totally compiled away by BuckleScript, so you get the full benefits of type safety with absolutely zero runtime cost!
 
+### Restricting Data Fetching to the Server
+
+If you want to use a `Client` in Next.js' newer methods like `getServerSideProps` you may use the `initUrqlClient` function to create a client on the fly. This will need to be done per request.
+
+```
+import { initUrqlClient, NextUrqlPageContext } from 'next-urql';
+
+export const getServerSideProps = async (ctx) => {
+  const client = initUrqlClient({
+    url: /graphql',
+  }, false /* set to false to disable suspense */);
+
+  const result = await client.query(QUERY, {}).toPromise();
+
+  return {
+    props: { data: result.data }
+  };
+};
+```
+
+The first argument passed to the `initUrqlClient` function is the same object that we'd normally pass to `createClient`.
+The second argument is a `boolean` flag indicating whether or not to enable `suspense`; typically, we'd disable it for manual usage.
+
 ### Examples
 
 You can see simple example projects using `next-urql` in the `examples` directory or on [CodeSandbox](https://codesandbox.io/s/next-urql-pokedex-oqj3x).
