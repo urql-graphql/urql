@@ -233,7 +233,8 @@ export const getServerSideProps = async (ctx) => {
 };
 ```
 
-The params passed into `initUrqlClient` function are the same you're passing into the `withUrqlClient` higher order component (it has the type of `ClientOptions`). See details here: [client options](https://github.com/FormidableLabs/urql/tree/main/packages/next-urql#clientoptions-required)
+The first option for `initUrqlClient` function are the same that we'd pass to `createClient`.
+The second option is there to either enable or disable `suspense`, which we'd typically disable for manual usage.
 
 ### Examples
 
