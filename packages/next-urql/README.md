@@ -215,7 +215,7 @@ The great part about writing thin bindings like this is that they are zero cost 
 
 ### Restricting Data Fetching to the Server
 
-If you want to use the Urql client in server-side-rendered mode of NextJS you have to load data in `getServerSideProps` lifecycle method. This will load your data while rendering a page on server.
+If you want to use a `Client` in Next.js' newer methods like `getServerSideProps` you may use the `initUrqlClient` method to create a client on the fly. THis will need to be done per request.
 
 ```
 import { initUrqlClient, NextUrqlPageContext } from 'next-urql';
