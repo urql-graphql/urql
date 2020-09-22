@@ -218,27 +218,17 @@ The great part about writing thin bindings like this is that they are zero cost 
 If you want to use the Urql client in server-side-rendered mode of NextJS you have to load data in `getServerSideProps` lifecycle method. This will load your data while rendering a page on server.
 
 ```
-// pages/index.tsx
-
 import { initUrqlClient, NextUrqlPageContext } from 'next-urql';
 
-export const getServerSideProps = async (ctx: NextUrqlPageContext): Promise<GetServerSidePropsResult<InitialProps>> => {
-  const graphQLClient = initUrqlClient({
-    url: 'https://graphql-pokemon.now.sh',
-    fetchOptions: {
-      headers: {
-        Authorization: `Bearer ${ctx?.req?.headers?.authorization ?? ''}`,
-      },
-    }
-  }, true) as Client;
-  const response = await graphQLClient.query(queryPokémon as unknown as string, { first: 20 }).toPromise();
+export const getServerSideProps = async (ctx) => {
+  const client = initUrqlClient({
+    url: /graphql',
+  }, false /* set to false to disable suspense */);
 
+  const result= await client.query(QUERY, {}).toPromise();
 
   return {
-    props: {
-      title: 'Pokédex',
-      data: response?.data?.pokemons
-    },
+    props: { data: result.data }
   };
 };
 ```
