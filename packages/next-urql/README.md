@@ -234,7 +234,7 @@ export const getServerSideProps = async (ctx) => {
 ```
 
 The first argument passed to the `initUrqlClient` function is the same object that we'd normally pass to `createClient`.
-The second option is there to either enable or disable `suspense`, which we'd typically disable for manual usage.
+The second argument is a `boolean` flag indicating whether or not to enable `suspense`; typically, we'd disable it for manual usage.
 
 ### Examples
 
