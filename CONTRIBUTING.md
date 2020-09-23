@@ -215,7 +215,7 @@ git commit -a -m 'Version Packages'
 ```
 
 At this point we have a new commit with packages that have been updated and should be published.
-Please don't push this commit before publishing so that we keep `master` in a pre-release state, in
+Please don't push this commit before publishing so that we keep `main` in a pre-release state, in
 case the publish actually fails!
 
 ```
