@@ -4,6 +4,7 @@ export * from './result';
 export * from './typenames';
 export * from './toSuspenseSource';
 export * from './stringifyVariables';
+export * from './getQueryNames';
 export * from './maskTypename';
 export * from './withPromise';
 

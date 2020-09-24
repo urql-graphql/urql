@@ -10,4 +10,5 @@ export {
   makeErrorResult,
   formatDocument,
   maskTypename,
+  getQueryNames,
 } from './utils';
