@@ -61,7 +61,9 @@ describe('storage', () => {
 
   it('should read the metadata and dispatch operations on initialization', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
-    const dispatchOperationSpy = jest.spyOn(client, 'dispatchOperation');
+    const reexecuteOperation = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(() => undefined);
     const op = client.createRequestOperation('mutation', {
       key: 1,
       query: mutationOne,
@@ -81,7 +83,7 @@ describe('storage', () => {
 
     storage.readData.mockReturnValueOnce({ then: () => undefined });
     storage.readMetadata.mockReturnValueOnce({ then: cb => cb([op]) });
-    dispatchOperationSpy.mockImplementation(() => undefined);
+    reexecuteOperation.mockImplementation(() => undefined);
 
     jest.useFakeTimers();
     pipe(
@@ -92,8 +94,8 @@ describe('storage', () => {
     jest.runAllTimers();
 
     expect(storage.readMetadata).toBeCalledTimes(1);
-    expect(dispatchOperationSpy).toBeCalledTimes(1);
-    expect(dispatchOperationSpy).toBeCalledWith({
+    expect(reexecuteOperation).toBeCalledTimes(1);
+    expect(reexecuteOperation).toBeCalledWith({
       ...op,
       key: expect.any(Number),
     });
@@ -229,10 +231,7 @@ describe('offline', () => {
     );
 
     next(queryOp);
-    expect(result).toBeCalledTimes(0);
-    expect(response).toBeCalledTimes(1);
 
-    await Promise.resolve();
     expect(result).toBeCalledTimes(1);
     expect(response).toBeCalledTimes(1);
 
@@ -258,8 +257,8 @@ describe('offline', () => {
     const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
 
     const client = createClient({ url: 'http://0.0.0.0' });
-    const dispatchOperationSpy = jest
-      .spyOn(client, 'dispatchOperation')
+    const reexecuteOperation = jest
+      .spyOn(client, 'reexecuteOperation')
       .mockImplementation(() => undefined);
 
     const mutationOp = client.createRequestOperation('mutation', {
@@ -319,9 +318,9 @@ describe('offline', () => {
     ]);
 
     flush!();
-    expect(dispatchOperationSpy).toHaveBeenCalledTimes(1);
-    expect((dispatchOperationSpy.mock.calls[0][0] as any).key).toEqual(1);
-    expect((dispatchOperationSpy.mock.calls[0][0] as any).query).toEqual(
+    expect(reexecuteOperation).toHaveBeenCalledTimes(1);
+    expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
+    expect((reexecuteOperation.mock.calls[0][0] as any).query).toEqual(
       formatDocument(mutationOp.query)
     );
   });
