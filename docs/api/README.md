@@ -21,3 +21,4 @@ more about the core package on the "Core Package" page.](../concepts/core-packag
 - [`@urql/exchange-persisted-fetch` API docs](./persisted-fetch-exchange.md)
 - [`@urql/exchange-request-policy` API docs](./request-policy-exchange.md)
 - [`@urql/exchange-auth` API docs](./auth-exchange.md)
+- [`@urql/exchange-refocus` API docs](./refocus-exchange.md)
