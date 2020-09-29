@@ -6,7 +6,7 @@ import typescript from 'rollup-plugin-typescript2';
 import sucrase from '@rollup/plugin-sucrase';
 import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
@@ -67,6 +67,7 @@ export const makePlugins = ({ isProduction } = {}) => [
   }),
   babel({
     babelrc: false,
+    babelHelpers: 'bundled',
     extensions: ['js', 'jsx', 'ts', 'tsx'],
     exclude: 'node_modules/**',
     presets: [],
