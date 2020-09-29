@@ -9,11 +9,9 @@ export const refocusExchange = (): Exchange => {
     window.addEventListener('focus', () => {
       watchedOperations.forEach(op => {
         client.reexecuteOperation(
-          client.createRequestOperation(
-            'query',
-            { key: op.key, query: op.query, variables: op.variables },
-            { requestPolicy: 'cache-and-network' }
-          )
+          client.createRequestOperation('query', op, {
+            requestPolicy: 'cache-and-network',
+          })
         );
       });
     });
