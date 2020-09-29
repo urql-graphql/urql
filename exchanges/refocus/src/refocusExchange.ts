@@ -5,11 +5,9 @@ export const refocusExchange = (): Exchange => {
   return ({ client, forward }) => ops$ => {
     const watchedOperations = new Map<number, Operation>();
     const observedOperations = new Map<number, number>();
-    const keys: Array<number> = [];
 
     window.addEventListener('focus', () => {
-      keys.forEach(key => {
-        const op = watchedOperations.get(key) as Operation;
+      watchedOperations.forEach(op => {
         client.reexecuteOperation(
           client.createRequestOperation(
             'query',
@@ -27,17 +25,13 @@ export const refocusExchange = (): Exchange => {
       if (op.operationName === 'query' && !observedOperations.has(op.key)) {
         observedOperations.set(op.key, 1);
         watchedOperations.set(op.key, op);
-        keys.push(op.key);
       } else if (op.operationName === 'query') {
-        const observedCount = observedOperations.get(op.key) as number;
-        observedOperations.set(op.key, observedCount + 1);
+        observedOperations.set(op.key, observedOperations.get(op.key) + 1);
       }
 
       if (op.operationName === 'teardown' && observedOperations.has(op.key)) {
-        const observedCount = observedOperations.get(op.key) as number;
         observedOperations.delete(op.key);
         watchedOperations.delete(op.key);
-        keys.splice(keys.indexOf(op.key), 1);
       }
     };
 
