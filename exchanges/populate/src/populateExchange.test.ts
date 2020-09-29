@@ -33,15 +33,55 @@ const schemaDef = `
 
   union UnionType = User | Todo
 
+  interface Product {
+    id: ID!
+    name: String!
+    price: Int!
+  }
+
+  interface Store {
+    id: ID!
+    name: String!
+  }
+
+  type PhysicalStore implements Store {
+    id: ID!
+    name: String!
+    address: String
+  }
+
+  type OnlineStore implements Store {
+    id: ID!
+    name: String!
+    website: String
+  }
+
+  type SimpleProduct implements Product {
+    id: ID!
+    name: String!
+    price: Int!
+    store: PhysicalStore
+  }
+
+  type ComplexProduct implements Product {
+    id: ID!
+    name: String!
+    price: Int!
+    tax: Int!
+    store: OnlineStore
+  }
+
   type Query {
     todos: [Todo!]
     users: [User!]!
+    products: [Product]!
   }
 
   type Mutation {
     addTodo: [Todo]
     removeTodo: [Node]
     updateTodo: [UnionType]
+    addProduct: Product
   }
 `;
 
@@ -505,5 +545,133 @@ describe('on query -> teardown -> mutation', () => {
         expect(field.name.value).toMatch(/addTodo|__typename/);
       });
     });
+  });
+});
+
+describe('interface returned in mutation', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        products {
+          id
+          text
+          price
+          tax
+        }
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addProduct @populate
+      }
+    `,
+  } as Operation;
+
+  it('should correctly make the inline-fragments', () => {
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp, mutationOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[1].query)).toMatchInlineSnapshot(`
+      "mutation MyMutation {
+        addProduct {
+          ...SimpleProduct_PopulateFragment_0
+          ...ComplexProduct_PopulateFragment_0
+        }
+      }
+
+      fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
+        id
+        price
+      }
+
+      fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
+        id
+        price
+        tax
+      }
+      "
+    `);
+  });
+});
+
+describe('nested interfaces', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        products {
+          id
+          text
+          price
+          tax
+          store {
+            id
+            name
+            address
+            website
+          }
+        }
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addProduct @populate
+      }
+    `,
+  } as Operation;
+
+  it('should correctly make the inline-fragments', () => {
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp, mutationOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[1].query)).toMatchInlineSnapshot(`
+      "mutation MyMutation {
+        addProduct {
+          ...SimpleProduct_PopulateFragment_0
+          ...ComplexProduct_PopulateFragment_0
+        }
+      }
+
+      fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
+        id
+        price
+        store {
+          id
+          name
+          address
+        }
+      }
+
+      fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
+        id
+        price
+        tax
+        store {
+          id
+          name
+          website
+        }
+      }
+      "
+    `);
   });
 });
