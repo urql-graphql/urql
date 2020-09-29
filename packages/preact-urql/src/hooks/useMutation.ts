@@ -1,16 +1,17 @@
-import { useCallback } from 'preact/hooks';
 import { DocumentNode } from 'graphql';
+import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { pipe, toPromise } from 'wonka';
+
 import {
-  Operation,
+  OperationResult,
   OperationContext,
   CombinedError,
   createRequest,
-  OperationResult,
+  Operation,
 } from '@urql/core';
+
 import { useClient } from '../context';
-import { useImmediateState } from './useImmediateState';
-import { initialState } from './useQuery';
+import { initialState } from './constants';
 
 export interface UseMutationState<T> {
   fetching: boolean;
@@ -29,21 +30,17 @@ export type UseMutationResponse<T, V> = [
   ) => Promise<OperationResult<T>>
 ];
 
-export const useMutation = <T = any, V = object>(
+export function useMutation<T = any, V = object>(
   query: DocumentNode | string
-): UseMutationResponse<T, V> => {
+): UseMutationResponse<T, V> {
+  const isMounted = useRef(true);
   const client = useClient();
 
-  const [state, setState] = useImmediateState<UseMutationState<T>>({
-    ...initialState,
-  });
+  const [state, setState] = useState<UseMutationState<T>>(initialState);
 
   const executeMutation = useCallback(
     (variables?: V, context?: Partial<OperationContext>) => {
-      setState({
-        ...initialState,
-        fetching: true,
-      });
+      setState({ ...initialState, fetching: true });
 
       return pipe(
         client.executeMutation(
@@ -52,14 +49,16 @@ export const useMutation = <T = any, V = object>(
         ),
         toPromise
       ).then(result => {
-        setState({
-          fetching: false,
-          stale: !!result.stale,
-          data: result.data,
-          error: result.error,
-          extensions: result.extensions,
-          operation: result.operation,
-        });
+        if (isMounted.current) {
+          setState({
+            fetching: false,
+            stale: !!result.stale,
+            data: result.data,
+            error: result.error,
+            extensions: result.extensions,
+            operation: result.operation,
+          });
+        }
         return result;
       });
     },
@@ -67,5 +66,11 @@ export const useMutation = <T = any, V = object>(
     [client, query, setState]
   );
 
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   return [state, executeMutation];
-};
+}

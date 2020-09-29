@@ -262,20 +262,22 @@ describe('useQuery', () => {
         unmount();
       });
 
-      expect(start).toBeCalledTimes(1);
-      expect(unsubscribe).toBeCalledTimes(1);
+      expect(start).toBeCalledTimes(2);
+      expect(unsubscribe).toBeCalledTimes(2);
     });
   });
 
   describe('active teardown', () => {
     it('sets fetching to false when the source ends', () => {
       client.executeQuery.mockReturnValueOnce(empty);
-      render(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
+      act(() => {
+        render(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+      });
       expect(client.executeQuery).toHaveBeenCalled();
       expect(state).toMatchObject({ fetching: false });
     });
@@ -313,15 +315,6 @@ describe('useQuery', () => {
         })
       );
 
-      /**
-       * Call update twice for the change to be detected.
-       */
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props, pause: true })],
-        })
-      );
       rerender(
         h(Provider, {
           value: client as any,
