@@ -5,6 +5,7 @@ import {
   Operation,
   GraphQLRequest,
   Exchange,
+  ExchangeIO,
   CombinedError,
   createRequest,
 } from '@urql/core';
@@ -59,14 +60,8 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
-  forward: outerForward,
-  client,
-  dispatchDebug,
-}) => ops$ => {
+export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
   const { storage } = opts;
-  const { source: reboundOps$, next } = makeSubject<Operation>();
-  let forward = outerForward;
 
   if (
     storage &&
@@ -74,6 +69,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
     storage.readMetadata &&
     storage.writeMetadata
   ) {
+    const { forward: outerForward, client, dispatchDebug } = input;
     const optimisticMutations = opts.optimistic || {};
     const failedQueue: GraphQLRequest[] = [];
 
@@ -100,30 +96,21 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
       updateMetadata();
     };
 
-    forward = ops$ => {
+    const forward: ExchangeIO = ops$ => {
       return pipe(
         outerForward(ops$),
         filter(res => {
           if (
-            res.operation.operationName === 'subscription' ||
-            !isOfflineError(res.error)
+            res.operation.operationName === 'mutation' &&
+            isOfflineError(res.error) &&
+            isOptimisticMutation(optimisticMutations, res.operation)
           ) {
-            return true;
-          } else if (res.operation.operationName === 'mutation') {
-            if (isOptimisticMutation(optimisticMutations, res.operation)) {
-              failedQueue.push(res.operation);
-              updateMetadata();
-              return false;
-            }
-
-            return true;
+            failedQueue.push(res.operation);
+            updateMetadata();
+            return false;
           }
 
-          Promise.resolve().then(() =>
-            next(toRequestPolicy(res.operation, 'cache-only'))
-          );
-
-          return false;
+          return true;
         })
       );
     };
@@ -137,14 +124,34 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => ({
           );
       flushQueue();
     });
+
+    const cacheResults$ = cacheExchange(opts)({
+      client,
+      dispatchDebug,
+      forward,
+    });
+
+    return ops$ => {
+      const sharedOps$ = share(ops$);
+      const { source: reboundOps$, next } = makeSubject<Operation>();
+      const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
+
+      return pipe(
+        cacheResults$(opsAndRebound$),
+        filter(res => {
+          if (
+            res.operation.operationName === 'query' &&
+            isOfflineError(res.error)
+          ) {
+            next(toRequestPolicy(res.operation, 'cache-only'));
+            return false;
+          }
+
+          return true;
+        })
+      );
+    };
   }
 
-  const sharedOps$ = share(ops$);
-  const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
-
-  return cacheExchange(opts)({
-    forward,
-    client,
-    dispatchDebug,
-  })(opsAndRebound$);
+  return cacheExchange(opts)(input);
 };

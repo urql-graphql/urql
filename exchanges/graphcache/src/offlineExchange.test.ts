@@ -229,10 +229,7 @@ describe('offline', () => {
     );
 
     next(queryOp);
-    expect(result).toBeCalledTimes(0);
-    expect(response).toBeCalledTimes(1);
 
-    await Promise.resolve();
     expect(result).toBeCalledTimes(1);
     expect(response).toBeCalledTimes(1);
 
