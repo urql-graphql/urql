@@ -16,7 +16,6 @@
     "graphql client",
     "formidablelabs",
     "exchanges",
-    "react",
     "request-policy"
   ],
   "main": "dist/urql-exchange-request-policy",
