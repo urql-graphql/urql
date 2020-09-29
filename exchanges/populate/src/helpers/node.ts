@@ -5,6 +5,7 @@ import {
   GraphQLOutputType,
   isWrappingType,
   GraphQLWrappingType,
+  Kind,
 } from 'graphql';
 
 export type SelectionSet = ReadonlyArray<SelectionNode>;
@@ -28,3 +29,10 @@ export const unwrapType = (
 
   return type || null;
 };
+
+export function createNameNode(value: string): NameNode {
+  return {
+    kind: Kind.NAME,
+    value,
+  };
+}
