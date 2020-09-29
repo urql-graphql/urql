@@ -1,5 +1,16 @@
 # @urql/exchange-populate
 
+## 0.2.0
+
+### Minor Changes
+
+- Support interfaces and nested interfaces, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#963](https://github.com/FormidableLabs/urql/pull/963))
+
+### Patch Changes
+
+- Updated dependencies (See [#1011](https://github.com/FormidableLabs/urql/pull/1011))
+  - @urql/core@1.13.1
+
 ## 0.1.8
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.13.1
+
+### Patch Changes
+
+- Allow `client.reexecuteOperation` to be called with mutations which skip the active operation minimums, by [@kitten](https://github.com/kitten) (See [#1011](https://github.com/FormidableLabs/urql/pull/1011))
+
 ## 1.13.0
 
 Please note that this release changes the data structure of the `ssrExchange`'s

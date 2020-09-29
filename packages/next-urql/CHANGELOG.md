@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- Add option called `neverSuspend` to disable `React.Suspense` on next.js, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#923](https://github.com/FormidableLabs/urql/pull/923))
+- Expose `initUrqlClient` function so that a `Client` can be created manually for use in Next's newer SSR methods manually, such as `getServerSideProps`, by [@sunpietro](https://github.com/sunpietro) (See [#993](https://github.com/FormidableLabs/urql/pull/993))
+
 ## 1.1.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @urql/preact
 
+## 1.3.0
+
+### Minor Changes
+
+- Update `@urql/preact` implementation to match `urql` React implementation. Internally these changes should align behaviour and updates slightly, but outwardly no changes should be apparent apart from how some updates are scheduled, by [@kitten](https://github.com/kitten) (See [#1008](https://github.com/FormidableLabs/urql/pull/1008))
+
+### Patch Changes
+
+- Updated dependencies (See [#1011](https://github.com/FormidableLabs/urql/pull/1011))
+  - @urql/core@1.13.1
+
 ## 1.2.1
 
 ### Patch Changes

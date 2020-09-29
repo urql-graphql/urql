@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 3.1.2
+
+### Patch Changes
+
+- ⚠️ Fix small pieces of code where polyfill-less ES5 usage was compromised. This was unlikely to have affected anyone in production as `Array.prototype.find` (the only usage of an ES6 method) is commonly used and polyfilled, by [@kitten](https://github.com/kitten) (See [#991](https://github.com/FormidableLabs/urql/pull/991))
+- ⚠️ Fix queries that have erroed with a `NetworkError` (`isOfflineError`) not flowing back completely through the `cacheExchange`.
+  These queries should also now be reexecuted when the client comes back online, by [@kitten](https://github.com/kitten) (See [#1011](https://github.com/FormidableLabs/urql/pull/1011))
+- Updated dependencies (See [#1011](https://github.com/FormidableLabs/urql/pull/1011))
+  - @urql/core@1.13.1
+
 ## 3.1.1
 
 ### Patch Changes
