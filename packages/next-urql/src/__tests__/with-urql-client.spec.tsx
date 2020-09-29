@@ -162,4 +162,50 @@ describe('withUrqlClient', () => {
       expect(exchange).toBeCalledTimes(1);
     });
   });
+
+  describe('never-suspend', () => {
+    // Simulate a token that might be passed in a request to the server-rendered application.
+    const token = Math.random().toString(36).slice(-10);
+    let mockSsrExchange;
+
+    const mockContext: NextUrqlPageContext = {
+      AppTree: MockAppTree,
+      pathname: '/',
+      query: {},
+      asPath: '/',
+      req: {
+        headers: {
+          cookie: token,
+        },
+      } as NextUrqlPageContext['req'],
+      urqlClient: {} as Client,
+    };
+
+    beforeEach(() => {
+      Component = withUrqlClient(
+        (ssrExchange, ctx) => ({
+          url: 'http://localhost:3000',
+          fetchOptions: {
+            headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
+          },
+          exchanges: [(mockSsrExchange = ssrExchange)],
+        }),
+        { ssr: true, neverSuspend: true }
+      )(MockApp);
+    });
+
+    it('should not enable suspense', async () => {
+      Component.getInitialProps &&
+        (await Component.getInitialProps(mockContext));
+
+      expect(spyInitUrqlClient).toHaveBeenCalledWith(
+        {
+          url: 'http://localhost:3000',
+          fetchOptions: { headers: { Authorization: token } },
+          exchanges: [mockSsrExchange],
+        },
+        false
+      );
+    });
+  });
 });

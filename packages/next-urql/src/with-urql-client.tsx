@@ -29,9 +29,10 @@ export function withUrqlClient(
   options?: WithUrqlClientOptions
 ) {
   if (!options) options = {};
+
   return (AppOrPage: NextPage<any> | typeof NextApp) => {
-    const shouldBindGetInitialprops = Boolean(
-      AppOrPage.getInitialProps || options!.ssr
+    const shouldEnableSuspense = Boolean(
+      (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
 
     const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
@@ -59,8 +60,7 @@ export function withUrqlClient(
         }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return initUrqlClient(clientConfig, shouldBindGetInitialprops)!;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return initUrqlClient(clientConfig, shouldEnableSuspense)!;
       }, [urqlClient, urqlState, forceUpdate[0]]);
 
       const resetUrqlClient = () => {
@@ -83,7 +83,7 @@ export function withUrqlClient(
     // Set the displayName to indicate use of withUrqlClient.
     withUrql.displayName = `withUrqlClient(${getDisplayName(AppOrPage)})`;
 
-    if (shouldBindGetInitialprops) {
+    if (AppOrPage.getInitialProps || options!.ssr) {
       withUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const { AppTree } = appOrPageCtx;
 
@@ -104,7 +104,8 @@ export function withUrqlClient(
             fetchExchange,
           ];
         }
-        const urqlClient = initUrqlClient(clientConfig, true);
+
+        const urqlClient = initUrqlClient(clientConfig, !options!.neverSuspend);
 
         if (urqlClient) {
           (ctx as NextUrqlContext).urqlClient = urqlClient;
@@ -127,7 +128,8 @@ export function withUrqlClient(
         const appTreeProps = isApp ? props : { pageProps: props };
 
         // Run the prepass step on AppTree. This will run all urql queries on the server.
-        await ssrPrepass(<AppTree {...appTreeProps} />);
+        if (!options!.neverSuspend)
+          await ssrPrepass(<AppTree {...appTreeProps} />);
 
         return {
           ...pageProps,
