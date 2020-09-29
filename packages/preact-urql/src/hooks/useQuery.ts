@@ -1,26 +1,17 @@
 import { DocumentNode } from 'graphql';
-import { pipe, subscribe, onEnd } from 'wonka';
-import { useRef, useCallback } from 'preact/hooks';
+import { useCallback, useMemo } from 'preact/hooks';
+import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 import {
+  CombinedError,
   OperationContext,
   RequestPolicy,
-  CombinedError,
   Operation,
 } from '@urql/core';
 
 import { useClient } from '../context';
+import { useSource, useBehaviourSubject } from './useSource';
 import { useRequest } from './useRequest';
-import { useImmediateState } from './useImmediateState';
-import { useImmediateEffect } from './useImmediateEffect';
-
-export const initialState: UseQueryState<any> = {
-  fetching: false,
-  stale: false,
-  data: undefined,
-  error: undefined,
-  operation: undefined,
-  extensions: undefined,
-};
+import { initialState } from './constants';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -45,69 +36,75 @@ export type UseQueryResponse<T> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-// eslint-disable-next-line
-export const noop = () => {};
-
-export const useQuery = <T = any, V = object>(
+export function useQuery<T = any, V = object>(
   args: UseQueryArgs<V>
-): UseQueryResponse<T> => {
-  const unsubscribe = useRef<(_1?: any) => void>(noop);
+): UseQueryResponse<T> {
   const client = useClient();
-  const [state, setState] = useImmediateState<UseQueryState<T>>({
-    ...initialState,
-  });
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
   const request = useRequest(args.query, args.variables);
 
-  const executeQuery = useCallback(
+  // Create a new query-source from client.executeQuery
+  const makeQuery$ = useCallback(
     (opts?: Partial<OperationContext>) => {
-      unsubscribe.current();
-
-      setState(s => ({ ...s, fetching: true }));
-
-      const result = pipe(
-        client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
-          ...args.context,
-          ...opts,
-        }),
-        onEnd(() => setState(s => ({ ...s, fetching: false }))),
-        subscribe(result => {
-          setState({
-            fetching: false,
-            data: result.data,
-            error: result.error,
-            extensions: result.extensions,
-            stale: !!result.stale,
-            operation: result.operation,
-          });
-        })
-      );
-      unsubscribe.current = result.unsubscribe;
+      return client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        pollInterval: args.pollInterval,
+        ...args.context,
+        ...opts,
+      });
     },
-    [
-      setState,
-      client,
-      request,
-      args.requestPolicy,
-      args.pollInterval,
-      args.context,
-    ]
+    [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
-  useImmediateEffect(() => {
-    if (args.pause) {
-      unsubscribe.current();
-      setState(s => ({ ...s, fetching: false }));
-      return noop;
-    }
+  const [query$$, update] = useBehaviourSubject(
+    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$])
+  );
 
-    executeQuery();
-    return unsubscribe.current; // eslint-disable-line
-  }, [executeQuery, args.pause, setState]);
+  const state = useSource(
+    useMemo(() => {
+      return pipe(
+        query$$,
+        switchMap(query$ => {
+          if (!query$) return fromValue({ fetching: false, stale: false });
+
+          return concat([
+            // Initially set fetching to true
+            fromValue({ fetching: true, stale: false }),
+            pipe(
+              query$,
+              map(({ stale, data, error, extensions, operation }) => ({
+                fetching: false,
+                stale: !!stale,
+                data,
+                error,
+                operation,
+                extensions,
+              }))
+            ),
+            // When the source proactively closes, fetching is set to false
+            fromValue({ fetching: false, stale: false }),
+          ]);
+        }),
+        // The individual partial results are merged into each previous result
+        scan(
+          (result, partial) => ({
+            ...result,
+            ...partial,
+          }),
+          initialState
+        )
+      );
+    }, [query$$]),
+    initialState
+  );
+
+  // This is the imperative execute function passed to the user
+  const executeQuery = useCallback(
+    (opts?: Partial<OperationContext>) => update(makeQuery$(opts)),
+    [update, makeQuery$]
+  );
 
   return [state, executeQuery];
-};
+}

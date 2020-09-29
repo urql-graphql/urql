@@ -112,7 +112,7 @@ describe('useSubscription', () => {
         children: [h(SubscriptionUser, { ...props })],
       })
     );
-    expect(handler).toBeCalledTimes(1);
+    expect(handler).toBeCalledTimes(2);
     expect(handler).toBeCalledWith(undefined, 1234);
   });
 

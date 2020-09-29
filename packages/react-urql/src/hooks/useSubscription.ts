@@ -40,7 +40,7 @@ export function useSubscription<T = any, R = T, V = object>(
   // Update handler on constant ref, since handler changes shouldn't
   // trigger a new subscription run
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+  handlerRef.current = handler!;
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
