@@ -35,13 +35,9 @@ export const refocusExchange = (): Exchange => {
 
       if (op.operationName === 'teardown' && observedOperations.has(op.key)) {
         const observedCount = observedOperations.get(op.key) as number;
-        if (observedCount === 1) {
-          observedOperations.delete(op.key);
-          watchedOperations.delete(op.key);
-          keys.splice(keys.indexOf(op.key), 1);
-        } else {
-          observedOperations.set(op.key, observedCount - 1);
-        }
+        observedOperations.delete(op.key);
+        watchedOperations.delete(op.key);
+        keys.splice(keys.indexOf(op.key), 1);
       }
     };
 
