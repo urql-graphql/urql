@@ -151,11 +151,10 @@ export const extractSelectionsFromQuery = (
   ) => {
     const selections: SelectionNode[] = [];
     const validTypes = (schema.getType(type) as GraphQLObjectType).getFields();
-    const validTypeProperties = Object.keys(validTypes);
 
     selectionSet.selections.forEach(selection => {
       if (selection.kind === Kind.FIELD) {
-        if (validTypeProperties.includes(selection.name.value)) {
+        if (validTypes[selection.name.value]) {
           if (selection.selectionSet) {
             selections.push({
               ...selection,
