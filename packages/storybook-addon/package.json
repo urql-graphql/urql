@@ -46,7 +46,7 @@
     "react": "^16.13.0",
     "urql": ">=1.10.0",
     "graphql": "^15.1.0",
-    "wonka": "latest"
+    "wonka": "^4.0.14"
   },
   "optionalDependencies": {
     "@storybook/addons": ">=6.0.0"

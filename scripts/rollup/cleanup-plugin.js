@@ -1,5 +1,5 @@
 import { transformSync as transform } from '@babel/core';
-import { createFilter } from 'rollup-pluginutils';
+import { createFilter } from '@rollup/pluginutils';
 
 function removeEmptyImports({ types: t }) {
   return {
