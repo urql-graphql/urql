@@ -1,7 +1,7 @@
 {
   "name": "@urql/exchange-refocus",
-  "version": "0.1.8",
-  "description": "An exchange for operation retry support in urql",
+  "version": "0.1.0",
+  "description": "An exchange that dispatches active operations when the window regains focus",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/FormidableLabs/urql/issues",
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "exchanges/retry"
+    "directory": "exchanges/refocus"
   },
   "keywords": [
     "urql",
@@ -17,16 +17,16 @@
     "formidablelabs",
     "exchanges",
     "react",
-    "retry"
+    "focus"
   ],
-  "main": "dist/urql-exchange-retry",
-  "module": "dist/urql-exchange-retry.mjs",
+  "main": "dist/urql-exchange-refocus",
+  "module": "dist/urql-exchange-refocus.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/urql-exchange-retry.mjs",
-      "require": "./dist/urql-exchange-retry.js",
+      "import": "./dist/urql-exchange-refocus.mjs",
+      "require": "./dist/urql-exchange-refocus.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     },
