@@ -1,4 +1,9 @@
-# @urql/exchange-refocus
+---
+title: '@urql/exchange-refocus'
+order: 10
+---
+
+# Refocus exchange
 
 `@urql/exchange-refocus` is an exchange for the [`urql`](../../README.md) GraphQL client that tracks currently active operations and redispatches them when the
 window regains focus

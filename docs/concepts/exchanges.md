@@ -32,6 +32,8 @@ Other available exchanges:
 - [`authExchange`](../api/auth-exchange.md): Allows complex authentication flows to be implemented
   easily.
 - [`requestPolicyExchange`](../api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
+- [`refocusExchange`](../api/refocus-exchange.md): Tracks open queries and refetches them
+  when the window regains focus.
 - `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
 
 It is also possible to apply custom exchanges to override the default logic.

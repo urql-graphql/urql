@@ -25,8 +25,6 @@ export const refocusExchange = (): Exchange => {
       if (op.operationName === 'query' && !observedOperations.has(op.key)) {
         observedOperations.set(op.key, 1);
         watchedOperations.set(op.key, op);
-      } else if (op.operationName === 'query') {
-        observedOperations.set(op.key, observedOperations.get(op.key) + 1);
       }
 
       if (op.operationName === 'teardown' && observedOperations.has(op.key)) {
