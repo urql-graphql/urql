@@ -135,7 +135,10 @@ export class Client {
     this.reexecuteOperation = (operation: Operation) => {
       // Reexecute operation only if any subscribers are still subscribed to the
       // operation's exchange results
-      if ((this.activeOperations[operation.key] || 0) > 0) {
+      if (
+        operation.operationName === 'mutation' ||
+        (this.activeOperations[operation.key] || 0) > 0
+      ) {
         this.queue.push(operation);
         if (!isOperationBatchActive) {
           Promise.resolve().then(this.dispatchOperation);

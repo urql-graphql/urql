@@ -3,7 +3,6 @@ import { print, SelectionNode } from 'graphql';
 
 import {
   Operation,
-  GraphQLRequest,
   Exchange,
   ExchangeIO,
   CombinedError,
@@ -21,7 +20,11 @@ import {
 } from './ast';
 
 import { makeDict } from './helpers/dict';
-import { OptimisticMutationConfig, Variables } from './types';
+import {
+  SerializedRequest,
+  OptimisticMutationConfig,
+  Variables,
+} from './types';
 import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
@@ -71,29 +74,32 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
   ) {
     const { forward: outerForward, client, dispatchDebug } = input;
     const optimisticMutations = opts.optimistic || {};
-    const failedQueue: GraphQLRequest[] = [];
+    const failedQueue: Operation[] = [];
 
     const updateMetadata = () => {
-      storage.writeMetadata!(
-        failedQueue.map(op => ({
-          query: print(op.query),
-          variables: op.variables,
-        }))
-      );
+      const requests: SerializedRequest[] = [];
+      for (let i = 0; i < failedQueue.length; i++) {
+        const op = failedQueue[i];
+        if (op.operationName === 'mutation') {
+          requests.push({
+            query: print(op.query),
+            variables: op.variables,
+          });
+        }
+      }
+      storage.writeMetadata!(requests);
     };
 
     let _flushing = false;
     const flushQueue = () => {
-      let request: void | GraphQLRequest;
-      while (!_flushing && (request = failedQueue.shift())) {
+      if (!_flushing) {
         _flushing = true;
-        client.dispatchOperation(
-          client.createRequestOperation('mutation', request)
-        );
+        let operation: void | Operation;
+        while ((operation = failedQueue.shift()))
+          client.reexecuteOperation(operation);
+        updateMetadata();
         _flushing = false;
       }
-
-      updateMetadata();
     };
 
     const forward: ExchangeIO = ops$ => {
@@ -117,12 +123,18 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
 
     storage.onOnline(flushQueue);
     storage.readMetadata().then(mutations => {
-      if (mutations)
-        for (let i = 0; i < mutations.length; i++)
+      if (mutations) {
+        for (let i = 0; i < mutations.length; i++) {
           failedQueue.push(
-            createRequest(mutations[i].query, mutations[i].variables)
+            client.createRequestOperation(
+              'mutation',
+              createRequest(mutations[i].query, mutations[i].variables)
+            )
           );
-      flushQueue();
+        }
+
+        flushQueue();
+      }
     });
 
     const cacheResults$ = cacheExchange(opts)({
@@ -144,6 +156,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
             isOfflineError(res.error)
           ) {
             next(toRequestPolicy(res.operation, 'cache-only'));
+            failedQueue.push(res.operation);
             return false;
           }
 
