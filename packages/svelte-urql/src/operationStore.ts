@@ -48,17 +48,17 @@ export function operationStore<Data = any, Vars = object>(
     extensions: undefined,
   } as OperationStore<Data, Vars>;
 
-  const store = writable(state);
+  const svelteStore = writable(state);
   let _internalUpdate = false;
 
-  function set(value?: Partial<typeof state>) {
+  state.set = function set(value?: Partial<typeof state>) {
     if (!value) value = noop;
 
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {
       if (!_storeUpdate.has(value!)) {
         for (const key in value) {
-          if (key !== 'query' && key !== 'variables') {
+          if (!(key in internal)) {
             throw new TypeError(
               'It is not allowed to update result properties on an OperationStore.'
             );
@@ -80,32 +80,32 @@ export function operationStore<Data = any, Vars = object>(
     }
 
     _internalUpdate = false;
-    store.set(state);
-  }
+    svelteStore.set(state);
+  };
 
-  function update(fn: Updater<typeof state>): void {
-    set(fn(state));
-  }
+  state.update = function update(fn: Updater<typeof state>): void {
+    state.set(fn(state));
+  };
 
-  state.set = set;
-  state.update = update;
-  state.subscribe = store.subscribe;
+  state.subscribe = function subscribe(run, invalidate) {
+    return svelteStore.subscribe(run, invalidate);
+  };
 
-  for (const prop in internal) {
+  Object.keys(internal).forEach(prop => {
     Object.defineProperty(state, prop, {
       configurable: false,
       get: () => internal[prop],
       set(value) {
         internal[prop] = value;
-        if (!_internalUpdate) store.set(state);
+        if (!_internalUpdate) svelteStore.set(state);
       },
     });
-  }
+  });
 
   if (process.env.NODE_ENV !== 'production') {
     const result = { ...state };
 
-    for (const prop in state) {
+    Object.keys(state).forEach(prop => {
       Object.defineProperty(result, prop, {
         configurable: false,
         get() {
@@ -117,18 +117,18 @@ export function operationStore<Data = any, Vars = object>(
           );
         },
       });
-    }
+    });
 
-    for (const prop in internal) {
+    Object.keys(internal).forEach(prop => {
       Object.defineProperty(result, prop, {
         configurable: false,
         get: () => internal[prop],
         set(value) {
           internal[prop] = value;
-          if (!_internalUpdate) store.set(state);
+          if (!_internalUpdate) svelteStore.set(state);
         },
       });
-    }
+    });
 
     return result;
   }
