@@ -1,7 +1,7 @@
-import { makeSubject } from 'wonka';
+import { makeSubject, pipe, take, toPromise } from 'wonka';
 import { createClient } from '@urql/core';
 import { operationStore } from './operationStore';
-import { query, subscription } from './operations';
+import { query, subscription, mutation } from './operations';
 
 const client = createClient({ url: '/graphql' });
 
@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 describe('query', () => {
-  it('susbcribes to a query and updates data', () => {
+  it('subscribes to a query and updates data', () => {
     const subscriber = jest.fn();
     const subject = makeSubject<any>();
     const executeQuery = jest
@@ -89,7 +89,7 @@ describe('query', () => {
 });
 
 describe('subscription', () => {
-  it('susbcribes to a subscription and updates data', () => {
+  it('subscribes to a subscription and updates data', () => {
     const subscriber = jest.fn();
     const subject = makeSubject<any>();
     const executeQuery = jest
@@ -170,7 +170,7 @@ describe('subscription', () => {
       .spyOn(client, 'executeSubscription')
       .mockImplementation(() => subject.source);
 
-    const store = operationStore('{ counter }');
+    const store = operationStore('subscription { counter }');
     store.subscribe(subscriber);
 
     subscription(store, (prev, current) => ({
@@ -193,5 +193,38 @@ describe('subscription', () => {
     subject.next({ data: { counter: 2 } });
     expect(subscriber).toHaveBeenCalledTimes(4);
     expect(store.data).toEqual({ counter: 3 });
+  });
+});
+
+describe('mutation', () => {
+  it('provides an execute method that resolves a promise', async () => {
+    const subscriber = jest.fn();
+    const subject = makeSubject<any>();
+    const clientMutation = jest
+      .spyOn(client, 'mutation')
+      .mockImplementation((): any => ({
+        toPromise() {
+          return pipe(subject.source, take(1), toPromise);
+        },
+      }));
+
+    const store = operationStore('mutation { test }', { test: false });
+    store.subscribe(subscriber);
+
+    const start = mutation(store);
+    expect(subscriber).toHaveBeenCalledTimes(1);
+    expect(clientMutation).not.toHaveBeenCalled();
+
+    const result$ = start({ test: true });
+    expect(subscriber).toHaveBeenCalledTimes(2);
+    expect(store.fetching).toBe(true);
+    expect(store.variables).toEqual({ test: true });
+
+    subject.next({ data: { test: true } });
+    expect(await result$).toEqual(store);
+
+    expect(subscriber).toHaveBeenCalledTimes(3);
+    expect(store.fetching).toBe(false);
+    expect(store.data).toEqual({ test: true });
   });
 });
