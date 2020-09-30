@@ -181,18 +181,19 @@ We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next
 this integration contains convenience methods specifically for `Next.js`.
 These will simplify the above setup for SSR.
 
-To setup `next-urql`, first we'll install `next-urql` with `react-is` and `isomorphic-unfetch` as
+To setup `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as
 peer dependencies:
 
 ```sh
-yarn add next-urql react-is isomorphic-unfetch
+yarn add next-urql react-is urql
 # or
-npm install --save next-urql react-is isomorphic-unfetch
+npm install --save next-urql react-is urql
 ```
 
-The peer dependency on `react-is` is inherited from `react-ssr-prepass` requiring it, and the peer
-dependency on `isomorphic-unfetch` exists, since `next-urql` automatically injects it as a `fetch`
-polyfill.
+The peer dependency on `react-is` is inherited from `react-ssr-prepass` requiring it.
+
+Note that if you are using Next before v9.4 you'll need to polyfill fetch, this can be
+done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch), ...
 
 We're now able to wrap any page or `_app.js` using the `withUrqlClient` higher-order component. If
 we wrap `_app.js` we won't have to wrap any individual page, but we also won't be able to make use
@@ -241,7 +242,7 @@ export default withUrqlClient(ssrExchange => ({
 Unless the component that is being wrapped already has a `getInitialProps` method, `next-urql` won't add its own SSR logic, which automatically fetches queries during
 server-side rendering. This can be explicitly enabled by passing the `{ ssr: true }` option as a second argument to `withUrqlClient`.
 
-When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`,  you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
+When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
 your `withUrqlClient`.
 During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
 could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.

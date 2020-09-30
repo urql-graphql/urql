@@ -1,5 +1,4 @@
 import { createClient, Client, ClientOptions } from 'urql';
-import 'isomorphic-unfetch';
 
 let urqlClient: Client | null = null;
 

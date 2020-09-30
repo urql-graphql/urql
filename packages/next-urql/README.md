@@ -25,10 +25,15 @@ Using GraphQL with server-side rendering in React is a challenging problem. Curr
 Install `next-urql` along with its `peerDependencies`.
 
 ```sh
-npm install --save next-urql urql react-is isomorphic-unfetch
+yarn add next-urql react-is urql
+# or
+npm install --save next-urql react-is urql
 ```
 
 `react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
+
+Note that if you are using Next before v9.4 you'll need to polyfill fetch, this can be
+done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch), ...
 
 ### Usage
 
@@ -247,7 +252,7 @@ component has children using `getInitialProps` but that component itself is not 
 `withUrqlClient`, this means `withUrqlClient(() => clientOptiosn, { ssr:true })`.
 This measure is available so we can support `getStaticProps`, ...
 
-When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`,  you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
+When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
 your `withUrqlClient`.
 During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
 could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.

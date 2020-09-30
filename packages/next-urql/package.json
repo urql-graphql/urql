@@ -43,7 +43,6 @@
     "enzyme-adapter-react-16": "^1.15.2",
     "graphql": "^15.1.0",
     "graphql-tag": "^2.10.3",
-    "isomorphic-unfetch": "^3.0.0",
     "next": "^9.2.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
@@ -53,7 +52,6 @@
     "react-ssr-prepass": "^1.2.1"
   },
   "peerDependencies": {
-    "isomorphic-unfetch": "^3.0.0",
     "react": ">=16.8.0",
     "urql": "^1.10.0"
   }
