@@ -85,6 +85,19 @@ describe('query', () => {
     expect(subscriber).toHaveBeenCalledTimes(5);
     expect(store.fetching).toBe(true);
     expect(store.data).toEqual({ test: true });
+
+    store.context = { requestPolicy: 'cache-and-network' };
+    expect(executeQuery).toHaveBeenCalledTimes(3);
+    expect(executeQuery).toHaveBeenCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: { test: true },
+      },
+      {
+        requestPolicy: 'cache-and-network',
+      }
+    );
   });
 });
 

@@ -27,10 +27,17 @@ const baseState: Partial<OperationStore> = {
 const toSource = (store: OperationStore) => {
   return make<GraphQLRequest>(observer => {
     let $request: void | GraphQLRequest;
+    let $context: void | Partial<OperationContext>;
     return store.subscribe(state => {
       const request = createRequest(state.query, state.variables as any);
-      if (!$request || request.key !== $request.key)
+      if (
+        $context !== state.context ||
+        !$request ||
+        request.key !== $request.key
+      ) {
+        $context = state.context;
         observer.next(($request = request));
+      }
     });
   });
 };
