@@ -23,12 +23,6 @@ const baseState: Partial<OperationStore> = {
   extensions: undefined,
 };
 
-const isStore = (input: any): input is OperationStore =>
-  input && typeof input.subscribe === 'function';
-
-const toStore = (input: GraphQLRequest | OperationStore) =>
-  !isStore(input) ? operationStore(input.query, input.variables) : input;
-
 const toSource = (store: OperationStore) => {
   return make<GraphQLRequest>(observer => {
     let $request: void | GraphQLRequest;
@@ -41,11 +35,10 @@ const toSource = (store: OperationStore) => {
 };
 
 export function query<T = any, V = object>(
-  input: GraphQLRequest | OperationStore<T, V>,
+  store: OperationStore<T, V>,
   context?: Partial<OperationContext>
 ): OperationStore<T, V> {
   const client = getClient();
-  const store = toStore(input);
   const subscription = pipe(
     toSource(store),
     switchMap(request => {
@@ -75,12 +68,11 @@ export function query<T = any, V = object>(
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export function subscription<T = any, R = T, V = object>(
-  input: GraphQLRequest | OperationStore<T, V>,
+  store: OperationStore<T, V>,
   context?: Partial<OperationContext>,
   handler?: SubscriptionHandler<T, R>
 ): OperationStore<T, V> {
   const client = getClient();
-  const store = toStore(input);
   const subscription = pipe(
     toSource(store),
     switchMap(request => {
@@ -118,7 +110,11 @@ export function mutation<T = any, V = object>(
   input: GraphQLRequest | OperationStore<T, V>
 ): ExecuteMutation<V> {
   const client = getClient();
-  const store = toStore(input);
+
+  const store =
+    typeof (input as any).subscribe !== 'function'
+      ? operationStore(input.query, input.variables)
+      : (input as OperationStore);
 
   return (vars, context) => {
     if (vars) store.variables = vars;
