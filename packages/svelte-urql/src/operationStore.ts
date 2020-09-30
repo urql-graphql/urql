@@ -1,4 +1,4 @@
-import { Writable, writable } from 'svelte/store';
+import { Readable, writable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 import { OperationContext, CombinedError } from '@urql/core';
 
@@ -13,7 +13,7 @@ type Updater<T> = (value: T) => T;
  * It can be used to update the query and read the subsequent result back.
  */
 export interface OperationStore<Data = any, Vars = any>
-  extends Writable<OperationStore<Data, Vars>> {
+  extends Readable<OperationStore<Data, Vars>> {
   // Input properties
   query: DocumentNode | string;
   variables: Vars | undefined | null;
@@ -24,6 +24,9 @@ export interface OperationStore<Data = any, Vars = any>
   readonly data: Data | void;
   readonly error?: CombinedError | void;
   readonly extensions?: Record<string, any> | void;
+  // Writable properties
+  set(value: Partial<OperationStore<Data, Vars>>): void;
+  update(updater: Updater<Partial<OperationStore<Data, Vars>>>): void;
 }
 
 export function operationStore<Data = any, Vars = object>(
@@ -59,7 +62,7 @@ export function operationStore<Data = any, Vars = object>(
         for (const key in value) {
           if (key !== 'query' && key !== 'variables') {
             throw new TypeError(
-              'It is not allowed to update result properties on an OperationStore .'
+              'It is not allowed to update result properties on an OperationStore.'
             );
           }
         }
@@ -102,7 +105,7 @@ export function operationStore<Data = any, Vars = object>(
         },
         set() {
           throw new TypeError(
-            'It is not allowed to update result properties on an OperationStore .'
+            'It is not allowed to update result properties on an OperationStore.'
           );
         },
       });
@@ -110,7 +113,7 @@ export function operationStore<Data = any, Vars = object>(
   }
 
   for (const prop in internal) {
-    Object.defineProperty(result, 'query', {
+    Object.defineProperty(result, prop, {
       configurable: false,
       get: () => internal[prop],
       set(value) {
