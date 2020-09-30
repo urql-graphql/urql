@@ -1,6 +1,6 @@
 import { Writable, writable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
-import { CombinedError } from '@urql/core';
+import { OperationContext, CombinedError } from '@urql/core';
 
 import { _storeUpdate } from './internal';
 
@@ -16,7 +16,8 @@ export interface OperationStore<Data = any, Vars = any>
   extends Writable<OperationStore<Data, Vars>> {
   // Input properties
   query: DocumentNode | string;
-  variables: Vars | void | null;
+  variables: Vars | undefined | null;
+  context: Partial<OperationContext> | undefined;
   // Output properties
   readonly stale: boolean;
   readonly fetching: boolean;
@@ -27,7 +28,8 @@ export interface OperationStore<Data = any, Vars = any>
 
 export function operationStore<Data = any, Vars = object>(
   query: string | DocumentNode,
-  variables?: Vars | null
+  variables?: Vars | null,
+  context?: Partial<OperationContext>
 ): OperationStore<Data, Vars> {
   const state = {
     stale: false,
@@ -65,6 +67,8 @@ export function operationStore<Data = any, Vars = object>(
         query = value.query!;
       } else if (key === 'variables') {
         variables = value.variables as Vars;
+      } else if (key === 'context') {
+        context = value.context as Partial<OperationContext>;
       } else if (key === 'stale' || key === 'fetching') {
         (state as any)[key] = !!value[key];
       } else if (key in state) {
@@ -117,6 +121,15 @@ export function operationStore<Data = any, Vars = object>(
     get: () => variables,
     set(newVariables) {
       variables = newVariables;
+      if (!_internalUpdate) invalidate();
+    },
+  });
+
+  Object.defineProperty(result, 'context', {
+    configurable: false,
+    get: () => context,
+    set(newContext) {
+      context = newContext;
       if (!_internalUpdate) invalidate();
     },
   });

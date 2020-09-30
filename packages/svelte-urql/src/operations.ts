@@ -35,8 +35,7 @@ const toSource = (store: OperationStore) => {
 };
 
 export function query<T = any, V = object>(
-  store: OperationStore<T, V>,
-  context?: Partial<OperationContext>
+  store: OperationStore<T, V>
 ): OperationStore<T, V> {
   const client = getClient();
   const subscription = pipe(
@@ -44,7 +43,7 @@ export function query<T = any, V = object>(
     switchMap(request => {
       return concat<Partial<OperationStore>>([
         fromValue({ fetching: true, stale: false }),
-        client.executeQuery(request, context),
+        client.executeQuery(request, store.context!),
         fromValue({ fetching: false, stale: false }),
       ]);
     }),
@@ -69,7 +68,6 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export function subscription<T = any, R = T, V = object>(
   store: OperationStore<T, V>,
-  context?: Partial<OperationContext>,
   handler?: SubscriptionHandler<T, R>
 ): OperationStore<T, V> {
   const client = getClient();
@@ -78,7 +76,7 @@ export function subscription<T = any, R = T, V = object>(
     switchMap(request => {
       return concat<Partial<OperationStore>>([
         fromValue({ fetching: true, stale: false }),
-        client.executeSubscription(request, context),
+        client.executeSubscription(request, store.context),
         fromValue({ fetching: false, stale: false }),
       ]);
     }),
