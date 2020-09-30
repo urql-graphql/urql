@@ -49,8 +49,6 @@ export function operationStore<Data = any, Vars = object>(
   } as OperationStore<Data, Vars>;
 
   const store = writable(state);
-  const invalidate = store.set.bind(null, state);
-
   let _internalUpdate = false;
 
   function set(value?: Partial<typeof state>) {
@@ -82,7 +80,7 @@ export function operationStore<Data = any, Vars = object>(
     }
 
     _internalUpdate = false;
-    invalidate();
+    store.set(state);
   }
 
   function update(fn: Updater<typeof state>): void {
@@ -99,7 +97,7 @@ export function operationStore<Data = any, Vars = object>(
       get: () => internal[prop],
       set(value) {
         internal[prop] = value;
-        if (!_internalUpdate) invalidate();
+        if (!_internalUpdate) store.set(state);
       },
     });
   }
@@ -127,7 +125,7 @@ export function operationStore<Data = any, Vars = object>(
         get: () => internal[prop],
         set(value) {
           internal[prop] = value;
-          if (!_internalUpdate) invalidate();
+          if (!_internalUpdate) store.set(state);
         },
       });
     }
