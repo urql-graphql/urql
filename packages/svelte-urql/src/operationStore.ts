@@ -4,6 +4,8 @@ import { CombinedError } from '@urql/core';
 
 import { _storeUpdate } from './internal';
 
+const noop = Object.create(null);
+
 type Updater<T> = (value: T) => T;
 
 /**
@@ -40,11 +42,12 @@ export function operationStore<Data = any, Vars = object>(
 
   let _internalUpdate = false;
 
-  function set(value: Partial<typeof state>) {
+  function set(value?: Partial<typeof state>) {
+    if (!value) value = noop;
+
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {
-      _storeUpdate.delete(value);
-      if (!_storeUpdate.has(value)) {
+      if (!_storeUpdate.has(value!)) {
         for (const key in value) {
           if (key !== 'query' && key !== 'variables') {
             throw new TypeError(
@@ -53,6 +56,8 @@ export function operationStore<Data = any, Vars = object>(
           }
         }
       }
+
+      _storeUpdate.delete(value!);
     }
 
     for (const key in value) {
