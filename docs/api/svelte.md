@@ -1,5 +1,5 @@
 ---
-title: @urql/svelte
+title: '@urql/svelte'
 order: 3
 ---
 
