@@ -126,13 +126,18 @@ export function mutation<T = any, V = object>(
       : (input as OperationStore);
 
   return (vars, context) => {
-    const update = { fetching: true, variables: vars || store.variables };
+    const update = {
+      fetching: true,
+      variables: vars || store.variables,
+      context: context || store.context,
+    };
+
     _markStoreUpdate(update);
     store.set(update);
 
     return new Promise(resolve => {
       client
-        .mutation(store.query, store.variables, context)
+        .mutation(store.query, store.variables, store.context)
         .toPromise()
         .then(result => {
           const update = { fetching: false, ...result };

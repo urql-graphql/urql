@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-request-policy'
-order: 8
+order: 9
 ---
 
 # Request Policy Exchange

@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-execute'
-order: 5
+order: 6
 ---
 
 # Execute Exchange

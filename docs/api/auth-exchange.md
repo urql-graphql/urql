@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-auth'
-order: 9
+order: 10
 ---
 
 # Authentication Exchange

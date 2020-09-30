@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-multipart-fetch'
-order: 6
+order: 7
 ---
 
 # Multipart Fetch Exchange

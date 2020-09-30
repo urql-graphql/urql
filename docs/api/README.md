@@ -14,6 +14,7 @@ more about the core package on the "Core Package" page.](../concepts/core-packag
 - [`@urql/core` API docs](./core.md)
 - [`urql` React API docs](./urql.md)
 - [`@urql/preact` Preact API docs](./preact.md)
+- [`@urql/svelte` Svelte API docs](./svelte.md)
 - [`@urql/exchange-graphcache` API docs](./graphcache.md)
 - [`@urql/exchange-retry` API docs](./retry-exchange.md)
 - [`@urql/exchange-execute` API docs](./execute-exchange.md)

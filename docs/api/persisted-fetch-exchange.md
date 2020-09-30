@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-persisted-fetch'
-order: 7
+order: 8
 ---
 
 # Persisted Fetch Exchange
