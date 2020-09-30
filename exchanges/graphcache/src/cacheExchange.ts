@@ -11,13 +11,14 @@ import {
 
 import {
   filter,
+  combine,
+  scan,
   map,
   merge,
   pipe,
   share,
   fromPromise,
   fromArray,
-  buffer,
   take,
   mergeMap,
   concat,
@@ -249,10 +250,15 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     // If no hydration takes place we replace this stream with an empty one
     const bufferedOps$ = hydration
       ? pipe(
-          sharedOps$,
-          buffer(fromPromise(hydration)),
+          combine(
+            pipe(
+              sharedOps$,
+              scan((acc: Operation[], x) => (acc.push(x), acc), [])
+            ),
+            fromPromise(hydration)
+          ),
           take(1),
-          mergeMap(fromArray)
+          mergeMap(zip => fromArray(zip[0]))
         )
       : (empty as Source<Operation>);
 
