@@ -31,6 +31,12 @@ export function operationStore<Data = any, Vars = object>(
   variables?: Vars | null,
   context?: Partial<OperationContext>
 ): OperationStore<Data, Vars> {
+  const internal = {
+    query,
+    variables,
+    context,
+  };
+
   const state = {
     stale: false,
     fetching: true,
@@ -63,12 +69,8 @@ export function operationStore<Data = any, Vars = object>(
     }
 
     for (const key in value) {
-      if (key === 'query') {
-        query = value.query!;
-      } else if (key === 'variables') {
-        variables = value.variables as Vars;
-      } else if (key === 'context') {
-        context = value.context as Partial<OperationContext>;
+      if (key === 'query' || key === 'variables' || key === 'context') {
+        (internal as any)[key] = value[key];
       } else if (key === 'stale' || key === 'fetching') {
         (state as any)[key] = !!value[key];
       } else if (key in state) {
@@ -92,7 +94,7 @@ export function operationStore<Data = any, Vars = object>(
   if (process.env.NODE_ENV !== 'production') {
     result = { ...state };
 
-    ['stale', 'fetching', 'data', 'error', 'extensions'].forEach(prop => {
+    for (const prop in state) {
       Object.defineProperty(result, prop, {
         configurable: false,
         get() {
@@ -104,35 +106,19 @@ export function operationStore<Data = any, Vars = object>(
           );
         },
       });
-    });
+    }
   }
 
-  Object.defineProperty(result, 'query', {
-    configurable: false,
-    get: () => query,
-    set(newQuery) {
-      query = newQuery;
-      if (!_internalUpdate) invalidate();
-    },
-  });
-
-  Object.defineProperty(result, 'variables', {
-    configurable: false,
-    get: () => variables,
-    set(newVariables) {
-      variables = newVariables;
-      if (!_internalUpdate) invalidate();
-    },
-  });
-
-  Object.defineProperty(result, 'context', {
-    configurable: false,
-    get: () => context,
-    set(newContext) {
-      context = newContext;
-      if (!_internalUpdate) invalidate();
-    },
-  });
+  for (const prop in internal) {
+    Object.defineProperty(result, 'query', {
+      configurable: false,
+      get: () => internal[prop],
+      set(value) {
+        internal[prop] = value;
+        if (!_internalUpdate) invalidate();
+      },
+    });
+  }
 
   return result as OperationStore<Data, Vars>;
 }
