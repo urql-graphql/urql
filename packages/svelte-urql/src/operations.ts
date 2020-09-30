@@ -3,6 +3,7 @@ import { onDestroy } from 'svelte';
 
 import {
   pipe,
+  map,
   make,
   scan,
   concat,
@@ -43,7 +44,10 @@ export function query<T = any, V = object>(
     switchMap(request => {
       return concat<Partial<OperationStore>>([
         fromValue({ fetching: true, stale: false }),
-        client.executeQuery(request, store.context!),
+        pipe(
+          client.executeQuery(request, store.context!),
+          map(result => ({ fetching: false, ...result }))
+        ),
         fromValue({ fetching: false, stale: false }),
       ]);
     }),

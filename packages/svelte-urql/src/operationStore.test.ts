@@ -55,6 +55,10 @@ it('adds getters and setters for known values', () => {
   store.subscribe(subscriber);
   expect(subscriber).toHaveBeenCalledTimes(1);
 
+  const state = subscriber.mock.calls[0][0];
+  expect(state.stale).toBe(true);
+  expect(state.query).toBe('{ update }');
+
   store.query = '{ imperative }';
   expect(subscriber).toHaveBeenCalledTimes(2);
   expect(store.query).toBe('{ imperative }');

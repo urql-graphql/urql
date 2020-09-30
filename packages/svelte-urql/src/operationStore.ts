@@ -93,9 +93,19 @@ export function operationStore<Data = any, Vars = object>(
   state.update = update;
   state.subscribe = store.subscribe;
 
-  let result = state;
+  for (const prop in internal) {
+    Object.defineProperty(state, prop, {
+      configurable: false,
+      get: () => internal[prop],
+      set(value) {
+        internal[prop] = value;
+        if (!_internalUpdate) invalidate();
+      },
+    });
+  }
+
   if (process.env.NODE_ENV !== 'production') {
-    result = { ...state };
+    const result = { ...state };
 
     for (const prop in state) {
       Object.defineProperty(result, prop, {
@@ -110,18 +120,20 @@ export function operationStore<Data = any, Vars = object>(
         },
       });
     }
+
+    for (const prop in internal) {
+      Object.defineProperty(result, prop, {
+        configurable: false,
+        get: () => internal[prop],
+        set(value) {
+          internal[prop] = value;
+          if (!_internalUpdate) invalidate();
+        },
+      });
+    }
+
+    return result;
   }
 
-  for (const prop in internal) {
-    Object.defineProperty(result, prop, {
-      configurable: false,
-      get: () => internal[prop],
-      set(value) {
-        internal[prop] = value;
-        if (!_internalUpdate) invalidate();
-      },
-    });
-  }
-
-  return result as OperationStore<Data, Vars>;
+  return state;
 }
