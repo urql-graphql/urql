@@ -1,25 +1,19 @@
 <script>
-  import { initClient, query } from '../..';
+  import { initClient, operationStore, query } from '../..';
 
   initClient({ url: "https://0ufyz.sse.codesandbox.io" });
 
-  let i = 0;
-
-  const todosQuery = query({
-    query: `
-      query {
-        todos {
-          id
-          text
-          complete
-        }
+  const todos = operationStore(`
+    query {
+      todos {
+        id
+        text
+        complete
       }
-    `,
-  });
+    }
+  `);
 
-  $: todos = todosQuery({ pause: true });
-
-  const execute = () => todosQuery().then();
+  query(todos);
 </script>
 
 {#if $todos.fetching}
@@ -35,5 +29,3 @@
     {/each}
   </ul>
 {/if}
-
-<button on:click={execute}>Execute</button>
