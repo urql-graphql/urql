@@ -4,7 +4,7 @@ import { OperationContext, CombinedError } from '@urql/core';
 
 import { _storeUpdate } from './internal';
 
-const noop = Object.create(null);
+const emptyUpdate = Object.create(null);
 
 type Updater<T> = (value: T) => T;
 
@@ -52,7 +52,7 @@ export function operationStore<Data = any, Vars = object>(
   let _internalUpdate = false;
 
   state.set = function set(value?: Partial<typeof state>) {
-    if (!value) value = noop;
+    if (!value) value = emptyUpdate;
 
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {
