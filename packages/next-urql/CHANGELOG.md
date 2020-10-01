@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.0
+
+This release moves `urql` from being in `dependencies` to `peerDependencies`. Please install it
+explicitly, as you may have already in the past, and ensure that both `urql` and `@urql/core` are
+not duplicated with either `npm dedupe` or `npx yarn-deduplicate`.
+
+```sh
+npm i --save urql
+# or
+yarn add urql
+```
+
+### Major Changes
+
+- Move the `urql` dependency to a peer dependency.
+- Remove the automatic polyfilling of `fetch` since this is done automatically starting at
+  [`Next v9.4`](https://nextjs.org/blog/next-9-4#improved-built-in-fetch-support)
+  If you are using a version before 9.4 you can upgrade by installing [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch)
+  and importing it to polyfill the behavior, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1018](https://github.com/FormidableLabs/urql/pull/1018))
+
 ## 1.2.0
 
 ### Minor Changes
