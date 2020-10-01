@@ -22,7 +22,7 @@ The default set of exchanges that `@urql/core` contains and applies to a `Client
 
 Other available exchanges:
 
-- [`errorExchange`](../api/core.md#errorexchange): Allows a global callback to be called when any error occursz
+- [`errorExchange`](../api/core.md#errorexchange): Allows a global callback to be called when any error occurs
 - [`ssrExchange`](../advanced/server-side-rendering.md): Allows for a server-side renderer to
   collect results for client-side rehydration.
 - [`retryExchange`](../api/retry-exchange.md): Allows operations to be retried
