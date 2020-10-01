@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
+    "vue-demi": "^0.3.3",
     "wonka": "^4.0.14"
   },
   "publishConfig": {

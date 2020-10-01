@@ -1,4 +1,4 @@
-import { inject, Ref, ref, watch } from 'vue';
+import { inject, Ref, ref, watch } from 'vue-demi';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe } from 'wonka';
 import {
@@ -50,9 +50,7 @@ export function useQuery<T = any, V = object>(
   }
 
   const result: Ref<UseQueryState<T>> = ref(initialState);
-  const request: Ref<GraphQLRequest> = ref(
-    createRequest(args.query, args.variables || {})
-  );
+  const request: Ref<GraphQLRequest | undefined> = ref();
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
   const executeQuery = () => {
@@ -64,7 +62,7 @@ export function useQuery<T = any, V = object>(
 
     // TODO: we can have a synchronous result
     unsubscribe.value = pipe(
-      client.executeQuery(request.value, args.context),
+      client.executeQuery(request.value as GraphQLRequest, args.context),
       onEnd(() => {
         result.value.fetching = false;
       }),
@@ -87,6 +85,8 @@ export function useQuery<T = any, V = object>(
       executeQuery();
     });
   }
+
+  request.value = createRequest(args.query, args.variables || {});
 
   function pause() {
     if (typeof unsubscribe.value === 'function') {
