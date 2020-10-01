@@ -33,7 +33,7 @@ npm install --save next-urql react-is urql
 `react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
 
 Note that if you are using Next before v9.4 you'll need to polyfill fetch, this can be
-done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch), ...
+done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch).
 
 ### Usage
 
