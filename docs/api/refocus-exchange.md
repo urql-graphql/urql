@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-refocus'
-order: 10
+order: 11
 ---
 
 # Refocus exchange

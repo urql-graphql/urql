@@ -100,3 +100,129 @@ it.](../api/urql.md#usemutation)
 
 [On the next page we'll learn about "Document Caching", `urql`'s default caching
 mechanism.](./document-caching.md)
+
+## Svelte
+
+This guide covers how to send mutations in Svelte using `@urql/svelte`'s `mutation` utility.
+The `mutation` function isn't dissimilar from the `query` function but is triggered manually and
+can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest) too while also supporting our
+trusty `operationStore`.
+
+### Sending a mutation
+
+Let's again pick up an example with an imaginary GraphQL API for todo items, and dive into an
+example! We'll set up a mutation that _updates_ a todo item's title.
+
+```html
+<script>
+  import { mutation } from '@urql/svelte';
+
+  export let id;
+
+  const mutateTodo = mutation({
+    query: `
+      mutation ($id: ID!, $title: String!) {
+        updateTodo (id: $id, title: $title) {
+          id
+          title
+        }
+      }
+    `,
+  });
+
+  function updateTodo(newTitle) {
+    mutateTodo({ id, title: newTitle });
+  }
+</script>
+```
+
+This small call to `mutation` accepts a `query` property (besides the `variables` property) and
+returns an execute function. We've wrapped it in an `updateTodo` function to illustrate its usage.
+
+Unlike the `query` function, the `mutation` function doesn't start our mutation automatically.
+Instead, mutations are started programmatically by calling the function they return. This function
+also returns a promise so that we can use the mutation's result.
+
+### Using the mutation result
+
+When calling `mutateTodo` in our previous example, we start the mutation. To use the mutation's
+result we actually have two options instead of one.
+
+The first option is to use the promise that the `mutation`'s execute function returns. This promise
+will resolve to an `operationStore`, which is what we're used to from sending queries. Using this
+store we can then read the mutation's `data` or `error`.
+
+```html
+<script>
+  import { mutation } from '@urql/svelte';
+
+  export let id;
+
+  const mutateTodo = mutation({
+    query: `
+      mutation ($id: ID!, $title: String!) {
+        updateTodo (id: $id, title: $title) {
+          id
+          title
+        }
+      }
+    `,
+  });
+
+  function updateTodo(newTitle) {
+    mutateTodo({ id, title: newTitle }).then(result => {
+      // The result is an operationStore again, which will already carry the mutation's result
+      console.log(result.data, result.error);
+    });
+  }
+</script>
+```
+
+Alternatively, we can pass `mutation` an `operationStore` directly. This allows us to use a
+mutation's result in our component's UI more easily, without storing it ourselves.
+
+```html
+<script>
+  import { operationStore, mutation } from '@urql/svelte';
+
+  export let id;
+
+  const updateTodoStore = operationStore(`
+    mutation ($id: ID!, $title: String!) {
+      updateTodo (id: $id, title: $title) {
+        id
+        title
+      }
+    }
+  `);
+
+  const updateTodoMutation = mutation(updateTodoStore);
+
+  function updateTodo(newTitle) {
+    updateTodoMutation({ id, title: newTitle });
+  }
+</script>
+
+{#if $updateTodoStore.data} Todo was updated! {/if}
+```
+
+### Handling mutation errors
+
+It's worth noting that the promise we receive when calling the execute function will never
+reject. Instead it will always return a promise that resolves to an `operationStore`, even if the
+mutation has failed.
+
+If you're checking for errors, you should use `operationStore.error` instead, which will be set
+to a `CombinedError` when any kind of errors occurred while executing your mutation.
+[Read more about errors on our "Errors" page.](./errors.md)
+
+```jsx
+mutateTodo({ id, title: newTitle }).then(result => {
+  if (result.error) {
+    console.error('Oh no!', result.error);
+  }
+});
+```
+
+[On the next page we'll learn about "Document Caching", `urql`'s default caching
+mechanism.](./document-caching.md)

@@ -1,6 +1,6 @@
 ---
 title: '@urql/exchange-graphcache'
-order: 3
+order: 4
 ---
 
 # @urql/exchange-graphcache

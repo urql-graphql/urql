@@ -72,7 +72,7 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 ## React & Preact
 
 The `useSubscription` hooks comes with a similar API to `useQuery`, which [we've learned about in
-the "Queries" page in the "Basics" section.](../basics/queries.md)
+the "Queries" page in the "Basics" section.](../basics/queries.md#react--preact)
 
 Its usage is extremely similar in that it accepts options, which may contain `query` and
 `variables`. However, it also accepts a second argument, which is a reducer function, similar to
@@ -130,6 +130,62 @@ the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
 
+## Svelte
+
+The `subscription` function in `@urql/svelte` comes with a similar API to `query`, which [we've
+learned about in the "Queries" page in the "Basics" section.](../basics/queries.md#svelte)
+
+Its usage is extremely similar in that it accepts an `operationStore`, which will typically contain
+our GraphQL subscription query. However, `subscription` also accepts a second argument, which is
+a reducer function, similar to what you would pass to `Array.prototype.reduce`.
+
+It receives the previous set of data that this function has returned or `undefined`.
+As the second argument, it receives the event that has come in from the subscription.
+You can use this to accumulate the data over time, which is useful for a
+list for example.
+
+In the following example, we create a subscription that informs us of
+new messages. We will concatenate the incoming messages so that we
+can display all messages that have come in over the subscription across
+events.
+
+```js
+<script>
+  import { operationStore, subscription } from '@urql/svelte';
+
+  const messages = operationStore(`
+    subscription MessageSub {
+      newMessages {
+        id
+        from
+        text
+      }
+    }
+  `);
+
+  const handleSubscription = (messages = [], data) => {
+    return [data.newMessages, ...messages];
+  };
+
+  subsription(messages, handleSubscription);
+</script>
+
+{#if !$result.data}
+  <p>No new messages</p>
+{:else}
+  <ul>
+    {#each $messages.data as message}
+      <li>{message.from}: "{message.text}"</li>
+    {/each}
+  </ul>
+{/if}
+
+```
+
+As we can see, the `$result.data` is being updated and transformed by the `handleSubscription`
+function. This works over time, so as new messages come in, we will append them to
+the list of previous messages.
+
 ## One-off Subscriptions
 
 When you're using subscriptions directly without `urql`'s framework bindings, you can use the `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for mutations and subscriptions [that we've seen before on the "Core Package" page.](../concepts/core-package.md#one-off-queries-and-mutations)
@@ -155,3 +211,4 @@ const { unsubscribe } = pipe(
     console.log(result); // { data: ... }
   })
 );
+```
