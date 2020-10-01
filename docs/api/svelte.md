@@ -27,14 +27,13 @@ create an [`Operation`](./core.md#operation) to execute. These are `query`, `var
 Furthermore the store exposes some **readonly properties** which represent the operation's progress
 and [result](./core.md#operationresult).
 
-| Prop                                                                                      | Type                   | Description                                                                                                                                       |
-| ----------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| data                                                                                      | `?any`                 | Data returned by the specified query                                                                                                              |
-| error                                                                                     | `?CombinedError`       | A [`CombinedError`](./core.md#combinederror) instances that wraps network or `GraphQLError`s (if any)                                             |
-| extensions                                                                                | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                             |
-| stale                                                                                     | `boolean`              | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon. |
-| fetching                                                                                  | `boolean`              | A flag that indicates whether the operation is currently                                                                                          |
-| in progress, which means that the `data` and `error` is out-of-date for the given inputs. |
+| Prop       | Type                   | Description                                                                                                                                        |
+| ---------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| data       | `?any`                 | Data returned by the specified query                                                                                                               |
+| error      | `?CombinedError`       | A [`CombinedError`](./core.md#combinederror) instances that wraps network or `GraphQLError`s (if any)                                              |
+| extensions | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                              |
+| stale      | `boolean`              | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon.  |
+| fetching   | `boolean`              | A flag that indicates whether the operation is currently in progress, which means that the `data` and `error` is out-of-date for the given inputs. |
 
 All of the writable properties are updatable either via the common Svelte Writable's `set` or
 `update` methods or directly. The `operationStore` exposes setters for the writable properties which
