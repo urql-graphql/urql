@@ -59,11 +59,6 @@ export function useQuery<T = any, V = object>(
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
   const executeQuery = (result.value.executeQuery = () => {
-    if (typeof unsubscribe.value === 'function') {
-      unsubscribe.value();
-      unsubscribe.value = null;
-    }
-
     result.value.fetching = true;
 
     unsubscribe.value = pipe(
@@ -83,8 +78,17 @@ export function useQuery<T = any, V = object>(
   });
 
   if (!args.pause) {
-    watch(request, () => {
-      if (!args.pause) executeQuery();
+    watch(request, (_value, _oldValue, onInvalidate) => {
+      onInvalidate(() => {
+        if (typeof unsubscribe.value === 'function') {
+          unsubscribe.value();
+          unsubscribe.value = null;
+        }
+      });
+
+      if (!args.pause) {
+        executeQuery();
+      }
     });
   }
 
