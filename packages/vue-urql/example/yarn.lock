@@ -2032,6 +2032,11 @@ vite@^1.0.0-rc.1:
     vue "^3.0.0-rc.5"
     ws "^7.2.3"
 
+vue-demi@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.3.3.tgz#27d7ae33e1d82752418ecfded60e625c5cc81866"
+  integrity sha512-/CvXJUp7e41C/jS5ZgflMQgkY2qFX1ZkZq1kYwYH5RCC9gGy1vgvjsldtQlVORaAUt55+k/mQIUnUKNrLosoIw==
+
 vue@^3.0.0-rc.1, vue@^3.0.0-rc.5:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.0.0.tgz#cfb5df5c34efce319b113a1667d12b74dcfd9c90"

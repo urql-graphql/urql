@@ -6,3 +6,6 @@ export const initialState = {
   extensions: undefined,
   operation: undefined,
 };
+
+// eslint-disable-next-line
+export const noop = () => {};

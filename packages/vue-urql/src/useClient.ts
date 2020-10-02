@@ -1,4 +1,4 @@
-import { provide } from 'vue-demi';
+import { provide } from 'vue';
 import { createClient, ClientOptions } from '@urql/core';
 
 export function useClient(opts: ClientOptions) {

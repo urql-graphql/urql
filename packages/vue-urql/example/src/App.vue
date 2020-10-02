@@ -5,7 +5,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import { useClient } from './components/useClient.js';
+import { useClient } from '@urql/vue';
 
 export default {
   name: 'App',

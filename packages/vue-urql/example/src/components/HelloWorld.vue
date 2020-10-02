@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { useQuery } from './useQuery.js';
+import { useQuery } from '@urql/vue';
 
 const query = `
   query {
@@ -28,7 +28,6 @@ export default {
     `;
 
     const result = useQuery({ query });
-    console.log(result);
 
     return { data: result.data && JSON.stringify(result.data) };
   },
