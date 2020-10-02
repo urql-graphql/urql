@@ -1,2 +1,3 @@
-export { useClient } from './useClient';
-export { useQuery } from './useQuery';
+export * from './useClient';
+export * from './useQuery';
+export * from './useMutation';
