@@ -1,11 +1,5 @@
-# @urql/vue
+# urql
 
-## Installation
+> A highly customizable and versatile GraphQL client **for React**
 
-## Setup
-
-## Queries
-
-## Mutations
-
-## Subscriptions
+More documentation is available at [formidable.com/open-source/urql](https://formidable.com/open-source/urql/).
