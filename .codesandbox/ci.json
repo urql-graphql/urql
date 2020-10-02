@@ -5,6 +5,7 @@
     "packages/react-urql",
     "packages/preact-urql",
     "packages/svelte-urql",
+    "packages/vue-urql",
     "exchanges/graphcache",
     "exchanges/multipart-fetch",
     "exchanges/persisted-fetch",
