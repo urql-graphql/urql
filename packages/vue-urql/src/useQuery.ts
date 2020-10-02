@@ -11,6 +11,8 @@ import {
   GraphQLRequest,
 } from '@urql/core';
 import { initialState, noop } from './constants';
+import { onPush } from 'wonka';
+import { publish } from 'wonka';
 
 export interface UseQueryArgs<V> {
   query: string | DocumentNode;
@@ -52,6 +54,7 @@ export function useQuery<T = any, V = object>(
     pause: noop,
     executeQuery: noop,
   });
+
   const request: Ref<GraphQLRequest | undefined> = ref();
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
@@ -60,9 +63,9 @@ export function useQuery<T = any, V = object>(
       unsubscribe.value();
       unsubscribe.value = null;
     }
+
     result.value.fetching = true;
 
-    // TODO: verify whether or not this handles sync results.
     unsubscribe.value = pipe(
       client.executeQuery(request.value as GraphQLRequest, args.context),
       onEnd(() => {
@@ -80,17 +83,30 @@ export function useQuery<T = any, V = object>(
   });
 
   if (!args.pause) {
-    onMounted(() => {
-      executeQuery();
-    });
-
     watch(request, () => {
-      request.value = createRequest(args.query, args.variables || {});
-      executeQuery();
+      if (!args.pause) executeQuery();
     });
   }
 
   request.value = createRequest(args.query, args.variables || {});
+
+  onMounted(() => {
+    // Checks for synchronous data in the cache.
+    pipe(
+      client.executeQuery(request.value as GraphQLRequest),
+      onPush(({ stale, data, error, extensions, operation }) => {
+        result.value.data = data;
+        result.value.stale = !!stale;
+        result.value.error = error;
+        result.value.fetching = false;
+        result.value.extensions = extensions;
+        result.value.operation = operation;
+      }),
+      publish
+    ).unsubscribe();
+
+    if (!args.pause) executeQuery();
+  });
 
   result.value.pause = function pause() {
     if (typeof unsubscribe.value === 'function') {
@@ -100,7 +116,7 @@ export function useQuery<T = any, V = object>(
   };
 
   result.value.resume = function resume() {
-    executeQuery();
+    if (!args.pause) executeQuery();
   };
 
   return result.value;
