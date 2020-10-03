@@ -197,7 +197,7 @@ const TableCell = styled.td`
 `;
 
 const TableOverflow = styled.div`
-  overflow-x: scroll;
+  overflow-x: auto;
 `;
 
 const Table = styled.table`
