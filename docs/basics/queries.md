@@ -267,9 +267,9 @@ use to supply variables to our query.
         id
         title
       }
-    },
+    }`,
     { from, limit }
-  `);
+  );
 
   query(todos);
 </script>
@@ -293,9 +293,9 @@ model as well and cause the `query` utility to start a new operation.
         id
         title
       }
-    },
+    }`,
     { from, limit }
-  `);
+  );
 
   query(todos);
 
@@ -349,10 +349,10 @@ result is either outdated or that another request is being sent in the backgroun
         id
         title
       }
-    },
+    }`,
     { from, limit },
     { requestPolicy: 'cache-and-network' }
-  `);
+  );
 
   query(todos);
 </script>
@@ -386,10 +386,10 @@ We can trigger a new query update by changing out the `context` of our `operatio
         id
         title
       }
-    },
+    }`,
     { from, limit },
     { requestPolicy: 'cache-first' }
-  `);
+  );
 
   query(todos);
 
