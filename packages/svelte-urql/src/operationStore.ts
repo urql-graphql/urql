@@ -72,12 +72,14 @@ export function operationStore<Data = any, Vars = object>(
     for (const key in value) {
       if (key === 'query' || key === 'variables' || key === 'context') {
         (internal as any)[key] = value[key];
-      } else if (key === 'stale' || key === 'fetching') {
+      } else if (key === 'fetching') {
         (state as any)[key] = !!value[key];
       } else if (key in state) {
         state[key] = value[key];
       }
     }
+
+    (state as any).stale = !!value!.stale;
 
     _internalUpdate = false;
     svelteStore.set(state);
