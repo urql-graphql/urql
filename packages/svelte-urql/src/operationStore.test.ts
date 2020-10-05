@@ -96,7 +96,7 @@ it('adds stale when not present in update', () => {
   expect(subscriber).toHaveBeenCalledTimes(1);
 
   const state = subscriber.mock.calls[0][0];
-  expect(state.stale).toBe(true);
+  expect(state.stale).toBe(false);
   expect(state.query).toBe('{ update }');
 
   store.query = '{ imperative }';
