@@ -2,4 +2,4 @@
 "@urql/svelte": patch
 ---
 
-Fix `stale` keeping a `truthy` on a `cache-and-network` operation.
+Fix `stale` keeping a `truthy` value on a `cache-and-network` operation.
