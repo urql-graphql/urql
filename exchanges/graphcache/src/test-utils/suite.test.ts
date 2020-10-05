@@ -314,6 +314,22 @@ it('conditionless inline fragment', () => {
   });
 });
 
+it('skipped conditionless inline fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        ... @skip(if: true) {
+          test
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+    },
+  });
+});
+
 it('entity list on query and spread fragment', () => {
   expectCacheIntegrity({
     query: gql`
@@ -335,6 +351,24 @@ it('entity list on query and spread fragment', () => {
     data: {
       __typename: 'Query',
       items: [{ __typename: 'Item', id: 1, test: true }, null],
+    },
+  });
+});
+
+it('skipped spread fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      query Test {
+        __typename
+        ...TestFragment @skip(if: true)
+      }
+
+      fragment TestFragment on Query {
+        test
+      }
+    `,
+    data: {
+      __typename: 'Query',
     },
   });
 });
