@@ -67,7 +67,7 @@ const isFragmentHeuristicallyMatching = (
 ) => {
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
-  if (typename === typeCondition) return true;
+  if (!typeCondition || typename === typeCondition) return true;
 
   warn(
     'Heuristic Fragment Matching: A fragment is trying to match against the `' +
@@ -127,11 +127,7 @@ export const makeSelectionIterator = (
               }
 
               const isMatching = ctx.store.schema
-                ? isInterfaceOfType(
-                    ctx.store.schema,
-                    getTypeCondition(fragmentNode),
-                    typename
-                  )
+                ? isInterfaceOfType(ctx.store.schema, fragmentNode, typename)
                 : isFragmentHeuristicallyMatching(
                     fragmentNode,
                     typename,

@@ -259,6 +259,23 @@ it('entity list on query and inline fragment', () => {
   });
 });
 
+it('conditionless inline fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        ... {
+          test
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      test: true,
+    },
+  });
+});
+
 it('entity list on query and spread fragment', () => {
   expectCacheIntegrity({
     query: gql`

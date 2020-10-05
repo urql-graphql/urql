@@ -2,6 +2,8 @@ import {
   isNullableType,
   isListType,
   isNonNullType,
+  InlineFragmentNode,
+  FragmentDefinitionNode,
   GraphQLSchema,
   GraphQLAbstractType,
   GraphQLObjectType,
@@ -10,6 +12,7 @@ import {
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
+import { getTypeCondition } from './node';
 import {
   KeyingConfig,
   UpdateResolver,
@@ -51,11 +54,12 @@ export const isFieldAvailableOnType = (
 
 export const isInterfaceOfType = (
   schema: GraphQLSchema,
-  typeCondition: null | string,
+  node: InlineFragmentNode | FragmentDefinitionNode,
   typename: string | void
 ): boolean => {
-  if (!typename || !typeCondition) return false;
-  if (typename === typeCondition) return true;
+  if (!typename) return false;
+  const typeCondition = getTypeCondition(node);
+  if (!typeCondition || typename === typeCondition) return true;
 
   const abstractType = schema.getType(typeCondition);
   const objectType = schema.getType(typename);
