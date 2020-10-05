@@ -44,6 +44,44 @@ it('aliased field on query', () => {
   });
 });
 
+it('@skip directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        intA @skip(if: true)
+        intB @skip(if: false)
+      }
+    `,
+    data: { __typename: 'Query', intB: 2 },
+  });
+});
+
+it('@include directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        intA @include(if: true)
+        intB @include(if: false)
+      }
+    `,
+    data: { __typename: 'Query', intA: 2 },
+  });
+});
+
+it('random directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        int @shouldntMatter
+      }
+    `,
+    data: { __typename: 'Query', int: 1 },
+  });
+});
+
 it('json on query', () => {
   expectCacheIntegrity({
     query: gql`
