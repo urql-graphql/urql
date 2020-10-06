@@ -48,8 +48,9 @@ All features are marked to indicate the following:
 | Stale while Revalidate / Cache and Network | ✅                                  | ✅                                            | ✅                             |
 | Focus Refetching                           | ✅ `@urql/exchange-refocus`         | 🛑                                            | 🛑                             |
 | Stale Time Configuration                   | ✅ `@urql/exchange-request-policy`  | ✅                                            | 🛑                             |
-| Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | 🔶                             |
+| Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | ✅                             |
 | Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | 🟡 `react-relay-network-layer` |
+| Live Queries                               | 🛑                                  | 🛑                                            | ✅                             |
 | File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | 🛑                             |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                        | ✅ `DefaultNetworkLayer`       |
 | Easy Authentication Flows                  | ✅ `@urql/exchange-auth`            | 🛑 (no docs for refresh-based authentication) | 🟡 `react-relay-network-layer` |
@@ -102,9 +103,9 @@ for instance.
 | Pagination Support                                      | 🔶                                                                    | 🔶                 | ✅                                             |
 | Optimistic Updates                                      | ✅                                                                    | ✅                 | ✅                                             |
 | Local Updates                                           | ✅                                                                    | ✅                 | ✅                                             |
-| Out-of-band Cache Updates                               | 🛑 (stays true to server data)                                        | ✅                 | 🛑                                             |
-| Local Resolvers and Redirects                           | ✅                                                                    | ✅                 | 🛑                                             |
-| Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                 | 🛑                                             |
+| Out-of-band Cache Updates                               | 🛑 (stays true to server data)                                        | ✅                 | ✅                                             |
+| Local Resolvers and Redirects                           | ✅                                                                    | ✅                 | 🛑 (not needed)                                |
+| Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                 | 🛑 (not needed)                                |
 | Commutativity Guarantees                                | ✅                                                                    | 🛑                 | 🛑                                             |
 | Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
 | Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                 | 🛑                                             |
