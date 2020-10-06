@@ -63,7 +63,7 @@ major difference in `urql` is that all caching logic is abstracted in exchanges 
 them slightly more powerful (and hence makes `urql` slightly more customizable.)
 
 A lot of the added exchanges for persisted queries, file uploads, retrying, and other features are
-implemented in the core library, while there are some cases where first-party support isn't provided
+implemented by the urql-team, while there are some cases where first-party support isn't provided
 in Relay or Apollo. This doesn't mean that these features can't be used with these clients, but that
 you'd have to lean on community libraries or maintaining/implementing them yourself.
 
