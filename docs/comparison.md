@@ -105,7 +105,7 @@ for instance.
 |                                                         | urql                                                                  | Apollo             | Relay                                          |
 | ------------------------------------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------------------- |
 | Caching Strategy                                        | Document Caching, Normalized Caching with `@urql/exchange-graphcache` | Normalized Caching | Normalized Caching (schema restrictions apply) |
-| Added Bundle Size                                       | +5.9kB (with Graphcache)                                              | +0 (default)       | +0 (default)                                   |
+| Added Bundle Size                                       | +6.5kB (with Graphcache)                                              | +0 (default)       | +0 (default)                                   |
 | Automatic Garbage Collection                            | ✅                                                                    | 🔶                 | ✅                                             |
 | Local State Management                                  | 🛑                                                                    | ✅                 | ✅                                             |
 | Pagination Support                                      | 🔶                                                                    | 🔶                 | ✅                                             |
