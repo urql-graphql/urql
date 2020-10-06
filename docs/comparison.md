@@ -70,6 +70,12 @@ implemented by the urql-team, while there are some cases where first-party suppo
 in Relay or Apollo. This doesn't mean that these features can't be used with these clients, but that
 you'd have to lean on community libraries or maintaining/implementing them yourself.
 
+One thing of note is our lack of support for batched queries in `urql`. We explicitly decided not to
+support this in our [first-party
+packages](https://github.com/FormidableLabs/urql/issues/800#issuecomment-626342821) as the benefits
+are not present anymore in most cases with HTTP/2 and established patterns by Relay that recommend
+hoisting all necessary data requirements to a page-wide query.
+
 ### Framework Bindings
 
 |                               | urql                             | Apollo             | Relay             |
