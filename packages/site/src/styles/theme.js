@@ -75,6 +75,7 @@ export const mediaSizes = {
 };
 
 export const media = {
+  maxmd: `(max-width: ${mediaSizes.md - 1}px)`,
   sm: `(min-width: ${mediaSizes.sm}px)`,
   md: `(min-width: ${mediaSizes.md}px)`,
   lg: `(min-width: ${mediaSizes.lg}px)`,

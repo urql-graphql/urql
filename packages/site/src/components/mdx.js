@@ -38,6 +38,7 @@ const Code = styled.code`
   font-variant-ligatures: none;
   font-feature-settings: normal;
   white-space: pre;
+  hyphens: initial;
 `;
 
 const InlineCode = styled(props => {
@@ -190,28 +191,28 @@ const TableCell = styled.td`
     min-width: 25rem;
   }
 
-  &:not(:first-child) {
-    overflow-wrap: break-word;
+  @media ${p => p.theme.media.md} {
+    &:not(:first-child) {
+      overflow-wrap: break-word;
+    }
   }
-`;
-
-const TableOverflow = styled.div`
-  overflow-x: auto;
 `;
 
 const Table = styled.table`
   border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
+  overflow-x: auto;
+
+  @media ${p => p.theme.media.maxmd} {
+    overflow-x: scroll;
+    overflow-wrap: initial;
+    word-wrap: initial;
+    word-break: initial;
+    hyphens: initial;
+  }
 `;
 
-const TableWithOverflow = props => (
-  <TableOverflow>
-    <Table {...props} />
-  </TableOverflow>
-);
-
 const MdLink = ({ href, children }) => {
-  const location = useLocation();
   const currentPage = useMarkdownPage();
 
   if (!/^\w+:/.test(href) && !href.startsWith('#')) {
@@ -277,7 +278,7 @@ const components = {
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
-  table: TableWithOverflow,
+  table: Table,
   th: TableHeader,
   td: TableCell,
   a: MdLink,
