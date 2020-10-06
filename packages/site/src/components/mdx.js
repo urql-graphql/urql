@@ -155,6 +155,7 @@ const sharedTableCellStyling = css`
 
   & > ${InlineCode} {
     white-space: pre-wrap;
+    display: inline;
   }
 `;
 
@@ -181,6 +182,7 @@ const TableCell = styled.td`
           padding: 0;
           margin: 0;
           white-space: pre;
+          display: block;
         }
       `
     );
