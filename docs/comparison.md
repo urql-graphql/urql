@@ -35,7 +35,7 @@ All features are marked to indicate the following:
 
 ### Core Features
 
-| ---                                        | urql                                | Apollo                                        | Relay                          |
+|                                            | urql                                | Apollo                                        | Relay                          |
 | ------------------------------------------ | ----------------------------------- | --------------------------------------------- | ------------------------------ |
 | Extensible on a network level              | ✅ Exchanges                        | ✅ Links                                      | ✅ Network Layers              |
 | Extensible on a cache / control flow level | ✅ Exchanges                        | 🛑                                            | 🛑                             |
@@ -72,7 +72,7 @@ you'd have to lean on community libraries or maintaining/implementing them yours
 
 ### Framework Bindings
 
-| ---                           | urql                             | Apollo             | Relay             |
+|                               | urql                             | Apollo             | Relay             |
 | ----------------------------- | -------------------------------- | ------------------ | ----------------- |
 | React Bindings                | ✅                               | ✅                 | ✅                |
 | React Hooks Support           | ✅                               | ✅                 | ✅ (experimental) |
@@ -96,7 +96,7 @@ for instance.
 
 ### Caching and State
 
-| ---                                                     | urql                                                                  | Apollo             | Relay                                          |
+|                                                         | urql                                                                  | Apollo             | Relay                                          |
 | ------------------------------------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------------------- |
 | Caching Strategy                                        | Document Caching, Normalized Caching with `@urql/exchange-graphcache` | Normalized Caching | Normalized Caching (schema restrictions apply) |
 | Added Bundle Size                                       | +5.9kB (with Graphcache)                                              | +0 (default)       | +0 (default)                                   |
