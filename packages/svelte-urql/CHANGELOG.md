@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 1.0.1
+
+### Patch Changes
+
+- ⚠️ Fix `stale` keeping a `truthy` value on a `cache-and-network` operation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1032](https://github.com/FormidableLabs/urql/pull/1032))
+
 ## 1.0.0
 
 The new `@urql/svelte` API features the `query`, `mutation`, and `subscription` utilities, which are

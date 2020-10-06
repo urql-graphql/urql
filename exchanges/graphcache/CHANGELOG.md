@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.1.4
+
+### Patch Changes
+
+- ⚠️ Fix inline fragments being skipped when they were missing a full type condition as per the GraphQL spec (e.g `{ ... { field } }`), by [@kitten](https://github.com/kitten) (See [#1040](https://github.com/FormidableLabs/urql/pull/1040))
+
 ## 3.1.3
 
 ### Patch Changes
