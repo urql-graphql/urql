@@ -6,13 +6,13 @@ export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
   const inFlightKeys = new Set<number>();
 
   const filterIncomingOperation = (operation: Operation) => {
-    const { key, operationName } = operation;
-    if (operationName === 'teardown') {
+    const { key, kind } = operation;
+    if (kind === 'teardown') {
       inFlightKeys.delete(key);
       return true;
     }
 
-    if (operationName !== 'query' && operationName !== 'subscription') {
+    if (kind !== 'query' && kind !== 'subscription') {
       return true;
     }
 

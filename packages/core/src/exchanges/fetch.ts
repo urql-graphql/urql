@@ -16,16 +16,13 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     const fetchResults$ = pipe(
       sharedOps$,
       filter(operation => {
-        return (
-          operation.operationName === 'query' ||
-          operation.operationName === 'mutation'
-        );
+        return operation.kind === 'query' || operation.kind === 'mutation';
       }),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
+          filter(op => op.kind === 'teardown' && op.key === key)
         );
 
         const body = makeFetchBody(operation);
@@ -68,10 +65,7 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
     const forward$ = pipe(
       sharedOps$,
       filter(operation => {
-        return (
-          operation.operationName !== 'query' &&
-          operation.operationName !== 'mutation'
-        );
+        return operation.kind !== 'query' && operation.kind !== 'mutation';
       }),
       forward
     );

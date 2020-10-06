@@ -1,8 +1,9 @@
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 
 import { Client } from '../client';
+import { makeOperation } from '../utils';
 import { queryOperation } from '../test-utils';
-import { OperationResult, OperationType } from '../types';
+import { OperationResult } from '../types';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -160,10 +161,9 @@ describe('on teardown', () => {
 
   it('does not call the query', () => {
     pipe(
-      fromValue({
-        ...queryOperation,
-        operationName: 'teardown' as OperationType,
-      }),
+      fromValue(
+        makeOperation('teardown', queryOperation, queryOperation.context)
+      ),
       fetchExchange(exchangeArgs),
       subscribe(fail)
     );

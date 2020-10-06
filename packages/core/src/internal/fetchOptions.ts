@@ -20,9 +20,7 @@ const getOperationName = (query: DocumentNode): string | undefined => {
 };
 
 const shouldUseGet = (operation: Operation): boolean => {
-  return (
-    operation.operationName === 'query' && !!operation.context.preferGetMethod
-  );
+  return operation.kind === 'query' && !!operation.context.preferGetMethod;
 };
 
 export const makeFetchBody = (request: {

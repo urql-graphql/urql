@@ -17,6 +17,7 @@ import {
 
 import { Provider } from '../context';
 import { useQuery } from '../hooks';
+import { makeOperation } from '@urql/core/src/utils';
 
 const context: OperationContext = {
   fetchOptions: {
@@ -42,21 +43,25 @@ export const queryGql: GraphQLRequest = {
   },
 };
 
-const teardownOperation: Operation = {
-  query: queryGql.query,
-  variables: queryGql.variables,
-  key: queryGql.key,
-  operationName: 'teardown',
-  context,
-};
+const teardownOperation: Operation = makeOperation(
+  'teardown',
+  {
+    query: queryGql.query,
+    variables: queryGql.variables,
+    key: queryGql.key,
+  },
+  context
+);
 
-const queryOperation: Operation = {
-  query: teardownOperation.query,
-  variables: teardownOperation.variables,
-  key: teardownOperation.key,
-  operationName: 'query',
-  context,
-};
+const queryOperation: Operation = makeOperation(
+  'query',
+  {
+    query: teardownOperation.query,
+    variables: teardownOperation.variables,
+    key: teardownOperation.key,
+  },
+  context
+);
 
 const queryResponse: OperationResult = {
   operation: queryOperation,
@@ -77,7 +82,7 @@ describe('server-side rendering', () => {
     const fetchExchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
-        filter(x => x.operationName === 'query'),
+        filter(x => x.kind === 'query'),
         delay(100),
         map(operation => ({ ...queryResponse, operation }))
       );

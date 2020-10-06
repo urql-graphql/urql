@@ -4,10 +4,10 @@ import {
   OperationContext,
   OperationType,
 } from '../types';
-import { deprecationWarning } from './deprecation';
+import { Warning, deprecationWarning } from './deprecation';
 
 // TODO: Remove when the deprecated `operationName` property is removed
-const DEPRECATED = {
+const DEPRECATED: Record<string, Warning> = {
   operationName: {
     key: 'Operation.operationName',
     message:

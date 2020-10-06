@@ -1,3 +1,8 @@
+export interface Warning {
+  key: string;
+  message: string;
+}
+
 /**
  * Module-scoped state to track if deprecation warnings have already been issued
  * for a particular key.
@@ -8,13 +13,7 @@ let issuedWarnings: Record<string, boolean> = {};
  * If a deprecation warning has not already been issued, use `console.warn()` to
  * issue it with an eye-catching prefix string.
  */
-export const deprecationWarning = ({
-  key,
-  message,
-}: {
-  key: string;
-  message: string;
-}) => {
+export const deprecationWarning = ({ key, message }: Warning) => {
   if (!issuedWarnings[key]) {
     console.warn(`[WARNING: Deprecated] ${message}`);
 
