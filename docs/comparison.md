@@ -1,5 +1,5 @@
 ---
-title: Showcase
+title: Comparison
 order: 8
 ---
 
