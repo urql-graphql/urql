@@ -26,11 +26,9 @@ export const getSelectionSet = (node: {
   selectionSet?: SelectionSetNode;
 }): SelectionSet => (node.selectionSet ? node.selectionSet.selections : []);
 
-export const getTypeCondition = ({
-  typeCondition,
-}: {
+export const getTypeCondition = (node: {
   typeCondition?: NamedTypeNode;
-}): string | null => (typeCondition ? getName(typeCondition) : null);
+}): string | null => (node.typeCondition ? getName(node.typeCondition) : null);
 
 export const isFieldNode = (node: SelectionNode): node is FieldNode =>
   node.kind === Kind.FIELD;

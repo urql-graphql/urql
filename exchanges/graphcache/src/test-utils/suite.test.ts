@@ -44,6 +44,44 @@ it('aliased field on query', () => {
   });
 });
 
+it('@skip directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        intA @skip(if: true)
+        intB @skip(if: false)
+      }
+    `,
+    data: { __typename: 'Query', intB: 2 },
+  });
+});
+
+it('@include directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        intA @include(if: true)
+        intB @include(if: false)
+      }
+    `,
+    data: { __typename: 'Query', intA: 2 },
+  });
+});
+
+it('random directive on field on query', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        int @shouldntMatter
+      }
+    `,
+    data: { __typename: 'Query', int: 1 },
+  });
+});
+
 it('json on query', () => {
   expectCacheIntegrity({
     query: gql`
@@ -259,6 +297,39 @@ it('entity list on query and inline fragment', () => {
   });
 });
 
+it('conditionless inline fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        ... {
+          test
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+      test: true,
+    },
+  });
+});
+
+it('skipped conditionless inline fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      {
+        __typename
+        ... @skip(if: true) {
+          test
+        }
+      }
+    `,
+    data: {
+      __typename: 'Query',
+    },
+  });
+});
+
 it('entity list on query and spread fragment', () => {
   expectCacheIntegrity({
     query: gql`
@@ -280,6 +351,24 @@ it('entity list on query and spread fragment', () => {
     data: {
       __typename: 'Query',
       items: [{ __typename: 'Item', id: 1, test: true }, null],
+    },
+  });
+});
+
+it('skipped spread fragment', () => {
+  expectCacheIntegrity({
+    query: gql`
+      query Test {
+        __typename
+        ...TestFragment @skip(if: true)
+      }
+
+      fragment TestFragment on Query {
+        test
+      }
+    `,
+    data: {
+      __typename: 'Query',
     },
   });
 });

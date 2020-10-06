@@ -1,4 +1,4 @@
-import { buildClientSchema } from 'graphql';
+import { Kind, InlineFragmentNode, buildClientSchema } from 'graphql';
 import { mocked } from 'ts-jest/utils';
 import * as SchemaPredicates from './schemaPredicates';
 
@@ -6,25 +6,46 @@ describe('SchemaPredicates', () => {
   // eslint-disable-next-line
   const schema = buildClientSchema(require('../test-utils/simple_schema.json'));
 
+  const frag = (value: string): InlineFragmentNode => ({
+    kind: Kind.INLINE_FRAGMENT,
+    typeCondition: {
+      kind: Kind.NAMED_TYPE,
+      name: {
+        kind: Kind.NAME,
+        value,
+      },
+    },
+    selectionSet: {
+      kind: Kind.SELECTION_SET,
+      selections: [],
+    },
+  });
+
   it('should match fragments by interface/union', () => {
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'ITodo', 'BigTodo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('ITodo'), 'BigTodo')
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'ITodo', 'SmallTodo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('ITodo'), 'SmallTodo')
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'Search', 'BigTodo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('Search'), 'BigTodo')
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'Search', 'SmallTodo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('Search'), 'SmallTodo')
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'ITodo', 'Todo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('ITodo'), 'Todo')
     ).toBeFalsy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'Search', 'Todo')
+      SchemaPredicates.isInterfaceOfType(schema, frag('Search'), 'Todo')
     ).toBeFalsy();
+
+    const typeConditionLess = frag('Type');
+    (typeConditionLess as any).typeCondition = undefined;
+    expect(
+      SchemaPredicates.isInterfaceOfType(schema, typeConditionLess, 'Todo')
+    ).toBeTruthy();
   });
 
   it('should indicate nullability', () => {
@@ -41,17 +62,21 @@ describe('SchemaPredicates', () => {
 
   it('should handle unions of objects', () => {
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'LatestTodoResult', 'Todo')
+      SchemaPredicates.isInterfaceOfType(
+        schema,
+        frag('LatestTodoResult'),
+        'Todo'
+      )
     ).toBeTruthy();
     expect(
       SchemaPredicates.isInterfaceOfType(
         schema,
-        'LatestTodoResult',
+        frag('LatestTodoResult'),
         'NoTodosError'
       )
     ).toBeTruthy();
     expect(
-      SchemaPredicates.isInterfaceOfType(schema, 'Todo', 'NoTodosError')
+      SchemaPredicates.isInterfaceOfType(schema, frag('Todo'), 'NoTodosError')
     ).toBeFalsy();
   });
 
