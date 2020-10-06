@@ -54,8 +54,11 @@ export interface OperationContext {
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
 export interface Operation extends GraphQLRequest {
-  operationName: OperationType;
+  kind: OperationType;
   context: OperationContext;
+
+  /** @deprecated use Operation.kind instead */
+  operationName: OperationType;
 }
 
 /** Resulting data from an [operation]{@link Operation}. */

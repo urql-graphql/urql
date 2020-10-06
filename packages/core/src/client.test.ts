@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and its interaction with default Exchanges */
 
-import { map, pipe, subscribe, filter, toArray, tap } from 'wonka';
+import { Source, map, pipe, subscribe, filter, toArray, tap } from 'wonka';
 import { Exchange, Operation, OperationResult } from './types';
 import { createClient } from './client';
 import { queryOperation } from './test-utils';
@@ -32,9 +32,9 @@ const query = {
   variables: { example: 1234 },
 };
 
-let receivedOps: any[] = [];
+let receivedOps: Operation[] = [];
 let client = createClient({ url: '1234' });
-const receiveMock = jest.fn(s =>
+const receiveMock = jest.fn((s: Source<Operation>) =>
   pipe(
     s,
     tap(op => (receivedOps = [...receivedOps, op])),
@@ -86,7 +86,7 @@ describe('promisified methods', () => {
     expect(print(received.query)).toEqual(print(query.query));
     expect(received.key).toBeDefined();
     expect(received.variables).toEqual({ example: 1234 });
-    expect(received.operationName).toEqual('query');
+    expect(received.kind).toEqual('query');
     expect(received.context).toEqual({
       url: 'https://hostname.com',
       requestPolicy: 'cache-only',
@@ -116,7 +116,7 @@ describe('promisified methods', () => {
     expect(print(received.query)).toEqual(print(query.query));
     expect(received.key).toBeDefined();
     expect(received.variables).toEqual({ example: 1234 });
-    expect(received.operationName).toEqual('mutation');
+    expect(received.kind).toEqual('mutation');
     expect(received.context).toEqual({
       url: 'https://hostname.com',
       requestPolicy: 'cache-and-network',
@@ -142,13 +142,16 @@ describe('synchronous methods', () => {
     );
 
     expect(receivedOps.length).toBe(2);
-    expect(receivedOps[0].operationName).toBe('query');
-    expect(receivedOps[1].operationName).toBe('teardown');
+    expect(receivedOps[0].kind).toBe('query');
+    expect(receivedOps[1].kind).toBe('teardown');
     expect(result).toEqual({
       operation: {
         ...query,
         context: expect.anything(),
         key: expect.any(Number),
+        kind: 'query',
+
+        // TODO: Remove this when the deprecated `operationName` property is removed
         operationName: 'query',
       },
     });
@@ -199,13 +202,13 @@ describe('executeQuery', () => {
     );
   });
 
-  it('passes operationName type to exchange', () => {
+  it('passes kind type to exchange', () => {
     pipe(
       client.executeQuery(query),
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('operationName', 'query');
+    expect(receivedOps[0]).toHaveProperty('kind', 'query');
   });
 
   it('passes url (from context) to exchange', () => {
@@ -227,11 +230,11 @@ describe('executeQuery', () => {
     expect(receivedOps.length).toEqual(1);
     jest.advanceTimersByTime(200);
     expect(receivedOps.length).toEqual(5);
-    expect(receivedOps[0].operationName).toEqual('query');
-    expect(receivedOps[1].operationName).toEqual('teardown');
-    expect(receivedOps[2].operationName).toEqual('query');
-    expect(receivedOps[3].operationName).toEqual('teardown');
-    expect(receivedOps[4].operationName).toEqual('query');
+    expect(receivedOps[0].kind).toEqual('query');
+    expect(receivedOps[1].kind).toEqual('teardown');
+    expect(receivedOps[2].kind).toEqual('query');
+    expect(receivedOps[3].kind).toEqual('teardown');
+    expect(receivedOps[4].kind).toEqual('query');
     unsubscribe();
   });
 });
@@ -256,13 +259,13 @@ describe('executeMutation', () => {
     expect(receivedOps[0]).toHaveProperty('variables', query.variables);
   });
 
-  it('passes operationName type to exchange', () => {
+  it('passes kind type to exchange', () => {
     pipe(
       client.executeMutation(query),
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('operationName', 'mutation');
+    expect(receivedOps[0]).toHaveProperty('kind', 'mutation');
   });
 
   it('passes url (from context) to exchange', () => {
@@ -295,13 +298,13 @@ describe('executeSubscription', () => {
     expect(receivedOps[0]).toHaveProperty('variables', query.variables);
   });
 
-  it('passes operationName type to exchange', () => {
+  it('passes kind type to exchange', () => {
     pipe(
       client.executeSubscription(query),
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('operationName', 'subscription');
+    expect(receivedOps[0]).toHaveProperty('kind', 'subscription');
   });
 });
 
@@ -312,7 +315,7 @@ describe('queuing behavior', () => {
     const exchange: Exchange = ({ client }) => ops$ => {
       return pipe(
         ops$,
-        filter(op => op.operationName !== 'teardown'),
+        filter(op => op.kind !== 'teardown'),
         tap(op => {
           output.push(op);
           if (

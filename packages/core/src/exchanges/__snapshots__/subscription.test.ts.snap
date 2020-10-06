@@ -14,6 +14,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 4,
+    "kind": "subscription",
     "operationName": "subscription",
     "query": Object {
       "definitions": Array [

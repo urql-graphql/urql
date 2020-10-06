@@ -7,6 +7,7 @@ import {
   OperationContext,
   OperationResult,
 } from '../types';
+import { makeOperation } from '../utils';
 
 const context: OperationContext = {
   fetchOptions: {
@@ -60,37 +61,45 @@ export const subscriptionGql: GraphQLRequest = {
   },
 };
 
-export const teardownOperation: Operation = {
-  query: queryGql.query,
-  variables: queryGql.variables,
-  key: queryGql.key,
-  operationName: 'teardown',
-  context,
-};
+export const teardownOperation: Operation = makeOperation(
+  'teardown',
+  {
+    query: queryGql.query,
+    variables: queryGql.variables,
+    key: queryGql.key,
+  },
+  context
+);
 
-export const queryOperation: Operation = {
-  query: teardownOperation.query,
-  variables: teardownOperation.variables,
-  key: teardownOperation.key,
-  operationName: 'query',
-  context,
-};
+export const queryOperation: Operation = makeOperation(
+  'query',
+  {
+    query: teardownOperation.query,
+    variables: teardownOperation.variables,
+    key: teardownOperation.key,
+  },
+  context
+);
 
-export const mutationOperation: Operation = {
-  query: mutationGql.query,
-  variables: mutationGql.variables,
-  key: mutationGql.key,
-  operationName: 'mutation',
-  context,
-};
+export const mutationOperation: Operation = makeOperation(
+  'mutation',
+  {
+    query: mutationGql.query,
+    variables: mutationGql.variables,
+    key: mutationGql.key,
+  },
+  context
+);
 
-export const subscriptionOperation: Operation = {
-  query: subscriptionGql.query,
-  variables: subscriptionGql.variables,
-  key: subscriptionGql.key,
-  operationName: 'subscription',
-  context,
-};
+export const subscriptionOperation: Operation = makeOperation(
+  'subscription',
+  {
+    query: subscriptionGql.query,
+    variables: subscriptionGql.variables,
+    key: subscriptionGql.key,
+  },
+  context
+);
 
 export const undefinedQueryResponse: OperationResult = {
   operation: queryOperation,
