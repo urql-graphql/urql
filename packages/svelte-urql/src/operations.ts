@@ -79,7 +79,7 @@ export function query<T = any, V = object>(
           fromValue({ fetching: true, stale: false }),
           pipe(
             client.executeQuery(request, request.context!),
-            map(result => ({ fetching: false, ...result }))
+            map(result => ({ fetching: false, ...result, stale: !!result.stale }))
           ),
           fromValue({ fetching: false, stale: false }),
         ]);
