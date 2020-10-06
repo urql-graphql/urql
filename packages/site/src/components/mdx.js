@@ -198,6 +198,15 @@ const TableCell = styled.td`
   }
 `;
 
+const TableScrollContainer = styled.div`
+  overflow-x: auto;
+
+  @media ${p => p.theme.media.maxmd} {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+`;
+
 const Table = styled.table`
   border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
@@ -211,6 +220,12 @@ const Table = styled.table`
     hyphens: initial;
   }
 `;
+
+const TableScroll = props => (
+  <TableScrollContainer>
+    <Table {...props} />
+  </TableScrollContainer>
+);
 
 const MdLink = ({ href, children }) => {
   const currentPage = useMarkdownPage();
@@ -278,7 +293,7 @@ const components = {
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
-  table: Table,
+  table: TableScroll,
   th: TableHeader,
   td: TableCell,
   a: MdLink,
