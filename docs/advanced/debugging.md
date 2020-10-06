@@ -70,12 +70,12 @@ It also contains a `dispatchDebug` property.
 
 It is called with an object containing the following properties:
 
-| Prop      | Type        | Description                                                                           |
-| --------- | ----------- | ------------------------------------------------------------------------------------- |
-| type      | `string`    | A unique type identifier for the Debug Event.                                         |
-| message   | `string`    | A human readable description of the event.                                            |
-| operation | `Operation` | The [`Operation`](../api/core.md#operation) that the event targets.                   |
-| data      | `?object`   | This is an optional payload to include any data that may become useful for debugging. |
+| Prop        | Type        | Description                                                                           |
+| ----------- | ----------- | ------------------------------------------------------------------------------------- |
+| `type`      | `string`    | A unique type identifier for the Debug Event.                                         |
+| `message`   | `string`    | A human readable description of the event.                                            |
+| `operation` | `Operation` | The [`Operation`](../api/core.md#operation) that the event targets.                   |
+| `data`      | `?object`   | This is an optional payload to include any data that may become useful for debugging. |
 
 For instance, we may call `dispatchDebug` with our `fetchRequest` event. This is the event that the
 `fetchExchange` uses to notify us that a request has commenced:

@@ -151,6 +151,10 @@ const sharedTableCellStyling = css`
   padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
   border-left: 1px solid ${p => p.theme.colors.passiveBg};
   border-bottom: 1px solid ${p => p.theme.colors.passiveBg};
+
+  & > ${InlineCode} {
+    white-space: pre-wrap;
+  }
 `;
 
 const TableHeader = styled.th`
@@ -160,7 +164,6 @@ const TableHeader = styled.th`
 `;
 
 const TableCell = styled.td`
-  width: min-content;
   ${sharedTableCellStyling}
 
   ${p => {
@@ -172,27 +175,23 @@ const TableCell = styled.td`
       css`
         background-color: ${p.theme.colors.codeBg};
 
-        & > ${InlineCode} {
+        && > ${InlineCode} {
           background: none;
           padding: 0;
           margin: 0;
+          white-space: pre;
         }
       `
     );
   }}
 
-  &:last-child {
-    min-width: 20rem;
-    width: max-content;
-  }
-
   &:first-child {
-    white-space: nowrap;
+    width: min-content;
+    min-width: 25rem;
   }
 
-  &:nth-child(2) {
+  &:not(:first-child) {
     overflow-wrap: break-word;
-    min-width: 20rem;
   }
 `;
 
