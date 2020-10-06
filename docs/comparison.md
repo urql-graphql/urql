@@ -60,7 +60,8 @@ matter which framework you use it with. It's worth mentioning that all three cli
 kind of extensibility API which allows you to change when and how queries are sent to an API. These
 are easy to use primitives particularly in Apollo, with links, and in `urql` with exchanges. The
 major difference in `urql` is that all caching logic is abstracted in exchanges too, which makes
-them slightly more powerful (and hence makes `urql` slightly more customizable.)
+it easy to swap the caching logic or other behavior out (and hence makes `urql` slightly more
+customizable.)
 
 A lot of the added exchanges for persisted queries, file uploads, retrying, and other features are
 implemented by the urql-team, while there are some cases where first-party support isn't provided
@@ -96,7 +97,7 @@ for instance.
 | ------------------------------------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------------------- |
 | Caching Strategy                                        | Document Caching, Normalized Caching with `@urql/exchange-graphcache` | Normalized Caching | Normalized Caching (schema restrictions apply) |
 | Added Bundle Size                                       | +5.9kB (with Graphcache)                                              | +0 (default)       | +0 (default)                                   |
-| Automatic Garbage Collection                            | ✅                                                                    | ✅                 | ✅                                             |
+| Automatic Garbage Collection                            | ✅                                                                    | 🔶                 | ✅                                             |
 | Local State Management                                  | 🛑                                                                    | ✅                 | ✅                                             |
 | Pagination Support                                      | 🔶                                                                    | 🔶                 | ✅                                             |
 | Optimistic Updates                                      | ✅                                                                    | ✅                 | ✅                                             |
@@ -105,7 +106,6 @@ for instance.
 | Local Resolvers and Redirects                           | ✅                                                                    | ✅                 | 🛑                                             |
 | Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                 | 🛑                                             |
 | Commutativity Guarantees                                | ✅                                                                    | 🛑                 | 🛑                                             |
-| Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
 | Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
 | Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                 | 🛑                                             |
 | Offline Support                                         | ✅                                                                    | 🛑                 | 🛑                                             |
