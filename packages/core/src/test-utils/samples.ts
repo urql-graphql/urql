@@ -61,8 +61,8 @@ export const subscriptionGql: GraphQLRequest = {
   },
 };
 
-export const teardownOperation: Operation = makeOperation(
-  'teardown',
+export const queryOperation: Operation = makeOperation(
+  'query',
   {
     query: queryGql.query,
     variables: queryGql.variables,
@@ -71,12 +71,12 @@ export const teardownOperation: Operation = makeOperation(
   context
 );
 
-export const queryOperation: Operation = makeOperation(
-  'query',
+export const teardownOperation: Operation = makeOperation(
+  'teardown',
   {
-    query: teardownOperation.query,
-    variables: teardownOperation.variables,
-    key: teardownOperation.key,
+    query: queryOperation.query,
+    variables: queryOperation.variables,
+    key: queryOperation.key,
   },
   context
 );
