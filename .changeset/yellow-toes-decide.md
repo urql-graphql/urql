@@ -2,4 +2,4 @@
 '@urql/svelte': minor
 ---
 
-Support pausing a query-operation
+Support passing `pause` to stop executing queries or subscriptions.
