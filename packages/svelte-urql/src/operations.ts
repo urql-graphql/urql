@@ -1,7 +1,14 @@
-import { createRequest, OperationContext, GraphQLRequest } from '@urql/core';
 import { onDestroy } from 'svelte';
 
 import {
+  createRequest,
+  stringifyVariables,
+  OperationContext,
+  GraphQLRequest,
+} from '@urql/core';
+
+import {
+  Source,
   pipe,
   map,
   make,
@@ -16,6 +23,12 @@ import { OperationStore, operationStore } from './operationStore';
 import { getClient } from './context';
 import { _markStoreUpdate } from './internal';
 
+interface SourceRequest extends GraphQLRequest {
+  context?: Partial<OperationContext> & {
+    pause?: boolean;
+  };
+}
+
 const baseState: Partial<OperationStore> = {
   fetching: false,
   stale: false,
@@ -25,19 +38,26 @@ const baseState: Partial<OperationStore> = {
 };
 
 const toSource = (store: OperationStore) => {
-  return make<GraphQLRequest>(observer => {
+  return make<SourceRequest>(observer => {
     let $request: void | GraphQLRequest;
-    let $context: void | Partial<OperationContext>;
+    let $contextKey: void | string;
     return store.subscribe(state => {
-      const request = createRequest(state.query, state.variables as any);
+      const request = createRequest(
+        state.query,
+        state.variables as any
+      ) as SourceRequest;
+
+      const contextKey = stringifyVariables((request.context = state.context));
+
       if (
-        (!state.context || (state.context && !state.context.pause)) &&
-        ($context !== state.context ||
-          !$request ||
-          request.key !== $request.key)
+        $request === undefined ||
+        request.key !== $request.key ||
+        $contextKey === undefined ||
+        contextKey !== $contextKey
       ) {
-        $context = state.context;
-        observer.next(($request = request));
+        $contextKey = contextKey;
+        $request = request;
+        observer.next(request);
       }
     });
   });
@@ -49,16 +69,22 @@ export function query<T = any, V = object>(
   const client = getClient();
   const subscription = pipe(
     toSource(store),
-    switchMap(request => {
-      return concat<Partial<OperationStore>>([
-        fromValue({ fetching: true, stale: false }),
-        pipe(
-          client.executeQuery(request, store.context!),
-          map(result => ({ fetching: false, ...result }))
-        ),
-        fromValue({ fetching: false, stale: false }),
-      ]);
-    }),
+    switchMap(
+      (request): Source<Partial<OperationStore>> => {
+        if (store.context && store.context.pause) {
+          return fromValue({ fetching: false, stale: false });
+        }
+
+        return concat<Partial<OperationStore>>([
+          fromValue({ fetching: true, stale: false }),
+          pipe(
+            client.executeQuery(request, request.context!),
+            map(result => ({ fetching: false, ...result }))
+          ),
+          fromValue({ fetching: false, stale: false }),
+        ]);
+      }
+    ),
     scan(
       (result, partial) => ({
         ...result,
@@ -85,13 +111,19 @@ export function subscription<T = any, R = T, V = object>(
   const client = getClient();
   const subscription = pipe(
     toSource(store),
-    switchMap(request => {
-      return concat<Partial<OperationStore>>([
-        fromValue({ fetching: true, stale: false }),
-        client.executeSubscription(request, store.context),
-        fromValue({ fetching: false, stale: false }),
-      ]);
-    }),
+    switchMap(
+      (request): Source<Partial<OperationStore>> => {
+        if (store.context && store.context.pause) {
+          return fromValue({ fetching: false, stale: false });
+        }
+
+        return concat<Partial<OperationStore>>([
+          fromValue({ fetching: true, stale: false }),
+          client.executeSubscription(request, store.context),
+          fromValue({ fetching: false, stale: false }),
+        ]);
+      }
+    ),
     scan((result, partial: any) => {
       const data =
         partial.data !== undefined
