@@ -17,16 +17,12 @@ const DEPRECATED: Record<string, Warning> = {
 
 export const makeOperation = (
   kind: OperationType,
-  {
-    key,
-    query,
-    variables,
-  }: Pick<GraphQLRequest, 'key' | 'query' | 'variables'>,
+  request: Pick<GraphQLRequest, 'key' | 'query' | 'variables'>,
   context: OperationContext
 ): Operation => ({
-  key,
-  query,
-  variables,
+  key: request.key,
+  query: request.query,
+  variables: request.variables,
   kind,
   context,
 
