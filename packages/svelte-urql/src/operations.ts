@@ -71,7 +71,7 @@ export function query<T = any, V = object>(
     toSource(store),
     switchMap(
       (request): Source<Partial<OperationStore>> => {
-        if (store.context && store.context.pause) {
+        if (request.context && request.context.pause) {
           return fromValue({ fetching: false, stale: false });
         }
 
@@ -113,7 +113,7 @@ export function subscription<T = any, R = T, V = object>(
     toSource(store),
     switchMap(
       (request): Source<Partial<OperationStore>> => {
-        if (store.context && store.context.pause) {
+        if (request.context && request.context.pause) {
           return fromValue({ fetching: false, stale: false });
         }
 
