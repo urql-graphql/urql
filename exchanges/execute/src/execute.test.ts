@@ -1,7 +1,7 @@
 jest.mock('graphql');
 
 import { fetchExchange } from 'urql';
-import { executeExchange, getOperationName } from './execute';
+import { executeExchange } from './execute';
 import { execute, print } from 'graphql';
 import {
   pipe,
@@ -13,6 +13,7 @@ import {
   Source,
 } from 'wonka';
 import { mocked } from 'ts-jest/utils';
+import { getOperationName } from '@urql/core/utils';
 import { queryOperation } from '@urql/core/test-utils';
 import { makeErrorResult, makeOperation } from '@urql/core';
 import { Client } from '@urql/core/client';
