@@ -13,11 +13,11 @@ import {
   GraphQLRequest,
   Operation,
   OperationResult,
+  makeOperation,
 } from '@urql/core';
 
 import { Provider } from '../context';
 import { useQuery } from '../hooks';
-import { makeOperation } from '@urql/core/src/utils';
 
 const context: OperationContext = {
   fetchOptions: {
