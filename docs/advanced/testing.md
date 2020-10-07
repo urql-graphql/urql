@@ -191,17 +191,15 @@ If you prefer to have more control on when the new data is arriving you can use 
 Here's an example of testing a list component which uses a subscription.
 
 ```tsx
+import { makeOperation } from '@urql/core';
+
 const mockClient = {
   executeSubscription: jest.fn(query =>
     pipe(
       interval(200),
       map((i: number) => ({
         // To mock a full result, we need to pass a mock operation back as well
-        operation: {
-          operationName: 'subscription,
-          context: {},
-          ...query,
-        },
+        operation: makeOperation('subscription', query, {}),
         data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
       }))
     )

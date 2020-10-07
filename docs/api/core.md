@@ -37,7 +37,7 @@ Accepts a [`GraphQLRequest`](#graphqlrequest) and optionally `Partial<OperationC
 [`Source<OperationResult>`](#operationresult) — a stream of query results that can be subscribed to.
 
 Internally, subscribing to the returned source will create an [`Operation`](#operation), with
-`operationName` set to `'query'`, and dispatch it on the
+`kind` set to `'query'`, and dispatch it on the
 exchanges pipeline. If no subscribers are listening to this operation anymore and unsubscribe from
 the query sources, the `Client` will dispatch a "teardown" operation.
 
@@ -53,12 +53,12 @@ repeatedly in the interval you pass.
 ### client.executeSubscription
 
 This is functionally the same as `client.executeQuery`, but creates operations for subscriptions
-instead, with `operationName` set to `'subscription'`.
+instead, with `kind` set to `'subscription'`.
 
 ### client.executeMutation
 
 This is functionally the same as `client.executeQuery`, but creates operations for mutations
-instead, with `operationName` set to `'mutation'`.
+instead, with `kind` set to `'mutation'`.
 
 A mutation source is always guaranteed to only respond with a single [`OperationResult`](#operationresult) and then complete.
 
@@ -170,14 +170,10 @@ received.
 The input for every exchange that informs GraphQL requests.
 It extends the [GraphQLRequest](#graphqlrequest) type and contains these additional properties:
 
-| Prop          | Type               | Description                                   |
-| ------------- | ------------------ | --------------------------------------------- |
-| operationName | `OperationType`    | The type of GraphQL operation being executed. |
-| context       | `OperationContext` | Additional metadata passed to exchange.       |
-
-> **Note:** In `urql` the `operationName` on the `Operation` isn't the actual name of an operation
-> and derived from the GraphQL `DocumentNode`, but instead a type of operation, like `'query'` or
-> `'teardown'`
+| Prop    | Type               | Description                                   |
+| ------- | ------------------ | --------------------------------------------- |
+| kind    | `OperationType`    | The type of GraphQL operation being executed. |
+| context | `OperationContext` | Additional metadata passed to exchange.       |
 
 ### RequestPolicy
 

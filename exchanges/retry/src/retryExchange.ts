@@ -68,9 +68,7 @@ export const retryExchange = ({
           sharedOps$,
           filter(op => {
             return (
-              (op.operationName === 'query' ||
-                op.operationName === 'teardown') &&
-              op.key === key
+              (op.kind === 'query' || op.kind === 'teardown') && op.key === key
             );
           })
         );

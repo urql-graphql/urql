@@ -130,14 +130,14 @@ export function authExchange<T>({
       const teardownOps$ = pipe(
         sharedOps$,
         filter((operation: Operation) => {
-          return operation.operationName === 'teardown';
+          return operation.kind === 'teardown';
         })
       );
 
       const pendingOps$ = pipe(
         sharedOps$,
         filter((operation: Operation) => {
-          return operation.operationName !== 'teardown';
+          return operation.kind !== 'teardown';
         })
       );
 
@@ -160,9 +160,7 @@ export function authExchange<T>({
               const teardown$ = pipe(
                 sharedOps$,
                 filter(op => {
-                  return (
-                    op.operationName === 'teardown' && op.key === operation.key
-                  );
+                  return op.kind === 'teardown' && op.key === operation.key;
                 })
               );
 

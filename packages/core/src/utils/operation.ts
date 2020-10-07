@@ -35,10 +35,4 @@ export const makeOperation = (
 
     return this.kind;
   },
-
-  set operationName(kind: OperationType) {
-    deprecationWarning(DEPRECATED.operationName);
-
-    this.kind = kind;
-  },
 });

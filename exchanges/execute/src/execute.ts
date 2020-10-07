@@ -10,8 +10,6 @@ import {
 } from 'wonka';
 
 import {
-  DocumentNode,
-  Kind,
   GraphQLSchema,
   GraphQLFieldResolver,
   GraphQLTypeResolver,
@@ -19,15 +17,7 @@ import {
 } from 'graphql';
 
 import { Exchange, makeResult, makeErrorResult, Operation } from '@urql/core';
-
-export const getOperationName = (query: DocumentNode): string | undefined => {
-  for (let i = 0, l = query.definitions.length; i < l; i++) {
-    const node = query.definitions[i];
-    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
-      return node.name.value;
-    }
-  }
-};
+import { getOperationName } from '@urql/core/utils';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
@@ -51,16 +41,13 @@ export const executeExchange = ({
     const executedOps$ = pipe(
       sharedOps$,
       filter((operation: Operation) => {
-        return (
-          operation.operationName === 'query' ||
-          operation.operationName === 'mutation'
-        );
+        return operation.kind === 'query' || operation.kind === 'mutation';
       }),
       mergeMap((operation: Operation) => {
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
+          filter(op => op.kind === 'teardown' && op.key === key)
         );
 
         const calculatedContext =
@@ -99,10 +86,7 @@ export const executeExchange = ({
     const forwardedOps$ = pipe(
       sharedOps$,
       filter((operation: Operation) => {
-        return (
-          operation.operationName !== 'query' &&
-          operation.operationName !== 'mutation'
-        );
+        return operation.kind !== 'query' && operation.kind !== 'mutation';
       }),
       forward
     );

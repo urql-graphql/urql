@@ -87,6 +87,9 @@ it(`attaches a listener and redispatches queries on call`, () => {
     context: expect.anything(),
     key: 1,
     query: queryOne,
+    kind: 'query',
+
+    // TODO: Remove this when the deprecated "operationName" property is removed
     operationName: 'query',
   });
 });

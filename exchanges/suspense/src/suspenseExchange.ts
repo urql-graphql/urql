@@ -32,9 +32,9 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
     // Every uncached operation that isn't skipped will be marked as immediate and forwarded
     const forwardResults$ = pipe(
       sharedOps$,
-      filter(op => op.operationName !== 'query' || !isOperationCached(op)),
+      filter(op => op.kind !== 'query' || !isOperationCached(op)),
       onPush(op => {
-        if (op.operationName === 'query') keys.add(op.key);
+        if (op.kind === 'query') keys.add(op.key);
       }),
       forward,
       share
@@ -43,7 +43,7 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
     // Results that are skipped by suspense (mutations)
     const ignoredResults$ = pipe(
       forwardResults$,
-      filter(res => res.operation.operationName !== 'query')
+      filter(res => res.operation.kind !== 'query')
     );
 
     // Results that may have suspended since they did not resolve synchronously
@@ -51,8 +51,7 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
       forwardResults$,
       filter(res => {
         return (
-          res.operation.operationName === 'query' &&
-          !isOperationCached(res.operation)
+          res.operation.kind === 'query' && !isOperationCached(res.operation)
         );
       }),
       onPush((res: OperationResult) => {
@@ -70,9 +69,9 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
     // deferredResults$ ignores it
     const immediateResults$ = pipe(
       sharedOps$,
-      filter(op => op.operationName === 'query' && !isOperationCached(op)),
+      filter(op => op.kind === 'query' && !isOperationCached(op)),
       onPush(op => {
-        if (op.operationName === 'query') keys.delete(op.key);
+        if (op.kind === 'query') keys.delete(op.key);
       }),
       filter<any>(() => false)
     );
@@ -81,7 +80,7 @@ export const suspenseExchange: Exchange = ({ client, forward }) => {
     // by the suspenseExchange, and will be deleted from the cache immediately after
     const cachedResults$ = pipe(
       sharedOps$,
-      filter(op => op.operationName === 'query' && isOperationCached(op)),
+      filter(op => op.kind === 'query' && isOperationCached(op)),
       map(op => {
         const { key } = op;
         const result = cache.get(key) as OperationResult;

@@ -1,4 +1,4 @@
-import { DocumentNode, parse, print } from 'graphql';
+import { DocumentNode, Kind, parse, print } from 'graphql';
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
 import { GraphQLRequest, Operation, OperationContext } from '../types';
@@ -54,3 +54,15 @@ export const addMetadata = (
     },
   },
 });
+
+/**
+ * Finds the Name value from the OperationDefinition of a Document
+ */
+export const getOperationName = (query: DocumentNode): string | undefined => {
+  for (let i = 0, l = query.definitions.length; i < l; i++) {
+    const node = query.definitions[i];
+    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
+      return node.name.value;
+    }
+  }
+};

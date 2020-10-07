@@ -127,16 +127,16 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
   // This registers queries with the data layer to ensure commutativity
   const prepareForwardedOperation = (operation: Operation) => {
-    if (operation.operationName === 'query') {
+    if (operation.kind === 'query') {
       // Pre-reserve the position of the result layer
       reserveLayer(store.data, operation.key);
-    } else if (operation.operationName === 'teardown') {
+    } else if (operation.kind === 'teardown') {
       // Delete reference to operation if any exists to release it
       ops.delete(operation.key);
       // Mark operation layer as done
       noopDataState(store.data, operation.key);
     } else if (
-      operation.operationName === 'mutation' &&
+      operation.kind === 'mutation' &&
       operation.context.requestPolicy !== 'network-only'
     ) {
       // This executes an optimistic update for mutations and registers it if necessary
@@ -207,7 +207,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     const { operation, error, extensions } = result;
     const { key } = operation;
 
-    if (operation.operationName === 'mutation') {
+    if (operation.kind === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
       const dependencies = optimisticKeysToDependencies.get(key);
       collectPendingOperations(pendingOperations, dependencies);
@@ -226,7 +226,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
 
       const queryResult = query(store, operation, result.data);
       result.data = queryResult.data;
-      if (operation.operationName === 'query') {
+      if (operation.kind === 'query') {
         // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
         collectPendingOperations(pendingOperations, queryDependencies);
@@ -269,8 +269,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       inputOps$,
       filter(op => {
         return (
-          op.operationName === 'query' &&
-          op.context.requestPolicy !== 'network-only'
+          op.kind === 'query' && op.context.requestPolicy !== 'network-only'
         );
       }),
       map(operationResultFromCache),
@@ -281,8 +280,7 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       inputOps$,
       filter(op => {
         return (
-          op.operationName !== 'query' ||
-          op.context.requestPolicy === 'network-only'
+          op.kind !== 'query' || op.context.requestPolicy === 'network-only'
         );
       })
     );

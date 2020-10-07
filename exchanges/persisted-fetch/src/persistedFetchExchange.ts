@@ -48,12 +48,12 @@ export const persistedFetchExchange = (
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(operation => operation.operationName === 'query'),
+      filter(operation => operation.kind === 'query'),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
+          filter(op => op.kind === 'teardown' && op.key === key)
         );
 
         const body = makeFetchBody(operation);
@@ -125,7 +125,7 @@ export const persistedFetchExchange = (
 
     const forward$ = pipe(
       sharedOps$,
-      filter(operation => operation.operationName !== 'query'),
+      filter(operation => operation.kind !== 'query'),
       forward
     );
 

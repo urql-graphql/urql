@@ -80,7 +80,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
       const requests: SerializedRequest[] = [];
       for (let i = 0; i < failedQueue.length; i++) {
         const op = failedQueue[i];
-        if (op.operationName === 'mutation') {
+        if (op.kind === 'mutation') {
           requests.push({
             query: print(op.query),
             variables: op.variables,
@@ -107,7 +107,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
         outerForward(ops$),
         filter(res => {
           if (
-            res.operation.operationName === 'mutation' &&
+            res.operation.kind === 'mutation' &&
             isOfflineError(res.error) &&
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
@@ -151,10 +151,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
       return pipe(
         cacheResults$(opsAndRebound$),
         filter(res => {
-          if (
-            res.operation.operationName === 'query' &&
-            isOfflineError(res.error)
-          ) {
+          if (res.operation.kind === 'query' && isOfflineError(res.error)) {
             next(toRequestPolicy(res.operation, 'cache-only'));
             failedQueue.push(res.operation);
             return false;
