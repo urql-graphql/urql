@@ -79,7 +79,11 @@ export function query<T = any, V = object>(
           fromValue({ fetching: true, stale: false }),
           pipe(
             client.executeQuery(request, request.context!),
-            map(result => ({ fetching: false, ...result }))
+            map(result => ({
+              fetching: false,
+              ...result,
+              stale: !!result.stale,
+            }))
           ),
           fromValue({ fetching: false, stale: false }),
         ]);
@@ -114,13 +118,13 @@ export function subscription<T = any, R = T, V = object>(
     switchMap(
       (request): Source<Partial<OperationStore>> => {
         if (request.context && request.context.pause) {
-          return fromValue({ fetching: false, stale: false });
+          return fromValue({ fetching: false });
         }
 
         return concat<Partial<OperationStore>>([
-          fromValue({ fetching: true, stale: false }),
+          fromValue({ fetching: true }),
           client.executeSubscription(request, store.context),
-          fromValue({ fetching: false, stale: false }),
+          fromValue({ fetching: false }),
         ]);
       }
     ),
@@ -131,7 +135,7 @@ export function subscription<T = any, R = T, V = object>(
             ? handler(result.data, partial.data)
             : partial.data
           : result.data;
-      return { ...result, ...partial, data };
+      return { ...result, ...partial, data, stale: false };
     }, baseState),
     subscribe(update => {
       _markStoreUpdate(update);
