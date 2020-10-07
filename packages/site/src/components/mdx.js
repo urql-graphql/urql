@@ -38,6 +38,7 @@ const Code = styled.code`
   font-variant-ligatures: none;
   font-feature-settings: normal;
   white-space: pre;
+  hyphens: initial;
 `;
 
 const InlineCode = styled(props => {
@@ -151,6 +152,11 @@ const sharedTableCellStyling = css`
   padding: ${p => p.theme.spacing.xs} ${p => p.theme.spacing.sm};
   border-left: 1px solid ${p => p.theme.colors.passiveBg};
   border-bottom: 1px solid ${p => p.theme.colors.passiveBg};
+
+  & > ${InlineCode} {
+    white-space: pre-wrap;
+    display: inline;
+  }
 `;
 
 const TableHeader = styled.th`
@@ -160,7 +166,6 @@ const TableHeader = styled.th`
 `;
 
 const TableCell = styled.td`
-  width: min-content;
   ${sharedTableCellStyling}
 
   ${p => {
@@ -172,47 +177,59 @@ const TableCell = styled.td`
       css`
         background-color: ${p.theme.colors.codeBg};
 
-        & > ${InlineCode} {
+        && > ${InlineCode} {
           background: none;
           padding: 0;
           margin: 0;
+          white-space: pre;
+          display: block;
         }
       `
     );
   }}
 
-  &:last-child {
-    min-width: 20rem;
-    width: max-content;
-  }
-
   &:first-child {
-    white-space: nowrap;
+    width: min-content;
+    min-width: 25rem;
   }
 
-  &:nth-child(2) {
-    overflow-wrap: break-word;
-    min-width: 20rem;
+  @media ${p => p.theme.media.md} {
+    &:not(:first-child) {
+      overflow-wrap: break-word;
+    }
   }
 `;
 
-const TableOverflow = styled.div`
+const TableScrollContainer = styled.div`
   overflow-x: auto;
+
+  @media ${p => p.theme.media.maxmd} {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
 `;
 
 const Table = styled.table`
   border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
+  overflow-x: auto;
+
+  @media ${p => p.theme.media.maxmd} {
+    overflow-x: scroll;
+    overflow-wrap: initial;
+    word-wrap: initial;
+    word-break: initial;
+    hyphens: initial;
+  }
 `;
 
-const TableWithOverflow = props => (
-  <TableOverflow>
+const TableScroll = props => (
+  <TableScrollContainer>
     <Table {...props} />
-  </TableOverflow>
+  </TableScrollContainer>
 );
 
 const MdLink = ({ href, children }) => {
-  const location = useLocation();
   const currentPage = useMarkdownPage();
 
   if (!/^\w+:/.test(href) && !href.startsWith('#')) {
@@ -278,7 +295,7 @@ const components = {
   blockquote: Blockquote,
   inlineCode: InlineCode,
   code: HighlightCode,
-  table: TableWithOverflow,
+  table: TableScroll,
   th: TableHeader,
   td: TableCell,
   a: MdLink,
