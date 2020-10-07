@@ -10,7 +10,11 @@ it('instantiates an operation container acting as a store', () => {
   expect(store.variables).toBe(variables);
   expect(store.context).toBe(context);
 
-  const subscriber = jest.fn();
+  let state: any;
+  const subscriber = jest.fn($state => {
+    state = $state;
+  });
+
   store.subscribe(subscriber);
 
   expect(subscriber).toHaveBeenCalledWith(store);
@@ -19,8 +23,11 @@ it('instantiates an operation container acting as a store', () => {
   store.set({ query: '{ test2 }' });
   expect(subscriber).toHaveBeenCalledWith(store);
   expect(subscriber).toHaveBeenCalledTimes(2);
-
   expect(store.query).toBe('{ test2 }');
+
+  // Svelte's reactive updates will call set with an identity state value
+  store.set(state);
+  expect(subscriber).toHaveBeenCalledTimes(3);
 });
 
 it('adds getters and setters for known values', () => {

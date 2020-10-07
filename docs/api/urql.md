@@ -9,14 +9,14 @@ order: 1
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop          | Type                     | Description                                                                                              |
-| ------------- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
-| query         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
-| variables     | `?object`                | The variables to be used with the GraphQL request.                                                       |
-| requestPolicy | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
-| pause         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
-| pollInterval  | `?number`                | Every `pollInterval` milliseconds the query will be reexecuted.                                          |
-| context       | `?object`                | Holds the contextual information for the query.                                                          |
+| Prop            | Type                     | Description                                                                                              |
+| --------------- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `query`         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
+| `variables`     | `?object`                | The variables to be used with the GraphQL request.                                                       |
+| `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
+| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
+| `pollInterval`  | `?number`                | Every `pollInterval` milliseconds the query will be reexecuted.                                          |
+| `context`       | `?object`                | Holds the contextual information for the query.                                                          |
 
 This hook returns a tuple of the shape `[result, executeQuery]`.
 
@@ -46,12 +46,12 @@ Accepts a single `query` argument of type `string | DocumentNode` and returns a 
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop      | Type                     | Description                                                                                 |
-| --------- | ------------------------ | ------------------------------------------------------------------------------------------- |
-| query     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.          |
-| variables | `?object`                | The variables to be used with the GraphQL request.                                          |
-| pause     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery). |
-| context   | `?object`                | Holds the contextual information for the query.                                             |
+| Prop        | Type                     | Description                                                                                 |
+| ----------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.          |
+| `variables` | `?object`                | The variables to be used with the GraphQL request.                                          |
+| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery). |
+| `context`   | `?object`                | Holds the contextual information for the query.                                             |
 
 The hook optionally accepts a second argument, which may be a handler function with a type signature
 of:

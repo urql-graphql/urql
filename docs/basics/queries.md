@@ -210,7 +210,7 @@ the query's eventual result, which we can then observe.
 For the following examples, we'll imagine that we're querying data from a GraphQL API that contains
 todo items. Let's dive right into it!
 
-```html
+```jsx
 <script>
   import { operationStore, query } from '@urql/svelte';
 
@@ -257,7 +257,7 @@ Typically we'll also need to pass variables to our queries, for instance, if we 
 pagination. For this purpose the `operationStore` also accepts a `variables` argument, which we can
 use to supply variables to our query.
 
-```html
+```jsx
 <script>
   import { operationStore, query } from '@urql/svelte';
 
@@ -283,7 +283,7 @@ As when we're sending GraphQL queries manually using `fetch`, the variables will
 The `operationStore` also supports being actively changed. This will hook into Svelte's reactivity
 model as well and cause the `query` utility to start a new operation.
 
-```html
+```jsx
 <script>
   import { operationStore, query } from '@urql/svelte';
 
@@ -304,13 +304,48 @@ model as well and cause the `query` utility to start a new operation.
   }
 </script>
 
-<button on:click="{nextPage}">Next page<button></button></button>
+<button on:click={nextPage}>Next page<button></button></button>
 ```
 
 The `operationStore` provides getters too so it's also possible for us to pass `todos` around and
 update `todos.variables` or `todos.query` directly. Both, updating `todos.variables` and
 `$todos.variables` in a component for instance, will cause `query` to pick up the update and execute
 our changes.
+
+### Pausing Queries
+
+In some cases we may want our queries to not execute until a pre-condition has been met. Since the
+`query` operation exists for the entire component lifecycle however, it can't just be stopped and
+started at will. Instead, the `query`'s third argument, the `context`, may have an added `pause`
+option that can be set to `true` to temporarily _freeze_ all changes and stop requests.
+
+For instance we may start out with a paused store and then unpause it once a callback is invoked:
+
+```html
+<script>
+  import { operationStore, query } from '@urql/svelte';
+
+  const todo = operationStore(
+    `
+    query {
+      todo {
+        id
+        title
+      }
+    }`,
+    undefined,
+    { pause: true }
+  );
+
+  query(todo);
+
+  function nextPage() {
+    $todo.context.pause = false;
+  }
+</script>
+
+<button on:click="{unpause}">Unpause</button>
+```
 
 ### Request Policies
 
@@ -339,7 +374,7 @@ the background.
 For this reason there's another field on results, `result.stale`, which indicates that the cached
 result is either outdated or that another request is being sent in the background.
 
-```html
+```jsx
 <script>
   import { operationStore, query } from '@urql/svelte';
 
@@ -376,7 +411,7 @@ couple of cases. It can for instance be used to refresh data that is currently b
 
 We can trigger a new query update by changing out the `context` of our `operationStore`.
 
-```html
+```jsx
 <script>
   import { operationStore, query } from '@urql/svelte';
 

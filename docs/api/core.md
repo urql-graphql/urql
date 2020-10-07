@@ -20,16 +20,16 @@ It accepts several options on creation.
 
 `@urql/core` also exposes `createClient()` that is just a convenient alternative to calling `new Client()`.
 
-| Input           | Type                               | Description                                                                                                                                                                            |
-| --------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| exchanges       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                           |
-| url             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                                         |
-| fetchOptions    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                 |
-| fetch           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                            |
-| suspense        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                        |
-| requestPolicy   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default this will be `cache-first`.                                                                                           |
-| preferGetMethod | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                                              |
-| maskTypename    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable. |
+| Input             | Type                               | Description                                                                                                                                                                            |
+| ----------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `exchanges`       | `Exchange[]`                       | An array of `Exchange`s that the client should use instead of the list of `defaultExchanges`                                                                                           |
+| `url`             | `string`                           | The GraphQL API URL as used by `fetchExchange`                                                                                                                                         |
+| `fetchOptions`    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                 |
+| `fetch`           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                            |
+| `suspense`        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                        |
+| `requestPolicy`   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default this will be `cache-first`.                                                                                           |
+| `preferGetMethod` | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                                              |
+| `maskTypename`    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable. |
 
 ### client.executeQuery
 
@@ -123,11 +123,11 @@ For an example, this method is used by the `cacheExchange` when an
 The `CombinedError` is used in `urql` to normalize network errors and `GraphQLError`s if anything
 goes wrong during a GraphQL request.
 
-| Input         | Type                             | Description                                                                        |
-| ------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
-| networkError  | `?Error`                         | An unexpected error that might've occurred when trying to send the GraphQL request |
-| graphQLErrors | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                      |
-| response      | `?any`                           | The raw response object (if any) from the `fetch` call                             |
+| Input           | Type                             | Description                                                                        |
+| --------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
+| `networkError`  | `?Error`                         | An unexpected error that might've occurred when trying to send the GraphQL request |
+| `graphQLErrors` | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                      |
+| `response`      | `?any`                           | The raw response object (if any) from the `fetch` call                             |
 
 [Read more about errors in `urql` on the "Error" page.](../basics/errors.md)
 
@@ -138,11 +138,11 @@ goes wrong during a GraphQL request.
 This often comes up as the **input** for every GraphQL request.
 It consists of `query` and optionally `variables`.
 
-| Prop      | Type           | Description                                                                                                           |
-| --------- | -------------- | --------------------------------------------------------------------------------------------------------------------- |
-| key       | `number`       | A unique key that identifies this exact combination of `query` and `variables`, which is derived using a stable hash. |
-| query     | `DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    |
-| variables | `?object`      | The variables to be used with the GraphQL request.                                                                    |
+| Prop        | Type           | Description                                                                                                           |
+| ----------- | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `key`       | `number`       | A unique key that identifies this exact combination of `query` and `variables`, which is derived using a stable hash. |
+| `query`     | `DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                                    |
+| `variables` | `?object`      | The variables to be used with the GraphQL request.                                                                    |
 
 The `key` property is a hash of both the `query` and the `variables`, to uniquely
 identify the request. When `variables` are passed it is ensured that they're stably stringified so
@@ -170,10 +170,10 @@ received.
 The input for every exchange that informs GraphQL requests.
 It extends the [GraphQLRequest](#graphqlrequest) type and contains these additional properties:
 
-| Prop    | Type               | Description                                   |
-| ------- | ------------------ | --------------------------------------------- |
-| kind    | `OperationType`    | The type of GraphQL operation being executed. |
-| context | `OperationContext` | Additional metadata passed to exchange.       |
+| Prop      | Type               | Description                                   |
+| --------- | ------------------ | --------------------------------------------- |
+| `kind`    | `OperationType`    | The type of GraphQL operation being executed. |
+| `context` | `OperationContext` | Additional metadata passed to exchange.       |
 
 ### RequestPolicy
 
@@ -197,17 +197,17 @@ data that can be passed from almost all API methods in `urql` that deal with
 Some of these options are set when the `Client` is initialised, so in the following list of
 properties you'll likely see some options that exist on the `Client` as well.
 
-| Prop                | Type                                  | Description                                                                                                           |
-| ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| fetchOptions        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                               |
-| fetch               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
-| requestPolicy       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
-| url                 | `string`                              | The GraphQL endpoint                                                                                                  |
-| pollInterval        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
-| meta                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
-| suspense            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
-| preferGetMethod     | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
-| additionalTypenames | `?number`                             | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
+| Prop                  | Type                                  | Description                                                                                                           |
+| --------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `fetchOptions`        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                               |
+| `fetch`               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
+| `requestPolicy`       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
+| `url`                 | `string`                              | The GraphQL endpoint                                                                                                  |
+| `pollInterval`        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
+| `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
+| `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
+| `preferGetMethod`     | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
+| `additionalTypenames` | `?number`                             | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.
@@ -217,23 +217,23 @@ information to custom exchanges.
 The result of every GraphQL request, i.e. an `Operation`. It's very similar to what comes back from
 a typical GraphQL API, but slightly enriched and normalized.
 
-| Prop       | Type                   | Description                                                                                                                                       |
-| ---------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| operation  | `Operation`            | The operation that this is a result for                                                                                                           |
-| data       | `?any`                 | Data returned by the specified query                                                                                                              |
-| error      | `?CombinedError`       | A [`CombinedError`](#combinederror) instances that wraps network or `GraphQLError`s (if any)                                                      |
-| extensions | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                             |
-| stale      | `?boolean`             | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon. |
+| Prop         | Type                   | Description                                                                                                                                       |
+| ------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `operation`  | `Operation`            | The operation that this is a result for                                                                                                           |
+| `data`       | `?any`                 | Data returned by the specified query                                                                                                              |
+| `error`      | `?CombinedError`       | A [`CombinedError`](#combinederror) instances that wraps network or `GraphQLError`s (if any)                                                      |
+| `extensions` | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                             |
+| `stale`      | `?boolean`             | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon. |
 
 ### ExchangeInput
 
 This is the input that an [`Exchange`](#exchange) receives when it's initialized by the
 [`Client`](#client)
 
-| Input   | Type         | Description                                                                                                             |
-| ------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| forward | `ExchangeIO` | The unction responsible for receiving an observable operation and returning a result                                    |
-| client  | `Client`     | The urql application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. |
+| Input     | Type         | Description                                                                                                             |
+| --------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `forward` | `ExchangeIO` | The unction responsible for receiving an observable operation and returning a result                                    |
+| `client`  | `Client`     | The urql application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. |
 
 ### Exchange
 

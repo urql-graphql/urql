@@ -20,12 +20,12 @@ options and returns an [`Exchange`](./core.md#exchange).
 
 | Input        | Description                                                                                                                                                                                                                   |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _keys_       | A mapping of key generator functions for types that are used to override the default key generation that _Graphcache_ uses to normalize data for given types.                                                                 |
-| _resolvers_  | A nested mapping of resolvers, which are used to override the record or entity that _Graphcache_ resolves for a given field for a type.                                                                                       |
-| _updates_    | A nested mapping of updater functions for mutation and subscription fields, which may be used to add side-effects that update other parts of the cache when the given subscription or mutation field is written to the cache. |
-| _optimistic_ | A mapping of mutation fields to resolvers that may be used to provide _Graphcache_ with an optimistic result for a given mutation field that should be applied to the cached data temporarily.                                |
-| _schema_     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, interfaces, and enums. The schema also used to provide helpful warnings for [schema awareness](../graphcache/schema-awareness.md).          |
-| _storage_    | A persisted storage interface that may be provided to preserve cache data for [offline support](../graphcache/offline.md).                                                                                                    |
+| `keys`       | A mapping of key generator functions for types that are used to override the default key generation that _Graphcache_ uses to normalize data for given types.                                                                 |
+| `resolvers`  | A nested mapping of resolvers, which are used to override the record or entity that _Graphcache_ resolves for a given field for a type.                                                                                       |
+| `updates`    | A nested mapping of updater functions for mutation and subscription fields, which may be used to add side-effects that update other parts of the cache when the given subscription or mutation field is written to the cache. |
+| `optimistic` | A mapping of mutation fields to resolvers that may be used to provide _Graphcache_ with an optimistic result for a given mutation field that should be applied to the cached data temporarily.                                |
+| `schema`     | A serialized GraphQL schema that is used by _Graphcache_ to resolve partial data, interfaces, and enums. The schema also used to provide helpful warnings for [schema awareness](../graphcache/schema-awareness.md).          |
+| `storage`    | A persisted storage interface that may be provided to preserve cache data for [offline support](../graphcache/offline.md).                                                                                                    |
 
 The `@urql/exchange-graphcache` package also exports the `offlineExchange`; which is identical to
 the `cacheExchange` but activates [offline support](../graphcache/offline.md) when the `storage` option is passed.
@@ -66,10 +66,10 @@ A `Resolver` receives four arguments when it's called: `parent`, `args`, `cache`
 
 | Argument | Type     | Description                                                                                                 |
 | -------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| parent   | `Data`   | The parent entity that the given field is on.                                                               |
-| args     | `object` | The arguments for the given field the updater is executed on.                                               |
-| cache    | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
-| info     | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
+| `parent` | `Data`   | The parent entity that the given field is on.                                                               |
+| `args`   | `object` | The arguments for the given field the updater is executed on.                                               |
+| `cache`  | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| `info`   | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `resolvers` on the "Computed Queries"
 page.](../graphcache/computed-queries.md)
@@ -98,10 +98,10 @@ An `UpdateResolver` receives four arguments when it's called: `result`, `args`, 
 
 | Argument | Type     | Description                                                                                                 |
 | -------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| result   | `any`    | Always the entire `data` object from the mutation or subscription.                                          |
-| args     | `object` | The arguments for the given field the updater is executed on.                                               |
-| cache    | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
-| info     | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
+| `result` | `any`    | Always the entire `data` object from the mutation or subscription.                                          |
+| `args`   | `object` | The arguments for the given field the updater is executed on.                                               |
+| `cache`  | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| `info`   | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `updates` on the "Custom Updates"
 page.](../graphcache/custom-updates.md)
@@ -122,11 +122,11 @@ interface OptimisticMutationConfig {
 A `OptimisticMutationResolver` receives three arguments when it's called: `variables`, `cache`, and
 `info`.
 
-| Argument  | Type     | Description                                                                                                 |
-| --------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| variables | `object` | The variables that the given mutation received.                                                             |
-| cache     | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
-| info      | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
+| Argument    | Type     | Description                                                                                                 |
+| ----------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| `variables` | `object` | The variables that the given mutation received.                                                             |
+| `cache`     | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| `info`      | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `optimistic` on the "Custom Updates"
 page.](../graphcache/custom-updates.md)
@@ -149,13 +149,13 @@ the cache's data to persisted storage on the user's device. it
 > **NOTE:** Offline Support is currently experimental! It hasn't been extensively tested yet and
 > may not always behave as expected. Please try it out with caution!
 
-| Method        | Type                                          | Description                                                                                                                                                                            |
-| ------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| writeData     | `(delta: SerializedEntries) => Promise<void>` | This provided method must be able to accept an object of key-value entries that will be persisted to the storage. This method is called as a batch of updated entries becomes ready.   |
-| readData      | `() => Promise<SerializedEntries>`            | This provided method must be able to return a single combined object of previous key-value entries that have been previously preserved using `writeData`. It's only called on startup. |
-| writeMetadata | `(json: SerializedRequest[]) => void`         | This provided method must be able to persist metadata for the cache. For backwards compatibility it should be able to accept any JSON data.                                            |
-| readMetadata  | `() => Promise<null \| SerializedRequest[]>`  | This provided method must be able to read the persisted metadata that has previously been written using `writeMetadata`. It's only called on startup.                                  |
-| onOnline      | `(cb: () => void) => void`                    | This method must be able to accept a callback that is called when the user's device comes back online.                                                                                 |
+| Method          | Type                                          | Description                                                                                                                                                                            |
+| --------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `writeData`     | `(delta: SerializedEntries) => Promise<void>` | This provided method must be able to accept an object of key-value entries that will be persisted to the storage. This method is called as a batch of updated entries becomes ready.   |
+| `readData`      | `() => Promise<SerializedEntries>`            | This provided method must be able to return a single combined object of previous key-value entries that have been previously preserved using `writeData`. It's only called on startup. |
+| `writeMetadata` | `(json: SerializedRequest[]) => void`         | This provided method must be able to persist metadata for the cache. For backwards compatibility it should be able to accept any JSON data.                                            |
+| `readMetadata`  | `() => Promise<null \| SerializedRequest[]>`  | This provided method must be able to read the persisted metadata that has previously been written using `writeMetadata`. It's only called on startup.                                  |
+| `onOnline`      | `(cb: () => void) => void`                    | This method must be able to accept a callback that is called when the user's device comes back online.                                                                                 |
 
 These options are split into three parts:
 
@@ -254,11 +254,11 @@ When calling the method this returns an array of `FieldInfo` objects, one per fi
 differing arguments) that is known to the cache. The `FieldInfo` interface has three properties:
 `fieldKey`, `fieldName`, and `arguments`:
 
-| Argument  | Type             | Description                                                                     |
-| --------- | ---------------- | ------------------------------------------------------------------------------- |
-| fieldName | `string`         | The field's name (without any arguments, just the name)                         |
-| arguments | `object \| null` | The field's arguments, or `null` if the field doesn't have any arguments        |
-| fieldKey  | `string`         | The field's cache key, which is similar to what `cache.keyOfField` would return |
+| Argument    | Type             | Description                                                                     |
+| ----------- | ---------------- | ------------------------------------------------------------------------------- |
+| `fieldName` | `string`         | The field's name (without any arguments, just the name)                         |
+| `arguments` | `object \| null` | The field's arguments, or `null` if the field doesn't have any arguments        |
+| `fieldKey`  | `string`         | The field's cache key, which is similar to what `cache.keyOfField` would return |
 
 This works on any given entity. When calling this method the cache works in reverse on its data
 structure, by parsing the entity's individual field keys.
@@ -427,16 +427,16 @@ This is a metadata object that is passed to every resolver and updater function.
 information about the current GraphQL document and query, and also some information on the current
 field that a given resolver or updater is called on.
 
-| Argument       | Type                                         | Description                                                                                                                                    |
-| -------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| parentTypeName | `string`                                     | The field's parent entity's typename                                                                                                           |
-| parentKey      | `string`                                     | The field's parent entity's cache key (if any)                                                                                                 |
-| parentFieldKey | `string`                                     | The current key's cache key, which is the parent entity's key combined with the current field's key (This is mostly obsolete)                  |
-| fieldName      | `string`                                     | The current field's name                                                                                                                       |
-| fragments      | `{ [name: string]: FragmentDefinitionNode }` | A dictionary of fragments from the current GraphQL document                                                                                    |
-| variables      | `object`                                     | The current GraphQL operation's variables (may be an empty object)                                                                             |
-| partial        | `?boolean`                                   | This may be set to `true` at any point in time (by your custom resolver or by _Graphcache_) to indicate that some data is uncached and missing |
-| optimistic     | `?boolean`                                   | This is only `true` when an optimistic mutation update is running                                                                              |
+| Argument         | Type                                         | Description                                                                                                                                    |
+| ---------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parentTypeName` | `string`                                     | The field's parent entity's typename                                                                                                           |
+| `parentKey`      | `string`                                     | The field's parent entity's cache key (if any)                                                                                                 |
+| `parentFieldKey` | `string`                                     | The current key's cache key, which is the parent entity's key combined with the current field's key (This is mostly obsolete)                  |
+| `fieldName`      | `string`                                     | The current field's name                                                                                                                       |
+| `fragments`      | `{ [name: string]: FragmentDefinitionNode }` | A dictionary of fragments from the current GraphQL document                                                                                    |
+| `variables`      | `object`                                     | The current GraphQL operation's variables (may be an empty object)                                                                             |
+| `partial`        | `?boolean`                                   | This may be set to `true` at any point in time (by your custom resolver or by _Graphcache_) to indicate that some data is uncached and missing |
+| `optimistic`     | `?boolean`                                   | This is only `true` when an optimistic mutation update is running                                                                              |
 
 > **Note:** Using `info` is regarded as a last resort. Please only use information from it if
 > there's no other solution to get to the metadata you need. We don't regard the `Info` API as
@@ -456,10 +456,10 @@ on the "Computed Queries" page.](../graphcache/computed-queries.md#pagination)
 Accepts a single object of optional options and returns a resolver that can be inserted into the
 [`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
 
-| Argument       | Type      | Description                                                                                                                                                        |
-| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| offsetArgument | `?string` | The field arguments' property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
-| limitArgument  | `?string` | The field arguments' property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
+| Argument         | Type      | Description                                                                                                                                                        |
+| ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `offsetArgument` | `?string` | The field arguments' property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
+| `limitArgument`  | `?string` | The field arguments' property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
 
 Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
 automatically. Queries to this resolvers will from then on only return the infinite, combined list
@@ -473,9 +473,9 @@ page.](../graphcache/computed-queries.md#simple-pagination)
 Accepts a single object of optional options and returns a resolver that can be inserted into the
 [`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
 
-| Argument  | Type                      | Description                                                                                                                                                                                                                                                                      |
-| --------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mergeMode | `'outwards' \| 'inwards'` | With Relay pagination, pages can be queried forwards and backwards using `after` and `before` cursors. This option defines whether pages that have been queried backwards should be concatenated before (outwards) or after (inwards) all pages that have been queried forwards. |
+| Argument    | Type                      | Description                                                                                                                                                                                                                                                                      |
+| ----------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mergeMode` | `'outwards' \| 'inwards'` | With Relay pagination, pages can be queried forwards and backwards using `after` and `before` cursors. This option defines whether pages that have been queried backwards should be concatenated before (outwards) or after (inwards) all pages that have been queried forwards. |
 
 Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
 automatically. Queries to this resolvers will from then on only return the infinite, combined list
@@ -493,7 +493,7 @@ It contains the `makeDefaultStorage` export which is a factory function that acc
 and returns a full [storage interface](#storage-option). This storage by default persists to
 [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 
-| Argument | Type     | Description                                                                                                                                       |
-| -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| idbName  | `string` | The name of the IndexedDB database that is used and created if needed. By default this is set to `"graphcache-v3"`                                |
-| maxAge   | `number` | The maximum age of entries that the storage should use in whole days. By default the storage will discard entries that are older than seven days. |
+| Argument  | Type     | Description                                                                                                                                       |
+| --------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `idbName` | `string` | The name of the IndexedDB database that is used and created if needed. By default this is set to `"graphcache-v3"`                                |
+| `maxAge`  | `number` | The maximum age of entries that the storage should use in whole days. By default the storage will discard entries that are older than seven days. |
