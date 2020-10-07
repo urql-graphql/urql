@@ -32,7 +32,7 @@ export interface OperationStore<Data = any, Vars = any>
 export function operationStore<Data = any, Vars = object>(
   query: string | DocumentNode,
   variables?: Vars | null,
-  context?: Partial<OperationContext>
+  context?: Partial<OperationContext & { pause: boolean }>
 ): OperationStore<Data, Vars> {
   const internal = {
     query,
@@ -52,7 +52,7 @@ export function operationStore<Data = any, Vars = object>(
   let _internalUpdate = false;
 
   state.set = function set(value?: Partial<typeof state>) {
-    if (!value) value = emptyUpdate;
+    if (!value || value === state) value = emptyUpdate;
 
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {

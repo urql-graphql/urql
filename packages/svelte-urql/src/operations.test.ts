@@ -3,7 +3,7 @@ import { createClient } from '@urql/core';
 import { operationStore } from './operationStore';
 import { query, subscription, mutation } from './operations';
 
-const client = createClient({ url: '/graphql' });
+const client = createClient({ url: '/graphql', exchanges: [] });
 
 jest.mock('./context', () => ({ getClient: () => client }));
 jest.mock('svelte', () => ({ onDestroy: () => undefined }));
@@ -30,6 +30,7 @@ describe('query', () => {
         key: expect.any(Number),
         query: expect.any(Object),
         variables: {},
+        context: undefined,
       },
       undefined
     );
@@ -44,6 +45,29 @@ describe('query', () => {
     subject.complete();
     expect(subscriber).toHaveBeenCalledTimes(4);
     expect(store.fetching).toBe(false);
+  });
+
+  it('pauses the query when requested to do so', () => {
+    const subscriber = jest.fn();
+    const subject = makeSubject<any>();
+    const executeQuery = jest
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(() => subject.source);
+
+    const store = operationStore('{ test }', undefined, { pause: true });
+    store.subscribe(subscriber);
+
+    query(store);
+
+    expect(executeQuery).not.toHaveBeenCalled();
+    expect(subscriber).toHaveBeenCalledTimes(2);
+    expect(store.fetching).toBe(false);
+    expect(store.stale).toBe(false);
+
+    store.set({ context: { pause: false } });
+    expect(executeQuery).toHaveBeenCalled();
+    expect(subscriber).toHaveBeenCalledTimes(4);
+    expect(store.fetching).toBe(true);
   });
 
   it('updates the executed query when inputs change', () => {
@@ -63,6 +87,7 @@ describe('query', () => {
         key: expect.any(Number),
         query: expect.any(Object),
         variables: {},
+        context: undefined,
       },
       undefined
     );
@@ -78,6 +103,7 @@ describe('query', () => {
         key: expect.any(Number),
         query: expect.any(Object),
         variables: { test: true },
+        context: undefined,
       },
       undefined
     );
@@ -93,6 +119,7 @@ describe('query', () => {
         key: expect.any(Number),
         query: expect.any(Object),
         variables: { test: true },
+        context: { requestPolicy: 'cache-and-network' },
       },
       {
         requestPolicy: 'cache-and-network',
