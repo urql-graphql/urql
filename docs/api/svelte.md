@@ -24,6 +24,9 @@ used by either [`query`](#query), [`mutation`](#mutation), or [`subscription`](#
 create an [`Operation`](./core.md#operation) to execute. These are `query`, `variables`, and
 `context`; the same properties that the `operationStore` accepts as arguments on creation.
 
+Additionally the `context` may have a `pause: boolean` property that instructs the `query` and
+`subscription` operations to pause execution and freeze the result.
+
 Furthermore the store exposes some **readonly properties** which represent the operation's progress
 and [result](./core.md#operationresult).
 
