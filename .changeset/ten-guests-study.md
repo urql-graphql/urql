@@ -1,5 +1,5 @@
 ---
-"@urql/svelte": patch
+'@urql/svelte': patch
 ---
 
-Add the stale flag on a query result
+Fix missing `stale` flag updates on query results
