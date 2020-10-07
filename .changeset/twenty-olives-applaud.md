@@ -8,7 +8,7 @@
 '@urql/exchange-refocus': patch
 '@urql/exchange-retry': patch
 '@urql/exchange-suspense': patch
-'@urql/core': patch
+'@urql/core': minor
 'urql': patch
 ---
 

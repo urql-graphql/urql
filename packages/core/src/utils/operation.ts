@@ -17,7 +17,7 @@ const DEPRECATED: Record<string, Warning> = {
 
 export const makeOperation = (
   kind: OperationType,
-  request: Pick<GraphQLRequest, 'key' | 'query' | 'variables'>,
+  request: GraphQLRequest,
   context: OperationContext
 ): Operation => ({
   key: request.key,
