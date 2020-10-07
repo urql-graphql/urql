@@ -1,5 +1,15 @@
 # @urql/svelte
 
+## 1.1.0
+
+### Minor Changes
+
+- Support passing `pause` to stop executing queries or subscriptions, by [@kitten](https://github.com/kitten) (See [#1046](https://github.com/FormidableLabs/urql/pull/1046))
+
+### Patch Changes
+
+- ⚠️ Fix an issue where updated `context` options wouldn't cause a new query to be executed, or updates to the store would erroneously throw a debug error, by [@kitten](https://github.com/kitten) (See [#1046](https://github.com/FormidableLabs/urql/pull/1046))
+
 ## 1.0.1
 
 ### Patch Changes
