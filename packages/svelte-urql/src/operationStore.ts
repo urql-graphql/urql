@@ -52,7 +52,7 @@ export function operationStore<Data = any, Vars = object>(
   let _internalUpdate = false;
 
   state.set = function set(value?: Partial<typeof state>) {
-    if (!value) value = emptyUpdate;
+    if (!value || value === state) value = emptyUpdate;
 
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {
