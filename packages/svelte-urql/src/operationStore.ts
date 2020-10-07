@@ -32,7 +32,7 @@ export interface OperationStore<Data = any, Vars = any>
 export function operationStore<Data = any, Vars = object>(
   query: string | DocumentNode,
   variables?: Vars | null,
-  context?: Partial<OperationContext>
+  context?: Partial<OperationContext & { pause: boolean }>
 ): OperationStore<Data, Vars> {
   const internal = {
     query,

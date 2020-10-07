@@ -31,9 +31,10 @@ const toSource = (store: OperationStore) => {
     return store.subscribe(state => {
       const request = createRequest(state.query, state.variables as any);
       if (
-        $context !== state.context ||
-        !$request ||
-        request.key !== $request.key
+        (!state.context || (state.context && !state.context.pause)) &&
+        ($context !== state.context ||
+          !$request ||
+          request.key !== $request.key)
       ) {
         $context = state.context;
         observer.next(($request = request));
