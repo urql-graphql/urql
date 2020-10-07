@@ -170,7 +170,7 @@ export class Client {
     pipe(this.results$, publish);
   }
 
-  private createOperationContext = (
+  createOperationContext = (
     opts?: Partial<OperationContext>
   ): OperationContext => ({
     url: this.url,
