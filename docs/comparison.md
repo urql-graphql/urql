@@ -81,12 +81,13 @@ hoisting all necessary data requirements to a page-wide query.
 |                               | urql                             | Apollo             | Relay             |
 | ----------------------------- | -------------------------------- | ------------------ | ----------------- |
 | React Bindings                | ✅                               | ✅                 | ✅                |
-| React Hooks Support           | ✅                               | ✅                 | ✅ (experimental) |
+| React Hooks Support           | ✅                               | ✅                 | ✅ (experimental), 🟡 `relay-hooks` |
 | React Suspense (Experimental) | ✅ (experimental on client-side) | 🛑                 | ✅                |
 | Next.js Integration           | ✅ `next-urql`                   | 🟡                 | 🔶                |
 | Preact Support                | ✅                               | 🔶                 | 🔶                |
-| Svelte Bindings               | ✅                               | 🟡 `svelte-apollo` | 🛑                |
+| Svelte Bindings               | ✅                               | 🟡 `svelte-apollo` | 🟡 `svelte-relay` |
 | Vue Bindings                  | 🛑 (planned)                     | 🟡 `vue-apollo`    | 🟡 `vue-relay`    |
+| Angular Bindings              | 🛑                               | 🟡 `apollo-angular`| 🟡 `relay-angular`|
 | Initial Data on mount         | ✅                               | ✅                 | ✅                |
 
 Interestingly all three libraries heavily support React as they were all started from the React
@@ -117,7 +118,7 @@ for instance.
 | Commutativity Guarantees                                | ✅                                                                    | 🛑                 | 🛑                                             |
 | Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
 | Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                 | 🛑                                             |
-| Offline Support                                         | ✅                                                                    | 🛑                 | 🛑                                             |
+| Offline Support                                         | ✅                                                                    | 🟡 `@wora/apollo-offline`| 🟡 `react-relay-offline` `relay-angular`|
 
 `urql` is the only of the three clients that doesn't pick [normalized
 caching](./graphcache/normalized-caching.md) as its default caching strategy. Typically this is seen
