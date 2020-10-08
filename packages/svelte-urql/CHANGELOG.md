@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 1.1.1
+
+### Patch Changes
+
+- ⚠️ Fix missing `stale` flag updates on query results, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1044](https://github.com/FormidableLabs/urql/pull/1044))
+
 ## 1.1.0
 
 ### Minor Changes
