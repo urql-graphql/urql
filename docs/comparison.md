@@ -81,7 +81,7 @@ hoisting all necessary data requirements to a page-wide query.
 |                               | urql                             | Apollo             | Relay             |
 | ----------------------------- | -------------------------------- | ------------------ | ----------------- |
 | React Bindings                | ✅                               | ✅                 | ✅                |
-| React Concurrent Hooks Support| 🛑                               | ✅                 | ✅ (experimental) |
+| React Concurrent Hooks Support| ✅                               | 🛑                 | ✅ (experimental) |
 | React Legacy Hooks Support    | ✅                               | ✅                 | 🟡 `relay-hooks`  |
 | React Suspense (Experimental) | ✅ (experimental on client-side) | 🛑                 | ✅                |
 | Next.js Integration           | ✅ `next-urql`                   | 🟡                 | 🔶                |
