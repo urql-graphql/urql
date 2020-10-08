@@ -49,10 +49,10 @@ All features are marked to indicate the following:
 | Focus Refetching                           | ✅ `@urql/exchange-refocus`         | 🛑                                            | 🛑                             |
 | Stale Time Configuration                   | ✅ `@urql/exchange-request-policy`  | ✅                                            | 🛑                             |
 | Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | ✅                             |
-| Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | 🟡 `react-relay-network-layer` |
+| Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | ✅ `react-relay-network-layer` |
 | Live Queries                               | 🛑                                  | 🛑                                            | ✅                             |
-| Switching to `GET` method                  | ✅                                  | ✅                                            | 🟡 `react-relay-network-layer` |
-| File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | 🛑                             |
+| Switching to `GET` method                  | ✅                                  | ✅                                            | ✅ `react-relay-network-layer` |
+| File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | ✅ `react-relay-network-layer` |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                        | ✅ `DefaultNetworkLayer`       |
 | Easy Authentication Flows                  | ✅ `@urql/exchange-auth`            | 🛑 (no docs for refresh-based authentication) | 🟡 `react-relay-network-layer` |
 | Automatic Refetch after Mutation           | ✅ (with document cache)            | 🛑                                            | ✅                             |
