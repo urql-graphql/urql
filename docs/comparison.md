@@ -116,7 +116,7 @@ for instance.
 | Out-of-band Cache Updates                               | 🛑 (stays true to server data)                                        | ✅                 | ✅                                             |
 | Local Resolvers and Redirects                           | ✅                                                                    | ✅                 | 🛑 (not needed)                                |
 | Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                 | 🛑 (not needed)                                |
-| Commutativity Guarantees                                | ✅                                                                    | 🛑                 | 🛑                                             |
+| Commutativity Guarantees                                | ✅                                                                    | 🛑                 | ✅                                             |
 | Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
 | Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                 | 🛑                                             |
 | Offline Support                                         | ✅                                                                    | 🛑                 | 🟡 `react-relay-offline`|
@@ -129,11 +129,15 @@ Once you need the same features that you'll find in Relay and Apollo, it's possi
 Graphcache. Graphcache is also slightly different from Apollo's cache and more opinionated as it
 doesn't allow arbitrary cache updates to be made.
 
-`urql` is also the only library that provides [Offline Support](./graphcache/offline.md) and
-[Commutativity Guarantees](./graphcache/under-the-hood.md) out of the box as part of Graphcache's
-feature set. There are a number of options for Apollo and Relay including writing your own logic for
-offline caching, which can be particularly successful in Relay, but for `@urql/exchange-graphcache`
-we chose to include it as a feature since it also strengthened other guarantees that the cache makes.
+`urql` is also the only library that provides [Offline Support](./graphcache/offline.md) out of the
+box as part of Graphcache's feature set. There are a number of options for Apollo and Relay including
+writing your own logic for offline caching, which can be particularly successful in Relay, but for
+`@urql/exchange-graphcache` we chose to include it as a feature since it also strengthened other
+guarantees that the cache makes.
+
+Relay does in fact have similar guarantees as [`urql`'s Commutativity Guarantees](./graphcache/under-the-hood.md)
+which are more evident when applying list updates out of order under more complex network
+conditions.
 
 ## About Bundle Size
 
