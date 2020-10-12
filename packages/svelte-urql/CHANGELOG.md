@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 1.1.2
+
+### Patch Changes
+
+- Replace `void` union types with `undefined` in `OperationStore` to allow nullish property access in TypeScript, by [@kitten](https://github.com/kitten) (See [#1053](https://github.com/FormidableLabs/urql/pull/1053))
+
 ## 1.1.1
 
 ### Patch Changes
