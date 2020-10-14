@@ -117,12 +117,12 @@ const readRoot = (
     return originalData;
   }
 
-  const iter = makeSelectionIterator(entityKey, entityKey, select, ctx);
+  const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
   const data = {} as Data;
   data.__typename = originalData.__typename;
 
   let node: FieldNode | void;
-  while ((node = iter.next()) !== undefined) {
+  while ((node = iterate()) !== undefined) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
     if (node.selectionSet !== undefined && fieldValue !== null) {
@@ -274,12 +274,12 @@ const readSelection = (
   // The following closely mirrors readSelection, but differs only slightly for the
   // sake of resolving from an existing resolver result
   data.__typename = typename;
-  const iter = makeSelectionIterator(typename, entityKey, select, ctx);
+  const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
   let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
-  while ((node = iter.next()) !== undefined) {
+  while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
