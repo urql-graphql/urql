@@ -199,7 +199,7 @@ const writeSelection = (
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
-  const iter = makeSelectionIterator(
+  const iterate = makeSelectionIterator(
     typename,
     entityKey || typename,
     select,
@@ -207,7 +207,7 @@ const writeSelection = (
   );
 
   let node: FieldNode | void;
-  while ((node = iter.next())) {
+  while ((node = iterate())) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
