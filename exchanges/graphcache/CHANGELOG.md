@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.1.5
+
+### Patch Changes
+
+- Changes some internals of how selections are iterated over and remove some private exports. This will have no effect or fixes on how Graphcache functions, but may improve some minor performance characteristics of large queries, by [@kitten](https://github.com/kitten) (See [#1060](https://github.com/FormidableLabs/urql/pull/1060))
+
 ## 3.1.4
 
 ### Patch Changes
