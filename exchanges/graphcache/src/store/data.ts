@@ -75,7 +75,7 @@ export const initDataState = (
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
-  currentIgnoreOptimistic = !!isOptimistic;
+  currentIgnoreOptimistic = !!isOptimistic && operationType !== 'write';
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
