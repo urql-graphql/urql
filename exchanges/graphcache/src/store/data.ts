@@ -559,6 +559,7 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
 export const persistData = () => {
   if (currentData!.storage) {
     currentOptimistic = true;
+    currentOperation = 'read';
     const entries: SerializedEntries = makeDict();
     currentData!.persist.forEach(key => {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
