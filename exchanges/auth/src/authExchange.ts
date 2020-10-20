@@ -6,6 +6,7 @@ import {
   fromValue,
   filter,
   onStart,
+  empty,
   take,
   makeSubject,
   toPromise,
@@ -153,6 +154,7 @@ export function authExchange<T>({
                 willAuthError({ operation, authState })
               ) {
                 pendingPromise = refreshAuth(operation);
+                return empty;
               } else if (!pendingPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
               }
