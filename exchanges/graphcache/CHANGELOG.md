@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.1.6
+
+### Patch Changes
+
+- ⚠️ Fix optimistic updates not being allowed to be cumulative and apply on top of each other. Previously in [#866](https://github.com/FormidableLabs/urql/pull/866) we explicitly deemed this as unsafe which isn't correct anymore given that concrete, non-optimistic updates are now never applied on top of optimistic layers, by [@kitten](https://github.com/kitten) (See [#1074](https://github.com/FormidableLabs/urql/pull/1074))
+
 ## 3.1.5
 
 ### Patch Changes
