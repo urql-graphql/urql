@@ -8,6 +8,7 @@
     "exchanges/graphcache",
     "exchanges/multipart-fetch",
     "exchanges/persisted-fetch",
+    "exchanges/auth",
     "exchanges/retry",
     "exchanges/suspense",
     "exchanges/execute"
