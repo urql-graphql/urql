@@ -783,7 +783,7 @@ describe('Store with storage', () => {
     InMemoryData.writeRecord('Query', 'base', false);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState('write', store.data, null);
+    InMemoryData.initDataState('read', store.data, null);
     expect(InMemoryData.readRecord('Query', 'base')).toBe(false);
     InMemoryData.persistData();
     InMemoryData.clearDataState();
