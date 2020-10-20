@@ -3,7 +3,9 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
+
 import {
+  makeOperation,
   addMetadata,
   collectTypesFromResponse,
   formatDocument,
@@ -23,10 +25,11 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const operationCache = Object.create(null) as OperationCache;
 
   // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: Operation): Operation => ({
-    ...operation,
-    query: formatDocument(operation.query),
-  });
+  const mapTypeNames = (operation: Operation): Operation => {
+    const formattedOperation = makeOperation(operation.kind, operation);
+    formattedOperation.query = formatDocument(operation.query);
+    return formattedOperation;
+  };
 
   const handleAfterMutation = afterMutation(
     resultCache,
