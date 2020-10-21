@@ -553,7 +553,7 @@ it('allows cumulative optimistic updates', () => {
   });
 });
 
-it('enforces atomic optimistic updates', () => {
+it('supports clearing a layer then reapplying optimistic updates', () => {
   let counter = 1;
 
   const store = new Store({
@@ -602,6 +602,11 @@ it('enforces atomic optimistic updates', () => {
   writeOptimistic(store, { query: AddTodo }, 1);
   writeOptimistic(store, { query: AddTodo }, 1);
 
+  InMemoryData.noopDataState(store.data, 1);
+
+  writeOptimistic(store, { query: AddTodo }, 1);
+  writeOptimistic(store, { query: AddTodo }, 1);
+
   const queryRes = query(store, { query: Todos });
 
   expect(queryRes.partial).toBe(false);
@@ -610,7 +615,8 @@ it('enforces atomic optimistic updates', () => {
     todos: [
       todosData.todos[0],
       todosData.todos[1],
-      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_3' },
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_4' },
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_5' },
     ],
   });
 });
