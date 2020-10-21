@@ -73,32 +73,42 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
     storage.writeMetadata
   ) {
     const { forward: outerForward, client, dispatchDebug } = input;
+    const { source: reboundOps$, next } = makeSubject<Operation>();
     const optimisticMutations = opts.optimistic || {};
     const failedQueue: Operation[] = [];
 
     const updateMetadata = () => {
       const requests: SerializedRequest[] = [];
       for (let i = 0; i < failedQueue.length; i++) {
-        const op = failedQueue[i];
-        if (op.operationName === 'mutation') {
+        const operation = failedQueue[i];
+        if (operation.operationName === 'mutation') {
           requests.push({
-            query: print(op.query),
-            variables: op.variables,
+            query: print(operation.query),
+            variables: operation.variables,
           });
         }
       }
       storage.writeMetadata!(requests);
     };
 
-    let _flushing = false;
+    let isFlushingQueue = false;
     const flushQueue = () => {
-      if (!_flushing) {
-        _flushing = true;
-        let operation: void | Operation;
-        while ((operation = failedQueue.shift()))
-          client.reexecuteOperation(operation);
+      if (!isFlushingQueue) {
+        isFlushingQueue = true;
+
+        for (let i = 0; i < failedQueue.length; i++) {
+          const operation = failedQueue[i];
+          if (operation.operationName === 'mutation') {
+            next({ ...operation, operationName: 'teardown' });
+          }
+        }
+
+        for (let i = 0; i < failedQueue.length; i++)
+          client.reexecuteOperation(failedQueue[i]);
+
+        failedQueue.length = 0;
+        isFlushingQueue = false;
         updateMetadata();
-        _flushing = false;
       }
     };
 
@@ -145,7 +155,6 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
 
     return ops$ => {
       const sharedOps$ = share(ops$);
-      const { source: reboundOps$, next } = makeSubject<Operation>();
       const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
 
       return pipe(
