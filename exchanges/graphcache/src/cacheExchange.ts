@@ -3,6 +3,7 @@ import { IntrospectionQuery } from 'graphql';
 import {
   Exchange,
   formatDocument,
+  makeOperation,
   Operation,
   OperationResult,
   RequestPolicy,
@@ -157,16 +158,20 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       }
     }
 
-    return {
-      ...operation,
-      variables: operation.variables
-        ? filterVariables(
-            getMainOperation(operation.query),
-            operation.variables
-          )
-        : operation.variables,
-      query: formatDocument(operation.query),
-    };
+    return makeOperation(
+      operation.kind,
+      {
+        key: operation.key,
+        query: formatDocument(operation.query),
+        variables: operation.variables
+          ? filterVariables(
+              getMainOperation(operation.query),
+              operation.variables
+            )
+          : operation.variables,
+      },
+      operation.context
+    );
   };
 
   // This updates the known dependencies for the passed operation
