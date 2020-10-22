@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.1.7
+
+### Patch Changes
+
+- Enforce atomic optimistic updates so that optimistic layers are cleared before they're reapplied. This is important for instance when an optimistic update is performed while offline and then reapplied while online, which would previously repeat the optimistic update on top of its past data changes, by [@kitten](https://github.com/kitten) (See [#1080](https://github.com/FormidableLabs/urql/pull/1080))
+
 ## 3.1.6
 
 ### Patch Changes
