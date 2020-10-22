@@ -6,14 +6,19 @@ export const refocusExchange = (): Exchange => {
     const watchedOperations = new Map<number, Operation>();
     const observedOperations = new Map<number, number>();
 
-    window.addEventListener('focus', () => {
-      watchedOperations.forEach(op => {
-        client.reexecuteOperation(
-          client.createRequestOperation('query', op, {
-            requestPolicy: 'cache-and-network',
-          })
-        );
-      });
+    window.addEventListener('visibilitychange', () => {
+      if (
+        typeof document !== 'object' ||
+        document.visibilityState === 'visible'
+      ) {
+        watchedOperations.forEach(op => {
+          client.reexecuteOperation(
+            client.createRequestOperation('query', op, {
+              requestPolicy: 'cache-and-network',
+            })
+          );
+        });
+      }
     });
 
     const processIncomingOperation = (op: Operation) => {

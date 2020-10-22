@@ -77,7 +77,7 @@ it(`attaches a listener and redispatches queries on call`, () => {
   );
 
   expect(spy).toBeCalledTimes(1);
-  expect(spy).toBeCalledWith('focus', expect.anything());
+  expect(spy).toBeCalledWith('visibilitychange', expect.anything());
 
   next(op);
 
