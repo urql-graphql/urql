@@ -1,9 +1,9 @@
 import genPackageJson from 'rollup-plugin-generate-package-json';
 import { relative, join, dirname, basename } from 'path';
-import { makePlugins } from './plugins';
+import { makePlugins, makeOutputPlugins } from './plugins';
 import * as settings from './settings';
 
-const plugins = makePlugins({ isProduction: false });
+const plugins = makePlugins();
 
 const input = settings.sources.reduce((acc, source) => {
   acc[source.name] = source.source;
@@ -34,47 +34,49 @@ const input = settings.sources.reduce((acc, source) => {
   return acc;
 }, {});
 
-const config = {
+const output = ({ format, isProduction }) => {
+  if (typeof isProduction !== 'boolean')
+    throw new Error('Invalid option `isProduction` at output({ ... })');
+  if (format !== 'cjs' && format !== 'esm')
+    throw new Error('Invalid option `format` at output({ ... })');
+
+  const extension = format === 'esm'
+    ? (settings.hasReact ? '.es.js' : '.mjs')
+    : '.js';
+
+  return {
+    chunkFileNames: '[hash]' + extension,
+    entryFileNames: '[name]' + extension,
+    dir: './dist',
+    exports: 'named',
+    externalLiveBindings: false,
+    sourcemap: true,
+    esModule: false,
+    indent: false,
+    freeze: false,
+    strict: false,
+    format,
+    plugins: makeOutputPlugins({
+      isProduction,
+      extension,
+    })
+  };
+};
+
+export default {
   input,
   external: settings.isExternal,
   onwarn() {},
+  plugins,
+  output: [
+    output({ format: 'cjs', isProduction: false }),
+    output({ format: 'esm', isProduction: false }),
+    !settings.isCI && output({ format: 'cjs', isProduction: true }),
+    !settings.isCI && output({ format: 'esm', isProduction: true }),
+  ].filter(Boolean),
   treeshake: {
     unknownGlobalSideEffects: false,
     tryCatchDeoptimization: false,
     moduleSideEffects: false
   }
 };
-
-const output = (format = 'cjs', ext = '.js') => ({
-  chunkFileNames: '[hash]' + ext,
-  entryFileNames: '[name]' + ext,
-  dir: './dist',
-  exports: 'named',
-  externalLiveBindings: false,
-  sourcemap: true,
-  esModule: false,
-  indent: false,
-  freeze: false,
-  strict: false,
-  format,
-});
-
-export default [
-  {
-    ...config,
-    shimMissingExports: true,
-    plugins,
-    output: [
-      output('cjs', '.js'),
-      output('esm', settings.hasReact ? '.es.js' : '.mjs'),
-    ],
-  },
-  !settings.isCI && {
-    ...config,
-    plugins: makePlugins({ isProduction: true }),
-    output: [
-      output('cjs', '.min.js'),
-      output('esm', settings.hasReact ? '.min.es.js' : '.min.mjs'),
-    ],
-  },
-].filter(Boolean);
