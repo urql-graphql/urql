@@ -51,7 +51,8 @@ All features are marked to indicate the following:
 | Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | ✅                             |
 | Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | 🟡 `react-relay-network-layer` |
 | Live Queries                               | 🛑                                  | 🛑                                            | ✅                             |
-| Prefer `GET` method                        | ✅                                  | ✅                                            | 🟡 `react-relay-network-layer` |
+| Defer & Stream Directives                  | 🛑                                  | 🛑                                            | ✅                             |
+| Switching to `GET` method                  | ✅                                  | ✅                                            | 🟡 `react-relay-network-layer` |
 | File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | 🛑                             |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                        | ✅ `DefaultNetworkLayer`       |
 | Easy Authentication Flows                  | ✅ `@urql/exchange-auth`            | 🛑 (no docs for refresh-based authentication) | 🟡 `react-relay-network-layer` |
@@ -78,16 +79,18 @@ hoisting all necessary data requirements to a page-wide query.
 
 ### Framework Bindings
 
-|                               | urql                             | Apollo             | Relay             |
-| ----------------------------- | -------------------------------- | ------------------ | ----------------- |
-| React Bindings                | ✅                               | ✅                 | ✅                |
-| React Hooks Support           | ✅                               | ✅                 | ✅ (experimental) |
-| React Suspense (Experimental) | ✅ (experimental on client-side) | 🛑                 | ✅                |
-| Next.js Integration           | ✅ `next-urql`                   | 🟡                 | 🔶                |
-| Preact Support                | ✅                               | 🔶                 | 🔶                |
-| Svelte Bindings               | ✅                               | 🟡 `svelte-apollo` | 🛑                |
-| Vue Bindings                  | 🛑 (planned)                     | 🟡 `vue-apollo`    | 🟡 `vue-relay`    |
-| Initial Data on mount         | ✅                               | ✅                 | ✅                |
+|                                | urql                             | Apollo              | Relay              |
+| ------------------------------ | -------------------------------- | ------------------- | ------------------ |
+| React Bindings                 | ✅                               | ✅                  | ✅                 |
+| React Concurrent Hooks Support | ✅                               | 🛑                  | ✅ (experimental)  |
+| React Legacy Hooks Support     | ✅                               | ✅                  | 🟡 `relay-hooks`   |
+| React Suspense (Experimental)  | ✅ (experimental on client-side) | 🛑                  | ✅                 |
+| Next.js Integration            | ✅ `next-urql`                   | 🟡                  | 🔶                 |
+| Preact Support                 | ✅                               | 🔶                  | 🔶                 |
+| Svelte Bindings                | ✅                               | 🟡 `svelte-apollo`  | 🟡 `svelte-relay`  |
+| Vue Bindings                   | 🛑 (planned)                     | 🟡 `vue-apollo`     | 🟡 `vue-relay`     |
+| Angular Bindings               | 🛑                               | 🟡 `apollo-angular` | 🟡 `relay-angular` |
+| Initial Data on mount          | ✅                               | ✅                  | ✅                 |
 
 Interestingly all three libraries heavily support React as they were all started from the React
 community outwards, but Apollo and Vue benefit from community bindings for different frameworks a
@@ -102,36 +105,42 @@ for instance.
 
 ### Caching and State
 
-|                                                         | urql                                                                  | Apollo             | Relay                                          |
-| ------------------------------------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------------------- |
-| Caching Strategy                                        | Document Caching, Normalized Caching with `@urql/exchange-graphcache` | Normalized Caching | Normalized Caching (schema restrictions apply) |
-| Added Bundle Size                                       | +6.5kB (with Graphcache)                                              | +0 (default)       | +0 (default)                                   |
-| Automatic Garbage Collection                            | ✅                                                                    | 🔶                 | ✅                                             |
-| Local State Management                                  | 🛑                                                                    | ✅                 | ✅                                             |
-| Pagination Support                                      | 🔶                                                                    | 🔶                 | ✅                                             |
-| Optimistic Updates                                      | ✅                                                                    | ✅                 | ✅                                             |
-| Local Updates                                           | ✅                                                                    | ✅                 | ✅                                             |
-| Out-of-band Cache Updates                               | 🛑 (stays true to server data)                                        | ✅                 | ✅                                             |
-| Local Resolvers and Redirects                           | ✅                                                                    | ✅                 | 🛑 (not needed)                                |
-| Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                 | 🛑 (not needed)                                |
-| Commutativity Guarantees                                | ✅                                                                    | 🛑                 | 🛑                                             |
-| Partial Results                                         | ✅                                                                    | ✅                 | 🛑                                             |
-| Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                 | 🛑                                             |
-| Offline Support                                         | ✅                                                                    | 🛑                 | 🛑                                             |
+|                                                         | urql                                                                  | Apollo                    | Relay                                          |
+| ------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------- | ---------------------------------------------- |
+| Caching Strategy                                        | Document Caching, Normalized Caching with `@urql/exchange-graphcache` | Normalized Caching        | Normalized Caching (schema restrictions apply) |
+| Added Bundle Size                                       | +6.5kB (with Graphcache)                                              | +0 (default)              | +0 (default)                                   |
+| Automatic Garbage Collection                            | ✅                                                                    | 🔶                        | ✅                                             |
+| Local State Management                                  | 🛑                                                                    | ✅                        | ✅                                             |
+| Pagination Support                                      | 🔶                                                                    | 🔶                        | ✅                                             |
+| Optimistic Updates                                      | ✅                                                                    | ✅                        | ✅                                             |
+| Local Updates                                           | ✅                                                                    | ✅                        | ✅                                             |
+| Out-of-band Cache Updates                               | 🛑 (stays true to server data)                                        | ✅                        | ✅                                             |
+| Local Resolvers and Redirects                           | ✅                                                                    | ✅                        | 🛑 (not needed)                                |
+| Complex Resolvers (nested non-normalized return values) | ✅                                                                    | 🛑                        | 🛑 (not needed)                                |
+| Commutativity Guarantees                                | ✅                                                                    | 🛑                        | ✅                                             |
+| Partial Results                                         | ✅                                                                    | ✅                        | 🛑                                             |
+| Safe Partial Results (schema-based)                     | ✅                                                                    | 🛑                        | 🛑                                             |
+| Persistence Support                                     | ✅                                                                    | ✅ `apollo-cache-persist` | 🟡 `@wora/relay-store`                         |
+| Offline Support                                         | ✅                                                                    | 🛑                        | 🟡 `@wora/relay-offline`                       |
 
 `urql` is the only of the three clients that doesn't pick [normalized
 caching](./graphcache/normalized-caching.md) as its default caching strategy. Typically this is seen
-by users as easier and quicker to get started with.
+by users as easier and quicker to get started with. All entries in this table for `urql` typically
+refer to the optional `@urql/exchange-graphcache` package.
 
 Once you need the same features that you'll find in Relay and Apollo, it's possible to migrate to
 Graphcache. Graphcache is also slightly different from Apollo's cache and more opinionated as it
 doesn't allow arbitrary cache updates to be made.
 
-`urql` is also the only library that provides [Offline Support](./graphcache/offline.md) and
-[Commutativity Guarantees](./graphcache/under-the-hood.md) out of the box as part of Graphcache's
-feature set. There are a number of options for Apollo and Relay including writing your own logic for
-offline caching, which can be particularly successful in Relay, but for `@urql/exchange-graphcache`
-we chose to include it as a feature since it also strengthened other guarantees that the cache makes.
+`urql` is also the only library that provides [Offline Support](./graphcache/offline.md) out of the
+box as part of Graphcache's feature set. There are a number of options for Apollo and Relay including
+writing your own logic for offline caching, which can be particularly successful in Relay, but for
+`@urql/exchange-graphcache` we chose to include it as a feature since it also strengthened other
+guarantees that the cache makes.
+
+Relay does in fact have similar guarantees as [`urql`'s Commutativity Guarantees](./graphcache/under-the-hood.md)
+which are more evident when applying list updates out of order under more complex network
+conditions.
 
 ## About Bundle Size
 

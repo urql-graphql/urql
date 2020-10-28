@@ -489,3 +489,134 @@ it('correctly resolves optimistic updates on Relay schemas', () => {
   expect(queryRes.partial).toBe(false);
   expect(queryRes.data).not.toBe(null);
 });
+
+it('allows cumulative optimistic updates', () => {
+  let counter = 1;
+
+  const store = new Store({
+    updates: {
+      Mutation: {
+        addTodo: (result, _, cache) => {
+          cache.updateQuery({ query: Todos }, data => {
+            (data as any).todos.push(result.addTodo);
+            return data as Data;
+          });
+        },
+      },
+    },
+    optimistic: {
+      addTodo: () => ({
+        __typename: 'Todo',
+        id: 'optimistic_' + ++counter,
+        text: '',
+        complete: false,
+      }),
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', complete: true, text: '0', __typename: 'Todo' },
+      { id: '1', complete: true, text: '1', __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+
+  const AddTodo = gql`
+    mutation {
+      __typename
+      addTodo {
+        __typename
+        complete
+        text
+        id
+      }
+    }
+  `;
+
+  writeOptimistic(store, { query: AddTodo }, 1);
+  writeOptimistic(store, { query: AddTodo }, 2);
+
+  const queryRes = query(store, { query: Todos });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data).toEqual({
+    ...todosData,
+    todos: [
+      todosData.todos[0],
+      todosData.todos[1],
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_2' },
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_3' },
+    ],
+  });
+});
+
+it('supports clearing a layer then reapplying optimistic updates', () => {
+  let counter = 1;
+
+  const store = new Store({
+    updates: {
+      Mutation: {
+        addTodo: (result, _, cache) => {
+          cache.updateQuery({ query: Todos }, data => {
+            (data as any).todos.push(result.addTodo);
+            return data as Data;
+          });
+        },
+      },
+    },
+    optimistic: {
+      addTodo: () => ({
+        __typename: 'Todo',
+        id: 'optimistic_' + ++counter,
+        text: '',
+        complete: false,
+      }),
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', complete: true, text: '0', __typename: 'Todo' },
+      { id: '1', complete: true, text: '1', __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+
+  const AddTodo = gql`
+    mutation {
+      __typename
+      addTodo {
+        __typename
+        complete
+        text
+        id
+      }
+    }
+  `;
+
+  writeOptimistic(store, { query: AddTodo }, 1);
+  writeOptimistic(store, { query: AddTodo }, 1);
+
+  InMemoryData.noopDataState(store.data, 1);
+
+  writeOptimistic(store, { query: AddTodo }, 1);
+  writeOptimistic(store, { query: AddTodo }, 1);
+
+  const queryRes = query(store, { query: Todos });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data).toEqual({
+    ...todosData,
+    todos: [
+      todosData.todos[0],
+      todosData.todos[1],
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_4' },
+      { __typename: 'Todo', text: '', complete: false, id: 'optimistic_5' },
+    ],
+  });
+});

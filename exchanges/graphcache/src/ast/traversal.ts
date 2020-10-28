@@ -1,8 +1,6 @@
 import {
   SelectionNode,
-  DefinitionNode,
   DocumentNode,
-  FragmentDefinitionNode,
   OperationDefinitionNode,
   valueFromASTUntyped,
   Kind,
@@ -12,9 +10,6 @@ import { getName } from './node';
 
 import { invariant } from '../helpers/help';
 import { Fragments, Variables } from '../types';
-
-const isFragmentNode = (node: DefinitionNode): node is FragmentDefinitionNode =>
-  node.kind === Kind.FRAGMENT_DEFINITION;
 
 /** Returns the main operation's definition */
 export const getMainOperation = (
@@ -35,11 +30,17 @@ export const getMainOperation = (
 };
 
 /** Returns a mapping from fragment names to their selections */
-export const getFragments = (doc: DocumentNode): Fragments =>
-  doc.definitions.filter(isFragmentNode).reduce((map: Fragments, node) => {
-    map[getName(node)] = node;
-    return map;
-  }, {});
+export const getFragments = (doc: DocumentNode): Fragments => {
+  const fragments: Fragments = {};
+  for (let i = 0; i < doc.definitions.length; i++) {
+    const node = doc.definitions[i];
+    if (node.kind === Kind.FRAGMENT_DEFINITION) {
+      fragments[getName(node)] = node;
+    }
+  }
+
+  return fragments;
+};
 
 export const shouldInclude = (
   node: SelectionNode,

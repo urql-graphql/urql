@@ -58,7 +58,7 @@ let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
-let currentIgnoreOptimistic = false;
+let currentOptimistic = false;
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
   optimistic: makeDict(),
@@ -75,7 +75,7 @@ export const initDataState = (
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
-  currentIgnoreOptimistic = !!isOptimistic;
+  currentOptimistic = !!isOptimistic;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -96,7 +96,7 @@ export const initDataState = (
 
     // An optimistic update of a mutation may force an optimistic layer,
     // or this Query update may be applied optimistically since it's part
-    // of a commutate chain
+    // of a commutative chain
     currentOptimisticKey = layerKey;
     createLayer(data, layerKey);
   } else {
@@ -116,7 +116,7 @@ export const clearDataState = () => {
 
   const data = currentData!;
   const layerKey = currentOptimisticKey;
-  currentIgnoreOptimistic = false;
+  currentOptimistic = false;
   currentOptimisticKey = null;
 
   // Determine whether the current operation has been a commutative layer
@@ -144,7 +144,7 @@ export const clearDataState = () => {
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
     Promise.resolve().then(() => {
-      initDataState('write', data, null);
+      initDataState('read', data, null);
       gc();
       persistData();
       clearDataState();
@@ -246,7 +246,8 @@ const getNode = <T>(
     // If the node and node value exists it is returned, including undefined
     if (
       optimistic &&
-      (!currentIgnoreOptimistic ||
+      (!currentOptimistic ||
+        currentOperation === 'write' ||
         currentData!.commutativeKeys.has(layerKey)) &&
       (node = optimistic.get(entityKey)) !== undefined &&
       fieldKey in node
@@ -383,7 +384,7 @@ const updateDependencies = (entityKey: string, fieldKey?: string) => {
 };
 
 const updatePersist = (entityKey: string, fieldKey: string) => {
-  if (!currentIgnoreOptimistic && currentData!.storage) {
+  if (!currentOptimistic && currentData!.storage) {
     currentData!.persist.add(serializeKeys(entityKey, fieldKey));
   }
 };
@@ -557,7 +558,8 @@ export const inspectFields = (entityKey: string): FieldInfo[] => {
 
 export const persistData = () => {
   if (currentData!.storage) {
-    currentIgnoreOptimistic = true;
+    currentOptimistic = true;
+    currentOperation = 'read';
     const entries: SerializedEntries = makeDict();
     currentData!.persist.forEach(key => {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
@@ -571,7 +573,7 @@ export const persistData = () => {
       }
     });
 
-    currentIgnoreOptimistic = false;
+    currentOptimistic = false;
     currentData!.storage.writeData(entries);
     currentData!.persist.clear();
   }
@@ -582,7 +584,7 @@ export const hydrateData = (
   storage: StorageAdapter,
   entries: SerializedEntries
 ) => {
-  initDataState('read', data, null);
+  initDataState('write', data, null);
 
   for (const key in entries) {
     const value = entries[key];

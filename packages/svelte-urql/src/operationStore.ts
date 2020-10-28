@@ -21,9 +21,9 @@ export interface OperationStore<Data = any, Vars = any>
   // Output properties
   readonly stale: boolean;
   readonly fetching: boolean;
-  readonly data: Data | void;
-  readonly error?: CombinedError | void;
-  readonly extensions?: Record<string, any> | void;
+  readonly data: Data | undefined;
+  readonly error: CombinedError | undefined;
+  readonly extensions: Record<string, any> | undefined;
   // Writable properties
   set(value: Partial<OperationStore<Data, Vars>>): void;
   update(updater: Updater<Partial<OperationStore<Data, Vars>>>): void;

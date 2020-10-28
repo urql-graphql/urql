@@ -1,5 +1,23 @@
 # @urql/exchange-graphcache
 
+## 3.1.7
+
+### Patch Changes
+
+- Enforce atomic optimistic updates so that optimistic layers are cleared before they're reapplied. This is important for instance when an optimistic update is performed while offline and then reapplied while online, which would previously repeat the optimistic update on top of its past data changes, by [@kitten](https://github.com/kitten) (See [#1080](https://github.com/FormidableLabs/urql/pull/1080))
+
+## 3.1.6
+
+### Patch Changes
+
+- ⚠️ Fix optimistic updates not being allowed to be cumulative and apply on top of each other. Previously in [#866](https://github.com/FormidableLabs/urql/pull/866) we explicitly deemed this as unsafe which isn't correct anymore given that concrete, non-optimistic updates are now never applied on top of optimistic layers, by [@kitten](https://github.com/kitten) (See [#1074](https://github.com/FormidableLabs/urql/pull/1074))
+
+## 3.1.5
+
+### Patch Changes
+
+- Changes some internals of how selections are iterated over and remove some private exports. This will have no effect or fixes on how Graphcache functions, but may improve some minor performance characteristics of large queries, by [@kitten](https://github.com/kitten) (See [#1060](https://github.com/FormidableLabs/urql/pull/1060))
+
 ## 3.1.4
 
 ### Patch Changes
