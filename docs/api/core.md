@@ -168,12 +168,15 @@ received.
 ### Operation
 
 The input for every exchange that informs GraphQL requests.
-It extends the [GraphQLRequest](#graphqlrequest) type and contains these additional properties:
+It extends the [`GraphQLRequest` type](#graphqlrequest) and contains these additional properties:
 
 | Prop      | Type               | Description                                   |
 | --------- | ------------------ | --------------------------------------------- |
 | `kind`    | `OperationType`    | The type of GraphQL operation being executed. |
 | `context` | `OperationContext` | Additional metadata passed to exchange.       |
+
+An `Operation` also contains the `operationName` property, which is a deprecated alias of the `kind`
+property and outputs a deprecation warning if it's used.
 
 ### RequestPolicy
 
@@ -374,6 +377,36 @@ The helper takes are of creating a unique `key` for the `GraphQLRequest`. This i
 Additionally, this utility will ensure that the `query` reference will remain stable. This means
 that if the same `query` will be passed in as a string or as a fresh `DocumentNode`, then the output
 will always have the same `DocumentNode` reference.
+
+### makeOperation
+
+This utility is used to either turn a [`GraphQLRequest` object](#graphqlrequest) into a new
+[`Operation` object](#operation) or to copy an `Operation`. It adds the `kind` property and the
+`operationName` alias that outputs a deprecation warning.
+
+It accepts three arguments:
+
+- An `Operation`'s `kind` (See [`OperationType`](#operationtype)
+- A [`GraphQLRequest` object](#graphqlrequest) or another [`Operation`](#operation) that should be
+  copied.
+- and; optionally a [partial `OperationContext` object.](#operationcontext). This argument may be
+  left out if the context is to be copied from the operation that may be passed as a second argument.
+
+Hence some valid uses of the utility are:
+
+```js
+// Create a new operation from scratch
+makeOperation('query', createRequest(query, variables), client.createOperationContext(opts));
+
+// Turn an operation into a 'teardown' operation
+makeOperation('teardown', operation);
+
+// Copy an existing operation while modifying its context
+makeOperation(operation.kind, operation, {
+  ...operation.context,
+  preferGetMethod: true,
+});
+```
 
 ### makeResult
 

@@ -12,4 +12,9 @@
 'urql': patch
 ---
 
-Deprecate the "Operation.operationName" property in favor of "Operation.kind"
+Deprecate the `Operation.operationName` property in favor of `Operation.kind`. This name was
+previously confusing as `operationName` was effectively referring to two different things. You can
+safely upgrade to this new version, however to mute all deprecation warnings you will have to
+**upgrade** all `urql` packages you use. If you have custom exchanges that spread operations, please
+use [the new `makeOperation` helper
+function](https://formidable.com/open-source/urql/docs/api/core/#makeoperation) instead.
