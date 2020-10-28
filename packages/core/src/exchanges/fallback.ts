@@ -12,10 +12,10 @@ export const fallbackExchange: ({
     ops$,
     tap<Operation>(operation => {
       if (
-        operation.operationName !== 'teardown' &&
+        operation.kind !== 'teardown' &&
         process.env.NODE_ENV !== 'production'
       ) {
-        const message = `No exchange has handled operations of type "${operation.operationName}". Check whether you've added an exchange responsible for these operations.`;
+        const message = `No exchange has handled operations of kind "${operation.kind}". Check whether you've added an exchange responsible for these operations.`;
 
         dispatchDebug({
           type: 'fallbackCatch',

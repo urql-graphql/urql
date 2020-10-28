@@ -775,7 +775,7 @@ describe('optimistic updates', () => {
 
     pipe(
       cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
-      filter(x => x.operation.operationName === 'mutation'),
+      filter(x => x.operation.kind === 'mutation'),
       tap(result),
       publish
     );
@@ -862,7 +862,7 @@ describe('optimistic updates', () => {
       pipe(
         ops$,
         delay(1),
-        filter(x => x.operationName !== 'mutation'),
+        filter(x => x.kind !== 'mutation'),
         map(response)
       );
 
@@ -1518,7 +1518,7 @@ describe('commutativity', () => {
     const forward = (ops$: Source<Operation>): Source<OperationResult> =>
       pipe(
         ops$,
-        filter(op => op.operationName !== 'teardown'),
+        filter(op => op.kind !== 'teardown'),
         mergeMap(result)
       );
 
@@ -1597,7 +1597,7 @@ describe('commutativity', () => {
     pipe(
       cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
       tap(result => {
-        if (result.operation.operationName === 'query') {
+        if (result.operation.kind === 'query') {
           data = result.data;
         }
       }),
@@ -1691,7 +1691,7 @@ describe('commutativity', () => {
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
-        if (result.operation.operationName === 'query') {
+        if (result.operation.kind === 'query') {
           data = result.data;
         }
       }),
@@ -1803,7 +1803,7 @@ describe('commutativity', () => {
     pipe(
       cacheExchange({ optimistic })({ forward, client, dispatchDebug })(ops$),
       tap(result => {
-        if (result.operation.operationName === 'query') {
+        if (result.operation.kind === 'query') {
           data = result.data;
         }
       }),
@@ -1888,7 +1888,7 @@ describe('commutativity', () => {
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
-        if (result.operation.operationName === 'query') {
+        if (result.operation.kind === 'query') {
           data = result.data;
         }
       }),
@@ -1979,7 +1979,7 @@ describe('commutativity', () => {
     pipe(
       cacheExchange()({ forward, client, dispatchDebug })(ops$),
       tap(result => {
-        if (result.operation.operationName === 'query') {
+        if (result.operation.kind === 'query') {
           data = result.data;
         }
       }),

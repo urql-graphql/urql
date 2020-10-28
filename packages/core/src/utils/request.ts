@@ -1,7 +1,7 @@
-import { DocumentNode, parse, print } from 'graphql';
+import { DocumentNode, Kind, parse, print } from 'graphql';
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
-import { GraphQLRequest, Operation, OperationContext } from '../types';
+import { GraphQLRequest } from '../types';
 
 interface Documents {
   [key: number]: DocumentNode;
@@ -40,17 +40,14 @@ export const createRequest = (
   };
 };
 
-/** Spreads the provided metadata to the source operation's meta property in context.  */
-export const addMetadata = (
-  source: Operation,
-  meta: Exclude<OperationContext['meta'], undefined>
-) => ({
-  ...source,
-  context: {
-    ...source.context,
-    meta: {
-      ...source.context.meta,
-      ...meta,
-    },
-  },
-});
+/**
+ * Finds the Name value from the OperationDefinition of a Document
+ */
+export const getOperationName = (query: DocumentNode): string | undefined => {
+  for (let i = 0, l = query.definitions.length; i < l; i++) {
+    const node = query.definitions[i];
+    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
+      return node.name.value;
+    }
+  }
+};

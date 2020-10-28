@@ -3,7 +3,9 @@ import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
 import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
+
 import {
+  makeOperation,
   addMetadata,
   collectTypesFromResponse,
   formatDocument,
@@ -15,18 +17,19 @@ interface OperationCache {
   [key: string]: Set<number>;
 }
 
-const shouldSkip = ({ operationName }: Operation) =>
-  operationName !== 'mutation' && operationName !== 'query';
+const shouldSkip = ({ kind }: Operation) =>
+  kind !== 'mutation' && kind !== 'query';
 
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache = new Map() as ResultCache;
   const operationCache = Object.create(null) as OperationCache;
 
   // Adds unique typenames to query (for invalidating cache entries)
-  const mapTypeNames = (operation: Operation): Operation => ({
-    ...operation,
-    query: formatDocument(operation.query),
-  });
+  const mapTypeNames = (operation: Operation): Operation => {
+    const formattedOperation = makeOperation(operation.kind, operation);
+    formattedOperation.query = formatDocument(operation.query);
+    return formattedOperation;
+  };
 
   const handleAfterMutation = afterMutation(
     resultCache,
@@ -37,14 +40,14 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 
   const handleAfterQuery = afterQuery(resultCache, operationCache);
 
-  const isOperationCached = operation => {
+  const isOperationCached = (operation: Operation) => {
     const {
       key,
-      operationName,
+      kind,
       context: { requestPolicy },
     } = operation;
     return (
-      operationName === 'query' &&
+      kind === 'query' &&
       requestPolicy !== 'network-only' &&
       (requestPolicy === 'cache-only' || resultCache.has(key))
     );
@@ -102,21 +105,13 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
       ]),
       map(op => addMetadata(op, { cacheOutcome: 'miss' })),
       filter(
-        op =>
-          op.operationName !== 'query' ||
-          op.context.requestPolicy !== 'cache-only'
+        op => op.kind !== 'query' || op.context.requestPolicy !== 'cache-only'
       ),
       forward,
       tap(response => {
-        if (
-          response.operation &&
-          response.operation.operationName === 'mutation'
-        ) {
+        if (response.operation && response.operation.kind === 'mutation') {
           handleAfterMutation(response);
-        } else if (
-          response.operation &&
-          response.operation.operationName === 'query'
-        ) {
+        } else if (response.operation && response.operation.kind === 'query') {
           handleAfterQuery(response);
         }
       })
@@ -128,13 +123,12 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 
 // Reexecutes a given operation with the default requestPolicy
 const reexecuteOperation = (client: Client, operation: Operation) => {
-  return client.reexecuteOperation({
-    ...operation,
-    context: {
+  return client.reexecuteOperation(
+    makeOperation(operation.kind, operation, {
       ...operation.context,
       requestPolicy: 'network-only',
-    },
-  });
+    })
+  );
 };
 
 // Invalidates the cache given a mutation's response

@@ -10,6 +10,7 @@ import {
   takeUntil,
 } from 'wonka';
 import {
+  makeOperation,
   Exchange,
   Operation,
   CombinedError,
@@ -68,9 +69,7 @@ export const retryExchange = ({
           sharedOps$,
           filter(op => {
             return (
-              (op.operationName === 'query' ||
-                op.operationName === 'teardown') &&
-              op.key === key
+              (op.kind === 'query' || op.kind === 'teardown') && op.key === key
             );
           })
         );
@@ -86,14 +85,13 @@ export const retryExchange = ({
 
         // Add new retryDelay and retryCount to operation
         return pipe(
-          fromValue({
-            ...op,
-            context: {
+          fromValue(
+            makeOperation(op.kind, op, {
               ...op.context,
               retryDelay: delayAmount,
               retryCount,
-            },
-          }),
+            })
+          ),
           delay(delayAmount),
           // Stop retry if a teardown comes in
           takeUntil(teardown$)

@@ -27,8 +27,8 @@ export interface SSRExchange extends Exchange {
   extractData(): SSRData;
 }
 
-const shouldSkip = ({ operationName }: Operation) =>
-  operationName !== 'subscription' && operationName !== 'query';
+const shouldSkip = ({ kind }: Operation) =>
+  kind !== 'subscription' && kind !== 'query';
 
 /** Serialize an OperationResult to plain JSON */
 const serializeResult = ({

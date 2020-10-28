@@ -22,6 +22,7 @@ import {
   CombinedError,
   Exchange,
   createRequest,
+  makeOperation,
 } from '@urql/core';
 
 import { DocumentNode } from 'graphql';
@@ -57,13 +58,11 @@ export interface AuthConfig<T> {
 const addAuthAttemptToOperation = (
   operation: Operation,
   hasAttempted: boolean
-) => ({
-  ...operation,
-  context: {
+) =>
+  makeOperation(operation.kind, operation, {
     ...operation.context,
     authAttempt: hasAttempted,
-  },
-});
+  });
 
 export function authExchange<T>({
   addAuthToOperation,
@@ -131,14 +130,14 @@ export function authExchange<T>({
       const teardownOps$ = pipe(
         sharedOps$,
         filter((operation: Operation) => {
-          return operation.operationName === 'teardown';
+          return operation.kind === 'teardown';
         })
       );
 
       const pendingOps$ = pipe(
         sharedOps$,
         filter((operation: Operation) => {
-          return operation.operationName !== 'teardown';
+          return operation.kind !== 'teardown';
         })
       );
 
@@ -162,9 +161,7 @@ export function authExchange<T>({
               const teardown$ = pipe(
                 sharedOps$,
                 filter(op => {
-                  return (
-                    op.operationName === 'teardown' && op.key === operation.key
-                  );
+                  return op.kind === 'teardown' && op.key === operation.key;
                 })
               );
 

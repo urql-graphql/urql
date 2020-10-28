@@ -14,6 +14,7 @@ import {
 } from '../test-utils';
 import { Operation } from '../types';
 import { dedupExchange } from './dedup';
+import { makeOperation } from '../utils';
 
 const dispatchDebug = jest.fn();
 let shouldRespond = false;
@@ -82,7 +83,7 @@ it('forwards duplicate query operations after one was torn down', async () => {
 
   publish(exchange);
   next(queryOperation);
-  next({ ...queryOperation, operationName: 'teardown' });
+  next(makeOperation('teardown', queryOperation, queryOperation.context));
   next(queryOperation);
   complete();
   expect(forwardedOperations.length).toBe(3);

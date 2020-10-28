@@ -11,7 +11,7 @@ import {
   takeUntil,
 } from 'wonka';
 
-import { makeResult, makeErrorResult } from '../utils';
+import { makeResult, makeErrorResult, makeOperation } from '../utils';
 
 import {
   Exchange,
@@ -85,11 +85,10 @@ export const subscriptionExchange = ({
           complete: () => {
             if (!isComplete) {
               isComplete = true;
-              if (operation.operationName === 'subscription') {
-                client.reexecuteOperation({
-                  ...operation,
-                  operationName: 'teardown',
-                });
+              if (operation.kind === 'subscription') {
+                client.reexecuteOperation(
+                  makeOperation('teardown', operation, operation.context)
+                );
               }
 
               complete();
@@ -106,11 +105,10 @@ export const subscriptionExchange = ({
   };
 
   const isSubscriptionOperation = (operation: Operation): boolean => {
-    const { operationName } = operation;
+    const { kind } = operation;
     return (
-      operationName === 'subscription' ||
-      (!!enableAllOperations &&
-        (operationName === 'query' || operationName === 'mutation'))
+      kind === 'subscription' ||
+      (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
     );
   };
 
@@ -123,7 +121,7 @@ export const subscriptionExchange = ({
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
+          filter(op => op.kind === 'teardown' && op.key === key)
         );
 
         return pipe(createSubscriptionSource(operation), takeUntil(teardown$));

@@ -17,17 +17,12 @@ export const multipartFetchExchange: Exchange = ({
   const fetchResults$ = pipe(
     sharedOps$,
     filter(operation => {
-      return (
-        operation.operationName === 'query' ||
-        operation.operationName === 'mutation'
-      );
+      return operation.kind === 'query' || operation.kind === 'mutation';
     }),
     mergeMap(operation => {
       const teardown$ = pipe(
         sharedOps$,
-        filter(
-          op => op.operationName === 'teardown' && op.key === operation.key
-        )
+        filter(op => op.kind === 'teardown' && op.key === operation.key)
       );
 
       // Spreading operation.variables here in case someone made a variables with Object.create(null).
@@ -102,10 +97,7 @@ export const multipartFetchExchange: Exchange = ({
   const forward$ = pipe(
     sharedOps$,
     filter(operation => {
-      return (
-        operation.operationName !== 'query' &&
-        operation.operationName !== 'mutation'
-      );
+      return operation.kind !== 'query' && operation.kind !== 'mutation';
     }),
     forward
   );

@@ -7,6 +7,7 @@ import {
   ExchangeIO,
   CombinedError,
   createRequest,
+  makeOperation,
 } from '@urql/core';
 
 import {
@@ -81,7 +82,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
       const requests: SerializedRequest[] = [];
       for (let i = 0; i < failedQueue.length; i++) {
         const operation = failedQueue[i];
-        if (operation.operationName === 'mutation') {
+        if (operation.kind === 'mutation') {
           requests.push({
             query: print(operation.query),
             variables: operation.variables,
@@ -98,8 +99,8 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
 
         for (let i = 0; i < failedQueue.length; i++) {
           const operation = failedQueue[i];
-          if (operation.operationName === 'mutation') {
-            next({ ...operation, operationName: 'teardown' });
+          if (operation.kind === 'mutation') {
+            next(makeOperation('teardown', operation));
           }
         }
 
@@ -117,7 +118,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
         outerForward(ops$),
         filter(res => {
           if (
-            res.operation.operationName === 'mutation' &&
+            res.operation.kind === 'mutation' &&
             isOfflineError(res.error) &&
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
@@ -160,10 +161,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
       return pipe(
         cacheResults$(opsAndRebound$),
         filter(res => {
-          if (
-            res.operation.operationName === 'query' &&
-            isOfflineError(res.error)
-          ) {
+          if (res.operation.kind === 'query' && isOfflineError(res.error)) {
             next(toRequestPolicy(res.operation, 'cache-only'));
             failedQueue.push(res.operation);
             return false;

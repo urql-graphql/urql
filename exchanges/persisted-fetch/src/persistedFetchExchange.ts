@@ -13,6 +13,7 @@ import {
 } from 'wonka';
 
 import {
+  makeOperation,
   CombinedError,
   ExchangeInput,
   Exchange,
@@ -48,12 +49,12 @@ export const persistedFetchExchange = (
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(operation => operation.operationName === 'query'),
+      filter(operation => operation.kind === 'query'),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
           sharedOps$,
-          filter(op => op.operationName === 'teardown' && op.key === key)
+          filter(op => op.kind === 'teardown' && op.key === key)
         );
 
         const body = makeFetchBody(operation);
@@ -125,7 +126,7 @@ export const persistedFetchExchange = (
 
     const forward$ = pipe(
       sharedOps$,
-      filter(operation => operation.operationName !== 'query'),
+      filter(operation => operation.kind !== 'query'),
       forward
     );
 
@@ -139,17 +140,16 @@ const makePersistedFetchSource = (
   dispatchDebug: ExchangeInput['dispatchDebug'],
   useGet: boolean
 ): Source<OperationResult> => {
-  const newOperation = {
-    ...operation,
-    context: {
-      ...operation.context,
-      preferGetMethod: useGet || operation.context.preferGetMethod,
-    },
-  };
+  const newOperation = makeOperation(operation.kind, operation, {
+    ...operation.context,
+    preferGetMethod: useGet || operation.context.preferGetMethod,
+  });
+
   const url = makeFetchURL(
     newOperation,
     body.query ? body : { ...body, query: '' }
   );
+
   const fetchOptions = makeFetchOptions(newOperation, body);
 
   dispatchDebug({

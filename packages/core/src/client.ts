@@ -42,6 +42,7 @@ import {
   withPromise,
   maskTypename,
   noop,
+  makeOperation,
 } from './utils';
 
 import { DocumentNode } from 'graphql';
@@ -136,7 +137,7 @@ export class Client {
       // Reexecute operation only if any subscribers are still subscribed to the
       // operation's exchange results
       if (
-        operation.operationName === 'mutation' ||
+        operation.kind === 'mutation' ||
         (this.activeOperations[operation.key] || 0) > 0
       ) {
         this.queue.push(operation);
@@ -169,7 +170,7 @@ export class Client {
     pipe(this.results$, publish);
   }
 
-  private createOperationContext = (
+  createOperationContext = (
     opts?: Partial<OperationContext>
   ): OperationContext => ({
     url: this.url,
@@ -181,16 +182,11 @@ export class Client {
   });
 
   createRequestOperation = (
-    type: OperationType,
+    kind: OperationType,
     request: GraphQLRequest,
     opts?: Partial<OperationContext>
-  ): Operation => ({
-    key: request.key,
-    query: request.query,
-    variables: request.variables,
-    operationName: type,
-    context: this.createOperationContext(opts),
-  });
+  ): Operation =>
+    makeOperation(kind, request, this.createOperationContext(opts));
 
   /** Counts up the active operation key and dispatches the operation */
   private onOperationStart(operation: Operation) {
@@ -207,13 +203,15 @@ export class Client {
       prevActive <= 0 ? 0 : prevActive - 1);
 
     if (newActive <= 0) {
-      this.dispatchOperation({ ...operation, operationName: 'teardown' });
+      this.dispatchOperation(
+        makeOperation('teardown', operation, operation.context)
+      );
     }
   }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation(operation: Operation): Source<OperationResult> {
-    const { key, operationName } = operation;
+    const { key, kind } = operation;
     let operationResults$ = pipe(
       this.results$,
       filter((res: OperationResult) => res.operation.key === key)
@@ -229,7 +227,7 @@ export class Client {
       );
     }
 
-    if (operationName === 'mutation') {
+    if (kind === 'mutation') {
       // A mutation is always limited to just a single result and is never shared
       return pipe(
         operationResults$,
@@ -240,9 +238,7 @@ export class Client {
 
     const teardown$ = pipe(
       this.operations$,
-      filter(
-        (op: Operation) => op.operationName === 'teardown' && op.key === key
-      )
+      filter((op: Operation) => op.kind === 'teardown' && op.key === key)
     );
 
     const result$ = pipe(
@@ -258,7 +254,7 @@ export class Client {
 
     return operation.context.suspense !== false &&
       this.suspense &&
-      operationName === 'query'
+      kind === 'query'
       ? toSuspenseSource<OperationResult>(result$ as Source<OperationResult>)
       : (result$ as Source<OperationResult>);
   }

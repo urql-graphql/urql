@@ -1,6 +1,6 @@
-import { Kind, print, DocumentNode } from 'graphql';
+import { DocumentNode, print } from 'graphql';
 
-import { stringifyVariables } from '../utils';
+import { getOperationName, stringifyVariables } from '../utils';
 import { Operation } from '../types';
 
 export interface FetchBody {
@@ -10,19 +10,8 @@ export interface FetchBody {
   extensions: undefined | Record<string, any>;
 }
 
-const getOperationName = (query: DocumentNode): string | undefined => {
-  for (let i = 0, l = query.definitions.length; i < l; i++) {
-    const node = query.definitions[i];
-    if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
-      return node.name.value;
-    }
-  }
-};
-
 const shouldUseGet = (operation: Operation): boolean => {
-  return (
-    operation.operationName === 'query' && !!operation.context.preferGetMethod
-  );
+  return operation.kind === 'query' && !!operation.context.preferGetMethod;
 };
 
 export const makeFetchBody = (request: {

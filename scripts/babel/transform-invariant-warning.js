@@ -7,16 +7,18 @@ const warningDevCheckTemplate = `
 `.trim();
 
 const plugin = ({ template, types: t }) => {
-  const wrapWithDevCheck = template(
-    warningDevCheckTemplate,
-    { placeholderPattern: /^NODE$/ }
-  );
+  const wrapWithDevCheck = template(warningDevCheckTemplate, {
+    placeholderPattern: /^NODE$/,
+  });
 
   return {
     visitor: {
       CallExpression(path) {
         const { name } = path.node.callee;
-        if ((name === 'warn') && !path.node[visited]) {
+        if (
+          (name === 'warn' || name === 'deprecationWarning') &&
+          !path.node[visited]
+        ) {
           path.node[visited] = true;
 
           // The production-check may be hoisted if the parent
@@ -63,10 +65,10 @@ const plugin = ({ template, types: t }) => {
             ),
             formerNode,
             t.stringLiteral('')
-          )
+          );
         }
-      }
-    }
+      },
+    },
   };
 };
 

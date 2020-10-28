@@ -1,4 +1,9 @@
-import { GraphQLRequest, OperationContext, Operation } from '@urql/core';
+import {
+  GraphQLRequest,
+  OperationContext,
+  Operation,
+  makeOperation,
+} from '@urql/core';
 import gql from 'graphql-tag';
 
 const context: OperationContext = {
@@ -60,20 +65,20 @@ const uploads: GraphQLRequest = {
   },
 };
 
-export const uploadOperation: Operation = {
-  ...upload,
-  operationName: 'mutation',
-  context,
-};
+export const uploadOperation: Operation = makeOperation(
+  'mutation',
+  upload,
+  context
+);
 
-export const multipleUploadOperation: Operation = {
-  ...uploads,
-  operationName: 'mutation',
-  context,
-};
+export const multipleUploadOperation: Operation = makeOperation(
+  'mutation',
+  uploads,
+  context
+);
 
-export const queryOperation: Operation = {
-  ...queryGql,
-  operationName: 'query',
-  context,
-};
+export const queryOperation: Operation = makeOperation(
+  'query',
+  queryGql,
+  context
+);

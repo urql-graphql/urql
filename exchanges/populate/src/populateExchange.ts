@@ -13,7 +13,7 @@ import {
   SelectionNode,
 } from 'graphql';
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation } from '@urql/core';
+import { makeOperation, Exchange, Operation } from '@urql/core';
 
 import { warn } from './helpers/help';
 import {
@@ -50,7 +50,7 @@ export const populateExchange = ({
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
-    if (op.operationName !== 'mutation') {
+    if (op.kind !== 'mutation') {
       return op;
     }
 
@@ -61,20 +61,20 @@ export const populateExchange = ({
       );
     }
 
-    return {
-      ...op,
-      query: addFragmentsToQuery(
-        schema,
-        op.query,
-        activeSelections,
-        userFragments
-      ),
-    };
+    const newOperation = makeOperation(op.kind, op);
+    newOperation.query = addFragmentsToQuery(
+      schema,
+      op.query,
+      activeSelections,
+      userFragments
+    );
+
+    return newOperation;
   };
 
   /** Handle query and extract fragments. */
-  const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
-    if (operationName !== 'query') {
+  const handleIncomingQuery = ({ key, kind, query }: Operation) => {
+    if (kind !== 'query') {
       return;
     }
 
@@ -106,8 +106,8 @@ export const populateExchange = ({
     }
   };
 
-  const handleIncomingTeardown = ({ key, operationName }: Operation) => {
-    if (operationName === 'teardown') {
+  const handleIncomingTeardown = ({ key, kind }: Operation) => {
+    if (kind === 'teardown') {
       activeOperations.delete(key);
     }
   };

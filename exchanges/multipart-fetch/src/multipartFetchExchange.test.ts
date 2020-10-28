@@ -1,4 +1,4 @@
-import { Client, OperationResult, OperationType } from '@urql/core';
+import { Client, OperationResult, makeOperation } from '@urql/core';
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
 
 import { multipartFetchExchange } from './multipartFetchExchange';
@@ -202,10 +202,9 @@ describe('on teardown', () => {
 
   it('does not call the query', () => {
     pipe(
-      fromValue({
-        ...queryOperation,
-        operationName: 'teardown' as OperationType,
-      }),
+      fromValue(
+        makeOperation('teardown', queryOperation, queryOperation.context)
+      ),
       multipartFetchExchange(exchangeArgs),
       subscribe(fail)
     );

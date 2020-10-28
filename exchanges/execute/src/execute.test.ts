@@ -1,7 +1,7 @@
 jest.mock('graphql');
 
 import { fetchExchange } from 'urql';
-import { executeExchange, getOperationName } from './execute';
+import { executeExchange } from './execute';
 import { execute, print } from 'graphql';
 import {
   pipe,
@@ -13,8 +13,9 @@ import {
   Source,
 } from 'wonka';
 import { mocked } from 'ts-jest/utils';
+import { getOperationName } from '@urql/core/utils';
 import { queryOperation } from '@urql/core/test-utils';
-import { makeErrorResult } from '@urql/core';
+import { makeErrorResult, makeOperation } from '@urql/core';
 import { Client } from '@urql/core/client';
 import { OperationResult } from '@urql/core/types';
 
@@ -179,10 +180,11 @@ describe('on thrown error', () => {
 });
 
 describe('on unsupported operation', () => {
-  const operation = {
-    ...queryOperation,
-    operationName: 'teardown',
-  } as const;
+  const operation = makeOperation(
+    'teardown',
+    queryOperation,
+    queryOperation.context
+  );
 
   it('returns operation result', async () => {
     const { source, next } = makeSubject<any>();

@@ -10,4 +10,5 @@ export {
   makeErrorResult,
   formatDocument,
   maskTypename,
+  makeOperation,
 } from './utils';

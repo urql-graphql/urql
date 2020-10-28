@@ -82,7 +82,7 @@ const getAuth = async ({ authState }) => {
   }
 
   return null;
-}
+};
 ```
 
 We check that the `authState` doesn't already exist (this indicates that it is the first time this exchange is executed and not an auth failure) and fetch the auth state from
@@ -104,7 +104,7 @@ const getAuth = async ({ authState, mutate }) => {
   }
 
   return null;
-}
+};
 ```
 
 ### Configuring `addAuthToOperation`
@@ -113,10 +113,9 @@ The purpose of `addAuthToOperation` is to take apply your auth state to each req
 you've returned from `getAuth` and not at all constrained by the exchange:
 
 ```js
-const addAuthToOperation = ({
-  authState,
-  operation,
-}) => {
+import { makeOperation } from '@urql/core';
+
+const addAuthToOperation = ({ authState, operation }) => {
   if (!authState || !authState.token) {
     return operation;
   }
@@ -126,20 +125,17 @@ const addAuthToOperation = ({
       ? operation.context.fetchOptions()
       : operation.context.fetchOptions || {};
 
-  return {
-    ...operation,
-    context: {
-      ...operation.context,
-      fetchOptions: {
-        ...fetchOptions,
-        headers: {
-          ...fetchOptions.headers,
-          "Authorization": authState.token,
-        },
+  return makeOperation(operation.kind, operation, {
+    ...operation.context,
+    fetchOptions: {
+      ...fetchOptions,
+      headers: {
+        ...fetchOptions.headers,
+        Authorization: authState.token,
       },
     },
-  };
-}
+  });
+};
 ```
 
 First we check that we have an `authState` and a `token`. Then we apply it to the request `fetchOptions` as an `Authorization` header.
@@ -174,10 +170,8 @@ is the recommended approach. We'll be able to determine whether any of the Graph
 
 ```js
 const didAuthError = ({ error }) => {
-  return error.graphQLErrors.some(
-    e => e.extensions?.code === 'FORBIDDEN',
-  );
-}
+  return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
+};
 ```
 
 For some GraphQL APIs, the auth error is communicated via an 401 HTTP response as is common in RESTful APIs:
@@ -225,7 +219,7 @@ const getAuth = async ({ authState }) => {
   logout();
 
   return null;
-}
+};
 ```
 
 Here, `logout()` is a placeholder that is called when we got an error, so that we can redirect to a login page again and clear our tokens from local storage or otherwise.
@@ -299,14 +293,12 @@ const client = createClient({
     cacheExchange,
     errorExchange({
       onError: error => {
-        const isAuthError = error.graphQLErrors.some(
-          e => e.extensions?.code === 'FORBIDDEN',
-        );
+        const isAuthError = error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
 
         if (isAuthError) {
           logout();
         }
-      }
+      },
     }),
     authExchange({
       /* config */
@@ -331,14 +323,14 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
     if (isLoggedIn === null) {
       return null;
     }
-  
+
     return createClient({ /* config */ });
   }, [isLoggedIn]);
 
   if (!client) {
     return null;
   }
-  
+
   return {
     <GraphQLProvider value={client}>
       {/* app content  */}

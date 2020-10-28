@@ -14,6 +14,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 2,
+    "kind": "query",
     "operationName": "query",
     "query": Object {
       "definitions": Array [
@@ -143,6 +144,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 2,
+    "kind": "query",
     "operationName": "query",
     "query": Object {
       "definitions": Array [
@@ -272,6 +274,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 2,
+    "kind": "query",
     "operationName": "query",
     "query": Object {
       "definitions": Array [
@@ -405,6 +408,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 2,
+    "kind": "query",
     "operationName": "query",
     "query": Object {
       "definitions": Array [
@@ -554,6 +558,7 @@ Object {
       "url": "http://localhost:3000/graphql",
     },
     "key": 2,
+    "kind": "query",
     "operationName": "query",
     "query": Object {
       "definitions": Array [

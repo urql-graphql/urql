@@ -22,12 +22,12 @@ export const refocusExchange = (): Exchange => {
     });
 
     const processIncomingOperation = (op: Operation) => {
-      if (op.operationName === 'query' && !observedOperations.has(op.key)) {
+      if (op.kind === 'query' && !observedOperations.has(op.key)) {
         observedOperations.set(op.key, 1);
         watchedOperations.set(op.key, op);
       }
 
-      if (op.operationName === 'teardown' && observedOperations.has(op.key)) {
+      if (op.kind === 'teardown' && observedOperations.has(op.key)) {
         observedOperations.delete(op.key);
         watchedOperations.delete(op.key);
       }

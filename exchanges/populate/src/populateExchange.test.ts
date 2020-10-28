@@ -9,7 +9,7 @@ import {
 
 import gql from 'graphql-tag';
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
-import { Client, Operation } from '@urql/core';
+import { Client, Operation, OperationContext, makeOperation } from '@urql/core';
 
 import { populateExchange } from './populateExchange';
 
@@ -85,6 +85,8 @@ const schemaDef = `
   }
 `;
 
+const context = {} as OperationContext;
+
 const getNodesByType = <T extends keyof ASTKindToNode, N = ASTKindToNode[T]>(
   query: DocumentNode,
   type: T
@@ -110,15 +112,18 @@ const exchangeArgs = {
 };
 
 describe('on mutation', () => {
-  const operation = {
-    key: 1234,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addTodo @populate
-      }
-    `,
-  } as Operation;
+  const operation = makeOperation(
+    'mutation',
+    {
+      key: 1234,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -140,37 +145,43 @@ describe('on mutation', () => {
 });
 
 describe('on query -> mutation', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
-          id
-          text
-          creator {
-            id
-            name
-          }
-        }
-        users {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
           todos {
+            id
             text
+            creator {
+              id
+              name
+            }
+          }
+          users {
+            todos {
+              text
+            }
           }
         }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addTodo @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -207,47 +218,53 @@ describe('on query -> mutation', () => {
 });
 
 describe('on (query w/ fragment) -> mutation', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
-          ...TodoFragment
-          creator {
-            ...CreatorFragment
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            ...TodoFragment
+            creator {
+              ...CreatorFragment
+            }
           }
         }
-      }
 
-      fragment TodoFragment on Todo {
-        id
-        text
-      }
-
-      fragment CreatorFragment on User {
-        id
-        name
-      }
-    `,
-  } as Operation;
-
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addTodo @populate {
-          ...TodoFragment
+        fragment TodoFragment on Todo {
+          id
+          text
         }
-      }
 
-      fragment TodoFragment on Todo {
-        id
-        text
-      }
-    `,
-  } as Operation;
+        fragment CreatorFragment on User {
+          id
+          name
+        }
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate {
+            ...TodoFragment
+          }
+        }
+
+        fragment TodoFragment on Todo {
+          id
+          text
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -301,36 +318,42 @@ describe('on (query w/ fragment) -> mutation', () => {
 });
 
 describe('on (query w/ unused fragment) -> mutation', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            id
+            text
+          }
+          users {
+            ...UserFragment
+          }
+        }
+
+        fragment UserFragment on User {
           id
-          text
+          name
         }
-        users {
-          ...UserFragment
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate
         }
-      }
-
-      fragment UserFragment on User {
-        id
-        name
-      }
-    `,
-  } as Operation;
-
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addTodo @populate
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -371,32 +394,38 @@ describe('on (query w/ unused fragment) -> mutation', () => {
 });
 
 describe('on query -> (mutation w/ interface return type)', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
-          id
-          name
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            id
+            name
+          }
+          users {
+            id
+            text
+          }
         }
-        users {
-          id
-          text
-        }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        removeTodo @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          removeTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -430,32 +459,38 @@ describe('on query -> (mutation w/ interface return type)', () => {
 });
 
 describe('on query -> (mutation w/ union return type)', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
-          id
-          name
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            id
+            name
+          }
+          users {
+            id
+            text
+          }
         }
-        users {
-          id
-          text
-        }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        updateTodo @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          updateTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -489,33 +524,36 @@ describe('on query -> (mutation w/ union return type)', () => {
 });
 
 describe('on query -> teardown -> mutation', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        todos {
-          id
-          text
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            id
+            text
+          }
         }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const teardownOp = {
-    key: queryOp.key,
-    operationName: 'teardown',
-  } as Operation;
+  const teardownOp = makeOperation('teardown', queryOp, context);
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addTodo @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
   describe('mutation query', () => {
     it('matches snapshot', async () => {
@@ -549,30 +587,36 @@ describe('on query -> teardown -> mutation', () => {
 });
 
 describe('interface returned in mutation', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        products {
-          id
-          text
-          price
-          tax
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          products {
+            id
+            text
+            price
+            tax
+          }
         }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addProduct @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addProduct @populate
+        }
+      `,
+    },
+    context
+  );
 
   it('should correctly make the inline-fragments', () => {
     const response = pipe<Operation, any, Operation[]>(
@@ -605,36 +649,42 @@ describe('interface returned in mutation', () => {
 });
 
 describe('nested interfaces', () => {
-  const queryOp = {
-    key: 1234,
-    operationName: 'query',
-    query: gql`
-      query {
-        products {
-          id
-          text
-          price
-          tax
-          store {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          products {
             id
-            name
-            address
-            website
+            text
+            price
+            tax
+            store {
+              id
+              name
+              address
+              website
+            }
           }
         }
-      }
-    `,
-  } as Operation;
+      `,
+    },
+    context
+  );
 
-  const mutationOp = {
-    key: 5678,
-    operationName: 'mutation',
-    query: gql`
-      mutation MyMutation {
-        addProduct @populate
-      }
-    `,
-  } as Operation;
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addProduct @populate
+        }
+      `,
+    },
+    context
+  );
 
   it('should correctly make the inline-fragments', () => {
     const response = pipe<Operation, any, Operation[]>(

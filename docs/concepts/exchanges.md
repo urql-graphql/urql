@@ -190,11 +190,11 @@ import { pipe, filter, merge, share } from 'wonka';
   // <-- The ExchangeIO function (inline)
   const queries = pipe(
     operations$,
-    filter(op => op.operationName === 'query')
+    filter(op => op.kind === 'query')
   );
   const others = pipe(
     operations$,
-    filter(op => op.operationName !== 'query')
+    filter(op => op.kind !== 'query')
   );
   return forward(merge([queries, others]));
 };
@@ -205,11 +205,11 @@ import { pipe, filter, merge, share } from 'wonka';
   const shared = pipe(operations$, share);
   const queries = pipe(
     shared,
-    filter(op => op.operationName === 'query')
+    filter(op => op.kind === 'query')
   );
   const others = pipe(
     shared,
-    filter(op => op.operationName !== 'query')
+    filter(op => op.kind !== 'query')
   );
   return forward(merge([queries, others]));
 };
@@ -221,7 +221,7 @@ import { pipe, filter, merge, share } from 'wonka';
   pipe(
     operations$,
     map(op => {
-      if (op.operationName === 'query') {
+      if (op.kind === 'query') {
         /* ... */
       } else {
         /* ... */
@@ -252,7 +252,7 @@ import { pipe, filter, merge, share } from 'wonka';
   // This doesn't handle operations that aren't queries
   const queries = pipe(
     operations$,
-    filter(op => op.operationName === 'query')
+    filter(op => op.kind === 'query')
   );
   return forward(queries);
 };
@@ -262,11 +262,11 @@ import { pipe, filter, merge, share } from 'wonka';
   const shared = pipe(operations$, share);
   const queries = pipe(
     shared,
-    filter(op => op.operationName === 'query')
+    filter(op => op.kind === 'query')
   );
   const rest = pipe(
     shared,
-    filter(op => op.operationName !== 'query')
+    filter(op => op.kind !== 'query')
   );
   return forward(merge([queries, rest]));
 };
