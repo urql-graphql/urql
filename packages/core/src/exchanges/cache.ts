@@ -123,13 +123,12 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 
 // Reexecutes a given operation with the default requestPolicy
 const reexecuteOperation = (client: Client, operation: Operation) => {
-  return client.reexecuteOperation({
-    ...operation,
-    context: {
+  return client.reexecuteOperation(
+    makeOperation(operation.kind, operation, {
       ...operation.context,
       requestPolicy: 'network-only',
-    },
-  });
+    })
+  );
 };
 
 // Invalidates the cache given a mutation's response

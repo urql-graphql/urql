@@ -7,6 +7,7 @@ import {
   ExchangeIO,
   CombinedError,
   createRequest,
+  makeOperation,
 } from '@urql/core';
 
 import {
@@ -99,7 +100,7 @@ export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
         for (let i = 0; i < failedQueue.length; i++) {
           const operation = failedQueue[i];
           if (operation.kind === 'mutation') {
-            next({ ...operation, operationName: 'teardown' });
+            next(makeOperation('teardown', operation));
           }
         }
 

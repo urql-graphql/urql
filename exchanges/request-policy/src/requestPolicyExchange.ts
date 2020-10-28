@@ -1,4 +1,4 @@
-import { Operation, Exchange } from '@urql/core';
+import { makeOperation, Operation, Exchange } from '@urql/core';
 import { pipe, map } from 'wonka';
 
 const defaultTTL = 5 * 60 * 1000;
@@ -33,13 +33,10 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
       (options.shouldUpgrade ? options.shouldUpgrade(operation) : true)
     ) {
       operations.set(operation.key, new Date());
-      return {
-        ...operation,
-        context: {
-          ...operation.context,
-          requestPolicy: 'cache-and-network',
-        },
-      };
+      return makeOperation(operation.kind, operation, {
+        ...operation.context,
+        requestPolicy: 'cache-and-network',
+      });
     }
 
     return operation;

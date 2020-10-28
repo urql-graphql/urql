@@ -13,6 +13,7 @@ import {
 } from 'wonka';
 
 import {
+  makeOperation,
   CombinedError,
   ExchangeInput,
   Exchange,
@@ -139,17 +140,16 @@ const makePersistedFetchSource = (
   dispatchDebug: ExchangeInput['dispatchDebug'],
   useGet: boolean
 ): Source<OperationResult> => {
-  const newOperation = {
-    ...operation,
-    context: {
-      ...operation.context,
-      preferGetMethod: useGet || operation.context.preferGetMethod,
-    },
-  };
+  const newOperation = makeOperation(operation.kind, operation, {
+    ...operation.context,
+    preferGetMethod: useGet || operation.context.preferGetMethod,
+  });
+
   const url = makeFetchURL(
     newOperation,
     body.query ? body : { ...body, query: '' }
   );
+
   const fetchOptions = makeFetchOptions(newOperation, body);
 
   dispatchDebug({

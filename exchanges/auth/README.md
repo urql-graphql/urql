@@ -18,6 +18,7 @@ You'll then need to add the `authExchange`, that this package exposes to your `u
 
 ```js
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 
 const client = createClient({
@@ -41,9 +42,10 @@ const client = createClient({
             ? operation.context.fetchOptions()
             : operation.context.fetchOptions || {};
 
-        return {
-          ...operation,
-          context: {
+        return makeOperation(
+          operation.kind,
+          operation,
+          {
             ...operation.context,
             fetchOptions: {
               ...fetchOptions,
@@ -53,7 +55,7 @@ const client = createClient({
               },
             },
           },
-        };
+        );
       },
       willAuthError: ({ authState }) => {
         if (!authState) return true;

@@ -13,7 +13,7 @@ import {
   SelectionNode,
 } from 'graphql';
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation } from '@urql/core';
+import { makeOperation, Exchange, Operation } from '@urql/core';
 
 import { warn } from './helpers/help';
 import {
@@ -61,15 +61,15 @@ export const populateExchange = ({
       );
     }
 
-    return {
-      ...op,
-      query: addFragmentsToQuery(
-        schema,
-        op.query,
-        activeSelections,
-        userFragments
-      ),
-    };
+    const newOperation = makeOperation(op.kind, op);
+    newOperation.query = addFragmentsToQuery(
+      schema,
+      op.query,
+      activeSelections,
+      userFragments
+    );
+
+    return newOperation;
   };
 
   /** Handle query and extract fragments. */

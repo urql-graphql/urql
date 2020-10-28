@@ -10,6 +10,8 @@ order: 6
 If you need `async fetchOptions` you can add an exchange that looks like this:
 
 ```js
+import { makeOperation } from '@urql/core';
+
 export const fetchOptionsExchange = (fn: any): Exchange => ({ forward }) => ops$ => {
   return pipe(
     ops$,
@@ -17,10 +19,12 @@ export const fetchOptionsExchange = (fn: any): Exchange => ({ forward }) => ops$
       const result = fn(operation.context.fetchOptions);
       return pipe(
         typeof result.then === 'function' ? fromPromise(result) : fromValue(result),
-        map((fetchOptions: RequestInit | (() => RequestInit)) => ({
-          ...operation,
-          context: { ...operation.context, fetchOptions },
-        }))
+        map((fetchOptions: RequestInit | (() => RequestInit)) => {
+          return makeOperation(operation.kind, operation, {
+            ...operation.context,
+            fetchOptions,
+          });
+        })
       );
     }),
     forward

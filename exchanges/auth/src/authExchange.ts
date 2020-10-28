@@ -22,6 +22,7 @@ import {
   CombinedError,
   Exchange,
   createRequest,
+  makeOperation,
 } from '@urql/core';
 
 import { DocumentNode } from 'graphql';
@@ -57,13 +58,11 @@ export interface AuthConfig<T> {
 const addAuthAttemptToOperation = (
   operation: Operation,
   hasAttempted: boolean
-) => ({
-  ...operation,
-  context: {
+) =>
+  makeOperation(operation.kind, operation, {
     ...operation.context,
     authAttempt: hasAttempted,
-  },
-});
+  });
 
 export function authExchange<T>({
   addAuthToOperation,
