@@ -1,4 +1,5 @@
 ---
+'@urql/preact': patch
 '@urql/exchange-execute': patch
 '@urql/exchange-graphcache': patch
 '@urql/exchange-populate': patch
