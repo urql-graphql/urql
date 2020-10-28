@@ -43,7 +43,6 @@
     "enzyme-adapter-react-16": "^1.15.2",
     "graphql": "^15.1.0",
     "graphql-tag": "^2.10.3",
-    "next": "^9.2.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-is": "^16.12.0"
