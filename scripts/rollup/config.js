@@ -58,7 +58,7 @@ const output = ({ format, isProduction }) => {
     format,
     plugins: makeOutputPlugins({
       isProduction,
-      extension,
+      extension: format === 'esm' ? '.mjs' : '.js',
     })
   };
 };
