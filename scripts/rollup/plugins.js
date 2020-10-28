@@ -18,7 +18,7 @@ import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
 
 import * as settings from './settings';
 
-export const makePlugins = ({ isProduction } = {}) => [
+export const makePlugins = () => [
   resolve({
     dedupe: settings.externalModules,
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -49,7 +49,7 @@ export const makePlugins = ({ isProduction } = {}) => [
         compilerOptions: {
           sourceMap: true,
           noEmit: false,
-          declaration: !isProduction,
+          declaration: true,
           declarationDir: settings.types,
           target: 'esnext',
         },
@@ -75,7 +75,6 @@ export const makePlugins = ({ isProduction } = {}) => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
-      'babel-plugin-modular-graphql',
       'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
@@ -93,20 +92,30 @@ export const makePlugins = ({ isProduction } = {}) => [
       }]
     ].filter(Boolean)
   }),
-  isProduction && replace({
-    'process.env.NODE_ENV': JSON.stringify('production')
-  }),
-  !settings.mayReexport && compiler({
-    formatting: 'PRETTY_PRINT',
-    compilation_level: 'SIMPLE_OPTIMIZATIONS'
-  }),
-  cleanup(),
-  isProduction ? terserMinified : terserPretty,
-  isProduction && settings.isAnalyze && visualizer({
-    filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
-    sourcemap: true,
-  }),
-].filter(Boolean);
+];
+
+export const makeOutputPlugins = ({ isProduction, extension }) => {
+  if (typeof isProduction !== 'boolean')
+    throw new Error('Missing option `isProduction` on makeOutputPlugins({ ... })');
+  if (extension !== '.mjs' && extension !== '.js')
+    throw new Error('Missing option `extension` on makeOutputPlugins({ ... })');
+
+  return [
+    isProduction && replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    !settings.mayReexport && compiler({
+      formatting: 'PRETTY_PRINT',
+      compilation_level: 'SIMPLE_OPTIMIZATIONS'
+    }),
+    cleanup({ extension }),
+    isProduction ? terserMinified : terserPretty,
+    isProduction && settings.isAnalyze && visualizer({
+      filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
+      sourcemap: true,
+    }),
+  ].filter(Boolean);
+};
 
 const terserPretty = terser({
   warnings: true,

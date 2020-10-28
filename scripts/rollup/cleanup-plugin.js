@@ -1,5 +1,6 @@
 import { transformSync as transform } from '@babel/core';
 import { createFilter } from '@rollup/pluginutils';
+import babelPluginModularGraphQL from 'babel-plugin-modular-graphql';
 
 function removeEmptyImports({ types: t }) {
   return {
@@ -36,7 +37,10 @@ function cleanup(opts = {}) {
       }
 
       return transform(code, {
-        plugins: [removeEmptyImports],
+        plugins: [
+          [babelPluginModularGraphQL, { extension: opts.extension }],
+          removeEmptyImports
+        ],
         babelrc: false
       });
     }

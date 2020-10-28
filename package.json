@@ -60,7 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
     "babel-plugin-closure-elimination": "^1.3.2",
-    "babel-plugin-modular-graphql": "0.1.3",
+    "babel-plugin-modular-graphql": "1.0.0",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "dotenv": "^8.2.0",
     "eslint": "^7.8.1",
