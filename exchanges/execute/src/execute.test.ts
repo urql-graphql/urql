@@ -175,7 +175,11 @@ describe('on thrown error', () => {
       toPromise
     );
 
-    expect(response).toMatchObject(makeErrorResult(queryOperation, errors));
+    const expected = makeErrorResult(queryOperation, errors);
+
+    expect(response.operation).toBe(expected.operation);
+    expect(response.data).toEqual(expected.data);
+    expect(response.error).toEqual(expected.error);
   });
 });
 
