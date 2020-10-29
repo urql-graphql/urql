@@ -29,7 +29,9 @@ export function withUrqlClient(
 ) {
   if (!options) options = {};
 
-  return <C extends NextComponentType = NextComponentType>(AppOrPage: C) => {
+  return <C extends NextComponentType = NextComponentType>(
+    AppOrPage: C
+  ): NextComponentType => {
     const shouldEnableSuspense = Boolean(
       (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
@@ -85,15 +87,12 @@ export function withUrqlClient(
     withUrql.displayName = `withUrqlClient(${displayName})`;
 
     if (AppOrPage.getInitialProps || options!.ssr) {
-      withUrql.getInitialProps = async (_ctx: any) => {
-        const appOrPageCtx = _ctx as PartialNextContext;
+      withUrql.getInitialProps = async (appOrPageCtx: PartialNextContext) => {
         const AppTree = appOrPageCtx.AppTree!;
 
         // Determine if we are wrapping an App component or a Page component.
         const isApp = !!appOrPageCtx.Component;
-        const ctx = isApp
-          ? (appOrPageCtx.ctx as PartialNextContext)
-          : appOrPageCtx;
+        const ctx = isApp ? appOrPageCtx.ctx! : appOrPageCtx;
 
         const ssrCache = ssrExchange({ initialState: undefined });
         const clientConfig = getClientConfig(ssrCache, ctx);
