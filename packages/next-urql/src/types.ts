@@ -1,32 +1,45 @@
 import { GraphQLError } from 'graphql';
-import { NextPageContext } from 'next';
+import { ComponentType } from 'react';
 import { ClientOptions, Exchange, Client } from 'urql';
-import { AppContext } from 'next/app';
+
+export interface PartialNextContext {
+  res?: any;
+  AppTree?: NextComponentType<PartialNextContext>;
+  Component?: NextComponentType<PartialNextContext>;
+  ctx?: PartialNextContext;
+  [key: string]: any;
+}
+
+export type NextComponentType<
+  C extends PartialNextContext = PartialNextContext,
+  IP = {},
+  P = {}
+> = ComponentType<P & WithUrqlProps> & {
+  getInitialProps?(context: C): IP | Promise<IP>;
+};
 
 export type NextUrqlClientConfig = (
   ssrExchange: SSRExchange,
-  ctx?: NextPageContext
+  ctx?: PartialNextContext
 ) => ClientOptions;
 
-export interface NextUrqlPageContext extends NextPageContext {
+export interface NextUrqlContext extends PartialNextContext {
   urqlClient: Client;
 }
 
-export interface NextUrqlAppContext extends AppContext {
-  urqlClient: Client;
-}
-
-export type NextUrqlContext = NextUrqlPageContext | NextUrqlAppContext;
+export type NextUrqlPageContext = NextUrqlContext;
+export type NextUrqlAppContext = NextUrqlContext;
 
 export interface WithUrqlState {
   urqlState?: SSRData;
 }
 
 export interface WithUrqlClient {
-  urqlClient: Client;
+  urqlClient?: Client;
 }
 
 export interface WithUrqlProps extends WithUrqlClient, WithUrqlState {
+  resetUrqlClient?: () => void;
   [key: string]: any;
 }
 
