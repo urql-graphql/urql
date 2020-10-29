@@ -38,6 +38,11 @@
       "pre-commit": "lint-staged --quiet --relative"
     }
   },
+  "resolutions": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-is": "^17.0.1"
+  },
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.26.0",
     "@babel/core": "^7.12.3",
