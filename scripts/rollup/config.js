@@ -40,9 +40,12 @@ const output = ({ format, isProduction }) => {
   if (format !== 'cjs' && format !== 'esm')
     throw new Error('Invalid option `format` at output({ ... })');
 
-  const extension = format === 'esm'
+  let extension = format === 'esm'
     ? (settings.hasReact ? '.es.js' : '.mjs')
     : '.js';
+  if (isProduction) {
+    extension = '.min' + extension;
+  }
 
   return {
     chunkFileNames: '[hash]' + extension,
