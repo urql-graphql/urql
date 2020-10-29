@@ -12,7 +12,13 @@ import {
 
 import { print } from 'graphql';
 import { authExchange } from './authExchange';
-import { CombinedError, Client, Operation, OperationResult } from '@urql/core';
+import {
+  makeOperation,
+  CombinedError,
+  Client,
+  Operation,
+  OperationResult,
+} from '@urql/core';
 import { queryOperation } from '@urql/core/test-utils';
 
 const makeExchangeArgs = () => {
@@ -42,19 +48,16 @@ const withAuthHeader = (operation, token) => {
       ? operation.context.fetchOptions()
       : operation.context.fetchOptions || {};
 
-  return {
-    ...operation,
-    context: {
-      ...operation.context,
-      fetchOptions: {
-        ...fetchOptions,
-        headers: {
-          ...fetchOptions.headers,
-          Authorization: token,
-        },
+  return makeOperation(operation.kind, operation, {
+    ...operation.context,
+    fetchOptions: {
+      ...fetchOptions,
+      headers: {
+        ...fetchOptions.headers,
+        Authorization: token,
       },
     },
-  };
+  });
 };
 
 it('adds the auth header correctly', async () => {
@@ -73,21 +76,13 @@ it('adds the auth header correctly', async () => {
     toPromise
   );
 
-  const expectedOperation = {
-    ...queryOperation,
-    context: {
-      ...queryOperation.context,
-      authAttempt: false,
-      fetchOptions: {
-        ...(queryOperation.context.fetchOptions || {}),
-        headers: {
-          Authorization: 'my-token',
-        },
-      },
+  expect(res.operation.context.authAttempt).toBe(false);
+  expect(res.operation.context.fetchOptions).toEqual({
+    ...(queryOperation.context.fetchOptions || {}),
+    headers: {
+      Authorization: 'my-token',
     },
-  };
-
-  expect(res).toEqual({ operation: expectedOperation });
+  });
 });
 
 it('adds the auth header correctly when it is fetched asynchronously', async () => {
@@ -109,21 +104,13 @@ it('adds the auth header correctly when it is fetched asynchronously', async () 
     toPromise
   );
 
-  const expectedOperation = {
-    ...queryOperation,
-    context: {
-      ...queryOperation.context,
-      authAttempt: false,
-      fetchOptions: {
-        ...(queryOperation.context.fetchOptions || {}),
-        headers: {
-          Authorization: 'async-token',
-        },
-      },
+  expect(res.operation.context.authAttempt).toBe(false);
+  expect(res.operation.context.fetchOptions).toEqual({
+    ...(queryOperation.context.fetchOptions || {}),
+    headers: {
+      Authorization: 'async-token',
     },
-  };
-
-  expect(res).toEqual({ operation: expectedOperation });
+  });
 });
 
 it('supports calls to the mutate() method in getAuth()', async () => {
@@ -146,21 +133,13 @@ it('supports calls to the mutate() method in getAuth()', async () => {
     toPromise
   );
 
-  const expectedOperation = {
-    ...queryOperation,
-    context: {
-      ...queryOperation.context,
-      authAttempt: false,
-      fetchOptions: {
-        ...(queryOperation.context.fetchOptions || {}),
-        headers: {
-          Authorization: 'async-token',
-        },
-      },
+  expect(res.operation.context.authAttempt).toBe(false);
+  expect(res.operation.context.fetchOptions).toEqual({
+    ...(queryOperation.context.fetchOptions || {}),
+    headers: {
+      Authorization: 'async-token',
     },
-  };
-
-  expect(res).toEqual({ operation: expectedOperation });
+  });
 });
 
 it('adds the same token to subsequent operations', async () => {
@@ -187,48 +166,29 @@ it('adds the same token to subsequent operations', async () => {
 
   next(queryOperation);
 
-  const secondQuery = {
-    ...queryOperation,
-    context: {
+  next(
+    makeOperation('query', queryOperation, {
       ...queryOperation.context,
       foo: 'bar',
-    },
-  };
-
-  next(secondQuery);
+    })
+  );
 
   await auth$;
   expect(result).toHaveBeenCalledTimes(2);
 
-  expect(result).nthCalledWith(1, {
-    operation: {
-      ...queryOperation,
-      context: {
-        ...queryOperation.context,
-        authAttempt: false,
-        fetchOptions: {
-          ...(queryOperation.context.fetchOptions || {}),
-          headers: {
-            Authorization: 'my-token',
-          },
-        },
-      },
+  expect(result.mock.calls[0][0].operation.context.authAttempt).toBe(false);
+  expect(result.mock.calls[0][0].operation.context.fetchOptions).toEqual({
+    ...(queryOperation.context.fetchOptions || {}),
+    headers: {
+      Authorization: 'my-token',
     },
   });
 
-  expect(result).nthCalledWith(2, {
-    operation: {
-      ...secondQuery,
-      context: {
-        ...secondQuery.context,
-        authAttempt: false,
-        fetchOptions: {
-          ...(secondQuery.context.fetchOptions || {}),
-          headers: {
-            Authorization: 'my-token',
-          },
-        },
-      },
+  expect(result.mock.calls[1][0].operation.context.authAttempt).toBe(false);
+  expect(result.mock.calls[1][0].operation.context.fetchOptions).toEqual({
+    ...(queryOperation.context.fetchOptions || {}),
+    headers: {
+      Authorization: 'my-token',
     },
   });
 });
