@@ -59,7 +59,7 @@
     "wonka": "^4.0.14"
   },
   "devDependencies": {
-    "graphql": "^15.1.0",
+    "graphql": "^15.4.0",
     "svelte": "^3.20.0"
   },
   "publishConfig": {
