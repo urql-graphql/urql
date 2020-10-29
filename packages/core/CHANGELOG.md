@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.14.1
+
+### Patch Changes
+
+- ⚠️ Fix the production build overwriting the development build. Specifically in the previous release we mistakenly replaced all development bundles with production bundles. This doesn't have any direct influence on how these packages work, but prevented development warnings from being logged or full errors from being thrown, by [@kitten](https://github.com/kitten) (See [#1097](https://github.com/FormidableLabs/urql/pull/1097))
+
 ## 1.14.0
 
 This version of `@urql/core` renames `Operation.operationName` to `Operation.kind`. For now the old
