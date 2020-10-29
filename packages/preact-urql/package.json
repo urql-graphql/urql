@@ -51,7 +51,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "@testing-library/preact": "^1.0.2",
+    "@testing-library/preact": "^2.0.0",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.10.1",
     "preact": "^10.5.5"
