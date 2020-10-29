@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+
+### Minor Changes
+
+- Update `next-urql` types to be free-standing and not depend on the types from the `next` packages, by [@kitten](https://github.com/kitten) (See [#1095](https://github.com/FormidableLabs/urql/pull/1095))
+
+### Patch Changes
+
+- Updated dependencies (See [#1045](https://github.com/FormidableLabs/urql/pull/1045))
+  - urql@1.10.2
+
 ## 2.0.0
 
 This release moves `urql` from being in `dependencies` to `peerDependencies`. Please install it

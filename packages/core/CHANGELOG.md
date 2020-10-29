@@ -1,5 +1,45 @@
 # @urql/core
 
+## 1.14.0
+
+This version of `@urql/core` renames `Operation.operationName` to `Operation.kind`. For now the old
+property is merely deprecated and will issue a warning if it's used directly. That said, all
+exchanges that are released today also need this new version of `@urql/core@>=1.14.0`, so if you
+upgrade to any of the following packages, you will also need to upgrade `@urql/core`. If you upgrade
+and see the deprecation warning, check whether all following exchanges have been upgraded:
+
+- `@urql/exchange-auth@0.1.2`
+- `@urql/exchange-execute@1.0.2`
+- `@urql/exchange-graphcache@3.1.8`
+- `@urql/exchange-multipart-fetch@0.1.10`
+- `@urql/exchange-persisted-fetch@1.2.2`
+- `@urql/exchange-populate@0.2.1`
+- `@urql/exchange-refocus@0.2.1`
+- `@urql/exchange-retry@0.1.9`
+- `@urql/exchange-suspense@1.9.2`
+
+Once you've upgraded `@urql/core` please also ensure that your package manager hasn't accidentally
+duplicated the `@urql/core` package. If you're using `npm` you can do so by running `npm dedupe`,
+and if you use `yarn` you can do so by running `yarn-deduplicate`.
+
+If you have a custom exchange, you can mute the deprecation warning by using `Operation.kind` rather
+than `Operation.operationName`. If these exchanges are copying or altering operations by spreading
+them this will also trigger the warning, which you can fix by using [the new `makeOperation` helper
+function.](https://formidable.com/open-source/urql/docs/api/core/#makeoperation)
+
+### Minor Changes
+
+- Deprecate the `Operation.operationName` property in favor of `Operation.kind`. This name was
+  previously confusing as `operationName` was effectively referring to two different things. You can
+  safely upgrade to this new version, however to mute all deprecation warnings you will have to
+  **upgrade** all `urql` packages you use. If you have custom exchanges that spread operations, please
+  use [the new `makeOperation` helper
+  function](https://formidable.com/open-source/urql/docs/api/core/#makeoperation) instead, by [@bkonkle](https://github.com/bkonkle) (See [#1045](https://github.com/FormidableLabs/urql/pull/1045))
+
+### Patch Changes
+
+- Add missing `.mjs` extension to all imports from `graphql` to fix Webpack 5 builds, which require extension-specific import paths for ESM bundles and packages. **This change allows you to safely upgrade to Webpack 5.**, by [@kitten](https://github.com/kitten) (See [#1094](https://github.com/FormidableLabs/urql/pull/1094))
+
 ## 1.13.1
 
 ### Patch Changes

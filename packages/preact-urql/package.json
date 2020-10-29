@@ -1,6 +1,6 @@
 {
   "name": "@urql/preact",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A highly customizable and versatile GraphQL client for Preact",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -61,7 +61,7 @@
     "preact": ">= 10.0.0"
   },
   "dependencies": {
-    "@urql/core": "^1.13.1",
+    "@urql/core": "^1.14.0",
     "wonka": "^4.0.14"
   },
   "publishConfig": {
