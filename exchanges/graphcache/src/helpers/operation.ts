@@ -7,18 +7,16 @@ import {
 
 // Returns the given operation result with added cacheOutcome meta field
 export const addCacheOutcome = (
-  op: Operation,
+  operation: Operation,
   outcome: CacheOutcome
-): Operation => ({
-  ...op,
-  context: {
-    ...op.context,
+): Operation =>
+  makeOperation(operation.kind, operation, {
+    ...operation.context,
     meta: {
-      ...op.context.meta,
+      ...operation.context.meta,
       cacheOutcome: outcome,
     },
-  },
-});
+  });
 
 // Copy an operation and change the requestPolicy to skip the cache
 export const toRequestPolicy = (
