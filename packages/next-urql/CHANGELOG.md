@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1
+
+### Patch Changes
+
+- ⚠️ Fix the production build overwriting the development build. Specifically in the previous release we mistakenly replaced all development bundles with production bundles. This doesn't have any direct influence on how these packages work, but prevented development warnings from being logged or full errors from being thrown, by [@kitten](https://github.com/kitten) (See [#1097](https://github.com/FormidableLabs/urql/pull/1097))
+- Updated dependencies
+  - urql@1.10.3
+
 ## 2.1.0
 
 ### Minor Changes
@@ -57,7 +65,9 @@ yarn add urql
 
 ## 1.0.1
 
-### Patch Changes
+### Patch Cho
+
+0nges
 
 - Prevent serialization of the `Client` for `withUrqlClient` even if the target component doesn't have a `getInitialProps` method. Before this caused the client to not be initialised correctly on the client-side, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#857](https://github.com/FormidableLabs/urql/pull/857))
 
