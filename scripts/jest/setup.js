@@ -17,3 +17,14 @@ global.console = {
 jest.spyOn(console, 'log');
 jest.spyOn(console, 'warn');
 jest.spyOn(console, 'error');
+
+jest.mock('../../packages/core/src/utils/deprecation.ts', () => ({
+  deprecationWarning({ message }) {
+    const error = new Error(`Deprecation Warnings are thrown in tests.\n${message}`);
+    if (!/jest-snapshot|pretty-format|jest-jasmine2/i.test(error.stack)) {
+      console.log(error.stack);
+      throw error;
+    }
+  },
+  _clearWarnings() {},
+}));

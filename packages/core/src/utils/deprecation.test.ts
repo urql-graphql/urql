@@ -1,3 +1,5 @@
+jest.unmock('./deprecation.ts');
+
 import { _clearWarnings, deprecationWarning } from './deprecation';
 
 describe('deprecationWarning()', () => {
