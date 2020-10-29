@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.1.10
+
+### Patch Changes
+
+- ⚠️ Fix a stray `operationName` deprecation warning in `@urql/exchange-graphcache`'s exchange logic, which adds the `meta.cacheOutcome` field to the operation's context, by [@kitten](https://github.com/kitten) (See [#1103](https://github.com/FormidableLabs/urql/pull/1103))
+
 ## 3.1.9
 
 ### Patch Changes
