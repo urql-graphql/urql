@@ -1,5 +1,8 @@
 ---
 '@urql/exchange-graphcache': patch
+'@urql/exchange-persisted-fetch': patch
+'@urql/exchange-multipart-fetch': patch
+'@urql/exchange-retry': patch
 '@urql/core': patch
 '@urql/preact': patch
 'urql': patch
