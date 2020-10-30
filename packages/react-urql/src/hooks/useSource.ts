@@ -10,6 +10,13 @@ type Updater<T> = (input: T) => void;
 
 let currentInit = false;
 
+const isShallowDifferent = (a: any, b: any) => {
+  if (typeof a != typeof b || typeof b != 'object') return true;
+  for (const x in a) if (!(x in b)) return true;
+  for (const x in b) if (a[x] !== b[x]) return true;
+  return false;
+};
+
 export function useSource<T, R>(
   input: T,
   transform: (input$: Source<T>) => Source<R>
@@ -22,9 +29,7 @@ export function useSource<T, R>(
 
     let prevInput = input;
     const updateInput = (input: T) => {
-      if (input !== prevInput) {
-        subject.next((prevInput = input));
-      }
+      if (input !== prevInput) subject.next((prevInput = input));
     };
 
     return [source, updateInput];
@@ -50,7 +55,9 @@ export function useSource<T, R>(
       transform(input$),
       subscribe(value => {
         if (!currentInit) {
-          setState(value);
+          setState(prevValue =>
+            isShallowDifferent(prevValue, value) ? value : prevValue
+          );
         }
       })
     );
