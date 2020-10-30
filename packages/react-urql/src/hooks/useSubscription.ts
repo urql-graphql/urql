@@ -4,7 +4,7 @@ import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 import { CombinedError, OperationContext, Operation } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource, useBehaviourSubject } from './useSource';
+import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -54,15 +54,12 @@ export function useSubscription<T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [subscription$$, update] = useBehaviourSubject(
+  const [state, update] = useSource(
     useMemo(() => (args.pause ? null : makeSubscription$()), [
       args.pause,
       makeSubscription$,
-    ])
-  );
-
-  const state = useSource(
-    useMemo(() => {
+    ]),
+    useCallback(subscription$$ => {
       return pipe(
         subscription$$,
         switchMap(subscription$ => {
@@ -99,8 +96,7 @@ export function useSubscription<T = any, R = T, V = object>(
           return { ...result, ...partial, data };
         }, initialState)
       );
-    }, [subscription$$]),
-    initialState
+    }, [])
   );
 
   // This is the imperative execute function passed to the user

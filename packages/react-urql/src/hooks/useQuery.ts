@@ -9,7 +9,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource, useBehaviourSubject } from './useSource';
+import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -58,12 +58,9 @@ export function useQuery<T = any, V = object>(
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
-  const [query$$, update] = useBehaviourSubject(
-    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$])
-  );
-
-  const state = useSource(
-    useMemo(() => {
+  const [state, update] = useSource(
+    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
+    useCallback(query$$ => {
       return pipe(
         query$$,
         switchMap(query$ => {
@@ -96,8 +93,7 @@ export function useQuery<T = any, V = object>(
           initialState
         )
       );
-    }, [query$$]),
-    initialState
+    }, [])
   );
 
   // This is the imperative execute function passed to the user
