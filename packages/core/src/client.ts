@@ -20,6 +20,9 @@ import {
   Subscription,
 } from 'wonka';
 
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { DocumentNode } from 'graphql';
+
 import { composeExchanges, defaultExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
@@ -44,8 +47,6 @@ import {
   noop,
   makeOperation,
 } from './utils';
-
-import { DocumentNode } from 'graphql';
 
 /** Options for configuring the URQL [client]{@link Client}. */
 export interface ClientOptions {
@@ -181,11 +182,11 @@ export class Client {
     requestPolicy: (opts || {}).requestPolicy || this.requestPolicy,
   });
 
-  createRequestOperation = (
+  createRequestOperation = <Data = any, Variables = object>(
     kind: OperationType,
-    request: GraphQLRequest,
+    request: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext>
-  ): Operation =>
+  ): Operation<Data, Variables> =>
     makeOperation(kind, request, this.createOperationContext(opts));
 
   /** Counts up the active operation key and dispatches the operation */
@@ -214,7 +215,9 @@ export class Client {
   }
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation(operation: Operation): Source<OperationResult> {
+  executeRequestOperation<Data = any, Variables = object>(
+    operation: Operation<Data, Variables>
+  ): Source<OperationResult<Data, Variables>> {
     const { key, kind } = operation;
     let operationResults$ = pipe(
       this.results$,
@@ -264,25 +267,28 @@ export class Client {
   }
 
   query<Data = any, Variables extends object = {}>(
-    query: DocumentNode | string,
+    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data>> {
+  ): PromisifiedSource<OperationResult<Data, Variables>> {
     if (!context || typeof context.suspense !== 'boolean') {
       context = { ...context, suspense: false };
     }
 
-    return withPromise<OperationResult<Data>>(
-      this.executeQuery(createRequest(query, variables), context)
+    return withPromise<OperationResult<Data, Variables>>(
+      this.executeQuery<Data, Variables>(
+        createRequest(query, variables),
+        context
+      )
     );
   }
 
   readQuery<Data = any, Variables extends object = {}>(
-    query: DocumentNode | string,
+    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): OperationResult<Data> | null {
-    let result: OperationResult<Data> | null = null;
+  ): OperationResult<Data, Variables> | null {
+    let result: OperationResult<Data, Variables> | null = null;
 
     pipe(
       this.executeQuery(createRequest(query, variables), context),
@@ -294,12 +300,12 @@ export class Client {
     return result;
   }
 
-  executeQuery = <Data = any>(
-    query: GraphQLRequest,
+  executeQuery = <Data = any, Variables = object>(
+    query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult<Data>> => {
+  ): Source<OperationResult<Data, Variables>> => {
     const operation = this.createRequestOperation('query', query, opts);
-    const response$ = this.executeRequestOperation(operation);
+    const response$ = this.executeRequestOperation<Data, Variables>(operation);
     const { pollInterval } = operation.context;
 
     if (pollInterval) {
@@ -313,36 +319,42 @@ export class Client {
   };
 
   subscription<Data = any, Variables extends object = {}>(
-    query: DocumentNode | string,
+    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): Source<OperationResult<Data>> {
-    return this.executeSubscription(createRequest(query, variables), context);
-  }
-
-  executeSubscription = (
-    query: GraphQLRequest,
-    opts?: Partial<OperationContext>
-  ): Source<OperationResult> => {
-    const operation = this.createRequestOperation('subscription', query, opts);
-    return this.executeRequestOperation(operation);
-  };
-
-  mutation<Data = any, Variables extends object = {}>(
-    query: DocumentNode | string,
-    variables?: Variables,
-    context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data>> {
-    return withPromise<OperationResult<Data>>(
-      this.executeMutation(createRequest(query, variables), context)
+  ): Source<OperationResult<Data, Variables>> {
+    return this.executeSubscription<Data, Variables>(
+      createRequest(query, variables),
+      context
     );
   }
 
-  executeMutation = <Data = any>(
-    query: GraphQLRequest,
+  executeSubscription = <Data = any, Variables = object>(
+    query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext>
-  ): Source<OperationResult<Data>> => {
+  ): Source<OperationResult<Data, Variables>> => {
+    const operation = this.createRequestOperation('subscription', query, opts);
+    return this.executeRequestOperation<Data, Variables>(operation);
+  };
+
+  mutation<Data = any, Variables extends object = {}>(
+    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    variables?: Variables,
+    context?: Partial<OperationContext>
+  ): PromisifiedSource<OperationResult<Data, Variables>> {
+    return withPromise<OperationResult<Data, Variables>>(
+      this.executeMutation<Data, Variables>(
+        createRequest(query, variables),
+        context
+      )
+    );
+  }
+
+  executeMutation = <Data = any, Variables = object>(
+    query: GraphQLRequest<Data, Variables>,
+    opts?: Partial<OperationContext>
+  ): Source<OperationResult<Data, Variables>> => {
     const operation = this.createRequestOperation('mutation', query, opts);
-    return this.executeRequestOperation(operation);
+    return this.executeRequestOperation<Data, Variables>(operation);
   };
 }

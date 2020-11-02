@@ -1,3 +1,4 @@
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode, Kind, parse, print } from 'graphql';
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
@@ -12,10 +13,10 @@ const hashQuery = (q: string): number =>
 
 const docs: Documents = Object.create(null);
 
-export const createRequest = (
-  q: string | DocumentNode,
-  vars?: object
-): GraphQLRequest => {
+export const createRequest = <Data = any, Variables = object>(
+  q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
+  vars?: Variables
+): GraphQLRequest<Data, Variables> => {
   let key: number;
   let query: DocumentNode;
   if (typeof q === 'string') {
