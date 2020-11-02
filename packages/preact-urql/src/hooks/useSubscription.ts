@@ -1,8 +1,12 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'preact/hooks';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
-import { CombinedError, OperationContext, Operation } from '@urql/core';
+import {
+  TypedDocumentNode,
+  CombinedError,
+  OperationContext,
+  Operation,
+} from '@urql/core';
 
 import { useClient } from '../context';
 import { useSource } from './useSource';

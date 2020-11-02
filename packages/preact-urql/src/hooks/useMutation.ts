@@ -1,9 +1,9 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { pipe, toPromise } from 'wonka';
 
 import {
+  TypedDocumentNode,
   OperationResult,
   OperationContext,
   CombinedError,

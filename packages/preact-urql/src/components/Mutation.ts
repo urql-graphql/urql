@@ -1,7 +1,10 @@
 import { VNode } from 'preact';
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
-import { OperationResult, OperationContext } from '@urql/core';
+import {
+  TypedDocumentNode,
+  OperationResult,
+  OperationContext,
+} from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
 export interface MutationProps<Data = any, Variables = object> {

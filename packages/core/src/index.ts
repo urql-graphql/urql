@@ -1,3 +1,5 @@
+export { TypedDocumentNode } from '@graphql-typed-document-node/core';
+
 export * from './client';
 export * from './exchanges';
 export * from './types';
