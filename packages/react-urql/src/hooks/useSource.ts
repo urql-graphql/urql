@@ -51,7 +51,7 @@ export function useSource<T, R>(
   });
 
   useEffect(() => {
-    pipe(
+    return pipe(
       transform(input$, prev.current),
       subscribe(value => {
         if (!currentInit) {
@@ -62,7 +62,7 @@ export function useSource<T, R>(
           });
         }
       })
-    );
+    ).unsubscribe;
   }, [input$]);
 
   useEffect(() => {
