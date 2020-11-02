@@ -1,3 +1,4 @@
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { pipe, toPromise } from 'wonka';
@@ -13,38 +14,40 @@ import {
 import { useClient } from '../context';
 import { initialState } from './constants';
 
-export interface UseMutationState<T> {
+export interface UseMutationState<Data = any, Variables = object> {
   fetching: boolean;
   stale: boolean;
-  data?: T;
+  data?: Data;
   error?: CombinedError;
   extensions?: Record<string, any>;
-  operation?: Operation;
+  operation?: Operation<Data, Variables>;
 }
 
-export type UseMutationResponse<T, V> = [
-  UseMutationState<T>,
+export type UseMutationResponse<Data = any, Variables = object> = [
+  UseMutationState<Data, Variables>,
   (
-    variables?: V,
+    variables?: Variables,
     context?: Partial<OperationContext>
-  ) => Promise<OperationResult<T>>
+  ) => Promise<OperationResult<Data, Variables>>
 ];
 
-export function useMutation<T = any, V = object>(
-  query: DocumentNode | string
-): UseMutationResponse<T, V> {
+export function useMutation<Data = any, Variables = object>(
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string
+): UseMutationResponse<Data, Variables> {
   const isMounted = useRef(true);
   const client = useClient();
 
-  const [state, setState] = useState<UseMutationState<T>>(initialState);
+  const [state, setState] = useState<UseMutationState<Data, Variables>>(
+    initialState
+  );
 
   const executeMutation = useCallback(
-    (variables?: V, context?: Partial<OperationContext>) => {
+    (variables: Variables, context?: Partial<OperationContext>) => {
       setState({ ...initialState, fetching: true });
 
       return pipe(
-        client.executeMutation(
-          createRequest(query, variables as any),
+        client.executeMutation<Data, Variables>(
+          createRequest(query, variables),
           context || {}
         ),
         toPromise

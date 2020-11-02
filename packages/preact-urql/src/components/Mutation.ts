@@ -1,26 +1,25 @@
 import { VNode } from 'preact';
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { OperationResult, OperationContext } from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
-export interface MutationProps<T, V> {
-  query: DocumentNode | string;
-  children: (arg: MutationState<T, V>) => VNode<any>;
+export interface MutationProps<Data = any, Variables = object> {
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  children: (arg: MutationState<Data, Variables>) => VNode<any>;
 }
 
-export interface MutationState<T, V> extends UseMutationState<T> {
+export interface MutationState<Data = any, Variables = object>
+  extends UseMutationState<Data, Variables> {
   executeMutation: (
-    variables?: V,
+    variables?: Variables,
     context?: Partial<OperationContext>
-  ) => Promise<OperationResult<T>>;
+  ) => Promise<OperationResult<Data, Variables>>;
 }
 
-export function Mutation<T = any, V = any>(
-  props: MutationProps<T, V>
+export function Mutation<Data = any, Variables = any>(
+  props: MutationProps<Data, Variables>
 ): VNode<any> {
-  const mutationState = useMutation<T, V>(props.query);
-  return props.children({
-    ...mutationState[0],
-    executeMutation: mutationState[1],
-  });
+  const mutation = useMutation<Data, Variables>(props.query);
+  return props.children({ ...mutation[0], executeMutation: mutation[1] });
 }
