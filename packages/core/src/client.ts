@@ -201,8 +201,12 @@ export class Client {
     const prevActive = this.activeOperations[key] || 0;
     const newActive = (this.activeOperations[key] =
       prevActive <= 0 ? 0 : prevActive - 1);
-
+    // Check whether this operation has now become inactive
     if (newActive <= 0) {
+      // Delete all related queued up operations for the inactive one
+      for (let i = this.queue.length - 1; i >= 0; i--)
+        if (this.queue[i].key === operation.key) this.queue.splice(i, 1);
+      // Issue the cancellation teardown operation
       this.dispatchOperation(
         makeOperation('teardown', operation, operation.context)
       );
