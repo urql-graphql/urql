@@ -1,3 +1,4 @@
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
@@ -8,33 +9,33 @@ import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
-export interface UseSubscriptionArgs<V> {
-  query: DocumentNode | string;
-  variables?: V;
+export interface UseSubscriptionArgs<Variables = object, Data = any> {
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  variables?: Variables;
   pause?: boolean;
   context?: Partial<OperationContext>;
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export interface UseSubscriptionState<T> {
+export interface UseSubscriptionState<Data = any, Variables = object> {
   fetching: boolean;
   stale: boolean;
-  data?: T;
+  data?: Data;
   error?: CombinedError;
   extensions?: Record<string, any>;
-  operation?: Operation;
+  operation?: Operation<Data, Variables>;
 }
 
-export type UseSubscriptionResponse<T> = [
-  UseSubscriptionState<T>,
+export type UseSubscriptionResponse<Data = any, Variables = object> = [
+  UseSubscriptionState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
 
-export function useSubscription<T = any, R = T, V = object>(
-  args: UseSubscriptionArgs<V>,
-  handler?: SubscriptionHandler<T, R>
-): UseSubscriptionResponse<R> {
+export function useSubscription<Data = any, Result = Data, Variables = object>(
+  args: UseSubscriptionArgs<Variables, Data>,
+  handler?: SubscriptionHandler<Data, Result>
+): UseSubscriptionResponse<Result, Variables> {
   const client = useClient();
 
   // Update handler on constant ref, since handler changes shouldn't
@@ -44,12 +45,15 @@ export function useSubscription<T = any, R = T, V = object>(
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
-  const request = useRequest(args.query, args.variables);
+  const request = useRequest<Data, Variables>(args.query, args.variables);
 
   // Create a new subscription-source from client.executeSubscription
   const makeSubscription$ = useCallback(
     (opts?: Partial<OperationContext>) => {
-      return client.executeSubscription(request, { ...args.context, ...opts });
+      return client.executeSubscription<Data, Variables>(request, {
+        ...args.context,
+        ...opts,
+      });
     },
     [client, request, args.context]
   );
@@ -60,32 +64,33 @@ export function useSubscription<T = any, R = T, V = object>(
       makeSubscription$,
     ]),
     useCallback(
-      (subscription$$, prevState: UseSubscriptionState<R> | undefined) => {
+      (subscription$$, prevState: UseSubscriptionState<Result> | undefined) => {
         return pipe(
           subscription$$,
           switchMap(subscription$ => {
             if (!subscription$) return fromValue({ fetching: false });
 
-            return concat([
-              // Initially set fetching to true
-              fromValue({ fetching: true, stale: false }),
-              pipe(
-                subscription$,
-                map(({ stale, data, error, extensions, operation }) => ({
-                  fetching: true,
-                  stale: !!stale,
-                  data,
-                  error,
-                  extensions,
-                  operation,
-                }))
-              ),
-              // When the source proactively closes, fetching is set to false
-              fromValue({ fetching: false, stale: false }),
-            ]);
-          }),
-          // The individual partial results are merged into each previous result
-          scan((result, partial: any) => {
+          return concat([
+            // Initially set fetching to true
+            fromValue({ fetching: true, stale: false }),
+            pipe(
+              subscription$,
+              map(({ stale, data, error, extensions, operation }) => ({
+                fetching: true,
+                stale: !!stale,
+                data,
+                error,
+                extensions,
+                operation,
+              }))
+            ),
+            // When the source proactively closes, fetching is set to false
+            fromValue({ fetching: false, stale: false }),
+          ]);
+        }),
+        // The individual partial results are merged into each previous result
+        scan(
+          (result: UseSubscriptionState<Result, Variables>, partial: any) => {
             const { current: handler } = handlerRef;
             // If a handler has been passed, it's used to merge new data in
             const data =
