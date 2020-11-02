@@ -4,13 +4,21 @@ import { Provider, createClient } from '@urql/preact';
 import { createElement } from 'preact';
 import { getStorybookExchange } from '../exchange';
 
+const { devtoolsExchange } = require('@urql/devtools');
+
 export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
   Story,
   context
 ) => {
+  const exchanges = [getStorybookExchange(context)];
+
+  if(devtoolsExchange){
+    exchanges.unshift(devtoolsExchange);
+  }
+
   const client = createClient({
     url: '/graphql',
-    exchanges: [getStorybookExchange(context)],
+    exchanges,
   });
 
   return createElement(Provider, { value: client, children: Story(context) });
