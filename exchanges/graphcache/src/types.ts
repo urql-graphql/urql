@@ -1,3 +1,4 @@
+import { TypedDocumentNode } from '@urql/core';
 import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
@@ -52,8 +53,8 @@ export interface KeyInfo {
 
 // This is an input operation
 export interface OperationRequest {
-  query: DocumentNode;
-  variables?: object;
+  query: DocumentNode | TypedDocumentNode<any, any>;
+  variables?: any;
 }
 
 export interface ResolveInfo {
@@ -67,9 +68,9 @@ export interface ResolveInfo {
   optimistic?: boolean;
 }
 
-export interface QueryInput {
-  query: string | DocumentNode;
-  variables?: Variables;
+export interface QueryInput<T = Data, V = Variables> {
+  query: string | DocumentNode | TypedDocumentNode<T, V>;
+  variables?: V;
 }
 
 export interface Cache {
@@ -99,26 +100,26 @@ export interface Cache {
   invalidate(entity: Data | string, fieldName?: string, args?: Variables): void;
 
   /** updateQuery() can be used to update the data of a given query using an updater function */
-  updateQuery(
-    input: QueryInput,
-    updater: (data: Data | null) => Data | null
+  updateQuery<T = Data, V = Variables>(
+    input: QueryInput<T, V>,
+    updater: (data: T | null) => T | null
   ): void;
 
   /** readQuery() retrieves the data for a given query */
-  readQuery(input: QueryInput): Data | null;
+  readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null;
 
   /** readFragment() retrieves the data for a given fragment, given a partial/keyable entity or an entity key */
-  readFragment(
-    fragment: DocumentNode,
-    entity: string | Data,
-    variables?: Variables
-  ): Data | null;
+  readFragment<T = Data, V = Variables>(
+    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    entity: string | Data | T,
+    variables?: V
+  ): T | null;
 
   /** writeFragment() can be used to update the data of a given fragment, given an entity that is supposed to be written using the fragment */
-  writeFragment(
-    fragment: DocumentNode,
-    data: Data,
-    variables?: Variables
+  writeFragment<T = Data, V = Variables>(
+    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    data: T,
+    variables?: V
   ): void;
 }
 

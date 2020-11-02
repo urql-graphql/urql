@@ -4,7 +4,8 @@ import {
   IntrospectionQuery,
   GraphQLSchema,
 } from 'graphql';
-import { createRequest } from '@urql/core';
+
+import { TypedDocumentNode, createRequest } from '@urql/core';
 
 import {
   Cache,
@@ -18,7 +19,6 @@ import {
   UpdateResolver,
   OptimisticMutationConfig,
   KeyingConfig,
-  DataFields,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -172,34 +172,35 @@ export class Store implements Cache {
     return entityKey !== null ? InMemoryData.inspectFields(entityKey) : [];
   }
 
-  updateQuery(
-    input: QueryInput,
-    updater: (data: Data | null) => DataFields | null
+  updateQuery<T = Data, V = Variables>(
+    input: QueryInput<T, V>,
+    updater: (data: T | null) => T | null
   ): void {
-    const request = createRequest(input.query, input.variables);
-    const output = updater(this.readQuery(request as QueryInput));
+    const request = createRequest<T, V>(input.query, input.variables as any);
+    const output = updater(this.readQuery(request));
     if (output !== null) {
-      startWrite(this, request, output as Data);
+      startWrite(this, request, output as any);
     }
   }
 
-  readQuery(input: QueryInput): Data | null {
-    return read(this, createRequest(input.query, input.variables)).data;
+  readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
+    return read(this, createRequest(input.query, input.variables!))
+      .data as T | null;
   }
 
-  readFragment(
-    dataFragment: DocumentNode,
-    entity: string | Data,
-    variables?: Variables
-  ): Data | null {
-    return readFragment(this, dataFragment, entity, variables);
+  readFragment<T = Data, V = Variables>(
+    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    entity: string | Data | T,
+    variables?: V
+  ): T | null {
+    return readFragment(this, fragment, entity, variables as any) as T | null;
   }
 
-  writeFragment(
-    dataFragment: DocumentNode,
-    data: Data,
-    variables?: Variables
+  writeFragment<T = Data, V = Variables>(
+    fragment: DocumentNode | TypedDocumentNode<T, V>,
+    data: T,
+    variables?: V
   ): void {
-    writeFragment(this, dataFragment, data, variables);
+    writeFragment(this, fragment, data, variables as any);
   }
 }
