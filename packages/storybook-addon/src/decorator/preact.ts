@@ -4,6 +4,7 @@ import { Provider, createClient } from '@urql/preact';
 import { createElement } from 'preact';
 import { getStorybookExchange } from '../exchange';
 
+/* eslint-disable */
 const { devtoolsExchange } = require('@urql/devtools');
 
 export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
@@ -12,7 +13,7 @@ export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
 ) => {
   const exchanges = [getStorybookExchange(context)];
 
-  if(devtoolsExchange){
+  if (devtoolsExchange) {
     exchanges.unshift(devtoolsExchange);
   }
 

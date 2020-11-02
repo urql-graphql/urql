@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { Provider, createClient } from 'urql';
 import { getStorybookExchange } from '../exchange';
 
+/* eslint-disable */
 const { devtoolsExchange } = require('@urql/devtools');
 
 export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
