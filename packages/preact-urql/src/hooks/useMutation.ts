@@ -42,12 +42,12 @@ export function useMutation<Data = any, Variables = object>(
   );
 
   const executeMutation = useCallback(
-    (variables: Variables, context?: Partial<OperationContext>) => {
+    (variables?: Variables, context?: Partial<OperationContext>) => {
       setState({ ...initialState, fetching: true });
 
       return pipe(
         client.executeMutation<Data, Variables>(
-          createRequest(query, variables),
+          createRequest<Data, Variables>(query, variables),
           context || {}
         ),
         toPromise
