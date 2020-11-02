@@ -4,6 +4,7 @@ import {
   createRequest,
   stringifyVariables,
   OperationContext,
+  OperationResult,
   GraphQLRequest,
 } from '@urql/core';
 
@@ -23,13 +24,14 @@ import { OperationStore, operationStore } from './operationStore';
 import { getClient } from './context';
 import { _markStoreUpdate } from './internal';
 
-interface SourceRequest extends GraphQLRequest {
+interface SourceRequest<Data = any, Variables = object>
+  extends GraphQLRequest<Data, Variables> {
   context?: Partial<OperationContext> & {
     pause?: boolean;
   };
 }
 
-const baseState: Partial<OperationStore> = {
+const baseState = {
   fetching: false,
   stale: false,
   error: undefined,
@@ -37,15 +39,15 @@ const baseState: Partial<OperationStore> = {
   extensions: undefined,
 };
 
-const toSource = (store: OperationStore) => {
-  return make<SourceRequest>(observer => {
-    let $request: void | GraphQLRequest;
+function toSource<Data, Variables>(store: OperationStore<Data, Variables>) {
+  return make<SourceRequest<Data, Variables>>(observer => {
+    let $request: void | GraphQLRequest<Data, Variables>;
     let $contextKey: void | string;
     return store.subscribe(state => {
-      const request = createRequest(
+      const request = createRequest<Data, Variables>(
         state.query,
-        state.variables as any
-      ) as SourceRequest;
+        state.variables!
+      ) as SourceRequest<Data, Variables>;
 
       const contextKey = stringifyVariables((request.context = state.context));
 
@@ -61,36 +63,34 @@ const toSource = (store: OperationStore) => {
       }
     });
   });
-};
+}
 
-export function query<T = any, V = object>(
-  store: OperationStore<T, V>
-): OperationStore<T, V> {
+export function query<Data = any, Variables = object>(
+  store: OperationStore<Data, Variables>
+): OperationStore<Data, Variables> {
   const client = getClient();
   const subscription = pipe(
     toSource(store),
-    switchMap(
-      (request): Source<Partial<OperationStore>> => {
-        if (request.context && request.context.pause) {
-          return fromValue({ fetching: false, stale: false });
-        }
-
-        return concat<Partial<OperationStore>>([
-          fromValue({ fetching: true, stale: false }),
-          pipe(
-            client.executeQuery(request, request.context!),
-            map(result => ({
-              fetching: false,
-              ...result,
-              stale: !!result.stale,
-            }))
-          ),
-          fromValue({ fetching: false, stale: false }),
-        ]);
+    switchMap(request => {
+      if (request.context && request.context.pause) {
+        return fromValue({ fetching: false, stale: false });
       }
-    ),
+
+      return concat([
+        fromValue({ fetching: true, stale: false }),
+        pipe(
+          client.executeQuery<Data, Variables>(request, request.context!),
+          map(result => ({
+            fetching: false,
+            ...result,
+            stale: !!result.stale,
+          }))
+        ),
+        fromValue({ fetching: false, stale: false }),
+      ]);
+    }),
     scan(
-      (result, partial) => ({
+      (result: Partial<OperationResult<Data, Variables>>, partial) => ({
         ...result,
         ...partial,
       }),
@@ -108,10 +108,10 @@ export function query<T = any, V = object>(
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export function subscription<T = any, R = T, V = object>(
-  store: OperationStore<T, V>,
-  handler?: SubscriptionHandler<T, R>
-): OperationStore<T, V> {
+export function subscription<Data = any, Result = Data, Variables = object>(
+  store: OperationStore<Result, Variables>,
+  handler?: SubscriptionHandler<Data, Result>
+): OperationStore<Result, Variables> {
   const client = getClient();
   const subscription = pipe(
     toSource(store),
@@ -128,18 +128,21 @@ export function subscription<T = any, R = T, V = object>(
         ]);
       }
     ),
-    scan((result, partial: any) => {
-      const data =
-        partial.data !== undefined
-          ? typeof handler === 'function'
-            ? handler(result.data, partial.data)
-            : partial.data
-          : result.data;
-      return { ...result, ...partial, data, stale: false };
-    }, baseState),
+    scan(
+      (result: Partial<OperationResult<Result, Variables>>, partial: any) => {
+        const data =
+          partial.data !== undefined
+            ? typeof handler === 'function'
+              ? handler(result.data, partial.data)
+              : partial.data
+            : result.data;
+        return { ...result, ...partial, data, stale: false };
+      },
+      baseState
+    ),
     subscribe(update => {
       _markStoreUpdate(update);
-      store.set(update as OperationStore);
+      store.set(update);
     })
   );
 
@@ -147,20 +150,20 @@ export function subscription<T = any, R = T, V = object>(
   return store;
 }
 
-export type ExecuteMutation<T = any, V = object> = (
-  variables?: V,
+export type ExecuteMutation<Data = any, Variables = object> = (
+  variables?: Variables,
   context?: Partial<OperationContext>
-) => Promise<OperationStore<T, V>>;
+) => Promise<OperationStore<Data, Variables>>;
 
-export function mutation<T = any, V = object>(
-  input: GraphQLRequest | OperationStore<T, V>
-): ExecuteMutation<V> {
+export function mutation<Data = any, Variables = object>(
+  input: GraphQLRequest<Data, Variables> | OperationStore<Data, Variables>
+): ExecuteMutation<Data, Variables> {
   const client = getClient();
 
   const store =
     typeof (input as any).subscribe !== 'function'
-      ? operationStore(input.query, input.variables)
-      : (input as OperationStore);
+      ? operationStore<Data, Variables>(input.query, input.variables)
+      : (input as OperationStore<Data, Variables>);
 
   return (vars, context) => {
     const update = {
@@ -172,16 +175,14 @@ export function mutation<T = any, V = object>(
     _markStoreUpdate(update);
     store.set(update);
 
-    return new Promise(resolve => {
-      client
-        .mutation(store.query, store.variables, store.context)
-        .toPromise()
-        .then(result => {
-          const update = { fetching: false, ...result };
-          _markStoreUpdate(update);
-          store.set(update);
-          resolve(store);
-        });
-    });
+    return client
+      .mutation(store.query, store.variables as any, store.context)
+      .toPromise()
+      .then(result => {
+        const update = { fetching: false, ...result };
+        _markStoreUpdate(update);
+        store.set(update);
+        return store;
+      });
   };
 }
