@@ -1,6 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+
 import {
   CombinedError,
   OperationContext,
@@ -60,7 +61,7 @@ export function useQuery<T = any, V = object>(
 
   const [state, update] = useSource(
     useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
-    useCallback(query$$ => {
+    useCallback((query$$, prevState: UseQueryState<T> | undefined) => {
       return pipe(
         query$$,
         switchMap(query$ => {
@@ -90,7 +91,7 @@ export function useQuery<T = any, V = object>(
             ...result,
             ...partial,
           }),
-          initialState
+          prevState || initialState
         )
       );
     }, [])

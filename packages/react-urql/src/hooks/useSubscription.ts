@@ -59,44 +59,47 @@ export function useSubscription<T = any, R = T, V = object>(
       args.pause,
       makeSubscription$,
     ]),
-    useCallback(subscription$$ => {
-      return pipe(
-        subscription$$,
-        switchMap(subscription$ => {
-          if (!subscription$) return fromValue({ fetching: false });
+    useCallback(
+      (subscription$$, prevState: UseSubscriptionState<R> | undefined) => {
+        return pipe(
+          subscription$$,
+          switchMap(subscription$ => {
+            if (!subscription$) return fromValue({ fetching: false });
 
-          return concat([
-            // Initially set fetching to true
-            fromValue({ fetching: true, stale: false }),
-            pipe(
-              subscription$,
-              map(({ stale, data, error, extensions, operation }) => ({
-                fetching: true,
-                stale: !!stale,
-                data,
-                error,
-                extensions,
-                operation,
-              }))
-            ),
-            // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false, stale: false }),
-          ]);
-        }),
-        // The individual partial results are merged into each previous result
-        scan((result, partial: any) => {
-          const { current: handler } = handlerRef;
-          // If a handler has been passed, it's used to merge new data in
-          const data =
-            partial.data !== undefined
-              ? typeof handler === 'function'
-                ? handler(result.data, partial.data)
-                : partial.data
-              : result.data;
-          return { ...result, ...partial, data };
-        }, initialState)
-      );
-    }, [])
+            return concat([
+              // Initially set fetching to true
+              fromValue({ fetching: true, stale: false }),
+              pipe(
+                subscription$,
+                map(({ stale, data, error, extensions, operation }) => ({
+                  fetching: true,
+                  stale: !!stale,
+                  data,
+                  error,
+                  extensions,
+                  operation,
+                }))
+              ),
+              // When the source proactively closes, fetching is set to false
+              fromValue({ fetching: false, stale: false }),
+            ]);
+          }),
+          // The individual partial results are merged into each previous result
+          scan((result, partial: any) => {
+            const { current: handler } = handlerRef;
+            // If a handler has been passed, it's used to merge new data in
+            const data =
+              partial.data !== undefined
+                ? typeof handler === 'function'
+                  ? handler(result.data, partial.data)
+                  : partial.data
+                : result.data;
+            return { ...result, ...partial, data };
+          }, prevState || initialState)
+        );
+      },
+      []
+    )
   );
 
   // This is the imperative execute function passed to the user
