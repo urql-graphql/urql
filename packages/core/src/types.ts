@@ -28,7 +28,7 @@ export interface GraphQLRequest<Data = any, Variables = object> {
   /** Unique identifier of the request. */
   key: number;
   query: DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: object;
+  variables?: Variables;
 }
 
 /** Metadata that is only available in development for devtools. */
@@ -54,7 +54,7 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation<Data = any, Variables = object>
+export interface Operation<Data = any, Variables = any>
   extends GraphQLRequest<Data, Variables> {
   readonly kind: OperationType;
   context: OperationContext;
@@ -64,7 +64,7 @@ export interface Operation<Data = any, Variables = object>
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface OperationResult<Data = any, Variables = object> {
+export interface OperationResult<Data = any, Variables = any> {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation<Data, Variables>;
   /** The data returned from the Graphql server. */

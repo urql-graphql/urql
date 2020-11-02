@@ -187,7 +187,11 @@ export class Client {
     request: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext>
   ): Operation<Data, Variables> =>
-    makeOperation(kind, request, this.createOperationContext(opts));
+    makeOperation<Data, Variables>(
+      kind,
+      request,
+      this.createOperationContext(opts)
+    );
 
   /** Counts up the active operation key and dispatches the operation */
   private onOperationStart(operation: Operation) {
@@ -222,7 +226,7 @@ export class Client {
     let operationResults$ = pipe(
       this.results$,
       filter((res: OperationResult) => res.operation.key === key)
-    );
+    ) as Source<OperationResult<Data, Variables>>;
 
     if (this.maskTypename) {
       operationResults$ = pipe(

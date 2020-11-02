@@ -37,7 +37,7 @@ export const createRequest = <Data = any, Variables = object>(
   return {
     key: vars ? phash(key, stringifyVariables(vars)) >>> 0 : key,
     query,
-    variables: vars || {},
+    variables: vars || ({} as Variables),
   };
 };
 
