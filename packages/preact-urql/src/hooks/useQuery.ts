@@ -62,40 +62,43 @@ export function useQuery<Data = any, Variables = object>(
 
   const [state, update] = useSource(
     useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
-    useCallback((query$$, prevState: UseQueryState<T> | undefined) => {
-      return pipe(
-        query$$,
-        switchMap(query$ => {
-          if (!query$) return fromValue({ fetching: false, stale: false });
+    useCallback(
+      (query$$, prevState: UseQueryState<Data, Variables> | undefined) => {
+        return pipe(
+          query$$,
+          switchMap(query$ => {
+            if (!query$) return fromValue({ fetching: false, stale: false });
 
-          return concat([
-            // Initially set fetching to true
-            fromValue({ fetching: true, stale: false }),
-            pipe(
-              query$,
-              map(({ stale, data, error, extensions, operation }) => ({
-                fetching: false,
-                stale: !!stale,
-                data,
-                error,
-                operation,
-                extensions,
-              }))
-            ),
-            // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false, stale: false }),
-          ]);
-        }),
-        // The individual partial results are merged into each previous result
-        scan(
-          (result: UseQueryState<Data, Variables>, partial) => ({
-            ...result,
-            ...partial,
+            return concat([
+              // Initially set fetching to true
+              fromValue({ fetching: true, stale: false }),
+              pipe(
+                query$,
+                map(({ stale, data, error, extensions, operation }) => ({
+                  fetching: false,
+                  stale: !!stale,
+                  data,
+                  error,
+                  operation,
+                  extensions,
+                }))
+              ),
+              // When the source proactively closes, fetching is set to false
+              fromValue({ fetching: false, stale: false }),
+            ]);
           }),
-          prevState || initialState
-        )
-      );
-    }, [])
+          // The individual partial results are merged into each previous result
+          scan(
+            (result: UseQueryState<Data, Variables>, partial) => ({
+              ...result,
+              ...partial,
+            }),
+            prevState || initialState
+          )
+        );
+      },
+      []
+    )
   );
 
   // This is the imperative execute function passed to the user
