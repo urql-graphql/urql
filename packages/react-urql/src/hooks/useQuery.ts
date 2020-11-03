@@ -1,6 +1,7 @@
 import { DocumentNode } from 'graphql';
 import { useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+
 import {
   CombinedError,
   OperationContext,
@@ -9,7 +10,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource, useBehaviourSubject } from './useSource';
+import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -58,12 +59,9 @@ export function useQuery<T = any, V = object>(
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
-  const [query$$, update] = useBehaviourSubject(
-    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$])
-  );
-
-  const state = useSource(
-    useMemo(() => {
+  const [state, update] = useSource(
+    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
+    useCallback((query$$, prevState: UseQueryState<T> | undefined) => {
       return pipe(
         query$$,
         switchMap(query$ => {
@@ -93,11 +91,10 @@ export function useQuery<T = any, V = object>(
             ...result,
             ...partial,
           }),
-          initialState
+          prevState || initialState
         )
       );
-    }, [query$$]),
-    initialState
+    }, [])
   );
 
   // This is the imperative execute function passed to the user

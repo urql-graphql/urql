@@ -4,7 +4,7 @@ import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 import { CombinedError, OperationContext, Operation } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource, useBehaviourSubject } from './useSource';
+import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -54,53 +54,52 @@ export function useSubscription<T = any, R = T, V = object>(
     [client, request, args.context]
   );
 
-  const [subscription$$, update] = useBehaviourSubject(
+  const [state, update] = useSource(
     useMemo(() => (args.pause ? null : makeSubscription$()), [
       args.pause,
       makeSubscription$,
-    ])
-  );
+    ]),
+    useCallback(
+      (subscription$$, prevState: UseSubscriptionState<R> | undefined) => {
+        return pipe(
+          subscription$$,
+          switchMap(subscription$ => {
+            if (!subscription$) return fromValue({ fetching: false });
 
-  const state = useSource(
-    useMemo(() => {
-      return pipe(
-        subscription$$,
-        switchMap(subscription$ => {
-          if (!subscription$) return fromValue({ fetching: false });
-
-          return concat([
-            // Initially set fetching to true
-            fromValue({ fetching: true, stale: false }),
-            pipe(
-              subscription$,
-              map(({ stale, data, error, extensions, operation }) => ({
-                fetching: true,
-                stale: !!stale,
-                data,
-                error,
-                extensions,
-                operation,
-              }))
-            ),
-            // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false, stale: false }),
-          ]);
-        }),
-        // The individual partial results are merged into each previous result
-        scan((result, partial: any) => {
-          const { current: handler } = handlerRef;
-          // If a handler has been passed, it's used to merge new data in
-          const data =
-            partial.data !== undefined
-              ? typeof handler === 'function'
-                ? handler(result.data, partial.data)
-                : partial.data
-              : result.data;
-          return { ...result, ...partial, data };
-        }, initialState)
-      );
-    }, [subscription$$]),
-    initialState
+            return concat([
+              // Initially set fetching to true
+              fromValue({ fetching: true, stale: false }),
+              pipe(
+                subscription$,
+                map(({ stale, data, error, extensions, operation }) => ({
+                  fetching: true,
+                  stale: !!stale,
+                  data,
+                  error,
+                  extensions,
+                  operation,
+                }))
+              ),
+              // When the source proactively closes, fetching is set to false
+              fromValue({ fetching: false, stale: false }),
+            ]);
+          }),
+          // The individual partial results are merged into each previous result
+          scan((result, partial: any) => {
+            const { current: handler } = handlerRef;
+            // If a handler has been passed, it's used to merge new data in
+            const data =
+              partial.data !== undefined
+                ? typeof handler === 'function'
+                  ? handler(result.data, partial.data)
+                  : partial.data
+                : result.data;
+            return { ...result, ...partial, data };
+          }, prevState || initialState)
+        );
+      },
+      []
+    )
   );
 
   // This is the imperative execute function passed to the user
