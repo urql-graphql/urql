@@ -8,21 +8,30 @@ import {
   SubscriptionHandler,
 } from '../hooks';
 
-export interface SubscriptionProps<T, R, V> extends UseSubscriptionArgs<V> {
-  handler?: SubscriptionHandler<T, R>;
-  children: (arg: SubscriptionState<R>) => ReactElement<any>;
+export interface SubscriptionProps<
+  Data = any,
+  Result = Data,
+  Variables = object
+> extends UseSubscriptionArgs<Variables, Data> {
+  handler?: SubscriptionHandler<Data, Result>;
+  children: (arg: SubscriptionState<Result, Variables>) => ReactElement<any>;
 }
 
-export interface SubscriptionState<T> extends UseSubscriptionState<T> {
+export interface SubscriptionState<Data = any, Variables = object>
+  extends UseSubscriptionState<Data, Variables> {
   executeSubscription: (opts?: Partial<OperationContext>) => void;
 }
 
-export function Subscription<T = any, R = T, V = any>(
-  props: SubscriptionProps<T, R, V>
+export function Subscription<Data = any, Result = Data, Variables = object>(
+  props: SubscriptionProps<Data, Result, Variables>
 ): ReactElement<any> {
-  const [state, executeSubscription] = useSubscription<T, R, V>(
+  const subscription = useSubscription<Data, Result, Variables>(
     props,
     props.handler
   );
-  return props.children({ ...state, executeSubscription });
+
+  return props.children({
+    ...subscription[0],
+    executeSubscription: subscription[1],
+  });
 }

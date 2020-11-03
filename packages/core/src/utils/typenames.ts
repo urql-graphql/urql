@@ -59,7 +59,7 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   }
 };
 
-export const formatDocument = (node: DocumentNode): DocumentNode => {
+export const formatDocument = <T extends DocumentNode>(node: T): T => {
   const result = visit(node, {
     Field: formatNode,
     InlineFragment: formatNode,

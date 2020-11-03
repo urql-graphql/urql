@@ -1,5 +1,6 @@
 import { Readable, writable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { OperationContext, CombinedError } from '@urql/core';
 
 import { _storeUpdate } from './internal';
@@ -15,8 +16,8 @@ type Updater<T> = (value: T) => T;
 export interface OperationStore<Data = any, Vars = any>
   extends Readable<OperationStore<Data, Vars>> {
   // Input properties
-  query: DocumentNode | string;
-  variables: Vars | undefined | null;
+  query: DocumentNode | TypedDocumentNode<Data, Vars> | string;
+  variables: Vars | null;
   context: Partial<OperationContext> | undefined;
   // Output properties
   readonly stale: boolean;
@@ -30,13 +31,13 @@ export interface OperationStore<Data = any, Vars = any>
 }
 
 export function operationStore<Data = any, Vars = object>(
-  query: string | DocumentNode,
+  query: string | DocumentNode | TypedDocumentNode<Data, Vars>,
   variables?: Vars | null,
   context?: Partial<OperationContext & { pause: boolean }>
 ): OperationStore<Data, Vars> {
   const internal = {
     query,
-    variables,
+    variables: variables || null,
     context,
   };
 

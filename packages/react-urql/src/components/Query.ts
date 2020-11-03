@@ -2,17 +2,19 @@ import { ReactElement } from 'react';
 import { OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from '../hooks';
 
-export interface QueryProps<T, V> extends UseQueryArgs<V> {
-  children: (arg: QueryState<T>) => ReactElement<any>;
+export interface QueryProps<Data = any, Variables = object>
+  extends UseQueryArgs<Variables, Data> {
+  children: (arg: QueryState<Data, Variables>) => ReactElement<any>;
 }
 
-export interface QueryState<T> extends UseQueryState<T> {
+export interface QueryState<Data = any, Variables = object>
+  extends UseQueryState<Data, Variables> {
   executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 
-export function Query<T = any, V = any>(
-  props: QueryProps<T, V>
+export function Query<Data = any, Variables = any>(
+  props: QueryProps<Data, Variables>
 ): ReactElement<any> {
-  const [state, executeQuery] = useQuery<T, V>(props);
-  return props.children({ ...state, executeQuery });
+  const query = useQuery<Data, Variables>(props);
+  return props.children({ ...query[0], executeQuery: query[1] });
 }

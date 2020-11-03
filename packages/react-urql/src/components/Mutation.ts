@@ -1,23 +1,28 @@
-import { ReactElement } from 'react';
 import { DocumentNode } from 'graphql';
-import { OperationResult, OperationContext } from '@urql/core';
+import { ReactElement } from 'react';
+import {
+  TypedDocumentNode,
+  OperationResult,
+  OperationContext,
+} from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
-export interface MutationProps<T, V> {
-  query: DocumentNode | string;
-  children: (arg: MutationState<T, V>) => ReactElement<any>;
+export interface MutationProps<Data = any, Variables = object> {
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  children: (arg: MutationState<Data, Variables>) => ReactElement<any>;
 }
 
-export interface MutationState<T, V> extends UseMutationState<T> {
+export interface MutationState<Data = any, Variables = object>
+  extends UseMutationState<Data, Variables> {
   executeMutation: (
-    variables?: V,
+    variables?: Variables,
     context?: Partial<OperationContext>
-  ) => Promise<OperationResult<T>>;
+  ) => Promise<OperationResult<Data, Variables>>;
 }
 
-export function Mutation<T = any, V = any>(
-  props: MutationProps<T, V>
+export function Mutation<Data = any, Variables = any>(
+  props: MutationProps<Data, Variables>
 ): ReactElement<any> {
-  const [state, executeMutation] = useMutation<T, V>(props.query);
-  return props.children({ ...state, executeMutation });
+  const mutation = useMutation<Data, Variables>(props.query);
+  return props.children({ ...mutation[0], executeMutation: mutation[1] });
 }

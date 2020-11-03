@@ -1,3 +1,4 @@
+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
@@ -23,11 +24,11 @@ export type RequestPolicy =
 export type CacheOutcome = 'miss' | 'partial' | 'hit';
 
 /** A Graphql query, mutation, or subscription. */
-export interface GraphQLRequest {
+export interface GraphQLRequest<Data = any, Variables = object> {
   /** Unique identifier of the request. */
   key: number;
-  query: DocumentNode;
-  variables?: object;
+  query: DocumentNode | TypedDocumentNode<Data, Variables>;
+  variables?: Variables;
 }
 
 /** Metadata that is only available in development for devtools. */
@@ -53,7 +54,8 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation extends GraphQLRequest {
+export interface Operation<Data = any, Variables = any>
+  extends GraphQLRequest<Data, Variables> {
   readonly kind: OperationType;
   context: OperationContext;
 
@@ -62,9 +64,9 @@ export interface Operation extends GraphQLRequest {
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface OperationResult<Data = any> {
+export interface OperationResult<Data = any, Variables = any> {
   /** The [operation]{@link Operation} which has been executed. */
-  operation: Operation;
+  operation: Operation<Data, Variables>;
   /** The data returned from the Graphql server. */
   data?: Data;
   /** Any errors resulting from the operation. */

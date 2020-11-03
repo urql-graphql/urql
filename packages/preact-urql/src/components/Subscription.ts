@@ -1,5 +1,6 @@
 import { VNode } from 'preact';
 import { OperationContext } from '@urql/core';
+
 import {
   useSubscription,
   UseSubscriptionArgs,
@@ -7,21 +8,30 @@ import {
   SubscriptionHandler,
 } from '../hooks';
 
-export interface SubscriptionProps<T, R, V> extends UseSubscriptionArgs<V> {
-  handler?: SubscriptionHandler<T, R>;
-  children: (arg: SubscriptionState<R>) => VNode<any>;
+export interface SubscriptionProps<
+  Data = any,
+  Result = Data,
+  Variables = object
+> extends UseSubscriptionArgs<Variables, Data> {
+  handler?: SubscriptionHandler<Data, Result>;
+  children: (arg: SubscriptionState<Result, Variables>) => VNode<any>;
 }
 
-export interface SubscriptionState<T> extends UseSubscriptionState<T> {
+export interface SubscriptionState<Data = any, Variables = object>
+  extends UseSubscriptionState<Data, Variables> {
   executeSubscription: (opts?: Partial<OperationContext>) => void;
 }
 
-export function Subscription<T = any, R = T, V = any>(
-  props: SubscriptionProps<T, R, V>
+export function Subscription<Data = any, Result = Data, Variables = object>(
+  props: SubscriptionProps<Data, Result, Variables>
 ): VNode<any> {
-  const subscriptionState = useSubscription<T, R, V>(props, props.handler);
+  const subscription = useSubscription<Data, Result, Variables>(
+    props,
+    props.handler
+  );
+
   return props.children({
-    ...subscriptionState[0],
-    executeSubscription: subscriptionState[1],
+    ...subscription[0],
+    executeSubscription: subscription[1],
   });
 }

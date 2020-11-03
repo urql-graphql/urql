@@ -15,16 +15,17 @@ const DEPRECATED: Record<string, Warning> = {
   },
 };
 
-function makeOperation(
+function makeOperation<Data = any, Variables = object>(
   kind: OperationType,
-  request: GraphQLRequest,
+  request: GraphQLRequest<Data, Variables>,
   context: OperationContext
-): Operation;
-function makeOperation(
+): Operation<Data, Variables>;
+
+function makeOperation<Data = any, Variables = object>(
   kind: OperationType,
-  request: Operation,
+  request: Operation<Data, Variables>,
   context?: OperationContext
-): Operation;
+): Operation<Data, Variables>;
 
 function makeOperation(kind, request, context) {
   if (!context) context = request.context;
