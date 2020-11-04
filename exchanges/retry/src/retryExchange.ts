@@ -24,7 +24,7 @@ interface RetryExchangeOptions {
   randomDelay?: boolean;
   maxNumberAttempts?: number;
   /** Conditionally determine whether an error should be retried */
-  retryIf?: (e: CombinedError) => boolean;
+  retryIf?: (error: CombinedError, operation: Operation) => boolean;
 }
 
 export const retryExchange = ({
@@ -106,7 +106,7 @@ export const retryExchange = ({
       filter(res => {
         // Only retry if the error passes the conditional retryIf function (if passed)
         // or if the error contains a networkError
-        if (!res.error || !retryIf(res.error)) {
+        if (!res.error || !retryIf(res.error, res.operation)) {
           return true;
         }
 
