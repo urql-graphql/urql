@@ -70,10 +70,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   const [state, update] = useSource(
     subscription$,
     useCallback(
-      (
-        subscription$$,
-        prevState: UseSubscriptionState<Result, Variables> | undefined
-      ) => {
+      (subscription$$, prevState?: UseSubscriptionState<Result, Variables>) => {
         return pipe(
           subscription$$,
           switchMap(subscription$ => {

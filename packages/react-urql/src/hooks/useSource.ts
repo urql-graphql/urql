@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useMemo, useEffect, useState, useRef } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 
 import { Source, fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
 
@@ -17,10 +17,8 @@ const isShallowDifferent = (a: any, b: any) => {
 
 export function useSource<T, R>(
   input: T,
-  transform: (input$: Source<T>, initial: R | undefined) => Source<R>
+  transform: (input$: Source<T>, initial?: R) => Source<R>
 ): [R, Updater<T>] {
-  const prev = useRef<R>();
-
   const [input$, updateInput] = useMemo((): [Source<T>, (value: T) => void] => {
     const subject = makeSubject<T>();
     const source = concat([fromValue(input), subject.source]);
@@ -34,32 +32,29 @@ export function useSource<T, R>(
 
   const [state, setState] = useState<R>(() => {
     currentInit = true;
-
+    let state: R;
     pipe(
-      transform(fromValue(input), prev.current),
+      transform(fromValue(input)),
       subscribe(value => {
-        prev.current = value;
+        state = value;
       })
     ).unsubscribe();
-
     currentInit = false;
-    return prev.current!;
+    return state!;
   });
 
   useEffect(() => {
     return pipe(
-      transform(input$, prev.current),
+      transform(input$, state),
       subscribe(value => {
         if (!currentInit) {
           setState(prevValue => {
-            return (prev.current = isShallowDifferent(prevValue, value)
-              ? value
-              : prevValue);
+            return isShallowDifferent(prevValue, value) ? value : prevValue;
           });
         }
       })
     ).unsubscribe;
-  }, [input$]);
+  }, [input$ /* `state` is only an initialiser */]);
 
   return [state, updateInput];
 }
