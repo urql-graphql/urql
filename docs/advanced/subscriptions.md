@@ -69,6 +69,45 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 
 [Read more about `subscription-transport-ws` on its README.](https://github.com/apollographql/subscriptions-transport-ws/blob/master/README.md)
 
+
+## Setting up `graphql-ws`
+
+If your GraphQL API server is using [graphql-ws](https://github.com/enisdenjo/graphql-ws),
+you'll be able to use it here too!
+
+```js
+import { createClient, defaultExchanges, subscriptionExchange } from 'urql';
+import { createClient as createGraphqlWsClient } from 'graphql-ws';
+
+const wsClient = createGraphqlWsClient({
+  url: 'wss://localhost/graphql',
+});
+
+const client = createClient({
+  url: '/graphql',
+  exchanges: [
+    ...defaultExchanges,
+    subscriptionExchange({
+      forwardSubscription(operation) {
+        return {
+          subscribe: (sink) => {
+            const dispose = wsClient.subscribe(operation, sink);
+            return {
+              unsubscribe: dispose,
+            };
+          },
+        };
+      },
+    }),
+  ],
+});
+```
+
+We create a WebSocket client with the necessary options and use the `subscribe` method from it to
+create a Subscription Observable, which we return to the `subscriptionExchange` inside `forwardSubscription`.
+
+[Read more on the `graphql-ws` README.](https://github.com/enisdenjo/graphql-ws/blob/master/README.md)
+
 ## React & Preact
 
 The `useSubscription` hooks comes with a similar API to `useQuery`, which [we've learned about in
