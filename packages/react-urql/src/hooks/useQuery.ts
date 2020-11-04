@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import {
@@ -60,8 +60,12 @@ export function useQuery<Data = any, Variables = object>(
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
 
+  const query$ = useMemo(() => {
+    return args.pause ? null : makeQuery$();
+  }, [args.pause, makeQuery$]);
+
   const [state, update] = useSource(
-    useMemo(() => (args.pause ? null : makeQuery$()), [args.pause, makeQuery$]),
+    query$,
     useCallback(
       (query$$, prevState: UseQueryState<Data, Variables> | undefined) => {
         return pipe(
@@ -106,6 +110,12 @@ export function useQuery<Data = any, Variables = object>(
     (opts?: Partial<OperationContext>) => update(makeQuery$(opts)),
     [update, makeQuery$]
   );
+
+  useEffect(() => {
+    if (!client.suspense) update(query$);
+  }, [update, query$]);
+
+  if (client.suspense) update(query$);
 
   return [state, executeQuery];
 }

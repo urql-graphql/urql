@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import {
@@ -63,11 +63,12 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     [client, request, args.context]
   );
 
+  const subscription$ = useMemo(() => {
+    return args.pause ? null : makeSubscription$();
+  }, [args.pause, makeSubscription$]);
+
   const [state, update] = useSource(
-    useMemo(() => (args.pause ? null : makeSubscription$()), [
-      args.pause,
-      makeSubscription$,
-    ]),
+    subscription$,
     useCallback(
       (
         subscription$$,
@@ -122,6 +123,10 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
     [update, makeSubscription$]
   );
+
+  useEffect(() => {
+    update(subscription$);
+  }, [update, subscription$]);
 
   return [state, executeSubscription];
 }

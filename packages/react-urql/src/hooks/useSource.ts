@@ -4,8 +4,6 @@ import { useMemo, useEffect, useState, useRef } from 'react';
 
 import { Source, fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
 
-import { useClient } from '../context';
-
 type Updater<T> = (input: T) => void;
 
 let currentInit = false;
@@ -21,7 +19,6 @@ export function useSource<T, R>(
   input: T,
   transform: (input$: Source<T>, initial: R | undefined) => Source<R>
 ): [R, Updater<T>] {
-  const client = useClient();
   const prev = useRef<R>();
 
   const [input$, updateInput] = useMemo((): [Source<T>, (value: T) => void] => {
@@ -64,12 +61,6 @@ export function useSource<T, R>(
       })
     ).unsubscribe;
   }, [input$]);
-
-  useEffect(() => {
-    if (!client.suspense) updateInput(input);
-  }, [updateInput, input]);
-
-  if (client.suspense) updateInput(input);
 
   return [state, updateInput];
 }
