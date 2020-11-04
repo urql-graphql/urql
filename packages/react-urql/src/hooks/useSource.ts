@@ -25,9 +25,8 @@ export function useSource<T, R>(
     const subject = makeSubject<T>();
     const source = concat([fromValue(input), subject.source]);
 
-    let prevInput = input;
-    const updateInput = (input: T) => {
-      if (input !== prevInput) subject.next((prevInput = input));
+    const updateInput = (nextInput: T) => {
+      if (nextInput !== input) subject.next((input = nextInput));
     };
 
     return [source, updateInput];
