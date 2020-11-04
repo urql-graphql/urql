@@ -116,7 +116,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
   next(op);
 
   expect(mockRetryIf).toHaveBeenCalledTimes(1);
-  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError, op);
 
   jest.runAllTimers();
 
@@ -131,7 +131,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
 
   jest.runAllTimers();
 
-  expect(mockRetryIf).toHaveBeenCalledWith(queryTwoError);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryTwoError, opTwo);
 
   // max number of retries for each op
   expect(response).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts * 2);
@@ -176,7 +176,7 @@ it('should retry x number of times and then return the successful result', () =>
   jest.runAllTimers();
 
   expect(mockRetryIf).toHaveBeenCalledTimes(numberRetriesBeforeSuccess);
-  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError, op);
 
   // one for original source, one for retry
   expect(response).toHaveBeenCalledTimes(1 + numberRetriesBeforeSuccess);
