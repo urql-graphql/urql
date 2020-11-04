@@ -25,6 +25,7 @@ const context: OperationContext = {
   },
   requestPolicy: 'cache-first',
   url: 'http://localhost:3000/graphql',
+  suspense: true,
 };
 
 export const queryGql: GraphQLRequest = {

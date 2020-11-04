@@ -173,14 +173,19 @@ export class Client {
 
   createOperationContext = (
     opts?: Partial<OperationContext>
-  ): OperationContext => ({
-    url: this.url,
-    fetchOptions: this.fetchOptions,
-    fetch: this.fetch,
-    preferGetMethod: this.preferGetMethod,
-    ...opts,
-    requestPolicy: (opts || {}).requestPolicy || this.requestPolicy,
-  });
+  ): OperationContext => {
+    if (!opts) opts = {};
+
+    return {
+      url: this.url,
+      fetchOptions: this.fetchOptions,
+      fetch: this.fetch,
+      preferGetMethod: this.preferGetMethod,
+      ...opts,
+      suspense: opts.suspense || (opts.suspense !== false && this.suspense),
+      requestPolicy: opts.requestPolicy || this.requestPolicy,
+    };
+  };
 
   createRequestOperation = <Data = any, Variables = object>(
     kind: OperationType,
@@ -222,10 +227,9 @@ export class Client {
   executeRequestOperation<Data = any, Variables = object>(
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>> {
-    const { key, kind } = operation;
     let operationResults$ = pipe(
       this.results$,
-      filter((res: OperationResult) => res.operation.key === key)
+      filter((res: OperationResult) => res.operation.key === operation.key)
     ) as Source<OperationResult<Data, Variables>>;
 
     if (this.maskTypename) {
@@ -238,7 +242,7 @@ export class Client {
       );
     }
 
-    if (kind === 'mutation') {
+    if (operation.kind === 'mutation') {
       // A mutation is always limited to just a single result and is never shared
       return pipe(
         operationResults$,
@@ -249,7 +253,9 @@ export class Client {
 
     const teardown$ = pipe(
       this.operations$,
-      filter((op: Operation) => op.kind === 'teardown' && op.key === key)
+      filter(
+        (op: Operation) => op.kind === 'teardown' && op.key === operation.key
+      )
     );
 
     const result$ = pipe(
@@ -263,9 +269,7 @@ export class Client {
       })
     );
 
-    return operation.context.suspense !== false &&
-      this.suspense &&
-      kind === 'query'
+    return operation.kind === 'query' && operation.context.suspense
       ? toSuspenseSource<OperationResult>(result$ as Source<OperationResult>)
       : (result$ as Source<OperationResult>);
   }
