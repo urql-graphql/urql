@@ -42,7 +42,6 @@ export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
-
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
   const request = useRequest<Data, Variables>(args.query, args.variables);
@@ -112,10 +111,14 @@ export function useQuery<Data = any, Variables = object>(
   );
 
   useEffect(() => {
-    if (!client.suspense) update(query$);
-  }, [update, query$]);
+    if (!client.suspense || (args.context && args.context.suspense === false)) {
+      update(query$);
+    }
+  }, [update, query$, args.context]);
 
-  if (client.suspense) update(query$);
+  if (client.suspense && (!args.context || args.context.suspense !== false)) {
+    update(query$);
+  }
 
   return [state, executeQuery];
 }
