@@ -2,6 +2,7 @@ import '../storybook';
 import { addDecorator } from '@storybook/react';
 import { createElement } from 'react';
 import { Provider, createClient } from 'urql';
+import { devtoolsExchange } from '@urql/devtools';
 import { getStorybookExchange } from '../exchange';
 
 export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
@@ -10,7 +11,7 @@ export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
 ) => {
   const client = createClient({
     url: 'storehhh',
-    exchanges: [getStorybookExchange(context)],
+    exchanges: [devtoolsExchange, getStorybookExchange(context)],
   });
 
   return createElement(Provider, { value: client, children: Story(context) });

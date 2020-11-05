@@ -41,6 +41,7 @@
     "@storybook/preact": ">=6.0.0",
     "@storybook/react": ">=6.0.0",
     "@types/webpack-env": "^1.15.3",
+    "@urql/devtools": "^2.0.2",
     "@urql/preact": ">=1.2.1",
     "graphql": "^15.4.0",
     "preact": "^10.5.5",
