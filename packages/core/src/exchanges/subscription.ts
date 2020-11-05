@@ -38,7 +38,7 @@ export interface ObservableLike<T> {
 
 export interface SubscriptionOperation {
   query: string;
-  variables?: object;
+  variables?: Record<string, unknown>;
   key: string;
   context: OperationContext;
 }
