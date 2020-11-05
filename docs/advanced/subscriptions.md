@@ -77,9 +77,9 @@ you'll be able to use it here too!
 
 ```js
 import { createClient, defaultExchanges, subscriptionExchange } from 'urql';
-import { createClient as createGraphqlWsClient } from 'graphql-ws';
+import { createClient as createWSClient } from 'graphql-ws';
 
-const wsClient = createGraphqlWsClient({
+const wsClient = createWSClient({
   url: 'wss://localhost/graphql',
 });
 
