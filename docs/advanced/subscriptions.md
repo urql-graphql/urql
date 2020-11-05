@@ -69,7 +69,6 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 
 [Read more about `subscription-transport-ws` on its README.](https://github.com/apollographql/subscriptions-transport-ws/blob/master/README.md)
 
-
 ## Setting up `graphql-ws`
 
 If your GraphQL API server is using [graphql-ws](https://github.com/enisdenjo/graphql-ws),
@@ -90,7 +89,7 @@ const client = createClient({
     subscriptionExchange({
       forwardSubscription(operation) {
         return {
-          subscribe: (sink) => {
+          subscribe: sink => {
             const dispose = wsClient.subscribe(operation, sink);
             return {
               unsubscribe: dispose,
