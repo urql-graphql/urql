@@ -13,13 +13,11 @@ suspense on the server.
 But since `<Suspense>` is mainly intended for client-side use it made sense to build and publish
 this exchange, which allows you to try out `urql` and suspense in your React app!
 
-> ⚠️ **\*Deprecated**:
-> This package is deprecated! Usage of client-side suspense with `urql` isn't recommended anymore
-> and this packages has been marked as _deprecated_ after being _experimental_, since all it allows
-> for is to use Suspense as a fancier loading boundary, which isn't its intended use.
-> This exchange may still be useful when used with care, but it's worth keeping in mind that the
-> suspense patterns in `urql` for the client-side may change.
-> Suspense-mode usage for SSR remains unchanged and undeprecated however.
+## ⚠️ Deprecated
+
+Starting from `urql@1.11.0` / `@urql/preact@1.4.0` this exchange isn't required anymore to enable
+client-side suspense support. Instead the `useQuery` hook internally handles React Suspense and
+caches a result between Suspense and the subsequent re-mount of your component automatically.
 
 ## Quick Start Guide
 
