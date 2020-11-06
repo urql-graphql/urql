@@ -98,23 +98,6 @@ describe('server-side rendering', () => {
     });
   });
 
-  it('correctly executes suspense and populates the SSR cache', async () => {
-    let promise;
-
-    try {
-      pipe(client.executeRequestOperation(queryOperation), publish);
-    } catch (error) {
-      promise = error;
-    }
-
-    expect(promise).toBeInstanceOf(Promise);
-    const result = await promise;
-    expect(result.data).not.toBe(undefined);
-
-    const data = ssr.extractData();
-    expect(Object.keys(data).length).toBe(1);
-  });
-
   it('works for an actual component tree', async () => {
     const Query = () => {
       useQuery({

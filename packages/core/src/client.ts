@@ -41,7 +41,6 @@ import {
 
 import {
   createRequest,
-  toSuspenseSource,
   withPromise,
   maskTypename,
   noop,
@@ -258,7 +257,7 @@ export class Client {
       )
     );
 
-    const result$ = pipe(
+    return pipe(
       operationResults$,
       takeUntil(teardown$),
       onStart<OperationResult>(() => {
@@ -268,10 +267,6 @@ export class Client {
         this.onOperationEnd(operation);
       })
     );
-
-    return operation.kind === 'query' && operation.context.suspense
-      ? toSuspenseSource<OperationResult>(result$ as Source<OperationResult>)
-      : (result$ as Source<OperationResult>);
   }
 
   query<Data = any, Variables extends object = {}>(

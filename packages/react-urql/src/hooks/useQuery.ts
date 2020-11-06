@@ -1,12 +1,24 @@
 import { DocumentNode } from 'graphql';
 import { useEffect, useCallback, useMemo } from 'react';
-import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+
+import {
+  Source,
+  pipe,
+  share,
+  takeWhile,
+  concat,
+  fromValue,
+  switchMap,
+  map,
+  scan,
+} from 'wonka';
 
 import {
   TypedDocumentNode,
   CombinedError,
   OperationContext,
   RequestPolicy,
+  OperationResult,
   Operation,
 } from '@urql/core';
 
@@ -38,6 +50,44 @@ export type UseQueryResponse<Data = any, Variables = object> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
+/** Convert the Source to a React Suspense source on demand */
+function toSuspenseSource<T>(source: Source<T>): Source<T> {
+  const shared = share(source);
+  let cache: T | void;
+  let resolve: (value: T) => void;
+
+  return sink => {
+    let hasSuspended = false;
+
+    pipe(
+      shared,
+      takeWhile(result => {
+        // The first result that is received will resolve the suspense
+        // promise after waiting for a microtick
+        if (cache === undefined) Promise.resolve(result).then(resolve);
+        cache = result;
+        return !hasSuspended;
+      })
+    )(sink);
+
+    // If we haven't got a previous result then start suspending
+    // otherwise issue the last known result immediately
+    if (cache !== undefined) {
+      const signal = [cache] as [T] & { tag: 1 };
+      signal.tag = 1;
+      sink(signal);
+    } else {
+      hasSuspended = true;
+      sink(0 /* End */);
+      throw new Promise<T>(_resolve => {
+        resolve = _resolve;
+      });
+    }
+  };
+}
+
+const sources = new Map<number, Source<OperationResult>>();
+
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
@@ -49,12 +99,27 @@ export function useQuery<Data = any, Variables = object>(
   // Create a new query-source from client.executeQuery
   const makeQuery$ = useCallback(
     (opts?: Partial<OperationContext>) => {
-      return client.executeQuery<Data, Variables>(request, {
-        requestPolicy: args.requestPolicy,
-        pollInterval: args.pollInterval,
-        ...args.context,
-        ...opts,
-      });
+      // Determine whether suspense is enabled for the given operation
+      const isSuspense =
+        client.suspense && (!args.context || args.context.suspense !== false);
+
+      let source: Source<OperationResult> | void = isSuspense
+        ? sources.get(request.key)
+        : undefined;
+      if (!source) {
+        source = client.executeQuery(request, {
+          requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
+          ...args.context,
+          ...opts,
+        });
+
+        // Create a suspense source and cache it for the given request
+        if (isSuspense)
+          sources.set(request.key, (source = toSuspenseSource(source)));
+      }
+
+      return source;
     },
     [client, request, args.requestPolicy, args.pollInterval, args.context]
   );
@@ -108,10 +173,11 @@ export function useQuery<Data = any, Variables = object>(
   );
 
   useEffect(() => {
+    sources.delete(request.key); // Delete any cached suspense source
     if (!client.suspense || (args.context && args.context.suspense === false)) {
       update(query$);
     }
-  }, [update, query$, args.context]);
+  }, [update, query$, request, args.context]);
 
   if (client.suspense && (!args.context || args.context.suspense !== false)) {
     update(query$);
