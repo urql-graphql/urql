@@ -1,0 +1,4 @@
+/.changeset/config.json @kitten @jovidecroock
+/scripts/prepare/* @kitten @jovidecroock
+/scripts/rollup/* @kitten @jovidecroock
+/scripts/changesets/* @kitten @jovidecroock
