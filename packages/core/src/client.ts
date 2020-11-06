@@ -257,7 +257,7 @@ export class Client {
       )
     );
 
-    return pipe(
+    const result$ = pipe(
       operationResults$,
       takeUntil(teardown$),
       onStart<OperationResult>(() => {
@@ -267,6 +267,15 @@ export class Client {
         this.onOperationEnd(operation);
       })
     );
+
+    if (operation.kind === 'query' && operation.context.pollInterval) {
+      return pipe(
+        merge([fromValue(0), interval(operation.context.pollInterval)]),
+        switchMap(() => result$)
+      );
+    }
+
+    return result$;
   }
 
   query<Data = any, Variables extends object = {}>(
@@ -308,17 +317,7 @@ export class Client {
     opts?: Partial<OperationContext>
   ): Source<OperationResult<Data, Variables>> => {
     const operation = this.createRequestOperation('query', query, opts);
-    const response$ = this.executeRequestOperation<Data, Variables>(operation);
-    const { pollInterval } = operation.context;
-
-    if (pollInterval) {
-      return pipe(
-        merge([fromValue(0), interval(pollInterval)]),
-        switchMap(() => response$)
-      );
-    }
-
-    return response$;
+    return this.executeRequestOperation<Data, Variables>(operation);
   };
 
   subscription<Data = any, Variables extends object = {}>(
