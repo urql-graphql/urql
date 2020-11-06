@@ -21,8 +21,6 @@ jobs:
       - name: PR or Publish
         id: changesets
         uses: changesets/action@bfeb9e0
-        with:
-          publish: ./node_modules/.bin/changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
