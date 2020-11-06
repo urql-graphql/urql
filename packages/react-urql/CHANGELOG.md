@@ -1,5 +1,18 @@
 # urql
 
+## 1.11.0
+
+### Minor Changes
+
+- Improve the Suspense implementation, which fixes edge-cases when Suspense is used with subscriptions, partially disabled, or _used on the client-side_. It has now been ensured that client-side suspense functions without the deprecated `suspenseExchange` and uncached results are loaded consistently. As part of this work, the `Client` itself does now never throw Suspense promises anymore, which is functionality that either way has no place outside of the React/Preact bindings, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+
+### Patch Changes
+
+- Add support for `TypedDocumentNode` to infer the type of the `OperationResult` and `Operation` for all methods, functions, and hooks that either directly or indirectly accept a `DocumentNode`. See [`graphql-typed-document-node` and the corresponding blog post for more information.](https://github.com/dotansimha/graphql-typed-document-node), by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+- Refactor `useSource` hooks which powers `useQuery` and `useSubscription` to improve various edge case behaviour. This will not change the behaviour of these hooks dramatically but avoid unnecessary state updates when any updates are obviously equivalent and the hook will furthermore improve continuation from mount to effects, which will fix cases where the state between the mounting and effect phase may slightly change, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+- Updated dependencies (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), and [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+  - @urql/core@1.15.0
+
 ## 1.10.3
 
 ### Patch Changes

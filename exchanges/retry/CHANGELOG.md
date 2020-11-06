@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- Add a second `Operation` input argument to the `retryIf` predicate, so that retrying can be actively avoided for specific types of operations, e.g. mutations or subscriptions, in certain user-defined cases, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+
+### Patch Changes
+
+- Updated dependencies (See [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6), and [`7364d93`](https://github.com/FormidableLabs/urql/commit/7364d93a59186d710f0c954e1874fec96892e1c6))
+  - @urql/core@1.15.0
+
 ## 0.1.10
 
 ### Patch Changes
