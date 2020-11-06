@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Setup Node.js 12.x
         uses: actions/setup-node@v1
         with:
@@ -25,6 +25,8 @@ jobs:
       - name: PR or Publish
         id: changesets
         uses: changesets/action@bfeb9e0
+        with:
+          publish: yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
