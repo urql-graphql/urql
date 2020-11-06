@@ -14,6 +14,7 @@ import {
 } from 'wonka';
 
 import {
+  Client,
   TypedDocumentNode,
   CombinedError,
   OperationContext,
@@ -86,6 +87,9 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
   };
 }
 
+const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
+  client.suspense && (!context || context.suspense !== false);
+
 const sources = new Map<number, Source<OperationResult>>();
 
 export function useQuery<Data = any, Variables = object>(
@@ -100,10 +104,8 @@ export function useQuery<Data = any, Variables = object>(
   const makeQuery$ = useCallback(
     (opts?: Partial<OperationContext>) => {
       // Determine whether suspense is enabled for the given operation
-      const isSuspense =
-        client.suspense && (!args.context || args.context.suspense !== false);
-
-      let source: Source<OperationResult> | void = isSuspense
+      const suspense = isSuspense(client, args.context);
+      let source: Source<OperationResult> | void = suspense
         ? sources.get(request.key)
         : undefined;
       if (!source) {
@@ -115,7 +117,7 @@ export function useQuery<Data = any, Variables = object>(
         });
 
         // Create a suspense source and cache it for the given request
-        if (isSuspense)
+        if (suspense)
           sources.set(request.key, (source = toSuspenseSource(source)));
       }
 
@@ -174,12 +176,12 @@ export function useQuery<Data = any, Variables = object>(
 
   useEffect(() => {
     sources.delete(request.key); // Delete any cached suspense source
-    if (!client.suspense || (args.context && args.context.suspense === false)) {
+    if (!isSuspense(client, args.context)) {
       update(query$);
     }
-  }, [update, query$, request, args.context]);
+  }, [update, client, query$, request, args.context]);
 
-  if (client.suspense && (!args.context || args.context.suspense !== false)) {
+  if (isSuspense(client, args.context)) {
     update(query$);
   }
 
