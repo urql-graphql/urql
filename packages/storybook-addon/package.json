@@ -38,8 +38,8 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@storybook/preact": ">=6.0.0",
-    "@storybook/react": ">=6.0.0",
+    "@storybook/preact": ">=6.0.28",
+    "@storybook/react": ">=6.0.28",
     "@types/webpack-env": "^1.15.3",
     "@urql/devtools": "^2.0.2",
     "@urql/preact": ">=1.2.1",
@@ -50,7 +50,7 @@
     "wonka": "^4.0.14"
   },
   "optionalDependencies": {
-    "@storybook/addons": ">=6.0.0"
+    "@storybook/addons": ">=6.0.28"
   },
   "publishConfig": {
     "access": "public"
