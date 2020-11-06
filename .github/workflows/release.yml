@@ -1,0 +1,30 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Setup Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile --non-interactive
+      - name: PR or Publish
+        id: changesets
+        uses: changesets/action@bfeb9e0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
