@@ -42,7 +42,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "@types/react": "^16.9.19",
+    "@types/react": "^16.9.56",
     "graphql": "^15.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
