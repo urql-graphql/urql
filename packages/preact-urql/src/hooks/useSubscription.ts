@@ -1,6 +1,7 @@
 import { DocumentNode } from 'graphql';
-import { useCallback, useRef, useMemo } from 'preact/hooks';
+import { useEffect, useCallback, useRef, useMemo } from 'preact/hooks';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+
 import {
   TypedDocumentNode,
   CombinedError,
@@ -62,16 +63,14 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     [client, request, args.context]
   );
 
+  const subscription$ = useMemo(() => {
+    return args.pause ? null : makeSubscription$();
+  }, [args.pause, makeSubscription$]);
+
   const [state, update] = useSource(
-    useMemo(() => (args.pause ? null : makeSubscription$()), [
-      args.pause,
-      makeSubscription$,
-    ]),
+    subscription$,
     useCallback(
-      (
-        subscription$$,
-        prevState: UseSubscriptionState<Result, Variables> | undefined
-      ) => {
+      (subscription$$, prevState?: UseSubscriptionState<Result, Variables>) => {
         return pipe(
           subscription$$,
           switchMap(subscription$ => {
@@ -121,6 +120,10 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
     [update, makeSubscription$]
   );
+
+  useEffect(() => {
+    update(subscription$);
+  }, [update, subscription$]);
 
   return [state, executeSubscription];
 }

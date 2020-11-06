@@ -25,6 +25,7 @@ const context: OperationContext = {
   },
   requestPolicy: 'cache-first',
   url: 'http://localhost:3000/graphql',
+  suspense: true,
 };
 
 export const queryGql: GraphQLRequest = {
@@ -95,23 +96,6 @@ describe('server-side rendering', () => {
       exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
       suspense: true,
     });
-  });
-
-  it('correctly executes suspense and populates the SSR cache', async () => {
-    let promise;
-
-    try {
-      pipe(client.executeRequestOperation(queryOperation), publish);
-    } catch (error) {
-      promise = error;
-    }
-
-    expect(promise).toBeInstanceOf(Promise);
-    const result = await promise;
-    expect(result.data).not.toBe(undefined);
-
-    const data = ssr.extractData();
-    expect(Object.keys(data).length).toBe(1);
   });
 
   it('works for an actual component tree', async () => {
