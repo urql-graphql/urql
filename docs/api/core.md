@@ -109,7 +109,7 @@ This is similar to [`client.query`](#clientquery), but does not provide a `toPro
 
 [Read more about how to use this API on the "Subscriptions" page.](../advanced/subscriptions.md)
 
-#### client.reexecuteOperation
+### client.reexecuteOperation
 
 This method is commonly used in _Exchanges_ to reexecute an [`Operation`](#operation) on the
 `Client`. It will only reexecute when there are still subscribers for the given
@@ -117,6 +117,10 @@ This method is commonly used in _Exchanges_ to reexecute an [`Operation`](#opera
 
 For an example, this method is used by the `cacheExchange` when an
 [`OperationResult`](#operationresult) is invalidated in the cache and needs to be refetched.
+
+### client.readQuery
+
+This method is typically used to read data synchronously from a cache. It returns an [`OperationResult`](#operationresult) if a value is returned immediately or `null` if no value is returned while cancelling all side effects.
 
 ## CombinedError
 
@@ -209,8 +213,8 @@ properties you'll likely see some options that exist on the `Client` as well.
 | `pollInterval`        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
 | `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
 | `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
-| `preferGetMethod`     | `?number`                             | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
-| `additionalTypenames` | `?number`                             | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
+| `preferGetMethod`     | `?boolean`                            | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
+| `additionalTypenames` | `?string[]`                           | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.
