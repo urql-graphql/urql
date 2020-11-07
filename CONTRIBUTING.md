@@ -17,6 +17,49 @@ If you have an idea for a feature or want to fix a bug, consider opening an issu
 first. We're also happy to discuss and help you open a PR and get your changes
 in!
 
+- If you have a question, try [creating a GitHub Discussions thread.](https://github.com/FormidableLabs/urql/discussions/new)
+- If you think you've found a bug, [open a new issue.](https://github.com/FormidableLabs/urql/issues/new/choose)
+- If you made a change you'd like to contribute, [open a PR.](https://github.com/FormidableLabs/urql/compare)
+
+### What are the issue conventions?
+
+There are **no strict conventions**, but we do have two templates in place that will fit most
+issues, since questions and other discussion start on GitHub Discussions. The bug template is fairly
+standard and the rule of thumb is to try to explain **what you expected** and **what you got
+instead.** Following this makes it very clear whether it's a known behavior, an unexpected issue,
+or an undocumented quirk.
+
+### How do I propose changes?
+
+We follow an **RFC proposal process**. This allows anyone to propose a new feature or a change, and
+allows us to communicate our current planned features or changes, so any technical discussion,
+progress, or upcoming changes are always **documented transparently.** You can [find the RFC
+template](https://github.com/FormidableLabs/urql/issues/new/choose) in our issue creator.
+
+All RFCs are added to the [RFC Lifecycle board.](https://github.com/FormidableLabs/urql/projects/3)
+This board tracks where an RFC stands and who's working on it until it's completed. Bugs and PRs may
+end up on there too if no corresponding RFC exists or was necessary. RFCs are typically first added
+to "In Discussion" until we believe they're ready to be worked on. This step may either be short,
+skipped, or rather long, if no plan is in place for a change yet. So if you see a way to help,
+please leave some suggestions.
+
+### What are the PR conventions?
+
+This also comes with **no strict conventions**. We only ask you to follow the PR template we have
+in place more strictly here than the templates for issues, since it asks you to list a summary
+(maybe even with a short explanation) and a list of technical changes.
+
+If you're **resolving** an issue please don't forget to add `Resolve #123` to the description so that
+it's automatically linked, so that there's no ambiguity and which issue is being addressed (if any)
+
+You'll find that a comment by the "Changeset" bot may pop up. If you don't know what a **changeset**
+is and why it's asking you to document your changes, read on at ["How do I document a change for the
+changelog"](#how-do-i-document-a-change-for-the-changelog)
+
+We also typically **name** our PRs with a slightly descriptive title, e.g. `(shortcode) - Title`,
+where shortcode is either the name of a package, e.g. `(core)` and the title is an imperative mood
+description, e.g. "Update X" or "Refactor Y."
+
 ## How do I set up the project?
 
 Luckily it's not hard to get started. You can install dependencies using yarn.
@@ -89,17 +132,51 @@ If you have them set up in your editor, even better!
 This project uses [changesets](https://github.com/atlassian/changesets). This means that for
 every PR there must be documentation for what has been changed and which package is affected.
 
-You can document a change by running `yarn changeset`, which will ask you which packages
+You can document a change by running `changeset`, which will ask you which packages
 have changed and whether the change is major/minor/patch. It will then ask you to write
 a change entry as markdown.
 
+```sh
+# In the root of the urql repository call:
+yarn changeset
+```
+
+This will create a new "changeset file" in the `.changeset` folder, which you should commit and
+push, so that it's added to your PR.
 This will eventually end up in the package's `CHANGELOG.md` file when we do a release.
+
+You won't need to add a changeset if you're simply making "non-visible" changes to the docs or other
+files that aren't published to `npm`.
 
 [Read more about adding a `changeset` here.](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md#i-am-in-a-multi-package-repository-a-mono-repo)
 
+## How do I release new versions of our packages?
+
+Hold up, that's **automated**! Since we use `changeset` to document our changes, which determines what
+goes into the changelog and what kind of version bump a change should make, you can also use the
+tool to check what's currently posed to change after a release batch using: `yarn changeset status`.
+
+We have a [GitHub Actions workflow](./.github/workflow/release.yml) which is triggered whenever new
+changes are merged. It will always open a **"Version Packages" PR** which is kept up-to-date. This PR
+documents all changes that are made and will show in its description what all new changelogs are
+going to contain for their new entries.
+
+Once a "Version Packages" PR is approved by a contributor and merged, the action will automatically
+take care of creating the release, publishing all updated packages to `npm`, and creating
+appropriate tags on GitHub too.
+
+This process is automated, but the changelog should be checked for errors.
+
+As to **when** to merge the automated PR and publish? Maybe not after every change. Typically there
+are two release batches: hotfixes and release batches. We expect that a hotfix for a single package
+should go out as quickly as possible if it negatively affects users. For **release batches**
+however, it's common to assume that if one change is made to a package that more will follow in the
+same week. So waiting for **a day or two** when other changes are expected will make sense to keep the
+fatigue as low as possible for downstream maintainers.
+
 ## How do I upgrade all dependencies?
 
-It may be a good idea to keep all dependencies on the `urql` repository up-to-date every now and
+It may be a good idea to keep all dependencies on the `urql` repository **up-to-date** every now and
 then. Typically we do this by running `yarn upgrade-interactive --latest` and checking one-by-one
 which dependencies will need to be bumped. In case of any security issues it may make sense to
 just run `yarn upgrade [package]`.
@@ -112,9 +189,13 @@ npx yarn-deduplicate yarn.lock
 yarn
 ```
 
+It's common to then **create a PR** (with a changeset documenting the packages that need to reflect new
+changes if any `dependencies` have changed) with the name of
+"(chore) - Upgrade direct and transitive dependencies" or something similar.
+
 ## How do I add a new package?
 
-First of all we need to know where to put the package.
+First of all we need to know **where** to put the package.
 
 - Exchanges should be added to `exchanges/` and the folder should be the plain
   name of the exchange. Since the `package.json:name` is following the convention
@@ -124,7 +205,7 @@ First of all we need to know where to put the package.
   prefix or `*-urql`. Optionally if the package will be named `*-urql` then the folder
   can take on the same name.
 
-When adding a new package, start by copying a `package.json` file from another project.
+When adding a new package, start by **copying** a `package.json` file from another project.
 You may want to alter the following fields first:
 
 - `name`
@@ -160,71 +241,11 @@ yarn
 yarn run check
 ```
 
-## When and how do I add a changeset?
-
-Our changelogs and releases are maintained using `changeset`. For each PR that actively changes the
-behaviour of one or more packages in our monorepo it allows you to log the change and classify it
-per package as either `patch`, `minor`, or `major`.
-
-You won't need to add a changeset if you're simply making "non-visible" changes to the docs or other
-files that aren't published to `npm`.
-
-If you are however making visible changes you can track a change by calling the `changeset` CLI.
+At this point, **don't publish** the package or a prerelease yourself if you can avoid it. If you can't
+or have already, we'll need to get the **rights** fixed by adding the package to the `@urql` scope.
+Typically what we do is:
 
 ```sh
-# In the root of the urql repository call:
-yarn changeset
+npm access grant read-write urql:developers [package]
+npm access grant read-write formidable:formidable [package]
 ```
-
-This will open an interactive CLI that asks you to track your changes and enter a change message.
-You should always add to the message, what you've changed (not which package if it's only for a
-single package though) and what the impact is. If it's a breaking change it should also include some
-instructions on how users should update their code.
-
-This will create a new "changeset file" in the `.changeset` folder, which you should commit and
-push, so that it's added to your PR.
-
-## How do I release new versions of our packages?
-
-The process of releasing versions is automated using `changeset`. This moves a lot of
-the work of writing CHANGELOG entries away from our release process and to our PR
-review process. During the release the created `changeset` entries are automatically
-applied and our `CHANGELOG`s are updated.
-
-First check what changes you're about to release with `yarn changeset status`.
-
-Then the process is similar to using `yarn version` and `yarn publish`.
-
-First we'll run `yarn changeset version` to bump all packages' versions and update CHANGELOG files:
-
-```sh
-# This will automatically bump versions as necessary and update CHANGELOG files:
-yarn changeset version
-```
-
-> **Note:** This command requires you to create a [GitHub Personal Access Token](https://github.com/settings/tokens/new)
-> and have it set on the `GITHUB_TOKEN` environment variable, either globally, e.g. in your
-> `~/.profile` file, or locally in a `.env` file.
-
-Then verify that the updated `package.json` and `CHANGELOG.md` files look correct and commit the
-changes:
-
-```sh
-# Commit all updated files
-git commit -a -m 'Version Packages'
-```
-
-At this point we have a new commit with packages that have been updated and should be published.
-Please don't push this commit before publishing so that we keep `main` in a pre-release state, in
-case the publish actually fails!
-
-```
-# Then publish all new packages / versions:
-yarn changeset publish
-# And push the "Version Packages" commit and all tags afterwards:
-git push && git push --tags
-```
-
-Publishing the packages will also create the tags, it won't however push them automatically. After
-you've pushed the new tags, please make sure to update releases with the new content in each
-`CHANGELOG.md`, like so: https://github.com/FormidableLabs/urql/releases/tag/%40urql%2Fexchange-graphcache%402.2.2
