@@ -13,11 +13,14 @@ import {
   Source,
 } from 'wonka';
 import { mocked } from 'ts-jest/utils';
-import { getOperationName } from '@urql/core/utils';
 import { queryOperation } from '@urql/core/test-utils';
-import { makeErrorResult, makeOperation } from '@urql/core';
-import { Client } from '@urql/core/client';
-import { OperationResult } from '@urql/core/types';
+import {
+  makeErrorResult,
+  makeOperation,
+  Client,
+  getOperationName,
+  OperationResult,
+} from '@urql/core';
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {
