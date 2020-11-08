@@ -16,7 +16,13 @@ import {
   execute,
 } from 'graphql';
 
-import { Exchange, makeResult, makeErrorResult, Operation, getOperationName } from '@urql/core';
+import {
+  Exchange,
+  makeResult,
+  makeErrorResult,
+  Operation,
+  getOperationName,
+} from '@urql/core';
 
 interface ExecuteExchangeArgs {
   schema: GraphQLSchema;

@@ -13,5 +13,5 @@ export {
   formatDocument,
   maskTypename,
   makeOperation,
-  getOperationName
+  getOperationName,
 } from './utils';
