@@ -108,6 +108,7 @@ export function useQuery<Data = any, Variables = object>(
       let source: Source<OperationResult> | void = suspense
         ? sources.get(request.key)
         : undefined;
+
       if (!source) {
         source = client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
@@ -117,8 +118,12 @@ export function useQuery<Data = any, Variables = object>(
         });
 
         // Create a suspense source and cache it for the given request
-        if (suspense)
-          sources.set(request.key, (source = toSuspenseSource(source)));
+        if (suspense) {
+          source = toSuspenseSource(source);
+          if (typeof window !== 'undefined') {
+            sources.set(request.key, source);
+          }
+        }
       }
 
       return source;
@@ -182,6 +187,7 @@ export function useQuery<Data = any, Variables = object>(
   }, [update, client, query$, request, args.context]);
 
   if (isSuspense(client, args.context)) {
+    sources.delete(request.key); // Delete any cached suspense source
     update(query$);
   }
 
