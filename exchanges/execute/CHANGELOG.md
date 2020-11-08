@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3
+
+### Patch Changes
+
+- Export `getOperationName` from `@urql/core` and use it in `@urql/exchange-execute`, fixing several imports, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1135](https://github.com/FormidableLabs/urql/pull/1135))
+- Updated dependencies (See [#1135](https://github.com/FormidableLabs/urql/pull/1135))
+  - @urql/core@1.15.1
+
 ## 1.0.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @urql/preact
 
+## 1.4.1
+
+### Patch Changes
+
+- ⚠️ Fix server-side rendering by disabling the new Suspense cache on the server-side and clear it for prepasses, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1138](https://github.com/FormidableLabs/urql/pull/1138))
+- Updated dependencies (See [#1135](https://github.com/FormidableLabs/urql/pull/1135))
+  - @urql/core@1.15.1
+
 ## 1.4.0
 
 ### Minor Changes
