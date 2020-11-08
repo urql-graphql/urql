@@ -3,4 +3,4 @@
 "@urql/exchange-execute": patch
 ---
 
-add the getOperationName export to @urql/core and use the newly exported getOperationName in @urql/exchange-execute.
+Export `getOperationName` from `@urql/core` and use it in `@urql/exchange-execute`, fixing several imports.
