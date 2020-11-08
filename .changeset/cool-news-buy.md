@@ -3,4 +3,4 @@
 'urql': patch
 ---
 
-Clear suspense cache outside of effect for ssr-prepasses and disable caching for concurrent ssr-prepasses.
+Fix server-side rendering by disabling the new Suspense cache on the server-side and clear it for prepasses.
