@@ -32,7 +32,8 @@ export type UseMutationResponse<Data = any, Variables = object> = [
 ];
 
 export function useMutation<Data = any, Variables = object>(
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+  defaultContext: Partial<OperationContext> = {}
 ): UseMutationResponse<Data, Variables> {
   const isMounted = useRef(true);
   const client = useClient();
@@ -42,13 +43,13 @@ export function useMutation<Data = any, Variables = object>(
   );
 
   const executeMutation = useCallback(
-    (variables?: Variables, context?: Partial<OperationContext>) => {
+    (variables?: Variables, context: Partial<OperationContext> = {}) => {
       setState({ ...initialState, fetching: true });
 
       return pipe(
         client.executeMutation<Data, Variables>(
           createRequest<Data, Variables>(query, variables),
-          context || {}
+          { ...defaultContext, ...context }
         ),
         toPromise
       ).then(result => {
