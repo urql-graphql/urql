@@ -51,10 +51,8 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "@testing-library/vue": "^5.1.0",
     "graphql": "^15.1.0",
-    "graphql-tag": "^2.10.1",
-    "vue": "^3.0.1"
+    "vue": "^3.0.2"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0",
@@ -62,7 +60,6 @@
   },
   "dependencies": {
     "@urql/core": "^1.13.1",
-    "vue-demi": "^0.3.3",
     "wonka": "^4.0.14"
   },
   "publishConfig": {
