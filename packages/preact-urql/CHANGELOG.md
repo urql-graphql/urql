@@ -1,5 +1,11 @@
 # @urql/preact
 
+## 1.4.2
+
+### Patch Changes
+
+- ⚠️ Fix regression in client-side Suspense behaviour. This has been fixed in `urql@1.11.0` and `@urql/preact@1.4.0` but regressed in the patches afterwards that were aimed at fixing server-side Suspense, by [@kitten](https://github.com/kitten) (See [#1142](https://github.com/FormidableLabs/urql/pull/1142))
+
 ## 1.4.1
 
 ### Patch Changes
