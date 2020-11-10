@@ -1,5 +1,11 @@
 # @urql/storybook-addon
 
+## 1.0.5
+
+### Patch Changes
+
+- Add missing optional dependency (@urql/devtools), by [@andyrichardson](https://github.com/andyrichardson) (See [#1129](https://github.com/FormidableLabs/urql/pull/1129))
+
 ## 1.0.4
 
 ### Patch Changes
