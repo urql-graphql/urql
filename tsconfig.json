@@ -13,13 +13,14 @@
     "noUnusedLocals": true,
     "noEmit": true,
     "lib": ["dom", "esnext"],
-    "jsx": "react",
+    "jsx": "preserve",
     "module": "es2015",
     "moduleResolution": "node",
     "target": "esnext",
     "strict": true,
     "noImplicitAny": false,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "skipLibCheck": true
   },
   "include": ["packages", "exchanges"],
   "exclude": [
@@ -27,6 +28,7 @@
     "packages/*/examples",
     "packages/*/dist",
     "exchanges/*/examples",
-    "exchanges/*/dist"
+    "exchanges/*/dist",
+    "node_modules"
   ]
 }
