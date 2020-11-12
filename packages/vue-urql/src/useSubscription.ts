@@ -57,7 +57,7 @@ export function useSubscription<T = any, R = T, V = object>(
   const request: Ref<GraphQLRequest> = ref(
     createRequest(args.query, args.variables || {})
   );
-  const isPaused: Ref<boolean> = ref(args.pause || false);
+  const isPaused: Ref<boolean> = ref(!!args.pause);
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
   const executeSubscription = (opts?: Partial<OperationContext>) => {
@@ -87,7 +87,7 @@ export function useSubscription<T = any, R = T, V = object>(
     ).unsubscribe;
   };
 
-  if (!args.pause) {
+  if (!isPaused.value) {
     watch(request, (_value, _oldValue, onInvalidate) => {
       onInvalidate(() => {
         if (typeof unsubscribe.value === 'function') {
@@ -96,7 +96,7 @@ export function useSubscription<T = any, R = T, V = object>(
         }
       });
 
-      if (!args.pause) {
+      if (!isPaused.value) {
         executeSubscription();
       }
     });
@@ -109,13 +109,15 @@ export function useSubscription<T = any, R = T, V = object>(
     if (isPaused.value) executeSubscription();
   });
 
-  watch(isPaused, () => {
-    if (isPaused.value) {
+  watch(isPaused, (_value, prevValue) => {
+    if (isPaused.value || prevValue) {
       if (typeof unsubscribe.value === 'function') {
         unsubscribe.value();
         unsubscribe.value = null;
       }
-    } else {
+    }
+
+    if (!isPaused.value) {
       executeSubscription();
     }
   });

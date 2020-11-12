@@ -63,7 +63,7 @@ export function useQuery<T = any, V = object>(
 
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
-  const isPaused: Ref<boolean> = ref(args.pause || false);
+  const isPaused: Ref<boolean> = ref(!!args.pause);
 
   const executeQuery = () => {
     fetching.value = true;
@@ -121,13 +121,15 @@ export function useQuery<T = any, V = object>(
     if (!isPaused.value && fetchOnMount) executeQuery();
   });
 
-  watch(isPaused, () => {
-    if (isPaused.value) {
+  watch(isPaused, (_value, prevValue) => {
+    if (isPaused.value || prevValue) {
       if (typeof unsubscribe.value === 'function') {
         unsubscribe.value();
         unsubscribe.value = null;
       }
-    } else {
+    }
+
+    if (!isPaused.value) {
       executeQuery();
     }
   });
