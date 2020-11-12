@@ -1,14 +1,14 @@
 import { ref, Ref, inject } from 'vue';
+import { DocumentNode } from 'graphql';
+
 import {
+  TypedDocumentNode,
   Client,
   CombinedError,
-  createRequest,
   Operation,
   OperationContext,
   OperationResult,
 } from '@urql/core';
-import { DocumentNode } from 'graphql';
-import { pipe, toPromise } from 'wonka';
 
 export interface UseMutationState<T, V> {
   fetching: Ref<boolean>;
@@ -16,7 +16,7 @@ export interface UseMutationState<T, V> {
   data: Ref<T | undefined>;
   error: Ref<CombinedError | undefined>;
   extensions: Ref<Record<string, any> | undefined>;
-  operation: Ref<Operation | undefined>;
+  operation: Ref<Operation<T, V> | undefined>;
   executeMutation: (
     variables: V,
     context?: Partial<OperationContext>
@@ -25,8 +25,8 @@ export interface UseMutationState<T, V> {
 
 export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 
-export function useMutation<T = any, V = object>(
-  query: DocumentNode | string
+export function useMutation<T = any, V = any>(
+  query: TypedDocumentNode<T, V> | DocumentNode | string
 ): UseMutationResponse<T, V> {
   const client = inject('$urql') as Client;
 
@@ -40,30 +40,8 @@ export function useMutation<T = any, V = object>(
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
   const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation | undefined> = ref();
+  const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
-
-  const executeMutation = async (
-    variables?: V,
-    context?: Partial<OperationContext>
-  ) => {
-    fetching.value = true;
-    return pipe(
-      client.executeMutation(
-        createRequest(query, variables as any),
-        context || {}
-      ),
-      toPromise
-    ).then(res => {
-      data.value = res.data;
-      stale.value = !!res.stale;
-      fetching.value = false;
-      error.value = res.error;
-      operation.value = res.operation;
-      extensions.value = res.extensions;
-      return res;
-    });
-  };
 
   return {
     data,
@@ -72,6 +50,23 @@ export function useMutation<T = any, V = object>(
     error,
     operation,
     extensions,
-    executeMutation,
+    executeMutation(
+      variables: V,
+      context?: Partial<OperationContext>
+    ): Promise<OperationResult<T, V>> {
+      fetching.value = true;
+      return client
+        .mutation(query, variables as any, context)
+        .toPromise()
+        .then((res: OperationResult) => {
+          data.value = res.data;
+          stale.value = !!res.stale;
+          fetching.value = false;
+          error.value = res.error;
+          operation.value = res.operation;
+          extensions.value = res.extensions;
+          return res;
+        });
+    },
   };
 }
