@@ -300,6 +300,23 @@ cache.readFragment(
 Note that the `__typename` may be left out on the partial entity, since the `__typename` is already
 present on the fragment itself.
 
+If any fields on the fragment require variables, you can pass them as the third argument like so:
+
+```js
+import gql from 'graphql-tag';
+
+cache.readFragment(
+  gql`
+    fragment _ on User {
+      id
+      permissions(byGroupId: $groupId)
+    }
+  `,
+  { id: 1 }, // this identifies the fragment (User) entity
+  { groupId: 5 } // any additional field variables
+)
+```
+
 [Read more about using `readFragment` on the ["Computed Queries"
 page.](../graphcache/computed-queries.md#reading-a-fragment)
 
