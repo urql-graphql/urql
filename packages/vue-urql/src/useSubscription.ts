@@ -31,9 +31,9 @@ export interface UseSubscriptionState<T = any, R = T, V = object> {
   extensions: Ref<Record<string, any> | undefined>;
   operation: Ref<Operation<T, V> | undefined>;
   isPaused: Ref<boolean>;
-  resume: () => void;
-  pause: () => void;
-  executeSubscription: () => void;
+  resume(): void;
+  pause(): void;
+  executeSubscription(opts?: Partial<OperationContext>): void;
 }
 
 export type UseSubscriptionResponse<
@@ -92,12 +92,15 @@ export function useSubscription<T = any, R = T, V = object>(
     }
   );
 
-  const executeSubscription = () => {
+  const executeSubscription = (opts?: Partial<OperationContext>) => {
     fetching.value = true;
 
     unsubscribe.value();
     unsubscribe.value = pipe(
-      client.executeSubscription<T, V>(request.value, unref(args.context)),
+      client.executeSubscription<T, V>(request.value, {
+        ...unref(args.context),
+        ...opts,
+      }),
       onEnd(() => {
         fetching.value = false;
       }),

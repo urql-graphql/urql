@@ -35,7 +35,9 @@ export interface UseQueryState<T = any, V = object> {
   isPaused: Ref<boolean>;
   resume(): void;
   pause(): void;
-  executeQuery(): PromiseLike<OperationResult<T, V>>;
+  executeQuery(
+    opts?: Partial<OperationContext>
+  ): PromiseLike<OperationResult<T, V>>;
 }
 
 export type UseQueryResponse<T = any, V = object> = UseQueryState<T, V> &
@@ -88,7 +90,7 @@ export function useQuery<T = any, V = object>(
 
   let isThenable = false;
 
-  const executeQuery = () => {
+  const executeQuery = (opts?: Partial<OperationContext>) => {
     fetching.value = true;
 
     const query$ = pipe(
@@ -96,6 +98,7 @@ export function useQuery<T = any, V = object>(
         requestPolicy: unref(args.requestPolicy),
         pollInterval: unref(args.pollInterval),
         ...unref(args.context),
+        ...opts,
       }),
       onEnd(() => {
         fetching.value = false;
