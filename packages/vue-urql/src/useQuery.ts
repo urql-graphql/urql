@@ -35,7 +35,9 @@ export interface UseQueryState<T> {
   executeQuery: () => void;
 }
 
-export type UseQueryResponse<T> = UseQueryState<T>;
+export type UseQueryResponse<T> = UseQueryState<T> & {
+  then: () => Promise<UseQueryState<T>>;
+};
 
 export function useQuery<T = any, V = object>(
   args: UseQueryArgs<V>
@@ -100,6 +102,7 @@ export function useQuery<T = any, V = object>(
   const req = createRequest(args.query, args.variables || {});
   if (req.key !== request.value.key) request.value = req;
 
+  let fetchOnMount = true;
   onMounted(() => {
     // Checks for synchronous data in the cache.
     pipe(
@@ -115,7 +118,7 @@ export function useQuery<T = any, V = object>(
       publish
     ).unsubscribe();
 
-    if (!isPaused.value) executeQuery();
+    if (!isPaused.value && fetchOnMount) executeQuery();
   });
 
   watch(isPaused, () => {
@@ -137,7 +140,7 @@ export function useQuery<T = any, V = object>(
     isPaused.value = false;
   }
 
-  return {
+  const result = {
     data,
     stale,
     error,
@@ -148,5 +151,25 @@ export function useQuery<T = any, V = object>(
     isPaused,
     pause,
     resume,
+  };
+
+  return {
+    ...result,
+    async then() {
+      fetchOnMount = false;
+
+      const res = await client
+        .query(args.query, args.variables || {}, args.context)
+        .toPromise();
+
+      data.value = res.data;
+      stale.value = !!res.stale;
+      fetching.value = false;
+      error.value = res.error;
+      operation.value = res.operation;
+      extensions.value = res.extensions;
+
+      return result;
+    },
   };
 }
