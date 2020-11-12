@@ -9,14 +9,6 @@
 <script>
 import { useQuery } from '@urql/vue';
 
-const query = `
-  query {
-    Country {
-      name
-    }
-  }
-`;
-
 export default {
   setup() {
     const query = `
