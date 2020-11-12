@@ -1,7 +1,10 @@
-import { inject, Ref, ref, watch, onMounted } from 'vue';
+import { inject, Ref, unref, ref, isRef, watchEffect } from 'vue';
 import { DocumentNode } from 'graphql';
-import { pipe, subscribe, onEnd } from 'wonka';
+import { pipe, take, publish, share, onPush, toPromise, onEnd } from 'wonka';
+
 import {
+  OperationResult,
+  TypedDocumentNode,
   CombinedError,
   OperationContext,
   RequestPolicy,
@@ -10,38 +13,37 @@ import {
   createRequest,
   GraphQLRequest,
 } from '@urql/core';
-import { onPush } from 'wonka';
-import { publish } from 'wonka';
 
-export interface UseQueryArgs<V> {
-  query: string | DocumentNode;
-  variables?: V;
-  requestPolicy?: RequestPolicy;
-  pollInterval?: number;
-  context?: Partial<OperationContext>;
-  pause?: boolean;
+type MaybeRef<T> = T | Ref<T>;
+
+export interface UseQueryArgs<T, V> {
+  query: MaybeRef<string | TypedDocumentNode<T, V> | DocumentNode>;
+  variables?: MaybeRef<V>;
+  requestPolicy?: MaybeRef<RequestPolicy>;
+  pollInterval?: MaybeRef<number>;
+  context?: MaybeRef<Partial<OperationContext>>;
+  pause?: MaybeRef<boolean>;
 }
 
-export interface UseQueryState<T> {
+export interface UseQueryState<T, V> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
   data: Ref<T | undefined>;
   error: Ref<CombinedError | undefined>;
   extensions: Ref<Record<string, any> | undefined>;
-  operation: Ref<Operation | undefined>;
-  resume: () => void;
-  pause: () => void;
+  operation: Ref<Operation<T, V> | undefined>;
   isPaused: Ref<boolean>;
-  executeQuery: () => void;
+  resume(): void;
+  pause(): void;
+  executeQuery(): PromiseLike<OperationResult<T, V>>;
 }
 
-export type UseQueryResponse<T> = UseQueryState<T> & {
-  then: () => PromiseLike<UseQueryState<T>>;
-};
+export type UseQueryResponse<T, V> = UseQueryState<T, V> &
+  PromiseLike<UseQueryState<T, V>>;
 
 export function useQuery<T = any, V = object>(
-  args: UseQueryArgs<V>
-): UseQueryResponse<T> {
+  args: UseQueryArgs<T, V>
+): UseQueryResponse<T, V> {
   const client = inject('$urql') as Client;
 
   if (process.env.NODE_ENV !== 'production' && !client) {
@@ -57,56 +59,45 @@ export function useQuery<T = any, V = object>(
   const operation: Ref<Operation | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const request: Ref<GraphQLRequest> = ref(
-    createRequest(args.query, args.variables || {})
+  const unsubscribe: Ref<() => void> = ref(() => {
+    /* noop */
+  });
+  const isPaused: Ref<boolean> = isRef(args.pause)
+    ? args.pause
+    : ref(!!args.pause);
+
+  const request: Ref<GraphQLRequest<T, V>> = ref(
+    createRequest<T, V>(unref(args.query), unref(args.variables) as V) as any
   );
 
-  const unsubscribe: Ref<null | (() => void)> = ref(null);
-
-  const isPaused: Ref<boolean> = ref(!!args.pause);
+  watchEffect(
+    () => {
+      const newRequest = createRequest<T, V>(
+        unref(args.query),
+        unref(args.variables) as any
+      );
+      if (request.value.key !== newRequest.key) {
+        request.value = newRequest;
+      }
+    },
+    {
+      flush: 'sync',
+    }
+  );
 
   const executeQuery = () => {
     fetching.value = true;
+    unsubscribe.value();
 
-    unsubscribe.value = pipe(
-      client.executeQuery(request.value as GraphQLRequest, args.context),
+    const query$ = pipe(
+      client.executeQuery<T, V>(request.value, {
+        requestPolicy: unref(args.requestPolicy),
+        pollInterval: unref(args.pollInterval),
+        ...unref(args.context),
+      }),
       onEnd(() => {
         fetching.value = false;
       }),
-      subscribe(res => {
-        data.value = res.data;
-        stale.value = !!res.stale;
-        fetching.value = false;
-        error.value = res.error;
-        operation.value = res.operation;
-        extensions.value = res.extensions;
-      })
-    ).unsubscribe;
-  };
-
-  if (isPaused.value) {
-    watch(request, (_value, _oldValue, onInvalidate) => {
-      onInvalidate(() => {
-        if (typeof unsubscribe.value === 'function') {
-          unsubscribe.value();
-          unsubscribe.value = null;
-        }
-      });
-
-      if (isPaused.value) {
-        executeQuery();
-      }
-    });
-  }
-
-  const req = createRequest(args.query, args.variables || {});
-  if (req.key !== request.value.key) request.value = req;
-
-  let fetchOnMount = true;
-  onMounted(() => {
-    // Checks for synchronous data in the cache.
-    pipe(
-      client.executeQuery(request.value as GraphQLRequest),
       onPush(res => {
         data.value = res.data;
         stale.value = !!res.stale;
@@ -115,32 +106,31 @@ export function useQuery<T = any, V = object>(
         operation.value = res.operation;
         extensions.value = res.extensions;
       }),
-      publish
-    ).unsubscribe();
+      share
+    );
 
-    if (!isPaused.value && fetchOnMount) executeQuery();
-  });
+    unsubscribe.value = publish(query$).unsubscribe;
 
-  watch(isPaused, (_value, prevValue) => {
-    if (isPaused.value || prevValue) {
-      if (typeof unsubscribe.value === 'function') {
-        unsubscribe.value();
-        unsubscribe.value = null;
+    return {
+      then(onFulfilled, onRejected) {
+        return pipe(query$, take(1), toPromise).then(onFulfilled, onRejected);
+      },
+    } as PromiseLike<OperationResult<T, V>>;
+  };
+
+  watchEffect(
+    onInvalidate => {
+      if (!isPaused.value) {
+        executeQuery();
+        onInvalidate(() => {
+          unsubscribe.value();
+        });
       }
+    },
+    {
+      flush: 'sync',
     }
-
-    if (!isPaused.value) {
-      executeQuery();
-    }
-  });
-
-  function pause() {
-    isPaused.value = true;
-  }
-
-  function resume() {
-    isPaused.value = false;
-  }
+  );
 
   const result = {
     data,
@@ -151,30 +141,20 @@ export function useQuery<T = any, V = object>(
     fetching,
     executeQuery,
     isPaused,
-    pause,
-    resume,
+    pause() {
+      isPaused.value = true;
+    },
+    resume() {
+      isPaused.value = false;
+    },
   };
 
   return {
     ...result,
-    then() {
-      return new Promise(resolve => {
-        fetchOnMount = false;
-
-        client
-          .query(args.query, args.variables || {}, args.context)
-          .toPromise()
-          .then(res => {
-            data.value = res.data;
-            stale.value = !!res.stale;
-            fetching.value = false;
-            error.value = res.error;
-            operation.value = res.operation;
-            extensions.value = res.extensions;
-
-            return resolve(result);
-          });
-      });
+    then(onFulfilled, onRejected) {
+      return executeQuery()
+        .then(() => result)
+        .then(onFulfilled, onRejected);
     },
   };
 }
