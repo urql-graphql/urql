@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="data">
-      <pre>{{ data }}</pre>
+      <pre>{{ JSON.stringify(data) }}</pre>
     </div>
   </div>
 </template>
@@ -21,7 +21,7 @@ export default {
 
     const result = useQuery({ query });
 
-    return { data: result.data && JSON.stringify(result.data) };
+    return { data: result.data };
   },
   name: 'HelloWorld',
 }
