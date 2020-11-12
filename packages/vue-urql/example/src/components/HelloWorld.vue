@@ -10,7 +10,7 @@
 import { useQuery } from '@urql/vue';
 
 export default {
-  setup() {
+  async setup() {
     const query = `
       query {
         Country {
@@ -20,7 +20,6 @@ export default {
     `;
 
     const result = useQuery({ query });
-
     return { data: result.data };
   },
   name: 'HelloWorld',

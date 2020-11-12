@@ -56,12 +56,13 @@ export function useQuery<T = any, V = object>(
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
   const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation | undefined> = ref();
+  const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const unsubscribe: Ref<() => void> = ref(() => {
     /* noop */
   });
+
   const isPaused: Ref<boolean> = isRef(args.pause)
     ? args.pause
     : ref(!!args.pause);
@@ -85,9 +86,10 @@ export function useQuery<T = any, V = object>(
     }
   );
 
+  let isThenable = false;
+
   const executeQuery = () => {
     fetching.value = true;
-    unsubscribe.value();
 
     const query$ = pipe(
       client.executeQuery<T, V>(request.value, {
@@ -99,6 +101,7 @@ export function useQuery<T = any, V = object>(
         fetching.value = false;
       }),
       onPush(res => {
+        isThenable = false;
         data.value = res.data;
         stale.value = !!res.stale;
         fetching.value = false;
@@ -109,7 +112,10 @@ export function useQuery<T = any, V = object>(
       share
     );
 
-    unsubscribe.value = publish(query$).unsubscribe;
+    if (!isThenable) {
+      unsubscribe.value();
+      unsubscribe.value = publish(query$).unsubscribe;
+    }
 
     return {
       then(onFulfilled, onRejected) {
@@ -128,7 +134,7 @@ export function useQuery<T = any, V = object>(
       }
     },
     {
-      flush: 'sync',
+      flush: 'pre',
     }
   );
 
@@ -152,6 +158,7 @@ export function useQuery<T = any, V = object>(
   return {
     ...result,
     then(onFulfilled, onRejected) {
+      isThenable = true;
       return executeQuery()
         .then(() => result)
         .then(onFulfilled, onRejected);

@@ -1,6 +1,13 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3.0 + Vite" />
+  <Suspense>
+    <template #default>
+      <HelloWorld msg="Hello Vue 3.0 + Vite" />
+    </template>
+    <template #fallback>
+      <div>Loading...</div>
+    </template>
+  </Suspense>
 </template>
 
 <script>
@@ -10,7 +17,6 @@ import { useClient } from '@urql/vue';
 export default {
   name: 'App',
   setup() {
-    console.log(useClient);
     useClient({
       url: 'https://countries-274616.ew.r.appspot.com/',
     });
