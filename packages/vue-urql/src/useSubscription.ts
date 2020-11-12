@@ -1,4 +1,4 @@
-import { inject, Ref, unref, ref, isRef, watchEffect } from 'vue';
+import { Ref, unref, ref, isRef, watchEffect } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 
@@ -7,10 +7,11 @@ import {
   CombinedError,
   OperationContext,
   Operation,
-  Client,
   createRequest,
   GraphQLRequest,
 } from '@urql/core';
+
+import { useClient } from './useClient';
 
 type MaybeRef<T> = T | Ref<T>;
 
@@ -46,13 +47,7 @@ export function useSubscription<T = any, R = T, V = object>(
   args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>
 ): UseSubscriptionResponse<T, R, V> {
-  const client = inject('$urql') as Client;
-
-  if (process.env.NODE_ENV !== 'production' && !client) {
-    throw new Error(
-      'Cannot detect urql Client, did you forget to call `useClient`?'
-    );
-  }
+  const client = useClient();
 
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);

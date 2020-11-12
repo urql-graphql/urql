@@ -1,4 +1,4 @@
-import { inject, Ref, unref, ref, isRef, watchEffect } from 'vue';
+import { Ref, unref, ref, isRef, watchEffect } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, take, publish, share, onPush, toPromise, onEnd } from 'wonka';
 
@@ -9,10 +9,11 @@ import {
   OperationContext,
   RequestPolicy,
   Operation,
-  Client,
   createRequest,
   GraphQLRequest,
 } from '@urql/core';
+
+import { useClient } from './useClient';
 
 type MaybeRef<T> = T | Ref<T>;
 
@@ -46,13 +47,7 @@ export type UseQueryResponse<T = any, V = object> = UseQueryState<T, V> &
 export function useQuery<T = any, V = object>(
   args: UseQueryArgs<T, V>
 ): UseQueryResponse<T, V> {
-  const client = inject('$urql') as Client;
-
-  if (process.env.NODE_ENV !== 'production' && !client) {
-    throw new Error(
-      'Cannot detect urql Client, did you forget to call `useClient`?'
-    );
-  }
+  const client = useClient();
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);

@@ -12,12 +12,12 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import { useClient } from '@urql/vue';
+import { provideClient } from '@urql/vue';
 
 export default {
   name: 'App',
   setup() {
-    useClient({
+    provideClient({
       url: 'https://countries-274616.ew.r.appspot.com/',
     });
   },

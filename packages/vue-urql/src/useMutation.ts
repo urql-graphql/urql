@@ -1,14 +1,15 @@
-import { ref, Ref, inject } from 'vue';
+import { ref, Ref } from 'vue';
 import { DocumentNode } from 'graphql';
 
 import {
   TypedDocumentNode,
-  Client,
   CombinedError,
   Operation,
   OperationContext,
   OperationResult,
 } from '@urql/core';
+
+import { useClient } from './useClient';
 
 export interface UseMutationState<T, V> {
   fetching: Ref<boolean>;
@@ -28,13 +29,7 @@ export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 export function useMutation<T = any, V = any>(
   query: TypedDocumentNode<T, V> | DocumentNode | string
 ): UseMutationResponse<T, V> {
-  const client = inject('$urql') as Client;
-
-  if (process.env.NODE_ENV !== 'production' && !client) {
-    throw new Error(
-      'Cannot detect urql Client, did you forget to call `useClient`?'
-    );
-  }
+  const client = useClient();
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
