@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createElement as h } from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
@@ -9,11 +9,11 @@ import * as init from '../init-urql-client';
 beforeEach(jest.clearAllMocks);
 
 const MockApp: React.FC<any> = () => {
-  return <div />;
+  return h('div');
 };
 
 const MockAppTree: React.FC<any> = () => {
-  return <div />;
+  return h('div');
 };
 
 describe('withUrqlClient', () => {
@@ -40,7 +40,7 @@ describe('withUrqlClient', () => {
     };
 
     it('should create the client instance when the component mounts', () => {
-      const tree = shallow(<Component />);
+      const tree = shallow(h(Component));
       const app = tree.find(MockApp);
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
@@ -55,7 +55,7 @@ describe('withUrqlClient', () => {
         (await Component.getInitialProps(mockContext));
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
 
-      const tree = shallow(<Component {...props} />);
+      const tree = shallow(h(Component, props));
       const app = tree.find(MockApp);
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
@@ -148,7 +148,7 @@ describe('withUrqlClient', () => {
     });
 
     it('uses exchanges defined in the client config', () => {
-      const tree = shallow(<Component />);
+      const tree = shallow(h(Component));
       const app = tree.find(MockApp);
 
       const client = app.props().urqlClient;

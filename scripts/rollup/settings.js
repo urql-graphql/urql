@@ -51,6 +51,7 @@ export const isExternal = id => {
 export const hasReact = externalModules.includes('react');
 export const hasPreact = externalModules.includes('preact');
 export const hasSvelte = externalModules.includes('svelte');
-export const mayReexport = hasReact || hasPreact || hasSvelte;
+export const hasVue = externalModules.includes('vue');
+export const mayReexport = hasReact || hasPreact || hasSvelte || hasVue;
 export const isCI = !!process.env.CIRCLECI;
 export const isAnalyze = !!process.env.ANALYZE;

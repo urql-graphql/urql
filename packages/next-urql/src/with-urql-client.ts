@@ -71,14 +71,14 @@ export function withUrqlClient(
         forceUpdate[1](forceUpdate[0] + 1);
       };
 
-      return (
-        <Provider value={client}>
-          {createElement(AppOrPage, {
-            ...rest,
-            urqlClient: client,
-            resetUrqlClient,
-          })}
-        </Provider>
+      return createElement(
+        Provider,
+        { value: client },
+        createElement(AppOrPage, {
+          ...rest,
+          urqlClient: client,
+          resetUrqlClient,
+        })
       );
     };
 
@@ -130,7 +130,7 @@ export function withUrqlClient(
 
         // Run the prepass step on AppTree. This will run all urql queries on the server.
         if (!options!.neverSuspend) {
-          await ssrPrepass(<AppTree {...appTreeProps} />);
+          await ssrPrepass(createElement(AppTree, appTreeProps));
         }
 
         return {
