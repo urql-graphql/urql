@@ -10,7 +10,6 @@ import {
   createRequest,
   GraphQLRequest,
 } from '@urql/core';
-import { initialState, noop } from './constants';
 import { onPush } from 'wonka';
 import { publish } from 'wonka';
 
@@ -24,14 +23,15 @@ export interface UseQueryArgs<V> {
 }
 
 export interface UseQueryState<T> {
-  fetching: boolean;
-  stale: boolean;
-  data?: T;
-  error?: CombinedError;
-  extensions?: Record<string, any>;
-  operation?: Operation;
+  fetching: Ref<boolean>;
+  stale: Ref<boolean>;
+  data: Ref<T | undefined>;
+  error: Ref<CombinedError | undefined>;
+  extensions: Ref<Record<string, any> | undefined>;
+  operation: Ref<Operation | undefined>;
   resume: () => void;
   pause: () => void;
+  isPaused: Ref<boolean>;
   executeQuery: () => void;
 }
 
@@ -48,36 +48,41 @@ export function useQuery<T = any, V = object>(
     );
   }
 
-  const result: Ref<UseQueryState<T>> = ref({
-    ...initialState,
-    resume: noop,
-    pause: noop,
-    executeQuery: noop,
-  });
+  const data: Ref<T | undefined> = ref();
+  const stale: Ref<boolean> = ref(false);
+  const fetching: Ref<boolean> = ref(false);
+  const error: Ref<CombinedError | undefined> = ref();
+  const operation: Ref<Operation | undefined> = ref();
+  const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const request: Ref<GraphQLRequest | undefined> = ref();
+  const request: Ref<GraphQLRequest> = ref(
+    createRequest(args.query, args.variables || {})
+  );
+
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
-  const executeQuery = (result.value.executeQuery = () => {
-    result.value.fetching = true;
+  const isPaused: Ref<boolean> = ref(args.pause || false);
+
+  const executeQuery = () => {
+    fetching.value = true;
 
     unsubscribe.value = pipe(
       client.executeQuery(request.value as GraphQLRequest, args.context),
       onEnd(() => {
-        result.value.fetching = false;
+        fetching.value = false;
       }),
-      subscribe(({ stale, data, error, extensions, operation }) => {
-        result.value.data = data;
-        result.value.stale = !!stale;
-        result.value.error = error;
-        result.value.fetching = false;
-        result.value.extensions = extensions;
-        result.value.operation = operation;
+      subscribe(res => {
+        data.value = res.data;
+        stale.value = !!res.stale;
+        fetching.value = false;
+        error.value = res.error;
+        operation.value = res.operation;
+        extensions.value = res.extensions;
       })
     ).unsubscribe;
-  });
+  };
 
-  if (!args.pause) {
+  if (isPaused.value) {
     watch(request, (_value, _oldValue, onInvalidate) => {
       onInvalidate(() => {
         if (typeof unsubscribe.value === 'function') {
@@ -86,42 +91,62 @@ export function useQuery<T = any, V = object>(
         }
       });
 
-      if (!args.pause) {
+      if (isPaused.value) {
         executeQuery();
       }
     });
   }
 
-  request.value = createRequest(args.query, args.variables || {});
+  const req = createRequest(args.query, args.variables || {});
+  if (req.key !== request.value.key) request.value = req;
 
   onMounted(() => {
     // Checks for synchronous data in the cache.
     pipe(
       client.executeQuery(request.value as GraphQLRequest),
-      onPush(({ stale, data, error, extensions, operation }) => {
-        result.value.data = data;
-        result.value.stale = !!stale;
-        result.value.error = error;
-        result.value.fetching = false;
-        result.value.extensions = extensions;
-        result.value.operation = operation;
+      onPush(res => {
+        data.value = res.data;
+        stale.value = !!res.stale;
+        fetching.value = false;
+        error.value = res.error;
+        operation.value = res.operation;
+        extensions.value = res.extensions;
       }),
       publish
     ).unsubscribe();
 
-    if (!args.pause) executeQuery();
+    if (!isPaused.value) executeQuery();
   });
 
-  result.value.pause = function pause() {
-    if (typeof unsubscribe.value === 'function') {
-      unsubscribe.value();
-      unsubscribe.value = null;
+  watch(isPaused, () => {
+    if (isPaused.value) {
+      if (typeof unsubscribe.value === 'function') {
+        unsubscribe.value();
+        unsubscribe.value = null;
+      }
+    } else {
+      executeQuery();
     }
-  };
+  });
 
-  result.value.resume = function resume() {
-    if (!args.pause) executeQuery();
-  };
+  function pause() {
+    isPaused.value = true;
+  }
 
-  return result.value;
+  function resume() {
+    isPaused.value = false;
+  }
+
+  return {
+    data,
+    stale,
+    error,
+    operation,
+    extensions,
+    fetching,
+    executeQuery,
+    isPaused,
+    pause,
+    resume,
+  };
 }

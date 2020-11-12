@@ -8,16 +8,15 @@ import {
   OperationResult,
 } from '@urql/core';
 import { DocumentNode } from 'graphql';
-import { initialState } from './constants';
 import { pipe, toPromise } from 'wonka';
 
 export interface UseMutationState<T, V> {
-  fetching: boolean;
-  stale: boolean;
-  data?: T;
-  error?: CombinedError;
-  extensions?: Record<string, any>;
-  operation?: Operation;
+  fetching: Ref<boolean>;
+  stale: Ref<boolean>;
+  data: Ref<T | undefined>;
+  error: Ref<CombinedError | undefined>;
+  extensions: Ref<Record<string, any> | undefined>;
+  operation: Ref<Operation | undefined>;
   executeMutation: (
     variables: V,
     context?: Partial<OperationContext>
@@ -37,33 +36,42 @@ export function useMutation<T = any, V = object>(
     );
   }
 
-  const result: Ref<UseMutationState<T, V>> = ref({
-    ...initialState,
-    executeMutation: Promise.resolve,
-  });
+  const data: Ref<T | undefined> = ref();
+  const stale: Ref<boolean> = ref(false);
+  const fetching: Ref<boolean> = ref(false);
+  const error: Ref<CombinedError | undefined> = ref();
+  const operation: Ref<Operation | undefined> = ref();
+  const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  result.value.executeMutation = async (
+  const executeMutation = async (
     variables?: V,
     context?: Partial<OperationContext>
   ) => {
-    result.value.fetching = true;
+    fetching.value = true;
     return pipe(
       client.executeMutation(
         createRequest(query, variables as any),
         context || {}
       ),
       toPromise
-    ).then(response => {
-      result.value.fetching = false;
-      result.value.stale = !!response.stale;
-      result.value.data = response.data;
-      result.value.error = response.error;
-      result.value.extensions = response.extensions;
-      result.value.operation = response.operation;
-
-      return response;
+    ).then(res => {
+      data.value = res.data;
+      stale.value = !!res.stale;
+      fetching.value = false;
+      error.value = res.error;
+      operation.value = res.operation;
+      extensions.value = res.extensions;
+      return res;
     });
   };
 
-  return result.value;
+  return {
+    data,
+    stale,
+    fetching,
+    error,
+    operation,
+    extensions,
+    executeMutation,
+  };
 }

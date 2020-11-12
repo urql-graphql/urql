@@ -9,7 +9,6 @@ import {
   createRequest,
   GraphQLRequest,
 } from '@urql/core';
-import { initialState, noop } from './constants';
 
 export interface UseSubscriptionArgs<V> {
   query: DocumentNode | string;
@@ -21,12 +20,13 @@ export interface UseSubscriptionArgs<V> {
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export interface UseSubscriptionState<T> {
-  fetching: boolean;
-  stale: boolean;
-  data?: T;
-  error?: CombinedError;
-  extensions?: Record<string, any>;
-  operation?: Operation;
+  fetching: Ref<boolean>;
+  stale: Ref<boolean>;
+  data: Ref<T | undefined>;
+  error: Ref<CombinedError | undefined>;
+  extensions: Ref<Record<string, any> | undefined>;
+  operation: Ref<Operation | undefined>;
+  isPaused: Ref<boolean>;
   resume: () => void;
   pause: () => void;
   executeSubscription: () => void;
@@ -46,21 +46,24 @@ export function useSubscription<T = any, R = T, V = object>(
     );
   }
 
-  const result: Ref<UseSubscriptionState<T>> = ref({
-    ...initialState,
-    resume: noop,
-    pause: noop,
-    executeSubscription: noop,
-  });
+  const data: Ref<T | undefined> = ref();
+  const stale: Ref<boolean> = ref(false);
+  const fetching: Ref<boolean> = ref(false);
+  const error: Ref<CombinedError | undefined> = ref();
+  const operation: Ref<Operation | undefined> = ref();
+  const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const subHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
-  const request: Ref<GraphQLRequest | undefined> = ref();
+  const request: Ref<GraphQLRequest> = ref(
+    createRequest(args.query, args.variables || {})
+  );
+  const isPaused: Ref<boolean> = ref(args.pause || false);
   const unsubscribe: Ref<null | (() => void)> = ref(null);
 
   const executeSubscription = (opts?: Partial<OperationContext>) => {
     if (unsubscribe.value) unsubscribe.value();
 
-    result.value.fetching = true;
+    fetching.value = true;
 
     unsubscribe.value = pipe(
       client.executeSubscription(request.value as GraphQLRequest, {
@@ -68,18 +71,18 @@ export function useSubscription<T = any, R = T, V = object>(
         ...opts,
       }),
       onEnd(() => {
-        result.value.fetching = false;
+        fetching.value = false;
       }),
       subscribe(operationResult => {
-        result.value.fetching = true;
-        (result.value.data =
+        fetching.value = true;
+        (data.value =
           typeof subHandler.value === 'function'
-            ? subHandler.value(result.value.data as any, operationResult.data)
+            ? subHandler.value(data.value as any, operationResult.data)
             : operationResult.data),
-          (result.value.error = operationResult.error);
-        result.value.extensions = operationResult.extensions;
-        result.value.stale = !!operationResult.stale;
-        result.value.operation = operationResult.operation;
+          (error.value = operationResult.error);
+        extensions.value = operationResult.extensions;
+        stale.value = !!operationResult.stale;
+        operation.value = operationResult.operation;
       })
     ).unsubscribe;
   };
@@ -99,22 +102,42 @@ export function useSubscription<T = any, R = T, V = object>(
     });
   }
 
-  request.value = createRequest(args.query, args.variables || {});
+  const req = createRequest(args.query, args.variables || {});
+  if (req.key !== request.value.key) request.value = req;
 
   onMounted(() => {
-    if (!args.pause) executeSubscription();
+    if (isPaused.value) executeSubscription();
   });
 
-  result.value.pause = function pause() {
-    if (typeof unsubscribe.value === 'function') {
-      unsubscribe.value();
-      unsubscribe.value = null;
+  watch(isPaused, () => {
+    if (isPaused.value) {
+      if (typeof unsubscribe.value === 'function') {
+        unsubscribe.value();
+        unsubscribe.value = null;
+      }
+    } else {
+      executeSubscription();
     }
-  };
+  });
 
-  result.value.resume = function resume() {
-    if (!args.pause) executeSubscription();
-  };
+  function pause() {
+    isPaused.value = true;
+  }
 
-  return result.value;
+  function resume() {
+    isPaused.value = false;
+  }
+
+  return {
+    data,
+    stale,
+    error,
+    operation,
+    extensions,
+    fetching,
+    executeSubscription,
+    isPaused,
+    pause,
+    resume,
+  };
 }
