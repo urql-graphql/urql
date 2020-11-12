@@ -17,9 +17,10 @@
 ## Installation
 
 ```sh
-yarn add @urql/vue urql graphql
+yarn add @urql/vue graphql
 # or
-npm install --save @urql/vue urql graphql
+npm install --save @urql/vue graphql
 ```
 
-## Usage
+> **Note:** `@urql/vue` has a peer dependency on `vue@^3.0.0` (Not v2) and doesn't currently plan to
+> be backwards compatible to Vue 2.
