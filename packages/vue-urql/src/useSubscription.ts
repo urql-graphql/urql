@@ -1,7 +1,9 @@
-import { inject, Ref, ref, watch, onMounted } from 'vue';
+import { inject, Ref, unref, ref, isRef, watchEffect } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
+
 import {
+  TypedDocumentNode,
   CombinedError,
   OperationContext,
   Operation,
@@ -10,34 +12,40 @@ import {
   GraphQLRequest,
 } from '@urql/core';
 
-export interface UseSubscriptionArgs<V> {
-  query: DocumentNode | string;
-  variables?: V;
-  pause?: boolean;
-  context?: Partial<OperationContext>;
+type MaybeRef<T> = T | Ref<T>;
+
+export interface UseSubscriptionArgs<T = any, V = object> {
+  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
+  variables?: MaybeRef<V>;
+  pause?: MaybeRef<boolean>;
+  context?: MaybeRef<Partial<OperationContext>>;
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export interface UseSubscriptionState<T> {
+export interface UseSubscriptionState<T = any, R = T, V = object> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
-  data: Ref<T | undefined>;
+  data: Ref<R | undefined>;
   error: Ref<CombinedError | undefined>;
   extensions: Ref<Record<string, any> | undefined>;
-  operation: Ref<Operation | undefined>;
+  operation: Ref<Operation<T, V> | undefined>;
   isPaused: Ref<boolean>;
   resume: () => void;
   pause: () => void;
   executeSubscription: () => void;
 }
 
-export type UseSubscriptionResponse<T> = UseSubscriptionState<T>;
+export type UseSubscriptionResponse<
+  T = any,
+  R = T,
+  V = object
+> = UseSubscriptionState<T, R, V>;
 
 export function useSubscription<T = any, R = T, V = object>(
-  args: UseSubscriptionArgs<V>,
-  handler?: SubscriptionHandler<T, R>
-): UseSubscriptionResponse<T> {
+  args: UseSubscriptionArgs<T, V>,
+  handler?: MaybeRef<SubscriptionHandler<T, R>>
+): UseSubscriptionResponse<T, R, V> {
   const client = inject('$urql') as Client;
 
   if (process.env.NODE_ENV !== 'production' && !client) {
@@ -46,89 +54,82 @@ export function useSubscription<T = any, R = T, V = object>(
     );
   }
 
-  const data: Ref<T | undefined> = ref();
+  const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
   const error: Ref<CombinedError | undefined> = ref();
   const operation: Ref<Operation | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const subHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
-  const request: Ref<GraphQLRequest> = ref(
-    createRequest(args.query, args.variables || {})
+  const unsubscribe: Ref<() => void> = ref(() => {
+    /* noop */
+  });
+
+  const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = isRef(handler)
+    ? handler
+    : ref(handler);
+
+  const isPaused: Ref<boolean> = isRef(args.pause)
+    ? args.pause
+    : ref(!!args.pause);
+
+  const request: Ref<GraphQLRequest<T, V>> = ref(
+    createRequest<T, V>(unref(args.query), unref(args.variables) as V) as any
   );
-  const isPaused: Ref<boolean> = ref(!!args.pause);
-  const unsubscribe: Ref<null | (() => void)> = ref(null);
 
-  const executeSubscription = (opts?: Partial<OperationContext>) => {
-    if (unsubscribe.value) unsubscribe.value();
+  watchEffect(
+    () => {
+      const newRequest = createRequest<T, V>(
+        unref(args.query),
+        unref(args.variables) as any
+      );
+      if (request.value.key !== newRequest.key) {
+        request.value = newRequest;
+      }
+    },
+    {
+      flush: 'sync',
+    }
+  );
 
+  const executeSubscription = () => {
     fetching.value = true;
 
+    unsubscribe.value();
     unsubscribe.value = pipe(
-      client.executeSubscription(request.value as GraphQLRequest, {
-        ...args.context,
-        ...opts,
-      }),
+      client.executeSubscription<T, V>(request.value, unref(args.context)),
       onEnd(() => {
         fetching.value = false;
       }),
-      subscribe(operationResult => {
+      subscribe(result => {
         fetching.value = true;
         (data.value =
-          typeof subHandler.value === 'function'
-            ? subHandler.value(data.value as any, operationResult.data)
-            : operationResult.data),
-          (error.value = operationResult.error);
-        extensions.value = operationResult.extensions;
-        stale.value = !!operationResult.stale;
-        operation.value = operationResult.operation;
+          result.data !== undefined
+            ? typeof scanHandler.value === 'function'
+              ? scanHandler.value(data.value as any, result.data!)
+              : result.data
+            : (result.data as any)),
+          (error.value = result.error);
+        extensions.value = result.extensions;
+        stale.value = !!result.stale;
+        operation.value = result.operation;
       })
     ).unsubscribe;
   };
 
-  if (!isPaused.value) {
-    watch(request, (_value, _oldValue, onInvalidate) => {
-      onInvalidate(() => {
-        if (typeof unsubscribe.value === 'function') {
-          unsubscribe.value();
-          unsubscribe.value = null;
-        }
-      });
-
+  watchEffect(
+    onInvalidate => {
       if (!isPaused.value) {
         executeSubscription();
+        onInvalidate(() => {
+          unsubscribe.value();
+        });
       }
-    });
-  }
-
-  const req = createRequest(args.query, args.variables || {});
-  if (req.key !== request.value.key) request.value = req;
-
-  onMounted(() => {
-    if (isPaused.value) executeSubscription();
-  });
-
-  watch(isPaused, (_value, prevValue) => {
-    if (isPaused.value || prevValue) {
-      if (typeof unsubscribe.value === 'function') {
-        unsubscribe.value();
-        unsubscribe.value = null;
-      }
+    },
+    {
+      flush: 'pre',
     }
-
-    if (!isPaused.value) {
-      executeSubscription();
-    }
-  });
-
-  function pause() {
-    isPaused.value = true;
-  }
-
-  function resume() {
-    isPaused.value = false;
-  }
+  );
 
   return {
     data,
@@ -139,7 +140,11 @@ export function useSubscription<T = any, R = T, V = object>(
     fetching,
     executeSubscription,
     isPaused,
-    pause,
-    resume,
+    pause() {
+      isPaused.value = true;
+    },
+    resume() {
+      isPaused.value = false;
+    },
   };
 }

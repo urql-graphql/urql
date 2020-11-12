@@ -16,8 +16,8 @@ import {
 
 type MaybeRef<T> = T | Ref<T>;
 
-export interface UseQueryArgs<T, V> {
-  query: MaybeRef<string | TypedDocumentNode<T, V> | DocumentNode>;
+export interface UseQueryArgs<T = any, V = object> {
+  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
   variables?: MaybeRef<V>;
   requestPolicy?: MaybeRef<RequestPolicy>;
   pollInterval?: MaybeRef<number>;
@@ -25,7 +25,7 @@ export interface UseQueryArgs<T, V> {
   pause?: MaybeRef<boolean>;
 }
 
-export interface UseQueryState<T, V> {
+export interface UseQueryState<T = any, V = object> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
   data: Ref<T | undefined>;
@@ -38,7 +38,7 @@ export interface UseQueryState<T, V> {
   executeQuery(): PromiseLike<OperationResult<T, V>>;
 }
 
-export type UseQueryResponse<T, V> = UseQueryState<T, V> &
+export type UseQueryResponse<T = any, V = object> = UseQueryState<T, V> &
   PromiseLike<UseQueryState<T, V>>;
 
 export function useQuery<T = any, V = object>(
