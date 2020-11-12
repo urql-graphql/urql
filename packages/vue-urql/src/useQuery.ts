@@ -36,7 +36,7 @@ export interface UseQueryState<T> {
 }
 
 export type UseQueryResponse<T> = UseQueryState<T> & {
-  then: () => Promise<UseQueryState<T>>;
+  then: () => PromiseLike<UseQueryState<T>>;
 };
 
 export function useQuery<T = any, V = object>(
@@ -157,21 +157,24 @@ export function useQuery<T = any, V = object>(
 
   return {
     ...result,
-    async then() {
-      fetchOnMount = false;
+    then() {
+      return new Promise(resolve => {
+        fetchOnMount = false;
 
-      const res = await client
-        .query(args.query, args.variables || {}, args.context)
-        .toPromise();
+        client
+          .query(args.query, args.variables || {}, args.context)
+          .toPromise()
+          .then(res => {
+            data.value = res.data;
+            stale.value = !!res.stale;
+            fetching.value = false;
+            error.value = res.error;
+            operation.value = res.operation;
+            extensions.value = res.extensions;
 
-      data.value = res.data;
-      stale.value = !!res.stale;
-      fetching.value = false;
-      error.value = res.error;
-      operation.value = res.operation;
-      extensions.value = res.extensions;
-
-      return result;
+            return resolve(result);
+          });
+      });
     },
   };
 }
