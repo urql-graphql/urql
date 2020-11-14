@@ -1,0 +1,60 @@
+jest.mock('vue', () => {
+  const vue = jest.requireActual('vue');
+
+  return {
+    __esModule: true,
+    ...vue,
+    inject: () => client,
+  };
+});
+import { makeSubject, pipe, take, toPromise } from 'wonka';
+import { createClient } from '@urql/core';
+import { useMutation } from './useMutation';
+import { reactive } from 'vue';
+
+const client = createClient({ url: '/graphql', exchanges: [] });
+
+beforeEach(() => {
+  jest.resetAllMocks();
+});
+
+describe('useMutation', () => {
+  it('provides an execute method that resolves a promise', async () => {
+    const subject = makeSubject<any>();
+    const clientMutation = jest
+      .spyOn(client, 'mutation')
+      .mockImplementation((): any => ({
+        toPromise() {
+          return pipe(subject.source, take(1), toPromise);
+        },
+      }));
+    const mutation = reactive(useMutation('mutation { test }'));
+
+    expect(mutation).toMatchObject({
+      data: undefined,
+      stale: false,
+      fetching: false,
+      error: undefined,
+      extensions: undefined,
+      operation: undefined,
+      executeMutation: expect.any(Function),
+    });
+
+    const promise = mutation.executeMutation({ test: true });
+
+    expect(mutation.fetching).toBe(true);
+    expect(mutation.stale).toBe(false);
+    expect(mutation.error).toBe(undefined);
+
+    expect(clientMutation).toHaveBeenCalledTimes(1);
+
+    subject.next({ data: { test: true } });
+
+    await promise;
+
+    expect(mutation.fetching).toBe(false);
+    expect(mutation.stale).toBe(false);
+    expect(mutation.error).toBe(undefined);
+    expect(mutation.data).toEqual({ test: true });
+  });
+});
