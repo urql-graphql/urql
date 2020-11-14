@@ -1,5 +1,3 @@
-import { App } from 'vue';
-
 export * from '@urql/core';
 export * from './useClient';
 export * from './useQuery';
