@@ -10,7 +10,7 @@ jest.mock('vue', () => {
 import { makeSubject } from 'wonka';
 import { createClient } from '@urql/core';
 import { useSubscription } from './useSubscription';
-import { nextTick, reactive, ref, useCssModule } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 
 const client = createClient({ url: '/graphql', exchanges: [] });
 
