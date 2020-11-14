@@ -1,4 +1,4 @@
-import { Ref, unref, ref, isRef, watchEffect } from 'vue';
+import { Ref, ref, watchEffect, reactive, computed } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 
@@ -44,9 +44,11 @@ export type UseSubscriptionResponse<
 > = UseSubscriptionState<T, R, V>;
 
 export function useSubscription<T = any, R = T, V = object>(
-  args: UseSubscriptionArgs<T, V>,
+  _args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>
 ): UseSubscriptionResponse<T, R, V> {
+  const args = reactive(_args);
+
   const client = useClient();
 
   const data: Ref<R | undefined> = ref();
@@ -60,24 +62,17 @@ export function useSubscription<T = any, R = T, V = object>(
     /* noop */
   });
 
-  const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = isRef(handler)
-    ? handler
-    : ref(handler);
+  const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
 
-  const isPaused: Ref<boolean> = isRef(args.pause)
-    ? args.pause
-    : ref(!!args.pause);
+  const isPaused: Ref<boolean> = computed(() => !!args.pause);
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
-    createRequest<T, V>(unref(args.query), unref(args.variables) as V) as any
+    createRequest<T, V>(args.query, args.variables as V) as any
   );
 
   watchEffect(
     () => {
-      const newRequest = createRequest<T, V>(
-        unref(args.query),
-        unref(args.variables) as any
-      );
+      const newRequest = createRequest<T, V>(args.query, args.variables as any);
       if (request.value.key !== newRequest.key) {
         request.value = newRequest;
       }
@@ -93,7 +88,7 @@ export function useSubscription<T = any, R = T, V = object>(
     unsubscribe.value();
     unsubscribe.value = pipe(
       client.executeSubscription<T, V>(request.value, {
-        ...unref(args.context),
+        ...args.context,
         ...opts,
       }),
       onEnd(() => {
