@@ -1,4 +1,4 @@
-import { Ref, unref, ref, isRef, watchEffect } from 'vue';
+import { Ref, ref, watchEffect, reactive, computed } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, take, publish, share, onPush, toPromise, onEnd } from 'wonka';
 
@@ -45,8 +45,9 @@ export type UseQueryResponse<T = any, V = object> = UseQueryState<T, V> &
   PromiseLike<UseQueryState<T, V>>;
 
 export function useQuery<T = any, V = object>(
-  args: UseQueryArgs<T, V>
+  _args: UseQueryArgs<T, V>
 ): UseQueryResponse<T, V> {
+  const args = reactive(_args);
   const client = useClient();
 
   const data: Ref<T | undefined> = ref();
@@ -60,20 +61,15 @@ export function useQuery<T = any, V = object>(
     /* noop */
   });
 
-  const isPaused: Ref<boolean> = isRef(args.pause)
-    ? args.pause
-    : ref(!!args.pause);
+  const isPaused: Ref<boolean> = computed(() => !!args.pause);
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
-    createRequest<T, V>(unref(args.query), unref(args.variables) as V) as any
+    createRequest<T, V>(args.query, args.variables as V) as any
   );
 
   watchEffect(
     () => {
-      const newRequest = createRequest<T, V>(
-        unref(args.query),
-        unref(args.variables) as any
-      );
+      const newRequest = createRequest<T, V>(args.query, args.variables as any);
       if (request.value.key !== newRequest.key) {
         request.value = newRequest;
       }
@@ -90,9 +86,9 @@ export function useQuery<T = any, V = object>(
 
     const query$ = pipe(
       client.executeQuery<T, V>(request.value, {
-        requestPolicy: unref(args.requestPolicy),
-        pollInterval: unref(args.pollInterval),
-        ...unref(args.context),
+        requestPolicy: args.requestPolicy,
+        pollInterval: args.pollInterval,
+        ...args.context,
         ...opts,
       }),
       onEnd(() => {
