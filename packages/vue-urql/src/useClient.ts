@@ -1,4 +1,4 @@
-import { inject, provide } from 'vue';
+import { App, inject, provide } from 'vue';
 import { Client, ClientOptions } from '@urql/core';
 
 export function provideClient(opts: ClientOptions | Client) {
@@ -7,11 +7,16 @@ export function provideClient(opts: ClientOptions | Client) {
   return client;
 }
 
+export function install(app: App, opts: ClientOptions | Client) {
+  const client = opts instanceof Client ? opts : new Client(opts);
+  app.provide('$urql', client);
+}
+
 export function useClient(): Client {
   const client = inject('$urql') as Client;
   if (process.env.NODE_ENV !== 'production' && !client) {
     throw new Error(
-      'No urql Client was provided. Did you forget to call `provideClient` in a parent?'
+      'No urql Client was provided. Did you forget to install the plugin or call `provideClient` in a parent?'
     );
   }
 
