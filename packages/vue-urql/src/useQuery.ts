@@ -1,4 +1,4 @@
-import { Ref, ref, watchEffect, reactive } from 'vue';
+import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, take, publish, share, onPush, toPromise, onEnd } from 'wonka';
 
@@ -61,7 +61,9 @@ export function useQuery<T = any, V = object>(
     /* noop */
   });
 
-  const isPaused: Ref<boolean> = ref(!!args.pause);
+  const isPaused: Ref<boolean> = isRef(_args.pause)
+    ? _args.pause
+    : ref(!!_args.pause);
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
     createRequest<T, V>(args.query, args.variables as V) as any
