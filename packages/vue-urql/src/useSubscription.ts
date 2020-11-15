@@ -1,4 +1,4 @@
-import { Ref, ref, watchEffect, reactive, computed, isRef } from 'vue';
+import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 
