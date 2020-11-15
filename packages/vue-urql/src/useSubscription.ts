@@ -1,4 +1,4 @@
-import { Ref, ref, watchEffect, reactive, computed } from 'vue';
+import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 
@@ -64,7 +64,9 @@ export function useSubscription<T = any, R = T, V = object>(
 
   const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
 
-  const isPaused: Ref<boolean> = computed(() => !!args.pause);
+  const isPaused: Ref<boolean> = isRef(_args.pause)
+    ? _args.pause
+    : ref(!!_args.pause);
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
     createRequest<T, V>(args.query, args.variables as V) as any
