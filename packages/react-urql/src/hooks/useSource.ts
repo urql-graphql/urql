@@ -37,7 +37,16 @@ export function useSource<T, R>(
     ]);
 
     const updateInput = (nextInput: T) => {
-      if (nextInput !== input) subject.next((input = nextInput));
+      const prevInput = input;
+      try {
+        if (nextInput !== prevInput) subject.next((input = nextInput));
+      } catch (error) {
+        // If we suspend then React will preserve the component's state
+        // which means we'll need to prepare that the next update must be
+        // able to retrigger an update of the input.
+        input = prevInput;
+        throw error;
+      }
     };
 
     return [source, updateInput];
