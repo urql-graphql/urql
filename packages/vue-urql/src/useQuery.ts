@@ -1,6 +1,20 @@
-import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
+import { Ref, ref, watch, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
-import { pipe, take, publish, share, onPush, toPromise, onEnd } from 'wonka';
+
+import {
+  Source,
+  concat,
+  fromValue,
+  map,
+  pipe,
+  take,
+  publish,
+  share,
+  onStart,
+  onPush,
+  toPromise,
+  onEnd,
+} from 'wonka';
 
 import {
   OperationResult,
@@ -36,13 +50,16 @@ export interface UseQueryState<T = any, V = object> {
   isPaused: Ref<boolean>;
   resume(): void;
   pause(): void;
-  executeQuery(
-    opts?: Partial<OperationContext>
-  ): PromiseLike<OperationResult<T, V>>;
+
+  executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V>;
 }
 
-export type UseQueryResponse<T = any, V = object> = UseQueryState<T, V> &
+export type UseQueryResponse<T, V> = UseQueryState<T, V> &
   PromiseLike<UseQueryState<T, V>>;
+
+const noop = () => {
+  /* noop */
+};
 
 export function useQuery<T = any, V = object>(
   _args: UseQueryArgs<T, V>
@@ -57,10 +74,6 @@ export function useQuery<T = any, V = object>(
   const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
-  const unsubscribe: Ref<() => void> = ref(() => {
-    /* noop */
-  });
-
   const isPaused: Ref<boolean> = isRef(_args.pause)
     ? _args.pause
     : ref(!!_args.pause);
@@ -69,7 +82,11 @@ export function useQuery<T = any, V = object>(
     createRequest<T, V>(args.query, args.variables as V) as any
   );
 
-  watchEffect(
+  const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
+  const unsubscribe: Ref<() => void> = ref(noop);
+
+  watch(
+    [args.query, args.variables],
     () => {
       const newRequest = createRequest<T, V>(args.query, args.variables as any);
       if (request.value.key !== newRequest.key) {
@@ -77,72 +94,94 @@ export function useQuery<T = any, V = object>(
       }
     },
     {
+      immediate: true,
       flush: 'sync',
     }
   );
 
-  let isThenable = false;
-
-  const executeQuery = (opts?: Partial<OperationContext>) => {
-    fetching.value = true;
-
-    const query$ = pipe(
-      client.executeQuery<T, V>(request.value, {
-        requestPolicy: args.requestPolicy,
-        pollInterval: args.pollInterval,
-        ...args.context,
-        ...opts,
-      }),
-      onEnd(() => {
-        fetching.value = false;
-      }),
-      onPush(res => {
-        isThenable = false;
-        data.value = res.data;
-        stale.value = !!res.stale;
-        fetching.value = false;
-        error.value = res.error;
-        operation.value = res.operation;
-        extensions.value = res.extensions;
-      }),
-      share
-    );
-
-    if (!isThenable) {
-      unsubscribe.value();
-      unsubscribe.value = publish(query$).unsubscribe;
-    }
-
-    return {
-      then(onFulfilled, onRejected) {
-        return pipe(query$, take(1), toPromise).then(onFulfilled, onRejected);
-      },
-    } as PromiseLike<OperationResult<T, V>>;
-  };
-
-  watchEffect(
-    onInvalidate => {
+  watch(
+    [isPaused, request, args.requestPolicy, args.pollInterval, args.context],
+    () => {
       if (!isPaused.value) {
-        executeQuery();
-        onInvalidate(() => {
-          unsubscribe.value();
-        });
+        source.value = pipe(
+          client.executeQuery<T, V>(request.value, {
+            requestPolicy: args.requestPolicy,
+            pollInterval: args.pollInterval,
+            ...args.context,
+          }),
+          share
+        );
+      } else {
+        source.value = undefined;
       }
     },
     {
+      immediate: true,
+      flush: 'sync',
+    }
+  );
+
+  watch(
+    [source],
+    (_, __, onInvalidate) => {
+      if (!source.value) {
+        return unsubscribe.value();
+      }
+
+      let cached: OperationResult<T, V> | undefined;
+
+      unsubscribe.value = pipe(
+        cached ? concat([fromValue(cached), source.value]) : source.value,
+        onStart(() => {
+          fetching.value = true;
+        }),
+        onEnd(() => {
+          fetching.value = false;
+        }),
+        onPush(res => {
+          cached = res;
+          data.value = res.data;
+          stale.value = !!res.stale;
+          fetching.value = false;
+          error.value = res.error;
+          operation.value = res.operation;
+          extensions.value = res.extensions;
+        }),
+        publish
+      ).unsubscribe;
+
+      onInvalidate(() => {
+        cached = undefined;
+        unsubscribe.value();
+      });
+    },
+    {
+      immediate: true,
       flush: 'pre',
     }
   );
 
-  const result = {
+  const state: UseQueryState<T, V> = {
     data,
     stale,
     error,
     operation,
     extensions,
     fetching,
-    executeQuery,
     isPaused,
+    executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
+      source.value = pipe(
+        client.executeQuery<T, V>(request.value, {
+          requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
+          ...args.context,
+          ...opts,
+        }),
+        share
+      );
+
+      return response;
+    },
     pause() {
       isPaused.value = true;
     },
@@ -151,13 +190,24 @@ export function useQuery<T = any, V = object>(
     },
   };
 
-  return {
-    ...result,
+  const response: UseQueryResponse<T, V> = {
+    ...state,
     then(onFulfilled, onRejected) {
-      isThenable = true;
-      return executeQuery()
-        .then(() => result)
-        .then(onFulfilled, onRejected);
+      let result$: Promise<UseQueryState<T, V>>;
+      if (fetching.value && source.value) {
+        result$ = pipe(
+          source.value,
+          take(1),
+          map(() => state),
+          toPromise
+        );
+      } else {
+        result$ = Promise.resolve(state);
+      }
+
+      return result$.then(onFulfilled, onRejected);
     },
   };
+
+  return response;
 }

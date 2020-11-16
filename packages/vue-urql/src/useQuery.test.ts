@@ -7,7 +7,8 @@ jest.mock('vue', () => {
     inject: () => client,
   };
 });
-import { makeSubject } from 'wonka';
+
+import { pipe, makeSubject, fromValue, delay } from 'wonka';
 import { createClient } from '@urql/core';
 import { useQuery } from './useQuery';
 import { nextTick, reactive } from 'vue';
@@ -75,19 +76,17 @@ describe('useQuery', () => {
    *   I can't say why it's 3 in the latter case-
    *
    */
-  it.skip('runs Query and awaits results', async () => {
-    const subject = makeSubject<any>();
+  it('runs Query and awaits results', async () => {
     const executeQuery = jest
       .spyOn(client, 'executeQuery')
       .mockImplementation(() => {
-        subject.next({ data: { test: true } });
-        return subject.source;
+        return pipe(fromValue({ data: { test: true } }), delay(1)) as any;
       });
 
     const query = await useQuery({
       query: `{ test }`,
-      // pause: true,
     });
+
     expect(executeQuery).toHaveBeenCalledTimes(1);
     expect(query.fetching.value).toBe(false);
     expect(query.data.value).toEqual({ test: true });
