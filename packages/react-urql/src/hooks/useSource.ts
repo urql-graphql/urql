@@ -47,7 +47,7 @@ export function useSource<T, R>(
     currentInit = true;
     let state: R;
     pipe(
-      transform(fromValue(input)),
+      transform(input$),
       subscribe(value => {
         state = value;
       })
