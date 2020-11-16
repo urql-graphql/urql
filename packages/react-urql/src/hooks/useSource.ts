@@ -1,8 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useMemo, useEffect, useState } from 'react';
-
-import { Source, fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
+import {
+  Source,
+  fromValue,
+  makeSubject,
+  pipe,
+  map,
+  concat,
+  subscribe,
+} from 'wonka';
 
 type Updater<T> = (input: T) => void;
 
@@ -21,10 +28,25 @@ export function useSource<T, R>(
 ): [R, Updater<T>] {
   const [input$, updateInput] = useMemo((): [Source<T>, (value: T) => void] => {
     const subject = makeSubject<T>();
-    const source = concat([fromValue(input), subject.source]);
+    const source = concat([
+      pipe(
+        fromValue(input),
+        map(() => input)
+      ),
+      subject.source,
+    ]);
 
     const updateInput = (nextInput: T) => {
-      if (nextInput !== input) subject.next((input = nextInput));
+      const prevInput = input;
+      try {
+        if (nextInput !== prevInput) subject.next((input = nextInput));
+      } catch (error) {
+        // If we suspend then React will preserve the component's state
+        // which means we'll need to prepare that the next update must be
+        // able to retrigger an update of the input.
+        input = prevInput;
+        throw error;
+      }
     };
 
     return [source, updateInput];
@@ -34,7 +56,7 @@ export function useSource<T, R>(
     currentInit = true;
     let state: R;
     pipe(
-      transform(fromValue(input)),
+      transform(input$),
       subscribe(value => {
         state = value;
       })
