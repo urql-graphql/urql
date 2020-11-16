@@ -1,8 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useMemo, useEffect, useState } from 'react';
-
-import { Source, fromValue, makeSubject, pipe, concat, subscribe } from 'wonka';
+import {
+  Source,
+  fromValue,
+  makeSubject,
+  pipe,
+  map,
+  concat,
+  subscribe,
+} from 'wonka';
 
 type Updater<T> = (input: T) => void;
 
@@ -21,7 +28,13 @@ export function useSource<T, R>(
 ): [R, Updater<T>] {
   const [input$, updateInput] = useMemo((): [Source<T>, (value: T) => void] => {
     const subject = makeSubject<T>();
-    const source = concat([fromValue(input), subject.source]);
+    const source = concat([
+      pipe(
+        fromValue(input),
+        map(() => input)
+      ),
+      subject.source,
+    ]);
 
     const updateInput = (nextInput: T) => {
       if (nextInput !== input) subject.next((input = nextInput));
