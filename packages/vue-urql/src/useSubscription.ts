@@ -1,8 +1,9 @@
 import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
-import { pipe, subscribe, onEnd } from 'wonka';
+import { Source, pipe, publish, share, onStart, onPush, onEnd } from 'wonka';
 
 import {
+  OperationResult,
   TypedDocumentNode,
   CombinedError,
   OperationContext,
@@ -43,12 +44,15 @@ export type UseSubscriptionResponse<
   V = object
 > = UseSubscriptionState<T, R, V>;
 
+const watchOptions = {
+  flush: 'pre' as const,
+};
+
 export function useSubscription<T = any, R = T, V = object>(
   _args: UseSubscriptionArgs<T, V>,
   handler?: MaybeRef<SubscriptionHandler<T, R>>
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args);
-
   const client = useClient();
 
   const data: Ref<R | undefined> = ref();
@@ -57,10 +61,6 @@ export function useSubscription<T = any, R = T, V = object>(
   const error: Ref<CombinedError | undefined> = ref();
   const operation: Ref<Operation | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
-
-  const unsubscribe: Ref<() => void> = ref(() => {
-    /* noop */
-  });
 
   const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);
 
@@ -72,69 +72,79 @@ export function useSubscription<T = any, R = T, V = object>(
     createRequest<T, V>(args.query, args.variables as V) as any
   );
 
-  watchEffect(
-    () => {
-      const newRequest = createRequest<T, V>(args.query, args.variables as any);
-      if (request.value.key !== newRequest.key) {
-        request.value = newRequest;
-      }
-    },
-    {
-      flush: 'sync',
+  const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
+
+  watchEffect(() => {
+    const newRequest = createRequest<T, V>(args.query, args.variables as any);
+    if (request.value.key !== newRequest.key) {
+      request.value = newRequest;
     }
-  );
+  }, watchOptions);
 
-  const executeSubscription = (opts?: Partial<OperationContext>) => {
-    fetching.value = true;
-
-    unsubscribe.value();
-    unsubscribe.value = pipe(
-      client.executeSubscription<T, V>(request.value, {
-        ...args.context,
-        ...opts,
-      }),
-      onEnd(() => {
-        fetching.value = false;
-      }),
-      subscribe(result => {
-        fetching.value = true;
-        (data.value =
-          result.data !== undefined
-            ? typeof scanHandler.value === 'function'
-              ? scanHandler.value(data.value as any, result.data!)
-              : result.data
-            : (result.data as any)),
-          (error.value = result.error);
-        extensions.value = result.extensions;
-        stale.value = !!result.stale;
-        operation.value = result.operation;
-      })
-    ).unsubscribe;
-  };
-
-  watchEffect(
-    onInvalidate => {
-      if (!isPaused.value) {
-        executeSubscription();
-        onInvalidate(() => {
-          unsubscribe.value();
-        });
-      }
-    },
-    {
-      flush: 'pre',
+  watchEffect(() => {
+    if (!isPaused.value) {
+      source.value = pipe(
+        client.executeSubscription<T, V>(request.value, {
+          ...args.context,
+        }),
+        share
+      );
+    } else {
+      source.value = undefined;
     }
-  );
+  }, watchOptions);
 
-  return {
+  watchEffect(onInvalidate => {
+    if (source.value) {
+      onInvalidate(
+        pipe(
+          source.value,
+          onStart(() => {
+            fetching.value = true;
+          }),
+          onEnd(() => {
+            fetching.value = false;
+          }),
+          onPush(result => {
+            fetching.value = true;
+            (data.value =
+              result.data !== undefined
+                ? typeof scanHandler.value === 'function'
+                  ? scanHandler.value(data.value as any, result.data!)
+                  : result.data
+                : (result.data as any)),
+              (error.value = result.error);
+            extensions.value = result.extensions;
+            stale.value = !!result.stale;
+            operation.value = result.operation;
+          }),
+          publish
+        ).unsubscribe
+      );
+    }
+  }, watchOptions);
+
+  const state: UseSubscriptionState<T, R, V> = {
     data,
     stale,
     error,
     operation,
     extensions,
     fetching,
-    executeSubscription,
     isPaused,
+    executeSubscription(
+      opts?: Partial<OperationContext>
+    ): UseSubscriptionState<T, R, V> {
+      source.value = pipe(
+        client.executeSubscription<T, V>(request.value, {
+          ...args.context,
+          ...opts,
+        }),
+        share
+      );
+
+      return state;
+    },
     pause() {
       isPaused.value = true;
     },
@@ -142,4 +152,6 @@ export function useSubscription<T = any, R = T, V = object>(
       isPaused.value = false;
     },
   };
+
+  return state;
 }
