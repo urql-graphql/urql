@@ -36,8 +36,7 @@ const serializeResult = ({
   error,
 }: OperationResult): SerializedResult => {
   const result: SerializedResult = {
-    data: JSON.stringify(data),
-    error: undefined,
+    data: JSON.stringify(data)
   };
 
   if (error) {
