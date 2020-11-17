@@ -11,7 +11,7 @@ jest.mock('vue', () => {
 import { pipe, makeSubject, fromValue, delay } from 'wonka';
 import { createClient } from '@urql/core';
 import { useQuery } from './useQuery';
-import { nextTick, reactive } from 'vue';
+import { nextTick, ref, reactive } from 'vue';
 
 const client = createClient({ url: '/graphql', exchanges: [] });
 
@@ -62,21 +62,7 @@ describe('useQuery', () => {
     expect(query.data).toEqual({ test: true });
   });
 
-  /*
-   * This test currently fails for the following reasons:
-   * with pause: false, `executeQuery` is called 3 times
-   * with pause: true, the promise from useQuery never resolves
-   *
-   * it's unclear to me what the desired behaviour is supposed to be.
-   * - If we want to have the query execute only once, we would have to set `pause: true`,
-   *   but that seems counter-intuitive
-   * - If we don't pause, I'd expect 2 calls:
-   *   -  one from watchEffect
-   *   -  one from useQuery().then()
-   *   I can't say why it's 3 in the latter case-
-   *
-   */
-  it('runs Query and awaits results', async () => {
+  it('runs queries as a promise-like that resolves when used', async () => {
     const executeQuery = jest
       .spyOn(client, 'executeQuery')
       .mockImplementation(() => {
@@ -90,6 +76,36 @@ describe('useQuery', () => {
     expect(executeQuery).toHaveBeenCalledTimes(1);
     expect(query.fetching.value).toBe(false);
     expect(query.data.value).toEqual({ test: true });
+  });
+
+  it('runs queries as a promise-like that resolves even when the query changes', async () => {
+    const executeQuery = jest
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(request => {
+        return pipe(
+          fromValue({ operation: request, data: { test: true } }),
+          delay(1)
+        ) as any;
+      });
+
+    const doc = ref('{ test }');
+
+    const query$ = useQuery({
+      query: doc,
+    });
+
+    doc.value = '{ test2 }';
+
+    await query$;
+
+    expect(executeQuery).toHaveBeenCalledTimes(2);
+    expect(query$.fetching.value).toBe(false);
+    expect(query$.data.value).toEqual({ test: true });
+
+    expect(query$.operation.value).toHaveProperty(
+      'query.definitions.0.selectionSet.selections.0.name.value',
+      'test2'
+    );
   });
 
   it('pauses query when asked to do so', async () => {
