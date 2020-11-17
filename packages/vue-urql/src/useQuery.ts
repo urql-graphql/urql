@@ -64,7 +64,7 @@ export type UseQueryResponse<T, V> = UseQueryState<T, V> &
   PromiseLike<UseQueryState<T, V>>;
 
 const watchOptions = {
-  flush: 'sync' as const,
+  flush: 'pre' as const,
 };
 
 /** Wonka Operator to replay the most recent value to sinks */
@@ -150,60 +150,61 @@ export function useQuery<T = any, V = object>(
 
   const getState = () => state;
 
-  watchEffect(onInvalidate => {
-    const subject = makeSubject<Source<any>>();
-    source.value = pipe(subject.source, replayOne);
-    next.value = (value: undefined | Source<any>) => {
-      const query$ = pipe(
-        value
-          ? pipe(
-              value,
-              onStart(() => {
-                fetching.value = true;
-                stale.value = false;
-              }),
-              onPush(res => {
-                data.value = res.data;
-                stale.value = !!res.stale;
-                fetching.value = false;
-                error.value = res.error;
-                operation.value = res.operation;
-                extensions.value = res.extensions;
-              }),
-              share
-            )
-          : fromValue(undefined),
-        onEnd(() => {
-          fetching.value = false;
-          stale.value = false;
-        })
-      );
-
-      subject.next(query$);
-    };
-
-    onInvalidate(
-      pipe(source.value, switchAll, map(getState), publish).unsubscribe
-    );
-  }, watchOptions);
-
   watchEffect(
-    () => {
-      next.value(
-        !isPaused.value
-          ? client.executeQuery<T, V>(request.value, {
-              requestPolicy: args.requestPolicy,
-              pollInterval: args.pollInterval,
-              ...args.context,
-            })
-          : undefined
+    onInvalidate => {
+      const subject = makeSubject<Source<any>>();
+      source.value = pipe(subject.source, replayOne);
+      next.value = (value: undefined | Source<any>) => {
+        const query$ = pipe(
+          value
+            ? pipe(
+                value,
+                onStart(() => {
+                  fetching.value = true;
+                  stale.value = false;
+                }),
+                onPush(res => {
+                  data.value = res.data;
+                  stale.value = !!res.stale;
+                  fetching.value = false;
+                  error.value = res.error;
+                  operation.value = res.operation;
+                  extensions.value = res.extensions;
+                }),
+                share
+              )
+            : fromValue(undefined),
+          onEnd(() => {
+            fetching.value = false;
+            stale.value = false;
+          })
+        );
+
+        subject.next(query$);
+      };
+
+      onInvalidate(
+        pipe(source.value, switchAll, map(getState), publish).unsubscribe
       );
     },
     {
-      // NOTE: Allows multiple reactive changes to take place before triggering the new query
-      flush: 'pre',
+      // NOTE: This part of the query pipeline is only initialised once and will need
+      // to do so synchronously
+      flush: 'sync',
     }
   );
+
+  watchEffect(() => {
+    next.value(
+      !isPaused.value
+        ? client.executeQuery<T, V>(request.value, {
+            requestPolicy: args.requestPolicy,
+            pollInterval: args.pollInterval,
+            ...args.context,
+          })
+        : undefined
+    );
+  }, watchOptions);
 
   const response: UseQueryResponse<T, V> = {
     ...state,
