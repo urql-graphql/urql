@@ -1,4 +1,4 @@
-import { Ref, ref, watch, reactive, isRef } from 'vue';
+import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
 import { DocumentNode } from 'graphql';
 
 import {
@@ -57,8 +57,8 @@ export interface UseQueryState<T = any, V = object> {
 export type UseQueryResponse<T, V> = UseQueryState<T, V> &
   PromiseLike<UseQueryState<T, V>>;
 
-const noop = () => {
-  /* noop */
+const watchOptions = {
+  flush: 'pre' as const,
 };
 
 export function useQuery<T = any, V = object>(
@@ -83,83 +83,57 @@ export function useQuery<T = any, V = object>(
   );
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
-  const unsubscribe: Ref<() => void> = ref(noop);
 
-  watch(
-    [args.query, args.variables],
-    () => {
-      const newRequest = createRequest<T, V>(args.query, args.variables as any);
-      if (request.value.key !== newRequest.key) {
-        request.value = newRequest;
-      }
-    },
-    {
-      immediate: true,
-      flush: 'sync',
+  watchEffect(() => {
+    const newRequest = createRequest<T, V>(args.query, args.variables as any);
+    if (request.value.key !== newRequest.key) {
+      request.value = newRequest;
     }
-  );
+  }, watchOptions);
 
-  watch(
-    [isPaused, request, args.requestPolicy, args.pollInterval, args.context],
-    () => {
-      if (!isPaused.value) {
-        source.value = pipe(
-          client.executeQuery<T, V>(request.value, {
-            requestPolicy: args.requestPolicy,
-            pollInterval: args.pollInterval,
-            ...args.context,
-          }),
-          share
-        );
-      } else {
-        source.value = undefined;
-      }
-    },
-    {
-      immediate: true,
-      flush: 'sync',
+  watchEffect(() => {
+    if (!isPaused.value) {
+      source.value = pipe(
+        client.executeQuery<T, V>(request.value, {
+          requestPolicy: args.requestPolicy,
+          pollInterval: args.pollInterval,
+          ...args.context,
+        }),
+        share
+      );
+    } else {
+      source.value = undefined;
     }
-  );
+  }, watchOptions);
 
-  watch(
-    [source],
-    (_, __, onInvalidate) => {
-      if (!source.value) {
-        return unsubscribe.value();
-      }
-
+  watchEffect(onInvalidate => {
+    if (source.value) {
       let cached: OperationResult<T, V> | undefined;
 
-      unsubscribe.value = pipe(
-        cached ? concat([fromValue(cached), source.value]) : source.value,
-        onStart(() => {
-          fetching.value = true;
-        }),
-        onEnd(() => {
-          fetching.value = false;
-        }),
-        onPush(res => {
-          cached = res;
-          data.value = res.data;
-          stale.value = !!res.stale;
-          fetching.value = false;
-          error.value = res.error;
-          operation.value = res.operation;
-          extensions.value = res.extensions;
-        }),
-        publish
-      ).unsubscribe;
-
-      onInvalidate(() => {
-        cached = undefined;
-        unsubscribe.value();
-      });
-    },
-    {
-      immediate: true,
-      flush: 'pre',
+      onInvalidate(
+        pipe(
+          cached ? concat([fromValue(cached), source.value]) : source.value,
+          onStart(() => {
+            fetching.value = true;
+          }),
+          onEnd(() => {
+            cached = undefined;
+            fetching.value = false;
+          }),
+          onPush(res => {
+            cached = res;
+            data.value = res.data;
+            stale.value = !!res.stale;
+            fetching.value = false;
+            error.value = res.error;
+            operation.value = res.operation;
+            extensions.value = res.extensions;
+          }),
+          publish
+        ).unsubscribe
+      );
     }
-  );
+  }, watchOptions);
 
   const state: UseQueryState<T, V> = {
     data,
