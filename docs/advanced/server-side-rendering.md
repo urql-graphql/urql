@@ -357,6 +357,8 @@ const handleRequest = async (req, res) => {
   });
 
   const markup = await renderToString(app);
+  
+  const data = JSON.stringify(ssr.extractData());
 
   res.status(200).send(`
     <html>
