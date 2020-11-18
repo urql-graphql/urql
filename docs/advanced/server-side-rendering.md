@@ -246,6 +246,69 @@ When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, 
 During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
 could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.
 
+### Using getStaticProps or getServerSideProps
+
+By default `withUrqlClient` will add `getInitialProps` to the component you're wrapping it in, this however excludes us from using
+`getStaticProps` and `getServerSideProps`. However we can enable this, let's look at an example:
+
+```js
+import { withUrqlClient, initUrqlClient } from "next-urql";
+import {
+  ssrExchange,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  useQuery
+} from "urql";
+
+const TODOS_QUERY = `
+  query { todos { id text } }
+`;
+
+const createUrqlClient = (ssr, ctx) => ({
+  url: "your-url"
+  exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange]
+});
+
+function Todos() {
+  const [res] = useQuery({ query: TODOS_QUERY });
+  return (
+    <div>
+      {res.data.todos.map((todo) => (
+        <div key={todo.id}>
+          {todo.id} - {todo.text}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export async function getStaticProps(ctx) {
+  const ssrCache = ssrExchange({ isClient: false });
+  const client = initUrqlClient(createUrqlClient(ssrCache, ctx));
+
+  // This query is used to populate the cache for the query
+  // used on this page.
+  await client.query(TODOS_QUERY).toPromise();
+
+  return {
+    props: {
+      // urqlState is a keyword here so withUrqlClient can pick it up.
+      urqlState: ssrCache.extractData()
+    },
+  };
+}
+
+export default withUrqlClient(
+  createUrqlClient,
+  { ssr: false } // Important so we don't wrap our component in getInitialProps
+)(Todos);
+```
+
+The above example will make sure the page is rendered as a static-page, it's important that you fully pre-populate your cache
+so in our case we were only interested in getting our todos, if there are child components relying on data you'll have to make
+sure these are fetched as well.
+
 ### Resetting the client instance
 
 In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
