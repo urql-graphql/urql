@@ -94,10 +94,8 @@ const Todo = ({ id, title }) => {
 };
 ```
 
-### Reading on
-
-There are some more tricks we can use with `useMutation`. [Read more about its API in the API docs for
-it.](../api/urql.md#usemutation)
+There are some more tricks we can use with `useMutation`.<br />
+[Read more about its API in the API docs for it.](../api/urql.md#usemutation)
 
 [On the next page we'll learn about "Document Caching", `urql`'s default caching
 mechanism.](./document-caching.md)
@@ -344,10 +342,8 @@ export default {
 };
 ```
 
-### Reading on
-
-There are some more tricks we can use with `useMutation`. [Read more about its API in the API docs for
-it.](../api/vue.md#usemutation)
+There are some more tricks we can use with `useMutation`.<br />
+[Read more about its API in the API docs for it.](../api/vue.md#usemutation)
 
 [On the next page we'll learn about "Document Caching", `urql`'s default caching
 mechanism.](./document-caching.md)
