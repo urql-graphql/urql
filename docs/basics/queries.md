@@ -742,6 +742,73 @@ cache, since we're passing `requestPolicy: 'network-only'`.
 Furthermore the `executeQuery` method can also be used to programmatically start a query even
 when `pause` is `true`, which would usually stop all automatic queries.
 
+### Vue Suspense
+
+In Vue 3 a [new feature was introduced](https://vuedose.tips/go-async-in-vue-3-with-suspense/) that
+natively allows components to suspend while data is loading, which works universally on the server
+and on the client, where a replacement loading template is rendered on a parent while data is
+loading.
+
+Any component's `setup()` function can be updated to instead be an `async setup()` function, in
+other words, to return a `Promise` instead of directly returning its data. This means that we can
+update any `setup()` function to make use of Suspense.
+
+The `useQuery`'s returned result supports this, since it is a `PromiseLike`. We can update one of
+our examples to have a suspending component by changing our usage of `useQuery`:
+
+```jsx
+<template>
+  <ul>
+    <li v-for="todo in data.todos">{{ todo.title }}</li>
+  </ul>
+</template>
+
+<script>
+import { useQuery } from '@urql/vue';
+
+export default {
+  async setup() {
+    const { data, error } = await useQuery({
+      query: `
+        {
+          todos {
+            id
+            title
+          }
+        }
+      `
+    });
+
+    return { data };
+  }
+};
+</script>
+```
+
+As we can see, `await useQuery(...)` here suspends the component and what we render will not have to
+handle the loading states of `useQuery` at all. Instead in Vue Suspense we'll have to wrap a parent
+component in a "Suspense boundary." This boundary is what switches a parent to a loading state while
+parts of its children are fetching data. The suspense promise is in essence "bubbling up" until it
+finds a "Suspense boundary".
+
+```
+<template>
+ <Suspense>
+   <template #default>
+     <MyAsyncComponent />
+   </template>
+   <template #fallback>
+     <span>Loading...</span>
+   </template>
+ </Suspense>
+</template>
+```
+
+As long as any parent component is wrapping our component which uses `async setup()` in this
+boundary, we'll get Vue Suspense to work correctly and trigger this loading state. When a child
+suspends this component will switch to using its `#fallback` template rather than its `#default`
+template.
+
 ### Reading on
 
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for

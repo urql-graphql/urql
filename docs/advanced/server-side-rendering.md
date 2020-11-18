@@ -253,3 +253,60 @@ and we consider it "unsafe" so evaluate this carefully for yourself.
 
 When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
 property, when invoked this will create a new top-level client and reset all prior operations.
+
+## Vue Suspense
+
+In Vue 3 a [new feature was introduced](https://vuedose.tips/go-async-in-vue-3-with-suspense/) that
+natively allows components to suspend while data is loading, which works universally on the server
+and on the client, where a replacement loading template is rendered on a parent while data is
+loading.
+
+We've previously seen how we can change our usage of `useQuery`'s `PromiseLike` result to [make use
+of Vue Suspense on the "Queries" page.](../basics/queries.md#vue-suspense)
+
+Any component's `setup()` function can be updated to instead be an `async setup()` function, in
+other words, to return a `Promise` instead of directly returning its data. This means that we can
+update any `setup()` function to make use of Suspense.
+
+On the server-side we can then use `@vue/server-renderer`'s `renderToString`, which will return a
+`Promise` that resolves when all suspense-related loading is completed.
+
+```jsx
+import { createSSRApp } = from 'vue'
+import { renderToString } from '@vue/server-renderer';
+
+import urql, {
+  createClient,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  ssrExchange
+} from '@urql/vue';
+
+const handleRequest = async (req, res) => {
+  // This is where we'll put our root component
+  const app = createSSRApp(Root)
+
+  // NOTE: All we care about here is that the SSR Exchange is included
+  const ssr = ssrExchange({ isClient: false });
+  app.use(urql, {
+    exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange]
+  });
+
+  const markup = await renderToString(app);
+
+  res.status(200).send(`
+    <html>
+      <body>
+        <div id="root">${markup}</div>
+        <script>
+          window.__URQL_DATA__ = JSON.parse(${data});
+        </script>
+      </body>
+    </html>
+  `);
+};
+```
+
+This effectively renders our Vue app on the server-side and provides the client-side data for
+rehydration that we've set up in the above [SSR Exchange section](#the-ssr-exchange) to use.

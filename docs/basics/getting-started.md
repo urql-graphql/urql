@@ -287,9 +287,18 @@ your parent components and accepts either a `Client` directly or just the option
 Alternatively we may use the exported `install` function and treat `@urql/vue` as a plugin by
 importing its default export and using it [as a plugin](https://v3.vuejs.org/guide/plugins.html#using-a-plugin).
 
-```html
-import { createApp } from 'vue' import Root from './App.vue' import urql from '@urql/vue' const app
-= createApp(Root) app.use(urql, { url: 'http://localhost:3000/graphql', }) app.mount('#app')
+```js
+import { createApp } from 'vue';
+import Root from './App.vue';
+import urql from '@urql/vue';
+
+const app = createApp(Root);
+
+app.use(urql, {
+  url: 'http://localhost:3000/graphql',
+});
+
+app.mount('#app');
 ```
 
 The plugin also accepts `createClient`'s options or a `Client` as its inputs.
