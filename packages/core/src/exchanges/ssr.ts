@@ -35,10 +35,11 @@ const serializeResult = ({
   data,
   error,
 }: OperationResult): SerializedResult => {
-  const result: SerializedResult = {
-    data: JSON.stringify(data),
-    error: undefined,
-  };
+  const result: SerializedResult = {};
+
+  if (data) {
+    result.data = JSON.stringify(data);
+  }
 
   if (error) {
     result.error = {
@@ -51,8 +52,11 @@ const serializeResult = ({
           extensions: error.extensions,
         };
       }),
-      networkError: error.networkError ? '' + error.networkError : undefined,
     };
+
+    if (error.networkError) {
+      result.error.networkError = '' + error.networkError;
+    }
   }
 
   return result;
