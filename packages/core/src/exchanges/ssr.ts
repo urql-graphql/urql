@@ -37,7 +37,7 @@ const serializeResult = ({
 }: OperationResult): SerializedResult => {
   const result: SerializedResult = {};
 
-  if (data) {
+  if (data !== undefined) {
     result.data = JSON.stringify(data);
   }
 
