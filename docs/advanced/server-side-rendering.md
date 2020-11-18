@@ -357,13 +357,15 @@ const handleRequest = async (req, res) => {
   });
 
   const markup = await renderToString(app);
+  
+  const data = JSON.stringify(ssr.extractData());
 
   res.status(200).send(`
     <html>
       <body>
         <div id="root">${markup}</div>
         <script>
-          window.__URQL_DATA__ = JSON.parse(${ssr.extractData()});
+          window.__URQL_DATA__ = JSON.parse(${data});
         </script>
       </body>
     </html>
