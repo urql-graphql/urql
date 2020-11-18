@@ -1,0 +1,16 @@
+{
+  "name": "@urql/exchange-graphcache-tachometer-benchmark",
+  "version": "1.0.0",
+  "description": "Comprehensive Tachometer benchmarks for urql/graphcache",
+  "main": "index.js",
+  "scripts": {
+    "tach": "tachometer forloop.html"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/client": "^3.2.7",
+    "graphql-tag": "^2.11.0",
+    "tachometer": "^0.5.5",
+    "urql": "^1.11.3"
+  }
+}
