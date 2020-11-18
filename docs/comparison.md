@@ -79,18 +79,18 @@ hoisting all necessary data requirements to a page-wide query.
 
 ### Framework Bindings
 
-|                                | urql                             | Apollo              | Relay              |
-| ------------------------------ | -------------------------------- | ------------------- | ------------------ |
-| React Bindings                 | ✅                               | ✅                  | ✅                 |
-| React Concurrent Hooks Support | ✅                               | 🛑                  | ✅ (experimental)  |
-| React Legacy Hooks Support     | ✅                               | ✅                  | 🟡 `relay-hooks`   |
-| React Suspense (Experimental)  | ✅ (experimental on client-side) | 🛑                  | ✅                 |
-| Next.js Integration            | ✅ `next-urql`                   | 🟡                  | 🔶                 |
-| Preact Support                 | ✅                               | 🔶                  | 🔶                 |
-| Svelte Bindings                | ✅                               | 🟡 `svelte-apollo`  | 🟡 `svelte-relay`  |
-| Vue Bindings                   | 🛑 (planned)                     | 🟡 `vue-apollo`     | 🟡 `vue-relay`     |
-| Angular Bindings               | 🛑                               | 🟡 `apollo-angular` | 🟡 `relay-angular` |
-| Initial Data on mount          | ✅                               | ✅                  | ✅                 |
+|                                | urql           | Apollo              | Relay              |
+| ------------------------------ | -------------- | ------------------- | ------------------ |
+| React Bindings                 | ✅             | ✅                  | ✅                 |
+| React Concurrent Hooks Support | ✅             | 🛑                  | ✅ (experimental)  |
+| React Legacy Hooks Support     | ✅             | ✅                  | 🟡 `relay-hooks`   |
+| React Suspense (Experimental)  | ✅             | 🛑                  | ✅                 |
+| Next.js Integration            | ✅ `next-urql` | 🟡                  | 🔶                 |
+| Preact Support                 | ✅             | 🔶                  | 🔶                 |
+| Svelte Bindings                | ✅             | 🟡 `svelte-apollo`  | 🟡 `svelte-relay`  |
+| Vue Bindings                   | ✅             | 🟡 `vue-apollo`     | 🟡 `vue-relay`     |
+| Angular Bindings               | 🛑             | 🟡 `apollo-angular` | 🟡 `relay-angular` |
+| Initial Data on mount          | ✅             | ✅                  | ✅                 |
 
 Interestingly all three libraries heavily support React as they were all started from the React
 community outwards, but Apollo and Vue benefit from community bindings for different frameworks a

@@ -168,6 +168,8 @@ the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
 
+[Read more about the `useSubscription` API in the API docs for it.](../api/urql.md#usesubscription)
+
 ## Svelte
 
 The `subscription` function in `@urql/svelte` comes with a similar API to `query`, which [we've
@@ -223,6 +225,76 @@ events.
 As we can see, the `$result.data` is being updated and transformed by the `handleSubscription`
 function. This works over time, so as new messages come in, we will append them to
 the list of previous messages.
+
+[Read more about the `subscription` API in the API docs for it.](../api/svelte.md#subscription)
+
+## Vue
+
+The `useSubscription` API is very similar to `useQuery`, which [we've learned about in
+the "Queries" page in the "Basics" section.](../basics/queries.md#vue)
+
+Its usage is extremely similar in that it accepts options, which may contain `query` and
+`variables`. However, it also accepts a second argument, which is a reducer function, similar to
+what you would pass to `Array.prototype.reduce`.
+
+It receives the previous set of data that this function has returned or `undefined`.
+As the second argument, it receives the event that has come in from the subscription.
+You can use this to accumulate the data over time, which is useful for a
+list for example.
+
+In the following example, we create a subscription that informs us of
+new messages. We will concatenate the incoming messages so that we
+can display all messages that have come in over the subscription across
+events.
+
+```jsx
+<template>
+  <div v-if="error">
+    Oh no... {{error}}
+  </div>
+  <div v-else>
+    <ul v-if="data">
+      <li v-for="msg in data">{{ msg.from }}: "{{ msg.text }}"</li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import { useSubscription } from '@urql/vue';
+
+export default {
+  setup() {
+    const handleSubscription = (messages = [], response) => {
+      return [response.newMessages, ...messages];
+    };
+
+    const result = useSubscription({
+      query: `
+        subscription MessageSub {
+          newMessages {
+            id
+            from
+            text
+          }
+        }
+      `
+    }, handleSubscription)
+
+    return {
+      data: result.data,
+      error: result.error,
+    };
+  }
+};
+</script>
+```
+
+As we can see, the `result.data` is being updated and transformed by
+the `handleSubscription` function. This works over time, so as
+new messages come in, we will append them to the list of previous
+messages.
+
+[Read more about the `useSubscription` API in the API docs for it.](../api/vue.md#usesubscription)
 
 ## One-off Subscriptions
 

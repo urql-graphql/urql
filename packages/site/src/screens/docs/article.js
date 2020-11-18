@@ -64,10 +64,12 @@ const HeadingList = styled.ul`
 const HeadingItem = styled.li`
   line-height: ${p => p.theme.lineHeights.heading};
   margin-bottom: ${p => p.theme.spacing.xs};
+  margin-left: ${p => (p.depth >= 3 ? p.theme.spacing.sm : 0)};
 
   > a {
     font-size: ${p => p.theme.fontSizes.small};
-    font-weight: ${p => p.theme.fontWeights.body};
+    font-weight: ${p =>
+      p.depth < 3 ? p.theme.fontWeights.links : p.theme.fontWeights.body};
     color: ${p => p.theme.colors.passive};
     text-decoration: none;
   }
@@ -85,7 +87,7 @@ const SectionList = () => {
       <LegendTitle>In this section</LegendTitle>
       <HeadingList>
         {headings.map(heading => (
-          <HeadingItem key={heading.slug}>
+          <HeadingItem key={heading.slug} depth={heading.depth}>
             <a href={`#${heading.slug}`}>{heading.value}</a>
           </HeadingItem>
         ))}
