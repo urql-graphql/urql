@@ -9,6 +9,9 @@
   "license": "MIT",
   "dependencies": {
     "@apollo/client": "^3.2.7",
+    "@urql/exchange-execute": "^1.0.3",
+    "@urql/exchange-graphcache": "^3.1.11",
+    "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
     "tachometer": "^0.5.5",
     "urql": "^1.11.3"
