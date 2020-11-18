@@ -287,23 +287,14 @@ export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient(createUrqlClient(ssrCache, ctx));
 
+  // This query is used to populate the cache for the query
+  // used on this page.
   await client.query(TODOS_QUERY).toPromise();
-  const data = ssrCache.extractData();
-  // This is needed because Next doesn't automatically ignore undefined as a value.
-  Object.keys(data).forEach((key) => {
-    if (data[key].error === undefined) {
-      delete data[key].error;
-    }
-
-    if (data[key].data === undefined) {
-      delete data[key].data;
-    }
-  });
 
   return {
     props: {
       // urqlState is a keyword here so withUrqlClient can pick it up.
-      urqlState: data
+      urqlState: ssrCache.extractData()
     },
   };
 }
