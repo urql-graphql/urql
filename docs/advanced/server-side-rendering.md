@@ -363,7 +363,7 @@ const handleRequest = async (req, res) => {
       <body>
         <div id="root">${markup}</div>
         <script>
-          window.__URQL_DATA__ = JSON.parse(${data});
+          window.__URQL_DATA__ = JSON.parse(${ssr.extractData()});
         </script>
       </body>
     </html>
