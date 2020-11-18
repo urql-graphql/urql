@@ -505,7 +505,8 @@ the request to the API has failed or when our API result contained some `GraphQL
 we'll get into later on the ["Errors" page](./errors.md).
 
 All of these properties on the result are derived from the [shape of
-`OperationResult`](../api/core.md#operationresult) and are marked as reactive, which means they may
+`OperationResult`](../api/core.md#operationresult) and are marked as [reactive
+](https://v3.vuejs.org/guide/reactivity-fundamentals.html), which means they may
 update while the query is running, which will automatically update your UI.
 
 ### Variables

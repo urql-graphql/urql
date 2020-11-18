@@ -39,7 +39,7 @@ const Todo = ({ id, title }) => {
 
 Similar to the `useQuery` output, `useMutation` returns a tuple. The first item in the tuple again
 contains `fetching`, `error`, and `data` — it's identical since this is a common pattern of how
-`urql` presents _operation results_.
+`urql` presents [operation results](../api/core.md#operationresult).
 
 Unlike the `useQuery` hook, the `useMutation` hook doesn't execute automatically. At this point in
 our example, no mutation will be performed. To execute our mutation we instead have to call the
@@ -60,12 +60,13 @@ const Todo = ({ id, title }) => {
     updateTodo(variables).then(result => {
       // The result is almost identical to `updateTodoResult` with the exception
       // of `result.fetching` not being set.
+      // It is an OperationResult.
     });
   };
 };
 ```
 
-This is useful when your UI has to display progress or results on the mutation, and the returned
+The result is useful when your UI has to display progress on the mutation, and the returned
 promise is particularly useful when you're adding side-effects that run after the mutation has
 completed.
 
@@ -223,6 +224,130 @@ mutateTodo({ id, title: newTitle }).then(result => {
   }
 });
 ```
+
+[On the next page we'll learn about "Document Caching", `urql`'s default caching
+mechanism.](./document-caching.md)
+
+## Vue
+
+This guide covers how to send mutations in Vue using `@urql/vue`'s `useMutation` API.
+The `useMutation` function isn't dissimilar from `useQuery` but is triggered manually and accepts
+only a `DocumentNode` or `string` as an input.
+
+### Sending a mutation
+
+Let's again pick up an example with an imaginary GraphQL API for todo items, and dive into an
+example! We'll set up a mutation that _updates_ a todo item's title.
+
+```js
+import { useMutation } from '@urql/vue';
+
+export default {
+  setup() {
+    const { executeMutation: updateTodo } = useMutation(`
+      mutation ($id: ID!, $title: String!) {
+        updateTodo (id: $id, title: $title) {
+          id
+          title
+        }
+      }
+    `);
+
+    return { updateTodo };
+  },
+};
+```
+
+Similar to the `useQuery` output, `useMutation` returns a result object, which reflects the data of
+an executed mutation. That means it'll contain the familiar `fetching`, `error`, and `data`
+properties — it's identical since this is a common pattern of how `urql`
+presents [operation results](../api/core.md#operationresult).
+
+Unlike the `useQuery` hook, the `useMutation` hook doesn't execute automatically. At this point in
+our example, no mutation will be performed. To execute our mutation we instead have to call the
+`executeMutation` method on the result with some variables.
+
+### Using the mutation result
+
+When calling our `updateTodo` function we have two ways of getting to the result as it comes back
+from our API. We can either use the result itself, since all properties related to the last
+[operation result](../api/core.md#operationresult) are marked as [reactive
+](https://v3.vuejs.org/guide/reactivity-fundamentals.html) — or we can use the promise that the
+`executeMutation` method returns when it's called:
+
+```js
+import { useMutation } from '@urql/vue';
+
+export default {
+  setup() {
+    const updateTodoResult = useMutation(`
+      mutation ($id: ID!, $title: String!) {
+        updateTodo (id: $id, title: $title) {
+          id
+          title
+        }
+      }
+    `);
+
+    return {
+      updateTodo(id, title) {
+        const variables = { id, title: title || '' };
+        updateTodoResult(variables).then(result => {
+          // The result is almost identical to `updateTodoResult` with the exception
+          // of `result.fetching` not being set and its properties not being reactive.
+          // It is an OperationResult.
+        });
+      },
+    };
+  },
+};
+```
+
+The reactive result that `useMutation` returns is useful when your UI has to display progress or
+results on the mutation, and the returned promise is particularly useful when you're adding
+side-effects that run after the mutation has completed.
+
+### Handling mutation errors
+
+It's worth noting that the promise we receive when calling the execute function will never
+reject. Instead it will always return a promise that resolves to a result.
+
+If you're checking for errors, you should use `result.error` instead, which will be set
+to a `CombinedError` when any kind of errors occurred while executing your mutation.
+[Read more about errors on our "Errors" page.](./errors.md)
+
+```js
+import { useMutation } from '@urql/vue';
+
+export default {
+  setup() {
+    const updateTodoResult = useMutation(`
+      mutation ($id: ID!, $title: String!) {
+        updateTodo (id: $id, title: $title) {
+          id
+          title
+        }
+      }
+    `);
+
+    return {
+      updateTodo(id, title) {
+        const variables = { id, title: title || '' };
+        updateTodoResult(variables).then(result => {
+          if (result.error) {
+            console.error('Oh no!', result.error);
+          }
+        });
+      },
+    };
+  },
+};
+```
+
+### Reading on
+
+There are some more tricks we can use with `useMutation`. [Read more about its API in the API docs for
+it.](../api/vue.md#usemutation)
 
 [On the next page we'll learn about "Document Caching", `urql`'s default caching
 mechanism.](./document-caching.md)
