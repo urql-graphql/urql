@@ -219,8 +219,7 @@ const Hero = props => {
         </HeroLogoContainer>
         <HeroTitle>urql</HeroTitle>
         <HeroBody>
-          urql is a blazing-fast GraphQL client that supports React, Preact, and
-          Svelte (alpha).
+          The highly customizable and versatile GraphQL client for React, Svelte, Vue, or plain JavaScript, with which you add on features like normalized caching as you grow.
         </HeroBody>
         <HeroButtonsWrapper>
           <HeroNPMWrapper>
