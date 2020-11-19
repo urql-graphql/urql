@@ -87,9 +87,10 @@ export const simplePagination = ({
         visited.add(link);
       }
 
-      const isAhead = !prevOffset || currentOffset > prevOffset;
-
-      if (isAhead === (mergeMode === 'inwards')) {
+      if (
+        (!prevOffset || currentOffset > prevOffset) ===
+        (mergeMode === 'inwards')
+      ) {
         result = [...result, ...tempResult];
       } else {
         result = [...tempResult, ...result];
