@@ -1,7 +1,7 @@
 import { stringifyVariables } from '@urql/core';
 import { Resolver, Variables, NullArray } from '../types';
 
-export type MergeMode = 'outwards' | 'inwards';
+export type MergeMode = 'before' | 'after';
 
 export interface PaginationParams {
   offsetArgument?: string;
@@ -12,7 +12,7 @@ export interface PaginationParams {
 export const simplePagination = ({
   offsetArgument = 'skip',
   limitArgument = 'limit',
-  mergeMode = 'inwards',
+  mergeMode = 'after',
 }: PaginationParams = {}): Resolver => {
   const compareArgs = (
     fieldArgs: Variables,
@@ -89,7 +89,7 @@ export const simplePagination = ({
 
       if (
         (!prevOffset || currentOffset > prevOffset) ===
-        (mergeMode === 'inwards')
+        (mergeMode === 'after')
       ) {
         result = [...result, ...tempResult];
       } else {

@@ -192,26 +192,29 @@ options in here `limitArgument` and `offsetArgument` these will default to `limi
 and `skip` respectively. This way you can use the keywords that you are using in
 your queries.
 
-You can also specify `mergeMode`, which defaults to `inwards` and
-can otherwise be set to `outwards`. This will handle how pages are merged when you paginate
-forwards and backwards at the same time. Outwards pagination assumes that pages
-that come in last should be merged before the first pages, so that the list
-grows outwards in both directions. The default inwards pagination assumes that
-pagination last pages is part of the same list and come after first pages.
-Hence it merges pages so that they converge in the middle.
+You can also specify `mergeMode`, which defaults to `after` and can otherwise
+be set to `before`. This will handle how pages are merged when you paginate
+forwards and backwards at the same time. The `before` mode assumes that pages
+that come in last should be merged _before_ the first pages. The default `after`
+mode assumes that pages that come in last should be merged _after_ the first pages.
 
-Example series of requests:
+Examples series of requests with `limit: 3`:
 
 ```
-limit: 2, skip: 0 => 1, 2
-limit: 2, skip: 1 => 2, 3
-...
-limit: 2, skip: c - 1 => 79, 89
-limit: 2, skip: c => 89, 99
-```
+// Where mergeMode: after makes sense
+skip: 0 => 1, 2, 3
+skip: 3 => 44, 55, 66
 
-With inwards merging the items will be in this order: `[1, 2, 3, ..., 79, 89, 99]`
-And with outwards merging: `[..., 79, 89, 99, 1, 2, 3, ...]`
+mergeMode: after => 1, 2, 3, 44, 55, 66
+mergeMode: before => 44, 55, 66, 1, 2, 3
+
+// Where mergeMode: before makes sense
+skip: 0 => 44, 55, 66
+skip: 3 => 1, 2, 3
+
+mergeMode: after => 44, 55, 66, 1, 2, 3
+mergeMode: before => 1, 2, 3, 44, 55, 66
+```
 
 ### Relay Pagination
 

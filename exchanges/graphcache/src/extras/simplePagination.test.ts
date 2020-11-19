@@ -87,7 +87,7 @@ it('works with backwards pagination', () => {
   const store = new Store({
     resolvers: {
       Query: {
-        persons: simplePagination({ mergeMode: 'outwards' }),
+        persons: simplePagination({ mergeMode: 'before' }),
       },
     },
   });
@@ -95,9 +95,9 @@ it('works with backwards pagination', () => {
   const pageOne = {
     __typename: 'Query',
     persons: [
-      { id: 1, name: 'Jovi', __typename: 'Person' },
-      { id: 2, name: 'Phil', __typename: 'Person' },
-      { id: 3, name: 'Andy', __typename: 'Person' },
+      { id: 7, name: 'Jovi', __typename: 'Person' },
+      { id: 8, name: 'Phil', __typename: 'Person' },
+      { id: 9, name: 'Andy', __typename: 'Person' },
     ],
   };
 
@@ -266,7 +266,7 @@ it('should preserve the correct order in forward pagination', () => {
   const store = new Store({
     resolvers: {
       Query: {
-        persons: simplePagination(),
+        persons: simplePagination({ mergeMode: 'after' }),
       },
     },
   });
@@ -324,7 +324,7 @@ it('should preserve the correct order in backward pagination', () => {
   const store = new Store({
     resolvers: {
       Query: {
-        persons: simplePagination({ mergeMode: 'outwards' }),
+        persons: simplePagination({ mergeMode: 'before' }),
       },
     },
   });
@@ -332,9 +332,9 @@ it('should preserve the correct order in backward pagination', () => {
   const pageOne = {
     __typename: 'Query',
     persons: [
-      { id: 1, name: 'Jovi', __typename: 'Person' },
-      { id: 2, name: 'Phil', __typename: 'Person' },
-      { id: 3, name: 'Andy', __typename: 'Person' },
+      { id: 7, name: 'Jovi', __typename: 'Person' },
+      { id: 8, name: 'Phil', __typename: 'Person' },
+      { id: 9, name: 'Andy', __typename: 'Person' },
     ],
   };
 
