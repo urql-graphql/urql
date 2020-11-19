@@ -1,14 +1,18 @@
 import { stringifyVariables } from '@urql/core';
 import { Resolver, Variables, NullArray } from '../types';
 
+export type MergeMode = 'outwards' | 'inwards';
+
 export interface PaginationParams {
   offsetArgument?: string;
   limitArgument?: string;
+  mergeMode?: MergeMode;
 }
 
 export const simplePagination = ({
   offsetArgument = 'skip',
   limitArgument = 'limit',
+  mergeMode = 'inwards',
 }: PaginationParams = {}): Resolver => {
   const compareArgs = (
     fieldArgs: Variables,
@@ -74,21 +78,20 @@ export const simplePagination = ({
         continue;
       }
 
-      if (!prevOffset || currentOffset > prevOffset) {
-        for (let j = 0; j < links.length; j++) {
-          const link = links[j];
-          if (visited.has(link)) continue;
-          result.push(link);
-          visited.add(link);
-        }
+      const tempResult: NullArray<string> = [];
+
+      for (let j = 0; j < links.length; j++) {
+        const link = links[j];
+        if (visited.has(link)) continue;
+        tempResult.push(link);
+        visited.add(link);
+      }
+
+      const isAhead = !prevOffset || currentOffset > prevOffset;
+
+      if (isAhead === (mergeMode === 'inwards')) {
+        result = [...result, ...tempResult];
       } else {
-        const tempResult: NullArray<string> = [];
-        for (let j = 0; j < links.length; j++) {
-          const link = links[j];
-          if (visited.has(link)) continue;
-          tempResult.push(link);
-          visited.add(link);
-        }
         result = [...tempResult, ...result];
       }
 
