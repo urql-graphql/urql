@@ -317,6 +317,63 @@ describe('on (query w/ fragment) -> mutation', () => {
   });
 });
 
+describe('on (query w/ nested fragment) -> mutation', () => {
+  const queryOp = {
+    key: 1234,
+    operationName: 'query',
+    query: gql`
+      query {
+        todos {
+          ...TodoFragment
+        }
+      }
+
+      fragment TodoFragment on Todo {
+        id
+        text
+        creator {
+          id
+          name
+        }
+      }
+    `,
+  } as Operation;
+
+  const mutationOp = {
+    key: 5678,
+    operationName: 'mutation',
+    query: gql`
+      mutation MyMutation {
+        addTodo @populate
+      }
+    `,
+  } as Operation;
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          addTodo {
+            ...User_PopulateFragment_0
+          }
+        }
+
+        fragment User_PopulateFragment_0 on Todo {
+          id
+          name
+        }
+        "
+      `);
+    });
+  });
+});
+
 describe('on (query w/ unused fragment) -> mutation', () => {
   const queryOp = makeOperation(
     'query',
