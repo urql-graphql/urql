@@ -1,7 +1,6 @@
 window.process = { env: { NODE_ENV: "development" } };
 
-// import { createClient } from 'urql/core';
-import { createClient } from '@urql/core/dist/urql-core.min.mjs'
+import { createClient } from 'urql/core';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { executeExchange } from '@urql/exchange-execute';
 
