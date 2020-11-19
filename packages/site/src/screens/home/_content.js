@@ -24,12 +24,6 @@ const content = {
       icon: require('../../assets/clock-tile.svg'),
     },
   ],
-  components: {
-    title: 'Minimal React Components and Hooks',
-    description:
-      "Whether you prefer a <Query> component or useQuery Hook, urql's API is intuitive to use, with full support for GraphQL Queries, Mutations and Subscriptions in both styles!",
-    icon: require('../../assets/react-tile.svg'),
-  },
   preview: {
     description: '',
     media: '',
