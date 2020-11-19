@@ -219,7 +219,9 @@ const Hero = props => {
         </HeroLogoContainer>
         <HeroTitle>urql</HeroTitle>
         <HeroBody>
-          The highly customizable and versatile GraphQL client for React, Svelte, Vue, or plain JavaScript, with which you add on features like normalized caching as you grow.
+          The highly customizable and versatile GraphQL client for React,
+          Svelte, Vue, or plain JavaScript, with which you add on features like
+          normalized caching as you grow.
         </HeroBody>
         <HeroButtonsWrapper>
           <HeroNPMWrapper>
