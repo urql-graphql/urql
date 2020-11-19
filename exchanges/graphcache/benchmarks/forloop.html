@@ -13,10 +13,52 @@
 <body>
     <div id="root"></div>
     <script type="module">
+        import urqlClient, { cache } from './urqlClient.js';
         import * as bench from '/bench.js';
-        import urqlClient from './urqlClient.js';
         // bench.start();
-            console.log(urqlClient);
+
+        // console.log(cache.resolve('Todo:1', 'text'));
+        console.log(cache);
+
+        const query = `
+            query Test {
+                todos {
+                    id,
+                    text
+                }
+            }
+        `;
+
+        const mutation = `
+            mutation Test($text: String!){
+                addTodo(text: $text){
+                    id,
+                    text
+                }
+            }
+        `;
+
+        const testQuery = () => {
+            urqlClient
+                .query(query)
+                .toPromise()
+                .then(result => {
+                    console.log(result);
+                })
+        };
+
+        const testMutation = () => {
+            urqlClient
+                .mutation(mutation, { text: '3rd todo' })
+                .toPromise()
+                .then(result => {
+                    console.log(result);
+                })
+        };
+
+        console.log(testQuery());
+        console.log(testMutation());
+
         // bench.stop();
     </script>
 </body>
