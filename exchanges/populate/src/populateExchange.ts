@@ -176,13 +176,19 @@ export const extractSelectionsFromQuery = (
   };
 
   const visits: string[] = [];
+  let insideFragment = false;
 
   traverse(
     query,
     node => {
       if (node.kind === Kind.FRAGMENT_DEFINITION) {
+        insideFragment = true;
         extractedFragments.push(node);
-      } else if (node.kind === Kind.FIELD && node.selectionSet) {
+      } else if (
+        node.kind === Kind.FIELD &&
+        node.selectionSet &&
+        !insideFragment
+      ) {
         const type = unwrapType(
           resolveFields(schema, visits)[node.name.value].type
         );
@@ -219,7 +225,13 @@ export const extractSelectionsFromQuery = (
       }
     },
     node => {
-      if (node.kind === Kind.FIELD && node.selectionSet) visits.pop();
+      if (node.kind === Kind.FIELD && node.selectionSet && !insideFragment) {
+        visits.pop();
+      }
+
+      if (node.kind === Kind.FRAGMENT_DEFINITION) {
+        insideFragment = false;
+      }
     }
   );
 

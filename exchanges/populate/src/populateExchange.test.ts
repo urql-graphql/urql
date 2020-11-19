@@ -648,6 +648,75 @@ describe('interface returned in mutation', () => {
   });
 });
 
+describe('nested fragment', () => {
+  const fragment = gql`
+    fragment TodoFragment on Todo {
+      id
+      author {
+        id
+      }
+    }
+  `;
+
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            ...TodoFragment
+          }
+        }
+
+        ${fragment}
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          updateTodo @populate
+        }
+      `,
+    },
+    context
+  );
+
+  it('should work with nested fragments', () => {
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp, mutationOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[1].query)).toMatchInlineSnapshot(`
+    "mutation MyMutation {
+      updateTodo {
+        ...Todo_PopulateFragment_0
+      }
+    }
+
+    fragment Todo_PopulateFragment_0 on Todo {
+      ...TodoFragment
+    }
+
+    fragment TodoFragment on Todo {
+      id
+      author {
+        id
+      }
+    }
+    "
+  `);
+  });
+});
+
 describe('nested interfaces', () => {
   const queryOp = makeOperation(
     'query',
