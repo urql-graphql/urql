@@ -3,7 +3,7 @@ import { query, write } from '../operations';
 import { Store } from '../store';
 import { simplePagination } from './simplePagination';
 
-it('works with simple pagination', () => {
+it('works with forward pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
       persons(skip: $skip, limit: $limit) {
@@ -64,6 +64,76 @@ it('works with simple pagination', () => {
   expect((pageTwoResult.data as any).persons).toEqual([
     ...pageOne.persons,
     ...pageTwo.persons,
+  ]);
+
+  const pageThreeResult = query(store, {
+    query: Pagination,
+    variables: { skip: 6, limit: 3 },
+  });
+  expect(pageThreeResult.data).toEqual(null);
+});
+
+it('works with backwards pagination', () => {
+  const Pagination = gql`
+    query($skip: Number, $limit: Number) {
+      persons(skip: $skip, limit: $limit) {
+        __typename
+        id
+        name
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination({ mergeMode: 'before' }),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    persons: [
+      { id: 7, name: 'Jovi', __typename: 'Person' },
+      { id: 8, name: 'Phil', __typename: 'Person' },
+      { id: 9, name: 'Andy', __typename: 'Person' },
+    ],
+  };
+
+  const pageTwo = {
+    __typename: 'Query',
+    persons: [
+      { id: 4, name: 'Kadi', __typename: 'Person' },
+      { id: 5, name: 'Dom', __typename: 'Person' },
+      { id: 6, name: 'Sofia', __typename: 'Person' },
+    ],
+  };
+
+  write(
+    store,
+    { query: Pagination, variables: { skip: 0, limit: 3 } },
+    pageOne
+  );
+  const pageOneResult = query(store, {
+    query: Pagination,
+    variables: { skip: 0, limit: 3 },
+  });
+  expect(pageOneResult.data).toEqual(pageOne);
+
+  write(
+    store,
+    { query: Pagination, variables: { skip: 3, limit: 3 } },
+    pageTwo
+  );
+
+  const pageTwoResult = query(store, {
+    query: Pagination,
+    variables: { skip: 3, limit: 3 },
+  });
+  expect((pageTwoResult.data as any).persons).toEqual([
+    ...pageTwo.persons,
+    ...pageOne.persons,
   ]);
 
   const pageThreeResult = query(store, {
@@ -182,7 +252,7 @@ it('should not return previous result when adding a parameter', () => {
   expect(res.data).toEqual({ __typename: 'Query', persons: [] });
 });
 
-it('should preserve the correct order', () => {
+it('should preserve the correct order in forward pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
       persons(skip: $skip, limit: $limit) {
@@ -196,7 +266,7 @@ it('should preserve the correct order', () => {
   const store = new Store({
     resolvers: {
       Query: {
-        persons: simplePagination(),
+        persons: simplePagination({ mergeMode: 'after' }),
       },
     },
   });
@@ -237,6 +307,64 @@ it('should preserve the correct order', () => {
   expect(result.data).toEqual({
     __typename: 'Query',
     persons: [...pageOne.persons, ...pageTwo.persons],
+  });
+});
+
+it('should preserve the correct order in backward pagination', () => {
+  const Pagination = gql`
+    query($skip: Number, $limit: Number) {
+      persons(skip: $skip, limit: $limit) {
+        __typename
+        id
+        name
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        persons: simplePagination({ mergeMode: 'before' }),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    persons: [
+      { id: 7, name: 'Jovi', __typename: 'Person' },
+      { id: 8, name: 'Phil', __typename: 'Person' },
+      { id: 9, name: 'Andy', __typename: 'Person' },
+    ],
+  };
+
+  const pageTwo = {
+    __typename: 'Query',
+    persons: [
+      { id: 4, name: 'Kadi', __typename: 'Person' },
+      { id: 5, name: 'Dom', __typename: 'Person' },
+      { id: 6, name: 'Sofia', __typename: 'Person' },
+    ],
+  };
+
+  write(
+    store,
+    { query: Pagination, variables: { skip: 3, limit: 3 } },
+    pageTwo
+  );
+  write(
+    store,
+    { query: Pagination, variables: { skip: 0, limit: 3 } },
+    pageOne
+  );
+
+  const result = query(store, {
+    query: Pagination,
+    variables: { skip: 3, limit: 3 },
+  });
+  expect(result.data).toEqual({
+    __typename: 'Query',
+    persons: [...pageTwo.persons, ...pageOne.persons],
   });
 });
 
