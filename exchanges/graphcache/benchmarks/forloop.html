@@ -15,10 +15,6 @@
     <script type="module">
         import urqlClient, { cache } from './urqlClient.js';
         import * as bench from '/bench.js';
-        // bench.start();
-
-        // console.log(cache.resolve('Todo:1', 'text'));
-        console.log(cache);
 
         const query = `
             query Test {
@@ -38,28 +34,19 @@
             }
         `;
 
-        const testQuery = () => {
-            urqlClient
-                .query(query)
-                .toPromise()
-                .then(result => {
-                    console.log(result);
-                })
+        const testQuery = async () => {
+            const queryResult = await urqlClient.query(query).toPromise();
         };
 
-        const testMutation = () => {
-            urqlClient
-                .mutation(mutation, { text: '3rd todo' })
-                .toPromise()
-                .then(result => {
-                    console.log(result);
-                })
+        const testMutation = async () => {
+            const mutationResult = await urqlClient.mutation(mutation, { text: '3rd todo' }).toPromise();
         };
 
-        console.log(testQuery());
-        console.log(testMutation());
+        bench.start();
+        // testQuery();
+        testMutation();
+        bench.stop();
 
-        // bench.stop();
     </script>
 </body>
 
