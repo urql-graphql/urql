@@ -314,7 +314,7 @@ cache.readFragment(
   `,
   { id: 1 }, // this identifies the fragment (User) entity
   { groupId: 5 } // any additional field variables
-)
+);
 ```
 
 [Read more about using `readFragment` on the ["Computed Queries"
@@ -473,10 +473,11 @@ on the "Computed Queries" page.](../graphcache/computed-queries.md#pagination)
 Accepts a single object of optional options and returns a resolver that can be inserted into the
 [`cacheExchange`'s](#cacheexchange) [`resolvers` configuration.](#resolvers-option)
 
-| Argument         | Type      | Description                                                                                                                                                        |
-| ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `offsetArgument` | `?string` | The field arguments' property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
-| `limitArgument`  | `?string` | The field arguments' property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
+| Argument         | Type                  | Description                                                                                                                                                        |
+| ---------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `offsetArgument` | `?string`             | The field arguments' property, as passed to the resolver, that contains the current offset, i.e. the number of items to be skipped. Defaults to `'skip'`.          |
+| `limitArgument`  | `?string`             | The field arguments' property, as passed to the resolver, that contains the current page size limit, i.e. the number of items on each page. Defaults to `'limit'`. |
+| `mergeMode`      | `'after' \| 'before'` | This option defines whether pages are merged before or after preceding ones when paginating. Defaults to `'after'`.                                                |
 
 Once set up, the resulting resolver is able to automatically concatenate all pages of a given field
 automatically. Queries to this resolvers will from then on only return the infinite, combined list
