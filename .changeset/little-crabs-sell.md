@@ -2,4 +2,4 @@
 '@urql/exchange-graphcache': minor
 ---
 
-Add mergeMode = 'before' | 'after' to simplePagination helper to define whether pages are merged before or after when you paginate forwards and backwards
+Add a `mergeMode: 'before' | 'after'` option to the `simplePagination` helper to define whether pages are merged before or after preceding ones when pagination, similar to `relayPagination`'s option
