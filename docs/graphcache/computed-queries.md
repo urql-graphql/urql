@@ -6,10 +6,10 @@ order: 2
 # Computed Queries
 
 When dealing with data we could have special cases where we want to transform
-the data between the API and frontend logic, for example:
+the data between the API and frontend logic. For example:
 
 - alter the format of a date, perhaps from a UNIX timestamp to a `Date` object.
-- if we have a list of a certain entity in the cache and next we want to query a
+- if we have a list of a certain entity in the cache and then want to query a
   specific entity, chances are this will already be (partially) available in the
   cache's list.
 
@@ -60,7 +60,7 @@ Our cache methods have three arguments:
 
 - `entity` – This can either be an object containing a `__typename` and an `id` or
   `_id` field _or_ a string key leading to a cached entity.
-- `field` – The field you want data for. This can be a relation or a single property.
+- `field` – The field we want data for. This can be a relation or a single property.
 - `arguments` – The arguments to include on the field.
 
 To get a better grasp let's look at a few examples,
@@ -106,9 +106,9 @@ console.log(name); // 'Bar'
 ```
 
 This can help solve practical use cases like date formatting,
-where you would query the date and then convert it in your resolver.
+where we would query the date and then convert it in our resolver.
 
-You can also link entities that come from a list, imagine the scenario where
+We can also link entities that come from a list, imagine the scenario where
 we have queried `todos` but now want the detailView of a single `todo`.
 
 ```js
@@ -124,11 +124,11 @@ cache resolve this to the full entity.
 
 Note that resolving from a list to details can lead to partial data, this will result in
 a network-request to get the full data when fields are missing.
-When graphcache isn't [aware of your schema](./schema-awareness.md) it won't show partial data.
+When graphcache isn't [aware of our schema](./schema-awareness.md) it won't show partial data.
 
 ### Reading a query
 
-Another method the cache allows is to let you read a full query, this method
+Another method the cache allows is to let us read a full query, this method
 accepts an object of `query` and optionally `variables`.
 
 ```js
@@ -169,7 +169,7 @@ fragment.
 
 ### Simple Pagination
 
-Given you have a schema that uses some form of `offset` and `limit` based pagination you can use the
+Given we have a schema that uses some form of `offset` and `limit` based pagination, we can use the
 `simplePagination` exported from `@urql/exchange-graphcache/extras` to achieve an endless scroller.
 
 This helper will concatenate all queries performed to one long data structure.
@@ -187,44 +187,44 @@ const cache = cacheExchange({
 });
 ```
 
-This form of pagination accepts an object as an argument, you can specify two
+This form of pagination accepts an object as an argument, we can specify two
 options in here `limitArgument` and `offsetArgument` these will default to `limit`
-and `skip` respectively. This way you can use the keywords that you are using in
-your queries.
+and `skip` respectively. This way we can use the keywords that are in our queries.
 
-You can also specify `mergeMode`, which defaults to `after` and can otherwise
-be set to `before`. This will handle how pages are merged when you paginate
-forwards and backwards at the same time. The `before` mode assumes that pages
-that come in last should be merged _before_ the first pages. The default `after`
-mode assumes that pages that come in last should be merged _after_ the first pages.
+We may also add the `mergeMode` option, which defaults to `'after'` and can otherwise
+be set to `'before'`. This will handle in which order pages are merged when paginating.
+The default `after` mode assumes that pages that come in last should be merged
+_after_ the first pages. The `'before'` mode assumes that pages that come in last
+should be merged _before_ the first pages, which can be helpful in a reverse
+endless scroller (E.g. Chat App).
 
-Examples series of requests with `limit: 3`:
+Example series of requests:
 
 ```
-// Where mergeMode: after makes sense
-skip: 0 => 1, 2, 3
-skip: 3 => 44, 55, 66
+// An example where mergeMode: after works better
+skip: 0, limit: 3 => 1, 2, 3
+skip: 3, limit: 3 => 4, 5, 6
 
-mergeMode: after => 1, 2, 3, 44, 55, 66
-mergeMode: before => 44, 55, 66, 1, 2, 3
+mergeMode: after => 1, 2, 3, 4, 5, 6 ✔️
+mergeMode: before => 4, 5, 6, 1, 2, 3
 
-// Where mergeMode: before makes sense
-skip: 0 => 44, 55, 66
-skip: 3 => 1, 2, 3
+// An example where mergeMode: before works better
+skip: 0, limit: 3 => 4, 5, 6
+skip: 3, limit: 3 => 1, 2, 3
 
-mergeMode: after => 44, 55, 66, 1, 2, 3
-mergeMode: before => 1, 2, 3, 44, 55, 66
+mergeMode: after => 4, 5, 6, 1, 2, 3
+mergeMode: before => 1, 2, 3, 4, 5, 6 ✔️
 ```
 
 ### Relay Pagination
 
-Given you have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
-on your backend we offer the possibility of endless data resolving.
-This means that when you fetch the next page in your data
-received in `useQuery` you'll see the previous pages as well. This is useful for
+Given we have a [relay-compatible schema](https://facebook.github.io/relay/graphql/connections.htm)
+on our backend, we can offer the possibility of endless data resolving.
+This means that when we fetch the next page in our data
+received in `useQuery` we'll see the previous pages as well. This is useful for
 endless scrolling.
 
-You can achieve this by importing `relayPagination` from `@urql/exchange-graphcache/extras`.
+We can achieve this by importing `relayPagination` from `@urql/exchange-graphcache/extras`.
 
 ```js
 import { cacheExchange } from '@urql/exchange-graphcache';
@@ -241,7 +241,7 @@ const cache = cacheExchange({
 
 `relayPagination` accepts an object of options, for now we are offering one
 option and that is the `mergeMode`. This defaults to `inwards` and can otherwise
-be set to `outwards`. This will handle how pages are merged when you paginate
+be set to `outwards`. This will handle how pages are merged when we paginate
 forwards and backwards at the same time. outwards pagination assumes that pages
 that come in last should be merged before the first pages, so that the list
 grows outwards in both directions. The default inwards pagination assumes that
@@ -261,8 +261,8 @@ last: 1, before: c => node 89, startCursor: d
 With inwards merging the nodes will be in this order: `[1, 2, ..., 89, 99]`
 And with outwards merging: `[..., 89, 99, 1, 2, ...]`
 
-The helper happily supports schemata that return nodes rather than
-individually-cursored edges. For each paginated type, you must either
+The helper happily supports schema that return nodes rather than
+individually-cursored edges. For each paginated type, we must either
 always request nodes, or always request edges -- otherwise the lists
 cannot be stiched together.
 
