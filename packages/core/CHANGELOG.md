@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.15.2
+
+### Patch Changes
+
+- Don't add `undefined` to any property of the `ssrExchange`'s serialized results, as this would crash in Next.js, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1168](https://github.com/FormidableLabs/urql/pull/1168))
+
 ## 1.15.1
 
 ### Patch Changes

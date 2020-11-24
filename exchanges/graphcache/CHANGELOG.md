@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 3.2.0
+
+### Minor Changes
+
+- Add a `mergeMode: 'before' | 'after'` option to the `simplePagination` helper to define whether pages are merged before or after preceding ones when pagination, similar to `relayPagination`'s option, by [@hoangvvo](https://github.com/hoangvvo) (See [#1174](https://github.com/FormidableLabs/urql/pull/1174))
+
+### Patch Changes
+
+- Updated dependencies (See [#1168](https://github.com/FormidableLabs/urql/pull/1168))
+  - @urql/core@1.15.2
+
 ## 3.1.11
 
 ### Patch Changes
