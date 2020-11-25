@@ -27,19 +27,31 @@ export const cache = cacheExchange({
     }
 });
 
-// // local schema to be used with Execute Exchange
+// local schema to be used with Execute Exchange
 const schema = buildSchema(`
     type Todo {
         id: ID!
         text: String!
+        complete: Boolean!
     }
 
+    input NewTodo {
+        id: ID!
+        text: String!
+        complete: Boolean!
+    }
+
+    input NewTodosInput {
+        todos: [NewTodo]!
+    }
+    
     type Query {
         todos: [Todo]!
     }
-
+    
     type Mutation {
-        addTodo( text: String! ): Todo!
+        addTodo( text: String!, complete: Boolean! ): Todo!
+        addTodos( newTodos: NewTodosInput! ): [Todo]
     }
 `);
 
@@ -55,6 +67,11 @@ const rootValue = {
         const todo = { id: todos.length.toString(), ...args };
         todos.push(todo);
         return todo;
+    },
+    addTodos: ({ newTodos }) => {
+        const todosToBeAdded = newTodos.todos;
+        todos.push(...todosToBeAdded);
+        return todos;
     }
 };
 
