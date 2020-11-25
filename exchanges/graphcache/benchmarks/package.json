@@ -4,7 +4,12 @@
   "description": "Comprehensive Tachometer benchmarks for urql/graphcache",
   "main": "index.js",
   "scripts": {
-    "tach": "tachometer forloop.html"
+    "write100": "tachometer 100Writes.html",
+    "write1000": "tachometer 1000Writes.html",
+    "write10000": "tachometer 10000Writes.html",
+    "read100": "tachometer 100Reads.html",
+    "read1000": "tachometer 1000Reads.html",
+    "read10000": "tachometer 10000Reads.html"
   },
   "license": "MIT",
   "dependencies": {
