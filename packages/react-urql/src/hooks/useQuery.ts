@@ -175,7 +175,9 @@ export function useQuery<Data = any, Variables = object>(
 
   // This is the imperative execute function passed to the user
   const executeQuery = useCallback(
-    (opts?: Partial<OperationContext>) => update(makeQuery$(opts)),
+    (opts?: Partial<OperationContext>) => {
+      update(makeQuery$({ suspense: false, ...opts }));
+    },
     [update, makeQuery$]
   );
 
