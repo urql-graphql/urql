@@ -19,7 +19,8 @@ in!
 
 - If you have a question, try [creating a GitHub Discussions thread.](https://github.com/FormidableLabs/urql/discussions/new)
 - If you think you've found a bug, [open a new issue.](https://github.com/FormidableLabs/urql/issues/new/choose)
-- If you made a change you'd like to contribute, [open a PR.](https://github.com/FormidableLabs/urql/compare)
+- or, if you found a bug you'd like to fix, [open a PR.](https://github.com/FormidableLabs/urql/compare)
+- If you'd like to propose a change [open an RFC issue.](https://github.com/FormidableLabs/urql/issues/new?labels=future+%F0%9F%94%AE&template=RFC.md&title=RFC%3A+Your+Proposal) You can read more about the RFC process [below](#how-do-i-propose-changes).
 
 ### What are the issue conventions?
 
