@@ -8,6 +8,7 @@ export const makeResult = (
 ): OperationResult => ({
   operation,
   data: result.data,
+  headers: response.headers,
   error: Array.isArray(result.errors)
     ? new CombinedError({
         graphQLErrors: result.errors,

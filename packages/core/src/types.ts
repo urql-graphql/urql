@@ -69,6 +69,8 @@ export interface OperationResult<Data = any, Variables = any> {
   operation: Operation<Data, Variables>;
   /** The data returned from the Graphql server. */
   data?: Data;
+  /** The headers returned from the Graphql server response */
+  headers?: Headers;
   /** Any errors resulting from the operation. */
   error?: CombinedError;
   /** Optional extensions return by the Graphql server. */
