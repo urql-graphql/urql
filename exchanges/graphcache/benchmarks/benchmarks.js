@@ -1,5 +1,5 @@
 import urqlClient from './urqlClient.js';
-import { ALL_TODOS_QUERY, ALL_WRITERS_QUERY, ALL_BOOKS_QUERY, ALL_STORES_QUERY, ALL_EMPLOYEES_QUERY, ALL_AUTHORS_QUERY,ADD_TODO_MUTATION, ADD_TODOS_MUTATION, ADD_WRITERS_MUTATION, ADD_BOOKS_MUTATION, ADD_STORES_MUTATION, ADD_EMPLOYEES_MUTATION, ADD_AUTHORS_MUTATION } from "./operations.js";
+import { ALL_TODOS_QUERY, ALL_WRITERS_QUERY, ALL_BOOKS_QUERY, ALL_STORES_QUERY, ALL_EMPLOYEES_QUERY, ALL_AUTHORS_QUERY,ADD_TODO_MUTATION, UPDATE_TODO_MUTATION, ADD_TODOS_MUTATION, ADD_WRITERS_MUTATION, ADD_BOOKS_MUTATION, ADD_STORES_MUTATION, ADD_EMPLOYEES_MUTATION, ADD_AUTHORS_MUTATION } from "./operations.js";
 
 // create functions that execute operations/queries/mutaitons to be benchmarked
 export const getAllTodos = async () => {
@@ -30,6 +30,11 @@ export const addTodo = async () => {
     const newTodo = newTodo = { text: 'New todo', complete: true };
     const mutationResult = await urqlClient.mutation(ADD_TODO_MUTATION, newTodo).toPromise();
     console.log("addTodo Mutation Result", mutationResult);
+};
+export const updateTodo = async ({ id, complete }) => {
+    const updatedTodo = { id, complete };
+    const mutationResult = await urqlClient.mutation(UPDATE_TODO_MUTATION, updatedTodo).toPromise();
+    console.log("updateTodo Mutation Result", mutationResult);
 };
 export const addTodos = async todosToBeAdded => {
     const newTodos = { newTodos: { todos: todosToBeAdded } };

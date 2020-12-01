@@ -2,7 +2,7 @@
 export const makeTodo = i => ({
     id: `${i}`,
     text: `Todo ${i}`,
-    complete: Boolean(i % 2),
+    complete: false,
 });
 export const makeWriter = i => ({
     id: `${i}`,

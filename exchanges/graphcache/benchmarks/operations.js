@@ -68,6 +68,15 @@ export const ADD_TODO_MUTATION = `
         }
     }
 `;
+export const UPDATE_TODO_MUTATION = `
+    mutation UPDATE_TODO_MUTATION($id: ID!, $complete: Boolean!){
+        updateTodo(id: $id, complete: $complete){
+            id,
+            text,
+            complete
+        }
+    }
+`;
 export const ADD_TODOS_MUTATION = `
     mutation ADD_TODOS_MUTATION($newTodos: NewTodosInput!){
         addTodos(newTodos: $newTodos){

@@ -4,6 +4,7 @@
   "description": "Comprehensive Tachometer benchmarks for urql/graphcache",
   "main": "index.js",
   "scripts": {
+    "update": "tachometer updateTodo.html",
     "write100": "tachometer 100Writes.html",
     "write100c": "tachometer 100WritesComplex.html",
     "write500": "tachometer 500Writes.html",

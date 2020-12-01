@@ -177,6 +177,7 @@ const schema = buildSchema(`
     
     type Mutation {
         addTodo( text: String!, complete: Boolean! ): Todo!
+        updateTodo( id: ID!, complete: Boolean! ): Todo!
         addTodos( newTodos: NewTodosInput! ): [Todo]!
         addWriters( newWriters: NewWritersInput! ): [Writer]!
         addBooks( newBooks: NewBooksInput! ): [Book]!
@@ -186,7 +187,7 @@ const schema = buildSchema(`
     }
 `);
 
-// // local state to be used with Execute Exchange
+// local state to be used with Execute Exchange
 const todos = [];
 const writers = [];
 const books = [];
@@ -194,7 +195,7 @@ const stores = [];
 const employees = [];
 const authors = [];
 
-// // root value with resolvers to be used with Execute Exchange
+// root value with resolvers to be used with Execute Exchange
 const rootValue = {
     todos: () => {
         return todos;
@@ -218,6 +219,11 @@ const rootValue = {
         const todo = { id: todos.length.toString(), ...args };
         todos.push(todo);
         return todo;
+    },
+    updateTodo: ({ id, complete }) => {
+        const todoToBeUpdated = todos.find( todo => todo.id === id );
+        todoToBeUpdated.complete = complete;
+        return todoToBeUpdated;
     },
     addTodos: ({ newTodos }) => {
         const todosToBeAdded = newTodos.todos;
