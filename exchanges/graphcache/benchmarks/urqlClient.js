@@ -37,7 +37,7 @@ const schema = buildSchema(`
 
     type Writer {
         name: String
-        amountOfBooks: Int!
+        amountOfBooks: Float!
         recognized: Boolean!
         number: Int!
         interests: String!
@@ -70,18 +70,33 @@ const schema = buildSchema(`
         todos: [NewTodo]!
     }
     
+    input NewWriter {
+        id: ID!
+        name: String
+        amountOfBooks: Float!
+        recognized: Boolean!
+        number: Int!
+        interests: String!
+    }
+
+    input NewWritersInput {
+        writers: [NewWriter]!
+    }
+
     type Query {
         todos: [Todo]!
     }
     
     type Mutation {
         addTodo( text: String!, complete: Boolean! ): Todo!
-        addTodos( newTodos: NewTodosInput! ): [Todo]
+        addTodos( newTodos: NewTodosInput! ): [Todo]!
+        addWriters( newWriters: NewWritersInput! ): [Writer]!
     }
 `);
 
 // // local state to be used with Execute Exchange
 const todos = [];
+const writers = [];
 
 // // root value with resolvers to be used with Execute Exchange
 const rootValue = {
@@ -97,6 +112,11 @@ const rootValue = {
         const todosToBeAdded = newTodos.todos;
         todos.push(...todosToBeAdded);
         return todos;
+    },
+    addWriters: ({ newWriters }) => {
+        const writersToBeAdded = newWriters.writers;
+        writers.push(...writersToBeAdded);
+        return writers;
     }
 };
 

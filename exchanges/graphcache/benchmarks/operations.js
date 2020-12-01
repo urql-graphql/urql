@@ -7,7 +7,7 @@ export const ALL_TODOS_QUERY = `
             complete
         }
     }
-    `;
+`;
 export const ADD_TODO_MUTATION = `
     mutation ADD_TODO_MUTATION($text: String!, $complete: Boolean!){
         addTodo(text: $text, complete: $complete){
@@ -16,7 +16,7 @@ export const ADD_TODO_MUTATION = `
             complete
         }
     }
-    `;
+`;
 export const ADD_TODOS_MUTATION = `
     mutation ADD_TODOS_MUTATION($newTodos: NewTodosInput!){
         addTodos(newTodos: $newTodos){
@@ -25,4 +25,16 @@ export const ADD_TODOS_MUTATION = `
             complete
         }
     }
-    `;
+`;
+export const ADD_WRITERS_MUTATION = `
+    mutation ADD_WRITERS_MUTATION($newWriters: NewWritersInput!){
+        addWriters(newWriters: $newWriters){
+            id,
+            name,
+            amountOfBooks,
+            recognized,
+            number,
+            interests
+        }
+    }
+`;
