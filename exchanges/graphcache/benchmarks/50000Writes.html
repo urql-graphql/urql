@@ -20,11 +20,11 @@
         import { getAllTodos, addTodos, addWriters, addBooks, addStores, addEmployees } from "./benchmarks.js";
 
         // create entities to be written
-        const hundredTodos = makeEntries(10000, makeTodo);
-        const hundredWriters = makeEntries(10000, makeWriter);
-        const hundredBooks = makeEntries(10000, makeBook);
-        const hundredStores = makeEntries(10000, makeStore);
-        const hundredEmployees = makeEntries(10000, makeEmployee);
+        const tenThousandTodos = makeEntries(10000, makeTodo);
+        const tenThousandWriters = makeEntries(10000, makeWriter);
+        const tenThousandBooks = makeEntries(10000, makeBook);
+        const tenThousandStores = makeEntries(10000, makeStore);
+        const tenThousandEmployees = makeEntries(10000, makeEmployee);
 
         bench.start();
         addTodos(hundredTodos);

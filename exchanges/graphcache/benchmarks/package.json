@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "write100": "tachometer 100Writes.html",
+    "write100c": "tachometer 100WritesComplex.html",
     "write500": "tachometer 500Writes.html",
     "write1000": "tachometer 1000Writes.html",
     "write5000": "tachometer 5000Writes.html",

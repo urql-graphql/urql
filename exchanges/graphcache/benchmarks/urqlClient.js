@@ -50,6 +50,7 @@ const schema = buildSchema(`
         published: Boolean!
         genre: String!
         rating: Float!
+        review: Review
     }
 
     type Store {
@@ -62,6 +63,26 @@ const schema = buildSchema(`
         id: ID!
         name: String!
         origin: String!
+    }
+
+    type Author {
+        id: ID!
+        name: String!
+        recognized: Boolean!
+        book: Book!
+    }
+
+    type Review {
+        id: ID!
+        score: Int!
+        name: String!
+        reviewer: Person!
+    }
+
+    type Person {
+        id: ID!
+        name: String!
+        verfied: Boolean!
     }
 
     input NewTodo {
@@ -93,6 +114,7 @@ const schema = buildSchema(`
         published: Boolean!
         genre: String!
         rating: Float!
+        review: NewReview
     }
 
     input NewBooksInput {
@@ -119,12 +141,38 @@ const schema = buildSchema(`
         employees: [NewEmployee]!
     }
 
+    input NewAuthor {
+        id: ID!
+        name: String!
+        recognized: Boolean!
+        book: NewBook!
+    }
+
+    
+    input NewAuthorsInput {
+        authors: [NewAuthor]!
+    }
+    
+    input NewReview {
+        id: ID!
+        score: Int!
+        name: String!
+        reviewer: NewPerson!
+    }
+
+    input NewPerson {
+        id: ID!
+        name: String!
+        verified: Boolean!
+    }
+
     type Query {
         todos: [Todo]!
         writers: [Writer]!
         books: [Book]!
         stores: [Store]!
-        employees: [Employee]
+        employees: [Employee]!
+        authors: [Author]!
     }
     
     type Mutation {
@@ -134,6 +182,7 @@ const schema = buildSchema(`
         addBooks( newBooks: NewBooksInput! ): [Book]!
         addStores( newStores: NewStoresInput! ): [Store]!
         addEmployees( newEmployees: NewEmployeesInput! ): [Employee]!
+        addAuthors( newAuthors: NewAuthorsInput! ): [Author]!
     }
 `);
 
@@ -143,6 +192,7 @@ const writers = [];
 const books = [];
 const stores = [];
 const employees = [];
+const authors = [];
 
 // // root value with resolvers to be used with Execute Exchange
 const rootValue = {
@@ -160,6 +210,9 @@ const rootValue = {
     },
     employees: () => {
         return employees;
+    },
+    authors: () => {
+        return authors;
     },
     addTodo: args => {
         const todo = { id: todos.length.toString(), ...args };
@@ -190,6 +243,11 @@ const rootValue = {
         const employeesToBeAdded = newEmployees.employees;
         employees.push(...employeesToBeAdded);
         return employees;
+    },
+    addAuthors: ({ newAuthors }) => {
+        const authorsToBeAdded = newAuthors.authors;
+        authors.push(...authorsToBeAdded);
+        return authors;
     }
 };
 

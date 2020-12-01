@@ -49,6 +49,16 @@ export const ALL_EMPLOYEES_QUERY = `
         }
     }
 `;
+export const ALL_AUTHORS_QUERY = `
+    query ALL_AUTHORS_QUERY {
+        authors {
+            id: ID!
+            name: String!
+            recognized: Boolean!
+            book: Book!
+        }
+    }
+`;
 export const ADD_TODO_MUTATION = `
     mutation ADD_TODO_MUTATION($text: String!, $complete: Boolean!){
         addTodo(text: $text, complete: $complete){
@@ -105,6 +115,16 @@ export const ADD_EMPLOYEES_MUTATION = `
             id,
             name,
             origin
+        }
+    }
+`;
+export const ADD_AUTHORS_MUTATION = `
+    mutation ADD_AUTHORS_MUTATION($newAuthors: NewAuthorsInput!){
+        addAuthors(newAuthors: $newAuthors){
+            id
+            name
+            recognized
+            book
         }
     }
 `;
