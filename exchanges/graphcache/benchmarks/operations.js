@@ -8,6 +8,47 @@ export const ALL_TODOS_QUERY = `
         }
     }
 `;
+export const ALL_WRITERS_QUERY = `
+    query ALL_WRITERS_QUERY {
+        writers {
+            id,
+            name,
+            amountOfBooks,
+            recognized,
+            number,
+            interests
+        }
+    }
+`;
+export const ALL_BOOKS_QUERY = `
+    query ALL_BOOKS_QUERY {
+        books {
+            id,
+            title,
+            published,
+            genre,
+            rating
+        }
+    }
+`;
+export const ALL_STORES_QUERY = `
+    query ALL_STORES_QUERY {
+        stores {
+            id,
+            name,
+            country
+        }
+    }
+`;
+export const ALL_EMPLOYEES_QUERY = `
+    query ALL_EMPLOYEES_QUERY {
+        employees {
+            id,
+            name,
+            origin
+        }
+    }
+`;
 export const ADD_TODO_MUTATION = `
     mutation ADD_TODO_MUTATION($text: String!, $complete: Boolean!){
         addTodo(text: $text, complete: $complete){

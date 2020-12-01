@@ -1,10 +1,26 @@
 import urqlClient from './urqlClient.js';
-import { ALL_TODOS_QUERY, ADD_TODO_MUTATION, ADD_TODOS_MUTATION, ADD_WRITERS_MUTATION, ADD_BOOKS_MUTATION, ADD_STORES_MUTATION, ADD_EMPLOYEES_MUTATION } from "./operations.js";
+import { ALL_TODOS_QUERY, ALL_WRITERS_QUERY, ALL_BOOKS_QUERY, ALL_STORES_QUERY, ALL_EMPLOYEES_QUERY,ADD_TODO_MUTATION, ADD_TODOS_MUTATION, ADD_WRITERS_MUTATION, ADD_BOOKS_MUTATION, ADD_STORES_MUTATION, ADD_EMPLOYEES_MUTATION } from "./operations.js";
 
 // create functions that execute operations/queries/mutaitons to be benchmarked
 export const getAllTodos = async () => {
     const queryResult = await urqlClient.query(ALL_TODOS_QUERY).toPromise();
     console.log("getAllTodoss Query Result", queryResult);
+};
+export const getAllWriters = async () => {
+    const queryResult = await urqlClient.query(ALL_WRITERS_QUERY).toPromise();
+    console.log("getAllWriterss Query Result", queryResult);
+};
+export const getAllBooks = async () => {
+    const queryResult = await urqlClient.query(ALL_BOOKS_QUERY).toPromise();
+    console.log("getAllBooks Query Result", queryResult);
+};
+export const getAllStores = async () => {
+    const queryResult = await urqlClient.query(ALL_STORES_QUERY).toPromise();
+    console.log("getAllStores Query Result", queryResult);
+};
+export const getAllEmployees = async () => {
+    const queryResult = await urqlClient.query(ALL_EMPLOYEES_QUERY).toPromise();
+    console.log("getAllEmployees Query Result", queryResult);
 };
 export const addTodo = async () => {
     const newTodo = newTodo = { text: 'New todo', complete: true };

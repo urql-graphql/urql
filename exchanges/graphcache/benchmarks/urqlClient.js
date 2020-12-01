@@ -121,6 +121,10 @@ const schema = buildSchema(`
 
     type Query {
         todos: [Todo]!
+        writers: [Writer]!
+        books: [Book]!
+        stores: [Store]!
+        employees: [Employee]
     }
     
     type Mutation {
@@ -144,6 +148,18 @@ const employees = [];
 const rootValue = {
     todos: () => {
         return todos;
+    },
+    writers: () => {
+        return writers;
+    },
+    books: () => {
+        return books;
+    },
+    stores: () => {
+        return stores;
+    },
+    employees: () => {
+        return employees;
     },
     addTodo: args => {
         const todo = { id: todos.length.toString(), ...args };
@@ -173,7 +189,6 @@ const rootValue = {
     addEmployees: ({ newEmployees }) => {
         const employeesToBeAdded = newEmployees.employees;
         employees.push(...employeesToBeAdded);
-        console.log("employees => ", employees);
         return employees;
     }
 };

@@ -7,10 +7,15 @@
     "write100": "tachometer 100Writes.html",
     "write500": "tachometer 500Writes.html",
     "write1000": "tachometer 1000Writes.html",
+    "write5000": "tachometer 5000Writes.html",
     "write10000": "tachometer 10000Writes.html",
+    "write50000": "tachometer 50000Writes.html",
     "read100": "tachometer 100Reads.html",
+    "read500": "tachometer 500Reads.html",
     "read1000": "tachometer 1000Reads.html",
-    "read10000": "tachometer 10000Reads.html"
+    "read5000": "tachometer 5000Reads.html",
+    "read10000": "tachometer 10000Reads.html",
+    "read50000": "tachometer 50000Reads.html"
   },
   "license": "MIT",
   "dependencies": {
