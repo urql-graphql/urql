@@ -10,7 +10,7 @@ export const makeWriter = i => ({
     amountOfBooks: Math.random() * 100,
     recognised: Boolean(i % 2),
     number: i,
-    interests: 'star wars',
+    interests: 'Dragonball-Z',
 });
 export const makeBook = i => ({
     id: `${i}`,
@@ -26,6 +26,6 @@ export const makeStore = i => ({
 });
 export const makeEmployee = i => ({
     id: `${i}`,
-    name: `employee ${i}`,
+    name: `Joe ${i}`,
     origin: countries[Math.floor(Math.random()) * 4],
 });

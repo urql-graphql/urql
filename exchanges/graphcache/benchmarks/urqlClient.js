@@ -35,6 +35,31 @@ const schema = buildSchema(`
         complete: Boolean!
     }
 
+    type Writer {
+        name: String
+        amountOfBooks: Int!
+        recognized: Boolean!
+        number: Int!
+        interests: String!
+    }
+
+    type Book {
+        title: String!
+        published: Boolean!
+        genre: String!
+        rating: Int!
+    }
+
+    type Store {
+        name: String!
+        country: String!
+    }
+
+    type Employee {
+        name: String!
+        origin: String!
+    }
+
     input NewTodo {
         id: ID!
         text: String!
