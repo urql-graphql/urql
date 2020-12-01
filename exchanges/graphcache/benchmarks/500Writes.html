@@ -17,7 +17,7 @@
         import * as bench from '/bench.js';
         import { makeEntries } from "./makeEntries.js";
         import { makeTodo, makeWriter, makeBook, makeStore, makeEmployee } from "./entities.js";
-        import { getAllTodos, addTodos, addWriters } from "./benchmarks.js";
+        import { getAllTodos, addTodos, addWriters, addBooks, addStores, addEmployees } from "./benchmarks.js";
 
         // create entities to be written
         const hundredTodos = makeEntries(100, makeTodo);
@@ -28,10 +28,10 @@
 
         // bench.start();
         // addTodos(hundredTodos);
-        addWriters(hundredWriters);
+        // addWriters(hundredWriters);
         // addBooks(hundredBooks);
         // addStores(hundredStores);
-        // addEmployees(hundredEmployees);
+        addEmployees(hundredEmployees);
         // bench.stop();
 
     </script>

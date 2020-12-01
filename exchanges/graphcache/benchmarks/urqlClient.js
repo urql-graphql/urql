@@ -36,6 +36,7 @@ const schema = buildSchema(`
     }
 
     type Writer {
+        id: ID!
         name: String
         amountOfBooks: Float!
         recognized: Boolean!
@@ -44,18 +45,21 @@ const schema = buildSchema(`
     }
 
     type Book {
+        id: ID!
         title: String!
         published: Boolean!
         genre: String!
-        rating: Int!
+        rating: Float!
     }
 
     type Store {
+        id: ID!
         name: String!
         country: String!
     }
 
     type Employee {
+        id: ID!
         name: String!
         origin: String!
     }
@@ -83,6 +87,38 @@ const schema = buildSchema(`
         writers: [NewWriter]!
     }
 
+    input NewBook {
+        id: ID!
+        title: String!
+        published: Boolean!
+        genre: String!
+        rating: Float!
+    }
+
+    input NewBooksInput {
+        books: [NewBook]!
+    }
+
+    input NewStore {
+        id: ID!
+        name: String!
+        country: String!
+    }
+
+    input NewStoresInput {
+        stores: [NewStore]!
+    }
+
+    input NewEmployee {
+        id: ID!
+        name: String!
+        origin: String!
+    }
+
+    input NewEmployeesInput {
+        employees: [NewEmployee]!
+    }
+
     type Query {
         todos: [Todo]!
     }
@@ -91,12 +127,18 @@ const schema = buildSchema(`
         addTodo( text: String!, complete: Boolean! ): Todo!
         addTodos( newTodos: NewTodosInput! ): [Todo]!
         addWriters( newWriters: NewWritersInput! ): [Writer]!
+        addBooks( newBooks: NewBooksInput! ): [Book]!
+        addStores( newStores: NewStoresInput! ): [Store]!
+        addEmployees( newEmployees: NewEmployeesInput! ): [Employee]!
     }
 `);
 
 // // local state to be used with Execute Exchange
 const todos = [];
 const writers = [];
+const books = [];
+const stores = [];
+const employees = [];
 
 // // root value with resolvers to be used with Execute Exchange
 const rootValue = {
@@ -117,6 +159,22 @@ const rootValue = {
         const writersToBeAdded = newWriters.writers;
         writers.push(...writersToBeAdded);
         return writers;
+    },
+    addBooks: ({ newBooks }) => {
+        const booksToBeAdded = newBooks.books;
+        books.push(...booksToBeAdded);
+        return books;
+    },
+    addStores: ({ newStores }) => {
+        const storesToBeAdded = newStores.stores;
+        stores.push(...storesToBeAdded);
+        return stores;
+    },
+    addEmployees: ({ newEmployees }) => {
+        const employeesToBeAdded = newEmployees.employees;
+        employees.push(...employeesToBeAdded);
+        console.log("employees => ", employees);
+        return employees;
     }
 };
 

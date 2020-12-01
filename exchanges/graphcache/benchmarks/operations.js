@@ -38,3 +38,32 @@ export const ADD_WRITERS_MUTATION = `
         }
     }
 `;
+export const ADD_BOOKS_MUTATION = `
+    mutation ADD_BOOKS_MUTATION($newBooks: NewBooksInput!){
+        addBooks(newBooks: $newBooks){
+            id,
+            title,
+            published,
+            genre,
+            rating
+        }
+    }
+`;
+export const ADD_STORES_MUTATION = `
+    mutation ADD_STORES_MUTATION($newStores: NewStoresInput!){
+        addStores(newStores: $newStores){
+            id,
+            name,
+            country
+        }
+    }
+`;
+export const ADD_EMPLOYEES_MUTATION = `
+    mutation ADD_EMPLOYEES_MUTATION($newEmployees: NewEmployeesInput!){
+        addEmployees(newEmployees: $newEmployees){
+            id,
+            name,
+            origin
+        }
+    }
+`;
