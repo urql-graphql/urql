@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>100 Writes Complex</title>
+    <title>1000 Writes Complex</title>
     <script>
         window.process = { env: { NODE_ENV: "development" } };
     </script>
@@ -20,7 +20,7 @@
         import { getAllAuthors, addAuthors } from "./benchmarks.js";
 
         // create authors to be added/written
-        const hundredAuthors = makeEntries(100, makeAuthor);
+        const hundredAuthors = makeEntries(1000, makeAuthor);
 
         // measure how long write takes
         bench.start();
