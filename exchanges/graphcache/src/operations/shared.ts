@@ -149,7 +149,7 @@ export const makeSelectionIterator = (
             ))();
           }
         }
-      } else if (getName(node) !== '__typename') {
+      } else {
         return node;
       }
     }
