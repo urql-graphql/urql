@@ -50,7 +50,7 @@ describe('formatTypeNames', () => {
   });
 
   it('preserves custom properties', () => {
-    const doc = parse(`{ id todos { id } }`) as any;
+    const doc = parse(`{ todos { id } }`) as any;
     doc.documentId = '123';
     expect((formatDocument(doc) as any).documentId).toBe(doc.documentId);
   });
@@ -79,6 +79,26 @@ describe('formatTypeNames', () => {
                   "{
                     todos {
                       id
+                      __typename
+                    }
+                  }
+                  "
+            `);
+  });
+
+  it('does add typenames when it is aliased', () => {
+    expect(
+      formatTypeNames(`{
+      todos {
+        id
+        typename: __typename
+      }
+    }`)
+    ).toMatchInlineSnapshot(`
+                  "{
+                    todos {
+                      id
+                      typename: __typename
                       __typename
                     }
                   }

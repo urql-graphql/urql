@@ -7,6 +7,8 @@ import {
   visit,
 } from 'graphql';
 
+import { KeyedDocumentNode, keyDocument } from './request';
+
 interface EntityLike {
   [key: string]: EntityLike | EntityLike[] | any;
   __typename: string | null | void;
@@ -38,7 +40,10 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   if (
     node.selectionSet &&
     !node.selectionSet.selections.some(
-      node => node.kind === Kind.FIELD && node.name.value === '__typename'
+      node =>
+        node.kind === Kind.FIELD &&
+        node.name.value === '__typename' &&
+        !node.alias
     )
   ) {
     return {
@@ -60,13 +65,21 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   }
 };
 
-export const formatDocument = <T extends DocumentNode>(node: T): T => {
-  const result = visit(node, {
-    Field: formatNode,
-    InlineFragment: formatNode,
-  });
+const formattedDocs = new Map<number, KeyedDocumentNode>();
 
-  // Ensure that the hash of the resulting document won't suddenly change
-  result.__key = (node as any).__key;
-  return result;
+export const formatDocument = <T extends DocumentNode>(node: T): T => {
+  const query = keyDocument(node);
+
+  let result = formattedDocs.get(query.__key);
+  if (!result) {
+    result = visit(query, {
+      Field: formatNode,
+      InlineFragment: formatNode,
+    }) as KeyedDocumentNode;
+    // Ensure that the hash of the resulting document won't suddenly change
+    result.__key = query.__key;
+    formattedDocs.set(query.__key, result);
+  }
+
+  return (result as unknown) as T;
 };
