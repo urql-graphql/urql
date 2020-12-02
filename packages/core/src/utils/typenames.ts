@@ -37,7 +37,10 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   if (
     node.selectionSet &&
     !node.selectionSet.selections.some(
-      node => node.kind === Kind.FIELD && node.name.value === '__typename'
+      node =>
+        node.kind === Kind.FIELD &&
+        node.name.value === '__typename' &&
+        !node.alias
     )
   ) {
     return {

@@ -85,6 +85,26 @@ describe('formatTypeNames', () => {
                   "
             `);
   });
+
+  it('does add typenames when it is aliased', () => {
+    expect(
+      formatTypeNames(`{
+      todos {
+        id
+        typename: __typename
+      }
+    }`)
+    ).toMatchInlineSnapshot(`
+                  "{
+                    todos {
+                      id
+                      typename: __typename
+                      __typename
+                    }
+                  }
+                  "
+            `);
+  });
 });
 
 describe('collectTypesFromResponse', () => {
