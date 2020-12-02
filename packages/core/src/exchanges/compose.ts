@@ -5,21 +5,19 @@ export const composeExchanges = (exchanges: Exchange[]) => ({
   client,
   forward,
   dispatchDebug,
-}: ExchangeInput) => {
-  let i = exchanges.length;
-  while (i--) {
-    forward = exchanges[i]({
-      client,
-      forward,
-      dispatchDebug(event) {
-        dispatchDebug({
-          timestamp: Date.now(),
-          source: exchanges[i].name,
-          ...event,
-        });
-      },
-    });
-  }
-
-  return forward;
-}
+}: ExchangeInput) =>
+  exchanges.reduceRight(
+    (forward, exchange) =>
+      exchange({
+        client,
+        forward,
+        dispatchDebug(event) {
+          dispatchDebug({
+            timestamp: Date.now(),
+            source: exchange.name,
+            ...event,
+          });
+        },
+      }),
+    forward
+  );
