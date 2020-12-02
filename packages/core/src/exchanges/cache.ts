@@ -103,8 +103,9 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
         let { operation } = response;
         if (!operation) return;
 
-        const typenames = collectTypesFromResponse(response.data)
-          .concat(operation.context.additionalTypenames || []);
+        const typenames = collectTypesFromResponse(response.data).concat(
+          operation.context.additionalTypenames || []
+        );
 
         // Invalidates the cache given a mutation's response
         if (response.operation.kind === 'mutation') {
@@ -120,7 +121,8 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
           for (let i = 0; i < typenames.length; i++) {
             const typeName = typenames[i];
             const operations =
-              operationCache[typeName] || (operationCache[typeName] = new Set());
+              operationCache[typeName] ||
+              (operationCache[typeName] = new Set());
             operations.forEach(key => {
               pendingOperations.add(key);
             });
@@ -134,13 +136,14 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
               reexecuteOperation(client, operation);
             }
           });
-        // Mark typenames on typenameInvalidate for early invalidation
+          // Mark typenames on typenameInvalidate for early invalidation
         } else if (operation.kind === 'query' && response.data) {
           resultCache.set(operation.key, response);
           for (let i = 0; i < typenames.length; i++) {
             const typeName = typenames[i];
             const operations =
-              operationCache[typeName] || (operationCache[typeName] = new Set());
+              operationCache[typeName] ||
+              (operationCache[typeName] = new Set());
             operations.add(operation.key);
           }
         }

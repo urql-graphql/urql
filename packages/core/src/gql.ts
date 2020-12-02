@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { Source, Location, DocumentNode, Kind, print } from 'graphql';
 import { keyDocument } from './utils';
@@ -15,7 +16,6 @@ function gql<Data = any, Variables = object>(
   string: string
 ): TypedDocumentNode<Data, Variables>;
 
-// eslint-disable-next prefer-rest-params
 function gql(/* arguments */) {
   let body: string = Array.isArray(arguments[0])
     ? arguments[0][0]

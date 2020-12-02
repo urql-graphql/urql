@@ -8,7 +8,13 @@ import {
 } from 'graphql';
 
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
-import { gql, Client, Operation, OperationContext, makeOperation } from '@urql/core';
+import {
+  gql,
+  Client,
+  Operation,
+  OperationContext,
+  makeOperation,
+} from '@urql/core';
 
 import { populateExchange } from './populateExchange';
 
