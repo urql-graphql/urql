@@ -148,24 +148,7 @@ describe('Query', () => {
       }
     );
     // Because of us indicating Todo:Writer as a scalar
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    write(
-      store,
-      { query: INVALID_TODO_QUERY },
-      {
-        __typename: 'Mutation',
-        toggleTodo: {
-          __typename: 'Todo',
-          id: '0',
-          text: 'Teach',
-          writer: {
-            id: '0',
-          },
-        },
-      }
-    );
-
-    expect(console.warn).toHaveBeenCalledTimes(1);
+    expect(console.warn).toHaveBeenCalledTimes(2);
     expect((console.warn as any).mock.calls[0][0]).toMatch(
       /The field `writer` does not exist on `Todo`/
     );

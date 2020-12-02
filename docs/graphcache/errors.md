@@ -194,6 +194,17 @@ As data is written to the cache, this warning is issued when `undefined` is enco
 GraphQL results should never contain an `undefined` value, so this warning will let you
 know which part of your result did contain `undefined`.
 
+## (14) Couldn't find \_\_typename when writing.
+
+> Couldn't find **typename when writing.
+> If you're writing to the cache manually have to pass a `**typename` property on each entity in your data.
+
+You probably have called `cache.writeFragment` or `cache.updateQuery` with data that is missing a
+`__typename` field for an entity where your document contains a selection set. The cache won't be
+able to generate a key for entities that are missing the `__typename` field.
+
+Please make sure that you include enough properties on your data so that `write` can generate a key.
+
 ## (15) Invalid key
 
 > Invalid key: The GraphQL query at the field at `???` has a selection set,

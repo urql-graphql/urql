@@ -177,6 +177,7 @@ export class Store implements Cache {
     updater: (data: T | null) => T | null
   ): void {
     const request = createRequest<T, V>(input.query, input.variables as any);
+    request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
       startWrite(this, request, output as any);
@@ -194,8 +195,12 @@ export class Store implements Cache {
     entity: string | Data | T,
     variables?: V
   ): T | null {
-    fragment = formatDocument(fragment);
-    return readFragment(this, fragment, entity, variables as any) as T | null;
+    return readFragment(
+      this,
+      formatDocument(fragment),
+      entity,
+      variables as any
+    ) as T | null;
   }
 
   writeFragment<T = Data, V = Variables>(
@@ -203,6 +208,6 @@ export class Store implements Cache {
     data: T,
     variables?: V
   ): void {
-    writeFragment(this, fragment, data, variables as any);
+    writeFragment(this, formatDocument(fragment), data, variables as any);
   }
 }

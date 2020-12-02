@@ -194,6 +194,11 @@ const writeSelection = (
   const isRoot = !isQuery && !!ctx.store.rootNames[entityKey!];
   const typename = isRoot || isQuery ? entityKey : data.__typename;
   if (!typename) {
+    warn(
+      "Couldn't find __typename when writing.\n" +
+        "If you're writing to the cache manually have to pass a `__typename` property on each entity in your data.",
+      14
+    );
     return;
   } else if (!isRoot && !isQuery && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);

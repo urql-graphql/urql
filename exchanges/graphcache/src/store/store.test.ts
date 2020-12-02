@@ -811,7 +811,7 @@ describe('Store with storage', () => {
     InMemoryData.clearDataState();
   });
 
-  it("should warn if an optimistic field doesn't exist in the schema's mutations", function () {
+  it("should warn if an optimistic field doesn't exist in the schema's mutations", () => {
     new Store({
       schema: minifyIntrospectionQuery(
         require('../test-utils/simple_schema.json')
@@ -883,5 +883,36 @@ describe('Store with storage', () => {
 
     query(store, { query: parse(getIntrospectionQuery()) }, schema);
     expect(console.warn).toBeCalledTimes(0);
+  });
+
+  it('should warn when __typename is missing when store.writeFragment is called', () => {
+    InMemoryData.initDataState('write', store.data, null);
+
+    store.writeFragment(
+      parse(`
+        fragment _ on Test {
+          __typename
+          id
+          sub {
+            id
+          }
+        }
+      `),
+      {
+        id: 'test',
+        sub: {
+          id: 'test',
+        },
+      }
+    );
+
+    InMemoryData.clearDataState();
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      "Couldn't find __typename when writing.\nIf you're writing to the cache manually have to pass a `__typename` property on each entity in your data."
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#14');
   });
 });
