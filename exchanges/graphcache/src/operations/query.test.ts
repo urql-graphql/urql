@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 
 import { Store } from '../store';

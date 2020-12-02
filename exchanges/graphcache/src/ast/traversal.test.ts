@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { getSelectionSet } from './node';
 
 import { getMainOperation, shouldInclude } from './traversal';

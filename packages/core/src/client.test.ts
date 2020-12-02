@@ -1,9 +1,9 @@
 import { print } from 'graphql';
-import gql from 'graphql-tag';
 
 /** NOTE: Testing in this file is designed to test both the client and its interaction with default Exchanges */
 
 import { Source, map, pipe, subscribe, filter, toArray, tap } from 'wonka';
+import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { createClient } from './client';
 import { queryOperation } from './test-utils';

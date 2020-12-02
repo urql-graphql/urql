@@ -16,7 +16,7 @@ jest.mock('../context', () => {
 });
 
 import { print } from 'graphql';
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
 
@@ -89,7 +89,7 @@ describe('on execute', () => {
     });
 
     const call = client.executeMutation.mock.calls[0][0];
-    expect(print(call.query)).toBe(print(gql([props.query])));
+    expect(print(call.query)).toBe(print(gql(props.query)));
   });
 
   it('calls executeMutation with variables', () => {

@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { query, write } from '../operations';
 import { Store } from '../store';
 import { relayPagination } from './relayPagination';

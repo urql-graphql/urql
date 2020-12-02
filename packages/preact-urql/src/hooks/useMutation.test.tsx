@@ -1,7 +1,7 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { print } from 'graphql';
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { useMutation } from './useMutation';
 import { fromValue, delay, pipe } from 'wonka';
 import { Provider } from '../context';
@@ -62,7 +62,7 @@ describe('useMutation', () => {
     const call = client.executeMutation.mock.calls[0][0];
     expect(state).toHaveProperty('fetching', true);
     expect(client.executeMutation).toBeCalledTimes(1);
-    expect(print(call.query)).toBe(print(gql([props.query])));
+    expect(print(call.query)).toBe(print(gql(props.query)));
     expect(call).toHaveProperty('variables', vars);
   });
 

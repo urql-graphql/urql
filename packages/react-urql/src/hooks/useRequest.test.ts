@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { renderHook } from '@testing-library/react-hooks';
 import { useRequest } from './useRequest';
 

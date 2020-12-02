@@ -1,9 +1,9 @@
 import React from 'react';
-import gql from 'graphql-tag';
 import prepass from 'react-ssr-prepass';
 import { never, publish, filter, delay, pipe, map } from 'wonka';
 
 import {
+  gql,
   createClient,
   Exchange,
   dedupExchange,
