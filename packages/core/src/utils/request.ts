@@ -8,14 +8,10 @@ export interface KeyedDocumentNode extends DocumentNode {
   __key: number;
 }
 
-interface Documents {
-  [key: number]: KeyedDocumentNode;
-}
-
 const hashQuery = (q: string): number =>
   hash(q.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim());
 
-const docs: Documents = Object.create(null);
+const docs = new Map<number, KeyedDocumentNode>();
 
 export const keyDocument = (
   q: string | DocumentNode | TypedDocumentNode
@@ -24,18 +20,17 @@ export const keyDocument = (
   let query: DocumentNode;
   if (typeof q === 'string') {
     key = hashQuery(q);
-    query =
-      docs[key] !== undefined ? docs[key] : parse(q, { noLocation: true });
+    query = docs.get(key) || parse(q, { noLocation: true });
   } else if ((q as any).__key != null) {
     key = (q as any).__key;
     query = q;
   } else {
     key = hashQuery(print(q));
-    query = docs[key] !== undefined ? docs[key] : q;
+    query = docs.get(key) || q;
   }
 
   (query as KeyedDocumentNode).__key = key;
-  docs[key] = query as KeyedDocumentNode;
+  docs.set(key, query as KeyedDocumentNode);
   return query as KeyedDocumentNode;
 };
 

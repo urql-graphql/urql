@@ -65,24 +65,20 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   }
 };
 
-interface Documents {
-  [key: number]: KeyedDocumentNode;
-}
-
-const docs: Documents = Object.create(null);
+const formattedDocs = new Map<number, KeyedDocumentNode>();
 
 export const formatDocument = <T extends DocumentNode>(node: T): T => {
   const query = keyDocument(node);
 
-  let result = docs[query.__key];
-  if (!docs[query.__key]) {
-    result = visit(node, {
+  let result = formattedDocs.get(query.__key);
+  if (!result) {
+    result = visit(query, {
       Field: formatNode,
       InlineFragment: formatNode,
     }) as KeyedDocumentNode;
     // Ensure that the hash of the resulting document won't suddenly change
     result.__key = query.__key;
-    docs[query.__key] = result;
+    formattedDocs.set(query.__key, result);
   }
 
   return (result as unknown) as T;
