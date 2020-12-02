@@ -2,7 +2,7 @@
 import { filter, map, merge, pipe, share, tap } from 'wonka';
 
 import { Client } from '../client';
-import { Exchange, Operation, OperationResult, ExchangeInput } from '../types';
+import { Exchange, Operation, OperationResult } from '../types';
 
 import {
   makeOperation,
@@ -30,15 +30,6 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
     formattedOperation.query = formatDocument(operation.query);
     return formattedOperation;
   };
-
-  const handleAfterMutation = afterMutation(
-    resultCache,
-    operationCache,
-    client,
-    dispatchDebug
-  );
-
-  const handleAfterQuery = afterQuery(resultCache, operationCache);
 
   const isOperationCached = (operation: Operation) => {
     const {
@@ -109,10 +100,49 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
       ),
       forward,
       tap(response => {
-        if (response.operation && response.operation.kind === 'mutation') {
-          handleAfterMutation(response);
-        } else if (response.operation && response.operation.kind === 'query') {
-          handleAfterQuery(response);
+        let { operation } = response;
+        if (!operation) return;
+
+        const typenames = collectTypesFromResponse(response.data)
+          .concat(operation.context.additionalTypenames || []);
+
+        // Invalidates the cache given a mutation's response
+        if (response.operation.kind === 'mutation') {
+          const pendingOperations = new Set<number>();
+
+          dispatchDebug({
+            type: 'cacheInvalidation',
+            message: `The following typenames have been invalidated: ${typenames}`,
+            operation,
+            data: { typenames, response },
+          });
+
+          for (let i = 0; i < typenames.length; i++) {
+            const typeName = typenames[i];
+            const operations =
+              operationCache[typeName] || (operationCache[typeName] = new Set());
+            operations.forEach(key => {
+              pendingOperations.add(key);
+            });
+            operations.clear();
+          }
+
+          pendingOperations.forEach(key => {
+            if (resultCache.has(key)) {
+              operation = (resultCache.get(key) as OperationResult).operation;
+              resultCache.delete(key);
+              reexecuteOperation(client, operation);
+            }
+          });
+        // Mark typenames on typenameInvalidate for early invalidation
+        } else if (operation.kind === 'query' && response.data) {
+          resultCache.set(operation.key, response);
+          for (let i = 0; i < typenames.length; i++) {
+            const typeName = typenames[i];
+            const operations =
+              operationCache[typeName] || (operationCache[typeName] = new Set());
+            operations.add(operation.key);
+          }
         }
       })
     );
@@ -129,68 +159,4 @@ const reexecuteOperation = (client: Client, operation: Operation) => {
       requestPolicy: 'network-only',
     })
   );
-};
-
-// Invalidates the cache given a mutation's response
-export const afterMutation = (
-  resultCache: ResultCache,
-  operationCache: OperationCache,
-  client: Client,
-  dispatchDebug: ExchangeInput['dispatchDebug']
-) => (response: OperationResult) => {
-  const pendingOperations = new Set<number>();
-  const { additionalTypenames } = response.operation.context;
-
-  const typenames = [
-    ...collectTypesFromResponse(response.data),
-    ...(additionalTypenames || []),
-  ];
-
-  dispatchDebug({
-    type: 'cacheInvalidation',
-    message: `The following typenames have been invalidated: ${typenames}`,
-    operation: response.operation,
-    data: { typenames, response },
-  });
-
-  typenames.forEach(typeName => {
-    const operations =
-      operationCache[typeName] || (operationCache[typeName] = new Set());
-    operations.forEach(key => {
-      pendingOperations.add(key);
-    });
-    operations.clear();
-  });
-
-  pendingOperations.forEach(key => {
-    if (resultCache.has(key)) {
-      const operation = (resultCache.get(key) as OperationResult).operation;
-      resultCache.delete(key);
-      reexecuteOperation(client, operation);
-    }
-  });
-};
-
-// Mark typenames on typenameInvalidate for early invalidation
-const afterQuery = (
-  resultCache: ResultCache,
-  operationCache: OperationCache
-) => (response: OperationResult) => {
-  const { operation, data, error } = response;
-  const { additionalTypenames } = operation.context;
-
-  if (data === undefined || data === null) {
-    return;
-  }
-
-  resultCache.set(operation.key, { operation, data, error });
-
-  [
-    ...collectTypesFromResponse(response.data),
-    ...(additionalTypenames || []),
-  ].forEach(typeName => {
-    const operations =
-      operationCache[typeName] || (operationCache[typeName] = new Set());
-    operations.add(operation.key);
-  });
 };

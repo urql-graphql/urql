@@ -20,7 +20,7 @@ import {
   undefinedQueryResponse,
 } from '../test-utils';
 import { Operation, OperationResult, ExchangeInput } from '../types';
-import { afterMutation, cacheExchange } from './cache';
+import { cacheExchange } from './cache';
 
 const reexecuteOperation = jest.fn();
 const dispatchDebug = jest.fn();
@@ -175,63 +175,6 @@ describe('on mutation', () => {
     complete();
     expect(forwardedOperations.length).toBe(2);
     expect(reexecuteOperation).not.toBeCalled();
-  });
-
-  it('retriggers query operation', () => {
-    const typename = 'ExampleType';
-    const resultCache = new Map([[123, queryResponse]]);
-    const operationCache = { [typename]: new Set([123]) };
-
-    afterMutation(
-      resultCache,
-      operationCache,
-      exchangeArgs.client,
-      dispatchDebug
-    )({
-      ...mutationResponse,
-      data: {
-        todos: [
-          {
-            id: 1,
-            __typename: typename,
-          },
-        ],
-      },
-    });
-
-    expect(reexecuteOperation).toBeCalledTimes(1);
-  });
-
-  it('retriggers query operation with additionalTypenames', () => {
-    const typename = 'ExampleType';
-    const resultCache = new Map([[123, queryResponse]]);
-    const operationCache = { [`${typename}-2`]: new Set([123]) };
-
-    afterMutation(
-      resultCache,
-      operationCache,
-      exchangeArgs.client,
-      dispatchDebug
-    )({
-      ...mutationResponse,
-      operation: {
-        ...mutationResponse.operation,
-        context: {
-          ...mutationResponse.operation.context,
-          additionalTypenames: [`${typename}-2`],
-        },
-      },
-      data: {
-        todos: [
-          {
-            id: 1,
-            __typename: typename,
-          },
-        ],
-      },
-    });
-
-    expect(reexecuteOperation).toBeCalledTimes(1);
   });
 });
 
