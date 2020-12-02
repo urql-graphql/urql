@@ -47,7 +47,6 @@ it('allows viewer fields to overwrite the root Query data', () => {
 
   expect(res.partial).toBe(false);
   expect(res.data).toEqual({
-    __typename: 'Query',
     int: 43,
   });
 });

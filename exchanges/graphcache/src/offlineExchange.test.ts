@@ -33,6 +33,7 @@ const queryOne = gql`
     authors {
       id
       name
+      __typename
     }
   }
 `;
@@ -41,9 +42,9 @@ const queryOneData = {
   __typename: 'Query',
   authors: [
     {
-      __typename: 'Author',
       id: '123',
       name: 'Me',
+      __typename: 'Author',
     },
   ],
 };
@@ -189,7 +190,6 @@ describe('offline', () => {
     next(queryOp);
     expect(result).toBeCalledTimes(2);
     expect(result.mock.calls[1][0].data).toEqual({
-      __typename: 'Query',
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
     });
   });

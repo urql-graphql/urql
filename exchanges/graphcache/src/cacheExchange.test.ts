@@ -1456,7 +1456,6 @@ describe('schema awareness', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(result.mock.calls[1][0].stale).toBe(true);
     expect(result.mock.calls[1][0].data).toEqual({
-      __typename: 'Query',
       todos: [
         {
           __typename: 'Todo',

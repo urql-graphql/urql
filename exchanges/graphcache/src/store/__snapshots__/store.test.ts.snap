@@ -4,6 +4,7 @@ exports[`Store with storage should be able to persist embedded data 1`] = `
 Object {
   "Query%2eappointment({\\"id\\":\\"1\\"}).__typename": "\\"Appointment\\"",
   "Query%2eappointment({\\"id\\":\\"1\\"}).info": "\\"urql meeting\\"",
+  "Query.__typename": "\\"Query\\"",
   "Query.appointment({\\"id\\":\\"1\\"})": ":\\"Query.appointment({\\\\\\"id\\\\\\":\\\\\\"1\\\\\\"})\\"",
 }
 `;
@@ -13,6 +14,7 @@ Object {
   "Appointment:1.__typename": "\\"Appointment\\"",
   "Appointment:1.id": "\\"1\\"",
   "Appointment:1.info": "\\"urql meeting\\"",
+  "Query.__typename": "\\"Query\\"",
   "Query.appointment({\\"id\\":\\"1\\"})": ":\\"Appointment:1\\"",
 }
 `;

@@ -2,6 +2,7 @@
 
 import gql from 'graphql-tag';
 import { minifyIntrospectionQuery } from '@urql/introspection';
+import { maskTypename } from '@urql/core';
 import { mocked } from 'ts-jest/utils';
 
 import { Data, StorageAdapter } from '../types';
@@ -14,6 +15,7 @@ import { getIntrospectionQuery, parse } from 'graphql';
 
 const Appointment = gql`
   query appointment($id: String) {
+    __typename
     appointment(id: $id) {
       __typename
       id
@@ -41,6 +43,7 @@ const Todos = gql`
 
 const TodosWithoutTypename = gql`
   query {
+    __typename
     todos {
       id
       text
@@ -87,7 +90,10 @@ describe('Store', () => {
     // NOTE: This is the query without __typename annotations
     write(store, { query: TodosWithoutTypename }, todosData);
     const result = query(store, { query: TodosWithoutTypename });
-    expect(result.data).toEqual(todosData);
+    expect(result.data).toEqual({
+      ...maskTypename(todosData),
+      __typename: 'Query',
+    });
   });
 });
 
@@ -473,6 +479,7 @@ describe('Store with OptimisticMutationConfig', () => {
           id
           text
           complete
+          __typename
         }
       `,
       { id: '0' }
@@ -714,6 +721,7 @@ describe('Store with storage', () => {
   it('should be able to persist embedded data', () => {
     const EmbeddedAppointment = gql`
       query appointment($id: String) {
+        __typename
         appointment(id: $id) {
           __typename
           info
