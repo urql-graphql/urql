@@ -296,7 +296,7 @@ const readSelection = (
     let dataFieldValue: void | DataField;
 
     if (fieldName === '__typename') {
-      data.__typename = typename;
+      data[fieldAlias] = typename;
       continue;
     } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
