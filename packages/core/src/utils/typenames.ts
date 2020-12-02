@@ -12,15 +12,16 @@ interface EntityLike {
   __typename: string | null | void;
 }
 
-const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
+const collectTypes = (
+  obj: EntityLike | EntityLike[],
+  types: { [typename: string]: unknown }
+) => {
   if (Array.isArray(obj)) {
-    obj.forEach(inner => {
-      collectTypes(inner, types);
-    });
+    for (let i = 0; i < obj.length; i++) collectTypes(obj[i], types);
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
       if (key === '__typename' && typeof obj[key] === 'string') {
-        types.push(obj[key] as string);
+        types[obj[key] as string] = 0;
       } else {
         collectTypes(obj[key], types);
       }
@@ -31,7 +32,7 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: string[] = []) => {
 };
 
 export const collectTypesFromResponse = (response: object) =>
-  collectTypes(response as EntityLike).filter((v, i, a) => a.indexOf(v) === i);
+  Object.keys(collectTypes(response as EntityLike, {}));
 
 const formatNode = (node: FieldNode | InlineFragmentNode) => {
   if (
