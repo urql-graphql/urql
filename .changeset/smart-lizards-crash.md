@@ -1,5 +1,5 @@
 ---
-'@urql/exchange-graphcache': patch
+'@urql/exchange-graphcache': minor
 ---
 
 Increase the consistency of when and how the `__typename` field is added to results. Instead of
