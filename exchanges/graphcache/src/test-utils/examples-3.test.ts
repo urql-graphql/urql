@@ -2,6 +2,10 @@ import gql from 'graphql-tag';
 import { query, write } from '../operations';
 import { Store } from '../store';
 
+afterEach(() => {
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 it('allows viewer fields to overwrite the root Query data', () => {
   const store = new Store();
   const get = gql`

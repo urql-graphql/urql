@@ -51,6 +51,10 @@ const Pagination = gql`
   }
 `;
 
+afterEach(() => {
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 it('allows custom resolvers to resolve nested, unkeyed data', () => {
   const store = new Store({
     resolvers: {
@@ -184,6 +188,9 @@ it('allows custom resolvers to resolve nested, unkeyed data with embedded links'
 
 it('allows custom resolvers to resolve mixed data (keyable and unkeyable)', () => {
   const store = new Store({
+    keys: {
+      TodoDetails: () => null,
+    },
     resolvers: {
       Query: {
         todo: () => ({

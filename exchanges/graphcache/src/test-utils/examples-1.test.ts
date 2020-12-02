@@ -63,6 +63,10 @@ const NestedClearNameTodo = gql`
   }
 `;
 
+afterEach(() => {
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 it('passes the "getting-started" example', () => {
   const store = new Store();
   const todosData = {
