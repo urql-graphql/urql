@@ -26,7 +26,7 @@ export const keyDocument = (
     key = hashQuery(q);
     query =
       docs[key] !== undefined ? docs[key] : parse(q, { noLocation: true });
-  } else if ((q as any).__key !== undefined) {
+  } else if ((q as any).__key != null) {
     key = (q as any).__key;
     query = q;
   } else {

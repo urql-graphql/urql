@@ -50,7 +50,7 @@ describe('formatTypeNames', () => {
   });
 
   it('preserves custom properties', () => {
-    const doc = parse(`{ id todos { id } }`) as any;
+    const doc = parse(`{ todos { id } }`) as any;
     doc.documentId = '123';
     expect((formatDocument(doc) as any).documentId).toBe(doc.documentId);
   });
