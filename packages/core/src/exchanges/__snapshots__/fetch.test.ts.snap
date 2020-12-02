@@ -17,31 +17,39 @@ Object {
     "kind": "query",
     "operationName": "query",
     "query": Object {
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
+          "loc": undefined,
           "name": Object {
             "kind": "Name",
+            "loc": undefined,
             "value": "getUser",
           },
           "operation": "query",
           "selectionSet": Object {
             "kind": "SelectionSet",
+            "loc": undefined,
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
+                    "loc": undefined,
                     "name": Object {
                       "kind": "Name",
+                      "loc": undefined,
                       "value": "name",
                     },
                     "value": Object {
                       "kind": "Variable",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "name",
                       },
                     },
@@ -49,20 +57,25 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
+                  "loc": undefined,
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "id",
                       },
                       "selectionSet": undefined,
@@ -72,8 +85,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
@@ -83,8 +98,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "lastName",
                       },
                       "selectionSet": undefined,
@@ -99,17 +116,22 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
+              "loc": undefined,
               "type": Object {
                 "kind": "NamedType",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "name",
                 },
               },
@@ -120,6 +142,22 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 124,
+        "source": Source {
+          "body": "
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
+    }
+  ",
+          "locationOffset": Object {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
         "start": 0,
       },
     },
@@ -157,31 +195,39 @@ Object {
     "kind": "query",
     "operationName": "query",
     "query": Object {
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
+          "loc": undefined,
           "name": Object {
             "kind": "Name",
+            "loc": undefined,
             "value": "getUser",
           },
           "operation": "query",
           "selectionSet": Object {
             "kind": "SelectionSet",
+            "loc": undefined,
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
+                    "loc": undefined,
                     "name": Object {
                       "kind": "Name",
+                      "loc": undefined,
                       "value": "name",
                     },
                     "value": Object {
                       "kind": "Variable",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "name",
                       },
                     },
@@ -189,20 +235,25 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
+                  "loc": undefined,
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "id",
                       },
                       "selectionSet": undefined,
@@ -212,8 +263,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
@@ -223,8 +276,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "lastName",
                       },
                       "selectionSet": undefined,
@@ -239,17 +294,22 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
+              "loc": undefined,
               "type": Object {
                 "kind": "NamedType",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "name",
                 },
               },
@@ -260,6 +320,22 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 124,
+        "source": Source {
+          "body": "
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
+    }
+  ",
+          "locationOffset": Object {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
         "start": 0,
       },
     },
@@ -299,31 +375,39 @@ Object {
     "kind": "query",
     "operationName": "query",
     "query": Object {
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
+          "loc": undefined,
           "name": Object {
             "kind": "Name",
+            "loc": undefined,
             "value": "getUser",
           },
           "operation": "query",
           "selectionSet": Object {
             "kind": "SelectionSet",
+            "loc": undefined,
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
+                    "loc": undefined,
                     "name": Object {
                       "kind": "Name",
+                      "loc": undefined,
                       "value": "name",
                     },
                     "value": Object {
                       "kind": "Variable",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "name",
                       },
                     },
@@ -331,20 +415,25 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
+                  "loc": undefined,
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "id",
                       },
                       "selectionSet": undefined,
@@ -354,8 +443,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
@@ -365,8 +456,10 @@ Object {
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "lastName",
                       },
                       "selectionSet": undefined,
@@ -381,17 +474,22 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
+              "loc": undefined,
               "type": Object {
                 "kind": "NamedType",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "name",
                 },
               },
@@ -402,6 +500,22 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 124,
+        "source": Source {
+          "body": "
+    query getUser($name: String) {
+      user(name: $name) {
+        id
+        firstName
+        lastName
+      }
+    }
+  ",
+          "locationOffset": Object {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
         "start": 0,
       },
     },

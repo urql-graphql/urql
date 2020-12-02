@@ -1,5 +1,5 @@
 import { parse, print } from 'graphql';
-import gql from 'graphql-tag';
+import { gql } from '../gql';
 import { createRequest } from './request';
 
 it('should hash identical queries identically', () => {

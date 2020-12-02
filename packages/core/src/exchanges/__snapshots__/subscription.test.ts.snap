@@ -17,31 +17,39 @@ Object {
     "kind": "subscription",
     "operationName": "subscription",
     "query": Object {
+      "__key": 2616620656,
       "definitions": Array [
         Object {
           "directives": Array [],
           "kind": "OperationDefinition",
+          "loc": undefined,
           "name": Object {
             "kind": "Name",
+            "loc": undefined,
             "value": "subscribeToUser",
           },
           "operation": "subscription",
           "selectionSet": Object {
             "kind": "SelectionSet",
+            "loc": undefined,
             "selections": Array [
               Object {
                 "alias": undefined,
                 "arguments": Array [
                   Object {
                     "kind": "Argument",
+                    "loc": undefined,
                     "name": Object {
                       "kind": "Name",
+                      "loc": undefined,
                       "value": "user",
                     },
                     "value": Object {
                       "kind": "Variable",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "user",
                       },
                     },
@@ -49,20 +57,25 @@ Object {
                 ],
                 "directives": Array [],
                 "kind": "Field",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "user",
                 },
                 "selectionSet": Object {
                   "kind": "SelectionSet",
+                  "loc": undefined,
                   "selections": Array [
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
                       "directives": Array [],
                       "kind": "Field",
+                      "loc": undefined,
                       "name": Object {
                         "kind": "Name",
+                        "loc": undefined,
                         "value": "name",
                       },
                       "selectionSet": undefined,
@@ -77,17 +90,22 @@ Object {
               "defaultValue": undefined,
               "directives": Array [],
               "kind": "VariableDefinition",
+              "loc": undefined,
               "type": Object {
                 "kind": "NamedType",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "String",
                 },
               },
               "variable": Object {
                 "kind": "Variable",
+                "loc": undefined,
                 "name": Object {
                   "kind": "Name",
+                  "loc": undefined,
                   "value": "user",
                 },
               },
@@ -98,6 +116,20 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 106,
+        "source": Source {
+          "body": "
+    subscription subscribeToUser($user: String) {
+      user(user: $user) {
+        name
+      }
+    }
+  ",
+          "locationOffset": Object {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
         "start": 0,
       },
     },
