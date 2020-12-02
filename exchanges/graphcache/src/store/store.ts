@@ -5,7 +5,7 @@ import {
   GraphQLSchema,
 } from 'graphql';
 
-import { TypedDocumentNode, createRequest } from '@urql/core';
+import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
   Cache,
@@ -184,8 +184,9 @@ export class Store implements Cache {
   }
 
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
-    return read(this, createRequest(input.query, input.variables!))
-      .data as T | null;
+    const request = createRequest(input.query, input.variables!);
+    request.query = formatDocument(request.query);
+    return read(this, request).data as T | null;
   }
 
   readFragment<T = Data, V = Variables>(
@@ -193,6 +194,7 @@ export class Store implements Cache {
     entity: string | Data | T,
     variables?: V
   ): T | null {
+    fragment = formatDocument(fragment);
     return readFragment(this, fragment, entity, variables as any) as T | null;
   }
 
