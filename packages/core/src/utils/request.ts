@@ -4,8 +4,12 @@ import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
 import { GraphQLRequest } from '../types';
 
+export interface KeyedDocumentNode extends DocumentNode {
+  __key: number;
+}
+
 interface Documents {
-  [key: number]: DocumentNode;
+  [key: number]: KeyedDocumentNode;
 }
 
 const hashQuery = (q: string): number =>
@@ -13,10 +17,9 @@ const hashQuery = (q: string): number =>
 
 const docs: Documents = Object.create(null);
 
-export const createRequest = <Data = any, Variables = object>(
-  q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
-  vars?: Variables
-): GraphQLRequest<Data, Variables> => {
+export const keyDocument = (
+  q: string | DocumentNode | TypedDocumentNode
+): KeyedDocumentNode => {
   let key: number;
   let query: DocumentNode;
   if (typeof q === 'string') {
@@ -31,11 +34,20 @@ export const createRequest = <Data = any, Variables = object>(
     query = docs[key] !== undefined ? docs[key] : q;
   }
 
-  docs[key] = query;
-  (query as any).__key = key;
+  (query as KeyedDocumentNode).__key = key;
+  docs[key] = query as KeyedDocumentNode;
+  return query as KeyedDocumentNode;
+};
 
+export const createRequest = <Data = any, Variables = object>(
+  q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
+  vars?: Variables
+): GraphQLRequest<Data, Variables> => {
+  const query = keyDocument(q);
   return {
-    key: vars ? phash(key, stringifyVariables(vars)) >>> 0 : key,
+    key: vars
+      ? phash(query.__key, stringifyVariables(vars)) >>> 0
+      : query.__key,
     query,
     variables: vars || ({} as Variables),
   };

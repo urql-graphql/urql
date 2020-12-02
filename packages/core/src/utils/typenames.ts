@@ -7,6 +7,8 @@ import {
   visit,
 } from 'graphql';
 
+import { KeyedDocumentNode, keyDocument } from './request';
+
 interface EntityLike {
   [key: string]: EntityLike | EntityLike[] | any;
   __typename: string | null | void;
@@ -62,13 +64,25 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
   }
 };
 
-export const formatDocument = <T extends DocumentNode>(node: T): T => {
-  const result = visit(node, {
-    Field: formatNode,
-    InlineFragment: formatNode,
-  });
+interface Documents {
+  [key: number]: KeyedDocumentNode;
+}
 
-  // Ensure that the hash of the resulting document won't suddenly change
-  result.__key = (node as any).__key;
-  return result;
+const docs: Documents = Object.create(null);
+
+export const formatDocument = <T extends DocumentNode>(node: T): T => {
+  const query = keyDocument(node);
+
+  let result = docs[query.__key];
+  if (!docs[query.__key]) {
+    result = visit(node, {
+      Field: formatNode,
+      InlineFragment: formatNode,
+    }) as KeyedDocumentNode;
+    // Ensure that the hash of the resulting document won't suddenly change
+    result.__key = query.__key;
+    docs[query.__key] = result;
+  }
+
+  return (result as unknown) as T;
 };
