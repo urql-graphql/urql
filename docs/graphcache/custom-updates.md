@@ -104,7 +104,7 @@ fragment. The second argument is the data that should be written to the cache. T
 contain `id` or another field if the type has a custom `keys` configuration.
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 cache.writeFragment(
   gql`
@@ -121,7 +121,7 @@ cache.writeFragment(
 ```
 
 > **Note:** In the above example, we've used
-> [graphql-tag](https://github.com/apollographql/graphql-tag) because `writeFragment` only accepts
+> [the `gql` tag function](../api/core.md#gql) because `writeFragment` only accepts
 > GraphQL `DocumentNode`s as inputs, and not strings.
 
 This can be useful for instance if we have a mutation that doesn't return the type that the GraphQL
@@ -130,7 +130,7 @@ to access the updated `Todo`. In such a case `cache.writeFragment` allows us to 
 manually:
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 const cache = cacheExchange({
   updates: {
