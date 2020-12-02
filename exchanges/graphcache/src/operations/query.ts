@@ -271,9 +271,6 @@ const readSelection = (
     return;
   }
 
-  // The following closely mirrors readSelection, but differs only slightly for the
-  // sake of resolving from an existing resolver result
-  data.__typename = typename;
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
   let node: FieldNode | void;
@@ -298,7 +295,10 @@ const readSelection = (
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
 
-    if (resultValue !== undefined && node.selectionSet === undefined) {
+    if (fieldName === '__typename') {
+      data[fieldAlias] = typename;
+      continue;
+    } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (

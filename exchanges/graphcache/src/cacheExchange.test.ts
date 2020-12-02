@@ -1011,6 +1011,7 @@ describe('optimistic updates', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
 
     jest.runAllTimers();
+
     expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(2);
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(4);
@@ -1456,7 +1457,6 @@ describe('schema awareness', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(result.mock.calls[1][0].stale).toBe(true);
     expect(result.mock.calls[1][0].data).toEqual({
-      __typename: 'Query',
       todos: [
         {
           __typename: 'Todo',

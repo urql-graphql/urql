@@ -256,6 +256,7 @@ it('nested entity list on query', () => {
   expectCacheIntegrity({
     query: gql`
       {
+        __typename
         items {
           __typename
           id
@@ -377,6 +378,7 @@ it('embedded objects on entities', () => {
   expectCacheIntegrity({
     query: gql`
       {
+        __typename
         user {
           __typename
           id

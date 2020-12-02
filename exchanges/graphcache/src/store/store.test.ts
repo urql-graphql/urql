@@ -2,6 +2,7 @@
 
 import gql from 'graphql-tag';
 import { minifyIntrospectionQuery } from '@urql/introspection';
+import { maskTypename } from '@urql/core';
 import { mocked } from 'ts-jest/utils';
 
 import { Data, StorageAdapter } from '../types';
@@ -14,6 +15,7 @@ import { getIntrospectionQuery, parse } from 'graphql';
 
 const Appointment = gql`
   query appointment($id: String) {
+    __typename
     appointment(id: $id) {
       __typename
       id
@@ -41,6 +43,7 @@ const Todos = gql`
 
 const TodosWithoutTypename = gql`
   query {
+    __typename
     todos {
       id
       text
@@ -87,7 +90,10 @@ describe('Store', () => {
     // NOTE: This is the query without __typename annotations
     write(store, { query: TodosWithoutTypename }, todosData);
     const result = query(store, { query: TodosWithoutTypename });
-    expect(result.data).toEqual(todosData);
+    expect(result.data).toEqual({
+      ...maskTypename(todosData),
+      __typename: 'Query',
+    });
   });
 });
 
@@ -473,6 +479,7 @@ describe('Store with OptimisticMutationConfig', () => {
           id
           text
           complete
+          __typename
         }
       `,
       { id: '0' }
@@ -714,6 +721,7 @@ describe('Store with storage', () => {
   it('should be able to persist embedded data', () => {
     const EmbeddedAppointment = gql`
       query appointment($id: String) {
+        __typename
         appointment(id: $id) {
           __typename
           info
@@ -803,7 +811,7 @@ describe('Store with storage', () => {
     InMemoryData.clearDataState();
   });
 
-  it("should warn if an optimistic field doesn't exist in the schema's mutations", function () {
+  it("should warn if an optimistic field doesn't exist in the schema's mutations", () => {
     new Store({
       schema: minifyIntrospectionQuery(
         require('../test-utils/simple_schema.json')
@@ -875,5 +883,36 @@ describe('Store with storage', () => {
 
     query(store, { query: parse(getIntrospectionQuery()) }, schema);
     expect(console.warn).toBeCalledTimes(0);
+  });
+
+  it('should warn when __typename is missing when store.writeFragment is called', () => {
+    InMemoryData.initDataState('write', store.data, null);
+
+    store.writeFragment(
+      parse(`
+        fragment _ on Test {
+          __typename
+          id
+          sub {
+            id
+          }
+        }
+      `),
+      {
+        id: 'test',
+        sub: {
+          id: 'test',
+        },
+      }
+    );
+
+    InMemoryData.clearDataState();
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      "Couldn't find __typename when writing.\nIf you're writing to the cache manually have to pass a `__typename` property on each entity in your data."
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#14');
   });
 });

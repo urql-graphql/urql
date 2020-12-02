@@ -51,6 +51,10 @@ const Pagination = gql`
   }
 `;
 
+afterEach(() => {
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 it('allows custom resolvers to resolve nested, unkeyed data', () => {
   const store = new Store({
     resolvers: {
@@ -98,7 +102,6 @@ it('allows custom resolvers to resolve nested, unkeyed data', () => {
   expect(res.partial).toBe(false);
 
   expect(res.data).toEqual({
-    __typename: 'Query',
     todos: {
       __typename: 'TodosConnection',
       edges: [
@@ -161,7 +164,6 @@ it('allows custom resolvers to resolve nested, unkeyed data with embedded links'
   const res = query(store, { query: Pagination });
   expect(res.partial).toBe(false);
   expect(res.data).toEqual({
-    __typename: 'Query',
     todos: {
       __typename: 'TodosConnection',
       edges: [
@@ -186,6 +188,9 @@ it('allows custom resolvers to resolve nested, unkeyed data with embedded links'
 
 it('allows custom resolvers to resolve mixed data (keyable and unkeyable)', () => {
   const store = new Store({
+    keys: {
+      TodoDetails: () => null,
+    },
     resolvers: {
       Query: {
         todo: () => ({
@@ -224,7 +229,6 @@ it('allows custom resolvers to resolve mixed data (keyable and unkeyable)', () =
   expect(res.partial).toBe(false);
   expect(res.dependencies).toHaveProperty('Author:x', true);
   expect(res.data).toEqual({
-    __typename: 'Query',
     todo: {
       __typename: 'Todo',
       id: '1',

@@ -6,6 +6,7 @@ import { simplePagination } from './simplePagination';
 it('works with forward pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
+      __typename
       persons(skip: $skip, limit: $limit) {
         __typename
         id
@@ -76,6 +77,7 @@ it('works with forward pagination', () => {
 it('works with backwards pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
+      __typename
       persons(skip: $skip, limit: $limit) {
         __typename
         id
@@ -146,6 +148,7 @@ it('works with backwards pagination', () => {
 it('handles duplicates', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
+      __typename
       persons(skip: $skip, limit: $limit) {
         __typename
         id
@@ -204,6 +207,7 @@ it('handles duplicates', () => {
 it('should not return previous result when adding a parameter', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number, $filter: String) {
+      __typename
       persons(skip: $skip, limit: $limit, filter: $filter) {
         __typename
         id
@@ -255,6 +259,7 @@ it('should not return previous result when adding a parameter', () => {
 it('should preserve the correct order in forward pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
+      __typename
       persons(skip: $skip, limit: $limit) {
         __typename
         id
@@ -313,6 +318,7 @@ it('should preserve the correct order in forward pagination', () => {
 it('should preserve the correct order in backward pagination', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number) {
+      __typename
       persons(skip: $skip, limit: $limit) {
         __typename
         id
@@ -362,6 +368,7 @@ it('should preserve the correct order in backward pagination', () => {
     query: Pagination,
     variables: { skip: 3, limit: 3 },
   });
+
   expect(result.data).toEqual({
     __typename: 'Query',
     persons: [...pageTwo.persons, ...pageOne.persons],
@@ -371,6 +378,7 @@ it('should preserve the correct order in backward pagination', () => {
 it('prevents overlapping of pagination on different arguments', () => {
   const Pagination = gql`
     query($skip: Number, $limit: Number, $filter: string) {
+      __typename
       persons(skip: $skip, limit: $limit, filter: $filter) {
         __typename
         id

@@ -63,6 +63,10 @@ const NestedClearNameTodo = gql`
   }
 `;
 
+afterEach(() => {
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 it('passes the "getting-started" example', () => {
   const store = new Store();
   const todosData = {
@@ -146,6 +150,7 @@ it('resolves missing, nullable arguments on fields', () => {
 
   const GetWithVariables = gql`
     query {
+      __typename
       todo(first: null) {
         __typename
         id
@@ -155,6 +160,7 @@ it('resolves missing, nullable arguments on fields', () => {
 
   const GetWithoutVariables = gql`
     query {
+      __typename
       todo {
         __typename
         id
@@ -203,7 +209,6 @@ it('should link entities', () => {
       id: '0',
       text: 'Go to the shops',
       complete: false,
-      __typename: 'Todo',
     },
   });
 });
