@@ -1,26 +1,30 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode, Kind, print } from 'graphql';
+import { Source, Location, DocumentNode, Kind, print } from 'graphql';
 import { keyDocument } from './utils';
+
+type WritableDocumentNode = {
+  -readonly [K in keyof DocumentNode]: DocumentNode[K]
+};
 
 function gql<Data = any, Variables = object>(
   strings: TemplateStringsArray,
-  ...interpolations: Array<string | DocumentNode | TypedDocumentNode>
+  ...interpolations: Array<TypedDocumentNode | DocumentNode | string>
 ): TypedDocumentNode<Data, Variables>;
 
 function gql<Data = any, Variables = object>(string: string): TypedDocumentNode<Data, Variables>;
 
 function gql(/* arguments */) {
-  let result = typeof arguments[0] === 'string' ? arguments[0] : arguments[0][0];
+  let body = typeof arguments[0] === 'string' ? arguments[0] : arguments[0][0];
   for (let i = 1; i < arguments.length; i++) {
-    const interpolation = arguments[i];
-    result +=
-      interpolation && interpolation.kind === Kind.DOCUMENT
-        ? print(interpolation)
-        : interpolation;
-    result += arguments[0][i];
+    const value = arguments[i];
+    body +=
+      value && value.kind === Kind.DOCUMENT
+        ? (value.loc ? value.loc.source.body : print(value))
+        : value;
+    body += arguments[0][i];
   }
 
-  const doc = keyDocument(result);
+  const doc = keyDocument(body);
   if (process.env.NODE_ENV !== 'production') {
     const fragmentNames = new Set();
     for (let i = 0; i < doc.definitions.length; i++) {
@@ -37,6 +41,12 @@ function gql(/* arguments */) {
       }
     }
   }
+
+  (doc as WritableDocumentNode).loc = {
+    start: 0,
+    end: body.length,
+    source: new Source(body, 'gql'),
+  } as Location;
 
   return doc;
 }
