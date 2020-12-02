@@ -236,12 +236,14 @@ const writeSelection = (
         );
 
         continue; // Skip this field
-      } else if (ctx.store.schema && typename) {
+      } else if (ctx.store.schema && typename && fieldName !== '__typename') {
         isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
       }
     }
 
-    if (ctx.optimistic && isRoot) {
+    if (fieldName === '__typename') {
+      continue;
+    } else if (ctx.optimistic && isRoot) {
       const resolver = ctx.store.optimisticMutations[fieldName];
 
       if (!resolver) continue;
