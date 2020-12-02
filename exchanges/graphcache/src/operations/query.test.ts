@@ -55,7 +55,6 @@ describe('Query', () => {
     const result = query(store, { query: TODO_QUERY });
     expect(result.partial).toBe(true);
     expect(result.data).toEqual({
-      __typename: 'Query',
       todos: [
         {
           id: '0',
@@ -135,7 +134,9 @@ describe('Query', () => {
   it('should not crash for valid queries', () => {
     const VALID_QUERY = gql`
       query getTodos {
+        __typename
         todos {
+          __typename
           id
           text
         }
@@ -162,14 +163,17 @@ describe('Query', () => {
       todos: [{ __typename: 'Todo', id: '0', text: 'Solve bug' }],
     });
 
-    expect(console.warn).not.toHaveBeenCalled();
+    // The warning should be called for `__typename`
+    expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.error).not.toHaveBeenCalled();
   });
 
   it('should respect altered root types', () => {
     const QUERY = gql`
       query getTodos {
+        __typename
         todos {
+          __typename
           id
           text
         }
@@ -203,7 +207,9 @@ describe('Query', () => {
   it('should allow subsequent read when first result was null', () => {
     const QUERY_WRITE = gql`
       query writeTodos {
+        __typename
         todos {
+          __typename
           ...ValidRead
         }
       }
@@ -215,10 +221,13 @@ describe('Query', () => {
 
     const QUERY_READ = gql`
       query getTodos {
+        __typename
         todos {
+          __typename
           ...MissingRead
         }
         todos {
+          __typename
           id
         }
       }
