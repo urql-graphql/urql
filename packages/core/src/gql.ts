@@ -14,7 +14,7 @@ function gql<Data = any, Variables = object>(
 function gql<Data = any, Variables = object>(string: string): TypedDocumentNode<Data, Variables>;
 
 function gql(/* arguments */) {
-  let body = typeof arguments[0] === 'string' ? arguments[0] : arguments[0][0];
+  let body = Array.isArray(arguments[0]) ? arguments[0][0] : (arguments[0] || '');
   for (let i = 1; i < arguments.length; i++) {
     const value = arguments[i];
     body +=
