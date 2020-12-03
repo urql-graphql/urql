@@ -2,7 +2,7 @@ import { InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
 import { getTypeCondition } from './node';
-import { SchemaIntrospector, SchemaObject } from './buildClientSchema';
+import { SchemaIntrospector, SchemaObject } from './schema';
 
 import {
   KeyingConfig,
@@ -30,7 +30,8 @@ export const isListNullable = (
 ): boolean => {
   const field = getField(schema, typename, fieldName);
   if (!field) return false;
-  const ofType = field.type.kind === 'NON_NULL' ? field.type.ofType : field.type;
+  const ofType =
+    field.type.kind === 'NON_NULL' ? field.type.ofType : field.type;
   return ofType.kind === 'LIST' && ofType.ofType.kind !== 'NON_NULL';
 };
 
@@ -51,7 +52,10 @@ export const isInterfaceOfType = (
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
-  if (schema.types[typeCondition] && schema.types[typeCondition].kind === 'OBJECT')
+  if (
+    schema.types[typeCondition] &&
+    schema.types[typeCondition].kind === 'OBJECT'
+  )
     return typeCondition === typename;
   expectAbstractType(schema, typeCondition!);
   expectObjectType(schema, typename!);
@@ -82,10 +86,7 @@ const getField = (
   return field;
 };
 
-function expectObjectType(
-  schema: SchemaIntrospector,
-  typename: string
-) {
+function expectObjectType(schema: SchemaIntrospector, typename: string) {
   invariant(
     schema.types[typename] && schema.types[typename].kind === 'OBJECT',
     'Invalid Object type: The type `' +
@@ -96,10 +97,7 @@ function expectObjectType(
   );
 }
 
-function expectAbstractType(
-  schema: SchemaIntrospector,
-  typename: string
-) {
+function expectAbstractType(schema: SchemaIntrospector, typename: string) {
   invariant(
     schema.types[typename] &&
       (schema.types[typename].kind === 'INTERFACE' ||
@@ -139,7 +137,8 @@ export function expectValidUpdatesConfig(
   }
 
   if (schema.mutation) {
-    const mutationFields = (schema.types[schema.mutation] as SchemaObject).fields;
+    const mutationFields = (schema.types[schema.mutation] as SchemaObject)
+      .fields;
     const givenMutations = updates[schema.mutation] || {};
     for (const fieldName in givenMutations) {
       if (mutationFields[fieldName] === undefined) {
@@ -154,7 +153,9 @@ export function expectValidUpdatesConfig(
   }
 
   if (schema.subscription) {
-    const subscriptionFields = (schema.types[schema.subscription] as SchemaObject).fields;
+    const subscriptionFields = (schema.types[
+      schema.subscription
+    ] as SchemaObject).fields;
     const givenSubscription = updates[schema.subscription] || {};
     for (const fieldName in givenSubscription) {
       if (subscriptionFields[fieldName] === undefined) {
@@ -187,7 +188,8 @@ export function expectValidResolversConfig(
   for (const key in resolvers) {
     if (key === 'Query') {
       if (schema.query) {
-        const validQueries = (schema.types[schema.query] as SchemaObject).fields;
+        const validQueries = (schema.types[schema.query] as SchemaObject)
+          .fields;
         for (const resolverQuery in resolvers.Query) {
           if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
@@ -220,7 +222,8 @@ export function expectValidOptimisticMutationsConfig(
   }
 
   if (schema.mutation) {
-    const validMutations = (schema.types[schema.mutation] as SchemaObject).fields;
+    const validMutations = (schema.types[schema.mutation] as SchemaObject)
+      .fields;
     for (const mutation in optimisticMutations) {
       if (!validMutations[mutation]) {
         warn(

@@ -45,7 +45,9 @@ export const buildClientSchema = ({
     return map;
   };
 
-  const buildType = (type: IntrospectionType): SchemaObject | SchemaUnion | void => {
+  const buildType = (
+    type: IntrospectionType
+  ): SchemaObject | SchemaUnion | void => {
     switch (type.kind) {
       case 'OBJECT':
       case 'INTERFACE':
@@ -53,11 +55,13 @@ export const buildClientSchema = ({
           name: type.name,
           kind: type.kind as 'OBJECT' | 'INTERFACE',
           interfaces: buildNameMap(type.interfaces || []),
-          fields: buildNameMap(type.fields.map(field => ({
-            name: field.name,
-            type: field.type,
-            args: buildNameMap(field.args)
-          }))),
+          fields: buildNameMap(
+            type.fields.map(field => ({
+              name: field.name,
+              type: field.type,
+              args: buildNameMap(field.args),
+            }))
+          ),
         } as SchemaObject;
       case 'UNION':
         return {
@@ -79,7 +83,9 @@ export const buildClientSchema = ({
   return {
     query: __schema.queryType ? __schema.queryType.name : null,
     mutation: __schema.mutationType ? __schema.mutationType.name : null,
-    subscription: __schema.subscriptionType ? __schema.subscriptionType.name : null,
+    subscription: __schema.subscriptionType
+      ? __schema.subscriptionType.name
+      : null,
     types: typemap,
     isSubType(abstract: string, possible: string) {
       const abstractType = typemap[abstract];
@@ -88,7 +94,10 @@ export const buildClientSchema = ({
         return false;
       } else if (abstractType.kind === 'UNION') {
         return !!abstractType.types[possible];
-      } else if (abstractType.kind !== 'OBJECT' && possibleType.kind === 'OBJECT') {
+      } else if (
+        abstractType.kind !== 'OBJECT' &&
+        possibleType.kind === 'OBJECT'
+      ) {
         return !!possibleType.interfaces[abstract];
       } else {
         return abstract === possible;
