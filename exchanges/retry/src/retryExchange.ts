@@ -18,7 +18,7 @@ import {
 } from '@urql/core';
 import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 
-interface RetryExchangeOptions {
+export interface RetryExchangeOptions {
   initialDelayMs?: number;
   maxDelayMs?: number;
   randomDelay?: boolean;

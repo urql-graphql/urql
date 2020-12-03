@@ -9,7 +9,7 @@ import {
   delay,
 } from 'wonka';
 
-import { createClient, Operation, OperationResult } from 'urql';
+import { createClient, Operation, OperationResult, ExchangeIO } from 'urql';
 import { suspenseExchange } from './suspenseExchange';
 
 const dispatchDebug = jest.fn();
@@ -27,7 +27,7 @@ it('logs a warning if suspense mode is not activated', () => {
     /* noop */
   });
   const client = createClient({ url: 'https://example.com', suspense: false });
-  const forward = jest.fn(() => fromArray([]));
+  const forward = jest.fn((() => fromArray([])) as ExchangeIO);
   const ops = fromArray([]);
 
   suspenseExchange({ client, forward, dispatchDebug })(ops);

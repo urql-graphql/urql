@@ -8,7 +8,7 @@ import {
   ExchangeIO,
 } from '@urql/core';
 
-import { retryExchange } from './retryExchange';
+import { retryExchange, RetryExchangeOptions } from './retryExchange';
 
 const dispatchDebug = jest.fn();
 
@@ -99,7 +99,8 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
     return pipe(ops$, map(response));
   };
 
-  const mockRetryIf = jest.fn(() => true);
+  const mockRetryIf = jest.fn((() => true) as RetryExchangeOptions['retryIf']);
+
   pipe(
     retryExchange({
       ...mockOptions,
@@ -116,7 +117,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
   next(op);
 
   expect(mockRetryIf).toHaveBeenCalledTimes(1);
-  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError, op);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError as any, op);
 
   jest.runAllTimers();
 
@@ -131,7 +132,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
 
   jest.runAllTimers();
 
-  expect(mockRetryIf).toHaveBeenCalledWith(queryTwoError, opTwo);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryTwoError as any, opTwo);
 
   // max number of retries for each op
   expect(response).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts * 2);
@@ -158,7 +159,8 @@ it('should retry x number of times and then return the successful result', () =>
     return pipe(ops$, map(response));
   };
 
-  const mockRetryIf = jest.fn(() => true);
+  const mockRetryIf = jest.fn((() => true) as RetryExchangeOptions['retryIf']);
+
   pipe(
     retryExchange({
       ...mockOptions,
@@ -176,7 +178,7 @@ it('should retry x number of times and then return the successful result', () =>
   jest.runAllTimers();
 
   expect(mockRetryIf).toHaveBeenCalledTimes(numberRetriesBeforeSuccess);
-  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError, op);
+  expect(mockRetryIf).toHaveBeenCalledWith(queryOneError as any, op);
 
   // one for original source, one for retry
   expect(response).toHaveBeenCalledTimes(1 + numberRetriesBeforeSuccess);

@@ -12,7 +12,7 @@ import {
   toPromise,
 } from 'wonka';
 
-import { print } from 'graphql';
+import { DocumentNode, print } from 'graphql';
 import { Client, OperationResult } from '@urql/core';
 
 import { queryOperation, mutationOperation } from './test-utils';
@@ -205,7 +205,9 @@ it('supports a custom hash function', async () => {
     json: () => expected,
   });
 
-  const hashFn = jest.fn(() => Promise.resolve('hello'));
+  const hashFn = jest.fn((_input: string, _doc: DocumentNode) => {
+    return Promise.resolve('hello');
+  });
 
   await pipe(
     fromValue(queryOperation),

@@ -14,5 +14,5 @@ export const urqlDecorator: Parameters<typeof addDecorator>[0] = (
     exchanges: [devtoolsExchange, getStorybookExchange(context)],
   });
 
-  return createElement(Provider, { value: client, children: Story(context) });
+  return createElement(Provider, { value: client }, Story(context));
 };
