@@ -33,10 +33,7 @@ export interface SchemaIntrospector {
   query: GraphQLObjectType | undefined;
   mutation: GraphQLObjectType | undefined;
   subscription: GraphQLObjectType | undefined;
-
-  getType(name: string): GraphQLNamedType | undefined;
-  getTypeMap(): Record<string, GraphQLNamedType>;
-  getImplementations(iface: GraphQLInterfaceType): InterfaceRefs;
+  types: Record<string, GraphQLNamedType>;
   isSubType(abstract: GraphQLAbstractType, possible: GraphQLObjectType): boolean;
 }
 
@@ -152,18 +149,10 @@ export const buildClientSchema = (
     query: (__schema.queryType && getNamedType(__schema.queryType.name) as GraphQLObjectType)!,
     mutation: (__schema.mutationType && getNamedType(__schema.mutationType.name) as GraphQLObjectType)!,
     subscription: (__schema.subscriptionType && getNamedType(__schema.subscriptionType.name) as GraphQLObjectType)!,
-
-    getType(name: string) {
-      return typemap[name];
-    },
-    getTypeMap() {
-      return typemap;
-    },
-    getImplementations,
+    types: typemap,
     isSubType(abstract: GraphQLAbstractType, possible: GraphQLObjectType) {
       let map = subTypeCache[abstract.name];
       if (map === undefined) {
-        map = Object.create(null);
         if (isUnionType(abstract)) {
           map = buildNameMap(abstract.getTypes());
         } else {

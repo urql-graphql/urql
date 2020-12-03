@@ -2,12 +2,13 @@ import {
   isNullableType,
   isListType,
   isNonNullType,
+  isObjectType,
+  isInterfaceType,
+  isUnionType,
   InlineFragmentNode,
   FragmentDefinitionNode,
   GraphQLAbstractType,
   GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
 } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
@@ -62,10 +63,9 @@ export const isInterfaceOfType = (
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
 
-  const abstractType = schema.getType(typeCondition);
-  const objectType = schema.getType(typename);
-
-  if (abstractType instanceof GraphQLObjectType) {
+  const abstractType = schema.types[typeCondition];
+  const objectType = schema.types[typename];
+  if (isObjectType(abstractType)) {
     return abstractType === objectType;
   }
 
@@ -79,7 +79,7 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
-  const object = schema.getType(typename);
+  const object = schema.types[typename];
   expectObjectType(object, typename);
 
   const field = object.getFields()[fieldName];
@@ -104,7 +104,7 @@ function expectObjectType(
   typename: string
 ): asserts x is GraphQLObjectType {
   invariant(
-    x instanceof GraphQLObjectType,
+    isObjectType(x),
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
@@ -118,7 +118,7 @@ function expectAbstractType(
   typename: string
 ): asserts x is GraphQLAbstractType {
   invariant(
-    x instanceof GraphQLInterfaceType || x instanceof GraphQLUnionType,
+    isInterfaceType(x) || isUnionType(x),
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +
@@ -132,9 +132,8 @@ export function expectValidKeyingConfig(
   keys: KeyingConfig
 ): void {
   if (process.env.NODE_ENV !== 'production') {
-    const types = schema.getTypeMap();
     for (const key in keys) {
-      if (!types[key]) {
+      if (!schema.types[key]) {
         warn(
           'Invalid Object type: The type `' +
             key +
@@ -197,7 +196,6 @@ export function expectValidResolversConfig(
     return;
   }
 
-  const validTypes = schema.getTypeMap();
   for (const key in resolvers) {
     if (key === 'Query') {
       if (schema.query) {
@@ -211,12 +209,10 @@ export function expectValidResolversConfig(
         warnAboutResolver('Query');
       }
     } else {
-      if (!validTypes[key]) {
+      if (!schema.types[key]) {
         warnAboutResolver(key);
       } else {
-        const validTypeProperties = (schema.getType(
-          key
-        ) as GraphQLObjectType).getFields();
+        const validTypeProperties = (schema.types[key] as GraphQLObjectType).getFields();
         for (const resolverProperty in resolvers[key]) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
