@@ -44,9 +44,10 @@ export const retryExchange = ({
 
   return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
-    const { source: retry$, next: nextRetryOperation } = makeSubject<
-      Operation
-    >();
+    const {
+      source: retry$,
+      next: nextRetryOperation,
+    } = makeSubject<Operation>();
 
     const retryWithBackoff$ = pipe(
       retry$,

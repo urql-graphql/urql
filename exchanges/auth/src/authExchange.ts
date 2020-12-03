@@ -72,9 +72,10 @@ export function authExchange<T>({
 }: AuthConfig<T>): Exchange {
   return ({ client, forward }) => {
     const retryQueue: Map<number, Operation> = new Map();
-    const { source: retrySource$, next: retryOperation } = makeSubject<
-      Operation
-    >();
+    const {
+      source: retrySource$,
+      next: retryOperation,
+    } = makeSubject<Operation>();
 
     let authState: T | null = null;
 
