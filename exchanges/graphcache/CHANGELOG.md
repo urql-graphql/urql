@@ -1,5 +1,24 @@
 # @urql/exchange-graphcache
 
+## 3.3.0
+
+### Minor Changes
+
+- Increase the consistency of when and how the `__typename` field is added to results. Instead of
+  adding it by default and automatically first, the `__typename` field will now be added along with
+  the usual selection set. The `write` operation now automatically issues a warning if `__typename`
+  isn't present where it's expected more often, which helps in debugging. Also the `__typename` field
+  may now not proactively be added to root results, e.g. `"Query"`, by [@kitten](https://github.com/kitten) (See [#1185](https://github.com/FormidableLabs/urql/pull/1185))
+
+### Patch Changes
+
+- Replace `graphql/utilities/buildClientSchema.mjs` with a custom-tailored, lighter implementation
+  built into `@urql/exchange-graphcache`. This will appear to increase its size by about `0.2kB gzip`
+  but will actually save around `8.5kB gzip` to `9.4kB gzip` in any production bundle by using less of
+  `graphql`'s code, by [@kitten](https://github.com/kitten) (See [#1189](https://github.com/FormidableLabs/urql/pull/1189))
+- Updated dependencies (See [#1187](https://github.com/FormidableLabs/urql/pull/1187), [#1186](https://github.com/FormidableLabs/urql/pull/1186), and [#1186](https://github.com/FormidableLabs/urql/pull/1186))
+  - @urql/core@1.16.0
+
 ## 3.2.0
 
 ### Minor Changes
