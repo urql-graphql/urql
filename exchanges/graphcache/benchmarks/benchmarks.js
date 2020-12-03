@@ -30,6 +30,7 @@ export const addTodo = async () => {
     const newTodo = { text: 'New todo', complete: true };
     const mutationResult = await urqlClient.mutation(ADD_TODO_MUTATION, newTodo).toPromise();
     console.log("addTodo Mutation Result", mutationResult);
+    return mutationResult.data.addTodo;
 };
 export const updateTodo = async ({ id, complete }) => {
     const updatedTodo = { id, complete };
@@ -40,6 +41,7 @@ export const addTodos = async todosToBeAdded => {
     const newTodos = { newTodos: { todos: todosToBeAdded } };
     const mutationResult = await urqlClient.mutation(ADD_TODOS_MUTATION, newTodos).toPromise();
     console.log("addTodos Mutation Result", mutationResult);
+    return mutationResult.data.addTodos;
 };
 export const addWriters = async writersToBeAdded => {
     const newWriters = { newWriters: { writers: writersToBeAdded } };

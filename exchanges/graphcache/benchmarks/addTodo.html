@@ -18,13 +18,19 @@
         import { makeEntries } from "./makeEntries.js";
         import { makeTodo } from "./entities.js";
         import { getAllTodos, addTodo, addTodos } from "./benchmarks.js";
-        
 
-        // bench.start();
-        addTodos(makeEntries(100, makeTodo));
-        addTodo();
-        getAllTodos();
-        // bench.stop();
+        const todosToBeAdded = makeEntries(100, makeTodo);
+
+        const benchmark = async () => {
+            await addTodos(todosToBeAdded);
+            await getAllTodos();
+            // bench.start();
+            await addTodo();
+            // bench.end();
+        };
+
+        benchmark();
+
     </script>
 </body>
 

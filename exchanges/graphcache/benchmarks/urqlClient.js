@@ -4,28 +4,16 @@ import { executeExchange } from '@urql/exchange-execute';
 import { buildSchema } from 'graphql';
 import { ALL_TODOS_QUERY } from './operations';
 
-const TodosQuery = `
-    query {
-        todos {
-            id
-            text
-            complete
-        }
-    }
-`;
-
 export const cache = cacheExchange({
     updates: {
         Mutation: {
             addTodo: (result, args, cache, info) => {
-                console.log("mutations => result", result);
-                console.log("mutations => args", args);
-                console.log("mutations => cache", cache);
-                console.log("mutations => info", info);
-                cache.updateQuery({ query: TodosQuery }, (data) => {
-                    console.log("cache query response in updater => ", data);
-                    return data;
-                });
+                cache.updateQuery(
+                    { query: ALL_TODOS_QUERY },
+                    data => {
+                        data.todos.push(result.addTodo);
+                        return data;
+                    });
                 return result;
             }
         }
