@@ -27,7 +27,7 @@ export const getAllAuthors = async () => {
     console.log("getAllAuthors Query Result", queryResult);
 };
 export const addTodo = async () => {
-    const newTodo = newTodo = { text: 'New todo', complete: true };
+    const newTodo = { text: 'New todo', complete: true };
     const mutationResult = await urqlClient.mutation(ADD_TODO_MUTATION, newTodo).toPromise();
     console.log("addTodo Mutation Result", mutationResult);
 };

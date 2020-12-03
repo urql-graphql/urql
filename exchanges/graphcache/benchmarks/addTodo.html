@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>100 Writes</title>
+    <title>Add Todo</title>
     <script>
         window.process = { env: { NODE_ENV: "development" } };
     </script>
@@ -17,13 +17,13 @@
         import * as bench from '/bench.js';
         import { makeEntries } from "./makeEntries.js";
         import { makeTodo } from "./entities.js";
-        import { getAllTodos, addTodos } from "./benchmarks.js";
-
-        // create todos to be added/written
-        const hundredTodos = makeEntries(100, makeTodo);
+        import { getAllTodos, addTodo, addTodos } from "./benchmarks.js";
+        
 
         // bench.start();
-        addTodos(hundredTodos);
+        addTodos(makeEntries(100, makeTodo));
+        addTodo();
+        getAllTodos();
         // bench.stop();
     </script>
 </body>

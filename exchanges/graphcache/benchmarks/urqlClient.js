@@ -2,25 +2,30 @@ import { createClient, dedupExchange } from '@urql/core';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { executeExchange } from '@urql/exchange-execute';
 import { buildSchema } from 'graphql';
+import { ALL_TODOS_QUERY } from './operations';
+
+const TodosQuery = `
+    query {
+        todos {
+            id
+            text
+            complete
+        }
+    }
+`;
 
 export const cache = cacheExchange({
-    resolvers: {
-        Todo: {
-            text(parent, args, cache, info) {
-                console.log("query => parent", parent);
-                console.log("query => args", args);
-                console.log("query => cache", cache);
-                console.log("query => info", info);
-                return parent.text;
-            }
-        }
-    },
     updates: {
         Mutation: {
-            addTodo: (result, args, cache) => {
+            addTodo: (result, args, cache, info) => {
                 console.log("mutations => result", result);
                 console.log("mutations => args", args);
                 console.log("mutations => cache", cache);
+                console.log("mutations => info", info);
+                cache.updateQuery({ query: TodosQuery }, (data) => {
+                    console.log("cache query response in updater => ", data);
+                    return data;
+                });
                 return result;
             }
         }
@@ -221,7 +226,7 @@ const rootValue = {
         return todo;
     },
     updateTodo: ({ id, complete }) => {
-        const todoToBeUpdated = todos.find( todo => todo.id === id );
+        const todoToBeUpdated = todos.find(todo => todo.id === id);
         todoToBeUpdated.complete = complete;
         return todoToBeUpdated;
     },
@@ -261,8 +266,8 @@ const client = createClient({
     url: "http://localhost:3000/graphql",
     exchanges: [
         dedupExchange,
-        // cache,
-        cacheExchange({}),
+        cache,
+        // cacheExchange({}),
         executeExchange({ schema, rootValue })
     ]
 });
