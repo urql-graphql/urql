@@ -1,19 +1,8 @@
-import {
-  isNullableType,
-  isListType,
-  isNonNullType,
-  isObjectType,
-  isInterfaceType,
-  isUnionType,
-  InlineFragmentNode,
-  FragmentDefinitionNode,
-  GraphQLAbstractType,
-  GraphQLObjectType,
-} from 'graphql';
+import { InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
 
 import { warn, invariant } from '../helpers/help';
 import { getTypeCondition } from './node';
-import { SchemaIntrospector } from './buildClientSchema';
+import { SchemaIntrospector, SchemaObject } from './buildClientSchema';
 
 import {
   KeyingConfig,
@@ -31,7 +20,7 @@ export const isFieldNullable = (
 ): boolean => {
   if (BUILTIN_FIELD_RE.test(fieldName)) return true;
   const field = getField(schema, typename, fieldName);
-  return !!field && isNullableType(field.type);
+  return !!field && field.type.kind !== 'NON_NULL';
 };
 
 export const isListNullable = (
@@ -41,8 +30,8 @@ export const isListNullable = (
 ): boolean => {
   const field = getField(schema, typename, fieldName);
   if (!field) return false;
-  const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
-  return isListType(ofType) && isNullableType(ofType.ofType);
+  const ofType = field.type.kind === 'NON_NULL' ? field.type.ofType : field.type;
+  return ofType.kind === 'LIST' && ofType.ofType.kind !== 'NON_NULL';
 };
 
 export const isFieldAvailableOnType = (
@@ -62,16 +51,11 @@ export const isInterfaceOfType = (
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
   if (!typeCondition || typename === typeCondition) return true;
-
-  const abstractType = schema.types[typeCondition];
-  const objectType = schema.types[typename];
-  if (isObjectType(abstractType)) {
-    return abstractType === objectType;
-  }
-
-  expectAbstractType(abstractType, typeCondition);
-  expectObjectType(objectType, typename);
-  return schema.isSubType(abstractType, objectType);
+  if (schema.types[typeCondition] && schema.types[typeCondition].kind === 'OBJECT')
+    return typeCondition === typename;
+  expectAbstractType(schema, typeCondition!);
+  expectObjectType(schema, typename!);
+  return schema.isSubType(typeCondition, typename);
 };
 
 const getField = (
@@ -79,10 +63,9 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
-  const object = schema.types[typename];
-  expectObjectType(object, typename);
-
-  const field = object.getFields()[fieldName];
+  expectObjectType(schema, typename);
+  const object = schema.types[typename] as SchemaObject;
+  const field = object.fields[fieldName];
   if (!field) {
     warn(
       'Invalid field: The field `' +
@@ -100,11 +83,11 @@ const getField = (
 };
 
 function expectObjectType(
-  x: any,
+  schema: SchemaIntrospector,
   typename: string
-): asserts x is GraphQLObjectType {
+) {
   invariant(
-    isObjectType(x),
+    schema.types[typename] && schema.types[typename].kind === 'OBJECT',
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
@@ -114,11 +97,13 @@ function expectObjectType(
 }
 
 function expectAbstractType(
-  x: any,
+  schema: SchemaIntrospector,
   typename: string
-): asserts x is GraphQLAbstractType {
+) {
   invariant(
-    isInterfaceType(x) || isUnionType(x),
+    schema.types[typename] &&
+      (schema.types[typename].kind === 'INTERFACE' ||
+        schema.types[typename].kind === 'UNION'),
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +
@@ -153,34 +138,33 @@ export function expectValidUpdatesConfig(
     return;
   }
 
-  const mutationFields = schema.mutation ? schema.mutation.getFields() : {};
-  const subscriptionFields = schema.subscription
-    ? schema.subscription.getFields()
-    : {};
-  const givenMutations =
-    (schema.mutation && updates[schema.mutation.name]) || {};
-  const givenSubscription =
-    (schema.subscription && updates[schema.subscription.name]) || {};
-
-  for (const fieldName in givenMutations) {
-    if (mutationFields[fieldName] === undefined) {
-      warn(
-        'Invalid mutation field: `' +
-          fieldName +
-          '` is not in the defined schema, but the `updates.Mutation` option is referencing it.',
-        21
-      );
+  if (schema.mutation) {
+    const mutationFields = (schema.types[schema.mutation] as SchemaObject).fields;
+    const givenMutations = updates[schema.mutation] || {};
+    for (const fieldName in givenMutations) {
+      if (mutationFields[fieldName] === undefined) {
+        warn(
+          'Invalid mutation field: `' +
+            fieldName +
+            '` is not in the defined schema, but the `updates.Mutation` option is referencing it.',
+          21
+        );
+      }
     }
   }
 
-  for (const fieldName in givenSubscription) {
-    if (subscriptionFields[fieldName] === undefined) {
-      warn(
-        'Invalid subscription field: `' +
-          fieldName +
-          '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
-        22
-      );
+  if (schema.subscription) {
+    const subscriptionFields = (schema.types[schema.subscription] as SchemaObject).fields;
+    const givenSubscription = updates[schema.subscription] || {};
+    for (const fieldName in givenSubscription) {
+      if (subscriptionFields[fieldName] === undefined) {
+        warn(
+          'Invalid subscription field: `' +
+            fieldName +
+            '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
+          22
+        );
+      }
     }
   }
 }
@@ -203,7 +187,7 @@ export function expectValidResolversConfig(
   for (const key in resolvers) {
     if (key === 'Query') {
       if (schema.query) {
-        const validQueries = schema.query.getFields();
+        const validQueries = (schema.types[schema.query] as SchemaObject).fields;
         for (const resolverQuery in resolvers.Query) {
           if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
@@ -216,9 +200,7 @@ export function expectValidResolversConfig(
       if (!schema.types[key]) {
         warnAboutResolver(key);
       } else {
-        const validTypeProperties = (schema.types[
-          key
-        ] as GraphQLObjectType).getFields();
+        const validTypeProperties = (schema.types[key] as SchemaObject).fields;
         for (const resolverProperty in resolvers[key]) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
@@ -237,13 +219,15 @@ export function expectValidOptimisticMutationsConfig(
     return;
   }
 
-  const validMutations = schema.mutation ? schema.mutation.getFields() : {};
-  for (const mutation in optimisticMutations) {
-    if (!validMutations[mutation]) {
-      warn(
-        `Invalid optimistic mutation field: \`${mutation}\` is not a mutation field in the defined schema, but the \`optimistic\` option is referencing it.`,
-        24
-      );
+  if (schema.mutation) {
+    const validMutations = (schema.types[schema.mutation] as SchemaObject).fields;
+    for (const mutation in optimisticMutations) {
+      if (!validMutations[mutation]) {
+        warn(
+          `Invalid optimistic mutation field: \`${mutation}\` is not a mutation field in the defined schema, but the \`optimistic\` option is referencing it.`,
+          24
+        );
+      }
     }
   }
 }
