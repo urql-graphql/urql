@@ -1,4 +1,5 @@
 import {
+  gql,
   createClient,
   ExchangeIO,
   Operation,
@@ -6,7 +7,6 @@ import {
   formatDocument,
 } from '@urql/core';
 
-import gql from 'graphql-tag';
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
 import { offlineExchange } from './offlineExchange';
 

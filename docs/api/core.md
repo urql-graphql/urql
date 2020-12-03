@@ -353,6 +353,36 @@ errorExchange({
 
 ## Utilities
 
+### gql
+
+This is a `gql` tagged template literal function, similar to the one that's also commonly known from
+`graphql-tag`. It can be used to write GraphQL documents in a tagged template literal and returns a
+parsed `DocumentNode` that's primed against the `createRequest`'s cache for `key`s.
+
+```js
+import { gql } from '@urql/core';
+
+const SharedFragment = gql`
+  fragment UserFrag on User {
+    id
+    name
+  }
+`;
+
+gql`
+  query {
+    user
+    ...UserFrag
+  }
+
+  ${SharedFragment}
+`;
+```
+
+Unlike `graphql-tag`, this function outputs a warning in development when names of fragments in the
+document are duplicated. It does not output warnings when fragment names were duplicated globally
+however.
+
 ### stringifyVariables
 
 This function is a variation of `JSON.stringify` that sorts any object's keys that is being

@@ -143,7 +143,7 @@ The store allows the user to also read a fragment for a certain entity, this fun
 accepts a `fragment` and an `id`. This looks like the following.
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 const data = cache.readFragment(
   gql`
@@ -157,7 +157,7 @@ const data = cache.readFragment(
 ```
 
 > **Note:** In the above example, we've used
-> [graphql-tag](https://github.com/apollographql/graphql-tag) because `writeFragment` only accepts
+> [the `gql` tag function](../api/core.md#gql) because `readFragment` only accepts
 > GraphQL `DocumentNode`s as inputs, and not strings.
 
 This way we'll get the Todo with id 1 and the relevant data we are asking for in the

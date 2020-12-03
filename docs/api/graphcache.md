@@ -284,7 +284,7 @@ The method will then attempt to read the entity according to the fragment entire
 data. If any data is uncached and missing it'll return `null`.
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 cache.readFragment(
   gql`
@@ -303,7 +303,7 @@ present on the fragment itself.
 If any fields on the fragment require variables, you can pass them as the third argument like so:
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 cache.readFragment(
   gql`
@@ -355,7 +355,7 @@ however the second argument, `data`, should not only contain properties that are
 an entity key from the given data, but also the fields that will be written:
 
 ```js
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 
 cache.writeFragment(
   gql`

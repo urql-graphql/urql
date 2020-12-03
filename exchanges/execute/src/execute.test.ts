@@ -1,4 +1,13 @@
-jest.mock('graphql');
+jest.mock('graphql', () => {
+  const graphql = jest.requireActual('graphql');
+
+  return {
+    __esModule: true,
+    ...graphql,
+    print: jest.fn(a => a as any),
+    execute: jest.fn(() => ({ key: 'value' })),
+  };
+});
 
 import { fetchExchange } from 'urql';
 import { executeExchange } from './execute';
@@ -31,17 +40,16 @@ const exchangeArgs = {
 const expectedOperationName = getOperationName(queryOperation.query);
 
 const fetchMock = (global as any).fetch as jest.Mock;
-afterEach(() => {
-  fetchMock.mockClear();
-});
-
 const mockHttpResponseData = { key: 'value' };
 
-beforeEach(jest.clearAllMocks);
-
 beforeEach(() => {
+  jest.clearAllMocks();
   mocked(print).mockImplementation(a => a as any);
   mocked(execute).mockResolvedValue({ data: mockHttpResponseData });
+});
+
+afterEach(() => {
+  fetchMock.mockClear();
 });
 
 describe('on operation', () => {

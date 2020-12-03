@@ -56,8 +56,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "graphql": "^15.4.0",
-    "graphql-tag": "^2.10.1"
+    "graphql": "^15.4.0"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0"

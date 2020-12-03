@@ -1,10 +1,10 @@
 import {
+  gql,
   GraphQLRequest,
   OperationContext,
   Operation,
   makeOperation,
 } from '@urql/core';
-import gql from 'graphql-tag';
 
 const context: OperationContext = {
   fetchOptions: {

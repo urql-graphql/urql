@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import gql from 'graphql-tag';
 import { minifyIntrospectionQuery } from '@urql/introspection';
-import { maskTypename } from '@urql/core';
+import { gql, maskTypename } from '@urql/core';
 import { mocked } from 'ts-jest/utils';
 
 import { Data, StorageAdapter } from '../types';

@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@urql/core';
 import { query, write, writeOptimistic } from '../operations';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';

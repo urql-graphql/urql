@@ -7,9 +7,14 @@ import {
   ASTKindToNode,
 } from 'graphql';
 
-import gql from 'graphql-tag';
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
-import { Client, Operation, OperationContext, makeOperation } from '@urql/core';
+import {
+  gql,
+  Client,
+  Operation,
+  OperationContext,
+  makeOperation,
+} from '@urql/core';
 
 import { populateExchange } from './populateExchange';
 

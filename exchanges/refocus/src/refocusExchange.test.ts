@@ -1,13 +1,13 @@
-import gql from 'graphql-tag';
-
 import { pipe, map, makeSubject, publish, tap } from 'wonka';
 
 import {
+  gql,
   createClient,
   Operation,
   OperationResult,
   ExchangeIO,
 } from '@urql/core';
+
 import { refocusExchange } from './refocusExchange';
 
 const dispatchDebug = jest.fn();
