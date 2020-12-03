@@ -154,12 +154,10 @@ export function expectValidUpdatesConfig(
     return;
   }
 
-  const mutation = schema.getMutationType();
-  const subscription = schema.getSubscriptionType();
-  const mutationFields = mutation ? mutation.getFields() : {};
-  const subscriptionFields = subscription ? subscription.getFields() : {};
-  const givenMutations = (mutation && updates[mutation.name]) || {};
-  const givenSubscription = (subscription && updates[subscription.name]) || {};
+  const mutationFields = schema.mutation ? schema.mutation.getFields() : {};
+  const subscriptionFields = schema.subscription ? schema.subscription.getFields() : {};
+  const givenMutations = (schema.mutation && updates[schema.mutation.name]) || {};
+  const givenSubscription = (schema.subscription && updates[schema.subscription.name]) || {};
 
   for (const fieldName in givenMutations) {
     if (mutationFields[fieldName] === undefined) {
@@ -202,9 +200,8 @@ export function expectValidResolversConfig(
   const validTypes = schema.getTypeMap();
   for (const key in resolvers) {
     if (key === 'Query') {
-      const queryType = schema.getQueryType();
-      if (queryType) {
-        const validQueries = queryType.getFields();
+      if (schema.query) {
+        const validQueries = schema.query.getFields();
         for (const resolverQuery in resolvers.Query) {
           if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
@@ -238,10 +235,7 @@ export function expectValidOptimisticMutationsConfig(
     return;
   }
 
-  const validMutations = schema.getMutationType()
-    ? (schema.getMutationType() as GraphQLObjectType).getFields()
-    : {};
-
+  const validMutations = schema.mutation ? schema.mutation.getFields() : {};
   for (const mutation in optimisticMutations) {
     if (!validMutations[mutation]) {
       warn(

@@ -30,9 +30,10 @@ interface InterfaceRefs {
 }
 
 export interface SchemaIntrospector {
-  getQueryType(): GraphQLObjectType | undefined;
-  getMutationType(): GraphQLObjectType | undefined;
-  getSubscriptionType(): GraphQLObjectType | undefined;
+  query: GraphQLObjectType | undefined;
+  mutation: GraphQLObjectType | undefined;
+  subscription: GraphQLObjectType | undefined;
+
   getType(name: string): GraphQLNamedType | undefined;
   getTypeMap(): Record<string, GraphQLNamedType>;
   getImplementations(iface: GraphQLInterfaceType): InterfaceRefs;
@@ -147,16 +148,11 @@ export const buildClientSchema = (
     }
   }
 
-  const schema = {
-    getQueryType() {
-      return (__schema.queryType && getNamedType(__schema.queryType.name) as GraphQLObjectType) || undefined;
-    },
-    getMutationType() {
-      return (__schema.mutationType && getNamedType(__schema.mutationType.name) as GraphQLObjectType) || undefined;
-    },
-    getSubscriptionType() {
-      return (__schema.subscriptionType && getNamedType(__schema.subscriptionType.name) as GraphQLObjectType) || undefined;
-    },
+  return {
+    query: (__schema.queryType && getNamedType(__schema.queryType.name) as GraphQLObjectType)!,
+    mutation: (__schema.mutationType && getNamedType(__schema.mutationType.name) as GraphQLObjectType)!,
+    subscription: (__schema.subscriptionType && getNamedType(__schema.subscriptionType.name) as GraphQLObjectType)!,
+
     getType(name: string) {
       return typemap[name];
     },
@@ -184,6 +180,4 @@ export const buildClientSchema = (
       return !!map[possible.name];
     },
   };
-
-  return schema;
 };
