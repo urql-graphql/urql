@@ -1,9 +1,4 @@
-import {
-  buildClientSchema,
-  DocumentNode,
-  IntrospectionQuery,
-  GraphQLSchema,
-} from 'graphql';
+import { DocumentNode, IntrospectionQuery } from 'graphql';
 
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
@@ -27,7 +22,15 @@ import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
-import * as SchemaPredicates from '../ast/schemaPredicates';
+
+import {
+  SchemaIntrospector,
+  buildClientSchema,
+  expectValidKeyingConfig,
+  expectValidUpdatesConfig,
+  expectValidResolversConfig,
+  expectValidOptimisticMutationsConfig,
+} from '../ast';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
@@ -46,7 +49,7 @@ export class Store implements Cache {
   updates: Record<string, Record<string, UpdateResolver>>;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
-  schema?: GraphQLSchema;
+  schema?: SchemaIntrospector;
 
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
@@ -63,14 +66,9 @@ export class Store implements Cache {
     let subscriptionName = 'Subscription';
     if (opts.schema) {
       const schema = (this.schema = buildClientSchema(opts.schema));
-      const queryType = schema.getQueryType();
-      const mutationType = schema.getMutationType();
-      const subscriptionType = schema.getSubscriptionType();
-      queryName = queryType ? queryType.name : queryName;
-      mutationName = mutationType ? mutationType.name : mutationName;
-      subscriptionName = subscriptionType
-        ? subscriptionType.name
-        : subscriptionName;
+      queryName = schema.query || queryName;
+      mutationName = schema.mutation || mutationName;
+      subscriptionName = schema.subscription || subscriptionName;
     }
 
     this.updates = {
@@ -93,10 +91,10 @@ export class Store implements Cache {
     this.data = InMemoryData.make(queryName);
 
     if (this.schema && process.env.NODE_ENV !== 'production') {
-      SchemaPredicates.expectValidKeyingConfig(this.schema, this.keys);
-      SchemaPredicates.expectValidUpdatesConfig(this.schema, this.updates);
-      SchemaPredicates.expectValidResolversConfig(this.schema, this.resolvers);
-      SchemaPredicates.expectValidOptimisticMutationsConfig(
+      expectValidKeyingConfig(this.schema, this.keys);
+      expectValidUpdatesConfig(this.schema, this.updates);
+      expectValidResolversConfig(this.schema, this.resolvers);
+      expectValidOptimisticMutationsConfig(
         this.schema,
         this.optimisticMutations
       );
