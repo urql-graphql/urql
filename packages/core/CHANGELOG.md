@@ -1,5 +1,16 @@
 # @urql/core
 
+## 1.16.0
+
+### Minor Changes
+
+- Add a built-in `gql` tag function helper to `@urql/core`. This behaves similarly to `graphql-tag` but only warns about _locally_ duplicated fragment names rather than globally. It also primes `@urql/core`'s key cache with the parsed `DocumentNode`, by [@kitten](https://github.com/kitten) (See [#1187](https://github.com/FormidableLabs/urql/pull/1187))
+
+### Patch Changes
+
+- ⚠️ Fix edge case in `formatDocument`, which fails to add a `__typename` field if it has been aliased to a different name, by [@kitten](https://github.com/kitten) (See [#1186](https://github.com/FormidableLabs/urql/pull/1186))
+- Cache results of `formatDocument` by the input document's key, by [@kitten](https://github.com/kitten) (See [#1186](https://github.com/FormidableLabs/urql/pull/1186))
+
 ## 1.15.2
 
 ### Patch Changes
