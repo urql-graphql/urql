@@ -1,6 +1,4 @@
 import {
-  valueFromAST,
-  parseValue,
   isUnionType,
   isInterfaceType,
   isObjectType,
@@ -13,10 +11,8 @@ import {
   GraphQLAbstractType,
   GraphQLNamedType,
   GraphQLUnionType,
-  GraphQLInputObjectType,
   GraphQLInterfaceType,
   GraphQLInputFieldConfig,
-  GraphQLEnumType,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLList,
@@ -54,6 +50,9 @@ export const buildClientSchema = ({
       interfaces: [],
     });
 
+  /** NOTE: This type is used to replace all scalars, since no exact scalar is used in Graphcache. */
+  const _any = (typemap._any = new GraphQLScalarType({ name: 'Any' }));
+
   const getNamedType = (
     ref: string | IntrospectionNamedTypeRef
   ): GraphQLNamedType => typemap[(ref as any).name || ref];
@@ -64,15 +63,10 @@ export const buildClientSchema = ({
     } else if (ref.kind === 'NON_NULL') {
       return new GraphQLNonNull(getType(ref.ofType));
     } else {
-      return getNamedType(ref);
+      // return getNamedType(ref);
+      return _any;
     }
   };
-
-  const buildNameConfig = <T extends { name: string }>(
-    x: T
-  ): { name: string } => ({
-    name: x.name,
-  });
 
   const buildNameMap = <T extends { name: string }>(
     arr: ReadonlyArray<T>
@@ -88,9 +82,12 @@ export const buildClientSchema = ({
     const type = getType(input.type) as any;
     return {
       type,
+      /*
+      NOTE: Not needed for Graphcache's purposes
       defaultValue: input.defaultValue
         ? valueFromAST(parseValue(input.defaultValue), type as any)
         : undefined,
+      */
     };
   };
 
@@ -102,13 +99,22 @@ export const buildClientSchema = ({
 
   const buildType = (type: IntrospectionType): GraphQLNamedType | void => {
     switch (type.kind) {
+      /*
+      NOTE: All input/output type values are replaced with the "Any" scalar.
       case 'SCALAR':
-        return new GraphQLScalarType(buildNameConfig(type));
+        return new GraphQLScalarType({ name: type.name }));
       case 'ENUM':
         return new GraphQLEnumType({
           name: type.name,
-          values: buildNameMap(type.enumValues.map(buildNameConfig) as any),
+          values: buildNameMap(type.enumValues.map(value => ({ name: value.name })) as any),
         } as any);
+      case 'INPUT_OBJECT':
+        return new GraphQLInputObjectType({
+          name: type.name,
+          fields: () =>
+            buildNameMap(type.inputFields.map(buildInputValue) as any),
+        } as any);
+      */
       case 'OBJECT':
         return new GraphQLObjectType({
           name: type.name,
@@ -129,12 +135,6 @@ export const buildClientSchema = ({
           types: () =>
             (type.possibleTypes || []).map(getNamedType) as GraphQLObjectType[],
         });
-      case 'INPUT_OBJECT':
-        return new GraphQLInputObjectType({
-          name: type.name,
-          fields: () =>
-            buildNameMap(type.inputFields.map(buildInputValue) as any),
-        } as any);
     }
   };
 
