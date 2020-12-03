@@ -4,7 +4,6 @@ import {
   isNonNullType,
   InlineFragmentNode,
   FragmentDefinitionNode,
-  GraphQLSchema,
   GraphQLAbstractType,
   GraphQLObjectType,
   GraphQLInterfaceType,
@@ -13,6 +12,8 @@ import {
 
 import { warn, invariant } from '../helpers/help';
 import { getTypeCondition } from './node';
+import { SchemaIntrospector } from './buildClientSchema';
+
 import {
   KeyingConfig,
   UpdateResolver,
@@ -23,7 +24,7 @@ import {
 const BUILTIN_FIELD_RE = /^__/;
 
 export const isFieldNullable = (
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   typename: string,
   fieldName: string
 ): boolean => {
@@ -33,7 +34,7 @@ export const isFieldNullable = (
 };
 
 export const isListNullable = (
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   typename: string,
   fieldName: string
 ): boolean => {
@@ -44,7 +45,7 @@ export const isListNullable = (
 };
 
 export const isFieldAvailableOnType = (
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   typename: string,
   fieldName: string
 ): boolean => {
@@ -53,7 +54,7 @@ export const isFieldAvailableOnType = (
 };
 
 export const isInterfaceOfType = (
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   node: InlineFragmentNode | FragmentDefinitionNode,
   typename: string | void
 ): boolean => {
@@ -70,11 +71,11 @@ export const isInterfaceOfType = (
 
   expectAbstractType(abstractType, typeCondition);
   expectObjectType(objectType, typename);
-  return schema.isPossibleType(abstractType, objectType);
+  return schema.isSubType(abstractType, objectType);
 };
 
 const getField = (
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   typename: string,
   fieldName: string
 ) => {
@@ -127,7 +128,7 @@ function expectAbstractType(
 }
 
 export function expectValidKeyingConfig(
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   keys: KeyingConfig
 ): void {
   if (process.env.NODE_ENV !== 'production') {
@@ -146,7 +147,7 @@ export function expectValidKeyingConfig(
 }
 
 export function expectValidUpdatesConfig(
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   updates: Record<string, Record<string, UpdateResolver>>
 ): void {
   if (process.env.NODE_ENV === 'production') {
@@ -191,7 +192,7 @@ function warnAboutResolver(name: string): void {
 }
 
 export function expectValidResolversConfig(
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   resolvers: ResolverConfig
 ): void {
   if (process.env.NODE_ENV === 'production') {
@@ -230,7 +231,7 @@ export function expectValidResolversConfig(
 }
 
 export function expectValidOptimisticMutationsConfig(
-  schema: GraphQLSchema,
+  schema: SchemaIntrospector,
   optimisticMutations: OptimisticMutationConfig
 ): void {
   if (process.env.NODE_ENV === 'production') {

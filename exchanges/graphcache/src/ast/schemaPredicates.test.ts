@@ -1,5 +1,6 @@
-import { Kind, InlineFragmentNode, buildClientSchema } from 'graphql';
+import { Kind, InlineFragmentNode } from 'graphql';
 import { mocked } from 'ts-jest/utils';
+import { buildClientSchema } from './buildClientSchema';
 import * as SchemaPredicates from './schemaPredicates';
 
 describe('SchemaPredicates', () => {
