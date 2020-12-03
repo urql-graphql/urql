@@ -1,7 +1,4 @@
-import {
-  DocumentNode,
-  IntrospectionQuery,
-} from 'graphql';
+import { DocumentNode, IntrospectionQuery } from 'graphql';
 
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
@@ -25,7 +22,10 @@ import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
 import { keyOfField } from './keys';
 import * as InMemoryData from './data';
-import { buildClientSchema, SchemaIntrospector }from '../ast/buildClientSchema';
+import {
+  buildClientSchema,
+  SchemaIntrospector,
+} from '../ast/buildClientSchema';
 import * as SchemaPredicates from '../ast/schemaPredicates';
 
 type RootField = 'query' | 'mutation' | 'subscription';
@@ -64,7 +64,9 @@ export class Store implements Cache {
       const schema = (this.schema = buildClientSchema(opts.schema));
       queryName = schema.query ? schema.query.name : queryName;
       mutationName = schema.mutation ? schema.mutation.name : mutationName;
-      subscriptionName = schema.subscription ? schema.subscription.name : subscriptionName;
+      subscriptionName = schema.subscription
+        ? schema.subscription.name
+        : subscriptionName;
     }
 
     this.updates = {

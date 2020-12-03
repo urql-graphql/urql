@@ -21,7 +21,7 @@ import {
   GraphQLScalarType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLType
+  GraphQLType,
 } from 'graphql';
 
 interface InterfaceRefs {
@@ -34,24 +34,29 @@ export interface SchemaIntrospector {
   mutation: GraphQLObjectType | undefined;
   subscription: GraphQLObjectType | undefined;
   types: Record<string, GraphQLNamedType>;
-  isSubType(abstract: GraphQLAbstractType, possible: GraphQLObjectType): boolean;
+  isSubType(
+    abstract: GraphQLAbstractType,
+    possible: GraphQLObjectType
+  ): boolean;
 }
 
-export const buildClientSchema = (
-  { __schema }: IntrospectionQuery
-): SchemaIntrospector => {
+export const buildClientSchema = ({
+  __schema,
+}: IntrospectionQuery): SchemaIntrospector => {
   const typemap: Record<string, GraphQLNamedType> = {};
   const implementations: Record<string, InterfaceRefs> = {};
   const subTypeCache: Record<string, Record<string, GraphQLObjectType>> = {};
 
   const getImplementations = (iface: GraphQLInterfaceType): InterfaceRefs =>
-    implementations[iface.name] || (implementations[iface.name] = {
+    implementations[iface.name] ||
+    (implementations[iface.name] = {
       objects: [],
       interfaces: [],
     });
 
-  const getNamedType = (ref: string | IntrospectionNamedTypeRef): GraphQLNamedType =>
-    typemap[(ref as any).name || ref];
+  const getNamedType = (
+    ref: string | IntrospectionNamedTypeRef
+  ): GraphQLNamedType => typemap[(ref as any).name || ref];
 
   const getType = (ref: IntrospectionTypeRef): GraphQLType => {
     if (ref.kind === 'LIST') {
@@ -63,18 +68,23 @@ export const buildClientSchema = (
     }
   };
 
-  const buildNameConfig = <T extends { name: string }>(x: T): { name: string } => ({
-    name: x.name
+  const buildNameConfig = <T extends { name: string }>(
+    x: T
+  ): { name: string } => ({
+    name: x.name,
   });
 
-  const buildNameMap = <T extends { name: string }>(arr: ReadonlyArray<T>): { [name: string]: T } => {
+  const buildNameMap = <T extends { name: string }>(
+    arr: ReadonlyArray<T>
+  ): { [name: string]: T } => {
     const map: Record<string, T> = {};
-    for (let i = 0; i < arr.length; i++)
-      map[arr[i].name] = arr[i];
+    for (let i = 0; i < arr.length; i++) map[arr[i].name] = arr[i];
     return map;
   };
 
-  const buildInputValue = (input: IntrospectionInputValue): GraphQLInputFieldConfig => {
+  const buildInputValue = (
+    input: IntrospectionInputValue
+  ): GraphQLInputFieldConfig => {
     const type = getType(input.type) as any;
     return {
       type,
@@ -102,24 +112,28 @@ export const buildClientSchema = (
       case 'OBJECT':
         return new GraphQLObjectType({
           name: type.name,
-          interfaces: () => (type.interfaces || []).map(getNamedType) as GraphQLInterfaceType[],
+          interfaces: () =>
+            (type.interfaces || []).map(getNamedType) as GraphQLInterfaceType[],
           fields: () => buildNameMap(type.fields.map(buildField) as any),
         } as any);
       case 'INTERFACE':
         return new GraphQLInterfaceType({
           name: type.name,
-          interfaces: () => (type.interfaces || []).map(getNamedType) as GraphQLInterfaceType[],
+          interfaces: () =>
+            (type.interfaces || []).map(getNamedType) as GraphQLInterfaceType[],
           fields: () => buildNameMap(type.fields.map(buildField)),
         } as any);
       case 'UNION':
         return new GraphQLUnionType({
           name: type.name,
-          types: () => (type.possibleTypes || []).map(getNamedType) as GraphQLObjectType[],
+          types: () =>
+            (type.possibleTypes || []).map(getNamedType) as GraphQLObjectType[],
         });
       case 'INPUT_OBJECT':
         return new GraphQLInputObjectType({
           name: type.name,
-          fields: () => buildNameMap(type.inputFields.map(buildInputValue) as any),
+          fields: () =>
+            buildNameMap(type.inputFields.map(buildInputValue) as any),
         } as any);
     }
   };
@@ -146,9 +160,12 @@ export const buildClientSchema = (
   }
 
   return {
-    query: (__schema.queryType && getNamedType(__schema.queryType.name) as GraphQLObjectType)!,
-    mutation: (__schema.mutationType && getNamedType(__schema.mutationType.name) as GraphQLObjectType)!,
-    subscription: (__schema.subscriptionType && getNamedType(__schema.subscriptionType.name) as GraphQLObjectType)!,
+    query: (__schema.queryType &&
+      (getNamedType(__schema.queryType.name) as GraphQLObjectType))!,
+    mutation: (__schema.mutationType &&
+      (getNamedType(__schema.mutationType.name) as GraphQLObjectType))!,
+    subscription: (__schema.subscriptionType &&
+      (getNamedType(__schema.subscriptionType.name) as GraphQLObjectType))!,
     types: typemap,
     isSubType(abstract: GraphQLAbstractType, possible: GraphQLObjectType) {
       let map = subTypeCache[abstract.name];
@@ -159,7 +176,7 @@ export const buildClientSchema = (
           const implementations = getImplementations(abstract);
           map = Object.assign(
             buildNameMap(implementations.objects),
-            buildNameMap(implementations.interfaces),
+            buildNameMap(implementations.interfaces)
           );
         }
 

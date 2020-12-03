@@ -154,9 +154,13 @@ export function expectValidUpdatesConfig(
   }
 
   const mutationFields = schema.mutation ? schema.mutation.getFields() : {};
-  const subscriptionFields = schema.subscription ? schema.subscription.getFields() : {};
-  const givenMutations = (schema.mutation && updates[schema.mutation.name]) || {};
-  const givenSubscription = (schema.subscription && updates[schema.subscription.name]) || {};
+  const subscriptionFields = schema.subscription
+    ? schema.subscription.getFields()
+    : {};
+  const givenMutations =
+    (schema.mutation && updates[schema.mutation.name]) || {};
+  const givenSubscription =
+    (schema.subscription && updates[schema.subscription.name]) || {};
 
   for (const fieldName in givenMutations) {
     if (mutationFields[fieldName] === undefined) {
@@ -212,7 +216,9 @@ export function expectValidResolversConfig(
       if (!schema.types[key]) {
         warnAboutResolver(key);
       } else {
-        const validTypeProperties = (schema.types[key] as GraphQLObjectType).getFields();
+        const validTypeProperties = (schema.types[
+          key
+        ] as GraphQLObjectType).getFields();
         for (const resolverProperty in resolvers[key]) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
