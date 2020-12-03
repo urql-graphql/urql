@@ -18,7 +18,7 @@ import {
 } from '@urql/core';
 import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 
-interface RetryExchangeOptions {
+export interface RetryExchangeOptions {
   initialDelayMs?: number;
   maxDelayMs?: number;
   randomDelay?: boolean;
@@ -44,9 +44,10 @@ export const retryExchange = ({
 
   return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
-    const { source: retry$, next: nextRetryOperation } = makeSubject<
-      Operation
-    >();
+    const {
+      source: retry$,
+      next: nextRetryOperation,
+    } = makeSubject<Operation>();
 
     const retryWithBackoff$ = pipe(
       retry$,

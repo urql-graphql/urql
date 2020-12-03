@@ -109,9 +109,9 @@ export function useQuery<T = any, V = object>(
   );
 
   const source: Ref<Source<Source<any>>> = ref(null as any);
-  const next: Ref<(
-    query$: undefined | Source<OperationResult<T, V>>
-  ) => void> = ref(null as any);
+  const next: Ref<
+    (query$: undefined | Source<OperationResult<T, V>>) => void
+  > = ref(null as any);
 
   watchEffect(() => {
     const newRequest = createRequest<T, V>(args.query, args.variables as any);
