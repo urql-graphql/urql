@@ -90,11 +90,14 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  let data: Data | undefined = input || ({} as Data);
-  data =
+  // NOTE: This may reuse "previous result data" as indicated by the
+  // `originalData` argument in readRoot(). This behaviour isn't used
+  // for readSelection() however, which always produces results from
+  // scratch
+  const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, data)
-      : readSelection(ctx, rootKey, rootSelect, data);
+      ? readRoot(ctx, rootKey, rootSelect, input || ({} as Data))
+      : readSelection(ctx, rootKey, rootSelect, {} as Data);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -102,8 +105,8 @@ export const read = (
 
   return {
     dependencies: getCurrentDependencies(),
-    partial: data === undefined ? false : ctx.partial,
-    data: data === undefined ? null : data,
+    partial: ctx.partial || !data,
+    data: data || null,
   };
 };
 
@@ -122,10 +125,10 @@ const readRoot = (
   data.__typename = originalData.__typename;
 
   let node: FieldNode | void;
-  while ((node = iterate()) !== undefined) {
+  while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
-    if (node.selectionSet !== undefined && fieldValue !== null) {
+    if (node.selectionSet && fieldValue !== null) {
       const fieldData = ensureData(fieldValue);
       data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
     } else {
@@ -171,7 +174,7 @@ export const readFragment = (
   const fragments = getFragments(query);
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
-  if (fragment === undefined) {
+  if (!fragment) {
     warn(
       'readFragment(...) was called with an empty fragment.\n' +
         'You have to call it with at least one fragment in your GraphQL document.',
@@ -323,7 +326,7 @@ const readSelection = (
         ctx
       );
 
-      if (node.selectionSet !== undefined) {
+      if (node.selectionSet) {
         // When it has a selection set we are resolving an entity with a
         // subselection. This can either be a list or an object.
         dataFieldValue = resolveResolverResult(
@@ -332,7 +335,7 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          (data[fieldAlias] || {}) as Data,
+          data[fieldAlias] as Data,
           dataFieldValue
         );
       }
@@ -346,7 +349,7 @@ const readSelection = (
         // current field
         return undefined;
       }
-    } else if (node.selectionSet === undefined) {
+    } else if (!node.selectionSet) {
       // The field is a scalar but isn't on the result, so it's retrieved from the cache
       dataFieldValue = fieldValue;
     } else if (resultValue !== undefined) {

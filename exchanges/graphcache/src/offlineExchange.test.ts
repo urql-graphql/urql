@@ -168,7 +168,10 @@ describe('offline', () => {
 
     next(queryOp);
     expect(result).toBeCalledTimes(1);
-    expect(result.mock.calls[0][0].data).toEqual(queryOneData);
+    expect(result.mock.calls[0][0].data).toEqual({
+      ...queryOneData,
+      __typename: undefined,
+    });
 
     next(mutationOp);
     expect(result).toBeCalledTimes(1);
