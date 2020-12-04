@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.3.1
+
+### Patch Changes
+
+- ⚠️ Fix reusing original query data from APIs accidentally, which can lead to subtle mismatches in results when the API's incoming `query` results are being updated by the `cacheExchange`, to apply resolvers. Specifically this may lead to relations from being set back to `null` when the resolver returns a different list of links than the result, since some `null` relations may unintentionally exist but aren't related. If you're using `relayPagination` then this fix is critical, by [@kitten](https://github.com/kitten) (See [#1196](https://github.com/FormidableLabs/urql/pull/1196))
+
 ## 3.3.0
 
 ### Minor Changes
