@@ -130,6 +130,82 @@ describe('Query', () => {
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
   });
 
+  it('should not overwrite different arrays from results and queries', () => {
+    const TODO_QUERY = gql`
+      query Todos {
+        todos {
+          __typename
+          node {
+            __typename
+            id
+            text
+            author {
+              __typename
+              id
+            }
+          }
+        }
+      }
+    `;
+
+    store = new Store({
+      resolvers: {
+        Query: {
+          todos: (_parent, _args, cache) => cache.resolve('Query', 'todos'),
+        },
+      },
+    });
+
+    const expected = {
+      todos: [
+        {
+          __typename: 'TodoEdge',
+          node: {
+            __typename: 'Todo',
+            id: '0',
+            text: 'Teach',
+            author: {
+              __typename: 'Author',
+              id: 'writy-mcwriteface',
+            },
+          },
+        },
+        {
+          __typename: 'TodoEdge',
+          node: {
+            __typename: 'Todo',
+            id: '1',
+            text: 'Learn',
+            author: null,
+          },
+        },
+      ],
+    } as Data;
+
+    write(store, { query: TODO_QUERY }, expected);
+
+    const result = query(
+      store,
+      { query: TODO_QUERY },
+      {
+        todos: [
+          // NOTE: This is a partial list of later results
+          {
+            __typename: 'TodoEdge',
+            node: {
+              id: '1',
+              text: 'Learn',
+              __typename: 'Todo',
+              author: null,
+            },
+          },
+        ],
+      }
+    );
+
+    expect(result.data).toEqual(expected);
+  });
+
   // Issue#64
   it('should not crash for valid queries', () => {
     const VALID_QUERY = gql`
