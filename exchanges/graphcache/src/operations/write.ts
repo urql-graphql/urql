@@ -144,7 +144,7 @@ export const writeFragment = (
   const fragments = getFragments(query);
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
-  if (fragment === undefined) {
+  if (!fragment) {
     return warn(
       'writeFragment(...) was called with an empty fragment.\n' +
         'You have to call it with at least one fragment in your GraphQL document.',
@@ -336,7 +336,7 @@ const writeField = (
 
   if (
     parentFieldKey &&
-    ctx.store.keys[data.__typename] === undefined &&
+    !ctx.store.keys[data.__typename] &&
     entityKey === null &&
     typeof typename === 'string' &&
     !KEYLESS_TYPE_RE.test(typename)

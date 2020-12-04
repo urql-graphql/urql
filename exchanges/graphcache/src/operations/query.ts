@@ -105,8 +105,8 @@ export const read = (
 
   return {
     dependencies: getCurrentDependencies(),
-    partial: data === undefined ? false : ctx.partial,
-    data: data === undefined ? null : data,
+    partial: ctx.partial || !data,
+    data: data || null,
   };
 };
 
@@ -125,7 +125,7 @@ const readRoot = (
   data.__typename = originalData.__typename;
 
   let node: FieldNode | void;
-  while ((node = iterate()) !== undefined) {
+  while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
     if (node.selectionSet && fieldValue !== null) {
@@ -174,7 +174,7 @@ export const readFragment = (
   const fragments = getFragments(query);
   const names = Object.keys(fragments);
   const fragment = fragments[names[0]] as FragmentDefinitionNode;
-  if (fragment === undefined) {
+  if (!fragment) {
     warn(
       'readFragment(...) was called with an empty fragment.\n' +
         'You have to call it with at least one fragment in your GraphQL document.',
@@ -349,7 +349,7 @@ const readSelection = (
         // current field
         return undefined;
       }
-    } else if (node.selectionSet === undefined) {
+    } else if (!node.selectionSet) {
       // The field is a scalar but isn't on the result, so it's retrieved from the cache
       dataFieldValue = fieldValue;
     } else if (resultValue !== undefined) {
