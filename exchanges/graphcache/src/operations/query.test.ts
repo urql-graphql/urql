@@ -206,6 +206,8 @@ describe('Query', () => {
     );
 
     expect(result.data).toEqual(expected);
+    expect(result.data).not.toBe(expected);
+    expect(result.data!.todos![0]).not.toBe(expected!.todos![0]);
   });
 
   // Issue#64
