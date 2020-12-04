@@ -90,11 +90,14 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  let data: Data | undefined = input || ({} as Data);
-  data =
+  // NOTE: This may reuse "previous result data" as indicated by the
+  // `originalData` argument in readRoot(). This behaviour isn't used
+  // for readSelection() however, which always produces results from
+  // scratch
+  const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, data)
-      : readSelection(ctx, rootKey, rootSelect, data);
+      ? readRoot(ctx, rootKey, rootSelect, input || ({} as Data))
+      : readSelection(ctx, rootKey, rootSelect, {} as Data);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -125,7 +128,7 @@ const readRoot = (
   while ((node = iterate()) !== undefined) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
-    if (node.selectionSet !== undefined && fieldValue !== null) {
+    if (node.selectionSet && fieldValue !== null) {
       const fieldData = ensureData(fieldValue);
       data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
     } else {
@@ -323,7 +326,7 @@ const readSelection = (
         ctx
       );
 
-      if (node.selectionSet !== undefined) {
+      if (node.selectionSet) {
         // When it has a selection set we are resolving an entity with a
         // subselection. This can either be a list or an object.
         dataFieldValue = resolveResolverResult(
@@ -332,7 +335,7 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          (data[fieldAlias] || {}) as Data,
+          data[fieldAlias] as Data,
           dataFieldValue
         );
       }
