@@ -1062,9 +1062,7 @@ describe('custom resolvers', () => {
     expect(fakeResolver).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(1);
     expect(result.mock.calls[0][0].data).toEqual({
-      __typename: 'Query',
       author: {
-        __typename: 'Author',
         id: '123',
         name: 'newName',
       },
@@ -1430,7 +1428,6 @@ describe('schema awareness', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0].data).toEqual({
-      __typename: 'Query',
       todos: [
         {
           __typename: 'Todo',

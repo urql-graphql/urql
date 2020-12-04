@@ -3,6 +3,7 @@
 import { gql } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 
+import { Data } from '../types';
 import { Store } from '../store';
 import { write } from './write';
 import { query } from './query';
@@ -156,7 +157,7 @@ describe('Query', () => {
       },
     });
 
-    const expected = {
+    const expected = ({
       todos: [
         {
           __typename: 'TodoEdge',
@@ -180,7 +181,7 @@ describe('Query', () => {
           },
         },
       ],
-    } as Data;
+    } as any) as Data;
 
     write(store, { query: TODO_QUERY }, expected);
 
@@ -188,6 +189,7 @@ describe('Query', () => {
       store,
       { query: TODO_QUERY },
       {
+        __typename: 'Query',
         todos: [
           // NOTE: This is a partial list of later results
           {
