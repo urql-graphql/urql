@@ -23,10 +23,14 @@
         const tenThousandAuthors = makeEntries(10000, makeAuthor);
         addAuthors(tenThousandAuthors);
 
-        // measure how long read takes
-        bench.start();
-        getAllAuthors();
-        bench.stop();
+        const benchmark = async () => {
+            // measure how long read takes
+            bench.start();
+            await getAllAuthors();
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>

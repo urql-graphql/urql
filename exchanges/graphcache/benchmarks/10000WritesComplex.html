@@ -22,10 +22,14 @@
         // create authors to be added/written
         const hundredAuthors = makeEntries(10000, makeAuthor);
 
-        // measure how long write takes
-        bench.start();
-        addAuthors(hundredAuthors);
-        bench.stop();
+        const benchmark = async () => {
+            // measure how long write takes
+            bench.start();
+            await addAuthors(hundredAuthors);
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>

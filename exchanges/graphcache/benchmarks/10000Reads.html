@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>100 Reads</title>
+    <title>10000 Reads</title>
     <script>
         window.process = { env: { NODE_ENV: "development" } };
     </script>
@@ -22,10 +22,14 @@
         // create todos to be added/written
         const tenThousandTodos = makeEntries(10000, makeTodo);
 
-        addTodos(tenThousandTodos);
-        bench.start();
-        getAllTodos();
-        bench.stop();
+        const benchmark = async () => {
+            await addTodos(tenThousandTodos);
+            bench.start();
+            await getAllTodos();
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>

@@ -22,9 +22,13 @@
         // create todos to be added/written
         const tenThousandTodos = makeEntries(10000, makeTodo);
 
-        bench.start();
-        addTodos(tenThousandTodos);
-        bench.stop();
+        const benchmark = async () => {
+            bench.start();
+            await addTodos(tenThousandTodos);
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>
