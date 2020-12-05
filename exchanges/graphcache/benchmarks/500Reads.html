@@ -17,7 +17,7 @@
         import * as bench from '/bench.js';
         import { makeEntries } from "./makeEntries.js";
         import { makeTodo, makeWriter, makeBook, makeStore, makeEmployee } from "./entities.js";
-        import { getAllTodos, getAllWriters, getAllBooks, getAllStores, getAllEmployees, addTodos, addWriters, addBooks, addStores, addEmployees,  } from "./benchmarks.js";
+        import { getAllTodos, getAllWriters, getAllBooks, getAllStores, getAllEmployees, addTodos, addWriters, addBooks, addStores, addEmployees, } from "./benchmarks.js";
 
         // create entities to be written
         const hundredTodos = makeEntries(100, makeTodo);
@@ -25,20 +25,30 @@
         const hundredBooks = makeEntries(100, makeBook);
         const hundredStores = makeEntries(100, makeStore);
         const hundredEmployees = makeEntries(100, makeEmployee);
-        
+
+        const benchmark = async () => {
+            await addTodos(hundredTodos);
+            await addWriters(hundredWriters);
+            await addBooks(hundredBooks);
+            await addStores(hundredStores);
+            await addEmployees(hundredEmployees);
+
+            bench.start();
+            await getAllTodos();
+            await getAllWriters();
+            await getAllBooks();
+            await getAllStores();
+            await getAllEmployees();
+            bench.stop();
+        };
+
         addTodos(hundredTodos);
         addWriters(hundredWriters);
         addBooks(hundredBooks);
         addStores(hundredStores);
         addEmployees(hundredEmployees);
 
-        bench.start();
-        getAllTodos();
-        getAllWriters();
-        getAllBooks();
-        getAllStores();
-        getAllEmployees();
-        bench.stop();
+        benchmark();
 
     </script>
 </body>

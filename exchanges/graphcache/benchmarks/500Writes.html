@@ -26,13 +26,17 @@
         const hundredStores = makeEntries(100, makeStore);
         const hundredEmployees = makeEntries(100, makeEmployee);
 
-        bench.start();
-        addTodos(hundredTodos);
-        addWriters(hundredWriters);
-        addBooks(hundredBooks);
-        addStores(hundredStores);
-        addEmployees(hundredEmployees);
-        bench.stop();
+        const benchmark = async () => {
+            bench.start();
+            await addTodos(hundredTodos);
+            await addWriters(hundredWriters);
+            await addBooks(hundredBooks);
+            await addStores(hundredStores);
+            await addEmployees(hundredEmployees);
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>
