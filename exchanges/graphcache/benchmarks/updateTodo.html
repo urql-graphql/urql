@@ -21,12 +21,17 @@
 
         // create todos to be added/written
         const hundredTodos = makeEntries(100, makeTodo);
-        addTodos(hundredTodos);
+
+        const benchmark = async () => {
+            await addTodos(hundredTodos);
+            // measure how long update of last Todo entity takes on faux server-side (executeExchange) & cache
+            bench.start();
+            await updateTodo({id: "99", complete: true});
+            bench.stop();
+        };
+
+        benchmark();
         
-        // measure how long update of last Todo entity takes on faux server-side (executeExchange) & cache
-        bench.start();
-        updateTodo({id: "99", complete: true});
-        bench.stop();
     </script>
 </body>
 
