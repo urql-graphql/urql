@@ -224,7 +224,7 @@ const cache = cacheExchange({
   updates: {
     Mutation: {
       addTodo: (result, args, cache, info) => {
-        const todoQueries = cache.inspectFields('Query').filter(x => x.fieldName === 'todos');
+        const todosQueries = cache.inspectFields('Query').filter(x => x.fieldName === 'todos');
 
         todosQueries.forEach(({ fieldName, arguments: variables }) => {
           cache.invalidate('Query', fieldName, variables);
