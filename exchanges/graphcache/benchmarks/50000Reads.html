@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>500 Writes</title>
+    <title>50000 Writes</title>
     <script>
         window.process = { env: { NODE_ENV: "development" } };
     </script>
@@ -25,20 +25,24 @@
         const hundredBooks = makeEntries(10000, makeBook);
         const hundredStores = makeEntries(10000, makeStore);
         const hundredEmployees = makeEntries(10000, makeEmployee);
-        
-        addTodos(hundredTodos);
-        addWriters(hundredWriters);
-        addBooks(hundredBooks);
-        addStores(hundredStores);
-        addEmployees(hundredEmployees);
 
-        bench.start();
-        getAllTodos();
-        getAllWriters();
-        getAllBooks();
-        getAllStores();
-        getAllEmployees();
-        bench.stop();
+        const benchmark = async () => {
+            await addTodos(hundredTodos);
+            await addWriters(hundredWriters);
+            await addBooks(hundredBooks);
+            await addStores(hundredStores);
+            await addEmployees(hundredEmployees);
+    
+            bench.start();
+            await getAllTodos();
+            await getAllWriters();
+            await getAllBooks();
+            await getAllStores();
+            await getAllEmployees();
+            bench.stop();
+        };
+        
+        benchmark();
 
     </script>
 </body>
