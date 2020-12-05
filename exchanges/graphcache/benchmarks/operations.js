@@ -52,10 +52,10 @@ export const ALL_EMPLOYEES_QUERY = `
 export const ALL_AUTHORS_QUERY = `
     query ALL_AUTHORS_QUERY {
         authors {
-            id: ID!
-            name: String!
-            recognized: Boolean!
-            book: Book!
+            id,
+            name,
+            recognized,
+            book
         }
     }
 `;

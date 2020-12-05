@@ -22,10 +22,15 @@
         // create todos to be added/written
         const hundredTodos = makeEntries(100, makeTodo);
 
-        addTodos(hundredTodos);
-        bench.start();
-        getAllTodos();
-        bench.stop();
+        // benchmark to be performed to assess urql client performance
+        const benchmark = async () => {
+            await addTodos(hundredTodos);
+            bench.start();
+            await getAllTodos();
+            bench.stop();
+        };
+
+        benchmark();
 
     </script>
 </body>

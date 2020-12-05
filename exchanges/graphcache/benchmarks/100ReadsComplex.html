@@ -21,12 +21,16 @@
 
         // create authors to be added/written
         const hundredAuthors = makeEntries(100, makeAuthor);
-        addAuthors(hundredAuthors);
+        
+        // benchmark to be performed to assess urql client performance
+        const benchmark = async () => {
+            await addAuthors(hundredAuthors);
+            bench.start();
+            await getAllAuthors();
+            bench.stop();
+        };
 
-        // measure how long read takes
-        bench.start();
-        getAllAuthors();
-        bench.stop();
+        benchmark();
 
     </script>
 </body>

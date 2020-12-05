@@ -24,9 +24,9 @@
         const benchmark = async () => {
             await addTodos(todosToBeAdded);
             await getAllTodos();
-            // bench.start();
+            bench.start();
             await addTodo();
-            // bench.end();
+            bench.end();
         };
 
         benchmark();
