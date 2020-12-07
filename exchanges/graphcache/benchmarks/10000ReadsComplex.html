@@ -21,9 +21,9 @@
 
         // create authors to be added/written
         const tenThousandAuthors = makeEntries(10000, makeAuthor);
-        addAuthors(tenThousandAuthors);
 
         const benchmark = async () => {
+            await addAuthors(tenThousandAuthors);
             // measure how long read takes
             bench.start();
             await getAllAuthors();

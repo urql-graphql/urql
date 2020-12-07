@@ -1,6 +1,6 @@
 ## About
 
-This is a set of benchmarks assessing the performance of various graphCache operation. The operations are of varying sizes, complexitites, and are accomplished via a singular `urql` client instance. Client has a stubbed out GQL API (fetchExchange) to perform GQL operations against.
+This is a set of benchmarks assessing the performance of various graphCache operations. The operations are of varying sizes, complexitites, and are accomplished via a singular `urql` client instance. Client has a stubbed out GQL API (fetchExchange) to perform GQL operations against.
 
 ## Usage
 

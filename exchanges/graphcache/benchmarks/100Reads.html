@@ -25,9 +25,9 @@
         // benchmark to be performed to assess urql client performance
         const benchmark = async () => {
             await addTodos(hundredTodos);
-            // bench.start();
+            bench.start();
             await getAllTodos();
-            // bench.stop();
+            bench.stop();
         };
 
         benchmark();

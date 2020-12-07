@@ -26,7 +26,7 @@
             await getAllTodos();
             bench.start();
             await addTodo();
-            bench.end();
+            bench.stop();
         };
 
         benchmark();
