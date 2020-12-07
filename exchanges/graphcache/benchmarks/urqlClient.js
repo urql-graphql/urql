@@ -5,19 +5,17 @@ import { buildSchema } from 'graphql';
 import { ALL_TODOS_QUERY } from './operations';
 
 export const cache = cacheExchange({
-    updates: {
-        Mutation: {
-            addTodo: (result, args, cache, info) => {
-                cache.updateQuery(
-                    { query: ALL_TODOS_QUERY },
-                    data => {
-                        data.todos.push(result.addTodo);
-                        return data;
-                    });
-                return result;
-            }
-        }
-    }
+  updates: {
+    Mutation: {
+      addTodo: (result, args, cache) => {
+        cache.updateQuery({ query: ALL_TODOS_QUERY }, data => {
+          data.todos.push(result.addTodo);
+          return data;
+        });
+        return result;
+      },
+    },
+  },
 });
 
 // local schema to be used with Execute Exchange
@@ -190,74 +188,74 @@ const authors = [];
 
 // root value with resolvers to be used with Execute Exchange
 const rootValue = {
-    todos: () => {
-        return todos;
-    },
-    writers: () => {
-        return writers;
-    },
-    books: () => {
-        return books;
-    },
-    stores: () => {
-        return stores;
-    },
-    employees: () => {
-        return employees;
-    },
-    authors: () => {
-        return authors;
-    },
-    addTodo: args => {
-        const todo = { id: todos.length.toString(), ...args };
-        todos.push(todo);
-        return todo;
-    },
-    updateTodo: ({ id, complete }) => {
-        const todoToBeUpdated = todos.find(todo => todo.id === id);
-        todoToBeUpdated.complete = complete;
-        return todoToBeUpdated;
-    },
-    addTodos: ({ newTodos }) => {
-        const todosToBeAdded = newTodos.todos;
-        todos.push(...todosToBeAdded);
-        return todos;
-    },
-    addWriters: ({ newWriters }) => {
-        const writersToBeAdded = newWriters.writers;
-        writers.push(...writersToBeAdded);
-        return writers;
-    },
-    addBooks: ({ newBooks }) => {
-        const booksToBeAdded = newBooks.books;
-        books.push(...booksToBeAdded);
-        return books;
-    },
-    addStores: ({ newStores }) => {
-        const storesToBeAdded = newStores.stores;
-        stores.push(...storesToBeAdded);
-        return stores;
-    },
-    addEmployees: ({ newEmployees }) => {
-        const employeesToBeAdded = newEmployees.employees;
-        employees.push(...employeesToBeAdded);
-        return employees;
-    },
-    addAuthors: ({ newAuthors }) => {
-        const authorsToBeAdded = newAuthors.authors;
-        authors.push(...authorsToBeAdded);
-        return authors;
-    }
+  todos: () => {
+    return todos;
+  },
+  writers: () => {
+    return writers;
+  },
+  books: () => {
+    return books;
+  },
+  stores: () => {
+    return stores;
+  },
+  employees: () => {
+    return employees;
+  },
+  authors: () => {
+    return authors;
+  },
+  addTodo: args => {
+    const todo = { id: todos.length.toString(), ...args };
+    todos.push(todo);
+    return todo;
+  },
+  updateTodo: ({ id, complete }) => {
+    const [todoToBeUpdated] = todos.filter(todo => todo.id === id);
+    todoToBeUpdated.complete = complete;
+    return todoToBeUpdated;
+  },
+  addTodos: ({ newTodos }) => {
+    const todosToBeAdded = newTodos.todos;
+    todos.push(...todosToBeAdded);
+    return todos;
+  },
+  addWriters: ({ newWriters }) => {
+    const writersToBeAdded = newWriters.writers;
+    writers.push(...writersToBeAdded);
+    return writers;
+  },
+  addBooks: ({ newBooks }) => {
+    const booksToBeAdded = newBooks.books;
+    books.push(...booksToBeAdded);
+    return books;
+  },
+  addStores: ({ newStores }) => {
+    const storesToBeAdded = newStores.stores;
+    stores.push(...storesToBeAdded);
+    return stores;
+  },
+  addEmployees: ({ newEmployees }) => {
+    const employeesToBeAdded = newEmployees.employees;
+    employees.push(...employeesToBeAdded);
+    return employees;
+  },
+  addAuthors: ({ newAuthors }) => {
+    const authorsToBeAdded = newAuthors.authors;
+    authors.push(...authorsToBeAdded);
+    return authors;
+  },
 };
 
 const client = createClient({
-    url: "http://localhost:3000/graphql",
-    exchanges: [
-        dedupExchange,
-        cache,
-        // cacheExchange({}),
-        executeExchange({ schema, rootValue })
-    ]
+  url: 'http://localhost:3000/graphql',
+  exchanges: [
+    dedupExchange,
+    cache,
+    // cacheExchange({}),
+    executeExchange({ schema, rootValue }),
+  ],
 });
 
 export default client;
