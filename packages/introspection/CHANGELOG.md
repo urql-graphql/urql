@@ -1,5 +1,11 @@
 # @urql/introspection
 
+## 0.1.2
+
+### Patch Changes
+
+- ⚠️ Fix the `graphql` dependency being postfixed with `.mjs` when building the package, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1204](https://github.com/FormidableLabs/urql/pull/1204))
+
 ## 0.1.1
 
 ### Patch Changes
