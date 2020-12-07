@@ -3737,10 +3737,10 @@ babel-plugin-minify-type-constructors@^0.4.3:
   dependencies:
     babel-helper-is-void-0 "^0.4.3"
 
-babel-plugin-modular-graphql@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-modular-graphql/-/babel-plugin-modular-graphql-1.0.0.tgz#f8575e746895cf9652ec1ad804661791f520d56c"
-  integrity sha512-yyj8KcO1YU4LfaUGOyP1DY9y3CdqRhc5WhTWYD2XNx8jX4OBLVED+QBY1QmCNLsVqyXyfsv86C2BnwaMnFfDKQ==
+babel-plugin-modular-graphql@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-modular-graphql/-/babel-plugin-modular-graphql-1.0.1.tgz#ea78f23fab06e5436f52c8cebe7bbe5fe01b7337"
+  integrity sha512-ZFS/dDv0If6QAmwET5aqIx0lO3JdRRvcdL/nD+AiEGfAKpc68rzvtxQcJ2HNTBp8LnwqGA40HEEaAeY9ty3ZMA==
 
 babel-plugin-named-asset-import@^0.3.1:
   version "0.3.7"
