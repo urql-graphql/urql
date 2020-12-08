@@ -1,0 +1,39 @@
+{
+  "name": "@urql/exchange-graphcache-tachometer-benchmark",
+  "version": "1.0.0",
+  "description": "Comprehensive Tachometer benchmarks for urql/graphcache",
+  "main": "index.js",
+  "scripts": {
+    "bench": "npm-run-all bench:*",
+    "bench:addTodo": "tachometer addTodo.html",
+    "bench:update": "tachometer updateTodo.html",
+    "bench:write100": "tachometer 100Writes.html",
+    "bench:write100c": "tachometer 100WritesComplex.html",
+    "bench:write500": "tachometer 500Writes.html",
+    "bench:write1000": "tachometer 1000Writes.html",
+    "bench:write1000c": "tachometer 1000WritesComplex.html",
+    "bench:write5000": "tachometer 5000Writes.html",
+    "bench:write10000": "tachometer 10000Writes.html",
+    "bench:write10000c": "tachometer 10000WritesComplex.html",
+    "bench:write50000": "tachometer 50000Writes.html",
+    "bench:read100": "tachometer 100Reads.html",
+    "bench:read100c": "tachometer 100ReadsComplex.html",
+    "bench:read500": "tachometer 500Reads.html",
+    "bench:read1000": "tachometer 1000Reads.html",
+    "bench:read1000c": "tachometer 1000ReadsComplex.html",
+    "bench:read5000": "tachometer 5000Reads.html",
+    "bench:read10000": "tachometer 10000Reads.html",
+    "bench:read10000c": "tachometer 10000ReadsComplex.html",
+    "bench:read50000": "tachometer 50000Reads.html"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@urql/exchange-execute": "^1.0.3",
+    "@urql/exchange-graphcache": "^3.1.11",
+    "graphql": "^15.4.0",
+    "graphql-tag": "^2.11.0",
+    "npm-run-all": "^4.1.5",
+    "tachometer": "^0.5.5",
+    "urql": "^1.11.3"
+  }
+}

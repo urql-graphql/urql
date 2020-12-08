@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>100 Writes</title>
+    <script>
+        window.process = { env: { NODE_ENV: "development" } };
+    </script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import urqlClient from './urqlClient.js';
+        import * as bench from '/bench.js';
+        import { makeEntries } from "./makeEntries.js";
+        import { makeTodo } from "./entities.js";
+        import { getAllTodos, addTodos } from "./benchmarks.js";
+
+        // create todos to be added/written
+        const hundredTodos = makeEntries(100, makeTodo);
+
+        // benchmark to be performed to assess urql client performance
+        const benchmark = async () => {
+            bench.start();
+            await addTodos(hundredTodos);
+            bench.stop();
+        };
+
+        benchmark();
+
+    </script>
+</body>
+
+</html>

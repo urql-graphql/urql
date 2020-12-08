@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>50000 Writes</title>
+    <script>
+        window.process = { env: { NODE_ENV: "development" } };
+    </script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import urqlClient from './urqlClient.js';
+        import * as bench from '/bench.js';
+        import { makeEntries } from "./makeEntries.js";
+        import { makeTodo, makeWriter, makeBook, makeStore, makeEmployee } from "./entities.js";
+        import { getAllTodos, addTodos, addWriters, addBooks, addStores, addEmployees } from "./benchmarks.js";
+
+        // create entities to be written
+        const tenThousandTodos = makeEntries(10000, makeTodo);
+        const tenThousandWriters = makeEntries(10000, makeWriter);
+        const tenThousandBooks = makeEntries(10000, makeBook);
+        const tenThousandStores = makeEntries(10000, makeStore);
+        const tenThousandEmployees = makeEntries(10000, makeEmployee);
+
+        const benchmark = async () => {
+            bench.start();
+            await addTodos(tenThousandTodos);
+            await addWriters(tenThousandWriters);
+            await addBooks(tenThousandBooks);
+            await addStores(tenThousandStores);
+            await addEmployees(tenThousandEmployees);
+            bench.stop();
+        };
+
+        benchmark();
+
+    </script>
+</body>
+
+</html>

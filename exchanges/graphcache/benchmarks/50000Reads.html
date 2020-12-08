@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>50000 Reads</title>
+    <script>
+        window.process = { env: { NODE_ENV: "development" } };
+    </script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import urqlClient from './urqlClient.js';
+        import * as bench from '/bench.js';
+        import { makeEntries } from "./makeEntries.js";
+        import { makeTodo, makeWriter, makeBook, makeStore, makeEmployee } from "./entities.js";
+        import { getAllTodos, getAllWriters, getAllBooks, getAllStores, getAllEmployees, addTodos, addWriters, addBooks, addStores, addEmployees,  } from "./benchmarks.js";
+
+        // create entities to be written
+        const hundredTodos = makeEntries(10000, makeTodo);
+        const hundredWriters = makeEntries(10000, makeWriter);
+        const hundredBooks = makeEntries(10000, makeBook);
+        const hundredStores = makeEntries(10000, makeStore);
+        const hundredEmployees = makeEntries(10000, makeEmployee);
+
+        const benchmark = async () => {
+            await addTodos(hundredTodos);
+            await addWriters(hundredWriters);
+            await addBooks(hundredBooks);
+            await addStores(hundredStores);
+            await addEmployees(hundredEmployees);
+    
+            bench.start();
+            await getAllTodos();
+            await getAllWriters();
+            await getAllBooks();
+            await getAllStores();
+            await getAllEmployees();
+            bench.stop();
+        };
+        
+        benchmark();
+
+    </script>
+</body>
+
+</html>
