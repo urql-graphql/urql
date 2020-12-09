@@ -190,9 +190,7 @@ export const readFragment = (
   }
 
   const entityKey =
-    typeof entity !== 'string'
-      ? store.keyOfEntity({ __typename: typename, ...entity } as Data)
-      : entity;
+    typeof entity !== 'string' ? store.keyOfEntity(entity as Data) : entity;
 
   if (!entityKey) {
     warn(
@@ -311,7 +309,7 @@ const readSelection = (
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
-      updateContext(ctx, typename, entityKey, key, fieldName);
+      updateContext(ctx, data, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
