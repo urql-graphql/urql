@@ -83,7 +83,7 @@ Next allows you to override the root of your application using a special page ca
 The `clientOptions` argument is required. It represents all of the options you want to enable on your `urql` Client instance. It has the following union type:
 
 ```typescript
-type NextUrqlClientConfig = (ssrExchange: SSRExchange, ctx?: NextPageContext) => ClientOptions;
+type NextUrqlClientConfig = (ssrExchange: SSRExchange, ctx?: PartialNextContext) => ClientOptions;
 ```
 
 The `ClientOptions` `interface` comes from `urql` itself and has the following type:
