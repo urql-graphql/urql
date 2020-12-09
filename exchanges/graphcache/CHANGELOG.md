@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.3.2
+
+### Patch Changes
+
+- Update `cache` methods, for instance `cache.resolve`, to consistently accept the `parent` argument from `resolvers` and `updates` and alias it to the parent's key (which is usually found on `info.parentKey`). This usage of `cache.resolve(parent, ...)` was intuitive and is now supported as expected, by [@kitten](https://github.com/kitten) (See [#1208](https://github.com/FormidableLabs/urql/pull/1208))
+
 ## 3.3.1
 
 ### Patch Changes
