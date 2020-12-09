@@ -17,6 +17,7 @@ import {
 } from '../types';
 
 import { invariant } from '../helpers/help';
+import { contextRef } from '../operations/shared';
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
@@ -124,11 +125,15 @@ export class Store implements Cache {
   }
 
   resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField {
-    const entityKey =
-      entity !== null && typeof entity !== 'string'
-        ? this.keyOfEntity(entity)
-        : entity;
-    if (entityKey === null) return null;
+    let entityKey =
+      entity && typeof entity !== 'string' ? this.keyOfEntity(entity) : entity;
+
+    // Some resolvers accept a parent object, which we can transparently resolve
+    // to an entity without it being keyable yet
+    if (contextRef.current && entity === contextRef.current.parent)
+      entityKey = contextRef.current!.parentKey;
+
+    if (!entityKey) return null;
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     if (fieldValue !== undefined) return fieldValue;
     const link = InMemoryData.readLink(entityKey, fieldKey);
