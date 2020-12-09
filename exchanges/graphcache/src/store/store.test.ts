@@ -5,6 +5,7 @@ import { gql, maskTypename } from '@urql/core';
 import { mocked } from 'ts-jest/utils';
 
 import { Data, StorageAdapter } from '../types';
+import { makeContext, updateContext } from '../operations/shared';
 import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
@@ -344,6 +345,7 @@ describe('Store with ResolverConfig', () => {
 
 describe('Store with OptimisticMutationConfig', () => {
   let store;
+  let context;
 
   beforeEach(() => {
     store = new Store({
@@ -356,8 +358,8 @@ describe('Store with OptimisticMutationConfig', () => {
       },
     });
 
+    context = makeContext(store, {}, {}, 'Query', 'Query');
     write(store, { query: Todos }, todosData);
-
     InMemoryData.initDataState('read', store.data, null);
   });
 
@@ -375,6 +377,22 @@ describe('Store with OptimisticMutationConfig', () => {
     const deps = InMemoryData.getCurrentDependencies();
     expect(deps).toEqual({ 'Todo:0': true, 'Author:0': true });
     InMemoryData.clearDataState();
+  });
+
+  it('should resolve current parent argument fields', () => {
+    const randomData = { __typename: 'Todo', id: 1, createdAt: '2020-12-09' };
+
+    updateContext(
+      context,
+      randomData,
+      'Todo',
+      'Todo:1',
+      'Todo:1.createdAt',
+      'createdAt'
+    );
+
+    expect(store.keyOfEntity(randomData)).toBe(context.parentKey);
+    expect(store.keyOfEntity({})).not.toBe(context.parentKey);
   });
 
   it('should resolve with a key as first argument', () => {
