@@ -22,7 +22,7 @@ export interface Context {
   parentTypeName: string;
   parentKey: string;
   parentFieldKey: string;
-  parent: Data | null;
+  parent: Data;
   fieldName: string;
   partial: boolean;
   optimistic: boolean;
