@@ -71,6 +71,22 @@ A `Resolver` receives four arguments when it's called: `parent`, `args`, `cache`
 | `cache`  | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
 | `info`   | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
+We can use the arguments it receives to either return new data based on just the arguments and other
+cache information, but we may also read information about the parent and return new data for the
+current field.
+
+```js
+{
+  Todo: {
+    createdAt(parent, args, cache) {
+      // Read `createdAt` on the parent but return a Date instance
+      const date = cache.resolve(parent, 'createdAt');
+      return new Date(date);
+    }
+  }
+}
+```
+
 [Read more about how to set up `resolvers` on the "Computed Queries"
 page.](../graphcache/computed-queries.md)
 
@@ -262,6 +278,7 @@ differing arguments) that is known to the cache. The `FieldInfo` interface has t
 
 This works on any given entity. When calling this method the cache works in reverse on its data
 structure, by parsing the entity's individual field keys.
+p
 
 ```js
 cache.inspectFields({ __typename: 'Query' });
@@ -444,16 +461,17 @@ This is a metadata object that is passed to every resolver and updater function.
 information about the current GraphQL document and query, and also some information on the current
 field that a given resolver or updater is called on.
 
-| Argument         | Type                                         | Description                                                                                                                                    |
-| ---------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parentTypeName` | `string`                                     | The field's parent entity's typename                                                                                                           |
-| `parentKey`      | `string`                                     | The field's parent entity's cache key (if any)                                                                                                 |
-| `parentFieldKey` | `string`                                     | The current key's cache key, which is the parent entity's key combined with the current field's key (This is mostly obsolete)                  |
-| `fieldName`      | `string`                                     | The current field's name                                                                                                                       |
-| `fragments`      | `{ [name: string]: FragmentDefinitionNode }` | A dictionary of fragments from the current GraphQL document                                                                                    |
-| `variables`      | `object`                                     | The current GraphQL operation's variables (may be an empty object)                                                                             |
-| `partial`        | `?boolean`                                   | This may be set to `true` at any point in time (by your custom resolver or by _Graphcache_) to indicate that some data is uncached and missing |
-| `optimistic`     | `?boolean`                                   | This is only `true` when an optimistic mutation update is running                                                                              |
+| Argument         | Type                                         | Description                                                                                                                                                  |
+| ---------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `parent`         | `Data`                                       | The field's parent entity's data, as it was written or read up until now, which means it may be incomplete. [Use `cache.resolve`](#resolve) to read from it. |
+| `parentTypeName` | `string`                                     | The field's parent entity's typename                                                                                                                         |
+| `parentKey`      | `string`                                     | The field's parent entity's cache key (if any)                                                                                                               |
+| `parentFieldKey` | `string`                                     | The current key's cache key, which is the parent entity's key combined with the current field's key (This is mostly obsolete)                                |
+| `fieldName`      | `string`                                     | The current field's name                                                                                                                                     |
+| `fragments`      | `{ [name: string]: FragmentDefinitionNode }` | A dictionary of fragments from the current GraphQL document                                                                                                  |
+| `variables`      | `object`                                     | The current GraphQL operation's variables (may be an empty object)                                                                                           |
+| `partial`        | `?boolean`                                   | This may be set to `true` at any point in time (by your custom resolver or by _Graphcache_) to indicate that some data is uncached and missing               |
+| `optimistic`     | `?boolean`                                   | This is only `true` when an optimistic mutation update is running                                                                                            |
 
 > **Note:** Using `info` is regarded as a last resort. Please only use information from it if
 > there's no other solution to get to the metadata you need. We don't regard the `Info` API as
