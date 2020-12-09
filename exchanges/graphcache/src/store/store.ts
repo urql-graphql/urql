@@ -104,13 +104,17 @@ export class Store implements Cache {
 
   keyOfField = keyOfField;
 
-  keyOfEntity(data: Data) {
+  keyOfEntity(data: Data | null | string) {
+    if (data == null || typeof data === 'string') return data || null;
     const { __typename: typename, id, _id } = data;
-    if (!typename) {
-      return null;
-    } else if (this.rootNames[typename] !== undefined) {
-      return typename;
-    }
+    if (!typename) return null;
+    if (this.rootNames[typename]) return typename;
+
+    // In resolvers and updaters we may have a specific parent
+    // object available that can be used to skip to a specific parent
+    // key directly without looking at its incomplete properties
+    if (contextRef.current && data === contextRef.current.parent)
+      return contextRef.current!.parentKey;
 
     let key: string | null | void;
     if (this.keys[typename]) {
@@ -125,14 +129,7 @@ export class Store implements Cache {
   }
 
   resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField {
-    let entityKey =
-      entity && typeof entity !== 'string' ? this.keyOfEntity(entity) : entity;
-
-    // Some resolvers accept a parent object, which we can transparently resolve
-    // to an entity without it being keyable yet
-    if (contextRef.current && entity === contextRef.current.parent)
-      entityKey = contextRef.current!.parentKey;
-
+    const entityKey = this.keyOfEntity(entity);
     if (!entityKey) return null;
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     if (fieldValue !== undefined) return fieldValue;
@@ -148,9 +145,8 @@ export class Store implements Cache {
     return this.resolveFieldByKey(entity, keyOfField(field, args));
   }
 
-  invalidate(entity: Data | string, field?: string, args?: Variables) {
-    const entityKey =
-      typeof entity === 'string' ? entity : this.keyOfEntity(entity);
+  invalidate(entity: Data | string | null, field?: string, args?: Variables) {
+    const entityKey = this.keyOfEntity(entity);
 
     invariant(
       entityKey,
@@ -167,12 +163,8 @@ export class Store implements Cache {
   }
 
   inspectFields(entity: Data | string | null): FieldInfo[] {
-    const entityKey =
-      entity !== null && typeof entity !== 'string'
-        ? this.keyOfEntity(entity)
-        : entity;
-
-    return entityKey !== null ? InMemoryData.inspectFields(entityKey) : [];
+    const entityKey = this.keyOfEntity(entity);
+    return entityKey ? InMemoryData.inspectFields(entityKey) : [];
   }
 
   updateQuery<T = Data, V = Variables>(
