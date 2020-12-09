@@ -203,7 +203,7 @@ const cache = cacheExchange({
 
         todosQueries.forEach(({ arguments }) => {
           cache.updateQuery(
-            { query: TODOS_QUERY, variables: x.arguments },
+            { query: TODOS_QUERY, variables: arguments },
             data => {
               data.todos.push(result.addTodo);
               return data;
