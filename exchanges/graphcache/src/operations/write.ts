@@ -253,7 +253,7 @@ const writeSelection = (
 
       if (!resolver) continue;
       // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(ctx, typename, typename, fieldKey, fieldName);
+      updateContext(ctx, data, typename, typename, fieldKey, fieldName);
       fieldValue = data[fieldAlias] = ensureData(
         resolver(fieldArgs || {}, ctx.store, ctx)
       );
@@ -286,6 +286,7 @@ const writeSelection = (
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(
         ctx,
+        data,
         typename,
         typename,
         joinKeys(typename, fieldKey),

@@ -58,6 +58,7 @@ export interface OperationRequest {
 }
 
 export interface ResolveInfo {
+  parent: Data;
   parentTypeName: string;
   parentKey: string;
   parentFieldKey: string;
@@ -75,7 +76,7 @@ export interface QueryInput<T = Data, V = Variables> {
 
 export interface Cache {
   /** keyOfEntity() returns the key for an entity or null if it's unkeyable */
-  keyOfEntity(data: Data): string | null;
+  keyOfEntity(data: Data | null | string): string | null;
 
   /** keyOfField() returns the key for a field */
   keyOfField(
@@ -97,7 +98,11 @@ export interface Cache {
   inspectFields(entity: Data | string | null): FieldInfo[];
 
   /** invalidate() invalidates an entity or a specific field of an entity */
-  invalidate(entity: Data | string, fieldName?: string, args?: Variables): void;
+  invalidate(
+    entity: Data | string | null,
+    fieldName?: string,
+    args?: Variables
+  ): void;
 
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery<T = Data, V = Variables>(

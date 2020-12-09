@@ -22,10 +22,13 @@ export interface Context {
   parentTypeName: string;
   parentKey: string;
   parentFieldKey: string;
+  parent: Data;
   fieldName: string;
   partial: boolean;
   optimistic: boolean;
 }
+
+export const contextRef: { current: Context | null } = { current: null };
 
 export const makeContext = (
   store: Store,
@@ -38,6 +41,7 @@ export const makeContext = (
   store,
   variables,
   fragments,
+  parent: { __typename: typename },
   parentTypeName: typename,
   parentKey: entityKey,
   parentFieldKey: '',
@@ -48,11 +52,14 @@ export const makeContext = (
 
 export const updateContext = (
   ctx: Context,
+  data: Data,
   typename: string,
   entityKey: string,
   fieldKey: string,
   fieldName: string
 ) => {
+  contextRef.current = ctx;
+  ctx.parent = data;
   ctx.parentTypeName = typename;
   ctx.parentKey = entityKey;
   ctx.parentFieldKey = fieldKey;
