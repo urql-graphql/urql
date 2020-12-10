@@ -91,7 +91,7 @@ export interface Cache {
     args?: Variables
   ): DataField;
 
-  /** resolveFieldByKey() returns a field's value on an entity, given that field's key */
+  /** @deprecated use resolve() instead */
   resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField;
 
   /** inspectFields() retrieves all known fields for a given entity */

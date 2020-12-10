@@ -128,7 +128,7 @@ const getPage = (
   entityKey: string,
   fieldKey: string
 ): Page | null => {
-  const link = ensureKey(cache.resolveFieldByKey(entityKey, fieldKey));
+  const link = ensureKey(cache.resolve(entityKey, fieldKey));
   if (!link) return null;
 
   const typename = cache.resolve(link, '__typename') as string;

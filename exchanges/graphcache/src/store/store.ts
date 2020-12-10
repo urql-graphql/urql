@@ -105,36 +105,26 @@ export class Store implements Cache {
   keyOfField = keyOfField;
 
   keyOfEntity(data: Data | null | string) {
-    if (data == null || typeof data === 'string') return data || null;
-    const { __typename: typename, id, _id } = data;
-    if (!typename) return null;
-    if (this.rootNames[typename]) return typename;
-
     // In resolvers and updaters we may have a specific parent
     // object available that can be used to skip to a specific parent
     // key directly without looking at its incomplete properties
     if (contextRef.current && data === contextRef.current.parent)
       return contextRef.current!.parentKey;
 
+    if (data == null || typeof data === 'string') return data || null;
+    if (!data.__typename) return null;
+    if (this.rootNames[data.__typename]) return data.__typename;
+
     let key: string | null | void;
-    if (this.keys[typename]) {
-      key = this.keys[typename](data);
-    } else if (id !== undefined && id !== null) {
-      key = `${id}`;
-    } else if (_id !== undefined && _id !== null) {
-      key = `${_id}`;
+    if (this.keys[data.__typename]) {
+      key = this.keys[data.__typename](data);
+    } else if (data.id != null) {
+      key = `${data.id}`;
+    } else if (data._id != null) {
+      key = `${data._id}`;
     }
 
-    return key ? `${typename}:${key}` : null;
-  }
-
-  resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField {
-    const entityKey = this.keyOfEntity(entity);
-    if (!entityKey) return null;
-    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-    if (fieldValue !== undefined) return fieldValue;
-    const link = InMemoryData.readLink(entityKey, fieldKey);
-    return link ? link : null;
+    return key ? `${data.__typename}:${key}` : null;
   }
 
   resolve(
@@ -142,8 +132,16 @@ export class Store implements Cache {
     field: string,
     args?: Variables
   ): DataField {
-    return this.resolveFieldByKey(entity, keyOfField(field, args));
+    const fieldKey = keyOfField(field, args);
+    const entityKey = this.keyOfEntity(entity);
+    if (!entityKey) return null;
+    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
+    if (fieldValue !== undefined) return fieldValue;
+    const link = InMemoryData.readLink(entityKey, fieldKey);
+    return link || null;
   }
+
+  resolveFieldByKey = this.resolve;
 
   invalidate(entity: Data | string | null, field?: string, args?: Variables) {
     const entityKey = this.keyOfEntity(entity);
