@@ -67,7 +67,7 @@ export const simplePagination = ({
         continue;
       }
 
-      const links = cache.resolveFieldByKey(entityKey, fieldKey) as string[];
+      const links = cache.resolve(entityKey, fieldKey) as string[];
       const currentOffset = args[offsetArgument];
 
       if (
