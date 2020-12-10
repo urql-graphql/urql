@@ -393,6 +393,10 @@ describe('Store with OptimisticMutationConfig', () => {
 
     expect(store.keyOfEntity(randomData)).toBe(context.parentKey);
     expect(store.keyOfEntity({})).not.toBe(context.parentKey);
+
+    // Should work without a __typename field
+    delete (randomData as any).__typename;
+    expect(store.keyOfEntity(randomData)).toBe(context.parentKey);
   });
 
   it('should resolve with a key as first argument', () => {
