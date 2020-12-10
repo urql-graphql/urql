@@ -269,8 +269,6 @@ cache, since we're passing `requestPolicy: 'network-only'`.
 Furthermore the `reexecuteQuery` function can also be used to programmatically start a query even
 when `pause` is set to `true`, which would usually stop all automatic queries.
 
-### Reading on
-
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
 it.](../api/urql.md#usequery)
 
