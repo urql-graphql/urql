@@ -89,7 +89,3 @@ const TodosQuery = gql`
 
 There are some more utilities that `@urql/core` exports. [All of them are listed in the API docs for
 it.](../api/core.md)
-
-## Queries
-
-## Mutations
