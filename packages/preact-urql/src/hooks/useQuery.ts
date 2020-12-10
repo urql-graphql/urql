@@ -74,8 +74,14 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
     // If we haven't got a previous result then start suspending
     // otherwise issue the last known result immediately
     if (cache !== undefined) {
-      const signal = [cache] as [T] & { tag: 1 };
+      const signal = [cache] as [T] & { tag: 1, TAG: 1, _0: T };
       signal.tag = 1;
+      // ReScript has new variant encoding from version 8 onwards.
+      // Mirror the variant encoding above to a compatbile version
+      // so urql works with Wonka no matter with which version of
+      // ReScript it was compiled.
+      signal.TAG = signal.tag;
+      signal._0 = signal[0];
       sink(signal);
     } else {
       hasSuspended = true;
