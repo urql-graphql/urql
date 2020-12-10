@@ -3,6 +3,8 @@ title: Node
 order: 3
 ---
 
+# Node
+
 ## Getting started
 
 Installing `@urql/core` is quick and no other packages are immediately necessary.

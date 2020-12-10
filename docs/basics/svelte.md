@@ -3,6 +3,8 @@ title: Svelte
 order: 2
 ---
 
+# Svelte
+
 ## Getting started
 
 This "Getting Started" guide covers how to install and set up `urql` and provide a `Client` for

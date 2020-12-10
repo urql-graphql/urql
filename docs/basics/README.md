@@ -6,7 +6,7 @@ order: 2
 # Basics
 
 In this chapter we'll explain the basics of `urql` and how to get started with using it without any
-prior knowledge. It's split into multiple pages that are best read in order.
+prior knowledge.
 
 - [**React/Preact**](./react-preact.md) covers how to work with the bindings for React/Preact.
 - [**Vue**](./vue.md) covers how to work with the bindings for Vue 3.

@@ -3,6 +3,8 @@ title: Vue
 order: 1
 ---
 
+# Vue
+
 ## Getting started
 
 The `@urql/vue` bindings have been written with [Vue
