@@ -5,7 +5,7 @@ order: 0
 
 # React/Preact
 
-This guide covers how to install and set up `urql` and the `Client`, for React and
+This guide covers how to install and setup `urql` and the `Client`, as well as query and mutate data, with React and
 Preact. Since the `urql` and `@urql/preact` packages share most of their API and are used in the
 same way, when reading the documentation on React, all examples are essentially the same, except
 that we'd want to use the `@urql/preact` package instead of the `urql` pack
@@ -93,8 +93,6 @@ Now every component and element inside and under the `Provider` are able to use 
 will be sent to our API.
 
 ## Queries
-
-This guide covers how to query data with React and Preact, which share almost the same API.
 
 Both libraries offer a `useQuery` hook and a `Query` component. The latter accepts the same
 parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
@@ -277,8 +275,6 @@ There are some more tricks we can use with `useQuery`. [Read more about its API 
 it.](../api/urql.md#usequery)
 
 ## Mutations
-
-This guide covers how to send mutations in React and Preact, which share almost the same API.
 
 Both libraries offer a `useMutation` hook and a `Mutation` component. The latter accepts the same
 parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer

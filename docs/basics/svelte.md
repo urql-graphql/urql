@@ -102,9 +102,7 @@ We can also use a convenience function, `initClient`. This function combines the
 
 ## Queries
 
-This guide covers how to query data with Svelte with our `Client` now fully set up and provided via
-the Context API. We'll implement queries using the `operationStore` and the `query` function from
-`@urql/svelte`.
+We'll implement queries using the `operationStore` and the `query` function from `@urql/svelte`.
 
 The `operationStore` function creates a [Svelte Writable store](https://svelte.dev/docs#writable).
 You can use it to initialise a data container in `urql`. This store holds on to our query inputs,
@@ -350,7 +348,6 @@ There are some more tricks we can use with `operationStore`.
 
 ## Mutations
 
-This guide covers how to send mutations in Svelte using `@urql/svelte`'s `mutation` utility.
 The `mutation` function isn't dissimilar from the `query` function but is triggered manually and
 can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest) too while also supporting our
 trusty `operationStore`.

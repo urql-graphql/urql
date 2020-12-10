@@ -106,8 +106,7 @@ The plugin also accepts `createClient`'s options or a `Client` as its inputs.
 
 ## Queries
 
-This guide covers how to query data with Vue with our `Client` now fully set up and provided to an
-app. We'll implement queries using the `useQuery` function from `@urql/vue`.
+We'll implement queries using the `useQuery` function from `@urql/vue`.
 
 ### Run a first query
 
@@ -476,7 +475,6 @@ it.](../api/vue.md#usequery)
 
 ## Mutations
 
-This guide covers how to send mutations in Vue using `@urql/vue`'s `useMutation` API.
 The `useMutation` function isn't dissimilar from `useQuery` but is triggered manually and accepts
 only a `DocumentNode` or `string` as an input.
 
