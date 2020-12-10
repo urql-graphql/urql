@@ -127,22 +127,21 @@ export class Store implements Cache {
     return key ? `${data.__typename}:${key}` : null;
   }
 
-  resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField {
-    const entityKey = this.keyOfEntity(entity);
-    if (!entityKey) return null;
-    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-    if (fieldValue !== undefined) return fieldValue;
-    const link = InMemoryData.readLink(entityKey, fieldKey);
-    return link ? link : null;
-  }
-
   resolve(
     entity: Data | string | null,
     field: string,
     args?: Variables
   ): DataField {
-    return this.resolveFieldByKey(entity, keyOfField(field, args));
+    const fieldKey = keyOfField(field, args);
+    const entityKey = this.keyOfEntity(entity);
+    if (!entityKey) return null;
+    const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
+    if (fieldValue !== undefined) return fieldValue;
+    const link = InMemoryData.readLink(entityKey, fieldKey);
+    return link || null;
   }
+
+  resolveFieldByKey = this.resolve;
 
   invalidate(entity: Data | string | null, field?: string, args?: Variables) {
     const entityKey = this.keyOfEntity(entity);
