@@ -142,13 +142,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -312,13 +312,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -484,13 +484,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -632,13 +632,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 102,
-        "source": Source {
+        "source": Object {
           "body": "mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $picture) { location } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -786,13 +786,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 108,
-        "source": Source {
+        "source": Object {
           "body": "mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(pictures: $pictures) { location } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },

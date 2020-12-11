@@ -142,13 +142,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -302,13 +302,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -462,13 +462,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -626,13 +626,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
@@ -806,13 +806,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 76,
-        "source": Source {
+        "source": Object {
           "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },

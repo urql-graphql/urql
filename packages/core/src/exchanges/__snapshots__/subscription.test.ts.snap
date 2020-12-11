@@ -116,13 +116,13 @@ Object {
       "kind": "Document",
       "loc": Object {
         "end": 74,
-        "source": Source {
+        "source": Object {
           "body": "subscription subscribeToUser($user: String) { user(user: $user) { name } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "GraphQL request",
+          "name": "gql",
         },
         "start": 0,
       },
