@@ -4,7 +4,7 @@ jest.mock('graphql', () => {
   return {
     __esModule: true,
     ...graphql,
-    print: jest.fn(a => a as any),
+    print: jest.fn(() => '{ placeholder }'),
     execute: jest.fn(() => ({ key: 'value' })),
   };
 });
