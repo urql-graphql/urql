@@ -16,10 +16,9 @@ const applyDefinitions = (
   source: Array<DefinitionNode> | ReadonlyArray<DefinitionNode>
 ) => {
   for (let i = 0; i < source.length; i++) {
-    const definition = source[i];
     if (source[i].kind === Kind.FRAGMENT_DEFINITION) {
       const name = (source[i] as FragmentDefinitionNode).name.value;
-      const value = stringifyDocument(definition);
+      const value = stringifyDocument(source[i]);
       // Fragments will be deduplicated according to this Map
       const prevValue = fragmentNames.get(name);
       if (prevValue === undefined) {
