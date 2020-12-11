@@ -56,11 +56,8 @@ export const keyDocument = (q: string | DocumentNode): KeyedDocumentNode => {
   if (typeof q === 'string') {
     key = hash(stringifyDocument(q));
     query = docs.get(key) || parse(q, { noLocation: true });
-  } else if ((q as any).__key != null) {
-    key = (q as any).__key;
-    query = q;
   } else {
-    key = hash(stringifyDocument(q));
+    key = (q as KeyedDocumentNode).__key || hash(stringifyDocument(q));
     query = docs.get(key) || q;
   }
 
