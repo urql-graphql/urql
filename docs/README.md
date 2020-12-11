@@ -14,51 +14,38 @@ As you're adopting GraphQL, `urql` becomes your primary data layer and can handl
 pages through ["Document Caching"](./basics/document-caching.md) as well as dynamic and data-heavy
 apps through ["Normalized Caching"](./graphcache/normalized-caching.md).
 
-## Constituent Parts
+`urql` can be understood as a collection of connected parts and packages.
+When we only need to install a single package for our framework of choice. We're then able to
+declaratively send GraphQL requests to our API. All framework packages — like `urql` (for React),
+`@urql/preact`, `@urql/svelte`, and `@urql/vue` — wrap the [core package,
+`@urql/core`](./basics/core.md), which we can imagine as the brain
+of `urql` with most of its logic. As we progress with implementing `urql` into our application,
+we're later able to extend it by adding ["addon packages", which we call
+_Exchanges_](./concepts/exchanges.md)
 
-`urql` can be understood as a collection of connected parts and packages. When [getting started](./basics/getting-started.md) we only need to install a single package for our
-framework of choice. We're then able to declaratively send GraphQL requests to our API.
+If at this point you're still unsure of whether to use `urql`, [have a look at the **Comparison**
+page](./comparison.md) and check whether `urql` supports all features you're looking for.
 
-All framework packages — like `urql` (for React), `@urql/preact`, `@urql/svelte`, and `@urql/vue` —
-wrap the [core package, `@urql/core`](./concepts/core-package.md), which we can imagine as the brain
-of `urql` with most of its logic.
+## Where to start
 
-As we progress with implementing `urql` into our application, we're later able to extend it by
-adding ["addon packages", which we call _Exchanges_](./concepts/exchanges.md)
+We have **Getting Started** guides for:
 
-## Quick Start
+- [**React/Preact**](./basics/react-preact.md) covers how to work with the bindings for React/Preact.
+- [**Vue**](./basics/vue.md) covers how to work with the bindings for Vue 3.
+- [**Svelte**](./basics/svelte.md) covers how to work with the bindings for Svelte.
+- [**Core Package**](./basics/core.md) covers the shared "core APIs" and how we can use them directly
+  in Node.js or imperatively.
 
-We have **Getting Started** guides for
-[React &
-Preact](https://formidable.com/open-source/urql/docs/basics/getting-started/#react--preact),
-[Svelte](https://formidable.com/open-source/urql/docs/basics/getting-started/#svelte), and
-[Vue](https://formidable.com/open-source/urql/docs/basics/getting-started/#vue) which walk through
-how to install the bindings for your framework of choice and set up the
-[`Client`](./api/core.md#client).
+Each of these sections will walk you through the specific instructions for the framework bindings,
+including how to install and set them up, how to write queries, and how to send mutations.
 
-Generally for React this would look like this, where the `urql` package may be replaced with your
-framework's bindings:
-
-```sh
-npm i --save urql graphql
-# or
-yarn add urql graphql
-```
-
-The **Basics** section also features pages to [write
-Queries](https://formidable.com/open-source/urql/docs/basics/queries/),
-[Mutations](https://formidable.com/open-source/urql/docs/basics/mutations/), after which we could
-continue learning about
-[Subscriptions](https://formidable.com/open-source/urql/docs/advanced/subscriptions/). These are
-among the only pages that are framework-specific.
-
-## The Documentation
+## Following the Documentation
 
 This documentation is split into groups or sections that cover different levels of usage or areas of
 interest.
 
-- **Basics** is the section where we find the ["Getting Started"
-  guide](./basics/getting-started.md) and usage patterns for our framework of choice.
+- **Basics** is the section where we'll want to start learning about `urql` as it contains "Getting
+  Started" guides for our framework of choice.
 - **Main Concepts** then explains more about how `urql` functions, what it's made up of, and covers
   the main aspects of the `Client` and GraphQL clients in general, on the ["Philosophy"
   page](./concepts/philosophy.md).
@@ -69,7 +56,8 @@ interest.
   use-cases, smarter caching, and more dynamic apps to function.
 - **Showcase** aims to list users of `urql`, third-party packages, and other helpful resources,
   like tutorials and guides.
-- **API** contains a detailed list of all helpers, utilities, components, and other parts of each of
-  `urql`'s packages, which may contain all details of each part and package.
+- **API** contains a detailed documentation on each package's APIs. The documentation links to each
+  of these as appropriate, but if we're unsure of how to use a utility or package, we can go here
+  directly to look up how to use a specific API.
 
 We hope you grow to love `urql`!
