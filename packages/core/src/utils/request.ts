@@ -1,6 +1,6 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+
 import {
-  Source,
   Location,
   DefinitionNode,
   DocumentNode,
@@ -8,6 +8,7 @@ import {
   parse,
   print,
 } from 'graphql';
+
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
 import { GraphQLRequest } from '../types';
@@ -36,7 +37,11 @@ export const stringifyDocument = (
     (node as WritableLocation).loc = {
       start: 0,
       end: str.length,
-      source: new Source(str),
+      source: {
+        body: str,
+        name: 'gql',
+        locationOffset: { line: 1, column: 1 },
+      },
     } as Location;
   }
 
