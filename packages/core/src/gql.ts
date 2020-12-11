@@ -1,10 +1,44 @@
 /* eslint-disable prefer-rest-params */
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { Source, Location, DocumentNode, Kind, print } from 'graphql';
-import { keyDocument } from './utils';
 
-type WritableDocumentNode = {
-  -readonly [K in keyof DocumentNode]: DocumentNode[K];
+import {
+  DocumentNode,
+  DefinitionNode,
+  FragmentDefinitionNode,
+  Kind,
+} from 'graphql';
+
+import { keyDocument, stringifyDocument } from './utils';
+
+const applyDefinitions = (
+  fragmentNames: Map<string, string>,
+  target: DefinitionNode[],
+  source: Array<DefinitionNode> | ReadonlyArray<DefinitionNode>
+) => {
+  for (let i = 0; i < source.length; i++) {
+    if (source[i].kind === Kind.FRAGMENT_DEFINITION) {
+      const name = (source[i] as FragmentDefinitionNode).name.value;
+      const value = stringifyDocument(source[i]);
+      // Fragments will be deduplicated according to this Map
+      if (!fragmentNames.has(name)) {
+        fragmentNames.set(name, value);
+        target.push(source[i]);
+      } else if (
+        process.env.NODE_ENV !== 'production' &&
+        fragmentNames.get(name) !== value
+      ) {
+        // Fragments with the same names is expected to have the same contents
+        console.warn(
+          '[WARNING: Duplicate Fragment] A fragment with name `' +
+            name +
+            '` already exists in this document.\n' +
+            'While fragment names may not be unique across your source, each name must be unique per document.'
+        );
+      }
+    } else {
+      target.push(source[i]);
+    }
+  }
 };
 
 function gql<Data = any, Variables = object>(
@@ -17,48 +51,34 @@ function gql<Data = any, Variables = object>(
 ): TypedDocumentNode<Data, Variables>;
 
 function gql(/* arguments */) {
+  const fragmentNames = new Map<string, string>();
+  const definitions: DefinitionNode[] = [];
+  const interpolations: DefinitionNode[] = [];
+
+  // Apply the entire tagged template body's definitions
   let body: string = Array.isArray(arguments[0])
     ? arguments[0][0]
     : arguments[0] || '';
   for (let i = 1; i < arguments.length; i++) {
     const value = arguments[i];
-    body +=
-      value && value.kind === Kind.DOCUMENT
-        ? value.loc
-          ? value.loc.source.body
-          : print(value)
-        : value;
+    if (value && value.definitions) {
+      interpolations.push(...value.definitions);
+    } else {
+      body += value;
+    }
+
     body += arguments[0][i];
   }
 
-  const doc = keyDocument(body);
-  if (process.env.NODE_ENV !== 'production') {
-    const fragmentNames = new Set();
-    for (let i = 0; i < doc.definitions.length; i++) {
-      const definition = doc.definitions[i];
-      if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-        const name = definition.name.value;
-        if (fragmentNames.has(name)) {
-          console.warn(
-            '[WARNING: Duplicate Fragment] A fragment with name `' +
-              name +
-              '` already exists in this document.\n' +
-              'While fragment names may not be unique across your source, each name must be unique per document.'
-          );
-        } else {
-          fragmentNames.add(name);
-        }
-      }
-    }
-  }
+  // Apply the tag's body definitions
+  applyDefinitions(fragmentNames, definitions, keyDocument(body).definitions);
+  // Copy over each interpolated document's definitions
+  applyDefinitions(fragmentNames, definitions, interpolations);
 
-  (doc as WritableDocumentNode).loc = {
-    start: 0,
-    end: body.length,
-    source: new Source(body, 'gql'),
-  } as Location;
-
-  return doc;
+  return keyDocument({
+    kind: Kind.DOCUMENT,
+    definitions,
+  });
 }
 
 export { gql };

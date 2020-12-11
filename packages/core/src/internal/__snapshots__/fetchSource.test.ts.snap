@@ -141,17 +141,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
-        "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+        "end": 76,
+        "source": Object {
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -309,17 +301,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
-        "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+        "end": 76,
+        "source": Object {
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -477,17 +461,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
-        "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+        "end": 76,
+        "source": Object {
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -649,17 +625,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
-        "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+        "end": 76,
+        "source": Object {
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -837,17 +805,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
-        "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+        "end": 76,
+        "source": Object {
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,

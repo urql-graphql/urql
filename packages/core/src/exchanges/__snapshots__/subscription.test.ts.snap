@@ -115,15 +115,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 106,
-        "source": Source {
-          "body": "
-    subscription subscribeToUser($user: String) {
-      user(user: $user) {
-        name
-      }
-    }
-  ",
+        "end": 74,
+        "source": Object {
+          "body": "subscription subscribeToUser($user: String) { user(user: $user) { name } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
