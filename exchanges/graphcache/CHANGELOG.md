@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 3.3.3
+
+### Patch Changes
+
+- Update `cache.resolve(parent, ...)` case to enable _even more_ cases, for instance where `parent.__typename` isn't set yet. This was intended to be enabled in the previous patch but has been forgotten, by [@kitten](https://github.com/kitten) (See [#1219](https://github.com/FormidableLabs/urql/pull/1219))
+- Deprecate `cache.resolveFieldByKey` in favour of `cache.resolve`, which functionally was already able to do the same, by [@kitten](https://github.com/kitten) (See [#1219](https://github.com/FormidableLabs/urql/pull/1219))
+- Updated dependencies (See [#1225](https://github.com/FormidableLabs/urql/pull/1225))
+  - @urql/core@1.16.1
+
 ## 3.3.2
 
 ### Patch Changes

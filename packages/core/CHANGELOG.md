@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.16.1
+
+### Patch Changes
+
+- Add fragment deduplication to `gql` tag. Identical fragments can now be interpolated multiple times without a warning being triggered or them being duplicated in `gql`'s output, by [@kitten](https://github.com/kitten) (See [#1225](https://github.com/FormidableLabs/urql/pull/1225))
+
 ## 1.16.0
 
 ### Minor Changes
