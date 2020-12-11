@@ -1,4 +1,4 @@
-import { Source, parse, print } from 'graphql';
+import { parse, print } from 'graphql';
 import { gql } from './gql';
 import { keyDocument } from './utils';
 
@@ -25,7 +25,7 @@ it('parses GraphQL Documents', () => {
   expect(doc.loc).toEqual({
     start: 0,
     end: 15,
-    source: new Source('{ gql testing }'),
+    source: expect.anything(),
   });
 });
 

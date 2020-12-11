@@ -20,11 +20,13 @@ const applyDefinitions = (
       const name = (source[i] as FragmentDefinitionNode).name.value;
       const value = stringifyDocument(source[i]);
       // Fragments will be deduplicated according to this Map
-      const prevValue = fragmentNames.get(name);
-      if (prevValue === undefined) {
+      if (!fragmentNames.has(name)) {
         fragmentNames.set(name, value);
         target.push(source[i]);
-      } else if (process.env.NODE_ENV !== 'production' && prevValue !== value) {
+      } else if (
+        process.env.NODE_ENV !== 'production' &&
+        fragmentNames.get(name) !== value
+      ) {
         // Fragments with the same names is expected to have the same contents
         console.warn(
           '[WARNING: Duplicate Fragment] A fragment with name `' +
@@ -51,7 +53,7 @@ function gql<Data = any, Variables = object>(
 function gql(/* arguments */) {
   const fragmentNames = new Map<string, string>();
   const definitions: DefinitionNode[] = [];
-  const interpolations: DocumentNode[] = [];
+  const interpolations: DefinitionNode[] = [];
 
   // Apply the entire tagged template body's definitions
   let body: string = Array.isArray(arguments[0])
@@ -59,8 +61,8 @@ function gql(/* arguments */) {
     : arguments[0] || '';
   for (let i = 1; i < arguments.length; i++) {
     const value = arguments[i];
-    if (value && value.kind === Kind.DOCUMENT) {
-      interpolations.push(value);
+    if (value && value.definitions) {
+      interpolations.push(...value.definitions);
     } else {
       body += value;
     }
@@ -70,10 +72,8 @@ function gql(/* arguments */) {
 
   // Apply the tag's body definitions
   applyDefinitions(fragmentNames, definitions, keyDocument(body).definitions);
-
   // Copy over each interpolated document's definitions
-  for (let i = 0; i < interpolations.length; i++)
-    applyDefinitions(fragmentNames, definitions, interpolations[i].definitions);
+  applyDefinitions(fragmentNames, definitions, interpolations);
 
   return keyDocument({
     kind: Kind.DOCUMENT,
