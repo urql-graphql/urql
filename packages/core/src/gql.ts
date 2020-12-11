@@ -2,20 +2,13 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 import {
-  Source,
   DocumentNode,
   DefinitionNode,
   FragmentDefinitionNode,
-  Location,
   Kind,
-  print,
 } from 'graphql';
 
 import { keyDocument, stringifyDocument } from './utils';
-
-type WritableDocumentNode = {
-  -readonly [K in keyof DocumentNode]: DocumentNode[K];
-};
 
 const applyDefinitions = (
   fragmentNames: Map<string, string>,
@@ -83,17 +76,10 @@ function gql(/* arguments */) {
   for (let i = 0; i < interpolations.length; i++)
     applyDefinitions(fragmentNames, definitions, interpolations[i].definitions);
 
-  const doc: WritableDocumentNode = {
+  return keyDocument({
     kind: Kind.DOCUMENT,
     definitions,
-    loc: undefined,
-  };
-
-  const str = print(doc);
-  doc.loc = { start: 0, end: str.length, source: new Source(str) } as Location;
-
-  // Add source for compatibility with graphql-tag, which keyDocument() will also reuse for hashing
-  return keyDocument(doc);
+  });
 }
 
 export { gql };

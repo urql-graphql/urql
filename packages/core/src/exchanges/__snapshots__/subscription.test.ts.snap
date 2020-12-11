@@ -115,20 +115,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 106,
+        "end": 74,
         "source": Source {
-          "body": "
-    subscription subscribeToUser($user: String) {
-      user(user: $user) {
-        name
-      }
-    }
-  ",
+          "body": "subscription subscribeToUser($user: String) { user(user: $user) { name } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },

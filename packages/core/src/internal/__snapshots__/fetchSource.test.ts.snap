@@ -141,22 +141,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
+        "end": 76,
         "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },
@@ -309,22 +301,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
+        "end": 76,
         "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },
@@ -477,22 +461,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
+        "end": 76,
         "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },
@@ -649,22 +625,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
+        "end": 76,
         "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },
@@ -837,22 +805,14 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 124,
+        "end": 76,
         "source": Source {
-          "body": "
-    query getUser($name: String) {
-      user(name: $name) {
-        id
-        firstName
-        lastName
-      }
-    }
-  ",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
           },
-          "name": "gql",
+          "name": "GraphQL request",
         },
         "start": 0,
       },
