@@ -14,8 +14,6 @@ Each page goes a little further in explaining a core concept of `urql`.
   particular, which shines a light on why you may want to use `urql`.
 - [**Stream Pattern**](./stream-patterns.md) explains the inner working of `urql`, which is _stream-based_, also known as
   Observable patterns in JS.
-- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main logic of `urql`, and
-  how we can use it directly in Node.js.
 - [**Exchanges**](./exchanges.md) finally introduces _Exchanges_ and how to write extensions or addons and use them
   in `urql`.
 
