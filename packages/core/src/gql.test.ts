@@ -3,15 +3,22 @@ import { gql } from './gql';
 import { keyDocument } from './utils';
 
 it('parses GraphQL Documents', () => {
-  expect(gql('{ test }').definitions).toEqual(
-    parse('{ test }', { noLocation: true }).definitions
-  );
-  expect(gql('{ test }')).toBe(keyDocument('{ test }'));
+  const doc = gql`
+    {
+      gql
+      testing
+    }
+  `;
 
-  expect(gql('{ test }').loc).toEqual({
+  expect(doc.definitions).toEqual(
+    parse('{ gql testing }', { noLocation: true }).definitions
+  );
+
+  expect(doc).toBe(keyDocument('{ gql testing }'));
+  expect(doc.loc).toEqual({
     start: 0,
-    end: 8,
-    source: new Source('{ test }', 'gql'),
+    end: 15,
+    source: new Source('{ gql testing }'),
   });
 });
 

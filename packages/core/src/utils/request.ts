@@ -1,33 +1,66 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode, Kind, parse, print } from 'graphql';
+import {
+  Source,
+  Location,
+  DefinitionNode,
+  DocumentNode,
+  Kind,
+  parse,
+  print,
+} from 'graphql';
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
 import { GraphQLRequest } from '../types';
+
+interface WritableLocation {
+  loc: Location | undefined;
+}
 
 export interface KeyedDocumentNode extends DocumentNode {
   __key: number;
 }
 
-const hashQuery = (q: string): number =>
-  hash(q.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim());
+export const stringifyDocument = (
+  node: string | DefinitionNode | DocumentNode
+): string => {
+  // Stringify or normalise input
+  const str = (typeof node !== 'string'
+    ? (node.loc && node.loc.source.body) || print(node)
+    : node
+  )
+    .replace(/([\s,]|#[^\n\r]+)+/g, ' ')
+    .trim();
+
+  // Add location information to stringified node
+  if (typeof node !== 'string' && !node.loc) {
+    (node as WritableLocation).loc = {
+      start: 0,
+      end: str.length,
+      source: new Source(str),
+    } as Location;
+  }
+
+  return str;
+};
 
 const docs = new Map<number, KeyedDocumentNode>();
 
-export const keyDocument = (
-  q: string | DocumentNode | TypedDocumentNode
-): KeyedDocumentNode => {
+export const keyDocument = (q: string | DocumentNode): KeyedDocumentNode => {
   let key: number;
   let query: DocumentNode;
   if (typeof q === 'string') {
-    key = hashQuery(q);
+    key = hash(stringifyDocument(q));
     query = docs.get(key) || parse(q, { noLocation: true });
   } else if ((q as any).__key != null) {
     key = (q as any).__key;
     query = q;
   } else {
-    key = hashQuery(print(q));
+    key = hash(stringifyDocument(q));
     query = docs.get(key) || q;
   }
+
+  // Add location information if it's missing
+  if (!query.loc) stringifyDocument(query);
 
   (query as KeyedDocumentNode).__key = key;
   docs.set(key, query as KeyedDocumentNode);
