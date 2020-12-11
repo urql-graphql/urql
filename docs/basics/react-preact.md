@@ -8,7 +8,7 @@ order: 0
 This guide covers how to install and setup `urql` and the `Client`, as well as query and mutate data, with React and
 Preact. Since the `urql` and `@urql/preact` packages share most of their API and are used in the
 same way, when reading the documentation on React, all examples are essentially the same, except
-that we'd want to use the `@urql/preact` package instead of the `urql` pack
+that we'd want to use the `@urql/preact` package instead of the `urql` package.
 
 ## Getting started
 

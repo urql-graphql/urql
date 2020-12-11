@@ -1,45 +1,27 @@
 ---
-title: Core Package
-order: 2
+title: Core
+order: 3
 ---
 
-# The Core Package
+# Core
 
 The `@urql/core` package contains `urql`'s `Client`, some common utilities, and some default
 _Exchanges_. These are the shared, default parts of `urql` that we will be using no matter which
 framework we're interacting with.
 
-Therefore those are also the parts of `urql` that contain its most important logic — like the
-[`Client`](../api/core.md#client) — and the package that we need to know about if we're either integrating `urql` with a new
-framework, or if we're using the "raw" `Client` in Node.js.
+All framework bindings — meaning `urql`, `@urql/preact`, `@urql/svelte`, and `@urql/vue` — reexport
+all exports of our `@urql/core` core library. This means that if we want to use `urql`'s `Client`
+imperatively or with Node.js we'd use `@urql/core`'s utilities or the `Client` directly.
 
-## Background
+## Getting started
 
-The ["Philosophy"](./philosophy.md) page explains how `urql` solves some of problems encountered when different aspects
-of having a GraphQL client handle declarative querying and being a central point of extensibility.
+Installing `@urql/core` is quick and no other packages are immediately necessary.
 
-By extension there are three parts of `urql` you'll come in contact with when you add it to your
-app:
-
-- the framework integration that allows you to declaratively write queries and mutations in your
-  preferred framework, which are currently the [`urql`](../api/urql.md) or
-  [`@urql/preact`](../api/preact.md) packages
-- the [`Client`](../api/core.md#client) that manages the operation lifecycle and results
-- and, exchanges that may either be some default exchanges or some from external packages
-
-On this page we'll learn about the latter two points - shared logic that isn't specific to
-a particular library or framework (such as React or Preact code).
-
-_Exchanges_ are discussed in more detail on the [next page](./exchanges.md).
-
-## Usage with Node.js
-
-The largest part of `urql` itself and the core package is the aforementioned `Client`. It's often
-used directly when using `urql` in Node.js without any other integration.
-
-We've previously seen how we can use the `Client`'s stream methods directly, in [Stream
-Patterns](./stream-patterns.md). However, the [`Client`](../api/core.md#client) also has plenty of
-convenience methods that make interacting with the `Client` directly a lot easier.
+```sh
+yarn add @urql/core graphql
+# or
+npm install --save @urql/core graphql
+```
 
 ### One-off Queries and Mutations
 
@@ -90,6 +72,73 @@ result; // null or { data: ... }
 Since the streams in `urql` operate synchronously, internally this method subscribes to
 `client.executeQuery` and unsubscribes immediately. If a result is available in the cache it will be
 resolved synchronously prior to the unsubscribe. If not, the query is cancelled and no request will be sent to the GraphQL API.
+
+### gql
+
+A notable utility function is the `gql` tagged template literal function, which is a drop-in
+replacement for `graphql-tag`, if you're coming from other GraphQL clients.
+
+Wherever `urql` accepts a query document, you may either pass a string or a `DocumentNode`. `gql` is
+a utility that allows a `DocumentNode` to be created directly, and others to be interpolated into
+it, which is useful for fragments for instance. This function will often also mark GraphQL documents
+for syntax highlighting in most code editors.
+
+In most examples we may have passed a string to define a query document, like so:
+
+```js
+const TodosQuery = `
+  query {
+    todos {
+      id
+      title
+    }
+  }
+`;
+```
+
+We may also use the `gql` tag function to create a `DocumentNode` directly:
+
+```js
+import { gql } from '@urql/core';
+
+const TodosQuery = gql`
+  query {
+    todos {
+      id
+      title
+    }
+  }
+`;
+```
+
+Since all framework bindings also re-export `@urql/core`, we may also import `gql` from `'urql'`,
+`'@urql/svelte'` and other bindings directly.
+
+We can also start interpolating other documents into the tag function. This is useful to compose
+fragment documents into a larger query, since it's common to define fragments across components of
+an app to spread out data dependencies. If we accidentally use a duplicate fragment name in a
+document, `gql` will log a warning, since GraphQL APIs won't accept duplicate names.
+
+```js
+import { gql } from '@urql/core';
+
+const TodoFragment = gql`
+  fragment SmallTodo on Todo {
+    id
+    title
+  }
+`;
+
+const TodosQuery = gql`
+  query {
+    todos {
+      ...TodoFragment
+    }
+  }
+
+  ${TodoFragment}
+`;
+```
 
 ## Common Utilities in Core
 

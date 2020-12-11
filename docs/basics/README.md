@@ -11,7 +11,8 @@ prior knowledge.
 - [**React/Preact**](./react-preact.md) covers how to work with the bindings for React/Preact.
 - [**Vue**](./vue.md) covers how to work with the bindings for Vue 3.
 - [**Svelte**](./Svelte.md) covers how to work with the bindings for Svelte.
-- [**Node**](./Node.md) covers how to work with the core-bindings.
+- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main
+  logic of `urql`, and how we can use it directly in Node.js.
 - [**Document Caching**](./document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
   [Normalized Cache](../graphcache/normalized-caching.md).
 - [**Errors**](./errors.md) contains information on error handling in `urql`.
