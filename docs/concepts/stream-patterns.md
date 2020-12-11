@@ -1,6 +1,6 @@
 ---
 title: Stream Patterns
-order: 1
+order: 4
 ---
 
 # Stream Patterns

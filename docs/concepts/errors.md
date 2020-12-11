@@ -1,6 +1,6 @@
 ---
 title: Errors
-order: 5
+order: 2
 ---
 
 # Error handling
