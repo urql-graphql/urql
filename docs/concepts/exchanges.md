@@ -1,6 +1,6 @@
 ---
 title: Exchanges
-order: 3
+order: 5
 ---
 
 # Exchanges
