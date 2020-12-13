@@ -1,3 +1,4 @@
+import { AppContext } from 'next/app';
 import React, { createElement, useState } from 'react';
 import ssrPrepass from 'react-ssr-prepass';
 
@@ -91,8 +92,8 @@ export function withUrqlClient(
         const AppTree = appOrPageCtx.AppTree!;
 
         // Determine if we are wrapping an App component or a Page component.
-        const isApp = !!appOrPageCtx.Component;
-        const ctx = isApp ? appOrPageCtx.ctx! : appOrPageCtx;
+        const isApp = !!(appOrPageCtx as AppContext).Component;
+        const ctx = isApp ? (appOrPageCtx as AppContext).ctx! : appOrPageCtx;
 
         const ssrCache = ssrExchange({ initialState: undefined });
         const clientConfig = getClientConfig(ssrCache, ctx);
