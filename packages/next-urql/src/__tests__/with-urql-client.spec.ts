@@ -5,7 +5,6 @@ import { Client } from 'urql';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
-import { NextPageContext } from 'next';
 
 beforeEach(jest.clearAllMocks);
 
@@ -78,7 +77,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      } as NextPageContext['req'],
+      } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
     };
 
@@ -88,8 +87,7 @@ describe('withUrqlClient', () => {
           url: 'http://localhost:3000',
           fetchOptions: {
             headers: {
-              Authorization:
-                (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+              Authorization: (ctx && ctx.req!.headers!.cookie) || '',
             },
           },
           exchanges: [(mockSsrExchange = ssrExchange)],
@@ -122,7 +120,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: '',
         },
-      } as NextPageContext['req'],
+      } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
     };
     const Component = withUrqlClient(
@@ -130,8 +128,7 @@ describe('withUrqlClient', () => {
         url: 'http://localhost:3000',
         fetchOptions: {
           headers: {
-            Authorization:
-              (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+            Authorization: (ctx && ctx.req!.headers!.cookie) || '',
           },
         },
         exchanges: [ssrExchange],
@@ -184,7 +181,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      } as NextPageContext['req'],
+      } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
     };
 
@@ -194,8 +191,7 @@ describe('withUrqlClient', () => {
           url: 'http://localhost:3000',
           fetchOptions: {
             headers: {
-              Authorization:
-                (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+              Authorization: (ctx && ctx.req!.headers!.cookie) || '',
             },
           },
           exchanges: [(mockSsrExchange = ssrExchange)],

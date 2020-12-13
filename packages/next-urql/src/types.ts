@@ -1,12 +1,19 @@
 import { GraphQLError } from 'graphql';
 import { ComponentType } from 'react';
 import { ClientOptions, Exchange, Client } from 'urql';
-import { NextPageContext } from 'next';
-import { AppContext } from 'next/app';
 
-export type PartialNextContext = (NextPageContext | AppContext) & {
-  urqlClient?: Client;
-};
+export interface PartialNextContext {
+  res?: any;
+  AppTree?: NextComponentType<PartialNextContext>;
+  Component?: NextComponentType<PartialNextContext>;
+  ctx?: PartialNextContext;
+  err?: any;
+  req?: any;
+  pathname?: string;
+  query?: any;
+  asPath?: string;
+  [key: string]: any;
+}
 
 export type NextComponentType<
   C extends PartialNextContext = PartialNextContext,
@@ -21,9 +28,9 @@ export type NextUrqlClientConfig = (
   ctx?: PartialNextContext
 ) => ClientOptions;
 
-export type NextUrqlContext = (NextPageContext | AppContext) & {
+export interface NextUrqlContext extends PartialNextContext {
   urqlClient: Client;
-};
+}
 
 export type NextUrqlPageContext = NextUrqlContext;
 export type NextUrqlAppContext = NextUrqlContext;
