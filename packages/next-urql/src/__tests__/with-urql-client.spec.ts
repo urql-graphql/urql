@@ -5,6 +5,7 @@ import { Client } from 'urql';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
+import { NextPageContext } from 'next';
 
 beforeEach(jest.clearAllMocks);
 
@@ -77,7 +78,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      } as NextUrqlPageContext['req'],
+      } as NextPageContext['req'],
       urqlClient: {} as Client,
     };
 
@@ -86,7 +87,10 @@ describe('withUrqlClient', () => {
         (ssrExchange, ctx) => ({
           url: 'http://localhost:3000',
           fetchOptions: {
-            headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
+            headers: {
+              Authorization:
+                (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+            },
           },
           exchanges: [(mockSsrExchange = ssrExchange)],
         }),
@@ -118,14 +122,17 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: '',
         },
-      } as NextUrqlPageContext['req'],
+      } as NextPageContext['req'],
       urqlClient: {} as Client,
     };
     const Component = withUrqlClient(
       (ssrExchange, ctx) => ({
         url: 'http://localhost:3000',
         fetchOptions: {
-          headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
+          headers: {
+            Authorization:
+              (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+          },
         },
         exchanges: [ssrExchange],
       }),
@@ -177,7 +184,7 @@ describe('withUrqlClient', () => {
         headers: {
           cookie: token,
         },
-      } as NextUrqlPageContext['req'],
+      } as NextPageContext['req'],
       urqlClient: {} as Client,
     };
 
@@ -186,7 +193,10 @@ describe('withUrqlClient', () => {
         (ssrExchange, ctx) => ({
           url: 'http://localhost:3000',
           fetchOptions: {
-            headers: { Authorization: (ctx && ctx.req!.headers!.cookie) || '' },
+            headers: {
+              Authorization:
+                (ctx && (ctx as NextPageContext).req!.headers!.cookie) || '',
+            },
           },
           exchanges: [(mockSsrExchange = ssrExchange)],
         }),
