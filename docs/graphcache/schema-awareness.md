@@ -107,9 +107,9 @@ fetch('http://localhost:3000/graphql', {
   });
 ```
 
-The `minifyIntrospectionQuery` doesn't only accept `IntrospectionQuery` JSON data as inputs, but also
+The `getIntrospectionSchema ` doesn't only accept `IntrospectionQuery` JSON data as inputs, but also
 allows you to pass a JSON string, `GraphQLSchema`, or GraphQL Schema SDL strings. It's a convenience
-helper and not needed to make schema-awareness work, minifying the introspected schema is an optimization step.
+helper and not needed in the above example.
 
 ## Integrating a schema
 
