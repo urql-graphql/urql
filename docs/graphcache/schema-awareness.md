@@ -20,7 +20,7 @@ But how do you get this introspected schema? The process of introspecting a sche
 introspection query on the GraphQL API, which will give us our `IntrospectionQuery` result. So an
 introspection is just another query we can run against our GraphQL APIs or schemas.
 
-As long as `introspection` as turned on and permitted, we can download an introspectin schema by
+As long as `introspection` as turned on and permitted, we can download an introspection schema by
 running a normal GraphQL query against the API and save the result in a JSON file.
 
 ```js
