@@ -2,10 +2,11 @@ import { Kind, InlineFragmentNode } from 'graphql';
 import { mocked } from 'ts-jest/utils';
 import { buildClientSchema } from './schema';
 import * as SchemaPredicates from './schemaPredicates';
+import { minifyIntrospectionQuery } from '@urql/introspection';
 
 describe('SchemaPredicates', () => {
   // eslint-disable-next-line
-  const schema = buildClientSchema(require('../test-utils/simple_schema.json'));
+  const schema = buildClientSchema(minifyIntrospectionQuery(require('../test-utils/simple_schema.json')));
 
   const frag = (value: string): InlineFragmentNode => ({
     kind: Kind.INLINE_FRAGMENT,
