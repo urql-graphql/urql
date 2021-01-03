@@ -9,7 +9,7 @@ interface PartialFieldInfo {
 export const invalidateEntity = (
   entityKey: string,
   field?: string,
-  args?: Variables
+  args?: Variables | null
 ) => {
   const fields: PartialFieldInfo[] = field
     ? [{ fieldKey: keyOfField(field, args) }]
