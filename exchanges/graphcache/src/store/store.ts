@@ -143,7 +143,11 @@ export class Store implements Cache {
 
   resolveFieldByKey = this.resolve;
 
-  invalidate(entity: Data | string | null, field?: string, args?: Variables | null) {
+  invalidate(
+    entity: Data | string | null,
+    field?: string,
+    args?: Variables | null
+  ) {
     const entityKey = this.keyOfEntity(entity);
 
     invariant(
