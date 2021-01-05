@@ -90,12 +90,12 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-const sources = new Map<number, Source<OperationResult>>();
-
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
+  if (!client.sources) client.sources = new Map();
+  const sources = client.sources;
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
   const request = useRequest<Data, Variables>(args.query, args.variables);
