@@ -90,7 +90,7 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-type Sources = Map<number, Source<OperationResult>>
+type Sources = Map<number, Source<OperationResult>>;
 const sourcesByClient = new WeakMap<Client, Sources>();
 
 export function useQuery<Data = any, Variables = object>(
@@ -105,7 +105,7 @@ export function useQuery<Data = any, Variables = object>(
   const makeQuery$ = useCallback(
     (opts?: Partial<OperationContext>) => {
       let sources = sourcesByClient.get(client);
-      if (!sources) sourcesByClient.set(client, (sources = new Map()))
+      if (!sources) sourcesByClient.set(client, (sources = new Map()));
 
       // Determine whether suspense is enabled for the given operation
       const suspense = isSuspense(client, args.context);
@@ -187,7 +187,7 @@ export function useQuery<Data = any, Variables = object>(
 
   useEffect(() => {
     let sources = sourcesByClient.get(client);
-    if (!sources) sourcesByClient.set(client, (sources = new Map()))
+    if (!sources) sourcesByClient.set(client, (sources = new Map()));
 
     sources.delete(request.key); // Delete any cached suspense source
     if (!isSuspense(client, args.context)) update(query$);
