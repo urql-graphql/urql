@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import Fuse from 'fuse.js';
 import { useBasepath } from 'react-static';
 import { Link, useLocation } from 'react-router-dom';
 import * as path from 'path';
 
-import { useMarkdownTree, useMarkdownPage } from 'react-static-plugin-md-pages';
+import { useMarkdownPage, useMarkdownTree } from 'react-static-plugin-md-pages';
 
 import {
   SidebarNavItem,
@@ -17,6 +18,7 @@ import {
   SideBarStripes,
   ChevronItem,
 } from './navigation';
+import SidebarSearchInput from './sidebar-search-input';
 
 import logoSidebar from '../assets/sidebar-badge.svg';
 
@@ -79,9 +81,77 @@ export const SidebarStyling = ({ children, sidebarOpen, closeSidebar }) => {
   );
 };
 
+const getMatchTree = (() => {
+  const sortByRefIndex = (a, b) => a.refIndex - b.refIndex;
+
+  const titleLocation = 'frontmatter.title';
+  const options = {
+    distance: 100,
+    findAllMatches: true,
+    includeMatches: true,
+    keys: [titleLocation, `children.${titleLocation}`],
+    threshold: 0.2,
+  };
+
+  return (children, pattern) => {
+    const fuse = new Fuse(children, options);
+    let matches = fuse.search(pattern);
+    return matches
+      .reduce((matches, match) => {
+        // Add the top level heading but don't add subheadings unless they match
+        const currentItem = {
+          ...match.item,
+          refIndex: match.refIndex,
+          children: [],
+        };
+        // For every match, add the matching indices
+        // For child matches, add the matching sorted children
+        match.matches.forEach(individualMatch => {
+          const isTopLevel = individualMatch.key === titleLocation;
+          if (isTopLevel) {
+            currentItem.matchedIndices = individualMatch.indices;
+          } else {
+            currentItem.children.push({
+              ...match.item.children[individualMatch.refIndex],
+              refIndex: individualMatch.refIndex,
+              matchedIndices: individualMatch.indices,
+            });
+          }
+        });
+        if (currentItem.children.length) {
+          currentItem.children.sort(sortByRefIndex);
+        }
+        return [...matches, currentItem];
+      }, [])
+      .sort(sortByRefIndex);
+  };
+})();
+
+// Wrap matching substrings in <strong>
+const highlightText = (text, indices) => (
+  <>
+    {indices.map(([startIndex, endIndex], i) => {
+      const isLastIndex = !indices[i + 1];
+      const prevEndIndex = indices[i - 1] ? indices[i - 1][1] : -1;
+
+      return (
+        <>
+          {startIndex != 0 ? text.slice(prevEndIndex + 1, startIndex) : ''}
+          <strong>{text.slice(startIndex, endIndex + 1)}</strong>
+          {isLastIndex && endIndex < text.length
+            ? text.slice(endIndex + 1, text.length)
+            : ''}
+        </>
+      );
+    })}
+  </>
+);
+
 const Sidebar = props => {
+  const [filterTerm, setFilterTerm] = useState('');
   const location = useLocation();
   const tree = useMarkdownTree();
+  const page = useMarkdownPage();
 
   const sidebarItems = useMemo(() => {
     let pathname = location.pathname.match(/docs\/?(.+)?/);
@@ -97,6 +167,10 @@ const Sidebar = props => {
       children = [{ ...tree, children: undefined }, ...children];
     }
 
+    if (filterTerm) {
+      children = getMatchTree(children, filterTerm);
+    }
+
     return children.map(page => {
       const pageChildren = page.children || [];
 
@@ -104,17 +178,22 @@ const Sidebar = props => {
         ? trimmedPathname.startsWith(page.path)
         : !!page.path.match(new RegExp(`${trimmedPathname}$`, 'g'));
 
+      const showSubItems = !!filterTerm || (pageChildren.length && isActive);
+
       return (
         <Fragment key={page.key}>
           <SidebarNavItem
             to={relative(pathname, page.path)}
+            // If there is an active filter term in place, expand all headings
             isActive={() => isActive}
           >
-            {page.frontmatter.title}
+            {page.matchedIndices
+              ? highlightText(page.frontmatter.title, page.matchedIndices)
+              : page.frontmatter.title}
             {pageChildren.length ? <ChevronItem /> : null}
           </SidebarNavItem>
 
-          {pageChildren.length && isActive ? (
+          {showSubItems ? (
             <SidebarNavSubItemWrapper>
               {pageChildren.map(childPage => (
                 <SidebarNavSubItem
@@ -126,7 +205,12 @@ const Sidebar = props => {
                   to={relative(pathname, childPage.path)}
                   key={childPage.key}
                 >
-                  {childPage.frontmatter.title}
+                  {childPage.matchedIndices
+                    ? highlightText(
+                        childPage.frontmatter.title,
+                        childPage.matchedIndices
+                      )
+                    : childPage.frontmatter.title}
                 </SidebarNavSubItem>
               ))}
             </SidebarNavSubItemWrapper>
@@ -134,9 +218,17 @@ const Sidebar = props => {
         </Fragment>
       );
     });
-  }, [location, tree]);
+  }, [location, tree, filterTerm]);
 
-  return <SidebarStyling {...props}>{sidebarItems}</SidebarStyling>;
+  return (
+    <SidebarStyling {...props}>
+      <SidebarSearchInput
+        onHandleInputChange={e => setFilterTerm(e.target.value)}
+        value={filterTerm}
+      />
+      {sidebarItems}
+    </SidebarStyling>
+  );
 };
 
 export default Sidebar;
