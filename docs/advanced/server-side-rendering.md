@@ -265,11 +265,6 @@ const TODOS_QUERY = `
   query { todos { id text } }
 `;
 
-const createUrqlClient = (ssr, ctx) => ({
-  url: "your-url"
-  exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange]
-});
-
 function Todos() {
   const [res] = useQuery({ query: TODOS_QUERY });
   return (
@@ -285,7 +280,10 @@ function Todos() {
 
 export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
-  const client = initUrqlClient(createUrqlClient(ssrCache, ctx));
+  const client = initUrqlClient({
+    url: "your-url",
+    exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange]
+  });
 
   // This query is used to populate the cache for the query
   // used on this page.
@@ -296,11 +294,14 @@ export async function getStaticProps(ctx) {
       // urqlState is a keyword here so withUrqlClient can pick it up.
       urqlState: ssrCache.extractData()
     },
+    revalidate: 600
   };
 }
 
 export default withUrqlClient(
-  createUrqlClient,
+  (ssr) => ({
+    url: "your-url"
+  }),
   { ssr: false } // Important so we don't wrap our component in getInitialProps
 )(Todos);
 ```
