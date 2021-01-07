@@ -55,13 +55,17 @@ export function useSource<T, R>(
   const [state, setState] = useState<R>(() => {
     currentInit = true;
     let state: R;
-    pipe(
-      transform(input$),
-      subscribe(value => {
-        state = value;
-      })
-    ).unsubscribe();
-    currentInit = false;
+    try {
+      pipe(
+        transform(input$),
+        subscribe(value => {
+          state = value;
+        })
+      ).unsubscribe();
+    } finally {
+      currentInit = false;
+    }
+
     return state!;
   });
 
