@@ -10,11 +10,11 @@ export const SidebarContainer = styled.div`
   right: 0;
   bottom: 0;
   min-height: 100%;
+  width: ${p => p.theme.layout.sidebar};
 
   @media ${({ theme }) => theme.media.sm} {
     display: block;
     position: relative;
-    width: ${p => p.theme.layout.sidebar};
     margin-left: calc(2 * ${p => p.theme.layout.stripes});
   }
 `;
@@ -49,12 +49,12 @@ export const SidebarWrapper = styled.aside`
   background-color: ${p => p.theme.colors.bg};
   border-right: 1px solid ${p => p.theme.colors.border};
   border-top: 1px solid ${p => p.theme.colors.border};
+  width: ${p => p.theme.layout.sidebar};
 
   @media ${({ theme }) => theme.media.sm} {
     border: none;
     background: none;
     padding-top: ${p => p.theme.spacing.md};
-    width: ${p => p.theme.layout.sidebar};
   }
 `;
 

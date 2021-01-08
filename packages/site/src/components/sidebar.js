@@ -23,30 +23,28 @@ import SidebarSearchInput from './sidebar-search-input';
 import logoSidebar from '../assets/sidebar-badge.svg';
 
 const HeroLogoLink = styled(Link)`
-  display: flex;
+  display: none;
   flex-direction: row;
   justify-content: center;
   margin-bottom: ${p => p.theme.spacing.sm};
   align-self: center;
+
+  @media ${p => p.theme.media.sm} {
+    display: flex;
+  }
 `;
 
 const HeroLogo = styled.img.attrs(() => ({
   src: logoSidebar,
   alt: 'urql',
 }))`
-  display: none;
   width: ${p => p.theme.layout.logo};
   height: ${p => p.theme.layout.logo};
-
-  @media ${p => p.theme.media.sm} {
-    display: block;
-  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: ${p => p.theme.spacing.xs};
   padding-bottom: ${p => p.theme.spacing.lg};
 `;
 
@@ -62,14 +60,14 @@ export const relative = (from, to) => {
   return { pathname };
 };
 
-export const SidebarStyling = ({ children, sidebarOpen, closeSidebar }) => {
+export const SidebarStyling = ({ children, sidebarOpen }) => {
   const basepath = useBasepath() || '';
   const homepage = basepath ? `/${basepath}/` : '/';
 
   return (
     <>
       <SideBarStripes />
-      <SidebarContainer hidden={!sidebarOpen} onClick={closeSidebar}>
+      <SidebarContainer hidden={!sidebarOpen}>
         <SidebarWrapper>
           <HeroLogoLink to={homepage}>
             <HeroLogo />
@@ -147,7 +145,7 @@ const highlightText = (text, indices) => (
   </>
 );
 
-const Sidebar = props => {
+const Sidebar = ({ closeSidebar, ...props }) => {
   const [filterTerm, setFilterTerm] = useState('');
   const location = useLocation();
   const tree = useMarkdownTree();
@@ -186,6 +184,7 @@ const Sidebar = props => {
             to={relative(pathname, page.path)}
             // If there is an active filter term in place, expand all headings
             isActive={() => isActive}
+            onClick={closeSidebar}
           >
             {page.matchedIndices
               ? highlightText(page.frontmatter.title, page.matchedIndices)
@@ -218,7 +217,7 @@ const Sidebar = props => {
         </Fragment>
       );
     });
-  }, [location, tree, filterTerm]);
+  }, [location, tree, filterTerm, closeSidebar]);
 
   return (
     <SidebarStyling {...props}>
