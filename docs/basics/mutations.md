@@ -45,6 +45,11 @@ Unlike the `useQuery` hook, the `useMutation` hook doesn't execute automatically
 our example, no mutation will be performed. To execute our mutation we instead have to call the
 execute function — `updateTodo` in our example — which is the second item in the tuple.
 
+### Updating the cache after a mutation
+
+If a mutation updates a single existing entity, `urql` can automatically update that entity’s value in its cache. To do so, the mutation must return the id of the modified entity, along with the values of the fields that were modified. You can clearly see that in the example above.
+However if mutation affects other entities, you may want to [set up manual updates that react to mutations.](https://formidable.com/open-source/urql/docs/graphcache/custom-updates/)
+
 ### Using the mutation result
 
 When calling our `updateTodo` function we have two ways of getting to the result as it comes back
