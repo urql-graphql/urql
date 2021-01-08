@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 3.3.4
+
+### Patch Changes
+
+- ⚠️ Fix, add null as a possible type for the variables argument in `cache.invalidate`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1269](https://github.com/FormidableLabs/urql/pull/1269))
+
 ## 3.3.3
 
 ### Patch Changes
