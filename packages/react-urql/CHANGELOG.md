@@ -1,5 +1,11 @@
 # urql
 
+## 1.11.5
+
+### Patch Changes
+
+- ⚠️ Fix Suspense when results share data, this would return partial results for graphCache and not update to the eventual data, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1282](https://github.com/FormidableLabs/urql/pull/1282))
+
 ## 1.11.4
 
 ### Patch Changes
