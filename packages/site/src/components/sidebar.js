@@ -82,43 +82,84 @@ export const SidebarStyling = ({ children, sidebarOpen }) => {
 const getMatchTree = (() => {
   const sortByRefIndex = (a, b) => a.refIndex - b.refIndex;
 
-  const titleLocation = 'frontmatter.title';
   const options = {
     distance: 100,
     findAllMatches: true,
     includeMatches: true,
-    keys: [titleLocation, `children.${titleLocation}`],
+    keys: [
+      'frontmatter.title',
+      `children.frontmatter.title`,
+      'children.headings.value',
+    ],
     threshold: 0.2,
   };
 
   return (children, pattern) => {
-    const fuse = new Fuse(children, options);
+    // Filter any nested heading with a depth greater than 2
+    const childrenMaxH3 = children.map(child => ({
+      ...child,
+      children:
+        child.children &&
+        child.children.map(child => ({
+          ...child,
+          headings: child.headings.filter(heading => heading.depth == 2),
+        })),
+    }));
+
+    const fuse = new Fuse(childrenMaxH3, options);
     let matches = fuse.search(pattern);
+
+    // For every matching section, include only matching headers
     return matches
       .reduce((matches, match) => {
+        const matchesMap = new Map();
+        match.matches.forEach(individualMatch => {
+          matchesMap.set(individualMatch.value, {
+            indices: individualMatch.indices,
+          });
+        });
+
         // Add the top level heading but don't add subheadings unless they match
         const currentItem = {
           ...match.item,
+          matchedIndices: match.indices,
           refIndex: match.refIndex,
-          children: [],
         };
-        // For every match, add the matching indices
-        // For child matches, add the matching sorted children
-        match.matches.forEach(individualMatch => {
-          const isTopLevel = individualMatch.key === titleLocation;
-          if (isTopLevel) {
-            currentItem.matchedIndices = individualMatch.indices;
-          } else {
-            currentItem.children.push({
-              ...match.item.children[individualMatch.refIndex],
-              refIndex: individualMatch.refIndex,
-              matchedIndices: individualMatch.indices,
-            });
-          }
-        });
-        if (currentItem.children.length) {
-          currentItem.children.sort(sortByRefIndex);
+
+        // For every child of the currently matched section, add all appplicable
+        // H2 and H3 headers plus their indices
+        if (currentItem.children) {
+          currentItem.children = currentItem.children.reduce(
+            (children, child) => {
+              const newChild = { ...child };
+              newChild.headings = newChild.headings.reduce(
+                (headings, header) => {
+                  const match = matchesMap.get(header.value);
+                  if (match) {
+                    headings.push({
+                      ...header,
+                      matchedIndices: match.indices,
+                    });
+                  }
+                  return headings;
+                },
+                []
+              );
+
+              const match = matchesMap.get(newChild.frontmatter.title);
+              if (match) {
+                newChild.matchedIndices = match.indices;
+              }
+
+              if (match || newChild.headings.length > 0) {
+                children.push(newChild);
+              }
+              return children;
+            },
+            []
+          );
         }
+
         return [...matches, currentItem];
       }, [])
       .sort(sortByRefIndex);
@@ -195,22 +236,35 @@ const Sidebar = ({ closeSidebar, ...props }) => {
           {showSubItems ? (
             <SidebarNavSubItemWrapper>
               {pageChildren.map(childPage => (
-                <SidebarNavSubItem
-                  isActive={() =>
-                    !!childPage.path.match(
-                      new RegExp(`${trimmedPathname}$`, 'g')
-                    )
-                  }
-                  to={relative(pathname, childPage.path)}
-                  key={childPage.key}
-                >
-                  {childPage.matchedIndices
-                    ? highlightText(
-                        childPage.frontmatter.title,
-                        childPage.matchedIndices
+                <Fragment key={childPage.key}>
+                  <SidebarNavSubItem
+                    isActive={() =>
+                      !!childPage.path.match(
+                        new RegExp(`${trimmedPathname}$`, 'g')
                       )
-                    : childPage.frontmatter.title}
-                </SidebarNavSubItem>
+                    }
+                    to={relative(pathname, childPage.path)}
+                  >
+                    {childPage.matchedIndices
+                      ? highlightText(
+                          childPage.frontmatter.title,
+                          childPage.matchedIndices
+                        )
+                      : childPage.frontmatter.title}
+                  </SidebarNavSubItem>
+                  {/* Only Show H3 items if there is a search applied */}
+                  {filterTerm
+                    ? childPage.headings.map(heading => (
+                        <SidebarNavSubItem
+                          to={relative(pathname, childPage.path)}
+                          key={heading.value}
+                          nested={true}
+                        >
+                          {highlightText(heading.value, heading.matchedIndices)}
+                        </SidebarNavSubItem>
+                      ))
+                    : null}
+                </Fragment>
               ))}
             </SidebarNavSubItemWrapper>
           ) : null}

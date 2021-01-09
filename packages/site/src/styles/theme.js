@@ -30,7 +30,7 @@ export const layout = {
   page: '144rem',
   header: '4.8rem',
   stripes: '0.7rem',
-  sidebar: '26rem',
+  sidebar: '28rem',
   legend: '22rem',
   logo: '12rem',
 };

@@ -107,7 +107,8 @@ export const SidebarNavSubItem = styled(NavLink).attrs(() => ({}))`
   color: ${p => p.theme.colors.passive};
   font-weight: ${p => p.theme.fontWeights.body};
   text-decoration: none;
-  margin-top: ${p => p.theme.spacing.xs};
+  margin: ${p =>
+    `${p.theme.spacing.xs} 0 0 ${p.nested ? p.theme.spacing.sm : 0}`};
 
   &:first-child {
     margin-top: 0;
