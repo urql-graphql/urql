@@ -339,12 +339,12 @@ For instance we may start out with a paused store and then unpause it once a cal
 
   query(todo);
 
-  function nextPage() {
+  function unpause() {
     $todo.context.pause = false;
   }
 </script>
 
-<button on:click="{unpause}">Unpause</button>
+<button on:click={unpause}>Unpause</button>
 ```
 
 ### Request Policies
