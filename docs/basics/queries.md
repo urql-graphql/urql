@@ -344,7 +344,7 @@ For instance we may start out with a paused store and then unpause it once a cal
   }
 </script>
 
-<button on:click="{unpause}">Unpause</button>
+<button on:click={unpause}>Unpause</button>
 ```
 
 ### Request Policies
