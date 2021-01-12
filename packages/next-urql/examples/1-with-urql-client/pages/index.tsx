@@ -1,19 +1,15 @@
 import React from 'react';
-import { NextComponentType } from 'next';
+import { NextPage } from 'next';
 import Head from 'next/head';
 import { withUrqlClient, NextUrqlPageContext } from 'next-urql';
 import fetch from 'isomorphic-unfetch';
 import PokémonList from '../components/pokemon_list';
 
 interface InitialProps {
-  title: string;
+  title?: string;
 }
 
-const Home: NextComponentType<
-  NextUrqlPageContext,
-  InitialProps,
-  InitialProps
-> = ({ title }) => (
+const Home: NextPage<InitialProps, InitialProps> = ({ title }) => (
   <div>
     <Head>
       <title>Home</title>
@@ -30,7 +26,7 @@ Home.getInitialProps = () => {
   };
 };
 
-export default withUrqlClient((_ssr: object, ctx: NextUrqlPageContext) => {
+export default withUrqlClient((_ssr: object, ctx?: NextUrqlPageContext) => {
   return {
     url: 'https://graphql-pokemon.now.sh',
     fetchOptions: {

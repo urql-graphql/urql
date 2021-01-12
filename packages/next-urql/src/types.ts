@@ -4,9 +4,11 @@ import { ClientOptions, Exchange, Client } from 'urql';
 
 export interface PartialNextContext {
   res?: any;
-  AppTree?: NextComponentType<PartialNextContext>;
+  AppTree: NextComponentType<PartialNextContext>;
   Component?: NextComponentType<PartialNextContext>;
   ctx?: PartialNextContext;
+  pathname: any;
+  query: any;
   [key: string]: any;
 }
 
@@ -18,17 +20,20 @@ export type NextComponentType<
   getInitialProps?(context: C): IP | Promise<IP>;
 };
 
-export type NextUrqlClientConfig = (
-  ssrExchange: SSRExchange,
-  ctx?: PartialNextContext
-) => ClientOptions;
-
 export interface NextUrqlContext extends PartialNextContext {
   urqlClient: Client;
+  Component: NextComponentType<PartialNextContext>;
+  ctx: NextUrqlContext;
+  router: any;
 }
 
 export type NextUrqlPageContext = NextUrqlContext;
 export type NextUrqlAppContext = NextUrqlContext;
+
+export type NextUrqlClientConfig = (
+  ssrExchange: SSRExchange,
+  ctx?: NextUrqlContext
+) => ClientOptions;
 
 export interface WithUrqlState {
   urqlState?: SSRData;
@@ -40,6 +45,7 @@ export interface WithUrqlClient {
 
 export interface WithUrqlProps extends WithUrqlClient, WithUrqlState {
   resetUrqlClient?: () => void;
+  pageProps: any;
   [key: string]: any;
 }
 

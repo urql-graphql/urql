@@ -3,7 +3,7 @@ import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
 
-import { withUrqlClient, NextUrqlPageContext } from '..';
+import { withUrqlClient, NextUrqlPageContext, PartialNextContext } from '..';
 import * as init from '../init-urql-client';
 
 beforeEach(jest.clearAllMocks);
@@ -31,7 +31,7 @@ describe('withUrqlClient', () => {
       })(MockApp);
     });
 
-    const mockContext: NextUrqlPageContext = {
+    const mockContext: PartialNextContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -68,7 +68,7 @@ describe('withUrqlClient', () => {
     const token = Math.random().toString(36).slice(-10);
     let mockSsrExchange;
 
-    const mockContext: NextUrqlPageContext = {
+    const mockContext = ({
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -79,7 +79,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    };
+    } as unknown) as NextUrqlPageContext;
 
     beforeEach(() => {
       Component = withUrqlClient(
@@ -109,7 +109,7 @@ describe('withUrqlClient', () => {
   });
 
   it('should not bind getInitialProps when there are no options', async () => {
-    const mockContext: NextUrqlPageContext = {
+    const mockContext = ({
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -120,7 +120,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    };
+    } as unknown) as NextUrqlPageContext;
     const Component = withUrqlClient(
       (ssrExchange, ctx) => ({
         url: 'http://localhost:3000',
@@ -168,7 +168,7 @@ describe('withUrqlClient', () => {
     const token = Math.random().toString(36).slice(-10);
     let mockSsrExchange;
 
-    const mockContext: NextUrqlPageContext = {
+    const mockContext = ({
       AppTree: MockAppTree,
       pathname: '/',
       query: {},
@@ -179,7 +179,7 @@ describe('withUrqlClient', () => {
         },
       } as NextUrqlPageContext['req'],
       urqlClient: {} as Client,
-    };
+    } as unknown) as NextUrqlPageContext;
 
     beforeEach(() => {
       Component = withUrqlClient(
