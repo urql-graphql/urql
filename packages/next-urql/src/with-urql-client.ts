@@ -16,9 +16,9 @@ import {
   NextUrqlContext,
   WithUrqlProps,
   WithUrqlClientOptions,
-  PartialNextContext,
   NextComponentType,
   SSRExchange,
+  NextUrqlPageContext,
 } from './types';
 
 let ssr: SSRExchange;
@@ -87,7 +87,7 @@ export function withUrqlClient(
     withUrql.displayName = `withUrqlClient(${displayName})`;
 
     if (AppOrPage.getInitialProps || options!.ssr) {
-      withUrql.getInitialProps = async (appOrPageCtx: PartialNextContext) => {
+      withUrql.getInitialProps = async (appOrPageCtx: NextUrqlPageContext) => {
         const AppTree = appOrPageCtx.AppTree!;
 
         // Determine if we are wrapping an App component or a Page component.
@@ -115,7 +115,9 @@ export function withUrqlClient(
         // Run the wrapped component's getInitialProps function.
         let pageProps = {} as any;
         if (AppOrPage.getInitialProps) {
-          pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
+          pageProps = await AppOrPage.getInitialProps(
+            appOrPageCtx as NextUrqlPageContext
+          );
         }
 
         // Check the window object to determine whether or not we are on the server.

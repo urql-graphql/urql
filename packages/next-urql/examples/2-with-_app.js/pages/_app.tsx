@@ -18,6 +18,5 @@ App.getInitialProps = async (ctx: NextUrqlAppContext) => {
 };
 
 export default withUrqlClient(() => ({ url: 'https://graphql-pokemon.now.sh', fetch }))(
-  // @ts-ignore
   App
 );
