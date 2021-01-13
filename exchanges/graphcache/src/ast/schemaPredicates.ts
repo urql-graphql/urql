@@ -177,6 +177,18 @@ function warnAboutResolver(name: string): void {
   );
 }
 
+function warnAboutAbstractResolver(
+  name: string,
+  kind: 'UNION' | 'INTERFACE'
+): void {
+  warn(
+    `Invalid resolver: \`${name}\` does not match to a concrete type in the schema, but the \`resolvers\` option is referencing it. Implement the resolver for the types that ${
+      kind === 'UNION' ? 'make up the union' : 'implement the interface'
+    } instead.`,
+    26
+  );
+}
+
 export function expectValidResolversConfig(
   schema: SchemaIntrospector,
   resolvers: ResolverConfig
@@ -201,6 +213,14 @@ export function expectValidResolversConfig(
     } else {
       if (!schema.types[key]) {
         warnAboutResolver(key);
+      } else if (
+        schema.types[key].kind === 'INTERFACE' ||
+        schema.types[key].kind === 'UNION'
+      ) {
+        warnAboutAbstractResolver(
+          key,
+          schema.types[key].kind as 'INTERFACE' | 'UNION'
+        );
       } else {
         const validTypeProperties = (schema.types[key] as SchemaObject).fields;
         for (const resolverProperty in resolvers[key]) {
