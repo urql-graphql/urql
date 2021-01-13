@@ -36,7 +36,7 @@ export function withUrqlClient(
       (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
 
-    const withUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
+    const WithUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const forceUpdate = useState(0);
 
@@ -84,10 +84,10 @@ export function withUrqlClient(
 
     // Set the displayName to indicate use of withUrqlClient.
     const displayName = AppOrPage.displayName || AppOrPage.name || 'Component';
-    withUrql.displayName = `withUrqlClient(${displayName})`;
+    WithUrql.displayName = `withUrqlClient(${displayName})`;
 
     if (AppOrPage.getInitialProps || options!.ssr) {
-      withUrql.getInitialProps = async (appOrPageCtx: NextUrqlPageContext) => {
+      WithUrql.getInitialProps = async (appOrPageCtx: NextUrqlPageContext) => {
         const AppTree = appOrPageCtx.AppTree!;
 
         // Determine if we are wrapping an App component or a Page component.
@@ -143,6 +143,6 @@ export function withUrqlClient(
       };
     }
 
-    return withUrql;
+    return WithUrql;
   };
 }
