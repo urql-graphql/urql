@@ -58,6 +58,7 @@ let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
+let currentLayer: null | number = null;
 let currentOptimistic = false;
 
 const makeNodeMap = <T>(): NodeMap<T> => ({
@@ -76,6 +77,7 @@ export const initDataState = (
   currentData = data;
   currentDependencies = makeDict();
   currentOptimistic = !!isOptimistic;
+  currentLayer = layerKey;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
   }
@@ -238,11 +240,15 @@ const getNode = <T>(
   fieldKey: string
 ): T | undefined => {
   let node: Dict<T | undefined> | undefined;
+  let skip =
+    currentOperation !== 'write' &&
+    currentData!.commutativeKeys.has(currentLayer!);
 
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const layerKey = currentData!.optimisticOrder[i];
     const optimistic = map.optimistic[layerKey];
+    skip = skip && layerKey !== currentLayer;
     // If the node and node value exists it is returned, including undefined
     if (
       optimistic &&
