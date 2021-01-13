@@ -379,8 +379,6 @@ on the default names `"Mutation"` and `"Subscription"`.
 
 ## (26) Invalid abstract resolver
 
-Invalid resolver: \`${name}\` does not match to a concrete type in the schema, but the \`resolvers\` option is referencing it. Implement the resolver for the types that ${kind === 'UNION' ? 'make up the union' : 'implement the interface'} instead.
-
 > Invalid resolver: `???` does not map to a concrete type in the schema,
 > but the resolvers option is referencing it. Implement the resolver for the types that `??` instead.
 
