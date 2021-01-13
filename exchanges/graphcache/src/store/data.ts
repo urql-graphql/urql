@@ -238,14 +238,23 @@ const getNode = <T>(
   fieldKey: string
 ): T | undefined => {
   let node: Dict<T | undefined> | undefined;
-
+  // A read may be initialised to skip layers until its own, which is useful for
+  // reading back written data. It won't skip over optimistic layers however
+  let skip =
+    !currentOptimistic &&
+    currentOperation === 'read' &&
+    currentOptimisticKey &&
+    currentData!.commutativeKeys.has(currentOptimisticKey);
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const layerKey = currentData!.optimisticOrder[i];
     const optimistic = map.optimistic[layerKey];
+    // If we're reading starting from a specific layer, we skip until a match
+    skip = skip && layerKey !== currentOptimisticKey;
     // If the node and node value exists it is returned, including undefined
     if (
       optimistic &&
+      (!skip || !currentData!.commutativeKeys.has(layerKey)) &&
       (!currentOptimistic ||
         currentOperation === 'write' ||
         currentData!.commutativeKeys.has(layerKey)) &&
