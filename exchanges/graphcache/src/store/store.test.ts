@@ -320,6 +320,26 @@ describe('Store with ResolverConfig', () => {
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#23');
   });
 
+  it('should warn when we use an interface type', function () {
+    new Store({
+      schema: minifyIntrospectionQuery(
+        require('../test-utils/simple_schema.json')
+      ),
+      resolvers: {
+        ITodo: {
+          complete: () => true,
+        },
+      },
+    });
+
+    expect(console.warn).toBeCalledTimes(1);
+    const warnMessage = mocked(console.warn).mock.calls[0][0];
+    expect(warnMessage).toContain(
+      'Invalid resolver: `ITodo` does not match to a concrete type in the schema, but the `resolvers` option is referencing it. Implement the resolver for the types that implement the interface instead.'
+    );
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#26');
+  });
+
   it("should warn if a type's property doesn't exist in the schema", function () {
     new Store({
       schema: minifyIntrospectionQuery(

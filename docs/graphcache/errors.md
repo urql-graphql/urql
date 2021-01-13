@@ -376,3 +376,17 @@ schema {
 
 Where `YourMutation` and `YourSubscription` are your custom Operation Root Types, instead of relying
 on the default names `"Mutation"` and `"Subscription"`.
+
+## (26) Invalid abstract resolver
+
+Invalid resolver: \`${name}\` does not match to a concrete type in the schema, but the \`resolvers\` option is referencing it. Implement the resolver for the types that ${kind === 'UNION' ? 'make up the union' : 'implement the interface'} instead.
+
+> Invalid resolver: `???` does not map to a concrete type in the schema,
+> but the resolvers option is referencing it. Implement the resolver for the types that `??` instead.
+
+When you're passing an introspected schema to the cache exchange, it is
+able to check whether your `opts.resolvers` is valid.
+This error occurs when you are using an `interface` or `union` rather than an
+implemented type for these.
+
+Check the type mentioned and change it to one of the specific types.
