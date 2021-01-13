@@ -239,6 +239,15 @@ const getNode = <T>(
 ): T | undefined => {
   let node: Dict<T | undefined> | undefined;
 
+  if (
+    currentOperation === 'read' &&
+    currentOptimisticKey &&
+    map.optimistic[currentOptimisticKey]
+  ) {
+    node = map.optimistic[currentOptimisticKey].get(entityKey);
+    if (node !== undefined && fieldKey in node) return node[fieldKey];
+  }
+
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const layerKey = currentData!.optimisticOrder[i];

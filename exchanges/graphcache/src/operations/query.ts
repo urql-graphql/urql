@@ -61,9 +61,10 @@ export interface QueryResult {
 export const query = (
   store: Store,
   request: OperationRequest,
-  data?: Data
+  data?: Data,
+  key?: number
 ): QueryResult => {
-  initDataState('read', store.data, null);
+  initDataState('read', store.data, (data && key) || null);
   const result = read(store, request, data);
   clearDataState();
   return result;
