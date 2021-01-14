@@ -9,6 +9,7 @@ import {
   concat,
   fromValue,
   switchMap,
+  filter,
   map,
   scan,
 } from 'wonka';
@@ -54,10 +55,10 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 /** Convert the Source to a React Suspense source on demand */
 function toSuspenseSource<T>(source: Source<T>): Source<T> {
   const shared = share(source);
-  let cache: T | void;
+  let cache: T | undefined;
   let resolve: (value: T) => void;
 
-  return sink => {
+  const suspend$: Source<T> = sink => {
     let hasSuspended = false;
 
     pipe(
@@ -73,11 +74,7 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 
     // If we haven't got a previous result then start suspending
     // otherwise issue the last known result immediately
-    if (cache !== undefined) {
-      const signal = [cache] as [T] & { tag: 1 };
-      signal.tag = 1;
-      sink(signal);
-    } else {
+    if (cache === undefined) {
       hasSuspended = true;
       sink(0 /* End */);
       throw new Promise<T>(_resolve => {
@@ -85,6 +82,15 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
       });
     }
   };
+
+  return concat([
+    pipe(
+      fromValue<T>(cache!),
+      map<T, T>(() => cache!),
+      filter(x => x !== undefined)
+    ),
+    suspend$,
+  ]);
 }
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
