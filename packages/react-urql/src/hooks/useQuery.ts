@@ -63,7 +63,7 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
       shared,
       onPush(result => {
         // The first result that is received will resolve the Suspense promise
-        if (cache === undefined) resolve(result);
+        if (resolve && cache === undefined) resolve(result);
         cache = result;
       })
     )(sink);
