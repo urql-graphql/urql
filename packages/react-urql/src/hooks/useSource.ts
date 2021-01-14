@@ -5,6 +5,7 @@ import {
   Source,
   fromValue,
   makeSubject,
+  takeWhile,
   pipe,
   map,
   concat,
@@ -58,6 +59,7 @@ export function useSource<T, R>(
     try {
       pipe(
         transform(input$),
+        takeWhile(() => currentInit),
         subscribe(value => {
           state = value;
         })
