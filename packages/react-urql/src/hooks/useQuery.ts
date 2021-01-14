@@ -182,7 +182,7 @@ export function useQuery<Data = any, Variables = object>(
 
   useEffect(() => {
     sources.delete(request.key); // Delete any cached suspense source
-    if (isSuspense(client, args.context)) update(query$);
+    if (!isSuspense(client, args.context)) update(query$);
   }, [update, client, query$, request, args.context]);
 
   if (isSuspense(client, args.context)) update(query$);
