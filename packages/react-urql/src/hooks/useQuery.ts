@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
   Source,
@@ -181,13 +181,23 @@ export function useQuery<Data = any, Variables = object>(
     [update, makeQuery$]
   );
 
+  const [suspend, setSuspend] = useState<[Promise<any> | null]>([null]);
+
   useEffect(() => {
-    sources.delete(request.key); // Delete any cached suspense source
-    if (!isSuspense(client, args.context)) update(query$);
+    try {
+      sources.delete(request.key); // Delete any cached suspense source
+      update(query$);
+    } catch (promise) {
+      if (promise != null && promise.then) {
+        setSuspend([promise]);
+      }
+    }
   }, [update, client, query$, request, args.context]);
 
-  if (isSuspense(client, args.context)) {
-    update(query$);
+  if (suspend[0]) {
+    const promise = suspend[0];
+    suspend[0] = null;
+    throw promise;
   }
 
   return [state, executeQuery];
