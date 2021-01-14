@@ -5,8 +5,8 @@ import {
   Source,
   pipe,
   share,
-  takeWhile,
   concat,
+  onPush,
   fromValue,
   switchMap,
   filter,
@@ -59,24 +59,17 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
   let resolve: (value: T) => void;
 
   const suspend$: Source<T> = sink => {
-    let hasSuspended = false;
-
     pipe(
       shared,
-      takeWhile(result => {
-        // The first result that is received will resolve the suspense
-        // promise after waiting for a microtick
-        if (cache === undefined) Promise.resolve(result).then(resolve);
+      onPush(result => {
+        // The first result that is received will resolve the Suspense promise
+        if (cache === undefined) resolve(result);
         cache = result;
-        return !hasSuspended;
       })
     )(sink);
 
-    // If we haven't got a previous result then start suspending
-    // otherwise issue the last known result immediately
+    // If we haven't got a previous result then throw a Suspense promise
     if (cache === undefined) {
-      hasSuspended = true;
-      sink(0 /* End */);
       throw new Promise<T>(_resolve => {
         resolve = _resolve;
       });
