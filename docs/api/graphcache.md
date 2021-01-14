@@ -315,8 +315,9 @@ cache.readFragment(
 ); // Data or null
 ```
 
-Note that the `__typename` may be left out on the partial entity, since the `__typename` is already
-present on the fragment itself.
+Note that the `__typename` may be left out on the partial entity if the fragment isn't on an
+interface or union type, since in that case the `__typename` is already present on the fragment
+itself.
 
 If any fields on the fragment require variables, you can pass them as the third argument like so:
 
