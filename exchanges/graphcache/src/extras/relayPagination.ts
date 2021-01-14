@@ -240,8 +240,8 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
       } else if (typeof args.last === 'number') {
-        endEdges = concatEdges(cache, endEdges, page.edges);
-        endNodes = concatNodes(endNodes, page.nodes);
+        endEdges = concatEdges(cache, page.edges, endEdges);
+        endNodes = concatNodes(page.nodes, endNodes);
         pageInfo = page.pageInfo;
       } else {
         startEdges = concatEdges(cache, startEdges, page.edges);
