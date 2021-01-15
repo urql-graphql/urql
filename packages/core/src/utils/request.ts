@@ -33,24 +33,22 @@ export const stringifyDocument = (
     } else {
       str = print(str);
     }
+
+    // Add location information to stringified node
+    if (!(node as WritableLocation).loc) {
+      (node as WritableLocation).loc = {
+        start: 0,
+        end: str.length,
+        source: {
+          body: str,
+          name: 'gql',
+          locationOffset: { line: 1, column: 1 },
+        },
+      } as Location;
+    }
   }
 
-  str = str.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim();
-
-  // Add location information to stringified node
-  if (typeof node !== 'string' && !node.loc) {
-    (node as WritableLocation).loc = {
-      start: 0,
-      end: str.length,
-      source: {
-        body: str,
-        name: 'gql',
-        locationOffset: { line: 1, column: 1 },
-      },
-    } as Location;
-  }
-
-  return str;
+  return str.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim();
 };
 
 const docs = new Map<number, KeyedDocumentNode>();
