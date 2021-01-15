@@ -2,4 +2,4 @@
 '@urql/exchange-graphcache': patch
 ---
 
-Fix relay-pagination would bug out when requesting overlapping pages through the last parameter.
+Fix a Relay Pagination edge case where overlapping ends of pages queried using the `last` argument would be in reverse order.
