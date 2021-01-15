@@ -21,6 +21,7 @@ import {
   RequestPolicy,
   OperationResult,
   Operation,
+  GraphQLRequest,
 } from '@urql/core';
 
 import { useClient } from '../context';
@@ -90,7 +91,10 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-const sources = new Map<number, Source<OperationResult>>();
+const sources = new WeakMap<
+  GraphQLRequest<any, any>,
+  Source<OperationResult>
+>();
 
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
@@ -106,7 +110,7 @@ export function useQuery<Data = any, Variables = object>(
       // Determine whether suspense is enabled for the given operation
       const suspense = isSuspense(client, args.context);
       let source: Source<OperationResult> | void = suspense
-        ? sources.get(request.key)
+        ? sources.get(request)
         : undefined;
 
       if (!source) {
@@ -121,7 +125,7 @@ export function useQuery<Data = any, Variables = object>(
         if (suspense) {
           source = toSuspenseSource(source);
           if (typeof window !== 'undefined') {
-            sources.set(request.key, source);
+            sources.set(request, source);
           }
         }
       }
@@ -182,7 +186,7 @@ export function useQuery<Data = any, Variables = object>(
   );
 
   useEffect(() => {
-    sources.delete(request.key); // Delete any cached suspense source
+    sources.delete(request); // Delete any cached suspense source
     if (!isSuspense(client, args.context)) update(query$);
   }, [update, client, query$, request, args.context]);
 
