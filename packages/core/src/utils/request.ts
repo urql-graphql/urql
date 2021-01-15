@@ -24,25 +24,28 @@ export interface KeyedDocumentNode extends DocumentNode {
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
-  // Stringify or normalise input
-  const str = (typeof node !== 'string'
+  let str = (typeof node !== 'string'
     ? (node.loc && node.loc.source.body) || print(node)
     : node
   )
     .replace(/([\s,]|#[^\n\r]+)+/g, ' ')
     .trim();
 
-  // Add location information to stringified node
-  if (typeof node !== 'string' && !node.loc) {
-    (node as WritableLocation).loc = {
-      start: 0,
-      end: str.length,
-      source: {
-        body: str,
-        name: 'gql',
-        locationOffset: { line: 1, column: 1 },
-      },
-    } as Location;
+  if (typeof node !== 'string') {
+    if (node.loc) {
+      const operationName = 'definitions' in node && getOperationName(node);
+      if (operationName) str = `# ${operationName}\n${str}`;
+    } else {
+      (node as WritableLocation).loc = {
+        start: 0,
+        end: str.length,
+        source: {
+          body: str,
+          name: 'gql',
+          locationOffset: { line: 1, column: 1 },
+        },
+      } as Location;
+    }
   }
 
   return str;
