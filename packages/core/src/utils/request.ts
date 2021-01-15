@@ -24,18 +24,18 @@ export interface KeyedDocumentNode extends DocumentNode {
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
-  let str = node;
-  if (typeof str !== 'string') {
-    if (str.loc && str.loc.source.body) {
-      const operationName = 'definitions' in str && getOperationName(str);
-      str = str.loc.source.body;
+  let str = (typeof node !== 'string'
+    ? (node.loc && node.loc.source.body) || print(node)
+    : node
+  )
+    .replace(/([\s,]|#[^\n\r]+)+/g, ' ')
+    .trim();
+
+  if (typeof node !== 'string') {
+    if (node.loc) {
+      const operationName = 'definitions' in node && getOperationName(node);
       if (operationName) str = `# ${operationName}\n${str}`;
     } else {
-      str = print(str);
-    }
-
-    // Add location information to stringified node
-    if (!(node as WritableLocation).loc) {
       (node as WritableLocation).loc = {
         start: 0,
         end: str.length,
@@ -48,7 +48,7 @@ export const stringifyDocument = (
     }
   }
 
-  return str.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim();
+  return str;
 };
 
 const docs = new Map<number, KeyedDocumentNode>();
