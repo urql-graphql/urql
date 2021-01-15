@@ -5,10 +5,11 @@ import {
   Source,
   pipe,
   share,
-  takeWhile,
   concat,
+  onPush,
   fromValue,
   switchMap,
+  filter,
   map,
   scan,
 } from 'wonka';
@@ -54,37 +55,35 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 /** Convert the Source to a React Suspense source on demand */
 function toSuspenseSource<T>(source: Source<T>): Source<T> {
   const shared = share(source);
-  let cache: T | void;
+  let cache: T | undefined;
   let resolve: (value: T) => void;
 
-  return sink => {
-    let hasSuspended = false;
-
+  const suspend$: Source<T> = sink => {
     pipe(
       shared,
-      takeWhile(result => {
-        // The first result that is received will resolve the suspense
-        // promise after waiting for a microtick
-        if (cache === undefined) Promise.resolve(result).then(resolve);
+      onPush(result => {
+        // The first result that is received will resolve the Suspense promise
+        if (resolve && cache === undefined) resolve(result);
         cache = result;
-        return !hasSuspended;
       })
     )(sink);
 
-    // If we haven't got a previous result then start suspending
-    // otherwise issue the last known result immediately
-    if (cache !== undefined) {
-      const signal = [cache] as [T] & { tag: 1 };
-      signal.tag = 1;
-      sink(signal);
-    } else {
-      hasSuspended = true;
-      sink(0 /* End */);
+    // If we haven't got a previous result then throw a Suspense promise
+    if (cache === undefined) {
       throw new Promise<T>(_resolve => {
         resolve = _resolve;
       });
     }
   };
+
+  return concat([
+    pipe(
+      fromValue<T>(cache!),
+      map<T, T>(() => cache!),
+      filter(x => x !== undefined)
+    ),
+    suspend$,
+  ]);
 }
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
@@ -186,9 +185,7 @@ export function useQuery<Data = any, Variables = object>(
     if (!isSuspense(client, args.context)) update(query$);
   }, [update, client, query$, request, args.context]);
 
-  if (isSuspense(client, args.context)) {
-    update(query$);
-  }
+  if (isSuspense(client, args.context)) update(query$);
 
   return [state, executeQuery];
 }
