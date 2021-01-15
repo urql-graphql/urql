@@ -1156,3 +1156,166 @@ it('Works with nodes absent from query', () => {
   expect(res.partial).toBe(false);
   expect(res.data).toEqual(results);
 });
+
+it('handles subsequent queries with larger last values', () => {
+  const Pagination = gql`
+    query($last: Int!) {
+      __typename
+      items(last: $last) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasPreviousPage
+          startCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(2)],
+      nodes: [itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasPreviousPage: true,
+        startCursor: '2',
+      },
+    },
+  };
+
+  const pageTwo = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(1), itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasPreviousPage: false,
+        startCursor: '1',
+      },
+    },
+  };
+
+  const pageThree = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(0), itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(0), itemNode(1), itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasPreviousPage: false,
+        startCursor: '0',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { last: 1 } }, pageOne);
+  write(store, { query: Pagination, variables: { last: 2 } }, pageTwo);
+
+  let res = query(store, { query: Pagination, variables: { last: 2 } });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(pageTwo);
+
+  write(store, { query: Pagination, variables: { last: 3 } }, pageThree);
+
+  res = query(store, { query: Pagination, variables: { last: 3 } });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(pageThree);
+});
+
+it('handles subsequent queries with larger first values', () => {
+  const Pagination = gql`
+    query($first: Int!) {
+      __typename
+      items(first: $first) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1)],
+      nodes: [itemNode(1)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        endCursor: '1',
+      },
+    },
+  };
+
+  const pageTwo = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(1), itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: false,
+        endCursor: '2',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 1 } }, pageOne);
+  write(store, { query: Pagination, variables: { first: 2 } }, pageTwo);
+
+  const res = query(store, { query: Pagination, variables: { first: 2 } });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(pageTwo);
+});
