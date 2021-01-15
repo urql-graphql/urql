@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 3.4.0
+
+### Minor Changes
+
+- Warn when using an interface or union field in the graphCache resolvers config, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1304](https://github.com/FormidableLabs/urql/pull/1304))
+
+### Patch Changes
+
+- ⚠️ Fix edge-case where query results would pick up invalidated fields from mutation results as they're written to the cache. This would cause invalid cache misses although the result was expected to just be passed through from the API result, by [@kitten](https://github.com/kitten) (See [#1300](https://github.com/FormidableLabs/urql/pull/1300))
+- ⚠️ Fix a Relay Pagination edge case where overlapping ends of pages queried using the `last` argument would be in reverse order, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1311](https://github.com/FormidableLabs/urql/pull/1311))
+
 ## 3.3.4
 
 ### Patch Changes
