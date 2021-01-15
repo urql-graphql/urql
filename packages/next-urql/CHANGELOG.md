@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.0
+
+### Minor Changes
+
+- Fix, update Next integration types so that they work with the newer `NextPage` typings, by [@wgolledge](https://github.com/wgolledge) (See [#1294](https://github.com/FormidableLabs/urql/pull/1294))
+
+### Patch Changes
+
+- ⚠️ Fix `withUrqlClient` fast-refresh detection, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1302](https://github.com/FormidableLabs/urql/pull/1302))
+
 ## 2.1.1
 
 ### Patch Changes

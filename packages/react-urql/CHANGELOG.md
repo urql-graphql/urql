@@ -1,5 +1,11 @@
 # urql
 
+## 1.11.6
+
+### Patch Changes
+
+- ⚠️ Fix edge cases related to Suspense triggering on an update in Concurrent Mode. Previously it was possible for stale state to be preserved across the Suspense update instead of the new state showing up. This has been fixed by preventing the suspending query source from closing prematurely, by [@kitten](https://github.com/kitten) (See [#1308](https://github.com/FormidableLabs/urql/pull/1308))
+
 ## 1.11.5
 
 ### Patch Changes
