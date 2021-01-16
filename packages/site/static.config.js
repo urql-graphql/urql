@@ -51,24 +51,24 @@ export default {
       template: require.resolve('./src/screens/home'),
     },
     {
-      path: '/concepts/core-package',
-      redirect: '/basics/core',
+      path: '/docs/concepts/core-package',
+      redirect: '/docs/basics/core',
     },
     {
-      path: '/basics/getting-started',
+      path: '/docs/basics/getting-started',
       redirect: '/basics',
     },
     {
       path: '/basics/mutations',
-      redirect: '/basics',
+      redirect: '/docs/basics',
     },
     {
-      path: '/basics/queries',
-      redirect: '/basics',
+      path: '/docs/basics/queries',
+      redirect: '/docs/basics',
     },
     {
-      path: '/basics/document-caching',
-      redirect: '/concepts/document-caching',
+      path: '/docs/basics/document-caching',
+      redirect: '/docs/concepts/document-caching',
     },
     {
       path: '404',
