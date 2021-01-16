@@ -1,9 +1,9 @@
 ---
-title: Custom Updates
+title: Cache Updates
 order: 3
 ---
 
-# Custom Updates
+# Cache Updates
 
 Every time Graphcache sees a result from the API for a `subscription` or a `mutation` it will look at the response and traverse it.
 This process is the same as for queries but instead of starting at the Query root type,
