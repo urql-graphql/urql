@@ -56,11 +56,11 @@ export default {
     },
     {
       path: '/docs/basics/getting-started',
-      redirect: '/basics',
+      redirect: '/docs/basics',
     },
     {
-      path: '/basics/mutations',
-      redirect: '/docs/basics',
+      path: '/docs/basics/mutations',
+      redirect: '/docs/docs/basics',
     },
     {
       path: '/docs/basics/queries',
