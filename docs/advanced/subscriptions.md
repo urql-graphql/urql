@@ -48,7 +48,7 @@ package](https://github.com/apollographql/subscriptions-transport-ws).
 import { Client, defaultExchanges, subscriptionExchange } from 'urql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
-const subscriptionClient = new SubscriptionClient('wss://localhost/graphql', { reconnect: true });
+const subscriptionClient = new SubscriptionClient('ws://localhost/graphql', { reconnect: true });
 
 const client = new Client({
   url: '/graphql',
@@ -79,7 +79,7 @@ import { createClient, defaultExchanges, subscriptionExchange } from 'urql';
 import { createClient as createWSClient } from 'graphql-ws';
 
 const wsClient = createWSClient({
-  url: 'wss://localhost/graphql',
+  url: 'ws://localhost/graphql',
 });
 
 const client = createClient({
