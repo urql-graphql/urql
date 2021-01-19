@@ -52,23 +52,23 @@ export default {
     },
     {
       path: '/docs/concepts/core-package',
-      redirect: '/docs/basics/core',
+      redirect: 'docs/basics/core',
     },
     {
       path: '/docs/basics/getting-started',
-      redirect: '/docs/basics',
+      redirect: 'docs/basics',
     },
     {
       path: '/docs/basics/mutations',
-      redirect: '/docs/docs/basics',
+      redirect: 'docs/docs/basics',
     },
     {
       path: '/docs/basics/queries',
-      redirect: '/docs/basics',
+      redirect: 'docs/basics',
     },
     {
       path: '/docs/basics/document-caching',
-      redirect: '/docs/concepts/document-caching',
+      redirect: 'docs/concepts/document-caching',
     },
     {
       path: '404',
