@@ -15,6 +15,7 @@ import {
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
+import { getCacheForClient } from './cache';
 
 export interface UseQueryArgs<Variables = object, Data = any> {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
@@ -38,13 +39,6 @@ export type UseQueryResponse<Data = any, Variables = object> = [
   UseQueryState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
-
-interface WithCache extends Client {
-  _cache: Map<number, OperationResult | Promise<unknown> | undefined>;
-}
-
-const getCache = (client: Client) =>
-  (client as WithCache)._cache || ((client as WithCache)._cache = new Map());
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
@@ -74,7 +68,7 @@ export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
-  const cache = getCache(client);
+  const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
   const request = useRequest<Data, Variables>(args.query, args.variables);
 
@@ -183,6 +177,9 @@ export function useQuery<Data = any, Variables = object>(
   }
 
   useEffect(() => {
+    const source = state[0];
+    const request = state[3][1];
+
     let hasResult = false;
 
     const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
@@ -195,9 +192,9 @@ export function useQuery<Data = any, Variables = object>(
       });
     };
 
-    if (state[0]) {
+    if (source) {
       const subscription = pipe(
-        state[0],
+        source,
         onEnd(() => {
           updateResult({ fetching: false });
         }),
@@ -205,11 +202,15 @@ export function useQuery<Data = any, Variables = object>(
       );
 
       if (!hasResult) updateResult({ fetching: true });
-      return subscription.unsubscribe;
+
+      return () => {
+        cache.dispose(request.key);
+        subscription.unsubscribe();
+      };
     } else {
       updateResult({ fetching: false });
     }
-  }, [state[0]]);
+  }, [cache, state[0], state[3][1]]);
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
