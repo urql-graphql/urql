@@ -14,9 +14,8 @@ interface ClientWithCache extends Client {
 }
 
 export const getCacheForClient = (client: Client): Cache => {
-  const reclaim = new Set();
-
   if (!(client as ClientWithCache)._react) {
+    const reclaim = new Set();
     const map = new Map<number, CacheEntry>();
 
     if (client.operations$ /* not available in mocks */) {
