@@ -32,3 +32,8 @@ export const computeNextState = <T extends Stateish>(
 
   return isShallowDifferent(prevState, newState) ? newState : prevState;
 };
+
+export const hasDepsChanged = <T extends { length: number }>(a: T, b: T) => {
+  for (let i = 0, l = b.length; i < l; i++) if (a[i] !== b[i]) return true;
+  return false;
+};

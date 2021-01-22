@@ -11,7 +11,7 @@ import {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { initialState, computeNextState } from './state';
+import { initialState, computeNextState, hasDepsChanged } from './state';
 
 export interface UseSubscriptionArgs<Variables = object, Data = any> {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
@@ -49,29 +49,23 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     [client, request, args.pause, args.context]
   );
 
+  const deps = [client, request, args.context, args.pause] as const;
+
   const [state, setState] = useState(
     () =>
-      [
-        source,
-        { ...initialState, fetching: !!source },
-        handler,
-        [client, request, args.context, args.pause] as const,
-      ] as const
+      [source, { ...initialState, fetching: !!source }, handler, deps] as const
   );
 
-  const hasDepsChanged =
-    state[3][0] !== client ||
-    state[3][1] !== request ||
-    state[3][2] !== args.context ||
-    state[3][3] !== args.pause;
-
   let currentResult = state[1];
-  if ((source !== state[0] && hasDepsChanged) || handler !== state[2]) {
+  if (
+    (source !== state[0] && hasDepsChanged(state[3], deps)) ||
+    handler !== state[2]
+  ) {
     setState([
       source,
       (currentResult = { ...initialState, fetching: !!source }),
       handler,
-      [client, request, args.context, args.pause],
+      deps,
     ]);
   }
 

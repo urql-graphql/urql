@@ -14,8 +14,8 @@ import {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { initialState, computeNextState } from './state';
 import { getCacheForClient } from './cache';
+import { initialState, computeNextState, hasDepsChanged } from './state';
 
 export interface UseQueryArgs<Variables = object, Data = any> {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
@@ -117,34 +117,27 @@ export function useQuery<Data = any, Variables = object>(
     [request]
   );
 
-  const [state, setState] = useState(() => {
-    const snapshot = getSnapshot(suspense, source);
+  const deps = [
+    client,
+    request,
+    args.requestPolicy,
+    args.pollInterval,
+    args.context,
+    args.pause,
+  ] as const;
 
-    return [
-      source,
-      getSnapshot,
-      computeNextState(initialState, snapshot),
+  const [state, setState] = useState(
+    () =>
       [
-        client,
-        request,
-        args.requestPolicy,
-        args.pollInterval,
-        args.context,
-        args.pause,
-      ] as const,
-    ] as const;
-  });
-
-  const hasDepsChanged =
-    state[3][0] !== client ||
-    state[3][1] !== request ||
-    state[3][2] !== args.requestPolicy ||
-    state[3][3] !== args.pollInterval ||
-    state[3][4] !== args.context ||
-    state[3][5] !== args.pause;
+        source,
+        getSnapshot,
+        computeNextState(initialState, getSnapshot(suspense, source)),
+        deps,
+      ] as const
+  );
 
   let currentResult = state[2];
-  if (source !== state[0] && hasDepsChanged) {
+  if (source !== state[0] && hasDepsChanged(state[3], deps)) {
     setState([
       source,
       getSnapshot,
@@ -152,14 +145,7 @@ export function useQuery<Data = any, Variables = object>(
         state[2],
         getSnapshot(suspense, source)
       )),
-      [
-        client,
-        request,
-        args.requestPolicy,
-        args.pollInterval,
-        args.context,
-        args.pause,
-      ],
+      deps,
     ]);
   }
 
