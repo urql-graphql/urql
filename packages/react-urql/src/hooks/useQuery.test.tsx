@@ -20,7 +20,7 @@ jest.mock('../context', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { pipe, onStart, onEnd, empty, never } from 'wonka';
+import { pipe, onStart, onEnd, never } from 'wonka';
 import { OperationContext } from '@urql/core';
 
 import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
@@ -192,15 +192,6 @@ describe('on unmount', () => {
     act(() => wrapper.unmount());
     expect(start).toHaveBeenCalled();
     expect(unsubscribe).toHaveBeenCalled();
-  });
-});
-
-describe('active teardown', () => {
-  it('sets fetching to false when the source ends', () => {
-    client.executeQuery.mockReturnValueOnce(empty);
-    renderer.create(<QueryUser {...props} />);
-    expect(client.executeQuery).toHaveBeenCalled();
-    expect(state).toMatchObject({ fetching: false });
   });
 });
 

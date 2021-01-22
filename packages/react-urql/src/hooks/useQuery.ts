@@ -1,18 +1,6 @@
 import { DocumentNode } from 'graphql';
-import { useEffect, useCallback, useMemo } from 'react';
-
-import {
-  Source,
-  pipe,
-  share,
-  concat,
-  onPush,
-  fromValue,
-  switchMap,
-  filter,
-  map,
-  scan,
-} from 'wonka';
+import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
   Client,
@@ -25,7 +13,6 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
@@ -52,140 +39,191 @@ export type UseQueryResponse<Data = any, Variables = object> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-/** Convert the Source to a React Suspense source on demand */
-function toSuspenseSource<T>(source: Source<T>): Source<T> {
-  const shared = share(source);
-  let cache: T | undefined;
-  let resolve: (value: T) => void;
-
-  const suspend$: Source<T> = sink => {
-    pipe(
-      shared,
-      onPush(result => {
-        // The first result that is received will resolve the Suspense promise
-        if (resolve && cache === undefined) resolve(result);
-        cache = result;
-      })
-    )(sink);
-
-    // If we haven't got a previous result then throw a Suspense promise
-    if (cache === undefined) {
-      throw new Promise<T>(_resolve => {
-        resolve = _resolve;
-      });
-    }
-  };
-
-  return concat([
-    pipe(
-      fromValue<T>(cache!),
-      map<T, T>(() => cache!),
-      filter(x => x !== undefined)
-    ),
-    suspend$,
-  ]);
+interface WithCache extends Client {
+  _cache: Map<number, OperationResult | Promise<unknown> | undefined>;
 }
+
+const getCache = (client: Client) =>
+  (client as WithCache)._cache || ((client as WithCache)._cache = new Map());
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-const sources = new Map<number, Source<OperationResult>>();
+const isShallowDifferent = (a: any, b: any) => {
+  if (typeof a != 'object' || typeof b != 'object') return a !== b;
+  for (const x in a) if (!(x in b)) return true;
+  for (const x in b) if (a[x] !== b[x]) return true;
+  return false;
+};
+
+const computeNextState = <Data = any, Variables = object>(
+  prevState: UseQueryState<Data, Variables>,
+  result: Partial<UseQueryState<Data, Variables>>
+): UseQueryState<Data, Variables> => {
+  const newState = {
+    ...prevState,
+    ...result,
+    fetching: !!result.fetching,
+    stale: !!result.stale,
+  };
+
+  return isShallowDifferent(prevState, newState) ? newState : prevState;
+};
 
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
-  // This creates a request which will keep a stable reference
-  // if request.key doesn't change
+  const cache = getCache(client);
+  const suspense = isSuspense(client, args.context);
   const request = useRequest<Data, Variables>(args.query, args.variables);
 
-  // Create a new query-source from client.executeQuery
-  const makeQuery$ = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      // Determine whether suspense is enabled for the given operation
-      const suspense = isSuspense(client, args.context);
-      let source: Source<OperationResult> | void = suspense
-        ? sources.get(request.key)
-        : undefined;
+  const source = useMemo(() => {
+    if (args.pause) return null;
 
-      if (!source) {
-        source = client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
-          ...args.context,
-          ...opts,
-        });
+    const source = client.executeQuery(request, {
+      requestPolicy: args.requestPolicy,
+      pollInterval: args.pollInterval,
+      ...args.context,
+    });
 
-        // Create a suspense source and cache it for the given request
-        if (suspense) {
-          source = toSuspenseSource(source);
-          if (typeof window !== 'undefined') {
-            sources.set(request.key, source);
-          }
+    return suspense
+      ? pipe(
+          source,
+          onPush(result => {
+            cache.set(request.key, result);
+          })
+        )
+      : source;
+  }, [
+    client,
+    request,
+    suspense,
+    args.pause,
+    args.requestPolicy,
+    args.pollInterval,
+    args.context,
+  ]);
+
+  const getSnapshot = useCallback(
+    (
+      suspense: boolean,
+      source: Source<OperationResult<Data, Variables>> | null
+    ): Partial<UseQueryState<Data, Variables>> => {
+      if (!source) return { fetching: false };
+
+      let result = cache.get(request.key);
+      if (!result) {
+        let resolve: (value: unknown) => void;
+
+        const subscription = pipe(
+          source,
+          takeWhile(() => (suspense && !resolve) || !result),
+          subscribe(_result => {
+            result = _result;
+            if (suspense) cache.set(request.key, result);
+            if (resolve) resolve(result);
+          })
+        );
+
+        if (result == null && suspense) {
+          const promise = new Promise(_resolve => {
+            resolve = _resolve;
+          });
+
+          cache.set(request.key, promise);
+          throw promise;
+        } else {
+          subscription.unsubscribe();
         }
+      } else if (suspense && result != null && 'then' in result) {
+        throw result;
       }
 
-      return source;
+      return (result as OperationResult<Data, Variables>) || { fetching: true };
     },
-    [client, request, args.requestPolicy, args.pollInterval, args.context]
+    [request]
   );
 
-  const query$ = useMemo(() => {
-    return args.pause ? null : makeQuery$();
-  }, [args.pause, makeQuery$]);
+  const [state, setState] = useState(() => {
+    const snapshot = getSnapshot(suspense, source);
 
-  const [state, update] = useSource(
-    query$,
-    useCallback((query$$, prevState?: UseQueryState<Data, Variables>) => {
-      return pipe(
-        query$$,
-        switchMap(query$ => {
-          if (!query$) return fromValue({ fetching: false, stale: false });
+    return [
+      source,
+      getSnapshot,
+      computeNextState(initialState, snapshot),
+      [
+        client,
+        request,
+        args.requestPolicy,
+        args.pollInterval,
+        args.context,
+      ] as const,
+    ] as const;
+  });
 
-          return concat([
-            // Initially set fetching to true
-            fromValue({ fetching: true, stale: false }),
-            pipe(
-              query$,
-              map(({ stale, data, error, extensions, operation }) => ({
-                fetching: false,
-                stale: !!stale,
-                data,
-                error,
-                operation,
-                extensions,
-              }))
-            ),
-            // When the source proactively closes, fetching is set to false
-            fromValue({ fetching: false, stale: false }),
-          ]);
-        }),
-        // The individual partial results are merged into each previous result
-        scan(
-          (result: UseQueryState<Data, Variables>, partial) => ({
-            ...result,
-            ...partial,
-          }),
-          prevState || initialState
-        )
-      );
-    }, [])
-  );
+  const hasDepsChanged =
+    state[3][0] !== client ||
+    state[3][1] !== request ||
+    state[3][2] !== args.requestPolicy ||
+    state[3][3] !== args.pollInterval ||
+    state[3][4] !== args.context;
 
-  // This is the imperative execute function passed to the user
-  const executeQuery = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      update(makeQuery$({ suspense: false, ...opts }));
-    },
-    [update, makeQuery$]
-  );
+  let currentResult = state[2];
+  if (source !== state[0] && hasDepsChanged) {
+    setState([
+      source,
+      getSnapshot,
+      (currentResult = computeNextState(
+        state[2],
+        getSnapshot(suspense, source)
+      )),
+      [client, request, args.requestPolicy, args.pollInterval, args.context],
+    ]);
+  }
 
   useEffect(() => {
-    sources.delete(request.key); // Delete any cached suspense source
-    if (!isSuspense(client, args.context)) update(query$);
-  }, [update, client, query$, request, args.context]);
+    let hasResult = false;
 
-  if (isSuspense(client, args.context)) update(query$);
+    const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
+      hasResult = true;
+      setState(state => {
+        const nextResult = computeNextState(state[2], result);
+        return state[2] !== nextResult
+          ? [state[0], state[1], nextResult, state[3]]
+          : state;
+      });
+    };
 
-  return [state, executeQuery];
+    if (state[0]) {
+      const subscription = pipe(
+        state[0],
+        onEnd(() => {
+          updateResult({ fetching: false });
+        }),
+        subscribe(updateResult)
+      );
+
+      if (!hasResult) updateResult({ fetching: true });
+      return subscription.unsubscribe;
+    } else {
+      updateResult({ fetching: false });
+    }
+  }, [state[0]]);
+
+  const executeQuery = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      const source = client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        pollInterval: args.pollInterval,
+        ...args.context,
+        ...opts,
+      });
+
+      setState(state => [source, state[1], state[2], state[3]]);
+    },
+    [getSnapshot]
+  );
+
+  return [currentResult, executeQuery];
 }
