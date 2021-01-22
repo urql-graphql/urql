@@ -12,7 +12,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { initialState } from './constants';
+import { initialState } from './state';
 
 export interface UseMutationState<Data = any, Variables = object> {
   fetching: boolean;

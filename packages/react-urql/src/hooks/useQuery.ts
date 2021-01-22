@@ -14,7 +14,7 @@ import {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { initialState } from './constants';
+import { initialState, computeNextState } from './state';
 import { getCacheForClient } from './cache';
 
 export interface UseQueryArgs<Variables = object, Data = any> {
@@ -42,27 +42,6 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
-
-const isShallowDifferent = (a: any, b: any) => {
-  if (typeof a != 'object' || typeof b != 'object') return a !== b;
-  for (const x in a) if (!(x in b)) return true;
-  for (const x in b) if (a[x] !== b[x]) return true;
-  return false;
-};
-
-const computeNextState = <Data = any, Variables = object>(
-  prevState: UseQueryState<Data, Variables>,
-  result: Partial<UseQueryState<Data, Variables>>
-): UseQueryState<Data, Variables> => {
-  const newState = {
-    ...prevState,
-    ...result,
-    fetching: !!result.fetching,
-    stale: !!result.stale,
-  };
-
-  return isShallowDifferent(prevState, newState) ? newState : prevState;
-};
 
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
@@ -115,7 +94,6 @@ export function useQuery<Data = any, Variables = object>(
           takeWhile(() => (suspense && !resolve) || !result),
           subscribe(_result => {
             result = _result;
-            if (suspense) cache.set(request.key, result);
             if (resolve) resolve(result);
           })
         );
@@ -152,6 +130,7 @@ export function useQuery<Data = any, Variables = object>(
         args.requestPolicy,
         args.pollInterval,
         args.context,
+        args.pause,
       ] as const,
     ] as const;
   });
@@ -161,7 +140,8 @@ export function useQuery<Data = any, Variables = object>(
     state[3][1] !== request ||
     state[3][2] !== args.requestPolicy ||
     state[3][3] !== args.pollInterval ||
-    state[3][4] !== args.context;
+    state[3][4] !== args.context ||
+    state[3][5] !== args.pause;
 
   let currentResult = state[2];
   if (source !== state[0] && hasDepsChanged) {
@@ -172,7 +152,14 @@ export function useQuery<Data = any, Variables = object>(
         state[2],
         getSnapshot(suspense, source)
       )),
-      [client, request, args.requestPolicy, args.pollInterval, args.context],
+      [
+        client,
+        request,
+        args.requestPolicy,
+        args.pollInterval,
+        args.context,
+        args.pause,
+      ],
     ]);
   }
 
@@ -212,19 +199,16 @@ export function useQuery<Data = any, Variables = object>(
     }
   }, [cache, state[0], state[3][1]]);
 
-  const executeQuery = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      const source = client.executeQuery(request, {
-        requestPolicy: args.requestPolicy,
-        pollInterval: args.pollInterval,
-        ...args.context,
-        ...opts,
-      });
+  const executeQuery = useCallback((opts?: Partial<OperationContext>) => {
+    const source = client.executeQuery(request, {
+      requestPolicy: args.requestPolicy,
+      pollInterval: args.pollInterval,
+      ...args.context,
+      ...opts,
+    });
 
-      setState(state => [source, state[1], state[2], state[3]]);
-    },
-    [getSnapshot]
-  );
+    setState(state => [source, state[1], state[2], state[3]]);
+  }, []);
 
   return [currentResult, executeQuery];
 }
