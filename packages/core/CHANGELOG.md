@@ -1,5 +1,11 @@
 # @urql/core
 
+## 1.16.2
+
+### Patch Changes
+
+- Add a workaround for `graphql-tag/loader`, which provides filtered query documents (where the original document contains multiple operations) without updating or providing a correct `document.loc.source.body` string, by [@kitten](https://github.com/kitten) (See [#1315](https://github.com/FormidableLabs/urql/pull/1315))
+
 ## 1.16.1
 
 ### Patch Changes
