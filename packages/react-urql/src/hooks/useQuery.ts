@@ -80,8 +80,8 @@ export function useQuery<Data = any, Variables = object>(
 
   const getSnapshot = useCallback(
     (
-      suspense: boolean,
-      source: Source<OperationResult<Data, Variables>> | null
+      source: Source<OperationResult<Data, Variables>> | null,
+      suspense: boolean
     ): Partial<UseQueryState<Data, Variables>> => {
       if (!source) return { fetching: false };
 
@@ -130,20 +130,18 @@ export function useQuery<Data = any, Variables = object>(
     () =>
       [
         source,
-        getSnapshot,
-        computeNextState(initialState, getSnapshot(suspense, source)),
+        computeNextState(initialState, getSnapshot(source, suspense)),
         deps,
       ] as const
   );
 
-  let currentResult = state[2];
-  if (source !== state[0] && hasDepsChanged(state[3], deps)) {
+  let currentResult = state[1];
+  if (source !== state[0] && hasDepsChanged(state[2], deps)) {
     setState([
       source,
-      getSnapshot,
       (currentResult = computeNextState(
-        state[2],
-        getSnapshot(suspense, source)
+        state[1],
+        getSnapshot(source, suspense)
       )),
       deps,
     ]);
@@ -151,16 +149,16 @@ export function useQuery<Data = any, Variables = object>(
 
   useEffect(() => {
     const source = state[0];
-    const request = state[3][1];
+    const request = state[2][1];
 
     let hasResult = false;
 
     const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
       hasResult = true;
       setState(state => {
-        const nextResult = computeNextState(state[2], result);
-        return state[2] !== nextResult
-          ? [state[0], state[1], nextResult, state[3]]
+        const nextResult = computeNextState(state[1], result);
+        return state[1] !== nextResult
+          ? [state[0], nextResult, state[2]]
           : state;
       });
     };
@@ -183,18 +181,32 @@ export function useQuery<Data = any, Variables = object>(
     } else {
       updateResult({ fetching: false });
     }
-  }, [cache, state[0], state[3][1]]);
+  }, [cache, state[0], state[2][1]]);
 
-  const executeQuery = useCallback((opts?: Partial<OperationContext>) => {
-    const source = client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      pollInterval: args.pollInterval,
-      ...args.context,
-      ...opts,
-    });
+  const executeQuery = useCallback(
+    (opts?: Partial<OperationContext>) => {
+      const source = client.executeQuery(request, {
+        requestPolicy: args.requestPolicy,
+        pollInterval: args.pollInterval,
+        ...args.context,
+        ...opts,
+      });
 
-    setState(state => [source, state[1], state[2], state[3]]);
-  }, []);
+      setState(state => [
+        source,
+        computeNextState(state[1], getSnapshot(source, false)),
+        state[2],
+      ]);
+    },
+    [
+      client,
+      request,
+      getSnapshot,
+      args.requestPolicy,
+      args.pollInterval,
+      args.context,
+    ]
+  );
 
   return [currentResult, executeQuery];
 }
