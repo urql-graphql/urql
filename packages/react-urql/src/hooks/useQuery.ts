@@ -185,18 +185,23 @@ export function useQuery<Data = any, Variables = object>(
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
-      const source = client.executeQuery(request, {
+      const context = {
         requestPolicy: args.requestPolicy,
         pollInterval: args.pollInterval,
         ...args.context,
         ...opts,
-      });
+      };
 
-      setState(state => [
-        source,
-        computeNextState(state[1], getSnapshot(source, false)),
-        state[2],
-      ]);
+      const source = client.executeQuery(request, context);
+
+      setState(state => {
+        const snapshot =
+          context.requestPolicy !== 'network-only'
+            ? getSnapshot(source, false)
+            : { fetching: true };
+        const nextResult = computeNextState(state[1], snapshot);
+        return state[1] !== nextResult ? [source, nextResult, state[2]] : state;
+      });
     },
     [
       client,
