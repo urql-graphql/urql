@@ -105,7 +105,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
 
       setState(state => [source, state[1], state[2], state[3]]);
     },
-    []
+    [client, args.context, request]
   );
 
   return [currentResult, executeSubscription];
