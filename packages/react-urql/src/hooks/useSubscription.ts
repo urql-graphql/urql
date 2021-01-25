@@ -63,7 +63,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   ) {
     setState([
       source,
-      (currentResult = { ...initialState, fetching: !!source }),
+      (currentResult = computeNextState(state[1], { fetching: !!source })),
       handler,
       deps,
     ]);
