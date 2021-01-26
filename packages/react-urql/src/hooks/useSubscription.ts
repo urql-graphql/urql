@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql';
-import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
+import { pipe, subscribe, onEnd } from 'wonka';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import {
   TypedDocumentNode,
@@ -10,9 +10,8 @@ import {
 } from '@urql/core';
 
 import { useClient } from '../context';
-import { useSource } from './useSource';
 import { useRequest } from './useRequest';
-import { initialState } from './constants';
+import { initialState, computeNextState, hasDepsChanged } from './state';
 
 export interface UseSubscriptionArgs<Variables = object, Data = any> {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
@@ -42,88 +41,72 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   handler?: SubscriptionHandler<Data, Result>
 ): UseSubscriptionResponse<Result, Variables> {
   const client = useClient();
-
-  // Update handler on constant ref, since handler changes shouldn't
-  // trigger a new subscription run
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler!;
-
-  // This creates a request which will keep a stable reference
-  // if request.key doesn't change
   const request = useRequest<Data, Variables>(args.query, args.variables);
 
-  // Create a new subscription-source from client.executeSubscription
-  const makeSubscription$ = useCallback(
-    (opts?: Partial<OperationContext>) => {
-      return client.executeSubscription<Data, Variables>(request, {
-        ...args.context,
-        ...opts,
+  const source = useMemo(
+    () =>
+      !args.pause ? client.executeSubscription(request, args.context) : null,
+    [client, request, args.pause, args.context]
+  );
+
+  const deps = [client, request, args.context, args.pause] as const;
+
+  const [state, setState] = useState(
+    () =>
+      [source, { ...initialState, fetching: !!source }, handler, deps] as const
+  );
+
+  let currentResult = state[1];
+  if (
+    (source !== state[0] && hasDepsChanged(state[3], deps)) ||
+    handler !== state[2]
+  ) {
+    setState([
+      source,
+      (currentResult = computeNextState(state[1], { fetching: !!source })),
+      handler,
+      deps,
+    ]);
+  }
+
+  useEffect(() => {
+    const updateResult = (
+      result: Partial<UseSubscriptionState<Data, Variables>>
+    ) => {
+      setState(state => {
+        const nextResult = computeNextState(state[1], result);
+        if (state[1] === nextResult) return state;
+        if (state[2] && state[1].data !== nextResult.data)
+          nextResult.data = state[2](state[1].data, nextResult.data!) as any;
+        return [state[0], state[1], nextResult as any, state[3]];
       });
-    },
-    [client, request, args.context]
-  );
+    };
 
-  const subscription$ = useMemo(() => {
-    return args.pause ? null : makeSubscription$();
-  }, [args.pause, makeSubscription$]);
-
-  const [state, update] = useSource(
-    subscription$,
-    useCallback(
-      (subscription$$, prevState?: UseSubscriptionState<Result, Variables>) => {
-        return pipe(
-          subscription$$,
-          switchMap(subscription$ => {
-            if (!subscription$) return fromValue({ fetching: false });
-
-            return concat([
-              // Initially set fetching to true
-              fromValue({ fetching: true, stale: false }),
-              pipe(
-                subscription$,
-                map(({ stale, data, error, extensions, operation }) => ({
-                  fetching: true,
-                  stale: !!stale,
-                  data,
-                  error,
-                  extensions,
-                  operation,
-                }))
-              ),
-              // When the source proactively closes, fetching is set to false
-              fromValue({ fetching: false, stale: false }),
-            ]);
-          }),
-          // The individual partial results are merged into each previous result
-          scan(
-            (result: UseSubscriptionState<Result, Variables>, partial: any) => {
-              const { current: handler } = handlerRef;
-              // If a handler has been passed, it's used to merge new data in
-              const data =
-                partial.data !== undefined
-                  ? typeof handler === 'function'
-                    ? handler(result.data, partial.data)
-                    : partial.data
-                  : result.data;
-              return { ...result, ...partial, data };
-            },
-            prevState || initialState
-          )
-        );
-      },
-      []
-    )
-  );
+    if (state[0]) {
+      return pipe(
+        state[0],
+        onEnd(() => {
+          updateResult({ fetching: false });
+        }),
+        subscribe(updateResult)
+      ).unsubscribe;
+    } else {
+      updateResult({ fetching: false });
+    }
+  }, [state[0]]);
 
   // This is the imperative execute function passed to the user
   const executeSubscription = useCallback(
-    (opts?: Partial<OperationContext>) => update(makeSubscription$(opts)),
-    [update, makeSubscription$]
+    (opts?: Partial<OperationContext>) => {
+      const source = client.executeSubscription(request, {
+        ...args.context,
+        ...opts,
+      });
+
+      setState(state => [source, state[1], state[2], state[3]]);
+    },
+    [client, args.context, request]
   );
 
-  useEffect(() => {
-    update(subscription$);
-  }, [update, subscription$]);
-
-  return [state, executeSubscription];
+  return [currentResult, executeSubscription];
 }

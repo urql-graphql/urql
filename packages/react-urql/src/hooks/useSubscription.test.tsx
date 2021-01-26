@@ -16,7 +16,6 @@ jest.mock('../context', () => {
 
 import React, { FC } from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { empty } from 'wonka';
 import { OperationContext } from '@urql/core';
 
 import { useSubscription, UseSubscriptionState } from './useSubscription';
@@ -73,24 +72,6 @@ it('should support setting context in useSubscription params', () => {
   );
 });
 
-describe('on subscription', () => {
-  it('forwards client response', () => {
-    const wrapper = renderer.create(<SubscriptionUser q={query} />);
-    /**
-     * Have to call update (without changes) in order to see the
-     * result of the state change.
-     */
-    wrapper.update(<SubscriptionUser q={query} />);
-    expect(state).toEqual({
-      data: 1234,
-      error: 5678,
-      extensions: undefined,
-      fetching: true,
-      stale: false,
-    });
-  });
-});
-
 it('calls handler', () => {
   const handler = jest.fn();
   const wrapper = renderer.create(
@@ -98,15 +79,6 @@ it('calls handler', () => {
   );
   wrapper.update(<SubscriptionUser q={query} handler={handler} />);
   expect(handler).toBeCalledWith(undefined, 1234);
-});
-
-describe('active teardown', () => {
-  it('sets fetching to false when the source ends', () => {
-    client.executeSubscription.mockReturnValueOnce(empty);
-    renderer.create(<SubscriptionUser q={query} />);
-    expect(client.executeSubscription).toHaveBeenCalled();
-    expect(state).toMatchObject({ fetching: false });
-  });
 });
 
 describe('execute subscription', () => {
