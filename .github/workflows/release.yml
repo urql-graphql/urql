@@ -24,7 +24,7 @@ jobs:
         run: yarn --frozen-lockfile --non-interactive
       - name: PR or Publish
         id: changesets
-        uses: changesets/action@bfeb9e0
+        uses: changesets/action@b3300fad33b6ab794313da28d27424c0e2f78991
         with:
           publish: yarn changeset publish
         env:
