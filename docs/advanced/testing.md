@@ -39,13 +39,13 @@ import { Provider } from 'urql';
 import { never } from 'wonka';
 import { MyComponent } from './MyComponent';
 
-const mockClient = {
-  executeQuery: jest.fn(() => never),
-  executeMutation: jest.fn(() => never),
-  executeSubscription: jest.fn(() => never),
-};
-
 it('renders', () => {
+  const mockClient = {
+    executeQuery: jest.fn(() => never),
+    executeMutation: jest.fn(() => never),
+    executeSubscription: jest.fn(() => never),
+  };
+
   const wrapper = mount(
     <Provider value={mockClient}>
       <MyComponent />
@@ -78,9 +78,8 @@ it('triggers a mutation', () => {
       <MyComponent />
     </Provider>
   );
-  const variables = {
-    name: 'Carla',
-  };
+
+  const variables = { name: 'Carla' };
 
   wrapper.find('input').simulate('change', { currentTarget: { value: variables.name } });
   wrapper.find('button').simulate('click');
@@ -123,19 +122,19 @@ Response states are simulated by providing a stream which contains a network res
 **Example snapshot test of response state**
 
 ```tsx
-const responseState = {
-  executeQuery: () =>
-    fromValue({
-      data: {
-        posts: [
-          { id: 1, title: 'Post title', content: 'This is a post' },
-          { id: 3, title: 'Final post', content: 'Final post here' },
-        ],
-      },
-    }),
-};
-
 it('matches snapshot', () => {
+  const responseState = {
+    executeQuery: () =>
+      fromValue({
+        data: {
+          posts: [
+            { id: 1, title: 'Post title', content: 'This is a post' },
+            { id: 3, title: 'Final post', content: 'Final post here' },
+          ],
+        },
+      }),
+  };
+
   const wrapper = mount(
     <Provider value={responseState}>
       <MyComponent />
@@ -167,20 +166,27 @@ const errorState = {
 Returning different values for many `useQuery` calls can be done by introducing conditionals into the mocked client functions.
 
 ```tsx
-const mockClient = () => {
-  executeQuery: ({ query }) => {
-    if (query === GET_USERS) {
-      return fromValue(usersResponse);
-    }
+let mockClient;
+beforeEach(() => {
+  mockClient = () => {
+    executeQuery: ({ query }) => {
+      if (query === GET_USERS) {
+        return fromValue(usersResponse);
+      }
 
-    if (query === GET_POSTS) {
-      return fromValue(postsResponse);
-    }
+      if (query === GET_POSTS) {
+        return fromValue(postsResponse);
+      }
+    };
   };
-};
+});
 ```
 
 The above client we've created mocks all three operations — queries, mutations, and subscriptions — to always remain in the `fetching: true` state.
+Generally when we're _hoisting_ our mocked client and reuse it across multiple tests we have to be
+mindful not to instantiate the mocks outside of Jest's lifecycle functions (like `it`, `beforeEach`,
+`beforeAll` and such) as it may otherwise reset our mocked functions' return values or
+implementation.
 
 ## Subscriptions
 
@@ -193,20 +199,20 @@ Here's an example of testing a list component which uses a subscription.
 ```tsx
 import { OperationContext, makeOperation } from '@urql/core';
 
-const mockClient = {
-  executeSubscription: jest.fn(query =>
-    pipe(
-      interval(200),
-      map((i: number) => ({
-        // To mock a full result, we need to pass a mock operation back as well
-        operation: makeOperation('subscription', query, {} as OperationContext),
-        data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
-      }))
-    )
-  ),
-};
-
 it('should update the list', done => {
+  const mockClient = {
+    executeSubscription: jest.fn(query =>
+      pipe(
+        interval(200),
+        map((i: number) => ({
+          // To mock a full result, we need to pass a mock operation back as well
+          operation: makeOperation('subscription', query, {} as OperationContext),
+          data: { posts: { id: i, title: 'Post title', content: 'This is a post' } },
+        }))
+      )
+    ),
+  };
+
   let index = 0;
 
   const wrapper = mount(
@@ -240,11 +246,11 @@ import { MyComponent } from './MyComponent';
 
 const { source: stream, next: pushResponse } = makeSubject();
 
-const mockedClient = {
-  executeQuery: jest.fn(() => stream),
-};
-
 it('shows notification on updated data', () => {
+  const mockedClient = {
+    executeQuery: jest.fn(() => stream),
+  };
+
   const wrapper = mount(
     <Provider value={mockedClient}>
       <MyComponent />
