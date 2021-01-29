@@ -57,9 +57,8 @@ const minifyIntrospectionType = (
               args:
                 field.args &&
                 field.args.map(arg => ({
-                  ...arg,
+                  name: arg.name,
                   type: mapType(arg.type, anyType),
-                  defaultValue: undefined,
                 })),
             } as any)
         ),
@@ -84,9 +83,8 @@ const minifyIntrospectionType = (
               args:
                 field.args &&
                 field.args.map(arg => ({
-                  ...arg,
+                  name: arg.name,
                   type: mapType(arg.type, anyType),
-                  defaultValue: undefined,
                 })),
             } as any)
         ),
@@ -133,12 +131,25 @@ export const minifyIntrospectionQuery = (
   } = schema;
 
   const minifiedTypes = types
-    .filter(
-      type =>
-        type.kind === 'OBJECT' ||
-        type.kind === 'INTERFACE' ||
-        type.kind === 'UNION'
-    )
+    .filter(type => {
+      switch (type.name) {
+        case '__Directive':
+        case '__DirectiveLocation':
+        case '__EnumValue':
+        case '__InputValue':
+        case '__Field':
+        case '__Type':
+        case '__TypeKind':
+        case '__Schema':
+          return false;
+        default:
+          return (
+            type.kind === 'OBJECT' ||
+            type.kind === 'INTERFACE' ||
+            type.kind === 'UNION'
+          );
+      }
+    })
     .map(minifyIntrospectionType);
 
   minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
