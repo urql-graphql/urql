@@ -57,9 +57,8 @@ const minifyIntrospectionType = (
               args:
                 field.args &&
                 field.args.map(arg => ({
-                  ...arg,
+                  name: arg.name,
                   type: mapType(arg.type, anyType),
-                  defaultValue: undefined,
                 })),
             } as any)
         ),
@@ -84,9 +83,8 @@ const minifyIntrospectionType = (
               args:
                 field.args &&
                 field.args.map(arg => ({
-                  ...arg,
+                  name: arg.name,
                   type: mapType(arg.type, anyType),
-                  defaultValue: undefined,
                 })),
             } as any)
         ),
