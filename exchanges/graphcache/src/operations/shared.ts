@@ -26,6 +26,7 @@ export interface Context {
   fieldName: string;
   partial: boolean;
   optimistic: boolean;
+  path: Array<string | number>;
 }
 
 export const contextRef: { current: Context | null } = { current: null };
@@ -48,6 +49,7 @@ export const makeContext = (
   fieldName: '',
   partial: false,
   optimistic: !!optimistic,
+  path: [],
 });
 
 export const updateContext = (

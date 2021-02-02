@@ -246,9 +246,14 @@ const writeSelection = (
       }
     }
 
-    if (fieldName === '__typename') {
-      continue;
-    } else if (ctx.optimistic && isRoot) {
+    // We simply skip all typenames fields and assume they've already been written above
+    if (fieldName === '__typename') continue;
+
+    // Add the current alias to the walked path before processing the field's value
+    ctx.path.push(fieldAlias);
+
+    // Execute optimistic mutation functions on root fields
+    if (ctx.optimistic && isRoot) {
       const resolver = ctx.store.optimisticMutations[fieldName];
 
       if (!resolver) continue;
@@ -301,6 +306,9 @@ const writeSelection = (
         updater(data, fieldArgs || {}, ctx.store, ctx);
       }
     }
+
+    // After processing the field, remove the current alias from the path again
+    ctx.path.pop();
   }
 };
 
@@ -316,15 +324,18 @@ const writeField = (
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
-      const item = data[i];
+      // Add the current index to the walked path before processing the link
+      ctx.path.push(i);
       // Append the current index to the parentFieldKey fallback
       const indexKey = parentFieldKey
         ? joinKeys(parentFieldKey, `${i}`)
         : undefined;
       // Recursively write array data
-      const links = writeField(ctx, select, item, indexKey);
+      const links = writeField(ctx, select, data[i], indexKey);
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
+      // After processing the field, remove the current index from the path
+      ctx.path.pop();
     }
 
     return newData;
