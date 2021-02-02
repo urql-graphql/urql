@@ -130,7 +130,8 @@ const readRoot = (
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
-    if (process.env.NODE_ENV !== 'production') ctx.path.push(fieldAlias);
+    if (process.env.NODE_ENV !== 'production')
+      ctx.__internal.path.push(fieldAlias);
     // Process the root field's value
     if (node.selectionSet && fieldValue !== null) {
       const fieldData = ensureData(fieldValue);
@@ -139,7 +140,7 @@ const readRoot = (
       data[fieldAlias] = fieldValue;
     }
     // After processing the field, remove the current alias from the path again
-    if (process.env.NODE_ENV !== 'production') ctx.path.pop();
+    if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
   }
 
   return data;
@@ -154,11 +155,11 @@ const readRootField = (
     const newData = new Array(originalData.length);
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.path.push(i);
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
       // Recursively read the root field's value
       newData[i] = readRootField(ctx, select, originalData[i]);
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.path.pop();
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
     }
 
     return newData;
@@ -311,7 +312,8 @@ const readSelection = (
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
     // Add the current alias to the walked path before processing the field's value
-    if (process.env.NODE_ENV !== 'production') ctx.path.push(fieldAlias);
+    if (process.env.NODE_ENV !== 'production')
+      ctx.__internal.path.push(fieldAlias);
 
     if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
@@ -395,7 +397,7 @@ const readSelection = (
     }
 
     // After processing the field, remove the current alias from the path again
-    if (process.env.NODE_ENV !== 'production') ctx.path.pop();
+    if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
@@ -440,7 +442,7 @@ const resolveResolverResult = (
     const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.path.push(i);
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
       // Recursively read resolver result
       const childResult = resolveResolverResult(
         ctx,
@@ -453,7 +455,7 @@ const resolveResolverResult = (
         result[i]
       );
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.path.pop();
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childResult === undefined && !_isListNullable) {
         return undefined;
@@ -502,7 +504,7 @@ const resolveLink = (
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.path.push(i);
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
       // Recursively read the link
       const childLink = resolveLink(
         ctx,
@@ -513,7 +515,7 @@ const resolveLink = (
         prevData != null ? prevData[i] : undefined
       );
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.path.pop();
+      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childLink === undefined && !_isListNullable) {
         return undefined;

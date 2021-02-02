@@ -43,7 +43,6 @@ import {
   ensureData,
   makeContext,
   updateContext,
-  initErrorMap,
   getFieldError,
 } from './shared';
 
@@ -60,9 +59,8 @@ export const write = (
   error?: CombinedError | undefined,
   key?: number
 ): WriteResult => {
-  initErrorMap(error);
   initDataState('write', store.data, key || null);
-  const result = startWrite(store, request, data);
+  const result = startWrite(store, request, data, error);
   clearDataState();
   return result;
 };
@@ -70,7 +68,8 @@ export const write = (
 export const startWrite = (
   store: Store,
   request: OperationRequest,
-  data: Data
+  data: Data,
+  error?: CombinedError | undefined
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { data, dependencies: getCurrentDependencies() };
@@ -81,7 +80,9 @@ export const startWrite = (
     normalizeVariables(operation, request.variables),
     getFragments(request.query),
     operationName,
-    operationName
+    operationName,
+    false,
+    error
   );
 
   if (process.env.NODE_ENV !== 'production') {
@@ -102,7 +103,6 @@ export const writeOptimistic = (
   request: OperationRequest,
   key: number
 ): WriteResult => {
-  initErrorMap();
   initDataState('write', store.data, key, true);
 
   const operation = getMainOperation(request.query);
@@ -129,7 +129,8 @@ export const writeOptimistic = (
     getFragments(request.query),
     operationName,
     operationName,
-    true
+    true,
+    undefined
   );
 
   writeSelection(ctx, operationName, getSelectionSet(operation), result.data!);
@@ -181,7 +182,8 @@ export const writeFragment = (
     variables || {},
     fragments,
     typename,
-    entityKey
+    entityKey,
+    undefined
   );
 
   writeSelection(ctx, entityKey, getSelectionSet(fragment), dataToWrite);
@@ -257,7 +259,7 @@ const writeSelection = (
     if (fieldName === '__typename') continue;
 
     // Add the current alias to the walked path before processing the field's value
-    ctx.path.push(fieldAlias);
+    ctx.__internal.path.push(fieldAlias);
 
     // Execute optimistic mutation functions on root fields
     if (ctx.optimistic && isRoot) {
@@ -317,7 +319,7 @@ const writeSelection = (
     }
 
     // After processing the field, remove the current alias from the path again
-    ctx.path.pop();
+    ctx.__internal.path.pop();
   }
 };
 
@@ -334,7 +336,7 @@ const writeField = (
     const newData = new Array(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
       // Add the current index to the walked path before processing the link
-      ctx.path.push(i);
+      ctx.__internal.path.push(i);
       // Append the current index to the parentFieldKey fallback
       const indexKey = parentFieldKey
         ? joinKeys(parentFieldKey, `${i}`)
@@ -344,7 +346,7 @@ const writeField = (
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
       // After processing the field, remove the current index from the path
-      ctx.path.pop();
+      ctx.__internal.path.pop();
     }
 
     return newData;

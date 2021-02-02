@@ -68,7 +68,7 @@ export interface ResolveInfo {
   error: GraphQLError | undefined;
   partial?: boolean;
   optimistic?: boolean;
-  // path: Array<string | number>; is not actively exposed as it leaks alias information and is hence not reliably stable
+  __internal?: unknown;
 }
 
 export interface QueryInput<T = Data, V = Variables> {
