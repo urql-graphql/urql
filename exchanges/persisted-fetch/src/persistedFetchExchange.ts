@@ -34,6 +34,7 @@ import { hash } from './sha256';
 
 interface PersistedFetchExchangeOptions {
   preferGetForPersistedQueries?: boolean;
+  enforcePersistedQueries?: boolean;
   generateHash?: (query: string, document: DocumentNode) => Promise<string>;
 }
 
@@ -42,6 +43,8 @@ export const persistedFetchExchange = (
 ): Exchange => ({ forward, dispatchDebug }) => {
   if (!options) options = {};
 
+  const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
+  const enforcePersistedQueries = !!options.enforcePersistedQueries;
   const hashFn = options.generateHash || hash;
   let supportsPersistedQueries = true;
 
@@ -87,34 +90,33 @@ export const persistedFetchExchange = (
               operation,
               body,
               dispatchDebug,
-              !!(
-                (options as PersistedFetchExchangeOptions)
-                  .preferGetForPersistedQueries && sha256Hash
-              )
+              !!(preferGetForPersistedQueries && sha256Hash)
             );
           }),
           mergeMap(result => {
-            if (result.error && isPersistedUnsupported(result.error)) {
-              // Reset the body back to its non-persisted state
-              body.query = query;
-              body.extensions = undefined;
-              // Disable future persisted queries
-              supportsPersistedQueries = false;
-              return makePersistedFetchSource(
-                operation,
-                body,
-                dispatchDebug,
-                false
-              );
-            } else if (result.error && isPersistedMiss(result.error)) {
-              // Add query to the body but leave SHA256 hash intact
-              body.query = query;
-              return makePersistedFetchSource(
-                operation,
-                body,
-                dispatchDebug,
-                false
-              );
+            if (!enforcePersistedQueries) {
+              if (result.error && isPersistedUnsupported(result.error)) {
+                // Reset the body back to its non-persisted state
+                body.query = query;
+                body.extensions = undefined;
+                // Disable future persisted queries if they're not enforced
+                supportsPersistedQueries = false;
+                return makePersistedFetchSource(
+                  operation,
+                  body,
+                  dispatchDebug,
+                  false
+                );
+              } else if (result.error && isPersistedMiss(result.error)) {
+                // Add query to the body but leave SHA256 hash intact
+                body.query = query;
+                return makePersistedFetchSource(
+                  operation,
+                  body,
+                  dispatchDebug,
+                  false
+                );
+              }
             }
 
             return fromValue(result);
