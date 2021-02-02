@@ -41,12 +41,10 @@ export interface Context {
 
 export const contextRef: { current: Context | null } = { current: null };
 
-let errorMap: { [path: string]: GraphQLError } | undefined;
-
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): GraphQLError | undefined =>
-  ctx.__internal.path.length > 0 && !!errorMap
-    ? errorMap[ctx.__internal.path.join('.')]
+  ctx.__internal.path.length > 0 && ctx.__internal.errorMap
+    ? ctx.__internal.errorMap[ctx.__internal.path.join('.')]
     : undefined;
 
 export const makeContext = (
