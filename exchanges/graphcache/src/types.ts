@@ -67,6 +67,7 @@ export interface ResolveInfo {
   variables: Variables;
   partial?: boolean;
   optimistic?: boolean;
+  // path: Array<string | number>; is not actively exposed as it leaks alias information and is hence not reliably stable
 }
 
 export interface QueryInput<T = Data, V = Variables> {
