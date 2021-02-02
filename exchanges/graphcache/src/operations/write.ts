@@ -44,7 +44,7 @@ import {
   makeContext,
   updateContext,
   initErrorMap,
-  isFieldMissing,
+  getFieldError,
 } from './shared';
 
 export interface WriteResult {
@@ -290,7 +290,7 @@ const writeSelection = (
       InMemoryData.writeRecord(
         entityKey || typename,
         fieldKey,
-        (fieldValue !== null || !isFieldMissing(ctx)
+        (fieldValue !== null || !getFieldError(ctx)
           ? fieldValue
           : undefined) as EntityField
       );
@@ -349,7 +349,7 @@ const writeField = (
 
     return newData;
   } else if (data === null) {
-    return isFieldMissing(ctx) ? undefined : null;
+    return getFieldError(ctx) ? undefined : null;
   }
 
   const entityKey = ctx.store.keyOfEntity(data);

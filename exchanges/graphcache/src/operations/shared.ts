@@ -55,10 +55,9 @@ export const initErrorMap = (error?: CombinedError | undefined) => {
   }
 };
 
-export const isFieldMissing = (ctx: Context): boolean => {
-  // Checks whether the current data field is a cache miss because of a GraphQLError
-  return ctx.path.length > 0 && !!errorMap && !!errorMap[ctx.path.join('.')];
-};
+// Checks whether the current data field is a cache miss because of a GraphQLError
+export const getFieldError = (ctx: Context): GraphQLError | undefined =>
+  ctx.path.length > 0 && !!errorMap ? errorMap[ctx.path.join('.')] : undefined;
 
 export const makeContext = (
   store: Store,
@@ -96,7 +95,7 @@ export const updateContext = (
   ctx.parentKey = entityKey;
   ctx.parentFieldKey = fieldKey;
   ctx.fieldName = fieldName;
-  ctx.error = errorMap && errorMap[ctx.path.join('.')];
+  ctx.error = getFieldError(ctx);
 };
 
 const isFragmentHeuristicallyMatching = (
