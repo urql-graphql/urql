@@ -1,5 +1,5 @@
 import { TypedDocumentNode } from '@urql/core';
-import { DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
 export type NullArray<T> = Array<null | T>;
@@ -65,6 +65,7 @@ export interface ResolveInfo {
   fieldName: string;
   fragments: Fragments;
   variables: Variables;
+  error: GraphQLError | undefined;
   partial?: boolean;
   optimistic?: boolean;
   // path: Array<string | number>; is not actively exposed as it leaks alias information and is hence not reliably stable

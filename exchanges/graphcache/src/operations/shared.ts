@@ -1,4 +1,10 @@
-import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
+import { CombinedError } from '@urql/core';
+import {
+  GraphQLError,
+  FieldNode,
+  InlineFragmentNode,
+  FragmentDefinitionNode,
+} from 'graphql';
 
 import {
   isInlineFragment,
@@ -24,12 +30,26 @@ export interface Context {
   parentFieldKey: string;
   parent: Data;
   fieldName: string;
+  error: GraphQLError | undefined;
   partial: boolean;
   optimistic: boolean;
   path: Array<string | number>;
 }
 
 export const contextRef: { current: Context | null } = { current: null };
+
+let errorMap: { [path: string]: GraphQLError } | undefined;
+
+export const initErrorMap = (error?: CombinedError | undefined) => {
+  errorMap = undefined;
+  for (let i = 0; error && i < error.graphQLErrors.length; i++) {
+    const graphQLError = error.graphQLErrors[i];
+    if (graphQLError.path && graphQLError.path.length) {
+      if (!errorMap) errorMap = Object.create(null);
+      errorMap![graphQLError.path.join('.')] = graphQLError;
+    }
+  }
+};
 
 export const makeContext = (
   store: Store,
@@ -47,6 +67,7 @@ export const makeContext = (
   parentKey: entityKey,
   parentFieldKey: '',
   fieldName: '',
+  error: undefined,
   partial: false,
   optimistic: !!optimistic,
   path: [],
@@ -66,6 +87,7 @@ export const updateContext = (
   ctx.parentKey = entityKey;
   ctx.parentFieldKey = fieldKey;
   ctx.fieldName = fieldName;
+  ctx.error = errorMap && errorMap[ctx.path.join('.')];
 };
 
 const isFragmentHeuristicallyMatching = (

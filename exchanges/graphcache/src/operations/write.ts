@@ -1,4 +1,5 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { CombinedError } from '@urql/core';
 
 import {
   getFragments,
@@ -35,12 +36,14 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
+
 import {
   Context,
   makeSelectionIterator,
   ensureData,
   makeContext,
   updateContext,
+  initErrorMap,
 } from './shared';
 
 export interface WriteResult {
@@ -53,8 +56,10 @@ export const write = (
   store: Store,
   request: OperationRequest,
   data: Data,
+  error?: CombinedError | undefined,
   key?: number
 ): WriteResult => {
+  initErrorMap(error);
   initDataState('write', store.data, key || null);
   const result = startWrite(store, request, data);
   clearDataState();
@@ -96,6 +101,7 @@ export const writeOptimistic = (
   request: OperationRequest,
   key: number
 ): WriteResult => {
+  initErrorMap();
   initDataState('write', store.data, key, true);
 
   const operation = getMainOperation(request.query);
