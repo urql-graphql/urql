@@ -6,7 +6,6 @@ export * from './stringifyVariables';
 export * from './maskTypename';
 export * from './withPromise';
 export * from './operation';
-export * from './deprecation';
 
 export const noop = () => {
   /* noop */

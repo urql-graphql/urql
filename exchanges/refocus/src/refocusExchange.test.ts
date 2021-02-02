@@ -88,8 +88,5 @@ it(`attaches a listener and redispatches queries on call`, () => {
     key: 1,
     query: queryOne,
     kind: 'query',
-
-    // TODO: Remove this when the deprecated "operationName" property is removed
-    operationName: 'query',
   });
 });

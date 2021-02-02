@@ -94,23 +94,23 @@ export const startWrite = (
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { data, dependencies: getCurrentDependencies() };
-  const operationName = store.rootFields[operation.operation];
+  const kind = store.rootFields[operation.operation];
 
   const ctx = makeContext(
     store,
     normalizeVariables(operation, request.variables),
     getFragments(request.query),
-    operationName,
-    operationName,
+    kind,
+    kind,
     !!isOptimistic,
     error
   );
 
   if (process.env.NODE_ENV !== 'production') {
-    pushDebugNode(operationName, operation);
+    pushDebugNode(kind, operation);
   }
 
-  writeSelection(ctx, operationName, getSelectionSet(operation), data);
+  writeSelection(ctx, kind, getSelectionSet(operation), data);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();

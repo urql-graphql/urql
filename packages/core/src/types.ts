@@ -57,9 +57,6 @@ export interface Operation<Data = any, Variables = any>
   extends GraphQLRequest<Data, Variables> {
   readonly kind: OperationType;
   context: OperationContext;
-
-  /** @deprecated use Operation.kind instead */
-  readonly operationName: OperationType;
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
