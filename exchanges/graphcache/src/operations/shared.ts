@@ -42,13 +42,22 @@ let errorMap: { [path: string]: GraphQLError } | undefined;
 
 export const initErrorMap = (error?: CombinedError | undefined) => {
   errorMap = undefined;
-  for (let i = 0; error && i < error.graphQLErrors.length; i++) {
+  for (
+    let i = 0;
+    error && error.graphQLErrors && i < error.graphQLErrors.length;
+    i++
+  ) {
     const graphQLError = error.graphQLErrors[i];
     if (graphQLError.path && graphQLError.path.length) {
       if (!errorMap) errorMap = Object.create(null);
       errorMap![graphQLError.path.join('.')] = graphQLError;
     }
   }
+};
+
+export const isFieldMissing = (ctx: Context): boolean => {
+  // Checks whether the current data field is a cache miss because of a GraphQLError
+  return ctx.path.length > 0 && !!errorMap && !!errorMap[ctx.path.join('.')];
 };
 
 export const makeContext = (

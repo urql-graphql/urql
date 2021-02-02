@@ -44,6 +44,7 @@ import {
   makeContext,
   updateContext,
   initErrorMap,
+  isFieldMissing,
 } from './shared';
 
 export interface WriteResult {
@@ -289,7 +290,9 @@ const writeSelection = (
       InMemoryData.writeRecord(
         entityKey || typename,
         fieldKey,
-        fieldValue as EntityField
+        (fieldValue !== null || !isFieldMissing(ctx)
+          ? fieldValue
+          : undefined) as EntityField
       );
     }
 
@@ -326,7 +329,7 @@ const writeField = (
   select: SelectionSet,
   data: null | Data | NullArray<Data>,
   parentFieldKey?: string
-): Link => {
+): Link | undefined => {
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
@@ -346,7 +349,7 @@ const writeField = (
 
     return newData;
   } else if (data === null) {
-    return null;
+    return isFieldMissing(ctx) ? undefined : null;
   }
 
   const entityKey = ctx.store.keyOfEntity(data);
