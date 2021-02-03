@@ -299,20 +299,20 @@ const writeSelection = (
     }
 
     if (isRoot) {
-      // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(
-        ctx,
-        data,
-        typename,
-        typename,
-        joinKeys(typename, fieldKey),
-        fieldName
-      );
-
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
       if (updater) {
+        // We have to update the context to reflect up-to-date ResolveInfo
+        updateContext(
+          ctx,
+          data,
+          typename,
+          typename,
+          joinKeys(typename, fieldKey),
+          fieldName
+        );
+
         data[fieldName] = fieldValue;
         updater(data, fieldArgs || {}, ctx.store, ctx);
       }
