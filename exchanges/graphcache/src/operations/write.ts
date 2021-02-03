@@ -65,11 +65,32 @@ export const write = (
   return result;
 };
 
+export const writeOptimistic = (
+  store: Store,
+  request: OperationRequest,
+  key: number
+): WriteResult => {
+  if (process.env.NODE_ENV !== 'production') {
+    invariant(
+      getMainOperation(request.query).operation === 'mutation',
+      'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
+        'This case is unsupported and should never occur.',
+      10
+    );
+  }
+
+  initDataState('write', store.data, key, true);
+  const result = startWrite(store, request, {} as Data, undefined, true);
+  clearDataState();
+  return result;
+};
+
 export const startWrite = (
   store: Store,
   request: OperationRequest,
   data: Data,
-  error?: CombinedError | undefined
+  error?: CombinedError | undefined,
+  isOptimistic?: boolean
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { data, dependencies: getCurrentDependencies() };
@@ -81,7 +102,7 @@ export const startWrite = (
     getFragments(request.query),
     operationName,
     operationName,
-    false,
+    !!isOptimistic,
     error
   );
 
@@ -95,51 +116,6 @@ export const startWrite = (
     popDebugNode();
   }
 
-  return result;
-};
-
-export const writeOptimistic = (
-  store: Store,
-  request: OperationRequest,
-  key: number
-): WriteResult => {
-  initDataState('write', store.data, key, true);
-
-  const operation = getMainOperation(request.query);
-  const result: WriteResult = {
-    data: {} as Data,
-    dependencies: getCurrentDependencies(),
-  };
-  const operationName = store.rootFields[operation.operation];
-
-  invariant(
-    operationName === store.rootFields['mutation'],
-    'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
-      'This case is unsupported and should never occur.',
-    10
-  );
-
-  if (process.env.NODE_ENV !== 'production') {
-    pushDebugNode(operationName, operation);
-  }
-
-  const ctx = makeContext(
-    store,
-    normalizeVariables(operation, request.variables),
-    getFragments(request.query),
-    operationName,
-    operationName,
-    true,
-    undefined
-  );
-
-  writeSelection(ctx, operationName, getSelectionSet(operation), result.data!);
-
-  if (process.env.NODE_ENV !== 'production') {
-    popDebugNode();
-  }
-
-  clearDataState();
   return result;
 };
 
