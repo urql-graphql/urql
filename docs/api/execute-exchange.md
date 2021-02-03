@@ -14,9 +14,9 @@ _fetchExchange_ and useful for the server-side, debugging, or testing.
 First install `@urql/exchange-execute` alongside `urql`:
 
 ```sh
-yarn add @urql/exchange-retry
+yarn add @urql/exchange-execute
 # or
-npm install --save @urql/exchange-retry
+npm install --save @urql/exchange-execute
 ```
 
 You'll then need to add the `executeExchange`, exposed by this package, to your `Client`.
