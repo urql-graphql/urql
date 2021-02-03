@@ -107,6 +107,11 @@ persistedFetchExchange({
 });
 ```
 
+Additionally, if the API only expects persisted queries and not arbitrary ones and all queries are
+pre-registered against the API then the `persistedFetchExchange` may be put into a **non-automatic**
+persisted queries mode by giving it the `enforcePersistedQueries: true` option. This disables any
+retry logic and assumes that persisted queries will be handled like regular GraphQL requests.
+
 [Read more about `@urql/persisted-fetch-exchange` in our API
 docs.](../api/persisted-fetch-exchange.md)
 

@@ -33,9 +33,12 @@ const client = createClient({
 });
 ```
 
-The `persistedQueryExchange` supports two configuration options:
+The `persistedQueryExchange` supports three configuration options:
 
 - `preferGetForPersistedQueries`: Use `GET` for fetches with persisted queries
+- `enforcePersistedQueries`: This disables _automatic persisted queries_ and disables any retry
+  logic for how the API responds to persisted queries. Instead it's assumed that they'll always
+  succeed.
 - `generateHash`: A function that takes a GraphQL query and returns the hashed result. This defaults to the `window.crypto` API in the browser and the `crypto` module in node.
 
 The `persistedFetchExchange` only handles queries, so for mutations we keep the
