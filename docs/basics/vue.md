@@ -593,5 +593,14 @@ export default {
 There are some more tricks we can use with `useMutation`.<br />
 [Read more about its API in the API docs for it.](../api/vue.md#usemutation)
 
-[On the following page we'll learn about "Document Caching", `urql`'s default caching
-mechanism.](./document-caching.md)
+## Reading on
+
+This concludes the introduction for using `urql` with Svelte. The rest of the documentation
+is mostly framework-agnostic and will apply to either `urql` in general or the `@urql/core` package,
+which is the same between all framework bindings. Hence, next we may want to learn more about one of
+the following to learn more about the internals:
+
+- [How does the default "document cache" work?](../concepts/document-caching.md)
+- [How are errors handled and represented?](../concepts/errors.md)
+- [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
+- [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)
