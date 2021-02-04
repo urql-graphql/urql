@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { gql } from '@urql/core';
+import { gql, CombinedError } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 
 import { write } from './write';
@@ -173,5 +173,78 @@ describe('Query', () => {
     InMemoryData.initDataState('read', store.data, null);
     // The field must still be `'test'`
     expect(InMemoryData.readRecord('Query', 'field')).toBe('test');
+  });
+
+  it('should write errored records as undefined rather than null', () => {
+    const query = gql`
+      {
+        missingField
+        setField
+      }
+    `;
+
+    write(
+      store,
+      { query },
+      { missingField: null, setField: 'test' } as any,
+      new CombinedError({
+        graphQLErrors: [
+          {
+            message: 'Test',
+            path: ['missingField'],
+          },
+        ],
+      })
+    );
+
+    InMemoryData.initDataState('read', store.data, null);
+
+    // The setField must still be `'test'`
+    expect(InMemoryData.readRecord('Query', 'setField')).toBe('test');
+    // The missingField must still be `undefined`
+    expect(InMemoryData.readRecord('Query', 'missingField')).toBe(undefined);
+  });
+
+  it('should write errored links as undefined rather than null', () => {
+    const query = gql`
+      {
+        missingTodoItem: todos {
+          id
+          text
+        }
+        missingTodo: todo {
+          id
+          text
+        }
+      }
+    `;
+
+    write(
+      store,
+      { query },
+      {
+        missingTodoItem: [null, { __typename: 'Todo', id: 1, text: 'Learn' }],
+        missingTodo: null,
+      } as any,
+      new CombinedError({
+        graphQLErrors: [
+          {
+            message: 'Test',
+            path: ['missingTodoItem', 0],
+          },
+          {
+            message: 'Test',
+            path: ['missingTodo'],
+          },
+        ],
+      })
+    );
+
+    InMemoryData.initDataState('read', store.data, null);
+    expect(InMemoryData.readLink('Query', 'todos')).toEqual([
+      undefined,
+      'Todo:1',
+    ]);
+    expect(InMemoryData.readLink('Query', 'todo')).toEqual(undefined);
   });
 });

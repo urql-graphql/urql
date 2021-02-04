@@ -1,4 +1,10 @@
-import { FieldNode, InlineFragmentNode, FragmentDefinitionNode } from 'graphql';
+import { CombinedError } from '@urql/core';
+import {
+  GraphQLError,
+  FieldNode,
+  InlineFragmentNode,
+  FragmentDefinitionNode,
+} from 'graphql';
 
 import {
   isInlineFragment,
@@ -24,11 +30,22 @@ export interface Context {
   parentFieldKey: string;
   parent: Data;
   fieldName: string;
+  error: GraphQLError | undefined;
   partial: boolean;
   optimistic: boolean;
+  __internal: {
+    path: Array<string | number>;
+    errorMap: { [path: string]: GraphQLError } | undefined;
+  };
 }
 
 export const contextRef: { current: Context | null } = { current: null };
+
+// Checks whether the current data field is a cache miss because of a GraphQLError
+export const getFieldError = (ctx: Context): GraphQLError | undefined =>
+  ctx.__internal.path.length > 0 && ctx.__internal.errorMap
+    ? ctx.__internal.errorMap[ctx.__internal.path.join('.')]
+    : undefined;
 
 export const makeContext = (
   store: Store,
@@ -36,19 +53,40 @@ export const makeContext = (
   fragments: Fragments,
   typename: string,
   entityKey: string,
-  optimistic?: boolean
-): Context => ({
-  store,
-  variables,
-  fragments,
-  parent: { __typename: typename },
-  parentTypeName: typename,
-  parentKey: entityKey,
-  parentFieldKey: '',
-  fieldName: '',
-  partial: false,
-  optimistic: !!optimistic,
-});
+  optimistic?: boolean,
+  error?: CombinedError | undefined
+): Context => {
+  const ctx: Context = {
+    store,
+    variables,
+    fragments,
+    parent: { __typename: typename },
+    parentTypeName: typename,
+    parentKey: entityKey,
+    parentFieldKey: '',
+    fieldName: '',
+    error: undefined,
+    partial: false,
+    optimistic: !!optimistic,
+    __internal: {
+      path: [],
+      errorMap: undefined,
+    },
+  };
+
+  if (error && error.graphQLErrors) {
+    for (let i = 0; i < error.graphQLErrors.length; i++) {
+      const graphQLError = error.graphQLErrors[i];
+      if (graphQLError.path && graphQLError.path.length) {
+        if (!ctx.__internal.errorMap)
+          ctx.__internal.errorMap = Object.create(null);
+        ctx.__internal.errorMap![graphQLError.path.join('.')] = graphQLError;
+      }
+    }
+  }
+
+  return ctx;
+};
 
 export const updateContext = (
   ctx: Context,
@@ -64,6 +102,7 @@ export const updateContext = (
   ctx.parentKey = entityKey;
   ctx.parentFieldKey = fieldKey;
   ctx.fieldName = fieldName;
+  ctx.error = getFieldError(ctx);
 };
 
 const isFragmentHeuristicallyMatching = (

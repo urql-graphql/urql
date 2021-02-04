@@ -1,5 +1,5 @@
 import { TypedDocumentNode } from '@urql/core';
-import { DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
 export type NullArray<T> = Array<null | T>;
@@ -65,8 +65,10 @@ export interface ResolveInfo {
   fieldName: string;
   fragments: Fragments;
   variables: Variables;
+  error: GraphQLError | undefined;
   partial?: boolean;
   optimistic?: boolean;
+  __internal?: unknown;
 }
 
 export interface QueryInput<T = Data, V = Variables> {

@@ -225,8 +225,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
     if (result.data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
-      const writeDependencies = write(store, operation, result.data, key)
-        .dependencies;
+      const writeDependencies = write(
+        store,
+        operation,
+        result.data,
+        result.error,
+        key
+      ).dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
       const queryResult = query(store, operation, result.data, key);

@@ -1,4 +1,5 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { CombinedError } from '@urql/core';
 
 import {
   getFragments,
@@ -35,12 +36,14 @@ import {
 } from '../store';
 
 import * as InMemoryData from '../store/data';
+
 import {
   Context,
   makeSelectionIterator,
   ensureData,
   makeContext,
   updateContext,
+  getFieldError,
 } from './shared';
 
 export interface WriteResult {
@@ -53,10 +56,31 @@ export const write = (
   store: Store,
   request: OperationRequest,
   data: Data,
+  error?: CombinedError | undefined,
   key?: number
 ): WriteResult => {
   initDataState('write', store.data, key || null);
-  const result = startWrite(store, request, data);
+  const result = startWrite(store, request, data, error);
+  clearDataState();
+  return result;
+};
+
+export const writeOptimistic = (
+  store: Store,
+  request: OperationRequest,
+  key: number
+): WriteResult => {
+  if (process.env.NODE_ENV !== 'production') {
+    invariant(
+      getMainOperation(request.query).operation === 'mutation',
+      'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
+        'This case is unsupported and should never occur.',
+      10
+    );
+  }
+
+  initDataState('write', store.data, key, true);
+  const result = startWrite(store, request, {} as Data, undefined, true);
   clearDataState();
   return result;
 };
@@ -64,7 +88,9 @@ export const write = (
 export const startWrite = (
   store: Store,
   request: OperationRequest,
-  data: Data
+  data: Data,
+  error?: CombinedError | undefined,
+  isOptimistic?: boolean
 ) => {
   const operation = getMainOperation(request.query);
   const result: WriteResult = { data, dependencies: getCurrentDependencies() };
@@ -75,7 +101,9 @@ export const startWrite = (
     normalizeVariables(operation, request.variables),
     getFragments(request.query),
     operationName,
-    operationName
+    operationName,
+    !!isOptimistic,
+    error
   );
 
   if (process.env.NODE_ENV !== 'production') {
@@ -88,50 +116,6 @@ export const startWrite = (
     popDebugNode();
   }
 
-  return result;
-};
-
-export const writeOptimistic = (
-  store: Store,
-  request: OperationRequest,
-  key: number
-): WriteResult => {
-  initDataState('write', store.data, key, true);
-
-  const operation = getMainOperation(request.query);
-  const result: WriteResult = {
-    data: {} as Data,
-    dependencies: getCurrentDependencies(),
-  };
-  const operationName = store.rootFields[operation.operation];
-
-  invariant(
-    operationName === store.rootFields['mutation'],
-    'writeOptimistic(...) was called with an operation that is not a mutation.\n' +
-      'This case is unsupported and should never occur.',
-    10
-  );
-
-  if (process.env.NODE_ENV !== 'production') {
-    pushDebugNode(operationName, operation);
-  }
-
-  const ctx = makeContext(
-    store,
-    normalizeVariables(operation, request.variables),
-    getFragments(request.query),
-    operationName,
-    operationName,
-    true
-  );
-
-  writeSelection(ctx, operationName, getSelectionSet(operation), result.data!);
-
-  if (process.env.NODE_ENV !== 'production') {
-    popDebugNode();
-  }
-
-  clearDataState();
   return result;
 };
 
@@ -174,7 +158,8 @@ export const writeFragment = (
     variables || {},
     fragments,
     typename,
-    entityKey
+    entityKey,
+    undefined
   );
 
   writeSelection(ctx, entityKey, getSelectionSet(fragment), dataToWrite);
@@ -246,9 +231,14 @@ const writeSelection = (
       }
     }
 
-    if (fieldName === '__typename') {
-      continue;
-    } else if (ctx.optimistic && isRoot) {
+    // We simply skip all typenames fields and assume they've already been written above
+    if (fieldName === '__typename') continue;
+
+    // Add the current alias to the walked path before processing the field's value
+    ctx.__internal.path.push(fieldAlias);
+
+    // Execute optimistic mutation functions on root fields
+    if (ctx.optimistic && isRoot) {
       const resolver = ctx.store.optimisticMutations[fieldName];
 
       if (!resolver) continue;
@@ -278,29 +268,34 @@ const writeSelection = (
       InMemoryData.writeRecord(
         entityKey || typename,
         fieldKey,
-        fieldValue as EntityField
+        (fieldValue !== null || !getFieldError(ctx)
+          ? fieldValue
+          : undefined) as EntityField
       );
     }
 
     if (isRoot) {
-      // We have to update the context to reflect up-to-date ResolveInfo
-      updateContext(
-        ctx,
-        data,
-        typename,
-        typename,
-        joinKeys(typename, fieldKey),
-        fieldName
-      );
-
       // We run side-effect updates after the default, normalized updates
       // so that the data is already available in-store if necessary
       const updater = ctx.store.updates[typename][fieldName];
       if (updater) {
+        // We have to update the context to reflect up-to-date ResolveInfo
+        updateContext(
+          ctx,
+          data,
+          typename,
+          typename,
+          joinKeys(typename, fieldKey),
+          fieldName
+        );
+
         data[fieldName] = fieldValue;
         updater(data, fieldArgs || {}, ctx.store, ctx);
       }
     }
+
+    // After processing the field, remove the current alias from the path again
+    ctx.__internal.path.pop();
   }
 };
 
@@ -312,24 +307,27 @@ const writeField = (
   select: SelectionSet,
   data: null | Data | NullArray<Data>,
   parentFieldKey?: string
-): Link => {
+): Link | undefined => {
   if (Array.isArray(data)) {
     const newData = new Array(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
-      const item = data[i];
+      // Add the current index to the walked path before processing the link
+      ctx.__internal.path.push(i);
       // Append the current index to the parentFieldKey fallback
       const indexKey = parentFieldKey
         ? joinKeys(parentFieldKey, `${i}`)
         : undefined;
       // Recursively write array data
-      const links = writeField(ctx, select, item, indexKey);
+      const links = writeField(ctx, select, data[i], indexKey);
       // Link cannot be expressed as a recursive type
       newData[i] = links as string | null;
+      // After processing the field, remove the current index from the path
+      ctx.__internal.path.pop();
     }
 
     return newData;
   } else if (data === null) {
-    return null;
+    return getFieldError(ctx) ? undefined : null;
   }
 
   const entityKey = ctx.store.keyOfEntity(data);
