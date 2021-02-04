@@ -39,11 +39,24 @@ while it doesn't deal with normalized data or IDs.
 
 ## Request Policies
 
-[We previously covered request policies on the "Queries" page.](./queries.md)
-
 The _request policy_ that is defined will alter what the default document cache does. By default the
-cache will prefer cached results and will otherwise send a request, which is called `cache-first`,
-but there's also `cache-and-network`, `cache-only`, and `network-only`.
+cache will prefer cached results and will otherwise send a request, which is called `cache-first`.
+In total there are four different policies that we can use:
+
+- `cache-first` (the default) prefers cached results and falls back to sending an API request when
+  no prior result is cached.
+- `cache-and-network` returns cached results but also always sends an API request, which is perfect
+  for displaying data quickly while keeping it up-to-date.
+- `network-only` will always send an API request and will ignore cached results.
+- `cache-only` will always return cached results or `null`.
+
+The `cache-and-network` policy is particularly useful, since it allows us to display data instantly
+if it has been cached, but also refreshes data in our cache in the background. This means though
+that `fetching` will be `false` for cached results although an API request may still be ongoing in
+the background.
+
+For this reason there's another field on results, `result.stale`, which indicates that the cached
+result is either outdated or that another request is being sent in the background.
 
 [Read more about which request policies are available in the API
 docs.](../api/core.md#requestpolicy-type)

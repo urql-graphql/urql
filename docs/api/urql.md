@@ -27,7 +27,7 @@ This hook returns a tuple of the shape `[result, executeQuery]`.
   it's called. When `pause` is set to `true` this executes the query, overriding the otherwise
   paused hook.
 
-[Read more about how to use the `useQuery` API on the "Queries" page.](../basics/queries.md)
+[Read more about how to use the `useQuery` API on the "Queries" page.](../basics/react-preact.md#queries)
 
 ## useMutation
 
@@ -40,18 +40,20 @@ Accepts a single `query` argument of type `string | DocumentNode` and returns a 
   [`Partial<OperationContext>`](./core.md#operationcontext) and may be used to start executing a
   mutation. It returns a `Promise` resolving to an [`OperationResult`](./core.md#operationresult).
 
-[Read more about how to use the `useMutation` API on the "Mutations" page.](../basics/mutations.md)
+[Read more about how to use the `useMutation` API on the "Mutations"
+page.](../basics/react-preact.md#mutations)
 
 ## useSubscription
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop        | Type                     | Description                                                                                 |
-| ----------- | ------------------------ | ------------------------------------------------------------------------------------------- |
-| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.          |
-| `variables` | `?object`                | The variables to be used with the GraphQL request.                                          |
-| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery). |
-| `context`   | `?object`                | Holds the contextual information for the query.                                             |
+| Prop                                                 | Type                     | Description                                                                        |
+| ---------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
+| `query`                                              | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
+| `variables`                                          | `?object`                | The variables to be used with the GraphQL request.                                 |
+| `pause`                                              | `?boolean`               | A boolean flag instructing [execution to be                                        |
+| paused](../basics/react-preact.md#pausing-usequery). |
+| `context`                                            | `?object`                | Holds the contextual information for the query.                                    |
 
 The hook optionally accepts a second argument, which may be a handler function with a type signature
 of:

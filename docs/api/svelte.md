@@ -56,7 +56,7 @@ variable to it, and instead must pass the raw `operationStore`.
 
 This function will return the `operationStore` itself that has been passed.
 
-[Read more about how to use the `query` API on the "Queries" page.](../basics/queries.md#svelte)
+[Read more about how to use the `query` API on the "Queries" page.](../basics/svelte.md#queries)
 
 ## subscription
 
@@ -94,7 +94,7 @@ The `executeMutation` callback will return a promise which resolves to the `oper
 mutation has been completed.
 
 [Read more about how to use the `mutation` API on the "Mutations"
-page.](../basics/mutations.md#svelte)
+page.](../basics/svelte.md#mutations)
 
 ## Context API
 

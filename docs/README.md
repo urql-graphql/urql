@@ -11,7 +11,7 @@ GraphQL, as well as extensible, to grow to support dynamic single-app applicatio
 customized GraphQL infrastructure. In short, `urql` prioritizes usability and adaptability.
 
 As you're adopting GraphQL, `urql` becomes your primary data layer and can handle content-heavy
-pages through ["Document Caching"](./basics/document-caching.md) as well as dynamic and data-heavy
+pages through ["Document Caching"](./concepts/document-caching.md) as well as dynamic and data-heavy
 apps through ["Normalized Caching"](./graphcache/normalized-caching.md).
 
 `urql` can be understood as a collection of connected parts and packages.

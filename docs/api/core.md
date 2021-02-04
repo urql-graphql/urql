@@ -1,6 +1,7 @@
----
+core.md---
 title: '@urql/core'
 order: 0
+
 ---
 
 # @urql/core
@@ -133,7 +134,7 @@ goes wrong during a GraphQL request.
 | `graphQLErrors` | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                      |
 | `response`      | `?any`                           | The raw response object (if any) from the `fetch` call                             |
 
-[Read more about errors in `urql` on the "Error" page.](../basics/errors.md)
+[Read more about errors in `urql` on the "Error" page.](../concepts/errors.md)
 
 ## Types
 
@@ -193,7 +194,7 @@ handled.
 - `'network-only'`
 - `'cache-and-network'`
 
-[Read more about request policies on the "Queries" page.](../basics/queries.md#request-policies)
+[Read more about request policies on the "Document Caching" page.](../concepts/document-caching.md#request-policies)
 
 ### OperationContext
 
@@ -267,7 +268,7 @@ Patterns".](../concepts/stream-patterns.md)
 
 ### cacheExchange
 
-The `cacheExchange` as [described on the "Document Caching" page.](../basics/document-caching.md). It's of type `Exchange`.
+The `cacheExchange` as [described on the "Document Caching" page.](../concepts/document-caching.md). It's of type `Exchange`.
 
 ### subscriptionExchange
 

@@ -460,7 +460,7 @@ mutation has failed.
 
 If you're checking for errors, you should use `operationStore.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
-[Read more about errors on our "Errors" page.](./errors.md)
+[Read more about errors on our "Errors" page.](../concepts/errors.md)
 
 ```jsx
 mutateTodo({ id, title: newTitle }).then(result => {

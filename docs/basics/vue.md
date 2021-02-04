@@ -163,7 +163,7 @@ tuple we then get in return is an array that contains a result object and a re-e
 The result object contains several properties. The `fetching` field indicates whether we're currently
 loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
 the request to the API has failed or when our API result contained some `GraphQLError`s, which
-we'll get into later on the ["Errors" page](./errors.md).
+we'll get into later on the ["Errors" page](../concepts/errors.md).
 
 All of these properties on the result are derived from the [shape of
 `OperationResult`](../api/core.md#operationresult) and are marked as [reactive
@@ -560,7 +560,7 @@ reject. Instead it will always return a promise that resolves to a result.
 
 If you're checking for errors, you should use `result.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
-[Read more about errors on our "Errors" page.](./errors.md)
+[Read more about errors on our "Errors" page.](../concepts/errors.md)
 
 ```js
 import { useMutation } from '@urql/vue';

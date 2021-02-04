@@ -142,7 +142,7 @@ tuple we then get in return is an array that contains a result object and a re-e
 The result object contains several properties. The `fetching` field indicates whether we're currently
 loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
 the request to the API has failed or when our API result contained some `GraphQLError`s, which
-we'll get into later on the ["Errors" page](./errors.md).
+we'll get into later on the ["Errors" page](../concepts/errors.md).
 
 ### Variables
 
@@ -218,25 +218,9 @@ The `requestPolicy` option determines how results are retrieved from our `Client
 default this is set to `cache-first`, which means that we prefer to get results from our cache, but
 are falling back to sending an API request.
 
-In total there are four different policies that we can use:
-
-- `cache-first` (the default) prefers cached results and falls back to sending an API request when
-  no prior result is cached.
-- `cache-and-network` returns cached results but also always sends an API request, which is perfect
-  for displaying data quickly while keeping it up-to-date.
-- `network-only` will always send an API request and will ignore cached results.
-- `cache-only` will always return cached results or `null`.
-
-The `cache-and-network` policy is particularly useful, since it allows us to display data instantly
-if it has been cached, but also refreshes data in our cache in the background. This means though
-that `fetching` will be `false` for cached results although an API request may still be ongoing in
-the background.
-
-For this reason there's another field on results, `result.stale`, which indicates that the cached
-result is either outdated or that another request is being sent in the background.
-
 Request policies aren't specific to `urql`'s React API, but are a common feature in its core. [You
-can learn more about request policies on the API docs.](../api/core.md#requestpolicy)
+can learn more about how the cache behaves given the four different policies on the "Document
+Caching" page.](../concepts/document-caching.md)
 
 ### Reexecuting Queries
 
@@ -338,7 +322,7 @@ reject. Instead it will always return a promise that resolves to a result.
 
 If you're checking for errors, you should use `result.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
-[Read more about errors on our "Errors" page.](./errors.md)
+[Read more about errors on our "Errors" page.](../concepts/errors.md)
 
 ```jsx
 const Todo = ({ id, title }) => {

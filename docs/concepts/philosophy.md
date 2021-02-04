@@ -18,9 +18,6 @@ In this guide, we will walk through how `urql` is set up internally and how all 
 
 ## Hello World
 
-We previously read about how to set up a `Client` in [Getting
-Started](../basics/getting-started.md).
-
 When you use `urql` you will always create and set up a `Client`. There is a `createClient`
 convenience helper to do just that.
 
@@ -81,7 +78,7 @@ cache the results of queries automatically. In `urql` the `Client` can be extend
 cache implementations; all of them allow you to prevent mixing your declarative query or mutation
 code with cache-implementation details, as they mostly happen behind the scenes.
 
-We previously read about the default [Document Caching](../basics/document-caching.md).
+We previously read about the default [Document Caching](../concepts/document-caching.md).
 
 Some GraphQL clients also resort to caching data in a normalized format. This is similar to
 [how you may store data in Redux.](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape/)
