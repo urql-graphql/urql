@@ -60,7 +60,7 @@ export default {
     },
     {
       path: '/docs/basics/mutations',
-      redirect: 'docs/docs/basics',
+      redirect: 'docs/basics',
     },
     {
       path: '/docs/basics/queries',
