@@ -4,6 +4,7 @@ import {
   ExchangeIO,
   Operation,
   OperationResult,
+  CombinedError,
 } from '@urql/core';
 
 import {
@@ -609,6 +610,69 @@ describe('data dependencies', () => {
 
     jest.runAllTimers();
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(2);
+  });
+
+  it('marks errored null fields as uncached but delivers them as expected', () => {
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+
+    const query = gql`
+      {
+        field
+        author {
+          id
+        }
+      }
+    `;
+
+    const operation = client.createRequestOperation('query', {
+      key: 1,
+      query,
+    });
+
+    const queryResult: OperationResult = {
+      operation,
+      data: {
+        __typename: 'Query',
+        field: 'test',
+        author: null,
+      },
+      error: new CombinedError({
+        graphQLErrors: [
+          {
+            message: 'Test',
+            path: ['author'],
+          },
+        ],
+      }),
+    };
+
+    const reexecuteOperation = jest
+      .spyOn(client, 'reexecuteOperation')
+      .mockImplementation(next);
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) return queryResult;
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
+
+    pipe(
+      cacheExchange({})({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(operation);
+
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(result).toHaveBeenCalledTimes(1);
+    expect(reexecuteOperation).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0]).toHaveProperty('data.author', null);
   });
 });
 
