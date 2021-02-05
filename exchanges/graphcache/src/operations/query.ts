@@ -1,4 +1,5 @@
 import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { CombinedError } from '@urql/core';
 
 import {
   getSelectionSet,
@@ -6,9 +7,6 @@ import {
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
-} from '../ast';
-
-import {
   getFragments,
   getMainOperation,
   normalizeVariables,
@@ -44,6 +42,7 @@ import {
   ensureData,
   makeContext,
   updateContext,
+  getFieldError,
 } from './shared';
 
 import {
@@ -62,10 +61,11 @@ export const query = (
   store: Store,
   request: OperationRequest,
   data?: Data,
+  error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
   initDataState('read', store.data, (data && key) || null);
-  const result = read(store, request, data);
+  const result = read(store, request, data, error);
   clearDataState();
   return result;
 };
@@ -73,7 +73,8 @@ export const query = (
 export const read = (
   store: Store,
   request: OperationRequest,
-  input?: Data
+  input?: Data,
+  error?: CombinedError | undefined
 ): QueryResult => {
   const operation = getMainOperation(request.query);
   const rootKey = store.rootFields[operation.operation];
@@ -84,7 +85,9 @@ export const read = (
     normalizeVariables(operation, request.variables),
     getFragments(request.query),
     rootKey,
-    rootKey
+    rootKey,
+    false,
+    error
   );
 
   if (process.env.NODE_ENV !== 'production') {
@@ -117,21 +120,22 @@ const readRoot = (
   select: SelectionSet,
   originalData: Data
 ): Data => {
-  if (typeof originalData.__typename !== 'string') {
+  const typename = ctx.store.rootNames[entityKey]
+    ? entityKey
+    : originalData.__typename;
+  if (typeof typename !== 'string') {
     return originalData;
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
-  const data = {} as Data;
-  data.__typename = originalData.__typename;
+  const data = { __typename: typename };
 
   let node: FieldNode | void;
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = originalData[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
-    if (process.env.NODE_ENV !== 'production')
-      ctx.__internal.path.push(fieldAlias);
+    ctx.__internal.path.push(fieldAlias);
     // Process the root field's value
     if (node.selectionSet && fieldValue !== null) {
       const fieldData = ensureData(fieldValue);
@@ -140,7 +144,7 @@ const readRoot = (
       data[fieldAlias] = fieldValue;
     }
     // After processing the field, remove the current alias from the path again
-    if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
+    ctx.__internal.path.pop();
   }
 
   return data;
@@ -155,11 +159,11 @@ const readRootField = (
     const newData = new Array(originalData.length);
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
+      ctx.__internal.path.push(i);
       // Recursively read the root field's value
       newData[i] = readRootField(ctx, select, originalData[i]);
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
+      ctx.__internal.path.pop();
     }
 
     return newData;
@@ -312,8 +316,7 @@ const readSelection = (
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
     // Add the current alias to the walked path before processing the field's value
-    if (process.env.NODE_ENV !== 'production')
-      ctx.__internal.path.push(fieldAlias);
+    ctx.__internal.path.push(fieldAlias);
 
     if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
@@ -396,8 +399,15 @@ const readSelection = (
       }
     }
 
+    // If we have an error registered for the current field change undefined values to null
+    if (dataFieldValue === undefined && !!getFieldError(ctx)) {
+      hasPartials = true;
+      dataFieldValue = null;
+    }
+
     // After processing the field, remove the current alias from the path again
-    if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
+    ctx.__internal.path.pop();
+
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
@@ -442,7 +452,7 @@ const resolveResolverResult = (
     const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
+      ctx.__internal.path.push(i);
       // Recursively read resolver result
       const childResult = resolveResolverResult(
         ctx,
@@ -455,7 +465,7 @@ const resolveResolverResult = (
         result[i]
       );
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
+      ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childResult === undefined && !_isListNullable) {
         return undefined;
@@ -504,7 +514,7 @@ const resolveLink = (
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.push(i);
+      ctx.__internal.path.push(i);
       // Recursively read the link
       const childLink = resolveLink(
         ctx,
@@ -515,7 +525,7 @@ const resolveLink = (
         prevData != null ? prevData[i] : undefined
       );
       // After processing the field, remove the current index from the path
-      if (process.env.NODE_ENV !== 'production') ctx.__internal.path.pop();
+      ctx.__internal.path.pop();
       // Check the result for cache-missed values
       if (childLink === undefined && !_isListNullable) {
         return undefined;
