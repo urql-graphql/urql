@@ -234,7 +234,13 @@ export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
       ).dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
-      const queryResult = query(store, operation, result.data, key);
+      const queryResult = query(
+        store,
+        operation,
+        result.data,
+        result.error,
+        key
+      );
       result.data = queryResult.data;
       if (operation.kind === 'query') {
         // Collect the query's dependencies for future pending operation updates
