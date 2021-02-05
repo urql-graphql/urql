@@ -405,6 +405,9 @@ const readSelection = (
       dataFieldValue = null;
     }
 
+    // After processing the field, remove the current alias from the path again
+    ctx.__internal.path.pop();
+
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
@@ -419,16 +422,12 @@ const readSelection = (
       data[fieldAlias] = null;
     } else if (dataFieldValue === undefined) {
       // The field is uncached and not nullable; return undefined
-      ctx.__internal.path.pop();
       return undefined;
     } else {
       // Otherwise continue as usual
       hasFields = true;
       data[fieldAlias] = dataFieldValue;
     }
-
-    // After processing the field, remove the current alias from the path again
-    ctx.__internal.path.pop();
   }
 
   if (hasPartials) ctx.partial = true;
