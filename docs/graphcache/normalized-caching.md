@@ -309,6 +309,140 @@ cacheExchange({
 });
 ```
 
-### Reading on
+## Non-Automatic Relations and Updates
 
-[On the next page we'll learn about "Computed queries".](./computed-queries.md)
+While _Graphcache_ is able to store and update our entities in an in-memory relational data
+structure, which keeps the same entities in singular unique locations, a GraphQL API may make a lot
+of implicit changes to the relations of data as it runs or have trivial relations that our cache
+doesn't need to see to resolve. Like with the `keys` config, we have two more configuration options
+to combat this: `resolvers` and `updates`.
+
+### Manually resolving entities
+
+Some fields in our configuration can be resolved without checking the GraphQL API for relations. The
+`resolvers` config allows us to create a list of client-side resolvers where we can read from the
+cache directly as _Graphcache_ creates a local GraphQL result from its cached data.
+
+```graphql
+{
+  todo(id: 1) {
+    id
+  }
+}
+```
+
+Previously we've looked at the above query to illustrate how data from a GraphQL API may be written
+to _Graphcache_'s relational data structure to store the links and entities in a result against this
+GraphQL query document. However, it may be possible for another query to have already written this
+`Todo` entity to the cache. So, **how do we resolve a relation manually?**
+
+In such a case, _Graphcache_ may have seen and stored the `Todo` entity but isn't aware of the
+relation between `Query.todo({"id":1})` and the `Todo:1` entity. However, we can tell _Graphcache_
+which entity it should look for when it accesses the `Query.todo` field by creating a resolver for
+it:
+
+```js
+cacheExchange({
+  resolvers: {
+    Query: {
+      todo(parent, args, cache, info) {
+        return { __typename: 'Todo', id: args.id };
+      },
+    },
+  },
+});
+```
+
+A resolver is a function that's similar to [GraphQL.js' resolvers on the
+server-side](https://www.graphql-tools.com/docs/resolvers/). They receive the parent data, the
+field's arguments, access to _Graphcache_'s cached data, and an `info` object. [The entire function
+signature and more explanations can be found in the API docs.](../api/graphcache.md#resolvers-option)
+Since it can access the field's arguments from the GraphQL query document, we can return a partial
+`Todo` entity. As long as this
+object is keyable, it will tell _Graphcache_ what the key of the returned entity is. In other words,
+we've told it how to get to a `Todo` from the `Query.todo` field.
+
+This mechanism is immensely more powerful than this example. We have two other use-cases that
+resolvers may be used for:
+
+- Resolvers can be applied to fields with records, which means that it can be used to change or
+  transform scalar values. For instance, we can update a string or parse a `Date` right inside a
+  resolver.
+- Resolvers can return deeply nested results, which will be layered on top of the in-memory
+  relational cached data of _Graphcache_, which means that it can emulate infinite pagination and
+  other complex behaviour.
+
+[Read more about local resolvers ont the following page, "Custom Queries".](./custom-queries.md)
+
+### Manual cache updates
+
+While `resolvers`, as shown above, operate while _Graphcache_ is reading from its in-memory cache,
+`updates` are a configuration option that operate while _Graphcache_ is writing to its cached data.
+Specifically, these functions can be used to add more updates onto what a `Mutation` or
+`Subscription` may automatically update.
+
+As stated before, a GraphQL schema's data may undergo a lot of implicit changes when we send it a
+`Mutation` or `Subscription`. A new item that we create may for instance manipulate a completely
+different item or even a list. Often mutations and subscriptions alter relations that their
+selection sets wouldn't necessarily see. Since mutations and subscriptions operate on a different
+root type, rather than the `Query` root type, we often need to update links in the rest of our data
+when a mutation is executed.
+
+```graphql
+query TodosList {
+  todos {
+    id
+    title
+  }
+}
+
+mutation AddTodo($title: String!) {
+  addTodo(title: $title) {
+    id
+    title
+  }
+}
+```
+
+In a simple example, like the one above, we have a list of todos in a query and create a new todo
+using the `Mutation.addTodo` mutation field. When the mutation is executed and we get the result
+back, _Graphcache_ already writes the `Todo` item to its normalized cache. However, we also want to
+add the new `Todo` item to the list on `Query.todos`:
+
+```js
+import { gql } from '@urql/core';
+
+cacheExchange({
+  updates: {
+    Mutation: {
+      addTodo(result, args, cache, info) {
+        const query = gql`
+          {
+            todos {
+              id
+            }
+          }
+        `;
+        cache.updateQuery({ query }, data => {
+          data.todos.push(result.addTodo);
+          return data;
+        });
+      },
+    },
+  },
+});
+```
+
+In this code example we can first see that the signature of the `updates` entry is very similar to
+the one of `resolvers`. However, we're seeing the `cache` in use for the first time. The `cache`
+object (as [documented in the API docs](http://localhost:3000/docs/api/graphcache/#cache)) gives us
+access to _Graphcache_'s mechanisms directly. Not only can we resolve data using it, we can directly
+start sub-queries or sub-writes manually. These are full normalized cache runs inside other runs. In
+this case we're calling `cache.updateQuery` on a list of `Todo` items while the `Mutation` that
+added the `Todo` is already being written to the cache.
+
+As we can see, we may perform manual changes inside of `updates` functions, which can be used to
+affect other parts of the cache (like `Query.todos` here) beyond the automatic updates that a
+normalized cache is expected to perform.
+
+[Read more about creating custom updates on the "Custom Updates" page.](./custom-updates.md)
