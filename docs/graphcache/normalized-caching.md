@@ -201,59 +201,110 @@ entities using this approach and can update one another.
 In other words, once we have a primary key like `"Todo:1"` we may find this primary key again in
 other entities in other GraphQL results.
 
-## Terminology
+## Custom Keys and Non-Keyable Entities
 
-A few terms that will be used throughout the _Graphcache_ documentation that are important to understand in order to get a full understanding.
+In the above introduction we've learned that while _Graphcache_ doesn't enforce `id` fields on each
+entity, it checks for the `id` and `_id` fields by default. There are many situations in which
+entities may either not have a key field or have different keys.
 
-- **Entity**, this is an object for which the cache can generate a key, like `Todo:1`.
-- **Record**, this is a property that relate to an entity, in the above case this would be `title`, ...
-  internally these will be represented as `Todo:1.title`.
-- **Link**, This is the connection between entities or the base `Query` field, this will link an entity key (ex: `Query`/`Todo:1`) to a single or an array
-  of keys
+As _Graphcache_ traverses JSON data and a GraphQL query document to write data to the cache you may
+see a warning from it along the lines of ["Invalid key: [...] No key could be generated for the data
+at this field."](./errors.md/#15-invalid-key) _Graphcache_ has many warnings like these that attempt
+to detect undesirable behaviour and helps us to update our configuration or queries accordingly.
 
-## Key Generation
+In the simplest cases, we may simply have forgotten to add the `id` field to the selection set of
+our GraphQL query document. However, what if the field is instead called `uuid` and our query looks
+accordingly different?
 
-As we saw in the previous example, by default _Graphcache_ will attempt to generate a key by
-combining the `__typename` of a piece of data with the `id` or `_id` fields, if they're present. For
-instance, `{ __typename: 'Author', id: 1 }` becomes `"Author:1"`.
+```graphql
+{
+  item {
+    uuid
+  }
+}
+```
 
-_Graphcache_ will log a warning when these fields weren't requested as part of a query's selection
-set or aren't present in the data. This can be useful if we forget to include them in our queries.
-In general, _Graphcache_ will always output warnings in development when it assumes that something
-went wrong.
-
-However, in your schema you may have types that don't have an `id` or `_id` field, say maybe some
-types have a `key` field instead. In such cases the custom `keys` configuration comes into play
-
-Let's look at an example. Say we have a set of todos each with a `__typename`
-of `Todo`, but instead of identifying on `id` or `_id` we want to identify
-each record by its `name`:
+In the above selection set we have an `item` field that has a `uuid` field rather than an `id`
+field. This means that _Graphcache_ won't automatically be able to generate a primary key for this
+entity. Instead, we have to help it generate a key by passing it a custom `keys` config:
 
 ```js
-import { cacheExchange } from '@urql/exchange-graphcache';
-
-const cache = cacheExchange({
+cacheExchange({
   keys: {
-    Todo: data => data.name,
+    Item: data => data.uuid,
   },
 });
 ```
 
-This will cause our cache to generate a key from `__typename` and `name` instead if an entity's type
-is `Todo`.
+We may add a function as an entry to the `keys` configuration. The property here, `"Item"` must be
+the typename of the entity for which we're generating a key. The function may return an arbitarily
+generated key. So for our `item` field, which in our example schema gives us an `Item` entity, we
+can create a `keys` configuration entry that creates a key from the `uuid` field rather than the
+`id` field.
 
-Similarly some pieces of data shouldn't be normalized at all. If _Graphcache_ can't find the `id` or
-`_id` fields it will log a warning and _embed the data_ instead. Embedding the data means that it
-won't be normalized because the generated key is `null` and will instead only be referenced by the
-parent entity.
+This also raises a question, **what does _Graphcache_ do with unkeyable data by default? And, what
+if my data has no key?**<br />
+This special case is what we call "embedded data". Not all types in a GraphQL schema will have
+keyable fields and some types may just abstract data without themselves being relational. They may
+be "edges", entities that have a field pointing to other entities that simply connect two entities,
+or data types like a `GeoJson` or `Image` type.
 
-You can force this behaviour and silence the warning by making a `keys` function that returns `null`
-immediately. This can be useful for types that aren't globally unique, like a `GeoPoint`:
+In these cases, where the normalized cache encounters unkeyable types, it will create an embedded
+key by using the parent's primary key and combining it with the field key. This means that
+"embedded entities" are only reachable from a specific field on their parent entities. They're
+globally unique and aren't strictly speaking relational data.
+
+```graphql
+{
+  __typename
+  todo(id: 1) {
+    id
+    image {
+      url
+      width
+      height
+    }
+  }
+}
+```
+
+In the above example we're querying an `Image` type on a `Todo`. This imaginary `Image` type has no
+key because the image is embedded data and will only ever be associated to this `Todo`. In other
+words, the API's schema doesn't consider it necessary to have a primary key field for this type.
+Maybe it doesn't even have an ID in our backend's database. We _could_ assign this type an imaginary
+key (maybe based on the `url`) but in fact if it's not shared data it wouldn't make much sense to
+do so.
+
+When _Graphcache_ attempts to store this entity it will issue the previously mentioned warning.
+Internally, it'll then generate an embedded key for this entity based on the parent entity. If
+the parent entity's key is `Todo:1` then the embedded key for our `Image` will become
+`Todo:1.image`. This is also how this entity will be stored internally by _Graphcache_:
 
 ```js
-const myGraphCache = cacheExchange({
+{
+  records: Map {
+    'Todo:1.image': Record {
+      '__typename': 'Image',
+      'url': '...',
+      'width': 1024,
+      'height': 768
+    },
+  }
+}
+```
+
+This doesn't however mute the warning that _Graphcache_ outputs, since it believes we may have made a
+mistake. The warning itself gives us advice on how to mute it:
+
+> If this is intentional, create a keys config for `Image` that always returns null.
+
+Meaning, that we can add an entry to our `keys` config for our non-keyable type that explicitly
+returns `null`, which tells _Graphcache_ that the entity has no key:
+
+```js
+cacheExchange({
   keys: {
-    GeoPoint: () => null,
+    Image: () => null,
   },
 });
 ```
