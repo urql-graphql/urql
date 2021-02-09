@@ -1,6 +1,6 @@
 ---
 title: Exchanges
-order: 3
+order: 5
 ---
 
 # Exchanges
@@ -17,7 +17,7 @@ fulfill our GraphQL requests and can change the stream of operations or results.
 The default set of exchanges that `@urql/core` contains and applies to a `Client` are:
 
 - `dedupExchange`: Deduplicates pending operations (pending = waiting for a result)
-- `cacheExchange`: The default caching logic with ["Document Caching"](../basics/document-caching.md)
+- `cacheExchange`: The default caching logic with ["Document Caching"](../concepts/document-caching.md)
 - `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
 
 Other available exchanges:

@@ -6,15 +6,18 @@ order: 2
 # Basics
 
 In this chapter we'll explain the basics of `urql` and how to get started with using it without any
-prior knowledge. It's split into multiple pages that are best read in order.
+prior knowledge.
 
-- [**Getting started**](./getting-started.md) covers how to install the package for your framework of choice and set it up.
-- [**Queries**](./queries.md) explains how to write your first GraphQL queries with `urql`.
-- [**Mutations**](./mutations.md) follows up with how to define GraphQL mutations.
-- [**Document Caching**](./document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
-  [Normalized Cache](../graphcache/normalized-caching.md).
-- [**Errors**](./errors.md) contains information on error handling in `urql`.
+- [**React/Preact**](./react-preact.md) covers how to work with the bindings for React/Preact.
+- [**Vue**](./vue.md) covers how to work with the bindings for Vue 3.
+- [**Svelte**](./svelte.md) covers how to work with the bindings for Svelte.
+- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main
+  logic of `urql`, and how we can use it directly in Node.js.
 
 After reading "Basics" you may want to [read the "Concepts" chapter of the
 documentation](../concepts/README.md) as it explains the motivation and architecture that drives
-`urql`.
+`urql`. Two notable sections there include:
+
+- [**Document Caching**](../concepts/document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
+  [Normalized Cache](../graphcache/normalized-caching.md).
+- [**Errors**](../concepts/errors.md) contains information on error handling in `urql`.

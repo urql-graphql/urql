@@ -252,14 +252,8 @@ By default `withUrqlClient` will add `getInitialProps` to the component you're w
 `getStaticProps` and `getServerSideProps`. However we can enable this, let's look at an example:
 
 ```js
-import { withUrqlClient, initUrqlClient } from "next-urql";
-import {
-  ssrExchange,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-  useQuery
-} from "urql";
+import { withUrqlClient, initUrqlClient } from 'next-urql';
+import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
 
 const TODOS_QUERY = `
   query { todos { id text } }
@@ -269,7 +263,7 @@ function Todos() {
   const [res] = useQuery({ query: TODOS_QUERY });
   return (
     <div>
-      {res.data.todos.map((todo) => (
+      {res.data.todos.map(todo => (
         <div key={todo.id}>
           {todo.id} - {todo.text}
         </div>
@@ -281,8 +275,8 @@ function Todos() {
 export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient({
-    url: "your-url",
-    exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange]
+    url: 'your-url',
+    exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
   });
 
   // This query is used to populate the cache for the query
@@ -292,15 +286,15 @@ export async function getStaticProps(ctx) {
   return {
     props: {
       // urqlState is a keyword here so withUrqlClient can pick it up.
-      urqlState: ssrCache.extractData()
+      urqlState: ssrCache.extractData(),
     },
-    revalidate: 600
+    revalidate: 600,
   };
 }
 
 export default withUrqlClient(
-  (ssr) => ({
-    url: "your-url"
+  ssr => ({
+    url: 'your-url',
   }),
   { ssr: false } // Important so we don't wrap our component in getInitialProps
 )(Todos);
@@ -326,7 +320,7 @@ and on the client, where a replacement loading template is rendered on a parent 
 loading.
 
 We've previously seen how we can change our usage of `useQuery`'s `PromiseLike` result to [make use
-of Vue Suspense on the "Queries" page.](../basics/queries.md#vue-suspense)
+of Vue Suspense on the "Queries" page.](../basics/vue.md#vue-suspense)
 
 Any component's `setup()` function can be updated to instead be an `async setup()` function, in
 other words, to return a `Promise` instead of directly returning its data. This means that we can
@@ -358,7 +352,7 @@ const handleRequest = async (req, res) => {
   });
 
   const markup = await renderToString(app);
-  
+
   const data = JSON.stringify(ssr.extractData());
 
   res.status(200).send(`

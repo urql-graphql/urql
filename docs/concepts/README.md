@@ -10,12 +10,13 @@ inner workings of the `Client`, and how to write extensions and addons, also kno
 
 Each page goes a little further in explaining a core concept of `urql`.
 
+- [**Document Caching**](./document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
+  [Normalized Cache](../graphcache/normalized-caching.md).
+- [**Errors**](./errors.md) contains information on error handling in `urql`.
 - [**Philosophy**](./philosophy.md) gives a quick overview of the different aspects of GraphQL clients and `urql` in
   particular, which shines a light on why you may want to use `urql`.
 - [**Stream Pattern**](./stream-patterns.md) explains the inner working of `urql`, which is _stream-based_, also known as
   Observable patterns in JS.
-- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main logic of `urql`, and
-  how we can use it directly in Node.js.
 - [**Exchanges**](./exchanges.md) finally introduces _Exchanges_ and how to write extensions or addons and use them
   in `urql`.
 

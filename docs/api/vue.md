@@ -14,7 +14,7 @@ Accepts a single required options object as an input with the following properti
 | `query`         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
 | `variables`     | `?object`                | The variables to be used with the GraphQL request.                                                       |
 | `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
-| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
+| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery).                  |
 | `pollInterval`  | `?number`                | Every `pollInterval` milliseconds the query will be reexecuted.                                          |
 | `context`       | `?object`                | Holds the contextual information for the query.                                                          |
 
@@ -43,7 +43,7 @@ take advantage of [Vue 3's experimental Suspense feature.](https://vuedose.tips/
 When the promise is used, e.g. you `await useQuery(...)` then the `PromiseLike` will only resolve
 once a result from the API is available.
 
-[Read more about how to use the `useQuery` API on the "Queries" page.](../basics/queries.md#vue)
+[Read more about how to use the `useQuery` API on the "Queries" page.](../basics/vue.md#queries)
 
 ## useMutation
 
@@ -59,18 +59,18 @@ The object also carries a special `executeMutation` method, which accepts variab
 mutation. It returns a `Promise` resolving to an [`OperationResult`](./core.md#operationresult)
 
 [Read more about how to use the `useMutation` API on the "Mutations"
-page.](../basics/mutations.md#vue)
+page.](../basics/vue.md#mutations)
 
 ## useSubscription
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop        | Type                     | Description                                                                                 |
-| ----------- | ------------------------ | ------------------------------------------------------------------------------------------- |
-| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.          |
-| `variables` | `?object`                | The variables to be used with the GraphQL request.                                          |
-| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery). |
-| `context`   | `?object`                | Holds the contextual information for the subscription.                                      |
+| Prop        | Type                     | Description                                                                             |
+| ----------- | ------------------------ | --------------------------------------------------------------------------------------- |
+| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.      |
+| `variables` | `?object`                | The variables to be used with the GraphQL request.                                      |
+| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery). |
+| `context`   | `?object`                | Holds the contextual information for the subscription.                                  |
 
 Each of these inputs may also be [reactive](https://v3.vuejs.org/api/refs-api.html) (e.g. a `ref`)
 and are allowed to change over time which will issue a new query.

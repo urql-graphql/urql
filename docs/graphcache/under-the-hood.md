@@ -28,7 +28,7 @@ This layering approach means that Graphcache is able to temporarily reorder resu
 
 We've previously learned about [how to create "Optimistic Updates" in an earlier section.](./custom-updates.md#optimistic-updates)
 Optimistic updates can temporarily update cached data after incoming mutations, which will trigger on screen queries to update.
-However, if we also use [the `cache-and-network` request policy](../basics/queries.md#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
+However, if we also use [the `cache-and-network` request policy](../concepts/document-caching.md#request-policies) at the same time, some queries can refetch and overwrite our optimistic data,
 causing an unintended state where the intended optimistic update is destroyed.
 Such an unintended refetch can also happen if after an optimistic update a query is refetched when it’s not or
 only partially available in the cache.

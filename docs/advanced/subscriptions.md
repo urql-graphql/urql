@@ -5,7 +5,7 @@ order: 0
 
 # Subscriptions
 
-One feature of `urql` that was not mentioned in the ["Basics" section](../basics/README.md) is `urql`'s
+One feature of `urql` that was not mentioned in the ["Basics" sections](../basics/README.md) is `urql`'s
 APIs and ability to handle GraphQL subscriptions.
 
 ## The Subscription Exchange
@@ -110,7 +110,7 @@ create a Subscription Observable, which we return to the `subscriptionExchange` 
 ## React & Preact
 
 The `useSubscription` hooks comes with a similar API to `useQuery`, which [we've learned about in
-the "Queries" page in the "Basics" section.](../basics/queries.md#react--preact)
+the "Queries" page in the "Basics" section.](../basics/react-preact.md#queries)
 
 Its usage is extremely similar in that it accepts options, which may contain `query` and
 `variables`. However, it also accepts a second argument, which is a reducer function, similar to
@@ -173,7 +173,7 @@ messages.
 ## Svelte
 
 The `subscription` function in `@urql/svelte` comes with a similar API to `query`, which [we've
-learned about in the "Queries" page in the "Basics" section.](../basics/queries.md#svelte)
+learned about in the "Queries" page in the "Basics" section.](../basics/svelte.md#queries)
 
 Its usage is extremely similar in that it accepts an `operationStore`, which will typically contain
 our GraphQL subscription query. However, `subscription` also accepts a second argument, which is
@@ -231,7 +231,7 @@ the list of previous messages.
 ## Vue
 
 The `useSubscription` API is very similar to `useQuery`, which [we've learned about in
-the "Queries" page in the "Basics" section.](../basics/queries.md#vue)
+the "Queries" page in the "Basics" section.](../basics/vue.md#queries)
 
 Its usage is extremely similar in that it accepts options, which may contain `query` and
 `variables`. However, it also accepts a second argument, which is a reducer function, similar to

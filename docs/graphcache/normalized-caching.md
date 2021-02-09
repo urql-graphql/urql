@@ -12,7 +12,7 @@ even lists of entities, which we call "links". The scalar fields on entities lik
 etc is what we call "records."
 
 Instead of storing query results as whole documents, like `urql` does with [its default "Document
-Caching"](../basics/document-caching.md), _Graphcache_ flattens all data it receives automatically.
+Caching"](../concepts/document-caching.md), _Graphcache_ flattens all data it receives automatically.
 If we looked at doing this manually on the following piece of data, we'd separate each object into a
 list of key-value entries per entity.
 
