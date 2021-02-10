@@ -1,5 +1,11 @@
 # @urql/introspection
 
+## 0.2.0
+
+### Minor Changes
+
+- Update `minifyIntrospectionQuery` utility to remove additional information on arguments and to filter out schema metadata types, like `__Field` and others, by [@kitten](https://github.com/kitten) (See [#1351](https://github.com/FormidableLabs/urql/pull/1351))
+
 ## 0.1.2
 
 ### Patch Changes
