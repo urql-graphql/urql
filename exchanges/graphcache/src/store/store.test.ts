@@ -892,7 +892,7 @@ describe('Store with storage', () => {
           subscriptionType: {
             name: 'subscription_root',
           },
-        }
+        },
       },
       updates: {
         Mutation: {

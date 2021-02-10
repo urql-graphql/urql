@@ -34,9 +34,10 @@ export interface SchemaIntrospector {
 }
 
 export interface PartialIntrospectionSchema {
-  queryType: { name: string; };
-  mutationType?: { name: string; };
-  subscriptionType?: { name: string; };
+  queryType: { name: string; kind?: any };
+  mutationType?: { name: string; kind?: any };
+  subscriptionType?: { name: string; kind?: any };
+  types?: IntrospectionSchema['types'];
 }
 
 export type IntrospectionData =
@@ -83,7 +84,7 @@ export const buildClientSchema = ({
     }
   };
 
-  const schema: SchemaIntrospector= {
+  const schema: SchemaIntrospector = {
     query: __schema.queryType ? __schema.queryType.name : null,
     mutation: __schema.mutationType ? __schema.mutationType.name : null,
     subscription: __schema.subscriptionType
