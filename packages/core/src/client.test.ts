@@ -220,24 +220,6 @@ describe('executeQuery', () => {
 
     expect(receivedOps[0]).toHaveProperty('context.url', url);
   });
-
-  it('polls when pollInterval is specified', () => {
-    jest.useFakeTimers();
-    const { unsubscribe } = pipe(
-      client.executeQuery(query, { pollInterval: 100 }),
-      subscribe(x => x)
-    );
-
-    expect(receivedOps.length).toEqual(1);
-    jest.advanceTimersByTime(200);
-    expect(receivedOps.length).toEqual(5);
-    expect(receivedOps[0].kind).toEqual('query');
-    expect(receivedOps[1].kind).toEqual('teardown');
-    expect(receivedOps[2].kind).toEqual('query');
-    expect(receivedOps[3].kind).toEqual('teardown');
-    expect(receivedOps[4].kind).toEqual('query');
-    unsubscribe();
-  });
 });
 
 describe('executeMutation', () => {

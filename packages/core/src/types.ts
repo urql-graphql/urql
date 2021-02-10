@@ -47,7 +47,6 @@ export interface OperationContext {
   fetchOptions?: RequestInit | (() => RequestInit);
   requestPolicy: RequestPolicy;
   url: string;
-  pollInterval?: number;
   meta?: OperationDebugMeta;
   suspense?: boolean;
   preferGetMethod?: boolean;
