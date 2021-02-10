@@ -320,6 +320,14 @@ describe('executeSubscription', () => {
 });
 
 describe('queuing behavior', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('queues reexecuteOperation, which dispatchOperation consumes', () => {
     const output: Array<Operation | OperationResult> = [];
 
@@ -392,8 +400,6 @@ describe('queuing behavior', () => {
   });
 
   it('reemits previous results as stale if the operation is reexecuted as network-only', async () => {
-    jest.useFakeTimers();
-
     const output: OperationResult[] = [];
 
     const exchange: Exchange = () => {
@@ -463,11 +469,68 @@ describe('queuing behavior', () => {
     );
 
     unsubscribe();
-    jest.useRealTimers();
   });
 
   it('does not reemit previous results as stale if it was marked as stale already', async () => {
     const output: OperationResult[] = [];
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        map(op => ({
+          data: 1,
+          operation: op,
+          stale: true,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const { unsubscribe } = pipe(
+      client.executeRequestOperation(queryOperation),
+      subscribe(result => {
+        output.push(result);
+      })
+    );
+
+    jest.advanceTimersByTime(1);
+
+    expect(output.length).toBe(1);
+    expect(output[0]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[0]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    client.reexecuteOperation(
+      makeOperation(queryOperation.kind, queryOperation, {
+        ...queryOperation.context,
+        requestPolicy: 'network-only',
+      })
+    );
+
+    await Promise.resolve();
+    jest.advanceTimersByTime(1);
+
+    expect(output.length).toBe(2);
+    expect(output[1]).toHaveProperty('stale', true);
+    expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[1]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'network-only'
+    );
+
+    unsubscribe();
+  });
+
+  it.skip('does not reemit previous results as stale if cache emits first', async () => {
+    const output: OperationResult[] = [];
+
     const exchange: Exchange = () => ops$ => {
       return pipe(
         ops$,
@@ -502,18 +565,18 @@ describe('queuing behavior', () => {
     client.reexecuteOperation(
       makeOperation(queryOperation.kind, queryOperation, {
         ...queryOperation.context,
-        requestPolicy: 'network-only',
+        requestPolicy: 'cache-and-network',
       })
     );
 
     await Promise.resolve();
 
     expect(output.length).toBe(2);
-    expect(output[1]).toHaveProperty('stale', true);
+    expect(output[1]).toHaveProperty('stale', false);
     expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
     expect(output[1]).toHaveProperty(
       'operation.context.requestPolicy',
-      'network-only'
+      'cache-and-network'
     );
 
     unsubscribe();
