@@ -1,5 +1,22 @@
 # urql
 
+## 2.0.0
+
+### Major Changes
+
+- **Breaking**: Remove `pollInterval` option from `useQuery`. Instead please consider using `useEffect` calling `executeQuery` on an interval, by [@kitten](https://github.com/kitten) (See [#1374](https://github.com/FormidableLabs/urql/pull/1374))
+
+### Minor Changes
+
+- Reimplement `useQuery` to apply a consistent Suspense cache (torn down queries will still eliminate stale values) and support all Concurrent Mode edge cases. This work is based on `useMutableSource`'s mechanisms and allows React to properly fork lanes since no implicit state exists outside of `useState` in the implementation. The `useSubscription` hook has been updated similarly without a cache or retrieving values on mount, by [@kitten](https://github.com/kitten) (See [#1335](https://github.com/FormidableLabs/urql/pull/1335))
+- Remove deprecated `operationName` property from `Operation`s. The new `Operation.kind` property is now preferred. If you're creating new operations you may also use the `makeOperation` utility instead.
+  When upgrading `@urql/core` please ensure that your package manager didn't install any duplicates of it. You may deduplicate it manually using `npx yarn-deduplicate` (for Yarn) or `npm dedupe` (for npm), by [@kitten](https://github.com/kitten) (See [#1357](https://github.com/FormidableLabs/urql/pull/1357))
+
+### Patch Changes
+
+- Updated dependencies (See [#1374](https://github.com/FormidableLabs/urql/pull/1374), [#1357](https://github.com/FormidableLabs/urql/pull/1357), and [#1375](https://github.com/FormidableLabs/urql/pull/1375))
+  - @urql/core@2.0.0
+
 ## 1.11.6
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies (See [#1335](https://github.com/FormidableLabs/urql/pull/1335), [#1357](https://github.com/FormidableLabs/urql/pull/1357), and [#1374](https://github.com/FormidableLabs/urql/pull/1374))
+  - urql@2.0.0
+
 ## 2.2.0
 
 ### Minor Changes
