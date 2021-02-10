@@ -15,7 +15,6 @@ Accepts a single required options object as an input with the following properti
 | `variables`     | `?object`                | The variables to be used with the GraphQL request.                                                       |
 | `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
 | `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
-| `pollInterval`  | `?number`                | Every `pollInterval` milliseconds the query will be reexecuted.                                          |
 | `context`       | `?object`                | Holds the contextual information for the query.                                                          |
 
 This hook returns a tuple of the shape `[result, executeQuery]`.

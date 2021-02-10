@@ -10,10 +10,6 @@ import {
   Source,
   take,
   takeUntil,
-  merge,
-  interval,
-  fromValue,
-  switchMap,
   publish,
   subscribe,
   map,
@@ -268,13 +264,6 @@ export class Client {
         this.onOperationEnd(operation);
       })
     );
-
-    if (operation.kind === 'query' && operation.context.pollInterval) {
-      return pipe(
-        merge([fromValue(0), interval(operation.context.pollInterval)]),
-        switchMap(() => result$)
-      );
-    }
 
     return result$;
   }

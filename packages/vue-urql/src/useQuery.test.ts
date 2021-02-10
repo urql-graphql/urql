@@ -49,7 +49,6 @@ describe('useQuery', () => {
         context: undefined,
       },
       {
-        pollInterval: undefined,
         requestPolicy: undefined,
       }
     );
@@ -130,42 +129,5 @@ describe('useQuery', () => {
 
     expect(query.fetching).toBe(false);
     expect(query.data).toEqual({ test: true });
-  });
-
-  it('updates when polling', async () => {
-    const subject = makeSubject<any>();
-    const executeQuery = jest
-      .spyOn(client, 'executeQuery')
-      .mockImplementation(() => subject.source);
-
-    const _query = useQuery({
-      query: `{ test }`,
-      pollInterval: 500,
-      requestPolicy: 'cache-first',
-    });
-    const query = reactive(_query);
-
-    expect(executeQuery).toHaveBeenCalledWith(
-      {
-        key: expect.any(Number),
-        query: expect.any(Object),
-        variables: {},
-        context: undefined,
-      },
-      {
-        pollInterval: 500,
-        requestPolicy: 'cache-first',
-      }
-    );
-
-    expect(query.fetching).toBe(true);
-
-    subject.next({ data: { test: true } });
-
-    expect(query.fetching).toBe(false);
-    expect(query.data).toEqual({ test: true });
-
-    subject.next({ data: { test: false } });
-    expect(query.data).toEqual({ test: false });
   });
 });

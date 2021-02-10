@@ -21,7 +21,6 @@ export interface UseQueryArgs<Variables = object, Data = any> {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
   variables?: Variables;
   requestPolicy?: RequestPolicy;
-  pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
 }
@@ -56,7 +55,6 @@ export function useQuery<Data = any, Variables = object>(
 
     const source = client.executeQuery(request, {
       requestPolicy: args.requestPolicy,
-      pollInterval: args.pollInterval,
       ...args.context,
     });
 
@@ -68,15 +66,7 @@ export function useQuery<Data = any, Variables = object>(
           })
         )
       : source;
-  }, [
-    client,
-    request,
-    suspense,
-    args.pause,
-    args.requestPolicy,
-    args.pollInterval,
-    args.context,
-  ]);
+  }, [client, request, suspense, args.pause, args.requestPolicy, args.context]);
 
   const getSnapshot = useCallback(
     (
@@ -121,7 +111,6 @@ export function useQuery<Data = any, Variables = object>(
     client,
     request,
     args.requestPolicy,
-    args.pollInterval,
     args.context,
     args.pause,
   ] as const;
@@ -187,7 +176,6 @@ export function useQuery<Data = any, Variables = object>(
     (opts?: Partial<OperationContext>) => {
       const context = {
         requestPolicy: args.requestPolicy,
-        pollInterval: args.pollInterval,
         ...args.context,
         ...opts,
       };
@@ -203,14 +191,7 @@ export function useQuery<Data = any, Variables = object>(
         return state[1] !== nextResult ? [source, nextResult, state[2]] : state;
       });
     },
-    [
-      client,
-      request,
-      getSnapshot,
-      args.requestPolicy,
-      args.pollInterval,
-      args.context,
-    ]
+    [client, request, getSnapshot, args.requestPolicy, args.context]
   );
 
   return [currentResult, executeQuery];

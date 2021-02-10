@@ -46,11 +46,6 @@ the query sources, the `Client` will dispatch a "teardown" operation.
   instead.](#clientquery)
 - [See `createRequest` for a utility that creates `GraphQLRequest` objects.](#createrequest)
 
-A feature that is specific to `client.executeQuery` and isn't supported by
-`client.executeSubscription` and `client.executeMutation` is polling. You may optionally pass a
-`pollInterval` option on the `OperationContext` object, which will instruct the query to reexecute
-repeatedly in the interval you pass.
-
 ### client.executeSubscription
 
 This is functionally the same as `client.executeQuery`, but creates operations for subscriptions
@@ -211,7 +206,6 @@ properties you'll likely see some options that exist on the `Client` as well.
 | `fetch`               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
 | `requestPolicy`       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
 | `url`                 | `string`                              | The GraphQL endpoint                                                                                                  |
-| `pollInterval`        | `?number`                             | Every `pollInterval` milliseconds the query will be refetched.                                                        |
 | `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
 | `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
 | `preferGetMethod`     | `?boolean`                            | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
