@@ -12,6 +12,9 @@ import {
   takeUntil,
   publish,
   subscribe,
+  switchMap,
+  fromValue,
+  merge,
   map,
   Subscription,
 } from 'wonka';
