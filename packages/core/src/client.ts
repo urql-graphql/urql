@@ -254,9 +254,31 @@ export class Client {
       )
     );
 
+    const refetch$ = pipe(
+      this.operations$,
+      filter(
+        (op: Operation) =>
+          op.kind === operation.kind &&
+          op.key === operation.key &&
+          op.context.requestPolicy !== 'cache-only'
+      )
+    );
+
     const result$ = pipe(
       operationResults$,
       takeUntil(teardown$),
+      switchMap(result => {
+        if (result.stale) return fromValue(result);
+
+        return merge([
+          fromValue(result),
+          pipe(
+            refetch$,
+            take(1),
+            map(() => ({ ...result, stale: true }))
+          ),
+        ]);
+      }),
       onStart<OperationResult>(() => {
         this.onOperationStart(operation);
       }),
