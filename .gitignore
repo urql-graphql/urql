@@ -2,6 +2,7 @@
 **/node_modules
 *.log
 .rts2_cache*
+.husky
 dist/
 build/
 coverage/
