@@ -2,9 +2,19 @@ import { print } from 'graphql';
 
 /** NOTE: Testing in this file is designed to test both the client and its interaction with default Exchanges */
 
-import { Source, map, pipe, subscribe, filter, toArray, tap } from 'wonka';
+import {
+  Source,
+  delay,
+  map,
+  pipe,
+  subscribe,
+  filter,
+  toArray,
+  tap,
+} from 'wonka';
 import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
+import { makeOperation } from './utils';
 import { createClient } from './client';
 import { queryOperation } from './test-utils';
 
@@ -379,5 +389,80 @@ describe('queuing behavior', () => {
 
     expect(output[1]).toBe(results[0]);
     expect(output[3]).toBe(results[1]);
+  });
+
+  it('reemits previous results as stale if the operation is reexecuted as network-only', async () => {
+    jest.useFakeTimers();
+
+    const output: OperationResult[] = [];
+
+    const exchange: Exchange = () => {
+      let countRes = 0;
+      return ops$ => {
+        return pipe(
+          ops$,
+          filter(op => op.kind !== 'teardown'),
+          map(op => ({
+            data: ++countRes,
+            operation: op,
+          })),
+          delay(1)
+        );
+      };
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const { unsubscribe } = pipe(
+      client.executeRequestOperation(queryOperation),
+      subscribe(result => {
+        output.push(result);
+      })
+    );
+
+    jest.advanceTimersByTime(1);
+
+    expect(output.length).toBe(1);
+    expect(output[0]).toHaveProperty('data', 1);
+    expect(output[0]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[0]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    client.reexecuteOperation(
+      makeOperation(queryOperation.kind, queryOperation, {
+        ...queryOperation.context,
+        requestPolicy: 'network-only',
+      })
+    );
+
+    await Promise.resolve();
+
+    expect(output.length).toBe(2);
+    expect(output[1]).toHaveProperty('data', 1);
+    expect(output[1]).toHaveProperty('stale', true);
+    expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[1]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    jest.advanceTimersByTime(1);
+
+    expect(output.length).toBe(3);
+    expect(output[2]).toHaveProperty('data', 2);
+    expect(output[2]).toHaveProperty('stale', undefined);
+    expect(output[2]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[2]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'network-only'
+    );
+
+    unsubscribe();
+    jest.useRealTimers();
   });
 });
