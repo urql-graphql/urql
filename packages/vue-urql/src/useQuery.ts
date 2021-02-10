@@ -38,7 +38,6 @@ export interface UseQueryArgs<T = any, V = object> {
   query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
   variables?: MaybeRef<V>;
   requestPolicy?: MaybeRef<RequestPolicy>;
-  pollInterval?: MaybeRef<number>;
   context?: MaybeRef<Partial<OperationContext>>;
   pause?: MaybeRef<boolean>;
 }
@@ -132,7 +131,6 @@ export function useQuery<T = any, V = object>(
       next.value(
         client.executeQuery<T, V>(request.value, {
           requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
           ...args.context,
           ...opts,
         })
@@ -199,7 +197,6 @@ export function useQuery<T = any, V = object>(
       !isPaused.value
         ? client.executeQuery<T, V>(request.value, {
             requestPolicy: args.requestPolicy,
-            pollInterval: args.pollInterval,
             ...args.context,
           })
         : undefined
