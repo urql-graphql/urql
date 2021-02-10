@@ -271,15 +271,18 @@ export class Client {
     const result$ = pipe(
       operationResults$,
       takeUntil(teardown$),
-      switchMap(result =>
-        merge([
+      switchMap(result => {
+        if (result.stale) return fromValue(result);
+
+        return merge([
           fromValue(result),
           pipe(
             refetch$,
+            take(1),
             map(() => ({ ...result, stale: true }))
           ),
-        ])
-      ),
+        ]);
+      }),
       onStart<OperationResult>(() => {
         this.onOperationStart(operation);
       }),

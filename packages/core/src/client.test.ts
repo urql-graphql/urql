@@ -465,4 +465,57 @@ describe('queuing behavior', () => {
     unsubscribe();
     jest.useRealTimers();
   });
+
+  it('does not reemit previous results as stale if it was marked as stale already', async () => {
+    const output: OperationResult[] = [];
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        map(op => ({
+          data: 1,
+          operation: op,
+          stale: true,
+        }))
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const { unsubscribe } = pipe(
+      client.executeRequestOperation(queryOperation),
+      subscribe(result => {
+        output.push(result);
+      })
+    );
+
+    expect(output.length).toBe(1);
+    expect(output[0]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[0]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'cache-first'
+    );
+
+    client.reexecuteOperation(
+      makeOperation(queryOperation.kind, queryOperation, {
+        ...queryOperation.context,
+        requestPolicy: 'network-only',
+      })
+    );
+
+    await Promise.resolve();
+
+    expect(output.length).toBe(2);
+    expect(output[1]).toHaveProperty('stale', true);
+    expect(output[1]).toHaveProperty('operation.key', queryOperation.key);
+    expect(output[1]).toHaveProperty(
+      'operation.context.requestPolicy',
+      'network-only'
+    );
+
+    unsubscribe();
+  });
 });
