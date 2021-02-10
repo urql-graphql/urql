@@ -15,7 +15,6 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "operationName": "query",
     "query": Object {
       "__key": 3044551916,
       "definitions": Array [
@@ -185,7 +184,6 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "operationName": "query",
     "query": Object {
       "__key": 3044551916,
       "definitions": Array [
@@ -357,7 +355,6 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "operationName": "query",
     "query": Object {
       "__key": 3044551916,
       "definitions": Array [

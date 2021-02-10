@@ -151,9 +151,6 @@ describe('synchronous methods', () => {
         context: expect.anything(),
         key: expect.any(Number),
         kind: 'query',
-
-        // TODO: Remove this when the deprecated `operationName` property is removed
-        operationName: 'query',
       },
     });
   });

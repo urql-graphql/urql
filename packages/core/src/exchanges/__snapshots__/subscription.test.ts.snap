@@ -15,7 +15,6 @@ Object {
     },
     "key": 4,
     "kind": "subscription",
-    "operationName": "subscription",
     "query": Object {
       "__key": 2616620656,
       "definitions": Array [
