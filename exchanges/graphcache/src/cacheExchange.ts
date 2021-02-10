@@ -1,5 +1,3 @@
-import { IntrospectionQuery } from 'graphql';
-
 import {
   Exchange,
   formatDocument,
@@ -30,7 +28,7 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
-import { filterVariables, getMainOperation } from './ast';
+import { IntrospectionData, filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 
 import {
@@ -57,7 +55,7 @@ export interface CacheExchangeOpts {
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
-  schema?: IntrospectionQuery;
+  schema?: IntrospectionData;
   storage?: StorageAdapter;
 }
 

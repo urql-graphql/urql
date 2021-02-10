@@ -881,9 +881,19 @@ describe('Store with storage', () => {
     const fakeUpdater = jest.fn();
 
     const store = new Store({
-      schema: minifyIntrospectionQuery(
-        require('../test-utils/altered_root_schema.json')
-      ),
+      schema: {
+        __schema: {
+          queryType: {
+            name: 'query_root',
+          },
+          mutationType: {
+            name: 'mutation_root',
+          },
+          subscriptionType: {
+            name: 'subscription_root',
+          },
+        }
+      },
       updates: {
         Mutation: {
           toggleTodo: fakeUpdater,

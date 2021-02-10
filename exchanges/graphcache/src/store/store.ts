@@ -1,5 +1,4 @@
-import { DocumentNode, IntrospectionQuery } from 'graphql';
-
+import { DocumentNode } from 'graphql';
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
@@ -25,6 +24,7 @@ import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
 import {
+  IntrospectionData,
   SchemaIntrospector,
   buildClientSchema,
   expectValidKeyingConfig,
@@ -40,7 +40,7 @@ export interface StoreOpts {
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
-  schema?: IntrospectionQuery;
+  schema?: IntrospectionData;
 }
 
 export class Store implements Cache {
@@ -66,10 +66,12 @@ export class Store implements Cache {
     let mutationName = 'Mutation';
     let subscriptionName = 'Subscription';
     if (opts.schema) {
-      const schema = (this.schema = buildClientSchema(opts.schema));
+      const schema = buildClientSchema(opts.schema);
       queryName = schema.query || queryName;
       mutationName = schema.mutation || mutationName;
       subscriptionName = schema.subscription || subscriptionName;
+      // Only add schema introspector if it has types info
+      if (schema.types) this.schema = schema;
     }
 
     this.updates = {

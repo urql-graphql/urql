@@ -20,12 +20,13 @@ import {
   getName,
 } from './ast';
 
-import { makeDict } from './helpers/dict';
 import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
 } from './types';
+
+import { makeDict } from './helpers/dict';
 import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 

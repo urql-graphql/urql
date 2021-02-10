@@ -1,5 +1,6 @@
 import {
   IntrospectionQuery,
+  IntrospectionSchema,
   IntrospectionInputValue,
   IntrospectionTypeRef,
   IntrospectionType,
@@ -28,13 +29,23 @@ export interface SchemaIntrospector {
   query: string | null;
   mutation: string | null;
   subscription: string | null;
-  types: Record<string, SchemaObject | SchemaUnion>;
+  types?: Record<string, SchemaObject | SchemaUnion>;
   isSubType(abstract: string, possible: string): boolean;
 }
 
+export interface PartialIntrospectionSchema {
+  queryType: { name: string; };
+  mutationType?: { name: string; };
+  subscriptionType?: { name: string; };
+}
+
+export type IntrospectionData =
+  | IntrospectionQuery
+  | { __schema: PartialIntrospectionSchema };
+
 export const buildClientSchema = ({
   __schema,
-}: IntrospectionQuery): SchemaIntrospector => {
+}: IntrospectionData): SchemaIntrospector => {
   const typemap: Record<string, SchemaObject | SchemaUnion> = {};
 
   const buildNameMap = <T extends { name: string }>(
@@ -72,21 +83,13 @@ export const buildClientSchema = ({
     }
   };
 
-  for (let i = 0; i < __schema.types.length; i++) {
-    const type = __schema.types[i];
-    if (type && type.name) {
-      const out = buildType(type);
-      if (out) typemap[type.name] = out;
-    }
-  }
-
-  return {
+  const schema: SchemaIntrospector= {
     query: __schema.queryType ? __schema.queryType.name : null,
     mutation: __schema.mutationType ? __schema.mutationType.name : null,
     subscription: __schema.subscriptionType
       ? __schema.subscriptionType.name
       : null,
-    types: typemap,
+    types: undefined,
     isSubType(abstract: string, possible: string) {
       const abstractType = typemap[abstract];
       const possibleType = typemap[possible];
@@ -104,4 +107,17 @@ export const buildClientSchema = ({
       }
     },
   };
+
+  if (__schema.types) {
+    schema.types = typemap;
+    for (let i = 0; i < __schema.types.length; i++) {
+      const type = __schema.types[i];
+      if (type && type.name) {
+        const out = buildType(type);
+        if (out) typemap[type.name] = out;
+      }
+    }
+  }
+
+  return schema;
 };
