@@ -1,4 +1,9 @@
-import { makeOperation, Operation, OperationResult, Exchange } from '@urql/core';
+import {
+  makeOperation,
+  Operation,
+  OperationResult,
+  Exchange,
+} from '@urql/core';
 import { pipe, tap, map } from 'wonka';
 
 const defaultTTL = 5 * 60 * 1000;
@@ -17,7 +22,8 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
   const processIncomingOperation = (operation: Operation): Operation => {
     if (
       operation.kind !== 'query' ||
-      (operation.context.requestPolicy !== 'cache-first' && operation.context.requestPolicy !== 'cache-only') ||
+      (operation.context.requestPolicy !== 'cache-first' &&
+        operation.context.requestPolicy !== 'cache-only') ||
       !operations.has(operation.key)
     ) {
       return operation;
