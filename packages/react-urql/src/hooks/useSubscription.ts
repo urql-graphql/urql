@@ -1,3 +1,5 @@
+// eslint-disable react-hooks/exhaustive-deps
+
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 import { useEffect, useState, useCallback, useMemo } from 'react';
