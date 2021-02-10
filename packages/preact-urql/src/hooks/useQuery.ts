@@ -32,7 +32,6 @@ export interface UseQueryArgs<Variables = object, Data = any> {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
   variables?: Variables;
   requestPolicy?: RequestPolicy;
-  pollInterval?: number;
   context?: Partial<OperationContext>;
   pause?: boolean;
 }
@@ -112,7 +111,6 @@ export function useQuery<Data = any, Variables = object>(
       if (!source) {
         source = client.executeQuery(request, {
           requestPolicy: args.requestPolicy,
-          pollInterval: args.pollInterval,
           ...args.context,
           ...opts,
         });
@@ -128,7 +126,7 @@ export function useQuery<Data = any, Variables = object>(
 
       return source;
     },
-    [client, request, args.requestPolicy, args.pollInterval, args.context]
+    [client, request, args.requestPolicy, args.context]
   );
 
   const query$ = useMemo(() => {
