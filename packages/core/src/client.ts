@@ -258,9 +258,28 @@ export class Client {
       )
     );
 
+    const refetch$ = pipe(
+      this.operations$,
+      filter(
+        (op: Operation) =>
+          op.kind === operation.kind &&
+          op.key === operation.key &&
+          op.context.requestPolicy === 'network-only'
+      )
+    );
+
     const result$ = pipe(
       operationResults$,
       takeUntil(teardown$),
+      switchMap(result =>
+        merge([
+          fromValue(result),
+          pipe(
+            refetch$,
+            map(() => ({ ...result, stale: true }))
+          ),
+        ])
+      ),
       onStart<OperationResult>(() => {
         this.onOperationStart(operation);
       }),
