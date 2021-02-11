@@ -435,7 +435,7 @@ cacheExchange({
 
 In this code example we can first see that the signature of the `updates` entry is very similar to
 the one of `resolvers`. However, we're seeing the `cache` in use for the first time. The `cache`
-object (as [documented in the API docs](http://localhost:3000/docs/api/graphcache/#cache)) gives us
+object (as [documented in the API docs](../api/graphcache/#cache)) gives us
 access to _Graphcache_'s mechanisms directly. Not only can we resolve data using it, we can directly
 start sub-queries or sub-writes manually. These are full normalized cache runs inside other runs. In
 this case we're calling `cache.updateQuery` on a list of `Todo` items while the `Mutation` that
