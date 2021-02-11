@@ -54,5 +54,9 @@ export default {
       path: '404',
       template: require.resolve('./src/screens/404'),
     },
+    {
+      path: '/docs/graphcache/custom-updates',
+      redirect: 'docs/graphcache/cache-updates',
+    },
   ],
 };
