@@ -1,5 +1,12 @@
 # urql
 
+## 2.0.1
+
+### Patch Changes
+
+- ⚠️ Fix issue where `useSubscription` would endlessly loop when the callback wasn't memoized, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1384](https://github.com/FormidableLabs/urql/pull/1384))
+- ⚠️ Fix case where identical `useQuery` calls would result in cross-component updates, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1383](https://github.com/FormidableLabs/urql/pull/1383))
+
 ## 2.0.0
 
 ### Major Changes
