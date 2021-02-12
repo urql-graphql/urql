@@ -2,7 +2,7 @@
 
 import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import {
   TypedDocumentNode,
@@ -45,6 +45,11 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   const client = useClient();
   const request = useRequest<Data, Variables>(args.query, args.variables);
 
+  const handlerRef = useRef<SubscriptionHandler<Data, Result> | undefined>(
+    handler
+  );
+  handlerRef.current = handler;
+
   const source = useMemo(
     () =>
       !args.pause ? client.executeSubscription(request, args.context) : null,
@@ -54,19 +59,14 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   const deps = [client, request, args.context, args.pause] as const;
 
   const [state, setState] = useState(
-    () =>
-      [source, { ...initialState, fetching: !!source }, handler, deps] as const
+    () => [source, { ...initialState, fetching: !!source }, deps] as const
   );
 
   let currentResult = state[1];
-  if (
-    (source !== state[0] && hasDepsChanged(state[3], deps)) ||
-    handler !== state[2]
-  ) {
+  if (source !== state[0] && hasDepsChanged(state[2], deps)) {
     setState([
       source,
       (currentResult = computeNextState(state[1], { fetching: !!source })),
-      handler,
       deps,
     ]);
   }
@@ -78,9 +78,14 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
       setState(state => {
         const nextResult = computeNextState(state[1], result);
         if (state[1] === nextResult) return state;
-        if (state[2] && state[1].data !== nextResult.data)
-          nextResult.data = state[2](state[1].data, nextResult.data!) as any;
-        return [state[0], state[1], nextResult as any, state[3]];
+        if (handlerRef.current && state[1].data !== nextResult.data) {
+          nextResult.data = handlerRef.current(
+            state[1].data,
+            nextResult.data!
+          ) as any;
+        }
+
+        return [state[0], nextResult as any, state[2]];
       });
     };
 
@@ -105,7 +110,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
         ...opts,
       });
 
-      setState(state => [source, state[1], state[2], state[3]]);
+      setState(state => [source, state[1], state[2]]);
     },
     [client, args.context, request]
   );
