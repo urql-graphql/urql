@@ -78,13 +78,14 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
       setState(state => {
         const nextResult = computeNextState(state[1], result);
         if (state[1] === nextResult) return state;
-        if (handlerRef.current && state[1].data !== nextResult.data)
+        if (handlerRef.current && state[1].data !== nextResult.data) {
           nextResult.data = handlerRef.current(
             state[1].data,
             nextResult.data!
           ) as any;
+        }
 
-        return [state[0], nextResult.data, state[2]];
+        return [state[0], nextResult as any, state[2]];
       });
     };
 
