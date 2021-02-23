@@ -115,6 +115,80 @@ arguments to a field in your query, your GraphQL API's schema must accept these 
 first place. However, this is still useful if we're trying to imitate what the API is doing, which
 will become more relevant in the following examples and sections.
 
+## Resolving Entities
+
+We've already briefly seen that resolvers can be used to replace a link in Graphcache's local data
+on the ["Normalized Caching" page](./normalized-caching.md#manually-resolving-entities).
+
+Given that Graphcache [stores entities in a normalized data
+structure](./normalized-caching.md#storing-normalized-data) there may be multiple fields on a given
+schema that can be used to get to the same entity. For instance, the schema may allow for the same
+entity to be looked up by an ID while this entity may also appear somewhere else in a list or on an
+entirely different field.
+
+When links (or relations) like these are cached by Graphcache it is able to look up the entities
+automatically, e.g. if we've sent a `{ todo(id: 1) { id } }` query to our API once then Graphcache
+will have seen that this field leads to the entity it returns and can query it automatically from
+its cache.
+
+However, if we have a list like `{ todos { id } }` we may have seen and cached a specific entity,
+but as we browse the app and query for `{ todo(id: 1) { id } }`, Graphcache isn't able to
+automatically find this entity even if it has cached it already and will send a request to our API.
+
+In many cases we can create a local resolvers to instead tell the cache where to look for a specific
+entity by returning partial information for it. Any resolver on a relational field, meaning any
+field that links to an object type (or a list of object types) in the schema, may return a partial
+entity that tells the cache how to resolve it. Hence, we're able to implement a resolver for the
+previously shown `todo(id: $id)` field as such:
+
+```js
+cacheExchange({
+  resolvers: {
+    Query: {
+      todo: (_, args) => ({ __typename: 'Todo', id: args.id }),
+    },
+  },
+});
+```
+
+The `__typename` field is required. Graphcache will [use its keying
+logic](./normalized-caching.md#custom-keys-and-non-keyable-entities) and your custom `keys`
+configuration to generate a key for this entity and will then be able to look this entity up in its
+local cache. As with regular queries, the resolver is known to return a link since the `todo(id:
+$id) { id }` will be used with a selection set, querying fields on the entity.
+
+### Resolving by keys
+
+Resolvers can also directly return keys. We've previously learned [on the "Normalized Caching"
+page](./normalized-caching.md#custom-keys-and-non-keyable-entities) that the key for our example above
+would look something like `"Todo:1"` for `todo(id: 1)`. While it isn't adivsable to create keys
+manually in your resolvers, if you returned a key directly this would still work.
+
+Essentially, returning `{ __typename, id }` may sometimes be the same as returning the key manually.
+The `cache` that we receive as an argument on resolvers has a method for this logic, [the
+`cache.keyOfEntity` method](../api/graphcache.md#keyofentity).
+
+While it doesn't make much sense in this case, our example can be rewritten as:
+
+```js
+cacheExchange({
+  resolvers: {
+    Query: {
+      todo: (_, args, cache) =>
+        cache.keyOfEntity({ __typename: 'Todo', id: args.id }),
+    },
+  },
+});
+```
+
+And while it's not advisable to create keys ourselves, the resolvers' `cache` and `info` arguments
+give us ample opportunities to use and pass around keys.
+
+One example is the `info.parentKey` property. This property [on the `info`
+object](../api/graphcache.md#info) will always be set to the key of the entity that the resolver is
+currently run on. For instance, for the above resolver it may be `"Query"`, for for a resolver on
+`Todo.updatedAt` it may be `"Todo:1"`.
+
 ## Cache parameter
 
 This is the main point of communication with the cache, it will give us access to
