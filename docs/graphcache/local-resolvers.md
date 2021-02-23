@@ -1,9 +1,9 @@
 ---
-title: Computed Queries
+title: Local Resolvers
 order: 2
 ---
 
-# Computed Queries
+# Local Resolvers
 
 When dealing with data we could have special cases where we want to transform
 the data between the API and frontend logic. For example:
