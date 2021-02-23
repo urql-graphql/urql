@@ -317,88 +317,73 @@ It's a pretty flexible method that allows us to access arbitrary values from our
 have to be careful about what value will be resolved by it, since the cache can't know itself what
 type of value it may return.
 
-## Cache parameter
+The last trick this method allows you to apply is to access arbitrary fields on the root `Query`
+type. If we call `cache.resolve("Query", ...)` then we're also able to access arbitrary fields
+starting from the root `Query` of the cached data. (If you're using [Schema
+Awareness](./schema-awareness.md) the name `"Query"` may vary for you depending on your schema.)
+We're not constrained to accessing fields on the `parent` of a resolver but can also attempt to
+break out and access fields on any other entity we know of.
 
-This is the main point of communication with the cache, it will give us access to
-all cached data.
+## Resolving Partial Data
 
-### resolve
-
-The `cache.resolve` method is used to get links and property values from the cache.
-Our cache methods have three arguments:
-
-- `entity` – This can either be an object containing a `__typename` and an `id` or
-  `_id` field _or_ a string key leading to a cached entity.
-- `field` – The field we want data for. This can be a relation or a single property.
-- `arguments` – The arguments to include on the field.
-
-To get a better grasp let's look at a few examples,
-consider the following data structure:
+Local resolvers also allow for more advanced use-cases when it comes to links and object types.
+Previously we've seen how a resolver is able to link up a given field to an entity, which causes
+this field to resolve an entity directly instead of it being cecked against any cached links:
 
 ```js
-todos: [
-  {
-    id: '1',
-    text: 'Install urql',
-    complete: true,
-    author: { id: '2', name: 'Bar' },
-  },
-  {
-    id: '2',
-    text: 'Learn urql',
-    complete: true,
-    author: { id: '1', name: 'Foo' },
-  },
-];
-```
-
-Lets get the `author` for a todo.
-
-```js
-const parent = {
-  id: '1',
-  text: 'Install urql',
-  complete: true,
-  author: undefined,
-  __typename: 'Todo',
-};
-
-console.log(cache.resolve(parent, 'author')); // 'Author:2'
-```
-
-Now we have a stringed key that identifies our author. We
-can use this to derive the name of our author.
-
-```js
-const name = cache.resolve('Author:2', 'name');
-console.log(name); // 'Bar'
-```
-
-This can help solve practical use cases like date formatting,
-where we would query the date and then convert it in our resolver.
-
-We can also link entities that come from a list, imagine the scenario where
-we have queried `todos` but now want the detailView of a single `todo`.
-
-```js
-const cache = cacheExchange({
+cacheExchange({
   resolvers: {
-    Query: { todo: (parent, args) => ({ __typename: 'Todo', id: args.id }) },
+    Query: {
+      todo: (_, args) => ({ __typename: 'Todo', id: args.id }),
+    },
   },
 });
 ```
 
-Returning a `__typename` and `key` (`id`/`_id`/custom key) is sufficient to make the
-cache resolve this to the full entity.
+In this example, while `__typename` and `id` are required to make this entity keyable, we're also
+able to add on more fields to this object to override values later on in our selection.
 
-Note that resolving from a list to details can lead to partial data, this will result in
-a network-request to get the full data when fields are missing.
-When graphcache isn't [aware of our schema](./schema-awareness.md) it won't show partial data.
+For instance, we can write a resolver that links `Query.todo` directly to our `Todo` entity but also
+only updates the `createdAt` field directly in the same resolver, if it is indeed accessed via the
+`Query.todo` field:
+
+```js
+cacheExchange({
+  resolvers: {
+    Query: {
+      todo: (_, args) => ({
+        __typename: 'Todo',
+        id: args.id,
+        createdAt: new Date().toString(),
+      }),
+    },
+  },
+});
+```
+
+Here we've replaced the `createdAt` value of the `Todo` when it's accessed via this manual resolver.
+If it was accessed someplace else, for instance via a `Query.todos` listing field, this override
+wouldn't apply.
+
+We can even apply overrides to nested fields, which helps us to create complex resolvers for other
+use cases like pagination.
+
+[Read more on the topic of "Pagination" in the section below.](#pagination)
+
+## Computed Queries
+
+We've now seen how the `cache` has several powerful methods, like [the `cache.resolve`
+method](../api/graphcache.md#resolve), which allow us to access any data in the cache while writing
+resolvers for individual fields.
+
+Additionally the cache has more methods that allow us to access more data at a time, like
+`cache.readQuery` and `cache.readFragment`.
 
 ### Reading a query
 
-Another method the cache allows is to let us read a full query, this method
-accepts an object of `query` and optionally `variables`.
+At any point, the `cache` allows us to read entirely separate queries in our resolvers which starts
+a separate virtual operation in our resolvers. When we call `cache.readQuery` with a query and
+variables we can execute an entirely new GraphQL query against our cached data:
 
 ```js
 cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
@@ -406,9 +391,11 @@ cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
 
 This way we'll get the stored data for the `TodosQuery` for the given `variables`.
 
+[Read more about `cache.readQuery` in the Graphcache API docs.](../api/graphcache.md#readquery)
+
 ### Reading a fragment
 
-The store allows the user to also read a fragment for a certain entity, this function
+The store also allows us to read a fragment for any given entity. The `cache.readFragment` method
 accepts a `fragment` and an `id`. This looks like the following.
 
 ```js
@@ -421,7 +408,7 @@ const data = cache.readFragment(
       text
     }
   `,
-  '1'
+  { id: 1 }
 );
 ```
 
@@ -429,12 +416,21 @@ const data = cache.readFragment(
 > [the `gql` tag function](../api/core.md#gql) because `readFragment` only accepts
 > GraphQL `DocumentNode`s as inputs, and not strings.
 
-This way we'll get the Todo with id 1 and the relevant data we are asking for in the
-fragment.
+This way we'll read the entire fragment that we've passed for the `Todo` for the given key, in this
+case `{ id: 1 }`.
+
+[Read more about `cache.readFragment` in the Graphcache API docs.](../api/graphcache.md#readfragment)
 
 ## Pagination
 
-`Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination.
+`Graphcache` offers some preset `resolvers` to help us out with endless scrolling pagination, also
+known as "infinite pagination". It comes with two more advanced but generalised resolvers that can
+be applied to two specific pagination use-cases.
+
+They're not meant to implement infinite pagination for _any app_, instead they're useful when we'd
+like to add infinite pagination to an app quickly to try it out or if we're unable to replace it
+with separate components per page in environments like React Native, where a `FlatList` would
+require a flat, infinite list of items.
 
 ### Simple Pagination
 
