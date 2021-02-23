@@ -445,4 +445,4 @@ As we can see, we may perform manual changes inside of `updates` functions, whic
 affect other parts of the cache (like `Query.todos` here) beyond the automatic updates that a
 normalized cache is expected to perform.
 
-[Read more about creating custom updates on the "Custom Updates" page.](./custom-updates.md)
+[Read more about writing cache updates on the "Cache Updates" page.](./cache-updates.md)
