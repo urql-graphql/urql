@@ -28,7 +28,7 @@ default.
   a normalized data structure. Query, mutation, and subscription results may update one another if
   they share data, and the app will rerender or refetch data accordingly. This often allows your app
   to make fewer API requests, since data may already be in the cache.
-- 💾 [**Custom cache resolvers**](./computed-queries.md) Since all queries are fully resolved in the
+- 💾 [**Custom cache resolvers**](./local-resolvers.md) Since all queries are fully resolved in the
   cache before and after they're sent, you can add custom resolvers that enable you to format data,
   implement pagination, or implement cache redirects.
 - 💭 [**Subscription and Mutation updates**](./custom-updates.md) You can implement update functions

@@ -78,5 +78,9 @@ export default {
       path: '/docs/graphcache/custom-updates',
       redirect: '/docs/graphcache/cache-updates',
     },
+    {
+      path: '/docs/graphcache/computed-queries',
+      redirect: '/docs/graphcache/local-resolvers',
+    },
   ],
 };

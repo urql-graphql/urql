@@ -372,7 +372,7 @@ resolvers may be used for:
   relational cached data of _Graphcache_, which means that it can emulate infinite pagination and
   other complex behaviour.
 
-[Read more about local resolvers ont the following page, "Custom Queries".](./custom-queries.md)
+[Read more about resolvers on the following page about "Local Resolvers".](./local-resolvers.md)
 
 ### Manual cache updates
 
@@ -445,4 +445,4 @@ As we can see, we may perform manual changes inside of `updates` functions, whic
 affect other parts of the cache (like `Query.todos` here) beyond the automatic updates that a
 normalized cache is expected to perform.
 
-[Read more about creating custom updates on the "Custom Updates" page.](./custom-updates.md)
+[Read more about writing cache updates on the "Cache Updates" page.](./cache-updates.md)

@@ -343,8 +343,8 @@ cache.readFragment(
 );
 ```
 
-[Read more about using `readFragment` on the ["Computed Queries"
-page.](../graphcache/computed-queries.md#reading-a-fragment)
+[Read more about using `readFragment` on the ["Local Resolvers"
+page.](../graphcache/local-resolvers.md#reading-a-fragment)
 
 ### readQuery
 
@@ -368,8 +368,8 @@ cache.readQuery({
 ); // Data or null
 ```
 
-[Read more about using `readQuery` on the ["Computed Queries"
-page.](../graphcache/computed-queries.md#reading-a-query)
+[Read more about using `readQuery` on the ["Local Resolvers"
+page.](../graphcache/local-resolvers.md#reading-a-query)
 
 ### writeFragment
 
