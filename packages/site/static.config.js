@@ -82,6 +82,5 @@ export default {
       path: '/docs/graphcache/computed-queries',
       redirect: '/docs/graphcache/local-resolvers',
     },
-
   ],
 };

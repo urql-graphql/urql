@@ -17,7 +17,7 @@ configuration to set up manual updates that react to mutations or subscriptions.
 ## Data Updates
 
 The `updates` configuration is similar to our `resolvers` configuration that we've [previously looked
-at on the "Computed Queries" page.](./computed-queries.md) We pass a resolver-like function into the
+at on the "Local Resolvers" page.](./local-resolvers.md) We pass a resolver-like function into the
 configuration that receives cache-specific arguments. Instead of the `parent` argument we'll however
 receive the subscription's or mutation's `data` instead.
 
@@ -38,8 +38,8 @@ const cache = cacheExchange({
 });
 ```
 
-Inside these update functions, apart from the `cache` methods that we've seen in ["Computed
-Query"](./computed-queries.md) to read from the cached data, we can also use other `cache` methods to
+Inside these update functions, apart from the `cache` methods that we've seen on the ["Local
+Resolvers" page](./local-resolvers.md) to read from the cached data, we can also use other `cache` methods to
 write to the cached data.
 
 ### cache.updateQuery
@@ -284,7 +284,7 @@ reverted if the GraphQL mutation fails.
 The `optimistic` functions receive the same arguments as `resolvers` functions, except for `parent`:
 
 - `variables` – The variables used to execute the mutation.
-- `cache` – The cache we've already seen in [resolvers](./computed-queries.md) and in the previous
+- `cache` – The cache we've already seen in [resolvers](./local-resolvers.md) and in the previous
   examples on this page. In optimistic updates it's useful to retrieve more data from the cache.
 - `info` – Contains the used fragments and field arguments.
 
