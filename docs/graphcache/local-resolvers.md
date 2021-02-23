@@ -65,6 +65,56 @@ record field into a link, i.e. replace a scalar with an entity. Instead, local r
 to transform records, like dates in our previous example, or to imitate server-side logic to allow
 Graphcache to retrieve more data from its cache without sending a query to our API.
 
+## Transforming Records
+
+As we've explored in the ["Normalized Caching" page's section on
+records](./normalized-caching.md#storing-normalized-data), "records" are scalars and any fields in
+your query without selection sets. This could be a field with a string value, number, or any other
+field that resolves to a [scalar type](https://graphql.org/learn/schema/#scalar-types) rather than
+another entity i.e. object type.
+
+At the beginning of this page we've already seen an example of a local resolver that we've attached
+to a record field where we've added a resolver to a `Todo.updatedAt` field:
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      updatedAt: parent => new Date(parent.updatedAt),
+    },
+  },
+});
+```
+
+A query that contains this field may look like `{ todo { updatedAt } }`, which clearly shows us that
+this field is a scalar since it doesn't have any selection set on the `updatedAt` field. In our
+example, we access this field's value and parse it as a `new Date()`.
+
+This shows us that it doesn't matter for scalar fields what kind of value we return. We may parse
+strings into more granular JS-native objects or replace values entirely.
+
+Furthermore, if we have a field that accepts arguments we can use those as well:
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      text: (parent, args) => {
+        return args.capitalize && parent.text
+          ? parent.text.toUpperCase()
+          : parent.text;
+      },
+    },
+  },
+});
+```
+
+This is actually unlikely to be of use with records and scalar values as our API will have to be
+able to use these arguments just as well. In other words, while you may be able to pass any
+arguments to a field in your query, your GraphQL API's schema must accept these arguments in the
+first place. However, this is still useful if we're trying to imitate what the API is doing, which
+will become more relevant in the following examples and sections.
+
 ## Cache parameter
 
 This is the main point of communication with the cache, it will give us access to
