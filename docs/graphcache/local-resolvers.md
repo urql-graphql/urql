@@ -5,7 +5,7 @@ order: 2
 
 # Local Resolvers
 
-Previously we've learned about local resolvers [on the "Normalized Caching"
+Previously, we've learned about local resolvers [on the "Normalized Caching"
 page](./normalized-caching.md#manually-resolving-entities). They allow us to change the data that
 Graphcache reads as it queries against its local cache, return links that would otherwise not be
 cached, or even transform scalar records on the fly.

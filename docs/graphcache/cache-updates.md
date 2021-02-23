@@ -5,14 +5,79 @@ order: 3
 
 # Cache Updates
 
-Every time Graphcache sees a result from the API for a `subscription` or a `mutation` it will look at the response and traverse it.
-This process is the same as for queries but instead of starting at the Query root type,
-it will start searching for keyable entities, where an object's `__typename` and `id` or `_id` fields (or a custom keys config)
-are provided, so it can write normalized entities to the cache.
+As we've learned [on the page on "Normalized
+Caching"](../normalized-caching.md#normalizing-relational-data), when Graphcache receives an API
+result it will traverse and store all its data to its cache in a normalised structure. Each entity
+that is found in a result will be stored under the entity's key.
 
-A normalized cache can't automatically assume that unrelated links have changed due to
-a mutation, since this is server-side specific logic. Instead, we may use the `updates`
-configuration to set up manual updates that react to mutations or subscriptions.
+A query's result is represented as a graph, which can also be understood as a tree structure,
+starting from the root `Query` entity which then connects to other entities via links, which are
+relations stored as keys, where each entity has records that store scalar values, which are the
+tree's leafs. On the previous page, on ["Local Resolvers"](./local-resolvers.md), we've seen how
+resolvers can be attached to fields to manually resolve other entities (or transform record fields).
+Local Resolvers passively _compute_ results and change how Graphcache traverses and sees its locally
+cached data, however, for **mutations** and **subscriptions** we cannot passively compute data.
+
+When Graphcache receives a mutation or subscription result it still traverses it using the query
+document as we've learned when reading about how Graphcache stores normalized data,
+[quote](./normalized-caching.md/#storing-normalized-data):
+
+> Any mutation or subscription can also be written to this data structure. Once Graphcache finds a
+> keyable entity in their results it's written to its relational table which may update other queries
+> in our application.
+
+This means that mutations and subscriptions still write and update entities in the cache. These
+updates are then reflected on all queries that our app currently uses. However, there are
+limitations to this. While resolvers can be used to passively change data for queries, for mutations
+and subscriptions we sometimes have to write **updaters** to update links and relations.
+This is often necessary when a given mutation or subscription deliver a result that is more granular
+than the cache needs to update all affected entities.
+
+Previously, we've learned about cache updates [on the "Normalized Caching"
+page](normalized-caching/#manual-cache-updates).
+
+The `updates` option on `cacheExchange` accepts a map for `Mutation` or `Subscription` keys on which
+we can add "updater functions" to react to mutation or subscription results. These `updates`
+functions look similar to ["Local Resolvers"](./local-resolvers.md) that we've seen in the last
+section and similar to [GraphQL.js' resolvers on the
+server-side](https://www.graphql-tools.com/docs/resolvers/).
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      mutationField: (result, args, cache, info) => {
+        // ...
+      },
+    },
+    Subscription: {
+      subscriptionField: (result, args, cache, info) => {
+        // ...
+      },
+    },
+  },
+})
+```
+
+An "updater" may be attached to a `Mutation` or `Subscription` field and accepts four positional
+arguments, which are the same as [the resolvers' arguments](./local-resolvers.md):
+
+- `result`: The full API result that's currently being written to the cache. Typically we'd want to
+  avoid coupling by only looking at the current field that the updater is attached to, but it's
+  worth noting that we can access any part of the result.
+- `args`: The arguments that the field has been called with, which will be replaced with an empty
+  object if the field hasn't been called with any arguments.
+- `cache`: The `cache` instance, which gives us access to methods allowing us to interact with the
+- local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
+  we use it frequently to read from and write to the cache.
+- `info`: This argument shouldn't be used frequently but it contains running information about the
+  traversal of the query document. It allows us to make resolvers reusable or to retrieve
+  information about the entire query. Its full API can be found [in the API
+  docs](../api/graphcache.md#info).
+
+The cache updaters return value is disregarded (and typed as `void` in TypeScript), which makes any
+method that they call on the `cache` instance a side-effect, which may trigger additional cache
+changes and updates all affected queries as we modify them.
 
 ## Data Updates
 
