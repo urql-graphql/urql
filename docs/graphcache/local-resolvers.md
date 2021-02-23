@@ -93,7 +93,31 @@ example, we access this field's value and parse it as a `new Date()`.
 This shows us that it doesn't matter for scalar fields what kind of value we return. We may parse
 strings into more granular JS-native objects or replace values entirely.
 
-Furthermore, if we have a field that accepts arguments we can use those as well:
+We may also run into situations where we'd like to generalise the resolver and not make it dependent
+on the exact field it's being attached to. In these cases, the [`info`
+object](../api/graphcache.md#info) can be very helpful as it provides us information about the
+current query traversal and which part of the query document the cache is currently processing. The
+`info.fieldName` property is one of these properties and lets us know which field the resolver is
+currently operating on. Hence, we can create a reusable resolver like so:
+
+```js
+const transformToDate = (parent, _args, _cache, info) =>
+  new Date(parent[info.fieldName]);
+
+cacheExchange({
+  resolvers: {
+    Todo: { updatedAt: transformToDate },
+  },
+});
+```
+
+The resolver is now much more reusable, which is particularly handy if we're creating resolvers that
+we'd like to apply to multiple fields. The [`info` object has several more
+fields](../api/graphcache.md#info) that are all similarly useful to abstract our resolvers.
+
+We also haven't seen yet how to handle a field's arguments.
+If we have a field that accepts arguments we can use those as well as they're passed to us with the
+second argument of a resolver:
 
 ```js
 cacheExchange({
@@ -188,6 +212,110 @@ One example is the `info.parentKey` property. This property [on the `info`
 object](../api/graphcache.md#info) will always be set to the key of the entity that the resolver is
 currently run on. For instance, for the above resolver it may be `"Query"`, for for a resolver on
 `Todo.updatedAt` it may be `"Todo:1"`.
+
+## Resolving other fields
+
+In the above two examples we've seen how a resolver can replace Graphcache's logic which usually
+reads links and records only from its locally cached data. We've seen how a field on a record can
+use `parent[fieldName]` to access its cached record value and transform it and how a resolver for a
+link can return a partial entity [or a key](#resolving-by-keys).
+
+However sometimes we'll need to resolve data from other fields in our resolvers.
+
+For records, if the other field is on the same `parent` entity, it may seem logical to access it on
+`parent[otherFieldName]` as well, however the `parent` object will only be sparsely populated with
+fields that the cache has already queried prior to reaching the resolver.
+
+In the previous example, where we've created a resolver for `Todo.updatedAt` and accessed
+`parent.updatedAt` to transform its value the `parent.updatedAt` field is essentially a shortcut
+that allows us to get to the record quickly.
+
+Instead we can use the [the `cache.resolve` method](../api/graphcache.md#resolve). This method
+allows us to access Graphcache's cached data directly. It is used to resolve records or links on any
+given entity and accepts three arguments:
+
+- `entity`: This is the entity on which we'd like to access a field. We may either pass a keyable,
+  partial entity, e.g. `{ __typename: 'Todo', id: 1 }` or a key. It takes the same inputs as [the
+  `cache.keyOfEntity` method](../api/graphcache.md#keyofentity) which we've seen earlier in the
+  ["Resolving by keys" section](#resolving-by-keys). It also accepts `null` which causes it to
+  return `null`, which is useful for chaining multiple `resolve` calls for deeply accessing a field.
+- `fieldName`: This is the field's name we'd like to access. If we're looking for the record on
+  `Todo.updatedAt` we would pass `"updatedAt"` and would receive the record value for this field. If
+  we pass a field that is a _link_ to another entity then we'd pass that field's name (e.g.
+  `"author"` for `Todo.author`) and `cache.resolve` will return a key instead of a record value.
+- `fieldArgs`: Optionally, as the third argument we may pass the field's arguments, e.g. `{ id: 1 }`
+  if we're trying to access `todo(id: 1)` for instance.
+
+This means that we can rewrite our original `Todo.updatedAt` example as follows, if we'd like to
+avoid using the `parent[fieldName]` shortcut:
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      updatedAt: (parent, _args, cache) =>
+        new Date(cache.resolve(parent, "updatedAt")),
+    },
+  },
+});
+```
+
+When we call `cache.resolve(parent, "updatedAt")`, the cache will look up the `"updatedAt"` field on
+the `parent` entity, i.e. on the current `Todo` entity.
+We've also previously learned that `parent` may not contain all fields that the entity may have and
+may hence be missing its keyable fields, like `id`, so why does this then work?
+It works because `cache.resolve(parent)` is a shortcut for `cache.resolve(info.parentKey)`.
+
+Like the `info.fieldName` property `info.parentKey` gives us information about the current state of
+Graphcache's query operation. In this case, `info.parentKey` tells us what the parent's key is.
+However, since `cache.resolve(parent)` is much more intuitive we can write that instead since this
+is a supported shortcut.
+
+From this follows that we may also use `cache.resolve` to access other fields. Let's suppose we'd
+want `updatedAt` to default to the entity's `createdAt` field when it's actually `null`. In such a
+case we could write a resolver like so:
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      updatedAt: (parent, _args, cache) =>
+        parent.updatedAt || cache.resolve(parent, "createdAt")
+    },
+  },
+});
+```
+
+As we can see, we're effortlessly able to access other records from the cache, provided these fields
+are actually cached. If they aren't `cache.resolve` will return `null` instead.
+
+Beyond records, we're also able to resolve links and hence jump to records from another entity.
+Let's suppose we have an `author { id, createdAt }` field on the `Todo` and would like
+`Todo.createdAt` to simply copy the author's `createdAt` field. We can chain `cache.resolve` calls
+to get to this value:
+
+```js
+cacheExchange({
+  resolvers: {
+    Todo: {
+      createdAt: (parent, _args, cache) =>
+        cache.resolve(
+          cache.resolve(parent, "author"), /* "Author:1" */
+          "createdAt"
+        )
+    },
+  },
+});
+```
+
+The return value of `cache.resolve` changes depending on what data the cache has stored. While it
+may return records for fields without selection sets, in other cases it may give you the key of
+other entities ("links") instead. It can even give you arrays of keys or records when the field's
+value contains a list.
+
+It's a pretty flexible method that allows us to access arbitrary values from our cache, however, we
+have to be careful about what value will be resolved by it, since the cache can't know itself what
+type of value it may return.
 
 ## Cache parameter
 
