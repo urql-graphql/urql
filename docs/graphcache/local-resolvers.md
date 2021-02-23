@@ -5,48 +5,65 @@ order: 2
 
 # Local Resolvers
 
-When dealing with data we could have special cases where we want to transform
-the data between the API and frontend logic. For example:
+Previously we've learned about local resolvers [on the "Normalized Caching"
+page](./normalized-caching.md#manually-resolving-entities). They allow us to change the data that
+Graphcache reads as it queries against its local cache, return links that would otherwise not be
+cached, or even transform scalar records on the fly.
 
-- alter the format of a date, perhaps from a UNIX timestamp to a `Date` object.
-- if we have a list of a certain entity in the cache and then want to query a
-  specific entity, chances are this will already be (partially) available in the
-  cache's list.
-
-These cases can be solved with the concept of `resolvers`.
-
-## Resolvers
-
-Let's look at how we can introduce these `resolvers` to our Graphcache exchange.
-Let's say we have a `Todo` type with an `updatedAt` property which is a UNIX timestamp.
+The `resolvers` option on `cacheExchange` accepts a map of types with a nested map of fields, which
+means that we can add local resolvers to any field of any type. For example:
 
 ```js
-import { cacheExchange } from '@urql/exchange-graphcache';
-
-const cache = cacheExchange({
+cacheExchange({
   resolvers: {
     Todo: {
-      updatedAt(parent, args, cache, info) {
-        return new Date(parent.updatedAt);
-      },
+      updatedAt: parent => new Date(parent.updatedAt),
     },
   },
 });
 ```
 
-Now when we query our `todos` every time we encounter an object with `Todo`
-as the `__typename` it will convert the `parent.updatedAt` property to a `Date`. This way we
-can effectively change how we handle a certain property on an entity.
+In the above example, what Graphcache does when it encounters the `updatedAt` field on `Todo` types.
+Similarly to how Graphcache knows [how to generate
+keys](./normalized-caching.md#custom-keys-and-non-keyable-entities) and looks up our custom `keys`
+configuration functions per `__typename`, it also uses our `resolvers` configuration on each field
+it queries from its locally cached data.
 
-Let's look at the arguments passed to `resolvers` to get a better sense of
-what we can do, there are four arguments (these are in order):
+A local resolver function in Graphcache has a similar signature to [GraphQL.js' resolvers on the
+server-side](https://www.graphql-tools.com/docs/resolvers/), so their shape should look familiar to
+us.
 
-- `parent` – The original entity in the cache. In the example above, this
-  would be the full `Todo` object.
-- `args` – The arguments used in this field.
-- `cache` – This is the normalized cache. The cache provides us with `resolve`, `readQuery` and `readFragment` methods,
-  read more about this [below](#resolve).
-- `info` – This contains the fragments used in the query and the field arguments in the query.
+```js
+{
+  TypeName: {
+    fieldName: (parent, args, cache, info) => {
+      return null; // new value
+    },
+  },
+}
+```
+
+A resolver may be attached to any type's field and accepts four positional arguments:
+
+- `parent`: The object on which the field will be added to, which contains the data as it's being
+  queried. It will contain the current field's raw value if it's a scalar, which allows us to
+  manipulate scalar values, like `parent.updatedAt` in the previous example.
+- `args`: The arguments that the field is being called with, which will be replaced with an empty
+  object if the field hasn't been called with any arguments. For example, if the field is queried as
+  `name(capitalize: true)` then `args` would be `{ capitalize: true }`.
+- `cache`: Unlike in GraphQL.js this will not be the context but a `cache` instance, which gives us
+  access to methods allowing us to interact with the local cache. Its full API can be found [in the
+  API docs](../api/graphcache.md#cache).
+- `info`: This argument shouldn't be used frequently but it contains running information about the
+  traversal of the query document. It allows us to make resolvers reusable or to retrieve
+  information about the entire query. Its full API can be found [in the API
+  docs](../api/graphcache.md#info).
+
+The local resolvers may return any value that fits the query document's shape, however we must
+ensure that what we return matches the types of our schema. It for instance isn't possible to turn a
+record field into a link, i.e. replace a scalar with an entity. Instead, local resolvers are useful
+to transform records, like dates in our previous example, or to imitate server-side logic to allow
+Graphcache to retrieve more data from its cache without sending a query to our API.
 
 ## Cache parameter
 
