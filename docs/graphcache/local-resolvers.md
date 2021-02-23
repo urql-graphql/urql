@@ -533,4 +533,4 @@ cannot be stiched together.
 
 ### Reading on
 
-[On the next page we'll learn about "Custom updates".](./custom-updates.md)
+[On the next page we'll learn about "Cache Updates".](./cache-updates.md)

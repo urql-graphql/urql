@@ -389,31 +389,52 @@ invalidate only these fields, which causes all queries using these listing field
 ## Optimistic updates
 
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
-The _Optimistic Updates_ configuration allows us to set up "temporary" results for mutations, which
-will be applied immediately. This is a great solution to reduce the waiting time for the user.
 
-> Note that an optimistic response is meant to be a temporary update to an entity until the server responds to your mutation.
-> This means that what you return here should reflect the shape of what the server will return.
-
+Additionally to the `updates` configuration we may also pass an `optimistic` option to the
+`cacheExchange` which is a factory function using which we can create a "virtual" result for a
+mutation. This temporary result can be applied immediately to the cache to give our users the
+illusion that mutations were executed immediately, which is a great method to reduce waiting time
+and to make our apps feel snappier.
 This technique is often used with one-off mutations that are assumed to succeed, like starring a
 repository, or liking a tweet. In such cases it's often desirable to make the interaction feel
 as instant as possible.
 
-The `optimistic` configurations are similar to `resolvers` as well. We supply an function to
-`Mutation` fields that must return some data. When said mutation is then executed, _Graphcache_
-applies a temporary update using the supplied optimistic data that is reverted when the real
-mutation completes and an actual result comes back from the API. The temporary update is also
-reverted if the GraphQL mutation fails.
+The `optimistic` configuration is similar to our `resolvers` or `updates` configuration, except that
+it only receives a single map for mutation fields. We can attach optimistic functions to any
+mutation field to make it generate an optimistic that is applied to the cache while the `Client`
+waits for a response from our API. An "optimistic" function accepts three positional arguments,
+which are the same as the resolvers' or updaters' arguments, except for the first one:
 
-The `optimistic` functions receive the same arguments as `resolvers` functions, except for `parent`:
+The `optimistic` functions receive the same arguments as `updates` functions, except for `parent`,
+since we don't have any server data to work with:
 
-- `variables` – The variables used to execute the mutation.
-- `cache` – The cache we've already seen in [resolvers](./local-resolvers.md) and in the previous
-  examples on this page. In optimistic updates it's useful to retrieve more data from the cache.
-- `info` – Contains the used fragments and field arguments.
+- `args`: The arguments that the field has been called with, which will be replaced with an empty
+  object if the field hasn't been called with any arguments.
+- `cache`: The `cache` instance, which gives us access to methods allowing us to interact with the
+- local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
+  we use it frequently to read from and write to the cache.
+- `info`: This argument shouldn't be used frequently but it contains running information about the
+  traversal of the query document. It allows us to make resolvers reusable or to retrieve
+  information about the entire query. Its full API can be found [in the API
+  docs](../api/graphcache.md#info).
+
+The usual `parent` argument isn't present since optimistic functions don't have any server data to
+handle or deal with and instead create this data. When a mutation is run that contains one or more
+optimistic mutation fields, Graphcache picks these up and generates immediate changes which it
+applies to the cache. The `resolvers` functions also trigger as if the results were real server
+results.
+
+This modification is temporary. Once a result from the API comes back it's reverted, which leaves us
+in a state where the cache can apply the "real" result to the cache.
+
+> Note: While optimistic mutations are waiting for results from the API all queries that may alter
+> our optimistic data are paused (or rather queued up) and all optimistic mutations will be reverted
+> at the same time. This means that optimistic results can stack but will never accidentally be
+> confused with "real" data in your configuration.
 
 In the following example we assume that we'd like to implement an optimistic result for a
-`favoriteTodo` mutation, which sets `favorite` on a `Todo` to `true`:
+`favoriteTodo` mutation. The mutation is rather simple and all we have to do is create a function
+that imitates the result that the API is assumed to send back:
 
 ```js
 const cache = cacheExchange({
@@ -427,10 +448,43 @@ const cache = cacheExchange({
 });
 ```
 
-Since we return an assumed result in our `optimistic` configuration, `Mutation.favoriteTodo` will be
-automatically applied and `favorite` will seemingly flip to `true` instantly for the queries that
-observe `Todo.query`.
+This optimistic mutation will be applied to the cache. If any `updates` configuration exists for
+`Mutation.favoriteTodo` then it will be executed using the optimistic result.
+Once the mutation result comes back from our API this temporary change will be rolled back and
+discarded.
+
+It's important to ensure that our optimistic mutations return all data that the real mutation may
+return. If our mutations request a field in their selection sets that our optimistic mutation
+doesn't contain then we'll see a warning, since this is a common mistake. To work around not having
+enough data we may use methods like `cache.readFragment` and `cache.resolve` to retrieve more data
+from our cache.
+
+### Variables for Optimistic Updates
+
+Sometimes it's not possible for us to retrieve all data that an optimistic update requires to create
+a "fake result" from the cache or from all existing variables.
+
+This is why Graphcache allows for a small escape hatch for these scenarios which allows us to access
+additional variables which we may want to pass from our UI code to the mutation. For instance, given
+a mutation like the following we may add more variables than the mutation specifies:
+
+```graphql
+mutation UpdateTodo ($id: ID!, $text: ID!) {
+  updateTodo(id: $id, text: $text) {
+    id
+    text
+  }
+}
+```
+
+In the above mutation we've only defined an `$id` and `$text` variable. Graphcache typically filters
+variables using our query document definitions, which means that our API will never receive any
+variables other than the ones we've defined.
+
+However, we're able to pass additional variables to our mutation, e.g. `{ extra }`, and since
+`$extra` isn't defined it will be filtered once the mutation is sent to the API. An optimistic
+mutation however will still be able to access this variable.
 
 ### Reading on
 
-[On the next page we'll learn about "Schema-awareness".](./schema-awareness.md)
+[On the next page we'll learn about "Schema Awareness".](./schema-awareness.md)
