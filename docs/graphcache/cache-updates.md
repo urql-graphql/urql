@@ -118,7 +118,7 @@ import { gql } from '@urql/core';
 cacheExchange({
   updates: {
     Mutation: {
-      updateTodoDate(result, args, cache, info) {
+      updateTodoDate(_result, args, cache, _info) {
         const fragment = gql`
           fragment _ on Todo {
             id
@@ -139,6 +139,10 @@ cacheExchange({
 The `cache.writeFragment` method is similar to the `cache.readFragment` method that we've seen [on
 the "Local Resolvers" page before](./local-resolvers.md#reading-a-fragment). Instead of reading data
 for a given fragment it instead writes data to the cache.
+
+> **Note:** In the above example, we've used
+> [the `gql` tag function](../api/core.md#gql) because `writeFragment` only accepts
+> GraphQL `DocumentNode`s as inputs, and not strings.
 
 ### Cache Updates outside of updates
 
@@ -182,7 +186,7 @@ means that we'll need to create an updater that automatically adds the `Todo` to
 cacheExchange({
   updates: {
     Mutation: {
-      updateTodoDate(result, args, cache, info) {
+      updateTodoDate(result, _args, cache, _info) {
         const TodoList = gql`{ todos { id } }`;
 
         cache.updateQuery({ query: TodoList }, data => {
@@ -250,7 +254,7 @@ page](./local-resolvers.md#resolving-by-keys) or the `cache.resolve` method's fi
 cacheExchange({
   updates: {
     Mutation: {
-      removeTodo(result, args, cache, info) {
+      removeTodo(_result, args, cache, _info) {
         const TodoList = gql`
           query (skip: $skip) {
             todos(skip: $skip) { id }
@@ -294,64 +298,46 @@ To summarise, we filter the list of fields in our example down to only the `todo
 iterate over each of our `arguments` for the `todos` field to filter all lists to remove the `Todo`
 from them.
 
-## Data Updates
+### Inspecting arbitary entities
 
-The `updates` configuration is similar to our `resolvers` configuration that we've [previously looked
-at on the "Local Resolvers" page.](./local-resolvers.md) We pass a resolver-like function into the
-configuration that receives cache-specific arguments. Instead of the `parent` argument we'll however
-receive the subscription's or mutation's `data` instead.
+We're not required to only inspecting fields on the `Query` root entity. Instead, we can inspect
+fields on any entity by passing a different partial, keyable entity or key to `cache.inspectFields`.
+
+For instance, if we had a `Todo` entity and wanted to get all of its known fields then we could pass
+in a partial `Todo` entity just as well:
 
 ```js
-const cache = cacheExchange({
-  updates: {
-    Mutation: {
-      addTodo: (result, args, cache, info) => {
-        // ...
-      },
-    },
-    Subscription: {
-      newTodo: (result, args, cache, info) => {
-        // ...
-      },
-    },
-  },
+cache.inspectFields({
+  __typename: 'Todo',
+  id: args.id
 });
 ```
 
-Inside these update functions, apart from the `cache` methods that we've seen on the ["Local
-Resolvers" page](./local-resolvers.md) to read from the cached data, we can also use other `cache` methods to
-write to the cached data.
+## Invalidating Entities
 
-### cache.updateQuery
+Admittedly, it's sometimes almost impossible to write updaters for all mutations. It's often even
+hard to predict what our APIs may do when they receive a mutation. An update of an entity may change
+the sorting of a list, or remove an item from a list in a way we can't predict, since we don't have
+access to a full database to run the API locally.
 
-The first we'll look at is `cache.updateQuery`. This method accepts a `{ query, variables }` object
-as the first argument and an updater callback as the second. The updater function receives the query
-data as its' only argument and must return the updated version of said data.
+In cases like these it may be advisable to trigger a refetch instead and let the cache update itself
+by sending queries that have invalidated data associated to them to our API again. This process is
+called **invalidation** since it removes data from Graphcache's locally cached data.
 
-Note that we don't have to update the query data immutably. _Graphcache_ never returns raw data and
-will instead always return copies of data. This means that we can also mutate query data inside the
-`updateQuery` callback.
+We may use the cache's [`cache.invalidate` method](../api/graphcache.md#invalidate) to either
+invalidate entire entities or individual fields. It has the same signature as [the `cache.resolve`
+method](../api/graphcache.md#resolve) which we've already seen [on the "Local Resolvers" page as
+well](./local-resolvers.md#resolving-other-fields). We can simplify the previous update we've written
+with a call to `cache.invalidate`:
 
 ```js
-const TodosQuery = gql`
-  query {
-    __typename
-    todos {
-      __typename
-      id
-      text
-      complete
-    }
-  }
-`;
-
-const cache = cacheExchange({
+cacheExchange({
   updates: {
     Mutation: {
-      addTodo: (result, args, cache, info) => {
-        cache.updateQuery({ query: TodosQuery }, data => {
-          data.todos.push(result.addTodo);
-          return data;
+      removeTodo(_result, args, cache, _info) {
+        cache.invalidate({
+          __typename: 'Todo',
+          id: args.id,
         });
       },
     },
@@ -359,188 +345,46 @@ const cache = cacheExchange({
 });
 ```
 
-In the above example, we add an updater configuration for `Mutation.addTodo`. Whenever a mutation's
-result contains `addTodo` our new updater will be called.
+Like any other cache update, this will cause all queries that use this `Todo` entity to be updated
+against the cache. Since we've invalidated the `Todo` item they're using these queries will be
+refetched and sent to our API.
 
-Inside the updater we use `cache.updateQuery` to update a list of todos with the new todo that has
-been created by `addTodo`, which we can access using `result.addTodo`.
-We could also alter this todo before returning our updated `data`.
+If we're using ["Schema Awareness"](./schema-awareness.md) then these queries' results may actually
+be temporarily updated with a partial result, but in general we should observe that queries with
+data that has been invalidated will be refetched as some of their data isn't cached anymore.
 
-With this configuration any query that requests `Query.todos` will automatically update and contain
-our new todo, when a mutation with `Mutation.addTodo` completes.
+### Invalidating individual fields
 
-It's worth noting that it doesn't matter whether the `TodosQuery` is the same one that you use in
-your application code. We're simply updating the normalized data of `Query.todos` across the
-normalized store, which will be reflected in any query that depends on `Query.todos`.
+We may also want to only invalidate individual fields, since maybe not all queries have to be
+immediately updated. We can pass a field (and optional arguments) to the `cache.invalidate` method
+as well to only invalidate a single field.
 
-### cache.writeFragment
-
-Similar to `cache.updateQuery`, we can also update data for a fragment using `cache.writeFragment`,
-instead of an entire query. This method accepts a GraphQL fragment instead of an entire GraphQL
-query. It's also not an updater method but a direct write method instead.
-
-The first argument for `cache.writeFragment`, similarly to `readFragment`, must be a GraphQL
-fragment. The second argument is the data that should be written to the cache. This data object must
-contain `id` or another field if the type has a custom `keys` configuration.
+For instance, we can use this to invalidate our lists instead of invalidating the entity itself.
+This can be useful if we know that modifying an entity will cause our list to be sorted differently,
+for instance.
 
 ```js
-import { gql } from '@urql/core';
-
-cache.writeFragment(
-  gql`
-    fragment _ on Todo {
-      id
-      text
-    }
-  `,
-  {
-    id: '1',
-    text: 'update',
-  }
-);
-```
-
-> **Note:** In the above example, we've used
-> [the `gql` tag function](../api/core.md#gql) because `writeFragment` only accepts
-> GraphQL `DocumentNode`s as inputs, and not strings.
-
-This can be useful for instance if we have a mutation that doesn't return the type that the GraphQL
-API will alter in the background. Suppose we had a `updateTodoText` mutation that doesn't allow us
-to access the updated `Todo`. In such a case `cache.writeFragment` allows us to make the change
-manually:
-
-```js
-import { gql } from '@urql/core';
-
-const cache = cacheExchange({
+cacheExchange({
   updates: {
     Mutation: {
-      updateTodoText: (result, args, cache, info) => {
-        cache.writeFragment(
-          gql`
-            fragment _ on Todo {
-              id
-              text
-            }
-          `,
-          { id: args.id, text: args.text }
-        );
+      updateTodo(_result, args, cache, _info) {
+        const key = 'Query';
+        const fields = cache.inspectFields(key)
+          .filter(field => field.fieldName === 'todos')
+          .forEach(field => {
+            cache.invalidate(key, field.fieldKey);
+            // or alternatively:
+            cache.invalidate(key, field.fieldName, field.arguments);
+          });
       },
     },
   },
 });
 ```
 
-In this example we haven't used `result` at all, but have written to a `Todo` fragment using the
-arguments (`args`) that have been supplied to `Mutation.updateTodoText`. This can also be used in
-combination with `cache.readFragment` or `cache.resolve` if we need to retrieve arbitrary data from
-the cache, before using `cache.writeFragment` to update some data.
-
-## cache.invalidate
-
-The `cache.invalidate` method is useful for evicting a single entity from the cache. When a user
-logs out or a mutation deletes an item from a list it can be tedious to update every link in our
-normalized data to said entity, instead the `cache.invalidate` method can be used to quickly remove
-the entity itself.
-
-Note that this may lead to an additional request to the GraphQL API, unless you're making use of the
-["Schema Awareness" feature](./schema-awareness.md), since deleting an entity may cause cache
-misses for all queries that depend on this entity.
-
-```js
-const cache = cacheExchange({
-  updates: {
-    Mutation: {
-      deleteTodo: (result, args, cache, info) => {
-        cache.invalidate({ __typename: 'Todo', id: args.id });
-      },
-    },
-  },
-});
-```
-
-The above example deletes a `Todo` with a given `id` from the arguments, when `Mutation.deleteTodo`
-is executed. This will cause all queries that reference this `Todo` to automatically update.
-
-## cache.inspectFields
-
-It's possible that you may have to alter multiple parts of the normalized cache data all at once.
-For instance, you may want to see a field that has been called with different arguments, like a listing
-field. The `cache.inspectFields` method was made for this purpose and is able to return all fields
-that the cache has seen on a given type.
-
-In this example we'll alter all fields on `Query.todos`:
-
-```js
-const cache = cacheExchange({
-  updates: {
-    Mutation: {
-      addTodo: (result, args, cache, info) => {
-        // Get all children of query, this can also be Todo if we would be looking for for instance the author subquery
-        const allFields = cache.inspectFields("Query");
-        // Filter these children to the query you like, in our case query { todos }
-        const todoQueries = allFields.filter(x => x.fieldName === "todos");
-
-        todosQueries.forEach(({ arguments }) => {
-          cache.updateQuery(
-            { query: TODOS_QUERY, variables: arguments },
-            data => {
-              data.todos.push(result.addTodo);
-              return data;
-            });
-          );
-        })
-      },
-    },
-  },
-});
-```
-
-Let's combine the above example with invalidating fields, imagine the scenario where we add a todo but
-rather than manually pushing it on all the lists we just want to refetch the lists.
-
-```js
-const cache = cacheExchange({
-  updates: {
-    Mutation: {
-      addTodo: (result, args, cache, info) => {
-        const todosQueries = cache.inspectFields('Query').filter(x => x.fieldName === 'todos');
-
-        todosQueries.forEach(({ fieldName, arguments: variables }) => {
-          cache.invalidate('Query', fieldName, variables);
-        });
-      },
-    },
-  },
-});
-```
-
-Now when we come onto a list we'll know that this list needs to be refetched.
-
-### Inspecting a sub-field
-
-We've seeen how to inspect fields for a root-field in the above, but what if your query looks like this:
-
-```
-query {
-  todo(id: "x") {
-    id
-    authors {
-      id
-      name
-    }
-  }
-}
-```
-
-Now we'd need to traverse all the `todos` to find which we need, but there's another solution.
-Rather than use `cache.inspectFields('Query')`, which would give us all queried `todo` fields with their arguments, we can instead provide an object as the argument to `inspectFields` asking for all `Todo` types for a given id.
-
-```js
-cache.inspectFields({ __typename: 'Todo', id: args.id });
-```
-
-Now we'll get all fields for the given `todo` and can freely update the `authors`.
+In this example we've attached an updater to a `Mutation.updateTodo` field. We react to this
+mutation by enumerating all `todos` listing fields using `cache.inspectFields` and targetedly
+invalidate only these fields, which causes all queries using these listing fields to be refetched.
 
 ## Optimistic updates
 
