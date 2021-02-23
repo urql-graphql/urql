@@ -79,6 +79,221 @@ The cache updaters return value is disregarded (and typed as `void` in TypeScrip
 method that they call on the `cache` instance a side-effect, which may trigger additional cache
 changes and updates all affected queries as we modify them.
 
+## Manually updating entities
+
+If a mutation field's result isn't returning the full entity it updates then it becomes impossible
+for Graphcache to update said entity automatically. For instance, we may have a mutation like the
+following:
+
+```graphql
+mutation UpdateTodo ($todoId: ID!, $date: String!) {
+  updateTodoDate(id: $todoId, date: $date)
+}
+```
+
+In this hypothetical case instead of `Mutation.updateDate` resolving to the full `Todo` object type
+it instead results in a scalar. This could be fixed by changing the `Mutation` in our API's schema
+to instead return the full `Todo` entity, which would allow us to run the mutation as such, which
+updates the `Todo` in our cache automatically:
+
+```graphql
+mutation UpdateTodo($todoId: ID!, $date: String!) {
+  updateTodoDate(id: $todoId, date: $date) {
+    ...Todo_date
+  }
+}
+
+fragment Todo_date on Todo {
+  id
+  updatedAt
+}
+```
+
+However, if this isn't possible we can instead write an updater that updates our `Todo` entity
+manually by using the `cache.writeFragment` method:
+
+```js
+import { gql } from '@urql/core';
+
+cacheExchange({
+  updates: {
+    Mutation: {
+      updateTodoDate(result, args, cache, info) {
+        const fragment = gql`
+          fragment _ on Todo {
+            id
+            updatedAt
+          }
+        `;
+
+        cache.writeFragment(
+          fragment,
+          { id: args.id, updatedAt: args.date },
+        );
+      },
+    },
+  },
+});
+```
+
+The `cache.writeFragment` method is similar to the `cache.readFragment` method that we've seen [on
+the "Local Resolvers" page before](./local-resolvers.md#reading-a-fragment). Instead of reading data
+for a given fragment it instead writes data to the cache.
+
+### Cache Updates outside of updates
+
+Cache updates are **not** possible outside of `updates`. If we attempt to store the `cache` in a
+variable and call its methods outside of any `updates` functions (or functions, like `resolvers`)
+then Graphcache will throw an error.
+
+Methods like these cannot be called outside of the `cacheExchange`'s `updates` functions, because
+all updates are isolated to be _reactive_ to mutations and subscription events. In Graphcache,
+out-of-band updates aren't permitted because the cache attempts to only represent the server's
+state. This limitation keeps the data of the cache true to the server data we receive from API
+results and makes its behaviour much more predictable.
+
+If we still manage to call any of the cache's methods outside of its callbacks in its configuration,
+we will receive [a "(2) Invalid Cache Call" error](./errors.md#2-invalid-cache-call).
+
+## Updating lists or links
+
+Mutations that create new entities are pretty common, and it's not uncommon to attempt to update the
+cache when a mutation result for these "creation" mutations come back, since this avoids an
+additional roundtrip to our APIs.
+
+While it's possible for these mutations to return any affected entities that carry the lists as
+well, often these lists live on fields on or below the `Query` root type, which means that we'd be
+sending a rather large API result. For large amounts of pages this is especially infeasible.
+Instead, most schemas opt to instead just return the entity that's just been created:
+
+```graphql
+mutation NewTodo ($text: String!) {
+  createTodo(id: $todoId, text: $text) {
+    id
+    text
+  }
+}
+```
+
+If we have a corresponding field on `Query.todos` that contains all of our `Todo` entities then this
+means that we'll need to create an updater that automatically adds the `Todo` to our list:
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      updateTodoDate(result, args, cache, info) {
+        const TodoList = gql`{ todos { id } }`;
+
+        cache.updateQuery({ query: TodoList }, data => {
+          data.todos.push(result.createTodo);
+          return data;
+        });
+      },
+    },
+  },
+});
+```
+
+Here we use the `cache.updateQuery` method, which is similar to the `cache.readQuery` method that
+we've seen on the "Local Resolvers" page before](./local-resolvers.md#reading-a-query).
+
+This method accepts a callback which will give us the `data` of the query, as read from the locally
+cached data and we may return an updated version of this data. While we may want to instinctively
+opt for immutably copying and modifying this data, we're actually allowed to mutate it directly,
+since it's just a copy of the data that's been read by the cache.
+
+This `data` may also be `null` if the cache doesn't actually have enough locally cached information
+to fulfil the query. This is important because resolvers aren't actually applied to cache methods in
+updaters. All resolvers are ignored so it becomes impossible to accidentally commit transformed data
+to our cache. We could safely add a resolver for `Todo.createdAt` and wouldn't have to worry about
+an updater accidentally writing it to the cache's internal data structure.
+
+## Updating many unknown links
+
+In the previous section we've seen how to update data, like a list, when a mutation result enters
+the cache. However, we've used a rather simple example when we've looked at a single list on a known
+field.
+
+In many schemas pagination is quite common and when we for instance delete a todo then knowing which
+list to update becomes unknowable. We cannot know ahead of time how many pages (and using which
+variables) we've already accessed. This knowledge in fact _shouldn't_ be available to Graphcache.
+Querying the `Client` is an entirely separate concern that's often colocated with some part of our
+UI code.
+
+```graphql
+mutation RemoveTodo ($id: ID!) {
+  removeTodo(id: $id)
+}
+```
+
+Suppose we have the above mutation which deletes a `Todo` entity by its ID. Our app may query a list
+of these items over many pages with separate queries being sent to our API, which makes it hard to
+know which fields should be checked:
+
+```graphql
+query PaginatedTodos ($skip: Int) {
+  todos(skip: $skip) {
+    id
+    text
+  }
+}
+```
+
+Instead, we can **introspect an entity's fields** to find out dynamically which fields we may want
+to update. This is possible thanks to [the `cache.inspectFields`
+method](../api/graphcache.md#inspectfields). This method accepts a key or a keyable entity like the
+`cache.keyOfEntity` method that [we've seen on the "Local Resolvers"
+page](./local-resolvers.md#resolving-by-keys) or the `cache.resolve` method's first argument.
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      removeTodo(result, args, cache, info) {
+        const TodoList = gql`
+          query (skip: $skip) {
+            todos(skip: $skip) { id }
+          }
+        `;
+
+        const fields = cache.inspectFields('Query')
+          .filter(field => field.fieldName === 'todos')
+          .forEach(field => {
+            cache.updateQuery(
+              {
+                query: TodoList,
+                variables: { skip: field.arguments.skip },
+              },
+              data => {
+                data.todos = data.todos.filter(todo => todo.id !== args.id);
+                return data;
+              }
+            });
+          });
+      },
+    },
+  },
+});
+```
+
+To implement an updater for our example's `removeTodo` mutation field we may use the
+`cache.inspectFields('Query')` method to retrieve a list of all fields on the `Query` root entity.
+This list will contain all known fields on the `"Query"` entity. Each field is described as an
+object with three properties:
+
+- `fieldName`: The field's name; in this case we're filtering for all `todos` listing fields.
+- `arguments`: The arguments for the given field, since each field that accepts arguments can be
+  accessed multiple times with different arguments. In this example we're looking at
+  `arguments.skip` to find all unique pages.
+- `fieldKey`: This is the field's key which can come in useful to retrieve a field using
+  `cache.resolve(entityKey, fieldKey)` to prevent the arguments from having to be stringified
+  repeatedly.
+
+To summarise, we filter the list of fields in our example down to only the `todos` fields and
+iterate over each of our `arguments` for the `todos` field to filter all lists to remove the `Todo`
+from them.
+
 ## Data Updates
 
 The `updates` configuration is similar to our `resolvers` configuration that we've [previously looked
