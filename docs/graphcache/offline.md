@@ -8,7 +8,7 @@ order: 6
 _Graphcache_ allows you to build an offline-first app with built-in offline and persistence support,
 by means of adding a `storage` interface. In combination with its [Schema
 Awareness](./schema-awareness.md) support and [Optimistic
-Updates](./custom-updates.md#optimistic-updates) this can be used to build an application that
+Updates](./cache-updates.md#optimistic-updates) this can be used to build an application that
 serves cached data entirely from memory when a user's device is offline and still display
 optimistically executed mutations.
 
@@ -25,7 +25,7 @@ as optional in the schema.
 
 Furthermore, if we have any mutations that the user doesn't interact with after triggering them (for
 instance, "liking a post"), we can set up [Optimistic
-Updates](./custom-updates.md#optimistic-updates) for these mutations, which allows them to be
+Updates](./cache-updates.md#optimistic-updates) for these mutations, which allows them to be
 reflected in our UI before sending a request to the API.
 
 To actually now set up offline support, we'll swap out the `cacheExchange` with the

@@ -136,7 +136,7 @@ possible, which means that different queries may give you partial data where som
 have been replaced with `null`, while loading more data in the background, instead of our apps
 having to wait for all data to be available.
 
-Let's approach this with the example from ["Computed Queries"](./computed-queries.md#resolve): We
+Let's approach this with the example from ["Computed Queries"](./local-resolvers.md#resolve): We
 have our `TodosQuery` result which loads a list, and our app may want to get a specific `Todo` when
 the app transitions to a details page. We may have already written a resolver that tells
 _Graphcache_ what `Query.todo` does, but it may be missing some optional field to actuall give us

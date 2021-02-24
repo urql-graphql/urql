@@ -31,11 +31,11 @@ default.
 - 💾 [**Custom cache resolvers**](./local-resolvers.md) Since all queries are fully resolved in the
   cache before and after they're sent, you can add custom resolvers that enable you to format data,
   implement pagination, or implement cache redirects.
-- 💭 [**Subscription and Mutation updates**](./custom-updates.md) You can implement update functions
+- 💭 [**Subscription and Mutation updates**](./cache-updates.md) You can implement update functions
   that tell _Graphcache_ how to update its data after a mutation has been executed, or whenever a
   subscription sends a new event. This allows the cache to reactively update itself without queries
   having to perform a refetch.
-- 🏃 [**Optimistic mutation updates**](./custom-updates.md) When implemented, optimistic updates can
+- 🏃 [**Optimistic mutation updates**](./cache-updates.md) When implemented, optimistic updates can
   provide the data that the GraphQL API is expected to send back before the request succeeds, which
   allows the app to instantly render an update while the GraphQL mutation is executed in the
   background.

@@ -88,7 +88,7 @@ current field.
 ```
 
 [Read more about how to set up `resolvers` on the "Computed Queries"
-page.](../graphcache/computed-queries.md)
+page.](../graphcache/local-resolvers.md)
 
 ### `updates` option
 
@@ -127,7 +127,7 @@ it may have the `error` field set to describe whether the current field is `null
 encountered a `GraphQLError`.
 
 [Read more about how to set up `updates` on the "Custom Updates"
-page.](../graphcache/custom-updates.md)
+page.](../graphcache/cache-updates.md)
 
 ### `optimistic` option
 
@@ -152,7 +152,7 @@ A `OptimisticMutationResolver` receives three arguments when it's called: `varia
 | `info`      | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `optimistic` on the "Custom Updates"
-page.](../graphcache/custom-updates.md)
+page.](../graphcache/cache-updates.md)
 
 ### `schema` option
 
@@ -398,7 +398,7 @@ In the example we can see that the `writeFragment` method returns `undefined`. F
 to include these fields.
 
 [Read more about using `writeFragment` on the ["Custom Updates"
-page.](../graphcache/custom-updates.md#cachewritefragment)
+page.](../graphcache/cache-updates.md#cachewritefragment)
 
 ### updateQuery
 
@@ -432,7 +432,7 @@ We can also see that data can simply be mutated and doesn't have to be altered i
 because all data from the cache is already a deep copy and hence we can do to it whatever we want.
 
 [Read more about using `updateQuery` on the "Custom Updates"
-page.](../graphcache/custom-updates.md#cacheupdatequery)
+page.](../graphcache/cache-updates.md#cacheupdatequery)
 
 ### invalidate
 
@@ -494,7 +494,7 @@ have to be included in every app or aren't needed by all users of _Graphcache_.
 All utilities from extras may be imported from `@urql/exchange-graphcache/extras`.
 
 Currently the `extras` subpackage only contains the [pagination resolvers that have been mentioned
-on the "Computed Queries" page.](../graphcache/computed-queries.md#pagination)
+on the "Computed Queries" page.](../graphcache/local-resolvers.md#pagination)
 
 ### simplePagination
 
@@ -512,7 +512,7 @@ automatically. Queries to this resolvers will from then on only return the infin
 of all pages.
 
 [Read more about `simplePagination` on the "Computed Queries"
-page.](../graphcache/computed-queries.md#simple-pagination)
+page.](../graphcache/local-resolvers.md#simple-pagination)
 
 ### relayPagination
 
@@ -528,7 +528,7 @@ automatically. Queries to this resolvers will from then on only return the infin
 of all pages.
 
 [Read more about `relayPagnation` on the "Computed Queries"
-page.](../graphcache/computed-queries.md#relay-pagination)
+page.](../graphcache/local-resolvers.md#relay-pagination)
 
 ## The `/default-storage` import
 
