@@ -5,22 +5,89 @@ order: 4
 
 # Schema Awareness
 
-As mentioned in the docs we allow for the schema to be passed
-to the `cacheExchange`. This allows for partial results and deterministic
-fragment matching. This schema argument is of type `IntrospectionQuery`, as JSON structure that
-describes your entire server-side `GraphQLSchema`.
+Previously, [on the "Normalized Caching" page](./normalized-caching.md) we've seen how Graphcache
+stores normalized data in its store and how it traverses GraphQL documents to do so. What we've seen
+is that just using the GraphQL document for traversal and the `__typename` introspection field
+Graphcache is able to build a normalized caching structure that keeps our application up-to-date
+across API results, allows it to store data by entities and keys, and provides us configuration
+options to write [manual cache updates](./cache-updates.md) and [local
+resolvers](./local-resolvers.md).
 
-With deterministic fragment matching if we use an interface or a union _Graphcache_ can be 100% sure
-what the expected types and shape of the data must be and whether the match is permitted. It also
-enables a feature called ["Partial Results"](#partial-results).
+While this is all possible without any information about a GraphQL API's schema, the `schema` option
+on `cacheExchange` allows us to pass an introspected schema to Graphcache:
+
+```js
+const introspectedSchema = {
+  __schema: {
+    queryType: { name: 'Query', },
+    mutationType: { name: 'Mutation', },
+    subscriptionType: { name: 'Subscription', },
+  },
+};
+
+cacheExchange({ schema: introspectedSchema });
+```
+
+In GraphQL, [APIs allow for the entire schema to be
+"introspected"](https://graphql.org/learn/introspection/), which are special GraphQL queries that
+give us information on what the API supports. This information can either be retrieved from a
+GraphQL API directly or from the GraphQL.js Schema and contains a list of all types, the types'
+fields, scalars, and other information.
+
+In Graphcache we can pass this schema information to enable several features that aren't enabled if
+we don't pass any information to this option:
+
+- Fragments will be matched deterministically: A fragment can be written to be on an interface type
+  or multiple fragments can be spread for separate union'ed types in a selection set. In many cases,
+  if Graphcache doesn't have any schema information then it won't know what possible types a field
+  can return and may sometimes make a best guess and [issue a
+  warning](./errors.md#16-heuristic-fragment-matching). If we pass Graphcache a `schema` then it'll
+  be able to match fragments deterministically.
+- A schema may have non-default names for its root types; `Query`, `Mutation`, and `Subscription`.
+  The names can be changed by passing `schema` information to `cacheExchange` which is important
+  if the root type appears elsewhere in the schema, e.g. if the `Query` can be accessed on a
+  `Mutation` field's result.
+- We may write a lot of configuration for our `cacheExchange` but if we pass a `schema` then it'll
+  start checking whether any of the configuration options actually don't exist, maybe because we've
+  typo'd them. This is a small detail but can make a large different in a longer configuration.
+- Lastly; a schema contains information on **which fields are optional or required**. When
+  Graphcache has a schema it knows which fields can be made optional and it'll be able to generate
+  "partial results".
+
+### Partial Results
+
+As we navigate an app that uses Graphcache we may be in states where some of our data is already
+cached and some isn't. Graphcache normalizes data and stores it in tables for links and records for
+each entity, which means that sometimes it can maybe even execute a query against its cache that it
+hasn't sent to the API before.
+
+[On the "Local Resolvers" page](./local-resolvers.md#resolving-entities) we've seen how to write
+resolvers that resolver entities without having to have seen a link from an API result before. If
+Graphcache uses these resolvers and previously cached data we often run into situations where a
+"partial result" could already be generated, which is what Graphcache does when it has `schema`
+information.
+
+![A "partial result" is an incomplete result of information that Graphcache already had cached
+before it sent an API result.](../assets/partial-results.png)
+
+Without a `schema` and information on which fields are optional, Graphcache will consider a "partial
+result" as a cache miss. If we don't have all of the information for a query then we can't execute
+it against the locally cached data after all. However, an API's schema contains information on which
+fields are required and which fields are optional, and if our apps are typed with this schema and
+TypeScript, can't we then use and handle these partial results before a request is sent to the API?
+
+This is the idea behind "Schema Awareness" and "Partial Results". When Graphcache has `schema`
+information it may give us partial results [with the `stale` flag
+set](../api/core.md#operationresult) while it fetches the full result from the API in the
+background. This allows our apps to show some information while more is loading.
 
 ## Getting your schema
 
-But how do you get this introspected schema? The process of introspecting a schema is running an
+But how do you get an introspected `schema`? The process of introspecting a schema is running an
 introspection query on the GraphQL API, which will give us our `IntrospectionQuery` result. So an
 introspection is just another query we can run against our GraphQL APIs or schemas.
 
-As long as `introspection` as turned on and permitted, we can download an introspection schema by
+As long as `introspection` is turned on and permitted, we can download an introspection schema by
 running a normal GraphQL query against the API and save the result in a JSON file.
 
 ```js
@@ -125,28 +192,3 @@ const cache = cacheExchange({ schema });
 It may be worth checking what your bundler or framework does when you import a JSON file. Typically
 you can reduce the parsing time by making sure it's turned into a string and parsed using
 `JSON.parse`
-
-**What do we get from adding the schema to _Graphcache_?**
-
-### Partial Results
-
-Once _Schema Awareness_ is activated in _Graphcache_, it can use the schema to check which fields
-and lists are marked as optional fields. This is then used to delivery partial results when
-possible, which means that different queries may give you partial data where some uncached fields
-have been replaced with `null`, while loading more data in the background, instead of our apps
-having to wait for all data to be available.
-
-Let's approach this with the example from ["Computed Queries"](./local-resolvers.md#resolve): We
-have our `TodosQuery` result which loads a list, and our app may want to get a specific `Todo` when
-the app transitions to a details page. We may have already written a resolver that tells
-_Graphcache_ what `Query.todo` does, but it may be missing some optional field to actuall give us
-the full detailed `Todo`.
-
-Without a schema _Graphcache_ would assume that because some fields are uncached and missing, it
-can't serve this query's data. But if it has a schema, it may see that the uncached fields are
-optional anyway and it can return a partial result for the `Todo` while it's fetching the full query
-in the background, which in the `OperationResult` also causes `stale` to be set to `true`.
-
-This means that _Schema Awareness_ can enable us to create apps that can display already cached data
-on page transitions, while the page's full data loads in the background, which can often feel much
-faster to the user.
