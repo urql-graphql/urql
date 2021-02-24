@@ -446,3 +446,65 @@ affect other parts of the cache (like `Query.todos` here) beyond the automatic u
 normalized cache is expected to perform.
 
 [Read more about writing cache updates on the "Cache Updates" page.](./cache-updates.md)
+
+## Deterministic Cache Updates
+
+Above, in [the "Storing Normalized Data" section](#storing-normalized-data), we've talked about how
+Graphcache is able to store normalized data. However, apart from storing this data there are a
+couple of caveats that many applications simply ignore, skip, or simplify when they implement a
+store to cache their data in.
+
+Amongst features like [Optimistic Updates](./cache-updates.md#optimistic-updates) and [Offline
+Support](./offline.md), Graphcache supports several features that allow our API results to be more
+unreliable. Essentially we don't expect API results to always come back in order or on time.
+However, we expect Graphcache to prevent us from making "indeterministic cache updates", meaning
+that we expect it to handle API results that come back in a random order and delayed gracefully.
+
+In terms of the ["Manual Cache Updates"](#manual-cache-updates) that we've talked about above and
+[Optimistic Updates](./cache-updates.md#optimistic-updates) the limitations are pretty simple at
+first and if we use Graphcache as usual we may not even notice them:
+
+- When we make an _optimistic_ change, we define what a mutation's result may look like once the API
+  responds in the future and apply this temporary result immediately. We store this temporary data
+  in a separate "layer". Once the real result comes back this layer can be deleted and the real API
+  result can be applied as usual.
+- When multiple _optimistic updates_ are made at the same time, we never allow these layers to be
+  deleted separately. Instead Graphcache waits for all mutations to complete before deleting the
+  optimistic layers and applying the real API result. This means that a mutation update cannot
+  accidentally commit optimistic data to the cache permanently.
+- While an _optimistic update_ has been applied, Graphcache stops refetching any queries that contain
+  this optimistic data so that it doesn't "flip back" to its non-optimistic state without the
+  optimistic update being applied. Otherwise we'd see a "flicker" in the UI.
+
+These three principles are the basic mechanisms we can expect from Graphcache. The summary is:
+**Graphcache groups optimistic mutations and pauses queries so that optimistic updates look as
+expected,** which is an implementation detail we can mostly ignore when using it.
+
+However, one implementation detail we cannot ignore is the last mechanism in Graphcache which is
+called **"Commutativity"**. As we can tell, "optimistic updates" need to store their normalized
+results on a separate layer. This means that the previous data structure we've seen in Graphcache is
+actually more like a list, with many tables of links and entities.
+
+Each layer may contain optimistic results and have an order of preference. However, this order also
+applies to queries. Since queries are run in one order but their API results can come back to us in
+a very different order, if we access enough pages in a random order things can sometimes look rather
+weird. We may see that in an application on a slow network connection the results may vary depending
+on when their results came back.
+
+![Commutativity means that we store data in separate layers.](../assets/commutative-layers.png)
+
+Instead, Graphcache actually uses layers for any API result it receives. In case, an API result
+arrives out-of-order, it sorts them by precedence — or rather by when they've been requested.
+Overall, we don't have to worry about this, but Graphcache has mechanisms that keep our updates
+safe.
+
+## Reading on
+
+This concludes the introduction to Graphcache with a short overview of how it works, what it
+supports, and some hidden mechanisms and internals. Next we may want to learn more about how to use
+it and more of its features:
+
+- [How do we write "Local Resolvers"?](./local-resolvers.md)
+- [How to set up "Cache Updates" and "Optimistic Updates"?](./cache-updates.md)
+- [What is Graphcache's "Schema Awareness" feature for?](./schema-awareness.md)
+- [How do I enable "Offline Support"?](./offline.md)
