@@ -1,5 +1,5 @@
 ---
-title: Svelte
+title: Svelte Bindings
 order: 2
 ---
 
@@ -460,7 +460,7 @@ mutation has failed.
 
 If you're checking for errors, you should use `operationStore.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
-[Read more about errors on our "Errors" page.](../concepts/errors.md)
+[Read more about errors on our "Errors" page.](./errors.md)
 
 ```jsx
 mutateTodo({ id, title: newTitle }).then(result => {
@@ -477,7 +477,7 @@ is mostly framework-agnostic and will apply to either `urql` in general or the `
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
 
-- [How does the default "document cache" work?](../concepts/document-caching.md)
-- [How are errors handled and represented?](../concepts/errors.md)
+- [How does the default "document cache" work?](./basics/document-caching.md)
+- [How are errors handled and represented?](./basics/errors.md)
 - [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
 - [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)

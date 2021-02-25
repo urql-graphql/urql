@@ -1,5 +1,5 @@
 ---
-title: Core
+title: Core Usage
 order: 3
 ---
 
@@ -160,7 +160,7 @@ just a couple of ways to use `gql` or the `Client`, however you may also want to
 binding introductions, there are some other pages that provide more information on how to get fully
 set up with `urql`:
 
-- [How does the default "document cache" work?](../concepts/document-caching.md)
-- [How are errors handled and represented?](../concepts/errors.md)
+- [How does the default "document cache" work?](./document-caching.md)
+- [How are errors handled and represented?](./errors.md)
 - [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
 - [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)

@@ -1,6 +1,6 @@
 ---
 title: Document Caching
-order: 1
+order: 4
 ---
 
 # Document Caching

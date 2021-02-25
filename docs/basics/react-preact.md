@@ -1,5 +1,5 @@
 ---
-title: React/Preact
+title: React/Preact Bindings
 order: 0
 ---
 
@@ -142,7 +142,7 @@ tuple we then get in return is an array that contains a result object and a re-e
 The result object contains several properties. The `fetching` field indicates whether we're currently
 loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
 the request to the API has failed or when our API result contained some `GraphQLError`s, which
-we'll get into later on the ["Errors" page](../concepts/errors.md).
+we'll get into later on the ["Errors" page](./errors.md).
 
 ### Variables
 
@@ -220,7 +220,7 @@ are falling back to sending an API request.
 
 Request policies aren't specific to `urql`'s React API, but are a common feature in its core. [You
 can learn more about how the cache behaves given the four different policies on the "Document
-Caching" page.](../concepts/document-caching.md)
+Caching" page.](../basics/document-caching.md)
 
 ### Reexecuting Queries
 
@@ -322,7 +322,7 @@ reject. Instead it will always return a promise that resolves to a result.
 
 If you're checking for errors, you should use `result.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
-[Read more about errors on our "Errors" page.](../concepts/errors.md)
+[Read more about errors on our "Errors" page.](./errors.md)
 
 ```jsx
 const Todo = ({ id, title }) => {
@@ -349,7 +349,7 @@ is mostly framework-agnostic and will apply to either `urql` in general or the `
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
 
-- [How does the default "document cache" work?](../concepts/document-caching.md)
-- [How are errors handled and represented?](../concepts/errors.md)
+- [How does the default "document cache" work?](./basics/document-caching.md)
+- [How are errors handled and represented?](./basics/errors.md)
 - [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
 - [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)

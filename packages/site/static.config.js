@@ -86,5 +86,13 @@ export default {
       path: '/docs/graphcache/under-the-hood',
       redirect: '/docs/graphcache/normalized-caching',
     },
+    {
+      path: '/docs/concepts/document-caching',
+      redirect: '/docs/basics/document-caching',
+    },
+    {
+      path: '/docs/concepts/errors',
+      redirect: '/docs/basics/errors',
+    },
   ],
 };
