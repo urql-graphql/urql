@@ -9,7 +9,7 @@ order: 3
 [core behavior in the core package](./core-package.md).
 
 By default, `urql` aims to provide the minimal amount of features that allow us to build an app
-quickly with minimal configuration. However, `urql` has also been designed to be a GraphQL Client
+quickly. However, `urql` has also been designed to be a GraphQL Client
 that grows with our usage and demands. As we go from building our smallest or first GraphQL apps to
 utilising its full functionality, we have tools at our disposal to extend and customize `urql` to
 our liking.
@@ -29,19 +29,18 @@ Specifically, `urql` simplifies three common aspects of using GraphQL:
 - Abstracting _caching_ and state management internally
 - Providing a central point of _extensibility_ and integration with your API
 
-In the following sections we'll talk about how `urql` solves these three problems, and how this is
-accomplished and abstracted internally.
+In the following sections we'll talk about the way that `urql` solves these three problems and how the logic abstracted away internally.
 
 ## Requests and Operations on the Client
 
 If `urql` was a train it would take several stops to arrive at its terminus, our API. It starts with us
 defining queries or mutations. Any GraphQL request can be abstracted into their query documents and
 their variables. In `urql`, these GraphQL requests are treated as unique objects which are uniquely
-identified by the query document and variables, which is why a `key` is generated from the two. This
+identified by the query document and variables (which is why a `key` is generated from the two). This
 `key` is a hash number of the query document and variables and uniquely identifies our
 [`GraphQLRequest`](./api/core.md#graphqlrequest).
 
-Whenever we'd now like to send a request to our API we start by using `urql`'s
+Whenever we decide to send a request to our API we start by using `urql`'s
 [`Client`](./api/core.md#client). It accepts several options like `url` or `requestPolicy` which are
 extra information on how the GraphQL requests are executed.
 
@@ -55,8 +54,7 @@ new Client({
 ```
 
 The bindings that we've seen in [the "Basics" section](./basics/README.md) interact with [the
-`Client`](./api/core.md#client) directly and are a thin abstraction on top of it, but we've also
-seen some methods that can be called on it directly [on the "Core Usage"
+`Client`](./api/core.md#client) directly and are a thin abstraction on top of it. Though some methods can be called on it directly, as seen [on the "Core Usage"
 page](./basics/core.md#one-off-queries-and-mutations).
 
 When we send our queries or mutations to the `Client`, internally they will be managed as
@@ -75,7 +73,7 @@ receive results.
 In the diagram we can see that each operation is a signal for our request to start at which point
 we can expect to receive our results eventually on a callback. Once we're not interested in results
 anymore a special "teardown" signal is issued on the `Client`. While we don't see operations outside
-of the `Client` they're what travel through the "Exchanges" on the `Client`.
+of the `Client`, they're what travel through the "Exchanges" on the `Client`.
 
 ## The Client and Exchanges
 
@@ -122,7 +120,7 @@ We now know how we get to operations and to the `Client`:
   a **stream of results**.
 
 To come back to our train analogy from earlier, an operation, like a train, travels from one end
-of the track to the terminus — our API — the results then come back on the same path as they're just
+of the track to the terminus — our API. The results then come back on the same path as they're just
 travelling the same line in reverse.
 
 ### The Exchanges
