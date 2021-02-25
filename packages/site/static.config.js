@@ -67,10 +67,6 @@ export default {
       redirect: '/docs/basics',
     },
     {
-      path: '/docs/basics/document-caching',
-      redirect: '/docs/concepts/document-caching',
-    },
-    {
       path: '404',
       template: require.resolve('./src/screens/404'),
     },
@@ -93,6 +89,22 @@ export default {
     {
       path: '/docs/concepts/errors',
       redirect: '/docs/basics/errors',
+    },
+    {
+      path: '/docs/concepts',
+      redirect: '/docs/architecture',
+    },
+    {
+      path: '/docs/concepts/stream-patterns',
+      redirect: '/docs/architecture',
+    },
+    {
+      path: '/docs/concepts/philosophy',
+      redirect: '/docs/architecture',
+    },
+    {
+      path: '/docs/concepts/exchanges',
+      redirect: '/docs/advanced/authoring-exchanges',
     },
   ],
 };

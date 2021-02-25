@@ -9,7 +9,7 @@ order: 9
 package or exchange packages, which are all listed in this section.
 
 Most of these packages will refer to or use utilities and types from the `@urql/core` package. [Read
-more about the core package on the "Core Package" page.](../concepts/core-package.md)
+more about the core package on the "Core" page.](../basics/core.md)
 
 - [`@urql/core` API docs](./core.md)
 - [`urql` React API docs](./urql.md)

@@ -158,6 +158,9 @@ We can even swap out our [document cache](./basics/document-caching.md), which i
 `@urql/core`'s `cacheExchange`, with `urql`'s [normalized cache,
 Graphcache](./graphcache/README.md).
 
+[Read more about exchanges and how to write them from scratch on the "Authoring Exchanges"
+page.](./advanced/authoring-exchanges.md)
+
 ## Stream Patterns in `urql`
 
 In the previous sections we've learned a lot about how the `Client` works, but we've always learned

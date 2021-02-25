@@ -10,7 +10,7 @@ order: 2
 This "Getting Started" guide covers how to install and set up `urql` and provide a `Client` for
 Svelte. The `@urql/svelte` package, which provides bindings for Svelte, doesn't fundamentally
 function differently from `@urql/preact` or `urql` and uses the same [Core Package and
-`Client`](../concepts/core-package.md).
+`Client`](./core.md).
 
 ### Installation
 
@@ -477,7 +477,7 @@ is mostly framework-agnostic and will apply to either `urql` in general or the `
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
 
-- [How does the default "document cache" work?](./basics/document-caching.md)
-- [How are errors handled and represented?](./basics/errors.md)
-- [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
+- [How does the default "document cache" work?](./document-caching.md)
+- [How are errors handled and represented?](./errors.md)
+- [A quick overview of `urql`'s architecture and structure.](../architecture.md)
 - [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)

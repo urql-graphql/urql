@@ -11,7 +11,7 @@ reexport all exports from `@urql/core`.
 Therefore if you're not accessing utilities directly, aren't in a Node.js environment, and are using
 framework bindings, you'll likely want to import from your framework bindings package directly.
 
-[Read more about `urql`'s core on the "Core Package" page.](../concepts/core-package.md)
+[Read more about `urql`'s core on the "Core Package" page.](../basics/core.md)
 
 ## Client
 
@@ -89,14 +89,14 @@ client
 ```
 
 [Read more about how to use this API on the "Core Package"
-page.](../concepts/core-package.md#one-off-queries-and-mutations)
+page.](../basics/core.md#one-off-queries-and-mutations)
 
 ### client.mutation
 
 This is similar to [`client.query`](#clientquery), but dispatches mutations instead.
 
 [Read more about how to use this API on the "Core Package"
-page.](../concepts/core-package.md#one-off-queries-and-mutations)
+page.](../basics/core.md#one-off-queries-and-mutations)
 
 ### client.subscription
 
@@ -241,7 +241,7 @@ This is the input that an [`Exchange`](#exchange) receives when it's initialized
 An exchange represents abstractions of small chunks of logic in `urql`.
 They're small building blocks and similar to "middleware".
 
-[Read more about _Exchanges_ on the "Exchanges" page.](../concepts/exchanges.md)
+[Read more about _Exchanges_ on the "Authoring Exchanges" page.](../advanced/authoring-exchanges.md)
 
 An exchange is defined to be a function that receives [`ExchangeInput`](#exchangeinput) and returns
 an `ExchangeIO` function. The `ExchangeIO` function in turn will receive a stream of operations, and
@@ -254,8 +254,8 @@ type ExchangeIO = (Source<Operation>) => Source<OperationResult>;
 type Exchange = ExchangeInput => ExchangeIO;
 ```
 
-[If you haven't yet seen `Source`, read more about "Stream
-Patterns".](../concepts/stream-patterns.md)
+[If you haven't yet seen streams you can read more about "Stream Patterns" on the "Architecture"
+page.](../architecture.md)
 
 ## Exchanges
 

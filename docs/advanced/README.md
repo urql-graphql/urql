@@ -6,8 +6,8 @@ order: 4
 # Advanced
 
 In this chapter we'll dive into various topics of "advanced" `urql` usage. This is admittedly a
-catch-all chapter of various use-cases that can only be covered after [the "Concepts"
-chapter.](../concepts/README.md)
+catch-all chapter of various use-cases that can only be covered after [the "Architecture"
+chapter.](../architecture.md)
 
 - [**Subscriptions**](./subscriptions.md) covers how to use `useSubscription` and how to set up GraphQL subscriptions with
   `urql`.
@@ -20,5 +20,8 @@ chapter.](../concepts/README.md)
 - [**Retrying operations**](./retry-operations.md) shows the `retryExchange` which allows you to retry operations when they've failed.
 - [**Authentication**](./authentication.md) describes how to implement authentication using the `authExchange`
 - [**Testing**](./testing.md) covers how to test components that use `urql` particularly in React.
+- [**Authoring Exchanges**](./authoring-exchanges.md) describes how to implement exchanges from
+  scratch and how they work internally. This is a good basis to understanding how some of the
+  features in this section function.
 - [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon which can make it easier to
   update normalized data after mutations.

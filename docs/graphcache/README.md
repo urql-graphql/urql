@@ -5,7 +5,7 @@ order: 5
 
 # Graphcache
 
-In `urql`, caching is fully configurable via [_Exchanges_](../concepts/exchanges.md) and the default
+In `urql`, caching is fully configurable via [exchanges](../architecture.md) and the default
 `cacheExchange` in `urql` offers a ["Document Cache"](../basics/document-caching.md), which is
 sufficient for sites that heavily rely and render static content. However as an app grows more
 complex it's likely that the data and state that `urql` manages, will also grow more complex and

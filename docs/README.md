@@ -21,7 +21,7 @@ declaratively send GraphQL requests to our API. All framework packages — like 
 `@urql/core`](./basics/core.md), which we can imagine as the brain
 of `urql` with most of its logic. As we progress with implementing `urql` into our application,
 we're later able to extend it by adding ["addon packages", which we call
-_Exchanges_](./concepts/exchanges.md)
+_Exchanges_](./advanced/authoring-exchanges.md)
 
 If at this point you're still unsure of whether to use `urql`, [have a look at the **Comparison**
 page](./comparison.md) and check whether `urql` supports all features you're looking for.
@@ -46,9 +46,8 @@ interest.
 
 - **Basics** is the section where we'll want to start learning about `urql` as it contains "Getting
   Started" guides for our framework of choice.
-- **Main Concepts** then explains more about how `urql` functions, what it's made up of, and covers
-  the main aspects of the `Client` and GraphQL clients in general, on the ["Philosophy"
-  page](./concepts/philosophy.md).
+- **Architecture** then explains more about how `urql` functions, what it's made up of, and covers
+  the main aspects of the `Client` and exchanges.
 - **Advanced** covers all more uncommon use-cases and contains guides that we won't need immediately
   when we get started with `urql`.
 - **Graphcache** documents one of the most important addons to `urql`, which adds ["Normalized

@@ -12,7 +12,7 @@ This works like the cache in a browser. `urql` creates a key for each request th
 a query and its variables.
 
 The default _document caching_ logic is implemented in the default `cacheExchange`. We'll learn more
-about ["Exchanges" on a later page.](../concepts/exchanges.md)
+about ["Exchanges" on the "Architecture" page.](../architecture.md)
 
 ## Operation Keys
 

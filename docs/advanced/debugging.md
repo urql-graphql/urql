@@ -54,7 +54,7 @@ const { unsubscribe } = client.subscribeToDebugTarget(event => {
 
 As demonstrated above, the `client.subscribeToDebugTarget` accepts a callback function and returns
 a subscription with an `unsubscribe` method. We've seen this pattern in the prior ["Stream Patterns"
-section.](../concepts/stream-patterns.md#the-wonka-library)
+section on the "Architecture" page.](../architecture.md)
 
 ## Adding your own Debug Events
 
@@ -64,7 +64,7 @@ to start adding your own events.
 
 #### Dispatching an event
 
-In the ["Exchanges" section](../concepts/exchanges.md) we've learned about the [`ExchangeInput`
+[On the "Authoring Exchanges" page](./authoring-exchanges.md) we've learned about the [`ExchangeInput`
 object](../api/core.md#exchangeinput), which comes with a `client` and a `forward` property.
 It also contains a `dispatchDebug` property.
 
