@@ -1,42 +1,21 @@
 ---
-title: Exchanges
-order: 5
+title: Authoring Exchanges
+order: 8
 ---
 
-# Exchanges
+# Exchange Author Guide
 
-As we've learned on the [Stream Patterns](./stream-patterns.md) page, `urql`'s `Client` structures
+As we've learned [on the "Architecture" page](../architecture.md) page, `urql`'s `Client` structures
 its data as an event hub. We have an input stream of operations, which are instructions for the
 `Client` to provide a result. These results then come from an output stream of operation results.
 
-_Exchanges_ are responsible for performing the important transform from the operations (input) stream to the results stream. Exchanges are handler functions that deal with these input and
-output streams. They're one of `urql`'s key components, and are needed to implement vital pieces of logic such as
-caching, fetching, deduplicating requests, and more. In other words, Exchanges are handlers that
-fulfill our GraphQL requests and can change the stream of operations or results.
+_Exchanges_ are responsible for performing the important transform from the operations (input) stream
+to the results stream. Exchanges are handler functions that deal with these input and
+output streams. They're one of `urql`'s key components, and are needed to implement vital pieces of
+logic such as caching, fetching, deduplicating requests, and more. In other words, Exchanges are
+handlers that fulfill our GraphQL requests and can change the stream of operations or results.
 
-The default set of exchanges that `@urql/core` contains and applies to a `Client` are:
-
-- `dedupExchange`: Deduplicates pending operations (pending = waiting for a result)
-- `cacheExchange`: The default caching logic with ["Document Caching"](../concepts/document-caching.md)
-- `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
-
-Other available exchanges:
-
-- [`errorExchange`](../api/core.md#errorexchange): Allows a global callback to be called when any error occurs
-- [`ssrExchange`](../advanced/server-side-rendering.md): Allows for a server-side renderer to
-  collect results for client-side rehydration.
-- [`retryExchange`](../api/retry-exchange.md): Allows operations to be retried
-- [`multipartFetchExchange`](../api/multipart-fetch-exchange.md): Provides multipart file upload capability
-- [`persistedFetchExchange`](../api/persisted-fetch-exchange.md): Provides support for Automatic
-  Persisted Queries
-- [`authExchange`](../api/auth-exchange.md): Allows complex authentication flows to be implemented
-  easily.
-- [`requestPolicyExchange`](../api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
-- [`refocusExchange`](../api/refocus-exchange.md): Tracks open queries and refetches them
-  when the window regains focus.
-- `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
-
-It is also possible to apply custom exchanges to override the default logic.
+In this guide we'll learn more about how exchanges work and how we can write our own exchanges.
 
 ## An Exchange Signature
 
@@ -57,7 +36,7 @@ function (this applies to the `forward` function as well), which accepts the sou
 [_Operations_](../api/core.md#operation) and returns a source of [_Operation
 Results_](../api/core.md#operationresult).
 
-- [Read more about streams on the "Stream Patterns" page.](../concepts/stream-patterns.md)
+- [Read more about streams on the "Architecture" page.](../architecture.md#stream-patterns-in-urql)
 - [Read more about the _Exchange_ type signature on the API docs.](../api/core.md#exchange)
 
 ## Using Exchanges

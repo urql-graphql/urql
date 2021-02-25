@@ -102,7 +102,7 @@ offline — either because `navigator.onLine` is `false` or because the error me
 offline error — the `offlineExchange` won't deliver the error for this query to avoid it from being
 surfaced to the user. This works particularly well in combination with ["Schema
 Awareness"](./schema-awareness.md) which will deliver as much of a partial query result as possible.
-In combination with the [`cache-and-network` request policy](../concepts/document-caching.md#request-policies)
+In combination with the [`cache-and-network` request policy](../basics/document-caching.md#request-policies)
 we can now ensure that we display as much data as possible when the user is offline while still
 keeping the cache up-to-date when the user is online.
 

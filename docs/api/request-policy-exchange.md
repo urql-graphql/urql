@@ -9,7 +9,7 @@ The `@urql/exchange-request-policy` package contains an addon `requestPolicyExch
 that may be used to upgrade [Operations' Request Policies](./core.md#requestpolicy) on a
 time-to-live basis.
 
-[Read more about request policies on the "Document Caching" page.](../concepts/document-caching.md#request-policies)
+[Read more about request policies on the "Document Caching" page.](../basics/document-caching.md#request-policies)
 
 This exchange will conditionally upgrade `cache-first` and `cache-only` operations to use
 `cache-and-network`, so that the client gets an opportunity to update its cached data, when the

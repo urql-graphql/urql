@@ -1,5 +1,5 @@
 ---
-title: Core
+title: Core Usage
 order: 3
 ---
 
@@ -156,11 +156,11 @@ There are other utilities not mentioned here. Read more about the `@urql/core` A
 
 This concludes the introduction for using `@urql/core` without any framework bindings. This showed
 just a couple of ways to use `gql` or the `Client`, however you may also want to learn more about
-[how to use `urql`'s streams](../concepts/stream-patterns.md). Furthermore, apart from the framework
+[how to use `urql`'s streams](../architecture.md#stream-patterns-in-urql). Furthermore, apart from the framework
 binding introductions, there are some other pages that provide more information on how to get fully
 set up with `urql`:
 
-- [How does the default "document cache" work?](../concepts/document-caching.md)
-- [How are errors handled and represented?](../concepts/errors.md)
-- [A quick overview of `urql`'s philosophy and structure.](../concepts/philosophy.md)
+- [How does the default "document cache" work?](./document-caching.md)
+- [How are errors handled and represented?](./errors.md)
+- [A quick overview of `urql`'s architecture and structure.](../architecture.md)
 - [Setting up other features, like authentication, uploads, or persisted queries.](../advanced/README.md)

@@ -14,10 +14,9 @@ prior knowledge.
 - [**Core Package**](./core-package.md) defines why a shared package exists that contains the main
   logic of `urql`, and how we can use it directly in Node.js.
 
-After reading "Basics" you may want to [read the "Concepts" chapter of the
-documentation](../concepts/README.md) as it explains the motivation and architecture that drives
-`urql`. Two notable sections there include:
+After reading the page for your bindings and the "Core" page you may want to the next two pages in
+this section of the documentation:
 
-- [**Document Caching**](../concepts/document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
+- [**Document Caching**](./document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
   [Normalized Cache](../graphcache/normalized-caching.md).
-- [**Errors**](../concepts/errors.md) contains information on error handling in `urql`.
+- [**Errors**](../basics/errors.md) contains information on error handling in `urql`.

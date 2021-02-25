@@ -5,8 +5,8 @@ order: 5
 
 # Graphcache
 
-In `urql`, caching is fully configurable via [_Exchanges_](../concepts/exchanges.md) and the default
-`cacheExchange` in `urql` offers a ["Document Cache"](../concepts/document-caching.md), which is
+In `urql`, caching is fully configurable via [exchanges](../architecture.md) and the default
+`cacheExchange` in `urql` offers a ["Document Cache"](../basics/document-caching.md), which is
 sufficient for sites that heavily rely and render static content. However as an app grows more
 complex it's likely that the data and state that `urql` manages, will also grow more complex and
 introduce interdependencies between data.
@@ -21,7 +21,7 @@ In `urql`, normalized caching is an opt-in feature which is provided by the
 ## Features
 
 The following pages introduce different features in _Graphcache_ which together make it a compelling
-alternative to the standard [document cache](../concepts/document-caching.md) that `urql` uses by
+alternative to the standard [document cache](../basics/document-caching.md) that `urql` uses by
 default.
 
 - 🔁 [**Fully reactive, normalized caching.**](./normalized-caching.md) _Graphcache_ stores data in
