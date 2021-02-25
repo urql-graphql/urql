@@ -13,8 +13,8 @@ All framework bindings — meaning `urql`, `@urql/preact`, `@urql/svelte`, and `
 all exports of our `@urql/core` core library. This means that if we want to use `urql`'s `Client`
 imperatively or with Node.js we'd use `@urql/core`'s utilities or the `Client` directly.
 
-In other words, if we're using framework bindings then writing `import { Client } from '@urql/vue'`
-for instance is the same as `import { Client } from '@urql/core';`.
+In other words, if we're using framework bindings then writing `import { Client } from "@urql/vue"`
+for instance is the same as `import { Client } from "@urql/core"`.
 This means that we can use the core utilities and exports that are shared between all bindings
 directly or install `@urql/core` separately. We can even use `@urql/core` directly without any
 framework bindings.
@@ -111,7 +111,86 @@ const TodosQuery = gql`
 `;
 ```
 
+This will all look familiar when coming from the `graphql-tag` package. The functionality is
+identical and the output is approximately the same. The two packages are also intercompatible.
+However, one small change that `@urql/core`'s implementation makes is that your fragment names don't
+have to be globally unique, since it's possible to create some one-off fragments every now and then.
+It also pre-generates a "hash key" for the `DocumentNode` which is what `urql` does anyway, thus
+avoiding some extra work compared to when the `graphql-tag` package is used with `urql`.
+
 ## Using the `urql` Client
+
+The `Client` is the main "hub" and store for everything that `urql` does. It is used by all
+framework bindings and from the other pages in the "Basics" section we can see that creating a
+`Client` comes up across all bindings and use-cases for `urql`.
+
+[Read more about the `Client` and `urql`'s architecture on the "Architecture"
+page.](../architecture.md)
+
+### Setting up the `Client`
+
+The `@urql/core` package exports a function called `createClient` which we can use to
+create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
+
+```js
+import { createClient } from 'urql';
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+});
+```
+
+At the bare minimum we'll need to pass an API's `url` when we create a `Client` to get started.
+
+Another common option is `fetchOptions`. This option allows us to customize the options that will be
+passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object or
+a function returning an options object.
+
+In the following example we'll add a token to each `fetch` request that our `Client` sends to our
+GraphQL API.
+
+```js
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  fetchOptions: () => {
+    const token = getToken();
+    return {
+      headers: { authorization: token ? `Bearer ${token}` : '' },
+    };
+  },
+});
+```
+
+### The `Client`s options
+
+As we've seen above, the most important option for the `Client` is `url`, since it won't work
+without it. However, another important option on the `Client` is the `exchanges` option.
+
+This option passes a list of exchanges to the `Client`, which tell it how to execute our requests
+and how to cache data in a certain order. By default this will be populated with the list of
+`defaultExchanges`.
+
+```js
+import { createClient, defaultExchanges } from 'urql';
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  // the default:
+  exchanges: defaultExchanges,
+  // the same as:
+  exchanges: [dedupExchange, cacheExchange, fetchExchange]
+});
+```
+
+Later, [in the "Advanced" section](../advanced/README.md) we'll see many more features that `urql`
+supports by adding new exchanges to this list. On [the "Architecture" page](../architecture.md)
+we'll also learn more about what exchanges are and why they exist.
+
+For now it's sufficient for us to know that our requests are executed using the logic in the
+exchanges in order. First, the `dedupExchange` deduplicates requests if we send the same queries
+twice, the `cacheExchange` implements the default "document caching" behaviour (as we'll learn about
+on the ["Document Caching"](./document-caching.md) page), and lastly the `fetchExchange` is
+responsible for sending our requests to our GraphQL API.
 
 ### One-off Queries and Mutations
 
@@ -137,8 +216,13 @@ client
   });
 ```
 
-This may be useful when we don't plan on cancelling queries or we don't care about future updates to
-this data and are just looking to query a result once.
+In the above example we're executing a query on the client, are passing some variables and are
+calling the `toPromise()` method on the return value to execute the request immediately and get the
+result as a promise.  This may be useful when we don't plan on cancelling queries or we don't
+care about future updates to this data and are just looking to query a result once.
+
+The same can be done for mutations by calling the `client.mutation` method instead of the
+`client.query` method.
 
 Similarly there's a way to read data from the cache synchronously, provided that the cache has
 received a result for a given query before. The `Client` has a `readQuery` method which is a
@@ -159,9 +243,58 @@ const result = client.readQuery(QUERY, { id: 'test' });
 result; // null or { data: ... }
 ```
 
-Since the streams in `urql` operate synchronously, internally this method subscribes to
-`client.executeQuery` and unsubscribes immediately. If a result is available in the cache it will be
-resolved synchronously prior to the unsubscribe. If not, the query is cancelled and no request will be sent to the GraphQL API.
+In the above example we call `readQuery` and receive a result immediately. This result will be
+`null` if the `cacheExchange` doesn't have any results cached for the given query.
+
+### Subscribing to Results
+
+GraphQL Clients are by their nature "reactive", meaning that when we execute a query, we expect to
+get future results for this query. [On the "Document Caching" page](./document-caching.md) we'll
+learn how mutations can invalidate results in the cache. This process (and others just like it) can
+cause our query to be refetched.
+
+In essence, if we're subscribing to results rather than using a promise, like we've seen above, then
+we're able to see future changes for our query's results. If a mutation causes a query to be
+refetched from our API in the background then we'll see a new result. If we execute a query
+somewhere else then we'll get notified of the new API result as well, as long as we're subscribed.
+
+```js
+import { pipe, subscribe } from 'wonka';
+
+const QUERY = `
+  query Test($id: ID!) {
+    getUser(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+const { unsubscribe } = pipe(
+  client.query(QUERY, { id: 'test' }),
+  subscribe(result => {
+    console.log(result); // { data: ... }
+  })
+);
+```
+
+This code example is similar to the one before. However, instead of sending a one-off query, we're
+subscribing to the query. Internally, this causes the `Client` to do the exact same, but the
+subscription means that our callback may be called repeatedly. We may get future results as well as
+the first one.
+
+This also works synchronously. As we've seen before `client.readQuery` can give us a result
+immediately if our cache already has a result for the given query. The same principle applies here!
+Our callback will be called synchronously if the cache already has a result.
+
+Once we're not interested in any results anymore we need to clean up after ourselves by calling
+`unsubscribe`. This stops the subscription and makes sure that the `Client` doesn't actively update
+the query anymore or refetches it. We can think of this pattern as being very similar to events or
+event hubs.
+
+We're using [the Wonka library for our streams](https://wonka.kitten.sh/basics/background) which
+we'll learn more about [on the "Architecture" page](./architecture.md). But we can think of this as
+React's effects being called over time, or as `window.addEventListener`.
 
 ## Common Utilities in Core
 
