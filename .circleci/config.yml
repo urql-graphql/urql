@@ -73,7 +73,7 @@ jobs:
           name: Deploy Staging Site
           command: |
             cd packages/site
-            node scripts/deploy/surge.js
+            yarn run deploy:stage
 
   production_site:
     working_directory: /mnt/ramdisk
@@ -95,7 +95,7 @@ jobs:
           name: Deploy Production Site
           command: |
             cd packages/site
-            node scripts/deploy/aws.js
+            node deploy:prod
 
 workflows:
   version: 2
