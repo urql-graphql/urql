@@ -3,7 +3,6 @@ import { resolve } from 'path';
 import constants from './src/constants';
 import Document from './src/html';
 
-const isStaging = process.env.REACT_STATIC_STAGING === 'true';
 const basePath = 'open-source/urql';
 
 export default {
@@ -26,16 +25,15 @@ export default {
 
   paths: {
     src: 'src',
-    dist: isStaging ? `dist/${basePath}` : 'dist',
+    dist: `dist/${basePath}`,
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
     devDist: 'node_modules/.cache/react-static/dist/',
     temp: 'node_modules/.cache/react-static/temp/',
     public: 'public', // The public directory (files copied to dist during build)
   },
-
-  basePath: 'open-source/urql',
-  stagingBasePath: '',
-  devBasePath: '',
+  basePath,
+  stagingBasePath: basePath,
+  devBasePath: basePath,
 
   Document,
 
