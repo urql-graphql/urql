@@ -1,7 +1,7 @@
 /**
  * Formideploy configuration overrides.
  */
- module.exports = {
+module.exports = {
   lander: {
     name: 'urql',
   },
