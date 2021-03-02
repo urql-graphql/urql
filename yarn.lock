@@ -1647,11 +1647,6 @@
     unist-builder "2.0.3"
     unist-util-visit "2.0.3"
 
-"@mdx-js/preact@^1.6.22":
-  version "1.6.22"
-  resolved "https://registry.yarnpkg.com/@mdx-js/preact/-/preact-1.6.22.tgz#98b9f5f865eb44d768ffea93497f7cb0c1e5f463"
-  integrity sha512-ZVq6uvfVGSAphYNuD+9MVcoRSF8yi6RlZIQDVIkgc3ZnUwqYdLheCkPZ+nIG1Mil8Kanah5tgPHLNmA7HwfGLw==
-
 "@mdx-js/react@^1.5.5", "@mdx-js/react@^1.6.22":
   version "1.6.22"
   resolved "https://registry.yarnpkg.com/@mdx-js/react/-/react-1.6.22.tgz#ae09b4744fddc74714ee9f9d6f17a66e77c43573"

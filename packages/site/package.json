@@ -30,7 +30,6 @@
     ]
   },
   "dependencies": {
-    "@mdx-js/preact": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "formidable-oss-badges": "0.3.5",
     "fuse.js": "^6.4.6",

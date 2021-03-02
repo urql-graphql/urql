@@ -3,13 +3,14 @@ import { resolve } from 'path';
 import constants from './src/constants';
 import Document from './src/html';
 
-const isStaging = process.env.REACT_STATIC_STAGING === 'true';
+const isStaging = process.env.REACT_STATIC_ENV === 'staging';
+const isProduction = process.env.REACT_STATIC_ENV === 'production';
 
 export default {
   plugins: [
     resolve(__dirname, 'plugins/monorepo-fix/'),
     resolve(__dirname, 'plugins/react-router/'),
-    // resolve(__dirname, 'plugins/preact/'),
+    (isStaging || isProduction) && resolve(__dirname, 'plugins/preact/'),
     [
       'react-static-plugin-md-pages',
       {
@@ -21,7 +22,7 @@ export default {
 
     'react-static-plugin-styled-components',
     'react-static-plugin-sitemap',
-  ],
+  ].filter(Boolean),
 
   paths: {
     src: 'src',
