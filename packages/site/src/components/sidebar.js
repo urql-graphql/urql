@@ -243,7 +243,7 @@ const Sidebar = ({ closeSidebar, ...props }) => {
                   {filterTerm
                     ? childPage.headings.map(heading => (
                         <SidebarNavSubItem
-                          to={`/${childPage.path}/`}
+                          to={`/${childPage.path}/#${heading.slug}`}
                           key={heading.value}
                           nested={true}
                         >
