@@ -1,14 +1,12 @@
 import React from 'react';
-import * as path from 'path';
 import styled, { css } from 'styled-components';
 import { MDXProvider } from '@mdx-js/react';
-import { useLocation, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import Highlight, { Prism } from 'prism-react-renderer';
 import nightOwlLight from 'prism-react-renderer/themes/nightOwlLight';
 
 import AnchorSvg from '../assets/anchor';
-import { relative } from './sidebar';
 
 const getLanguage = className => {
   const res = className.match(/language-(\w+)/);
@@ -230,13 +228,8 @@ const TableScroll = props => (
 );
 
 const MdLink = ({ href, children }) => {
-  const currentPage = useMarkdownPage();
-
   if (!/^\w+:/.test(href) && !href.startsWith('#')) {
-    const from = currentPage.path.replace(/\/$/, '');
-    const to = path.join(path.dirname(currentPage.originalPath), href);
-
-    return <Link to={relative(from, to)}>{children}</Link>;
+    return <Link to={href}>{children}</Link>;
   }
 
   return (

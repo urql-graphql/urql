@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Fuse from 'fuse.js';
 import { useBasepath } from 'react-static';
 import { Link, useLocation } from 'react-router-dom';
-import * as path from 'path';
 
 import { useMarkdownPage, useMarkdownTree } from 'react-static-plugin-md-pages';
 
@@ -47,18 +46,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   padding-bottom: ${p => p.theme.spacing.lg};
 `;
-
-export const relative = (from, to) => {
-  if (!from || !to) return null;
-  let [toPath, hash] = to.split('#');
-  let pathname = path.relative(path.dirname(from), toPath);
-  if (!pathname)
-    pathname = path.join(path.relative(from, toPath), path.basename(toPath));
-  if (from.endsWith('/')) pathname = '../' + pathname + '/';
-  if (!pathname.endsWith('/')) pathname += '/';
-  if (hash) pathname += `#${hash}`;
-  return { pathname };
-};
 
 export const SidebarStyling = ({ children, sidebarOpen }) => {
   const basepath = useBasepath() || '';
@@ -194,10 +181,10 @@ const Sidebar = ({ closeSidebar, ...props }) => {
 
   const sidebarItems = useMemo(() => {
     let pathname = location.pathname.match(/docs\/?(.+)?/);
-
     if (!pathname || !tree || !tree.children || !location) {
       return null;
     }
+
     pathname = pathname[0];
     const trimmedPathname = pathname.replace(/(\/$)|(\/#.+)/, '');
 
@@ -222,7 +209,7 @@ const Sidebar = ({ closeSidebar, ...props }) => {
       return (
         <Fragment key={page.key}>
           <SidebarNavItem
-            to={relative(pathname, page.path)}
+            to={`/${page.path}/`}
             // If there is an active filter term in place, expand all headings
             isActive={() => isActive}
             onClick={closeSidebar}
@@ -243,7 +230,7 @@ const Sidebar = ({ closeSidebar, ...props }) => {
                         new RegExp(`${trimmedPathname}$`, 'g')
                       )
                     }
-                    to={relative(pathname, childPage.path)}
+                    to={`/${childPage.path}/`}
                   >
                     {childPage.matchedIndices
                       ? highlightText(
@@ -256,7 +243,7 @@ const Sidebar = ({ closeSidebar, ...props }) => {
                   {filterTerm
                     ? childPage.headings.map(heading => (
                         <SidebarNavSubItem
-                          to={relative(pathname, childPage.path)}
+                          to={`/${childPage.path}/`}
                           key={heading.value}
                           nested={true}
                         >

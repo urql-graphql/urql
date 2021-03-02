@@ -4,12 +4,12 @@ import constants from './src/constants';
 import Document from './src/html';
 
 const isStaging = process.env.REACT_STATIC_STAGING === 'true';
-const basePath = 'open-source/urql';
 
 export default {
   plugins: [
     resolve(__dirname, 'plugins/monorepo-fix/'),
-    resolve(__dirname, 'plugins/preact'),
+    resolve(__dirname, 'plugins/react-router/'),
+    // resolve(__dirname, 'plugins/preact/'),
     [
       'react-static-plugin-md-pages',
       {
@@ -21,12 +21,11 @@ export default {
 
     'react-static-plugin-styled-components',
     'react-static-plugin-sitemap',
-    'react-static-plugin-react-router',
   ],
 
   paths: {
     src: 'src',
-    dist: isStaging ? `dist/${basePath}` : 'dist',
+    dist: isStaging ? `dist/open-source/urql` : 'dist',
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
     devDist: 'node_modules/.cache/react-static/dist/',
     temp: 'node_modules/.cache/react-static/temp/',

@@ -6,7 +6,7 @@ order: 3
 # Architecture
 
 `urql` is a highly customizable and flexible GraphQL client, that happens to come with some default
-[core behavior in the core package](./core-package.md).
+[core behavior in the core package](./basics/core.md).
 
 By default, `urql` aims to provide the minimal amount of features that allow us to build an app
 quickly. However, `urql` has also been designed to be a GraphQL Client
