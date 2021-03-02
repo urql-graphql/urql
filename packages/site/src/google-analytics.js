@@ -14,7 +14,11 @@ const GoogleAnalytics = ({ children, ...rest }) => {
   const basename = `/${useBasepath() || ''}`;
   if (typeof document !== 'undefined') {
     // fragment doesn't like it when you try to give it attributes
-    return <Analytics {...rest} basename={basename}>{children}</Analytics>;
+    return (
+      <Analytics {...rest} basename={basename}>
+        {children}
+      </Analytics>
+    );
   }
   return <Analytics>{children}</Analytics>;
 };
