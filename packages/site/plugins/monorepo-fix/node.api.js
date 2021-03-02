@@ -11,7 +11,6 @@ export default () => ({
         (context, request, callback) => {
           if (/^[.\/]/.test(request)) {
             return callback();
-            e;
           }
 
           const res = resolveFrom(`${context}/`, request);

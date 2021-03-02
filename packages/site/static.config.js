@@ -8,6 +8,7 @@ const isProduction = process.env.REACT_STATIC_ENV === 'production';
 
 export default {
   plugins: [
+    resolve(__dirname, 'plugins/assets-fix/'),
     resolve(__dirname, 'plugins/monorepo-fix/'),
     resolve(__dirname, 'plugins/react-router/'),
     (isStaging || isProduction) && resolve(__dirname, 'plugins/preact/'),
@@ -30,6 +31,7 @@ export default {
     buildArtifacts: 'node_modules/.cache/react-static/artifacts/',
     devDist: 'node_modules/.cache/react-static/dist/',
     temp: 'node_modules/.cache/react-static/temp/',
+    assetsPath: 'static',
     public: 'public', // The public directory (files copied to dist during build)
   },
 
