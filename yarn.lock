@@ -1733,7 +1733,7 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.6.0.tgz#f022195afdfc942e088ee2101285a1d31c7d727f"
   integrity sha512-cPqjjzuFWNK3BSKLm0abspP0sp/IGOli4p5I5fKFAzdS8fvjdOwDCfZqAaIiXd9lPkOWi3SUUfZof3hEb7J/uw==
 
-"@reach/router@^1.3.1", "@reach/router@^1.3.3":
+"@reach/router@^1.2.1", "@reach/router@^1.3.3":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@reach/router/-/router-1.3.4.tgz#d2574b19370a70c80480ed91f3da840136d10f8c"
   integrity sha512-+mtn9wjlB9NN2CNnnC/BRYtwdKBfSyyasPYraNAyvaV1occr/5NnB4CVzjEZipNHwYebQwcndGUmpFzxAUoqSA==
@@ -3453,7 +3453,7 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-autoprefixer@^9.7.2, autoprefixer@^9.7.4:
+autoprefixer@^9.6.1, autoprefixer@^9.7.2:
   version "9.8.6"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.8.6.tgz#3b73594ca1bf9266320c5acf1588d74dea74210f"
   integrity sha512-XrvP4VVHdRBCdX1S3WXVD8+RyG9qeb1D5Sn1DeLiG2xfSpzellk5k54xbUERJ3M5DggQxes39UGOTP8CFrEGbg==
@@ -12329,9 +12329,9 @@ pretty-hrtime@^1.0.3:
   integrity sha1-t+PqQkNaTJsnWdmeDyAesZWALuE=
 
 prism-react-renderer@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/prism-react-renderer/-/prism-react-renderer-1.1.1.tgz#1c1be61b1eb9446a146ca7a50b7bcf36f2a70a44"
-  integrity sha512-MgMhSdHuHymNRqD6KM3eGS0PNqgK9q4QF5P0yoQQvpB6jNjeSAi3jcSAz0Sua/t9fa4xDOMar9HJbLa08gl9ug==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/prism-react-renderer/-/prism-react-renderer-1.2.0.tgz#5ad4f90c3e447069426c8a53a0eafde60909cdf4"
+  integrity sha512-GHqzxLYImx1iKN1jJURcuRoA/0ygCcNhfGw1IT8nPIMzarmKQ3Nc+JcG0gi8JXQzuh0C5ShE4npMIoqNin40hg==
 
 prismjs@^1.21.0, prismjs@~1.23.0:
   version "1.23.0"
@@ -12857,7 +12857,7 @@ react-refresh@^0.8.3:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.8.3.tgz#721d4657672d400c5e3c75d063c4a85fb2d5d68f"
   integrity sha512-X8jZHc7nCMjaCqoU+V2I0cOhNW+QMBwSUkeXnTi8IPe6zaRWfn60ZzvFDZqWPfmSJfjub7dDW1SP0jaHWLu/hg==
 
-react-router-dom@^5.0.1:
+react-router-dom@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-5.2.0.tgz#9e65a4d0c45e13289e66c7b17c7e175d0ea15662"
   integrity sha512-gxAmfylo2QUjcwxI63RhQ5G85Qqt4voZpUXSEqCwykV0baaOTQDR1f0PmY8AELqIyVc0NEZUj0Gov5lNGcXgsA==
@@ -12875,7 +12875,7 @@ react-router-ga@^1.2.3:
   resolved "https://registry.yarnpkg.com/react-router-ga/-/react-router-ga-1.2.3.tgz#3011b63554e65f50dd16df3dbcdf4ed286b74e73"
   integrity sha512-0rNBGGI6Q1hkznbLB+bAmDTS+8w3duaJYYIbCrCwof/p7RbZuv+Lsv9enumRZXxb4oTZrY95vOvFxnsRQ4cFCg==
 
-react-router@5.2.0, react-router@^5.0.1:
+react-router@5.2.0, react-router@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-router/-/react-router-5.2.0.tgz#424e75641ca8747fbf76e5ecca69781aa37ea293"
   integrity sha512-smz1DUuFHRKdcJC0jobGo8cVbhO3x50tCL4icacOlcwDOEQPq4TMqwx3sY1TP+DvtTgz4nm3thuo7A+BK2U0Dw==
@@ -12931,10 +12931,10 @@ react-ssr-prepass@^1.1.2, react-ssr-prepass@^1.2.1:
   dependencies:
     object-is "^1.1.2"
 
-react-static-plugin-md-pages@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.2.0.tgz#5d5b70dff9fbb276da4ac76680536fa093c0da3d"
-  integrity sha512-PtcKa48bJSMvKQSA/8Pz8rxL9ZgTXIvci/BCT6OKunC7iQimSWLv1XvLr88a54SY7xq9/pPe+UkmJGNl5w+egg==
+react-static-plugin-md-pages@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.3.0.tgz#a420df0d42a43d387369f8b92d5ab7a27c319a1b"
+  integrity sha512-DIBa8pA4LeGU1ioueeO8Yr3F7CVjwg90nBup9A9wNeRIiRz+qkSdlw5Fu86VPkCyxjY4K+xzVbL1JfpMXCMcug==
   dependencies:
     "@mdx-js/mdx" "^1.5.5"
     "@mdx-js/react" "^1.5.5"
@@ -12951,28 +12951,23 @@ react-static-plugin-md-pages@^0.2.0:
     unist-util-visit "^2.0.2"
     yaml "^1.7.2"
 
-react-static-plugin-react-router@^7.2.3:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-react-router/-/react-static-plugin-react-router-7.5.0.tgz#d3b56287e157637c36421d00747ccfe421aa4077"
-  integrity sha512-ylOCRNACvfXx0KIFxuismQ3GpUXusBrdIdpcUhpKjSze91+gPTyIVrVaf8/DxNqKNYP5Kcxyy5C5NtpYOsJicw==
-
-react-static-plugin-sitemap@^7.0.0:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-sitemap/-/react-static-plugin-sitemap-7.5.0.tgz#7fe2b6327b3bc787c576f66d1df0a416bb2fecd0"
-  integrity sha512-k93RRslHk5jGL0/3rU3SNm+xUP2N6CQ1ZER7A753+jA4no/PVu08aHzgM79yeUfyRbQGGEhaNZ2gVafuQIv/+A==
+react-static-plugin-sitemap@7.2.2:
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/react-static-plugin-sitemap/-/react-static-plugin-sitemap-7.2.2.tgz#6f454e352958fb48c1c27f22d6aeeeace53ca44e"
+  integrity sha512-uBnsjJBC/IIH+/FJXBUuMvxUPgZNe5KMPuVJPxaRhXFv9HBgYe9H1tCYnlrkZHRjF5aln399cvKyxrJs1CYhiQ==
   dependencies:
     chalk "^2.4.2"
     fs-extra "^8.1.0"
 
-react-static-plugin-styled-components@^7.2.2:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-styled-components/-/react-static-plugin-styled-components-7.5.0.tgz#2d03f77cf2a12429788797310b6e6625f0dd7835"
-  integrity sha512-oZq169VBHemynzpxqIWSBjZHcccftIlenNfq7vPS8FwULGU1K9vbstLw1DnlI+NslKwIvLj9Jnasa8Df8c6H1Q==
+react-static-plugin-styled-components@7.2.2:
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/react-static-plugin-styled-components/-/react-static-plugin-styled-components-7.2.2.tgz#17b71a448780005e1f5fbb0432a440d994144b5d"
+  integrity sha512-yjZ2V5b4HLRs6ldbLmreXpXBiNU5y4IByPID/rYWe3J8NFenPMI7kbhiFlBDkUDEhJvGIpSFw3I8OCvAcm4yQg==
 
-react-static@7.4.2:
-  version "7.4.2"
-  resolved "https://registry.yarnpkg.com/react-static/-/react-static-7.4.2.tgz#4433dc724c85a074eb7f7412a2d6d55a1e062207"
-  integrity sha512-RSrA2dRb3xue4r1fbvG1CA8QLt0kENz2B57NXGVXdC0NPkX3iXUYa8YVPKQV5yHo04Vidcgzki598gtQIK6Omw==
+react-static@7.2.2:
+  version "7.2.2"
+  resolved "https://registry.yarnpkg.com/react-static/-/react-static-7.2.2.tgz#09c43fd73d0c4201a3d21d8d1609d6afd578447a"
+  integrity sha512-+ebhBhRnAT/pPqwJBF1gqqxJOZWpV57fklxm5yM7zRU6xa+CNG3wnYj8VgYI4asjI+WSLnWx92Z+Yk2bWSKd9w==
   dependencies:
     "@babel/cli" "^7.5.5"
     "@babel/core" "^7.5.5"
@@ -12988,8 +12983,8 @@ react-static@7.4.2:
     "@babel/preset-stage-0" "^7.0.0"
     "@babel/register" "^7.5.5"
     "@babel/runtime" "^7.5.5"
-    "@reach/router" "^1.3.1"
-    autoprefixer "^9.7.4"
+    "@reach/router" "^1.2.1"
+    autoprefixer "^9.6.1"
     axios "^0.19.0"
     babel-core "7.0.0-bridge.0"
     babel-loader "^8.0.6"

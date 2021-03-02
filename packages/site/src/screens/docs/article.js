@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import React from 'react';
+import { Head } from 'react-static';
 import styled from 'styled-components';
 import { useMarkdownPage } from 'react-static-plugin-md-pages';
 import { ScrollToTop } from '../../components/scroll-to-top';
@@ -79,11 +80,17 @@ const SectionList = () => {
   const page = useMarkdownPage();
   if (!page || !page.headings) return null;
 
+  const title = (page.frontmatter && page.frontmatter.title) || null;
   const headings = page.headings.filter(x => x.depth > 1);
   if (headings.length === 0) return null;
 
   return (
     <>
+      {title && (
+        <Head>
+          <title>{title} | urql Documentation</title>
+        </Head>
+      )}
       <LegendTitle>In this section</LegendTitle>
       <HeadingList>
         {headings.map(heading => (

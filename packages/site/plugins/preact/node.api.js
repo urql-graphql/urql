@@ -1,5 +1,5 @@
 export default () => ({
-  webpack: (config, { stage }) => {
+  webpack: config => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       react: 'preact/compat',
