@@ -4,7 +4,7 @@ import { Exchange, Operation } from '@urql/core';
 export const refocusExchange = (): Exchange => {
   return ({ client, forward }) => ops$ => {
     if (typeof window === 'undefined') {
-      return forward(ops$)
+      return forward(ops$);
     }
 
     const watchedOperations = new Map<number, Operation>();
