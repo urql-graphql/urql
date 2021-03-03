@@ -8,7 +8,7 @@ const defaultClient = createClient({ url: '/graphql' });
 export const Context = createContext<Client>(defaultClient);
 export const Provider = Context.Provider;
 export const Consumer = Context.Consumer;
-Provider.displayName = 'UrqlProvider';
+Context.displayName = 'UrqlContext';
 
 let hasWarnedAboutDefault = false;
 
