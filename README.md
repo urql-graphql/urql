@@ -32,7 +32,7 @@
 ## ✨ Features
 
 - 📦 **One package** to get a working GraphQL client in React, Preact, and Svelte
-- ⚙️ Fully **customisable** behaviour [via "exchanges"](https://formidable.com/open-source/urql/docs/concepts/exchanges)
+- ⚙️ Fully **customisable** behaviour [via "exchanges"](https://formidable.com/open-source/urql/docs/advanced/authoring-exchanges/)
 - 🗂 Logical but simple default behaviour and document caching
 - 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://formidable.com/open-source/urql/docs/graphcache)
 - 🔬 Easy debugging with the [`urql` devtools browser extensions](https://formidable.com/open-source/urql/docs/advanced/debugging/)
