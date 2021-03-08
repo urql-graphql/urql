@@ -7,7 +7,7 @@ order: 1
 
 `urql` is a highly customizable and versatile GraphQL client with which you add on features like
 normalized caching as you grow. It's built to be both easy to use for newcomers to
-GraphQL, as well as extensible, to grow to support dynamic single-app applications and highly
+GraphQL, and extensible, to grow to support dynamic single-app applications and highly
 customized GraphQL infrastructure. In short, `urql` prioritizes usability and adaptability.
 
 As you're adopting GraphQL, `urql` becomes your primary data layer and can handle content-heavy
