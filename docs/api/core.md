@@ -464,7 +464,7 @@ and marks every `__typename` property as non-enumerable.
 
 The [`formatDocument`](#formatdocument) is often used by `urql` automatically and adds `__typename`
 fields to all results. However, this means that data often cannot be passed back into variables or
-inputs on mutations, which is a common use-case. This utility hides these fields, which can solves
+inputs on mutations, which is a common use-case. This utility hides these fields, which can solve
 this problem.
 
 It's used by the [`Client`](#client) when the `maskTypename` option is enabled.

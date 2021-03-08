@@ -236,7 +236,7 @@ it('should update the list', done => {
 
 Simulating multiple responses can be useful, particularly testing `useEffect` calls dependent on changing query responses.
 
-For this, a _subject_ is the way to go. In short, it's a stream, which you can push responses to. The `makeSubject` function from Wonka is what you'll want to use for this purpose.
+For this, a _subject_ is the way to go. In short, it's a stream that you can push responses to. The `makeSubject` function from Wonka is what you'll want to use for this purpose.
 
 Below is an example of simulating subsequent responses (such as a cache update/refetch) in a test.
 

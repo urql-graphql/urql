@@ -75,7 +75,7 @@ This hook returns a tuple of the shape `[result, executeQuery]`.
 
 Since a subscription may proactively be closed by the server, the additional `fetching: boolean`
 property on the `result` may update to `false` when the server ends the subscription.
-By default, `urql` unable able to start subscriptions, since this requires some additional setup.
+By default, `urql` is unable able to start subscriptions, since this requires some additional setup.
 
 [Read more about how to use the `useSubscription` API on the "Subscriptions"
 page.](../advanced/subscriptions.md)
