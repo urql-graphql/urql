@@ -16,7 +16,7 @@ wrong.
 - The `networkError` property will contain any error that stopped `urql` from making a network
   request.
 - The `graphQLErrors` property may be an array that contains [normalized `GraphQLError`s as they
-  were returned in the `errors` array from a GraphQL API.](https://graphql.org/graphql-js/error/)
+  were received in the `errors` array from a GraphQL API.](https://graphql.org/graphql-js/error/)
 
 Additionally, the `message` of the error will be generated and combined from the errors for
 debugging purposes.

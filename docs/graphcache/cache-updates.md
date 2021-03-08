@@ -11,7 +11,7 @@ result it will traverse and store all its data to its cache in a normalised stru
 that is found in a result will be stored under the entity's key.
 
 A query's result is represented as a graph, which can also be understood as a tree structure,
-starting from the root `Query` entity which then connects to other entities via links, which are
+starting from the root `Query` entity, which then connects to other entities via links, which are
 relations stored as keys, where each entity has records that store scalar values, which are the
 tree's leafs. On the previous page, on ["Local Resolvers"](./local-resolvers.md), we've seen how
 resolvers can be attached to fields to manually resolve other entities (or transform record fields).
@@ -23,12 +23,12 @@ document as we've learned when reading about how Graphcache stores normalized da
 [quote](./normalized-caching.md/#storing-normalized-data):
 
 > Any mutation or subscription can also be written to this data structure. Once Graphcache finds a
-> keyable entity in their results it's written to its relational table which may update other queries
-> in our application.
+> keyable entity in their results it's written to its relational table, which may update other
+> queries in our application.
 
 This means that mutations and subscriptions still write and update entities in the cache. These
-updates are then reflected on all queries that our app currently uses. However, there are
-limitations to this. While resolvers can be used to passively change data for queries, for mutations
+updates are then reflected on all active queries that our app uses. However, there are limitations to this.
+While resolvers can be used to passively change data for queries, for mutations
 and subscriptions we sometimes have to write **updaters** to update links and relations.
 This is often necessary when a given mutation or subscription deliver a result that is more granular
 than the cache needs to update all affected entities.
@@ -62,7 +62,7 @@ cacheExchange({
 An "updater" may be attached to a `Mutation` or `Subscription` field and accepts four positional
 arguments, which are the same as [the resolvers' arguments](./local-resolvers.md):
 
-- `result`: The full API result that's currently being written to the cache. Typically we'd want to
+- `result`: The full API result that's being written to the cache. Typically we'd want to
   avoid coupling by only looking at the current field that the updater is attached to, but it's
   worth noting that we can access any part of the result.
 - `args`: The arguments that the field has been called with, which will be replaced with an empty
@@ -70,13 +70,13 @@ arguments, which are the same as [the resolvers' arguments](./local-resolvers.md
 - `cache`: The `cache` instance, which gives us access to methods allowing us to interact with the
 - local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
   we use it frequently to read from and write to the cache.
-- `info`: This argument shouldn't be used frequently but it contains running information about the
+- `info`: This argument shouldn't be used frequently, but it contains running information about the
   traversal of the query document. It allows us to make resolvers reusable or to retrieve
   information about the entire query. Its full API can be found [in the API
   docs](../api/graphcache.md#info).
 
 The cache updaters return value is disregarded (and typed as `void` in TypeScript), which makes any
-method that they call on the `cache` instance a side-effect, which may trigger additional cache
+method that they call on the `cache` instance a side effect, which may trigger additional cache
 changes and updates all affected queries as we modify them.
 
 ## Manually updating entities
@@ -144,19 +144,19 @@ for a given fragment it instead writes data to the cache.
 > [the `gql` tag function](../api/core.md#gql) because `writeFragment` only accepts
 > GraphQL `DocumentNode`s as inputs, and not strings.
 
-### Cache Updates outside of updates
+### Cache Updates outside updates
 
-Cache updates are **not** possible outside of `updates`. If we attempt to store the `cache` in a
-variable and call its methods outside of any `updates` functions (or functions, like `resolvers`)
+Cache updates are **not** possible outside `updates`. If we attempt to store the `cache` in a
+variable and call its methods outside any `updates` functions (or functions, like `resolvers`)
 then Graphcache will throw an error.
 
-Methods like these cannot be called outside of the `cacheExchange`'s `updates` functions, because
+Methods like these cannot be called outside the `cacheExchange`'s `updates` functions, because
 all updates are isolated to be _reactive_ to mutations and subscription events. In Graphcache,
 out-of-band updates aren't permitted because the cache attempts to only represent the server's
 state. This limitation keeps the data of the cache true to the server data we receive from API
 results and makes its behaviour much more predictable.
 
-If we still manage to call any of the cache's methods outside of its callbacks in its configuration,
+If we still manage to call any of the cache's methods outside its callbacks in its configuration,
 we will receive [a "(2) Invalid Cache Call" error](./errors.md#2-invalid-cache-call).
 
 ## Updating lists or links
@@ -202,14 +202,14 @@ cacheExchange({
 Here we use the `cache.updateQuery` method, which is similar to the `cache.readQuery` method that
 we've seen on the "Local Resolvers" page before](./local-resolvers.md#reading-a-query).
 
-This method accepts a callback which will give us the `data` of the query, as read from the locally
-cached data and we may return an updated version of this data. While we may want to instinctively
+This method accepts a callback, which will give us the `data` of the query, as read from the locally
+cached data, and we may return an updated version of this data. While we may want to instinctively
 opt for immutably copying and modifying this data, we're actually allowed to mutate it directly,
 since it's just a copy of the data that's been read by the cache.
 
 This `data` may also be `null` if the cache doesn't actually have enough locally cached information
 to fulfil the query. This is important because resolvers aren't actually applied to cache methods in
-updaters. All resolvers are ignored so it becomes impossible to accidentally commit transformed data
+updaters. All resolvers are ignored, so it becomes impossible to accidentally commit transformed data
 to our cache. We could safely add a resolver for `Todo.createdAt` and wouldn't have to worry about
 an updater accidentally writing it to the cache's internal data structure.
 
@@ -219,10 +219,10 @@ In the previous section we've seen how to update data, like a list, when a mutat
 the cache. However, we've used a rather simple example when we've looked at a single list on a known
 field.
 
-In many schemas pagination is quite common and when we for instance delete a todo then knowing which
-list to update becomes unknowable. We cannot know ahead of time how many pages (and using which
-variables) we've already accessed. This knowledge in fact _shouldn't_ be available to Graphcache.
-Querying the `Client` is an entirely separate concern that's often colocated with some part of our
+In many schemas pagination is quite common, and when we for instance delete a todo then knowing the
+lists to update becomes unknowable. We cannot know ahead of time how many pages (and its variables)
+we've already accessed. This knowledge in fact _shouldn't_ be available to Graphcache. Querying the
+`Client` is an entirely separate concern that's often colocated with some part of our
 UI code.
 
 ```graphql
@@ -231,9 +231,9 @@ mutation RemoveTodo ($id: ID!) {
 }
 ```
 
-Suppose we have the above mutation which deletes a `Todo` entity by its ID. Our app may query a list
+Suppose we have the above mutation, which deletes a `Todo` entity by its ID. Our app may query a list
 of these items over many pages with separate queries being sent to our API, which makes it hard to
-know which fields should be checked:
+know the fields that should be checked:
 
 ```graphql
 query PaginatedTodos ($skip: Int) {
@@ -244,9 +244,9 @@ query PaginatedTodos ($skip: Int) {
 }
 ```
 
-Instead, we can **introspect an entity's fields** to find out dynamically which fields we may want
-to update. This is possible thanks to [the `cache.inspectFields`
-method](../api/graphcache.md#inspectfields). This method accepts a key or a keyable entity like the
+Instead, we can **introspect an entity's fields** to find the fields we may want to update
+dynamically. This is possible thanks to [the `cache.inspectFields`
+method](../api/graphcache.md#inspectfields). This method accepts a key, or a keyable entity like the
 `cache.keyOfEntity` method that [we've seen on the "Local Resolvers"
 page](./local-resolvers.md#resolving-by-keys) or the `cache.resolve` method's first argument.
 
@@ -290,7 +290,7 @@ object with three properties:
 - `arguments`: The arguments for the given field, since each field that accepts arguments can be
   accessed multiple times with different arguments. In this example we're looking at
   `arguments.skip` to find all unique pages.
-- `fieldKey`: This is the field's key which can come in useful to retrieve a field using
+- `fieldKey`: This is the field's key, which can come in useful to retrieve a field using
   `cache.resolve(entityKey, fieldKey)` to prevent the arguments from having to be stringified
   repeatedly.
 
@@ -326,7 +326,7 @@ called **invalidation** since it removes data from Graphcache's locally cached d
 
 We may use the cache's [`cache.invalidate` method](../api/graphcache.md#invalidate) to either
 invalidate entire entities or individual fields. It has the same signature as [the `cache.resolve`
-method](../api/graphcache.md#resolve) which we've already seen [on the "Local Resolvers" page as
+method](../api/graphcache.md#resolve), which we've already seen [on the "Local Resolvers" page as
 well](./local-resolvers.md#resolving-other-fields). We can simplify the previous update we've written
 with a call to `cache.invalidate`:
 
@@ -391,7 +391,7 @@ invalidate only these fields, which causes all queries using these listing field
 If we know what result a mutation may return, why wait for the GraphQL API to fulfill our mutations?
 
 Additionally to the `updates` configuration we may also pass an `optimistic` option to the
-`cacheExchange` which is a factory function using which we can create a "virtual" result for a
+`cacheExchange` which is a factory function using, which we can create a "virtual" result for a
 mutation. This temporary result can be applied immediately to the cache to give our users the
 illusion that mutations were executed immediately, which is a great method to reduce waiting time
 and to make our apps feel snappier.
@@ -413,14 +413,14 @@ since we don't have any server data to work with:
 - `cache`: The `cache` instance, which gives us access to methods allowing us to interact with the
 - local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
   we use it frequently to read from and write to the cache.
-- `info`: This argument shouldn't be used frequently but it contains running information about the
+- `info`: This argument shouldn't be used frequently, but it contains running information about the
   traversal of the query document. It allows us to make resolvers reusable or to retrieve
   information about the entire query. Its full API can be found [in the API
   docs](../api/graphcache.md#info).
 
 The usual `parent` argument isn't present since optimistic functions don't have any server data to
 handle or deal with and instead create this data. When a mutation is run that contains one or more
-optimistic mutation fields, Graphcache picks these up and generates immediate changes which it
+optimistic mutation fields, Graphcache picks these up and generates immediate changes, which it
 applies to the cache. The `resolvers` functions also trigger as if the results were real server
 results.
 
@@ -464,8 +464,8 @@ from our cache.
 Sometimes it's not possible for us to retrieve all data that an optimistic update requires to create
 a "fake result" from the cache or from all existing variables.
 
-This is why Graphcache allows for a small escape hatch for these scenarios which allows us to access
-additional variables which we may want to pass from our UI code to the mutation. For instance, given
+This is why Graphcache allows for a small escape hatch for these scenarios, which allows us to access
+additional variables, which we may want to pass from our UI code to the mutation. For instance, given
 a mutation like the following we may add more variables than the mutation specifies:
 
 ```graphql

@@ -55,9 +55,9 @@ same operation / request twice in parallel.
 
 **Second,** operations are checked against the cache. Depending on the `requestPolicy`,
 cached results can be resolved from here instead, which would mean that the cache sends back the
-result and the operation doesn't travel any further in the chain.
+result, and the operation doesn't travel any further in the chain.
 
-**Third,** operations are sent to the API and the result is turned into an `OperationResult`.
+**Third,** operations are sent to the API, and the result is turned into an `OperationResult`.
 
 **Lastly,** operation results then travel through the exchanges in _reverse order_, which is because
 exchanges are a pipeline where all operations travel forward deeper into the exchange chain, and
@@ -118,7 +118,7 @@ const noopExchange = ({ client, forward }) => {
 ```
 
 This exchange does nothing else than forward all operations and return all results. Hence, it's
-called a `noopExchange` - an exchange that doesn't do anything.
+called a `noopExchange` — an exchange that doesn't do anything.
 
 ### Forward and Return Composition
 
@@ -155,8 +155,9 @@ const client = new Client({
 ### Only One Operations Stream
 
 When writing an Exchange we have to be careful not to _split_ the stream into multiple ones by
-subscribing multiple times. Streams are lazy and immutable by default. Every time you use them, a new chain of streaming operators is created; since Exchanges are technically side-effects, we don't want to
-accidentally have multiple instances of them in parallel.
+subscribing multiple times. Streams are lazy and immutable by default. Every time you use them,
+a new chain of streaming operators is created; since Exchanges are technically side effects, we don't
+want to accidentally have multiple instances of them in parallel.
 
 The `ExchangeIO` function receives an `operations$` stream. It's important to be careful to either only
 use it once, or to _share_ its subscription.
@@ -289,8 +290,8 @@ Both the `dedupExchange` and `cacheExchange` are completely
 synchronous. The `fetchExchange` is asynchronous since
 it makes a `fetch` request and waits for a server response.
 
-When you're adding more exchanges it's often crucial
-to put them in a specific order. For instance - an authentication exchange
+When you're adding more exchanges, it's often crucial
+to put them in a specific order. For instance, an authentication exchange
 will need to go before the `fetchExchange`, a secondary cache will probably have to
 go in front of the default cache exchange.
 

@@ -6,7 +6,7 @@ order: 6
 # Offline Support
 
 _Graphcache_ allows you to build an offline-first app with built-in offline and persistence support,
-by means of adding a `storage` interface. In combination with its [Schema
+by adding a `storage` interface. In combination with its [Schema
 Awareness](./schema-awareness.md) support and [Optimistic
 Updates](./cache-updates.md#optimistic-updates) this can be used to build an application that
 serves cached data entirely from memory when a user's device is offline and still display
@@ -55,7 +55,7 @@ This activates offline support, however we'll also need to provide the `storage`
 `offlineExchange`. The `storage` is an adapter that contains methods for storing cache data in a
 persisted storage interface on the user's device.
 
-By default we can use the default storage option that `@urql/exchange-graphcache` comes with. This
+By default, we can use the default storage option that `@urql/exchange-graphcache` comes with. This
 default storage uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to
 persist the cache's data. We can use this default storage by importing the `makeDefaultStorage`
 function from `@urql/exchange-graphcache/default-storage`.
@@ -121,7 +121,7 @@ maximum age, which prevents the database from becoming too full, but a custom st
 have different strategies for dealing with this.
 
 [The API docs list the entire interface for the `storage` option.](../api/graphcache.md#storage-option)
-There we can see which methods we need to implement to implement a custom storage engine.
+There we can see the methods we need to implement to implement a custom storage engine.
 
 Following is an example of the simplest possible storage engine, which uses the browser's
 [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).

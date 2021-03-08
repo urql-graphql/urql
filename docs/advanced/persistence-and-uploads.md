@@ -22,7 +22,7 @@ With Automatic Persisted Queries the client hashes the GraphQL query and turns i
 hash and sends this hash instead of the full query. If the server has seen this GraphQL query before
 it will recognise it by its hash and process the GraphQL API request as usual, otherwise it may
 respond using a `PersistedQueryNotFound` error. In that case the client is supposed to instead send
-the full GraphQL query and the hash together, which will cause the query to be "registered" with the
+the full GraphQL query, and the hash together, which will cause the query to be "registered" with the
 server.
 
 Additionally we could also decide to send these hashed queries as GET requests instead of POST
@@ -76,7 +76,7 @@ query to handle, while the `persistedFetchExchange`'s SHA256 hashes will remain 
 ### Customizing Hashing
 
 The `persistedFetchExchange` also accepts a `generateHash` option. This may be used to swap out the
-exchange's default method of generating SHA256 hashes. By default the exchange will use the
+exchange's default method of generating SHA256 hashes. By default, the exchange will use the
 built-in [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) on the
 browser, which has been implemented to support IE11 as well. In Node.js it'll use the [Node
 Crypto Module](https://nodejs.org/api/crypto.html) instead.
@@ -158,7 +158,7 @@ const client = createClient({
 ```
 
 If you're using the `persistedFetchExchange` then put the `persistedFetchExchange` in front of the
-`multipartFetchExchange`, since only the latter is a full replacement for the `fetchExchange` and
+`multipartFetchExchange`, since only the latter is a full replacement for the `fetchExchange`, and
 the former only handled query operations.
 
 [Read more about `@urql/multipart-fetch-exchange` in our API

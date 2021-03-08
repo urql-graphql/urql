@@ -14,7 +14,7 @@ except that we'd want to use the `@urql/preact` package instead of the `urql` pa
 
 ### Installation
 
-Installing `urql` is as quick as you'd expect and you won't need any other packages to get started
+Installing `urql` is as quick as you'd expect, and you won't need any other packages to get started
 with at first. We'll install the package with our package manager of choice.
 
 ```sh
@@ -51,7 +51,7 @@ const client = createClient({
 At the bare minimum we'll need to pass an API's `url` when we create a `Client` to get started.
 
 Another common option is `fetchOptions`. This option allows us to customize the options that will be
-passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object or
+passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object, or
 a function returning an options object.
 
 In the following example we'll add a token to each `fetch` request that our `Client` sends to our
@@ -89,13 +89,13 @@ const App = () => (
 );
 ```
 
-Now every component and element inside and under the `Provider` are able to use GraphQL queries that
+Now every component and element inside and under the `Provider` can use GraphQL queries that
 will be sent to our API.
 
 ## Queries
 
 Both libraries offer a `useQuery` hook and a `Query` component. The latter accepts the same
-parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
+parameters, but we won't cover it in this guide. [Look it up in the API docs if you prefer
 render-props components.](../api/urql.md#query-component)
 
 ### Run a first query
@@ -137,9 +137,9 @@ const Todos = () => {
 
 Here we have implemented our first GraphQL query to fetch todos. We see that `useQuery` accepts
 options and returns a tuple. In this case we've set the `query` option to our GraphQL query. The
-tuple we then get in return is an array that contains a result object and a re-execute function.
+tuple we then get in return is an array that contains a result object, and a re-execute function.
 
-The result object contains several properties. The `fetching` field indicates whether we're currently
+The result object contains several properties. The `fetching` field indicates whether the hook is
 loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
 the request to the API has failed or when our API result contained some `GraphQLError`s, which
 we'll get into later on the ["Errors" page](./errors.md).
@@ -174,7 +174,7 @@ As when we're sending GraphQL queries manually using `fetch`, the variables will
 `POST` request body that is sent to our GraphQL API.
 
 Whenever the `variables` (or the `query`) option on the `useQuery` hook changes `fetching` will
-switch to `true` and a new request will be sent to our API, unless a result has already been cached
+switch to `true`, and a new request will be sent to our API, unless a result has already been cached
 previously.
 
 ### Pausing `useQuery`
@@ -191,7 +191,7 @@ variables have been defined to be non-nullable `Int!` values.
 
 Let's pause the query we've just
 written to not execute when these variables are empty, to prevent `null` variables from being
-executed. We can do this by means of setting the `pause` option to `true`:
+executed. We can do this by setting the `pause` option to `true`:
 
 ```jsx
 const Todos = ({ from, limit }) => {
@@ -215,7 +215,7 @@ As has become clear in the previous sections of this page, the `useQuery` hook a
 than just `query` and `variables`. Another option we should touch on is `requestPolicy`.
 
 The `requestPolicy` option determines how results are retrieved from our `Client`'s cache. By
-default this is set to `cache-first`, which means that we prefer to get results from our cache, but
+default, this is set to `cache-first`, which means that we prefer to get results from our cache, but
 are falling back to sending an API request.
 
 Request policies aren't specific to `urql`'s React API, but are a common feature in its core. [You
@@ -226,12 +226,12 @@ Caching" page.](../basics/document-caching.md)
 
 The `useQuery` hook updates and executes queries whenever its inputs, like the `query` or
 `variables` change, but in some cases we may find that we need to programmatically trigger a new
-query. This is the purpose of the `reexecuteQuery` function which is the second item in the tuple
+query. This is the purpose of the `reexecuteQuery` function, which is the second item in the tuple
 that `useQuery` returns.
 
 Triggering a query programmatically may be useful in a couple of cases. It can for instance be used
-to refresh data that is currently being displayed. In these cases we may also override the
-`requestPolicy` of our query just once and set it to `network-only` to skip the cache.
+to refresh the hook's data. In these cases we may also override the `requestPolicy` of our query just
+once and set it to `network-only` to skip the cache.
 
 ```jsx
 const Todos = ({ from, limit }) => {
@@ -259,7 +259,7 @@ it.](../api/urql.md#usequery)
 ## Mutations
 
 Both libraries offer a `useMutation` hook and a `Mutation` component. The latter accepts the same
-parameters but we won't cover it in this guide. [Look it up in the API docs if you prefer
+parameters, but we won't cover it in this guide. [Look it up in the API docs if you prefer
 render-props components.](../api/urql.md#mutation-component)
 
 ### Sending a mutation
@@ -293,7 +293,7 @@ execute function — `updateTodo` in our example — which is the second item in
 ### Using the mutation result
 
 When calling our `updateTodo` function we have two ways of getting to the result as it comes back
-from our API. We can either use the first value of the returned tuple — our `updateTodoResult` — or
+from our API. We can either use the first value of the returned tuple, our `updateTodoResult`, or
 we can use the promise that `updateTodo` returns.
 
 ```jsx
@@ -312,7 +312,7 @@ const Todo = ({ id, title }) => {
 ```
 
 The result is useful when your UI has to display progress on the mutation, and the returned
-promise is particularly useful when you're adding side-effects that run after the mutation has
+promise is particularly useful when you're adding side effects that run after the mutation has
 completed.
 
 ### Handling mutation errors
@@ -345,7 +345,7 @@ There are some more tricks we can use with `useMutation`.<br />
 ## Reading on
 
 This concludes the introduction for using `urql` with React or Preact. The rest of the documentation
-is mostly framework-agnostic and will apply to either `urql` in general or the `@urql/core` package,
+is mostly framework-agnostic and will apply to either `urql` in general, or the `@urql/core` package,
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
 

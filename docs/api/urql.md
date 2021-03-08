@@ -20,7 +20,7 @@ Accepts a single required options object as an input with the following properti
 This hook returns a tuple of the shape `[result, executeQuery]`.
 
 - The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult) with
-  an added `fetching: boolean` property, indicating whether the query is currently being fetched.
+  an added `fetching: boolean` property, indicating whether the query is being fetched.
 - The `executeQuery` function optionally accepts
   [`Partial<OperationContext>`](./core.md#operationcontext) and reexecutes the current query when
   it's called. When `pause` is set to `true` this executes the query, overriding the otherwise
@@ -34,7 +34,7 @@ Accepts a single `query` argument of type `string | DocumentNode` and returns a 
 `[result, executeMutation]`.
 
 - The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult) with
-  an added `fetching: boolean` property, indicating whether the mutation is currently being executed.
+  an added `fetching: boolean` property, indicating whether the mutation is being executed.
 - The `executeMutation` function accepts variables and optionally
   [`Partial<OperationContext>`](./core.md#operationcontext) and may be used to start executing a
   mutation. It returns a `Promise` resolving to an [`OperationResult`](./core.md#operationresult).
@@ -73,9 +73,9 @@ This hook returns a tuple of the shape `[result, executeQuery]`.
   it's called. When `pause` is set to `true` this starts the subscription, overriding the otherwise
   paused hook.
 
-Since a subscription may proactively closed by the server, the additional `fetching: boolean`
+Since a subscription may proactively be closed by the server, the additional `fetching: boolean`
 property on the `result` may update to `false` when the server ends the subscription.
-By default `urql` is not able to start subscriptions, since this requires some additional setup.
+By default, `urql` unable able to start subscriptions, since this requires some additional setup.
 
 [Read more about how to use the `useSubscription` API on the "Subscriptions"
 page.](../advanced/subscriptions.md)
@@ -97,7 +97,7 @@ on the query result.
 This component is a wrapper around [`useMutation`](#usemutation), exposing a [render prop
 API](https://reactjs.org/docs/render-props.html) for cases where hooks aren't desirable.
 
-The `Mutation` component accepts a `query` prop and a function callback must be passed to `children`
+The `Mutation` component accepts a `query` prop, and a function callback must be passed to `children`
 that receives the mutation result and must return a React element. The second argument of
 `useMutation`'s returned tuple, `executeMutation` is passed as an added property on the mutation
 result object.

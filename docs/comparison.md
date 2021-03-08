@@ -5,20 +5,20 @@ order: 8
 
 # Comparison
 
-> This comparison page aims to be accurate, unbiased, and up-to-date. If you see any information that
+> This comparison page aims to be detailed, unbiased, and up-to-date. If you see any information that
 > may be inaccurate or could be improved otherwise, please feel free to suggest changes.
 
 The most common question that you may encounter with GraphQL is what client to choose when you are
-getting started. We aim to provide an unbiased and accurate comparison of several options on this
+getting started. We aim to provide an unbiased and detailed comparison of several options on this
 page, so that you can make an **informed decision**.
 
 All options come with several drawbacks and advantages, and all of these clients have been around
 for a while now. A little known fact is that `urql` in its current form and architecture has already
-existed since February of 2019, and its normalized cache has been around since September 2019.
+existed since February 2019, and its normalized cache has been around since September 2019.
 
 Overall, we would recommend to make your decision based on whether your required features are
 supported, which patterns you'll use (or restrictions thereof), and you may want to look into
-whether all of the parts and features you're interested in are well maintained.
+whether all the parts and features you're interested in are well maintained.
 
 ## Comparison by Features
 
@@ -60,7 +60,7 @@ All features are marked to indicate the following:
 
 Typically these are all additional addon features that you may expect from a GraphQL client, no
 matter which framework you use it with. It's worth mentioning that all three clients support some
-kind of extensibility API which allows you to change when and how queries are sent to an API. These
+kind of extensibility API, which allows you to change when and how queries are sent to an API. These
 are easy to use primitives particularly in Apollo, with links, and in `urql` with exchanges. The
 major difference in `urql` is that all caching logic is abstracted in exchanges too, which makes
 it easy to swap the caching logic or other behavior out (and hence makes `urql` slightly more
@@ -138,7 +138,8 @@ writing your own logic for offline caching, which can be particularly successful
 `@urql/exchange-graphcache` we chose to include it as a feature since it also strengthened other
 guarantees that the cache makes.
 
-Relay does in fact have similar guarantees as [`urql`'s Commutativity Guarantees](./graphcache/under-the-hood.md)
+Relay does in fact have similar guarantees as [`urql`'s Commutativity
+Guarantees](./graphcache/under-the-hood.md),
 which are more evident when applying list updates out of order under more complex network
 conditions.
 
@@ -155,7 +156,7 @@ GraphQL clients you should keep in mind that:
 
 - Parts of the `graphql` package tree-shake away and may also be replaced (e.g. `parse`)
 - All packages in `urql` reuse parts of `@urql/core` and `wonka`, which means adding all their total
-  sizes up doesn't give you an accurate result.
+  sizes up doesn't give you a correct result of their expected bundle size.
 - These sizes may change drastically given the code you write and add yourself, but can be managed
   via precompilation (e.g. with `babel-plugin-graphql-tag` or GraphQL Code Generator for Apollo and
   `urql`)
