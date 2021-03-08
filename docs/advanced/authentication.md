@@ -27,9 +27,9 @@ could have the opportunity to log in again. To do this, we want to clear any per
 **User initiated log out** — when the user chooses to log out of the application, we usually send a logout request to the API, then clear any tokens
 from persisted storage, and redirect them to the application home or login page.
 
-**Refresh (optional)** — this is not always implemented, but given that your API supports it, the
-user will receive both an auth token, and a refresh token,
-where the auth token is valid for a shorter duration of time (e.g. 1 week) than the refresh token
+**Refresh (optional)** — this is not always implemented; if your API supports it, the
+user will receive both an auth token, and a refresh token. 
+The auth token is usually valid for a shorter duration of time (e.g. 1 week) than the refresh token
 (e.g. 6 months), and the latter can be used to request a new
 auth token if the auth token has expired. The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date),
 or when an API request returns with an unauthorized response. For graphQL APIs, it is usually an error code, instead of a 401 HTTP response, but both can be supported.
@@ -351,8 +351,8 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
 When the application launches, the first thing we do is check whether the user has any auth tokens in persisted storage. This will tell us
 whether to show the user the logged in or logged out view.
 
-The `isLoggedIn` prop should always be updated based on authentication state change e.g. set to
-`true` after the use has authenticated, and their tokens have been added to storage, and set to
-`false` if the user has been logged out, and their tokens have been cleared. It's important to clear
+The `isLoggedIn` prop should always be updated based on authentication state change. For instance, we may set it to
+`true` after the user has authenticated and their tokens have been added to storage, and set it to
+`false` once the user has been logged out and their tokens have been cleared. It's important to clear
 or add tokens to a storage _before_ updating the prop in order for the auth exchange to work
 correctly.

@@ -156,7 +156,7 @@ GraphQL clients you should keep in mind that:
 
 - Parts of the `graphql` package tree-shake away and may also be replaced (e.g. `parse`)
 - All packages in `urql` reuse parts of `@urql/core` and `wonka`, which means adding all their total
-  sizes up doesn't give you a correct result of their expected bundle size.
+  sizes up doesn't give you a correct result of their total expected bundle size.
 - These sizes may change drastically given the code you write and add yourself, but can be managed
   via precompilation (e.g. with `babel-plugin-graphql-tag` or GraphQL Code Generator for Apollo and
   `urql`)

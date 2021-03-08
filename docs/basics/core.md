@@ -305,7 +305,7 @@ This is a short but non-exhaustive list. It contains,
 - [`CombinedError`](../api/core.md#combinederror) - our abstraction to combine one or more `GraphQLError`(s) and a `NetworkError`
 - `makeResult` and `makeErrorResult` - utilities to create _Operation Results_
 - [`createRequest`](../api/core.md#createrequest) - a utility function to create a request from a
-  query, and some variables (which generates a stable _Operation Key_)
+  query, and some variables (which generate a stable _Operation Key_)
 
 There are other utilities not mentioned here. Read more about the `@urql/core` API in the [API docs](../api/core.md).
 

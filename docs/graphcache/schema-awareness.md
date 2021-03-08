@@ -57,7 +57,7 @@ we don't pass any information to this option:
 ### Partial Results
 
 As we navigate an app that uses Graphcache we may be in states where some of our data is already
-cached while some isn't. Graphcache normalizes data and stores it in tables for links and records for
+cached while some aren't. Graphcache normalizes data and stores it in tables for links and records for
 each entity, which means that sometimes it can maybe even execute a query against its cache that it
 hasn't sent to the API before.
 

@@ -351,7 +351,7 @@ There are some more tricks we can use with `operationStore`.
 ## Mutations
 
 The `mutation` function isn't dissimilar from the `query` function but is triggered manually and
-can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest) too, while also supporting our
+can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest), while also supporting our
 trusty `operationStore`.
 
 ### Sending a mutation

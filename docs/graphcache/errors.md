@@ -7,9 +7,9 @@ order: 7
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**
 
-Any unexpected behaviour, condition or error will be marked by an error or warning
-in development, which will output a helpful little message. Sometimes however, this
-message may not actually tell you everything about what's going on.
+Any unexpected behaviour or condition will be marked by an error or warning
+in development. This will output as a helpful little message. Sometimes, however, this
+message may not actually tell you about everything that's going on.
 
 This is a supporting document that explains every error and attempts to give more
 information on how you may be able to fix some issues or avoid these errors/warnings.
@@ -23,7 +23,7 @@ There are multiple places where you're passing in GraphQL documents, either thro
 methods on `Cache` (e.g. `cache.updateQuery`) or via `urql` using the `Client` or
 hooks like `useQuery`.
 
-Your queries must always contain a main operation, so either a query, mutation or
+Your queries must always contain a main operation, one of: query, mutation, or
 subscription. This error occurs when this is missing, because the `DocumentNode`
 is maybe empty or only contains fragments.
 
