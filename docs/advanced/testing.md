@@ -23,7 +23,7 @@ The way in which they do this is by making calls to the client via context.
 
 In the section ["Stream Patterns" on the "Architecture" page](../architecture.md) we've seen, that
 all methods on the client operate with and return streams. These streams are created using
-[the Wonka library](../architecture.md#the-wonka-library) and we're able to create streams
+[the Wonka library](../architecture.md#the-wonka-library), and we're able to create streams
 ourselves to mock the different states of our operations, e.g. fetching, errors, or success with data.
 
 You'll probably use one of these utility functions to create streams:
@@ -98,9 +98,9 @@ For testing render output, or creating fixtures, you may want to force the state
 
 ### Fetching
 
-Fetching states can be simulated by returning a stream which never returns. Wonka provides a utility for this, aptly called `never`.
+Fetching states can be simulated by returning a stream, which never returns. Wonka provides a utility for this, aptly called `never`.
 
-Here's a fixture which stays in the _fetching_ state.
+Here's a fixture, which stays in the _fetching_ state.
 
 ```tsx
 import { Provider } from 'urql';
@@ -120,7 +120,7 @@ export default (
 
 ### Response (success)
 
-Response states are simulated by providing a stream which contains a network response. For single responses, Wonka's `fromValue` function can do this for us.
+Response states are simulated by providing a stream, which contains a network response. For single responses, Wonka's `fromValue` function can do this for us.
 
 **Example snapshot test of response state**
 
@@ -185,7 +185,7 @@ beforeEach(() => {
 });
 ```
 
-The above client we've created mocks all three operations — queries, mutations, and subscriptions — to always remain in the `fetching: true` state.
+The above client we've created mocks all three operations — queries, mutations and subscriptions — to always remain in the `fetching: true` state.
 Generally when we're _hoisting_ our mocked client and reuse it across multiple tests we have to be
 mindful not to instantiate the mocks outside of Jest's lifecycle functions (like `it`, `beforeEach`,
 `beforeAll` and such) as it may otherwise reset our mocked functions' return values or
@@ -197,7 +197,7 @@ Testing subscriptions can be done by simulating the arrival of new data over tim
 
 If you prefer to have more control on when the new data is arriving you can use the `makeSubject` utility from Wonka. You can see more details in the next section.
 
-Here's an example of testing a list component which uses a subscription.
+Here's an example of testing a list component, which uses a subscription.
 
 ```tsx
 import { OperationContext, makeOperation } from '@urql/core';
@@ -236,7 +236,7 @@ it('should update the list', done => {
 
 Simulating multiple responses can be useful, particularly testing `useEffect` calls dependent on changing query responses.
 
-For this, a _subject_ is the way to go. In short, it's a stream which you can push responses to. The `makeSubject` function from Wonka is what you'll want to use for this purpose.
+For this, a _subject_ is the way to go. In short, it's a stream that you can push responses to. The `makeSubject` function from Wonka is what you'll want to use for this purpose.
 
 Below is an example of simulating subsequent responses (such as a cache update/refetch) in a test.
 

@@ -6,7 +6,7 @@ order: 7
 # Showcase
 
 `urql` wouldn't be the same without our growing and loving community of users,
-maintainers, and supporters. This page is specifically dedicated to all of you!
+maintainers and supporters. This page is specifically dedicated to all of you!
 
 ## Used by folks at
 

@@ -7,10 +7,10 @@ order: 9
 
 The `populateExchange` allows you to auto-populate selection sets in your mutations using the
 `@populate` directive. In combination with [Graphcache](../graphcache/README.md) this is a useful
-tool to update the data in your application automatically following a mutation, when your app grows
+tool to update the data in your application automatically following a mutation, when your app grows,
 and it becomes harder to track all fields that have been queried before.
 
-> **NOTE:** The `populateExchange` is currently _experimental_! Certain patterns and usage paths
+> **NOTE:** The `populateExchange` is _experimental_! Certain patterns and usage paths
 > like GraphQL field arguments aren't covered yet, and the exchange hasn't been extensively used
 > yet.
 
@@ -48,7 +48,7 @@ about how to get your schema can be found [in the "Schema Awareness" Page of the
 
 ## Example usage
 
-Consider the following queries which have been requested in other parts of your application:
+Consider the following queries, which have been requested in other parts of your application:
 
 ```graphql
 # Query 1
@@ -92,7 +92,7 @@ mutation addTodo(id: ID!) {
 
 ### Choosing when to populate
 
-You may not want to populate your whole mutation response. In order to reduce your payload, pass populate lower in your query.
+You may not want to populate your whole mutation response. To reduce your payload, pass populate lower in your query.
 
 ```graphql
 mutation addTodo(id: ID!) {
@@ -106,7 +106,7 @@ mutation addTodo(id: ID!) {
 ### Using aliases
 
 If you find yourself using multiple queries with variables, it may be necessary to
-[use aliases](https://graphql.org/learn/queries/#aliases) in order to allow merging of queries.
+[use aliases](https://graphql.org/learn/queries/#aliases) to allow merging of queries.
 
 > **Note:** This caveat may change in the future or this restriction may be lifted.
 

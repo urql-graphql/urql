@@ -5,7 +5,7 @@ order: 4
 
 # Document Caching
 
-By default `urql` uses a concept called _Document Caching_. It will avoid sending the same requests
+By default, `urql` uses a concept called _Document Caching_. It will avoid sending the same requests
 to a GraphQL API repeatedly by caching the result of each query.
 
 This works like the cache in a browser. `urql` creates a key for each request that is sent based on
@@ -39,7 +39,7 @@ while it doesn't deal with normalized data or IDs.
 
 ## Request Policies
 
-The _request policy_ that is defined will alter what the default document cache does. By default the
+The _request policy_ that is defined will alter what the default document cache does. By default, the
 cache will prefer cached results and will otherwise send a request, which is called `cache-first`.
 In total there are four different policies that we can use:
 
@@ -63,8 +63,8 @@ docs.](../api/core.md#requestpolicy-type)
 
 ## Document Cache Gotchas
 
-This cache has a small trade-off! If we request a list of data and the API returns an empty list,
-the cache won't be able to see the `__typename` of said list and won't invalidate.
+This cache has a small trade-off! If we request a list of data, and the API returns an empty list,
+then the cache won't be able to see the `__typename` of said list and invalidate it.
 
 There are two ways to fix this issue, supplying `additionalTypenames` to the context of your query or [switch to "Normalized Caching"
 instead](../graphcache/normalized-caching.md).
@@ -91,9 +91,8 @@ const [result] = useQuery({ query, context });
 
 Now the cache will know when to invalidate this query even when the list is empty.
 
-We also have the possibility to use this for `mutations`.
-There are moments where a mutation can cause a side-effect on your server side and it needs
-to invalidate an additional entity.
+We may also use this feature for mutations, since occasionally mutations must invalidate data that
+isn't directly connected to a mutation by a `__typename`.
 
 ```js
 const [result, execute] = useMutation(`mutation($name: String!) { createUser(name: $name) }`);

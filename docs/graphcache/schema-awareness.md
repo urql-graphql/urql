@@ -7,7 +7,7 @@ order: 4
 
 Previously, [on the "Normalized Caching" page](./normalized-caching.md) we've seen how Graphcache
 stores normalized data in its store and how it traverses GraphQL documents to do so. What we've seen
-is that just using the GraphQL document for traversal and the `__typename` introspection field
+is that just using the GraphQL document for traversal, and the `__typename` introspection field
 Graphcache is able to build a normalized caching structure that keeps our application up-to-date
 across API results, allows it to store data by entities and keys, and provides us configuration
 options to write [manual cache updates](./cache-updates.md) and [local
@@ -40,7 +40,7 @@ we don't pass any information to this option:
 - Fragments will be matched deterministically: A fragment can be written to be on an interface type
   or multiple fragments can be spread for separate union'ed types in a selection set. In many cases,
   if Graphcache doesn't have any schema information then it won't know what possible types a field
-  can return and may sometimes make a best guess and [issue a
+  can return and may sometimes make a guess and [issue a
   warning](./errors.md#16-heuristic-fragment-matching). If we pass Graphcache a `schema` then it'll
   be able to match fragments deterministically.
 - A schema may have non-default names for its root types; `Query`, `Mutation`, and `Subscription`.
@@ -51,13 +51,13 @@ we don't pass any information to this option:
   start checking whether any of the configuration options actually don't exist, maybe because we've
   typo'd them. This is a small detail but can make a large different in a longer configuration.
 - Lastly; a schema contains information on **which fields are optional or required**. When
-  Graphcache has a schema it knows which fields can be made optional and it'll be able to generate
+  Graphcache has a schema it knows optional fields that may be left out, and it'll be able to generate
   "partial results".
 
 ### Partial Results
 
 As we navigate an app that uses Graphcache we may be in states where some of our data is already
-cached and some isn't. Graphcache normalizes data and stores it in tables for links and records for
+cached while some aren't. Graphcache normalizes data and stores it in tables for links and records for
 each entity, which means that sometimes it can maybe even execute a query against its cache that it
 hasn't sent to the API before.
 
@@ -71,9 +71,9 @@ information.
 before it sent an API result.](../assets/partial-results.png)
 
 Without a `schema` and information on which fields are optional, Graphcache will consider a "partial
-result" as a cache miss. If we don't have all of the information for a query then we can't execute
+result" as a cache miss. If we don't have all the information for a query then we can't execute
 it against the locally cached data after all. However, an API's schema contains information on which
-fields are required and which fields are optional, and if our apps are typed with this schema and
+fields are required and optional, and if our apps are typed with this schema and
 TypeScript, can't we then use and handle these partial results before a request is sent to the API?
 
 This is the idea behind "Schema Awareness" and "Partial Results". When Graphcache has `schema`

@@ -22,8 +22,8 @@ framework bindings.
 ## Installation
 
 As we said above, if we are using bindings then those will already have installed `@urql/core` as
-they depend on it. They also all re-export all exports from `@urql/core`, so we can use those no
-matter which bindings we've installed. However, it's also possible to explicitly install
+they depend on it. They also all re-export all exports from `@urql/core`, so we can use those
+regardless of which bindings we've installed. However, it's also possible to explicitly install
 `@urql/core` or use it standalone, e.g. in a Node.js environment.
 
 ```sh
@@ -111,10 +111,11 @@ const TodosQuery = gql`
 `;
 ```
 
-This will all look familiar when coming from the `graphql-tag` package. The functionality is
-identical and the output is approximately the same. The two packages are also intercompatible.
-However, one small change that `@urql/core`'s implementation makes is that your fragment names don't
-have to be globally unique, since it's possible to create some one-off fragments every now and then.
+This usage will look familiar when coming from the `graphql-tag` package. The `gql` API is
+identical, and its output is approximately the same. The two packages are also intercompatible.
+However, one small change in `@urql/core`'s implementation is that your fragment names don't
+have to be globally unique, since it's possible to create some one-off fragments occasionally,
+especially for `@urql/exchange-graphcache`'s configuration.
 It also pre-generates a "hash key" for the `DocumentNode` which is what `urql` does anyway, thus
 avoiding some extra work compared to when the `graphql-tag` package is used with `urql`.
 
@@ -143,7 +144,7 @@ const client = createClient({
 At the bare minimum we'll need to pass an API's `url` when we create a `Client` to get started.
 
 Another common option is `fetchOptions`. This option allows us to customize the options that will be
-passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object or
+passed to `fetch` when a request is sent to the given API `url`. We may pass in an options object, or
 a function returning an options object.
 
 In the following example we'll add a token to each `fetch` request that our `Client` sends to our
@@ -167,7 +168,7 @@ As we've seen above, the most important option for the `Client` is `url`, since 
 without it. However, another important option on the `Client` is the `exchanges` option.
 
 This option passes a list of exchanges to the `Client`, which tell it how to execute our requests
-and how to cache data in a certain order. By default this will be populated with the list of
+and how to cache data in a certain order. By default, this will be populated with the list of
 `defaultExchanges`.
 
 ```js
@@ -186,7 +187,7 @@ Later, [in the "Advanced" section](../advanced/README.md) we'll see many more fe
 supports by adding new exchanges to this list. On [the "Architecture" page](../architecture.md)
 we'll also learn more about what exchanges are and why they exist.
 
-For now it's sufficient for us to know that our requests are executed using the logic in the
+For now, it's enough for us to know that our requests are executed using the logic in the
 exchanges in order. First, the `dedupExchange` deduplicates requests if we send the same queries
 twice, the `cacheExchange` implements the default "document caching" behaviour (as we'll learn about
 on the ["Document Caching"](./document-caching.md) page), and lastly the `fetchExchange` is
@@ -218,14 +219,14 @@ client
 
 In the above example we're executing a query on the client, are passing some variables and are
 calling the `toPromise()` method on the return value to execute the request immediately and get the
-result as a promise.  This may be useful when we don't plan on cancelling queries or we don't
+result as a promise. This may be useful when we don't plan on cancelling queries, or we don't
 care about future updates to this data and are just looking to query a result once.
 
 The same can be done for mutations by calling the `client.mutation` method instead of the
 `client.query` method.
 
 Similarly there's a way to read data from the cache synchronously, provided that the cache has
-received a result for a given query before. The `Client` has a `readQuery` method which is a
+received a result for a given query before. The `Client` has a `readQuery` method, which is a
 shortcut for just that.
 
 ```js
@@ -279,7 +280,7 @@ const { unsubscribe } = pipe(
 ```
 
 This code example is similar to the one before. However, instead of sending a one-off query, we're
-subscribing to the query. Internally, this causes the `Client` to do the exact same, but the
+subscribing to the query. Internally, this causes the `Client` to do the same, but the
 subscription means that our callback may be called repeatedly. We may get future results as well as
 the first one.
 
@@ -287,12 +288,12 @@ This also works synchronously. As we've seen before `client.readQuery` can give 
 immediately if our cache already has a result for the given query. The same principle applies here!
 Our callback will be called synchronously if the cache already has a result.
 
-Once we're not interested in any results anymore we need to clean up after ourselves by calling
+Once we're not interested in any results anymore, we need to clean up after ourselves by calling
 `unsubscribe`. This stops the subscription and makes sure that the `Client` doesn't actively update
 the query anymore or refetches it. We can think of this pattern as being very similar to events or
 event hubs.
 
-We're using [the Wonka library for our streams](https://wonka.kitten.sh/basics/background) which
+We're using [the Wonka library for our streams](https://wonka.kitten.sh/basics/background), which
 we'll learn more about [on the "Architecture" page](./architecture.md). But we can think of this as
 React's effects being called over time, or as `window.addEventListener`.
 
@@ -303,8 +304,8 @@ This is a short but non-exhaustive list. It contains,
 
 - [`CombinedError`](../api/core.md#combinederror) - our abstraction to combine one or more `GraphQLError`(s) and a `NetworkError`
 - `makeResult` and `makeErrorResult` - utilities to create _Operation Results_
-- [`createRequest`](../api/core.md#createrequest) - a utility function to create a request from a query and some variables (which
-  generates a stable _Operation Key_)
+- [`createRequest`](../api/core.md#createrequest) - a utility function to create a request from a
+  query, and some variables (which generate a stable _Operation Key_)
 
 There are other utilities not mentioned here. Read more about the `@urql/core` API in the [API docs](../api/core.md).
 

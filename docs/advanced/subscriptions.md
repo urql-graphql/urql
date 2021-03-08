@@ -33,7 +33,7 @@ page.](../architecture.md)
 In the above example, we add the `subscriptionExchange` to the `Client` with the default exchanges
 add before it. The `subscriptionExchange` is a factory that accepts additional options and returns
 the actual `Exchange` function. It does not make any assumption over the transport protocol and
-scheme that is used. Instead, we need to pass a `forwardSubscription` function which is called with
+scheme that is used. Instead, we need to pass a `forwardSubscription` function, which is called with
 an "enriched" _Operation_ every time the `Client` attempts to execute a GraphQL Subscription.
 
 When we define this function it must return an "Observable-like" object, which needs to follow the
@@ -304,7 +304,10 @@ When you're using subscriptions directly without `urql`'s framework bindings, yo
 `Client`'s `subscription` method for one-off subscriptions. This method is similar to the ones for
 mutations and subscriptions [that we've seen before on the "Core Package" page.](../basics/core.md)
 
-This method will always [returns a Wonka stream](../architecture.md#the-wonka-library) and doesn't have a `.toPromise()` shortcut method, since promises won't return the multiple values that a subscription may deliver. Let's convert the above example to one without framework code, as we may use subscriptions in a Node.js environment.
+This method will always [returns a Wonka stream](../architecture.md#the-wonka-library) and doesn't
+have a `.toPromise()` shortcut method, since promises won't return the multiple values that a
+subscription may deliver. Let's convert the above example to one without framework code, as we may
+use subscriptions in a Node.js environment.
 
 ```js
 import { pipe, subscribe } from 'wonka';

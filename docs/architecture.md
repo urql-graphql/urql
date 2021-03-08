@@ -35,7 +35,7 @@ In the following sections we'll talk about the way that `urql` solves these thre
 
 If `urql` was a train it would take several stops to arrive at its terminus, our API. It starts with us
 defining queries or mutations. Any GraphQL request can be abstracted into their query documents and
-their variables. In `urql`, these GraphQL requests are treated as unique objects which are uniquely
+their variables. In `urql`, these GraphQL requests are treated as unique objects, which are uniquely
 identified by the query document and variables (which is why a `key` is generated from the two). This
 `key` is a hash number of the query document and variables and uniquely identifies our
 [`GraphQLRequest`](./api/core.md#graphqlrequest).
@@ -66,19 +66,19 @@ only do they carry the `query`, `variables`, and a `key` property, they will als
 ![Operations and Results](./assets/urql-event-hub.png)
 
 It's the `Client`s responsibility to accept an `Operation` and execute it. The bindings interally
-call the `client.executeQuery`, `client.executeMutation`, or `client.executeSubscription` methods
+call the `client.executeQuery`, `client.executeMutation`, or `client.executeSubscription` methods,
 and we'll get a "stream" of results. This "stream" allows us to register a callback with it to
 receive results.
 
 In the diagram we can see that each operation is a signal for our request to start at which point
 we can expect to receive our results eventually on a callback. Once we're not interested in results
 anymore a special "teardown" signal is issued on the `Client`. While we don't see operations outside
-of the `Client`, they're what travel through the "Exchanges" on the `Client`.
+the `Client`, they're what travel through the "Exchanges" on the `Client`.
 
 ## The Client and Exchanges
 
 To reiterate, when we use `urql`'s bindings for our framework of choice, methods are called on the
-`Client` but we never see the operations that are created in the background from our bindings. We
+`Client`, but we never see the operations that are created in the background from our bindings. We
 call a method like `client.executeQuery` (or it's called for us in the bindings), an operation is
 issued internally when we subscribe with a callback, and later our callback is called with results.
 
@@ -95,9 +95,9 @@ However, internally, all of our operations are processed at the same time concur
 our perspective:
 
 - We subscribe to a "stream" and expect to get results on a callback
-- The `Client` issues the operation and we'll receive some results back eventually as either the
-  cache responds (synchronously) or the request gets sent to our API.
-- We eventually unsubscribe and the `Client` issues a "teardown" operation with the same `key` as
+- The `Client` issues the operation, and we'll receive some results back eventually as either the
+  cache responds (synchronously), or the request gets sent to our API.
+- We eventually unsubscribe, and the `Client` issues a "teardown" operation with the same `key` as
   the original operation, which concludes our flow.
 
 The `Client` itself doesn't actually know what to do with operations. Instead, it sends them through
@@ -115,7 +115,7 @@ We now know how we get to operations and to the `Client`:
   unique `key`.
 - This operation is sent into the **exchanges** and eventually ends up at the `fetchExchange`
   (or a similar exchange)
-- The operation is sent to the API and a **result** comes back which is wrapped in an `OperationResult`
+- The operation is sent to the API and a **result** comes back, which is wrapped in an `OperationResult`
 - The `Client` filters the `OperationResult` by the `operation.key` and — via a callback — gives us
   a **stream of results**.
 
@@ -167,12 +167,12 @@ operations as "one stream of operations" that it sends to the exchanges.
 But, **what are streams?**
 
 Generally we refer to _streams_ as abstractions that allow us to program with asynchronous events
-over time. Within the JavaScript context we're thinking specifically in terms of of
+over time. Within the context of JavaScript we're specifically thinking in terms of
 [Observables](https://github.com/tc39/proposal-observable)
 and [Reactive Programming with Observables.](http://reactivex.io/documentation/observable.html)
 These concepts may sound initimidating, but from a high-level view what we're talking about can be
 thought of as a combination of promises and iterables (e.g. arrays). We're dealing with multiple
-events but our callback is called over time. It's like calling `forEach` on an array but expecting
+events, but our callback is called over time. It's like calling `forEach` on an array but expecting
 the results to come in asynchronously.
 
 As a user, if we're using the one framework bindings that we've seen in [the "Basics"

@@ -10,7 +10,7 @@ and those creating their own exchanges.
 
 ## Devtools
 
-The quickest way to debug `urql` is to use the [`urql` devtools.](https://github.com/FormidableLabs/urql-devtools/)
+It's easiest to debug `urql` with the [`urql` devtools.](https://github.com/FormidableLabs/urql-devtools/)
 
 It offers tools to inspect internal ["Debug Events"](#debug-events) as they happen, to explore data
 as your app is seeing it, and to quickly trigger GraphQL queries.
@@ -125,8 +125,8 @@ declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-me
 
 ### Tips
 
-Lastly, in summary, here are a few tips, dos, and don'ts that are important when we're adding new
-Debug Events to custom exchanges.
+Lastly, in summary, here are a few tips, that are important when we're adding new Debug Events to
+custom exchanges:
 
 - ✅ **Share internal details**: Frequent debug messages on key events inside your exchange are very
   useful when later inspecting them, e.g. in the `devtools`.

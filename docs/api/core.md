@@ -5,8 +5,8 @@ order: 0
 
 # @urql/core
 
-The `@urql/core` package is the basis of all framework bindings. Every bindings package,
-like [`urql` for React](./urql.md) or [`@urql/preact`](./preact.md) will reuse the core logic and
+The `@urql/core` package is the basis of all framework bindings. Each bindings-package,
+like [`urql` for React](./urql.md) or [`@urql/preact`](./preact.md), will reuse the core logic and
 reexport all exports from `@urql/core`.
 Therefore if you're not accessing utilities directly, aren't in a Node.js environment, and are using
 framework bindings, you'll likely want to import from your framework bindings package directly.
@@ -27,7 +27,7 @@ It accepts several options on creation.
 | `fetchOptions`    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                 |
 | `fetch`           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                            |
 | `suspense`        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                        |
-| `requestPolicy`   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default this will be `cache-first`.                                                                                           |
+| `requestPolicy`   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default, this will be `cache-first`.                                                                                           |
 | `preferGetMethod` | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                                              |
 | `maskTypename`    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable. |
 
@@ -62,7 +62,7 @@ A mutation source is always guaranteed to only respond with a single [`Operation
 This is a shorthand method for [`client.executeQuery`](#clientexecutequery), which accepts a query
 (`DocumentNode | string`) and variables separately and creates a [`GraphQLRequest`](#graphqlrequest) [`createRequest`](#createrequest) automatically.
 
-The returned `Source<OperationResult>` will also have an added `toPromise` method so the stream can
+The returned `Source<OperationResult>` will also have an added `toPromise` method, so the stream can
 be conveniently converted to a promise.
 
 ```js
@@ -286,7 +286,7 @@ a rehydrated cache, and `isClient` which can be set to
 `true` or `false` to tell the `ssrExchange` whether to
 write to (server-side) or read from (client-side) the cache.
 
-By default `isClient` defaults to `true` when the `Client.suspense`
+By default, `isClient` defaults to `true` when the `Client.suspense`
 mode is disabled and to `false` when the `Client.suspense` mode
 is enabled.
 
@@ -307,7 +307,7 @@ Basically, the `ssrExchange` is a small cache that collects data
 during the server-side rendering pass, and allows you to populate
 the cache on the client-side with the same data.
 
-During React rehydration this cache will be emptied and it will
+During React rehydration this cache will be emptied, and it will
 become inactive and won't change the results of queries after
 rehydration.
 
@@ -409,7 +409,7 @@ will always have the same `DocumentNode` reference.
 ### makeOperation
 
 This utility is used to either turn a [`GraphQLRequest` object](#graphqlrequest) into a new
-[`Operation` object](#operation) or to copy an `Operation`. It adds the `kind` property and the
+[`Operation` object](#operation) or to copy an `Operation`. It adds the `kind` property, and the
 `operationName` alias that outputs a deprecation warning.
 
 It accepts three arguments:
@@ -463,8 +463,8 @@ This utility accepts a GraphQL `data` object, like `data` on [`OperationResult`s
 and marks every `__typename` property as non-enumerable.
 
 The [`formatDocument`](#formatdocument) is often used by `urql` automatically and adds `__typename`
-fields to all results. However, this means that data can often not be passed back into variables or
-inputs on mutations, which is a common use-case. This utility hides these fields which can solves
+fields to all results. However, this means that data often cannot be passed back into variables or
+inputs on mutations, which is a common use-case. This utility hides these fields, which can solve
 this problem.
 
 It's used by the [`Client`](#client) when the `maskTypename` option is enabled.

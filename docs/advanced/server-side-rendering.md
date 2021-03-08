@@ -64,7 +64,7 @@ const html = `
 `;
 ```
 
-This will provide `__URQL_DATA__` globally which we've used in our first example to inject data into
+This will provide `__URQL_DATA__` globally, which we've used in our first example to inject data into
 the `ssrExchange` on the client-side.
 
 Alternatively you can also call `restoreData` as long as this call happens synchronously before the
@@ -86,7 +86,7 @@ to manually execute our queries before rendering a server-side React app [using 
 or `renderToNodeStream`](https://reactjs.org/docs/react-dom-server.html#rendertostring).
 
 For React, `urql` has a "Suspense mode" that [allows data fetching to interrupt
-rendering](https://reactjs.org/docs/concurrent-mode-suspense.html). However, suspense is currently
+rendering](https://reactjs.org/docs/concurrent-mode-suspense.html). However, Suspense is
 not supported by React during server-side rendering.
 
 Using [the `react-ssr-prepass` package](https://github.com/FormidableLabs/react-ssr-prepass) however,
@@ -158,7 +158,7 @@ React suspense.
 ### With Preact
 
 If you're using Preact instead of React, there's a drop-in replacement package for
-`react-ssr-prepass`, which is called `preact-ssr-prepass`. It only has a peer dependency on Preact
+`react-ssr-prepass`, which is called `preact-ssr-prepass`. It only has a peer dependency on Preact,
 and we can install it like so:
 
 ```sh
@@ -167,7 +167,7 @@ yarn add preact-ssr-prepass preact
 npm install --save preact-ssr-prepass preact
 ```
 
-All above examples for `react-ssr-prepass` will still be the exact same, except that instead of
+All above examples for `react-ssr-prepass` will still be the same, except that instead of
 using the `urql` package we'll have to import from `@urql/preact`, and instead of `react-ssr-prepass`
 we'll have to import from. `preact-ssr-prepass`.
 
@@ -181,7 +181,7 @@ We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next
 this integration contains convenience methods specifically for `Next.js`.
 These will simplify the above setup for SSR.
 
-To setup `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as
+To set up `next-urql`, first we'll install `next-urql` with `react-is` and `urql` as
 peer dependencies:
 
 ```sh
@@ -222,7 +222,7 @@ export default withUrqlClient((_ssrExchange, ctx) => ({
 
 This will automatically set up server-side rendering on the page. The `withUrqlClient` higher-order
 component function accepts the usual `Client` options as an argument. This may either just be an
-object or a function that receives the Next.js' `getInitialProps` context.
+object, or a function that receives the Next.js' `getInitialProps` context.
 
 One added caveat is that these options may not include the `exchanges` option because `next-urql`
 injects the `ssrExchange` automatically at the right location. If you're setting up custom exchanges
@@ -306,8 +306,8 @@ sure these are fetched as well.
 
 ### Resetting the client instance
 
-In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this is an uncommon scenario
-and we consider it "unsafe" so evaluate this carefully for yourself.
+In rare scenario's you possibly will have to reset the client instance (reset all cache, ...), this
+is an uncommon scenario, and we consider it "unsafe" so evaluate this carefully for yourself.
 
 When this does seem like the appropriate solution any component wrapped with `withUrqlClient` will receive the `resetUrqlClient`
 property, when invoked this will create a new top-level client and reset all prior operations.

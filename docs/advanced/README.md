@@ -21,7 +21,7 @@ chapter.](../architecture.md)
 - [**Authentication**](./authentication.md) describes how to implement authentication using the `authExchange`
 - [**Testing**](./testing.md) covers how to test components that use `urql` particularly in React.
 - [**Authoring Exchanges**](./authoring-exchanges.md) describes how to implement exchanges from
-  scratch and how they work internally. This is a good basis to understanding how some of the
+  scratch and how they work internally. This is a good basis to understanding how some
   features in this section function.
-- [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon which can make it easier to
+- [**Auto-populate Mutations**](./auto-populate-mutations.md) presents the `populateExchange` addon, which can make it easier to
   update normalized data after mutations.

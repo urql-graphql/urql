@@ -7,9 +7,9 @@ order: 7
 
 **This document lists out all errors and warnings in `@urql/exchange-graphcache`.**
 
-Any unexpected behaviour, condition, or error will be marked by an error or warning
-in development, which will output a helpful little message. Sometimes however, this
-message may not actually tell you everything about what's going on.
+Any unexpected behaviour or condition will be marked by an error or warning
+in development. This will output as a helpful little message. Sometimes, however, this
+message may not actually tell you about everything that's going on.
 
 This is a supporting document that explains every error and attempts to give more
 information on how you may be able to fix some issues or avoid these errors/warnings.
@@ -17,13 +17,13 @@ information on how you may be able to fix some issues or avoid these errors/warn
 ## (1) Invalid GraphQL document
 
 > Invalid GraphQL document: All GraphQL documents must contain an OperationDefinition
-> node for a query, subscription, or mutation.
+> node for a query, subscription or mutation.
 
 There are multiple places where you're passing in GraphQL documents, either through
 methods on `Cache` (e.g. `cache.updateQuery`) or via `urql` using the `Client` or
 hooks like `useQuery`.
 
-Your queries must always contain a main operation, so either a query, mutation, or
+Your queries must always contain a main operation, one of: query, mutation, or
 subscription. This error occurs when this is missing, because the `DocumentNode`
 is maybe empty or only contains fragments.
 
@@ -33,11 +33,11 @@ is maybe empty or only contains fragments.
 > operations like write or query, or as part of its resolvers, updaters,
 > or optimistic configs.
 
-If you're somehow accessing the `Cache` (an instance of `Store`) outside of any
+If you're somehow accessing the `Cache` (an instance of `Store`) outside any
 of the usual operations then this error will be thrown.
 
 Please make sure that you're only calling methods on the `cache` as part of
-configs that you pass to your `cacheExchange`. Outside of these functions the cache
+configs that you pass to your `cacheExchange`. Outside these functions the cache
 must not be changed.
 
 However when you're not using the `cacheExchange` and are trying to use the
@@ -45,7 +45,7 @@ However when you're not using the `cacheExchange` and are trying to use the
 initialised correctly.
 
 This is a safe-guard to prevent any asynchronous work to take place, or to
-avoid mutating the cache outside of any normal operation.
+avoid mutating the cache outside any normal operation.
 
 ## (3) Invalid Object type
 
@@ -74,7 +74,7 @@ of a query or fragment.
 Check whether your schema is up-to-date or whether you're using an invalid
 field somewhere, maybe due to a typo.
 
-As the warning states, this won't lead any operation to abort or an error
+As the warning states, this won't lead any operation to abort, or an error
 to be thrown!
 
 ## (5) Invalid Abstract type
@@ -192,7 +192,7 @@ can generate a key.
 
 As data is written to the cache, this warning is issued when `undefined` is encountered.
 GraphQL results should never contain an `undefined` value, so this warning will let you
-know which part of your result did contain `undefined`.
+know the part of your result that did contain `undefined`.
 
 ## (14) Couldn't find \_\_typename when writing.
 
@@ -215,7 +215,7 @@ Please make sure that you include enough properties on your data so that `write`
 > If this is intentional, create a `keys` config for `???` that always returns null.
 
 This error occurs when the cache can't generate a key for an entity. The key
-would then effectively be `null` and the entity won't be cached by a key.
+would then effectively be `null`, and the entity won't be cached by a key.
 
 Conceptually this means that an entity won't be normalised but will indeed
 be cached by the parent's key and field, which is displayed in the first
@@ -225,7 +225,7 @@ This may mean that you forgot to include an `id` or `_id` field.
 
 But if your entity at that place doesn't have any `id` fields, then you may
 have to create a custom `keys` config. This `keys` function either needs to
-return a unique ID for your entity or it needs to explicitly return `null` to silence
+return a unique ID for your entity, or it needs to explicitly return `null` to silence
 this warning.
 
 ## (16) Heuristic Fragment Matching
@@ -259,7 +259,7 @@ When you're using the populate exchange with an introspected schema and add the
 `@populate` directive to fields it first checks whether the type is valid and
 exists on the schema.
 
-If the field does not have sufficient type information because it doesn't exist
+If the field does not have enough type information because it doesn't exist
 on the schema or does not match expectations then this warning is logged.
 
 Check whether your schema is up-to-date or whether you're using an invalid
@@ -303,7 +303,7 @@ typename in `opts.keys`, maybe due to a typo.
 
 ## (21) Invalid mutation
 
-> Invalid mutation field `???` is not in the defined schema but the `updates` option is referencing it.
+> Invalid mutation field `???` is not in the defined schema, but the `updates` option is referencing it.
 
 When you're passing an introspected schema to the cache exchange, it is
 able to check whether your `opts.updates.Mutation` is valid.
@@ -313,7 +313,7 @@ Check whether your schema is up-to-date, or whether you've got a typo in `opts.u
 
 ## (22) Invalid subscription
 
-> Invalid subscription field: `???` is not in the defined schema but the `updates` option is referencing it.
+> Invalid subscription field: `???` is not in the defined schema, but the `updates` option is referencing it.
 
 When you're passing an introspected schema to the cache exchange, it is
 able to check whether your `opts.updates.Subscription` is valid.

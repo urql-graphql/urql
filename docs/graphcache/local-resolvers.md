@@ -51,10 +51,10 @@ A resolver may be attached to any type's field and accepts four positional argum
 - `args`: The arguments that the field is being called with, which will be replaced with an empty
   object if the field hasn't been called with any arguments. For example, if the field is queried as
   `name(capitalize: true)` then `args` would be `{ capitalize: true }`.
-- `cache`: Unlike in GraphQL.js this will not be the context but a `cache` instance, which gives us
+- `cache`: Unlike in GraphQL.js this will not be the context, but a `cache` instance, which gives us
   access to methods allowing us to interact with the local cache. Its full API can be found [in the
   API docs](../api/graphcache.md#cache).
-- `info`: This argument shouldn't be used frequently but it contains running information about the
+- `info`: This argument shouldn't be used frequently, but it contains running information about the
   traversal of the query document. It allows us to make resolvers reusable or to retrieve
   information about the entire query. Its full API can be found [in the API
   docs](../api/graphcache.md#info).
@@ -96,9 +96,9 @@ strings into more granular JS-native objects or replace values entirely.
 We may also run into situations where we'd like to generalise the resolver and not make it dependent
 on the exact field it's being attached to. In these cases, the [`info`
 object](../api/graphcache.md#info) can be very helpful as it provides us information about the
-current query traversal and which part of the query document the cache is currently processing. The
-`info.fieldName` property is one of these properties and lets us know which field the resolver is
-currently operating on. Hence, we can create a reusable resolver like so:
+current query traversal, and the part of the query document the cache is processing. The
+`info.fieldName` property is one of these properties and lets us know the field that the resolver is
+operating on. Hence, we can create a reusable resolver like so:
 
 ```js
 const transformToDate = (parent, _args, _cache, info) =>
@@ -176,7 +176,7 @@ cacheExchange({
 ```
 
 The `__typename` field is required. Graphcache will [use its keying
-logic](./normalized-caching.md#custom-keys-and-non-keyable-entities) and your custom `keys`
+logic](./normalized-caching.md#custom-keys-and-non-keyable-entities), and your custom `keys`
 configuration to generate a key for this entity and will then be able to look this entity up in its
 local cache. As with regular queries, the resolver is known to return a link since the `todo(id:
 $id) { id }` will be used with a selection set, querying fields on the entity.
@@ -215,7 +215,7 @@ currently run on. For instance, for the above resolver it may be `"Query"`, for 
 
 ## Resolving other fields
 
-In the above two examples we've seen how a resolver can replace Graphcache's logic which usually
+In the above two examples we've seen how a resolver can replace Graphcache's logic, which usually
 reads links and records only from its locally cached data. We've seen how a field on a record can
 use `parent[fieldName]` to access its cached record value and transform it and how a resolver for a
 link can return a partial entity [or a key](#resolving-by-keys).
@@ -236,7 +236,7 @@ given entity and accepts three arguments:
 
 - `entity`: This is the entity on which we'd like to access a field. We may either pass a keyable,
   partial entity, e.g. `{ __typename: 'Todo', id: 1 }` or a key. It takes the same inputs as [the
-  `cache.keyOfEntity` method](../api/graphcache.md#keyofentity) which we've seen earlier in the
+  `cache.keyOfEntity` method](../api/graphcache.md#keyofentity), which we've seen earlier in the
   ["Resolving by keys" section](#resolving-by-keys). It also accepts `null` which causes it to
   return `null`, which is useful for chaining multiple `resolve` calls for deeply accessing a field.
 - `fieldName`: This is the field's name we'd like to access. If we're looking for the record on
@@ -381,7 +381,7 @@ Additionally the cache has more methods that allow us to access more data at a t
 
 ### Reading a query
 
-At any point, the `cache` allows us to read entirely separate queries in our resolvers which starts
+At any point, the `cache` allows us to read entirely separate queries in our resolvers, which starts
 a separate virtual operation in our resolvers. When we call `cache.readQuery` with a query and
 variables we can execute an entirely new GraphQL query against our cached data:
 

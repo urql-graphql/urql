@@ -108,7 +108,7 @@ We'll implement queries using the `operationStore` and the `query` function from
 
 The `operationStore` function creates a [Svelte Writable store](https://svelte.dev/docs#writable).
 You can use it to initialise a data container in `urql`. This store holds on to our query inputs,
-like the GraphQL query and variables, which we can change to launch new queries, and also exposes
+like the GraphQL query and variables, which we can change to launch new queries. It also exposes
 the query's eventual result, which we can then observe.
 
 ### Run a first query
@@ -213,7 +213,7 @@ model as well and cause the `query` utility to start a new operation.
 <button on:click={nextPage}>Next page<button></button></button>
 ```
 
-The `operationStore` provides getters too so it's also possible for us to pass `todos` around and
+The `operationStore` provides getters as well, so it's also possible for us to pass `todos` around and
 update `todos.variables` or `todos.query` directly. Both, updating `todos.variables` and
 `$todos.variables` in a component for instance, will cause `query` to pick up the update and execute
 our changes.
@@ -225,7 +225,7 @@ In some cases we may want our queries to not execute until a pre-condition has b
 started at will. Instead, the `query`'s third argument, the `context`, may have an added `pause`
 option that can be set to `true` to temporarily _freeze_ all changes and stop requests.
 
-For instance we may start out with a paused store and then unpause it once a callback is invoked:
+For instance, we may start out with a paused store and then unpause it once a callback is invoked:
 
 ```html
 <script>
@@ -260,7 +260,7 @@ you may pass a third argument, [the `context` object](../api/core.md#operationco
 most interesting option the `context` may contain is `requestPolicy`.
 
 The `requestPolicy` option determines how results are retrieved from our `Client`'s cache. By
-default this is set to `cache-first`, which means that we prefer to get results from our cache, but
+default, this is set to `cache-first`, which means that we prefer to get results from our cache, but
 are falling back to sending an API request.
 
 In total there are four different policies that we can use:
@@ -301,7 +301,7 @@ result is either outdated or that another request is being sent in the backgroun
 ...
 ```
 
-As we can see, the `requestPolicy` is easily changed here and we can read our `context` option back
+As we can see, the `requestPolicy` is easily changed, and we can read our `context` option back
 from `todos.context`, just as we can check `todos.query` and `todos.variables`. Updating
 `operationStore.context` can be very useful to also refetch queries, as we'll see in the next
 section.
@@ -313,7 +313,7 @@ section.
 The default caching approach in `@urql/svelte` typically takes care of updating queries on the fly
 quite well and does so automatically. Sometimes it may be necessary though to refetch data and to
 execute a query with a different `context`. Triggering a query programmatically may be useful in a
-couple of cases. It can for instance be used to refresh data that is currently being displayed.
+couple of cases. It can for instance be used to refresh data.
 
 We can trigger a new query update by changing out the `context` of our `operationStore`.
 
@@ -351,7 +351,7 @@ There are some more tricks we can use with `operationStore`.
 ## Mutations
 
 The `mutation` function isn't dissimilar from the `query` function but is triggered manually and
-can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest) too while also supporting our
+can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest), while also supporting our
 trusty `operationStore`.
 
 ### Sending a mutation
@@ -473,7 +473,7 @@ mutateTodo({ id, title: newTitle }).then(result => {
 ## Reading on
 
 This concludes the introduction for using `urql` with Svelte. The rest of the documentation
-is mostly framework-agnostic and will apply to either `urql` in general or the `@urql/core` package,
+is mostly framework-agnostic and will apply to either `urql` in general, or the `@urql/core` package,
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
 
