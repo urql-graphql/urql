@@ -209,7 +209,7 @@ events.
     return [data.newMessages, ...messages];
   };
 
-  subsription(messages, handleSubscription);
+  subscription(messages, handleSubscription);
 </script>
 
 {#if !$result.data}
