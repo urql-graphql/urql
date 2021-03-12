@@ -165,7 +165,7 @@ const Messages = () => {
 };
 ```
 
-As we can see, the `result.data` is being updated and transformed by
+As we can see, the `res.data` is being updated and transformed by
 the `handleSubscription` function. This works over time, so as
 new messages come in, we will append them to the list of previous
 messages.
