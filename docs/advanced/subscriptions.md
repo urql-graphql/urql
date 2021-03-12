@@ -212,7 +212,7 @@ events.
   subsription(messages, handleSubscription);
 </script>
 
-{#if !$result.data}
+{#if !$messages.data}
   <p>No new messages</p>
 {:else}
   <ul>
@@ -224,7 +224,7 @@ events.
 
 ```
 
-As we can see, the `$result.data` is being updated and transformed by the `handleSubscription`
+As we can see, the `$messages.data` is being updated and transformed by the `handleSubscription`
 function. This works over time, so as new messages come in, we will append them to
 the list of previous messages.
 
