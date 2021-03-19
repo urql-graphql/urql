@@ -17,7 +17,9 @@
     "urql",
     "formidablelabs",
     "preact",
-    "react"
+    "react",
+    "storybook-addon",
+    "data-state"
   ],
   "main": "dist/urql-storybook-addon.js",
   "module": "dist/urql-storybook-addon.es.js",
@@ -55,5 +57,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "storybook": {
+    "icon": "https://github.com/FormidableLabs/urql/raw/main/packages/site/src/assets/sidebar-badge.svg",
+    "displayName": "URQL"
   }
 }
