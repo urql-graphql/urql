@@ -54,7 +54,7 @@ npm install --save urql graphql
 The documentation contains everything you need to know about `urql`, and contains several sections in order of importance
 when you first get started:
 
-- **[Basics](https://formidable.com/open-source/urql/docs/basics/)** — contains the ["Getting Started" guide](https://formidable.com/open-source/urql/docs/basics/getting-started/) and all you need to know when first using `urql`.
+- **[Basics](https://formidable.com/open-source/urql/docs/basics/)** — contains the ["Getting Started" guide](https://formidable.com/open-source/urql/docs/#where-to-start) and all you need to know when first using `urql`.
 - **[Main Concepts](https://formidable.com/open-source/urql/docs/concepts/)** — explains how `urql` functions and is built and covers GraphQL clients in general, on the ["Philosophy" page](https://formidable.com/open-source/urql/docs/concepts/philosophy).
 - **[Advanced](https://formidable.com/open-source/urql/docs/advanced/)** — covers more uncommon use-cases and things you don't immediately need when getting started.
 - **[Graphcache](https://formidable.com/open-source/urql/docs/graphcache/)** — documents ["Normalized Caching" support](https://formidable.com/open-source/urql/docs/graphcache/normalized-caching/) which enables more complex apps and use-cases.
