@@ -6,6 +6,7 @@ import {
   OperationContext,
   OperationResult,
   GraphQLRequest,
+  TypedDocumentNode,
 } from '@urql/core';
 
 import {
@@ -23,6 +24,7 @@ import {
 import { OperationStore, operationStore } from './operationStore';
 import { getClient } from './context';
 import { _markStoreUpdate } from './internal';
+import { DocumentNode } from 'graphql';
 
 interface SourceRequest<Data = any, Variables = object>
   extends GraphQLRequest<Data, Variables> {
@@ -155,8 +157,14 @@ export type ExecuteMutation<Data = any, Variables = object> = (
   context?: Partial<OperationContext>
 ) => Promise<OperationStore<Data, Variables>>;
 
+interface GraphQLRequestInput<Data = any, Variables = object> {
+  key?: number;
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  variables?: Variables;
+}
+
 export function mutation<Data = any, Variables = object>(
-  input: GraphQLRequest<Data, Variables> | OperationStore<Data, Variables>
+  input: GraphQLRequestInput<Data, Variables> | OperationStore<Data, Variables>
 ): ExecuteMutation<Data, Variables> {
   const client = getClient();
 
