@@ -2,4 +2,4 @@
 '@urql/svelte': patch
 ---
 
-Make the Svelte `mutation` request input type of less strict
+Allow `mutation` to accept a more partial `GraphQLRequest` object without a `key` or `variables`
