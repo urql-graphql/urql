@@ -8,6 +8,13 @@ export interface Fragments {
   [fragmentName: string]: void | FragmentDefinitionNode;
 }
 
+export interface ConnectionArgs {
+  first?: number;
+  last?: number;
+  after?: string;
+  before?: string;
+}
+
 // Scalar types are not entities as part of response data
 export type Primitive = null | number | boolean | string;
 

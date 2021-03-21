@@ -1,10 +1,31 @@
 import { stringifyVariables } from '@urql/core';
-import { Cache, Resolver, Variables, NullArray } from '../types';
+import {
+  Cache,
+  Resolver,
+  Variables,
+  NullArray,
+  ConnectionArgs,
+} from '../types';
 
 export type MergeMode = 'outwards' | 'inwards';
 
 export interface PaginationParams {
   mergeMode?: MergeMode;
+  /**
+   * Invalidate pagination cache when both cursors are empty.
+   * This is useful in case we need to refresh a paginated list, we can do so by reloading first/last page with an empty cursor.
+   *
+   * Sample:
+   * ```
+   *    [cursor, setCursor] = useState<string>('');
+   *    [result, refetch] =  useQuery({variables: {after: cursor}});
+   *    function reload() {
+   *      setCursor(''); // reset cursor
+   *      refetch(); // this will refetch with empty cursors, and pagination cache will be invalidated
+   *    }
+   * ```
+   */
+  cleanOnEmptyCursors?: boolean;
 }
 
 interface PageInfo {
@@ -184,6 +205,7 @@ const getPage = (
 
 export const relayPagination = (params: PaginationParams = {}): Resolver => {
   const mergeMode = params.mergeMode || 'inwards';
+  const cleanOnEmptyCursors = params.cleanOnEmptyCursors || false;
 
   return (_parent, fieldArgs, cache, info) => {
     const { parentKey: entityKey, fieldName } = info;
@@ -193,6 +215,20 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
     const size = fieldInfos.length;
     if (size === 0) {
       return undefined;
+    }
+
+    // check whether the page is first/last page, and pagination cache should be invalidated
+    if (cleanOnEmptyCursors && areCursorsEmpty(fieldArgs)) {
+      fieldInfos
+        .filter(f => f.arguments && !areCursorsEmpty(f.arguments)) // keep current page
+        .forEach(fieldInfo =>
+          // the rest are prior/subsequent pages to invalidate
+          cache.invalidate(
+            entityKey,
+            fieldName,
+            fieldInfo.arguments ? fieldInfo.arguments : undefined
+          )
+        );
     }
 
     let typename: string | null = null;
@@ -288,4 +324,12 @@ export const relayPagination = (params: PaginationParams = {}): Resolver => {
       },
     };
   };
+};
+
+const areCursorsEmpty = (args: ConnectionArgs): boolean => {
+  return isEmpty(args.after) && isEmpty(args.before);
+};
+
+const isEmpty = (str: string | null | undefined) => {
+  return typeof str !== 'string' || str.trim() === '';
 };
