@@ -7,12 +7,14 @@ import {
   ResolverConfig,
   DataField,
   Variables,
+  FieldArguments,
   Data,
   QueryInput,
   UpdatesConfig,
   UpdateResolver,
   OptimisticMutationConfig,
   KeyingConfig,
+  Entity,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -106,7 +108,7 @@ export class Store implements Cache {
 
   keyOfField = keyOfField;
 
-  keyOfEntity(data: Data | null | string) {
+  keyOfEntity(data: Entity) {
     // In resolvers and updaters we may have a specific parent
     // object available that can be used to skip to a specific parent
     // key directly without looking at its incomplete properties
@@ -129,11 +131,7 @@ export class Store implements Cache {
     return key ? `${data.__typename}:${key}` : null;
   }
 
-  resolve(
-    entity: Data | string | null,
-    field: string,
-    args?: Variables
-  ): DataField {
+  resolve(entity: Entity, field: string, args?: FieldArguments): DataField {
     const fieldKey = keyOfField(field, args);
     const entityKey = this.keyOfEntity(entity);
     if (!entityKey) return null;
@@ -145,11 +143,7 @@ export class Store implements Cache {
 
   resolveFieldByKey = this.resolve;
 
-  invalidate(
-    entity: Data | string | null,
-    field?: string,
-    args?: Variables | null
-  ) {
+  invalidate(entity: Entity, field?: string, args?: FieldArguments) {
     const entityKey = this.keyOfEntity(entity);
 
     invariant(
@@ -166,7 +160,7 @@ export class Store implements Cache {
     invalidateEntity(entityKey, field, args);
   }
 
-  inspectFields(entity: Data | string | null): FieldInfo[] {
+  inspectFields(entity: Entity): FieldInfo[] {
     const entityKey = this.keyOfEntity(entity);
     return entityKey ? InMemoryData.inspectFields(entityKey) : [];
   }

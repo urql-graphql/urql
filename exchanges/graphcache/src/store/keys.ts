@@ -1,7 +1,7 @@
 import { stringifyVariables } from '@urql/core';
-import { Variables, FieldInfo, KeyInfo } from '../types';
+import { FieldArguments, FieldInfo, KeyInfo } from '../types';
 
-export const keyOfField = (fieldName: string, args?: null | Variables) =>
+export const keyOfField = (fieldName: string, args?: FieldArguments) =>
   args ? `${fieldName}(${stringifyVariables(args)})` : fieldName;
 
 export const joinKeys = (parentKey: string, key: string) =>

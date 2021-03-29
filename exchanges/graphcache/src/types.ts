@@ -36,9 +36,10 @@ export interface Variables {
 }
 
 export type Data = SystemFields & DataFields;
+export type Entity = null | Data | string;
 export type Link<Key = string> = null | Key | NullArray<Key>;
-export type ResolvedLink = Link<Data>;
 export type Connection = [Variables, string];
+export type FieldArguments = Variables | null | undefined;
 
 export interface FieldInfo {
   fieldKey: string;
@@ -78,33 +79,22 @@ export interface QueryInput<T = Data, V = Variables> {
 
 export interface Cache {
   /** keyOfEntity() returns the key for an entity or null if it's unkeyable */
-  keyOfEntity(data: Data | null | string): string | null;
+  keyOfEntity(entity: Entity): string | null;
 
   /** keyOfField() returns the key for a field */
-  keyOfField(
-    fieldName: string,
-    args?: Variables | null | undefined
-  ): string | null;
+  keyOfField(fieldName: string, args?: FieldArguments): string | null;
 
   /** resolve() retrieves the value (or link) of a field on any entity, given a partial/keyable entity or an entity key */
-  resolve(
-    entity: Data | string | null,
-    fieldName: string,
-    args?: Variables
-  ): DataField;
+  resolve(entity: Entity, fieldName: string, args?: FieldArguments): DataField;
 
   /** @deprecated use resolve() instead */
-  resolveFieldByKey(entity: Data | string | null, fieldKey: string): DataField;
+  resolveFieldByKey(entity: Entity, fieldKey: string): DataField;
 
   /** inspectFields() retrieves all known fields for a given entity */
-  inspectFields(entity: Data | string | null): FieldInfo[];
+  inspectFields(entity: Entity): FieldInfo[];
 
   /** invalidate() invalidates an entity or a specific field of an entity */
-  invalidate(
-    entity: Data | string | null,
-    fieldName?: string,
-    args?: Variables
-  ): void;
+  invalidate(entity: Entity, fieldName?: string, args?: FieldArguments): void;
 
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery<T = Data, V = Variables>(
@@ -172,7 +162,7 @@ export type OptimisticMutationResolver = (
   vars: Variables,
   cache: Cache,
   info: ResolveInfo
-) => null | Data | NullArray<Data>;
+) => Link<Data>;
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;
