@@ -33,7 +33,7 @@ The auth token is usually valid for a shorter duration of time (e.g. 1 week) tha
 (e.g. 6 months), and the latter can be used to request a new
 auth token if the auth token has expired. The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date),
 or when an API request returns with an unauthorized response. For graphQL APIs, it is usually an error code, instead of a 401 HTTP response, but both can be supported.
-When the token as been successfully refreshed (this can be done as a mutation to the graphQL API or a request to a different API endpoint, depending on implementation),
+When the token has been successfully refreshed (this can be done as a mutation to the graphQL API or a request to a different API endpoint, depending on implementation),
 we will save the new token in persisted storage, and retry the failed request with the new auth header. The user should be logged out and persisted storage cleared if
 the refresh fails or if the re-executing the query with the new token fails with an auth error for the second time.
 

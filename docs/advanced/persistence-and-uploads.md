@@ -8,7 +8,7 @@ order: 1
 `urql` supports both [Automatic Persisted
 Queries](https://www.apollographql.com/docs/apollo-server/performance/apq/) and [File
 Uploads](https://www.apollographql.com/docs/apollo-server/data/file-uploads/).
-Both of these features is implemented by enhancing or swapping out the default
+Both of these features are implemented by enhancing or swapping out the default
 [`fetchExchange`](../api/core.md#fetchexchange).
 
 ## Automatic Persisted Queries
@@ -25,7 +25,7 @@ respond using a `PersistedQueryNotFound` error. In that case the client is suppo
 the full GraphQL query, and the hash together, which will cause the query to be "registered" with the
 server.
 
-Additionally we could also decide to send these hashed queries as GET requests instead of POST
+Additionally, we could also decide to send these hashed queries as GET requests instead of POST
 requests. If we only send the persisted queries with hashes as GET requests then they become a lot
 easier for a CDN to cache, as by default most caches would not cache POST requests automatically.
 

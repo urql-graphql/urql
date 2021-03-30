@@ -91,7 +91,7 @@ one big stream. The `Client` sees an incoming flow of all of our operations.
 As we've learned before, each operation carries a `key` and each result we receive carries the
 original `operation`. Because an `OperationResult` also carries an `operation` property the `Client`
 will always know which results correspond to an individual operation.
-However, internally, all of our operations are processed at the same time concurrently. However from
+However, internally, all of our operations are processed at the same time concurrently. However, from
 our perspective:
 
 - We subscribe to a "stream" and expect to get results on a callback
@@ -132,7 +132,7 @@ The default set of exchanges that `@urql/core` contains and applies to a `Client
 - `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
 
 When we don't pass the `exchanges` option manually to our `Client` then these are the ones that will
-be applied. As we can see, an exchange exters a lot of power over our operations and results. They
+be applied. As we can see, an exchange exerts a lot of power over our operations and results. They
 determine a lot of the logic of the `Client`, taking care of things like deduplication, caching, and
 sending requests to our API.
 
@@ -179,7 +179,7 @@ As a user, if we're using the one framework bindings that we've seen in [the "Ba
 section](./basics/README.md), we may never see these streams in action or may never use them even,
 since the bindings internally use them for us. But if we [use the `Client`
 directly](./basics/core.md#one-off-queries-and-mutations) or write exchanges then we'll see streams
-and wil have to deal with their API.
+and will have to deal with their API.
 
 ### The Wonka library
 

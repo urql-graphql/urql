@@ -31,7 +31,7 @@ page.](./authoring-exchanges.md) or what they are [on the "Architecture"
 page.](../architecture.md)
 
 In the above example, we add the `subscriptionExchange` to the `Client` with the default exchanges
-add before it. The `subscriptionExchange` is a factory that accepts additional options and returns
+added before it. The `subscriptionExchange` is a factory that accepts additional options and returns
 the actual `Exchange` function. It does not make any assumption over the transport protocol and
 scheme that is used. Instead, we need to pass a `forwardSubscription` function, which is called with
 an "enriched" _Operation_ every time the `Client` attempts to execute a GraphQL Subscription.
