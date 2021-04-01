@@ -35,7 +35,13 @@ export function withUrqlClient(
     const shouldEnableSuspense = Boolean(
       (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
-    const WithUrql = ({ pageProps, urqlClient, urqlState, ...rest }: WithUrqlProps) => {
+
+    const WithUrql = ({
+      pageProps,
+      urqlClient,
+      urqlState,
+      ...rest
+    }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const forceUpdate = useState(0);
       const urqlServerState = (pageProps && pageProps.urqlState) || urqlState;
