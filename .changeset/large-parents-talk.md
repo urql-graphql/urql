@@ -2,4 +2,9 @@
 'next-urql': patch
 ---
 
-Provide urqlState coming from pageProps
+Ensure `urqlState` is hydrated onto the client when a user opts out of `ssr` and uses the `getServerSideProps` or `getStaticProps` on a page-level.
+
+Examples:
+
+- [getStaticProps](https://codesandbox.io/s/urql-get-static-props-dmjch?file=/pages/index.js)
+- [getServerSideProps](https://codesandbox.io/s/urql-get-static-props-forked-xfbrs?file=/pages/index.js)
