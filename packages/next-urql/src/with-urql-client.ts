@@ -38,7 +38,7 @@ export function withUrqlClient(
     const WithUrql = ({ pageProps, urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const forceUpdate = useState(0);
-      const urqlServerState = pageProps.urqlState || urqlState;
+      const urqlServerState = (pageProps && pageProps.urqlState) || urqlState;
 
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
@@ -46,8 +46,10 @@ export function withUrqlClient(
           return urqlClient;
         }
 
-        if (!ssr || typeof window === 'undefined')
-          ssr = ssrExchange({ initialState: urqlServerState });
+        if (!ssr || typeof window === 'undefined') {
+          // We want to force the cache to hydrate, we do this by setting the isClient flag to true
+          ssr = ssrExchange({ initialState: urqlServerState, isClient: true });
+        }
 
         const clientConfig = getClientConfig(ssr);
         if (!clientConfig.exchanges) {
