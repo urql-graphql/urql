@@ -1,5 +1,11 @@
 # @urql/storybook-addon
 
+## 1.0.6
+
+### Patch Changes
+
+- Add Storybook metadata to `package.json` for npm discoverability, by [@coderkevin](https://github.com/coderkevin) (See [#1469](https://github.com/FormidableLabs/urql/pull/1469))
+
 ## 1.0.5
 
 ### Patch Changes

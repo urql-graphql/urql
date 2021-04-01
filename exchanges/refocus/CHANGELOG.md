@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+### Patch Changes
+
+- Prevent the refocus Exchange from being used on a Node env, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1430](https://github.com/FormidableLabs/urql/pull/1430))
+
 ## 0.2.1
 
 ### Patch Changes

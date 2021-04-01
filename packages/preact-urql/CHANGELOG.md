@@ -1,5 +1,11 @@
 # @urql/preact
 
+## 2.0.1
+
+### Patch Changes
+
+- Add a displayName to the Provider, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1431](https://github.com/FormidableLabs/urql/pull/1431))
+
 ## 2.0.0
 
 ### Major Changes
