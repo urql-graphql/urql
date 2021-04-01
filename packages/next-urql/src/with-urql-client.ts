@@ -35,10 +35,10 @@ export function withUrqlClient(
     const shouldEnableSuspense = Boolean(
       (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
-
-    const WithUrql = ({ urqlClient, urqlState, ...rest }: WithUrqlProps) => {
+    const WithUrql = ({ pageProps, urqlClient, urqlState, ...rest }: WithUrqlProps) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const forceUpdate = useState(0);
+      const urqlServerState = pageProps.urqlState || urqlState;
 
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const client = React.useMemo(() => {
@@ -47,7 +47,7 @@ export function withUrqlClient(
         }
 
         if (!ssr || typeof window === 'undefined')
-          ssr = ssrExchange({ initialState: urqlState });
+          ssr = ssrExchange({ initialState: urqlServerState });
 
         const clientConfig = getClientConfig(ssr);
         if (!clientConfig.exchanges) {
@@ -63,7 +63,7 @@ export function withUrqlClient(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return initUrqlClient(clientConfig, shouldEnableSuspense)!;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [urqlClient, urqlState, forceUpdate[0]]);
+      }, [urqlClient, urqlServerState, forceUpdate[0]]);
 
       const resetUrqlClient = () => {
         resetClient();
@@ -76,6 +76,7 @@ export function withUrqlClient(
         { value: client },
         createElement(AppOrPage, {
           ...rest,
+          pageProps,
           urqlClient: client,
           resetUrqlClient,
         })
