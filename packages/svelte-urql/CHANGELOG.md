@@ -1,5 +1,11 @@
 # @urql/svelte
 
+## 1.2.1
+
+### Patch Changes
+
+- Allow `mutation` to accept a more partial `GraphQLRequest` object without a `key` or `variables`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1473](https://github.com/FormidableLabs/urql/pull/1473))
+
 ## 1.2.0
 
 ### Minor Changes
