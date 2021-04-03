@@ -19,7 +19,7 @@ const Home: React.FC = () => (
 );
 
 export default withUrqlClient((ssrExchange) => ({
-  url: 'https://graphql-pokemon.now.sh',
+  url: 'https://graphql-pokemon2.vercel.app',
   fetch,
   suspense: true,
   exchanges: [

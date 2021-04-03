@@ -65,7 +65,7 @@ const Root = () => (
   </div>
 );
 
-export default withUrqlClient(() => ({ url: 'https://graphql-pokemon.now.sh' }))(Root);
+export default withUrqlClient(() => ({ url: 'https://graphql-pokemon2.vercel.app' }))(Root);
 ```
 
 Read more below in the [API](#API) section to learn more about the arguments that can be passed to `withUrqlClient`.

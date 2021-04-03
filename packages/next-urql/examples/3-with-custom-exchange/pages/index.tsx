@@ -26,6 +26,6 @@ export default withUrqlClient((ssrExchange) => ({
     ssrExchange,
     fetchExchange,
   ],
-  url: 'https://graphql-pokemon.now.sh',
+  url: 'https://graphql-pokemon2.vercel.app',
   fetch,
 }))(Home);

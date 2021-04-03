@@ -28,7 +28,7 @@ Home.getInitialProps = () => {
 
 export default withUrqlClient((_ssr: object, ctx?: NextUrqlPageContext) => {
   return {
-    url: 'https://graphql-pokemon.now.sh',
+    url: 'https://graphql-pokemon2.vercel.app',
     fetchOptions: {
       headers: {
         Authorization: `Bearer ${ctx?.req?.headers?.authorization ?? ''}`,
