@@ -1,8 +1,6 @@
-import React from 'react';
 import Head from 'next/head';
 import { withUrqlClient, SSRExchange } from 'next-urql';
 import { dedupExchange, cacheExchange, fetchExchange } from 'urql';
-import fetch from 'isomorphic-unfetch';
 
 import PokémonList from '../components/pokemon_list';
 import { urlExchange } from '../utils/url-exchange';
@@ -27,5 +25,4 @@ export default withUrqlClient((ssrExchange) => ({
     fetchExchange,
   ],
   url: 'https://graphql-pokemon2.vercel.app',
-  fetch,
 }))(Home);

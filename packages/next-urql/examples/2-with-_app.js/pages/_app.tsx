@@ -1,7 +1,5 @@
-import React from 'react';
 import { withUrqlClient, NextUrqlAppContext } from 'next-urql';
 import NextApp, { AppProps } from 'next/app';
-import fetch from 'isomorphic-unfetch';
 
 const App = ({ Component, pageProps }: AppProps) => {
   return <Component {...pageProps} />;
@@ -17,6 +15,6 @@ App.getInitialProps = async (ctx: NextUrqlAppContext) => {
   };
 };
 
-export default withUrqlClient(() => ({ url: 'https://graphql-pokemon2.vercel.app', fetch }))(
+export default withUrqlClient(() => ({ url: 'https://graphql-pokemon2.vercel.app' }))(
   App
 );

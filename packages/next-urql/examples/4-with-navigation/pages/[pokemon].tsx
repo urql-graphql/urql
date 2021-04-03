@@ -1,8 +1,6 @@
-import React from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from 'urql';
 import { withUrqlClient } from 'next-urql';
-import fetch from 'isomorphic-unfetch';
 import gql from 'graphql-tag';
 
 const pokemonQuery = gql`
@@ -51,5 +49,4 @@ const Pokemon = () => {
 
 export default withUrqlClient(() => ({
   url: 'https://graphql-pokemon2.vercel.app',
-  fetch,
 }))(Pokemon);

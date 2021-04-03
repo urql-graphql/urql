@@ -1,8 +1,6 @@
-import React from 'react';
 import Head from 'next/head';
 import { withUrqlClient, SSRExchange } from 'next-urql';
 import { dedupExchange, cacheExchange, fetchExchange } from 'urql';
-import fetch from 'isomorphic-unfetch';
 import { suspenseExchange } from '@urql/exchange-suspense';
 
 import PokémonList from '../components/pokemon_list';
@@ -20,7 +18,6 @@ const Home: React.FC = () => (
 
 export default withUrqlClient((ssrExchange) => ({
   url: 'https://graphql-pokemon2.vercel.app',
-  fetch,
   suspense: true,
   exchanges: [
     dedupExchange,
