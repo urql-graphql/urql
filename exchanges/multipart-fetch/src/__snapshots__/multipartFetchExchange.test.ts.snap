@@ -16,7 +16,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3044551916,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -140,9 +140,10 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 76,
+        "end": 86,
         "source": Object {
-          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "# getUser
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -185,7 +186,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3044551916,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -309,9 +310,10 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 76,
+        "end": 86,
         "source": Object {
-          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "# getUser
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -356,7 +358,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3044551916,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -480,9 +482,10 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 76,
+        "end": 86,
         "source": Object {
-          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "# getUser
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -529,7 +532,7 @@ Object {
     "key": 3,
     "kind": "mutation",
     "query": Object {
-      "__key": 3781860981,
+      "__key": 4034972436,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -627,9 +630,10 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 102,
+        "end": 125,
         "source": Object {
-          "body": "mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $picture) { location } }",
+          "body": "# uploadProfilePicture
+mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $picture) { location } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -678,7 +682,7 @@ Object {
     "key": 3,
     "kind": "mutation",
     "query": Object {
-      "__key": 1193185401,
+      "__key": 2033658603,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -780,9 +784,10 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 108,
+        "end": 132,
         "source": Object {
-          "body": "mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(pictures: $pictures) { location } }",
+          "body": "# uploadProfilePictures
+mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(pictures: $pictures) { location } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,

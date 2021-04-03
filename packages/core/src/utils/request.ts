@@ -32,10 +32,12 @@ export const stringifyDocument = (
     .trim();
 
   if (typeof node !== 'string') {
-    if (node.loc) {
-      const operationName = 'definitions' in node && getOperationName(node);
-      if (operationName) str = `# ${operationName}\n${str}`;
-    } else {
+    const operationName = 'definitions' in node && getOperationName(node);
+    if (operationName) {
+      str = `# ${operationName}\n${str}`;
+    }
+
+    if (!node.loc) {
       (node as WritableLocation).loc = {
         start: 0,
         end: str.length,
