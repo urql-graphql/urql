@@ -47,7 +47,7 @@ const client = createClient({
 });
 ```
 
-We want to place the `retryExchange` after the `fetchExchange` so that retries are only performed _after_ the operation has passed through the cache and has attempted to fetch.
+We want to place the `retryExchange` before the `fetchExchange` so that retries are only performed _after_ the operation has passed through the cache and has attempted to fetch.
 
 ## The Options
 
