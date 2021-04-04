@@ -67,6 +67,11 @@ export interface ClientOptions {
   maskTypename?: boolean;
 }
 
+interface ActiveOperation {
+  source: Source<OperationResult>;
+  cache: OperationResult | null;
+}
+
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
@@ -90,7 +95,7 @@ export class Client {
   dispatchOperation: (operation?: Operation | void) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
-  activeOperations: Map<number, Source<OperationResult>> = new Map();
+  activeOperations: Map<number, ActiveOperation> = new Map();
   queue: Operation[] = [];
 
   constructor(opts: ClientOptions) {
@@ -198,13 +203,12 @@ export class Client {
   executeRequestOperation<Data = any, Variables = object>(
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>> {
-    let result$ = this.activeOperations.get(operation.key);
-    if (!result$) {
-      result$ = pipe(
+    let active = this.activeOperations.get(operation.key);
+    if (!active) {
+      let result$ = pipe(
         this.results$,
         filter((res: OperationResult) => res.operation.key === operation.key)
       ) as Source<OperationResult<Data, Variables>>;
-
       if (this.maskTypename) {
         result$ = pipe(
           result$,
@@ -239,17 +243,8 @@ export class Client {
         take(1)
       );
 
-      let prevResult: OperationResult | undefined;
-
       result$ = pipe(
-        merge([
-          pipe(
-            fromValue(null),
-            map(() => prevResult),
-            filter(Boolean)
-          ) as Source<OperationResult>,
-          result$,
-        ]),
+        result$,
         takeUntil(teardown$),
         switchMap(result => {
           if (result.stale) return fromValue(result);
@@ -262,7 +257,7 @@ export class Client {
           ]);
         }),
         onEnd<OperationResult>(() => {
-          prevResult = undefined;
+          active!.cache = null;
           this.activeOperations.delete(operation.key);
           for (let i = this.queue.length - 1; i >= 0; i--)
             if (this.queue[i].key === operation.key) this.queue.splice(i, 1);
@@ -271,18 +266,25 @@ export class Client {
           );
         }),
         onPush(result => {
-          prevResult = result;
+          active!.cache = result;
         }),
         share
       );
+
+      active = { source: result$, cache: null };
     }
 
+    const behavior = makeSubject<OperationResult>();
+    const cache = active.cache;
+
     return pipe(
-      result$,
+      merge([behavior.source, active.source]),
       onStart<OperationResult>(() => {
         const { key } = operation;
-        this.activeOperations.set(key, result$!);
+        this.activeOperations.set(key, active!);
         this.dispatchOperation(operation);
+        if (cache != null && cache === active!.cache)
+          behavior.next({ ...cache, stale: true });
       })
     );
   }
