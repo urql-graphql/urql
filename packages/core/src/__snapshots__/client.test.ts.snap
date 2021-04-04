@@ -2,7 +2,7 @@
 
 exports[`createClient passes snapshot 1`] = `
 Client {
-  "activeOperations": Object {},
+  "activeOperations": Map {},
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
   "dispatchOperation": [Function],

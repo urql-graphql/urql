@@ -4,6 +4,7 @@ import {
   filter,
   makeSubject,
   onEnd,
+  onPush,
   onStart,
   pipe,
   share,
@@ -66,10 +67,6 @@ export interface ClientOptions {
   maskTypename?: boolean;
 }
 
-interface ActiveOperations {
-  [operationKey: string]: number;
-}
-
 export const createClient = (opts: ClientOptions) => new Client(opts);
 
 /** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
@@ -93,7 +90,7 @@ export class Client {
   dispatchOperation: (operation?: Operation | void) => void;
   operations$: Source<Operation>;
   results$: Source<OperationResult>;
-  activeOperations = Object.create(null) as ActiveOperations;
+  activeOperations: Map<number, Source<OperationResult>> = new Map();
   queue: Operation[] = [];
 
   constructor(opts: ClientOptions) {
@@ -138,7 +135,7 @@ export class Client {
       // operation's exchange results
       if (
         operation.kind === 'mutation' ||
-        (this.activeOperations[operation.key] || 0) > 0
+        this.activeOperations.has(operation.key)
       ) {
         this.queue.push(operation);
         if (!isOperationBatchActive) {
@@ -197,100 +194,97 @@ export class Client {
       this.createOperationContext(opts)
     );
 
-  /** Counts up the active operation key and dispatches the operation */
-  private onOperationStart(operation: Operation) {
-    const { key } = operation;
-    this.activeOperations[key] = (this.activeOperations[key] || 0) + 1;
-    this.dispatchOperation(operation);
-  }
-
-  /** Deletes an active operation's result observable and sends a teardown signal through the exchange pipeline */
-  private onOperationEnd(operation: Operation) {
-    const { key } = operation;
-    const prevActive = this.activeOperations[key] || 0;
-    const newActive = (this.activeOperations[key] =
-      prevActive <= 0 ? 0 : prevActive - 1);
-    // Check whether this operation has now become inactive
-    if (newActive <= 0) {
-      // Delete all related queued up operations for the inactive one
-      for (let i = this.queue.length - 1; i >= 0; i--)
-        if (this.queue[i].key === operation.key) this.queue.splice(i, 1);
-      // Issue the cancellation teardown operation
-      this.dispatchOperation(
-        makeOperation('teardown', operation, operation.context)
-      );
-    }
-  }
-
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
   executeRequestOperation<Data = any, Variables = object>(
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>> {
-    let operationResults$ = pipe(
-      this.results$,
-      filter((res: OperationResult) => res.operation.key === operation.key)
-    ) as Source<OperationResult<Data, Variables>>;
+    let result$ = this.activeOperations.get(operation.key);
+    if (!result$) {
+      result$ = pipe(
+        this.results$,
+        filter((res: OperationResult) => res.operation.key === operation.key)
+      ) as Source<OperationResult<Data, Variables>>;
 
-    if (this.maskTypename) {
-      operationResults$ = pipe(
-        operationResults$,
-        map(res => {
-          res.data = maskTypename(res.data);
-          return res;
-        })
-      );
-    }
+      if (this.maskTypename) {
+        result$ = pipe(
+          result$,
+          map(res => ({ ...res, data: maskTypename(res.data) }))
+        );
+      }
 
-    if (operation.kind === 'mutation') {
       // A mutation is always limited to just a single result and is never shared
-      return pipe(
-        operationResults$,
-        onStart<OperationResult>(() => this.dispatchOperation(operation)),
+      if (operation.kind === 'mutation') {
+        return pipe(
+          result$,
+          onStart<OperationResult>(() => this.dispatchOperation(operation)),
+          take(1)
+        );
+      }
+
+      const teardown$ = pipe(
+        this.operations$,
+        filter(
+          (op: Operation) => op.kind === 'teardown' && op.key === operation.key
+        )
+      );
+
+      const refetch$ = pipe(
+        this.operations$,
+        filter(
+          (op: Operation) =>
+            op.kind === operation.kind &&
+            op.key === operation.key &&
+            op.context.requestPolicy !== 'cache-only'
+        ),
         take(1)
       );
+
+      let prevResult: OperationResult | undefined;
+
+      result$ = pipe(
+        merge([
+          pipe(
+            fromValue(null),
+            map(() => prevResult),
+            filter(Boolean)
+          ) as Source<OperationResult>,
+          result$,
+        ]),
+        takeUntil(teardown$),
+        switchMap(result => {
+          if (result.stale) return fromValue(result);
+          return merge([
+            fromValue(result),
+            pipe(
+              refetch$,
+              map(() => ({ ...result, stale: true }))
+            ),
+          ]);
+        }),
+        onEnd<OperationResult>(() => {
+          prevResult = undefined;
+          this.activeOperations.delete(operation.key);
+          for (let i = this.queue.length - 1; i >= 0; i--)
+            if (this.queue[i].key === operation.key) this.queue.splice(i, 1);
+          this.dispatchOperation(
+            makeOperation('teardown', operation, operation.context)
+          );
+        }),
+        onPush(result => {
+          prevResult = result;
+        }),
+        share
+      );
     }
 
-    const teardown$ = pipe(
-      this.operations$,
-      filter(
-        (op: Operation) => op.kind === 'teardown' && op.key === operation.key
-      )
-    );
-
-    const refetch$ = pipe(
-      this.operations$,
-      filter(
-        (op: Operation) =>
-          op.kind === operation.kind &&
-          op.key === operation.key &&
-          op.context.requestPolicy !== 'cache-only'
-      )
-    );
-
-    const result$ = pipe(
-      operationResults$,
-      takeUntil(teardown$),
-      switchMap(result => {
-        if (result.stale) return fromValue(result);
-
-        return merge([
-          fromValue(result),
-          pipe(
-            refetch$,
-            take(1),
-            map(() => ({ ...result, stale: true }))
-          ),
-        ]);
-      }),
+    return pipe(
+      result$,
       onStart<OperationResult>(() => {
-        this.onOperationStart(operation);
-      }),
-      onEnd<OperationResult>(() => {
-        this.onOperationEnd(operation);
+        const { key } = operation;
+        this.activeOperations.set(key, result$!);
+        this.dispatchOperation(operation);
       })
     );
-
-    return result$;
   }
 
   query<Data = any, Variables extends object = {}>(
