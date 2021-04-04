@@ -17,7 +17,7 @@ ensure that the server we're targetting is running so we can successfully execut
 
 ## getServerSideProps
 
-This requires some manual work, when we look at [`static.js`](./pages/server.js) we can see that we define our own
+This requires some manual work, when we look at [`server.js`](./pages/server.js) we can see that we define our own
 `getServerSideProps` method, this because these methods are only `user-facing`.
 
 ## Output
