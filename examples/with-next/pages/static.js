@@ -14,9 +14,8 @@ const TODOS_QUERY = `
 
 function Static(props) {
   const client = useClient();
-  console.log('static', client)
   const [res] = useQuery({ query: TODOS_QUERY });
-  console.log(res);
+
   return (
     <div>
       <h1>Static</h1>
