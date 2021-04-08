@@ -68,9 +68,9 @@ function toSource<Data, Variables>(store: OperationStore<Data, Variables>) {
 }
 
 export function query<Data = any, Variables = object>(
-  store: OperationStore<Data, Variables>
+  store: OperationStore<Data, Variables>,
+  client = getClient()
 ): OperationStore<Data, Variables> {
-  const client = getClient();
   const subscription = pipe(
     toSource(store),
     switchMap(request => {
@@ -112,9 +112,9 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export function subscription<Data = any, Result = Data, Variables = object>(
   store: OperationStore<Result, Variables>,
-  handler?: SubscriptionHandler<Data, Result>
+  handler?: SubscriptionHandler<Data, Result>,
+  client = getClient()
 ): OperationStore<Result, Variables> {
-  const client = getClient();
   const subscription = pipe(
     toSource(store),
     switchMap(
@@ -164,10 +164,9 @@ interface GraphQLRequestInput<Data = any, Variables = object> {
 }
 
 export function mutation<Data = any, Variables = object>(
-  input: GraphQLRequestInput<Data, Variables> | OperationStore<Data, Variables>
+  input: GraphQLRequestInput<Data, Variables> | OperationStore<Data, Variables>,
+  client = getClient()
 ): ExecuteMutation<Data, Variables> {
-  const client = getClient();
-
   const store =
     typeof (input as any).subscribe !== 'function'
       ? operationStore<Data, Variables>(input.query, input.variables)

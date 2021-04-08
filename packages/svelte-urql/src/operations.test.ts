@@ -47,6 +47,48 @@ describe('query', () => {
     expect(store.fetching).toBe(false);
   });
 
+  it('uses passed in client', () => {
+    const subscriber = jest.fn();
+    const subject = makeSubject<any>();
+    const executeQuery = jest
+      .spyOn(client, 'executeQuery')
+      .mockImplementation(() => {
+        throw new Error('should use local client');
+      });
+    const localClient = createClient({ url: '/graphql', exchanges: [] });
+    const localExecuteQuery = jest
+      .spyOn(localClient, 'executeQuery')
+      .mockImplementation(() => subject.source);
+
+    const store = operationStore('{ test }');
+    store.subscribe(subscriber);
+
+    query(store, localClient);
+
+    expect(localExecuteQuery).toHaveBeenCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: {},
+        context: undefined,
+      },
+      undefined
+    );
+
+    expect(subscriber).toHaveBeenCalledTimes(2);
+    expect(store.fetching).toBe(true);
+
+    subject.next({ data: { test: true } });
+    expect(subscriber).toHaveBeenCalledTimes(3);
+    expect(store.data).toEqual({ test: true });
+
+    subject.complete();
+    expect(subscriber).toHaveBeenCalledTimes(4);
+    expect(store.fetching).toBe(false);
+
+    expect(executeQuery).not.toHaveBeenCalled();
+  });
+
   it('pauses the query when requested to do so', () => {
     const subscriber = jest.fn();
     const subject = makeSubject<any>();
@@ -162,6 +204,47 @@ describe('subscription', () => {
     expect(store.fetching).toBe(false);
   });
 
+  it('uses passed in client', () => {
+    const subscriber = jest.fn();
+    const subject = makeSubject<any>();
+    const executeQuery = jest
+      .spyOn(client, 'executeSubscription')
+      .mockImplementation(() => {
+        throw new Error('should use local client');
+      });
+    const localClient = createClient({ url: '/graphql', exchanges: [] });
+    const localExecuteQuery = jest
+      .spyOn(localClient, 'executeSubscription')
+      .mockImplementation(() => subject.source);
+
+    const store = operationStore('subscription { test }');
+    store.subscribe(subscriber);
+
+    subscription(store, undefined, localClient);
+
+    expect(localExecuteQuery).toHaveBeenCalledWith(
+      {
+        key: expect.any(Number),
+        query: expect.any(Object),
+        variables: {},
+      },
+      undefined
+    );
+
+    expect(subscriber).toHaveBeenCalledTimes(2);
+    expect(store.fetching).toBe(true);
+
+    subject.next({ data: { test: true } });
+    expect(subscriber).toHaveBeenCalledTimes(3);
+    expect(store.data).toEqual({ test: true });
+
+    subject.complete();
+    expect(subscriber).toHaveBeenCalledTimes(4);
+    expect(store.fetching).toBe(false);
+
+    expect(executeQuery).not.toHaveBeenCalled();
+  });
+
   it('updates the executed subscription when inputs change', () => {
     const subscriber = jest.fn();
     const subject = makeSubject<any>();
@@ -266,5 +349,44 @@ describe('mutation', () => {
     expect(subscriber).toHaveBeenCalledTimes(3);
     expect(store.fetching).toBe(false);
     expect(store.data).toEqual({ test: true });
+  });
+
+  it('uses passed in client', async () => {
+    const subscriber = jest.fn();
+    const subject = makeSubject<any>();
+    const clientMutation = jest
+      .spyOn(client, 'mutation')
+      .mockImplementation(() => {
+        throw new Error('should use local client');
+      });
+    const localClient = createClient({ url: '/graphql', exchanges: [] });
+    const localClientMutation = jest
+      .spyOn(localClient, 'mutation')
+      .mockImplementation((): any => ({
+        toPromise() {
+          return pipe(subject.source, take(1), toPromise);
+        },
+      }));
+
+    const store = operationStore('mutation { test }', { test: false });
+    store.subscribe(subscriber);
+
+    const start = mutation(store, localClient);
+    expect(subscriber).toHaveBeenCalledTimes(1);
+    expect(localClientMutation).not.toHaveBeenCalled();
+
+    const result$ = start({ test: true });
+    expect(subscriber).toHaveBeenCalledTimes(2);
+    expect(store.fetching).toBe(true);
+    expect(store.variables).toEqual({ test: true });
+
+    subject.next({ data: { test: true } });
+    expect(await result$).toEqual(store);
+
+    expect(subscriber).toHaveBeenCalledTimes(3);
+    expect(store.fetching).toBe(false);
+    expect(store.data).toEqual({ test: true });
+
+    expect(clientMutation).not.toHaveBeenCalled();
   });
 });
