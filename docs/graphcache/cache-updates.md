@@ -199,8 +199,8 @@ cacheExchange({
 });
 ```
 
-Here we use the `cache.updateQuery` method, which is similar to the `cache.readQuery` method that
-we've seen on the "Local Resolvers" page before](./local-resolvers.md#reading-a-query).
+Here we use the `cache.updateQuery` method, which is similar to the [`cache.readQuery` method](./local-resolvers.md#reading-a-query) that
+we've seen on the "Local Resolvers" page before.
 
 This method accepts a callback, which will give us the `data` of the query, as read from the locally
 cached data, and we may return an updated version of this data. While we may want to instinctively
