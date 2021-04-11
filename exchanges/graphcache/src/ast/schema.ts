@@ -35,8 +35,8 @@ export interface SchemaIntrospector {
 
 export interface PartialIntrospectionSchema {
   queryType: { name: string; kind?: any };
-  mutationType?: { name: string; kind?: any };
-  subscriptionType?: { name: string; kind?: any };
+  mutationType?: { name: string; kind?: any } | null;
+  subscriptionType?: { name: string; kind?: any } | null;
   types?: IntrospectionSchema['types'];
 }
 
