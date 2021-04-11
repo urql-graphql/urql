@@ -68,7 +68,7 @@ arguments, which are the same as [the resolvers' arguments](./local-resolvers.md
 - `args`: The arguments that the field has been called with, which will be replaced with an empty
   object if the field hasn't been called with any arguments.
 - `cache`: The `cache` instance, which gives us access to methods allowing us to interact with the
-- local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
+  local cache. Its full API can be found [in the API docs](../api/graphcache.md#cache). On this page
   we use it frequently to read from and write to the cache.
 - `info`: This argument shouldn't be used frequently, but it contains running information about the
   traversal of the query document. It allows us to make resolvers reusable or to retrieve
