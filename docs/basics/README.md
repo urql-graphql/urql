@@ -11,7 +11,7 @@ prior knowledge.
 - [**React/Preact**](./react-preact.md) covers how to work with the bindings for React/Preact.
 - [**Vue**](./vue.md) covers how to work with the bindings for Vue 3.
 - [**Svelte**](./svelte.md) covers how to work with the bindings for Svelte.
-- [**Core Package**](./core-package.md) defines why a shared package exists that contains the main
+- [**Core Package**](./core.md) defines why a shared package exists that contains the main
   logic of `urql`, and how we can use it directly in Node.js.
 
 After reading the page for your bindings and the "Core" page you may want to the next two pages in
