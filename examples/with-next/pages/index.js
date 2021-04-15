@@ -7,18 +7,23 @@ import {
   useQuery
 } from "urql";
 
-const TODOS_QUERY = `
-  query { todos { id text } }
+const POKEMONS_QUERY = `
+  query {
+    pokemons(limit: 10) {
+      id
+      name
+    }
+  }
 `;
 
 function Index(props) {
-  const [res] = useQuery({ query: TODOS_QUERY });
+  const [res] = useQuery({ query: POKEMONS_QUERY });
   return (
     <div>
       <h1>Static</h1>
-      {res.data.todos.map((todo) => (
-        <div key={todo.id}>
-          {todo.id} - {todo.text}
+      {res.data.pokemons.map((pokemon) => (
+        <div key={pokemon.id}>
+          {pokemon.id} - {pokemon.name}
         </div>
       ))}
     </div>
@@ -27,7 +32,7 @@ function Index(props) {
 
 export default withUrqlClient(
   () => ({
-    url: "http://localhost:3000/api/graphql"
+    url: "https://trygql.dev/graphql/basic-pokedex"
   }),
   { ssr: true }
 )(Index);
