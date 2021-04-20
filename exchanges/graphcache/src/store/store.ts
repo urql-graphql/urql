@@ -8,6 +8,7 @@ import {
   DataField,
   Variables,
   FieldArgs,
+  Link,
   Data,
   QueryInput,
   UpdatesConfig,
@@ -202,5 +203,38 @@ export class Store implements Cache {
     variables?: V
   ): void {
     writeFragment(this, formatDocument(fragment), data, variables as any);
+  }
+
+  link(
+    entity: Entity,
+    field: string,
+    args: FieldArgs,
+    link: Link<Entity>
+  ): void;
+
+  link(entity: Entity, field: string, link: Link<Entity>): void;
+
+  link(
+    entity: Entity,
+    field: string,
+    argsOrLink: FieldArgs | Link<Entity>,
+    maybeLink?: Link<Entity>
+  ): void {
+    const args = (maybeLink !== undefined ? argsOrLink : null) as FieldArgs;
+    const link = (maybeLink !== undefined
+      ? maybeLink
+      : argsOrLink) as Link<Entity>;
+
+    const entityKey = this.keyOfEntity(entity);
+    if (!entityKey) return;
+
+    InMemoryData.writeLink(
+      entityKey,
+      keyOfField(field, args),
+      // FIXME: Needs to handle nested lists, unknown entities (?), scalars, etc (see writeField in operations/write)
+      Array.isArray(link)
+        ? link.map(entity => this.keyOfEntity(entity as any))
+        : this.keyOfEntity(link)
+    );
   }
 }
