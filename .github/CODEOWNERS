@@ -1,4 +1,5 @@
 /.github/ @kitten @jovidecroock
+/.github/ @kitten @jovidecroock @andyrichardson
 /.changeset/config.json @kitten @jovidecroock
 /scripts/prepare/* @kitten @jovidecroock
 /scripts/rollup/* @kitten @jovidecroock
