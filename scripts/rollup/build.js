@@ -11,9 +11,10 @@ let packages = glob('{packages,exchanges}/*/package.json')
   .map(pkg => path.resolve(pkg, '../'));
 
 if (process.env.NODE_TOTAL) {
-  const nodeTotal = parseInt(process.env.NODE_TOTAL, 10);
+  const nodeTotal = parseInt(process.env.NODE_TOTAL, 10) || 1;
   const nodeIndex = parseInt(process.env.NODE_INDEX, 10) % nodeTotal;
   packages = packages.filter((_, i) => i % nodeTotal === nodeIndex);
+  console.log(`> Node ${nodeIndex + 1} of ${nodeTotal}.`);
 }
 
 const builds = packages.map(async package => {
