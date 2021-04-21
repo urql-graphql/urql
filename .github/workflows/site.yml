@@ -12,8 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: chrislennon/action-aws-cli@v1.1
+      - uses: actions/checkout@v2
       - uses: ./.github/actions/prepare
+      - uses: chrislennon/action-aws-cli@v1.1
       - name: Build Site
         working-directory: ./packages/site
         run: yarn run build
@@ -29,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/actions/prepare
       - name: Build Site
         working-directory: ./packages/site

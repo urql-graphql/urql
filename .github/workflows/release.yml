@@ -8,8 +8,8 @@ jobs:
     name: Release
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/actions/prepare
-
       - name: PR or Publish
         id: changesets
         uses: changesets/action@b3300fad33b6ab794313da28d27424c0e2f78991

@@ -10,6 +10,7 @@ jobs:
     name: Checks
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/actions/prepare
       - name: TypeScript
         run: yarn run check
@@ -28,6 +29,7 @@ jobs:
       NODE_TOTAL: 3
       NODE_INDEX: ${{matrix.index}}
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/actions/prepare
       - name: Build
         run: yarn run build

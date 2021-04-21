@@ -3,11 +3,6 @@ description: "Checkout Repo, setup Node, and install dependencies"
 runs:
   using: "composite"
   steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
