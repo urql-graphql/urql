@@ -314,7 +314,7 @@ export class Client {
     let result: OperationResult<Data, Variables> | null = null;
 
     pipe(
-      this.executeQuery(createRequest(query, variables), context),
+      this.query(query, variables, context),
       subscribe(res => {
         result = res;
       })
