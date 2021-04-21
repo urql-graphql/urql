@@ -9,11 +9,6 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
-      - id: event
-        run: |
-          METADATA=$(cargo metadata --no-deps)
-          echo "::set-output name=payload::$(cat $GITHUB_EVENT_PATH)"
-
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:

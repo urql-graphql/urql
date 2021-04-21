@@ -9,7 +9,7 @@ on:
 jobs:
   site:
     name: Publish Site
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     timeout-minutes: 10
     steps:
       - name: Checkout Repo
@@ -21,10 +21,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14'
-
-      - name: Setup AWS CLI
-        if: github.ref == 'refs/heads/main'
-        uses: chrislennon/action-aws-cli@v1.1
 
       - name: Get Yarn cache directory
         id: yarn-cache-dir-path
