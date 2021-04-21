@@ -43,7 +43,7 @@ jobs:
         if: |
           steps.yarn-cache.outputs.cache-hit != 'true' ||
           steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: yarn install --prefer-offline --frozen-lockfile --non-interactive
+        run: yarn install --prefer-offline --frozen-lockfile --non-interactive --silent
       - name: Build Production Site
         working-directory: ./packages/site
         if: github.ref == 'refs/heads/main'
