@@ -8,8 +8,27 @@ jobs:
     name: Release
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/prepare
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - name: Get Yarn cache directory
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Use Yarn cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install Dependencies
+        run: yarn install --prefer-offline --frozen-lockfile --non-interactive
       - name: PR or Publish
         id: changesets
         uses: changesets/action@b3300fad33b6ab794313da28d27424c0e2f78991
