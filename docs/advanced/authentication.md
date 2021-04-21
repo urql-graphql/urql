@@ -67,7 +67,7 @@ const client = createClient({
 });
 ```
 
-Let's discuss each of the [configuration options](../api/auth-exchange/#options) and how to use them in turn.
+Let's discuss each of the [configuration options](../api/auth-exchange.md#options) and how to use them in turn.
 
 ### Configuring `getAuth` (initial load, fetch from storage)
 
