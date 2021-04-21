@@ -10,12 +10,11 @@ let packages = glob('{packages,exchanges}/*/package.json')
   .filter(pkg => !require(path.join(workspaceRoot, pkg)).private)
   .map(pkg => path.resolve(pkg, '../'));
 
-// CircleCI parallelism
-// See: https://github.com/facebook/react/blob/901d76bc5c8dcd0fa15bb32d1dfe05709aa5d273/scripts/rollup/build.js#L705-L710
-if (process.env.CIRCLE_NODE_TOTAL) {
-  const nodeTotal = parseInt(process.env.CIRCLE_NODE_TOTAL, 10);
-  const nodeIndex = parseInt(process.env.CIRCLE_NODE_INDEX, 10);
+if (process.env.NODE_TOTAL) {
+  const nodeTotal = parseInt(process.env.NODE_TOTAL, 10) || 1;
+  const nodeIndex = parseInt(process.env.NODE_INDEX, 10) % nodeTotal;
   packages = packages.filter((_, i) => i % nodeTotal === nodeIndex);
+  console.log(`> Node ${nodeIndex + 1} of ${nodeTotal}.`);
 }
 
 const builds = packages.map(async package => {
