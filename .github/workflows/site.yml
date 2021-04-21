@@ -1,0 +1,42 @@
+name: Publish Site
+
+on:
+  pull_request:
+    branches: main
+  push:
+    branches: main
+
+jobs:
+  production_site:
+    name: Production Site
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: chrislennon/action-aws-cli@v1.1
+      - uses: ./.github/actions/prepare
+      - name: Build Site
+        working-directory: ./packages/site
+        run: yarn run build
+      - name: Deploy Site
+        working-directory: ./packages/site
+        run: node scripts/deploy/aws.js
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+
+  staging_site:
+    name: Staging Site
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - uses: ./.github/actions/prepare
+      - name: Build Site
+        working-directory: ./packages/site
+        run: yarn run build --staging
+      - name: Deploy Site
+        working-directory: ./packages/site
+        run: node scripts/deploy/surge.js
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+

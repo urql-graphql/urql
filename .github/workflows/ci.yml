@@ -1,0 +1,33 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  check:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/prepare
+      - name: TypeScript
+        run: yarn run check
+      - name: Unit Tests
+        run: yarn run test --maxWorkers=2
+      - name: Linting
+        run: yarn run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [0, 1, 2]
+    env:
+      NODE_TOTAL: 3
+      NODE_INDEX: ${{matrix.index}}
+    steps:
+      - uses: ./.github/actions/prepare
+      - name: Build
+        run: yarn run build
