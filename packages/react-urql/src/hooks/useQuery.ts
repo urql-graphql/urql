@@ -1,4 +1,4 @@
-// eslint-disable react-hooks/exhaustive-deps
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { DocumentNode } from 'graphql';
 import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
@@ -70,7 +70,15 @@ export function useQuery<Data = any, Variables = object>(
           })
         )
       : source;
-  }, [client, request, suspense, args.pause, args.requestPolicy, args.context]);
+  }, [
+    cache,
+    client,
+    request,
+    suspense,
+    args.pause,
+    args.requestPolicy,
+    args.context,
+  ]);
 
   const getSnapshot = useCallback(
     (
@@ -108,7 +116,7 @@ export function useQuery<Data = any, Variables = object>(
 
       return (result as OperationResult<Data, Variables>) || { fetching: true };
     },
-    [request]
+    [cache, request]
   );
 
   const deps = [
