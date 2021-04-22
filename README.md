@@ -11,7 +11,7 @@
   <br />
   <br />
   <a href="https://circleci.com/gh/FormidableLabs/urql">
-    <img alt="Test Status" src="https://badgen.net/github/status/FormidableLabs/urql/main/ci/circleci?label=circleci" />
+    <img alt="CI Status" src="https://github.com/FormidableLabs/urql/actions/workflows/ci.yml/badge.svg?branch=main" />
   </a>
   <a href="https://github.com/FormidableLabs/urql#maintenance-status">
     <img alt="Maintenance Status" src="https://badgen.net/badge/maintenance/active/green" />
