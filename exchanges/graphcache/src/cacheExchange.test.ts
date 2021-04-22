@@ -1609,7 +1609,7 @@ describe('commutativity', () => {
     expect(data.index).toBe(3);
   });
 
-  it('applies optimistic updates on top of commutative queries', () => {
+  it('applies optimistic updates on top of commutative queries as query result comes in', () => {
     let data: any;
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
@@ -1816,7 +1816,7 @@ describe('commutativity', () => {
     expect(data).toHaveProperty('node.name', 'mutation');
   });
 
-  it('applies optimistic updates on top of commutative queries', () => {
+  it('applies optimistic updates on top of commutative queries until mutation resolves', () => {
     let data: any;
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
