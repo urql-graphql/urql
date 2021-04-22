@@ -26,7 +26,7 @@ it('filters all results and warns about input', () => {
   expect(console.warn).toHaveBeenCalled();
 });
 
-it('filters all results and warns about input', () => {
+it('filters all results and does not warn about teardown operations', () => {
   const res: any[] = [];
 
   pipe(

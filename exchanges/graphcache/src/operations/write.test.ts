@@ -120,7 +120,7 @@ describe('Query', () => {
     );
   });
 
-  it('should warn once for invalid fields on an entity', () => {
+  it('should warn once for invalid link fields on an entity', () => {
     const INVALID_TODO_QUERY = gql`
       mutation {
         toggleTodo {
