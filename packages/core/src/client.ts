@@ -238,7 +238,8 @@ export class Client {
           (op: Operation) =>
             op.kind === operation.kind &&
             op.key === operation.key &&
-            op.context.requestPolicy !== 'cache-only'
+            (op.context.requestPolicy === 'network-only' ||
+              op.context.requestPolicy === 'cache-and-network')
         ),
         take(1)
       );
