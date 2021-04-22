@@ -3,8 +3,14 @@ name: Site
 on:
   pull_request:
     branches: main
+    paths:
+      - 'docs/**'
+      - 'packages/site/**'
   push:
     branches: main
+    paths:
+      - 'docs/**'
+      - 'packages/site/**'
 
 jobs:
   site:
