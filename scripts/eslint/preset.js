@@ -3,7 +3,7 @@ module.exports = {
   extends: [
     './common.js',
     'plugin:@typescript-eslint/recommended',
-    'prettier/@typescript-eslint',
+    'prettier',
   ],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
