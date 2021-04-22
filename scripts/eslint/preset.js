@@ -19,5 +19,9 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/array-type': 'off',
     'import/no-internal-modules': 'off',
+
+    '@typescript-eslint/no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+    }],
   },
 };
