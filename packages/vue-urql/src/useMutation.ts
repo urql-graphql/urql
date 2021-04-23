@@ -31,7 +31,7 @@ export function useMutation<T = any, V = any>(
   query: TypedDocumentNode<T, V> | DocumentNode | string,
   client?: Client
 ): UseMutationResponse<T, V> {
-  let _client = client ?? useClient();
+  const _client = client || useClient();
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
