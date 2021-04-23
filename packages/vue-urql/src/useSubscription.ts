@@ -10,6 +10,7 @@ import {
   Operation,
   createRequest,
   GraphQLRequest,
+  Client,
 } from '@urql/core';
 
 import { useClient } from './useClient';
@@ -21,6 +22,7 @@ export interface UseSubscriptionArgs<T = any, V = object> {
   variables?: MaybeRef<V>;
   pause?: MaybeRef<boolean>;
   context?: MaybeRef<Partial<OperationContext>>;
+  client?: Client
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
@@ -53,7 +55,7 @@ export function useSubscription<T = any, R = T, V = object>(
   handler?: MaybeRef<SubscriptionHandler<T, R>>
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args);
-  const client = useClient();
+  const client = _args.client ?? useClient();
 
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);

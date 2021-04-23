@@ -7,6 +7,7 @@ import {
   Operation,
   OperationContext,
   OperationResult,
+  Client,
 } from '@urql/core';
 
 import { useClient } from './useClient';
@@ -27,9 +28,10 @@ export interface UseMutationState<T, V> {
 export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 
 export function useMutation<T = any, V = any>(
-  query: TypedDocumentNode<T, V> | DocumentNode | string
+  query: TypedDocumentNode<T, V> | DocumentNode | string,
+  client?: Client
 ): UseMutationResponse<T, V> {
-  const client = useClient();
+  let _client = client ?? useClient();
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -50,7 +52,7 @@ export function useMutation<T = any, V = any>(
       context?: Partial<OperationContext>
     ): Promise<OperationResult<T, V>> {
       fetching.value = true;
-      return client
+      return _client
         .mutation(query, variables as any, context)
         .toPromise()
         .then((res: OperationResult) => {
