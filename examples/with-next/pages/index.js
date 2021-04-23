@@ -4,10 +4,11 @@ import {
   dedupExchange,
   cacheExchange,
   fetchExchange,
-  useQuery
+  useQuery,
+  gql
 } from "urql";
 
-const POKEMONS_QUERY = `
+const POKEMONS_QUERY = gql`
   query {
     pokemons(limit: 10) {
       id
@@ -16,8 +17,9 @@ const POKEMONS_QUERY = `
   }
 `;
 
-function Index(props) {
+function Index() {
   const [res] = useQuery({ query: POKEMONS_QUERY });
+
   return (
     <div>
       <h1>Static</h1>

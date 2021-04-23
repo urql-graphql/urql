@@ -5,10 +5,10 @@ import {
   cacheExchange,
   fetchExchange,
   useQuery,
-  useClient
+  gql
 } from "urql";
 
-const POKEMONS_QUERY = `
+const POKEMONS_QUERY = gql`
   query {
     pokemons(limit: 10) {
       id
@@ -17,8 +17,7 @@ const POKEMONS_QUERY = `
   }
 `;
 
-function Static(props) {
-  const client = useClient();
+function Static() {
   const [res] = useQuery({ query: POKEMONS_QUERY });
 
   return (
@@ -33,7 +32,7 @@ function Static(props) {
   );
 }
 
-export async function getStaticProps(ctx) {
+export async function getStaticProps() {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient({
     url: "https://trygql.dev/graphql/basic-pokedex",
