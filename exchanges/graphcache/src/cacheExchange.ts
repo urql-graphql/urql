@@ -50,21 +50,26 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export interface CacheExchangeOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
+export interface CacheExchangeOpts<Updaters extends UpdatesConfig, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
+  updates?: Partial<Updaters>;
+  resolvers?: Resolvers;
+  optimistic?: Optimistic;
+  keys?: Keys;
   schema?: IntrospectionData;
   storage?: StorageAdapter;
 }
 
-export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
+export const cacheExchange = <
+  Updaters extends UpdatesConfig = UpdatesConfig,
+  Resolvers  extends ResolverConfig = ResolverConfig,
+  Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
+  Keys extends KeyingConfig = KeyingConfig
+>(opts?: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>): Exchange => ({
   forward,
   client,
   dispatchDebug,
 }) => {
-  const store = new Store(opts);
+  const store = new Store<Updaters, Resolvers, Optimistic, Keys>(opts);
 
   let hydration: void | Promise<void>;
   if (opts && opts.storage) {

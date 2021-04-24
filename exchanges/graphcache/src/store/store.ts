@@ -35,15 +35,20 @@ import {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
+export interface StoreOpts<Updaters extends UpdatesConfig, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
+  updates?: Partial<Updaters>;
+  resolvers?: Resolvers;
+  optimistic?: Optimistic;
+  keys?: Keys;
   schema?: IntrospectionData;
 }
 
-export class Store implements Cache {
+export class Store<
+  Updaters extends UpdatesConfig = UpdatesConfig,
+  Resolvers  extends ResolverConfig = ResolverConfig,
+  Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
+  Keys extends KeyingConfig = KeyingConfig
+> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -55,7 +60,7 @@ export class Store implements Cache {
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(opts?: StoreOpts) {
+  constructor(opts?: StoreOpts<Updaters, Resolvers, Optimistic, Keys>) {
     if (!opts) opts = {};
 
     this.resolvers = opts.resolvers || {};

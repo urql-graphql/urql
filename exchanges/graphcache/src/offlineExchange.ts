@@ -24,6 +24,9 @@ import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
+  UpdatesConfig,
+  ResolverConfig,
+  KeyingConfig,
 } from './types';
 
 import { makeDict } from './helpers/dict';
@@ -65,7 +68,12 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
+export const offlineExchange = <
+  Updaters extends UpdatesConfig = UpdatesConfig,
+  Resolvers  extends ResolverConfig = ResolverConfig,
+  Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
+  Keys extends KeyingConfig = KeyingConfig
+>(opts: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>): Exchange => input => {
   const { storage } = opts;
 
   if (
