@@ -3,6 +3,6 @@
     "exchanges/graphcache"
   ],
   "sandboxes": ["urql-issue-template-client-iui0o"],
-  "buildCommand": "build",
+  "buildCommand": "yarn workspace @urql/exchange-graphcache build",
   "silent": true
 }

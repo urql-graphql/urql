@@ -7,7 +7,7 @@ import sucrase from '@rollup/plugin-sucrase';
 import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
+// import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
@@ -104,10 +104,10 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
     isProduction && replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    !settings.mayReexport && compiler({
-      formatting: 'PRETTY_PRINT',
-      compilation_level: 'SIMPLE_OPTIMIZATIONS'
-    }),
+    // !settings.mayReexport && compiler({
+    //   formatting: 'PRETTY_PRINT',
+    //   compilation_level: 'SIMPLE_OPTIMIZATIONS'
+    // }),
     cleanup({ extension }),
     isProduction ? terserMinified : terserPretty,
     isProduction && settings.isAnalyze && visualizer({
