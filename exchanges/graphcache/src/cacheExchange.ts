@@ -60,7 +60,7 @@ export interface CacheExchangeOpts<Updaters, Resolvers extends ResolverConfig, O
 }
 
 export const cacheExchange = <
-  Updaters = UpdatesConfig,
+  Updaters extends UpdatesConfig = UpdatesConfig,
   Resolvers  extends ResolverConfig = ResolverConfig,
   Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
   Keys extends KeyingConfig = KeyingConfig
