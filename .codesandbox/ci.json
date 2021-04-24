@@ -1,18 +1,6 @@
 {
   "packages": [
-    "packages/core",
-    "packages/next-urql",
-    "packages/react-urql",
-    "packages/preact-urql",
-    "packages/svelte-urql",
-    "packages/vue-urql",
-    "exchanges/graphcache",
-    "exchanges/multipart-fetch",
-    "exchanges/persisted-fetch",
-    "exchanges/auth",
-    "exchanges/retry",
-    "exchanges/suspense",
-    "exchanges/execute"
+    "exchanges/graphcache"
   ],
   "sandboxes": ["urql-issue-template-client-iui0o"],
   "buildCommand": "build",
