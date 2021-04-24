@@ -69,7 +69,7 @@ const isOfflineError = (error: undefined | CombinedError) =>
     ));
 
 export const offlineExchange = <
-  Updaters extends UpdatesConfig = UpdatesConfig,
+  Updaters = UpdatesConfig,
   Resolvers  extends ResolverConfig = ResolverConfig,
   Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
   Keys extends KeyingConfig = KeyingConfig

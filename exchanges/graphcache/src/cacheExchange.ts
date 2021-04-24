@@ -50,7 +50,7 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export interface CacheExchangeOpts<Updaters extends UpdatesConfig, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
+export interface CacheExchangeOpts<Updaters, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
   updates?: Partial<Updaters>;
   resolvers?: Resolvers;
   optimistic?: Optimistic;
@@ -60,7 +60,7 @@ export interface CacheExchangeOpts<Updaters extends UpdatesConfig, Resolvers ext
 }
 
 export const cacheExchange = <
-  Updaters extends UpdatesConfig = UpdatesConfig,
+  Updaters = UpdatesConfig,
   Resolvers  extends ResolverConfig = ResolverConfig,
   Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
   Keys extends KeyingConfig = KeyingConfig

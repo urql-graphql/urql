@@ -35,7 +35,7 @@ import {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts<Updaters extends UpdatesConfig, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
+export interface StoreOpts<Updaters, Resolvers extends ResolverConfig, Optimistic extends OptimisticMutationConfig, Keys extends KeyingConfig> {
   updates?: Partial<Updaters>;
   resolvers?: Resolvers;
   optimistic?: Optimistic;
@@ -44,7 +44,7 @@ export interface StoreOpts<Updaters extends UpdatesConfig, Resolvers extends Res
 }
 
 export class Store<
-  Updaters extends UpdatesConfig = UpdatesConfig,
+  Updaters = UpdatesConfig,
   Resolvers  extends ResolverConfig = ResolverConfig,
   Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
   Keys extends KeyingConfig = KeyingConfig
