@@ -123,7 +123,6 @@ jobs:
           steps.node-modules-cache.outputs.cache-hit != 'true'
         run: yarn install --prefer-offline --frozen-lockfile --non-interactive --silent
       - name: Build
-        if: ${{ steps.filter.outputs.wmr == 'true' }}
         uses: preactjs/compressed-size-action@v2
         env:
           NODE_TOTAL: 3
