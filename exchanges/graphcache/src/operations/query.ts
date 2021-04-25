@@ -448,7 +448,7 @@ const resolveResolverResult = (
     // Check whether values of the list may be null; for resolvers we assume
     // that they can be, since it's user-provided data
     const _isListNullable =
-      !store.schema || isListNullable(store.schema, typename, fieldName);
+      store.schema ? isListNullable(store.schema, typename, fieldName) : false;
     const data = new Array(result.length);
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
@@ -510,7 +510,7 @@ const resolveLink = (
   if (Array.isArray(link)) {
     const { store } = ctx;
     const _isListNullable =
-      store.schema && isListNullable(store.schema, typename, fieldName);
+      store.schema ? isListNullable(store.schema, typename, fieldName) : false;
     const newLink = new Array(link.length);
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
