@@ -137,12 +137,11 @@ type ResolverResult =
   | undefined;
 
 // Cache resolvers are user-defined to overwrite an entity field result
-export type Resolver<ParentData = Data, Args = Variables, Result = ResolverResult> = (
-  parent: ParentData,
-  args: Args,
-  cache: Cache,
-  info: ResolveInfo
-) => Result;
+export type Resolver<
+  ParentData = Data,
+  Args = Variables,
+  Result = ResolverResult
+> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
 
 export interface ResolverConfig {
   [typeName: string]: {
@@ -168,11 +167,10 @@ export interface UpdatesConfig {
   };
 }
 
-export type OptimisticMutationResolver<Args = Variables, Result = null | Data | NullArray<Data>> = (
-  vars: Args,
-  cache: Cache,
-  info: ResolveInfo
-) => Result;
+export type OptimisticMutationResolver<
+  Args = Variables,
+  Result = null | Data | NullArray<Data>
+> = (vars: Args, cache: Cache, info: ResolveInfo) => Result;
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;

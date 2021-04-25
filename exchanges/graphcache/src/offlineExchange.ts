@@ -70,10 +70,12 @@ const isOfflineError = (error: undefined | CombinedError) =>
 
 export const offlineExchange = <
   Updaters extends UpdatesConfig = UpdatesConfig,
-  Resolvers  extends ResolverConfig = ResolverConfig,
+  Resolvers extends ResolverConfig = ResolverConfig,
   Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
   Keys extends KeyingConfig = KeyingConfig
->(opts: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>): Exchange => input => {
+>(
+  opts: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>
+): Exchange => input => {
   const { storage } = opts;
 
   if (
