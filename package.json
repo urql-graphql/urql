@@ -8,8 +8,9 @@
     "test": "jest",
     "check": "tsc",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
-    "build": "node ./scripts/rollup/build.js",
-    "postinstall": "node ./scripts/prepare/postinstall.js"
+    "build": "node ./scripts/actions/build-all.js",
+    "postinstall": "node ./scripts/prepare/postinstall.js",
+    "pack": "node ./scripts/actions/pack-all.js"
   },
   "jest": {
     "projects": [
