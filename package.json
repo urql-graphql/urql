@@ -44,7 +44,6 @@
     "react-is": "^17.0.1"
   },
   "devDependencies": {
-    "@ampproject/rollup-plugin-closure-compiler": "^0.26.0",
     "@babel/core": "^7.12.13",
     "@babel/plugin-transform-object-assign": "^7.12.13",
     "@babel/plugin-transform-react-jsx": "^7.12.13",
