@@ -60,6 +60,7 @@
     "react-is": "^17.0.2"
   },
   "devDependencies": {
+    "@actions/artifact": "^0.5.1",
     "@babel/core": "^7.13.16",
     "@babel/plugin-transform-object-assign": "^7.12.13",
     "@babel/plugin-transform-react-jsx": "^7.13.12",

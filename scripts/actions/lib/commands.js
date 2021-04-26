@@ -65,7 +65,6 @@ const packPackage = async (cwd) => {
     );
   } catch (error) {
     console.error('> Packing failed', manifest.name);
-    console.error(error);
     throw error;
   }
 };

@@ -91,6 +91,9 @@ jobs:
     strategy:
       matrix:
         node: [0, 1, 2]
+    env:
+      NODE_TOTAL: 3
+      NODE_INDEX: ${{matrix.node}}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -124,6 +127,7 @@ jobs:
         run: yarn install --prefer-offline --frozen-lockfile --non-interactive --silent
       - name: Build
         run: yarn run build
+      - name: Pack
+        run: yarn run pack
         env:
-          NODE_TOTAL: 3
-          NODE_INDEX: ${{matrix.node}}
+          ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
