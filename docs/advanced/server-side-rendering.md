@@ -185,9 +185,9 @@ To set up `next-urql`, first we'll install `next-urql` with `react-is` and `urql
 peer dependencies:
 
 ```sh
-yarn add next-urql react-is urql
+yarn add next-urql react-is urql graphql
 # or
-npm install --save next-urql react-is urql
+npm install --save next-urql react-is urql graphql
 ```
 
 The peer dependency on `react-is` is inherited from `react-ssr-prepass` requiring it.
@@ -204,6 +204,7 @@ Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimi
 // pages/index.js
 import React from 'react';
 import Head from 'next/head';
+import { useQuery } from "urql";
 import { withUrqlClient } from 'next-urql';
 
 const Index = () => {
