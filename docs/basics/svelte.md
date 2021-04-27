@@ -31,6 +31,17 @@ all `@urql/svelte` packages will define a range of compatible versions of `graph
 for breaking changes in the future however, in which case your package manager may warn you about
 `graphql` being out of the defined peer dependency range.
 
+Note: if using Vite as your bundler, you might stumble upon the error `Function called outside component initialization`, which will prevent the page from loading. To fix it, you must add `@urql/svelte` to Vite's configuration property [`optimizeDeps.exclude`](https://vitejs.dev/config/#dep-optimization-options):
+
+```js
+{
+  optimizeDeps: {
+    exclude: ['@urql/svelte'],
+  }
+  // other properties
+}
+```
+
 ### Setting up the `Client`
 
 The `@urql/svelte` package exports a method called `createClient` which we can use to create
