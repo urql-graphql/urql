@@ -11,6 +11,7 @@ import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
+import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
@@ -74,6 +75,7 @@ export const makePlugins = () => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
+      babelPluginTransformFunctionExpressions,
       '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
