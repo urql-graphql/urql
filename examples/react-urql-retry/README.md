@@ -10,6 +10,6 @@ yarn add urql @urql/exchange-retry graphql
 
 npm install --save urql @urql/exchange-retry graphql
 
-2.  Setting up the Client [here](src/App.js)
+2.  Setting up the Client and adding the `retryExchange` [here](src/App.js)
 
 3.  Execute the Query [here](src/pages/PokemonList.js)
