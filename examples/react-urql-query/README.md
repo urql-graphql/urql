@@ -4,6 +4,7 @@ Integrating urql is as simple as:
 
 1. Install packages 
 
+```sh
 yarn add urql graphql
 # or
 npm install --save urql graphql
