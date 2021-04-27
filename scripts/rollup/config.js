@@ -14,6 +14,7 @@ const input = settings.sources.reduce((acc, source) => {
       baseContents: {
         name: source.name,
         private: true,
+        version: '0.0.0',
         main: join(rel, dirname(source.main), basename(source.main, '.js')),
         module: join(rel, source.module),
         types: join(rel, source.types),

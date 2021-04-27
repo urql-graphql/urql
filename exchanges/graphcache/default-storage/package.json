@@ -1,6 +1,7 @@
 {
   "name": "urql-exchange-graphcache-default-storage",
   "private": true,
+  "version": "0.0.0",
   "main": "../dist/urql-exchange-graphcache-default-storage",
   "module": "../dist/urql-exchange-graphcache-default-storage.mjs",
   "types": "../dist/types/default-storage/index.d.ts",
@@ -15,7 +16,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@urql/core": ">=1.16.0",
+    "@urql/core": ">=2.0.0",
     "wonka": "^4.0.14"
   }
 }
