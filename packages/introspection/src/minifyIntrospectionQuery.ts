@@ -4,7 +4,8 @@ import {
   IntrospectionTypeRef,
 } from 'graphql';
 
-let _includeScalars: boolean = false;
+let _includeScalars = false;
+let _hasAnyType = false;
 
 const anyType: IntrospectionTypeRef = {
   kind: 'SCALAR',
@@ -21,10 +22,12 @@ const mapType = (fromType: any): IntrospectionTypeRef => {
       };
 
     case 'SCALAR':
+      _hasAnyType = _hasAnyType || _includeScalars;
       return _includeScalars ? fromType : anyType;
 
     case 'INPUT_OBJECT':
     case 'ENUM':
+      _hasAnyType = true;
       return anyType;
 
     case 'OBJECT':
@@ -138,6 +141,7 @@ export const minifyIntrospectionQuery = (
     throw new TypeError('Expected to receive an IntrospectionQuery.');
   }
 
+  _hasAnyType = false;
   _includeScalars = !!opts.includeScalars;
 
   const {
@@ -167,7 +171,7 @@ export const minifyIntrospectionQuery = (
     })
     .map(minifyIntrospectionType);
 
-  if (_includeScalars) {
+  if (!_includeScalars || _hasAnyType) {
     minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
   }
 
