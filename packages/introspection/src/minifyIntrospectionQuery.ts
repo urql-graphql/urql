@@ -4,27 +4,28 @@ import {
   IntrospectionTypeRef,
 } from 'graphql';
 
+let _includeScalars: boolean = false;
+
 const anyType: IntrospectionTypeRef = {
   kind: 'SCALAR',
   name: 'Any',
 };
 
-const mapType = (
-  fromType: any,
-  toType: IntrospectionTypeRef
-): IntrospectionTypeRef => {
+const mapType = (fromType: any): IntrospectionTypeRef => {
   switch (fromType.kind) {
     case 'NON_NULL':
     case 'LIST':
       return {
         kind: fromType.kind,
-        ofType: mapType(fromType.ofType, toType),
+        ofType: mapType(fromType.ofType),
       };
 
     case 'SCALAR':
+      return _includeScalars ? fromType : anyType;
+
     case 'INPUT_OBJECT':
     case 'ENUM':
-      return toType;
+      return anyType;
 
     case 'OBJECT':
     case 'INTERFACE':
@@ -42,9 +43,15 @@ const mapType = (
 };
 
 const minifyIntrospectionType = (
-  type: IntrospectionType
+  type: IntrospectionType,
 ): IntrospectionType => {
   switch (type.kind) {
+    case 'SCALAR':
+      return {
+        kind: 'SCALAR',
+        name: type.name,
+      };
+
     case 'OBJECT': {
       return {
         kind: 'OBJECT',
@@ -53,12 +60,12 @@ const minifyIntrospectionType = (
           field =>
             ({
               name: field.name,
-              type: field.type && mapType(field.type, anyType),
+              type: field.type && mapType(field.type),
               args:
                 field.args &&
                 field.args.map(arg => ({
                   name: arg.name,
-                  type: mapType(arg.type, anyType),
+                  type: mapType(arg.type),
                 })),
             } as any)
         ),
@@ -79,12 +86,12 @@ const minifyIntrospectionType = (
           field =>
             ({
               name: field.name,
-              type: field.type && mapType(field.type, anyType),
+              type: field.type && mapType(field.type),
               args:
                 field.args &&
                 field.args.map(arg => ({
                   name: arg.name,
-                  type: mapType(arg.type, anyType),
+                  type: mapType(arg.type),
                 })),
             } as any)
         ),
@@ -119,12 +126,19 @@ const minifyIntrospectionType = (
   }
 };
 
+export interface MinifySchemaOptions {
+  includeScalars?: boolean;
+}
+
 export const minifyIntrospectionQuery = (
-  schema: IntrospectionQuery
+  schema: IntrospectionQuery,
+  opts: MinifySchemaOptions = {}
 ): IntrospectionQuery => {
   if (!schema || !('__schema' in schema)) {
     throw new TypeError('Expected to receive an IntrospectionQuery.');
   }
+
+  _includeScalars = !!opts.includeScalars;
 
   const {
     __schema: { queryType, mutationType, subscriptionType, types },
@@ -144,6 +158,7 @@ export const minifyIntrospectionQuery = (
           return false;
         default:
           return (
+            (_includeScalars && type.kind === 'SCALAR') ||
             type.kind === 'OBJECT' ||
             type.kind === 'INTERFACE' ||
             type.kind === 'UNION'
@@ -152,7 +167,9 @@ export const minifyIntrospectionQuery = (
     })
     .map(minifyIntrospectionType);
 
-  minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
+  if (_includeScalars) {
+    minifiedTypes.push({ kind: 'SCALAR', name: anyType.name });
+  }
 
   return {
     __schema: {
