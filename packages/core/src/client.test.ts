@@ -18,7 +18,7 @@ import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { createClient } from './client';
-import { queryOperation } from './test-utils';
+import { queryOperation, subscriptionOperation } from './test-utils';
 
 const url = 'https://hostname.com';
 
@@ -698,4 +698,30 @@ describe('shared sources behavior', () => {
       stale: true,
     });
   });
+
+  it('does nothing when operation is a subscription has been emitted yet', () => {
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        map(op => ({ data: 1, operation: op })),
+        take(1),
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(subscriptionOperation), subscribe(resultOne));
+    expect(resultOne).toHaveBeenCalledTimes(1);
+
+    pipe(client.executeRequestOperation(subscriptionOperation), subscribe(resultTwo));
+    expect(resultTwo).toHaveBeenCalledTimes(0);
+  });
+
+
 });
