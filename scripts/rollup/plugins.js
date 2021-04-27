@@ -74,7 +74,6 @@ export const makePlugins = () => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
-      'babel-plugin-closure-elimination',
       '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
