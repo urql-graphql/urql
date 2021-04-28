@@ -4,11 +4,11 @@ Integrating urql is as simple as:
 
 1.  Install packages
 
+```sh
 yarn add urql @urql/exchange-retry graphql
-
 # or
-
 npm install --save urql @urql/exchange-retry graphql
+```
 
 2.  Setting up the Client and adding the `retryExchange` [here](src/App.js)
 
