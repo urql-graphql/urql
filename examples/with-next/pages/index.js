@@ -1,9 +1,5 @@
-import { initUrqlClient, withUrqlClient } from "next-urql";
+import { withUrqlClient } from "next-urql";
 import {
-  ssrExchange,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
   useQuery,
   gql
 } from "urql";
