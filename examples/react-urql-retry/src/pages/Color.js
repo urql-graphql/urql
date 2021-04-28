@@ -26,6 +26,10 @@ const RandomColorDisplay = () => {
           {data.randomColor.name}
         </div>
       )}
+      
+      {result.operation && (
+        <p>We retried {res.operation.context.retryCount} times to get a result without an error.</p>
+      )}
     </div>
   );
 };
