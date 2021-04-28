@@ -4,7 +4,7 @@ import {
   dedupExchange,
   cacheExchange,
   fetchExchange,
-  useQuery
+  useQuery,
   gql
 } from "urql";
 
