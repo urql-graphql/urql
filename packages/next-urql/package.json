@@ -47,7 +47,7 @@
     "react-is": "^17.0.1"
   },
   "dependencies": {
-    "react-ssr-prepass": "^1.2.1"
+    "react-ssr-prepass": "^1.4.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
