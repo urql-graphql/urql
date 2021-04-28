@@ -14,7 +14,7 @@ jest.mock('../context', () => {
   };
 });
 
-import React, { FC } from 'react';
+import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { OperationContext } from '@urql/core';
 
@@ -28,12 +28,17 @@ const query = 'subscription Example { example }';
 let state: UseSubscriptionState<any> | undefined;
 let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
-const SubscriptionUser: FC<{
+const SubscriptionUser = ({
+  q,
+  handler,
+  context,
+  pause = false,
+}: {
   q: string;
   handler?: (prev: any, data: any) => any;
   context?: Partial<OperationContext>;
   pause?: boolean;
-}> = ({ q, handler, context, pause = false }) => {
+}) => {
   [state, execute] = useSubscription({ query: q, context, pause }, handler);
   return <p>{state.data}</p>;
 };

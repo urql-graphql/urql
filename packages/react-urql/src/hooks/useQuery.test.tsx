@@ -18,7 +18,7 @@ jest.mock('../context', () => {
   };
 });
 
-import React, { FC } from 'react';
+import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { pipe, onStart, onEnd, never } from 'wonka';
 import { OperationContext } from '@urql/core';
@@ -40,11 +40,11 @@ const props: UseQueryArgs<{ myVar: number }> = {
 let state: UseQueryState<any> | undefined;
 let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
 
-const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
+const QueryUser = ({
   query,
   variables,
   pause,
-}) => {
+}: UseQueryArgs<{ myVar: number }>) => {
   const [s, e] = useQuery({ query, variables, pause });
   state = s;
   execute = e;
