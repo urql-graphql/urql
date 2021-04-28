@@ -12,4 +12,4 @@ npm install --save urql graphql @urql/exchange-persisted-fetch
 
 2. Setting up the Client and adding persistedFetchExchange [here](src/App.js)
 
-3. Execute the Query [here](src/pages/PokemonList.js)
+3. Execute the Query [here](src/pages/LocationsList.js)
