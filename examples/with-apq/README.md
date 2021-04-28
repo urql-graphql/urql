@@ -5,11 +5,20 @@ Integrating urql is as simple as:
 1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
 
 ```sh
-yarn add urql graphql @urql/exchange-persisted-fetch
+yarn add urql graphql
 # or
-npm install --save urql graphql @urql/exchange-persisted-fetch
+npm install --save urql graphql
 ```
 
-2. Setting up the Client and adding persistedFetchExchange [here](src/App.js)
+2. Then install the package for [automatic persisted queries](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/)
 
-3. Execute the Query [here](src/pages/LocationsList.js)
+
+```sh
+yarn add @urql/exchange-persisted-fetch
+# or
+npm install --save @urql/exchange-persisted-fetch
+```
+
+3. Setting up the Client and adding persistedFetchExchange [here](src/App.js)
+
+4. Execute the Query [here](src/pages/LocationsList.js)
