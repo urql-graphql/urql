@@ -10,7 +10,7 @@ const client = createClient({
     retryExchange({
       maxNumberAttempts: 5,
       retryIf: error => {
-        return Boolean(error && (error.graphQLErrors.length > 0 || error.networkError));
+        return error.graphQLErrors.length || error.networkError;
       }
     }), // Use the retryExchange factory to add a new exchange,
     fetchExchange
