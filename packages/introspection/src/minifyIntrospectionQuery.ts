@@ -49,7 +49,7 @@ const mapType = (fromType: any): IntrospectionTypeRef => {
 };
 
 const minifyIntrospectionType = (
-  type: IntrospectionType,
+  type: IntrospectionType
 ): IntrospectionType => {
   switch (type.kind) {
     case 'SCALAR':
@@ -62,9 +62,12 @@ const minifyIntrospectionType = (
       return {
         kind: 'ENUM',
         name: type.name,
-        enumValues: type.enumValues.map(value => ({
-          name: value.name,
-        }) as any)
+        enumValues: type.enumValues.map(
+          value =>
+            ({
+              name: value.name,
+            } as any)
+        ),
       };
 
     case 'INPUT_OBJECT': {
@@ -72,12 +75,13 @@ const minifyIntrospectionType = (
         kind: 'INPUT_OBJECT',
         name: type.name,
         inputFields: type.inputFields.map(
-          field => ({
-            name: field.name,
-            type: mapType(field.type),
-            defaultValue: field.defaultValue || undefined,
-          }) as IntrospectionInputValue
-        )
+          field =>
+            ({
+              name: field.name,
+              type: mapType(field.type),
+              defaultValue: field.defaultValue || undefined,
+            } as IntrospectionInputValue)
+        ),
       };
     }
 
@@ -210,11 +214,14 @@ export const minifyIntrospectionQuery = (
     name: directive.name,
     isRepeatable: directive.isRepeatable ? true : undefined,
     locations: directive.locations,
-    args: directive.args.map(arg => ({
-      name: arg.name,
-      type: mapType(arg.type),
-      defaultValue: arg.defaultValue || undefined,
-    }) as IntrospectionInputValue),
+    args: directive.args.map(
+      arg =>
+        ({
+          name: arg.name,
+          type: mapType(arg.type),
+          defaultValue: arg.defaultValue || undefined,
+        } as IntrospectionInputValue)
+    ),
   }));
 
   if (!_includeScalars || !_includeEnums || !_includeInputs || _hasAnyType) {
@@ -227,9 +234,7 @@ export const minifyIntrospectionQuery = (
       mutationType,
       subscriptionType,
       types: minifiedTypes,
-      directives: opts.includeDirectives
-        ? minifiedDirectives
-        : [],
+      directives: opts.includeDirectives ? minifiedDirectives : [],
     },
   };
 };
