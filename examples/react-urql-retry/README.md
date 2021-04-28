@@ -1,4 +1,4 @@
-# Integrating with React
+# Integrating `@urql/exchange-retry`’s retryExchange
 
 Integrating urql is as simple as:
 
