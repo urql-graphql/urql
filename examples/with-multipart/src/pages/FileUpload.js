@@ -19,7 +19,7 @@ const FileUpload = () => {
     uploadFile({ file: selectedFile})
   }
 
-  const onFileChange = (event) => {
+  const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   }
 
@@ -33,7 +33,7 @@ const FileUpload = () => {
         <p>File uploaded to {data.uploadFile.filename}</p>
       ): (
         <div>
-          <input type="file" onChange={onFileChange} />
+          <input type="file" onChange={handleFileChange} />
 
           <button onClick={handleFileUpload}>
             Upload!
