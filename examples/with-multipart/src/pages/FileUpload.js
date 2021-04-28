@@ -29,7 +29,7 @@ const FileUpload = () => {
 
       {error && <p>Oh no... {error.message}</p>}
 
-      {data ? (
+      {data && data.uploadFile ? (
         <p>File uploaded to {data.uploadFile.filename}</p>
       ): (
         <div>
