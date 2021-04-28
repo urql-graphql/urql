@@ -10,7 +10,7 @@ yarn add urql graphql
 npm install --save urql graphql
 ```
 
-2.
+2. Add [multipart exchange](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/)
 
 ```yarn add @urql/exchange-multipart-fetch
 # or
