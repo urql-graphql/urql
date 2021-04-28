@@ -210,7 +210,7 @@ export const minifyIntrospectionQuery = (
     })
     .map(minifyIntrospectionType);
 
-  const minifiedDirectives = directives.map(directive => ({
+  const minifiedDirectives = (directives || []).map(directive => ({
     name: directive.name,
     isRepeatable: directive.isRepeatable ? true : undefined,
     locations: directive.locations,
