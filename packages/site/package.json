@@ -29,6 +29,9 @@
       "../../scripts/eslint/js-preset.js"
     ]
   },
+  "eslintIgnore": [
+    "dist-prod"
+  ],
   "dependencies": {
     "@mdx-js/react": "^1.6.22",
     "formidable-oss-badges": "0.3.5",

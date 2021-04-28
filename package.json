@@ -23,6 +23,11 @@
       "./scripts/eslint/preset.js"
     ]
   },
+  "eslintIgnore": [
+    "packages/site/dist-prod",
+    "docs",
+    "examples"
+  ],
   "prettier": {
     "singleQuote": true,
     "arrowParens": "avoid",
