@@ -16,9 +16,5 @@ exchanges/*/LICENSE
 # TODO: Figure out how to remove these:
 tmp/
 dist/
-examples/react-urql-retry/public/favicon.ico
-examples/react-urql-retry/public/index.html
-examples/react-urql-retry/public/logo192.png
-examples/react-urql-retry/public/logo512.png
-examples/react-urql-retry/public/manifest.json
-examples/react-urql-retry/public/robots.txt
+examples/*/public
+examples/*/yarn.lock
