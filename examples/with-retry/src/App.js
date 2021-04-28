@@ -1,7 +1,6 @@
 import { createClient, fetchExchange, Provider } from "urql";
 import { retryExchange } from '@urql/exchange-retry';
 
-import "./App.css";
 import Color from "./pages/Color";
 
 const client = createClient({

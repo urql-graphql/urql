@@ -28,7 +28,7 @@ const RandomColorDisplay = () => {
       )}
       
       {result.operation && (
-        <p>We retried {res.operation.context.retryCount} times to get a result without an error.</p>
+        <p>We retried {result.operation.context.retryCount} times to get a result without an error.</p>
       )}
     </div>
   );
