@@ -260,7 +260,7 @@ export class Client {
         this.dispatchOperation(
           makeOperation('teardown', operation, operation.context)
         );
-      }),
+      })
     );
 
     if (operation.kind === 'subscription') {
@@ -270,7 +270,7 @@ export class Client {
           this.activeOperations.set(operation.key, active!);
           this.dispatchOperation(operation);
         }),
-        share,
+        share
       );
     } else {
       active = pipe(
@@ -278,7 +278,7 @@ export class Client {
         replayOnStart(() => {
           this.activeOperations.set(operation.key, active!);
           this.dispatchOperation(operation);
-        }),
+        })
       );
     }
 

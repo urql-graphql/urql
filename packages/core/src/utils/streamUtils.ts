@@ -20,7 +20,9 @@ export function withPromise<T>(source$: Source<T>): PromisifiedSource<T> {
   return source$ as PromisifiedSource<T>;
 }
 
-export function replayOnStart<T extends OperationResult>(start?: () => void): Operator<T, T> {
+export function replayOnStart<T extends OperationResult>(
+  start?: () => void
+): Operator<T, T> {
   return source$ => {
     let replay: T | void;
 
@@ -29,7 +31,7 @@ export function replayOnStart<T extends OperationResult>(start?: () => void): Op
       onPush(value => {
         replay = value;
       }),
-      share,
+      share
     );
 
     return make<T>(observer => {
@@ -39,8 +41,7 @@ export function replayOnStart<T extends OperationResult>(start?: () => void): Op
         shared$,
         onEnd(observer.complete),
         onStart(() => {
-          if (start)
-            start();
+          if (start) start();
           if (prevReplay !== undefined && prevReplay === replay)
             observer.next({ ...prevReplay, stale: true });
         }),

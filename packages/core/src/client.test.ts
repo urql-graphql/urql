@@ -704,7 +704,7 @@ describe('shared sources behavior', () => {
       return pipe(
         ops$,
         map(op => ({ data: 1, operation: op })),
-        take(1),
+        take(1)
       );
     };
 
@@ -716,12 +716,16 @@ describe('shared sources behavior', () => {
     const resultOne = jest.fn();
     const resultTwo = jest.fn();
 
-    pipe(client.executeRequestOperation(subscriptionOperation), subscribe(resultOne));
+    pipe(
+      client.executeRequestOperation(subscriptionOperation),
+      subscribe(resultOne)
+    );
     expect(resultOne).toHaveBeenCalledTimes(1);
 
-    pipe(client.executeRequestOperation(subscriptionOperation), subscribe(resultTwo));
+    pipe(
+      client.executeRequestOperation(subscriptionOperation),
+      subscribe(resultTwo)
+    );
     expect(resultTwo).toHaveBeenCalledTimes(0);
   });
-
-
 });
