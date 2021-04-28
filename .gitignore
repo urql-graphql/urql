@@ -17,3 +17,4 @@ exchanges/*/LICENSE
 tmp/
 dist/
 examples/*/public
+examples/*/yarn.lock
