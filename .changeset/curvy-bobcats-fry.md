@@ -8,7 +8,6 @@
 '@urql/exchange-refocus': patch
 '@urql/exchange-request-policy': patch
 '@urql/exchange-retry': patch
-'@urql/exchange-suspense': patch
 '@urql/core': patch
 '@urql/introspection': patch
 'next-urql': patch
@@ -20,3 +19,5 @@
 ---
 
 Remove closure-compiler from the build step
+
+See: [#1570](https://github.com/FormidableLabs/urql/pull/1570)
