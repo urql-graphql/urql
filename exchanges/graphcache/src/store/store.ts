@@ -7,7 +7,7 @@ import {
   ResolverConfig,
   DataField,
   Variables,
-  FieldArguments,
+  FieldArgs,
   Data,
   QueryInput,
   UpdatesConfig,
@@ -131,7 +131,7 @@ export class Store implements Cache {
     return key ? `${data.__typename}:${key}` : null;
   }
 
-  resolve(entity: Entity, field: string, args?: FieldArguments): DataField {
+  resolve(entity: Entity, field: string, args?: FieldArgs): DataField {
     const fieldKey = keyOfField(field, args);
     const entityKey = this.keyOfEntity(entity);
     if (!entityKey) return null;
@@ -143,7 +143,7 @@ export class Store implements Cache {
 
   resolveFieldByKey = this.resolve;
 
-  invalidate(entity: Entity, field?: string, args?: FieldArguments) {
+  invalidate(entity: Entity, field?: string, args?: FieldArgs) {
     const entityKey = this.keyOfEntity(entity);
 
     invariant(

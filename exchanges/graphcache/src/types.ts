@@ -39,7 +39,7 @@ export type Data = SystemFields & DataFields;
 export type Entity = null | Data | string;
 export type Link<Key = string> = null | Key | NullArray<Key>;
 export type Connection = [Variables, string];
-export type FieldArguments = Variables | null | undefined;
+export type FieldArgs = Variables | null | undefined;
 
 export interface FieldInfo {
   fieldKey: string;
@@ -82,10 +82,10 @@ export interface Cache {
   keyOfEntity(entity: Entity): string | null;
 
   /** keyOfField() returns the key for a field */
-  keyOfField(fieldName: string, args?: FieldArguments): string | null;
+  keyOfField(fieldName: string, args?: FieldArgs): string | null;
 
   /** resolve() retrieves the value (or link) of a field on any entity, given a partial/keyable entity or an entity key */
-  resolve(entity: Entity, fieldName: string, args?: FieldArguments): DataField;
+  resolve(entity: Entity, fieldName: string, args?: FieldArgs): DataField;
 
   /** @deprecated use resolve() instead */
   resolveFieldByKey(entity: Entity, fieldKey: string): DataField;
@@ -94,7 +94,7 @@ export interface Cache {
   inspectFields(entity: Entity): FieldInfo[];
 
   /** invalidate() invalidates an entity or a specific field of an entity */
-  invalidate(entity: Entity, fieldName?: string, args?: FieldArguments): void;
+  invalidate(entity: Entity, fieldName?: string, args?: FieldArgs): void;
 
   /** updateQuery() can be used to update the data of a given query using an updater function */
   updateQuery<T = Data, V = Variables>(

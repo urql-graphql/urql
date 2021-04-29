@@ -1,5 +1,5 @@
 import * as InMemoryData from '../store/data';
-import { FieldArguments } from '../types';
+import { FieldArgs } from '../types';
 import { keyOfField } from '../store';
 
 interface PartialFieldInfo {
@@ -9,7 +9,7 @@ interface PartialFieldInfo {
 export const invalidateEntity = (
   entityKey: string,
   field?: string,
-  args?: FieldArguments
+  args?: FieldArgs
 ) => {
   const fields: PartialFieldInfo[] = field
     ? [{ fieldKey: keyOfField(field, args) }]
