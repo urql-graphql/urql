@@ -12,4 +12,4 @@ npm install --save urql graphql
 
 2. Setting up the Client [here](src/App.js)
 
-3. Execute the Query [here](src/pages/PokemonList.js)
+3. Execute the Query [here](src/pages/PaginatedNpmSearch.js)
