@@ -2,7 +2,7 @@ import { TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
 // Helper types
-export type NullArray<T> = Array<null | T>;
+export type NullArray<T> = Array<null | T | NullArray<T>>;
 
 export interface Fragments {
   [fragmentName: string]: void | FragmentDefinitionNode;
@@ -12,8 +12,7 @@ export interface Fragments {
 export type Primitive = null | number | boolean | string;
 
 export interface ScalarObject {
-  __typename?: never;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type Scalar = Primitive | ScalarObject;
@@ -25,7 +24,7 @@ export interface SystemFields {
 }
 
 export type EntityField = undefined | Scalar | Scalar[];
-export type DataField = Scalar | Scalar[] | Data | NullArray<Data>;
+export type DataField = Scalar | Data | NullArray<Data | Scalar>;
 
 export interface DataFields {
   [fieldName: string]: DataField;

@@ -299,12 +299,8 @@ const updateRCForLink = (
   if (typeof link === 'string') {
     updateRCForEntity(gc, refCount, link, by);
   } else if (Array.isArray(link)) {
-    for (let i = 0, l = link.length; i < l; i++) {
-      const entityKey = link[i];
-      if (entityKey) {
-        updateRCForEntity(gc, refCount, entityKey, by);
-      }
-    }
+    for (let i = 0, l = link.length; i < l; i++)
+      updateRCForLink(gc, refCount, link[i], by);
   }
 };
 

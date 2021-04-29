@@ -338,7 +338,7 @@ const readSelection = (
 
       dataFieldValue = resolvers[fieldName](
         data,
-        fieldArgs || ({} as Data),
+        fieldArgs || ({} as Variables),
         store,
         ctx
       );
