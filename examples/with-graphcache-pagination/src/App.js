@@ -4,7 +4,6 @@ import { relayPagination } from '@urql/exchange-graphcache/extras';
 
 import PaginatedNpmSearch from "./pages/PaginatedNpmSearch";
 
-
 const client = createClient({
   url: "https://trygql.dev/graphql/relay-npm",
   exchanges: [
