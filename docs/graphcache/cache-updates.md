@@ -56,7 +56,7 @@ cacheExchange({
       },
     },
   },
-})
+});
 ```
 
 An "updater" may be attached to a `Mutation` or `Subscription` field and accepts four positional
@@ -86,7 +86,7 @@ for Graphcache to update said entity automatically. For instance, we may have a 
 following:
 
 ```graphql
-mutation UpdateTodo ($todoId: ID!, $date: String!) {
+mutation UpdateTodo($todoId: ID!, $date: String!) {
   updateTodoDate(id: $todoId, date: $date)
 }
 ```
@@ -126,10 +126,7 @@ cacheExchange({
           }
         `;
 
-        cache.writeFragment(
-          fragment,
-          { id: args.id, updatedAt: args.date },
-        );
+        cache.writeFragment(fragment, { id: args.id, updatedAt: args.date });
       },
     },
   },
@@ -144,10 +141,10 @@ for a given fragment it instead writes data to the cache.
 > [the `gql` tag function](../api/core.md#gql) because `writeFragment` only accepts
 > GraphQL `DocumentNode`s as inputs, and not strings.
 
-### Cache Updates outside updates
+### Cache Updates outside updaters
 
-Cache updates are **not** possible outside `updates`. If we attempt to store the `cache` in a
-variable and call its methods outside any `updates` functions (or functions, like `resolvers`)
+Cache updates are **not** possible outside `updates`'s functions. If we attempt to store the `cache`
+in a variable and call its methods outside any `updates` functions (or functions, like `resolvers`)
 then Graphcache will throw an error.
 
 Methods like these cannot be called outside the `cacheExchange`'s `updates` functions, because
@@ -171,7 +168,7 @@ sending a rather large API result. For large amounts of pages this is especially
 Instead, most schemas opt to instead just return the entity that's just been created:
 
 ```graphql
-mutation NewTodo ($text: String!) {
+mutation NewTodo($text: String!) {
   createTodo(id: $todoId, text: $text) {
     id
     text
@@ -187,7 +184,13 @@ cacheExchange({
   updates: {
     Mutation: {
       updateTodoDate(result, _args, cache, _info) {
-        const TodoList = gql`{ todos { id } }`;
+        const TodoList = gql`
+          {
+            todos {
+              id
+            }
+          }
+        `;
 
         cache.updateQuery({ query: TodoList }, data => {
           data.todos.push(result.createTodo);
@@ -213,6 +216,37 @@ updaters. All resolvers are ignored, so it becomes impossible to accidentally co
 to our cache. We could safely add a resolver for `Todo.createdAt` and wouldn't have to worry about
 an updater accidentally writing it to the cache's internal data structure.
 
+### Writing links individually
+
+As long as we're only updating links (as in 'relations') then we may also use the [`cache.link`
+method](../api/graphcache.md#link). This method is the "write equivalent" of [the `cache.resolve`
+method, as seen on the "Local Resolvers" page before.](./local-resolvers.md#resolving-other-fields)
+
+We can use this method to update any relation in our cache, so the example above could also be
+rewritten to use `cache.link` and `cache.resolve` rather than `cache.updateQuery`.
+
+```js
+cacheExchange({
+  updates: {
+    Mutation: {
+      updateTodoDate(result, _args, cache, _info) {
+        const todos = cache.resolve('Query', 'todos');
+        if (Array.isArray(todos)) {
+          todos.push(result.createTodo);
+          cache.link('Query', 'todos', todos);
+        }
+      },
+    },
+  },
+});
+```
+
+This method can be combined with more than just `cache.resolve`, for instance, it's a good fit with
+`cache.inspectFields`. However, when you're writing records (as in 'scalar' values)
+`cache.writeFragment` and `cache.updateQuery` are still the only methods that you can use.
+But since this kind of data is often written automatically by the normalized cache, often updating a
+link is the only modification we may want to make.
+
 ## Updating many unknown links
 
 In the previous section we've seen how to update data, like a list, when a mutation result enters
@@ -226,7 +260,7 @@ we've already accessed. This knowledge in fact _shouldn't_ be available to Graph
 UI code.
 
 ```graphql
-mutation RemoveTodo ($id: ID!) {
+mutation RemoveTodo($id: ID!) {
   removeTodo(id: $id)
 }
 ```
@@ -236,7 +270,7 @@ of these items over many pages with separate queries being sent to our API, whic
 know the fields that should be checked:
 
 ```graphql
-query PaginatedTodos ($skip: Int) {
+query PaginatedTodos($skip: Int) {
   todos(skip: $skip) {
     id
     text
@@ -309,7 +343,7 @@ in a partial `Todo` entity just as well:
 ```js
 cache.inspectFields({
   __typename: 'Todo',
-  id: args.id
+  id: args.id,
 });
 ```
 
@@ -369,7 +403,8 @@ cacheExchange({
     Mutation: {
       updateTodo(_result, args, cache, _info) {
         const key = 'Query';
-        const fields = cache.inspectFields(key)
+        const fields = cache
+          .inspectFields(key)
           .filter(field => field.fieldName === 'todos')
           .forEach(field => {
             cache.invalidate(key, field.fieldKey);
@@ -469,7 +504,7 @@ additional variables, which we may want to pass from our UI code to the mutation
 a mutation like the following we may add more variables than the mutation specifies:
 
 ```graphql
-mutation UpdateTodo ($id: ID!, $text: ID!) {
+mutation UpdateTodo($id: ID!, $text: ID!) {
   updateTodo(id: $id, text: $text) {
     id
     text
