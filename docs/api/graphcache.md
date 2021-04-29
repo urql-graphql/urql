@@ -371,6 +371,39 @@ cache.readQuery({
 [Read more about using `readQuery` on the ["Local Resolvers"
 page.](../graphcache/local-resolvers.md#reading-a-query)
 
+### link
+
+Corresponding to [`cache.resolve`](#resolve), the `cache.link` method allows
+links in the cache to be updated. While the `cache.resolve` method reads both
+records and links from the cache, the `cache.link` method will only ever write
+links as fragments (See [`cache.writeFragment`](#writefragment) below) are more
+suitable for updating scalar data in the cache.
+
+The arguments for `cache.link` are identical to [`cache.resolve`](#resolve) and
+the field's arguments are optional. However, the last argument must always be
+a link, meaning `null`, an entity key, a keyable entity, or a list of these.
+
+In other words, `cache.link` accepts an entity to write to as its first argument,
+with the same arguments as `cache.keyOfEntity`. It then accepts one or two arguments
+that are passed to `cache.keyOfField` to get the targeted field key. And lastly,
+you may pass a list or a single entity (or an entity key).
+
+```js
+// Link Query.todo field to a todo item
+cache.link({ __typename: 'Query' }, 'todo', { __typename: 'Todo', id: 1 });
+
+// You may also pass arguments instead:
+cache.link({ __typename: 'Query' }, 'todo', { id: 1 }, { __typename: 'Todo', id: 1 });
+
+// Or use entity keys instead of the entities themselves:
+cache.link('Query', 'todo', cache.keyOfEntity({ __typename: 'Todo', id: 1 }));
+```
+
+The method may [output a
+warning](../graphcache/errors.md#12-cant-generate-a-key-for-writefragment-or-link) when any of the
+entities were passed as objects but aren't keyable, which is useful when a scalar or a non-keyable
+object have been passed to `cache.link` accidentally.
+
 ### writeFragment
 
 Corresponding to [`cache.readFragment`](#readfragments), the `cache.writeFragment` method allows
