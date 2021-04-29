@@ -23,8 +23,8 @@ export interface SystemFields {
   id?: string | number | null;
 }
 
-export type EntityField = undefined | Scalar | Scalar[];
-export type DataField = Scalar | Data | NullArray<Data | Scalar>;
+export type EntityField = undefined | Scalar | NullArray<Scalar>;
+export type DataField = Scalar | Data | NullArray<Scalar> | NullArray<Data>;
 
 export interface DataFields {
   [fieldName: string]: DataField;
