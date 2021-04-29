@@ -19,7 +19,6 @@ import {
   DataField,
   Link,
   OperationRequest,
-  NullArray,
   Dependencies,
 } from '../types';
 
@@ -153,8 +152,8 @@ const readRoot = (
 const readRootField = (
   ctx: Context,
   select: SelectionSet,
-  originalData: null | Data | NullArray<Data>
-): Data | NullArray<Data> | null => {
+  originalData: Link<Data>
+): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
     for (let i = 0, l = originalData.length; i < l; i++) {
@@ -338,7 +337,7 @@ const readSelection = (
 
       dataFieldValue = resolvers[fieldName](
         data,
-        fieldArgs || ({} as Data),
+        fieldArgs || ({} as Variables),
         store,
         ctx
       );

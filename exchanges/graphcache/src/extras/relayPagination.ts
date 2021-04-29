@@ -39,14 +39,14 @@ const concatEdges = (
 ) => {
   const ids = new Set<string>();
   for (let i = 0, l = leftEdges.length; i < l; i++) {
-    const edge = leftEdges[i];
+    const edge = leftEdges[i] as string | null;
     const node = cache.resolve(edge, 'node');
     if (typeof node === 'string') ids.add(node);
   }
 
   const newEdges = leftEdges.slice();
   for (let i = 0, l = rightEdges.length; i < l; i++) {
-    const edge = rightEdges[i];
+    const edge = rightEdges[i] as string | null;
     const node = cache.resolve(edge, 'node');
     if (typeof node === 'string' && !ids.has(node)) {
       ids.add(node);
@@ -163,7 +163,7 @@ const getPage = (
     });
 
     if (pageInfo.endCursor === null) {
-      const edge = edges[edges.length - 1];
+      const edge = edges[edges.length - 1] as string | null;
       if (edge) {
         const endCursor = cache.resolve(edge, 'cursor');
         pageInfo.endCursor = ensureKey(endCursor);
@@ -171,7 +171,7 @@ const getPage = (
     }
 
     if (pageInfo.startCursor === null) {
-      const edge = edges[0];
+      const edge = edges[0] as string | null;
       if (edge) {
         const startCursor = cache.resolve(edge, 'cursor');
         pageInfo.startCursor = ensureKey(startCursor);
