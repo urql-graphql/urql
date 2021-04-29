@@ -92,7 +92,7 @@ export function useQuery<T = any, V = object>(
   _args: UseQueryArgs<T, V>
 ): UseQueryResponse<T, V> {
   const args = reactive(_args);
-  const client = _args.client || useClient();
+  const client = _args.client || useClient(); // eslint-disable-line react-hooks/rules-of-hooks
 
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);

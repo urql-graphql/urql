@@ -55,7 +55,7 @@ export function useSubscription<T = any, R = T, V = object>(
   handler?: MaybeRef<SubscriptionHandler<T, R>>
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args);
-  const client = _args.client || useClient();
+  const client = _args.client || useClient(); // eslint-disable-line react-hooks/rules-of-hooks
 
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
