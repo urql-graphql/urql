@@ -16,8 +16,9 @@ Accepts a single required options object as an input with the following properti
 | `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
 | `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery).                  |
 | `context`       | `?object`                | Holds the contextual information for the query.                                                          |
+| `client`        | `?Urql.Client`           | Client to use. If not provided will use client provided in parent component with `provideClient()`.      |
 
-Each of these inputs may also be [reactive](https://v3.vuejs.org/api/refs-api.html) (e.g. a `ref`)
+Each of these inputs (except `client`) may also be [reactive](https://v3.vuejs.org/api/refs-api.html) (e.g. a `ref`)
 and are allowed to change over time which will issue a new query.
 
 This function returns an object with the shape of an [`OperationResult`](./core.md#operationresult)
@@ -46,7 +47,7 @@ once a result from the API is available.
 
 ## useMutation
 
-Accepts a single `query` argument of type `string | DocumentNode` and returns a result object with
+Accepts a `query` argument of type `string | DocumentNode` and an optional `client` argument of type `Urql.Client`, returns a result object with
 the shape of an [`OperationResult`](./core.md#operationresult) with an added `fetching` property.
 
 All of the properties on this result object are also marked as
@@ -64,12 +65,13 @@ page.](../basics/vue.md#mutations)
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop        | Type                     | Description                                                                             |
-| ----------- | ------------------------ | --------------------------------------------------------------------------------------- |
-| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.      |
-| `variables` | `?object`                | The variables to be used with the GraphQL request.                                      |
-| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery). |
-| `context`   | `?object`                | Holds the contextual information for the subscription.                                  |
+| Prop        | Type                     | Description                                                                                         |
+| ----------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                  |
+| `variables` | `?object`                | The variables to be used with the GraphQL request.                                                  |
+| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery).             |
+| `context`   | `?object`                | Holds the contextual information for the subscription.                                              |
+| `client`    | `?Urql.Client`           | Client to use. If not provided will use client provided in parent component with `provideClient()`. |
 
 Each of these inputs may also be [reactive](https://v3.vuejs.org/api/refs-api.html) (e.g. a `ref`)
 and are allowed to change over time which will issue a new query.
