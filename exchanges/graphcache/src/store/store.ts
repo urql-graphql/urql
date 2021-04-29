@@ -19,7 +19,7 @@ import {
 } from '../types';
 
 import { invariant } from '../helpers/help';
-import { contextRef } from '../operations/shared';
+import { contextRef, ensureLink } from '../operations/shared';
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
@@ -224,17 +224,13 @@ export class Store implements Cache {
     const link = (maybeLink !== undefined
       ? maybeLink
       : argsOrLink) as Link<Entity>;
-
-    const entityKey = this.keyOfEntity(entity);
-    if (!entityKey) return;
-
-    InMemoryData.writeLink(
-      entityKey,
-      keyOfField(field, args),
-      // FIXME: Needs to handle nested lists, unknown entities (?), scalars, etc (see writeField in operations/write)
-      Array.isArray(link)
-        ? link.map(entity => this.keyOfEntity(entity as any))
-        : this.keyOfEntity(link)
-    );
+    const entityKey = ensureLink(this, entity);
+    if (typeof entityKey === 'string') {
+      InMemoryData.writeLink(
+        entityKey,
+        keyOfField(field, args),
+        ensureLink(this, link)
+      );
+    }
   }
 }

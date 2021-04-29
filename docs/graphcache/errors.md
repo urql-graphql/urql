@@ -171,19 +171,20 @@ is maybe empty or does not contain fragments.
 When you're calling a fragment method, please ensure that you're only passing fragments
 in your GraphQL document. The first fragment will be used to start writing data.
 
-## (12) Can't generate a key for writeFragment(...)
+## (12) Can't generate a key for writeFragment(...) or link(...)
 
-> Can't generate a key for writeFragment(...) data.
+> Can't generate a key for writeFragment(...) [or link(...) data.
 > You have to pass an `id` or `_id` field or create a custom `keys` config for `???`.
 
-You probably have called `cache.writeFragment` with data that the cache can't generate a
-key for.
+You probably have called `cache.writeFragment` or `cache.link` with data that the cache
+can't generate a key for.
 
 This may either happen because you're missing the `id` or `_id` field or some other
 fields for your custom `keys` config.
 
 Please make sure that you include enough properties on your data so that `writeFragment`
-can generate a key.
+or `cache.link` can generate a key. On `cache.link` the entities must either be
+an existing entity key, or a keyable entity.
 
 ## (13) Invalid undefined
 
@@ -196,8 +197,8 @@ know the part of your result that did contain `undefined`.
 
 ## (14) Couldn't find \_\_typename when writing.
 
-> Couldn't find **typename when writing.
-> If you're writing to the cache manually have to pass a `**typename` property on each entity in your data.
+> Couldn't find `__typename` when writing.
+> If you're writing to the cache manually have to pass a `__typename` property on each entity in your data.
 
 You probably have called `cache.writeFragment` or `cache.updateQuery` with data that is missing a
 `__typename` field for an entity where your document contains a selection set. The cache won't be
