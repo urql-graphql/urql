@@ -18,8 +18,17 @@ import {
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
-import { Fragments, Variables, DataField, NullArray, Data } from '../types';
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
+
+import {
+  Fragments,
+  Variables,
+  DataField,
+  NullArray,
+  Link,
+  Entity,
+  Data,
+} from '../types';
 
 export interface Context {
   store: Store;
@@ -204,3 +213,27 @@ export const makeSelectionIterator = (
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
   x === undefined ? null : (x as Data | NullArray<Data>);
+
+export const ensureLink = (store: Store, ref: Link<Entity>): Link => {
+  if (ref == null) {
+    return ref;
+  } else if (Array.isArray(ref)) {
+    const link = new Array(ref.length);
+    for (let i = 0, l = link.length; i < l; i++)
+      link[i] = ensureLink(store, ref[i]);
+    return link;
+  }
+
+  const link = store.keyOfEntity(ref);
+  if (!link && ref && typeof ref === 'object') {
+    warn(
+      "Can't generate a key for link(...) item." +
+        '\nYou have to pass an `id` or `_id` field or create a custom `keys` config for `' +
+        ref.__typename +
+        '`.',
+      12
+    );
+  }
+
+  return link;
+};

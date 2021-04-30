@@ -8,6 +8,7 @@ import {
   DataField,
   Variables,
   FieldArgs,
+  Link,
   Data,
   QueryInput,
   UpdatesConfig,
@@ -18,7 +19,7 @@ import {
 } from '../types';
 
 import { invariant } from '../helpers/help';
-import { contextRef } from '../operations/shared';
+import { contextRef, ensureLink } from '../operations/shared';
 import { read, readFragment } from '../operations/query';
 import { writeFragment, startWrite } from '../operations/write';
 import { invalidateEntity } from '../operations/invalidate';
@@ -202,5 +203,34 @@ export class Store implements Cache {
     variables?: V
   ): void {
     writeFragment(this, formatDocument(fragment), data, variables as any);
+  }
+
+  link(
+    entity: Entity,
+    field: string,
+    args: FieldArgs,
+    link: Link<Entity>
+  ): void;
+
+  link(entity: Entity, field: string, link: Link<Entity>): void;
+
+  link(
+    entity: Entity,
+    field: string,
+    argsOrLink: FieldArgs | Link<Entity>,
+    maybeLink?: Link<Entity>
+  ): void {
+    const args = (maybeLink !== undefined ? argsOrLink : null) as FieldArgs;
+    const link = (maybeLink !== undefined
+      ? maybeLink
+      : argsOrLink) as Link<Entity>;
+    const entityKey = ensureLink(this, entity);
+    if (typeof entityKey === 'string') {
+      InMemoryData.writeLink(
+        entityKey,
+        keyOfField(field, args),
+        ensureLink(this, link)
+      );
+    }
   }
 }

@@ -117,6 +117,16 @@ export interface Cache {
     data: T,
     variables?: V
   ): void;
+
+  /** link() can be used to update a given entity field to link to another entity or entities */
+  link(
+    entity: Entity,
+    field: string,
+    args: FieldArgs,
+    link: Link<Entity>
+  ): void;
+  /** link() can be used to update a given entity field to link to another entity or entities */
+  link(entity: Entity, field: string, value: Link<Entity>): void;
 }
 
 type ResolverResult =
