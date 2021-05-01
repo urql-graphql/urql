@@ -79,9 +79,7 @@ const client = createClient({
     cacheExchange,
     retryExchange({
       retryIf: error => {
-        if ((error && error.graphQLErrors.length > 0) || error.networkError) {
-          return true;
-        }
+        return !!(error.graphQLErrors.length > 0 || error.networkError);
       },
     }),
     fetchExchange,

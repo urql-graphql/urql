@@ -11,12 +11,14 @@ import {
   filter,
   toArray,
   tap,
+  take,
 } from 'wonka';
+
 import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { createClient } from './client';
-import { queryOperation } from './test-utils';
+import { queryOperation, subscriptionOperation } from './test-utils';
 
 const url = 'https://hostname.com';
 
@@ -505,5 +507,225 @@ describe('queuing behavior', () => {
     );
 
     unsubscribe();
+  });
+});
+
+describe('shared sources behavior', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('replays results from prior operation result as needed', async () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        map(op => ({
+          data: ++i,
+          operation: op,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledTimes(0);
+
+    jest.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+    });
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 1,
+      stale: true,
+      operation: queryOperation,
+    });
+
+    jest.advanceTimersByTime(1);
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 2,
+      operation: queryOperation,
+    });
+  });
+
+  it('replayed results are not emitted on the shared source', () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        map(op => ({
+          data: ++i,
+          operation: op,
+        })),
+        take(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+      stale: true,
+    });
+  });
+
+  it('does nothing when no operation result has been emitted yet', () => {
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        map(op => ({ data: 1, operation: op })),
+        filter(() => false)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+
+    expect(resultOne).toHaveBeenCalledTimes(0);
+    expect(resultTwo).toHaveBeenCalledTimes(0);
+  });
+
+  it('skips replaying results when a result is emitted immediately', () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        map(op => ({ data: ++i, operation: op }))
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+    });
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 2,
+      operation: queryOperation,
+    });
+
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 2,
+      operation: queryOperation,
+    });
+  });
+
+  it('replays stale results as needed', () => {
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        map(op => ({ stale: true, data: 1, operation: op })),
+        take(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+      stale: true,
+    });
+
+    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+      stale: true,
+    });
+  });
+
+  it('does nothing when operation is a subscription has been emitted yet', () => {
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        map(op => ({ data: 1, operation: op })),
+        take(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(
+      client.executeRequestOperation(subscriptionOperation),
+      subscribe(resultOne)
+    );
+    expect(resultOne).toHaveBeenCalledTimes(1);
+
+    pipe(
+      client.executeRequestOperation(subscriptionOperation),
+      subscribe(resultTwo)
+    );
+    expect(resultTwo).toHaveBeenCalledTimes(0);
   });
 });

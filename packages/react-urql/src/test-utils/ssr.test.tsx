@@ -4,7 +4,7 @@ import { never, publish, filter, delay, pipe, map } from 'wonka';
 
 import {
   gql,
-  createClient,
+  Client,
   Exchange,
   dedupExchange,
   cacheExchange,
@@ -77,7 +77,7 @@ const url = 'https://hostname.com';
 
 describe('server-side rendering', () => {
   let ssr;
-  let client;
+  let client: Client;
 
   beforeEach(() => {
     const fetchExchange: Exchange = () => ops$ => {
@@ -90,7 +90,7 @@ describe('server-side rendering', () => {
     };
 
     ssr = ssrExchange();
-    client = createClient({
+    client = new Client({
       url,
       // We include the SSR exchange after the cache
       exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
@@ -108,10 +108,11 @@ describe('server-side rendering', () => {
       return null;
     };
 
+    const Element = Provider as any;
     const App = () => (
-      <Provider value={client}>
+      <Element value={client}>
         <Query />
-      </Provider>
+      </Element>
     );
 
     await prepass(<App />);
@@ -129,7 +130,7 @@ describe('client-side rehydration', () => {
     const fetchExchange: Exchange = () => () => never as any;
 
     ssr = ssrExchange();
-    client = createClient({
+    client = new Client({
       url,
       // We include the SSR exchange after the cache
       exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],

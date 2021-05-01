@@ -14,7 +14,7 @@ Accepts a single required options object as an input with the following properti
 | `query`         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
 | `variables`     | `?object`                | The variables to be used with the GraphQL request.                                                       |
 | `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
-| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/queries.md#pausing-usequery).              |
+| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/react-preact.md#pausing-usequery).              |
 | `context`       | `?object`                | Holds the contextual information for the query.                                                          |
 
 This hook returns a tuple of the shape `[result, executeQuery]`.

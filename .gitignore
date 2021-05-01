@@ -16,3 +16,5 @@ exchanges/*/LICENSE
 # TODO: Figure out how to remove these:
 tmp/
 dist/
+examples/*/public
+examples/*/yarn.lock

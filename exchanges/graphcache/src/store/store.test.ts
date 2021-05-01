@@ -967,3 +967,87 @@ describe('Store with storage', () => {
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#14');
   });
 });
+
+it('should link up entities', () => {
+  const store = new Store();
+  const todo = gql`
+    query test {
+      todo(id: "1") {
+        id
+        title
+        __typename
+      }
+    }
+  `;
+  const author = gql`
+    query testAuthor {
+      author(id: "1") {
+        id
+        name
+        __typename
+      }
+    }
+  `;
+  write(
+    store,
+    {
+      query: todo,
+    },
+    {
+      todo: {
+        id: '1',
+        title: 'learn urql',
+        __typename: 'Todo',
+      },
+      __typename: 'Query',
+    } as any
+  );
+  let { data } = query(store, { query: todo });
+  expect((data as any).todo).toEqual({
+    id: '1',
+    title: 'learn urql',
+    __typename: 'Todo',
+  });
+  write(
+    store,
+    {
+      query: author,
+    },
+    {
+      author: { __typename: 'Author', id: '1', name: 'Formidable' },
+      __typename: 'Query',
+    } as any
+  );
+  InMemoryData.initDataState('write', store.data, null);
+  store.link((data as any).todo, 'author', {
+    __typename: 'Author',
+    id: '1',
+    name: 'Formidable',
+  });
+  InMemoryData.clearDataState();
+  const todoWithAuthor = gql`
+    query test {
+      todo(id: "1") {
+        id
+        title
+        __typename
+        author {
+          id
+          name
+          __typename
+        }
+      }
+    }
+  `;
+  ({ data } = query(store, { query: todoWithAuthor }));
+  expect((data as any).todo).toEqual({
+    id: '1',
+    title: 'learn urql',
+    __typename: 'Todo',
+    author: {
+      __typename: 'Author',
+      id: '1',
+      name: 'Formidable',
+    },
+  });
+});

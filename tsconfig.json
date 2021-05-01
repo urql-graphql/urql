@@ -25,6 +25,7 @@
   "include": ["packages", "exchanges"],
   "exclude": [
     "scripts",
+    "examples",
     "packages/*/examples",
     "packages/*/dist",
     "exchanges/*/examples",

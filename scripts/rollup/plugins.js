@@ -7,11 +7,11 @@ import sucrase from '@rollup/plugin-sucrase';
 import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
+import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
@@ -75,7 +75,7 @@ export const makePlugins = () => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
-      'babel-plugin-closure-elimination',
+      babelPluginTransformFunctionExpressions,
       '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
@@ -104,10 +104,6 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
     isProduction && replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    !settings.mayReexport && compiler({
-      formatting: 'PRETTY_PRINT',
-      compilation_level: 'SIMPLE_OPTIMIZATIONS'
-    }),
     cleanup({ extension }),
     isProduction ? terserMinified : terserPretty,
     isProduction && settings.isAnalyze && visualizer({
@@ -123,9 +119,6 @@ const terserPretty = terser({
   keep_fnames: true,
   ie8: false,
   compress: {
-    // We need to hoist vars for process.env.NODE_ENV if-clauses for Metro:
-    hoist_vars: true,
-    hoist_funs: true,
     pure_getters: true,
     toplevel: true,
     booleans_as_integers: false,
@@ -138,7 +131,10 @@ const terserPretty = terser({
     conditionals: false,
     join_vars: false
   },
-  mangle: false,
+  mangle: {
+    module: true,
+    keep_fnames: true,
+  },
   output: {
     beautify: true,
     braces: true,
@@ -155,6 +151,9 @@ const terserMinified = terser({
     keep_infinity: true,
     pure_getters: true,
     passes: 10
+  },
+  mangle: {
+    module: true,
   },
   output: {
     comments: false

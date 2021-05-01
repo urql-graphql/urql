@@ -17,7 +17,7 @@ jest.mock('../context', () => {
 
 import { print } from 'graphql';
 import { gql } from '@urql/core';
-import React, { FC } from 'react';
+import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
 import { useClient } from '../context';
@@ -33,7 +33,7 @@ const props = {
 let state: any;
 let execute: any;
 
-const MutationUser: FC<typeof props> = ({ query }) => {
+const MutationUser = ({ query }: { query: any }) => {
   const [s, e] = useMutation(query);
   state = s;
   execute = e;
