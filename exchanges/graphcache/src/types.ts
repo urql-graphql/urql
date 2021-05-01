@@ -168,8 +168,8 @@ export interface UpdatesConfig {
 
 export type OptimisticMutationResolver<
   Args = Variables,
-  Result = null | Data | NullArray<Data>
-> = (vars: Args, cache: Cache, info: ResolveInfo) => Link<Data>;
+  Result = Link<Data>
+> = (vars: Args, cache: Cache, info: ResolveInfo) => Result;
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;
