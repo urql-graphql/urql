@@ -1,6 +1,11 @@
 import { DocumentNode } from 'graphql';
 import { Client, TypedDocumentNode } from '@urql/core';
-import { WatchStopHandle, onMounted, onBeforeUnmount } from 'vue';
+import {
+  WatchStopHandle,
+  getCurrentInstance,
+  onMounted,
+  onBeforeUnmount,
+} from 'vue';
 
 import { useClient } from './useClient';
 
@@ -30,12 +35,6 @@ export interface ClientHandle {
   useMutation<T = any, V = any>(
     query: TypedDocumentNode<T, V> | DocumentNode | string
   ): UseMutationResponse<T, V>;
-}
-
-export function noopHook(): never {
-  throw new Error(
-    'Methods on the `useClientHandle()` handle should only be called in the `async setup()` lifecycle.'
-  );
 }
 
 export function useClientHandle(): ClientHandle {
@@ -72,9 +71,32 @@ export function useClientHandle(): ClientHandle {
 
   if (process.env.NODE_ENV !== 'production') {
     onMounted(() => {
-      handle.useQuery = noopHook;
-      handle.useSubscription = noopHook;
-      handle.useMutation = noopHook;
+      Object.assign(handle, {
+        useQuery<T = any, V = object>(
+          args: UseQueryArgs<T, V>
+        ): UseQueryResponse<T, V> {
+          if (process.env.NODE_ENV !== 'production' && !getCurrentInstance()) {
+            throw new Error(
+              '`handle.useQuery()` should only be called in the `setup()` or a lifecycle hook.'
+            );
+          }
+
+          return callUseQuery(args, client, stops);
+        },
+
+        useSubscription<T = any, R = T, V = object>(
+          args: UseSubscriptionArgs<T, V>,
+          handler?: SubscriptionHandlerArg<T, R>
+        ): UseSubscriptionResponse<T, R, V> {
+          if (process.env.NODE_ENV !== 'production' && !getCurrentInstance()) {
+            throw new Error(
+              '`handle.useSubscription()` should only be called in the `setup()` or a lifecycle hook.'
+            );
+          }
+
+          return callUseSubscription(args, handler, client, stops);
+        },
+      });
     });
   }
 
