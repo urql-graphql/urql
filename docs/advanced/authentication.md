@@ -28,7 +28,7 @@ could have the opportunity to log in again. To do this, we want to clear any per
 from persisted storage, and redirect them to the application home or login page.
 
 **Refresh (optional)** — this is not always implemented; if your API supports it, the
-user will receive both an auth token, and a refresh token. 
+user will receive both an auth token, and a refresh token.
 The auth token is usually valid for a shorter duration of time (e.g. 1 week) than the refresh token
 (e.g. 6 months), and the latter can be used to request a new
 auth token if the auth token has expired. The refresh logic is triggered either when the JWT is known to be invalid (e.g. by decoding it and inspecting the expiry date),
@@ -283,6 +283,45 @@ const willAuthError = ({ authState }) => {
   return false;
 }
 ```
+
+This can be really useful when we know when our authentication state is invalid and want to prevent
+even sending any operation that we know will fail with an authentication error. However, if we were
+to use this and are logging in our users with a login _mutation_ then the above code will
+unfortunately never let this login mutation through to our GraphQL API.
+
+If we have such a mutation we may need to write a more sophisticated `willAuthError` function like
+the following:
+
+```js
+const willAuthError = ({ operation, authState }) => {
+  if (!authState) {
+    // Detect our login mutation and let this operation through:
+    return !(
+      operation.kind === 'mutation' &&
+      // Here we find any mutation definition with the "login" field
+      operation.query.definitions.some(definition => {
+        return (
+          definition.kind === 'OperationDefinition' &&
+          definition.selectionSet.selections.some(node => {
+            // The field name is just an example, since signup may also be an exception
+            return node.kind === 'Field' && node.name.value === 'login';
+          })
+        );
+      })
+    );
+
+    return true;
+  } else if (false /* JWT is expired */) {
+    return true;
+  }
+
+  return false;
+};
+```
+
+Alternatively, you may decide to let all operations through if `authState` isn't defined or to allow
+all mutations through. In an application that allows unauthenticated users to perform various
+actions, it's a good idea for us to return `false` when `!authState` applies.
 
 [Read more about `@urql/exchange-auth`'s API in our API docs.](../api/auth-exchange.md)
 
