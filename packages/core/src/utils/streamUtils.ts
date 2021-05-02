@@ -28,6 +28,9 @@ export function replayOnStart<T extends OperationResult>(
 
     const shared$ = pipe(
       source$,
+      onEnd(() => {
+        replay = undefined;
+      }),
       onPush(value => {
         replay = value;
       }),

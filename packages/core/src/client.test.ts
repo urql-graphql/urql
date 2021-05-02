@@ -568,6 +568,53 @@ describe('shared sources behavior', () => {
     });
   });
 
+  it('does not replay values from a past subscription', async () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        map(op => ({
+          data: ++i,
+          operation: op,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    // We keep the source in-memory
+    const source = client.executeRequestOperation(queryOperation);
+    const resultOne = jest.fn();
+    let subscription;
+
+    subscription = pipe(source, subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledTimes(0);
+    jest.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+    });
+
+    subscription.unsubscribe();
+    const resultTwo = jest.fn();
+    subscription = pipe(source, subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledTimes(0);
+    jest.advanceTimersByTime(1);
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 2,
+      operation: queryOperation,
+    });
+  });
+
   it('replayed results are not emitted on the shared source', () => {
     const exchange: Exchange = () => ops$ => {
       let i = 0;
