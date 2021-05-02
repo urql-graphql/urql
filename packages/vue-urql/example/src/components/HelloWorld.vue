@@ -6,11 +6,12 @@
     <div v-if="pokemon">
       <pre>{{ JSON.stringify(pokemon) }}</pre>
     </div>
+    <button @click="nextPokemon">Next Pokemon</button>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { gql, useClientHandle } from '@urql/vue';
 
 export default {
@@ -28,6 +29,8 @@ export default {
       `
     });
 
+    const index = ref(0);
+
     const pokemon = await handle.useQuery({
       query: gql`
         query ($id: ID!) {
@@ -38,13 +41,18 @@ export default {
         }
       `,
       variables: {
-        id: pokemons.data.value.pokemons[0].id,
+        id: computed(() => pokemons.data.value.pokemons[index.value].id),
       },
     });
 
     return {
       pokemons: pokemons.data,
-      pokemon: pokemon.data
+      pokemon: pokemon.data,
+      nextPokemon() {
+        index.value = index.value < (pokemons.data.value.pokemons.length - 1)
+          ? index.value + 1
+          : 0;
+      },
     };
   },
   name: 'HelloWorld',
