@@ -1,4 +1,4 @@
-import { App, inject, provide } from 'vue';
+import { App, getCurrentInstance, inject, provide } from 'vue';
 import { Client, ClientOptions } from '@urql/core';
 
 export function provideClient(opts: ClientOptions | Client) {
@@ -13,6 +13,12 @@ export function install(app: App, opts: ClientOptions | Client) {
 }
 
 export function useClient(): Client {
+  if (process.env.NODE_ENV !== 'production' && !getCurrentInstance()) {
+    throw new Error(
+      'use* functions may only be called during the `setup()` or other lifecycle hooks.'
+    );
+  }
+
   const client = inject('$urql') as Client;
   if (process.env.NODE_ENV !== 'production' && !client) {
     throw new Error(
