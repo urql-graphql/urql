@@ -1,6 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { Client, TypedDocumentNode } from '@urql/core';
-import { WatchStopHandle, onBeforeUnmount } from 'vue';
+import { WatchStopHandle, onMounted, onBeforeUnmount } from 'vue';
 
 import { useClient } from './useClient';
 
@@ -32,6 +32,12 @@ export interface ClientHandle {
   ): UseMutationResponse<T, V>;
 }
 
+export function noopHook(): never {
+  throw new Error(
+    'Methods on the `useClientHandle()` handle should only be called in the `async setup()` lifecycle.'
+  );
+}
+
 export function useClientHandle(): ClientHandle {
   const client = useClient();
   const stops: WatchStopHandle[] = [];
@@ -41,7 +47,7 @@ export function useClientHandle(): ClientHandle {
     while ((stop = stops.shift())) stop();
   });
 
-  return {
+  const handle: ClientHandle = {
     client,
 
     useQuery<T = any, V = object>(
@@ -63,4 +69,14 @@ export function useClientHandle(): ClientHandle {
       return callUseMutation(query, client);
     },
   };
+
+  if (process.env.NODE_ENV !== 'production') {
+    onMounted(() => {
+      handle.useQuery = noopHook;
+      handle.useSubscription = noopHook;
+      handle.useMutation = noopHook;
+    });
+  }
+
+  return handle;
 }
