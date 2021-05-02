@@ -1,7 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import { ref, Ref } from 'vue';
 import { DocumentNode } from 'graphql';
 
 import {
+  Client,
   TypedDocumentNode,
   CombinedError,
   Operation,
@@ -29,8 +32,13 @@ export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 export function useMutation<T = any, V = any>(
   query: TypedDocumentNode<T, V> | DocumentNode | string
 ): UseMutationResponse<T, V> {
-  const client = useClient();
+  return callUseMutation(query);
+}
 
+export function callUseMutation<T = any, V = any>(
+  query: TypedDocumentNode<T, V> | DocumentNode | string,
+  client: Client = useClient()
+): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
