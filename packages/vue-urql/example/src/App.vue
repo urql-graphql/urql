@@ -18,7 +18,7 @@ export default {
   name: 'App',
   setup() {
     provideClient({
-      url: 'https://countries-274616.ew.r.appspot.com/',
+      url: 'https://trygql.dev/graphql/basic-pokedex',
     });
   },
   components: {
