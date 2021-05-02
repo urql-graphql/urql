@@ -273,9 +273,14 @@ export class Client {
         share
       );
     } else {
+      const mode =
+        operation.context.requestPolicy === 'cache-and-network' ||
+        operation.context.requestPolicy === 'network-only'
+          ? 'pre'
+          : 'post';
       active = pipe(
         result$,
-        replayOnStart(() => {
+        replayOnStart(mode, () => {
           this.activeOperations.set(operation.key, active!);
           this.dispatchOperation(operation);
         })
