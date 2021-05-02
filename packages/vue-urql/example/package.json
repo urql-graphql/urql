@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@urql/vue": "link:../",
-    "vue": "^3.0.2"
+    "vue": "^3.0.11"
   },
   "devDependencies": {
     "@vue/compiler-sfc": "^3.0.2",
