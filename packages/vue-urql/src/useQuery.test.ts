@@ -1,12 +1,8 @@
-jest.mock('vue', () => {
-  const vue = jest.requireActual('vue');
-
-  return {
-    __esModule: true,
-    ...vue,
-    inject: () => client,
-  };
-});
+jest.mock('./useClient.ts', () => ({
+  __esModule: true,
+  ...jest.requireActual('./useClient.ts'),
+  useClient: () => client,
+}));
 
 import { pipe, makeSubject, fromValue, delay } from 'wonka';
 import { createClient } from '@urql/core';
