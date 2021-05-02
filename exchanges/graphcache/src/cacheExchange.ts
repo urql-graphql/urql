@@ -32,10 +32,7 @@ import { IntrospectionData, filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 
 import {
-  UpdatesConfig,
-  ResolverConfig,
-  OptimisticMutationConfig,
-  KeyingConfig,
+  CacheType,
   StorageAdapter,
   Dependencies,
 } from './types';
@@ -50,29 +47,22 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export interface CacheExchangeOpts<
-  Updaters,
-  Resolvers extends ResolverConfig,
-  Optimistic extends OptimisticMutationConfig,
-  Keys extends KeyingConfig
-> {
-  updates?: Partial<Updaters>;
-  resolvers?: Resolvers;
-  optimistic?: Optimistic;
-  keys?: Keys;
+export interface CacheExchangeOpts<C extends CacheType> {
+  updates?: Partial<C['updates']>;
+  resolvers?: C['resolvers'];
+  optimistic?: C['optimistic'];
+  keys?: C['keys'];
   schema?: IntrospectionData;
   storage?: StorageAdapter;
 }
 
+
 export const cacheExchange = <
-  Updaters extends UpdatesConfig = UpdatesConfig,
-  Resolvers extends ResolverConfig = ResolverConfig,
-  Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
-  Keys extends KeyingConfig = KeyingConfig
+  C extends CacheType = CacheType
 >(
-  opts?: CacheExchangeOpts<Updaters, Resolvers, Optimistic, Keys>
+  opts?: CacheExchangeOpts<C>
 ): Exchange => ({ forward, client, dispatchDebug }) => {
-  const store = new Store<Updaters, Resolvers, Optimistic, Keys>(opts);
+  const store = new Store<C>(opts);
 
   let hydration: void | Promise<void>;
   if (opts && opts.storage) {

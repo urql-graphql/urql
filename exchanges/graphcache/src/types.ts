@@ -1,6 +1,13 @@
 import { TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 
+export interface CacheType {
+  updates?: Partial<UpdatesConfig>;
+  resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
+}
+
 // Helper types
 export type NullArray<T> = Array<null | T | NullArray<T>>;
 

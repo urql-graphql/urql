@@ -2,7 +2,7 @@ import { DocumentNode } from 'graphql';
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
-  Cache,
+  CacheType,
   FieldInfo,
   ResolverConfig,
   DataField,
@@ -11,7 +11,6 @@ import {
   Link,
   Data,
   QueryInput,
-  UpdatesConfig,
   UpdateResolver,
   OptimisticMutationConfig,
   KeyingConfig,
@@ -38,25 +37,15 @@ import {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts<
-  Updaters extends UpdatesConfig,
-  Resolvers extends ResolverConfig,
-  Optimistic extends OptimisticMutationConfig,
-  Keys extends KeyingConfig
-> {
-  updates?: Partial<Updaters>;
-  resolvers?: Resolvers;
-  optimistic?: Optimistic;
-  keys?: Keys;
+export interface StoreOpts<C extends CacheType> {
+  updates?: Partial<C['updates']>;
+  resolvers?: C['resolvers'];
+  optimistic?: C['optimistic'];
+  keys?: C['keys'];
   schema?: IntrospectionData;
 }
 
-export class Store<
-  Updaters extends UpdatesConfig = UpdatesConfig,
-  Resolvers extends ResolverConfig = ResolverConfig,
-  Optimistic extends OptimisticMutationConfig = OptimisticMutationConfig,
-  Keys extends KeyingConfig = KeyingConfig
-> implements Cache {
+export class Store<C extends CacheType = CacheType> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -68,7 +57,7 @@ export class Store<
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(opts?: StoreOpts<Updaters, Resolvers, Optimistic, Keys>) {
+  constructor(opts?: StoreOpts<C>) {
     if (!opts) opts = {};
 
     this.resolvers = opts.resolvers || {};
