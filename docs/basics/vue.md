@@ -470,6 +470,52 @@ boundary, we'll get Vue Suspense to work correctly and trigger this loading stat
 suspends this component will switch to using its `#fallback` template rather than its `#default`
 template.
 
+### Chaining calls in Vue Suspense
+
+As shown [above](#vue-suspense), in Vue Suspense the `async setup()` lifecycle function can be used
+to set up queries in advance, wait for them to have fetched some data, and then let the component
+render as usual.
+
+However, because the `async setup()` function can be used with `await`-ed promise calls, we may run
+into situations where we're trying to call functions like `useQuery()` after we've already awaited
+another promise and will be outside of the synchronous scope of the `setup()` lifecycle. This means
+that the `useQuery` (and `useSubscription` & `useMutation`) functions won't have access to the
+`Client` anymore that we'd have set up using `provideClient`.
+
+To prevent this, we can create something called a "client handle" using the `useClientHandle`
+function.
+
+```js
+import { gql, useClientHandle } from '@urql/vue';
+
+export default {
+  async setup() {
+    const handle = useClientHandle();
+
+    await Promise.resolve(); // NOTE: This could be any await call
+
+    const result = await handle.useQuery({
+      query: gql`
+        {
+          todos {
+            id
+            title
+          }
+        }
+      `,
+    });
+
+    return { data: result.data };
+  },
+};
+```
+
+As we can see, when we use `handle.useQuery()` we're able to still create query results although we've
+interrupted the synchronous `setup()` lifecycle with a `Promise.resolve()` delay. This would also
+allow us to create chained queries by using
+[`computed`](https://v3.vuejs.org/guide/reactivity-computed-watchers.html#computed-values) to use an
+output from a preceding result in a next `handle.useQuery()` call.
+
 ### Reading on
 
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
