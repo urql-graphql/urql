@@ -104,14 +104,28 @@ The result furthermore carries several utility methods:
 [Read more about how to use the `useSubscription` API on the "Subscriptions"
 page.](../advanced/subscriptions.md#vue)
 
+## useClientHandle
+
+The `useClientHandle()` function may, like the other `use*` functions, be called either in
+`setup()` or another lifecycle hook, and returns a so called "client handle". Using this `handle` we
+can access the [`Client`](./core.md#client) directly via the `client` property or call the other
+`use*` functions as methods, which will be directly bound to this `client`. This may be useful when
+chaining these methods inside an `async setup()` lifecycle function.
+
+| Method                 | Description                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `client`               | Contains the raw [`Client`](./core.md#client) reference, which allows the `Client` to be used directly.                   |
+| `useQuery(...)`        | Accepts the same arguments as the `useQuery` function, but will always use the `Client` from the handle's context.        |
+| `useMutation(...)`     | Accepts the same arguments as the `useMutation` function, but will always use the `Client` from the handle's context.     |
+| `useSubscription(...)` | Accepts the same arguments as the `useSubscription` function, but will always use the `Client` from the handle's context. |
+
 ## Context API
 
 In Vue the [`Client`](./core.md#client) is provided either to your app or to a parent component of a
 given subtree and is then subsequently injected whenever one of the above composition functions is
 used.
 
-You can manually retrieve the `Client` in your component by calling `useClient`. Symmetrically you
-can provide the `Client` from any of your components using the `provideClient` function.
+You can provide the `Client` from any of your components using the `provideClient` function.
 Alternatively, `@urql/vue` also has a default export of a [Vue Plugin function](https://v3.vuejs.org/guide/plugins.html#using-a-plugin).
 
 Both `provideClient` and the plugin function either accept an [instance of

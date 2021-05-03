@@ -1,8 +1,12 @@
-import { Ref, ref, watchEffect, reactive, isRef } from 'vue';
+/* eslint-disable react-hooks/rules-of-hooks */
+
 import { DocumentNode } from 'graphql';
 import { Source, pipe, publish, share, onStart, onPush, onEnd } from 'wonka';
 
+import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
+
 import {
+  Client,
   OperationResult,
   TypedDocumentNode,
   CombinedError,
@@ -24,6 +28,7 @@ export interface UseSubscriptionArgs<T = any, V = object> {
 }
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
+export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
 
 export interface UseSubscriptionState<T = any, R = T, V = object> {
   fetching: Ref<boolean>;
@@ -49,11 +54,19 @@ const watchOptions = {
 };
 
 export function useSubscription<T = any, R = T, V = object>(
+  args: UseSubscriptionArgs<T, V>,
+  handler?: SubscriptionHandlerArg<T, R>
+): UseSubscriptionResponse<T, R, V> {
+  return callUseSubscription(args, handler);
+}
+
+export function callUseSubscription<T = any, R = T, V = object>(
   _args: UseSubscriptionArgs<T, V>,
-  handler?: MaybeRef<SubscriptionHandler<T, R>>
+  handler?: SubscriptionHandlerArg<T, R>,
+  client: Client = useClient(),
+  stops: WatchStopHandle[] = []
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args);
-  const client = useClient();
 
   const data: Ref<R | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -74,55 +87,61 @@ export function useSubscription<T = any, R = T, V = object>(
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
-  watchEffect(() => {
-    const newRequest = createRequest<T, V>(args.query, args.variables as any);
-    if (request.value.key !== newRequest.key) {
-      request.value = newRequest;
-    }
-  }, watchOptions);
+  stops.push(
+    watchEffect(() => {
+      const newRequest = createRequest<T, V>(args.query, args.variables as any);
+      if (request.value.key !== newRequest.key) {
+        request.value = newRequest;
+      }
+    }, watchOptions)
+  );
 
-  watchEffect(() => {
-    if (!isPaused.value) {
-      source.value = pipe(
-        client.executeSubscription<T, V>(request.value, {
-          ...args.context,
-        }),
-        share
-      );
-    } else {
-      source.value = undefined;
-    }
-  }, watchOptions);
+  stops.push(
+    watchEffect(() => {
+      if (!isPaused.value) {
+        source.value = pipe(
+          client.executeSubscription<T, V>(request.value, {
+            ...args.context,
+          }),
+          share
+        );
+      } else {
+        source.value = undefined;
+      }
+    }, watchOptions)
+  );
 
-  watchEffect(onInvalidate => {
-    if (source.value) {
-      onInvalidate(
-        pipe(
-          source.value,
-          onStart(() => {
-            fetching.value = true;
-          }),
-          onEnd(() => {
-            fetching.value = false;
-          }),
-          onPush(result => {
-            fetching.value = true;
-            (data.value =
-              result.data !== undefined
-                ? typeof scanHandler.value === 'function'
-                  ? scanHandler.value(data.value as any, result.data!)
-                  : result.data
-                : (result.data as any)),
-              (error.value = result.error);
-            extensions.value = result.extensions;
-            stale.value = !!result.stale;
-            operation.value = result.operation;
-          }),
-          publish
-        ).unsubscribe
-      );
-    }
-  }, watchOptions);
+  stops.push(
+    watchEffect(onInvalidate => {
+      if (source.value) {
+        onInvalidate(
+          pipe(
+            source.value,
+            onStart(() => {
+              fetching.value = true;
+            }),
+            onEnd(() => {
+              fetching.value = false;
+            }),
+            onPush(result => {
+              fetching.value = true;
+              (data.value =
+                result.data !== undefined
+                  ? typeof scanHandler.value === 'function'
+                    ? scanHandler.value(data.value as any, result.data!)
+                    : result.data
+                  : (result.data as any)),
+                (error.value = result.error);
+              extensions.value = result.extensions;
+              stale.value = !!result.stale;
+              operation.value = result.operation;
+            }),
+            publish
+          ).unsubscribe
+        );
+      }
+    }, watchOptions)
+  );
 
   const state: UseSubscriptionState<T, R, V> = {
     data,
