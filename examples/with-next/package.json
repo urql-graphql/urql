@@ -11,6 +11,7 @@
     "urql": "^2.0.2"
   },
   "scripts": {
+    "dev": "next dev",
     "start": "next",
     "build": "next build"
   }
