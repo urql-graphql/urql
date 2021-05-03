@@ -1,5 +1,4 @@
 import { initUrqlClient } from "next-urql";
-import Link from 'next/link';
 import {
   ssrExchange,
   dedupExchange,
@@ -11,7 +10,7 @@ import {
 
 const POKEMONS_QUERY = gql`
   query {
-    pokemons(limit: 10) {
+    pokemons(limit: 10 skip: 10) {
       id
       name
     }
@@ -29,7 +28,6 @@ function Static() {
           {pokemon.id} - {pokemon.name}
         </div>
       ))}
-      <Link href="/static-2">Static 2</Link>
     </div>
   );
 }
