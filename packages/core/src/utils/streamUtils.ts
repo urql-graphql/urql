@@ -20,14 +20,20 @@ export function withPromise<T>(source$: Source<T>): PromisifiedSource<T> {
   return source$ as PromisifiedSource<T>;
 }
 
+export type ReplayMode = 'pre' | 'post';
+
 export function replayOnStart<T extends OperationResult>(
-  start?: () => void
+  mode: ReplayMode,
+  start: () => void
 ): Operator<T, T> {
   return source$ => {
     let replay: T | void;
 
     const shared$ = pipe(
       source$,
+      onEnd(() => {
+        replay = undefined;
+      }),
       onPush(value => {
         replay = value;
       }),
@@ -37,18 +43,24 @@ export function replayOnStart<T extends OperationResult>(
     return make<T>(observer => {
       const prevReplay = replay;
 
-      const subscription = pipe(
+      return pipe(
         shared$,
         onEnd(observer.complete),
         onStart(() => {
-          if (start) start();
-          if (prevReplay !== undefined && prevReplay === replay)
-            observer.next({ ...prevReplay, stale: true });
+          if (mode === 'pre') {
+            start();
+          }
+
+          if (prevReplay !== undefined && prevReplay === replay) {
+            observer.next(
+              mode === 'pre' ? { ...prevReplay, stale: true } : prevReplay
+            );
+          } else if (mode === 'post') {
+            start();
+          }
         }),
         subscribe(observer.next)
-      );
-
-      return subscription.unsubscribe;
+      ).unsubscribe;
     });
   };
 }

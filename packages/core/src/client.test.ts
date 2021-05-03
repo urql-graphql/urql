@@ -519,7 +519,7 @@ describe('shared sources behavior', () => {
     jest.useRealTimers();
   });
 
-  it('replays results from prior operation result as needed', async () => {
+  it('replays results from prior operation result as needed (cache-first)', async () => {
     const exchange: Exchange = () => ops$ => {
       let i = 0;
       return pipe(
@@ -556,10 +556,111 @@ describe('shared sources behavior', () => {
 
     expect(resultTwo).toHaveBeenCalledWith({
       data: 1,
-      stale: true,
       operation: queryOperation,
     });
 
+    jest.advanceTimersByTime(1);
+
+    // With cache-first we don't expect a new operation to be issued
+    expect(resultTwo).toHaveBeenCalledTimes(1);
+  });
+
+  it('replays results from prior operation result as needed (network-only)', async () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        map(op => ({
+          data: ++i,
+          operation: op,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
+    const resultOne = jest.fn();
+    const resultTwo = jest.fn();
+
+    pipe(client.executeRequestOperation(operation), subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledTimes(0);
+
+    jest.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledTimes(1);
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation,
+    });
+
+    pipe(client.executeRequestOperation(operation), subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 1,
+      operation,
+      stale: true,
+    });
+
+    jest.advanceTimersByTime(1);
+
+    // With network-only we expect a new operation to be issued, hence a new result
+    expect(resultTwo).toHaveBeenCalledTimes(2);
+
+    expect(resultTwo).toHaveBeenCalledWith({
+      data: 2,
+      operation,
+    });
+  });
+
+  it('does not replay values from a past subscription', async () => {
+    const exchange: Exchange = () => ops$ => {
+      let i = 0;
+      return pipe(
+        ops$,
+        filter(op => op.kind !== 'teardown'),
+        map(op => ({
+          data: ++i,
+          operation: op,
+        })),
+        delay(1)
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    // We keep the source in-memory
+    const source = client.executeRequestOperation(queryOperation);
+    const resultOne = jest.fn();
+    let subscription;
+
+    subscription = pipe(source, subscribe(resultOne));
+
+    expect(resultOne).toHaveBeenCalledTimes(0);
+    jest.advanceTimersByTime(1);
+
+    expect(resultOne).toHaveBeenCalledWith({
+      data: 1,
+      operation: queryOperation,
+    });
+
+    subscription.unsubscribe();
+    const resultTwo = jest.fn();
+    subscription = pipe(source, subscribe(resultTwo));
+
+    expect(resultTwo).toHaveBeenCalledTimes(0);
     jest.advanceTimersByTime(1);
 
     expect(resultTwo).toHaveBeenCalledWith({
@@ -586,19 +687,21 @@ describe('shared sources behavior', () => {
       exchanges: [exchange],
     });
 
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
     const resultOne = jest.fn();
     const resultTwo = jest.fn();
 
-    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+    pipe(client.executeRequestOperation(operation), subscribe(resultOne));
+    pipe(client.executeRequestOperation(operation), subscribe(resultTwo));
 
-    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
-
-    expect(resultOne).toHaveBeenCalledTimes(1);
     expect(resultTwo).toHaveBeenCalledTimes(1);
-
     expect(resultTwo).toHaveBeenCalledWith({
       data: 1,
-      operation: queryOperation,
+      operation,
       stale: true,
     });
   });
@@ -628,7 +731,7 @@ describe('shared sources behavior', () => {
     expect(resultTwo).toHaveBeenCalledTimes(0);
   });
 
-  it('skips replaying results when a result is emitted immediately', () => {
+  it('skips replaying results when a result is emitted immediately (network-only)', () => {
     const exchange: Exchange = () => ops$ => {
       let i = 0;
       return pipe(
@@ -642,26 +745,31 @@ describe('shared sources behavior', () => {
       exchanges: [exchange],
     });
 
+    const operation = makeOperation('query', queryOperation, {
+      ...queryOperation.context,
+      requestPolicy: 'network-only',
+    });
+
     const resultOne = jest.fn();
     const resultTwo = jest.fn();
 
-    pipe(client.executeRequestOperation(queryOperation), subscribe(resultOne));
+    pipe(client.executeRequestOperation(operation), subscribe(resultOne));
 
     expect(resultOne).toHaveBeenCalledWith({
       data: 1,
-      operation: queryOperation,
+      operation,
     });
 
-    pipe(client.executeRequestOperation(queryOperation), subscribe(resultTwo));
+    pipe(client.executeRequestOperation(operation), subscribe(resultTwo));
 
     expect(resultTwo).toHaveBeenCalledWith({
       data: 2,
-      operation: queryOperation,
+      operation,
     });
 
     expect(resultOne).toHaveBeenCalledWith({
       data: 2,
-      operation: queryOperation,
+      operation,
     });
   });
 
