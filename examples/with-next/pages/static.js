@@ -1,5 +1,4 @@
 import { initUrqlClient } from "next-urql";
-import Link from 'next/link';
 import {
   ssrExchange,
   dedupExchange,
@@ -29,7 +28,6 @@ function Static() {
           {pokemon.id} - {pokemon.name}
         </div>
       ))}
-      <Link href="/static-2">Static 2</Link>
     </div>
   );
 }
