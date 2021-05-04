@@ -2,6 +2,7 @@ import { DocumentNode } from 'graphql';
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
+  Cache,
   FieldInfo,
   ResolverConfig,
   DataField,
@@ -32,7 +33,7 @@ import {
   expectValidResolversConfig,
   expectValidOptimisticMutationsConfig,
 } from '../ast';
-import { CacheExchangeOpts } from 'src/cacheExchange';
+import { CacheExchangeOpts } from '../cacheExchange';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
