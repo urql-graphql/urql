@@ -73,7 +73,7 @@ const didAuthError = ({ error }) => {
 };
 
 const client = createClient({
-  url: 'http://localhost:8080/graphql/web-collections',
+  url: 'https://trygql.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
     authExchange({ getAuth, addAuthToOperation, didAuthError }),
