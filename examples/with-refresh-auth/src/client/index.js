@@ -1,7 +1,12 @@
-import { createClient, dedupExchange, fetchExchange, gql } from 'urql';
+import {
+  createClient,
+  dedupExchange,
+  fetchExchange,
+  cacheExchange,
+  gql,
+} from 'urql';
 import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
-import { cacheExchange } from '@urql/exchange-graphcache';
 import {
   getRefreshToken,
   getToken,
