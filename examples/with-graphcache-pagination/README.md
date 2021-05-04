@@ -1,4 +1,4 @@
-# Integrating with React
+# Integrating with `@urql/exchange-graphcache`'s cacheExchange pagination
 
 Integrating urql is as simple as:
 
@@ -11,6 +11,7 @@ npm install --save urql graphql
 ```
 
 2. Install [graphcache](https://formidable.com/open-source/urql/docs/graphcache/)
+
 ```sh
 yarn add @urql/exchange-graphcache
 # or

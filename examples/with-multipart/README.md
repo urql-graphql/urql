@@ -1,4 +1,4 @@
-# Integrating with React
+# Integrating with `@urql/exchange-multipart-fetch`'s multipartFetchExchange
 
 Integrating urql is as simple as:
 
