@@ -78,7 +78,7 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
   ) {
     const { forward: outerForward, client, dispatchDebug } = input;
     const { source: reboundOps$, next } = makeSubject<Operation>();
-    const optimisticMutations = opts.optimistic ?? {};
+    const optimisticMutations = opts.optimistic || {};
     const failedQueue: Operation[] = [];
 
     const updateMetadata = () => {
