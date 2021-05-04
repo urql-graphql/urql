@@ -2,7 +2,6 @@ import { DocumentNode } from 'graphql';
 import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
 
 import {
-  CacheType,
   FieldInfo,
   ResolverConfig,
   DataField,
@@ -26,7 +25,6 @@ import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
 import {
-  IntrospectionData,
   SchemaIntrospector,
   buildClientSchema,
   expectValidKeyingConfig,
@@ -34,18 +32,13 @@ import {
   expectValidResolversConfig,
   expectValidOptimisticMutationsConfig,
 } from '../ast';
+import { CacheExchangeOpts } from 'src/cacheExchange';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts<C extends CacheType> {
-  updates?: Partial<C['updates']>;
-  resolvers?: C['resolvers'];
-  optimistic?: C['optimistic'];
-  keys?: C['keys'];
-  schema?: IntrospectionData;
-}
-
-export class Store<C extends CacheType = CacheType> implements Cache {
+export class Store<
+  C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
+> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -57,8 +50,8 @@ export class Store<C extends CacheType = CacheType> implements Cache {
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(opts?: StoreOpts<C>) {
-    if (!opts) opts = {};
+  constructor(opts?: C) {
+    if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
     this.optimisticMutations = opts.optimistic || {};

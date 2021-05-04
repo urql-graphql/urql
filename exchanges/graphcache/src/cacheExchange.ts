@@ -32,9 +32,12 @@ import { IntrospectionData, filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 
 import {
-  CacheType,
   StorageAdapter,
   Dependencies,
+  UpdatesConfig,
+  ResolverConfig,
+  OptimisticMutationConfig,
+  KeyingConfig,
 } from './types';
 
 type OperationResultWithMeta = OperationResult & {
@@ -47,20 +50,17 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export interface CacheExchangeOpts<C extends CacheType> {
-  updates?: Partial<C['updates']>;
-  resolvers?: C['resolvers'];
-  optimistic?: C['optimistic'];
-  keys?: C['keys'];
-  schema?: IntrospectionData;
-  storage?: StorageAdapter;
-}
+export type CacheExchangeOpts = {
+  updates: Partial<UpdatesConfig>;
+  resolvers: ResolverConfig;
+  optimistic: OptimisticMutationConfig;
+  keys: KeyingConfig;
+  schema: IntrospectionData;
+  storage: StorageAdapter;
+};
 
-
-export const cacheExchange = <
-  C extends CacheType = CacheType
->(
-  opts?: CacheExchangeOpts<C>
+export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
+  opts?: C
 ): Exchange => ({ forward, client, dispatchDebug }) => {
   const store = new Store<C>(opts);
 

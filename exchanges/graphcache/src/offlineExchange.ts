@@ -24,7 +24,6 @@ import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
-  CacheType,
 } from './types';
 
 import { makeDict } from './helpers/dict';
@@ -32,8 +31,8 @@ import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
 /** Determines whether a given query contains an optimistic mutation field */
-const isOptimisticMutation = (
-  config: OptimisticMutationConfig,
+const isOptimisticMutation = <T extends OptimisticMutationConfig>(
+  config: T,
   operation: Operation
 ) => {
   const vars: Variables = operation.variables || makeDict();
@@ -66,10 +65,8 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = <
-  C extends CacheType = CacheType
->(
-  opts: CacheExchangeOpts<C>
+export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
+  opts: C
 ): Exchange => input => {
   const { storage } = opts;
 
@@ -81,7 +78,7 @@ export const offlineExchange = <
   ) {
     const { forward: outerForward, client, dispatchDebug } = input;
     const { source: reboundOps$, next } = makeSubject<Operation>();
-    const optimisticMutations = opts.optimistic || {};
+    const optimisticMutations = opts.optimistic ?? {};
     const failedQueue: Operation[] = [];
 
     const updateMetadata = () => {
