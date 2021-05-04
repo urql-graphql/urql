@@ -1,5 +1,6 @@
-import React from "react";
-import { gql, useQuery } from "urql";
+import React from 'react';
+import { View, Text } from 'react-native';
+import { gql, useQuery } from 'urql';
 
 const POKEMONS_QUERY = gql`
   query Pokemons {
@@ -16,19 +17,9 @@ const PokemonList = () => {
   const { data, fetching, error } = result;
 
   return (
-    <div>
-      {fetching && <p>Loading...</p>}
-
-      {error && <p>Oh no... {error.message}</p>}
-
-      {data && (
-        <ul>
-          {data.pokemons.map((pokemon) => (
-            <li key={pokemon.id}>{pokemon.name}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <View>
+      <Text>aa</Text>
+    </View>
   );
 };
 
