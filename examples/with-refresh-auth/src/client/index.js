@@ -1,6 +1,7 @@
 import { createClient, dedupExchange, fetchExchange, gql } from 'urql';
 import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
+import { cacheExchange } from '@urql/exchange-graphcache';
 import {
   getRefreshToken,
   getToken,
@@ -76,6 +77,7 @@ const client = createClient({
   url: 'https://trygql.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
+    cacheExchange({}),
     authExchange({ getAuth, addAuthToOperation, didAuthError }),
     fetchExchange,
   ],
