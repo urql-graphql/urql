@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gql, useMutation } from 'urql';
-
-import { AuthContext } from '../auth/AuthContext';
 
 const LOGIN_MUTATION = gql`
   mutation Signin($input: LoginInput!) {
@@ -12,9 +10,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-const LoginForm = () => {
-  const { onLoginSuccess } = useContext(AuthContext);
-
+const LoginForm = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 

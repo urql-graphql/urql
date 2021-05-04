@@ -1,13 +1,28 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { AuthContext } from '../auth/AuthContext';
-import LoginForm from './LoginForm';
+import { getToken, saveAuthData } from '../auth/Store';
 import Profile from './Profile';
+import LoginForm from './LoginForm';
 
 const Home = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  return isLoggedIn ? <Profile /> : <LoginForm />;
+  const onLoginSuccess = auth => {
+    setIsLoggedIn(true);
+    saveAuthData(auth);
+  };
+
+  useEffect(() => {
+    if (getToken()) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  return isLoggedIn ? (
+    <Profile />
+  ) : (
+    <LoginForm onLoginSuccess={onLoginSuccess} />
+  );
 };
 
 export default Home;
