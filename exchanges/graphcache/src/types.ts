@@ -148,7 +148,7 @@ export interface ResolverConfig {
   };
 }
 
-export type UpdateResolver<Result = Data | Data[], Args = Variables> = (
+export type UpdateResolver<Result = Data, Args = Variables> = (
   result: Result,
   args: Args,
   cache: Cache,
