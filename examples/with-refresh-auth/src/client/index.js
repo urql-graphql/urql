@@ -78,12 +78,33 @@ const didAuthError = ({ error }) => {
   return error.graphQLErrors.some(e => e.extensions?.code === 'UNAUTHORIZED');
 };
 
+const willAuthError = ({ operation, authState }) => {
+  if (!authState) {
+    // Detect our login mutation and let this operation through:
+    return (
+      operation.kind !== 'mutation' ||
+      // Here we find any mutation definition with the "signin" field
+      !operation.query.definitions.some(definition => {
+        return (
+          definition.kind === 'OperationDefinition' &&
+          definition.selectionSet.selections.some(node => {
+            // The field name is just an example, since register may also be an exception
+            return node.kind === 'Field' && node.name.value === 'signin';
+          })
+        );
+      })
+    );
+  }
+
+  return true;
+};
+
 const client = createClient({
   url: 'https://trygql.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
-    cacheExchange({}),
-    authExchange({ getAuth, addAuthToOperation, didAuthError }),
+    cacheExchange,
+    authExchange({ getAuth, addAuthToOperation, didAuthError, willAuthError }),
     fetchExchange,
   ],
 });
