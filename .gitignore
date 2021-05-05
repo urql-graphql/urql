@@ -18,3 +18,8 @@ tmp/
 dist/
 examples/*/public
 examples/*/yarn.lock
+examples/*/ios/
+examples/*/android/
+examples/*/.watchmanconfig
+examples/*/metro.config.js
+examples/*/babel.config.js
