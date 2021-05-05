@@ -8,8 +8,8 @@ const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const onLoginSuccess = auth => {
-    setIsLoggedIn(true);
     saveAuthData(auth);
+    setIsLoggedIn(true);
   };
 
   useEffect(() => {

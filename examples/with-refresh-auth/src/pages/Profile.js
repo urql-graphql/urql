@@ -22,7 +22,7 @@ const Profile = () => {
 
       {error && <p>Oh no... {error.message}</p>}
 
-      {data && (
+      {data?.me && (
         <>
           <p>profile data</p>
           <p>id: {data.me.id}</p>
