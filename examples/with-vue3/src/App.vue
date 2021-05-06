@@ -1,8 +1,7 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
   <Suspense>
     <template #default>
-      <HelloWorld msg="Hello Vue 3.0 + Vite" />
+      <PokemonList />
     </template>
     <template #fallback>
       <div>Loading...</div>
@@ -11,8 +10,8 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import { provideClient } from '@urql/vue';
+import PokemonList from './PokemonList.vue'
 
 export default {
   name: 'App',
@@ -22,7 +21,7 @@ export default {
     });
   },
   components: {
-    HelloWorld
+    PokemonList
   }
 }
 </script>
