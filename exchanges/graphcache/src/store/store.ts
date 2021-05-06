@@ -15,7 +15,7 @@ import {
   OptimisticMutationConfig,
   KeyingConfig,
   Entity,
-  CacheExchangeOpts
+  CacheExchangeOpts,
 } from '../types';
 
 import { invariant } from '../helpers/help';
