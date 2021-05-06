@@ -12,7 +12,6 @@ const cache = cacheExchange({
             links(first: $first) {
               nodes {
                 id
-                canonicalUrl
               }
             }
           }
@@ -32,7 +31,6 @@ const cache = cacheExchange({
             },
             data => {
               data.links.nodes.push(result.createLink.node);
-
               return data;
             }
           );
