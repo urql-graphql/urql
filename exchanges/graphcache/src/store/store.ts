@@ -15,6 +15,7 @@ import {
   OptimisticMutationConfig,
   KeyingConfig,
   Entity,
+  CacheExchangeOpts
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -33,7 +34,6 @@ import {
   expectValidResolversConfig,
   expectValidOptimisticMutationsConfig,
 } from '../ast';
-import { CacheExchangeOpts } from '../cacheExchange';
 
 type RootField = 'query' | 'mutation' | 'subscription';
 

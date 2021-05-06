@@ -24,10 +24,11 @@ import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
+  CacheExchangeOpts,
 } from './types';
 
 import { makeDict } from './helpers/dict';
-import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
+import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
 /** Determines whether a given query contains an optimistic mutation field */

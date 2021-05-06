@@ -28,17 +28,9 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
-import { IntrospectionData, filterVariables, getMainOperation } from './ast';
+import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
-
-import {
-  StorageAdapter,
-  Dependencies,
-  UpdatesConfig,
-  ResolverConfig,
-  OptimisticMutationConfig,
-  KeyingConfig,
-} from './types';
+import { Dependencies, CacheExchangeOpts } from './types';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -49,15 +41,6 @@ type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
-
-export type CacheExchangeOpts = {
-  updates: Partial<UpdatesConfig>;
-  resolvers: ResolverConfig;
-  optimistic: OptimisticMutationConfig;
-  keys: KeyingConfig;
-  schema: IntrospectionData;
-  storage: StorageAdapter;
-};
 
 export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C

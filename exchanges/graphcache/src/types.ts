@@ -1,5 +1,6 @@
 import { TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { IntrospectionData } from './ast';
 
 // Helper types
 export type NullArray<T> = Array<null | T | NullArray<T>>;
@@ -135,9 +136,18 @@ type ResolverResult =
   | null
   | undefined;
 
+export type CacheExchangeOpts = Partial<{
+  updates: Partial<UpdatesConfig>;
+  resolvers: ResolverConfig;
+  optimistic: OptimisticMutationConfig;
+  keys: KeyingConfig;
+  schema: IntrospectionData;
+  storage: StorageAdapter;
+}>;
+
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver<
-  ParentData = Data,
+  ParentData = DataFields,
   Args = Variables,
   Result = ResolverResult
 > = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
