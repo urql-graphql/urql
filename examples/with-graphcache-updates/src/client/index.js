@@ -41,7 +41,7 @@ const cache = cacheExchange({
 });
 
 const client = createClient({
-  url: 'https://trygql.dev/graphql/web-collections',
+  url: 'https://trygql.formidable.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
     cache,

@@ -17,7 +17,7 @@ export default {
   name: 'App',
   setup() {
     provideClient({
-      url: 'https://trygql.dev/graphql/basic-pokedex',
+      url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
     });
   },
   components: {

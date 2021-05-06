@@ -4,7 +4,7 @@ import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
 import FileUpload from "./pages/FileUpload";
 
 const client = createClient({
-  url: "https://trygql.dev/graphql/uploads-mock",
+  url: "https://trygql.formidable.dev/graphql/uploads-mock",
   exchanges: [multipartFetchExchange],
 });
 

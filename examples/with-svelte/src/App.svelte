@@ -3,7 +3,7 @@
   import PokemonList from "./PokemonList.svelte";
 
   initClient({
-    url: "https://trygql.dev/graphql/basic-pokedex"
+    url: "https://trygql.formidable.dev/graphql/basic-pokedex"
   });
 </script>
 

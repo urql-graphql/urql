@@ -35,7 +35,7 @@ function Server() {
 export async function getServerSideProps() {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient({
-    url: "https://trygql.dev/graphql/basic-pokedex",
+    url: "https://trygql.formidable.dev/graphql/basic-pokedex",
     exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange]
   }, false);
 

@@ -30,7 +30,7 @@ function Index() {
 
 export default withUrqlClient(
   () => ({
-    url: "https://trygql.dev/graphql/basic-pokedex"
+    url: "https://trygql.formidable.dev/graphql/basic-pokedex"
   }),
   { ssr: true }
 )(Index);

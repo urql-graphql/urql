@@ -4,7 +4,7 @@ import { retryExchange } from '@urql/exchange-retry';
 import Color from "./pages/Color";
 
 const client = createClient({
-  url: "https://trygql.dev/graphql/intermittent-colors",
+  url: "https://trygql.formidable.dev/graphql/intermittent-colors",
   exchanges: [
     retryExchange({
       maxNumberAttempts: 5,
