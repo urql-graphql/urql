@@ -1,52 +1,21 @@
-import {
-  createClient,
-  dedupExchange,
-  fetchExchange,
-  cacheExchange,
-  gql,
-} from 'urql';
+import { createClient, dedupExchange, fetchExchange, gql } from 'urql';
 import { makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
-import {
-  getRefreshToken,
-  getToken,
-  saveAuthData,
-  clearStorage,
-} from '../auth/Store';
+import { cacheExchange } from '@urql/exchange-graphcache';
 
-const REFRESH_TOKEN_MUTATION = gql`
-  mutation RefreshCredentials($refreshToken: String!) {
-    refreshCredentials(refreshToken: $refreshToken) {
-      refreshToken
-      token
-    }
-  }
-`;
-
-const getAuth = async ({ authState, mutate }) => {
+const getAuth = async ({ authState }) => {
   if (!authState) {
-    const token = getToken();
-    const refreshToken = getRefreshToken();
+    const token = localStorage.getItem('authToken');
 
-    if (token && refreshToken) {
-      return { token, refreshToken };
+    if (token) {
+      return { token };
     }
 
     return null;
   }
 
-  const result = await mutate(REFRESH_TOKEN_MUTATION, {
-    refreshToken: authState.refreshToken,
-  });
-
-  if (result.data?.refreshCredentials) {
-    saveAuthData(result.data.refreshCredentials);
-
-    return result.data.refreshCredentials;
-  }
-
   // This is where auth has gone wrong and we need to clean up and redirect to a login page
-  clearStorage();
+  localStorage.clear();
   window.location.reload();
 
   return null;
@@ -103,7 +72,44 @@ const client = createClient({
   url: 'https://trygql.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
-    cacheExchange,
+    cacheExchange({
+      updates: {
+        Mutation: {
+          createLink(result, _args, cache, _info) {
+            const LinksList = gql`
+              query Links($first: Int!) {
+                links(first: $first) {
+                  nodes {
+                    id
+                    canonicalUrl
+                  }
+                }
+              }
+            `;
+
+            const linksPages = cache
+              .inspectFields('Query')
+              .filter(field => field.fieldName === 'links');
+
+            if (linksPages.length > 0) {
+              const field = linksPages[linksPages.length - 1];
+
+              cache.updateQuery(
+                {
+                  query: LinksList,
+                  variables: { first: field.arguments.first },
+                },
+                data => {
+                  data.links.nodes.push(result.createLink.node);
+
+                  return data;
+                }
+              );
+            }
+          },
+        },
+      },
+    }),
     authExchange({ getAuth, addAuthToOperation, didAuthError, willAuthError }),
     fetchExchange,
   ],
