@@ -307,7 +307,7 @@ cacheExchange({
                 data.todos = data.todos.filter(todo => todo.id !== args.id);
                 return data;
               }
-            });
+            );
           });
       },
     },
