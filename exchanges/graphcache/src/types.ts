@@ -136,14 +136,14 @@ type ResolverResult =
   | null
   | undefined;
 
-export type CacheExchangeOpts = Partial<{
-  updates: Partial<UpdatesConfig>;
-  resolvers: ResolverConfig;
-  optimistic: OptimisticMutationConfig;
-  keys: KeyingConfig;
-  schema: IntrospectionData;
-  storage: StorageAdapter;
-}>;
+export type CacheExchangeOpts = {
+  updates?: Partial<UpdatesConfig>;
+  resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
+  schema?: IntrospectionData;
+  storage?: StorageAdapter;
+};
 
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver<
