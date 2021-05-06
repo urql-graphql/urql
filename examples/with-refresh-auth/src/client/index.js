@@ -96,7 +96,7 @@ const willAuthError = ({ operation, authState }) => {
     );
   }
 
-  return true;
+  return false;
 };
 
 const client = createClient({
