@@ -1,0 +1,19 @@
+{
+  "name": "vue-urql-query",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@urql/vue": "0.3.0",
+    "vue": "^3.0.11"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.2",
+    "@vue/compiler-sfc": "^3.0.11",
+    "vite": "^2.2.4"
+  }
+}
