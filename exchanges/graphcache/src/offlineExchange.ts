@@ -24,15 +24,16 @@ import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
+  CacheExchangeOpts,
 } from './types';
 
 import { makeDict } from './helpers/dict';
-import { cacheExchange, CacheExchangeOpts } from './cacheExchange';
+import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
 /** Determines whether a given query contains an optimistic mutation field */
-const isOptimisticMutation = (
-  config: OptimisticMutationConfig,
+const isOptimisticMutation = <T extends OptimisticMutationConfig>(
+  config: T,
   operation: Operation
 ) => {
   const vars: Variables = operation.variables || makeDict();
@@ -65,7 +66,9 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = (opts: CacheExchangeOpts): Exchange => input => {
+export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
+  opts: C
+): Exchange => input => {
   const { storage } = opts;
 
   if (

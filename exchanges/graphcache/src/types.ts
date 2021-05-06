@@ -1,5 +1,6 @@
 import { TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { IntrospectionData } from './ast';
 
 // Helper types
 export type NullArray<T> = Array<null | T | NullArray<T>>;
@@ -135,13 +136,21 @@ type ResolverResult =
   | null
   | undefined;
 
+export type CacheExchangeOpts = {
+  updates?: Partial<UpdatesConfig>;
+  resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
+  schema?: IntrospectionData;
+  storage?: StorageAdapter;
+};
+
 // Cache resolvers are user-defined to overwrite an entity field result
-export type Resolver = (
-  parent: Data,
-  args: Variables,
-  cache: Cache,
-  info: ResolveInfo
-) => ResolverResult;
+export type Resolver<
+  ParentData = DataFields,
+  Args = Variables,
+  Result = ResolverResult
+> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
 
 export interface ResolverConfig {
   [typeName: string]: {
@@ -149,9 +158,9 @@ export interface ResolverConfig {
   };
 }
 
-export type UpdateResolver = (
-  result: Data,
-  args: Variables,
+export type UpdateResolver<ParentData = DataFields, Args = Variables> = (
+  parent: ParentData,
+  args: Args,
   cache: Cache,
   info: ResolveInfo
 ) => void;
@@ -167,11 +176,10 @@ export interface UpdatesConfig {
   };
 }
 
-export type OptimisticMutationResolver = (
-  vars: Variables,
-  cache: Cache,
-  info: ResolveInfo
-) => Link<Data>;
+export type OptimisticMutationResolver<
+  Args = Variables,
+  Result = Link<Data>
+> = (vars: Args, cache: Cache, info: ResolveInfo) => Result;
 
 export interface OptimisticMutationConfig {
   [mutationFieldName: string]: OptimisticMutationResolver;

@@ -11,11 +11,11 @@ import {
   Link,
   Data,
   QueryInput,
-  UpdatesConfig,
   UpdateResolver,
   OptimisticMutationConfig,
   KeyingConfig,
   Entity,
+  CacheExchangeOpts,
 } from '../types';
 
 import { invariant } from '../helpers/help';
@@ -27,7 +27,6 @@ import { keyOfField } from './keys';
 import * as InMemoryData from './data';
 
 import {
-  IntrospectionData,
   SchemaIntrospector,
   buildClientSchema,
   expectValidKeyingConfig,
@@ -38,15 +37,9 @@ import {
 
 type RootField = 'query' | 'mutation' | 'subscription';
 
-export interface StoreOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
-  schema?: IntrospectionData;
-}
-
-export class Store implements Cache {
+export class Store<
+  C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
+> implements Cache {
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
@@ -58,8 +51,8 @@ export class Store implements Cache {
   rootFields: { query: string; mutation: string; subscription: string };
   rootNames: { [name: string]: RootField };
 
-  constructor(opts?: StoreOpts) {
-    if (!opts) opts = {};
+  constructor(opts?: C) {
+    if (!opts) opts = {} as C;
 
     this.resolvers = opts.resolvers || {};
     this.optimisticMutations = opts.optimistic || {};

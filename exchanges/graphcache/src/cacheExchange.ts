@@ -28,17 +28,9 @@ import {
 import { query, write, writeOptimistic } from './operations';
 import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
-import { IntrospectionData, filterVariables, getMainOperation } from './ast';
+import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
-
-import {
-  UpdatesConfig,
-  ResolverConfig,
-  OptimisticMutationConfig,
-  KeyingConfig,
-  StorageAdapter,
-  Dependencies,
-} from './types';
+import { Dependencies, CacheExchangeOpts } from './types';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -50,21 +42,10 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export interface CacheExchangeOpts {
-  updates?: Partial<UpdatesConfig>;
-  resolvers?: ResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
-  schema?: IntrospectionData;
-  storage?: StorageAdapter;
-}
-
-export const cacheExchange = (opts?: CacheExchangeOpts): Exchange => ({
-  forward,
-  client,
-  dispatchDebug,
-}) => {
-  const store = new Store(opts);
+export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
+  opts?: C
+): Exchange => ({ forward, client, dispatchDebug }) => {
+  const store = new Store<C>(opts);
 
   let hydration: void | Promise<void>;
   if (opts && opts.storage) {
