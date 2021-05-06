@@ -92,12 +92,12 @@ const client = createClient({
               .filter(field => field.fieldName === 'links');
 
             if (linksPages.length > 0) {
-              const field = linksPages[linksPages.length - 1];
+              const lastField = linksPages[linksPages.length - 1];
 
               cache.updateQuery(
                 {
                   query: LinksList,
-                  variables: { first: field.arguments.first },
+                  variables: { first: lastField.arguments.first },
                 },
                 data => {
                   data.links.nodes.push(result.createLink.node);
