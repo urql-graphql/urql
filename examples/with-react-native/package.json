@@ -1,13 +1,11 @@
 {
-  "name": "withreactnative",
-  "version": "0.0.1",
+  "name": "with-react-native",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start",
-    "test": "jest",
-    "lint": "eslint ."
+    "start": "react-native start"
   },
   "dependencies": {
     "graphql": "^15.5.0",

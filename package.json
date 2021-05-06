@@ -23,6 +23,16 @@
       "./scripts/eslint/preset.js"
     ]
   },
+  "overrides": [
+    {
+      "files": [
+        "examples/**/*"
+      ],
+      "extends": [
+        "./scripts/eslint/js-preset.js"
+      ]
+    }
+  ],
   "eslintIgnore": [
     "packages/site/dist-prod",
     "docs"
