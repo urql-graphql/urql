@@ -1,24 +1,24 @@
-# Integrating with `@urql/exchange-persisted-fetch`’s persistedFetchExchange
+# With Automatic Persisted Queries
 
-Integrating urql is as simple as:
+This example shows `urql` in use with `@urql/exchange-persisted-fetch`'s `persistedFetchExchange`
+to support [Automatic Persisted
+Queries](https://www.apollographql.com/docs/apollo-server/performance/apq/). This largely follows
+the ["Persisted Queries" docs
+page](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/#automatic-persisted-queries)
+and uses the [`trygql.formidable.dev/graphql/apq-weather` schema](https://github.com/FormidableLabs/trygql).
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
-
-```sh
-yarn add urql graphql
-# or
-npm install --save urql graphql
-```
-
-2. Then install the package for [automatic persisted queries](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/)
-
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add @urql/exchange-persisted-fetch
+yarn install
+yarn run start
 # or
-npm install --save @urql/exchange-persisted-fetch
+npm install
+npm run start
 ```
 
-3. Setting up the Client and adding persistedFetchExchange [here](src/App.js)
+This example contains:
 
-4. Execute the Query [here](src/pages/LocationsList.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
+- The `persistedFetchExchange` from `@urql/exchange-persisted-fetch` in [`src/App.js`](src/App.js)
+- A query for locations in [`src/pages/LocationsList.js`](src/pages/LocationsList.js)

@@ -1,6 +1,6 @@
 {
-  "name": "urlq-retry-query",
-  "version": "1.0.0",
+  "name": "with-retry",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "@urql/exchange-retry": "^0.2.0",
@@ -17,12 +17,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

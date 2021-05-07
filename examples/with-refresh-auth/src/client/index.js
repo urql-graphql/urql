@@ -100,7 +100,7 @@ const willAuthError = ({ operation, authState }) => {
 };
 
 const client = createClient({
-  url: 'https://trygql.dev/graphql/web-collections',
+  url: 'https://trygql.formidable.dev/graphql/web-collections',
   exchanges: [
     dedupExchange,
     cacheExchange,

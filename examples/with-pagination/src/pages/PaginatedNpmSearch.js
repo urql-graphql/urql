@@ -61,16 +61,15 @@ const PaginatedNpmSearch = () => {
   return (
     <div>
       {pageVariables.map((variables, i) => (
-          <SearchResultPage
-            key={"" + variables.after}
-            variables={variables}
-            isLastPage={i === pageVariables.length - 1}
-            onLoadMore={(after) =>
-              setPageVariables([...pageVariables, { after, first: limit, query }])
-            }
-          />
-        )
-      )}
+        <SearchResultPage
+          key={"" + variables.after}
+          variables={variables}
+          isLastPage={i === pageVariables.length - 1}
+          onLoadMore={(after) =>
+            setPageVariables([...pageVariables, { after, first: limit, query }])
+          }
+        />
+      ))}
     </div>
   );
 };

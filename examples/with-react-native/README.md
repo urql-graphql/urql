@@ -1,15 +1,18 @@
-# Integrating with React Native
+# With React Native
 
-Integrating urql is as simple as:
+This example shows `urql` in use with React Native.
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add urql graphql
+yarn install
+yarn run start
 # or
-npm install --save urql graphql
+npm install
+npm run start
 ```
 
-2. Setting up the Client [here](App.js)
+This example contains:
 
-3. Execute the Query [here](src/screens/PokemonList.js)
+- The `urql` bindings and a React Native app with a client set up in [`src/App.js`](src/App.js)
+- A query for pokémon in [`src/screens/PokemonList.js`](src/screens/PokemonList.js)

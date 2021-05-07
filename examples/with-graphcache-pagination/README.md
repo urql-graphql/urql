@@ -1,23 +1,23 @@
-# Integrating with `@urql/exchange-graphcache`'s cacheExchange pagination
+# With Graphcache's Pagination
 
-Integrating urql is as simple as:
+This example shows `urql` in use with `@urql/exchange-graphcache`'s infinite pagination helpers to
+merge several pages of a Relay-compliant schema into an infinite list.
+This largely follows the ["Pagination" section on the "Local Resolvers" docs
+page](https://formidable.com/open-source/urql/docs/graphcache/local-resolvers/#pagination)
+and uses the [`trygql.formidable.dev/graphql/relay-npm` schema](https://github.com/FormidableLabs/trygql).
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
-
-```sh
-yarn add urql graphql
-# or
-npm install --save urql graphql
-```
-
-2. Install [graphcache](https://formidable.com/open-source/urql/docs/graphcache/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add @urql/exchange-graphcache
+yarn install
+yarn run start
 # or
-npm install --save @urql/exchange-graphcache
+npm install
+npm run start
 ```
 
-3. Setting up the Client [here](src/App.js)
+This example contains:
 
-4. Execute the Query [here](src/pages/PaginatedNpmSearch.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
+- The `cacheExchange` from `@urql/exchange-graphcache` in [`src/App.js`](src/App.js)
+- A paginated query for packages in [`src/pages/PaginatedNpmSearch.js`](src/pages/PaginatedNpmSearch.js)

@@ -1,6 +1,6 @@
 import { Provider } from "urql";
 
-import client from './client';
+import client from "./client";
 import Home from "./pages/Home";
 
 function App() {

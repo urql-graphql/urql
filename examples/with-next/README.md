@@ -1,4 +1,18 @@
-# Integrating with Next
+# With Next.js
+
+This example shows `next-urql` and `urql` in use with Next.js as explained [in the "Next.js" section
+on the "Server-side Rendering" docs
+page](https://formidable.com/open-source/urql/docs/advanced/server-side-rendering/#nextjs).
+
+To run this example install dependencies and run the `start` script:
+
+```sh
+yarn install
+yarn run start
+# or
+npm install
+npm run start
+```
 
 ## getInitialProps
 

@@ -1,6 +1,6 @@
 {
-  "name": "next-get-static-props",
-  "version": "1.0.0",
+  "name": "with-next",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "graphql": "^15.5.0",

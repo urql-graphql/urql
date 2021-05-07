@@ -1,15 +1,21 @@
-# Integrating with React
+# With Pagination (in React)
 
-Integrating urql is as simple as:
+This example shows how to implement infinite pagination with `urql` in your React UI code. It
+renders several pages as fragments with one component managing the variables for the page queries.
+This example is also reapplicable to other libraries, like Svelte or Vue.
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add urql graphql
+yarn install
+yarn run start
 # or
-npm install --save urql graphql
+npm install
+npm run start
 ```
 
-2. Setting up the Client [here](src/App.js)
+This example contains:
 
-3. Execute the Query [here](src/pages/PaginatedNpmSearch.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
+- A managing component called `PaginatedNpmSearch` set up to render all pages in [`src/PaginatedNpmSearch.js`](src/PaginatedNpmSearch.js)
+- A page component called `SearchResultPage` running page queries in [`src/PaginatedNpmSearch.js`](src/PaginatedNpmSearch.js)
