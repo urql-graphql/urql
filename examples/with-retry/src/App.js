@@ -9,9 +9,11 @@ const client = createClient({
     retryExchange({
       maxNumberAttempts: 5,
       retryIf: error => {
-        return error.graphQLErrors.length || error.networkError;
+        // NOTE: With this deemo schema we have a specific random error to look out for:
+        return error.graphQLErrors.some(x => x.extensions?.code === 'NO_SOUP')
+          || !!error.networkError;
       }
-    }), // Use the retryExchange factory to add a new exchange,
+    }),
     fetchExchange
   ],
 });

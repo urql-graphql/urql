@@ -1,22 +1,22 @@
-# Integrating with `@urql/exchange-multipart-fetch`'s multipartFetchExchange
+# With Multipart File Upload
 
-Integrating urql is as simple as:
+This example shows `urql` in use with `@urql/exchange-multipart-fetch`'s `multipartFetchExchange`
+to support file uploads in GraphQL. This largely follows the ["File Uploads" docs
+page](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/)
+and uses the [`trygql.formidable.dev/graphql/uploads-mock` schema](https://github.com/FormidableLabs/trygql).
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add urql graphql
+yarn install
+yarn run start
 # or
-npm install --save urql graphql
+npm install
+npm run start
 ```
 
-2. Add [multipart exchange](https://formidable.com/open-source/urql/docs/advanced/persistence-and-uploads/)
+This example contains:
 
-```yarn add @urql/exchange-multipart-fetch
-# or
-npm install --save @urql/exchange-multipart-fetch
-```
-
-3. Setting up the Client [here](src/App.js)
-
-4. Execute the Mutation [here](src/pages/FileUpload.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
+- The `multipartFetchExchange` from `@urql/exchange-multipart-fetch` in [`src/App.js`](src/App.js)
+- A basic file upload form in [`src/pages/FileUpload.js`](src/pages/FileUpload.js)

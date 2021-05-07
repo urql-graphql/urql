@@ -1,25 +1,24 @@
-# Integrating with `@urql/exchange-graphcache`'s cacheExchange Cache Updates
+# With Graphcache's Pagination
 
-Integrating urql is as simple as:
+This example shows `urql` in use with `@urql/exchange-graphcache` and demonstrates a manual cache
+update, as explained in [the "Cache Updates" docs page](https://formidable.com/open-source/urql/docs/graphcache/cache-updates/).
+This example uses the [`trygql.formidable.dev/graphql/web-collections`
+schema](https://github.com/FormidableLabs/trygql) and builds on top of the [`with-refresh-auth`
+example](../with-refresh-auth) so that we can authenticate with the schema before creating links on
+it.
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
-
-```sh
-yarn add urql graphql
-# or
-npm install --save urql graphql
-```
-
-2. Install [graphcache](https://formidable.com/open-source/urql/docs/graphcache/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add @urql/exchange-graphcache
+yarn install
+yarn run start
 # or
-npm install --save @urql/exchange-graphcache
+npm install
+npm run start
 ```
 
-3. Setting up the Client [here](src/App.js)
+This example contains:
 
-4. Configure the Client for handling cache updates [here](src/client/index.js#76) 
-
-5. Execute the create Mutation [here](src/pages/Links.js)
+- The `urql` bindings and a React app with a client set up in [`src/client/index.js`](src/client/index.js)
+- The `cacheExchange` from `@urql/exchange-graphcache` in [`src/client/index.js`](src/client/index.js)
+- A links list and link creation in [`src/pages/Links.js`](src/pages/Links.js)

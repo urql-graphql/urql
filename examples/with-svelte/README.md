@@ -1,15 +1,19 @@
-# Integrating with React
+# With Svelte
 
-Integrating urql is as simple as:
+This example shows `@urql/svelte` in use with Svelte, as explained on the ["Svelte" page of the "Basics"
+documentation.](https://formidable.com/open-source/urql/docs/basics/svelte/)
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/svelte/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add @urql/svelte graphql
+yarn install
+yarn run start
 # or
-npm install --save @urql/svelte graphql
+npm install
+npm run start
 ```
 
-2. Setting up the Client [here](src/App.svelte)
+This example contains:
 
-3. Execute the Query [here](src/App.svelte)
+- The `@urql/svelte` bindings with a client set up in [`src/App.svelte`](src/App.svelte)
+- A query for pokémon in [`src/PokemonList.svelte`](src/pages/PokemonList.svelte)

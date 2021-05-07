@@ -1,15 +1,19 @@
-# Integrating with React
+# With React
 
-Integrating urql is as simple as:
+This example shows `urql` in use with React, as explained on the ["React/Preact" page of the "Basics"
+documentation.](https://formidable.com/open-source/urql/docs/basics/react-preact/)
 
-1. Install packages [getting started](https://formidable.com/open-source/urql/docs/basics/react-preact/)
+To run this example install dependencies and run the `start` script:
 
 ```sh
-yarn add urql graphql
+yarn install
+yarn run start
 # or
-npm install --save urql graphql
+npm install
+npm run start
 ```
 
-2. Setting up the Client [here](src/App.js)
+This example contains:
 
-3. Execute the Query [here](src/pages/PokemonList.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
+- A query for pokémon in [`src/pages/PokemonList.js`](src/pages/PokemonList.js)
