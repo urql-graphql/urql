@@ -1,5 +1,17 @@
 # @urql/introspection
 
+## 0.3.0
+
+### Minor Changes
+
+- Add options to `@urql/introspection`'s `minifyIntrospectionQuery` allowing the inclusion of more
+  information into the minified schema as needed, namely `includeScalars`, `includeEnums`,
+  `includeInputs`, and `includeDirectives`, by [@kitten](https://github.com/kitten) (See [#1578](https://github.com/FormidableLabs/urql/pull/1578))
+
+### Patch Changes
+
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+
 ## 0.2.0
 
 ### Minor Changes
