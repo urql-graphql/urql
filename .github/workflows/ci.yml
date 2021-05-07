@@ -91,6 +91,9 @@ jobs:
     strategy:
       matrix:
         node: [0, 1, 2]
+    env:
+      NODE_TOTAL: 3
+      NODE_INDEX: ${{matrix.node}}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -124,6 +127,7 @@ jobs:
         run: yarn install --prefer-offline --frozen-lockfile --non-interactive --silent
       - name: Build
         run: yarn run build
-        env:
-          NODE_TOTAL: 3
-          NODE_INDEX: ${{matrix.node}}
+      - name: Pack
+        uses: ./.github/actions/yarn-run
+        with:
+          command: pack

@@ -1,0 +1,9 @@
+name: 'Run a Yarn command'
+description: 'Locally run a forked Yarn command as an action.'
+inputs:
+  command:
+    description: 'Command'
+    default: 'help'
+runs:
+  using: 'node12'
+  main: 'action.js'

@@ -1,6 +1,6 @@
-/.github/ @kitten @jovidecroock
 /.github/ @kitten @jovidecroock @andyrichardson
 /.changeset/config.json @kitten @jovidecroock
+/scripts/actions/* @kitten @jovidecroock
 /scripts/prepare/* @kitten @jovidecroock
 /scripts/rollup/* @kitten @jovidecroock
 /scripts/changesets/* @kitten @jovidecroock
