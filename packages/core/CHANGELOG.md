@@ -1,5 +1,22 @@
 # @urql/core
 
+## 2.1.0
+
+### Minor Changes
+
+- With the "single-source behavior" the `Client` will now also avoid executing an operation if it's already active, has a previous result available, and is either run with the `cache-first` or `cache-only` request policies. This is similar to a "short circuiting" behavior, where unnecessary work is avoided by not issuing more operations into the exchange pipeline than expected, by [@kitten](https://github.com/kitten) (See [#1600](https://github.com/FormidableLabs/urql/pull/1600))
+- Add consistent "single-source behavior" which makes the `Client` more forgiving when duplicate
+  sources are used, which previously made it difficult to use the same operation across an app
+  together with `cache-and-network`; This was a rare use-case, and it isn't recommended to overfetch
+  data across an app, however, the new `Client` implementation of shared sources ensures that when an
+  operation is active that the `Client` distributes the last known result for the active operation to
+  any new usages of it (which is called “replaying stale results”) (See [#1515](https://github.com/FormidableLabs/urql/pull/1515))
+
+### Patch Changes
+
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+- ⚠️ Fix inconsistency in generating keys for `DocumentNode`s, especially when using GraphQL Code Generator, which could cause SSR serialization to fail, by [@zenflow](https://github.com/zenflow) (See [#1509](https://github.com/FormidableLabs/urql/pull/1509))
+
 ## 2.0.0
 
 ### Major Changes

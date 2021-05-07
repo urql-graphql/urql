@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.0
+
+### Minor Changes
+
+- Allow subsequent static-pages to hydrate the cache, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1602](https://github.com/FormidableLabs/urql/pull/1602))
+
+### Patch Changes
+
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+
 ## 3.0.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @urql/storybook-addon
 
+## 1.0.7
+
+### Patch Changes
+
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+
 ## 1.0.6
 
 ### Patch Changes

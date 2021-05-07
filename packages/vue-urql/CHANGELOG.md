@@ -1,5 +1,18 @@
 # @urql/vue
 
+## 0.4.0
+
+### Minor Changes
+
+- A `useClientHandle()` function has been added. This creates a `handle` on which all `use*` hooks can be called, like `await handle.useQuery(...)` or `await handle.useSubscription(...)` which is useful for sequentially chaining hook calls in an `async setup()` function or preserve the right instance of a `Client` across lifecycle hooks, by [@kitten](https://github.com/kitten) (See [#1599](https://github.com/FormidableLabs/urql/pull/1599))
+
+### Patch Changes
+
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+- The `useClient()` function will now throw a more helpful error when it's called outside of any lifecycle hooks, by [@kitten](https://github.com/kitten) (See [#1599](https://github.com/FormidableLabs/urql/pull/1599))
+- Updated dependencies (See [#1570](https://github.com/FormidableLabs/urql/pull/1570), [#1509](https://github.com/FormidableLabs/urql/pull/1509), [#1600](https://github.com/FormidableLabs/urql/pull/1600), and [#1515](https://github.com/FormidableLabs/urql/pull/1515))
+  - @urql/core@2.1.0
+
 ## 0.3.0
 
 ### Minor Changes

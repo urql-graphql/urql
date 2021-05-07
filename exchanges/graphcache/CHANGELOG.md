@@ -1,5 +1,21 @@
 # @urql/exchange-graphcache
 
+## 4.1.0
+
+### Minor Changes
+
+- Add `cache.link(...)` method to Graphcache. This method may be used in updaters to update links in the cache. It is hence the writing-equivalent of `cache.resolve()`, which previously didn't have any equivalent as such, which meant that only `cache.updateQuery` or `cache.writeFragment` could be used, even to update simple relations, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1551](https://github.com/FormidableLabs/urql/pull/1551))
+- Add on a generic to `cacheExchange` and `offlineExchange` for future, experimental type-generation support, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1562](https://github.com/FormidableLabs/urql/pull/1562))
+
+### Patch Changes
+
+- ⚠️ Fix up internal types in Graphcache to improve their accuracy for catching more edge cases in its implementation. This only affects you if you previously imported any type related to `ScalarObject` from Graphcache which now is a more opaque type. We've also adjusted the `NullArray` types to be potentially nested, since lists in GraphQL can be nested arbitarily, which we were covering but didn't reflect in our types, by [@kitten](https://github.com/kitten) (See [#1591](https://github.com/FormidableLabs/urql/pull/1591))
+- Remove closure-compiler from the build step (See [#1570](https://github.com/FormidableLabs/urql/pull/1570))
+- ⚠️ Fix list items being returned as `null` even for non-nullable lists, when the entities are missing in the cache. This could happen when a resolver was added returning entities or their keys. This behaviour is now (correctly) only applied to partial results with schema awareness, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1566](https://github.com/FormidableLabs/urql/pull/1566))
+- Allow for the schema subscription and mutationType to be null, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1530](https://github.com/FormidableLabs/urql/pull/1530))
+- Updated dependencies (See [#1570](https://github.com/FormidableLabs/urql/pull/1570), [#1509](https://github.com/FormidableLabs/urql/pull/1509), [#1600](https://github.com/FormidableLabs/urql/pull/1600), and [#1515](https://github.com/FormidableLabs/urql/pull/1515))
+  - @urql/core@2.1.0
+
 ## 4.0.0
 
 ### Major Changes
