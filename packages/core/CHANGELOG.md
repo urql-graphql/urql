@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.1.1
+
+### Patch Changes
+
+- ⚠️ Fix a regression in `@urql/core@2.1.1` that prevented concurrent operations from being dispatched with differing request policies, which for instance prevented the explicit `executeQuery` calls on bindings to fail, by [@kitten](https://github.com/kitten) (See [#1626](https://github.com/FormidableLabs/urql/pull/1626))
+
 ## 2.1.0
 
 ### Minor Changes
