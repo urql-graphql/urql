@@ -12,9 +12,7 @@
     "stage:build": "react-static build --staging",
     "prod:build": "react-static build",
     "prod:serve": "serve -l 3000",
-    "serve": "formideploy serve",
-    "deploy:prod": "formideploy deploy --production",
-    "deploy:stage": "formideploy deploy --staging"
+    "deploy": "formideploy deploy"
   },
   "babel": {
     "presets": [

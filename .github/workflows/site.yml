@@ -62,7 +62,7 @@ jobs:
       - name: Deploy Production Site
         working-directory: ./packages/site
         if: github.ref == 'refs/heads/main'
-        run: yarn run deploy:prod
+        run: yarn run deploy --production
         env:
           GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -76,7 +76,7 @@ jobs:
       - name: Deploy Staging Site
         working-directory: ./packages/site
         if: github.ref != 'refs/heads/main'
-        run: yarn run deploy:stage
+        run: yarn run deploy --staging
         env:
           FORMIDEPLOY_GIT_SHA: ${{ github.event.pull_request.head.sha }}
           GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
