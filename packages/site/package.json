@@ -11,7 +11,7 @@
     "prepublishOnly": "run-s clean build",
     "stage:build": "react-static build --staging",
     "prod:build": "react-static build",
-    "prod:serve": "serve -l 3000",
+    "prod:serve": "formideploy serve",
     "deploy": "formideploy deploy"
   },
   "babel": {
