@@ -62,8 +62,9 @@ jobs:
       - name: Deploy Production Site
         working-directory: ./packages/site
         if: github.ref == 'refs/heads/main'
-        run: node scripts/deploy/aws.js
+        run: yarn run deploy:prod
         env:
+          GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -75,8 +76,9 @@ jobs:
       - name: Deploy Staging Site
         working-directory: ./packages/site
         if: github.ref != 'refs/heads/main'
-        run: node scripts/deploy/surge.js
+        run: yarn run deploy:stage
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          FORMIDEPLOY_GIT_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
