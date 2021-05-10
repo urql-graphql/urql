@@ -1,9 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { gql, useMutation } from 'urql';
 
 const LOGIN_MUTATION = gql`
-  mutation Signin($input: LoginInput!) {
+  mutation Login($input: LoginInput!) {
     signin(input: $input) {
+      refreshToken
+      token
+    }
+  }
+`;
+
+const REGISTER_MUTATION = gql`
+  mutation Register($input: LoginInput!) {
+    register(input: $input) {
       refreshToken
       token
     }
@@ -12,43 +21,79 @@ const LOGIN_MUTATION = gql`
 
 const LoginForm = ({ onLoginSuccess }) => {
   const [loginResult, login] = useMutation(LOGIN_MUTATION);
-  const { data, fetching, error } = loginResult;
+  const [registerResult, register] = useMutation(REGISTER_MUTATION);
 
-  const onSubmit = (event) => {
+  const onSubmitLogin = (event) => {
     event.preventDefault();
     const data = new FormData(event.target);
     const username = data.get('username');
     const password = data.get('password');
-    login({ input: { username, password } });
+
+    login({ input: { username, password } }).then(result => {
+      if (!result.error && result.data && result.data.signin) {
+        onLoginSuccess(result.data.signin);
+      }
+    });
   };
 
-  useEffect(() => {
-    if (data && data.signin) {
-      onLoginSuccess(data.signin);
-    }
-  }, [onLoginSuccess, data]);
+  const onSubmitRegister = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    const username = data.get('username');
+    const password = data.get('password');
 
-  if (fetching) {
-    return <p>loading...</p>;
-  }
+    register({ input: { username, password } }).then(result => {
+      if (!result.error && result.data && result.data.register) {
+        onLoginSuccess(result.data.register);
+      }
+    });
+  };
+
+  const disabled = loginResult.fetching || registerResult.fetching;
 
   return (
-    <form onSubmit={onSubmit}>
-      {error && <p>Oh no... {error.message}</p>}
+    <>
+      <form onSubmit={onSubmitLogin}>
+        {loginResult.fetching ? <p>Logging in...</p> : null}
+        {loginResult.error ? <p>Oh no... {loginResult.error.message}</p> : null}
 
-      <label>
-        Username:
-        <input name="username" type="text" />
-      </label>
+        <fieldset disabled={disabled ? 'disabled' : null}>
+          <h3>Login</h3>
+          <label>
+            Username:
+            <input name="username" type="text" />
+          </label>
 
-      <label>
-        Password:
-        <input name="password" type="password" />
-      </label>
+          <label>
+            Password:
+            <input name="password" type="password" />
+          </label>
 
-      <input name="type" value="Login" type="submit" />
-      <input name="type" value="Register" type="submit" />
-    </form>
+          <button type="submit">Login</button>
+        </fieldset>
+      </form>
+
+      <form onSubmit={onSubmitRegister}>
+        {registerResult.fetching ? <p>Signing up...</p> : null}
+        {registerResult.error ? <p>Oh no... {registerResult.error.message}</p> : null}
+
+        <fieldset disabled={disabled ? 'disabled' : null}>
+          <h3>Register</h3>
+          <label>
+            {'Username: '}
+            <input name="username" type="text" />
+          </label>
+
+          <label>
+            {'Password: '}
+            <input name="password" type="password" />
+          </label>
+
+          <button type="submit">Register</button>
+        </fieldset>
+      </form>
+
+    </>
   );
 };
 

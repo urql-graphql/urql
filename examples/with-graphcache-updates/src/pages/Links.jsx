@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect } from "react";
 import { gql, useQuery, useMutation } from "urql";
 
 const LINKS_QUERY = gql`
@@ -6,6 +6,7 @@ const LINKS_QUERY = gql`
     links(first: $first) {
       nodes {
         id
+        title
         canonicalUrl
       }
     }
@@ -17,6 +18,7 @@ const CREATE_LINK_MUTATION = gql`
     createLink(url: $url) {
       node {
         id
+        title
         canonicalUrl
       }
     }
@@ -24,29 +26,15 @@ const CREATE_LINK_MUTATION = gql`
 `;
 
 const Links = () => {
-  const [newLink, setNewLink] = useState("");
-
   const [linksResult] = useQuery({ query: LINKS_QUERY, variables: { first: 10 } });
   const [createResult, createLink] = useMutation(CREATE_LINK_MUTATION)
 
-  const onChangeLink = evt => {
-    setNewLink(evt.target.value);
-  }
-
-  const onSubmit = evt => {
-    evt.preventDefault();
-    createLink({ url: newLink });
+  const onSubmitLink = (event) => {
+    event.preventDefault();
+    const { target } = event;
+    createLink({ url: new FormData(target).get('link') })
+      .then(() => target.reset());
   };
-
-  useEffect(() => {
-    if (createResult.data) {
-      setNewLink("");
-    }
-  }, [createResult]);
-
-  if (linksResult.fetching || createResult.fetching) {
-    return <p>Loading...</p>
-  }
 
   return (
     <div>
@@ -55,17 +43,26 @@ const Links = () => {
       {linksResult.data && (
         <ul>
           {linksResult.data.links.nodes.map((link) => (
-            <li key={link.id}>{link.canonicalUrl}</li>
+            <li key={link.id}>
+              <a rel="noreferrer" href={link.canonicalUrl}>
+                {link.title}
+              </a>
+            </li>
           ))}
         </ul>
       )}
 
-      <form onSubmit={onSubmit}>
-        {createResult.error && <p>Oh no... {createResult.error.message}</p>}
+      <form onSubmit={onSubmitLink}>
+        {createResult.fetching ? <p>Submitting...</p> : null}
+        {createResult.error ? <p>Oh no... {createResult.error.message}</p> : null}
 
-        <input onChange={onChangeLink} value={newLink} />
-
-        <input type="submit" title="add" />
+        <fieldset disabled={createResult.fetching ? 'disabled' : null}>
+          <label>
+            {'Link to Blog Post: '}
+            <input type="url" name="link" placeholder="https://..."/>
+          </label>
+          <button type="submit">Add Link</button>
+        </fieldset>
       </form>
     </div>
   );
