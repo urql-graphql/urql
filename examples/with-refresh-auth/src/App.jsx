@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Provider } from 'urql';
 
-import { getToken, saveAuthData } from '../auth/Store';
-import Profile from './Profile';
-import LoginForm from './LoginForm';
+import client from './client';
+
+import { getToken, saveAuthData } from './authStore';
+import Profile from './pages/Profile';
+import LoginForm from './pages/LoginForm';
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,4 +28,12 @@ const Home = () => {
   );
 };
 
-export default Home;
+function App() {
+  return (
+    <Provider value={client}>
+      <Home />
+    </Provider>
+  );
+}
+
+export default App;

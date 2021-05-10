@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { gql, useMutation } from 'urql';
 
 const LOGIN_MUTATION = gql`
@@ -11,23 +11,14 @@ const LOGIN_MUTATION = gql`
 `;
 
 const LoginForm = ({ onLoginSuccess }) => {
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-
   const [loginResult, login] = useMutation(LOGIN_MUTATION);
-
   const { data, fetching, error } = loginResult;
 
-  const onUsernameChange = evt => {
-    setUsername(evt.target.value);
-  };
-
-  const onPasswordChange = evt => {
-    setPassword(evt.target.value);
-  };
-
-  const onSubmit = evt => {
-    evt.preventDefault();
+  const onSubmit = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    const username = data.get('username');
+    const password = data.get('password');
     login({ input: { username, password } });
   };
 
@@ -45,11 +36,18 @@ const LoginForm = ({ onLoginSuccess }) => {
     <form onSubmit={onSubmit}>
       {error && <p>Oh no... {error.message}</p>}
 
-      <input type="text" onChange={onUsernameChange} />
+      <label>
+        Username:
+        <input name="username" type="text" />
+      </label>
 
-      <input type="password" onChange={onPasswordChange} />
+      <label>
+        Password:
+        <input name="password" type="password" />
+      </label>
 
-      <input type="submit" title="login" />
+      <input name="type" value="Login" type="submit" />
+      <input name="type" value="Register" type="submit" />
     </form>
   );
 };
