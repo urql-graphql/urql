@@ -17,8 +17,6 @@ module.exports = {
     'build/',
     'coverage/',
     'benchmark/',
-    'example/',
-    'examples/',
     'scripts/'
   ],
   plugins: [
@@ -76,6 +74,22 @@ module.exports = {
   settings: {
     react: {
       version: 'detect',
+    },
+    'import/extensions': [
+      '.js',
+      '.jsx',
+      '.ts',
+      '.tsx',
+    ],
+    'import/resolver': {
+      node: {
+        extensions: [
+          '.js',
+          '.jsx',
+          '.ts',
+          '.tsx',
+        ]
+      },
     },
   },
 };

@@ -23,7 +23,7 @@ const LoginForm = ({ onLoginSuccess }) => {
   const [loginResult, login] = useMutation(LOGIN_MUTATION);
   const [registerResult, register] = useMutation(REGISTER_MUTATION);
 
-  const onSubmitLogin = (event) => {
+  const onSubmitLogin = event => {
     event.preventDefault();
     const data = new FormData(event.target);
     const username = data.get('username');
@@ -36,7 +36,7 @@ const LoginForm = ({ onLoginSuccess }) => {
     });
   };
 
-  const onSubmitRegister = (event) => {
+  const onSubmitRegister = event => {
     event.preventDefault();
     const data = new FormData(event.target);
     const username = data.get('username');
@@ -75,7 +75,9 @@ const LoginForm = ({ onLoginSuccess }) => {
 
       <form onSubmit={onSubmitRegister}>
         {registerResult.fetching ? <p>Signing up...</p> : null}
-        {registerResult.error ? <p>Oh no... {registerResult.error.message}</p> : null}
+        {registerResult.error ? (
+          <p>Oh no... {registerResult.error.message}</p>
+        ) : null}
 
         <fieldset disabled={disabled ? 'disabled' : null}>
           <h3>Register</h3>
@@ -92,7 +94,6 @@ const LoginForm = ({ onLoginSuccess }) => {
           <button type="submit">Register</button>
         </fieldset>
       </form>
-
     </>
   );
 };

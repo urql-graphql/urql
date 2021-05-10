@@ -1,5 +1,5 @@
-import React from "react";
-import { gql, useQuery } from "urql";
+import React from 'react';
+import { gql, useQuery } from 'urql';
 
 const LOCATIONS_QUERY = gql`
   query Locations($query: String!) {
@@ -11,7 +11,10 @@ const LOCATIONS_QUERY = gql`
 `;
 
 const LocationsList = () => {
-  const [result] = useQuery({ query: LOCATIONS_QUERY, variables: { query: "LON"} });
+  const [result] = useQuery({
+    query: LOCATIONS_QUERY,
+    variables: { query: 'LON' },
+  });
 
   const { data, fetching, error } = result;
 
@@ -23,7 +26,7 @@ const LocationsList = () => {
 
       {data && (
         <ul>
-          {data.locations.map((location) => (
+          {data.locations.map(location => (
             <li key={location.id}>{location.name}</li>
           ))}
         </ul>

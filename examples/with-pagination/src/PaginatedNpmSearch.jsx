@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { gql, useQuery } from "urql";
+import React, { useState } from 'react';
+import { gql, useQuery } from 'urql';
 
 const limit = 5;
-const query = "graphql";
+const query = 'graphql';
 
 const NPM_SEARCH = gql`
   query Search($query: String!, $first: Int!, $after: String) {
@@ -19,7 +19,7 @@ const NPM_SEARCH = gql`
   }
 `;
 
-const SearchResultPage = ({ variables, onLoadMore, isLastPage }) => {
+const SearchResultPage = ({ variables, onLoadMore, isLastPage }) => {
   const [result] = useQuery({ query: NPM_SEARCH, variables });
 
   const { data, fetching, error } = result;
@@ -34,12 +34,16 @@ const SearchResultPage = ({ variables, onLoadMore, isLastPage }) => {
 
       {searchResults && (
         <>
-          {searchResults.nodes.map((packageInfo) => (
-            <div key={packageInfo.id}>{packageInfo.id}: {packageInfo.name}</div>
+          {searchResults.nodes.map(packageInfo => (
+            <div key={packageInfo.id}>
+              {packageInfo.id}: {packageInfo.name}
+            </div>
           ))}
 
           {isLastPage && searchResults.pageInfo.hasNextPage && (
-            <button onClick={() => onLoadMore(searchResults.pageInfo.endCursor)}>
+            <button
+              onClick={() => onLoadMore(searchResults.pageInfo.endCursor)}
+            >
               load more
             </button>
           )}
@@ -51,21 +55,21 @@ const SearchResultPage = ({ variables, onLoadMore, isLastPage }) => {
 
 const PaginatedNpmSearch = () => {
   const [pageVariables, setPageVariables] = useState([
-     {
-       query,
-       first: limit,
-       after: ""
-     },
-   ]);
+    {
+      query,
+      first: limit,
+      after: '',
+    },
+  ]);
 
   return (
     <div>
       {pageVariables.map((variables, i) => (
         <SearchResultPage
-          key={"" + variables.after}
+          key={'' + variables.after}
           variables={variables}
           isLastPage={i === pageVariables.length - 1}
-          onLoadMore={(after) =>
+          onLoadMore={after =>
             setPageVariables([...pageVariables, { after, first: limit, query }])
           }
         />

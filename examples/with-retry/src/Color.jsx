@@ -1,5 +1,5 @@
-import React from "react";
-import { gql, useQuery } from "urql";
+import React from 'react';
+import { gql, useQuery } from 'urql';
 
 const RANDOM_COLOR_QUERY = gql`
   query RandomColor {
@@ -26,9 +26,12 @@ const RandomColorDisplay = () => {
           {data.randomColor.name}
         </div>
       )}
-      
+
       {result.operation && (
-        <p>We retried {result.operation.context.retryCount} times to get a result without an error.</p>
+        <p>
+          We retried {result.operation.context.retryCount} times to get a result
+          without an error.
+        </p>
       )}
     </div>
   );

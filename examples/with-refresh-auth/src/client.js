@@ -83,7 +83,9 @@ const client = createClient({
       },
 
       didAuthError({ error }) {
-        return error.graphQLErrors.some(e => e.extensions?.code === 'UNAUTHORIZED');
+        return error.graphQLErrors.some(
+          e => e.extensions?.code === 'UNAUTHORIZED'
+        );
       },
 
       willAuthError({ operation, authState }) {

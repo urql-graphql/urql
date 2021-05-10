@@ -1,5 +1,5 @@
-import React from "react";
-import { gql, useQuery } from "urql";
+import React from 'react';
+import { gql, useQuery } from 'urql';
 
 const POKEMONS_QUERY = gql`
   query Pokemons {
@@ -23,7 +23,7 @@ const PokemonList = () => {
 
       {data && (
         <ul>
-          {data.pokemons.map((pokemon) => (
+          {data.pokemons.map(pokemon => (
             <li key={pokemon.id}>{pokemon.name}</li>
           ))}
         </ul>

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { gql, useQuery } from "urql";
+import React, { useState } from 'react';
+import { gql, useQuery } from 'urql';
 
 const limit = 5;
-const query = "graphql";
+const query = 'graphql';
 
 const NPM_SEARCH = gql`
   query Search($query: String!, $first: Int!, $after: String) {
@@ -21,13 +21,12 @@ const NPM_SEARCH = gql`
   }
 `;
 
-
 const PaginatedNpmSearch = () => {
-  const [after, setAfter] = useState("");
+  const [after, setAfter] = useState('');
 
   const [result] = useQuery({
-    query: NPM_SEARCH, 
-    variables: { query, first: limit, after } 
+    query: NPM_SEARCH,
+    variables: { query, first: limit, after },
   });
 
   const { data, fetching, error } = result;
@@ -43,7 +42,9 @@ const PaginatedNpmSearch = () => {
       {searchResults && (
         <>
           {searchResults.edges.map(({ node }) => (
-            <div key={node.id}>{node.id}: {node.name}</div>
+            <div key={node.id}>
+              {node.id}: {node.name}
+            </div>
           ))}
 
           {searchResults.pageInfo.hasNextPage && (

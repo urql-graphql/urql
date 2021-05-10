@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { gql, useQuery, useMutation } from "urql";
+import React from 'react';
+import { gql, useQuery, useMutation } from 'urql';
 
 const LINKS_QUERY = gql`
   query Links($first: Int!) {
@@ -26,14 +26,18 @@ const CREATE_LINK_MUTATION = gql`
 `;
 
 const Links = () => {
-  const [linksResult] = useQuery({ query: LINKS_QUERY, variables: { first: 10 } });
-  const [createResult, createLink] = useMutation(CREATE_LINK_MUTATION)
+  const [linksResult] = useQuery({
+    query: LINKS_QUERY,
+    variables: { first: 10 },
+  });
+  const [createResult, createLink] = useMutation(CREATE_LINK_MUTATION);
 
-  const onSubmitLink = (event) => {
+  const onSubmitLink = event => {
     event.preventDefault();
     const { target } = event;
-    createLink({ url: new FormData(target).get('link') })
-      .then(() => target.reset());
+    createLink({ url: new FormData(target).get('link') }).then(() =>
+      target.reset()
+    );
   };
 
   return (
@@ -42,7 +46,7 @@ const Links = () => {
 
       {linksResult.data && (
         <ul>
-          {linksResult.data.links.nodes.map((link) => (
+          {linksResult.data.links.nodes.map(link => (
             <li key={link.id}>
               <a rel="noreferrer" href={link.canonicalUrl}>
                 {link.title}
@@ -54,12 +58,14 @@ const Links = () => {
 
       <form onSubmit={onSubmitLink}>
         {createResult.fetching ? <p>Submitting...</p> : null}
-        {createResult.error ? <p>Oh no... {createResult.error.message}</p> : null}
+        {createResult.error ? (
+          <p>Oh no... {createResult.error.message}</p>
+        ) : null}
 
         <fieldset disabled={createResult.fetching ? 'disabled' : null}>
           <label>
             {'Link to Blog Post: '}
-            <input type="url" name="link" placeholder="https://..."/>
+            <input type="url" name="link" placeholder="https://..." />
           </label>
           <button type="submit">Add Link</button>
         </fieldset>

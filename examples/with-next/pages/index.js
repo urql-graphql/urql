@@ -1,8 +1,5 @@
-import { withUrqlClient } from "next-urql";
-import {
-  useQuery,
-  gql
-} from "urql";
+import { withUrqlClient } from 'next-urql';
+import { useQuery, gql } from 'urql';
 
 const POKEMONS_QUERY = gql`
   query {
@@ -19,7 +16,7 @@ function Index() {
   return (
     <div>
       <h1>Static</h1>
-      {res.data.pokemons.map((pokemon) => (
+      {res.data.pokemons.map(pokemon => (
         <div key={pokemon.id}>
           {pokemon.id} - {pokemon.name}
         </div>
@@ -30,7 +27,7 @@ function Index() {
 
 export default withUrqlClient(
   () => ({
-    url: "https://trygql.formidable.dev/graphql/basic-pokedex"
+    url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
   }),
   { ssr: true }
 )(Index);

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { gql, useMutation } from "urql";
+import React, { useState } from 'react';
+import { gql, useMutation } from 'urql';
 
 const UPLOAD_FILE = gql`
   mutation UploadFile($file: Upload!) {
@@ -16,12 +16,12 @@ const FileUpload = () => {
   const { data, fetching, error } = result;
 
   const handleFileUpload = () => {
-    uploadFile({ file: selectedFile})
-  }
+    uploadFile({ file: selectedFile });
+  };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = event => {
     setSelectedFile(event.target.files[0]);
-  }
+  };
 
   return (
     <div>
@@ -31,13 +31,11 @@ const FileUpload = () => {
 
       {data && data.uploadFile ? (
         <p>File uploaded to {data.uploadFile.filename}</p>
-      ): (
+      ) : (
         <div>
           <input type="file" onChange={handleFileChange} />
 
-          <button onClick={handleFileUpload}>
-            Upload!
-          </button>
+          <button onClick={handleFileUpload}>Upload!</button>
         </div>
       )}
     </div>
