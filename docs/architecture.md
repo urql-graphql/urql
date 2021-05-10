@@ -50,7 +50,7 @@ import { Client } from '@urql/core';
 new Client({
   url: '/graphql',
   requestPolicy: 'cache-first',
-})
+});
 ```
 
 The bindings that we've seen in [the "Basics" section](./basics/README.md) interact with [the
@@ -128,7 +128,7 @@ travelling the same line in reverse.
 The default set of exchanges that `@urql/core` contains and applies to a `Client` are:
 
 - `dedupExchange`: Deduplicates pending operations (pending = waiting for a result)
-- `cacheExchange`: The default caching logic with ["Document Caching"](../basics/document-caching.md)
+- `cacheExchange`: The default caching logic with ["Document Caching"](./basics/document-caching.md)
 - `fetchExchange`: Sends an operation to the API using `fetch` and adds results to the output stream
 
 When we don't pass the `exchanges` option manually to our `Client` then these are the ones that will
@@ -147,8 +147,8 @@ Some of the exchanges that are available to us are:
   Persisted Queries
 - [`authExchange`](./advanced/authentication.md): Allows complex authentication flows to be implemented
   easily.
-- [`requestPolicyExchange`](../api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
-- [`refocusExchange`](../api/refocus-exchange.md): Tracks open queries and refetches them
+- [`requestPolicyExchange`](./api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
+- [`refocusExchange`](./api/refocus-exchange.md): Tracks open queries and refetches them
   when the window regains focus.
 - `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
 

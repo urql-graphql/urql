@@ -91,8 +91,8 @@ const client = createClient({
 
 _Graphcache_ applies several mechanisms that improve the consistency of the cache and how it behaves
 when it's used in highly cached-dependent scenarios, including when it's used with its offline
-support. We've previously read about some of these guarantees on the ["Under the hood"
-page.](./underunder-the-hood.md)
+support. We've previously read about some of these guarantees on the ["Normalized Caching"
+page.](./normalized-caching.md)
 
 While the client is offline, _Graphcache_ will also apply some opinionated mechanisms to queries and
 mutations.

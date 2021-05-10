@@ -6,7 +6,7 @@ order: 3
 # Cache Updates
 
 As we've learned [on the page on "Normalized
-Caching"](../normalized-caching.md#normalizing-relational-data), when Graphcache receives an API
+Caching"](./normalized-caching.md#normalizing-relational-data), when Graphcache receives an API
 result it will traverse and store all its data to its cache in a normalised structure. Each entity
 that is found in a result will be stored under the entity's key.
 
@@ -34,7 +34,7 @@ This is often necessary when a given mutation or subscription deliver a result t
 than the cache needs to update all affected entities.
 
 Previously, we've learned about cache updates [on the "Normalized Caching"
-page](normalized-caching/#manual-cache-updates).
+page](./normalized-caching.md#manual-cache-updates).
 
 The `updates` option on `cacheExchange` accepts a map for `Mutation` or `Subscription` keys on which
 we can add "updater functions" to react to mutation or subscription results. These `updates`
@@ -295,7 +295,8 @@ cacheExchange({
           }
         `;
 
-        const fields = cache.inspectFields('Query')
+        const fields = cache
+          .inspectFields('Query')
           .filter(field => field.fieldName === 'todos')
           .forEach(field => {
             cache.updateQuery(

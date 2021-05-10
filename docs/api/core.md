@@ -27,7 +27,7 @@ It accepts several options on creation.
 | `fetchOptions`    | `RequestInit \| () => RequestInit` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request                                                                                                 |
 | `fetch`           | `typeof fetch`                     | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                                                                            |
 | `suspense`        | `?boolean`                         | Activates the experimental React suspense mode, which can be used during server-side rendering to prefetch data                                                                        |
-| `requestPolicy`   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default, this will be `cache-first`.                                                                                           |
+| `requestPolicy`   | `?RequestPolicy`                   | Changes the default request policy that will be used. By default, this will be `cache-first`.                                                                                          |
 | `preferGetMethod` | `?boolean`                         | This is picked up by the `fetchExchange` and will force all queries (not mutations) to be sent using the HTTP GET method instead of POST.                                              |
 | `maskTypename`    | `?boolean`                         | Enables the `Client` to automatically apply the `maskTypename` utility to all `data` on [`OperationResult`s](#operationresult). This makes the `__typename` properties non-enumerable. |
 
@@ -199,16 +199,16 @@ data that can be passed from almost all API methods in `urql` that deal with
 Some of these options are set when the `Client` is initialised, so in the following list of
 properties you'll likely see some options that exist on the `Client` as well.
 
-| Prop                  | Type                                  | Description                                                                                                           |
-| --------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `fetchOptions`        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                               |
-| `fetch`               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`           |
-| `requestPolicy`       | `RequestPolicy`                       | An optional [request policy](/basics/querying-data#request-policy) that should be used specifying the cache strategy. |
-| `url`                 | `string`                              | The GraphQL endpoint                                                                                                  |
-| `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                          |
-| `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                          |
-| `preferGetMethod`     | `?boolean`                            | Instructs the `fetchExchange` to use HTTP GET for queries.                                                            |
-| `additionalTypenames` | `?string[]`                           | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                       |
+| Prop                  | Type                                  | Description                                                                                                                     |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `fetchOptions`        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                                         |
+| `fetch`               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                     |
+| `requestPolicy`       | `RequestPolicy`                       | An optional [request policy](../basics/document-caching.md#request-policies) that should be used specifying the cache strategy. |
+| `url`                 | `string`                              | The GraphQL endpoint                                                                                                            |
+| `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                                    |
+| `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                                    |
+| `preferGetMethod`     | `?boolean`                            | Instructs the `fetchExchange` to use HTTP GET for queries.                                                                      |
+| `additionalTypenames` | `?string[]`                           | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                                 |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.

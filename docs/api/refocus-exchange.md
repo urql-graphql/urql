@@ -3,7 +3,7 @@ title: '@urql/exchange-refocus'
 order: 11
 ---
 
-# Refocus exchange
+# Refocus Exchange
 
 `@urql/exchange-refocus` is an exchange for the `urql` that tracks currently active operations and redispatches them when the
 window regains focus

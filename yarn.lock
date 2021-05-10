@@ -12983,10 +12983,10 @@ react-ssr-prepass@^1.1.2, react-ssr-prepass@^1.4.0:
   resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.4.0.tgz#33a3db19414f0f8f9f3f781c88f760ae366b4f51"
   integrity sha512-0SzdmiQUtHvhxCabHg9BI/pkJfijGkQ0jQL6fC4YFy7idaDOuaiQLsajIkkNxffFXtJFHIWFITlve2WB88e0Jw==
 
-react-static-plugin-md-pages@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.3.0.tgz#a420df0d42a43d387369f8b92d5ab7a27c319a1b"
-  integrity sha512-DIBa8pA4LeGU1ioueeO8Yr3F7CVjwg90nBup9A9wNeRIiRz+qkSdlw5Fu86VPkCyxjY4K+xzVbL1JfpMXCMcug==
+react-static-plugin-md-pages@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/react-static-plugin-md-pages/-/react-static-plugin-md-pages-0.3.2.tgz#4c2d668eb5721a2ccbb3aa544075ac8583862568"
+  integrity sha512-YvZ2MrO9TfkLsXu/lIMKB11ziuRDReT1mGrpOUV6CIYgXHOSACzU7e0VtwWaHq7e5Hz5/J9ACEBrEt24UG/VUg==
   dependencies:
     "@mdx-js/mdx" "^1.5.5"
     "@mdx-js/react" "^1.5.5"

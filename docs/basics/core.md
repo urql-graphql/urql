@@ -179,7 +179,7 @@ const client = createClient({
   // the default:
   exchanges: defaultExchanges,
   // the same as:
-  exchanges: [dedupExchange, cacheExchange, fetchExchange]
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -294,7 +294,7 @@ the query anymore or refetches it. We can think of this pattern as being very si
 event hubs.
 
 We're using [the Wonka library for our streams](https://wonka.kitten.sh/basics/background), which
-we'll learn more about [on the "Architecture" page](./architecture.md). But we can think of this as
+we'll learn more about [on the "Architecture" page](../architecture.md). But we can think of this as
 React's effects being called over time, or as `window.addEventListener`.
 
 ## Common Utilities in Core
