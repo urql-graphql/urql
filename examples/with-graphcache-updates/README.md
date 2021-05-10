@@ -19,6 +19,6 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/client/index.js`](src/client/index.js)
-- The `cacheExchange` from `@urql/exchange-graphcache` in [`src/client/index.js`](src/client/index.js)
-- A links list and link creation in [`src/pages/Links.js`](src/pages/Links.js)
+- The `urql` bindings and a React app with a client set up in [`src/client.js`](src/client.js)
+- The `cacheExchange` from `@urql/exchange-graphcache` in [`src/client.js`](src/client.js)
+- A links list and link creation in [`src/pages/Links.jsx`](src/pages/Links.jsx)

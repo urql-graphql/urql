@@ -16,6 +16,6 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
-- A managing component called `PaginatedNpmSearch` set up to render all pages in [`src/PaginatedNpmSearch.js`](src/PaginatedNpmSearch.js)
-- A page component called `SearchResultPage` running page queries in [`src/PaginatedNpmSearch.js`](src/PaginatedNpmSearch.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.jsx)
+- A managing component called `PaginatedNpmSearch` set up to render all pages in [`src/PaginatedNpmSearch.jss`](src/PaginatedNpmSearch.jsx)
+- A page component called `SearchResultPage` running page queries in [`src/PaginatedNpmSearch.jsx`](src/PaginatedNpmSearch.jsx)

@@ -15,5 +15,5 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
-- A query for pokémon in [`src/pages/PokemonList.js`](src/pages/PokemonList.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
+- A query for pokémon in [`src/PokemonList.jsx`](src/PokemonList.jsx)
