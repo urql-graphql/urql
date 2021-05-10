@@ -19,6 +19,6 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
-- The `persistedFetchExchange` from `@urql/exchange-persisted-fetch` in [`src/App.js`](src/App.js)
-- A query for locations in [`src/pages/LocationsList.js`](src/pages/LocationsList.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
+- The `persistedFetchExchange` from `@urql/exchange-persisted-fetch` in [`src/App.jsx`](src/App.jsx)
+- A query for locations in [`src/LocationsList.jsx`](src/pages/LocationsList.jsx)

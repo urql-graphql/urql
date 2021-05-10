@@ -1,7 +1,8 @@
+import React from 'react';
 import { createClient, Provider, fetchExchange } from 'urql';
 import { persistedFetchExchange } from '@urql/exchange-persisted-fetch';
 
-import LocationsList from "./pages/LocationsList";
+import LocationsList from "./LocationsList";
 
 const client = createClient({
   url: "https://trygql.formidable.dev/graphql/apq-weather",
