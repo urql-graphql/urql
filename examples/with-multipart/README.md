@@ -17,6 +17,6 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
-- The `multipartFetchExchange` from `@urql/exchange-multipart-fetch` in [`src/App.js`](src/App.js)
-- A basic file upload form in [`src/pages/FileUpload.js`](src/pages/FileUpload.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
+- The `multipartFetchExchange` from `@urql/exchange-multipart-fetch` in [`src/App.jsx`](src/App.jsx)
+- A basic file upload form in [`src/FileUpload.jsx`](src/FileUpload.jsx)
