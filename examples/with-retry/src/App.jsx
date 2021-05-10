@@ -1,7 +1,8 @@
+import React from "react";
 import { createClient, fetchExchange, Provider } from "urql";
 import { retryExchange } from '@urql/exchange-retry';
 
-import Color from "./pages/Color";
+import Color from "./Color";
 
 const client = createClient({
   url: "https://trygql.formidable.dev/graphql/intermittent-colors",

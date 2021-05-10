@@ -42,6 +42,6 @@ npm run start
 
 This example contains:
 
-- The `urql` bindings and a React app with a client set up in [`src/App.js`](src/App.js)
-- The `retryExchange` from `@urql/exchange-retry` in [`src/App.js`](src/App.js)
-- A random colour query in [`src/pages/Color.js`](src/pages/Color.js)
+- The `urql` bindings and a React app with a client set up in [`src/App.jsx`](src/App.jsx)
+- The `retryExchange` from `@urql/exchange-retry` in [`src/App.jsx`](src/App.jsx)
+- A random colour query in [`src/Color.jsx`](src/pages/Color.jsx)
