@@ -3,7 +3,6 @@
 import React, { Fragment, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Fuse from 'fuse.js';
-import { useBasepath } from 'react-static';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useMarkdownPage, useMarkdownTree } from 'react-static-plugin-md-pages';
@@ -47,24 +46,19 @@ const ContentWrapper = styled.div`
   padding-bottom: ${p => p.theme.spacing.lg};
 `;
 
-export const SidebarStyling = ({ children, sidebarOpen }) => {
-  const basepath = useBasepath() || '';
-  const homepage = basepath ? `/${basepath}/` : '/';
-
-  return (
-    <>
-      <SideBarStripes />
-      <SidebarContainer hidden={!sidebarOpen}>
-        <SidebarWrapper>
-          <HeroLogoLink to={homepage}>
-            <HeroLogo />
-          </HeroLogoLink>
-          <ContentWrapper>{children}</ContentWrapper>
-        </SidebarWrapper>
-      </SidebarContainer>
-    </>
-  );
-};
+export const SidebarStyling = ({ children, sidebarOpen }) => (
+  <>
+    <SideBarStripes />
+    <SidebarContainer hidden={!sidebarOpen}>
+      <SidebarWrapper>
+        <HeroLogoLink to="/">
+          <HeroLogo />
+        </HeroLogoLink>
+        <ContentWrapper>{children}</ContentWrapper>
+      </SidebarWrapper>
+    </SidebarContainer>
+  </>
+);
 
 const getMatchTree = (() => {
   const sortByRefIndex = (a, b) => a.refIndex - b.refIndex;
