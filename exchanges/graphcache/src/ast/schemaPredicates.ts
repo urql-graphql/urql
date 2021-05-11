@@ -11,14 +11,13 @@ import {
   OptimisticMutationConfig,
 } from '../types';
 
-const BUILTIN_FIELD_RE = /^__/;
+const BUILTIN_NAME_RE = /^__/;
 
 export const isFieldNullable = (
   schema: SchemaIntrospector,
   typename: string,
   fieldName: string
 ): boolean => {
-  if (BUILTIN_FIELD_RE.test(fieldName)) return true;
   const field = getField(schema, typename, fieldName);
   return !!field && field.type.kind !== 'NON_NULL';
 };
@@ -39,10 +38,10 @@ export const isFieldAvailableOnType = (
   schema: SchemaIntrospector,
   typename: string,
   fieldName: string
-): boolean => {
-  if (BUILTIN_FIELD_RE.test(fieldName)) return true;
-  return !!getField(schema, typename, fieldName);
-};
+): boolean =>
+  BUILTIN_NAME_RE.test(fieldName) ||
+  BUILTIN_NAME_RE.test(typename) ||
+  !!getField(schema, typename, fieldName);
 
 export const isInterfaceOfType = (
   schema: SchemaIntrospector,
@@ -51,12 +50,15 @@ export const isInterfaceOfType = (
 ): boolean => {
   if (!typename) return false;
   const typeCondition = getTypeCondition(node);
-  if (!typeCondition || typename === typeCondition) return true;
-  if (
+  if (!typeCondition || typename === typeCondition) {
+    return true;
+  } else if (
     schema.types![typeCondition] &&
     schema.types![typeCondition].kind === 'OBJECT'
-  )
+  ) {
     return typeCondition === typename;
+  }
+
   expectAbstractType(schema, typeCondition!);
   expectObjectType(schema, typename!);
   return schema.isSubType(typeCondition, typename);
@@ -67,6 +69,8 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
+  if (BUILTIN_NAME_RE.test(typename) || BUILTIN_NAME_RE.test(fieldName)) return;
+
   expectObjectType(schema, typename);
   const object = schema.types![typename] as SchemaObject;
   const field = object.fields[fieldName];
