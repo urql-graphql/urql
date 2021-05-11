@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.1.1
+
+### Patch Changes
+
+- ⚠️ Fix an edge-case for which an introspection query during runtime could fail when schema-awareness was enabled in Graphcache, since built-in types weren't recognised as existent, by [@kitten](https://github.com/kitten) (See [#1631](https://github.com/FormidableLabs/urql/pull/1631))
+
 ## 4.1.0
 
 ### Minor Changes
