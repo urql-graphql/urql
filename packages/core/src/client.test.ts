@@ -10,6 +10,7 @@ import {
   subscribe,
   filter,
   toArray,
+  toPromise,
   tap,
   take,
 } from 'wonka';
@@ -892,5 +893,31 @@ describe('shared sources behavior', () => {
       subscribe(resultTwo)
     );
     expect(resultTwo).toHaveBeenCalledTimes(0);
+  });
+
+  it('supports promisified sources', async () => {
+    const exchange: Exchange = () => ops$ => {
+      return pipe(
+        ops$,
+        map(op => ({ stale: true, data: 1, operation: op }))
+      );
+    };
+
+    const client = createClient({
+      url: 'test',
+      exchanges: [exchange],
+    });
+
+    const resultOne = await pipe(
+      client.executeRequestOperation(queryOperation),
+      take(1),
+      toPromise
+    );
+
+    expect(resultOne).toEqual({
+      data: 1,
+      operation: queryOperation,
+      stale: true,
+    });
   });
 });

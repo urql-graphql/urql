@@ -2,6 +2,7 @@
 
 import {
   filter,
+  make,
   makeSubject,
   onEnd,
   onPush,
@@ -285,31 +286,37 @@ export class Client {
       };
     }
 
-    const prevReplay = activeOperation.replay;
-    const subject = makeSubject<OperationResult>();
     const isNetworkOperation =
       operation.context.requestPolicy === 'cache-and-network' ||
       operation.context.requestPolicy === 'network-only';
 
-    return pipe(
-      merge([subject.source, activeOperation.source]),
-      onStart(() => {
-        this.activeOperations.set(operation.key, activeOperation!);
-        if (operation.kind === 'subscription') {
-          return this.dispatchOperation(operation);
-        } else if (isNetworkOperation) {
-          this.dispatchOperation(operation);
-        }
+    return make(observer => {
+      activeOperation =
+        this.activeOperations.get(operation.key) || activeOperation!;
+      const prevReplay = activeOperation.replay;
 
-        if (prevReplay != null && prevReplay === activeOperation!.replay) {
-          subject.next(
-            isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
-          );
-        } else if (!isNetworkOperation) {
-          this.dispatchOperation(operation);
-        }
-      })
-    );
+      return pipe(
+        activeOperation.source,
+        onStart(() => {
+          this.activeOperations.set(operation.key, activeOperation!);
+          if (operation.kind === 'subscription') {
+            return this.dispatchOperation(operation);
+          } else if (isNetworkOperation) {
+            this.dispatchOperation(operation);
+          }
+
+          if (prevReplay != null && prevReplay === activeOperation!.replay) {
+            observer.next(
+              isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
+            );
+          } else if (!isNetworkOperation) {
+            this.dispatchOperation(operation);
+          }
+        }),
+        onEnd(observer.complete),
+        subscribe(observer.next)
+      ).unsubscribe;
+    });
   }
 
   query<Data = any, Variables extends object = {}>(
