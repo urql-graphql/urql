@@ -142,7 +142,9 @@ export interface Client {
   ): Source<OperationResult<Data, Variables>>;
 }
 
-export const Client = (function Client(opts: ClientOptions) {
+export const Client: new (opts: ClientOptions) => Client = function Client(
+  opts: ClientOptions
+) {
   if (process.env.NODE_ENV !== 'production' && !opts.url) {
     throw new Error('You are creating an urql-client without a url.');
   }
@@ -417,6 +419,6 @@ export const Client = (function Client(opts: ClientOptions) {
 
   client.constructor = Client;
   return client;
-} as unknown) as Client;
+} as any;
 
 export const createClient = (Client as any) as (opts: ClientOptions) => Client;
