@@ -43,7 +43,6 @@ describe('withUrqlClient', () => {
       const tree = shallow(h(Component));
       const app = tree.find(MockApp);
 
-      expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.url).toBe('http://localhost:3000');
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
       expect(spyInitUrqlClient.mock.calls[0][0].exchanges).toHaveLength(4);
@@ -58,7 +57,6 @@ describe('withUrqlClient', () => {
       const tree = shallow(h(Component, props));
       const app = tree.find(MockApp);
 
-      expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(app.props().urqlClient.url).toEqual('http://localhost:3000');
     });
   });
