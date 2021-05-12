@@ -8,6 +8,7 @@ Client {
   "dispatchOperation": [Function],
   "executeMutation": [Function],
   "executeQuery": [Function],
+  "executeRequestOperation": [Function],
   "executeSubscription": [Function],
   "fetch": undefined,
   "fetchOptions": undefined,
