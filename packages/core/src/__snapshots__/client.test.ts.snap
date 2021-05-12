@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createClient passes snapshot 1`] = `
+exports[`createClient / Client passes snapshot 1`] = `
 Client {
-  "constructor": [Function],
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
   "executeMutation": [Function],

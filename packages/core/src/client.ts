@@ -143,6 +143,7 @@ export interface Client {
 }
 
 export const Client: new (opts: ClientOptions) => Client = function Client(
+  this: Client | {},
   opts: ClientOptions
 ) {
   if (process.env.NODE_ENV !== 'production' && !opts.url) {
@@ -251,7 +252,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     return source;
   };
 
-  const client = {
+  const instance: Client =
+    this instanceof Client ? this : Object.create(Client.prototype);
+  const client: Client = Object.assign(instance, {
     url: opts.url,
     fetchOptions: opts.fetchOptions,
     fetch: opts.fetch,
@@ -385,7 +388,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         client.executeMutation(createRequest(query, variables), context)
       );
     },
-  } as Client;
+  } as Client);
 
   let dispatchDebug: ExchangeInput['dispatchDebug'] = noop;
   if (process.env.NODE_ENV !== 'production') {
@@ -417,7 +420,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   // cancellations cascading up from components
   pipe(results$, publish);
 
-  client.constructor = Client;
   return client;
 } as any;
 

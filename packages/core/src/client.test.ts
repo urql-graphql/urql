@@ -21,18 +21,20 @@ import {
 import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
-import { createClient } from './client';
+import { Client, createClient } from './client';
 import { queryOperation, subscriptionOperation } from './test-utils';
 
 const url = 'https://hostname.com';
 
-describe('createClient', () => {
-  it('passes snapshot', () => {
-    const c = createClient({
-      url,
-    });
+describe('createClient / Client', () => {
+  it('creates an instance of Client', () => {
+    expect(createClient({ url }) instanceof Client).toBeTruthy();
+    expect(new Client({ url }) instanceof Client).toBeTruthy();
+  });
 
-    expect(c).toMatchSnapshot();
+  it('passes snapshot', () => {
+    const client = createClient({ url });
+    expect(client).toMatchSnapshot();
   });
 });
 
