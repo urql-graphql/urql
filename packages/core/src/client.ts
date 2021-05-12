@@ -68,14 +68,12 @@ export interface ClientOptions {
   maskTypename?: boolean;
 }
 
-export const createClient = (opts: ClientOptions) => new Client(opts);
+export interface Client {
+  new (options: ClientOptions): Client;
 
-/** The URQL application-wide client library. Each execute method starts a GraphQL request and returns a stream of results. */
-export class Client {
   /** Start an operation from an exchange */
   reexecuteOperation: (operation: Operation) => void;
-
-  // Event target for monitoring
+  /** Event target for monitoring, e.g. for @urql/devtools */
   subscribeToDebugTarget?: (onEvent: (e: DebugEvent) => void) => Subscription;
 
   // These are variables derived from ClientOptions
@@ -83,214 +81,92 @@ export class Client {
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
   suspense: boolean;
-  preferGetMethod: boolean;
   requestPolicy: RequestPolicy;
+  preferGetMethod: boolean;
   maskTypename: boolean;
 
-  // These are internals to be used to keep track of operations
-  dispatchOperation: (operation?: Operation | void) => void;
-  operations$: Source<Operation>;
-  results$: Source<OperationResult>;
-  activeOperations: Map<number, Source<OperationResult>> = new Map();
-  queue: Operation[] = [];
+  createOperationContext(
+    opts?: Partial<OperationContext> | undefined
+  ): OperationContext;
 
-  constructor(opts: ClientOptions) {
-    if (process.env.NODE_ENV !== 'production' && !opts.url) {
-      throw new Error('You are creating an urql-client without a url.');
-    }
-
-    let dispatchDebug: ExchangeInput['dispatchDebug'] = noop;
-    if (process.env.NODE_ENV !== 'production') {
-      const { next, source } = makeSubject<DebugEvent>();
-      this.subscribeToDebugTarget = (onEvent: (e: DebugEvent) => void) =>
-        pipe(source, subscribe(onEvent));
-      dispatchDebug = next as ExchangeInput['dispatchDebug'];
-    }
-
-    this.url = opts.url;
-    this.fetchOptions = opts.fetchOptions;
-    this.fetch = opts.fetch;
-    this.suspense = !!opts.suspense;
-    this.requestPolicy = opts.requestPolicy || 'cache-first';
-    this.preferGetMethod = !!opts.preferGetMethod;
-    this.maskTypename = !!opts.maskTypename;
-
-    // This subject forms the input of operations; executeOperation may be
-    // called to dispatch a new operation on the subject
-    const {
-      source: operations$,
-      next: nextOperation,
-    } = makeSubject<Operation>();
-    this.operations$ = operations$;
-
-    let isOperationBatchActive = false;
-    this.dispatchOperation = (operation?: Operation | void) => {
-      isOperationBatchActive = true;
-      if (operation) nextOperation(operation);
-      while ((operation = this.queue.shift())) nextOperation(operation);
-      isOperationBatchActive = false;
-    };
-
-    this.reexecuteOperation = (operation: Operation) => {
-      // Reexecute operation only if any subscribers are still subscribed to the
-      // operation's exchange results
-      if (
-        operation.kind === 'mutation' ||
-        this.activeOperations.has(operation.key)
-      ) {
-        this.queue.push(operation);
-        if (!isOperationBatchActive) {
-          Promise.resolve().then(this.dispatchOperation);
-        }
-      }
-    };
-
-    const exchanges =
-      opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
-
-    // All exchange are composed into a single one and are called using the constructed client
-    // and the fallback exchange stream
-    const composedExchange = composeExchanges(exchanges);
-
-    // All exchanges receive inputs using which they can forward operations to the next exchange
-    // and receive a stream of results in return, access the client, or dispatch debugging events
-    // All operations then run through the Exchange IOs in a pipeline-like fashion
-    this.results$ = share(
-      composedExchange({
-        client: this,
-        dispatchDebug,
-        forward: fallbackExchange({ dispatchDebug }),
-      })(this.operations$)
-    );
-
-    // Prevent the `results$` exchange pipeline from being closed by active
-    // cancellations cascading up from components
-    pipe(this.results$, publish);
-  }
-
-  createOperationContext = (
-    opts?: Partial<OperationContext>
-  ): OperationContext => {
-    if (!opts) opts = {};
-
-    return {
-      url: this.url,
-      fetchOptions: this.fetchOptions,
-      fetch: this.fetch,
-      preferGetMethod: this.preferGetMethod,
-      ...opts,
-      suspense: opts.suspense || (opts.suspense !== false && this.suspense),
-      requestPolicy: opts.requestPolicy || this.requestPolicy,
-    };
-  };
-
-  createRequestOperation = <Data = any, Variables = object>(
+  createRequestOperation<Data = any, Variables = object>(
     kind: OperationType,
     request: GraphQLRequest<Data, Variables>,
-    opts?: Partial<OperationContext>
-  ): Operation<Data, Variables> =>
-    makeOperation<Data, Variables>(
-      kind,
-      request,
-      this.createOperationContext(opts)
-    );
+    opts?: Partial<OperationContext> | undefined
+  ): Operation<Data, Variables>;
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation: <Data = any, Variables = object>(
+  executeRequestOperation<Data = any, Variables = object>(
     operation: Operation<Data, Variables>
-  ) => Source<OperationResult<Data, Variables>> = makeExecutor(this);
+  ): Source<OperationResult<Data, Variables>>;
 
   query<Data = any, Variables extends object = {}>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>> {
-    if (!context || typeof context.suspense !== 'boolean') {
-      context = { ...context, suspense: false };
-    }
-
-    return withPromise<OperationResult<Data, Variables>>(
-      this.executeQuery<Data, Variables>(
-        createRequest(query, variables),
-        context
-      )
-    );
-  }
+  ): PromisifiedSource<OperationResult<Data, Variables>>;
 
   readQuery<Data = any, Variables extends object = {}>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): OperationResult<Data, Variables> | null {
-    let result: OperationResult<Data, Variables> | null = null;
+  ): OperationResult<Data, Variables> | null;
 
-    pipe(
-      this.query(query, variables, context),
-      subscribe(res => {
-        result = res;
-      })
-    ).unsubscribe();
-
-    return result;
-  }
-
-  executeQuery = <Data = any, Variables = object>(
+  executeQuery<Data = any, Variables = object>(
     query: GraphQLRequest<Data, Variables>,
-    opts?: Partial<OperationContext>
-  ): Source<OperationResult<Data, Variables>> => {
-    const operation = this.createRequestOperation('query', query, opts);
-    return this.executeRequestOperation<Data, Variables>(operation);
-  };
+    opts?: Partial<OperationContext> | undefined
+  ): Source<OperationResult<Data, Variables>>;
 
   subscription<Data = any, Variables extends object = {}>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): Source<OperationResult<Data, Variables>> {
-    return this.executeSubscription<Data, Variables>(
-      createRequest(query, variables),
-      context
-    );
-  }
+  ): Source<OperationResult<Data, Variables>>;
 
-  executeSubscription = <Data = any, Variables = object>(
+  executeSubscription<Data = any, Variables = object>(
     query: GraphQLRequest<Data, Variables>,
-    opts?: Partial<OperationContext>
-  ): Source<OperationResult<Data, Variables>> => {
-    const operation = this.createRequestOperation('subscription', query, opts);
-    return this.executeRequestOperation<Data, Variables>(operation);
-  };
+    opts?: Partial<OperationContext> | undefined
+  ): Source<OperationResult<Data, Variables>>;
 
   mutation<Data = any, Variables extends object = {}>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables?: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>> {
-    return withPromise<OperationResult<Data, Variables>>(
-      this.executeMutation<Data, Variables>(
-        createRequest(query, variables),
-        context
-      )
-    );
-  }
+  ): PromisifiedSource<OperationResult<Data, Variables>>;
 
-  executeMutation = <Data = any, Variables = object>(
+  executeMutation<Data = any, Variables = object>(
     query: GraphQLRequest<Data, Variables>,
-    opts?: Partial<OperationContext>
-  ): Source<OperationResult<Data, Variables>> => {
-    const operation = this.createRequestOperation('mutation', query, opts);
-    return this.executeRequestOperation<Data, Variables>(operation);
-  };
+    opts?: Partial<OperationContext> | undefined
+  ): Source<OperationResult<Data, Variables>>;
 }
 
-function makeExecutor(
-  client: Client
-): (operation: Operation) => Source<OperationResult> {
-  const replays = new Map<number, OperationResult>();
+export const Client = (function FauxClass(opts: ClientOptions) {
+  if (process.env.NODE_ENV !== 'production' && !opts.url) {
+    throw new Error('You are creating an urql-client without a url.');
+  }
 
+  const replays = new Map<number, OperationResult>();
+  const active: Map<number, Source<OperationResult>> = new Map();
+  const queue: Operation[] = [];
+
+  // This subject forms the input of operations; executeOperation may be
+  // called to dispatch a new operation on the subject
+  const { source: operations$, next: nextOperation } = makeSubject<Operation>();
+
+  // We define a queued dispatcher on the subject, which empties the queue when it's
+  // activated to allow `reexecuteOperation` to be trampoline-scheduled
+  let isOperationBatchActive = false;
+  function dispatchOperation(operation?: Operation | void) {
+    isOperationBatchActive = true;
+    if (operation) nextOperation(operation);
+    while ((operation = queue.shift())) nextOperation(operation);
+    isOperationBatchActive = false;
+  }
+
+  /** Defines how result streams are created */
   const makeResultSource = (operation: Operation) => {
     let result$ = pipe(
-      client.results$,
+      results$,
       filter(
         (res: OperationResult) =>
           res.operation.kind === operation.kind &&
@@ -310,7 +186,7 @@ function makeExecutor(
     if (operation.kind === 'mutation') {
       return pipe(
         result$,
-        onStart(() => client.dispatchOperation(operation)),
+        onStart(() => dispatchOperation(operation)),
         take(1)
       );
     }
@@ -320,7 +196,7 @@ function makeExecutor(
       // End the results stream when an active teardown event is sent
       takeUntil(
         pipe(
-          client.operations$,
+          operations$,
           filter(op => op.kind === 'teardown' && op.key === operation.key)
         )
       ),
@@ -333,7 +209,7 @@ function makeExecutor(
           fromValue(result),
           // Mark a result as stale when a new operation is sent for it
           pipe(
-            client.operations$,
+            operations$,
             filter(op => {
               return (
                 op.kind === operation.kind &&
@@ -351,17 +227,17 @@ function makeExecutor(
         replays.set(operation.key, result);
       }),
       onStart(() => {
-        client.activeOperations.set(operation.key, source);
+        active.set(operation.key, source);
       }),
       onEnd(() => {
         // Delete the active operation handle
         replays.delete(operation.key);
-        client.activeOperations.delete(operation.key);
+        active.delete(operation.key);
         // Delete all queued up operations of the same key on end
-        for (let i = client.queue.length - 1; i >= 0; i--)
-          if (client.queue[i].key === operation.key) client.queue.splice(i, 1);
+        for (let i = queue.length - 1; i >= 0; i--)
+          if (queue[i].key === operation.key) queue.splice(i, 1);
         // Dispatch a teardown signal for the stopped operation
-        client.dispatchOperation(
+        dispatchOperation(
           makeOperation('teardown', operation, operation.context)
         );
       }),
@@ -371,41 +247,171 @@ function makeExecutor(
     return source;
   };
 
-  return operation => {
-    if (operation.kind === 'mutation') {
-      return makeResultSource(operation);
-    }
+  const client = {
+    url: opts.url,
+    fetchOptions: opts.fetchOptions,
+    fetch: opts.fetch,
+    suspense: !!opts.suspense,
+    requestPolicy: opts.requestPolicy || 'cache-first',
+    preferGetMethod: !!opts.preferGetMethod,
+    maskTypename: !!opts.maskTypename,
 
-    const source =
-      client.activeOperations.get(operation.key) || makeResultSource(operation);
+    reexecuteOperation(operation: Operation) {
+      // Reexecute operation only if any subscribers are still subscribed to the
+      // operation's exchange results
+      if (operation.kind === 'mutation' || active.has(operation.key)) {
+        queue.push(operation);
+        if (!isOperationBatchActive) {
+          Promise.resolve().then(dispatchOperation);
+        }
+      }
+    },
 
-    const isNetworkOperation =
-      operation.context.requestPolicy === 'cache-and-network' ||
-      operation.context.requestPolicy === 'network-only';
+    createOperationContext(opts) {
+      if (!opts) opts = {};
 
-    return make(observer => {
-      return pipe(
-        source,
-        onStart(() => {
-          const prevReplay = replays.get(operation.key);
+      return {
+        url: client.url,
+        fetchOptions: client.fetchOptions,
+        fetch: client.fetch,
+        preferGetMethod: client.preferGetMethod,
+        ...opts,
+        suspense: opts.suspense || (opts.suspense !== false && client.suspense),
+        requestPolicy: opts.requestPolicy || client.requestPolicy,
+      };
+    },
 
-          if (operation.kind === 'subscription') {
-            return client.dispatchOperation(operation);
-          } else if (isNetworkOperation) {
-            client.dispatchOperation(operation);
-          }
+    createRequestOperation(kind, request, opts) {
+      return makeOperation(kind, request, client.createOperationContext(opts));
+    },
 
-          if (prevReplay != null && prevReplay === replays.get(operation.key)) {
-            observer.next(
-              isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
-            );
-          } else if (!isNetworkOperation) {
-            client.dispatchOperation(operation);
-          }
-        }),
-        onEnd(observer.complete),
-        subscribe(observer.next)
-      ).unsubscribe;
-    });
-  };
-}
+    executeRequestOperation(operation) {
+      if (operation.kind === 'mutation') {
+        return makeResultSource(operation);
+      }
+
+      const source = active.get(operation.key) || makeResultSource(operation);
+
+      const isNetworkOperation =
+        operation.context.requestPolicy === 'cache-and-network' ||
+        operation.context.requestPolicy === 'network-only';
+
+      return make(observer => {
+        return pipe(
+          source,
+          onStart(() => {
+            const prevReplay = replays.get(operation.key);
+
+            if (operation.kind === 'subscription') {
+              return dispatchOperation(operation);
+            } else if (isNetworkOperation) {
+              dispatchOperation(operation);
+            }
+
+            if (
+              prevReplay != null &&
+              prevReplay === replays.get(operation.key)
+            ) {
+              observer.next(
+                isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
+              );
+            } else if (!isNetworkOperation) {
+              dispatchOperation(operation);
+            }
+          }),
+          onEnd(observer.complete),
+          subscribe(observer.next)
+        ).unsubscribe;
+      });
+    },
+
+    executeQuery(query, opts) {
+      const operation = client.createRequestOperation('query', query, opts);
+      return client.executeRequestOperation(operation);
+    },
+
+    executeSubscription(query, opts) {
+      const operation = client.createRequestOperation(
+        'subscription',
+        query,
+        opts
+      );
+      return client.executeRequestOperation(operation);
+    },
+
+    executeMutation(query, opts) {
+      const operation = client.createRequestOperation('mutation', query, opts);
+      return client.executeRequestOperation(operation);
+    },
+
+    query(query, variables, context) {
+      if (!context || typeof context.suspense !== 'boolean') {
+        context = { ...context, suspense: false };
+      }
+
+      return withPromise(
+        client.executeQuery(createRequest(query, variables), context)
+      );
+    },
+
+    readQuery(query, variables, context) {
+      let result: OperationResult | null = null;
+
+      pipe(
+        client.query(query, variables, context),
+        subscribe(res => {
+          result = res;
+        })
+      ).unsubscribe();
+
+      return result;
+    },
+
+    subscription(query, variables, context) {
+      return client.executeSubscription(
+        createRequest(query, variables),
+        context
+      );
+    },
+
+    mutation(query, variables, context) {
+      return withPromise(
+        client.executeMutation(createRequest(query, variables), context)
+      );
+    },
+  } as Client;
+
+  let dispatchDebug: ExchangeInput['dispatchDebug'] = noop;
+  if (process.env.NODE_ENV !== 'production') {
+    const { next, source } = makeSubject<DebugEvent>();
+    client.subscribeToDebugTarget = (onEvent: (e: DebugEvent) => void) =>
+      pipe(source, subscribe(onEvent));
+    dispatchDebug = next as ExchangeInput['dispatchDebug'];
+  }
+
+  const exchanges =
+    opts.exchanges !== undefined ? opts.exchanges : defaultExchanges;
+
+  // All exchange are composed into a single one and are called using the constructed client
+  // and the fallback exchange stream
+  const composedExchange = composeExchanges(exchanges);
+
+  // All exchanges receive inputs using which they can forward operations to the next exchange
+  // and receive a stream of results in return, access the client, or dispatch debugging events
+  // All operations then run through the Exchange IOs in a pipeline-like fashion
+  const results$ = share(
+    composedExchange({
+      client,
+      dispatchDebug,
+      forward: fallbackExchange({ dispatchDebug }),
+    })(operations$)
+  );
+
+  // Prevent the `results$` exchange pipeline from being closed by active
+  // cancellations cascading up from components
+  pipe(results$, publish);
+
+  return client;
+} as any) as Client;
+
+export const createClient = (Client as any) as (opts: ClientOptions) => Client;

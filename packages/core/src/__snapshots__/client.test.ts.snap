@@ -1,11 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createClient passes snapshot 1`] = `
-Client {
-  "activeOperations": Map {},
+Object {
   "createOperationContext": [Function],
   "createRequestOperation": [Function],
-  "dispatchOperation": [Function],
   "executeMutation": [Function],
   "executeQuery": [Function],
   "executeRequestOperation": [Function],
@@ -13,13 +11,14 @@ Client {
   "fetch": undefined,
   "fetchOptions": undefined,
   "maskTypename": false,
-  "operations$": [Function],
+  "mutation": [Function],
   "preferGetMethod": false,
-  "queue": Array [],
+  "query": [Function],
+  "readQuery": [Function],
   "reexecuteOperation": [Function],
   "requestPolicy": "cache-first",
-  "results$": [Function],
   "subscribeToDebugTarget": [Function],
+  "subscription": [Function],
   "suspense": false,
   "url": "https://hostname.com",
 }

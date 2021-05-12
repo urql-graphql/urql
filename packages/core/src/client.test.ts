@@ -8,9 +8,12 @@ import {
   map,
   pipe,
   subscribe,
+  publish,
   filter,
+  share,
   toArray,
   toPromise,
+  onPush,
   tap,
   take,
 } from 'wonka';
@@ -344,19 +347,16 @@ describe('queuing behavior', () => {
       exchanges: [exchange],
     });
 
-    pipe(
-      client.results$,
-      subscribe(result => {
-        output.push(result);
-      })
-    );
-
-    const results = pipe(
+    const shared = pipe(
       client.executeRequestOperation(queryOperation),
-      toArray
+      onPush(result => output.push(result)),
+      share
     );
 
-    expect(output.length).toBe(4);
+    const results = pipe(shared, toArray);
+    pipe(shared, publish);
+
+    expect(output.length).toBe(8);
     expect(results.length).toBe(2);
 
     expect(output[0]).toHaveProperty('key', queryOperation.key);
