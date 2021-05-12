@@ -71,6 +71,8 @@ export interface ClientOptions {
 export interface Client {
   new (options: ClientOptions): Client;
 
+  operations$: Source<Operation>;
+
   /** Start an operation from an exchange */
   reexecuteOperation: (operation: Operation) => void;
   /** Event target for monitoring, e.g. for @urql/devtools */
@@ -140,7 +142,7 @@ export interface Client {
   ): Source<OperationResult<Data, Variables>>;
 }
 
-export const Client = (function FauxClass(opts: ClientOptions) {
+export const Client = (function Client(opts: ClientOptions) {
   if (process.env.NODE_ENV !== 'production' && !opts.url) {
     throw new Error('You are creating an urql-client without a url.');
   }
@@ -255,6 +257,8 @@ export const Client = (function FauxClass(opts: ClientOptions) {
     requestPolicy: opts.requestPolicy || 'cache-first',
     preferGetMethod: !!opts.preferGetMethod,
     maskTypename: !!opts.maskTypename,
+
+    operations$,
 
     reexecuteOperation(operation: Operation) {
       // Reexecute operation only if any subscribers are still subscribed to the
@@ -411,7 +415,8 @@ export const Client = (function FauxClass(opts: ClientOptions) {
   // cancellations cascading up from components
   pipe(results$, publish);
 
+  client.constructor = Client;
   return client;
-} as any) as Client;
+} as unknown) as Client;
 
 export const createClient = (Client as any) as (opts: ClientOptions) => Client;
