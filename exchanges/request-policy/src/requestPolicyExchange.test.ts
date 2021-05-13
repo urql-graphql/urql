@@ -74,7 +74,7 @@ it(`upgrades to cache-and-network`, done => {
 
   expect(response).toHaveBeenCalledTimes(1);
   expect(response.mock.calls[0][0].context.requestPolicy).toEqual(
-    'cache-first'
+    'cache-and-network'
   );
   expect(result).toHaveBeenCalledTimes(1);
 
@@ -130,7 +130,7 @@ it(`doesn't upgrade when shouldUpgrade returns false`, done => {
       'cache-first'
     );
     expect(result).toHaveBeenCalledTimes(2);
-    expect(shouldUpgrade).toBeCalledTimes(1);
+    expect(shouldUpgrade).toBeCalledTimes(2);
     done();
   }, 10);
 });

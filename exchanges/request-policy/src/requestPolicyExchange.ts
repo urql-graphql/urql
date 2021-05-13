@@ -23,19 +23,17 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
     if (
       operation.kind !== 'query' ||
       (operation.context.requestPolicy !== 'cache-first' &&
-        operation.context.requestPolicy !== 'cache-only') ||
-      !operations.has(operation.key)
+        operation.context.requestPolicy !== 'cache-only')
     ) {
       return operation;
     }
 
-    const lastOccurrence = operations.get(operation.key);
     const currentTime = new Date().getTime();
+    const lastOccurrence = operations.get(operation.key) || 0;
     if (
       currentTime - lastOccurrence > TTL &&
-      (options.shouldUpgrade ? options.shouldUpgrade(operation) : true)
+      (!options.shouldUpgrade || options.shouldUpgrade(operation))
     ) {
-      operations.delete(operation.key);
       return makeOperation(operation.kind, operation, {
         ...operation.context,
         requestPolicy: 'cache-and-network',
@@ -46,7 +44,14 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
   };
 
   const processIncomingResults = (result: OperationResult): void => {
-    operations.set(result.operation.key, new Date().getTime());
+    const meta = result.operation.context.meta;
+    const isMiss =
+      !operations.has(result.operation.key) ||
+      !meta ||
+      meta.cacheOutcome === 'miss';
+    if (isMiss) {
+      operations.set(result.operation.key, new Date().getTime());
+    }
   };
 
   return ops$ => {
