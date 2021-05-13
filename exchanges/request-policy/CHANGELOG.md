@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3
+
+### Patch Changes
+
+- ⚠️ Fix TTL being updated to a newer timestamp when a cached result comes in, and prevent TTL from being deleted on our React binding's cache probes. Instead we now never delete the TTL and update it on incoming cache miss results, by [@kitten](https://github.com/kitten) (See [#1641](https://github.com/FormidableLabs/urql/pull/1641))
+- Updated dependencies (See [#1634](https://github.com/FormidableLabs/urql/pull/1634) and [#1638](https://github.com/FormidableLabs/urql/pull/1638))
+  - @urql/core@2.1.2
+
 ## 0.1.2
 
 ### Patch Changes
