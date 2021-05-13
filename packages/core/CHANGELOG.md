@@ -1,5 +1,12 @@
 # @urql/core
 
+## 2.1.2
+
+### Patch Changes
+
+- ⚠️ Fix a condition under which the `Client` would hang when a query is started and consumed with `toPromise()`, by [@kitten](https://github.com/kitten) (See [#1634](https://github.com/FormidableLabs/urql/pull/1634))
+- Refactor `Client` to hide some implementation details and to reduce size, by [@kitten](https://github.com/kitten) (See [#1638](https://github.com/FormidableLabs/urql/pull/1638))
+
 ## 2.1.1
 
 ### Patch Changes
