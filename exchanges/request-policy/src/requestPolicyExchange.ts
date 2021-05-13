@@ -46,7 +46,14 @@ export const requestPolicyExchange = (options: Options): Exchange => ({
   };
 
   const processIncomingResults = (result: OperationResult): void => {
-    operations.set(result.operation.key, new Date().getTime());
+    const meta = result.operation.context.meta;
+    const isMiss =
+      !operations.has(result.operation.key) ||
+      !meta ||
+      meta.cacheOutcome === 'miss';
+    if (isMiss) {
+      operations.set(result.operation.key, new Date().getTime());
+    }
   };
 
   return ops$ => {
