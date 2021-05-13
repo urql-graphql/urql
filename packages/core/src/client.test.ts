@@ -8,9 +8,12 @@ import {
   map,
   pipe,
   subscribe,
+  publish,
   filter,
+  share,
   toArray,
   toPromise,
+  onPush,
   tap,
   take,
 } from 'wonka';
@@ -18,18 +21,20 @@ import {
 import { gql } from './gql';
 import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
-import { createClient } from './client';
+import { Client, createClient } from './client';
 import { queryOperation, subscriptionOperation } from './test-utils';
 
 const url = 'https://hostname.com';
 
-describe('createClient', () => {
-  it('passes snapshot', () => {
-    const c = createClient({
-      url,
-    });
+describe('createClient / Client', () => {
+  it('creates an instance of Client', () => {
+    expect(createClient({ url }) instanceof Client).toBeTruthy();
+    expect(new Client({ url }) instanceof Client).toBeTruthy();
+  });
 
-    expect(c).toMatchSnapshot();
+  it('passes snapshot', () => {
+    const client = createClient({ url });
+    expect(client).toMatchSnapshot();
   });
 });
 
@@ -344,19 +349,16 @@ describe('queuing behavior', () => {
       exchanges: [exchange],
     });
 
-    pipe(
-      client.results$,
-      subscribe(result => {
-        output.push(result);
-      })
-    );
-
-    const results = pipe(
+    const shared = pipe(
       client.executeRequestOperation(queryOperation),
-      toArray
+      onPush(result => output.push(result)),
+      share
     );
 
-    expect(output.length).toBe(4);
+    const results = pipe(shared, toArray);
+    pipe(shared, publish);
+
+    expect(output.length).toBe(8);
     expect(results.length).toBe(2);
 
     expect(output[0]).toHaveProperty('key', queryOperation.key);
