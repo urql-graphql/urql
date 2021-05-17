@@ -5,7 +5,7 @@ module.exports = {
   ],
   clearMocks: true,
   transform: {
-    '^.+\\.tsx?$': 'esbuild-jest',
+    '^.+\\.tsx?$': '@sucrase/jest-plugin',
   },
   moduleNameMapper: {
     "^urql$": "<rootDir>/../../node_modules/urql/src",
