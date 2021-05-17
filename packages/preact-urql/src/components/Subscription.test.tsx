@@ -1,4 +1,3 @@
-/* @jsx h */
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
@@ -13,6 +12,11 @@ const client = {
       map((i: number) => ({ data: i, error: i + 1 }))
     )
   ),
+};
+
+// @ts-ignore
+const React = {
+  createElement: h,
 };
 
 describe('Subscription', () => {

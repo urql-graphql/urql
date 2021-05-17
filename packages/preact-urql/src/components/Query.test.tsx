@@ -1,4 +1,3 @@
-/* @jsx h */
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
@@ -8,6 +7,11 @@ import { Provider } from '../context';
 const query = '{ example }';
 const variables = {
   myVar: 1234,
+};
+
+// @ts-ignore
+const React = {
+  createElement: h,
 };
 
 const client = {

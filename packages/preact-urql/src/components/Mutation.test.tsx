@@ -1,9 +1,13 @@
-/* @jsx h */
 import { h } from 'preact';
 import { act, cleanup, render } from '@testing-library/preact';
 import { pipe, fromValue, delay } from 'wonka';
 import { Provider } from '../context';
 import { Mutation } from './Mutation';
+
+// @ts-ignore
+const React = {
+  createElement: h,
+};
 
 const mock = {
   executeMutation: jest.fn(() =>
