@@ -4,11 +4,6 @@ import { pipe, fromValue, delay } from 'wonka';
 import { Provider } from '../context';
 import { Mutation } from './Mutation';
 
-// @ts-ignore
-const React = {
-  createElement: h,
-};
-
 const mock = {
   executeMutation: jest.fn(() =>
     pipe(fromValue({ data: 1, error: 2, extensions: { i: 1 } }), delay(200))
@@ -30,7 +25,7 @@ describe('Mutation', () => {
     // eslint-disable-next-line
     let execute = () => {},
       props = {};
-    const Test = () => <p>Hi</p>;
+    const Test = () => h('p', {}, 'hi');
     const App = () => {
       // @ts-ignore
       return h(Provider, {
@@ -43,6 +38,7 @@ describe('Mutation', () => {
             ({ data, fetching, error, executeMutation }) => {
               execute = executeMutation;
               props = { data, fetching, error };
+              // @ts-ignore
               return h(Test, {});
             }
           ),
