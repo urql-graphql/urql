@@ -2,7 +2,6 @@
 
 import { minifyIntrospectionQuery } from '@urql/introspection';
 import { formatDocument, gql, maskTypename } from '@urql/core';
-import { mocked } from 'ts-jest/utils';
 
 import {
   executeSync,
@@ -18,6 +17,8 @@ import { write, writeOptimistic } from '../operations/write';
 import * as InMemoryData from './data';
 import { Store } from './store';
 import { noop } from '../test-utils/utils';
+
+const mocked = (x: any): any => x;
 
 const Appointment = gql`
   query appointment($id: String) {

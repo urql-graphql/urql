@@ -21,7 +21,6 @@ import {
   empty,
   Source,
 } from 'wonka';
-import { mocked } from 'ts-jest/utils';
 import { queryOperation } from '@urql/core/test-utils';
 import {
   makeErrorResult,
@@ -30,6 +29,8 @@ import {
   getOperationName,
   OperationResult,
 } from '@urql/core';
+
+const mocked = (x: any): any => x;
 
 const schema = 'STUB_SCHEMA' as any;
 const exchangeArgs = {

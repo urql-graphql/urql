@@ -1,8 +1,9 @@
 import { Kind, InlineFragmentNode } from 'graphql';
-import { mocked } from 'ts-jest/utils';
 import { buildClientSchema } from './schema';
 import * as SchemaPredicates from './schemaPredicates';
 import { minifyIntrospectionQuery } from '@urql/introspection';
+
+const mocked = (x: any): any => x;
 
 describe('SchemaPredicates', () => {
   // eslint-disable-next-line
