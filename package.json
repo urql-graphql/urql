@@ -103,10 +103,10 @@
     "npm-packlist": "^2.1.5",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
-    "rimraf": "^3.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-is": "^17.0.2",
+    "rimraf": "^3.0.2",
     "rollup": "^2.45.2",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-terser": "^7.0.2",
@@ -114,6 +114,7 @@
     "rollup-plugin-visualizer": "^5.4.1",
     "tar": "^6.1.0",
     "terser": "^5.7.0",
+    "ts-jest": "^26.5.5",
     "typescript": "^4.2.4"
   }
 }
