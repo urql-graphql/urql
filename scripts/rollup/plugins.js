@@ -11,10 +11,12 @@ import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
+
 import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
+import babelPluginTransformJsTag from '../babel/transform-js-tag';
 
 import * as settings from './settings';
 
@@ -55,6 +57,14 @@ export const makePlugins = () => [
         },
       },
     }),
+  settings.name === 'urql-fast-json' && babel({
+    babelrc: false,
+    babelHelpers: 'bundled',
+    extensions: ['js', 'jsx', 'ts', 'tsx'],
+    exclude: 'node_modules/**',
+    presets: [],
+    plugins: [babelPluginTransformJsTag],
+  }),
   buble({
     transforms: {
       unicodeRegExp: false,
