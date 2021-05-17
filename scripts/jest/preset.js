@@ -5,7 +5,7 @@ module.exports = {
   ],
   clearMocks: true,
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': 'esbuild-jest',
   },
   moduleNameMapper: {
     "^urql$": "<rootDir>/../../node_modules/urql/src",
