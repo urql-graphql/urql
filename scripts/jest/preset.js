@@ -1,5 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
   setupFiles: [
     require.resolve('./setup.js')
   ],
