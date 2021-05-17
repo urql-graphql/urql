@@ -13,7 +13,8 @@ export interface Fragments {
 export type Primitive = null | number | boolean | string;
 
 export interface ScalarObject {
-  [key: string]: unknown;
+  constructor?: Function;
+  [key: string]: any;
 }
 
 export type Scalar = Primitive | ScalarObject;
