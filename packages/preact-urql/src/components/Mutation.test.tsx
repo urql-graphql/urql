@@ -1,4 +1,3 @@
-/* @jsx h */
 import { h } from 'preact';
 import { act, cleanup, render } from '@testing-library/preact';
 import { pipe, fromValue, delay } from 'wonka';
@@ -26,7 +25,7 @@ describe('Mutation', () => {
     // eslint-disable-next-line
     let execute = () => {},
       props = {};
-    const Test = () => <p>Hi</p>;
+    const Test = () => h('p', {}, 'hi');
     const App = () => {
       // @ts-ignore
       return h(Provider, {
@@ -39,6 +38,7 @@ describe('Mutation', () => {
             ({ data, fetching, error, executeMutation }) => {
               execute = executeMutation;
               props = { data, fetching, error };
+              // @ts-ignore
               return h(Test, {});
             }
           ),

@@ -1,4 +1,3 @@
-/* @jsx h */
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
@@ -26,7 +25,7 @@ describe('Subscription', () => {
 
   it('Should execute the subscription', done => {
     let props = {};
-    const Test = () => <p>Hi</p>;
+    const Test = () => h('p', {}, 'hi');
     const App = () => {
       // @ts-ignore
       return h(Provider, {
@@ -35,6 +34,7 @@ describe('Subscription', () => {
           // @ts-ignore
           h(Subscription, { query }, ({ data, fetching, error }) => {
             props = { data, fetching, error };
+            // @ts-ignore
             return h(Test, {});
           }),
         ],

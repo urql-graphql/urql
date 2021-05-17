@@ -1,11 +1,10 @@
 module.exports = {
-  preset: 'ts-jest',
   setupFiles: [
     require.resolve('./setup.js')
   ],
   clearMocks: true,
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': '@sucrase/jest-plugin',
   },
   moduleNameMapper: {
     "^urql$": "<rootDir>/../../node_modules/urql/src",
