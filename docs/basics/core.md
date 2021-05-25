@@ -172,7 +172,7 @@ and how to cache data in a certain order. By default, this will be populated wit
 `defaultExchanges`.
 
 ```js
-import { createClient, defaultExchanges } from 'urql';
+import { createClient, defaultExchanges } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
