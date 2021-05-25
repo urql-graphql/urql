@@ -134,7 +134,7 @@ The `@urql/core` package exports a function called `createClient` which we can u
 create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from 'urql';
+import { createClient } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
@@ -172,7 +172,7 @@ and how to cache data in a certain order. By default, this will be populated wit
 `defaultExchanges`.
 
 ```js
-import { createClient, defaultExchanges } from 'urql';
+import { createClient, defaultExchanges } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
