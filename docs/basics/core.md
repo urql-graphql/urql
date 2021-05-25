@@ -134,7 +134,7 @@ The `@urql/core` package exports a function called `createClient` which we can u
 create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from 'urql';
+import { createClient } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
