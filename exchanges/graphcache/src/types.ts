@@ -146,6 +146,29 @@ export type CacheExchangeOpts = {
   storage?: StorageAdapter;
 };
 
+type GenericUpdateResolver<
+  ParentData extends any = DataFields,
+  Args = Variables
+> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => void;
+
+interface GenericUpdatesConfig {
+  Mutation: {
+    [fieldName: string]: GenericUpdateResolver;
+  };
+  Subscription: {
+    [fieldName: string]: GenericUpdateResolver;
+  };
+}
+
+export type GenericCacheExchangeOpts = {
+  updates?: Partial<GenericUpdatesConfig>;
+  resolvers?: ResolverConfig;
+  optimistic?: OptimisticMutationConfig;
+  keys?: KeyingConfig;
+  schema?: IntrospectionData;
+  storage?: StorageAdapter;
+};
+
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver<
   ParentData = DataFields,
