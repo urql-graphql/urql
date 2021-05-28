@@ -146,6 +146,23 @@ export type CacheExchangeOpts = {
   storage?: StorageAdapter;
 };
 
+/**
+ * The following part is meant to support the generic type-generated part of graphcache,
+ * we want to make the extends loose but the default type still has to work as DataFields.
+ * You can recognize these by the "generic" prefix.
+ */
+type GenericResolver<
+  ParentData extends any = DataFields,
+  Args = Variables,
+  Result = ResolverResult
+> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
+
+interface GenericResolverConfig {
+  [typeName: string]: {
+    [fieldName: string]: GenericResolver;
+  };
+}
+
 type GenericUpdateResolver<
   ParentData extends any = DataFields,
   Args = Variables
@@ -162,7 +179,7 @@ interface GenericUpdatesConfig {
 
 export type GenericCacheExchangeOpts = {
   updates?: Partial<GenericUpdatesConfig>;
-  resolvers?: ResolverConfig;
+  resolvers?: GenericResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
   schema?: IntrospectionData;
