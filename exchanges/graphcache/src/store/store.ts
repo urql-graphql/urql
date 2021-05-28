@@ -15,6 +15,7 @@ import {
   OptimisticMutationConfig,
   KeyingConfig,
   Entity,
+  GenericCacheExchangeOpts,
   CacheExchangeOpts,
 } from '../types';
 
@@ -38,7 +39,7 @@ import {
 type RootField = 'query' | 'mutation' | 'subscription';
 
 export class Store<
-  C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
+  C extends Partial<GenericCacheExchangeOpts> = Partial<CacheExchangeOpts>
 > implements Cache {
   data: InMemoryData.InMemoryData;
 
