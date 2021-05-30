@@ -11,6 +11,7 @@ import {
   Operation,
   OperationContext,
   OperationResult,
+  createRequest,
 } from '@urql/core';
 
 import { useClient } from './useClient';
@@ -60,8 +61,11 @@ export function callUseMutation<T = any, V = any>(
     ): Promise<OperationResult<T, V>> {
       fetching.value = true;
       return pipe(
-        client.executeMutation(query, variables as any, context),
-        toPromise()
+        client.executeMutation<T, V>(
+          createRequest<T, V>(query, variables),
+          context || {}
+        ),
+        toPromise
       ).then((res: OperationResult) => {
         data.value = res.data;
         stale.value = !!res.stale;

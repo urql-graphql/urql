@@ -19,7 +19,7 @@ describe('useMutation', () => {
   it('provides an execute method that resolves a promise', async () => {
     const subject = makeSubject<any>();
     const clientMutation = jest
-      .spyOn(client, 'mutation')
+      .spyOn(client, 'executeMutation')
       .mockImplementation((): any => ({
         toPromise() {
           return pipe(subject.source, take(1), toPromise);
