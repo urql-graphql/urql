@@ -4,7 +4,7 @@ jest.mock('./useClient.ts', () => ({
   useClient: () => client,
 }));
 
-import { makeSubject, pipe, take, toPromise } from 'wonka';
+import { makeSubject } from 'wonka';
 import { createClient, gql } from '@urql/core';
 import { useMutation } from './useMutation';
 import { reactive } from 'vue';
@@ -14,17 +14,13 @@ const client = createClient({ url: '/graphql', exchanges: [] });
 beforeEach(() => {
   jest.resetAllMocks();
 });
-
 describe('useMutation', () => {
   it('provides an execute method that resolves a promise', async () => {
     const subject = makeSubject<any>();
     const clientMutation = jest
       .spyOn(client, 'executeMutation')
-      .mockImplementation((): any => ({
-        toPromise() {
-          return pipe(subject.source, take(1), toPromise);
-        },
-      }));
+      .mockImplementation(() => subject.source);
+
     const mutation = reactive(
       useMutation(
         gql`
