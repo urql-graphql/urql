@@ -5,7 +5,7 @@ jest.mock('./useClient.ts', () => ({
 }));
 
 import { makeSubject, pipe, take, toPromise } from 'wonka';
-import { createClient } from '@urql/core';
+import { createClient, gql } from '@urql/core';
 import { useMutation } from './useMutation';
 import { reactive } from 'vue';
 
@@ -25,7 +25,15 @@ describe('useMutation', () => {
           return pipe(subject.source, take(1), toPromise);
         },
       }));
-    const mutation = reactive(useMutation('mutation { test }'));
+    const mutation = reactive(
+      useMutation(
+        gql`
+          mutation {
+            test
+          }
+        `
+      )
+    );
 
     expect(mutation).toMatchObject({
       data: undefined,
