@@ -24,7 +24,7 @@ import {
   SerializedRequest,
   OptimisticMutationConfig,
   Variables,
-  GenericCacheExchangeOpts,
+  CacheExchangeOpts,
 } from './types';
 
 import { makeDict } from './helpers/dict';
@@ -66,7 +66,7 @@ const isOfflineError = (error: undefined | CombinedError) =>
       error.networkError.message
     ));
 
-export const offlineExchange = <C extends Partial<GenericCacheExchangeOpts>>(
+export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
   opts: C
 ): Exchange => input => {
   const { storage } = opts;
