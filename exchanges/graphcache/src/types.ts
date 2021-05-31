@@ -10,7 +10,7 @@ export interface Fragments {
 }
 
 // Scalar types are not entities as part of response data
-export type Primitive = null | number | boolean | string;
+export type Primitive = null | number | boolean | string | Date;
 
 export interface ScalarObject {
   constructor?: Function;
