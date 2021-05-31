@@ -98,7 +98,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     clear() {
       return database$.then(database => {
         const transaction = database.transaction(
-          METADATA_STORE_NAME,
+          [METADATA_STORE_NAME, ENTRIES_STORE_NAME],
           'readwrite'
         );
         transaction.objectStore(METADATA_STORE_NAME).clear();
