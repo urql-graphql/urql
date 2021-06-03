@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 4.1.3
+
+### Patch Changes
+
+- ⚠️ Fix: add the `ENTRIES_STORE_NAME` to the clear transaction, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1685](https://github.com/FormidableLabs/urql/pull/1685))
+- Updated dependencies (See [#1695](https://github.com/FormidableLabs/urql/pull/1695))
+  - @urql/core@2.1.3
+
 ## 4.1.2
 
 ### Patch Changes

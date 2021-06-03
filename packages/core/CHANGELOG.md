@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.1.3
+
+### Patch Changes
+
+- Treat empty variables the same as no variables in `@urql/core`'s `createRequest`, by [@kitten](https://github.com/kitten) (See [#1695](https://github.com/FormidableLabs/urql/pull/1695))
+
 ## 2.1.2
 
 ### Patch Changes
