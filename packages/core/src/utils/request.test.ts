@@ -2,6 +2,11 @@ import { parse, print } from 'graphql';
 import { gql } from '../gql';
 import { createRequest } from './request';
 
+jest.mock('./hash', () => ({
+  hash: jest.requireActual('./hash').hash,
+  phash: (x: number) => x,
+}));
+
 it('should hash identical queries identically', () => {
   const reqA = createRequest('{ test }');
   const reqB = createRequest('{ test }');
