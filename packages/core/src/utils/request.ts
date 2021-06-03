@@ -78,13 +78,12 @@ export const createRequest = <Data = any, Variables = object>(
   q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
   vars?: Variables
 ): GraphQLRequest<Data, Variables> => {
+  if (!vars) vars = {} as Variables;
   const query = keyDocument(q);
   return {
-    key: vars
-      ? phash(query.__key, stringifyVariables(vars)) >>> 0
-      : query.__key,
+    key: phash(query.__key, stringifyVariables(vars)) >>> 0,
     query,
-    variables: vars || ({} as Variables),
+    variables: vars,
   };
 };
 
