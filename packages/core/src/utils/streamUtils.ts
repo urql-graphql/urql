@@ -1,9 +1,17 @@
-import { Source, pipe, toPromise, take } from 'wonka';
+import { Source, pipe, toPromise, filter, take } from 'wonka';
+import { OperationResult, PromisifiedSource } from '../types';
 
-import { PromisifiedSource } from '../types';
+export function withPromise<T extends OperationResult>(
+  source$: Source<T>
+): PromisifiedSource<T> {
+  (source$ as PromisifiedSource<T>).toPromise = () => {
+    return pipe(
+      source$,
+      filter(result => !result.stale),
+      take(1),
+      toPromise
+    );
+  };
 
-export function withPromise<T>(source$: Source<T>): PromisifiedSource<T> {
-  (source$ as PromisifiedSource<T>).toPromise = () =>
-    pipe(source$, take(1), toPromise);
   return source$ as PromisifiedSource<T>;
 }
