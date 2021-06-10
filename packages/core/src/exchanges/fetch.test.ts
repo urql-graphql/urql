@@ -51,6 +51,9 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
+      headers: {
+        'content-type': 'application/json',
+      },
       json: jest.fn().mockResolvedValue(response),
     });
   });
@@ -80,6 +83,9 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: {
+        'content-type': 'application/json',
+      },
       json: jest.fn().mockResolvedValue({}),
     });
   });
@@ -115,6 +121,9 @@ describe('on error', () => {
   it('ignores the error when a result is available', async () => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: {
+        'content-type': 'application/json',
+      },
       json: jest.fn().mockResolvedValue(response),
     });
 

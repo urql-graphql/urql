@@ -1,5 +1,5 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode } from 'graphql';
+import { DocumentNode, GraphQLError } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
@@ -71,6 +71,13 @@ export interface OperationResult<Data = any, Variables = any> {
   extensions?: Record<string, any>;
   /** Optional stale flag added by exchanges that return stale results. */
   stale?: boolean;
+}
+
+export interface MultipartPayload<Data = any> {
+  data?: Data;
+  error?: GraphQLError[];
+  path: (string | number)[];
+  hasNext: boolean;
 }
 
 /** Input parameters for to an Exchange factory function. */
