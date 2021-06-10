@@ -14,7 +14,8 @@ export const makeFetchSource = (
     const fetcher = operation.context.fetch || fetch;
 
     let ended = false;
-    let catch_response: Response;
+    let statusNotOk = false;
+    let response: Response;
 
     Promise.resolve()
       .then(() => {
@@ -24,38 +25,35 @@ export const makeFetchSource = (
           fetchOptions.signal = abortController.signal;
         }
 
-        // Does the fetch call — handling any network level errors, like not 200's
-        return fetcher(url, fetchOptions).then((response: Response) => {
-          catch_response = response;
+        return fetcher(url, fetchOptions).then((res: Response) => {
+          statusNotOk =
+            res.status < 200 ||
+            res.status >= (fetchOptions.redirect === 'manual' ? 400 : 300);
 
-          if (
-            response.status < 200 ||
-            response.status >= (fetchOptions.redirect === 'manual' ? 400 : 300)
-          ) {
-            throw new Error(response.statusText);
-          }
-
-          return response;
+          return (response = res);
         });
       })
-      // now we handle the maybe response
-      .then(async (response: Response | undefined) => {
-        if (!response || ended) return;
+      .then(async (res: Response | undefined) => {
+        if (!res || ended) return;
 
-        const networkResult = await response.json();
+        let result = await res.json();
 
-        if (!('data' in networkResult) && !('errors' in networkResult))
+        if (!('data' in result) && !('errors' in result))
           throw new Error('No Content');
 
-        if (ended) return;
-
-        const result = makeResult(operation, networkResult, response);
+        result = makeResult(operation, result, response);
         if (result) next(result);
       })
       .catch((error: Error) => {
         if (error.name === 'AbortError') return;
 
-        next(makeErrorResult(operation, error, catch_response));
+        next(
+          makeErrorResult(
+            operation,
+            statusNotOk ? new Error(response.statusText) : error,
+            response
+          )
+        );
       })
       .finally(() => complete());
 

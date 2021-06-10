@@ -153,7 +153,7 @@ describe('on error', () => {
     expect(data).toMatchSnapshot();
   });
 
-  it.skip('ignores the error when a result is available', async () => {
+  it('ignores the error when a result is available', async () => {
     fetch.mockResolvedValue({
       status: 400,
       json: jest.fn().mockResolvedValue(response),
