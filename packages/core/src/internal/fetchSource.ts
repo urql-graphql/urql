@@ -2,42 +2,6 @@ import { Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult } from '../utils';
 import { make } from 'wonka';
 
-const executeFetch = (
-  operation: Operation,
-  url: string,
-  fetchOptions: RequestInit
-): Promise<OperationResult> => {
-  const fetcher = operation.context.fetch;
-
-  let statusNotOk = false;
-  let response: Response;
-
-  return (fetcher || fetch)(url, fetchOptions)
-    .then((res: Response) => {
-      response = res;
-      statusNotOk =
-        res.status < 200 ||
-        res.status >= (fetchOptions.redirect === 'manual' ? 400 : 300);
-      return res.json();
-    })
-    .then((result: any) => {
-      if (!('data' in result) && !('errors' in result)) {
-        throw new Error('No Content');
-      }
-
-      return makeResult(operation, result, response);
-    })
-    .catch((error: Error) => {
-      if (error.name !== 'AbortError') {
-        return makeErrorResult(
-          operation,
-          statusNotOk ? new Error(response.statusText) : error,
-          response
-        );
-      }
-    }) as Promise<OperationResult>;
-};
-
 export const makeFetchSource = (
   operation: Operation,
   url: string,
@@ -47,7 +11,10 @@ export const makeFetchSource = (
     const abortController =
       typeof AbortController !== 'undefined' ? new AbortController() : null;
 
+    const fetcher = operation.context.fetch || fetch;
+
     let ended = false;
+    let catch_response: Response;
 
     Promise.resolve()
       .then(() => {
@@ -57,21 +24,44 @@ export const makeFetchSource = (
           fetchOptions.signal = abortController.signal;
         }
 
-        return executeFetch(operation, url, fetchOptions);
+        // Does the fetch call — handling any network level errors, like not 200's
+        return fetcher(url, fetchOptions).then((response: Response) => {
+          catch_response = response;
+
+          if (
+            response.status < 200 ||
+            response.status >= (fetchOptions.redirect === 'manual' ? 400 : 300)
+          ) {
+            throw new Error(response.statusText);
+          }
+
+          return response;
+        });
       })
-      .then((result: OperationResult | undefined) => {
-        if (!ended) {
-          ended = true;
-          if (result) next(result);
-          complete();
-        }
-      });
+      // now we handle the maybe response
+      .then(async (response: Response | undefined) => {
+        if (!response || ended) return;
+
+        const networkResult = await response.json();
+
+        if (!('data' in networkResult) && !('errors' in networkResult))
+          throw new Error('No Content');
+
+        if (ended) return;
+
+        const result = makeResult(operation, networkResult, response);
+        if (result) next(result);
+      })
+      .catch((error: Error) => {
+        if (error.name === 'AbortError') return;
+
+        next(makeErrorResult(operation, error, catch_response));
+      })
+      .finally(() => complete());
 
     return () => {
       ended = true;
-      if (abortController) {
-        abortController.abort();
-      }
+      if (abortController) abortController.abort();
     };
   });
 };
