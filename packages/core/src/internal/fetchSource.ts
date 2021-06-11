@@ -33,19 +33,22 @@ export const makeFetchSource = (
           return (response = res);
         });
       })
-      .then(async (res: Response | undefined) => {
-        if (!res || ended) return;
+      .then((res: Response | undefined) => {
+        if (!res || ended) throw new Error('bail early');
 
-        let result = await res.json();
-
+        return res.json();
+      })
+      .then((result: OperationResult) => {
         if (!('data' in result) && !('errors' in result))
           throw new Error('No Content');
 
         result = makeResult(operation, result, response);
         if (result) next(result);
+        complete();
       })
       .catch((error: Error) => {
-        if (error.name === 'AbortError') return;
+        if (error.name === 'AbortError') return void complete();
+        if (error.message === 'bail early') return void complete();
 
         next(
           makeErrorResult(
@@ -54,8 +57,8 @@ export const makeFetchSource = (
             response
           )
         );
-      })
-      .finally(() => complete());
+        complete();
+      });
 
     return () => {
       ended = true;
