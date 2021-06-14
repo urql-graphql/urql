@@ -198,18 +198,27 @@ export function useQuery<Data = any, Variables = object>(
         ...opts,
       };
 
-      const source = client.executeQuery(request, context);
-
       setState(state => {
-        const snapshot =
-          context.requestPolicy !== 'network-only'
-            ? getSnapshot(source, false)
-            : { fetching: true };
-        const nextResult = computeNextState(state[1], snapshot);
-        return state[1] !== nextResult ? [source, nextResult, state[2]] : state;
+        const source = suspense
+          ? pipe(
+              client.executeQuery(request, context),
+              onPush(result => {
+                cache.set(request.key, result);
+              })
+            )
+          : client.executeQuery(request, context);
+        return [source, state[1], state[2]];
       });
     },
-    [client, request, getSnapshot, args.requestPolicy, args.context]
+    [
+      client,
+      cache,
+      request,
+      suspense,
+      getSnapshot,
+      args.requestPolicy,
+      args.context,
+    ]
   );
 
   return [currentResult, executeQuery];
