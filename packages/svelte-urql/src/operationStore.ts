@@ -13,8 +13,8 @@ type Updater<T> = (value: T) => T;
  * This Svelte store wraps both a `GraphQLRequest` and an `OperationResult`.
  * It can be used to update the query and read the subsequent result back.
  */
-export interface OperationStore<Data = any, Vars = any>
-  extends Readable<OperationStore<Data, Vars>> {
+export interface OperationStore<Data = any, Vars = any, Result = Data>
+  extends Readable<OperationStore<Data, Vars, Result>> {
   // Input properties
   query: DocumentNode | TypedDocumentNode<Data, Vars> | string;
   variables: Vars | null;
@@ -22,19 +22,19 @@ export interface OperationStore<Data = any, Vars = any>
   // Output properties
   readonly stale: boolean;
   readonly fetching: boolean;
-  readonly data: Data | undefined;
+  readonly data: Result | undefined;
   readonly error: CombinedError | undefined;
   readonly extensions: Record<string, any> | undefined;
   // Writable properties
-  set(value: Partial<OperationStore<Data, Vars>>): void;
-  update(updater: Updater<Partial<OperationStore<Data, Vars>>>): void;
+  set(value: Partial<OperationStore<Data, Vars, Result>>): void;
+  update(updater: Updater<Partial<OperationStore<Data, Vars, Result>>>): void;
 }
 
-export function operationStore<Data = any, Vars = object>(
+export function operationStore<Data = any, Vars = object, Result = Data>(
   query: string | DocumentNode | TypedDocumentNode<Data, Vars>,
   variables?: Vars | null,
   context?: Partial<OperationContext & { pause: boolean }>
-): OperationStore<Data, Vars> {
+): OperationStore<Data, Vars, Result> {
   const internal = {
     query,
     variables: variables || null,
@@ -47,7 +47,7 @@ export function operationStore<Data = any, Vars = object>(
     data: undefined,
     error: undefined,
     extensions: undefined,
-  } as OperationStore<Data, Vars>;
+  } as OperationStore<Data, Vars, Result>;
 
   const svelteStore = writable(state);
   let _internalUpdate = false;
