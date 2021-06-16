@@ -41,7 +41,9 @@ const baseState = {
   extensions: undefined,
 };
 
-function toSource<Data, Variables>(store: OperationStore<Data, Variables>) {
+function toSource<Data, Variables, Result>(
+  store: OperationStore<Data, Variables, Result>
+) {
   return make<SourceRequest<Data, Variables>>(observer => {
     let $request: void | GraphQLRequest<Data, Variables>;
     let $contextKey: void | string;
@@ -111,9 +113,9 @@ export function query<Data = any, Variables = object>(
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export function subscription<Data = any, Result = Data, Variables = object>(
-  store: OperationStore<Result, Variables>,
+  store: OperationStore<Data, Variables, Result>,
   handler?: SubscriptionHandler<Data, Result>
-): OperationStore<Result, Variables> {
+): OperationStore<Data, Variables, Result> {
   const client = getClient();
   const subscription = pipe(
     toSource(store),
@@ -182,7 +184,6 @@ export function mutation<Data = any, Variables = object>(
 
     _markStoreUpdate(update);
     store.set(update);
-
     return client
       .mutation(store.query, store.variables as any, store.context)
       .toPromise()
