@@ -2,7 +2,7 @@
 
 import { ref, Ref } from 'vue';
 import { DocumentNode } from 'graphql';
-import { pipe, toPromise } from 'wonka';
+import { pipe, toPromise, take } from 'wonka';
 
 import {
   Client,
@@ -60,11 +60,13 @@ export function callUseMutation<T = any, V = any>(
       context?: Partial<OperationContext>
     ): Promise<OperationResult<T, V>> {
       fetching.value = true;
+
       return pipe(
         client.executeMutation<T, V>(
           createRequest<T, V>(query, variables),
           context || {}
         ),
+        take(1),
         toPromise
       ).then((res: OperationResult) => {
         data.value = res.data;

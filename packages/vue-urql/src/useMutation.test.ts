@@ -14,8 +14,9 @@ const client = createClient({ url: '/graphql', exchanges: [] });
 beforeEach(() => {
   jest.resetAllMocks();
 });
+
 describe('useMutation', () => {
-  it('provides an execute method that resolves a promise', async () => {
+  it('provides an execute method that resolves a promise', done => {
     const subject = makeSubject<any>();
     const clientMutation = jest
       .spyOn(client, 'executeMutation')
@@ -50,12 +51,12 @@ describe('useMutation', () => {
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
     subject.next({ data: { test: true } });
-
-    await promise;
-
-    expect(mutation.fetching).toBe(false);
-    expect(mutation.stale).toBe(false);
-    expect(mutation.error).toBe(undefined);
-    expect(mutation.data).toEqual({ test: true });
+    promise.then(function () {
+      expect(mutation.fetching).toBe(false);
+      expect(mutation.stale).toBe(false);
+      expect(mutation.error).toBe(undefined);
+      expect(mutation.data).toEqual({ test: true });
+      done();
+    });
   });
 });
