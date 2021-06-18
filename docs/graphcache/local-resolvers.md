@@ -385,8 +385,19 @@ At any point, the `cache` allows us to read entirely separate queries in our res
 a separate virtual operation in our resolvers. When we call `cache.readQuery` with a query and
 variables we can execute an entirely new GraphQL query against our cached data:
 
-```js
-cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } })`
+```js
+import { gql } from '@urql/core';
+import { cacheExchange } from '@urql/exchange-graphcache';
+
+const cache = cacheExchange({
+  updates: {
+    Mutation: {
+      addTodo: (result, args, cache) => {
+        const data = cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } });
+      }
+    }
+  }
+})
 ```
 
 This way we'll get the stored data for the `TodosQuery` for the given `variables`.
@@ -400,16 +411,25 @@ accepts a `fragment` and an `id`. This looks like the following.
 
 ```js
 import { gql } from '@urql/core';
+import { cacheExchange } from '@urql/exchange-graphcache';
 
-const data = cache.readFragment(
-  gql`
-    fragment _ on Todo {
-      id
-      text
+const cache = cacheExchange({
+  resolvers: {
+    Query: {
+      Todo: (parent, args, cache) => {
+        return cache.readFragment(
+          gql`
+            fragment _ on Todo {
+              id
+              text
+            }
+          `,
+          { id: 1 }
+        );
+      }
     }
-  `,
-  { id: 1 }
-);
+  }
+})
 ```
 
 > **Note:** In the above example, we've used
@@ -420,6 +440,11 @@ This way we'll read the entire fragment that we've passed for the `Todo` for the
 case `{ id: 1 }`.
 
 [Read more about `cache.readFragment` in the Graphcache API docs.](../api/graphcache.md#readfragment)
+
+### Cache methods outside of `resolvers`
+
+The cache read methods are not possible outside of GraphQL operations. This means these methods will
+be limited to the different `Graphcache` configuration methods.
 
 ## Pagination
 
