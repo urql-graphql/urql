@@ -1,4 +1,4 @@
-import { makeSubject, pipe, take, toPromise } from 'wonka';
+import { makeSubject } from 'wonka';
 import { createClient } from '@urql/core';
 import { operationStore } from './operationStore';
 import { query, subscription, mutation } from './operations';
@@ -241,12 +241,8 @@ describe('mutation', () => {
     const subscriber = jest.fn();
     const subject = makeSubject<any>();
     const clientMutation = jest
-      .spyOn(client, 'mutation')
-      .mockImplementation((): any => ({
-        toPromise() {
-          return pipe(subject.source, take(1), toPromise);
-        },
-      }));
+      .spyOn(client, 'executeMutation')
+      .mockImplementation((): any => subject.source);
 
     const store = operationStore('mutation { test }', { test: false });
     store.subscribe(subscriber);

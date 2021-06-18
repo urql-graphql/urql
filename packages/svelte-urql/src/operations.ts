@@ -19,6 +19,8 @@ import {
   fromValue,
   switchMap,
   subscribe,
+  toPromise,
+  take,
 } from 'wonka';
 
 import { OperationStore, operationStore } from './operationStore';
@@ -184,14 +186,18 @@ export function mutation<Data = any, Variables = object>(
 
     _markStoreUpdate(update);
     store.set(update);
-    return client
-      .mutation(store.query, store.variables as any, store.context)
-      .toPromise()
-      .then(result => {
-        const update = { fetching: false, ...result };
-        _markStoreUpdate(update);
-        store.set(update);
-        return store;
-      });
+    return pipe(
+      client.executeMutation(
+        createRequest(store.query, store.variables || {}),
+        store.context
+      ),
+      take(1),
+      toPromise
+    ).then(result => {
+      const update = { fetching: false, ...result };
+      _markStoreUpdate(update);
+      store.set(update);
+      return store;
+    });
   };
 }
