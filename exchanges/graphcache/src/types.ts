@@ -151,43 +151,62 @@ export type Resolver<
   ParentData = DataFields,
   Args = Variables,
   Result = ResolverResult
-> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
+> = {
+  bivarianceHack(
+    parent: ParentData,
+    args: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): Result;
+}['bivarianceHack'];
 
 export interface ResolverConfig {
-  [typeName: string]: {
-    [fieldName: string]: Resolver;
-  };
+  [typeName: string]:
+    | {
+        [fieldName: string]: Resolver | undefined;
+      }
+    | undefined;
 }
 
-export type UpdateResolver<ParentData = DataFields, Args = Variables> = (
-  parent: ParentData,
-  args: Args,
-  cache: Cache,
-  info: ResolveInfo
-) => void;
+export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
+  bivarianceHack(
+    parent: ParentData,
+    args: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): void;
+}['bivarianceHack'];
 
-export type KeyGenerator = (data: Data) => null | string;
+export type KeyGenerator = {
+  bivarianceHack(data: Data): null | string;
+}['bivarianceHack'];
 
 export interface UpdatesConfig {
-  Mutation: {
-    [fieldName: string]: UpdateResolver | undefined;
-  };
-  Subscription: {
-    [fieldName: string]: UpdateResolver | undefined;
-  };
+  Mutation:
+    | {
+        [fieldName: string]: UpdateResolver | undefined;
+      }
+    | undefined;
+  Subscription:
+    | {
+        [fieldName: string]: UpdateResolver | undefined;
+      }
+    | undefined;
 }
 
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data>
-> = (vars: Args, cache: Cache, info: ResolveInfo) => Result;
+> = {
+  bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
+}['bivarianceHack'];
 
 export interface OptimisticMutationConfig {
-  [mutationFieldName: string]: OptimisticMutationResolver;
+  [mutationFieldName: string]: OptimisticMutationResolver | undefined;
 }
 
 export interface KeyingConfig {
-  [typename: string]: KeyGenerator;
+  [typename: string]: KeyGenerator | undefined;
 }
 
 export type SerializedEntry = EntityField | Connection[] | Link;

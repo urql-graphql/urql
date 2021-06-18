@@ -14,7 +14,6 @@ type Scalars = {
   Int: number;
   Float: number;
 };
-
 type Author = {
   __typename?: 'Author';
   id?: Maybe<Scalars['ID']>;
