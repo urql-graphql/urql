@@ -4,8 +4,8 @@ jest.mock('./useClient.ts', () => ({
   useClient: () => client,
 }));
 
-import { makeSubject, pipe, take, toPromise } from 'wonka';
-import { createClient } from '@urql/core';
+import { makeSubject } from 'wonka';
+import { createClient, gql } from '@urql/core';
 import { useMutation } from './useMutation';
 import { reactive } from 'vue';
 
@@ -16,16 +16,21 @@ beforeEach(() => {
 });
 
 describe('useMutation', () => {
-  it('provides an execute method that resolves a promise', async () => {
+  it('provides an execute method that resolves a promise', done => {
     const subject = makeSubject<any>();
     const clientMutation = jest
-      .spyOn(client, 'mutation')
-      .mockImplementation((): any => ({
-        toPromise() {
-          return pipe(subject.source, take(1), toPromise);
-        },
-      }));
-    const mutation = reactive(useMutation('mutation { test }'));
+      .spyOn(client, 'executeMutation')
+      .mockImplementation(() => subject.source);
+
+    const mutation = reactive(
+      useMutation(
+        gql`
+          mutation {
+            test
+          }
+        `
+      )
+    );
 
     expect(mutation).toMatchObject({
       data: undefined,
@@ -46,12 +51,12 @@ describe('useMutation', () => {
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
     subject.next({ data: { test: true } });
-
-    await promise;
-
-    expect(mutation.fetching).toBe(false);
-    expect(mutation.stale).toBe(false);
-    expect(mutation.error).toBe(undefined);
-    expect(mutation.data).toEqual({ test: true });
+    promise.then(function () {
+      expect(mutation.fetching).toBe(false);
+      expect(mutation.stale).toBe(false);
+      expect(mutation.error).toBe(undefined);
+      expect(mutation.data).toEqual({ test: true });
+      done();
+    });
   });
 });

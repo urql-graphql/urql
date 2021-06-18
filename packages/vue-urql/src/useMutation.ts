@@ -2,6 +2,7 @@
 
 import { ref, Ref } from 'vue';
 import { DocumentNode } from 'graphql';
+import { pipe, toPromise, take } from 'wonka';
 
 import {
   Client,
@@ -10,6 +11,7 @@ import {
   Operation,
   OperationContext,
   OperationResult,
+  createRequest,
 } from '@urql/core';
 
 import { useClient } from './useClient';
@@ -58,18 +60,23 @@ export function callUseMutation<T = any, V = any>(
       context?: Partial<OperationContext>
     ): Promise<OperationResult<T, V>> {
       fetching.value = true;
-      return client
-        .mutation(query, variables as any, context)
-        .toPromise()
-        .then((res: OperationResult) => {
-          data.value = res.data;
-          stale.value = !!res.stale;
-          fetching.value = false;
-          error.value = res.error;
-          operation.value = res.operation;
-          extensions.value = res.extensions;
-          return res;
-        });
+
+      return pipe(
+        client.executeMutation<T, V>(
+          createRequest<T, V>(query, variables),
+          context || {}
+        ),
+        take(1),
+        toPromise
+      ).then((res: OperationResult) => {
+        data.value = res.data;
+        stale.value = !!res.stale;
+        fetching.value = false;
+        error.value = res.error;
+        operation.value = res.operation;
+        extensions.value = res.extensions;
+        return res;
+      });
     },
   };
 }
