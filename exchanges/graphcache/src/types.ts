@@ -29,7 +29,7 @@ export type EntityField = undefined | Scalar | NullArray<Scalar>;
 export type DataField = Scalar | Data | NullArray<Scalar> | NullArray<Data>;
 
 export interface DataFields {
-  readonly [fieldName: string]: DataField;
+  [fieldName: string]: DataField;
 }
 
 export interface Variables {
@@ -160,13 +160,11 @@ export type Resolver<
   ): Result;
 }['bivarianceHack'];
 
-export interface ResolverConfig {
-  [typeName: string]:
-    | {
-        [fieldName: string]: Resolver | undefined;
-      }
-    | undefined;
-}
+export type ResolverConfig = {
+  [typeName: string]: {
+    [fieldName: string]: Resolver;
+  };
+};
 
 export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
   bivarianceHack(
@@ -178,21 +176,17 @@ export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
 }['bivarianceHack'];
 
 export type KeyGenerator = {
-  bivarianceHack(data: Data): null | string;
+  bivarianceHack(data: Data): string | null;
 }['bivarianceHack'];
 
-export interface UpdatesConfig {
-  Mutation:
-    | {
-        [fieldName: string]: UpdateResolver | undefined;
-      }
-    | undefined;
-  Subscription:
-    | {
-        [fieldName: string]: UpdateResolver | undefined;
-      }
-    | undefined;
-}
+export type UpdatesConfig = {
+  Mutation: {
+    [fieldName: string]: UpdateResolver;
+  };
+  Subscription: {
+    [fieldName: string]: UpdateResolver;
+  };
+};
 
 export type OptimisticMutationResolver<
   Args = Variables,
@@ -201,13 +195,13 @@ export type OptimisticMutationResolver<
   bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
 }['bivarianceHack'];
 
-export interface OptimisticMutationConfig {
-  [mutationFieldName: string]: OptimisticMutationResolver | undefined;
-}
+export type OptimisticMutationConfig = {
+  [mutationFieldName: string]: OptimisticMutationResolver;
+};
 
-export interface KeyingConfig {
-  [typename: string]: KeyGenerator | undefined;
-}
+export type KeyingConfig = {
+  [typename: string]: KeyGenerator;
+};
 
 export type SerializedEntry = EntityField | Connection[] | Link;
 
