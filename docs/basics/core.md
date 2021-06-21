@@ -1,9 +1,9 @@
 ---
-title: Core Usage
+title: Core / Node.js
 order: 3
 ---
 
-# Core
+# Core and Node.js Usage
 
 The `@urql/core` package contains `urql`'s `Client`, some common utilities, and some default
 _Exchanges_. These are the shared, default parts of `urql` that we will be using no matter which
