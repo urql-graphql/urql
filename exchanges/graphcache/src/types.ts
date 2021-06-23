@@ -146,89 +146,62 @@ export type CacheExchangeOpts = {
   storage?: StorageAdapter;
 };
 
-/**
- * The following part is meant to support the generic type-generated part of graphcache,
- * we want to make the extends loose but the default type still has to work as DataFields.
- * You can recognize these by the "generic" prefix.
- */
-type GenericResolver<
-  ParentData extends any = DataFields,
-  Args = Variables,
-  Result = ResolverResult
-> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
-
-interface GenericResolverConfig {
-  [typeName: string]: {
-    [fieldName: string]: GenericResolver;
-  };
-}
-
-type GenericUpdateResolver<
-  ParentData extends any = DataFields,
-  Args = Variables
-> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => void;
-
-interface GenericUpdatesConfig {
-  Mutation: {
-    [fieldName: string]: GenericUpdateResolver;
-  };
-  Subscription: {
-    [fieldName: string]: GenericUpdateResolver;
-  };
-}
-
-export type GenericCacheExchangeOpts = {
-  updates?: Partial<GenericUpdatesConfig>;
-  resolvers?: GenericResolverConfig;
-  optimistic?: OptimisticMutationConfig;
-  keys?: KeyingConfig;
-  schema?: IntrospectionData;
-  storage?: StorageAdapter;
-};
-
 // Cache resolvers are user-defined to overwrite an entity field result
 export type Resolver<
   ParentData = DataFields,
   Args = Variables,
   Result = ResolverResult
-> = (parent: ParentData, args: Args, cache: Cache, info: ResolveInfo) => Result;
+> = {
+  bivarianceHack(
+    parent: ParentData,
+    args: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): Result;
+}['bivarianceHack'];
 
-export interface ResolverConfig {
+export type ResolverConfig = {
   [typeName: string]: {
     [fieldName: string]: Resolver;
   };
-}
+};
 
-export type UpdateResolver<ParentData = DataFields, Args = Variables> = (
-  parent: ParentData,
-  args: Args,
-  cache: Cache,
-  info: ResolveInfo
-) => void;
+export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
+  bivarianceHack(
+    parent: ParentData,
+    args: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): void;
+}['bivarianceHack'];
 
-export type KeyGenerator = (data: Data) => null | string;
+export type KeyGenerator = {
+  bivarianceHack(data: Data): string | null;
+}['bivarianceHack'];
 
-export interface UpdatesConfig {
+export type UpdatesConfig = {
   Mutation: {
     [fieldName: string]: UpdateResolver;
   };
   Subscription: {
     [fieldName: string]: UpdateResolver;
   };
-}
+};
 
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data>
-> = (vars: Args, cache: Cache, info: ResolveInfo) => Result;
+> = {
+  bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
+}['bivarianceHack'];
 
-export interface OptimisticMutationConfig {
+export type OptimisticMutationConfig = {
   [mutationFieldName: string]: OptimisticMutationResolver;
-}
+};
 
-export interface KeyingConfig {
+export type KeyingConfig = {
   [typename: string]: KeyGenerator;
-}
+};
 
 export type SerializedEntry = EntityField | Connection[] | Link;
 

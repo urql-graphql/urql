@@ -134,7 +134,7 @@ export function expectValidKeyingConfig(
 
 export function expectValidUpdatesConfig(
   schema: SchemaIntrospector,
-  updates: Record<string, Record<string, UpdateResolver>>
+  updates: Record<string, Record<string, UpdateResolver | undefined>>
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;

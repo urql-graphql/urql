@@ -30,7 +30,7 @@ import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
-import { Dependencies, GenericCacheExchangeOpts } from './types';
+import { Dependencies, CacheExchangeOpts } from './types';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -42,7 +42,7 @@ type OperationMap = Map<number, Operation>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
-export const cacheExchange = <C extends Partial<GenericCacheExchangeOpts>>(
+export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C
 ): Exchange => ({ forward, client, dispatchDebug }) => {
   const store = new Store<C>(opts);
