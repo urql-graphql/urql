@@ -30,6 +30,10 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 <img alt="The Atlantic" height="60" src="./assets/logos/the-atlantic.png" />
 </a>
 
+<a href="https://www.loveholidays.com">
+<img alt="loveholidays" height="60" src="./assets/logos/loveholidays.png" />
+</a>
+
 ## Articles & Tutorials
 
 - [Egghead Course](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5)
