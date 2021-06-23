@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.1.4
+
+### Patch Changes
+
+- Prevent stale results from being emitted by promisified query sources, e.g. `client.query(...).toPromise()` yielding a partial result with `stale: true` set. Instead, `.toPromise()` will now filter out stale results, by [@kitten](https://github.com/kitten) (See [#1709](https://github.com/FormidableLabs/urql/pull/1709))
+
 ## 2.1.3
 
 ### Patch Changes

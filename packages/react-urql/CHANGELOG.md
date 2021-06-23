@@ -1,5 +1,13 @@
 # urql
 
+## 2.0.4
+
+### Patch Changes
+
+- ⚠️ Fix issue with `useQuery`'s `executeQuery` state updates, where some calls wouldn't trigger a source change and start a request when the hook was paused, by [@kitten](https://github.com/kitten) (See [#1722](https://github.com/FormidableLabs/urql/pull/1722))
+- Updated dependencies (See [#1709](https://github.com/FormidableLabs/urql/pull/1709))
+  - @urql/core@2.1.4
+
 ## 2.0.3
 
 ### Patch Changes

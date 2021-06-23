@@ -1,5 +1,14 @@
 # @urql/svelte
 
+## 1.2.3
+
+### Patch Changes
+
+- Improve `OperationStore` and `subscription` types to allow for result types of `data` that differ from the original `Data` type, which may be picked up from `TypedDocumentNode`, by [@kitten](https://github.com/kitten) (See [#1731](https://github.com/FormidableLabs/urql/pull/1731))
+- Use client.executeMutation rather than client.mutation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1732](https://github.com/FormidableLabs/urql/pull/1732))
+- Updated dependencies (See [#1709](https://github.com/FormidableLabs/urql/pull/1709))
+  - @urql/core@2.1.4
+
 ## 1.2.2
 
 ### Patch Changes
