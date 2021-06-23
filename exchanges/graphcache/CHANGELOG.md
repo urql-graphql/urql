@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 4.1.4
+
+### Patch Changes
+
+- Apply [`bivarianceHack`](https://stackoverflow.com/questions/52667959/what-is-the-purpose-of-bivariancehack-in-typescript-types) in the `graphcache` types to better support code-generated configs, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1687](https://github.com/FormidableLabs/urql/pull/1687))
+- Updated dependencies (See [#1709](https://github.com/FormidableLabs/urql/pull/1709))
+  - @urql/core@2.1.4
+
 ## 4.1.3
 
 ### Patch Changes

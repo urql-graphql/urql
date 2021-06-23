@@ -1,5 +1,13 @@
 # @urql/vue
 
+## 0.4.1
+
+### Patch Changes
+
+- Use client.executeMutation rather than client.mutation in useMutation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1680](https://github.com/FormidableLabs/urql/pull/1680))
+- Updated dependencies (See [#1709](https://github.com/FormidableLabs/urql/pull/1709))
+  - @urql/core@2.1.4
+
 ## 0.4.0
 
 ### Minor Changes
