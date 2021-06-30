@@ -405,6 +405,9 @@ when `pause` is `true`, which would usually stop all automatic queries.
 
 ### Vue Suspense
 
+> There is a known issue with useQuery that result in a hanged promise that doesn't resolve if the data is loaded from cache.
+> See [#1429](https://github.com/FormidableLabs/urql/issues/1429) for discussion.
+
 In Vue 3 a [new feature was introduced](https://vuedose.tips/go-async-in-vue-3-with-suspense/) that
 natively allows components to suspend while data is loading, which works universally on the server
 and on the client, where a replacement loading template is rendered on a parent while data is
