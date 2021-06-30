@@ -95,11 +95,18 @@ export const Footer = () => (
         </FooterLinks>
       </FooterLeft>
       <FooterDescription>
-        Formidable is a Seattle, Denver, Phoenix, and London-based engineering
-        consultancy and open source software organization, specializing in
-        React.js, React Native, GraphQL, Node.js, and the extended JavaScript
-        ecosystem. For more information about Formidable, please visit{' '}
-        <a href="https://www.formidable.com">formidable.com</a>.
+        Formidable is a global design and engineering consultancy and open
+        source software organization, specializing in React.js, React Native,
+        GraphQL, Node.js, and the extended JavaScript ecosystem. We have
+        locations in Seattle, London, Toronto, Denver, and Phoenix with remote
+        consultants worldwide. For more information please visit{' '}
+        <a
+          href="https://formidable.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          formidable.com.
+        </a>
       </FooterDescription>
     </Wrapper>
   </Container>
