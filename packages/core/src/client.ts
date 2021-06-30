@@ -215,14 +215,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           // Mark a result as stale when a new operation is sent for it
           pipe(
             operations$,
-            filter(op => {
-              return (
+            filter(
+              op =>
                 op.kind === operation.kind &&
                 op.key === operation.key &&
-                (op.context.requestPolicy === 'network-only' ||
-                  op.context.requestPolicy === 'cache-and-network')
-              );
-            }),
+                op.context.requestPolicy !== 'cache-only'
+            ),
             take(1),
             map(() => ({ ...result, stale: true }))
           ),
