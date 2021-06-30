@@ -6,19 +6,12 @@ import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import {
   Source,
-  concat,
-  switchAll,
-  share,
-  fromValue,
-  makeSubject,
-  filter,
   map,
   pipe,
   take,
-  publish,
+  subscribe,
   onEnd,
   onStart,
-  onPush,
   toPromise,
 } from 'wonka';
 
@@ -70,26 +63,6 @@ const watchOptions = {
   flush: 'pre' as const,
 };
 
-/** Wonka Operator to replay the most recent value to sinks */
-function replayOne<T>(source: Source<T>): Source<T> {
-  let cached: undefined | T;
-
-  return concat([
-    pipe(
-      fromValue(cached!),
-      map(() => cached!),
-      filter(x => x !== undefined)
-    ),
-    pipe(
-      source,
-      onPush(value => {
-        cached = value;
-      }),
-      share
-    ),
-  ]);
-}
-
 export function useQuery<T = any, V = object>(
   args: UseQueryArgs<T, V>
 ): UseQueryResponse<T, V> {
@@ -118,10 +91,7 @@ export function callUseQuery<T = any, V = object>(
     createRequest<T, V>(args.query, args.variables as V) as any
   );
 
-  const source: Ref<Source<Source<any>>> = ref(null as any);
-  const next: Ref<
-    (query$: undefined | Source<OperationResult<T, V>>) => void
-  > = ref(null as any);
+  const source: Ref<Source<OperationResult> | null> = ref(null as any);
 
   stops.push(
     watchEffect(() => {
@@ -129,6 +99,17 @@ export function callUseQuery<T = any, V = object>(
       if (request.value.key !== newRequest.key) {
         request.value = newRequest;
       }
+    }, watchOptions)
+  );
+
+  stops.push(
+    watchEffect(() => {
+      source.value = !isPaused.value
+        ? client.executeQuery<T, V>(request.value, {
+            requestPolicy: args.requestPolicy,
+            ...args.context,
+          })
+        : null;
     }, watchOptions)
   );
 
@@ -141,13 +122,11 @@ export function callUseQuery<T = any, V = object>(
     fetching,
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      next.value(
-        client.executeQuery<T, V>(request.value, {
-          requestPolicy: args.requestPolicy,
-          ...args.context,
-          ...opts,
-        })
-      );
+      source.value = client.executeQuery<T, V>(request.value, {
+        requestPolicy: args.requestPolicy,
+        ...args.context,
+        ...opts,
+      });
 
       return response;
     },
@@ -159,45 +138,32 @@ export function callUseQuery<T = any, V = object>(
     },
   };
 
-  const getState = () => state;
-
   stops.push(
     watchEffect(
       onInvalidate => {
-        const subject = makeSubject<Source<any>>();
-        source.value = pipe(subject.source, replayOne);
-        next.value = (value: undefined | Source<any>) => {
-          const query$ = pipe(
-            value
-              ? pipe(
-                  value,
-                  onStart(() => {
-                    fetching.value = true;
-                    stale.value = false;
-                  }),
-                  onPush(res => {
-                    data.value = res.data;
-                    stale.value = !!res.stale;
-                    fetching.value = false;
-                    error.value = res.error;
-                    operation.value = res.operation;
-                    extensions.value = res.extensions;
-                  }),
-                  share
-                )
-              : fromValue(undefined),
-            onEnd(() => {
-              fetching.value = false;
-              stale.value = false;
-            })
+        if (source.value) {
+          onInvalidate(
+            pipe(
+              source.value,
+              onStart(() => {
+                fetching.value = true;
+                stale.value = false;
+              }),
+              onEnd(() => {
+                fetching.value = false;
+                stale.value = false;
+              }),
+              subscribe(res => {
+                data.value = res.data;
+                stale.value = !!res.stale;
+                fetching.value = false;
+                error.value = res.error;
+                operation.value = res.operation;
+                extensions.value = res.extensions;
+              })
+            ).unsubscribe
           );
-
-          subject.next(query$);
-        };
-
-        onInvalidate(
-          pipe(source.value, switchAll, map(getState), publish).unsubscribe
-        );
+        }
       },
       {
         // NOTE: This part of the query pipeline is only initialised once and will need
@@ -207,28 +173,17 @@ export function callUseQuery<T = any, V = object>(
     )
   );
 
-  stops.push(
-    watchEffect(() => {
-      next.value(
-        !isPaused.value
-          ? client.executeQuery<T, V>(request.value, {
-              requestPolicy: args.requestPolicy,
-              ...args.context,
-            })
-          : undefined
-      );
-    }, watchOptions)
-  );
-
   const response: UseQueryResponse<T, V> = {
     ...state,
     then(onFulfilled, onRejected) {
-      return pipe(
-        source.value,
-        switchAll,
-        map(getState),
-        take(1),
-        toPromise
+      return (source.value
+        ? pipe(
+            source.value,
+            take(1),
+            map(() => state),
+            toPromise
+          )
+        : Promise.resolve(state)
       ).then(onFulfilled, onRejected);
     },
   };
