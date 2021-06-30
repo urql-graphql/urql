@@ -6,7 +6,9 @@ import {
   Source,
   delay,
   map,
+  never,
   pipe,
+  merge,
   subscribe,
   publish,
   filter,
@@ -869,11 +871,14 @@ describe('shared sources behavior', () => {
 
   it('does nothing when operation is a subscription has been emitted yet', () => {
     const exchange: Exchange = () => ops$ => {
-      return pipe(
-        ops$,
-        map(op => ({ data: 1, operation: op })),
-        take(1)
-      );
+      return merge([
+        pipe(
+          ops$,
+          map(op => ({ data: 1, operation: op })),
+          take(1)
+        ),
+        never,
+      ]);
     };
 
     const client = createClient({

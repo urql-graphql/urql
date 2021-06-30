@@ -206,7 +206,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         )
       ),
       switchMap(result => {
-        if (result.stale) {
+        if (operation.kind !== 'query' || result.stale) {
           return fromValue(result);
         }
 
@@ -217,7 +217,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
             operations$,
             filter(
               op =>
-                op.kind === operation.kind &&
+                op.kind === 'query' &&
                 op.key === operation.key &&
                 op.context.requestPolicy !== 'cache-only'
             ),
