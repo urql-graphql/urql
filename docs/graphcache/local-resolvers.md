@@ -328,7 +328,7 @@ break out and access fields on any other entity we know of.
 
 Local resolvers also allow for more advanced use-cases when it comes to links and object types.
 Previously we've seen how a resolver is able to link up a given field to an entity, which causes
-this field to resolve an entity directly instead of it being cecked against any cached links:
+this field to resolve an entity directly instead of it being checked against any cached links:
 
 ```js
 cacheExchange({
