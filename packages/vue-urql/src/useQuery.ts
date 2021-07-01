@@ -82,7 +82,7 @@ export function callUseQuery<T = any, V = object>(
     createRequest<T, V>(args.query, args.variables as V) as any
   );
 
-  const source: Ref<Source<OperationResult> | null> = ref(null as any);
+  const source: Ref<Source<OperationResult> | undefined> = ref();
 
   stops.push(
     watchEffect(() => {
@@ -100,7 +100,7 @@ export function callUseQuery<T = any, V = object>(
             requestPolicy: args.requestPolicy,
             ...args.context,
           })
-        : null;
+        : undefined;
     }, watchOptions)
   );
 

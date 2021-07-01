@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import { DocumentNode } from 'graphql';
-import { Source, pipe, subscribe, share, onEnd } from 'wonka';
+import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
@@ -98,16 +98,9 @@ export function callUseSubscription<T = any, R = T, V = object>(
 
   stops.push(
     watchEffect(() => {
-      if (!isPaused.value) {
-        source.value = pipe(
-          client.executeSubscription<T, V>(request.value, {
-            ...args.context,
-          }),
-          share
-        );
-      } else {
-        source.value = undefined;
-      }
+      source.value = !isPaused.value
+        ? client.executeSubscription<T, V>(request.value, { ...args.context })
+        : undefined;
     }, watchOptions)
   );
 
@@ -154,13 +147,10 @@ export function callUseSubscription<T = any, R = T, V = object>(
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionState<T, R, V> {
-      source.value = pipe(
-        client.executeSubscription<T, V>(request.value, {
-          ...args.context,
-          ...opts,
-        }),
-        share
-      );
+      source.value = client.executeSubscription<T, V>(request.value, {
+        ...args.context,
+        ...opts,
+      });
 
       return state;
     },
