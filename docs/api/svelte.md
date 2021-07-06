@@ -45,6 +45,15 @@ will automatically update the store and notify reactive subscribers.
 In development, trying to update the _readonly_ properties directly or via the `set` or `update`
 method will result in a `TypeError` being thrown.
 
+An additional non-standard method on the store is `reexecute`, which does _almost_ the same as
+assigning a new context to the operation. It is syntactic sugar to ensure that an operation may be
+reexecuted at any point in time:
+
+```js
+operationStre(...).reexecute();
+operationStre(...).reexecute({ requestPolicy: 'network-only' });
+```
+
 [Read more about `writable` stores on the Svelte API docs.](https://svelte.dev/docs#writable)
 
 ## query

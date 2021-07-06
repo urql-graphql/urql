@@ -326,7 +326,9 @@ quite well and does so automatically. Sometimes it may be necessary though to re
 execute a query with a different `context`. Triggering a query programmatically may be useful in a
 couple of cases. It can for instance be used to refresh data.
 
-We can trigger a new query update by changing out the `context` of our `operationStore`.
+We can trigger a new query update by changing out the `context` of our `operationStore`. While we
+can simply assign a new context value using `$todos.context = {}` we can also use the store's
+`reexecute` method as syntactic sugar for this:
 
 ```jsx
 <script>
@@ -346,7 +348,7 @@ We can trigger a new query update by changing out the `context` of our `operatio
   query(todos);
 
   function refresh() {
-    $todos.context = { requestPolicy: 'network-only' };
+    todos.reexecute({ requestPolicy: 'network-only' });
   }
 </script>
 ```
