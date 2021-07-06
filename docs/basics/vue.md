@@ -584,7 +584,7 @@ export default {
     return {
       updateTodo(id, title) {
         const variables = { id, title: title || '' };
-        updateTodoResult(variables).then(result => {
+        updateTodoResult.executeMutation(variables).then(result => {
           // The result is almost identical to `updateTodoResult` with the exception
           // of `result.fetching` not being set and its properties not being reactive.
           // It is an OperationResult.
@@ -625,7 +625,7 @@ export default {
     return {
       updateTodo(id, title) {
         const variables = { id, title: title || '' };
-        updateTodoResult(variables).then(result => {
+        updateTodoResult.executeMutation(variables).then(result => {
           if (result.error) {
             console.error('Oh no!', result.error);
           }
