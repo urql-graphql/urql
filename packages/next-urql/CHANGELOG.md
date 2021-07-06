@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1
+
+### Patch Changes
+
+- ⚠️ Fix `resetUrqlClient` not resetting the SSR cache itself and instead restoring data when all data related to this `Client` and session should've been deleted, by [@Biboswan](https://github.com/Biboswan) (See [#1715](https://github.com/FormidableLabs/urql/pull/1715))
+
 ## 3.1.0
 
 ### Minor Changes

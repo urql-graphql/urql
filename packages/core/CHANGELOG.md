@@ -1,5 +1,12 @@
 # @urql/core
 
+## 2.1.5
+
+### Patch Changes
+
+- Prevent `ssrExchange().restoreData()` from adding results to the exchange that have already been invalidated. This may happen when `restoreData()` is called repeatedly, e.g. per page. When a prior run has already invalidated an SSR result then the result is 'migrated' to the user's `cacheExchange`, which means that `restoreData()` should never attempt to re-add it again, by [@kitten](https://github.com/kitten) (See [#1776](https://github.com/FormidableLabs/urql/pull/1776))
+- ⚠️ Fix accidental change in passive `stale: true`, where a `cache-first` operation issued by Graphcache wouldn't yield an affected query and update its result to reflect the loading state with `stale: true`. This is a regression from `v2.1.0` and mostly becomes unexpected when `cache.invalidate(...)` is used, by [@kitten](https://github.com/kitten) (See [#1755](https://github.com/FormidableLabs/urql/pull/1755))
+
 ## 2.1.4
 
 ### Patch Changes

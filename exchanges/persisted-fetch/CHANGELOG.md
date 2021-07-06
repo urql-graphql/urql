@@ -1,5 +1,13 @@
 # @urql/exchange-persisted-fetch
 
+## 1.3.2
+
+### Patch Changes
+
+- Optimize for minification by avoiding direct eval call, by [@nderscore](https://github.com/nderscore) (See [#1744](https://github.com/FormidableLabs/urql/pull/1744))
+- Updated dependencies (See [#1776](https://github.com/FormidableLabs/urql/pull/1776) and [#1755](https://github.com/FormidableLabs/urql/pull/1755))
+  - @urql/core@2.1.5
+
 ## 1.3.1
 
 ### Patch Changes
