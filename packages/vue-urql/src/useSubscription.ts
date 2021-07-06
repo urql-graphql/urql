@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import { DocumentNode } from 'graphql';
-import { Source, pipe, publish, share, onStart, onPush, onEnd } from 'wonka';
+import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
@@ -98,32 +98,24 @@ export function callUseSubscription<T = any, R = T, V = object>(
 
   stops.push(
     watchEffect(() => {
-      if (!isPaused.value) {
-        source.value = pipe(
-          client.executeSubscription<T, V>(request.value, {
-            ...args.context,
-          }),
-          share
-        );
-      } else {
-        source.value = undefined;
-      }
+      source.value = !isPaused.value
+        ? client.executeSubscription<T, V>(request.value, { ...args.context })
+        : undefined;
     }, watchOptions)
   );
 
   stops.push(
     watchEffect(onInvalidate => {
       if (source.value) {
+        fetching.value = true;
+
         onInvalidate(
           pipe(
             source.value,
-            onStart(() => {
-              fetching.value = true;
-            }),
             onEnd(() => {
               fetching.value = false;
             }),
-            onPush(result => {
+            subscribe(result => {
               fetching.value = true;
               (data.value =
                 result.data !== undefined
@@ -135,10 +127,11 @@ export function callUseSubscription<T = any, R = T, V = object>(
               extensions.value = result.extensions;
               stale.value = !!result.stale;
               operation.value = result.operation;
-            }),
-            publish
+            })
           ).unsubscribe
         );
+      } else {
+        fetching.value = false;
       }
     }, watchOptions)
   );
@@ -154,13 +147,10 @@ export function callUseSubscription<T = any, R = T, V = object>(
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionState<T, R, V> {
-      source.value = pipe(
-        client.executeSubscription<T, V>(request.value, {
-          ...args.context,
-          ...opts,
-        }),
-        share
-      );
+      source.value = client.executeSubscription<T, V>(request.value, {
+        ...args.context,
+        ...opts,
+      });
 
       return state;
     },
