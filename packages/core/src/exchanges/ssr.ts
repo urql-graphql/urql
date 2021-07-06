@@ -12,7 +12,7 @@ export interface SerializedResult {
 }
 
 export interface SSRData {
-  [key: string]: SerializedResult | null;
+  [key: string]: SerializedResult;
 }
 
 export interface SSRExchangeParams {
@@ -91,7 +91,7 @@ const deserializeResult = (
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
-  const data: SSRData = {};
+  const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
@@ -170,7 +170,11 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     }
   };
 
-  ssr.extractData = () => Object.assign({}, data);
+  ssr.extractData = () => {
+    const result: SSRData = {};
+    for (const key in data) if (data[key] != null) result[key] = data[key]!;
+    return result;
+  };
 
   if (params && params.initialState) {
     ssr.restoreData(params.initialState);

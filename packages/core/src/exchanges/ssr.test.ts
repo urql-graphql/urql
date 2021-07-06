@@ -134,7 +134,7 @@ it('caches complex GraphQLErrors in query results correctly', () => {
   publish(exchange);
   next(queryOperation);
 
-  const error = ssr.extractData()[queryOperation.key].error;
+  const error = ssr.extractData()[queryOperation.key]!.error;
 
   expect(error).toHaveProperty('graphQLErrors.0.message', 'Oh no!');
   expect(error).toHaveProperty('graphQLErrors.0.path', ['Query']);
@@ -176,7 +176,7 @@ it('deletes cached results in non-suspense environments', async () => {
 
   await Promise.resolve();
 
-  expect(ssr.extractData()[queryOperation.key]).toBe(null);
+  expect(Object.keys(ssr.extractData()).length).toBe(0);
   expect(onPush).toHaveBeenCalledWith(queryResponse);
 
   // NOTE: The operation should not be duplicated
@@ -202,12 +202,12 @@ it('never allows restoration of invalidated results', async () => {
 
   await Promise.resolve();
 
-  expect(ssr.extractData()[queryOperation.key]).toBe(null);
+  expect(Object.keys(ssr.extractData()).length).toBe(0);
   expect(onPush).toHaveBeenCalledTimes(1);
   expect(output).not.toHaveBeenCalled();
 
   ssr.restoreData(initialState);
-  expect(ssr.extractData()[queryOperation.key]).toBe(null);
+  expect(Object.keys(ssr.extractData()).length).toBe(0);
 
   next(queryOperation);
   expect(onPush).toHaveBeenCalledTimes(2);
