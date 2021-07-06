@@ -190,7 +190,7 @@ export type UpdatesConfig = {
 
 export type OptimisticMutationResolver<
   Args = Variables,
-  Result = Link<Data>
+  Result = Link<Data> | Scalar
 > = {
   bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
 }['bivarianceHack'];

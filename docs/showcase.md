@@ -38,6 +38,10 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 <img alt="Swan" height="60" src="./assets/logos/swan.png" />
 </a>
 
+<a href="https://www.getopensocial.com">
+<img alt="Open Social" height="60" src="./assets/logos/open-social.png" />
+</a>
+
 ## Articles & Tutorials
 
 - [Egghead Course](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5)

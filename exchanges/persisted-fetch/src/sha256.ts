@@ -30,8 +30,14 @@ const sha256Browser = (bytes: Uint8Array): Promise<Uint8Array> => {
   });
 };
 
-const nodeCrypto =
-  typeof window === 'undefined' ? eval("require('crypto')") : null;
+let nodeCrypto;
+if (typeof window === 'undefined') {
+  try {
+    // Indirect eval/require to guarantee no side-effects in module scope
+    // (optimization for minifiers)
+    nodeCrypto = new Function('require', 'return require("crypto")')(require);
+  } catch (e) {}
+}
 
 export const hash = async (query: string): Promise<string> => {
   if (
