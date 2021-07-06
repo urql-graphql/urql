@@ -91,7 +91,7 @@ const deserializeResult = (
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
-  const data: SSRData = {};
+  const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
   // this is delayed so that concurrent queries don't delete each other's data
@@ -101,13 +101,15 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     if (invalidateQueue.length === 1) {
       Promise.resolve().then(() => {
         let key: number | void;
-        while ((key = invalidateQueue.shift())) delete data[key];
+        while ((key = invalidateQueue.shift())) {
+          data[key] = null;
+        }
       });
     }
   };
 
   const isCached = (operation: Operation) => {
-    return !shouldSkip(operation) && data[operation.key] !== undefined;
+    return !shouldSkip(operation) && data[operation.key] != null;
   };
 
   // The SSR Exchange is a temporary cache that can populate results into data for suspense
@@ -134,7 +136,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       sharedOps$,
       filter(op => isCached(op)),
       map(op => {
-        const serialized = data[op.key];
+        const serialized = data[op.key]!;
         return deserializeResult(op, serialized);
       })
     );
@@ -159,8 +161,20 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     return merge([forwardedOps$, cachedOps$]);
   };
 
-  ssr.restoreData = (restore: SSRData) => Object.assign(data, restore);
-  ssr.extractData = () => Object.assign({}, data);
+  ssr.restoreData = (restore: SSRData) => {
+    for (const key in restore) {
+      // We only restore data that hasn't been previously invalidated
+      if (data[key] !== null) {
+        data[key] = restore[key];
+      }
+    }
+  };
+
+  ssr.extractData = () => {
+    const result: SSRData = {};
+    for (const key in data) if (data[key] != null) result[key] = data[key]!;
+    return result;
+  };
 
   if (params && params.initialState) {
     ssr.restoreData(params.initialState);

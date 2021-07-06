@@ -134,7 +134,7 @@ it('caches complex GraphQLErrors in query results correctly', () => {
   publish(exchange);
   next(queryOperation);
 
-  const error = ssr.extractData()[queryOperation.key].error;
+  const error = ssr.extractData()[queryOperation.key]!.error;
 
   expect(error).toHaveProperty('graphQLErrors.0.message', 'Oh no!');
   expect(error).toHaveProperty('graphQLErrors.0.path', ['Query']);
@@ -181,4 +181,35 @@ it('deletes cached results in non-suspense environments', async () => {
 
   // NOTE: The operation should not be duplicated
   expect(output).not.toHaveBeenCalled();
+});
+
+it('never allows restoration of invalidated results', async () => {
+  client.suspense = false;
+
+  const onPush = jest.fn();
+  const initialState = { [queryOperation.key]: serializedQueryResponse as any };
+
+  const ssr = ssrExchange({
+    isClient: true,
+    initialState: { ...initialState },
+  });
+
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  pipe(exchange, forEach(onPush));
+  next(queryOperation);
+
+  await Promise.resolve();
+
+  expect(Object.keys(ssr.extractData()).length).toBe(0);
+  expect(onPush).toHaveBeenCalledTimes(1);
+  expect(output).not.toHaveBeenCalled();
+
+  ssr.restoreData(initialState);
+  expect(Object.keys(ssr.extractData()).length).toBe(0);
+
+  next(queryOperation);
+  expect(onPush).toHaveBeenCalledTimes(2);
+  expect(output).toHaveBeenCalledTimes(1);
 });
