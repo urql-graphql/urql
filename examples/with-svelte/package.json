@@ -12,6 +12,7 @@
     "vite": "^2.2.4"
   },
   "dependencies": {
+    "@urql/svelte": "^1.2.3",
     "svelte": "^3.38.2"
   }
 }
