@@ -1,5 +1,17 @@
 # @urql/svelte
 
+## 1.3.0
+
+### Minor Changes
+
+- Improve granularity of `operationStore` updates when `query`, `variables`, and `context` are changed. This also adds an `operationStore(...).reexecute()` method, which optionally accepts a new context value and forces an update on the store, so that a query may reexecute, by [@kitten](https://github.com/kitten) (See [#1780](https://github.com/FormidableLabs/urql/pull/1780))
+
+### Patch Changes
+
+- Loosen `subscription(...)` type further to allow any `operationStore` input, regardless of the `Result` produced, by [@kitten](https://github.com/kitten) (See [#1779](https://github.com/FormidableLabs/urql/pull/1779))
+- Updated dependencies (See [#1776](https://github.com/FormidableLabs/urql/pull/1776) and [#1755](https://github.com/FormidableLabs/urql/pull/1755))
+  - @urql/core@2.1.5
+
 ## 1.2.3
 
 ### Patch Changes

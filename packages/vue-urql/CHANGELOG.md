@@ -1,5 +1,13 @@
 # @urql/vue
 
+## 0.4.2
+
+### Patch Changes
+
+- Refactor `useQuery` implementation to utilise the single-source implementation of `@urql/core@2.1.0`. This should improve the stability of promisified `useQuery()` calls and prevent operations from not being issued in some edge cases, by [@kitten](https://github.com/kitten) (See [#1758](https://github.com/FormidableLabs/urql/pull/1758))
+- Updated dependencies (See [#1776](https://github.com/FormidableLabs/urql/pull/1776) and [#1755](https://github.com/FormidableLabs/urql/pull/1755))
+  - @urql/core@2.1.5
+
 ## 0.4.1
 
 ### Patch Changes

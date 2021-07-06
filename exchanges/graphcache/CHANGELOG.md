@@ -1,5 +1,17 @@
 # @urql/exchange-graphcache
 
+## 4.2.0
+
+### Minor Changes
+
+- Fixed typing of OptimisticMutationResolver, by [@taneba](https://github.com/taneba) (See [#1765](https://github.com/FormidableLabs/urql/pull/1765))
+
+### Patch Changes
+
+- Type the `relayPagination` and `simplePagination` helpers return value as `Resolver<any, any, any>` as there's no way to match them consistently to either generated or non-generated resolver types anymore, by [@kitten](https://github.com/kitten) (See [#1778](https://github.com/FormidableLabs/urql/pull/1778))
+- Updated dependencies (See [#1776](https://github.com/FormidableLabs/urql/pull/1776) and [#1755](https://github.com/FormidableLabs/urql/pull/1755))
+  - @urql/core@2.1.5
+
 ## 4.1.4
 
 ### Patch Changes
