@@ -159,7 +159,16 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     return merge([forwardedOps$, cachedOps$]);
   };
 
-  ssr.restoreData = (restore: SSRData) => Object.assign(data, restore);
+  ssr.restoreData = (restore: SSRData) => {
+    // Only restore data for uncached operations
+    const uncached = {};
+    Object.entries(restore).forEach(([key, value]) => {
+      if (false === key in data) {
+        uncached[key] = value;
+      }
+    });
+    return Object.assign(data, uncached);
+  };
   ssr.extractData = () => Object.assign({}, data);
 
   if (params && params.initialState) {
