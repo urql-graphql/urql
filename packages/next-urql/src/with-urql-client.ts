@@ -1,4 +1,4 @@
-import React, { createElement, useState } from 'react';
+import { createElement, useCallback, useReducer, useMemo } from 'react';
 import ssrPrepass from 'react-ssr-prepass';
 
 import {
@@ -42,20 +42,18 @@ export function withUrqlClient(
       urqlState,
       ...rest
     }: WithUrqlProps) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const forceUpdate = useState(0);
+      const [version, forceUpdate] = useReducer(prev => prev + 1, 0);
       const urqlServerState = (pageProps && pageProps.urqlState) || urqlState;
 
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const client = React.useMemo(() => {
-        if (urqlClient) {
+      const client = useMemo(() => {
+        if (urqlClient && !version) {
           return urqlClient;
         }
 
         if (!ssr || typeof window === 'undefined') {
           // We want to force the cache to hydrate, we do this by setting the isClient flag to true
           ssr = ssrExchange({ initialState: urqlServerState, isClient: true });
-        } else if (ssr && typeof window !== 'undefined') {
+        } else if (!version) {
           ssr.restoreData(urqlServerState);
         }
 
@@ -70,16 +68,14 @@ export function withUrqlClient(
           ];
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return initUrqlClient(clientConfig, shouldEnableSuspense)!;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [urqlClient, urqlServerState, forceUpdate[0]]);
+      }, [urqlClient, urqlServerState, version]);
 
-      const resetUrqlClient = () => {
+      const resetUrqlClient = useCallback(() => {
         resetClient();
         ssr = ssrExchange({ initialState: undefined });
-        forceUpdate[1](forceUpdate[0] + 1);
-      };
+        forceUpdate();
+      }, []);
 
       return createElement(
         Provider,
