@@ -115,7 +115,7 @@ export function query<Data = any, Variables = object>(
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
 export function subscription<Data = any, Result = Data, Variables = object>(
-  store: OperationStore<Data, Variables, Result>,
+  store: OperationStore<Data, Variables, any>,
   handler?: SubscriptionHandler<Data, Result>
 ): OperationStore<Data, Variables, Result> {
   const client = getClient();
