@@ -176,9 +176,40 @@ it('deletes cached results in non-suspense environments', async () => {
 
   await Promise.resolve();
 
-  expect(Object.keys(ssr.extractData()).length).toBe(0);
+  expect(ssr.extractData()[queryOperation.key]).toBe(null);
   expect(onPush).toHaveBeenCalledWith(queryResponse);
 
   // NOTE: The operation should not be duplicated
   expect(output).not.toHaveBeenCalled();
+});
+
+it('never allows restoration of invalidated results', async () => {
+  client.suspense = false;
+
+  const onPush = jest.fn();
+  const initialState = { [queryOperation.key]: serializedQueryResponse as any };
+
+  const ssr = ssrExchange({
+    isClient: true,
+    initialState: { ...initialState },
+  });
+
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  pipe(exchange, forEach(onPush));
+  next(queryOperation);
+
+  await Promise.resolve();
+
+  expect(ssr.extractData()[queryOperation.key]).toBe(null);
+  expect(onPush).toHaveBeenCalledTimes(1);
+  expect(output).not.toHaveBeenCalled();
+
+  ssr.restoreData(initialState);
+  expect(ssr.extractData()[queryOperation.key]).toBe(null);
+
+  next(queryOperation);
+  expect(onPush).toHaveBeenCalledTimes(2);
+  expect(output).toHaveBeenCalledTimes(1);
 });
