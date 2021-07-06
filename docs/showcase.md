@@ -34,6 +34,10 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 <img alt="loveholidays" height="60" src="./assets/logos/loveholidays.png" />
 </a>
 
+<a href="https://www.swan.io/">
+<img alt="Swan" height="60" src="./assets/logos/swan.png" />
+</a>
+
 <a href="https://www.getopensocial.com">
 <img alt="Open Social" height="60" src="./assets/logos/open-social.png" />
 </a>
