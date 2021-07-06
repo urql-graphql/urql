@@ -13,7 +13,7 @@ export const simplePagination = ({
   offsetArgument = 'skip',
   limitArgument = 'limit',
   mergeMode = 'after',
-}: PaginationParams = {}): Resolver => {
+}: PaginationParams = {}): Resolver<any, any, any> => {
   const compareArgs = (
     fieldArgs: Variables,
     connectionArgs: Variables

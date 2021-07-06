@@ -182,7 +182,9 @@ const getPage = (
   return page;
 };
 
-export const relayPagination = (params: PaginationParams = {}): Resolver => {
+export const relayPagination = (
+  params: PaginationParams = {}
+): Resolver<any, any, any> => {
   const mergeMode = params.mergeMode || 'inwards';
 
   return (_parent, fieldArgs, cache, info) => {
