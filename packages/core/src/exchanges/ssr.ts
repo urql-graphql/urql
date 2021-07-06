@@ -12,7 +12,7 @@ export interface SerializedResult {
 }
 
 export interface SSRData {
-  [key: string]: SerializedResult;
+  [key: string]: SerializedResult | null;
 }
 
 export interface SSRExchangeParams {
@@ -101,13 +101,15 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     if (invalidateQueue.length === 1) {
       Promise.resolve().then(() => {
         let key: number | void;
-        while ((key = invalidateQueue.shift())) delete data[key];
+        while ((key = invalidateQueue.shift())) {
+          data[key] = null;
+        }
       });
     }
   };
 
   const isCached = (operation: Operation) => {
-    return !shouldSkip(operation) && data[operation.key] !== undefined;
+    return !shouldSkip(operation) && data[operation.key] != null;
   };
 
   // The SSR Exchange is a temporary cache that can populate results into data for suspense
@@ -134,7 +136,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       sharedOps$,
       filter(op => isCached(op)),
       map(op => {
-        const serialized = data[op.key];
+        const serialized = data[op.key]!;
         return deserializeResult(op, serialized);
       })
     );
@@ -159,7 +161,15 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     return merge([forwardedOps$, cachedOps$]);
   };
 
-  ssr.restoreData = (restore: SSRData) => Object.assign(data, restore);
+  ssr.restoreData = (restore: SSRData) => {
+    for (const key in restore) {
+      // We only restore data that hasn't been previously invalidated
+      if (data[key] !== null) {
+        data[key] = restore[key];
+      }
+    }
+  };
+
   ssr.extractData = () => Object.assign({}, data);
 
   if (params && params.initialState) {
