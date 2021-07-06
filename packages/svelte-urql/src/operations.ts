@@ -2,7 +2,6 @@ import { onDestroy } from 'svelte';
 
 import {
   createRequest,
-  stringifyVariables,
   OperationContext,
   OperationResult,
   GraphQLRequest,
@@ -47,24 +46,20 @@ function toSource<Data, Variables, Result>(
   store: OperationStore<Data, Variables, Result>
 ) {
   return make<SourceRequest<Data, Variables>>(observer => {
-    let $request: void | GraphQLRequest<Data, Variables>;
-    let $contextKey: void | string;
+    let _key: number | void;
+    let _context: object | void = {};
+
     return store.subscribe(state => {
       const request = createRequest<Data, Variables>(
         state.query,
         state.variables!
       ) as SourceRequest<Data, Variables>;
-
-      const contextKey = stringifyVariables((request.context = state.context));
-
       if (
-        $request === undefined ||
-        request.key !== $request.key ||
-        $contextKey === undefined ||
-        contextKey !== $contextKey
+        (request.context = state.context) !== _context ||
+        request.key !== _key
       ) {
-        $contextKey = contextKey;
-        $request = request;
+        _key = request.key;
+        _context = state.context;
         observer.next(request);
       }
     });

@@ -1,11 +1,14 @@
 import { Readable, writable } from 'svelte/store';
 import { DocumentNode } from 'graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { OperationContext, CombinedError } from '@urql/core';
+import {
+  OperationContext,
+  CombinedError,
+  createRequest,
+  stringifyVariables,
+} from '@urql/core';
 
 import { _storeUpdate } from './internal';
-
-const emptyUpdate = Object.create(null);
 
 type Updater<T> = (value: T) => T;
 
@@ -28,6 +31,8 @@ export interface OperationStore<Data = any, Vars = any, Result = Data>
   // Writable properties
   set(value: Partial<OperationStore<Data, Vars, Result>>): void;
   update(updater: Updater<Partial<OperationStore<Data, Vars, Result>>>): void;
+  // Imperative methods
+  reexecute(context?: Partial<OperationContext> | undefined): void;
 }
 
 export function operationStore<Data = any, Vars = object, Result = Data>(
@@ -53,7 +58,7 @@ export function operationStore<Data = any, Vars = object, Result = Data>(
   let _internalUpdate = false;
 
   state.set = function set(value?: Partial<typeof state>) {
-    if (!value || value === state) value = emptyUpdate;
+    if (!value || value === state) return;
 
     _internalUpdate = true;
     if (process.env.NODE_ENV !== 'production') {
@@ -66,24 +71,48 @@ export function operationStore<Data = any, Vars = object, Result = Data>(
           }
         }
       }
+    }
 
-      _storeUpdate.delete(value!);
+    let hasUpdate = false;
+
+    if ('query' in value! || 'variables' in value!) {
+      const prev = createRequest(internal.query, internal.variables);
+      const next = createRequest(
+        value.query || internal.query,
+        value.variables || internal.variables
+      );
+      if (prev.key !== next.key) {
+        hasUpdate = true;
+        internal.query = value.query || internal.query;
+        internal.variables = value.variables || internal.variables || null;
+      }
+    }
+
+    if ('context' in value!) {
+      const prevKey = stringifyVariables(internal.context);
+      const nextKey = stringifyVariables(value.context);
+      if (prevKey !== nextKey) {
+        hasUpdate = true;
+        internal.context = value.context;
+      }
     }
 
     for (const key in value) {
       if (key === 'query' || key === 'variables' || key === 'context') {
-        (internal as any)[key] = value[key];
+        continue;
       } else if (key === 'fetching') {
         (state as any)[key] = !!value[key];
       } else if (key in state) {
         state[key] = value[key];
       }
+
+      hasUpdate = true;
     }
 
     (state as any).stale = !!value!.stale;
 
     _internalUpdate = false;
-    svelteStore.set(state);
+    if (hasUpdate) svelteStore.set(state);
   };
 
   state.update = function update(fn: Updater<typeof state>): void {
@@ -92,6 +121,11 @@ export function operationStore<Data = any, Vars = object, Result = Data>(
 
   state.subscribe = function subscribe(run, invalidate) {
     return svelteStore.subscribe(run, invalidate);
+  };
+
+  state.reexecute = function (context) {
+    internal.context = { ...(context || internal.context) };
+    svelteStore.set(state);
   };
 
   Object.keys(internal).forEach(prop => {
