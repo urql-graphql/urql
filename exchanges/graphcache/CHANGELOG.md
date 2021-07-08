@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.2.1
+
+### Patch Changes
+
+- ⚠️ Fix issue where operations that get dispatched synchronously after the cache restoration completes get forgotten, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1789](https://github.com/FormidableLabs/urql/pull/1789))
+
 ## 4.2.0
 
 ### Minor Changes
