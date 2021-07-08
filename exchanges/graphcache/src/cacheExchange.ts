@@ -10,7 +10,6 @@ import {
 
 import {
   filter,
-  scan,
   map,
   merge,
   pipe,
@@ -18,12 +17,10 @@ import {
   fromPromise,
   fromArray,
   mergeMap,
-  concat,
   empty,
   Source,
-  takeUntil,
   skipUntil,
-  take,
+  buffer,
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
@@ -244,20 +241,18 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
     // Buffer operations while waiting on hydration to finish
     // If no hydration takes place we replace this stream with an empty one
-    const bufferedOps$ = hydration
-      ? merge([
-          pipe(
-            sharedOps$,
-            scan((acc: Operation[], x) => (acc.push(x), acc), []),
-            takeUntil(fromPromise(hydration)),
-            take(1),
-            mergeMap(zip => fromArray(zip))
-          ),
-          pipe(sharedOps$, skipUntil(fromPromise(hydration))),
-        ])
-      : (empty as Source<Operation>);
-
-    const inputOps$ = pipe(concat([bufferedOps$, sharedOps$]), share);
+    const inputOps$ = hydration
+      ? share(
+          merge([
+            pipe(
+              sharedOps$,
+              buffer(fromPromise(hydration)),
+              mergeMap(fromArray)
+            ),
+            pipe(sharedOps$, skipUntil(fromPromise(hydration))),
+          ])
+        )
+      : sharedOps$;
 
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cacheOps$ = pipe(
