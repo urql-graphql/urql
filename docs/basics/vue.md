@@ -641,7 +641,7 @@ There are some more tricks we can use with `useMutation`.<br />
 
 ## Reading on
 
-This concludes the introduction for using `urql` with Svelte. The rest of the documentation
+This concludes the introduction for using `urql` with Vue. The rest of the documentation
 is mostly framework-agnostic and will apply to either `urql` in general or the `@urql/core` package,
 which is the same between all framework bindings. Hence, next we may want to learn more about one of
 the following to learn more about the internals:
