@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@urql/core": ">=2.1.0",
-    "extract-files": "^8.1.0",
+    "extract-files": "^11.0.0",
     "wonka": "^4.0.14"
   },
   "peerDependencies": {
