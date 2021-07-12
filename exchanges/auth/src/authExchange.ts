@@ -23,6 +23,7 @@ import {
   Exchange,
   createRequest,
   makeOperation,
+  TypedDocumentNode,
 } from '@urql/core';
 
 import { DocumentNode } from 'graphql';
@@ -48,7 +49,7 @@ export interface AuthConfig<T> {
     authState: T | null;
     /** The mutate() method may be used to send one-off mutations to the GraphQL API for the purpose of authentication. */
     mutate<Data = any, Variables extends object = {}>(
-      query: DocumentNode | string,
+      query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
       variables?: Variables,
       context?: Partial<OperationContext>
     ): Promise<OperationResult<Data>>;
