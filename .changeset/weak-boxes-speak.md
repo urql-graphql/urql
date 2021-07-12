@@ -2,4 +2,4 @@
 '@urql/exchange-auth': patch
 ---
 
-allow mutate to infer mutation Data and Variables by using TypedDocumentNode
+Allow `mutate` to infer the result's type when a `TypedDocumentNode` is passed via the usual generics, like `client.mutation` for instance.
