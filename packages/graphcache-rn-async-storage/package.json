@@ -1,0 +1,58 @@
+{
+  "name": "@urql/graphcache-rn-async-storage",
+  "version": "0.0.1",
+  "sideEffects": false,
+  "description": "TODO:",
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/graphcache-rn-async-storage"
+  },
+  "keywords": [
+    "urql",
+    "graphql client",
+    "formidablelabs",
+    "exchanges",
+    "react native",
+    "offline",
+    "storage"
+  ],
+  "main": "dist/urql-graphcache-rn-async-storage",
+  "module": "dist/urql-graphcache-rn-async-storage.mjs",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/urql-graphcache-rn-async-storage.mjs",
+      "require": "./dist/urql-graphcache-rn-async-storage.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "^1.15.5",
+    "@react-native-community/netinfo": "^6.0.0",
+    "@urql/exchange-graphcache": ">=4.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
