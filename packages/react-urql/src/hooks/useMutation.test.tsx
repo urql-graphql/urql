@@ -16,7 +16,7 @@ jest.mock('../context', () => {
 });
 
 import { print } from 'graphql';
-import { gql } from '@urql/core';
+import { gql, OperationContext } from '@urql/core';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
@@ -34,10 +34,21 @@ let state: any;
 let execute: any;
 
 const MutationUser = ({ query }: { query: any }) => {
-  const [s, e] = useMutation(query);
-  state = s;
-  execute = e;
-  return <p>{s.data}</p>;
+  [state, execute] = useMutation(query);
+  return <p>{state.data}</p>;
+};
+
+const globalContext: Partial<OperationContext> = {
+  fetchOptions: {
+    headers: {
+      sampleHeader: 'test',
+    },
+  } as RequestInit,
+};
+
+const MutationUserWithContext = ({ query }: { query: any }) => {
+  [state, execute] = useMutation(query, globalContext);
+  return <p>{state.data}</p>;
 };
 
 beforeAll(() => {
@@ -109,6 +120,29 @@ describe('on execute', () => {
       execute(vars, { url: 'test' });
     });
     expect(client.executeMutation.mock.calls[0][1].url).toBe('test');
+  });
+
+  it('calls executeMutation with global context', () => {
+    renderer.create(<MutationUserWithContext {...props} />);
+    act(() => {
+      execute(vars);
+    });
+    expect(
+      client.executeMutation.mock.calls[0][1].fetchOptions.headers.sampleHeader
+    ).toBe('test');
+  });
+
+  it('calls executeMutation with overriden global context', () => {
+    renderer.create(<MutationUserWithContext {...props} />);
+    act(() => {
+      execute(vars, { fetchOptions: { headers: { something: 'different' } } });
+    });
+    expect(
+      client.executeMutation.mock.calls[0][1].fetchOptions.headers.sampleHeader
+    ).toBeUndefined();
+    expect(
+      client.executeMutation.mock.calls[0][1].fetchOptions.headers.something
+    ).toBe('different');
   });
 });
 

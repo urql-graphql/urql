@@ -14,7 +14,7 @@ Accepts a single required options object as an input with the following properti
 | `query`         | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
 | `variables`     | `?object`                | The variables to be used with the GraphQL request.                                                       |
 | `requestPolicy` | `?RequestPolicy`         | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
-| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/react-preact.md#pausing-usequery).              |
+| `pause`         | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/react-preact.md#pausing-usequery).         |
 | `context`       | `?object`                | Holds the contextual information for the query.                                                          |
 
 This hook returns a tuple of the shape `[result, executeQuery]`.
@@ -30,13 +30,13 @@ This hook returns a tuple of the shape `[result, executeQuery]`.
 
 ## useMutation
 
-Accepts a single `query` argument of type `string | DocumentNode` and returns a tuple of the shape
+Accepts a `query` argument of type `string | DocumentNode` and a `globalContext` argument of type `Partial<OperationContext>` and returns a tuple of the shape
 `[result, executeMutation]`.
 
 - The `result` is an object with the shape of an [`OperationResult`](./core.md#operationresult) with
   an added `fetching: boolean` property, indicating whether the mutation is being executed.
 - The `executeMutation` function accepts variables and optionally
-  [`Partial<OperationContext>`](./core.md#operationcontext) and may be used to start executing a
+  [`Partial<OperationContext>`](./core.md#operationcontext) (it overwrites the global context param passed when initializing `useMutation`) and may be used to start executing a
   mutation. It returns a `Promise` resolving to an [`OperationResult`](./core.md#operationresult).
 
 [Read more about how to use the `useMutation` API on the "Mutations"
@@ -46,12 +46,12 @@ page.](../basics/react-preact.md#mutations)
 
 Accepts a single required options object as an input with the following properties:
 
-| Prop                                                 | Type                     | Description                                                                        |
-| ---------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
-| `query`                                              | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
-| `variables`                                          | `?object`                | The variables to be used with the GraphQL request.                                 |
-| `pause`                                              | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/react-preact.md#pausing-usequery). |
-| `context`                                            | `?object`                | Holds the contextual information for the query.                                    |
+| Prop        | Type                     | Description                                                                                      |
+| ----------- | ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.               |
+| `variables` | `?object`                | The variables to be used with the GraphQL request.                                               |
+| `pause`     | `?boolean`               | A boolean flag instructing [execution to be paused](../basics/react-preact.md#pausing-usequery). |
+| `context`   | `?object`                | Holds the contextual information for the query.                                                  |
 
 The hook optionally accepts a second argument, which may be a handler function with a type signature
 of:

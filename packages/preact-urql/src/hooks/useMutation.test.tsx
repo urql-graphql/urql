@@ -1,7 +1,7 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { print } from 'graphql';
-import { gql } from '@urql/core';
+import { gql, OperationContext } from '@urql/core';
 import { useMutation } from './useMutation';
 import { fromValue, delay, pipe } from 'wonka';
 import { Provider } from '../context';
@@ -22,6 +22,19 @@ let execute: any;
 
 const MutationUser: FC<typeof props> = ({ query }) => {
   [state, execute] = useMutation(query);
+  return h('p', {}, state.data);
+};
+
+const globalContext: Partial<OperationContext> = {
+  fetchOptions: {
+    headers: {
+      sampleHeader: 'test',
+    },
+  } as RequestInit,
+};
+
+const MutationUserWithContext = ({ query }: { query: any }) => {
+  [state, execute] = useMutation(query, globalContext);
   return h('p', {}, state.data);
 };
 
@@ -64,6 +77,27 @@ describe('useMutation', () => {
     expect(client.executeMutation).toBeCalledTimes(1);
     expect(print(call.query)).toBe(print(gql(props.query)));
     expect(call).toHaveProperty('variables', vars);
+  });
+
+  it('executes mutation with global context', () => {
+    render(
+      h(Provider, {
+        value: client as any,
+        children: [h(MutationUserWithContext, { ...props })],
+      })
+    );
+    const vars = { test: 1234 };
+    act(() => {
+      execute(vars);
+    });
+    const call = client.executeMutation.mock.calls[0][0];
+    expect(state).toHaveProperty('fetching', true);
+    expect(client.executeMutation).toBeCalledTimes(1);
+    expect(print(call.query)).toBe(print(gql(props.query)));
+    expect(call).toHaveProperty('variables', vars);
+    expect(
+      client.executeMutation.mock.calls[0][1].fetchOptions.headers.sampleHeader
+    ).toBe('test');
   });
 
   it('respects context changes', () => {

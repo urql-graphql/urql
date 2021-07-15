@@ -32,7 +32,8 @@ export type UseMutationResponse<Data = any, Variables = object> = [
 ];
 
 export function useMutation<Data = any, Variables = object>(
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+  globalMutationContext?: Partial<OperationContext>
 ): UseMutationResponse<Data, Variables> {
   const isMounted = useRef(true);
   const client = useClient();
@@ -45,10 +46,16 @@ export function useMutation<Data = any, Variables = object>(
     (variables?: Variables, context?: Partial<OperationContext>) => {
       setState({ ...initialState, fetching: true });
 
+      let mutationContext = globalMutationContext || {};
+
+      if (context) {
+        mutationContext = context;
+      }
+
       return pipe(
         client.executeMutation<Data, Variables>(
           createRequest<Data, Variables>(query, variables),
-          context || {}
+          mutationContext
         ),
         toPromise
       ).then(result => {
@@ -66,7 +73,7 @@ export function useMutation<Data = any, Variables = object>(
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [client, query, setState]
+    [client, query, setState, globalMutationContext]
   );
 
   useEffect(() => {

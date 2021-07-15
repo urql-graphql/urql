@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { Client, TypedDocumentNode } from '@urql/core';
+import { Client, TypedDocumentNode, OperationContext } from '@urql/core';
 import {
   WatchStopHandle,
   getCurrentInstance,
@@ -33,7 +33,8 @@ export interface ClientHandle {
   ): UseSubscriptionResponse<T, R, V>;
 
   useMutation<T = any, V = any>(
-    query: TypedDocumentNode<T, V> | DocumentNode | string
+    query: TypedDocumentNode<T, V> | DocumentNode | string,
+    globalMutationContext?: Partial<OperationContext>
   ): UseMutationResponse<T, V>;
 }
 

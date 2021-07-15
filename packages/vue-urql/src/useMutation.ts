@@ -32,14 +32,16 @@ export interface UseMutationState<T, V> {
 export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 
 export function useMutation<T = any, V = any>(
-  query: TypedDocumentNode<T, V> | DocumentNode | string
+  query: TypedDocumentNode<T, V> | DocumentNode | string,
+  globalMutationContext?: Partial<OperationContext>
 ): UseMutationResponse<T, V> {
-  return callUseMutation(query);
+  return callUseMutation(query, undefined, globalMutationContext);
 }
 
 export function callUseMutation<T = any, V = any>(
   query: TypedDocumentNode<T, V> | DocumentNode | string,
-  client: Client = useClient()
+  client: Client = useClient(),
+  globalMutationContext?: Partial<OperationContext>
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -61,10 +63,16 @@ export function callUseMutation<T = any, V = any>(
     ): Promise<OperationResult<T, V>> {
       fetching.value = true;
 
+      let mutationContext = globalMutationContext || {};
+
+      if (context) {
+        mutationContext = context;
+      }
+
       return pipe(
         client.executeMutation<T, V>(
           createRequest<T, V>(query, variables),
-          context || {}
+          mutationContext
         ),
         take(1),
         toPromise
