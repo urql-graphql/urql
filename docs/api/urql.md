@@ -144,3 +144,36 @@ const useClient = () => React.useContext(Context);
 
 However, this hook is also responsible for outputting the default client warning that's mentioned
 above, and should thus be preferred over manually using `useContext` with `urql`'s `Context`.
+
+### Setting up custom headers for a query/mutations
+
+Sometimes, it's required to send custom headers with your query/mutation. In such case you should send them via `context` property of `useQuery`/`useMutation` params object:
+
+```
+import React from 'react';
+
+const SomeComponent = (): JSX.Element => {
+  const [{ data, error, fetching }] = useQuery({ query: YourQuery, context: { fetchOptions: { headers: { 'x-custom-header': 'some-value' } } });
+  
+  return <div>{fetching ? 'Loading ...' : 'Data loaded'}</div>;
+}
+```
+
+However you have to make an additional addition to such, as passing the `context` object will cause an infinite loop of re-rendering. In such case, you should memoize the `context` value in order to avoid re-renderings.
+
+```
+import React, { useMemo } from 'react';
+
+const SomeComponent = (): JSX.Element => {
+  const context = useMemo(() => {
+    return {
+      fetchOptions: { headers: { 'x-custom-header': 'some-value' } }
+    };
+  }, []);
+  const [{ data, error, fetching }] = useQuery({ query: YourQuery, context} });
+  
+  return <div>{fetching ? 'Loading ...' : 'Data loaded'}</div>;
+}
+```
+
+That way, you'll be able to pass custom headers to your queries/mutations everytime it's needed.
