@@ -50,8 +50,8 @@ assigning a new context to the operation. It is syntactic sugar to ensure that a
 reexecuted at any point in time:
 
 ```js
-operationStre(...).reexecute();
-operationStre(...).reexecute({ requestPolicy: 'network-only' });
+operationStore(...).reexecute();
+operationStore(...).reexecute({ requestPolicy: 'network-only' });
 ```
 
 [Read more about `writable` stores on the Svelte API docs.](https://svelte.dev/docs#writable)
