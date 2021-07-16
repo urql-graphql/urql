@@ -15,6 +15,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from './useClient';
+import { unwrapPossibleProxy } from './utils';
 
 export interface UseMutationState<T, V> {
   fetching: Ref<boolean>;
@@ -63,7 +64,7 @@ export function callUseMutation<T = any, V = any>(
 
       return pipe(
         client.executeMutation<T, V>(
-          createRequest<T, V>(query, JSON.parse(JSON.stringify(variables))),
+          createRequest<T, V>(query, unwrapPossibleProxy<V>(variables)),
           context || {}
         ),
         take(1),
