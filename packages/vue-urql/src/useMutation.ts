@@ -63,7 +63,7 @@ export function callUseMutation<T = any, V = any>(
 
       return pipe(
         client.executeMutation<T, V>(
-          createRequest<T, V>(query, variables),
+          createRequest<T, V>(query, JSON.parse(JSON.stringify(variables))),
           context || {}
         ),
         take(1),
