@@ -221,7 +221,7 @@ model as well and cause the `query` utility to start a new operation.
     $todos.variables = { ...$todos.variables, from: $todos.variables.from + $todos.variables.limit };
     // OR
     $todos.variables.from += $todos.variables.limit;
-    todos.reexecute();
+    $todos.reexecute();
   }
 </script>
 
