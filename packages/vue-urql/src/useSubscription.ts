@@ -17,6 +17,7 @@ import {
 } from '@urql/core';
 
 import { useClient } from './useClient';
+import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
 
@@ -82,14 +83,20 @@ export function callUseSubscription<T = any, R = T, V = object>(
     : ref(!!_args.pause);
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
-    createRequest<T, V>(args.query, args.variables as V) as any
+    createRequest<T, V>(
+      args.query,
+      unwrapPossibleProxy<V>(args.variables as V)
+    ) as any
   );
 
   const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
   stops.push(
     watchEffect(() => {
-      const newRequest = createRequest<T, V>(args.query, args.variables as any);
+      const newRequest = createRequest<T, V>(
+        args.query,
+        unwrapPossibleProxy<V>(args.variables as V)
+      );
       if (request.value.key !== newRequest.key) {
         request.value = newRequest;
       }
