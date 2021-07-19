@@ -149,7 +149,7 @@ above, and should thus be preferred over manually using `useContext` with `urql`
 
 Sometimes, it's required to send custom headers with your query/mutation. In such case you should send them via `context` property of `useQuery`/`useMutation` params object:
 
-```
+```tsx
 import React from 'react';
 
 const SomeComponent = (): JSX.Element => {
