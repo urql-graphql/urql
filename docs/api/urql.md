@@ -153,7 +153,10 @@ Sometimes, it's required to send custom headers with your query/mutation. In suc
 import React from 'react';
 
 const SomeComponent = (): JSX.Element => {
-  const [{ data, error, fetching }] = useQuery({ query: YourQuery, context: { fetchOptions: { headers: { 'x-custom-header': 'some-value' } } });
+  const context = React.useMemo(() => ({
+    fetchOptions: { headers: { 'x-custom-header': 'some-value' } }
+  }), [])
+  const [{ data, error, fetching }] = useQuery({ query: YourQuery, context });
   
   return <div>{fetching ? 'Loading ...' : 'Data loaded'}</div>;
 }
