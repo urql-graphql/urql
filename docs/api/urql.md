@@ -164,7 +164,7 @@ const SomeComponent = (): JSX.Element => {
 
 However you have to make an additional addition to such, as passing the `context` object will cause an infinite loop of re-rendering. In such case, you should memoize the `context` value in order to avoid re-renderings.
 
-```
+```tsx
 import React, { useMemo } from 'react';
 
 const SomeComponent = (): JSX.Element => {
