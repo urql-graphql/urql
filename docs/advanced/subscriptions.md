@@ -40,41 +40,9 @@ When we define this function it must return an "Observable-like" object, which n
 [Observable spec](https://github.com/tc39/proposal-observable), which comes down to having an
 object with a `.subscribe()` method accepting an observer.
 
-## Setting up `subscriptions-transport-ws`
-
-If your GraphQL API is using [the Apollo Server](https://www.apollographql.com/docs/apollo-server/),
-you'll be able to use [Apollo's `subscriptions-transport-ws`
-package](https://github.com/apollographql/subscriptions-transport-ws).
-
-```js
-import { Client, defaultExchanges, subscriptionExchange } from 'urql';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
-
-const subscriptionClient = new SubscriptionClient('ws://localhost/graphql', { reconnect: true });
-
-const client = new Client({
-  url: '/graphql',
-  exchanges: [
-    ...defaultExchanges,
-    subscriptionExchange({
-      forwardSubscription(operation) {
-        return subscriptionClient.request(operation);
-      },
-    }),
-  ],
-});
-```
-
-In this example, we're creating a `SubscriptionClient`, are passing in a URL and some parameters,
-and are using the `SubscriptionClient`'s `request` method to create a Subscription Observable, which
-we return to the `subscriptionExchange` inside `forwardSubscription`.
-
-[Read more about `subscription-transport-ws` on its README.](https://github.com/apollographql/subscriptions-transport-ws/blob/master/README.md)
-
 ## Setting up `graphql-ws`
 
-If your GraphQL API server is using [graphql-ws](https://github.com/enisdenjo/graphql-ws),
-you'll be able to use it here too!
+For backends supporting `graphql-ws`, we recommend using the [graphql-ws](https://github.com/enisdenjo/graphql-ws) client.
 
 ```js
 import { createClient, defaultExchanges, subscriptionExchange } from 'urql';
@@ -89,25 +57,47 @@ const client = createClient({
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
-      forwardSubscription(operation) {
-        return {
-          subscribe: sink => {
-            const dispose = wsClient.subscribe(operation, sink);
-            return {
-              unsubscribe: dispose,
-            };
-          },
-        };
-      },
+      forwardSubscription: (operation) => ({
+        subscribe: (sink) => ({
+          unsubscribe: wsClient.subscribe(operation, sink),
+        }),
+      }),
     }),
   ],
 });
 ```
 
-We create a WebSocket client with the necessary options and use the `subscribe` method from it to
-create a Subscription Observable, which we return to the `subscriptionExchange` inside `forwardSubscription`.
-
 [Read more on the `graphql-ws` README.](https://github.com/enisdenjo/graphql-ws/blob/master/README.md)
+
+## Setting up `subscriptions-transport-ws`
+
+For backends supporting `subscriptions-transport-ws`, [Apollo's `subscriptions-transport-ws`
+package](https://github.com/apollographql/subscriptions-transport-ws) can be used.
+
+> Note: `subscriptions-transport-ws` is deprecated, consider using `graphql-ws` (above)
+
+```js
+import { Client, defaultExchanges, subscriptionExchange } from 'urql';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
+
+const subscriptionClient = new SubscriptionClient('ws://localhost/graphql', { reconnect: true });
+
+const client = new Client({
+  url: '/graphql',
+  exchanges: [
+    ...defaultExchanges,
+    subscriptionExchange({
+      forwardSubscription: (operation) => subscriptionClient.request(operation)
+    }),
+  ],
+});
+```
+
+In this example, we're creating a `SubscriptionClient`, are passing in a URL and some parameters,
+and are using the `SubscriptionClient`'s `request` method to create a Subscription Observable, which
+we return to the `subscriptionExchange` inside `forwardSubscription`.
+
+[Read more about `subscription-transport-ws` on its README.](https://github.com/apollographql/subscriptions-transport-ws/blob/master/README.md)
 
 ## React & Preact
 
