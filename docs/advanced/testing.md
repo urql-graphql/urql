@@ -88,7 +88,7 @@ it('triggers a mutation', () => {
   wrapper.find('button').simulate('click');
 
   expect(mockClient.executeMutation).toBeCalledTimes(1);
-  expect(mockClient.executeMutation).toBeCalledWith(expect.objectContaining({ variables }));
+  expect(mockClient.executeMutation).toBeCalledWith(expect.objectContaining({ variables }), {});
 });
 ```
 
