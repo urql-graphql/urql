@@ -78,7 +78,7 @@ we return to the `subscriptionExchange` inside `forwardSubscription`.
 For backends supporting `subscriptions-transport-ws`, [Apollo's `subscriptions-transport-ws`
 package](https://github.com/apollographql/subscriptions-transport-ws) can be used.
 
-> Note: `subscriptions-transport-ws` is deprecated, consider using `graphql-ws` (above)
+> The `subscriptions-transport-ws` package isn't actively maintained. If your API supports the new protocol or you can swap the package out, consider using [`graphql-ws`](#setting-up-graphql-ws) instead.
 
 ```js
 import { Client, defaultExchanges, subscriptionExchange } from 'urql';
