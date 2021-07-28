@@ -67,6 +67,10 @@ const client = createClient({
 });
 ```
 
+In this example, we're creating a `SubscriptionClient`, are passing in a URL and some parameters,
+and are using the `SubscriptionClient`'s `request` method to create a Subscription Observable, which
+we return to the `subscriptionExchange` inside `forwardSubscription`.
+
 [Read more on the `graphql-ws` README.](https://github.com/enisdenjo/graphql-ws/blob/master/README.md)
 
 ## Setting up `subscriptions-transport-ws`
