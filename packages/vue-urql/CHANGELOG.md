@@ -1,5 +1,11 @@
 # @urql/vue
 
+## 0.4.3
+
+### Patch Changes
+
+- Unwrap the `variables` proxy before we send it into the client, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1810](https://github.com/FormidableLabs/urql/pull/1810))
+
 ## 0.4.2
 
 ### Patch Changes
