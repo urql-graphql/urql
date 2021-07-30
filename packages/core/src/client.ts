@@ -290,6 +290,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
     createRequestOperation(kind, request, opts) {
       if (
+        kind !== 'teardown' &&
         !request.query.definitions.some(
           x => x.kind === Kind.OPERATION_DEFINITION && x.operation === kind
         ) &&

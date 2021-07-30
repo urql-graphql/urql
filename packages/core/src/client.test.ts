@@ -207,6 +207,17 @@ describe('executeQuery', () => {
     expect(print(receivedQuery)).toBe(print(query.query));
   });
 
+  it('should throw when passing in a mutation', () => {
+    try {
+      client.executeQuery(mutation);
+      expect(true).toBeFalsy();
+    } catch (e) {
+      expect(e.message).toMatchInlineSnapshot(
+        `"Expected operation of type query but found mutation"`
+      );
+    }
+  });
+
   it('passes variables type to exchange', () => {
     pipe(
       client.executeQuery(query),
