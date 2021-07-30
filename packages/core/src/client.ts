@@ -22,7 +22,7 @@ import {
 } from 'wonka';
 
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode, Kind } from 'graphql';
+import { DocumentNode } from 'graphql';
 
 import { composeExchanges, defaultExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
@@ -46,6 +46,7 @@ import {
   maskTypename,
   noop,
   makeOperation,
+  getOperationType,
 } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -289,24 +290,15 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     createRequestOperation(kind, request, opts) {
+      const requestOperationType = getOperationType(request.query);
       if (
+        process.env.NODE_ENV !== 'production' &&
         kind !== 'teardown' &&
-        !request.query.definitions.some(
-          x => x.kind === Kind.OPERATION_DEFINITION && x.operation === kind
-        ) &&
-        process.env.NODE_ENV !== 'production'
+        requestOperationType !== kind
       ) {
-        for (let i = 0; i < request.query.definitions.length; i++) {
-          const definition = request.query.definitions[i];
-          if (
-            definition.kind === Kind.OPERATION_DEFINITION &&
-            definition.operation !== kind
-          ) {
-            throw new Error(
-              `Expected operation of type ${kind} but found ${definition.operation}`
-            );
-          }
-        }
+        throw new Error(
+          `Expected operation of type "${kind}" but found "${requestOperationType}"`
+        );
       }
       return makeOperation(kind, request, client.createOperationContext(opts));
     },
