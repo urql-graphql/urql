@@ -213,7 +213,7 @@ describe('executeQuery', () => {
       expect(true).toBeFalsy();
     } catch (e) {
       expect(e.message).toMatchInlineSnapshot(
-        `"Expected operation of type query but found mutation"`
+        `"Expected operation of type \"query\" but found \"mutation\""`
       );
     }
   });
