@@ -46,6 +46,7 @@ import {
   maskTypename,
   noop,
   makeOperation,
+  getOperationType,
 } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -289,6 +290,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     createRequestOperation(kind, request, opts) {
+      const requestOperationType = getOperationType(request.query);
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        kind !== 'teardown' &&
+        requestOperationType !== kind
+      ) {
+        throw new Error(
+          `Expected operation of type "${kind}" but found "${requestOperationType}"`
+        );
+      }
       return makeOperation(kind, request, client.createOperationContext(opts));
     },
 
