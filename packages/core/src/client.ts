@@ -22,7 +22,7 @@ import {
 } from 'wonka';
 
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode } from 'graphql';
+import { DocumentNode, Kind } from 'graphql';
 
 import { composeExchanges, defaultExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
@@ -289,6 +289,24 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     createRequestOperation(kind, request, opts) {
+      if (
+        !request.query.definitions.some(
+          x => x.kind === Kind.OPERATION_DEFINITION && x.operation === kind
+        ) &&
+        process.env.NODE_ENV !== 'production'
+      ) {
+        for (let i = 0; i < request.query.definitions.length; i++) {
+          const definition = request.query.definitions[i];
+          if (
+            definition.kind === Kind.OPERATION_DEFINITION &&
+            definition.operation !== kind
+          ) {
+            throw new Error(
+              `Expected operation of type ${kind} but found ${definition.operation}`
+            );
+          }
+        }
+      }
       return makeOperation(kind, request, client.createOperationContext(opts));
     },
 

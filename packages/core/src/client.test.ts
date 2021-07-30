@@ -52,6 +52,30 @@ const query = {
   variables: { example: 1234 },
 };
 
+const mutation = {
+  key: 1,
+  query: gql`
+    mutation {
+      todos {
+        id
+      }
+    }
+  `,
+  variables: { example: 1234 },
+};
+
+const subscription = {
+  key: 1,
+  query: gql`
+    subscription {
+      todos {
+        id
+      }
+    }
+  `,
+  variables: { example: 1234 },
+};
+
 let receivedOps: Operation[] = [];
 let client = createClient({ url: '1234' });
 const receiveMock = jest.fn((s: Source<Operation>) =>
@@ -119,21 +143,17 @@ describe('promisified methods', () => {
   });
 
   it('mutation', () => {
-    const mutationResult = client
-      .mutation(
-        gql`
-          {
-            todos {
-              id
-            }
-          }
-        `,
-        { example: 1234 }
-      )
-      .toPromise();
+    const mut = gql`
+      mutation {
+        todos {
+          id
+        }
+      }
+    `;
+    const mutationResult = client.mutation(mut, { example: 1234 }).toPromise();
 
     const received = receivedOps[0];
-    expect(print(received.query)).toEqual(print(query.query));
+    expect(print(received.query)).toEqual(print(mut));
     expect(received.key).toBeDefined();
     expect(received.variables).toEqual({ example: 1234 });
     expect(received.kind).toEqual('mutation');
@@ -242,17 +262,17 @@ describe('executeQuery', () => {
 describe('executeMutation', () => {
   it('passes query string exchange', async () => {
     pipe(
-      client.executeMutation(query),
+      client.executeMutation(mutation),
       subscribe(x => x)
     );
 
     const receivedQuery = receivedOps[0].query;
-    expect(print(receivedQuery)).toBe(print(query.query));
+    expect(print(receivedQuery)).toBe(print(mutation.query));
   });
 
   it('passes variables type to exchange', () => {
     pipe(
-      client.executeMutation(query),
+      client.executeMutation(mutation),
       subscribe(x => x)
     );
 
@@ -261,7 +281,7 @@ describe('executeMutation', () => {
 
   it('passes kind type to exchange', () => {
     pipe(
-      client.executeMutation(query),
+      client.executeMutation(mutation),
       subscribe(x => x)
     );
 
@@ -270,7 +290,7 @@ describe('executeMutation', () => {
 
   it('passes url (from context) to exchange', () => {
     pipe(
-      client.executeMutation(query),
+      client.executeMutation(mutation),
       subscribe(x => x)
     );
 
@@ -281,26 +301,26 @@ describe('executeMutation', () => {
 describe('executeSubscription', () => {
   it('passes query string exchange', async () => {
     pipe(
-      client.executeSubscription(query),
+      client.executeSubscription(subscription),
       subscribe(x => x)
     );
 
     const receivedQuery = receivedOps[0].query;
-    expect(print(receivedQuery)).toBe(print(query.query));
+    expect(print(receivedQuery)).toBe(print(subscription.query));
   });
 
   it('passes variables type to exchange', () => {
     pipe(
-      client.executeSubscription(query),
+      client.executeSubscription(subscription),
       subscribe(x => x)
     );
 
-    expect(receivedOps[0]).toHaveProperty('variables', query.variables);
+    expect(receivedOps[0]).toHaveProperty('variables', subscription.variables);
   });
 
   it('passes kind type to exchange', () => {
     pipe(
-      client.executeSubscription(query),
+      client.executeSubscription(subscription),
       subscribe(x => x)
     );
 
