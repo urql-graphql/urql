@@ -1,1 +1,1 @@
-export { authExchange } from './authExchange';
+export { authExchange, AuthConfig } from './authExchange';
