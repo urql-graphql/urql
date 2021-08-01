@@ -11,25 +11,34 @@ If you need `async fetchOptions` you can add an exchange that looks like this:
 
 ```js
 import { makeOperation } from '@urql/core';
+import { Exchange, Operation } from 'urql';
+import { pipe, mergeMap, map, fromPromise } from 'wonka';
 
-export const fetchOptionsExchange = (fn: any): Exchange => ({ forward }) => ops$ => {
-  return pipe(
-    ops$,
-    mergeMap((operation: Operation) => {
-      const result = fn(operation.context.fetchOptions);
-      return pipe(
-        typeof result.then === 'function' ? fromPromise(result) : fromValue(result),
-        map((fetchOptions: RequestInit | (() => RequestInit)) => {
-          return makeOperation(operation.kind, operation, {
-            ...operation.context,
-            fetchOptions,
-          });
-        })
-      );
-    }),
-    forward
-  );
-};
+export const fetchOptionsExchange =
+  (fn: (fetchOptions: RequestInit) => Promise<RequestInit>): Exchange =>
+  ({ forward }) =>
+  (ops$) => {
+    return pipe(
+      ops$,
+      mergeMap((operation: Operation) => {
+        const currentOptions =
+          typeof operation.context.fetchOptions === 'function'
+            ? operation.context.fetchOptions()
+            : operation.context.fetchOptions || {};
+
+        return pipe(
+          fromPromise(fn(currentOptions)),
+          map((fetchOptions) => {
+            return makeOperation(operation.kind, operation, {
+              ...operation.context,
+              fetchOptions,
+            });
+          }),
+        );
+      }),
+      forward,
+    );
+  };
 ```
 
 If we add the above exchange before our `fetchExchange` our `fetchOptions` will be handled.
@@ -40,7 +49,7 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    fetchOptionsExchange(async (fetchOptions: any) => {
+    fetchOptionsExchange(async (fetchOptions) => {
       return Promise.resolve({
         ...fetchOptions,
         headers: {
