@@ -24,7 +24,7 @@ import {
   getOperationName,
 } from '@urql/core';
 
-interface ExecuteExchangeArgs {
+export interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
   rootValue?: any;
   context?: ((op: Operation) => void) | any;
