@@ -12,10 +12,16 @@ If you need `async fetchOptions` you can add an exchange that looks like this:
 ```js
 import { makeOperation } from '@urql/core';
 import { Exchange, Operation } from 'urql';
-import { pipe, mergeMap, map, fromPromise } from 'wonka';
+import { pipe, mergeMap, map, fromPromise, fromValue } from 'wonka';
+
+const isPromise = (value: any): value is Promise<unknown> => {
+  return typeof value.then === 'function';
+};
 
 export const fetchOptionsExchange =
-  (fn: (fetchOptions: RequestInit) => Promise<RequestInit>): Exchange =>
+  (
+    fn: (fetchOptions: RequestInit) => Promise<RequestInit> | RequestInit,
+  ): Exchange =>
   ({ forward }) =>
   (ops$) => {
     return pipe(
@@ -26,8 +32,12 @@ export const fetchOptionsExchange =
             ? operation.context.fetchOptions()
             : operation.context.fetchOptions || {};
 
+        const finalOptions = fn(currentOptions);
+
         return pipe(
-          fromPromise(fn(currentOptions)),
+          isPromise(finalOptions)
+            ? fromPromise(finalOptions)
+            : fromValue(finalOptions),
           map((fetchOptions) => {
             return makeOperation(operation.kind, operation, {
               ...operation.context,
