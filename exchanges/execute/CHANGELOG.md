@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.5
+
+### Patch Changes
+
+- Expose `ExecuteExchangeArgs` interface, by [@taneba](https://github.com/taneba) (See [#1837](https://github.com/FormidableLabs/urql/pull/1837))
+- Updated dependencies (See [#1829](https://github.com/FormidableLabs/urql/pull/1829))
+  - @urql/core@2.1.6
+
 ## 1.0.4
 
 ### Patch Changes
