@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- Expose `AuthContext` type, by [@arempe93](https://github.com/arempe93) (See [#1828](https://github.com/FormidableLabs/urql/pull/1828))
+- Updated dependencies (See [#1829](https://github.com/FormidableLabs/urql/pull/1829))
+  - @urql/core@2.1.6
+
 ## 0.1.4
 
 ### Patch Changes

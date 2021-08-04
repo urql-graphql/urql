@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.1.6
+
+### Patch Changes
+
+- Warn for invalid operation passed to query/subscription/mutation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1829](https://github.com/FormidableLabs/urql/pull/1829))
+
 ## 2.1.5
 
 ### Patch Changes
