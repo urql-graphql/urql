@@ -285,8 +285,8 @@ optional and populates the server-side rendered data with
 a rehydrated cache, `isClient` which can be set to
 `true` or `false` to tell the `ssrExchange` whether to
 write to (server-side) or read from (client-side) the cache, and
-`staleWhileRevalidate` which will dispatch the hydrated operations as
-`network-only` requests so they can be revalidated on the client.
+`staleWhileRevalidate` which will treat rehydrated data as stale
+and refetch up-to-date data by reexecuring the operation using a `network-only` requests policy.
 
 By default, `isClient` defaults to `true` when the `Client.suspense`
 mode is disabled and to `false` when the `Client.suspense` mode
