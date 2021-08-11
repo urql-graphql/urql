@@ -155,7 +155,7 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 };
 
 // Reexecutes a given operation with the default requestPolicy
-const reexecuteOperation = (client: Client, operation: Operation) => {
+export const reexecuteOperation = (client: Client, operation: Operation) => {
   return client.reexecuteOperation(
     makeOperation(operation.kind, operation, {
       ...operation.context,

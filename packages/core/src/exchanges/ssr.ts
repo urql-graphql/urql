@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { pipe, share, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
 import { CombinedError } from '../utils';
+import { reexecuteOperation } from './cache';
 
 export interface SerializedResult {
   data?: string | undefined; // JSON string of data
@@ -18,6 +19,7 @@ export interface SSRData {
 export interface SSRExchangeParams {
   isClient?: boolean;
   initialState?: SSRData;
+  staleWhileRevalidate?: boolean;
 }
 
 export interface SSRExchange extends Exchange {
@@ -91,6 +93,7 @@ const deserializeResult = (
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
+  const staleWhileRevalidate = !!(params && params.staleWhileRevalidate);
   const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
@@ -137,7 +140,13 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       filter(op => isCached(op)),
       map(op => {
         const serialized = data[op.key]!;
-        return deserializeResult(op, serialized);
+        const result = deserializeResult(op, serialized);
+        if (staleWhileRevalidate) {
+          result.stale = true;
+          reexecuteOperation(client, op);
+        }
+
+        return result;
       })
     );
 
