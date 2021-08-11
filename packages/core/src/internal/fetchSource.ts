@@ -21,6 +21,8 @@ const toString = (input: Buffer | ArrayBuffer): string =>
     ? input.toString()
     : decoder!.decode(input);
 
+// DERIVATIVE: Copyright (c) 2021 Marais Rossouw <hi@marais.io>
+// See: https://github.com/maraisr/meros/blob/219fe95/src/browser.ts
 const executeIncrementalFetch = (
   onResult: (result: OperationResult) => void,
   operation: Operation,
