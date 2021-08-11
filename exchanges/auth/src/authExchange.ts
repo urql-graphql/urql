@@ -103,28 +103,32 @@ export function authExchange<T>({
 
       const updateAuthState = (newAuthState: T | null) => {
         authState = newAuthState;
-        pendingPromise = undefined;
+        authPromise = undefined;
         retryQueue.forEach(retryOperation);
         retryQueue.clear();
       };
 
-      let pendingPromise: Promise<any> | void = Promise.resolve()
+      let authPromise: Promise<any> | void = Promise.resolve()
         .then(() => getAuth({ authState, mutate }))
         .then(updateAuthState);
 
-      const refreshAuth = (operation: Operation): Promise<any> => {
+      const refreshAuth = (
+        operation: Operation,
+        addAuthAttempt = true
+      ): void => {
+        if (addAuthAttempt) {
+          operation = addAuthAttemptToOperation(operation, true);
+        }
+
         // add to retry queue to try again later
-        operation = addAuthAttemptToOperation(operation, true);
         retryQueue.set(operation.key, operation);
 
         // check that another operation isn't already doing refresh
-        if (!pendingPromise) {
-          pendingPromise = getAuth({ authState, mutate })
+        if (!authPromise) {
+          authPromise = getAuth({ authState, mutate })
             .then(updateAuthState)
             .catch(() => updateAuthState(null));
         }
-
-        return pendingPromise;
       };
 
       const sharedOps$ = pipe(operations$, share);
@@ -150,13 +154,13 @@ export function authExchange<T>({
             pendingOps$,
             mergeMap(operation => {
               if (
-                !pendingPromise &&
+                !authPromise &&
                 willAuthError &&
                 willAuthError({ operation, authState })
               ) {
-                pendingPromise = refreshAuth(operation);
+                refreshAuth(operation);
                 return empty;
-              } else if (!pendingPromise) {
+              } else if (!authPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
               }
 
@@ -168,7 +172,7 @@ export function authExchange<T>({
               );
 
               return pipe(
-                fromPromise(pendingPromise),
+                fromPromise(authPromise),
                 map(() => addAuthAttemptToOperation(operation, false)),
                 takeUntil(teardown$)
               );
@@ -185,7 +189,7 @@ export function authExchange<T>({
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
             if (!operation.context.authAttempt) {
-              pendingPromise = refreshAuth(operation);
+              refreshAuth(operation);
               return false;
             }
           }
