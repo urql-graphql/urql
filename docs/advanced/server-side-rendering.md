@@ -39,8 +39,10 @@ const client = createClient({
 ```
 
 The `ssrExchange` must be initialized with the `isClient` and `initialState` options. The `isClient`
-option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`. Optionally you can pass in `staleWhileRevalidate`, this property will ensure that when the data-hydration completes another
-operation will be dispatched to update the data, this can come in handy with statically generated applications.
+option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`.
+
+Optionally, we may also choose to enable `staleWhileRevalidate`. When enabled this flag will ensure that although a result may have been rehydrated from our SSR result, another
+refetch `network-only` operation will be issued, to update stale data. This is useful for statically generated sites (SSG) that may ship stale data to our application initially.
 
 The `initialState` option should be set to the serialized data you retrieve on your server-side.
 This data may be retrieved using methods on `ssrExchange()`. You can retrieve the serialized data
@@ -306,10 +308,10 @@ The above example will make sure the page is rendered as a static-page, it's imp
 so in our case we were only interested in getting our todos, if there are child components relying on data you'll have to make
 sure these are fetched as well.
 
-### Stale while revalidate
+### Stale While Revalidate
 
-If you are using `SSG` (or `ISG`) it could be that you want to update the data when it has hydrated on the client, this can
-be solved by passing `staleWhileRevalidate` to the second argument of `withUrqlClient`.
+If we choose to use Next's static site generation (SSG or ISG) we may be embedding data in our initial payload that's stale on the client. In this case, we may want to update this data immediately after rehydration.
+We can pass `staleWhileRevalidate: true` to `withUrqlClient`'s second option argument to Switch it to a mode where it'll refresh its rehydrated data immediately by issuing another network request.
 
 ```js
 export default withUrqlClient(
@@ -320,9 +322,8 @@ export default withUrqlClient(
 )(...);
 ```
 
-Now when the client finishes hydrating the data operations found in the payload will be redispatched as `network-only` so the
-latest results can be displayed. During this revalidation the results in your `useQuery` hook will have `result.stale` set to
-`true`.
+Now, although on rehydration we'll receive the stale data from our `ssrExchange` first, it'll also immediately issue another `network-only` operation to update the data.
+During this revalidation our stale results will be marked using `result.stale`. While this is similar to what we see with `cache-and-network` without server-side rendering, it isn't quite the same. Changing the request policy wouldn't actually refetch our data on rehydration as the `ssrExchange` is simply a replacement of a full network request. Hence, this flag allows us to treat this case separately.
 
 ### Resetting the client instance
 
