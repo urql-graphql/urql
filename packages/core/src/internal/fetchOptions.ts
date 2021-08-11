@@ -40,9 +40,7 @@ export const makeFetchURL = (
   if (body.query) {
     search.push(
       'query=' +
-        encodeURIComponent(
-          body.query.replace(/([\s,]|#[^\n\r]+)+/g, ' ').trim()
-        )
+        encodeURIComponent(body.query.replace(/#[^\n\r]+/g, ' ').trim())
     );
   }
 
