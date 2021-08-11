@@ -28,11 +28,9 @@ const executeIncrementalFetch = (
   operation: Operation,
   response: Response
 ): Promise<void> => {
+  // NOTE: Guarding against fetch polyfills here
   const contentType =
-    (response.headers &&
-      (response.headers.get('Content-Type') ||
-        response.headers['Content-Type'])) ||
-    '';
+    (response.headers && response.headers.get('Content-Type')) || '';
   if (!/multipart\/mixed/i.test(contentType)) {
     return response.json().then(payload => {
       onResult(makeResult(operation, payload, response));
