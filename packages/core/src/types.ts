@@ -1,10 +1,21 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode } from 'graphql';
+import { GraphQLError, DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
 
-export { ExecutionResult } from 'graphql';
+export type ExecutionResult =
+  | {
+      errors?: Array<string | Partial<GraphQLError> | Error>;
+      data?: null | Record<string, any>;
+      extensions?: Record<string, any>;
+      hasNext?: boolean;
+    }
+  | {
+      data: any;
+      path: (string | number)[];
+      hasNext?: boolean;
+    };
 
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
