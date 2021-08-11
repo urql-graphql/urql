@@ -52,7 +52,11 @@ export function withUrqlClient(
 
         if (!ssr || typeof window === 'undefined') {
           // We want to force the cache to hydrate, we do this by setting the isClient flag to true
-          ssr = ssrExchange({ initialState: urqlServerState, isClient: true });
+          ssr = ssrExchange({
+            initialState: urqlServerState,
+            isClient: true,
+            staleWhileRevalidate: options!.staleWhileRevalidate,
+          });
         } else if (!version) {
           ssr.restoreData(urqlServerState);
         }
