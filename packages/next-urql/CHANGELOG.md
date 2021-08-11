@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.2.0
+
+### Minor Changes
+
+- Add new `staleWhileRevalidate` option from the `ssrExchange` addition to `withUrqlClient`'s options. This is useful when Next.js is used in static site generation (SSG) mode, by [@kitten](https://github.com/kitten) (See [#1852](https://github.com/FormidableLabs/urql/pull/1852))
+
+### Patch Changes
+
+- Use the built-in `next` types for next-urql HOC return values, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1812](https://github.com/FormidableLabs/urql/pull/1812))
+
 ## 3.1.1
 
 ### Patch Changes
