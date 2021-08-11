@@ -112,15 +112,9 @@ export function authExchange<T>({
         .then(() => getAuth({ authState, mutate }))
         .then(updateAuthState);
 
-      const refreshAuth = (
-        operation: Operation,
-        addAuthAttempt: boolean
-      ): void => {
-        if (addAuthAttempt) {
-          operation = addAuthAttemptToOperation(operation, true);
-        }
-
+      const refreshAuth = (operation: Operation): void => {
         // add to retry queue to try again later
+        operation = addAuthAttemptToOperation(operation, true);
         retryQueue.set(operation.key, operation);
 
         // check that another operation isn't already doing refresh
@@ -153,12 +147,16 @@ export function authExchange<T>({
           pipe(
             pendingOps$,
             mergeMap(operation => {
+              if (retryQueue.has(operation.key)) {
+                return empty;
+              }
+
               if (
                 !authPromise &&
                 willAuthError &&
                 willAuthError({ operation, authState })
               ) {
-                refreshAuth(operation, false);
+                refreshAuth(operation);
                 return empty;
               } else if (!authPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
@@ -189,7 +187,7 @@ export function authExchange<T>({
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
             if (!operation.context.authAttempt) {
-              refreshAuth(operation, true);
+              refreshAuth(operation);
               return false;
             }
           }
