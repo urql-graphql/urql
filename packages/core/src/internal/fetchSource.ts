@@ -88,12 +88,17 @@ const executeIncrementalFetch = (
             } catch (_error) {}
           }
 
-          // hit a tail boundary, break
           if (
             next.slice(0, 2) === '--' ||
             (payload && payload.hasNext === false)
           ) {
-            if (nextResult) onResult(nextResult);
+            // break on tail boundary or when payload indicates no more results
+            if (nextResult) {
+              onResult(nextResult);
+            } else if (!prevResult) {
+              onResult(makeResult(operation, {}, response));
+            }
+
             return;
           }
         }
