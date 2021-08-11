@@ -114,7 +114,7 @@ export function authExchange<T>({
 
       const refreshAuth = (
         operation: Operation,
-        addAuthAttempt = true
+        addAuthAttempt: boolean
       ): void => {
         if (addAuthAttempt) {
           operation = addAuthAttemptToOperation(operation, true);
@@ -158,7 +158,7 @@ export function authExchange<T>({
                 willAuthError &&
                 willAuthError({ operation, authState })
               ) {
-                refreshAuth(operation);
+                refreshAuth(operation, false);
                 return empty;
               } else if (!authPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
@@ -189,7 +189,7 @@ export function authExchange<T>({
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
             if (!operation.context.authAttempt) {
-              refreshAuth(operation);
+              refreshAuth(operation, true);
               return false;
             }
           }
