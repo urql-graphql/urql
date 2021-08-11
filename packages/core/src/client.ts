@@ -230,9 +230,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       onPush(result => {
         replays.set(operation.key, result);
       }),
-      onStart(() => {
-        active.set(operation.key, source);
-      }),
       onEnd(() => {
         // Delete the active operation handle
         replays.delete(operation.key);
@@ -308,13 +305,17 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         return makeResultSource(operation);
       }
 
-      const source = active.get(operation.key) || makeResultSource(operation);
-
-      const isNetworkOperation =
-        operation.context.requestPolicy === 'cache-and-network' ||
-        operation.context.requestPolicy === 'network-only';
-
       return make(observer => {
+        let source = active.get(operation.key);
+
+        if (!source) {
+          active.set(operation.key, (source = makeResultSource(operation)));
+        }
+
+        const isNetworkOperation =
+          operation.context.requestPolicy === 'cache-and-network' ||
+          operation.context.requestPolicy === 'network-only';
+
         return pipe(
           source,
           onStart(() => {
