@@ -39,7 +39,8 @@ const client = createClient({
 ```
 
 The `ssrExchange` must be initialized with the `isClient` and `initialState` options. The `isClient`
-option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`.
+option tells the exchange whether it's on the server- or client-side. In our example we use `typeof window` to determine this, but in Webpack environments you may also be able to use `process.browser`. Optionally you can pass in `staleWhileRevalidate`, this property will ensure that when the data-hydration completes another
+operation will be dispatched to update the data, this can come in handy with statically generated applications.
 
 The `initialState` option should be set to the serialized data you retrieve on your server-side.
 This data may be retrieved using methods on `ssrExchange()`. You can retrieve the serialized data
@@ -204,7 +205,7 @@ Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimi
 // pages/index.js
 import React from 'react';
 import Head from 'next/head';
-import { useQuery } from "urql";
+import { useQuery } from 'urql';
 import { withUrqlClient } from 'next-urql';
 
 const Index = () => {
@@ -304,6 +305,24 @@ export default withUrqlClient(
 The above example will make sure the page is rendered as a static-page, it's important that you fully pre-populate your cache
 so in our case we were only interested in getting our todos, if there are child components relying on data you'll have to make
 sure these are fetched as well.
+
+### Stale while revalidate
+
+If you are using `SSG` (or `ISG`) it could be that you want to update the data when it has hydrated on the client, this can
+be solved by passing `staleWhileRevalidate` to the second argument of `withUrqlClient`.
+
+```js
+export default withUrqlClient(
+  ssr => ({
+    url: 'your-url',
+  }),
+  { staleWhileRevalidate: true }
+)(...);
+```
+
+Now when the client finishes hydrating the data operations found in the payload will be redispatched as `network-only` so the
+latest results can be displayed. During this revalidation the results in your `useQuery` hook will have `result.stale` set to
+`true`.
 
 ### Resetting the client instance
 
