@@ -2126,4 +2126,136 @@ describe('commutativity', () => {
 
     expect(data).toHaveProperty('node.name', 'subscription b');
   });
+
+  it('applies deferred results to previous layers', () => {
+    let normalData: any;
+    let deferredData: any;
+    let combinedData: any;
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+
+    const normalQuery = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const deferredQuery = gql`
+      {
+        ... @defer {
+          deferred {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const combinedQuery = gql`
+      {
+        node {
+          id
+          name
+        }
+        ... @defer {
+          deferred {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
+        res$,
+      ]);
+
+    pipe(
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
+      tap(result => {
+        if (result.operation.kind === 'query') {
+          if (result.operation.key === 1) {
+            deferredData = result.data;
+          } else if (result.operation.key === 42) {
+            combinedData = result.data;
+          } else {
+            normalData = result.data;
+          }
+        }
+      }),
+      publish
+    );
+
+    const combinedOp = client.createRequestOperation('query', {
+      key: 42,
+      query: combinedQuery,
+    });
+    const deferredOp = client.createRequestOperation('query', {
+      key: 1,
+      query: deferredQuery,
+    });
+    const normalOp = client.createRequestOperation('query', {
+      key: 2,
+      query: normalQuery,
+    });
+
+    nextOp(combinedOp);
+    nextOp(deferredOp);
+    nextOp(normalOp);
+
+    nextRes({
+      operation: deferredOp,
+      data: {
+        __typename: 'Query',
+      },
+      hasNext: true,
+    });
+
+    expect(deferredData).toHaveProperty('deferred', undefined);
+
+    nextRes({
+      operation: normalOp,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 2,
+          name: 'normal',
+        },
+      },
+    });
+
+    expect(normalData).toHaveProperty('node.id', 2);
+    expect(combinedData).toHaveProperty('deferred', undefined);
+    expect(combinedData).toHaveProperty('node.id', 2);
+
+    nextRes({
+      operation: deferredOp,
+      data: {
+        __typename: 'Query',
+        deferred: {
+          __typename: 'Node',
+          id: 1,
+          name: 'deferred',
+        },
+      },
+      hasNext: true,
+    });
+
+    expect(deferredData).toHaveProperty('deferred.id', 1);
+    expect(combinedData).toHaveProperty('deferred.id', 1);
+    expect(combinedData).toHaveProperty('node.id', 2);
+  });
 });
