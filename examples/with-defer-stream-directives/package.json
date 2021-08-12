@@ -1,5 +1,5 @@
 {
-  "name": "with-apq",
+  "name": "with-defer-stream-directives",
   "version": "0.0.0",
   "private": true,
   "scripts": {
