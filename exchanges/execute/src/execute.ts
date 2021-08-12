@@ -18,6 +18,7 @@ import {
 
 import {
   Exchange,
+  ExecutionResult,
   makeResult,
   makeErrorResult,
   Operation,
@@ -75,7 +76,7 @@ export const executeExchange = ({
               typeResolver
             );
           })
-          .then(result => makeResult(operation, result))
+          .then(result => makeResult(operation, result as ExecutionResult))
           .catch(err => makeErrorResult(operation, err));
 
         return pipe(
