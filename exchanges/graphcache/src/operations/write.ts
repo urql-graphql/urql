@@ -205,17 +205,9 @@ const writeSelection = (
     const fieldAlias = getFieldAlias(node);
     let fieldValue = data[fieldAlias];
 
-    if (
-      // Skip typename fields and assume they've already been written above
-      fieldName === '__typename' ||
-      // Fields marked as deferred that aren't defined must be skipped
-      (fieldValue === undefined && deferRef.current)
-    )
-      continue;
-
     // Development check of undefined fields
     if (process.env.NODE_ENV !== 'production') {
-      if (!isRoot && fieldValue === undefined) {
+      if (!isRoot && fieldValue === undefined && !deferRef.current) {
         const advice = ctx.optimistic
           ? '\nYour optimistic result may be missing a field!'
           : '';
@@ -239,6 +231,15 @@ const writeSelection = (
       } else if (ctx.store.schema && typename && fieldName !== '__typename') {
         isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
       }
+    }
+
+    if (
+      // Skip typename fields and assume they've already been written above
+      fieldName === '__typename' ||
+      // Fields marked as deferred that aren't defined must be skipped
+      (fieldValue === undefined && deferRef.current)
+    ) {
+      continue;
     }
 
     // Add the current alias to the walked path before processing the field's value
