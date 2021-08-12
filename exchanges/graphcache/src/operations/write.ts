@@ -12,6 +12,7 @@ import {
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
+  isFieldDeferred,
 } from '../ast';
 
 import { invariant, warn, pushDebugNode, popDebugNode } from '../helpers/help';
@@ -204,6 +205,15 @@ const writeSelection = (
     const fieldAlias = getFieldAlias(node);
     let fieldValue = data[fieldAlias];
 
+    if (
+      // Skip typename fields and assume they've already been written above
+      fieldName === '__typename' ||
+      // Fields marked as deferred that aren't defined must be skipped
+      (fieldValue === undefined && isFieldDeferred(node))
+    )
+      continue;
+
+    // Development check of undefined fields
     if (process.env.NODE_ENV !== 'production') {
       if (!isRoot && fieldValue === undefined) {
         const advice = ctx.optimistic
@@ -230,9 +240,6 @@ const writeSelection = (
         isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
       }
     }
-
-    // We simply skip all typenames fields and assume they've already been written above
-    if (fieldName === '__typename') continue;
 
     // Add the current alias to the walked path before processing the field's value
     ctx.__internal.path.push(fieldAlias);
