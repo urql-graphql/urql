@@ -1,12 +1,12 @@
 import {
+  Source,
   pipe,
   share,
   filter,
-  fromPromise,
   takeUntil,
-  onEnd,
   mergeMap,
   merge,
+  make,
 } from 'wonka';
 
 import {
@@ -21,7 +21,9 @@ import {
   ExecutionResult,
   makeResult,
   makeErrorResult,
+  mergeResultPatch,
   Operation,
+  OperationResult,
   getOperationName,
 } from '@urql/core';
 
@@ -32,6 +34,72 @@ export interface ExecuteExchangeArgs {
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
 }
+
+type ExecuteParams = Parameters<typeof execute>;
+
+const asyncIterator =
+  typeof Symbol !== 'undefined' ? Symbol.asyncIterator : null;
+
+const makeExecuteSource = (
+  operation: Operation,
+  args: ExecuteParams
+): Source<OperationResult> => {
+  return make<OperationResult>(observer => {
+    let ended = false;
+
+    Promise.resolve()
+      .then(() => {
+        if (ended) return;
+        return execute(...args) as any;
+      })
+      .then((result: ExecutionResult | AsyncIterable<ExecutionResult>) => {
+        if (ended || !result) {
+          return;
+        } else if (!asyncIterator || !result[asyncIterator]) {
+          observer.next(makeResult(operation, result as ExecutionResult));
+          return;
+        }
+
+        const iterator: AsyncIterator<ExecutionResult> = result[
+          asyncIterator!
+        ]();
+        let prevResult: OperationResult | null = null;
+
+        function next({
+          done,
+          value,
+        }: {
+          done?: boolean;
+          value: ExecutionResult;
+        }) {
+          if (value) {
+            observer.next(
+              (prevResult = prevResult
+                ? mergeResultPatch(prevResult, value)
+                : makeResult(operation, value))
+            );
+          }
+
+          if (!done && !ended) {
+            return iterator.next().then(next);
+          }
+        }
+
+        return iterator.next().then(next);
+      })
+      .then(() => {
+        observer.complete();
+      })
+      .catch(error => {
+        observer.next(makeErrorResult(operation, error));
+        observer.complete();
+      });
+
+    return () => {
+      ended = true;
+    };
+  });
+};
 
 /** Exchange for executing queries locally on a schema using graphql-js. */
 export const executeExchange = ({
@@ -58,32 +126,17 @@ export const executeExchange = ({
 
         const calculatedContext =
           typeof context === 'function' ? context(operation) : context;
-
-        let ended = false;
-
-        const result = Promise.resolve()
-          .then(() => {
-            if (ended) return;
-
-            return execute(
-              schema,
-              operation.query,
-              rootValue,
-              calculatedContext,
-              operation.variables,
-              getOperationName(operation.query),
-              fieldResolver,
-              typeResolver
-            );
-          })
-          .then(result => makeResult(operation, result as ExecutionResult))
-          .catch(err => makeErrorResult(operation, err));
-
         return pipe(
-          fromPromise(result),
-          onEnd(() => {
-            ended = true;
-          }),
+          makeExecuteSource(operation, [
+            schema,
+            operation.query,
+            rootValue,
+            calculatedContext,
+            operation.variables,
+            getOperationName(operation.query),
+            fieldResolver,
+            typeResolver,
+          ]),
           takeUntil(teardown$)
         );
       })
@@ -91,9 +144,7 @@ export const executeExchange = ({
 
     const forwardedOps$ = pipe(
       sharedOps$,
-      filter((operation: Operation) => {
-        return operation.kind !== 'query' && operation.kind !== 'mutation';
-      }),
+      filter(operation => operation.kind === 'teardown'),
       forward
     );
 

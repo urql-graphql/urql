@@ -1,4 +1,4 @@
-import { make } from 'wonka';
+import { Source, make } from 'wonka';
 import { Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
@@ -117,7 +117,7 @@ export const makeFetchSource = (
   operation: Operation,
   url: string,
   fetchOptions: RequestInit
-) => {
+): Source<OperationResult> => {
   const maxStatus = fetchOptions.redirect === 'manual' ? 400 : 300;
   const fetcher = operation.context.fetch;
 
