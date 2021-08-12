@@ -83,6 +83,8 @@ export interface OperationResult<Data = any, Variables = any> {
   extensions?: Record<string, any>;
   /** Optional stale flag added by exchanges that return stale results. */
   stale?: boolean;
+  /** Optional hasNext flag indicating deferred/streamed results are following. */
+  hasNext?: boolean;
 }
 
 /** Input parameters for to an Exchange factory function. */

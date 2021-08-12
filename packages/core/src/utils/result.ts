@@ -3,7 +3,7 @@ import { CombinedError } from './error';
 
 export const makeResult = (
   operation: Operation,
-  result: any,
+  result: ExecutionResult,
   response?: any
 ): OperationResult => {
   if ((!('data' in result) && !('errors' in result)) || 'path' in result) {
@@ -21,6 +21,7 @@ export const makeResult = (
       : undefined,
     extensions:
       (typeof result.extensions === 'object' && result.extensions) || undefined,
+    hasNext: !!result.hasNext,
   };
 };
 
@@ -57,6 +58,7 @@ export const mergeResultPatch = (
   }
 
   part[patch.path[i]] = patch.data;
+  result.hasNext = !!patch.hasNext;
   return result;
 };
 
