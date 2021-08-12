@@ -83,7 +83,7 @@ const executeIncrementalFetch = (
             try {
               payload = JSON.parse(body);
               prevResult = nextResult = prevResult
-                ? mergeResultPatch(prevResult, payload)
+                ? mergeResultPatch(prevResult, payload, response)
                 : makeResult(operation, payload, response);
             } catch (_error) {}
           }

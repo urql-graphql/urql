@@ -12,6 +12,7 @@ export type ExecutionResult =
       hasNext?: boolean;
     }
   | {
+      errors?: Array<string | Partial<GraphQLError> | Error>;
       data: any;
       path: (string | number)[];
       hasNext?: boolean;

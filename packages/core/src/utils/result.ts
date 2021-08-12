@@ -26,12 +26,22 @@ export const makeResult = (
 
 export const mergeResultPatch = (
   prevResult: OperationResult,
-  patch: ExecutionResult
+  patch: ExecutionResult,
+  response?: any
 ): OperationResult => {
   const result = { ...prevResult };
   if (!('path' in patch)) {
     if ('data' in patch) result.data = patch.data;
     return result;
+  }
+
+  if (Array.isArray(patch.errors)) {
+    result.error = new CombinedError({
+      graphQLErrors: result.error
+        ? [...result.error.graphQLErrors, ...patch.errors]
+        : patch.errors,
+      response,
+    });
   }
 
   let part: Record<string, any> | Array<any> = (prevResult.data = {
