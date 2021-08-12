@@ -58,7 +58,6 @@ const executeIncrementalFetch = (
   function next(data: ChunkData): Promise<void> | void {
     if (!data.done) {
       const chunk = toString(data.value);
-
       let boundaryIndex = chunk.indexOf(boundary);
       if (boundaryIndex > -1) {
         boundaryIndex += buffer.length;
