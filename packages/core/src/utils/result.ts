@@ -31,6 +31,8 @@ export const mergeResultPatch = (
   response?: any
 ): OperationResult => {
   const result = { ...prevResult };
+  result.hasNext = !!patch.hasNext;
+
   if (!('path' in patch)) {
     if ('data' in patch) result.data = patch.data;
     return result;
@@ -45,20 +47,19 @@ export const mergeResultPatch = (
     });
   }
 
-  let part: Record<string, any> | Array<any> = (prevResult.data = {
-    ...prevResult.data,
+  let part: Record<string, any> | Array<any> = (result.data = {
+    ...result.data,
   });
-  const i = 0;
 
-  for (let i = 0, l = patch.path.length - 1; i < l; i++) {
-    const prop = patch.path[i];
+  let i = 0;
+  while (i < patch.path.length - 1) {
+    const prop = patch.path[i++];
     part = part[prop] = Array.isArray(part[prop])
       ? [...part[prop]]
       : { ...part[prop] };
   }
 
   part[patch.path[i]] = patch.data;
-  result.hasNext = !!patch.hasNext;
   return result;
 };
 

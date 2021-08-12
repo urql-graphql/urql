@@ -10,12 +10,6 @@ const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
 
 type ChunkData = { done: false; value: Buffer | Uint8Array } | { done: true };
 
-interface AbstractReader {
-  next?(): Promise<ChunkData>;
-  read?(): Promise<ChunkData>;
-  cancel?(): void;
-}
-
 const toString = (input: Buffer | ArrayBuffer): string =>
   typeof Buffer !== 'undefined' && Buffer.isBuffer(input)
     ? input.toString()
@@ -37,15 +31,21 @@ const executeIncrementalFetch = (
     });
   }
 
-  let boundary = '-';
+  let boundary = '---';
   const boundaryHeader = contentType.match(boundaryHeaderRe);
-  if (boundaryHeader) boundary = boundaryHeader[1];
+  if (boundaryHeader) boundary = '--' + boundaryHeader[1];
 
-  let iterator: AbstractReader;
+  let read: () => Promise<ChunkData>;
+  let cancel = () => {
+    /*noop*/
+  };
   if (asyncIterator && response[asyncIterator]) {
-    iterator = response[asyncIterator]();
+    const iterator = response[asyncIterator]();
+    read = iterator.next.bind(iterator);
   } else if ('body' in response && response.body) {
-    iterator = response.body.getReader();
+    const reader = response.body.getReader();
+    cancel = reader.cancel.bind(reader);
+    read = reader.read.bind(reader);
   } else {
     throw new TypeError('Streaming requests unsupported');
   }
@@ -82,24 +82,16 @@ const executeIncrementalFetch = (
           if (jsonHeaderRe.test(headers)) {
             try {
               payload = JSON.parse(body);
-              prevResult = nextResult = prevResult
+              nextResult = prevResult = prevResult
                 ? mergeResultPatch(prevResult, payload, response)
                 : makeResult(operation, payload, response);
             } catch (_error) {}
           }
 
-          if (
-            next.slice(0, 2) === '--' ||
-            (payload && payload.hasNext === false)
-          ) {
-            // break on tail boundary or when payload indicates no more results
-            if (nextResult) {
-              onResult(nextResult);
-            } else if (!prevResult) {
-              onResult(makeResult(operation, {}, response));
-            }
-
-            return;
+          if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
+            if (!prevResult)
+              return onResult(makeResult(operation, {}, response));
+            break;
           }
         }
 
@@ -113,16 +105,12 @@ const executeIncrementalFetch = (
       nextResult = null;
     }
 
-    if (!data.done) {
-      return (iterator.next || iterator.read)!().then(next);
+    if (!data.done && (!prevResult || prevResult.hasNext)) {
+      return read().then(next);
     }
   }
 
-  return (iterator.next || iterator.read)!()
-    .then(next)
-    .finally(() => {
-      if (iterator.cancel) iterator.cancel();
-    });
+  return read().then(next).finally(cancel);
 };
 
 export const makeFetchSource = (
