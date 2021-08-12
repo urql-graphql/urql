@@ -187,6 +187,7 @@ export const noopDataState = (
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
+  if (layerKey && !isOptimistic) data.deferredKeys.delete(layerKey);
   initDataState('read', data, layerKey, isOptimistic);
   clearDataState();
 };
