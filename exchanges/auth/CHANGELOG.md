@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6
+
+### Patch Changes
+
+- ⚠️ Fix willAuthError causing duplicate operations, by [@yankovalera](https://github.com/yankovalera) (See [#1849](https://github.com/FormidableLabs/urql/pull/1849))
+- Updated dependencies (See [#1851](https://github.com/FormidableLabs/urql/pull/1851), [#1850](https://github.com/FormidableLabs/urql/pull/1850), and [#1852](https://github.com/FormidableLabs/urql/pull/1852))
+  - @urql/core@2.2.0
+
 ## 0.1.5
 
 ### Patch Changes

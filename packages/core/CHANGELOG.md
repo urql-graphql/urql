@@ -1,5 +1,18 @@
 # @urql/core
 
+## 2.2.0
+
+### Minor Changes
+
+- Add a `staleWhileRevalidate` option to the `ssrExchange`, which allows the client to immediately refetch a new result on hydration, which may be used for cached / stale SSR or SSG pages. This is different from using `cache-and-network` by default (which isn't recommended) as the `ssrExchange` typically acts like a "replacement fetch request", by [@kitten](https://github.com/kitten) (See [#1852](https://github.com/FormidableLabs/urql/pull/1852))
+
+### Patch Changes
+
+- ⚠️ Fix prevent mangling embedded strings in queries sent using the `GET` method, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1851](https://github.com/FormidableLabs/urql/pull/1851))
+- The [single-source behavior previously](https://github.com/FormidableLabs/urql/pull/1515) wasn't effective for implementations like React,
+  where the issue presents itself when the state of an operation is first polled. This led to the operation being torn down erroneously.
+  We now ensure that operations started at the same time still use a shared single-source, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1850](https://github.com/FormidableLabs/urql/pull/1850))
+
 ## 2.1.6
 
 ### Patch Changes
