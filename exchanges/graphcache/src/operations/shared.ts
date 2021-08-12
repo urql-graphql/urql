@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 
 import {
+  isDeferred,
   isInlineFragment,
   getTypeCondition,
   getSelectionSet,
@@ -18,7 +19,12 @@ import {
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
-import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
+import {
+  markDefer,
+  getFieldArguments,
+  shouldInclude,
+  isInterfaceOfType,
+} from '../ast';
 
 import {
   Fragments,
@@ -41,6 +47,7 @@ export interface Context {
   fieldName: string;
   error: GraphQLError | undefined;
   partial: boolean;
+  defer: boolean;
   optimistic: boolean;
   __internal: {
     path: Array<string | number>;
@@ -76,6 +83,7 @@ export const makeContext = (
     fieldName: '',
     error: undefined,
     partial: false,
+    defer: false,
     optimistic: !!optimistic,
     __internal: {
       path: [],
@@ -155,17 +163,20 @@ export const makeSelectionIterator = (
   select: SelectionSet,
   ctx: Context
 ): SelectionIterator => {
+  let childDeferred = false;
   let childIterator: SelectionIterator | void;
   let index = 0;
 
   return function next() {
     if (childIterator !== undefined) {
       const node = childIterator();
-      if (node !== undefined) {
+      if (node != null) {
+        if (childDeferred) markDefer(node);
         return node;
       }
 
       childIterator = undefined;
+      childDeferred = false;
       if (process.env.NODE_ENV !== 'production') {
         popDebugNode();
       }
@@ -190,12 +201,12 @@ export const makeSelectionIterator = (
                 entityKey,
                 ctx.variables
               );
-
           if (isMatching) {
             if (process.env.NODE_ENV !== 'production') {
               pushDebugNode(typename, fragmentNode);
             }
 
+            childDeferred = !!isDeferred(node, ctx.variables);
             return (childIterator = makeSelectionIterator(
               typename,
               entityKey,
