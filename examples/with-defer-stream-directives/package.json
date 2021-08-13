@@ -5,6 +5,9 @@
   "scripts": {
     "start": "concurrently -k \"vite\" \"node server/index.js\""
   },
+  "resolutions": {
+    "@urql/core": "2.3.0-defer.0"
+  },
   "dependencies": {
     "graphql": "15.4.0-experimental-stream-defer.1",
     "react": "^17.0.2",
