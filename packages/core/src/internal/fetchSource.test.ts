@@ -163,7 +163,7 @@ describe('on multipart/mixed', () => {
     JSON.stringify(json) +
     '\r\n---';
 
-  it('listens for more responses', async () => {
+  it('listens for more responses (stream)', async () => {
     fetch.mockResolvedValue({
       status: 200,
       headers: {
@@ -285,6 +285,253 @@ describe('on multipart/mixed', () => {
           { id: '1', text: 'stream', __typename: 'Todo' },
           { id: '2', text: 'defer', __typename: 'Todo' },
         ],
+      },
+    });
+  });
+
+  it('listens for more responses (defer)', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      __typename: 'Author',
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  path: ['author'],
+                  data: { name: 'Steve' },
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const AuthorFragment = gql`
+      fragment authorFields on Author {
+        name
+      }
+    `;
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              ...authorFields @defer
+            }
+          }
+
+          ${AuthorFragment}
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[2].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+  });
+
+  it('listens for more responses (defer-neted)', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      name: 'Steve',
+                      address: {
+                        country: 'UK',
+                        __typename: 'Address',
+                      },
+                      __typename: 'Author',
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  path: ['author', 'address'],
+                  data: { street: 'home' },
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const AddressFragment = gql`
+      fragment addressFields on Address {
+        street
+      }
+    `;
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              address {
+                id
+                country
+                ...addressFields @defer
+              }
+            }
+          }
+
+          ${AddressFragment}
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        address: {
+          country: 'UK',
+          __typename: 'Address',
+        },
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        address: {
+          country: 'UK',
+          street: 'home',
+          __typename: 'Address',
+        },
+        __typename: 'Author',
       },
     });
   });

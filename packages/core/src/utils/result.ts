@@ -52,14 +52,27 @@ export const mergeResultPatch = (
   });
 
   let i = 0;
+  let original;
   while (i < patch.path.length - 1) {
     const prop = patch.path[i++];
+    original = original ? original[prop] : result.data[prop];
     part = part[prop] = Array.isArray(part[prop])
       ? [...part[prop]]
-      : { ...part[prop] };
+      : { ...original, ...part[prop] };
   }
 
-  part[patch.path[i]] = patch.data;
+  if (
+    typeof part[patch.path[i]] === 'object' &&
+    !Array.isArray(part[patch.path[i]])
+  ) {
+    part[patch.path[i]] = {
+      ...(original ? original : result.data)[patch.path[i]],
+      ...patch.data,
+    };
+  } else {
+    part[patch.path[i]] = patch.data;
+  }
+
   return result;
 };
 
