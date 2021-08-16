@@ -1125,7 +1125,7 @@ describe('custom resolvers', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(fakeResolver).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(1);
-    expect(result.mock.calls[0][0].data).toEqual({
+    expect(result.mock.calls[0][0].data).toMatchObject({
       author: {
         id: '123',
         name: 'newName',
@@ -1491,7 +1491,7 @@ describe('schema awareness', () => {
     jest.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(0);
-    expect(result.mock.calls[0][0].data).toEqual({
+    expect(result.mock.calls[0][0].data).toMatchObject({
       todos: [
         {
           __typename: 'Todo',

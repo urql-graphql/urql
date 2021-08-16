@@ -94,14 +94,15 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
+  if (!input) input = makeDataMap();
   // NOTE: This may reuse "previous result data" as indicated by the
   // `originalData` argument in readRoot(). This behaviour isn't used
   // for readSelection() however, which always produces results from
   // scratch
   const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, input || ({} as Data))
-      : readSelection(ctx, rootKey, rootSelect, {} as Data);
+      ? readRoot(ctx, rootKey, rootSelect, input)
+      : readSelection(ctx, rootKey, rootSelect, input);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -172,16 +173,18 @@ const readRootField = (
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
+    let hasChanged = false;
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
       // Recursively read the root field's value
       newData[i] = readRootField(ctx, select, originalData[i]);
+      hasChanged = hasChanged || newData[i] !== originalData[i];
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
     }
 
-    return newData;
+    return hasChanged ? newData : originalData;
   } else if (originalData === null) {
     return null;
   }
@@ -191,8 +194,7 @@ const readRootField = (
   if (entityKey !== null) {
     // We assume that since this is used for result data this can never be undefined,
     // since the result data has already been written to the cache
-    const fieldValue = readSelection(ctx, entityKey, select, {} as Data);
-    return fieldValue === undefined ? null : fieldValue;
+    return readSelection(ctx, entityKey, select, originalData) || null;
   } else {
     return readRoot(ctx, originalData.__typename, select, originalData);
   }
@@ -246,7 +248,7 @@ export const readFragment = (
   );
 
   const result =
-    readSelection(ctx, entityKey, getSelectionSet(fragment), {} as Data) ||
+    readSelection(ctx, entityKey, getSelectionSet(fragment), makeDataMap()) ||
     null;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -303,11 +305,11 @@ const readSelection = (
 
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
-  let output = data;
-  let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
-  let hasChanged = false;
+  let hasChanged = typename !== data.__typename;
+  let output = hasChanged ? makeDataMap(data) : data;
+  let node: FieldNode | void;
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -468,6 +470,8 @@ const resolveResolverResult = (
       ? isListNullable(store.schema, typename, fieldName)
       : false;
     const data = new Array(result.length);
+    let hasChanged =
+      !Array.isArray(prevData) || result.length !== prevData.length;
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -489,18 +493,15 @@ const resolveResolverResult = (
         return undefined;
       } else {
         data[i] = childResult !== undefined ? childResult : null;
+        hasChanged = hasChanged || data[i] !== prevData![i];
       }
     }
 
-    return data;
+    return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
-  } else if (prevData === null) {
-    // If we've previously set this piece of data to be null,
-    // we skip it and return null immediately
-    return null;
   } else if (isDataOrKey(result)) {
-    const data = (prevData || {}) as Data;
+    const data = (prevData || makeDataMap()) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -531,6 +532,8 @@ const resolveLink = (
       ? isListNullable(store.schema, typename, fieldName)
       : false;
     const newLink = new Array(link.length);
+    let hasChanged =
+      !Array.isArray(prevData) || newLink.length !== prevData.length;
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -541,7 +544,7 @@ const resolveLink = (
         typename,
         fieldName,
         select,
-        prevData != null ? prevData[i] : undefined
+        Array.isArray(prevData) ? prevData[i] : null
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -549,18 +552,17 @@ const resolveLink = (
       if (childLink === undefined && !_isListNullable) {
         return undefined;
       } else {
-        newLink[i] = childLink !== undefined ? childLink : null;
+        newLink[i] = childLink || null;
+        hasChanged = hasChanged || newLink[i] !== prevData![i];
       }
     }
 
-    return newLink;
-  } else if (link === null || prevData === null) {
-    // If the link is set to null or we previously set this piece of data to be null,
-    // we skip it and return null immediately
+    return hasChanged ? newLink : (prevData as Data[]);
+  } else if (link === null) {
     return null;
-  } else {
-    return readSelection(ctx, link, select, (prevData || {}) as Data);
   }
+
+  return readSelection(ctx, link, select, (prevData || makeDataMap()) as Data);
 };
 
 const isDataOrKey = (x: any): x is string | Data =>

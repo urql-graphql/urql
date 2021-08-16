@@ -3,7 +3,6 @@
 import { gql } from '@urql/core';
 import { minifyIntrospectionQuery } from '@urql/introspection';
 
-import { Data } from '../types';
 import { Store } from '../store';
 import { write } from './write';
 import { query } from './query';
@@ -129,85 +128,6 @@ describe('Query', () => {
     query(store, { query: INVALID_TODO_QUERY });
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect((console.warn as any).mock.calls[0][0]).toMatch(/writer/);
-  });
-
-  it('should not overwrite different arrays from results and queries', () => {
-    const TODO_QUERY = gql`
-      query Todos {
-        todos {
-          __typename
-          node {
-            __typename
-            id
-            text
-            author {
-              __typename
-              id
-            }
-          }
-        }
-      }
-    `;
-
-    store = new Store({
-      resolvers: {
-        Query: {
-          todos: (_parent, _args, cache) => cache.resolve('Query', 'todos'),
-        },
-      },
-    });
-
-    const expected = ({
-      todos: [
-        {
-          __typename: 'TodoEdge',
-          node: {
-            __typename: 'Todo',
-            id: '0',
-            text: 'Teach',
-            author: {
-              __typename: 'Author',
-              id: 'writy-mcwriteface',
-            },
-          },
-        },
-        {
-          __typename: 'TodoEdge',
-          node: {
-            __typename: 'Todo',
-            id: '1',
-            text: 'Learn',
-            author: null,
-          },
-        },
-      ],
-    } as any) as Data;
-
-    write(store, { query: TODO_QUERY }, expected);
-
-    const result = query(
-      store,
-      { query: TODO_QUERY },
-      {
-        __typename: 'Query',
-        todos: [
-          // NOTE: This is a partial list of later results
-          {
-            __typename: 'TodoEdge',
-            node: {
-              id: '1',
-              text: 'Learn',
-              __typename: 'Todo',
-              author: null,
-            },
-          },
-        ],
-      }
-    );
-
-    expect(result.data).toEqual(expected);
-    expect(result.data).not.toBe(expected);
-    expect(result.data!.todos![0]).not.toBe(expected!.todos![0]);
   });
 
   // Issue#64
