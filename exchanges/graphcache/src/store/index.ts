@@ -2,6 +2,8 @@ export {
   initDataState,
   clearDataState,
   noopDataState,
+  makeData,
+  ownsData,
   reserveLayer,
   getCurrentOperation,
   getCurrentDependencies,

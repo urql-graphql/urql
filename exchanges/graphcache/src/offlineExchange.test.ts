@@ -168,10 +168,7 @@ describe('offline', () => {
 
     next(queryOp);
     expect(result).toBeCalledTimes(1);
-    expect(result.mock.calls[0][0].data).toEqual({
-      ...queryOneData,
-      __typename: undefined,
-    });
+    expect(result.mock.calls[0][0].data).toMatchObject(queryOneData);
 
     next(mutationOp);
     expect(result).toBeCalledTimes(1);
@@ -192,7 +189,7 @@ describe('offline', () => {
 
     next(queryOp);
     expect(result).toBeCalledTimes(2);
-    expect(result.mock.calls[1][0].data).toEqual({
+    expect(result.mock.calls[1][0].data).toMatchObject({
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
     });
   });

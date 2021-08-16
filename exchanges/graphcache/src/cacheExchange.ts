@@ -28,7 +28,7 @@ import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
-import { Dependencies, CacheExchangeOpts } from './types';
+import { Data, Dependencies, CacheExchangeOpts } from './types';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -37,6 +37,7 @@ type OperationResultWithMeta = OperationResult & {
 
 type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
+type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
 type DependentOperations = Record<string, number[]>;
 
@@ -54,7 +55,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
   const optimisticKeysToDependencies: OptimisticDependencies = new Map();
   const mutationResultBuffer: OperationResult[] = [];
-  const ops: OperationMap = new Map();
+  const operations: OperationMap = new Map();
+  const results: ResultMap = new Map();
   const blockedDependencies: Dependencies = makeDict();
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = makeDict();
@@ -89,9 +91,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
       if (key !== operation.key) {
-        const op = ops.get(key);
+        const op = operations.get(key);
         if (op) {
-          ops.delete(key);
+          operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
           if (requestedRefetch.has(key)) {
             requestedRefetch.delete(key);
@@ -110,7 +112,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       reserveLayer(store.data, operation.key);
     } else if (operation.kind === 'teardown') {
       // Delete reference to operation if any exists to release it
-      ops.delete(operation.key);
+      operations.delete(operation.key);
+      results.delete(operation.key);
       // Mark operation layer as done
       noopDataState(store.data, operation.key);
     } else if (
@@ -155,7 +158,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const updateDependencies = (op: Operation, dependencies: Dependencies) => {
     for (const dep in dependencies) {
       (deps[dep] || (deps[dep] = [])).push(op.key);
-      ops.set(op.key, op);
+      operations.set(op.key, op);
     }
   };
 
@@ -164,20 +167,21 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
-    const res = query(store, operation);
-    const cacheOutcome: CacheOutcome = res.data
-      ? !res.partial
+    const result = query(store, operation, results.get(operation.key));
+    const cacheOutcome: CacheOutcome = result.data
+      ? !result.partial
         ? 'hit'
         : 'partial'
       : 'miss';
 
-    updateDependencies(operation, res.dependencies);
+    results.set(operation.key, result.data);
+    updateDependencies(operation, result.dependencies);
 
     return {
       outcome: cacheOutcome,
       operation,
-      data: res.data,
-      dependencies: res.dependencies,
+      data: result.data,
+      dependencies: result.dependencies,
     };
   };
 
@@ -199,30 +203,28 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     }
 
     let queryDependencies: void | Dependencies;
-    if (result.data) {
+    let data: Data | null = result.data;
+    if (data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
-      const writeDependencies = write(
-        store,
-        operation,
-        result.data,
-        result.error,
-        key
-      ).dependencies;
+      const writeDependencies = write(store, operation, data, result.error, key)
+        .dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
       const queryResult = query(
         store,
         operation,
-        result.data,
+        operation.kind === 'query' ? results.get(operation.key) || data : data,
         result.error,
         key
       );
-      result.data = queryResult.data;
+
+      data = queryResult.data;
       if (operation.kind === 'query') {
         // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
         collectPendingOperations(pendingOperations, queryDependencies);
+        results.set(operation.key, result.data);
       }
     } else {
       noopDataState(store.data, operation.key);
@@ -233,7 +235,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       updateDependencies(result.operation, queryDependencies);
     }
 
-    return { data: result.data, error, extensions, operation };
+    return { data, error, extensions, operation };
   };
 
   return ops$ => {

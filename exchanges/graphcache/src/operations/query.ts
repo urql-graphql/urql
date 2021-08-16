@@ -30,6 +30,8 @@ import {
   clearDataState,
   joinKeys,
   keyOfField,
+  makeData,
+  ownsData,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
@@ -59,7 +61,7 @@ export interface QueryResult {
 export const query = (
   store: Store,
   request: OperationRequest,
-  data?: Data,
+  data?: Data | null | undefined,
   error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
@@ -72,7 +74,7 @@ export const query = (
 export const read = (
   store: Store,
   request: OperationRequest,
-  input?: Data,
+  input?: Data | null | undefined,
   error?: CombinedError | undefined
 ): QueryResult => {
   const operation = getMainOperation(request.query);
@@ -93,14 +95,15 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
+  if (!input) input = makeData();
   // NOTE: This may reuse "previous result data" as indicated by the
   // `originalData` argument in readRoot(). This behaviour isn't used
   // for readSelection() however, which always produces results from
   // scratch
   const data =
     rootKey !== ctx.store.rootFields['query']
-      ? readRoot(ctx, rootKey, rootSelect, input || ({} as Data))
-      : readSelection(ctx, rootKey, rootSelect, {} as Data);
+      ? readRoot(ctx, rootKey, rootSelect, input)
+      : readSelection(ctx, rootKey, rootSelect, input);
 
   if (process.env.NODE_ENV !== 'production') {
     popDebugNode();
@@ -117,36 +120,45 @@ const readRoot = (
   ctx: Context,
   entityKey: string,
   select: SelectionSet,
-  originalData: Data
+  data: Data
 ): Data => {
-  const typename = ctx.store.rootNames[entityKey]
-    ? entityKey
-    : originalData.__typename;
+  const typename = ctx.store.rootNames[entityKey] ? entityKey : data.__typename;
   if (typeof typename !== 'string') {
-    return originalData;
+    return data;
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
-  const data = { __typename: typename };
 
   let node: FieldNode | void;
+  let hasChanged = false;
+  const output = makeData(data);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
-    const fieldValue = originalData[fieldAlias];
+    const fieldValue = output[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
     ctx.__internal.path.push(fieldAlias);
-    // Process the root field's value
+    // We temporarily store the data field in here, but undefined
+    // means that the value is missing from the cache
+    let dataFieldValue: void | DataField;
     if (node.selectionSet && fieldValue !== null) {
-      const fieldData = ensureData(fieldValue);
-      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
+      dataFieldValue = readRootField(
+        ctx,
+        getSelectionSet(node),
+        ensureData(fieldValue)
+      );
     } else {
-      data[fieldAlias] = fieldValue;
+      dataFieldValue = fieldValue;
     }
+
+    // Check for any referential changes in the field's value
+    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    output[fieldAlias] = dataFieldValue!;
+
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
   }
 
-  return data;
+  return hasChanged ? output : data;
 };
 
 const readRootField = (
@@ -156,16 +168,18 @@ const readRootField = (
 ): Link<Data> => {
   if (Array.isArray(originalData)) {
     const newData = new Array(originalData.length);
+    let hasChanged = false;
     for (let i = 0, l = originalData.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
       // Recursively read the root field's value
       newData[i] = readRootField(ctx, select, originalData[i]);
+      hasChanged = hasChanged || newData[i] !== originalData[i];
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
     }
 
-    return newData;
+    return hasChanged ? newData : originalData;
   } else if (originalData === null) {
     return null;
   }
@@ -175,8 +189,7 @@ const readRootField = (
   if (entityKey !== null) {
     // We assume that since this is used for result data this can never be undefined,
     // since the result data has already been written to the cache
-    const fieldValue = readSelection(ctx, entityKey, select, {} as Data);
-    return fieldValue === undefined ? null : fieldValue;
+    return readSelection(ctx, entityKey, select, originalData) || null;
   } else {
     return readRoot(ctx, originalData.__typename, select, originalData);
   }
@@ -230,7 +243,7 @@ export const readFragment = (
   );
 
   const result =
-    readSelection(ctx, entityKey, getSelectionSet(fragment), {} as Data) ||
+    readSelection(ctx, entityKey, getSelectionSet(fragment), makeData()) ||
     null;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -287,9 +300,11 @@ const readSelection = (
 
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
-  let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
+  let hasChanged = typename !== data.__typename;
+  let node: FieldNode | void;
+  const output = makeData(data);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -305,19 +320,16 @@ const readSelection = (
       isFieldAvailableOnType(store.schema, typename, fieldName);
     }
 
-    // We directly assign typenames and skip the field afterwards
-    if (fieldName === '__typename') {
-      data[fieldAlias] = typename;
-      continue;
-    }
-
+    // Add the current alias to the walked path before processing the field's value
+    ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
-    // Add the current alias to the walked path before processing the field's value
-    ctx.__internal.path.push(fieldAlias);
 
-    if (resultValue !== undefined && node.selectionSet === undefined) {
+    if (fieldName === '__typename') {
+      // We directly assign the typename as it's already available
+      dataFieldValue = typename;
+    } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (
@@ -332,11 +344,11 @@ const readSelection = (
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
       if (fieldValue !== undefined) {
-        data[fieldAlias] = fieldValue;
+        output[fieldAlias] = fieldValue;
       }
 
       dataFieldValue = resolvers[fieldName](
-        data,
+        output,
         fieldArgs || ({} as Variables),
         store,
         ctx
@@ -351,8 +363,9 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          data[fieldAlias] as Data,
-          dataFieldValue
+          output[fieldAlias] as Data,
+          dataFieldValue,
+          ownsData(output)
         );
       }
 
@@ -376,8 +389,9 @@ const readSelection = (
         fieldName,
         key,
         getSelectionSet(node),
-        data[fieldAlias] as Data,
-        resultValue
+        output[fieldAlias] as Data,
+        resultValue,
+        ownsData(output)
       );
     } else {
       // Otherwise we attempt to get the missing field from the cache
@@ -390,7 +404,8 @@ const readSelection = (
           typename,
           fieldName,
           getSelectionSet(node),
-          data[fieldAlias] as Data
+          output[fieldAlias] as Data,
+          ownsData(output)
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -398,39 +413,40 @@ const readSelection = (
       }
     }
 
-    // If we have an error registered for the current field change undefined values to null
-    if (dataFieldValue === undefined && !!getFieldError(ctx)) {
-      hasPartials = true;
-      dataFieldValue = null;
-    }
-
-    // After processing the field, remove the current alias from the path again
-    ctx.__internal.path.pop();
-
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
     if (
       dataFieldValue === undefined &&
-      store.schema &&
-      isFieldNullable(store.schema, typename, fieldName)
+      ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
+        !!getFieldError(ctx))
     ) {
-      // The field is uncached but we have a schema that says it's nullable
-      // Set the field to null and continue
+      // The field is uncached or has errored, so it'll be set to null and skipped
       hasPartials = true;
-      data[fieldAlias] = null;
-    } else if (dataFieldValue === undefined) {
-      // The field is uncached and not nullable; return undefined
-      return undefined;
+      dataFieldValue = null;
     } else {
       // Otherwise continue as usual
-      hasFields = true;
-      data[fieldAlias] = dataFieldValue;
+      hasFields = fieldName !== '__typename';
     }
+
+    // After processing the field, remove the current alias from the path again
+    ctx.__internal.path.pop();
+    // Return undefined immediately when a field is uncached
+    if (dataFieldValue === undefined) {
+      return undefined;
+    }
+
+    // Check for any referential changes in the field's value
+    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    output[fieldAlias] = dataFieldValue;
   }
 
-  if (hasPartials) ctx.partial = true;
-  return isQuery && hasPartials && !hasFields ? undefined : data;
+  ctx.partial = ctx.partial || hasPartials;
+  return isQuery && hasPartials && !hasFields
+    ? undefined
+    : hasChanged
+    ? output
+    : data;
 };
 
 const resolveResolverResult = (
@@ -440,7 +456,8 @@ const resolveResolverResult = (
   key: string,
   select: SelectionSet,
   prevData: void | null | Data | Data[],
-  result: void | DataField
+  result: void | DataField,
+  skipNull: boolean
 ): DataField | void => {
   if (Array.isArray(result)) {
     const { store } = ctx;
@@ -450,6 +467,8 @@ const resolveResolverResult = (
       ? isListNullable(store.schema, typename, fieldName)
       : false;
     const data = new Array(result.length);
+    let hasChanged =
+      !Array.isArray(prevData) || result.length !== prevData.length;
     for (let i = 0, l = result.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -460,9 +479,9 @@ const resolveResolverResult = (
         fieldName,
         joinKeys(key, `${i}`),
         select,
-        // Get the inner previous data from prevData
         prevData != null ? prevData[i] : undefined,
-        result[i]
+        result[i],
+        skipNull
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -471,18 +490,17 @@ const resolveResolverResult = (
         return undefined;
       } else {
         data[i] = childResult !== undefined ? childResult : null;
+        hasChanged = hasChanged || data[i] !== prevData![i];
       }
     }
 
-    return data;
+    return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
-  } else if (prevData === null) {
-    // If we've previously set this piece of data to be null,
-    // we skip it and return null immediately
+  } else if (skipNull && prevData === null) {
     return null;
   } else if (isDataOrKey(result)) {
-    const data = (prevData || {}) as Data;
+    const data = (prevData || makeData()) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -505,7 +523,8 @@ const resolveLink = (
   typename: string,
   fieldName: string,
   select: SelectionSet,
-  prevData: void | null | Data | Data[]
+  prevData: void | null | Data | Data[],
+  skipNull: boolean
 ): DataField | undefined => {
   if (Array.isArray(link)) {
     const { store } = ctx;
@@ -513,6 +532,8 @@ const resolveLink = (
       ? isListNullable(store.schema, typename, fieldName)
       : false;
     const newLink = new Array(link.length);
+    let hasChanged =
+      !Array.isArray(prevData) || newLink.length !== prevData.length;
     for (let i = 0, l = link.length; i < l; i++) {
       // Add the current index to the walked path before reading the field's value
       ctx.__internal.path.push(i);
@@ -523,7 +544,8 @@ const resolveLink = (
         typename,
         fieldName,
         select,
-        prevData != null ? prevData[i] : undefined
+        prevData != null ? prevData[i] : undefined,
+        skipNull
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -531,18 +553,17 @@ const resolveLink = (
       if (childLink === undefined && !_isListNullable) {
         return undefined;
       } else {
-        newLink[i] = childLink !== undefined ? childLink : null;
+        newLink[i] = childLink || null;
+        hasChanged = hasChanged || newLink[i] !== prevData![i];
       }
     }
 
-    return newLink;
-  } else if (link === null || prevData === null) {
-    // If the link is set to null or we previously set this piece of data to be null,
-    // we skip it and return null immediately
+    return hasChanged ? newLink : (prevData as Data[]);
+  } else if (link === null || (prevData === null && ownsData)) {
     return null;
-  } else {
-    return readSelection(ctx, link, select, (prevData || {}) as Data);
   }
+
+  return readSelection(ctx, link, select, (prevData || makeData()) as Data);
 };
 
 const isDataOrKey = (x: any): x is string | Data =>
