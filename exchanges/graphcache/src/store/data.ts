@@ -56,6 +56,7 @@ export interface InMemoryData {
 }
 
 let currentOwnership: null | Set<Data> = null;
+let currentDataMapping: null | Map<Data, Data> = null;
 let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
@@ -69,8 +70,15 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
 
 /** Creates a new data object unless it's been created in this data run */
 export const makeData = (data?: Data): Data => {
-  if (data && currentOwnership!.has(data)) return data;
-  const newData = { ...data } as Data;
+  let newData: Data;
+  if (data) {
+    if (currentOwnership!.has(data)) return data;
+    newData = currentDataMapping!.get(data) || ({ ...data } as Data);
+    currentDataMapping!.set(data, newData);
+  } else {
+    newData = {} as Data;
+  }
+
   currentOwnership!.add(newData);
   return newData;
 };
@@ -86,6 +94,7 @@ export const initDataState = (
   isOptimistic?: boolean
 ) => {
   currentOwnership = new Set();
+  currentDataMapping = new Map();
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
@@ -148,6 +157,7 @@ export const clearDataState = () => {
   }
 
   currentOwnership = null;
+  currentDataMapping = null;
   currentOperation = null;
   currentData = null;
   currentDependencies = null;

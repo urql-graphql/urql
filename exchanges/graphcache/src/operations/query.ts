@@ -129,9 +129,9 @@ const readRoot = (
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
 
-  let output = data;
   let node: FieldNode | void;
   let hasChanged = false;
+  const output = makeData(data);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
     const fieldValue = output[fieldAlias];
@@ -151,20 +151,14 @@ const readRoot = (
     }
 
     // Check for any referential changes in the field's value
-    if (dataFieldValue !== output[fieldAlias]) {
-      if (!hasChanged) {
-        output = makeData(data);
-        hasChanged = true;
-      }
-
-      output[fieldAlias] = dataFieldValue!;
-    }
+    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    output[fieldAlias] = dataFieldValue!;
 
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
   }
 
-  return output;
+  return hasChanged ? output : data;
 };
 
 const readRootField = (
@@ -309,8 +303,8 @@ const readSelection = (
   let hasFields = false;
   let hasPartials = false;
   let hasChanged = typename !== data.__typename;
-  let output = hasChanged ? makeData(data) : data;
   let node: FieldNode | void;
+  const output = makeData(data);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -443,18 +437,16 @@ const readSelection = (
     }
 
     // Check for any referential changes in the field's value
-    if (dataFieldValue !== output[fieldAlias]) {
-      if (!hasChanged) {
-        output = makeData(data);
-        hasChanged = true;
-      }
-
-      output[fieldAlias] = dataFieldValue;
-    }
+    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    output[fieldAlias] = dataFieldValue;
   }
 
   ctx.partial = ctx.partial || hasPartials;
-  return isQuery && hasPartials && !hasFields ? undefined : output;
+  return isQuery && hasPartials && !hasFields
+    ? undefined
+    : hasChanged
+    ? output
+    : data;
 };
 
 const resolveResolverResult = (
