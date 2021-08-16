@@ -203,26 +203,23 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     }
 
     let queryDependencies: void | Dependencies;
-    if (result.data) {
+    let data: Data | null = result.data;
+    if (data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
-      const writeDependencies = write(
-        store,
-        operation,
-        result.data,
-        result.error,
-        key
-      ).dependencies;
+      const writeDependencies = write(store, operation, data, result.error, key)
+        .dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
       const queryResult = query(
         store,
         operation,
-        result.data,
+        operation.kind === 'query' ? results.get(operation.key) || data : data,
         result.error,
         key
       );
-      result.data = queryResult.data;
+
+      data = queryResult.data;
       if (operation.kind === 'query') {
         // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
@@ -238,7 +235,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       updateDependencies(result.operation, queryDependencies);
     }
 
-    return { data: result.data, error, extensions, operation };
+    return { data, error, extensions, operation };
   };
 
   return ops$ => {
