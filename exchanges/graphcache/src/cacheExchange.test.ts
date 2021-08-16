@@ -30,6 +30,9 @@ const queryOne = gql`
       id
       name
     }
+    unrelated {
+      id
+    }
   }
 `;
 
@@ -39,6 +42,10 @@ const queryOneData = {
     __typename: 'Author',
     id: '123',
     name: 'Author',
+  },
+  unrelated: {
+    __typename: 'Unrelated',
+    id: 'unrelated',
   },
 };
 
@@ -142,7 +149,7 @@ describe('data dependencies', () => {
         {
           __typename: 'Author',
           id: '123',
-          name: 'Author',
+          name: 'New Author Name',
         },
       ],
     };
@@ -193,6 +200,13 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(2);
     expect(reexec).toHaveBeenCalledWith(opOne);
     expect(result).toHaveBeenCalledTimes(3);
+
+    // test for reference reuse
+    const firstDataOne = result.mock.calls[0][0].data;
+    const firstDataTwo = result.mock.calls[1][0].data;
+    expect(firstDataOne).not.toBe(firstDataTwo);
+    expect(firstDataOne.author).not.toBe(firstDataTwo.author);
+    expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
   });
 
   it('updates related queries when a mutation update touches query data', () => {
