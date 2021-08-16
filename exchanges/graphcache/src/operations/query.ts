@@ -305,19 +305,16 @@ const readSelection = (
       isFieldAvailableOnType(store.schema, typename, fieldName);
     }
 
-    // We directly assign typenames and skip the field afterwards
-    if (fieldName === '__typename') {
-      data[fieldAlias] = typename;
-      continue;
-    }
-
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
     // Add the current alias to the walked path before processing the field's value
     ctx.__internal.path.push(fieldAlias);
 
-    if (resultValue !== undefined && node.selectionSet === undefined) {
+    if (fieldName === '__typename') {
+      // We directly assign the typename as it's already available
+      dataFieldValue = typename;
+    } else if (resultValue !== undefined && node.selectionSet === undefined) {
       // The field is a scalar and can be retrieved directly from the result
       dataFieldValue = resultValue;
     } else if (
@@ -398,38 +395,33 @@ const readSelection = (
       }
     }
 
-    // If we have an error registered for the current field change undefined values to null
-    if (dataFieldValue === undefined && !!getFieldError(ctx)) {
-      hasPartials = true;
-      dataFieldValue = null;
-    }
-
-    // After processing the field, remove the current alias from the path again
-    ctx.__internal.path.pop();
-
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
     if (
       dataFieldValue === undefined &&
-      store.schema &&
-      isFieldNullable(store.schema, typename, fieldName)
+      ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
+        !!getFieldError(ctx))
     ) {
-      // The field is uncached but we have a schema that says it's nullable
-      // Set the field to null and continue
+      // The field is uncached or has errored, so it'll be set to null and skipped
       hasPartials = true;
-      data[fieldAlias] = null;
-    } else if (dataFieldValue === undefined) {
-      // The field is uncached and not nullable; return undefined
-      return undefined;
+      dataFieldValue = null;
     } else {
       // Otherwise continue as usual
-      hasFields = true;
-      data[fieldAlias] = dataFieldValue;
+      hasFields = fieldName !== '__typename';
     }
+
+    // After processing the field, remove the current alias from the path again
+    ctx.__internal.path.pop();
+    // Return undefined immediately when a field is uncached
+    if (dataFieldValue === undefined) {
+      return undefined;
+    }
+
+    data[fieldAlias] = dataFieldValue;
   }
 
-  if (hasPartials) ctx.partial = true;
+  ctx.partial = ctx.partial || hasPartials;
   return isQuery && hasPartials && !hasFields ? undefined : data;
 };
 
