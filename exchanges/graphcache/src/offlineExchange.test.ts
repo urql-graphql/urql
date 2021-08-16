@@ -189,7 +189,7 @@ describe('offline', () => {
 
     next(queryOp);
     expect(result).toBeCalledTimes(2);
-    expect(result.mock.calls[1][0].data).toEqual({
+    expect(result.mock.calls[1][0].data).toMatchObject({
       authors: [{ id: '123', name: 'URQL', __typename: 'Author' }],
     });
   });

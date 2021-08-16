@@ -61,7 +61,7 @@ export interface QueryResult {
 export const query = (
   store: Store,
   request: OperationRequest,
-  data?: Data,
+  data?: Data | null,
   error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
@@ -74,7 +74,7 @@ export const query = (
 export const read = (
   store: Store,
   request: OperationRequest,
-  input?: Data,
+  input?: Data | null,
   error?: CombinedError | undefined
 ): QueryResult => {
   const operation = getMainOperation(request.query);
