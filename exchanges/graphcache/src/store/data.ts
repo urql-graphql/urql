@@ -55,7 +55,7 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
-let currentRefs: null | WeakSet<Data> = null;
+let currentOwnership: null | WeakSet<Data> = null;
 let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
@@ -68,12 +68,15 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
 });
 
 /** Creates a new data object unless it's been created in this data run */
-export const makeDataMap = (data?: Data): Data => {
-  if (data && currentRefs!.has(data)) return data;
+export const makeData = (data?: Data): Data => {
+  if (data && currentOwnership!.has(data)) return data;
   const newData = { ...data } as Data;
-  currentRefs!.add(newData);
+  currentOwnership!.add(newData);
   return newData;
 };
+
+export const ownsData = (data?: Data): boolean =>
+  !!data && currentOwnership!.has(data);
 
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
@@ -82,7 +85,7 @@ export const initDataState = (
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
-  currentRefs = new WeakSet();
+  currentOwnership = new WeakSet();
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
@@ -144,7 +147,7 @@ export const clearDataState = () => {
     }
   }
 
-  currentRefs = null;
+  currentOwnership = null;
   currentOperation = null;
   currentData = null;
   currentDependencies = null;

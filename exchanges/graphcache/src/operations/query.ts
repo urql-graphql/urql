@@ -26,11 +26,12 @@ import {
   Store,
   getCurrentOperation,
   getCurrentDependencies,
-  makeDataMap,
   initDataState,
   clearDataState,
   joinKeys,
   keyOfField,
+  makeData,
+  ownsData,
 } from '../store';
 
 import * as InMemoryData from '../store/data';
@@ -94,7 +95,7 @@ export const read = (
     pushDebugNode(rootKey, operation);
   }
 
-  if (!input) input = makeDataMap();
+  if (!input) input = makeData();
   // NOTE: This may reuse "previous result data" as indicated by the
   // `originalData` argument in readRoot(). This behaviour isn't used
   // for readSelection() however, which always produces results from
@@ -152,7 +153,7 @@ const readRoot = (
     // Check for any referential changes in the field's value
     if (dataFieldValue !== output[fieldAlias]) {
       if (!hasChanged) {
-        output = makeDataMap(data);
+        output = makeData(data);
         hasChanged = true;
       }
 
@@ -248,7 +249,7 @@ export const readFragment = (
   );
 
   const result =
-    readSelection(ctx, entityKey, getSelectionSet(fragment), makeDataMap()) ||
+    readSelection(ctx, entityKey, getSelectionSet(fragment), makeData()) ||
     null;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -308,7 +309,7 @@ const readSelection = (
   let hasFields = false;
   let hasPartials = false;
   let hasChanged = typename !== data.__typename;
-  let output = hasChanged ? makeDataMap(data) : data;
+  let output = hasChanged ? makeData(data) : data;
   let node: FieldNode | void;
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
@@ -369,7 +370,8 @@ const readSelection = (
           key,
           getSelectionSet(node),
           output[fieldAlias] as Data,
-          dataFieldValue
+          dataFieldValue,
+          ownsData(output)
         );
       }
 
@@ -394,7 +396,8 @@ const readSelection = (
         key,
         getSelectionSet(node),
         output[fieldAlias] as Data,
-        resultValue
+        resultValue,
+        ownsData(output)
       );
     } else {
       // Otherwise we attempt to get the missing field from the cache
@@ -407,7 +410,8 @@ const readSelection = (
           typename,
           fieldName,
           getSelectionSet(node),
-          output[fieldAlias] as Data
+          output[fieldAlias] as Data,
+          ownsData(output)
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -441,7 +445,7 @@ const readSelection = (
     // Check for any referential changes in the field's value
     if (dataFieldValue !== output[fieldAlias]) {
       if (!hasChanged) {
-        output = makeDataMap(data);
+        output = makeData(data);
         hasChanged = true;
       }
 
@@ -460,7 +464,8 @@ const resolveResolverResult = (
   key: string,
   select: SelectionSet,
   prevData: void | null | Data | Data[],
-  result: void | DataField
+  result: void | DataField,
+  skipNull: boolean
 ): DataField | void => {
   if (Array.isArray(result)) {
     const { store } = ctx;
@@ -482,9 +487,9 @@ const resolveResolverResult = (
         fieldName,
         joinKeys(key, `${i}`),
         select,
-        // Get the inner previous data from prevData
         prevData != null ? prevData[i] : undefined,
-        result[i]
+        result[i],
+        skipNull
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -500,8 +505,10 @@ const resolveResolverResult = (
     return hasChanged ? data : prevData;
   } else if (result === null || result === undefined) {
     return result;
+  } else if (skipNull && prevData === null) {
+    return null;
   } else if (isDataOrKey(result)) {
-    const data = (prevData || makeDataMap()) as Data;
+    const data = (prevData || makeData()) as Data;
     return typeof result === 'string'
       ? readSelection(ctx, result, select, data)
       : readSelection(ctx, key, select, data, result);
@@ -524,7 +531,8 @@ const resolveLink = (
   typename: string,
   fieldName: string,
   select: SelectionSet,
-  prevData: void | null | Data | Data[]
+  prevData: void | null | Data | Data[],
+  skipNull: boolean
 ): DataField | undefined => {
   if (Array.isArray(link)) {
     const { store } = ctx;
@@ -544,7 +552,8 @@ const resolveLink = (
         typename,
         fieldName,
         select,
-        Array.isArray(prevData) ? prevData[i] : null
+        prevData != null ? prevData[i] : undefined,
+        skipNull
       );
       // After processing the field, remove the current index from the path
       ctx.__internal.path.pop();
@@ -558,11 +567,11 @@ const resolveLink = (
     }
 
     return hasChanged ? newLink : (prevData as Data[]);
-  } else if (link === null) {
+  } else if (link === null || (prevData === null && ownsData)) {
     return null;
   }
 
-  return readSelection(ctx, link, select, (prevData || makeDataMap()) as Data);
+  return readSelection(ctx, link, select, (prevData || makeData()) as Data);
 };
 
 const isDataOrKey = (x: any): x is string | Data =>
