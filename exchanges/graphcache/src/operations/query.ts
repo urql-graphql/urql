@@ -26,6 +26,7 @@ import {
   Store,
   getCurrentOperation,
   getCurrentDependencies,
+  makeDataMap,
   initDataState,
   clearDataState,
   joinKeys,
@@ -287,9 +288,11 @@ const readSelection = (
 
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
+  let output = data;
   let node: FieldNode | void;
   let hasFields = false;
   let hasPartials = false;
+  let hasChanged = false;
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -305,11 +308,11 @@ const readSelection = (
       isFieldAvailableOnType(store.schema, typename, fieldName);
     }
 
+    // Add the current alias to the walked path before processing the field's value
+    ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
     // means that the value is missing from the cache
     let dataFieldValue: void | DataField;
-    // Add the current alias to the walked path before processing the field's value
-    ctx.__internal.path.push(fieldAlias);
 
     if (fieldName === '__typename') {
       // We directly assign the typename as it's already available
@@ -329,11 +332,11 @@ const readSelection = (
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
       if (fieldValue !== undefined) {
-        data[fieldAlias] = fieldValue;
+        output[fieldAlias] = fieldValue;
       }
 
       dataFieldValue = resolvers[fieldName](
-        data,
+        output,
         fieldArgs || ({} as Variables),
         store,
         ctx
@@ -348,7 +351,7 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          data[fieldAlias] as Data,
+          output[fieldAlias] as Data,
           dataFieldValue
         );
       }
@@ -373,7 +376,7 @@ const readSelection = (
         fieldName,
         key,
         getSelectionSet(node),
-        data[fieldAlias] as Data,
+        output[fieldAlias] as Data,
         resultValue
       );
     } else {
@@ -387,7 +390,7 @@ const readSelection = (
           typename,
           fieldName,
           getSelectionSet(node),
-          data[fieldAlias] as Data
+          output[fieldAlias] as Data
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -418,11 +421,19 @@ const readSelection = (
       return undefined;
     }
 
-    data[fieldAlias] = dataFieldValue;
+    // Check for any referential changes in the field's value
+    if (dataFieldValue !== output[fieldAlias]) {
+      if (!hasChanged) {
+        output = makeDataMap(data);
+        hasChanged = true;
+      }
+
+      output[fieldAlias] = dataFieldValue;
+    }
   }
 
   ctx.partial = ctx.partial || hasPartials;
-  return isQuery && hasPartials && !hasFields ? undefined : data;
+  return isQuery && hasPartials && !hasFields ? undefined : output;
 };
 
 const resolveResolverResult = (

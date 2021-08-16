@@ -212,7 +212,7 @@ export const makeSelectionIterator = (
 };
 
 export const ensureData = (x: DataField): Data | NullArray<Data> | null =>
-  x === undefined ? null : (x as Data | NullArray<Data>);
+  x == null ? null : (x as Data | NullArray<Data>);
 
 export const ensureLink = (store: Store, ref: Link<Entity>): Link => {
   if (ref == null) {
