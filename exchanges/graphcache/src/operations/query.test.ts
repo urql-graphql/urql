@@ -204,7 +204,7 @@ describe('Query', () => {
     expect(console.error).not.toHaveBeenCalled();
   });
 
-  it('should allow subsequent read when first result was null', () => {
+  it('should not allow subsequent reads when first result was null', () => {
     const QUERY_WRITE = gql`
       query writeTodos {
         __typename
@@ -230,10 +230,6 @@ describe('Query', () => {
           __typename
           id
         }
-      }
-
-      fragment ValidRead on Todo {
-        id
       }
 
       fragment MissingRead on Todo {
@@ -271,5 +267,162 @@ describe('Query', () => {
 
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('should not mix references', () => {
+    const QUERY_WRITE = gql`
+      query writeTodos {
+        __typename
+        todos {
+          __typename
+          id
+          textA
+          textB
+        }
+      }
+    `;
+
+    const QUERY_READ = gql`
+      query getTodos {
+        __typename
+        todos {
+          __typename
+          id
+          textA
+        }
+        todos {
+          __typename
+          textB
+        }
+      }
+    `;
+
+    const store = new Store({
+      schema: alteredRoot,
+    });
+
+    write(
+      store,
+      { query: QUERY_WRITE },
+      {
+        todos: [
+          {
+            __typename: 'Todo',
+            id: '0',
+            textA: 'a',
+            textB: 'b',
+          },
+        ],
+        __typename: 'Query',
+      }
+    );
+
+    let data: any;
+    data = query(store, { query: QUERY_READ }).data;
+
+    expect(data).toEqual({
+      __typename: 'query_root',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '0',
+          textA: 'a',
+          textB: 'b',
+        },
+      ],
+    });
+
+    const previousData = {
+      __typename: 'query_root',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '0',
+          textA: 'a',
+          textB: 'old',
+        },
+      ],
+    };
+
+    data = query(store, { query: QUERY_READ }, previousData).data;
+
+    expect(data).toEqual({
+      __typename: 'query_root',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '0',
+          textA: 'a',
+          textB: 'b',
+        },
+      ],
+    });
+
+    expect(previousData).toHaveProperty('todos.0.textA', 'a');
+    expect(previousData).toHaveProperty('todos.0.textB', 'old');
+  });
+
+  it('should not keep references stable', () => {
+    const QUERY = gql`
+      query todos {
+        __typename
+        todos {
+          __typename
+          id
+        }
+      }
+    `;
+
+    const store = new Store({
+      schema: alteredRoot,
+    });
+
+    const expected = {
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '0',
+        },
+        {
+          __typename: 'Todo',
+          id: '1',
+        },
+        {
+          __typename: 'Todo',
+          id: '2',
+        },
+      ],
+      __typename: 'query_root',
+    };
+
+    write(store, { query: QUERY }, expected);
+
+    const prevData = {
+      todos: [
+        {
+          __typename: 'Todo',
+          id: 'prev-0',
+        },
+        {
+          __typename: 'Todo',
+          id: '1',
+        },
+        {
+          __typename: 'Todo',
+          id: '2',
+        },
+      ],
+      __typename: 'query_root',
+    };
+
+    const data = query(store, { query: QUERY }, prevData)
+      .data as typeof expected;
+    expect(data).toEqual(expected);
+
+    expect(prevData.todos[0]).not.toEqual(data.todos[0]);
+    expect(prevData.todos[0]).not.toBe(data.todos[0]);
+    // unchanged references:
+    expect(prevData.todos[1]).toBe(data.todos[1]);
+    expect(prevData.todos[2]).toBe(data.todos[2]);
   });
 });
