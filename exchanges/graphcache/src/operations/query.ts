@@ -118,36 +118,51 @@ const readRoot = (
   ctx: Context,
   entityKey: string,
   select: SelectionSet,
-  originalData: Data
+  data: Data
 ): Data => {
-  const typename = ctx.store.rootNames[entityKey]
-    ? entityKey
-    : originalData.__typename;
+  const typename = ctx.store.rootNames[entityKey] ? entityKey : data.__typename;
   if (typeof typename !== 'string') {
-    return originalData;
+    return data;
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
-  const data = { __typename: typename };
 
+  let output = data;
   let node: FieldNode | void;
+  let hasChanged = false;
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
-    const fieldValue = originalData[fieldAlias];
+    const fieldValue = output[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
     ctx.__internal.path.push(fieldAlias);
-    // Process the root field's value
+    // We temporarily store the data field in here, but undefined
+    // means that the value is missing from the cache
+    let dataFieldValue: void | DataField;
     if (node.selectionSet && fieldValue !== null) {
-      const fieldData = ensureData(fieldValue);
-      data[fieldAlias] = readRootField(ctx, getSelectionSet(node), fieldData);
+      dataFieldValue = readRootField(
+        ctx,
+        getSelectionSet(node),
+        ensureData(fieldValue)
+      );
     } else {
-      data[fieldAlias] = fieldValue;
+      dataFieldValue = fieldValue;
     }
+
+    // Check for any referential changes in the field's value
+    if (dataFieldValue !== output[fieldAlias]) {
+      if (!hasChanged) {
+        output = makeDataMap(data);
+        hasChanged = true;
+      }
+
+      output[fieldAlias] = dataFieldValue!;
+    }
+
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
   }
 
-  return data;
+  return output;
 };
 
 const readRootField = (
