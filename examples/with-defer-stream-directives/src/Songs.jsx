@@ -21,6 +21,15 @@ const SONGS_QUERY = gql`
   ${SecondVerseFragment}
 `;
 
+const Song = React.memo(function Song({ song }) {
+  return (
+    <section>
+      <p>{song.firstVerse}</p>
+      <p>{song.secondVerse}</p>
+    </section>
+  );
+});
+
 const LocationsList = () => {
   const [result] = useQuery({
     query: SONGS_QUERY,
@@ -32,8 +41,7 @@ const LocationsList = () => {
     <div>
       {data && (
         <>
-          <p>{data.song.firstVerse}</p>
-          <p>{data.song.secondVerse}</p>
+          <Song song={data.song} />
           {data.alphabet.map(i => (
             <div key={i.char}>{i.char}</div>
           ))}

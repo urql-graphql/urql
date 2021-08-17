@@ -3,16 +3,24 @@ import {
   createClient,
   Provider,
   dedupExchange,
-  cacheExchange,
   debugExchange,
   fetchExchange,
 } from 'urql';
 
+import { cacheExchange } from '@urql/exchange-graphcache';
+
 import Songs from './Songs';
+
+const cache = cacheExchange({
+  keys: {
+    Alphabet: data => data.char,
+    Song: () => null,
+  },
+});
 
 const client = createClient({
   url: 'http://localhost:3004/graphql',
-  exchanges: [dedupExchange, cacheExchange, debugExchange, fetchExchange],
+  exchanges: [dedupExchange, cache, debugExchange, fetchExchange],
 });
 
 function App() {
