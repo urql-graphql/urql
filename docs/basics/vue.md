@@ -335,25 +335,69 @@ The `requestPolicy` option determines how results are retrieved from our `Client
 default this is set to `cache-first`, which means that we prefer to get results from our cache, but
 are falling back to sending an API request.
 
-In total there are four different policies that we can use:
+Request policies aren't specific to `urql`'s Vue bindings, but are a common feature in its core.
+[You can learn more about how the cache behaves given the four different policies on the "Document
+Caching" page.](../basics/document-caching.md)
 
-- `cache-first` (the default) prefers cached results and falls back to sending an API request when
-  no prior result is cached.
-- `cache-and-network` returns cached results but also always sends an API request, which is perfect
-  for displaying data quickly while keeping it up-to-date.
-- `network-only` will always send an API request and will ignore cached results.
-- `cache-only` will always return cached results or `null`.
+```js
+import { useQuery } from '@urql/vue';
 
-The `cache-and-network` policy is particularly useful, since it allows us to display data instantly
-if it has been cached, but also refreshes data in our cache in the background. This means though
-that `fetching` will be `false` for cached results although an API request may still be ongoing in
-the background.
+export default {
+  setup() {
+    return useQuery({
+      query: TodosQuery,
+      requestPolicy: 'cache-and-network',
+    });
+  },
+};
+```
 
-For this reason there's another field on results, `result.stale`, which indicates that the cached
-result is either outdated or that another request is being sent in the background.
+Specifically, a new request policy may be passed directly to `useQuery` as an option.
+This policy is then used for this specific query. In this case, `cache-and-network` is used and
+the query will be refreshed from our API even after our cache has given us a cached result.
 
-Request policies aren't specific to `urql`'s Vue bindings, but are a common feature in its core. [You
-can learn more about request policies on the API docs.](../api/core.md#requestpolicy)
+Internally, the `requestPolicy` is just one of several "**context** options". The `context`
+provides metadata apart from the usual `query` and `variables` we may pass. This means that
+we may also change the `Client`'s default `requestPolicy` by passing it there.
+
+```js
+import { createClient } from '@urql/vue';
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  // every operation will by default use cache-and-network rather
+  // than cache-first now:
+  requestPolicy: 'cache-and-network',
+});
+```
+
+### Context Options
+
+As mentioned, the `requestPolicy` option on `useQuery` is a part of `urql`'s context options.
+In fact, there are several more built-in context options, and the `requestPolicy` option is
+one of them. Another option we've already seen is the `url` option, which determines our
+API's URL. These options aren't limited to the `Client` and may also be passed per query.
+
+```jsx
+import { useQuery } from '@urql/vue';
+
+export default {
+  setup() {
+    return useQuery({
+      query: TodosQuery,
+      context: {
+        requestPolicy: 'cache-and-network',
+        url: 'http://localhost:3000/graphql?debug=true',
+      },
+    });
+  },
+};
+```
+
+As we can see, the `context` property for `useQuery` accepts any known `context` option and can be
+used to alter them per query rather than globally. The `Client` accepts a subset of `context`
+options, while the `useQuery` option does the same for a single query.
+[You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)
 
 ### Reexecuting Queries
 
@@ -379,7 +423,7 @@ export default {
             title
           }
         }
-      `
+      `,
     });
 
     return {
@@ -388,13 +432,12 @@ export default {
       error: result.error,
       refresh() {
         result.executeQuery({
-          requestPolicy: 'network-only'
+          requestPolicy: 'network-only',
         });
-      }
+      },
     };
-  }
+  },
 };
-</script>
 ```
 
 Calling `refresh` in the above example will execute the query again forcefully, and will skip the
