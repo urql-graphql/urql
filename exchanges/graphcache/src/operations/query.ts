@@ -492,7 +492,8 @@ const resolveResolverResult = (
       if (childResult === undefined && !_isListNullable) {
         return undefined;
       } else {
-        data[i] = childResult !== undefined ? childResult : null;
+        ctx.partial = ctx.partial || _isListNullable;
+        data[i] = childResult != null ? childResult : null;
         hasChanged = hasChanged || data[i] !== prevData![i];
       }
     }
@@ -556,6 +557,7 @@ const resolveLink = (
       if (childLink === undefined && !_isListNullable) {
         return undefined;
       } else {
+        ctx.partial = ctx.partial || _isListNullable;
         newLink[i] = childLink || null;
         hasChanged = hasChanged || newLink[i] !== prevData![i];
       }
