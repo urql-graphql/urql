@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Support async iterated results, including subscriptions via `AsyncIterator` support and `@defer` / `@stream` if the appropriate version of `graphql` is used, e.g. `15.4.0-experimental-stream-defer.1`, by [@kitten](https://github.com/kitten) (See [#1854](https://github.com/FormidableLabs/urql/pull/1854))
+
+### Patch Changes
+
+- Updated dependencies (See [#1854](https://github.com/FormidableLabs/urql/pull/1854))
+  - @urql/core@2.3.0
+
 ## 1.0.5
 
 ### Patch Changes
