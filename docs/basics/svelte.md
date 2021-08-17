@@ -398,6 +398,10 @@ can simply assign a new context value using `$todos.context = {}` we can also us
 Calling `refresh` in the above example will execute the query again forcefully, and will skip the
 cache, since we're passing `requestPolicy: 'network-only'`.
 
+Furthermore the `reexecute` function can also be used to programmatically start a query even
+when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
+perform one-off actions, or to set up polling.
+
 ### Reading on
 
 There are some more tricks we can use with `operationStore`.

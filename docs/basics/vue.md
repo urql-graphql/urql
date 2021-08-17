@@ -443,8 +443,9 @@ export default {
 Calling `refresh` in the above example will execute the query again forcefully, and will skip the
 cache, since we're passing `requestPolicy: 'network-only'`.
 
-Furthermore the `executeQuery` method can also be used to programmatically start a query even
-when `pause` is `true`, which would usually stop all automatic queries.
+Furthermore the `executeQuery` function can also be used to programmatically start a query even
+when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
+perform one-off actions, or to set up polling.
 
 ### Vue Suspense
 

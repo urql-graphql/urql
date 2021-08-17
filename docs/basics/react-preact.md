@@ -311,7 +311,34 @@ Calling `refresh` in the above example will execute the query again forcefully, 
 cache, since we're passing `requestPolicy: 'network-only'`.
 
 Furthermore the `reexecuteQuery` function can also be used to programmatically start a query even
-when `pause` is set to `true`, which would usually stop all automatic queries.
+when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
+perform one-off actions, or to set up polling.
+
+```jsx
+import { useEffect } from 'react';
+import { useQuery } from 'urql';
+
+const Todos = ({ from, limit }) => {
+  const [result, reexecuteQuery] = useQuery({
+    query: TodosListQuery,
+    variables: { from, limit },
+    pause: true,
+  });
+
+  useEffect(() => {
+    if (result.fetching) return;
+
+    // Set up to refetch in one second, if the query is idle
+    const timerId = setTimeout(() => {
+      reexecuteQuery({ requestPolicy: 'network-only' });
+    }, 1000);
+
+    return () => clearTimeout(timerId);
+  }, [result.fetching, reexecuteQuery]);
+
+  // ...
+};
+```
 
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
 it.](../api/urql.md#usequery)
