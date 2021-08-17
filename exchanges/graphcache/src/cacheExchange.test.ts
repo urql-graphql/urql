@@ -1554,6 +1554,122 @@ describe('schema awareness', () => {
       'partial'
     );
   });
+
+  it('reexecutes query and returns data on partial results for nullable lists', () => {
+    jest.useFakeTimers();
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      // Empty mock to avoid going in an endless loop, since we would again return
+      // partial data.
+      .mockImplementation(() => undefined);
+
+    const initialQuery = gql`
+      query {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+
+    const query = gql`
+      query {
+        todos {
+          id
+          text
+          __typename
+        }
+      }
+    `;
+
+    const initialQueryOperation = client.createRequestOperation('query', {
+      key: 1,
+      query: initialQuery,
+    });
+
+    const queryOperation = client.createRequestOperation('query', {
+      key: 2,
+      query,
+    });
+
+    const queryData = {
+      __typename: 'Query',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+        },
+      ],
+    };
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: initialQueryOperation, data: queryData };
+        } else if (forwardOp.key === 2) {
+          return { operation: queryOperation, data: queryData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+    pipe(
+      cacheExchange({
+        schema: minifyIntrospectionQuery(
+          // eslint-disable-next-line
+          require('./test-utils/simple_schema.json')
+        ),
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(initialQueryOperation);
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toMatchObject({
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+        },
+      ],
+    });
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta',
+      undefined
+    );
+
+    next(queryOperation);
+    jest.runAllTimers();
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(result.mock.calls[1][0].stale).toBe(true);
+    expect(result.mock.calls[1][0].data).toEqual({
+      todos: [null, null],
+    });
+
+    expect(result.mock.calls[1][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'partial'
+    );
+  });
 });
 
 describe('commutativity', () => {
