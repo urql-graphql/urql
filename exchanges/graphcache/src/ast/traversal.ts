@@ -2,7 +2,6 @@ import {
   SelectionNode,
   DocumentNode,
   OperationDefinitionNode,
-  FieldNode,
   FragmentSpreadNode,
   InlineFragmentNode,
   valueFromASTUntyped,
@@ -96,12 +95,4 @@ export const isDeferred = (
   }
 
   return false;
-};
-
-export const markDefer = (node: FieldNode) => {
-  (node as FieldNode & { __defer?: true }).__defer = true;
-};
-
-export const isFieldDeferred = (node: FieldNode) => {
-  return !!(node as FieldNode & { __defer?: true }).__defer;
 };

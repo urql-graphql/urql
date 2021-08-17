@@ -12,7 +12,6 @@ import {
   SelectionSet,
   getFragmentTypeName,
   getFieldAlias,
-  isFieldDeferred,
 } from '../ast';
 
 import { invariant, warn, pushDebugNode, popDebugNode } from '../helpers/help';
@@ -45,6 +44,7 @@ import {
   makeContext,
   updateContext,
   getFieldError,
+  deferRef,
 } from './shared';
 
 export interface WriteResult {
@@ -209,7 +209,7 @@ const writeSelection = (
       // Skip typename fields and assume they've already been written above
       fieldName === '__typename' ||
       // Fields marked as deferred that aren't defined must be skipped
-      (fieldValue === undefined && isFieldDeferred(node))
+      (fieldValue === undefined && deferRef.current)
     )
       continue;
 

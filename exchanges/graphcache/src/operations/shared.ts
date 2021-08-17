@@ -20,12 +20,7 @@ import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
 
-import {
-  markDefer,
-  getFieldArguments,
-  shouldInclude,
-  isInterfaceOfType,
-} from '../ast';
+import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
 import {
   Fragments,
@@ -56,6 +51,7 @@ export interface Context {
 }
 
 export const contextRef: { current: Context | null } = { current: null };
+export const deferRef: { current: boolean } = { current: false };
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): GraphQLError | undefined =>
@@ -167,10 +163,11 @@ export const makeSelectionIterator = (
   let index = 0;
 
   return function next() {
+    if (!deferRef.current && childDeferred) deferRef.current = childDeferred;
+
     if (childIterator) {
       const node = childIterator();
       if (node != null) {
-        if (childDeferred) markDefer(node);
         return node;
       }
 
@@ -206,14 +203,15 @@ export const makeSelectionIterator = (
             }
 
             childDeferred = !!isDeferred(node, ctx.variables);
-            childIterator = makeSelectionIterator(
+            if (!deferRef.current && childDeferred)
+              deferRef.current = childDeferred;
+
+            return (childIterator = makeSelectionIterator(
               typename,
               entityKey,
               getSelectionSet(fragmentNode),
               ctx
-            );
-
-            return next();
+            ))();
           }
         }
       } else {
