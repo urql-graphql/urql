@@ -153,8 +153,7 @@ const readRoot = (
 
     // Check for any referential changes in the field's value
     hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
-    if (dataFieldValue !== undefined)
-      output[fieldAlias] = dataFieldValue!;
+    if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue!;
 
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
@@ -442,8 +441,7 @@ const readSelection = (
     ctx.__internal.path.pop();
     // Check for any referential changes in the field's value
     hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
-    if (dataFieldValue !== undefined)
-      output[fieldAlias] = dataFieldValue;
+    if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue;
   }
 
   ctx.partial = ctx.partial || hasPartials;
