@@ -426,7 +426,7 @@ const readSelection = (
       dataFieldValue = null;
     } else {
       // Otherwise continue as usual
-      hasFields = fieldName !== '__typename';
+      hasFields = hasFields || fieldName !== '__typename';
     }
 
     // After processing the field, remove the current alias from the path again
