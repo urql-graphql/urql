@@ -19,6 +19,7 @@ import {
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
+
 import {
   markDefer,
   getFieldArguments,
@@ -47,7 +48,6 @@ export interface Context {
   fieldName: string;
   error: GraphQLError | undefined;
   partial: boolean;
-  defer: boolean;
   optimistic: boolean;
   __internal: {
     path: Array<string | number>;
@@ -83,7 +83,6 @@ export const makeContext = (
     fieldName: '',
     error: undefined,
     partial: false,
-    defer: false,
     optimistic: !!optimistic,
     __internal: {
       path: [],
@@ -168,7 +167,7 @@ export const makeSelectionIterator = (
   let index = 0;
 
   return function next() {
-    if (childIterator !== undefined) {
+    if (childIterator) {
       const node = childIterator();
       if (node != null) {
         if (childDeferred) markDefer(node);
@@ -207,12 +206,14 @@ export const makeSelectionIterator = (
             }
 
             childDeferred = !!isDeferred(node, ctx.variables);
-            return (childIterator = makeSelectionIterator(
+            childIterator = makeSelectionIterator(
               typename,
               entityKey,
               getSelectionSet(fragmentNode),
               ctx
-            ))();
+            );
+
+            return next();
           }
         }
       } else {
