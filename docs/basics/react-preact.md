@@ -222,6 +222,66 @@ Request policies aren't specific to `urql`'s React API, but are a common feature
 can learn more about how the cache behaves given the four different policies on the "Document
 Caching" page.](../basics/document-caching.md)
 
+```jsx
+const [result, reexecuteQuery] = useQuery({
+  query: TodosListQuery,
+  variables: { from, limit },
+  requestPolicy: 'cache-and-network',
+});
+```
+
+Specifically, a new request policy may be passed directly to the `useQuery` hook as an option.
+This policy is then used for this specific query. In this case, `cache-and-network` is used and
+the query will be refreshed from our API even after our cache has given us a cached result.
+
+Internally, the `requestPolicy` is just one of several "**context** options". The `context`
+provides metadata apart from the usual `query` and `variables` we may pass. This means that
+we may also change the `Client`'s default `requestPolicy` by passing it there.
+
+```js
+import { createClient } from 'urql';
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  // every operation will by default use cache-and-network rather
+  // than cache-first now:
+  requestPolicy: 'cache-and-network',
+});
+```
+
+### Context Options
+
+As mentioned, the `requestPolicy` option on `useQuery` is a part of `urql`'s context options.
+In fact, there are several more built-in context options, and the `requestPolicy` option is
+one of them. Another option we've already seen is the `url` option, which determines our
+API's URL. These options aren't limited to the `Client` and may also be passed per query.
+
+```jsx
+import { useMemo } from 'react';
+import { useQuery } from 'urql';
+
+const Todos = ({ from, limit }) => {
+  const [result, reexecuteQuery] = useQuery({
+    query: TodosListQuery,
+    variables: { from, limit },
+    context: useMemo(
+      () => ({
+        requestPolicy: 'cache-and-network',
+        url: 'http://localhost:3000/graphql?debug=true',
+      }),
+      []
+    ),
+  });
+
+  // ...
+};
+```
+
+As we can see, the `context` property for `useQuery` accepts any known `context` option and can be
+used to alter them per query rather than globally. The `Client` accepts a subset of `context`
+options, while the `useQuery` option does the same for a single query.
+[You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)
+
 ### Reexecuting Queries
 
 The `useQuery` hook updates and executes queries whenever its inputs, like the `query` or
@@ -251,7 +311,34 @@ Calling `refresh` in the above example will execute the query again forcefully, 
 cache, since we're passing `requestPolicy: 'network-only'`.
 
 Furthermore the `reexecuteQuery` function can also be used to programmatically start a query even
-when `pause` is set to `true`, which would usually stop all automatic queries.
+when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
+perform one-off actions, or to set up polling.
+
+```jsx
+import { useEffect } from 'react';
+import { useQuery } from 'urql';
+
+const Todos = ({ from, limit }) => {
+  const [result, reexecuteQuery] = useQuery({
+    query: TodosListQuery,
+    variables: { from, limit },
+    pause: true,
+  });
+
+  useEffect(() => {
+    if (result.fetching) return;
+
+    // Set up to refetch in one second, if the query is idle
+    const timerId = setTimeout(() => {
+      reexecuteQuery({ requestPolicy: 'network-only' });
+    }, 1000);
+
+    return () => clearTimeout(timerId);
+  }, [result.fetching, reexecuteQuery]);
+
+  // ...
+};
+```
 
 There are some more tricks we can use with `useQuery`. [Read more about its API in the API docs for
 it.](../api/urql.md#usequery)
