@@ -9,7 +9,7 @@ import {
 } from '../types';
 import { makeOperation } from '../utils';
 
-const context: OperationContext = {
+export const context: OperationContext = {
   fetchOptions: {
     method: 'POST',
   },

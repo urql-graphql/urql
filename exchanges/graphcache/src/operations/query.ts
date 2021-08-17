@@ -44,6 +44,7 @@ import {
   makeContext,
   updateContext,
   getFieldError,
+  deferRef,
 } from './shared';
 
 import {
@@ -152,7 +153,7 @@ const readRoot = (
 
     // Check for any referential changes in the field's value
     hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
-    output[fieldAlias] = dataFieldValue!;
+    if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue!;
 
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
@@ -416,7 +417,10 @@ const readSelection = (
     // Now that dataFieldValue has been retrieved it'll be set on data
     // If it's uncached (undefined) but nullable we can continue assembling
     // a partial query result
-    if (
+    if (dataFieldValue === undefined && deferRef.current) {
+      // The field is undelivered and uncached, but is included in a deferred fragment
+      hasFields = true;
+    } else if (
       dataFieldValue === undefined &&
       ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
         !!getFieldError(ctx))
@@ -424,6 +428,10 @@ const readSelection = (
       // The field is uncached or has errored, so it'll be set to null and skipped
       hasPartials = true;
       dataFieldValue = null;
+    } else if (dataFieldValue === undefined) {
+      // If the field isn't deferred or partial then we have to abort
+      ctx.__internal.path.pop();
+      return undefined;
     } else {
       // Otherwise continue as usual
       hasFields = hasFields || fieldName !== '__typename';
@@ -431,14 +439,9 @@ const readSelection = (
 
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
-    // Return undefined immediately when a field is uncached
-    if (dataFieldValue === undefined) {
-      return undefined;
-    }
-
     // Check for any referential changes in the field's value
     hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
-    output[fieldAlias] = dataFieldValue;
+    if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue;
   }
 
   ctx.partial = ctx.partial || hasPartials;

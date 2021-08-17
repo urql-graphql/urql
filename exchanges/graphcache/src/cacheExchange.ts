@@ -198,9 +198,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       const dependencies = optimisticKeysToDependencies.get(key);
       collectPendingOperations(pendingOperations, dependencies);
       optimisticKeysToDependencies.delete(key);
-    } else {
-      reserveLayer(store.data, operation.key);
     }
+
+    reserveLayer(store.data, operation.key, result.hasNext);
 
     let queryDependencies: void | Dependencies;
     let data: Data | null = result.data;
@@ -322,6 +322,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
               outcome === 'partial')
           ) {
             result.stale = true;
+            result.hasNext = true;
             if (!isBlockedByOptimisticUpdate(dependencies)) {
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')

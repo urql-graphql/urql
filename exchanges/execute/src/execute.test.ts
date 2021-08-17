@@ -148,6 +148,7 @@ describe('on success response', () => {
     expect(response).toEqual({
       operation: queryOperation,
       data: mockHttpResponseData,
+      hasNext: false,
     });
   });
 });

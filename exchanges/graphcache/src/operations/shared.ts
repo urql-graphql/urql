@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 
 import {
+  isDeferred,
   isInlineFragment,
   getTypeCondition,
   getSelectionSet,
@@ -18,6 +19,7 @@ import {
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
 import { hasField } from '../store/data';
 import { Store, keyOfField } from '../store';
+
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
 
 import {
@@ -49,6 +51,7 @@ export interface Context {
 }
 
 export const contextRef: { current: Context | null } = { current: null };
+export const deferRef: { current: boolean } = { current: false };
 
 // Checks whether the current data field is a cache miss because of a GraphQLError
 export const getFieldError = (ctx: Context): GraphQLError | undefined =>
@@ -155,17 +158,21 @@ export const makeSelectionIterator = (
   select: SelectionSet,
   ctx: Context
 ): SelectionIterator => {
+  let childDeferred = false;
   let childIterator: SelectionIterator | void;
   let index = 0;
 
   return function next() {
-    if (childIterator !== undefined) {
+    if (!deferRef.current && childDeferred) deferRef.current = childDeferred;
+
+    if (childIterator) {
       const node = childIterator();
-      if (node !== undefined) {
+      if (node != null) {
         return node;
       }
 
       childIterator = undefined;
+      childDeferred = false;
       if (process.env.NODE_ENV !== 'production') {
         popDebugNode();
       }
@@ -190,11 +197,14 @@ export const makeSelectionIterator = (
                 entityKey,
                 ctx.variables
               );
-
           if (isMatching) {
             if (process.env.NODE_ENV !== 'production') {
               pushDebugNode(typename, fragmentNode);
             }
+
+            childDeferred = !!isDeferred(node, ctx.variables);
+            if (!deferRef.current && childDeferred)
+              deferRef.current = childDeferred;
 
             return (childIterator = makeSelectionIterator(
               typename,
