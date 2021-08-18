@@ -8,8 +8,8 @@ import {
   isAbstractType,
   FragmentDefinitionNode,
   FragmentSpreadNode,
-} from 'graphql';
-import { unwrapType, getName } from './node';
+} from "graphql";
+import { unwrapType, getName } from "./node";
 
 export function traverse(
   node: ASTNode,
@@ -25,7 +25,7 @@ export function traverse(
       node = {
         ...node,
         definitions: node.definitions.map(
-          n => traverse(n, enter, exit) as DefinitionNode
+          (n) => traverse(n, enter, exit) as DefinitionNode
         ),
       };
       break;
@@ -39,7 +39,7 @@ export function traverse(
           selectionSet: {
             ...node.selectionSet,
             selections: node.selectionSet.selections.map(
-              n => traverse(n, enter, exit) as SelectionNode
+              (n) => traverse(n, enter, exit) as SelectionNode
             ),
           },
         };
@@ -65,14 +65,15 @@ export function resolveFields(
     const t = unwrapType(currentFields[visits[i]].type);
 
     if (isAbstractType(t)) {
-      currentFields = {};
-      schema.getPossibleTypes(t).forEach(implementedType => {
-        currentFields = {
-          ...currentFields,
-          // @ts-ignore TODO: proper casting
-          ...schema.getType(implementedType.name)!.toConfig().fields,
-        };
-      });
+      currentFields = schema
+        .getPossibleTypes(t)
+        .reduce((previousValue, implementedType) => {
+          return {
+            ...previousValue,
+            // @ts-ignore TODO: proper casting
+            ...schema.getType(implementedType.name)!.toConfig().fields,
+          };
+        }, {});
     } else {
       // @ts-ignore TODO: proper casting
       currentFields = schema.getType(t!.name)!.toConfig().fields;
@@ -86,7 +87,7 @@ export function resolveFields(
 export function getUsedFragmentNames(node: FragmentDefinitionNode) {
   const names: string[] = [];
 
-  traverse(node, n => {
+  traverse(node, (n) => {
     if (n.kind === Kind.FRAGMENT_SPREAD) {
       names.push(getName(n as FragmentSpreadNode));
     }
