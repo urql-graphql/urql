@@ -49,6 +49,15 @@ describe('formatTypeNames', () => {
     expect(expectedKey).toBe(actualKey);
   });
 
+  it('does not preserve the referential integrity with a cloned object', () => {
+    const doc = parse(`{ id todos { id } }`);
+    const formattedDoc = formatDocument(doc);
+    expect(formattedDoc).not.toBe(doc);
+    const query = { ...formattedDoc };
+    const reformattedDoc = formatDocument(query);
+    expect(reformattedDoc).not.toBe(doc);
+  });
+
   it('preserves custom properties', () => {
     const doc = parse(`{ todos { id } }`) as any;
     doc.documentId = '123';
