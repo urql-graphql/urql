@@ -260,7 +260,7 @@ export const extractSelectionsFromQuery = (
 
     selectionSet.selections.forEach(selection => {
       if (selection.kind === Kind.FIELD) {
-        if (validTypeProperties.includes(selection.name.value)) {
+        if (validTypeProperties.indexOf(selection.name.value) !== -1) {
           if (selection.selectionSet) {
             selections.push({
               ...selection,
