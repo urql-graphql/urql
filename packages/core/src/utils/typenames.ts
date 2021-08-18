@@ -76,8 +76,16 @@ export const formatDocument = <T extends DocumentNode>(node: T): T => {
       Field: formatNode,
       InlineFragment: formatNode,
     }) as KeyedDocumentNode;
+
     // Ensure that the hash of the resulting document won't suddenly change
-    result.__key = query.__key;
+    // we are marking __key as non-enumerable so when external exchanges use visit
+    // to manipulate a document we won't restore the previous query due to the __key
+    // property.
+    Object.defineProperty(result, '__key', {
+      value: query.__key,
+      enumerable: false,
+    });
+
     formattedDocs.set(query.__key, result);
   }
 
