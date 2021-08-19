@@ -28,6 +28,7 @@ const schemaDef = `
     name: String!
     age: Int!
     todos: [Todo]
+    projectMemberships: ProjectMemberships
   }
 
   type Todo implements Node {
@@ -76,10 +77,19 @@ const schemaDef = `
     store: OnlineStore
   }
 
+  type ProjectMembership {
+    id: ID!
+  }
+
+  type ProjectMemberships {
+    nodes: [ProjectMembership]
+  }
+
   type Query {
     todos: [Todo!]
     users: [User!]!
     products: [Product]!
+    currentUser: User
   }
 
   type Mutation {
@@ -115,6 +125,61 @@ const exchangeArgs = {
   client: {} as Client,
   dispatchDebug: jest.fn(),
 };
+
+describe('on query with fragment', () => {
+  it('query with fragments is traversed correctly', () => {
+    const fragment = gql`
+      fragment Fraggy on User {
+        email
+        projectMemberships {
+          nodes {
+            id
+          }
+        }
+      }
+    `;
+
+    const queryOp = makeOperation(
+      'query',
+      {
+        key: 1001,
+        query: gql`
+          query {
+            currentUser {
+              id
+              ...Fraggy
+            }
+          }
+          ${fragment}
+        `,
+      },
+      context
+    );
+
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[0].query)).toBe(`{
+  currentUser {
+    id
+    ...Fraggy
+  }
+}
+
+fragment Fraggy on User {
+  email
+  projectMemberships {
+    nodes {
+      id
+    }
+  }
+}
+`);
+  });
+});
 
 describe('on mutation', () => {
   const operation = makeOperation(

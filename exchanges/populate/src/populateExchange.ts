@@ -289,9 +289,15 @@ export const extractSelectionsFromQuery = (
       if (node.kind === Kind.FRAGMENT_DEFINITION) {
         extractedFragments.push(node);
       } else if (node.kind === Kind.FIELD && node.selectionSet) {
-        const type = unwrapType(
-          resolveFields(schema, visits)[node.name.value].type
-        );
+        const resolvedFields = resolveFields(schema, visits);
+
+        const fieldType = resolvedFields[node.name.value];
+
+        const type = fieldType && unwrapType(fieldType.type);
+
+        if (!type) {
+          return;
+        }
 
         visits.push(node.name.value);
 
@@ -311,7 +317,7 @@ export const extractSelectionsFromQuery = (
               ),
             });
           });
-        } else if (type) {
+        } else {
           newFragments.push({
             kind: Kind.FRAGMENT_DEFINITION,
             typeCondition: {
