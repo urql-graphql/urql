@@ -24,11 +24,7 @@ import {
   unwrapType,
   createNameNode,
 } from './helpers/node';
-import {
-  traverse,
-  resolveFields,
-  getUsedFragmentNames,
-} from './helpers/traverse';
+import { traverse, resolveFields } from './helpers/traverse';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
@@ -444,23 +440,6 @@ export const addFragmentsToQuery = (
           for (let i = 0, l = typeFrags.length; i < l; i++) {
             const { fragment } = typeFrags[i];
             const fragmentName = getName(fragment);
-            const usedFragments = getUsedFragmentNames(fragment);
-
-            // Add used fragment for insertion at Document node
-            for (let j = 0, l = usedFragments.length; j < l; j++) {
-              const name = usedFragments[j];
-              if (!existingFragmentsForQuery.has(name)) {
-                requiredUserFragments[name] = userFragments[name];
-              }
-            }
-
-            // Add fragment for insertion at Document node
-            additionalFragments[fragmentName] = fragment;
-
-            const fragmentSpreadNode = {
-              kind: Kind.FRAGMENT_SPREAD,
-              name: createNameNode(fragmentName),
-            };
 
             if (fragmentFields[fragmentName]) {
               p.push({
@@ -468,11 +447,22 @@ export const addFragmentsToQuery = (
                 name: createNameNode(fragmentFields[fragmentName]),
                 selectionSet: {
                   kind: Kind.SELECTION_SET,
-                  selections: [fragmentSpreadNode],
+                  selections: fragment.selectionSet.selections,
                 },
               });
             } else {
-              p.push(fragmentSpreadNode);
+              fragment.selectionSet.selections.forEach(selection => {
+                if (
+                  selection.kind === Kind.FRAGMENT_SPREAD &&
+                  userFragments[selection.name.value]
+                ) {
+                  p = p.concat(
+                    userFragments[selection.name.value].selectionSet.selections
+                  );
+                } else if (selection.kind === Kind.FIELD) {
+                  p.push(selection);
+                }
+              });
             }
           }
 
