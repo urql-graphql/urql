@@ -77,19 +77,10 @@ const schemaDef = `
     store: OnlineStore
   }
 
-  type ProjectMembership {
-    id: ID!
-  }
-
-  type ProjectMemberships {
-    nodes: [ProjectMembership]
-  }
-
   type Query {
     todos: [Todo!]
     users: [User!]!
     products: [Product]!
-    currentUser: User
   }
 
   type Mutation {
@@ -126,55 +117,66 @@ const exchangeArgs = {
   dispatchDebug: jest.fn(),
 };
 
-describe('on query with fragment', () => {
-  it('query with fragments is traversed correctly', () => {
-    const fragment = gql`
-      fragment Fraggy on User {
-        email
-        projectMemberships {
-          nodes {
-            id
+describe('nested fragment', () => {
+  const fragment = gql`
+    fragment TodoFragment on Todo {
+      id
+      author {
+        id
+      }
+    }
+  `;
+
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          todos {
+            ...TodoFragment
           }
         }
-      }
-    `;
+        ${fragment}
+      `,
+    },
+    context
+  );
 
-    const queryOp = makeOperation(
-      'query',
-      {
-        key: 1001,
-        query: gql`
-          query {
-            currentUser {
-              id
-              ...Fraggy
-            }
-          }
-          ${fragment}
-        `,
-      },
-      context
-    );
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          updateTodo @populate
+        }
+      `,
+    },
+    context
+  );
 
+  it('should work with nested fragments', () => {
     const response = pipe<Operation, any, Operation[]>(
-      fromArray([queryOp]),
+      fromArray([queryOp, mutationOp]),
       populateExchange({ schema })(exchangeArgs),
       toArray
     );
 
-    expect(print(response[0].query)).toBe(`{
-  currentUser {
-    id
-    ...Fraggy
+    expect(print(response[1].query)).toBe(`mutation MyMutation {
+  updateTodo {
+    ...Todo_PopulateFragment_0
   }
 }
 
-fragment Fraggy on User {
-  email
-  projectMemberships {
-    nodes {
-      id
-    }
+fragment Todo_PopulateFragment_0 on Todo {
+  ...TodoFragment
+}
+
+fragment TodoFragment on Todo {
+  id
+  author {
+    id
   }
 }
 `);
