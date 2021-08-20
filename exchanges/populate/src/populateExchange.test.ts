@@ -28,7 +28,6 @@ const schemaDef = `
     name: String!
     age: Int!
     todos: [Todo]
-    projectMemberships: ProjectMemberships
   }
 
   type Todo implements Node {
