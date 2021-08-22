@@ -7,7 +7,7 @@ export function withPromise<T extends OperationResult>(
   (source$ as PromisifiedSource<T>).toPromise = () => {
     return pipe(
       source$,
-      filter(result => !result.stale),
+      filter(result => !result.stale && !result.hasNext),
       take(1),
       toPromise
     );
