@@ -25,6 +25,8 @@ export interface RetryExchangeOptions {
   maxNumberAttempts?: number;
   /** Conditionally determine whether an error should be retried */
   retryIf?: (error: CombinedError, operation: Operation) => boolean;
+  /** Conditionally update operations as they're retried (retryIf can be replaced with this) */
+  retryWith?: (error: CombinedError, operation: Operation) => Operation;
 }
 
 export const retryExchange = ({
@@ -33,6 +35,7 @@ export const retryExchange = ({
   randomDelay,
   maxNumberAttempts,
   retryIf: retryIfOption,
+  retryWith,
 }: RetryExchangeOptions): Exchange => {
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
@@ -117,7 +120,10 @@ export const retryExchange = ({
         if (!maxNumberAttemptsExceeded) {
           // Send failed responses to be retried by calling next on the retry$ subject
           // Exclude operations that have been retried more than the specified max
-          nextRetryOperation(res.operation);
+          nextRetryOperation(
+            retryWith ? retryWith(res.error, res.operation) : res.operation
+          );
+
           return false;
         }
 
