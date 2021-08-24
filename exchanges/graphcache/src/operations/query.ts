@@ -342,7 +342,7 @@ const readSelection = (
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
-      updateContext(ctx, input, typename, entityKey, key, fieldName);
+      updateContext(ctx, output, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
