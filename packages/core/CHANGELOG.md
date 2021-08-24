@@ -1,5 +1,14 @@
 # @urql/core
 
+## 2.3.1
+
+### Patch Changes
+
+- ⚠️ Fix mark `query.__key` as non-enumerable so `formatDocument` does not restore previous invocations when cloning the gql-ast, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1870](https://github.com/FormidableLabs/urql/pull/1870))
+- ⚠️ Fix: update toPromise to exclude `hasNext` results. This change ensures that
+  when we call toPromise() on a query we wont serve an incomplete result, the
+  user will expect to receive a non-stale full-result when using toPromise(), by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1880](https://github.com/FormidableLabs/urql/pull/1880))
+
 ## 2.3.0
 
 ### Minor Changes
