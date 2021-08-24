@@ -66,7 +66,7 @@ export const query = (
   error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
-  initDataState('read', store.data, (data && key) || null);
+  initDataState('read', store.data, key);
   const result = read(store, request, data, error);
   clearDataState();
   return result;
@@ -121,21 +121,23 @@ const readRoot = (
   ctx: Context,
   entityKey: string,
   select: SelectionSet,
-  data: Data
+  input: Data
 ): Data => {
-  const typename = ctx.store.rootNames[entityKey] ? entityKey : data.__typename;
+  const typename = ctx.store.rootNames[entityKey]
+    ? entityKey
+    : input.__typename;
   if (typeof typename !== 'string') {
-    return data;
+    return input;
   }
 
   const iterate = makeSelectionIterator(entityKey, entityKey, select, ctx);
 
   let node: FieldNode | void;
   let hasChanged = false;
-  const output = makeData(data);
+  const output = makeData(input);
   while ((node = iterate())) {
     const fieldAlias = getFieldAlias(node);
-    const fieldValue = output[fieldAlias];
+    const fieldValue = input[fieldAlias];
     // Add the current alias to the walked path before processing the field's value
     ctx.__internal.path.push(fieldAlias);
     // We temporarily store the data field in here, but undefined
@@ -152,14 +154,14 @@ const readRoot = (
     }
 
     // Check for any referential changes in the field's value
-    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    hasChanged = hasChanged || dataFieldValue !== fieldValue;
     if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue!;
 
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
   }
 
-  return hasChanged ? output : data;
+  return hasChanged ? output : input;
 };
 
 const readRootField = (
@@ -258,7 +260,7 @@ const readSelection = (
   ctx: Context,
   key: string,
   select: SelectionSet,
-  data: Data,
+  input: Data,
   result?: Data
 ): Data | undefined => {
   const { store } = ctx;
@@ -303,9 +305,9 @@ const readSelection = (
 
   let hasFields = false;
   let hasPartials = false;
-  let hasChanged = typename !== data.__typename;
+  let hasChanged = typename !== input.__typename;
   let node: FieldNode | void;
-  const output = makeData(data);
+  const output = makeData(input);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
     const fieldName = getName(node);
@@ -340,7 +342,7 @@ const readSelection = (
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
-      updateContext(ctx, data, typename, entityKey, key, fieldName);
+      updateContext(ctx, output, typename, entityKey, key, fieldName);
 
       // We have a resolver for this field.
       // Prepare the actual fieldValue, so that the resolver can use it
@@ -364,9 +366,11 @@ const readSelection = (
           fieldName,
           key,
           getSelectionSet(node),
-          output[fieldAlias] as Data,
+          (output[fieldAlias] !== undefined
+            ? output[fieldAlias]
+            : input[fieldAlias]) as Data,
           dataFieldValue,
-          ownsData(output)
+          ownsData(input)
         );
       }
 
@@ -390,9 +394,11 @@ const readSelection = (
         fieldName,
         key,
         getSelectionSet(node),
-        output[fieldAlias] as Data,
+        (output[fieldAlias] !== undefined
+          ? output[fieldAlias]
+          : input[fieldAlias]) as Data,
         resultValue,
-        ownsData(output)
+        ownsData(input)
       );
     } else {
       // Otherwise we attempt to get the missing field from the cache
@@ -405,8 +411,10 @@ const readSelection = (
           typename,
           fieldName,
           getSelectionSet(node),
-          output[fieldAlias] as Data,
-          ownsData(output)
+          (output[fieldAlias] !== undefined
+            ? output[fieldAlias]
+            : input[fieldAlias]) as Data,
+          ownsData(input)
         );
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // The entity on the field was invalid but can still be recovered
@@ -440,7 +448,7 @@ const readSelection = (
     // After processing the field, remove the current alias from the path again
     ctx.__internal.path.pop();
     // Check for any referential changes in the field's value
-    hasChanged = hasChanged || dataFieldValue !== output[fieldAlias];
+    hasChanged = hasChanged || dataFieldValue !== input[fieldAlias];
     if (dataFieldValue !== undefined) output[fieldAlias] = dataFieldValue;
   }
 
@@ -449,7 +457,7 @@ const readSelection = (
     ? undefined
     : hasChanged
     ? output
-    : data;
+    : input;
 };
 
 const resolveResolverResult = (
@@ -564,7 +572,7 @@ const resolveLink = (
     }
 
     return hasChanged ? newLink : (prevData as Data[]);
-  } else if (link === null || (prevData === null && ownsData)) {
+  } else if (link === null || (prevData === null && skipNull)) {
     return null;
   }
 
