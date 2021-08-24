@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 4.3.1
+
+### Patch Changes
+
+- ⚠️ Fix previous results' `null` values spilling into the next result that Graphcache issues, which may prevent updates from being issued until the query is reexecuted. This was affecting any `null` links on data, and any queries that were issued before non-optimistic mutations, by [@kitten](https://github.com/kitten) (See [#1885](https://github.com/FormidableLabs/urql/pull/1885))
+- Updated dependencies (See [#1870](https://github.com/FormidableLabs/urql/pull/1870) and [#1880](https://github.com/FormidableLabs/urql/pull/1880))
+  - @urql/core@2.3.1
+
 ## 4.3.0
 
 ### Minor Changes
