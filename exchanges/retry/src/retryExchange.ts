@@ -26,7 +26,10 @@ export interface RetryExchangeOptions {
   /** Conditionally determine whether an error should be retried */
   retryIf?: (error: CombinedError, operation: Operation) => boolean;
   /** Conditionally update operations as they're retried (retryIf can be replaced with this) */
-  retryWith?: (error: CombinedError, operation: Operation) => Operation;
+  retryWith?: (
+    error: CombinedError,
+    operation: Operation
+  ) => Operation | null | undefined;
 }
 
 export const retryExchange = ({
@@ -118,12 +121,14 @@ export const retryExchange = ({
           (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
 
         if (!maxNumberAttemptsExceeded) {
+          const operation = retryWith
+            ? retryWith(res.error, res.operation)
+            : res.operation;
+          if (!operation) return true;
+
           // Send failed responses to be retried by calling next on the retry$ subject
           // Exclude operations that have been retried more than the specified max
-          nextRetryOperation(
-            retryWith ? retryWith(res.error, res.operation) : res.operation
-          );
-
+          nextRetryOperation(operation);
           return false;
         }
 
