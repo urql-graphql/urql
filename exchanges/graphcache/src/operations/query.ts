@@ -564,7 +564,7 @@ const resolveLink = (
     }
 
     return hasChanged ? newLink : (prevData as Data[]);
-  } else if (link === null || (prevData === null && ownsData)) {
+  } else if (link === null || (prevData === null && skipNull)) {
     return null;
   }
 
