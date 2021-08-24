@@ -25,6 +25,11 @@ export interface RetryExchangeOptions {
   maxNumberAttempts?: number;
   /** Conditionally determine whether an error should be retried */
   retryIf?: (error: CombinedError, operation: Operation) => boolean;
+  /** Conditionally update operations as they're retried (retryIf can be replaced with this) */
+  retryWith?: (
+    error: CombinedError,
+    operation: Operation
+  ) => Operation | null | undefined;
 }
 
 export const retryExchange = ({
@@ -32,15 +37,13 @@ export const retryExchange = ({
   maxDelayMs,
   randomDelay,
   maxNumberAttempts,
-  retryIf: retryIfOption,
+  retryIf,
+  retryWith,
 }: RetryExchangeOptions): Exchange => {
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
   const MAX_ATTEMPTS = maxNumberAttempts || 2;
   const RANDOM_DELAY = randomDelay || true;
-
-  const retryIf =
-    retryIfOption || ((err: CombinedError) => err && err.networkError);
 
   return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
@@ -107,7 +110,12 @@ export const retryExchange = ({
       filter(res => {
         // Only retry if the error passes the conditional retryIf function (if passed)
         // or if the error contains a networkError
-        if (!res.error || !retryIf(res.error, res.operation)) {
+        if (
+          !res.error ||
+          (retryIf
+            ? !retryIf(res.error, res.operation)
+            : !retryWith && !res.error.networkError)
+        ) {
           return true;
         }
 
@@ -115,9 +123,14 @@ export const retryExchange = ({
           (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
 
         if (!maxNumberAttemptsExceeded) {
+          const operation = retryWith
+            ? retryWith(res.error, res.operation)
+            : res.operation;
+          if (!operation) return true;
+
           // Send failed responses to be retried by calling next on the retry$ subject
           // Exclude operations that have been retried more than the specified max
-          nextRetryOperation(res.operation);
+          nextRetryOperation(operation);
           return false;
         }
 

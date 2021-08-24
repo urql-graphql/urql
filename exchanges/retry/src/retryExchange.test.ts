@@ -3,6 +3,7 @@ import { pipe, map, makeSubject, publish, tap } from 'wonka';
 import {
   gql,
   createClient,
+  makeOperation,
   Operation,
   OperationResult,
   ExchangeIO,
@@ -226,4 +227,106 @@ it(`should still retry if retryIf undefined but there is a networkError`, () => 
   // max number of retries, plus original call
   expect(response).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts);
   expect(result).toHaveBeenCalledTimes(1);
+});
+
+it('should allow retryWhen to return falsy value and act as replacement of retryIf', () => {
+  const errorWithNetworkError = {
+    ...queryOneError,
+    networkError: 'scary network error',
+  };
+  const response = jest.fn(
+    (forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return {
+        operation: forwardOp,
+        // @ts-ignore
+        error: errorWithNetworkError,
+      };
+    }
+  );
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  const retryWith = jest.fn(() => null);
+
+  pipe(
+    retryExchange({
+      ...mockOptions,
+      retryIf: undefined,
+      retryWith,
+    })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+
+  jest.runAllTimers();
+
+  // max number of retries, plus original call
+  expect(retryWith).toHaveBeenCalledTimes(1);
+  expect(response).toHaveBeenCalledTimes(1);
+  expect(result).toHaveBeenCalledTimes(1);
+});
+
+it('should allow retryWhen to return new operations when retrying', () => {
+  const errorWithNetworkError = {
+    ...queryOneError,
+    networkError: 'scary network error',
+  };
+  const response = jest.fn(
+    (forwardOp: Operation): OperationResult => {
+      expect(forwardOp.key).toBe(op.key);
+      return {
+        operation: forwardOp,
+        // @ts-ignore
+        error: errorWithNetworkError,
+      };
+    }
+  );
+
+  const result = jest.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  const retryWith = jest.fn((_error, operation) => {
+    return makeOperation(operation.kind, operation, {
+      ...operation.context,
+      counter: (operation.context?.counter || 0) + 1,
+    });
+  });
+
+  pipe(
+    retryExchange({
+      ...mockOptions,
+      retryIf: undefined,
+      retryWith,
+    })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+
+  jest.runAllTimers();
+
+  // max number of retries, plus original call
+  expect(retryWith).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts - 1);
+  expect(response).toHaveBeenCalledTimes(mockOptions.maxNumberAttempts);
+  expect(result).toHaveBeenCalledTimes(1);
+
+  expect(response.mock.calls[1][0]).toHaveProperty('context.counter', 1);
+  expect(response.mock.calls[2][0]).toHaveProperty('context.counter', 2);
 });
