@@ -73,9 +73,6 @@ polka()
 
     let { operationName, query, variables } = getGraphQLParameters(request);
 
-    // BEWARE HACKS
-    query = query.replace('initial_count', 'initialCount');
-
     const result = await processRequest({
       operationName,
       query,
