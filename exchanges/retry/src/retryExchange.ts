@@ -37,16 +37,13 @@ export const retryExchange = ({
   maxDelayMs,
   randomDelay,
   maxNumberAttempts,
-  retryIf: retryIfOption,
+  retryIf,
   retryWith,
 }: RetryExchangeOptions): Exchange => {
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
   const MAX_ATTEMPTS = maxNumberAttempts || 2;
   const RANDOM_DELAY = randomDelay || true;
-
-  const retryIf =
-    retryIfOption || ((err: CombinedError) => err && err.networkError);
 
   return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
@@ -113,7 +110,12 @@ export const retryExchange = ({
       filter(res => {
         // Only retry if the error passes the conditional retryIf function (if passed)
         // or if the error contains a networkError
-        if (!res.error || !retryIf(res.error, res.operation)) {
+        if (
+          !res.error ||
+          (retryIf
+            ? !retryIf(res.error, res.operation)
+            : !retryWith && !res.error.networkError)
+        ) {
           return true;
         }
 
