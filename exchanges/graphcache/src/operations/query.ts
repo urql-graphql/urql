@@ -66,7 +66,7 @@ export const query = (
   error?: CombinedError | undefined,
   key?: number
 ): QueryResult => {
-  initDataState('read', store.data, (data && key) || null);
+  initDataState('read', store.data, key);
   const result = read(store, request, data, error);
   clearDataState();
   return result;

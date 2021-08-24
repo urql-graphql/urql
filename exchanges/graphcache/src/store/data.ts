@@ -92,7 +92,7 @@ export const ownsData = (data?: Data): boolean =>
 export const initDataState = (
   operationType: OperationType,
   data: InMemoryData,
-  layerKey: number | null,
+  layerKey?: number | null,
   isOptimistic?: boolean
 ) => {
   currentOwnership = new Set();
