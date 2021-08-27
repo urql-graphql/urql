@@ -55,7 +55,10 @@ export function withUrqlClient(
           ssr = ssrExchange({
             initialState: urqlServerState,
             isClient: true,
-            staleWhileRevalidate: options!.staleWhileRevalidate,
+            staleWhileRevalidate:
+              typeof window !== 'undefined'
+                ? options!.staleWhileRevalidate
+                : undefined,
           });
         } else if (!version) {
           ssr.restoreData(urqlServerState);
