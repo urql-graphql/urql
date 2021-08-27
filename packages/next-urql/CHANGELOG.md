@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.1
+
+### Patch Changes
+
+- ⚠️ Fix issue where the `renderToString` pass would keep looping due to reexecuting operations on the server, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1895](https://github.com/FormidableLabs/urql/pull/1895))
+
 ## 3.2.0
 
 ### Minor Changes
