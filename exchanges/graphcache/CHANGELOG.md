@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.3.2
+
+### Patch Changes
+
+- Cleanup the previous `onOnline` event-listener when called again, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1896](https://github.com/FormidableLabs/urql/pull/1896))
+
 ## 4.3.1
 
 ### Patch Changes
