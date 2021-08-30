@@ -322,7 +322,6 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
               outcome === 'partial')
           ) {
             result.stale = true;
-            result.hasNext = true;
             if (!isBlockedByOptimisticUpdate(dependencies)) {
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
