@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.3.3
+
+### Patch Changes
+
+- Remove `hasNext: true` flag from stale responses. This was erroneously added in debugging, but leads to stale responses being marked with `hasNext`, which means the `dedupExchange` will keep waiting for further network responses, by [@kitten](https://github.com/kitten) (See [#1911](https://github.com/FormidableLabs/urql/pull/1911))
+
 ## 4.3.2
 
 ### Patch Changes
