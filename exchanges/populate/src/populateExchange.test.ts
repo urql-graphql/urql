@@ -120,7 +120,7 @@ describe('nested fragment', () => {
   const fragment = gql`
     fragment TodoFragment on Todo {
       id
-      author {
+      creator {
         id
       }
     }
@@ -165,7 +165,7 @@ describe('nested fragment', () => {
     expect(print(response[1].query)).toBe(`mutation MyMutation {
   updateTodo {
     id
-    author {
+    creator {
       id
     }
   }
@@ -260,14 +260,13 @@ describe('on query -> mutation', () => {
       id
       name
     }
-    text
   }
 }
 `);
     });
   });
 });
-/*
+
 describe('on (query w/ fragment) -> mutation', () => {
   const queryOp = makeOperation(
     'query',
@@ -325,32 +324,23 @@ describe('on (query w/ fragment) -> mutation', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchInlineSnapshot(`
-        "mutation MyMutation {
-          addTodo {
-            ...Todo_PopulateFragment_0
-            ...TodoFragment
-          }
-        }
+      expect(print(response[1].query)).toBe(`mutation MyMutation {
+  addTodo {
+    id
+    text
+    creator {
+      id
+      name
+    }
+    ...TodoFragment
+  }
+}
 
-        fragment TodoFragment on Todo {
-          id
-          text
-        }
-
-        fragment Todo_PopulateFragment_0 on Todo {
-          ...TodoFragment
-          creator {
-            ...CreatorFragment
-          }
-        }
-
-        fragment CreatorFragment on User {
-          id
-          name
-        }
-        "
-      `);
+fragment TodoFragment on Todo {
+  id
+  text
+}
+`);
     });
 
     it('includes user fragment', () => {
@@ -414,19 +404,13 @@ describe('on (query w/ unused fragment) -> mutation', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchInlineSnapshot(`
-        "mutation MyMutation {
-          addTodo {
-            ...Todo_PopulateFragment_0
-          }
-        }
-
-        fragment Todo_PopulateFragment_0 on Todo {
-          id
-          text
-        }
-        "
-      `);
+      expect(print(response[1].query)).toBe(`mutation MyMutation {
+  addTodo {
+    id
+    text
+  }
+}
+`);
     });
 
     it('excludes user fragment', () => {
@@ -486,32 +470,19 @@ describe('on query -> (mutation w/ interface return type)', () => {
         toArray
       );
 
-      expect(print(response[1].query)).toMatchInlineSnapshot(`
-        "mutation MyMutation {
-          removeTodo {
-            ...User_PopulateFragment_0
-            ...Todo_PopulateFragment_0
-          }
-        }
-
-        fragment User_PopulateFragment_0 on User {
-          id
-          text
-        }
-
-        fragment Todo_PopulateFragment_0 on Todo {
-          id
-          name
-        }
-        "
-      `);
+      expect(print(response[1].query)).toBe(`mutation MyMutation {
+  removeTodo {
+    id
+  }
+}
+`);
     });
   });
 });
-
-describe('on query -> (mutation w/ union return type)', () => {
+/*
+describe("on query -> (mutation w/ union return type)", () => {
   const queryOp = makeOperation(
-    'query',
+    "query",
     {
       key: 1234,
       query: gql`
@@ -531,7 +502,7 @@ describe('on query -> (mutation w/ union return type)', () => {
   );
 
   const mutationOp = makeOperation(
-    'mutation',
+    "mutation",
     {
       key: 5678,
       query: gql`
@@ -543,8 +514,8 @@ describe('on query -> (mutation w/ union return type)', () => {
     context
   );
 
-  describe('mutation query', () => {
-    it('matches snapshot', async () => {
+  describe("mutation query", () => {
+    it("matches snapshot", async () => {
       const response = pipe<Operation, any, Operation[]>(
         fromArray([queryOp, mutationOp]),
         populateExchange({ schema })(exchangeArgs),
@@ -573,6 +544,7 @@ describe('on query -> (mutation w/ union return type)', () => {
     });
   });
 });
+*/
 
 describe('on query -> teardown -> mutation', () => {
   const queryOp = makeOperation(
@@ -614,26 +586,25 @@ describe('on query -> teardown -> mutation', () => {
         toArray
       );
 
-      expect(print(response[2].query)).toMatchInlineSnapshot(`
-        "mutation MyMutation {
-          addTodo {
-            __typename
-          }
-        }
-        "
-      `);
+      expect(print(response[2].query)).toBe(`mutation MyMutation {
+  addTodo {
+    id
+    text
+  }
+}
+`);
     });
 
-    it('only requests __typename', () => {
+    /*it("only requests __typename", () => {
       const response = pipe<Operation, any, Operation[]>(
         fromArray([queryOp, teardownOp, mutationOp]),
         populateExchange({ schema })(exchangeArgs),
         toArray
       );
-      getNodesByType(response[2].query, 'Field').forEach(field => {
+      getNodesByType(response[2].query, "Field").forEach((field) => {
         expect(field.name.value).toMatch(/addTodo|__typename/);
       });
-    });
+    });*/
   });
 });
 
@@ -646,7 +617,7 @@ describe('interface returned in mutation', () => {
         query {
           products {
             id
-            text
+            name
             price
             tax
           }
@@ -676,26 +647,15 @@ describe('interface returned in mutation', () => {
       toArray
     );
 
-    expect(print(response[1].query)).toMatchInlineSnapshot(`
-      "mutation MyMutation {
-        addProduct {
-          ...SimpleProduct_PopulateFragment_0
-          ...ComplexProduct_PopulateFragment_0
-        }
-      }
-
-      fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
-        id
-        price
-      }
-
-      fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
-        id
-        price
-        tax
-      }
-      "
-    `);
+    expect(print(response[1].query)).toBe(`mutation MyMutation {
+  addProduct {
+    id
+    name
+    price
+    tax
+  }
+}
+`);
   });
 });
 
@@ -708,7 +668,7 @@ describe('nested interfaces', () => {
         query {
           products {
             id
-            text
+            name
             price
             tax
             store {
@@ -744,36 +704,20 @@ describe('nested interfaces', () => {
       toArray
     );
 
-    expect(print(response[1].query)).toMatchInlineSnapshot(`
-      "mutation MyMutation {
-        addProduct {
-          ...SimpleProduct_PopulateFragment_0
-          ...ComplexProduct_PopulateFragment_0
-        }
-      }
-
-      fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
-        id
-        price
-        store {
-          id
-          name
-          address
-        }
-      }
-
-      fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
-        id
-        price
-        tax
-        store {
-          id
-          name
-          website
-        }
-      }
-      "
-    `);
+    expect(print(response[1].query)).toBe(`mutation MyMutation {
+  addProduct {
+    id
+    name
+    price
+    tax
+    store {
+      id
+      name
+      address
+      website
+    }
+  }
+}
+`);
   });
 });
-*/
