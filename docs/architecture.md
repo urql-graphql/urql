@@ -242,4 +242,4 @@ const { unsubscribe } = pipe(
 );
 ```
 
-Read more about the available APIs on the `Client` in the [Core API docs](../api/core.md).
+Read more about the available APIs on the `Client` in the [Core API docs](./api/core.md).
