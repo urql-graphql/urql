@@ -1,12 +1,10 @@
-import { Readable, writable } from 'svelte/store';
-import { DocumentNode } from 'graphql';
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import {
-  OperationContext,
-  CombinedError,
-  createRequest,
-  stringifyVariables,
-} from '@urql/core';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { OperationContext, CombinedError } from '@urql/core';
+import type { DocumentNode } from 'graphql';
+import type { Readable } from 'svelte/store';
+
+import { createRequest, stringifyVariables } from '@urql/core';
+import { writable } from 'svelte/store';
 
 import { _storeUpdate } from './internal';
 

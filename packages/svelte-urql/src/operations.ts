@@ -1,15 +1,15 @@
-import { onDestroy } from 'svelte';
-
-import {
-  createRequest,
+import type {
   OperationContext,
   OperationResult,
   GraphQLRequest,
   TypedDocumentNode,
 } from '@urql/core';
+import type { DocumentNode } from 'graphql';
+import type { Source } from 'wonka';
 
+import { onDestroy } from 'svelte';
+import { createRequest } from '@urql/core';
 import {
-  Source,
   pipe,
   map,
   make,
@@ -22,10 +22,11 @@ import {
   take,
 } from 'wonka';
 
-import { OperationStore, operationStore } from './operationStore';
+import type { OperationStore } from './operationStore';
+
+import { operationStore } from './operationStore';
 import { getClient } from './context';
 import { _markStoreUpdate } from './internal';
-import { DocumentNode } from 'graphql';
 
 interface SourceRequest<Data = any, Variables = object>
   extends GraphQLRequest<Data, Variables> {

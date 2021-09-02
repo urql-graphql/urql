@@ -1,5 +1,8 @@
+import type { ClientOptions } from '@urql/core';
+
 import { setContext, getContext } from 'svelte';
-import { Client, ClientOptions } from '@urql/core';
+import { Client } from '@urql/core';
+
 import { _contextKey } from './internal';
 
 export const getClient = (): Client => getContext(_contextKey);

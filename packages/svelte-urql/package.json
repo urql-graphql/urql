@@ -21,6 +21,7 @@
   ],
   "main": "dist/urql-svelte",
   "module": "dist/urql-svelte.mjs",
+  "svelte": "src/index.ts",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
