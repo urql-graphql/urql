@@ -21,7 +21,7 @@ export interface OperationStore<Data = any, Vars = any, Result = Data>
   // Input properties
   query: DocumentNode | TypedDocumentNode<Data, Vars> | string;
   variables: Vars | null;
-  context: Partial<OperationContext> | undefined;
+  context: Partial<OperationContext & { pause: boolean }> | undefined;
   // Output properties
   readonly stale: boolean;
   readonly fetching: boolean;
