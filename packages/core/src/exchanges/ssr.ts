@@ -80,6 +80,8 @@ const deserializeResult = (
   hasNext: result.hasNext,
 });
 
+const revalidated = new Set<number>();
+
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   const staleWhileRevalidate = !!(params && params.staleWhileRevalidate);
@@ -128,8 +130,9 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       map(op => {
         const serialized = data[op.key]!;
         const result = deserializeResult(op, serialized);
-        if (staleWhileRevalidate) {
+        if (staleWhileRevalidate && !revalidated.has(op.key)) {
           result.stale = true;
+          revalidated.add(op.key);
           reexecuteOperation(client, op);
         }
 
