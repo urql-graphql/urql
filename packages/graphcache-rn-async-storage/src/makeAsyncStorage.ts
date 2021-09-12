@@ -8,6 +8,8 @@ export type StorageOptions = {
   maxAge?: number; // Number of days
 };
 
+let disconnect;
+
 export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
   dataKey = 'graphcache-data',
   metadataKey = 'graphcache-metadata',
@@ -97,7 +99,12 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
     },
 
     onOnline: cb => {
-      NetInfo.addEventListener(({ isConnected }) => {
+      if (disconnect) {
+        disconnect();
+        disconnect = undefined;
+      }
+
+      disconnect = NetInfo.addEventListener(({ isConnected }) => {
         if (isConnected) {
           cb();
         }
