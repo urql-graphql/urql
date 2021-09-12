@@ -45,7 +45,7 @@ export interface SubscriptionOperation {
 
 export type SubscriptionForwarder = (
   operation: SubscriptionOperation
-) => ObservableLike<ExecutionResult & { extensions?: Record<string, any> }>;
+) => ObservableLike<ExecutionResult>;
 
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
 export interface SubscriptionExchangeOpts {

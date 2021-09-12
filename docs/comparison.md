@@ -43,7 +43,7 @@ All features are marked to indicate the following:
 | Devtools                                   | ✅                                  | ✅                                            | ✅                             |
 | Subscriptions                              | ✅                                  | ✅                                            | ✅                             |
 | Client-side Rehydration                    | ✅                                  | ✅                                            | ✅                             |
-| Polled Queries                             | ✅                                  | ✅                                            | ✅                             |
+| Polled Queries                             | 🔶                                  | ✅                                            | ✅                             |
 | Lazy Queries                               | ✅                                  | ✅                                            | ✅                             |
 | Stale while Revalidate / Cache and Network | ✅                                  | ✅                                            | ✅                             |
 | Focus Refetching                           | ✅ `@urql/exchange-refocus`         | 🛑                                            | 🛑                             |
@@ -51,7 +51,7 @@ All features are marked to indicate the following:
 | Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | ✅                             |
 | Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | 🟡 `react-relay-network-layer` |
 | Live Queries                               | 🛑                                  | 🛑                                            | ✅                             |
-| Defer & Stream Directives                  | 🛑                                  | 🛑                                            | ✅                             |
+| Defer & Stream Directives                  | ✅                                  | 🛑                                            | 🟡 (unreleased)                |
 | Switching to `GET` method                  | ✅                                  | ✅                                            | 🟡 `react-relay-network-layer` |
 | File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | 🛑                             |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                        | ✅ `DefaultNetworkLayer`       |

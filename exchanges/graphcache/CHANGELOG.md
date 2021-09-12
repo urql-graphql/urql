@@ -1,5 +1,40 @@
 # @urql/exchange-graphcache
 
+## 4.3.3
+
+### Patch Changes
+
+- Remove `hasNext: true` flag from stale responses. This was erroneously added in debugging, but leads to stale responses being marked with `hasNext`, which means the `dedupExchange` will keep waiting for further network responses, by [@kitten](https://github.com/kitten) (See [#1911](https://github.com/FormidableLabs/urql/pull/1911))
+
+## 4.3.2
+
+### Patch Changes
+
+- Cleanup the previous `onOnline` event-listener when called again, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1896](https://github.com/FormidableLabs/urql/pull/1896))
+
+## 4.3.1
+
+### Patch Changes
+
+- ⚠️ Fix previous results' `null` values spilling into the next result that Graphcache issues, which may prevent updates from being issued until the query is reexecuted. This was affecting any `null` links on data, and any queries that were issued before non-optimistic mutations, by [@kitten](https://github.com/kitten) (See [#1885](https://github.com/FormidableLabs/urql/pull/1885))
+- Updated dependencies (See [#1870](https://github.com/FormidableLabs/urql/pull/1870) and [#1880](https://github.com/FormidableLabs/urql/pull/1880))
+  - @urql/core@2.3.1
+
+## 4.3.0
+
+### Minor Changes
+
+- Improve referential equality of deeply queried objects from the normalised cache for queries. Each query operation will now reuse the last known result and only incrementally change references as necessary, scanning over the previous result to identify whether anything has changed.
+  This should help improve the performance of processing updates in UI frameworks (e.g. in React with `useMemo` or `React.memo`). (See [#1859](https://github.com/FormidableLabs/urql/pull/1859))
+- Add **experimental** support for `@defer` and `@stream` responses for GraphQL. This implements the ["GraphQL Defer and Stream Directives"](https://github.com/graphql/graphql-spec/blob/4fd39e0/rfcs/DeferStream.md) and ["Incremental Delivery over HTTP"](https://github.com/graphql/graphql-over-http/blob/290b0e2/rfcs/IncrementalDelivery.md) specifications. If a GraphQL API supports `multipart/mixed` responses for deferred and streamed delivery of GraphQL results, `@urql/core` (and all its derived fetch implementations) will attempt to stream results. This is _only supported_ on browsers [supporting streamed fetch responses](https://developer.mozilla.org/en-US/docs/Web/API/Response/body), which excludes IE11.
+  The implementation of streamed multipart responses is derived from [`meros` by `@maraisr`](https://github.com/maraisr/meros), and is subject to change if the RFCs end up changing, by [@kitten](https://github.com/kitten) (See [#1854](https://github.com/FormidableLabs/urql/pull/1854))
+
+### Patch Changes
+
+- ⚠️ Fix missing values cascading into lists causing a `null` item without the query being marked as stale and fetched from the API. This would happen in schema awareness when a required field, which isn't cached, cascades into a nullable list, by [@kitten](https://github.com/kitten) (See [#1869](https://github.com/FormidableLabs/urql/pull/1869))
+- Updated dependencies (See [#1854](https://github.com/FormidableLabs/urql/pull/1854))
+  - @urql/core@2.3.0
+
 ## 4.2.1
 
 ### Patch Changes

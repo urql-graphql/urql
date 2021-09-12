@@ -489,6 +489,7 @@ Object {
   },
   "error": undefined,
   "extensions": undefined,
+  "hasNext": false,
   "operation": Object {
     "context": Object {
       "fetchOptions": Object {
@@ -653,6 +654,7 @@ Object {
   },
   "error": undefined,
   "extensions": undefined,
+  "hasNext": false,
   "operation": Object {
     "context": Object {
       "fetch": [MockFunction] {

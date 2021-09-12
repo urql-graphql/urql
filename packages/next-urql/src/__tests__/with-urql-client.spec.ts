@@ -3,7 +3,7 @@ import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
 
-import { withUrqlClient, NextUrqlPageContext, PartialNextContext } from '..';
+import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
 
 beforeEach(jest.clearAllMocks);
@@ -31,7 +31,7 @@ describe('withUrqlClient', () => {
       })(MockApp);
     });
 
-    const mockContext: PartialNextContext = {
+    const mockContext: NextUrqlPageContext = {
       AppTree: MockAppTree,
       pathname: '/',
       query: {},

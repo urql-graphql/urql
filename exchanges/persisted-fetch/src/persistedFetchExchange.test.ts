@@ -2,20 +2,12 @@
  * @jest-environment node
  */
 
-import {
-  empty,
-  fromValue,
-  fromArray,
-  pipe,
-  Source,
-  subscribe,
-  toPromise,
-} from 'wonka';
+import { empty, fromValue, fromArray, pipe, Source, toPromise } from 'wonka';
 
 import { DocumentNode, print } from 'graphql';
 import { Client, OperationResult } from '@urql/core';
 
-import { queryOperation, mutationOperation } from './test-utils';
+import { queryOperation } from './test-utils';
 import { hash } from './sha256';
 import { persistedFetchExchange } from './persistedFetchExchange';
 
@@ -43,7 +35,7 @@ it('accepts successful persisted query responses', async () => {
   };
 
   fetch.mockResolvedValueOnce({
-    json: () => expected,
+    json: () => Promise.resolve(expected),
   });
 
   const actual = await pipe(
@@ -69,8 +61,12 @@ it('supports cache-miss persisted query errors', async () => {
   };
 
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedMiss),
+    })
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedRetry),
+    });
 
   const actual = await pipe(
     fromValue(queryOperation),
@@ -96,8 +92,12 @@ it('supports GET exclusively for persisted queries', async () => {
   };
 
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedMiss),
+    })
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedRetry),
+    });
 
   const actual = await pipe(
     fromValue(queryOperation),
@@ -125,9 +125,15 @@ it('supports unsupported persisted query errors', async () => {
   };
 
   fetch
-    .mockResolvedValueOnce({ json: () => expectedMiss })
-    .mockResolvedValueOnce({ json: () => expectedRetry })
-    .mockResolvedValueOnce({ json: () => expectedRetry });
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedMiss),
+    })
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedRetry),
+    })
+    .mockResolvedValueOnce({
+      json: () => Promise.resolve(expectedRetry),
+    });
 
   const actual = await pipe(
     fromArray([queryOperation, queryOperation]),
@@ -141,22 +147,6 @@ it('supports unsupported persisted query errors', async () => {
   expect(actual.data).not.toBeUndefined();
 });
 
-it('ignores mutations', async () => {
-  const result = jest.fn();
-  fetch.mockResolvedValueOnce(undefined);
-
-  pipe(
-    fromValue(mutationOperation),
-    persistedFetchExchange()(exchangeArgs),
-    subscribe(result)
-  );
-
-  await Promise.resolve();
-
-  expect(result).toHaveBeenCalledTimes(0);
-  expect(fetch).toHaveBeenCalledTimes(0);
-});
-
 it('correctly generates an SHA256 hash', async () => {
   const expected = {
     data: {
@@ -164,8 +154,8 @@ it('correctly generates an SHA256 hash', async () => {
     },
   };
 
-  fetch.mockResolvedValueOnce({
-    json: () => expected,
+  fetch.mockResolvedValue({
+    json: () => Promise.resolve(expected),
   });
 
   const queryHash = await hash(print(queryOperation.query));
@@ -180,8 +170,8 @@ it('correctly generates an SHA256 hash', async () => {
 
   const body = JSON.parse(fetch.mock.calls[0][1].body);
 
-  expect(queryHash).toMatchInlineSnapshot(
-    `"bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4"`
+  expect(queryHash).toBe(
+    'bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4'
   );
 
   expect(body).toMatchObject({
@@ -202,7 +192,7 @@ it('supports a custom hash function', async () => {
   };
 
   fetch.mockResolvedValueOnce({
-    json: () => expected,
+    json: () => Promise.resolve(expected),
   });
 
   const hashFn = jest.fn((_input: string, _doc: DocumentNode) => {
@@ -246,7 +236,7 @@ it('falls back to a non-persisted query if the hash is falsy', async () => {
   };
 
   fetch.mockResolvedValueOnce({
-    json: () => expected,
+    json: () => Promise.resolve(expected),
   });
 
   const hashFn = jest.fn(() => Promise.resolve(''));

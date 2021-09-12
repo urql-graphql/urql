@@ -217,7 +217,11 @@ model as well and cause the `query` utility to start a new operation.
   query(todos);
 
   function nextPage() {
+    // it's important that we assign a new reference to variables.
+    $todos.variables = { ...$todos.variables, from: $todos.variables.from + $todos.variables.limit };
+    // OR
     $todos.variables.from += $todos.variables.limit;
+    $todos.reexecute();
   }
 </script>
 
@@ -274,22 +278,9 @@ The `requestPolicy` option determines how results are retrieved from our `Client
 default, this is set to `cache-first`, which means that we prefer to get results from our cache, but
 are falling back to sending an API request.
 
-In total there are four different policies that we can use:
-
-- `cache-first` (the default) prefers cached results and falls back to sending an API request when
-  no prior result is cached.
-- `cache-and-network` returns cached results but also always sends an API request, which is perfect
-  for displaying data quickly while keeping it up-to-date.
-- `network-only` will always send an API request and will ignore cached results.
-- `cache-only` will always return cached results or `null`.
-
-The `cache-and-network` policy is particularly useful, since it allows us to display data instantly
-if it has been cached, but also refreshes data in our cache in the background. This means though
-that `fetching` will be `false` for cached results although an API request may still be ongoing in
-the background.
-
-For this reason there's another field on results, `result.stale`, which indicates that the cached
-result is either outdated or that another request is being sent in the background.
+Request policies aren't specific to `urql`'s Svelte bindings, but are a common feature in its core.
+[You can learn more about how the cache behaves given the four different policies on the "Document
+Caching" page.](../basics/document-caching.md)
 
 ```jsx
 <script>
@@ -312,12 +303,63 @@ result is either outdated or that another request is being sent in the backgroun
 ...
 ```
 
-As we can see, the `requestPolicy` is easily changed, and we can read our `context` option back
-from `todos.context`, just as we can check `todos.query` and `todos.variables`. Updating
-`operationStore.context` can be very useful to also refetch queries, as we'll see in the next
-section.
+As we can see, the `requestPolicy` is easily changed by passing it directly as a "context option"
+when creating an `operationStore`. We can then read our `context` option back from `todos.context`,
+just as we can check `todos.query` and `todos.variables`.
 
-[You can learn more about request policies on the API docs.](../api/core.md#requestpolicy)
+Internally, the `requestPolicy` is just one of several "**context** options". The `context`
+provides metadata apart from the usual `query` and `variables` we may pass. This means that
+we may also change the `Client`'s default `requestPolicy` by passing it there.
+
+```js
+import { createClient } from '@urql/svelte';
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  // every operation will by default use cache-and-network rather
+  // than cache-first now:
+  requestPolicy: 'cache-and-network',
+});
+```
+
+### Context Options
+
+As mentioned, the `requestPolicy` option that we're passing to the `operationStore` is a part of
+`urql`'s context options. In fact, there are several more built-in context options, and the
+`requestPolicy` option is one of them. Another option we've already seen is the `url` option, which
+determines our API's URL.
+
+```jsx
+<script>
+  import { operationStore, query } from '@urql/svelte';
+
+  const todos = operationStore(`
+    query ($from: Int!, $limit: Int!) {
+      todos(from: $from, limit: $limit) {
+        id
+        title
+      }
+    }`,
+    { from, limit },
+    {
+      requestPolicy: 'cache-and-network'
+      url: 'http://localhost:3000/graphql?debug=true',
+    }
+  );
+
+  query(todos);
+</script>
+
+...
+```
+
+As we can see, the `context` argument for `operationStore` accepts any known `context` option and
+can be used to alter them per query rather than globally. The `Client` accepts a subset of `context`
+options, while the `operationStore` argument does the same for a single query. They're then merged
+for your operation and form a full `Context` object for each operation, which means that any given
+query is able to override them as needed.
+
+[You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)
 
 ### Reexecuting Queries
 
@@ -355,6 +397,10 @@ can simply assign a new context value using `$todos.context = {}` we can also us
 
 Calling `refresh` in the above example will execute the query again forcefully, and will skip the
 cache, since we're passing `requestPolicy: 'network-only'`.
+
+Furthermore the `reexecute` function can also be used to programmatically start a query even
+when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
+perform one-off actions, or to set up polling.
 
 ### Reading on
 

@@ -30,6 +30,9 @@ const queryOne = gql`
       id
       name
     }
+    unrelated {
+      id
+    }
   }
 `;
 
@@ -39,6 +42,10 @@ const queryOneData = {
     __typename: 'Author',
     id: '123',
     name: 'Author',
+  },
+  unrelated: {
+    __typename: 'Unrelated',
+    id: 'unrelated',
   },
 };
 
@@ -142,7 +149,7 @@ describe('data dependencies', () => {
         {
           __typename: 'Author',
           id: '123',
-          name: 'Author',
+          name: 'New Author Name',
         },
       ],
     };
@@ -193,6 +200,13 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(2);
     expect(reexec).toHaveBeenCalledWith(opOne);
     expect(result).toHaveBeenCalledTimes(3);
+
+    // test for reference reuse
+    const firstDataOne = result.mock.calls[0][0].data;
+    const firstDataTwo = result.mock.calls[1][0].data;
+    expect(firstDataOne).not.toBe(firstDataTwo);
+    expect(firstDataOne.author).not.toBe(firstDataTwo.author);
+    expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
   });
 
   it('updates related queries when a mutation update touches query data', () => {
@@ -1125,7 +1139,7 @@ describe('custom resolvers', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(fakeResolver).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(1);
-    expect(result.mock.calls[0][0].data).toEqual({
+    expect(result.mock.calls[0][0].data).toMatchObject({
       author: {
         id: '123',
         name: 'newName',
@@ -1491,7 +1505,7 @@ describe('schema awareness', () => {
     jest.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(0);
-    expect(result.mock.calls[0][0].data).toEqual({
+    expect(result.mock.calls[0][0].data).toMatchObject({
       todos: [
         {
           __typename: 'Todo',
@@ -1533,6 +1547,122 @@ describe('schema awareness', () => {
           text: 'Teach',
         },
       ],
+    });
+
+    expect(result.mock.calls[1][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'partial'
+    );
+  });
+
+  it('reexecutes query and returns data on partial results for nullable lists', () => {
+    jest.useFakeTimers();
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      // Empty mock to avoid going in an endless loop, since we would again return
+      // partial data.
+      .mockImplementation(() => undefined);
+
+    const initialQuery = gql`
+      query {
+        todos {
+          id
+          __typename
+        }
+      }
+    `;
+
+    const query = gql`
+      query {
+        todos {
+          id
+          text
+          __typename
+        }
+      }
+    `;
+
+    const initialQueryOperation = client.createRequestOperation('query', {
+      key: 1,
+      query: initialQuery,
+    });
+
+    const queryOperation = client.createRequestOperation('query', {
+      key: 2,
+      query,
+    });
+
+    const queryData = {
+      __typename: 'Query',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+        },
+      ],
+    };
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: initialQueryOperation, data: queryData };
+        } else if (forwardOp.key === 2) {
+          return { operation: queryOperation, data: queryData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+    pipe(
+      cacheExchange({
+        schema: minifyIntrospectionQuery(
+          // eslint-disable-next-line
+          require('./test-utils/simple_schema.json')
+        ),
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(initialQueryOperation);
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toMatchObject({
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+        },
+      ],
+    });
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta',
+      undefined
+    );
+
+    next(queryOperation);
+    jest.runAllTimers();
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(result.mock.calls[1][0].stale).toBe(true);
+    expect(result.mock.calls[1][0].data).toEqual({
+      todos: [null, null],
     });
 
     expect(result.mock.calls[1][0]).toHaveProperty(
@@ -2111,5 +2241,137 @@ describe('commutativity', () => {
     });
 
     expect(data).toHaveProperty('node.name', 'subscription b');
+  });
+
+  it('applies deferred results to previous layers', () => {
+    let normalData: any;
+    let deferredData: any;
+    let combinedData: any;
+
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next: nextOp } = makeSubject<Operation>();
+    const { source: res$, next: nextRes } = makeSubject<OperationResult>();
+
+    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+
+    const normalQuery = gql`
+      {
+        node {
+          id
+          name
+        }
+      }
+    `;
+
+    const deferredQuery = gql`
+      {
+        ... @defer {
+          deferred {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const combinedQuery = gql`
+      {
+        node {
+          id
+          name
+        }
+        ... @defer {
+          deferred {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    const forward = (ops$: Source<Operation>): Source<OperationResult> =>
+      merge([
+        pipe(
+          ops$,
+          filter(() => false)
+        ) as any,
+        res$,
+      ]);
+
+    pipe(
+      cacheExchange()({ forward, client, dispatchDebug })(ops$),
+      tap(result => {
+        if (result.operation.kind === 'query') {
+          if (result.operation.key === 1) {
+            deferredData = result.data;
+          } else if (result.operation.key === 42) {
+            combinedData = result.data;
+          } else {
+            normalData = result.data;
+          }
+        }
+      }),
+      publish
+    );
+
+    const combinedOp = client.createRequestOperation('query', {
+      key: 42,
+      query: combinedQuery,
+    });
+    const deferredOp = client.createRequestOperation('query', {
+      key: 1,
+      query: deferredQuery,
+    });
+    const normalOp = client.createRequestOperation('query', {
+      key: 2,
+      query: normalQuery,
+    });
+
+    nextOp(combinedOp);
+    nextOp(deferredOp);
+    nextOp(normalOp);
+
+    nextRes({
+      operation: deferredOp,
+      data: {
+        __typename: 'Query',
+      },
+      hasNext: true,
+    });
+
+    expect(deferredData).toHaveProperty('deferred', undefined);
+
+    nextRes({
+      operation: normalOp,
+      data: {
+        __typename: 'Query',
+        node: {
+          __typename: 'Node',
+          id: 2,
+          name: 'normal',
+        },
+      },
+    });
+
+    expect(normalData).toHaveProperty('node.id', 2);
+    expect(combinedData).toHaveProperty('deferred', undefined);
+    expect(combinedData).toHaveProperty('node.id', 2);
+
+    nextRes({
+      operation: deferredOp,
+      data: {
+        __typename: 'Query',
+        deferred: {
+          __typename: 'Node',
+          id: 1,
+          name: 'deferred',
+        },
+      },
+      hasNext: true,
+    });
+
+    expect(deferredData).toHaveProperty('deferred.id', 1);
+    expect(combinedData).toHaveProperty('deferred.id', 1);
+    expect(combinedData).toHaveProperty('node.id', 2);
   });
 });

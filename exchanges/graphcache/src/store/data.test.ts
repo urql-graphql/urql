@@ -475,3 +475,84 @@ describe('commutative changes', () => {
     expect([...data.commutativeKeys]).toEqual([1]);
   });
 });
+
+describe('deferred changes', () => {
+  it('keeps a deferred layer around until completion', () => {
+    // initially it's unknown whether a layer is deferred
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.reserveLayer(data, 2);
+    InMemoryData.initDataState('write', data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    // The layer is marked as deferred via re-reserving it
+    InMemoryData.reserveLayer(data, 1, true);
+    InMemoryData.initDataState('write', data, 1);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState('read', data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    // The layers must not be squashed
+    expect(data.optimisticOrder).toEqual([2, 1]);
+
+    // A future response may then clear the layer
+    InMemoryData.reserveLayer(data, 1, false);
+    InMemoryData.initDataState('write', data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    // The layers must then be squashed
+    expect(data.optimisticOrder).toEqual([]);
+  });
+
+  it('keeps a deferred layer around even if it is the lowest', () => {
+    // initially it's unknown whether a layer is deferred
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.reserveLayer(data, 2, true);
+    InMemoryData.initDataState('write', data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState('read', data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    // The layers must not be squashed
+    expect(data.optimisticOrder).toEqual([2, 1]);
+
+    // A future response may not clear the layer
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.initDataState('write', data, 1);
+    InMemoryData.writeRecord('Query', 'index', 1);
+    InMemoryData.clearDataState();
+
+    // The layers must then be squashed
+    expect(data.optimisticOrder).toEqual([2]);
+    InMemoryData.noopDataState(data, 2, false);
+    expect(data.optimisticOrder).toEqual([]);
+  });
+
+  it('unmarks deferred layers when they receive a noop write', () => {
+    // initially it's unknown whether a layer is deferred
+    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 2);
+
+    InMemoryData.reserveLayer(data, 2);
+    InMemoryData.initDataState('write', data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    // The layer is marked as deferred via re-reserving it
+    InMemoryData.reserveLayer(data, 1, true);
+    InMemoryData.initDataState('write', data, 1);
+    InMemoryData.clearDataState();
+
+    // The layer is then receiving a noop write
+    InMemoryData.noopDataState(data, 1, false);
+    expect(data.optimisticOrder).toEqual([]);
+  });
+});

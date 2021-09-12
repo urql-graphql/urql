@@ -1,10 +1,22 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { DocumentNode } from 'graphql';
+import { GraphQLError, DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
 
-export { ExecutionResult } from 'graphql';
+export type ExecutionResult =
+  | {
+      errors?: Array<string | Partial<GraphQLError> | Error>;
+      data?: null | Record<string, any>;
+      extensions?: Record<string, any>;
+      hasNext?: boolean;
+    }
+  | {
+      errors?: Array<string | Partial<GraphQLError> | Error>;
+      data: any;
+      path: (string | number)[];
+      hasNext?: boolean;
+    };
 
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
@@ -71,6 +83,8 @@ export interface OperationResult<Data = any, Variables = any> {
   extensions?: Record<string, any>;
   /** Optional stale flag added by exchanges that return stale results. */
   stale?: boolean;
+  /** Optional hasNext flag indicating deferred/streamed results are following. */
+  hasNext?: boolean;
 }
 
 /** Input parameters for to an Exchange factory function. */

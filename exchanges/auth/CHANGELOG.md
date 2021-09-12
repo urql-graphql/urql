@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.6
+
+### Patch Changes
+
+- ⚠️ Fix willAuthError causing duplicate operations, by [@yankovalera](https://github.com/yankovalera) (See [#1849](https://github.com/FormidableLabs/urql/pull/1849))
+- Updated dependencies (See [#1851](https://github.com/FormidableLabs/urql/pull/1851), [#1850](https://github.com/FormidableLabs/urql/pull/1850), and [#1852](https://github.com/FormidableLabs/urql/pull/1852))
+  - @urql/core@2.2.0
+
+## 0.1.5
+
+### Patch Changes
+
+- Expose `AuthContext` type, by [@arempe93](https://github.com/arempe93) (See [#1828](https://github.com/FormidableLabs/urql/pull/1828))
+- Updated dependencies (See [#1829](https://github.com/FormidableLabs/urql/pull/1829))
+  - @urql/core@2.1.6
+
+## 0.1.4
+
+### Patch Changes
+
+- Allow `mutate` to infer the result's type when a `TypedDocumentNode` is passed via the usual generics, like `client.mutation` for instance, by [@younesmln](https://github.com/younesmln) (See [#1796](https://github.com/FormidableLabs/urql/pull/1796))
+
 ## 0.1.3
 
 ### Patch Changes

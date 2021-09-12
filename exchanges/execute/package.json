@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-execute",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "An exchange for executing queries against a local schema in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -51,7 +51,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=2.1.0",
+    "@urql/core": ">=2.3.0",
     "wonka": "^4.0.14"
   },
   "peerDependencies": {

@@ -280,11 +280,13 @@ The `ssrExchange` as [described on the "Server-side Rendering"
 page.](../advanced/server-side-rendering.md).
 It's of type `Options => Exchange`.
 
-It accepts two inputs, `initialState` which is completely
+It accepts three inputs, `initialState` which is completely
 optional and populates the server-side rendered data with
-a rehydrated cache, and `isClient` which can be set to
+a rehydrated cache, `isClient` which can be set to
 `true` or `false` to tell the `ssrExchange` whether to
-write to (server-side) or read from (client-side) the cache.
+write to (server-side) or read from (client-side) the cache, and
+`staleWhileRevalidate` which will treat rehydrated data as stale
+and refetch up-to-date data by reexecuring the operation using a `network-only` requests policy.
 
 By default, `isClient` defaults to `true` when the `Client.suspense`
 mode is disabled and to `false` when the `Client.suspense` mode

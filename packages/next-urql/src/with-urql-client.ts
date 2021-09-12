@@ -1,5 +1,7 @@
 import { createElement, useCallback, useReducer, useMemo } from 'react';
 import ssrPrepass from 'react-ssr-prepass';
+import { NextComponentType, NextPage, NextPageContext } from 'next';
+import NextApp, { AppContext } from 'next/app';
 
 import {
   Provider,
@@ -16,9 +18,7 @@ import {
   NextUrqlContext,
   WithUrqlProps,
   WithUrqlClientOptions,
-  NextComponentType,
   SSRExchange,
-  NextUrqlPageContext,
 } from './types';
 
 let ssr: SSRExchange;
@@ -29,9 +29,9 @@ export function withUrqlClient(
 ) {
   if (!options) options = {};
 
-  return <C extends NextComponentType = NextComponentType>(
+  return <C extends NextPage<any> | typeof NextApp>(
     AppOrPage: C
-  ): NextComponentType => {
+  ): NextComponentType<NextUrqlContext, {}, WithUrqlProps> => {
     const shouldEnableSuspense = Boolean(
       (AppOrPage.getInitialProps || options!.ssr) && !options!.neverSuspend
     );
@@ -52,7 +52,14 @@ export function withUrqlClient(
 
         if (!ssr || typeof window === 'undefined') {
           // We want to force the cache to hydrate, we do this by setting the isClient flag to true
-          ssr = ssrExchange({ initialState: urqlServerState, isClient: true });
+          ssr = ssrExchange({
+            initialState: urqlServerState,
+            isClient: true,
+            staleWhileRevalidate:
+              typeof window !== 'undefined'
+                ? options!.staleWhileRevalidate
+                : undefined,
+          });
         } else if (!version) {
           ssr.restoreData(urqlServerState);
         }
@@ -90,16 +97,19 @@ export function withUrqlClient(
     };
 
     // Set the displayName to indicate use of withUrqlClient.
-    const displayName = AppOrPage.displayName || AppOrPage.name || 'Component';
+    const displayName =
+      (AppOrPage as any).displayName || AppOrPage.name || 'Component';
     WithUrql.displayName = `withUrqlClient(${displayName})`;
 
     if (AppOrPage.getInitialProps || options!.ssr) {
-      WithUrql.getInitialProps = async (appOrPageCtx: NextUrqlPageContext) => {
+      WithUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
         const AppTree = appOrPageCtx.AppTree!;
 
         // Determine if we are wrapping an App component or a Page component.
-        const isApp = !!appOrPageCtx.Component;
-        const ctx = isApp ? appOrPageCtx.ctx! : appOrPageCtx;
+        const isApp = !!(appOrPageCtx as AppContext).Component;
+        const ctx = isApp
+          ? (appOrPageCtx as AppContext).ctx
+          : (appOrPageCtx as NextPageContext);
 
         const ssrCache = ssrExchange({ initialState: undefined });
         const clientConfig = getClientConfig(ssrCache, ctx);
@@ -122,9 +132,7 @@ export function withUrqlClient(
         // Run the wrapped component's getInitialProps function.
         let pageProps = {} as any;
         if (AppOrPage.getInitialProps) {
-          pageProps = await AppOrPage.getInitialProps(
-            appOrPageCtx as NextUrqlPageContext
-          );
+          pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
         }
 
         // Check the window object to determine whether or not we are on the server.

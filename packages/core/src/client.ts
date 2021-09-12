@@ -46,6 +46,7 @@ import {
   maskTypename,
   noop,
   makeOperation,
+  getOperationType,
 } from './utils';
 
 /** Options for configuring the URQL [client]{@link Client}. */
@@ -229,9 +230,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       onPush(result => {
         replays.set(operation.key, result);
       }),
-      onStart(() => {
-        active.set(operation.key, source);
-      }),
       onEnd(() => {
         // Delete the active operation handle
         replays.delete(operation.key);
@@ -289,6 +287,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     createRequestOperation(kind, request, opts) {
+      const requestOperationType = getOperationType(request.query);
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        kind !== 'teardown' &&
+        requestOperationType !== kind
+      ) {
+        throw new Error(
+          `Expected operation of type "${kind}" but found "${requestOperationType}"`
+        );
+      }
       return makeOperation(kind, request, client.createOperationContext(opts));
     },
 
@@ -297,13 +305,17 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         return makeResultSource(operation);
       }
 
-      const source = active.get(operation.key) || makeResultSource(operation);
-
-      const isNetworkOperation =
-        operation.context.requestPolicy === 'cache-and-network' ||
-        operation.context.requestPolicy === 'network-only';
-
       return make(observer => {
+        let source = active.get(operation.key);
+
+        if (!source) {
+          active.set(operation.key, (source = makeResultSource(operation)));
+        }
+
+        const isNetworkOperation =
+          operation.context.requestPolicy === 'cache-and-network' ||
+          operation.context.requestPolicy === 'network-only';
+
         return pipe(
           source,
           onStart(() => {

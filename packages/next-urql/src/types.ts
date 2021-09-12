@@ -1,38 +1,21 @@
 import { GraphQLError } from 'graphql';
-import { ComponentType } from 'react';
 import { ClientOptions, Exchange, Client } from 'urql';
+import { NextPageContext } from 'next';
+import { AppContext } from 'next/app';
 
-export interface PartialNextContext {
-  res?: any;
-  AppTree: NextComponentType<PartialNextContext>;
-  Component?: NextComponentType<PartialNextContext>;
-  ctx?: PartialNextContext;
-  pathname: any;
-  query: any;
-  [key: string]: any;
-}
-
-export type NextComponentType<
-  C extends PartialNextContext = PartialNextContext,
-  IP = {},
-  P = {}
-> = ComponentType<P & WithUrqlProps> & {
-  getInitialProps?(context: C): IP | Promise<IP>;
-};
-
-export interface NextUrqlContext extends PartialNextContext {
+export interface NextUrqlPageContext extends NextPageContext {
   urqlClient: Client;
-  Component: NextComponentType<PartialNextContext>;
-  ctx: NextUrqlContext;
-  router: any;
 }
 
-export type NextUrqlPageContext = NextUrqlContext;
-export type NextUrqlAppContext = NextUrqlContext;
+export interface NextUrqlAppContext extends AppContext {
+  urqlClient: Client;
+}
+
+export type NextUrqlContext = NextUrqlPageContext | NextUrqlAppContext;
 
 export type NextUrqlClientConfig = (
   ssrExchange: SSRExchange,
-  ctx?: NextUrqlContext
+  ctx?: NextPageContext
 ) => ClientOptions;
 
 export interface WithUrqlState {
@@ -71,4 +54,5 @@ export interface SSRExchange extends Exchange {
 export interface WithUrqlClientOptions {
   ssr?: boolean;
   neverSuspend?: boolean;
+  staleWhileRevalidate?: boolean;
 }

@@ -8,6 +8,7 @@ import {
   SerializedEntries,
   Dependencies,
   OperationType,
+  Data,
 } from '../types';
 
 import {
@@ -46,6 +47,8 @@ export interface InMemoryData {
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
   links: NodeMap<Link>;
+  /** A set of Query operation keys that are in-flight and deferred/streamed */
+  deferredKeys: Set<number>;
   /** A set of Query operation keys that are in-flight and awaiting a result */
   commutativeKeys: Set<number>;
   /** The order of optimistic layers */
@@ -54,6 +57,8 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
+let currentOwnership: null | Set<Data> = null;
+let currentDataMapping: null | Map<Data, Data> = null;
 let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
@@ -65,13 +70,33 @@ const makeNodeMap = <T>(): NodeMap<T> => ({
   base: new Map(),
 });
 
+/** Creates a new data object unless it's been created in this data run */
+export const makeData = (data?: Data): Data => {
+  let newData: Data;
+  if (data) {
+    if (currentOwnership!.has(data)) return data;
+    newData = currentDataMapping!.get(data) || ({ ...data } as Data);
+    currentDataMapping!.set(data, newData);
+  } else {
+    newData = {} as Data;
+  }
+
+  currentOwnership!.add(newData);
+  return newData;
+};
+
+export const ownsData = (data?: Data): boolean =>
+  !!data && currentOwnership!.has(data);
+
 /** Before reading or writing the global state needs to be initialised */
 export const initDataState = (
   operationType: OperationType,
   data: InMemoryData,
-  layerKey: number | null,
+  layerKey?: number | null,
   isOptimistic?: boolean
 ) => {
+  currentOwnership = new Set();
+  currentDataMapping = new Map();
   currentOperation = operationType;
   currentData = data;
   currentDependencies = makeDict();
@@ -127,12 +152,15 @@ export const clearDataState = () => {
     while (
       --i >= 0 &&
       data.refLock[data.optimisticOrder[i]] &&
-      data.commutativeKeys.has(data.optimisticOrder[i])
+      data.commutativeKeys.has(data.optimisticOrder[i]) &&
+      !data.deferredKeys.has(data.optimisticOrder[i])
     ) {
       squashLayer(data.optimisticOrder[i]);
     }
   }
 
+  currentOwnership = null;
+  currentDataMapping = null;
   currentOperation = null;
   currentData = null;
   currentDependencies = null;
@@ -159,6 +187,7 @@ export const noopDataState = (
   layerKey: number | null,
   isOptimistic?: boolean
 ) => {
+  if (layerKey && !isOptimistic) data.deferredKeys.delete(layerKey);
   initDataState('read', data, layerKey, isOptimistic);
   clearDataState();
 };
@@ -197,6 +226,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
   refLock: makeDict(),
   links: makeNodeMap(),
   records: makeNodeMap(),
+  deferredKeys: new Set(),
   commutativeKeys: new Set(),
   optimisticOrder: [],
   storage: null,
@@ -474,7 +504,11 @@ export const writeLink = (
 };
 
 /** Reserves an optimistic layer and preorders it */
-export const reserveLayer = (data: InMemoryData, layerKey: number) => {
+export const reserveLayer = (
+  data: InMemoryData,
+  layerKey: number,
+  hasNext?: boolean
+) => {
   const index = data.optimisticOrder.indexOf(layerKey);
   if (index === -1) {
     // The new layer needs to be reserved in front of all other commutative
@@ -488,6 +522,12 @@ export const reserveLayer = (data: InMemoryData, layerKey: number) => {
     // to a new non-optimistic layer and shifted ahead
     data.optimisticOrder.splice(index, 1);
     data.optimisticOrder.unshift(layerKey);
+  }
+
+  if (hasNext) {
+    data.deferredKeys.add(layerKey);
+  } else {
+    data.deferredKeys.delete(layerKey);
   }
 
   data.commutativeKeys.add(layerKey);
@@ -512,6 +552,7 @@ const clearLayer = (data: InMemoryData, layerKey: number) => {
     delete data.refLock[layerKey];
     delete data.records.optimistic[layerKey];
     delete data.links.optimistic[layerKey];
+    data.deferredKeys.delete(layerKey);
   }
 };
 

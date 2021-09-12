@@ -2,6 +2,8 @@ import {
   SelectionNode,
   DocumentNode,
   OperationDefinitionNode,
+  FragmentSpreadNode,
+  InlineFragmentNode,
   valueFromASTUntyped,
   Kind,
 } from 'graphql';
@@ -42,18 +44,15 @@ export const getFragments = (doc: DocumentNode): Fragments => {
   return fragments;
 };
 
+/** Resolves @include and @skip directives to determine whether field is included. */
 export const shouldInclude = (
   node: SelectionNode,
   vars: Variables
 ): boolean => {
-  const { directives } = node;
-  if (!directives) return true;
-
   // Finds any @include or @skip directive that forces the node to be skipped
-  for (let i = 0, l = directives.length; i < l; i++) {
-    const directive = directives[i];
+  for (let i = 0; node.directives && i < node.directives.length; i++) {
+    const directive = node.directives[i];
     const name = getName(directive);
-
     if (
       (name === 'include' || name === 'skip') &&
       directive.arguments &&
@@ -68,4 +67,32 @@ export const shouldInclude = (
   }
 
   return true;
+};
+
+/** Resolves @defer directive to determine whether a fragment is potentially skipped. */
+export const isDeferred = (
+  node: FragmentSpreadNode | InlineFragmentNode,
+  vars: Variables
+): boolean => {
+  for (let i = 0; node.directives && i < node.directives.length; i++) {
+    const directive = node.directives[i];
+    const name = getName(directive);
+    if (name === 'defer') {
+      for (
+        let j = 0;
+        directive.arguments && j < directive.arguments.length;
+        j++
+      ) {
+        const argument = directive.arguments[i];
+        if (getName(argument) === 'if') {
+          // Return whether `@defer(if: )` is enabled
+          return !!valueFromASTUntyped(argument.value, vars);
+        }
+      }
+
+      return true;
+    }
+  }
+
+  return false;
 };

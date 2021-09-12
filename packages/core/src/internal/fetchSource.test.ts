@@ -1,7 +1,10 @@
-import { pipe, subscribe, toPromise } from 'wonka';
+import { pipe, scan, subscribe, toPromise } from 'wonka';
 
-import { queryOperation } from '../test-utils';
+import { queryOperation, context } from '../test-utils';
 import { makeFetchSource } from './fetchSource';
+import { gql } from '../gql';
+import { OperationResult, Operation } from '../types';
+import { makeOperation } from '../utils';
 
 const fetch = (global as any).fetch as jest.Mock;
 const abort = jest.fn();
@@ -16,7 +19,7 @@ beforeAll(() => {
   };
 });
 
-afterEach(() => {
+beforeEach(() => {
   fetch.mockClear();
   abort.mockClear();
 });
@@ -125,7 +128,7 @@ describe('on error', () => {
 
 describe('on teardown', () => {
   it('does not start the outgoing request on immediate teardowns', () => {
-    fetch.mockRejectedValueOnce(abortError);
+    fetch.mockRejectedValue(abortError);
 
     const { unsubscribe } = pipe(
       makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
@@ -138,7 +141,7 @@ describe('on teardown', () => {
   });
 
   it('aborts the outgoing request', async () => {
-    fetch.mockRejectedValueOnce(abortError);
+    fetch.mockRejectedValue(abortError);
 
     const { unsubscribe } = pipe(
       makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
@@ -150,5 +153,386 @@ describe('on teardown', () => {
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(abort).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('on multipart/mixed', () => {
+  const wrap = (json: object) =>
+    '\r\n' +
+    'Content-Type: application/json; charset=utf-8\r\n\r\n' +
+    JSON.stringify(json) +
+    '\r\n---';
+
+  it('listens for more responses (stream)', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      name: 'Steve',
+                      __typename: 'Author',
+                      todos: [{ id: '1', text: 'stream', __typename: 'Todo' }],
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  path: ['author', 'todos', 1],
+                  data: { id: '2', text: 'defer', __typename: 'Todo' },
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              name
+              todos @stream {
+                id
+                text
+              }
+            }
+          }
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+        todos: [{ id: '1', text: 'stream', __typename: 'Todo' }],
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+        todos: [
+          { id: '1', text: 'stream', __typename: 'Todo' },
+          { id: '2', text: 'defer', __typename: 'Todo' },
+        ],
+      },
+    });
+
+    expect(chunks[2].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+        todos: [
+          { id: '1', text: 'stream', __typename: 'Todo' },
+          { id: '2', text: 'defer', __typename: 'Todo' },
+        ],
+      },
+    });
+  });
+
+  it('listens for more responses (defer)', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      __typename: 'Author',
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  path: ['author'],
+                  data: { name: 'Steve' },
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const AuthorFragment = gql`
+      fragment authorFields on Author {
+        name
+      }
+    `;
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              ...authorFields @defer
+            }
+          }
+
+          ${AuthorFragment}
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[2].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        __typename: 'Author',
+      },
+    });
+  });
+
+  it('listens for more responses (defer-neted)', async () => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get() {
+          return 'multipart/mixed';
+        },
+      },
+      body: {
+        getReader: function () {
+          let cancelled = false;
+          const results = [
+            {
+              done: false,
+              value: Buffer.from('\r\n---'),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  hasNext: true,
+                  data: {
+                    author: {
+                      id: '1',
+                      name: 'Steve',
+                      address: {
+                        country: 'UK',
+                        __typename: 'Address',
+                      },
+                      __typename: 'Author',
+                    },
+                  },
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(
+                wrap({
+                  path: ['author', 'address'],
+                  data: { street: 'home' },
+                  hasNext: true,
+                })
+              ),
+            },
+            {
+              done: false,
+              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+            },
+            { done: true },
+          ];
+          let count = 0;
+          return {
+            cancel: function () {
+              cancelled = true;
+            },
+            read: function () {
+              if (cancelled) throw new Error('No');
+
+              return Promise.resolve(results[count++]);
+            },
+          };
+        },
+      },
+    });
+
+    const AddressFragment = gql`
+      fragment addressFields on Address {
+        street
+      }
+    `;
+
+    const streamedQueryOperation: Operation = makeOperation(
+      'query',
+      {
+        query: gql`
+          query {
+            author {
+              id
+              address {
+                id
+                country
+                ...addressFields @defer
+              }
+            }
+          }
+
+          ${AddressFragment}
+        `,
+        variables: {},
+        key: 1,
+      },
+      context
+    );
+
+    const chunks: OperationResult[] = await pipe(
+      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
+      scan((prev: OperationResult[], item) => [...prev, item], []),
+      toPromise
+    );
+
+    expect(chunks.length).toEqual(3);
+
+    expect(chunks[0].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        address: {
+          country: 'UK',
+          __typename: 'Address',
+        },
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[1].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
+        address: {
+          country: 'UK',
+          street: 'home',
+          __typename: 'Address',
+        },
+        __typename: 'Author',
+      },
+    });
   });
 });

@@ -2,8 +2,10 @@ import { GraphQLError } from 'graphql';
 import { pipe, share, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
 import { CombinedError } from '../utils';
+import { reexecuteOperation } from './cache';
 
 export interface SerializedResult {
+  hasNext?: boolean;
   data?: string | undefined; // JSON string of data
   error?: {
     graphQLErrors: Array<Partial<GraphQLError> | string>;
@@ -18,6 +20,7 @@ export interface SSRData {
 export interface SSRExchangeParams {
   isClient?: boolean;
   initialState?: SSRData;
+  staleWhileRevalidate?: boolean;
 }
 
 export interface SSRExchange extends Exchange {
@@ -27,19 +30,15 @@ export interface SSRExchange extends Exchange {
   extractData(): SSRData;
 }
 
-const shouldSkip = ({ kind }: Operation) =>
-  kind !== 'subscription' && kind !== 'query';
-
 /** Serialize an OperationResult to plain JSON */
 const serializeResult = ({
+  hasNext,
   data,
   error,
 }: OperationResult): SerializedResult => {
   const result: SerializedResult = {};
-
-  if (data !== undefined) {
-    result.data = JSON.stringify(data);
-  }
+  if (data !== undefined) result.data = JSON.stringify(data);
+  if (hasNext) result.hasNext = true;
 
   if (error) {
     result.error = {
@@ -66,31 +65,26 @@ const serializeResult = ({
 const deserializeResult = (
   operation: Operation,
   result: SerializedResult
-): OperationResult => {
-  const { error, data: dataJson } = result;
+): OperationResult => ({
+  operation,
+  data: result.data ? JSON.parse(result.data) : undefined,
+  extensions: undefined,
+  error: result.error
+    ? new CombinedError({
+        networkError: result.error.networkError
+          ? new Error(result.error.networkError)
+          : undefined,
+        graphQLErrors: result.error.graphQLErrors,
+      })
+    : undefined,
+  hasNext: result.hasNext,
+});
 
-  const deserialized: OperationResult = {
-    operation,
-    data: dataJson ? JSON.parse(dataJson) : undefined,
-    extensions: undefined,
-    error: error
-      ? new CombinedError({
-          networkError: error.networkError
-            ? new Error(error.networkError)
-            : undefined,
-          graphQLErrors:
-            error.graphQLErrors && error.graphQLErrors.length
-              ? error.graphQLErrors
-              : undefined,
-        })
-      : undefined,
-  };
-
-  return deserialized;
-};
+const revalidated = new Set<number>();
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
+  const staleWhileRevalidate = !!(params && params.staleWhileRevalidate);
   const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
@@ -108,10 +102,6 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     }
   };
 
-  const isCached = (operation: Operation) => {
-    return !shouldSkip(operation) && data[operation.key] != null;
-  };
-
   // The SSR Exchange is a temporary cache that can populate results into data for suspense
   // On the client it can be used to retrieve these temporary results from a rehydrated cache
   const ssr: SSRExchange = ({ client, forward }) => ops$ => {
@@ -126,7 +116,9 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
 
     let forwardedOps$ = pipe(
       sharedOps$,
-      filter(op => !isCached(op)),
+      filter(
+        operation => !data[operation.key] || !!data[operation.key]!.hasNext
+      ),
       forward
     );
 
@@ -134,10 +126,17 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     // it once, cachedOps$ needs to be merged after forwardedOps$
     let cachedOps$ = pipe(
       sharedOps$,
-      filter(op => isCached(op)),
+      filter(operation => !!data[operation.key]),
       map(op => {
         const serialized = data[op.key]!;
-        return deserializeResult(op, serialized);
+        const result = deserializeResult(op, serialized);
+        if (staleWhileRevalidate && !revalidated.has(op.key)) {
+          result.stale = true;
+          revalidated.add(op.key);
+          reexecuteOperation(client, op);
+        }
+
+        return result;
       })
     );
 
@@ -147,7 +146,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
         forwardedOps$,
         tap((result: OperationResult) => {
           const { operation } = result;
-          if (!shouldSkip(operation)) {
+          if (operation.kind !== 'mutation') {
             const serialized = serializeResult(result);
             data[operation.key] = serialized;
           }

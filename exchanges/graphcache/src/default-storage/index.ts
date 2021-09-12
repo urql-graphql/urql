@@ -34,6 +34,8 @@ export interface DefaultStorage extends StorageAdapter {
 export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
   if (!opts) opts = {};
 
+  let callback: (() => void) | undefined;
+
   const DB_NAME = opts.idbName || 'graphcache-v4';
   const ENTRIES_STORE_NAME = 'entries';
   const METADATA_STORE_NAME = 'metadata';
@@ -195,9 +197,17 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
     },
 
     onOnline(cb: () => void) {
-      window.addEventListener('online', () => {
-        cb();
-      });
+      if (callback) {
+        window.removeEventListener('online', callback);
+        callback = undefined;
+      }
+
+      window.addEventListener(
+        'online',
+        (callback = () => {
+          cb();
+        })
+      );
     },
   };
 };

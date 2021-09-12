@@ -19,10 +19,14 @@ const serializedQueryResponse = {
 
 beforeEach(() => {
   input = makeSubject<Operation>();
-  output = jest.fn();
+  output = jest.fn(operation => ({ operation }));
   forward = ops$ => pipe(ops$, map(output));
   client = { suspense: true } as any;
   exchangeInput = { forward, client };
+});
+
+afterEach(() => {
+  output.mockClear();
 });
 
 it('caches query results correctly', () => {
@@ -158,6 +162,32 @@ it('resolves cached query results correctly', () => {
   expect(Object.keys(data).length).toBe(1);
   expect(output).not.toHaveBeenCalled();
   expect(onPush).toHaveBeenCalledWith(queryResponse);
+});
+
+it('resolves deferred, cached query results correctly', () => {
+  const onPush = jest.fn();
+
+  const ssr = ssrExchange({
+    isClient: true,
+    initialState: {
+      [queryOperation.key]: {
+        hasNext: true,
+        ...(serializedQueryResponse as any),
+      },
+    },
+  });
+
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  pipe(exchange, forEach(onPush));
+  next(queryOperation);
+
+  const data = ssr.extractData();
+  expect(Object.keys(data).length).toBe(1);
+  expect(output).toHaveBeenCalledTimes(1);
+  expect(onPush).toHaveBeenCalledTimes(2);
+  expect(onPush.mock.calls[1][0]).toEqual({ hasNext: true, ...queryResponse });
 });
 
 it('deletes cached results in non-suspense environments', async () => {

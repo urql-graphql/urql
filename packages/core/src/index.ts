@@ -11,6 +11,7 @@ export {
   createRequest,
   makeResult,
   makeErrorResult,
+  mergeResultPatch,
   formatDocument,
   maskTypename,
   makeOperation,

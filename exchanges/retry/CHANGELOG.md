@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- Add a new `retryWith` option which allows operations to be updated when a request is being retried, by [@kitten](https://github.com/kitten) (See [#1881](https://github.com/FormidableLabs/urql/pull/1881))
+
+### Patch Changes
+
+- Updated dependencies (See [#1870](https://github.com/FormidableLabs/urql/pull/1870) and [#1880](https://github.com/FormidableLabs/urql/pull/1880))
+  - @urql/core@2.3.1
+
 ## 0.2.1
 
 ### Patch Changes

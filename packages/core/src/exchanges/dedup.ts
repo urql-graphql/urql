@@ -30,8 +30,10 @@ export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
     return !isInFlight;
   };
 
-  const afterOperationResult = ({ operation }: OperationResult) => {
-    inFlightKeys.delete(operation.key);
+  const afterOperationResult = ({ operation, hasNext }: OperationResult) => {
+    if (!hasNext) {
+      inFlightKeys.delete(operation.key);
+    }
   };
 
   return ops$ => {

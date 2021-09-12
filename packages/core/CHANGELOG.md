@@ -1,5 +1,40 @@
 # @urql/core
 
+## 2.3.1
+
+### Patch Changes
+
+- ⚠️ Fix mark `query.__key` as non-enumerable so `formatDocument` does not restore previous invocations when cloning the gql-ast, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1870](https://github.com/FormidableLabs/urql/pull/1870))
+- ⚠️ Fix: update toPromise to exclude `hasNext` results. This change ensures that
+  when we call toPromise() on a query we wont serve an incomplete result, the
+  user will expect to receive a non-stale full-result when using toPromise(), by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1880](https://github.com/FormidableLabs/urql/pull/1880))
+
+## 2.3.0
+
+### Minor Changes
+
+- Add **experimental** support for `@defer` and `@stream` responses for GraphQL. This implements the ["GraphQL Defer and Stream Directives"](https://github.com/graphql/graphql-spec/blob/4fd39e0/rfcs/DeferStream.md) and ["Incremental Delivery over HTTP"](https://github.com/graphql/graphql-over-http/blob/290b0e2/rfcs/IncrementalDelivery.md) specifications. If a GraphQL API supports `multipart/mixed` responses for deferred and streamed delivery of GraphQL results, `@urql/core` (and all its derived fetch implementations) will attempt to stream results. This is _only supported_ on browsers [supporting streamed fetch responses](https://developer.mozilla.org/en-US/docs/Web/API/Response/body), which excludes IE11.
+  The implementation of streamed multipart responses is derived from [`meros` by `@maraisr`](https://github.com/maraisr/meros), and is subject to change if the RFCs end up changing, by [@kitten](https://github.com/kitten) (See [#1854](https://github.com/FormidableLabs/urql/pull/1854))
+
+## 2.2.0
+
+### Minor Changes
+
+- Add a `staleWhileRevalidate` option to the `ssrExchange`, which allows the client to immediately refetch a new result on hydration, which may be used for cached / stale SSR or SSG pages. This is different from using `cache-and-network` by default (which isn't recommended) as the `ssrExchange` typically acts like a "replacement fetch request", by [@kitten](https://github.com/kitten) (See [#1852](https://github.com/FormidableLabs/urql/pull/1852))
+
+### Patch Changes
+
+- ⚠️ Fix prevent mangling embedded strings in queries sent using the `GET` method, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1851](https://github.com/FormidableLabs/urql/pull/1851))
+- The [single-source behavior previously](https://github.com/FormidableLabs/urql/pull/1515) wasn't effective for implementations like React,
+  where the issue presents itself when the state of an operation is first polled. This led to the operation being torn down erroneously.
+  We now ensure that operations started at the same time still use a shared single-source, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1850](https://github.com/FormidableLabs/urql/pull/1850))
+
+## 2.1.6
+
+### Patch Changes
+
+- Warn for invalid operation passed to query/subscription/mutation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1829](https://github.com/FormidableLabs/urql/pull/1829))
+
 ## 2.1.5
 
 ### Patch Changes
