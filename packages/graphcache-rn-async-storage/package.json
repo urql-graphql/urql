@@ -1,8 +1,8 @@
 {
   "name": "@urql/graphcache-rn-async-storage",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "sideEffects": false,
-  "description": "TODO:",
+  "description": "Graphcache offline storage for React Native",
   "homepage": "https://formidable.com/open-source/urql/docs/",
   "bugs": "https://github.com/FormidableLabs/urql/issues",
   "license": "MIT",
