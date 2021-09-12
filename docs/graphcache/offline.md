@@ -87,6 +87,22 @@ const client = createClient({
 });
 ```
 
+## React Native
+
+For React Native, we can use the async storage package `@urql/graphcache-rn-async-storage`.
+
+Before installing the [library](https://github.com/FormidableLabs/urql/tree/main/packages/graphcache-rn-async-storage), ensure you have installed the necessary peer dependencies: NetInfo ([RN](https://github.com/react-native-netinfo/react-native-netinfo) | [Expo](https://docs.expo.dev/versions/latest/sdk/netinfo/)) and AsyncStorage ([RN](https://react-native-async-storage.github.io/async-storage/docs/install) | [Expo](https://docs.expo.dev/versions/v42.0.0/sdk/async-storage/)).
+
+```js
+import { makeAsyncStorage } from '@urql/graphcache-rn-async-storage';
+
+const storage = makeAsyncStorage({
+  dataKey: 'graphcache-data', // The AsyncStorage key used for the data (defaults to graphcache-data)
+  metadataKey: 'graphcache-metadata', // The AsyncStorage key used for the metadata (defaults to graphcache-metadata)
+  maxAge: 7 // How long to persist the data in storage (defaults to 7 days)
+});
+```
+
 ## Offline Behavior
 
 _Graphcache_ applies several mechanisms that improve the consistency of the cache and how it behaves
