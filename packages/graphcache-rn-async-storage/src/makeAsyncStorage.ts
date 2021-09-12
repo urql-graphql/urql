@@ -61,7 +61,7 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
                   Object.assign(todayBatch, parsedData);
                 }
               }
-            } catch {}
+            } catch (_err) {}
           }
         }
       } catch (_err) {}
@@ -82,7 +82,7 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
     writeMetadata: async data => {
       try {
         await AsyncStorage.setItem(metadataKey, JSON.stringify(data));
-      } catch {}
+      } catch (_err) {}
     },
 
     readMetadata: async () => {
