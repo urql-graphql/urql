@@ -32,7 +32,8 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
       try {
         const persistedDayStamps = (await AsyncStorage.getAllKeys())
           .reduce<number[]>((filtered, curr) => {
-            const ts = curr.match(prefixCheck)?.[1];
+            const match = curr.match(prefixCheck);
+            const ts = match ? match[1] : undefined;
 
             if (ts) {
               filtered.push(Number(ts));
