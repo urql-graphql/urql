@@ -9,9 +9,9 @@ type StorageOptions = {
 };
 
 export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
-  dataKey = 'GRAPHCACHE_DATA',
-  metadataKey = 'GRAPHCACHE_METADATA',
-  maxAge = 7, // In days
+  dataKey = 'graphcache-data',
+  metadataKey = 'graphcache-metadata',
+  maxAge = 7,
 } = {}) => {
   const todayDayStamp = Math.floor(
     new Date().valueOf() / (1000 * 60 * 60 * 24)
@@ -41,7 +41,8 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
           }, [])
           .sort();
 
-        for (let dayStamp of persistedDayStamps) {
+        // eslint-disable-next-line es5/no-for-of
+        for (const dayStamp of persistedDayStamps) {
           // Discard
           if (todayDayStamp - dayStamp > maxAge) {
             await AsyncStorage.removeItem(`${dataKey}_${dayStamp}`);
