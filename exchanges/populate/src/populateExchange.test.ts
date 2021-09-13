@@ -111,7 +111,7 @@ const schema = introspectionFromSchema(buildSchema(schemaDef));
 beforeEach(jest.clearAllMocks);
 
 const exchangeArgs = {
-  forward: a => a as any,
+  forward: (a: any) => a as any,
   client: {} as Client,
   dispatchDebug: jest.fn(),
 };
@@ -148,7 +148,7 @@ describe('nested fragment', () => {
       key: 5678,
       query: gql`
         mutation MyMutation {
-          updateTodo @populate
+          addTodo @populate
         }
       `,
     },
@@ -163,7 +163,7 @@ describe('nested fragment', () => {
     );
 
     expect(print(response[1].query)).toBe(`mutation MyMutation {
-  updateTodo {
+  addTodo {
     id
     creator {
       id
@@ -189,7 +189,7 @@ describe('on mutation', () => {
   );
 
   describe('mutation query', () => {
-    it('matches snapshot', async () => {
+    it('Only adds __typename if there are no queries to infer fields', async () => {
       const response = pipe<Operation, any, Operation[]>(
         fromValue(operation),
         populateExchange({ schema })(exchangeArgs),
@@ -245,7 +245,7 @@ describe('on query -> mutation', () => {
   );
 
   describe('mutation query', () => {
-    it('matches snapshot', async () => {
+    it('Populate mutation with fields required to update previous queries', async () => {
       const response = pipe<Operation, any, Operation[]>(
         fromArray([queryOp, mutationOp]),
         populateExchange({ schema })(exchangeArgs),
@@ -437,11 +437,11 @@ describe('on query -> (mutation w/ interface return type)', () => {
         query {
           todos {
             id
-            name
+            text
           }
           users {
             id
-            text
+            name
           }
         }
       `,
@@ -472,28 +472,39 @@ describe('on query -> (mutation w/ interface return type)', () => {
 
       expect(print(response[1].query)).toBe(`mutation MyMutation {
   removeTodo {
-    id
+    ...User_PopulateFragment_0
+    ...Todo_PopulateFragment_0
   }
+}
+
+fragment User_PopulateFragment_0 on User {
+  id
+  name
+}
+
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  text
 }
 `);
     });
   });
 });
-/*
-describe("on query -> (mutation w/ union return type)", () => {
+
+describe('on query -> (mutation w/ union return type)', () => {
   const queryOp = makeOperation(
-    "query",
+    'query',
     {
       key: 1234,
       query: gql`
         query {
           todos {
             id
-            name
+            text
           }
           users {
             id
-            text
+            name
           }
         }
       `,
@@ -502,7 +513,7 @@ describe("on query -> (mutation w/ union return type)", () => {
   );
 
   const mutationOp = makeOperation(
-    "mutation",
+    'mutation',
     {
       key: 5678,
       query: gql`
@@ -514,37 +525,34 @@ describe("on query -> (mutation w/ union return type)", () => {
     context
   );
 
-  describe("mutation query", () => {
-    it("matches snapshot", async () => {
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
       const response = pipe<Operation, any, Operation[]>(
         fromArray([queryOp, mutationOp]),
         populateExchange({ schema })(exchangeArgs),
         toArray
       );
 
-      expect(print(response[1].query)).toMatchInlineSnapshot(`
-        "mutation MyMutation {
-          updateTodo {
-            ...User_PopulateFragment_0
-            ...Todo_PopulateFragment_0
-          }
-        }
+      expect(print(response[1].query)).toBe(`mutation MyMutation {
+  updateTodo {
+    ...User_PopulateFragment_0
+    ...Todo_PopulateFragment_0
+  }
+}
 
-        fragment User_PopulateFragment_0 on User {
-          id
-          text
-        }
+fragment User_PopulateFragment_0 on User {
+  id
+  name
+}
 
-        fragment Todo_PopulateFragment_0 on Todo {
-          id
-          name
-        }
-        "
-      `);
+fragment Todo_PopulateFragment_0 on Todo {
+  id
+  text
+}
+`);
     });
   });
 });
-*/
 
 describe('on query -> teardown -> mutation', () => {
   const queryOp = makeOperation(
@@ -619,63 +627,8 @@ describe('interface returned in mutation', () => {
             id
             name
             price
-            tax
-          }
-        }
-      `,
-    },
-    context
-  );
-
-  const mutationOp = makeOperation(
-    'mutation',
-    {
-      key: 5678,
-      query: gql`
-        mutation MyMutation {
-          addProduct @populate
-        }
-      `,
-    },
-    context
-  );
-
-  it('should correctly make the inline-fragments', () => {
-    const response = pipe<Operation, any, Operation[]>(
-      fromArray([queryOp, mutationOp]),
-      populateExchange({ schema })(exchangeArgs),
-      toArray
-    );
-
-    expect(print(response[1].query)).toBe(`mutation MyMutation {
-  addProduct {
-    id
-    name
-    price
-    tax
-  }
-}
-`);
-  });
-});
-
-describe('nested interfaces', () => {
-  const queryOp = makeOperation(
-    'query',
-    {
-      key: 1234,
-      query: gql`
-        query {
-          products {
-            id
-            name
-            price
-            tax
-            store {
-              id
-              name
-              address
-              website
+            ... on ComplexProduct {
+              tax
             }
           }
         }
@@ -706,16 +659,107 @@ describe('nested interfaces', () => {
 
     expect(print(response[1].query)).toBe(`mutation MyMutation {
   addProduct {
+    ...SimpleProduct_PopulateFragment_0
+    ...ComplexProduct_PopulateFragment_0
+  }
+}
+
+fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
+  id
+  name
+  price
+}
+
+fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
+  id
+  name
+  price
+  tax
+}
+`);
+  });
+});
+
+describe('nested interfaces', () => {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      query: gql`
+        query {
+          products {
+            id
+            name
+            price
+            ... on ComplexProduct {
+              tax
+              store {
+                id
+                name
+                website
+              }
+            }
+            ... on SimpleProduct {
+              store {
+                id
+                name
+                address
+              }
+            }
+          }
+        }
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      query: gql`
+        mutation MyMutation {
+          addProduct @populate
+        }
+      `,
+    },
+    context
+  );
+
+  it('should correctly make the inline-fragments', () => {
+    const response = pipe<Operation, any, Operation[]>(
+      fromArray([queryOp, mutationOp]),
+      populateExchange({ schema })(exchangeArgs),
+      toArray
+    );
+
+    expect(print(response[1].query)).toBe(`mutation MyMutation {
+  addProduct {
+    ...SimpleProduct_PopulateFragment_0
+    ...ComplexProduct_PopulateFragment_0
+  }
+}
+
+fragment SimpleProduct_PopulateFragment_0 on SimpleProduct {
+  id
+  name
+  price
+  store {
     id
     name
-    price
-    tax
-    store {
-      id
-      name
-      address
-      website
-    }
+    address
+  }
+}
+
+fragment ComplexProduct_PopulateFragment_0 on ComplexProduct {
+  id
+  name
+  price
+  tax
+  store {
+    id
+    name
+    website
   }
 }
 `);
