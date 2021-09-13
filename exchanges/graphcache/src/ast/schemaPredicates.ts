@@ -39,8 +39,8 @@ export const isFieldAvailableOnType = (
   typename: string,
   fieldName: string
 ): boolean =>
-  fieldName.indexOf(BUILTIN_NAME) === 0 ||
-  typename.indexOf(BUILTIN_NAME) === 0 ||
+  fieldName.startsWith(BUILTIN_NAME) ||
+  typename.startsWith(BUILTIN_NAME) ||
   !!getField(schema, typename, fieldName);
 
 export const isInterfaceOfType = (
@@ -69,10 +69,7 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
-  if (
-    fieldName.indexOf(BUILTIN_NAME) === 0 ||
-    typename.indexOf(BUILTIN_NAME) === 0
-  ) return;
+  if (fieldName.startsWith(BUILTIN_NAME) || typename.startsWith(BUILTIN_NAME)) return;
 
   expectObjectType(schema, typename);
   const object = schema.types![typename] as SchemaObject;
