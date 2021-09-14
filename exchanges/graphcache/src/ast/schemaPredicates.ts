@@ -11,7 +11,7 @@ import {
   OptimisticMutationConfig,
 } from '../types';
 
-const BUILTIN_NAME_RE = /^__/;
+const BUILTIN_NAME = '__';
 
 export const isFieldNullable = (
   schema: SchemaIntrospector,
@@ -39,8 +39,8 @@ export const isFieldAvailableOnType = (
   typename: string,
   fieldName: string
 ): boolean =>
-  BUILTIN_NAME_RE.test(fieldName) ||
-  BUILTIN_NAME_RE.test(typename) ||
+  fieldName.indexOf(BUILTIN_NAME) === 0 ||
+  typename.indexOf(BUILTIN_NAME) === 0 ||
   !!getField(schema, typename, fieldName);
 
 export const isInterfaceOfType = (
@@ -69,7 +69,11 @@ const getField = (
   typename: string,
   fieldName: string
 ) => {
-  if (BUILTIN_NAME_RE.test(typename) || BUILTIN_NAME_RE.test(fieldName)) return;
+  if (
+    fieldName.indexOf(BUILTIN_NAME) === 0 ||
+    typename.indexOf(BUILTIN_NAME) === 0
+  )
+    return;
 
   expectObjectType(schema, typename);
   const object = schema.types![typename] as SchemaObject;
