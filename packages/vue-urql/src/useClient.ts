@@ -1,14 +1,25 @@
-import { App, getCurrentInstance, inject, provide } from 'vue';
+import { App, getCurrentInstance, inject, provide, Ref, isRef } from 'vue';
 import { Client, ClientOptions } from '@urql/core';
 
-export function provideClient(opts: ClientOptions | Client) {
-  const client = opts instanceof Client ? opts : new Client(opts);
+export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
+  let client: Client;
+  if (isRef(opts)) {
+    client = opts.value;
+  } else {
+    client = opts instanceof Client ? opts : new Client(opts);
+  }
+
   provide('$urql', client);
   return client;
 }
 
-export function install(app: App, opts: ClientOptions | Client) {
-  const client = opts instanceof Client ? opts : new Client(opts);
+export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
+  let client: Client;
+  if (isRef(opts)) {
+    client = opts.value;
+  } else {
+    client = opts instanceof Client ? opts : new Client(opts);
+  }
   app.provide('$urql', client);
 }
 
