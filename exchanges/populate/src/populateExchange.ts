@@ -76,7 +76,7 @@ export const populateExchange = ({
     if (isAbstractType(type)) {
       // TODO: should we add this to typeParents/typeFields as well?
       schema.getPossibleTypes(type).forEach(t => {
-        readFromSelectionSet(t, selections, seenFields);
+        readFromSelectionSet(t, selections);
       });
     } else {
       const fieldMap = type.getFields();
@@ -93,6 +93,12 @@ export const populateExchange = ({
           if (fragment) {
             readFromSelectionSet(type, fragment.selectionSet.selections);
           }
+
+          continue;
+        }
+
+        if (selection.kind === Kind.INLINE_FRAGMENT) {
+          readFromSelectionSet(type, selection.selectionSet.selections);
 
           continue;
         }
@@ -226,6 +232,8 @@ type UserFragmentMap<T extends string = string> = Record<
 
 type SelectionMap = Map<string, Set<string>>;
 
+const DOUBLE_COLON = '::';
+
 /** Replaces populate decorator with fragment spreads + fragments. */
 export const addSelectionsToMutation = (
   schema: GraphQLSchema,
@@ -311,6 +319,13 @@ export const addSelectionsToMutation = (
             const field = fieldValues[fieldKey];
 
             if (field.type instanceof GraphQLObjectType) {
+              const keyName = `${field.fieldName}${DOUBLE_COLON}${field.type.name}`;
+
+              selectionMap.set(
+                parent,
+                (selectionMap.get(parent) || new Set()).add(keyName)
+              );
+
               typeFields.forEach((value, fieldKey) => {
                 if (fieldKey.name === field.type.name) {
                   inferFields(
@@ -325,7 +340,7 @@ export const addSelectionsToMutation = (
 
                       return prev;
                     }, {}),
-                    field.fieldName
+                    keyName
                   );
                 }
               });
@@ -358,7 +373,7 @@ export const addSelectionsToMutation = (
               }
 
               inferFields(p, value, parent);
-            } else {
+            } else if (!abstractType) {
               const possibleTypeFields = possibleType.getFields();
               for (const ptKey in possibleTypeFields) {
                 const typeField = possibleTypeFields[ptKey].type;
@@ -427,10 +442,23 @@ const addSelections = (
     const result: Array<SelectionNode> = [];
 
     fieldSet.forEach(fieldName => {
-      result.push({
-        kind: Kind.FIELD,
-        name: createNameNode(fieldName),
-      });
+      const doubleColonPosition = fieldName.indexOf(DOUBLE_COLON);
+
+      if (doubleColonPosition === -1) {
+        result.push({
+          kind: Kind.FIELD,
+          name: createNameNode(fieldName),
+        });
+      } else {
+        result.push({
+          kind: Kind.FIELD,
+          name: createNameNode(fieldName.substring(0, doubleColonPosition)),
+          selectionSet: {
+            kind: Kind.SELECTION_SET,
+            selections: addFields(selectionMap.get(fieldName)!),
+          },
+        });
+      }
     });
 
     return result;
@@ -459,7 +487,7 @@ const addSelections = (
         kind: Kind.FRAGMENT_SPREAD,
         name: createNameNode(key),
       });
-    } else {
+    } else if (key.indexOf(DOUBLE_COLON) === -1) {
       newSelections.push({
         kind: Kind.FIELD,
         name: createNameNode(key),
