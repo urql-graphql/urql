@@ -1,5 +1,5 @@
 {
-  "name": "@urql/graphcache-rn-async-storage",
+  "name": "@urql/storage-rn",
   "version": "0.1.0",
   "sideEffects": false,
   "description": "Graphcache offline storage for React Native",
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/FormidableLabs/urql.git",
-    "directory": "packages/graphcache-rn-async-storage"
+    "directory": "packages/storage-rn"
   },
   "keywords": [
     "urql",
@@ -20,8 +20,8 @@
     "offline",
     "storage"
   ],
-  "main": "dist/urql-graphcache-rn-async-storage",
-  "module": "dist/urql-graphcache-rn-async-storage.mjs",
+  "main": "dist/urql-storage-rn",
+  "module": "dist/urql-storage-rn.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "files": [
@@ -32,8 +32,8 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/urql-graphcache-rn-async-storage.mjs",
-      "require": "./dist/urql-graphcache-rn-async-storage.js",
+      "import": "./dist/urql-storage-rn.mjs",
+      "require": "./dist/urql-storage-rn.js",
       "types": "./dist/types/index.d.ts",
       "source": "./src/index.ts"
     },
