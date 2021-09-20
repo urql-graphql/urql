@@ -42,6 +42,10 @@ maintainers and supporters. This page is specifically dedicated to all of you!
 <img alt="Open Social" height="60" src="./assets/logos/open-social.png" />
 </a>
 
+<a href="https://getsturdy.com/">
+<img alt="Sturdy" height="60" src="./assets/logos/sturdy.png" />
+</a>
+
 ## Articles & Tutorials
 
 - [Egghead Course](https://egghead.io/lessons/graphql-set-up-an-urql-graphql-provider-in-react?pl=introduction-to-urql-a-react-graphql-client-faaa2bf5)
