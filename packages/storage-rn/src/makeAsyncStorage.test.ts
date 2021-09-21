@@ -332,4 +332,27 @@ describe('makeAsyncStorage', () => {
       expect(callbackSpy).toBeCalledTimes(0);
     });
   });
+
+  describe('clear', () => {
+    it('clears all data and metadata', async () => {
+      const removeItemSpy = jest.fn();
+      const secondRemoveItemSpy = jest.fn();
+      jest
+        .spyOn(AsyncStorage, 'removeItem')
+        .mockImplementationOnce(removeItemSpy)
+        .mockImplementationOnce(secondRemoveItemSpy);
+
+      const storage = makeAsyncStorage({
+        dataKey: 'my-data',
+        metadataKey: 'my-metadata',
+      });
+
+      if (storage && storage.clear) {
+        await storage.clear();
+      }
+
+      expect(removeItemSpy).toHaveBeenCalledWith('my-data');
+      expect(secondRemoveItemSpy).toHaveBeenCalledWith('my-metadata');
+    });
+  });
 });

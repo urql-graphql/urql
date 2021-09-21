@@ -28,7 +28,13 @@ const saveToStorage = async (key: string, data: object) => {
 
 let disconnect;
 
-export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
+export interface DefaultAsyncStorage extends StorageAdapter {
+  clear(): Promise<any>;
+}
+
+export const makeAsyncStorage: (
+  ops?: StorageOptions
+) => DefaultAsyncStorage = ({
   dataKey = 'graphcache-data',
   metadataKey = 'graphcache-metadata',
   maxAge = 7,
@@ -94,6 +100,13 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
           cb();
         }
       });
+    },
+
+    clear: async () => {
+      try {
+        await AsyncStorage.removeItem(dataKey);
+        await AsyncStorage.removeItem(metadataKey);
+      } catch (_err) {}
     },
   };
 };
