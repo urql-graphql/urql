@@ -8,22 +8,14 @@ export type StorageOptions = {
   maxAge?: number; // Number of days
 };
 
-const getFromStorage = async (key: string, fallback: any) => {
+const parseData = (persistedData: any, fallback: any) => {
   try {
-    const persistedData = await AsyncStorage.getItem(key);
-
     if (persistedData) {
       return JSON.parse(persistedData);
     }
   } catch (_err) {}
 
   return fallback;
-};
-
-const saveToStorage = async (key: string, data: object) => {
-  try {
-    await AsyncStorage.setItem(key, JSON.stringify(data));
-  } catch (_err) {}
 };
 
 let disconnect;
@@ -47,7 +39,12 @@ export const makeAsyncStorage: (
   return {
     readData: async () => {
       if (!Object.keys(allData).length) {
-        const parsed = await getFromStorage(dataKey, {});
+        let persistedData: string | null = null;
+        try {
+          persistedData = await AsyncStorage.getItem(dataKey);
+        } catch (_err) {}
+        const parsed = parseData(persistedData, {});
+
         Object.assign(allData, parsed);
       }
 
@@ -61,7 +58,9 @@ export const makeAsyncStorage: (
       });
 
       if (syncNeeded) {
-        await saveToStorage(dataKey, allData);
+        try {
+          await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
+        } catch (_err) {}
       }
 
       return Object.assign(
@@ -72,7 +71,11 @@ export const makeAsyncStorage: (
 
     writeData: async delta => {
       if (!Object.keys(allData).length) {
-        const parsed = await getFromStorage(dataKey, {});
+        let persistedData: string | null = null;
+        try {
+          persistedData = await AsyncStorage.getItem(dataKey);
+        } catch (_err) {}
+        const parsed = parseData(persistedData, {});
         Object.assign(allData, parsed);
       }
 
@@ -81,15 +84,23 @@ export const makeAsyncStorage: (
         [todayDayStamp]: Object.assign(today, delta),
       });
 
-      await saveToStorage(dataKey, allData);
+      try {
+        await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
+      } catch (_err) {}
     },
 
     writeMetadata: async data => {
-      await saveToStorage(metadataKey, data);
+      try {
+        await AsyncStorage.setItem(metadataKey, JSON.stringify(data));
+      } catch (_err) {}
     },
 
     readMetadata: async () => {
-      return await getFromStorage(metadataKey, []);
+      let persistedData: string | null = null;
+      try {
+        persistedData = await AsyncStorage.getItem(metadataKey);
+      } catch (_err) {}
+      return parseData(persistedData, []);
     },
 
     onOnline: cb => {
