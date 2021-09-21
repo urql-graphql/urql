@@ -64,7 +64,10 @@ export const makeAsyncStorage: (
         await saveToStorage(dataKey, allData);
       }
 
-      return allData[todayDayStamp] || {};
+      return Object.assign(
+        {},
+        ...Object.keys(allData).map(key => allData[key])
+      );
     },
 
     writeData: async delta => {

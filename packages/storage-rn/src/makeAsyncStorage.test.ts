@@ -245,6 +245,31 @@ describe('makeAsyncStorage', () => {
       }
     });
 
+    it('merges data from past days correctly', async () => {
+      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      const dayStamp = 18891;
+      const mockData = JSON.stringify({
+        [dayStamp]: { one: 'one' },
+        [dayStamp - 1]: { two: 'two' },
+        [dayStamp - 3]: { three: 'three' },
+        [dayStamp - 4]: { two: 'old' },
+      });
+      const getItemSpy = jest.fn().mockResolvedValue(mockData);
+      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.readData) {
+        const result = await storage.readData();
+        expect(getItemSpy).toHaveBeenCalledWith('graphcache-data');
+        expect(result).toEqual({
+          one: 'one',
+          two: 'two',
+          three: 'three',
+        });
+      }
+    });
+
     it('cleans up old data', async () => {
       jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
