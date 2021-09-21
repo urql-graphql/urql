@@ -86,16 +86,20 @@ export const makeAsyncStorage: (
         }
       });
 
+      // all the past entries
+      const past = Object.keys(allData).map(key => ({
+        [key]: Object.assign(allData[key], deletedKeys),
+      }));
+
+      // merge past entries with allData
+      past.forEach(item => {
+        Object.assign(allData, item);
+      });
+
       const today = allData[todayDayStamp] || {};
-      Object.assign(
-        allData,
-        ...Object.keys(allData).map(key => ({
-          [key]: Object.assign(allData[key], deletedKeys),
-        })),
-        {
-          [todayDayStamp]: Object.assign(today, delta),
-        }
-      );
+      Object.assign(allData, {
+        [todayDayStamp]: Object.assign(today, delta),
+      });
 
       try {
         await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
