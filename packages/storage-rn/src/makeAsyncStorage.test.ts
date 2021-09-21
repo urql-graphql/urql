@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { makeAsyncStorage } from './makeAsyncStorage';
 
-jest.mock('@react-native-community/netinfo');
+jest.mock('@react-native-community/netinfo', () => ({
+  addEventListener: () => 'addEventListener',
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: () => 'setItem',
   getItem: () => 'getItem',
+  getAllKeys: () => 'getAllKeys',
+  removeItem: () => 'removeItem',
 }));
 
 const request = [
@@ -181,6 +187,65 @@ describe('makeAsyncStorage', () => {
         `graphcache-data_${dayStamp}`,
         JSON.stringify({ hello: 'world', foo: 'bar' })
       );
+    });
+  });
+
+  describe('onOnline', () => {
+    it('sets up an event listener for the network change event', () => {
+      const addEventListenerSpy = jest.fn();
+      jest
+        .spyOn(NetInfo, 'addEventListener')
+        .mockImplementationOnce(addEventListenerSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.onOnline) {
+        storage.onOnline(() => null);
+      }
+
+      expect(addEventListenerSpy).toBeCalledTimes(1);
+    });
+
+    it('calls the callback when the device comes online', () => {
+      const callbackSpy = jest.fn();
+      let networkCallback;
+      jest
+        .spyOn(NetInfo, 'addEventListener')
+        .mockImplementationOnce(callback => {
+          networkCallback = callback;
+          return () => null;
+        });
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.onOnline) {
+        storage.onOnline(callbackSpy);
+      }
+
+      networkCallback({ isConnected: true });
+
+      expect(callbackSpy).toBeCalledTimes(1);
+    });
+
+    it('does not call the callback when the device is offline', () => {
+      const callbackSpy = jest.fn();
+      let networkCallback;
+      jest
+        .spyOn(NetInfo, 'addEventListener')
+        .mockImplementationOnce(callback => {
+          networkCallback = callback;
+          return () => null;
+        });
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.onOnline) {
+        storage.onOnline(callbackSpy);
+      }
+
+      networkCallback({ isConnected: false });
+
+      expect(callbackSpy).toBeCalledTimes(0);
     });
   });
 });
