@@ -8,6 +8,24 @@ export type StorageOptions = {
   maxAge?: number; // Number of days
 };
 
+const getFromStorage = async (key: string, fallback: any) => {
+  try {
+    const persistedData = await AsyncStorage.getItem(key);
+
+    if (persistedData) {
+      return JSON.parse(persistedData);
+    }
+  } catch (_err) {}
+
+  return fallback;
+};
+
+const saveToStorage = async (key: string, data: object) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+  } catch (_err) {}
+};
+
 let disconnect;
 
 export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
@@ -18,6 +36,7 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
   const todayDayStamp = Math.floor(
     new Date().valueOf() / (1000 * 60 * 60 * 24)
   );
+  const allData = {};
   const todayBatch = {};
   const prefixCheck = new RegExp(`^${dataKey}_(\\d+)$`);
 
@@ -72,30 +91,25 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
     },
 
     writeData: async delta => {
-      try {
-        Object.assign(todayBatch, delta);
-        await AsyncStorage.setItem(
-          `${dataKey}_${todayDayStamp}`,
-          JSON.stringify(todayBatch)
-        );
-      } catch (_err) {}
+      if (!Object.keys(allData).length) {
+        const parsed = await getFromStorage(dataKey, {});
+        Object.assign(allData, parsed);
+      }
+
+      const today = allData[todayDayStamp] || {};
+      Object.assign(allData, {
+        [todayDayStamp]: Object.assign(today, delta),
+      });
+
+      await saveToStorage(dataKey, allData);
     },
 
     writeMetadata: async data => {
-      try {
-        await AsyncStorage.setItem(metadataKey, JSON.stringify(data));
-      } catch (_err) {}
+      await saveToStorage(metadataKey, data);
     },
 
     readMetadata: async () => {
-      try {
-        const persistedMetadata = await AsyncStorage.getItem(metadataKey);
-        if (persistedMetadata) {
-          return JSON.parse(persistedMetadata);
-        }
-      } catch (_err) {}
-
-      return [];
+      return await getFromStorage(metadataKey, []);
     },
 
     onOnline: cb => {

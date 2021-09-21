@@ -30,14 +30,14 @@ const serializedEntries = '{"hello":"world"}';
 
 describe('makeAsyncStorage', () => {
   describe('writeMetadata', () => {
-    it('writes metadata to async storage', () => {
+    it('writes metadata to async storage', async () => {
       const setItemSpy = jest.fn();
       jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
       if (storage && storage.writeMetadata) {
-        storage.writeMetadata(request);
+        await storage.writeMetadata(request);
       }
 
       expect(setItemSpy).toHaveBeenCalledWith(
@@ -46,14 +46,14 @@ describe('makeAsyncStorage', () => {
       );
     });
 
-    it('writes metadata using a custom key key', () => {
+    it('writes metadata using a custom key', async () => {
       const setItemSpy = jest.fn();
       jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage({ metadataKey: 'my-custom-key' });
 
       if (storage && storage.writeMetadata) {
-        storage.writeMetadata(request);
+        await storage.writeMetadata(request);
       }
 
       expect(setItemSpy).toHaveBeenCalledWith(
@@ -90,7 +90,7 @@ describe('makeAsyncStorage', () => {
       }
     });
 
-    it('reads metadata using a custom key key', async () => {
+    it('reads metadata using a custom key', async () => {
       const getItemSpy = jest.fn().mockResolvedValue(serializedRequest);
       jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
@@ -117,7 +117,7 @@ describe('makeAsyncStorage', () => {
   });
 
   describe('writeData', () => {
-    it('writes data to async storage', () => {
+    it('writes data to async storage', async () => {
       jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
@@ -127,16 +127,16 @@ describe('makeAsyncStorage', () => {
       const storage = makeAsyncStorage();
 
       if (storage && storage.writeData) {
-        storage.writeData(entires);
+        await storage.writeData(entires);
       }
 
       expect(setItemSpy).toHaveBeenCalledWith(
-        `graphcache-data_${dayStamp}`,
-        serializedEntries
+        'graphcache-data',
+        `{"${dayStamp}":${serializedEntries}}`
       );
     });
 
-    it('writes data to async storage using custom key', () => {
+    it('writes data to async storage using custom key', async () => {
       jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
@@ -146,16 +146,16 @@ describe('makeAsyncStorage', () => {
       const storage = makeAsyncStorage({ dataKey: 'my-custom-key' });
 
       if (storage && storage.writeData) {
-        storage.writeData(entires);
+        await storage.writeData(entires);
       }
 
       expect(setItemSpy).toHaveBeenCalledWith(
-        `my-custom-key_${dayStamp}`,
-        serializedEntries
+        'my-custom-key',
+        `{"${dayStamp}":${serializedEntries}}`
       );
     });
 
-    it('merges previous writes', () => {
+    it('merges previous writes', async () => {
       jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
@@ -166,12 +166,12 @@ describe('makeAsyncStorage', () => {
 
       // write once
       if (storage && storage.writeData) {
-        storage.writeData(entires);
+        await storage.writeData(entires);
       }
 
       expect(setItemSpy).toHaveBeenCalledWith(
-        `graphcache-data_${dayStamp}`,
-        serializedEntries
+        'graphcache-data',
+        `{"${dayStamp}":${serializedEntries}}`
       );
 
       // write twice
@@ -184,8 +184,33 @@ describe('makeAsyncStorage', () => {
         storage.writeData({ foo: 'bar' });
       }
       expect(secondSetItemSpy).toHaveBeenCalledWith(
-        `graphcache-data_${dayStamp}`,
-        JSON.stringify({ hello: 'world', foo: 'bar' })
+        'graphcache-data',
+        `{"${dayStamp}":${JSON.stringify({ hello: 'world', foo: 'bar' })}}`
+      );
+    });
+
+    it('keeps items from previous days', async () => {
+      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      const dayStamp = 18891;
+      const oldDayStamp = 18857;
+      jest
+        .spyOn(AsyncStorage, 'getItem')
+        .mockResolvedValueOnce(
+          JSON.stringify({ [oldDayStamp]: { foo: 'bar' } })
+        );
+
+      const setItemSpy = jest.fn();
+      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.writeData) {
+        await storage.writeData(entires);
+      }
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'graphcache-data',
+        JSON.stringify({ [oldDayStamp]: { foo: 'bar' }, [dayStamp]: entires })
       );
     });
   });
