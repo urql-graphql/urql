@@ -213,6 +213,36 @@ describe('makeAsyncStorage', () => {
         JSON.stringify({ [oldDayStamp]: { foo: 'bar' }, [dayStamp]: entires })
       );
     });
+
+    it('propagates deleted keys to previous days', async () => {
+      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      const dayStamp = 18891;
+      jest.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(
+        JSON.stringify({
+          [dayStamp]: { foo: 'bar', hello: 'world' },
+          [dayStamp - 1]: { foo: 'bar', hello: 'world' },
+          [dayStamp - 2]: { foo: 'bar', hello: 'world' },
+        })
+      );
+
+      const setItemSpy = jest.fn();
+      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.writeData) {
+        await storage.writeData({ foo: 'new', hello: undefined });
+      }
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'graphcache-data',
+        JSON.stringify({
+          [dayStamp]: { foo: 'new' },
+          [dayStamp - 1]: { foo: 'bar' },
+          [dayStamp - 2]: { foo: 'bar' },
+        })
+      );
+    });
   });
 
   describe('readData', () => {

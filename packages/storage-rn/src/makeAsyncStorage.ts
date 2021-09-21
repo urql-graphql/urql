@@ -79,10 +79,23 @@ export const makeAsyncStorage: (
         Object.assign(allData, parsed);
       }
 
-      const today = allData[todayDayStamp] || {};
-      Object.assign(allData, {
-        [todayDayStamp]: Object.assign(today, delta),
+      const deletedKeys = {};
+      Object.keys(delta).forEach(key => {
+        if (delta[key] === undefined) {
+          deletedKeys[key] = undefined;
+        }
       });
+
+      const today = allData[todayDayStamp] || {};
+      Object.assign(
+        allData,
+        ...Object.keys(allData).map(key => ({
+          [key]: Object.assign(allData[key], deletedKeys),
+        })),
+        {
+          [todayDayStamp]: Object.assign(today, delta),
+        }
+      );
 
       try {
         await AsyncStorage.setItem(dataKey, JSON.stringify(allData));
