@@ -215,6 +215,65 @@ describe('makeAsyncStorage', () => {
     });
   });
 
+  describe('readData', () => {
+    it('returns an empty object if no data is found', async () => {
+      const getItemSpy = jest.fn().mockResolvedValue(null);
+      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.readData) {
+        const result = await storage.readData();
+        expect(getItemSpy).toHaveBeenCalledWith('graphcache-data');
+        expect(result).toEqual({});
+      }
+    });
+
+    it("returns today's data correctly", async () => {
+      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      const dayStamp = 18891;
+      const mockData = JSON.stringify({ [dayStamp]: entires });
+      const getItemSpy = jest.fn().mockResolvedValue(mockData);
+      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+
+      const storage = makeAsyncStorage();
+
+      if (storage && storage.readData) {
+        const result = await storage.readData();
+        expect(getItemSpy).toHaveBeenCalledWith('graphcache-data');
+        expect(result).toEqual(entires);
+      }
+    });
+
+    it('cleans up old data', async () => {
+      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      const dayStamp = 18891;
+      const maxAge = 5;
+      const mockData = JSON.stringify({
+        [dayStamp]: entires, // should be kept
+        [dayStamp - maxAge + 1]: entires, // should be kept
+        [dayStamp - maxAge - 1]: { old: 'data' }, // should get deleted
+      });
+      jest.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(mockData);
+      const setItemSpy = jest.fn();
+      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+
+      const storage = makeAsyncStorage({ maxAge });
+
+      if (storage && storage.readData) {
+        const result = await storage.readData();
+        expect(result).toEqual(entires);
+        expect(setItemSpy).toBeCalledWith(
+          'graphcache-data',
+          JSON.stringify({
+            [dayStamp]: entires,
+            [dayStamp - maxAge + 1]: entires,
+          })
+        );
+      }
+    });
+  });
+
   describe('onOnline', () => {
     it('sets up an event listener for the network change event', () => {
       const addEventListenerSpy = jest.fn();

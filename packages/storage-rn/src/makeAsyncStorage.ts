@@ -37,57 +37,28 @@ export const makeAsyncStorage: (ops?: StorageOptions) => StorageAdapter = ({
     new Date().valueOf() / (1000 * 60 * 60 * 24)
   );
   const allData = {};
-  const todayBatch = {};
-  const prefixCheck = new RegExp(`^${dataKey}_(\\d+)$`);
 
   return {
-    /**
-     * On initial read, pull storage keys and see which match our storage key pattern.
-     * Any record that is expired should be removed from AsyncStorage.
-     * The rest of the batches should be merged into a cache in chrono order.
-     * Also hydrate todayBatch if we find it.
-     */
     readData: async () => {
-      const cache = {};
+      if (!Object.keys(allData).length) {
+        const parsed = await getFromStorage(dataKey, {});
+        Object.assign(allData, parsed);
+      }
 
-      try {
-        const persistedDayStamps = (await AsyncStorage.getAllKeys())
-          .reduce<number[]>((filtered, curr) => {
-            const match = curr.match(prefixCheck);
-            const ts = match ? match[1] : undefined;
-
-            if (ts) {
-              filtered.push(Number(ts));
-            }
-            return filtered;
-          }, [])
-          .sort();
-
-        // eslint-disable-next-line es5/no-for-of
-        for (const dayStamp of persistedDayStamps) {
-          // Discard
-          if (todayDayStamp - dayStamp > maxAge) {
-            await AsyncStorage.removeItem(`${dataKey}_${dayStamp}`);
-          }
-          // Parse batch and merge in.
-          else {
-            try {
-              const data = await AsyncStorage.getItem(`${dataKey}_${dayStamp}`);
-              if (data) {
-                const parsedData = JSON.parse(data);
-                Object.assign(cache, parsedData);
-
-                // We found today's batch, let's hydrate that while we're at it.
-                if (dayStamp === todayDayStamp) {
-                  Object.assign(todayBatch, parsedData);
-                }
-              }
-            } catch (_err) {}
-          }
+      // clean up old data
+      let syncNeeded = false;
+      Object.keys(allData).forEach(dayStamp => {
+        if (todayDayStamp - Number(dayStamp) > maxAge) {
+          syncNeeded = true;
+          delete allData[dayStamp];
         }
-      } catch (_err) {}
+      });
 
-      return cache;
+      if (syncNeeded) {
+        await saveToStorage(dataKey, allData);
+      }
+
+      return allData[todayDayStamp] || {};
     },
 
     writeData: async delta => {
