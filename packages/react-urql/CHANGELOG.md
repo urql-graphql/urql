@@ -1,5 +1,13 @@
 # urql
 
+## 2.0.5
+
+### Patch Changes
+
+- ⚠️ Fix issue where a paused query would not behave correctly when calling `executeQuery`, this scenario occured when the query has variables, there would be cases where on the first call it would think that the dependencies had changed (previous request vs current request) which made the source reset to null, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1982](https://github.com/FormidableLabs/urql/pull/1982))
+- Updated dependencies (See [#1944](https://github.com/FormidableLabs/urql/pull/1944))
+  - @urql/core@2.3.2
+
 ## 2.0.4
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @urql/svelte
 
+## 1.3.1
+
+### Patch Changes
+
+- Add missing `pause` on the `operationStore` return value, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1925](https://github.com/FormidableLabs/urql/pull/1925))
+- Updated dependencies (See [#1944](https://github.com/FormidableLabs/urql/pull/1944))
+  - @urql/core@2.3.2
+
 ## 1.3.0
 
 ### Minor Changes

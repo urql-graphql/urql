@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 4.3.4
+
+### Patch Changes
+
+- Improve perf by using String.indexOf in getField, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1957](https://github.com/FormidableLabs/urql/pull/1957))
+- Updated dependencies (See [#1944](https://github.com/FormidableLabs/urql/pull/1944))
+  - @urql/core@2.3.2
+
 ## 4.3.3
 
 ### Patch Changes

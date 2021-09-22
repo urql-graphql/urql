@@ -1,5 +1,16 @@
 # @urql/vue
 
+## 0.5.0
+
+### Minor Changes
+
+- Allow passing in a Ref of client to `provideClient` and `install`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1962](https://github.com/FormidableLabs/urql/pull/1962))
+
+### Patch Changes
+
+- Updated dependencies (See [#1944](https://github.com/FormidableLabs/urql/pull/1944))
+  - @urql/core@2.3.2
+
 ## 0.4.3
 
 ### Patch Changes
