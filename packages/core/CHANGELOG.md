@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.3.2
+
+### Patch Changes
+
+- ⚠️ Fix issue where the ssr-exchange would loop due to checking network-only revalidations, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1944](https://github.com/FormidableLabs/urql/pull/1944))
+
 ## 2.3.1
 
 ### Patch Changes
