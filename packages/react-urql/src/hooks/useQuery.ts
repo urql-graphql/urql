@@ -207,7 +207,7 @@ export function useQuery<Data = any, Variables = object>(
               })
             )
           : client.executeQuery(request, context);
-        return [source, state[1], state[2]];
+        return [source, state[1], deps];
       });
     },
     [
