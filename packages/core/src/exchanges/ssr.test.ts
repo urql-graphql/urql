@@ -116,6 +116,34 @@ it('caches errored query results correctly', () => {
   });
 });
 
+it('caches extensions when includeExtensions=true', () => {
+  output.mockReturnValueOnce({
+    ...queryResponse,
+    extensions: {
+      foo: 'bar',
+    },
+  });
+
+  const ssr = ssrExchange({
+    includeExtensions: true,
+  });
+  const { source: ops$, next } = input;
+  const exchange = ssr(exchangeInput)(ops$);
+
+  publish(exchange);
+  next(queryOperation);
+
+  const data = ssr.extractData();
+  expect(Object.keys(data)).toEqual(['' + queryOperation.key]);
+
+  expect(data).toEqual({
+    [queryOperation.key]: {
+      data: '{"user":{"name":"Clive"}}',
+      extensions: '{"foo":"bar"}',
+    },
+  });
+});
+
 it('caches complex GraphQLErrors in query results correctly', () => {
   output.mockReturnValueOnce({
     ...queryResponse,
