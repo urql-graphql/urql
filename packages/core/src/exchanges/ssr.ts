@@ -7,6 +7,7 @@ import { reexecuteOperation } from './cache';
 export interface SerializedResult {
   hasNext?: boolean;
   data?: string | undefined; // JSON string of data
+  extensions?: string | undefined; // JSON string of data
   error?: {
     graphQLErrors: Array<Partial<GraphQLError> | string>;
     networkError?: string;
@@ -21,6 +22,7 @@ export interface SSRExchangeParams {
   isClient?: boolean;
   initialState?: SSRData;
   staleWhileRevalidate?: boolean;
+  includeExtensions?: boolean;
 }
 
 export interface SSRExchange extends Exchange {
@@ -31,13 +33,15 @@ export interface SSRExchange extends Exchange {
 }
 
 /** Serialize an OperationResult to plain JSON */
-const serializeResult = ({
-  hasNext,
-  data,
-  error,
-}: OperationResult): SerializedResult => {
+const serializeResult = (
+  { hasNext, data, extensions, error }: OperationResult,
+  includeExtensions: boolean
+): SerializedResult => {
   const result: SerializedResult = {};
   if (data !== undefined) result.data = JSON.stringify(data);
+  if (includeExtensions && extensions !== undefined) {
+    result.extensions = JSON.stringify(extensions);
+  }
   if (hasNext) result.hasNext = true;
 
   if (error) {
@@ -64,11 +68,15 @@ const serializeResult = ({
 /** Deserialize plain JSON to an OperationResult */
 const deserializeResult = (
   operation: Operation,
-  result: SerializedResult
+  result: SerializedResult,
+  includeExtensions: boolean
 ): OperationResult => ({
   operation,
   data: result.data ? JSON.parse(result.data) : undefined,
-  extensions: undefined,
+  extensions:
+    includeExtensions && result.extensions
+      ? JSON.parse(result.extensions)
+      : undefined,
   error: result.error
     ? new CombinedError({
         networkError: result.error.networkError
@@ -85,6 +93,7 @@ const revalidated = new Set<number>();
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
 export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
   const staleWhileRevalidate = !!(params && params.staleWhileRevalidate);
+  const includeExtensions = !!(params && params.includeExtensions);
   const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved
@@ -129,7 +138,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
       filter(operation => !!data[operation.key]),
       map(op => {
         const serialized = data[op.key]!;
-        const result = deserializeResult(op, serialized);
+        const result = deserializeResult(op, serialized, includeExtensions);
         if (staleWhileRevalidate && !revalidated.has(op.key)) {
           result.stale = true;
           revalidated.add(op.key);
@@ -147,7 +156,7 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
         tap((result: OperationResult) => {
           const { operation } = result;
           if (operation.kind !== 'mutation') {
-            const serialized = serializeResult(result);
+            const serialized = serializeResult(result, includeExtensions);
             data[operation.key] = serialized;
           }
         })
