@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 4.3.5
+
+### Patch Changes
+
+- ⚠️ Fix regression from [#1869](https://github.com/FormidableLabs/urql/pull/1869) that caused nullable lists to always cause a cache miss, if schema awareness is enabled, by [@kitten](https://github.com/kitten) (See [#1983](https://github.com/FormidableLabs/urql/pull/1983))
+- Updated dependencies (See [#1985](https://github.com/FormidableLabs/urql/pull/1985))
+  - @urql/core@2.3.3
+
 ## 4.3.4
 
 ### Patch Changes
