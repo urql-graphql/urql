@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.3.3
+
+### Patch Changes
+
+- Adding option to `ssrExchange` to include the `extensions` field of operation results in the cache, by [@dios-david](https://github.com/dios-david) (See [#1985](https://github.com/FormidableLabs/urql/pull/1985))
+
 ## 2.3.2
 
 ### Patch Changes
