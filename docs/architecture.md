@@ -65,7 +65,7 @@ only do they carry the `query`, `variables`, and a `key` property, they will als
 
 ![Operations and Results](./assets/urql-event-hub.png)
 
-It's the `Client`s responsibility to accept an `Operation` and execute it. The bindings interally
+It's the `Client`s responsibility to accept an `Operation` and execute it. The bindings internally
 call the `client.executeQuery`, `client.executeMutation`, or `client.executeSubscription` methods,
 and we'll get a "stream" of results. This "stream" allows us to register a callback with it to
 receive results.
