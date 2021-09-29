@@ -6,13 +6,13 @@ import { CombinedError } from './utils/error';
 
 export type ExecutionResult =
   | {
-      errors?: Array<string | Partial<GraphQLError> | Error>;
+      errors?: Array<readonly GraphQLError[]>;
       data?: null | Record<string, any>;
       extensions?: Record<string, any>;
       hasNext?: boolean;
     }
   | {
-      errors?: Array<string | Partial<GraphQLError> | Error>;
+      errors?: Array<readonly GraphQLError[]>;
       data: any;
       path: (string | number)[];
       hasNext?: boolean;
