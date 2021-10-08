@@ -1,4 +1,4 @@
-import { FieldNode, DocumentNode, FragmentDefinitionNode } from 'graphql';
+import { DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { CombinedError } from '@urql/core';
 
 import {
@@ -6,6 +6,7 @@ import {
   getMainOperation,
   normalizeVariables,
   getFieldArguments,
+  isFieldNullable,
   isFieldAvailableOnType,
   getSelectionSet,
   getName,
@@ -197,7 +198,7 @@ const writeSelection = (
     ctx
   );
 
-  let node: FieldNode | void;
+  let node: ReturnType<typeof iterate>;
   while ((node = iterate())) {
     const fieldName = getName(node);
     const fieldArgs = getFieldArguments(node, ctx.variables);
@@ -255,6 +256,15 @@ const writeSelection = (
       fieldValue = data[fieldAlias] = ensureData(
         resolver(fieldArgs || {}, ctx.store, ctx)
       );
+    } else if (
+      fieldValue == null &&
+      node.required === 'optional' &&
+      (!ctx.store.schema ||
+        !isFieldNullable(ctx.store.schema, typename, fieldName))
+    ) {
+      // If the field has errored or it's marked as optional (and we can't assume it's nullable),
+      // we erase it instead of writing it as null
+      fieldValue = undefined as any;
     }
 
     if (node.selectionSet) {
