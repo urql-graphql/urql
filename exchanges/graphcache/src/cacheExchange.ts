@@ -1,6 +1,8 @@
+import { visit, DocumentNode } from 'graphql';
+
 import {
   Exchange,
-  formatDocument,
+  formatDocument as core_formatDocument,
   makeOperation,
   Operation,
   OperationResult,
@@ -29,6 +31,14 @@ import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 import { Data, Dependencies, CacheExchangeOpts } from './types';
+
+/** Modified to strip out nullability operators. */
+const formatDocument = <T extends DocumentNode>(node: T): T =>
+  core_formatDocument(
+    visit(node, {
+      Field: field => ({ ...field, required: 'unset' }),
+    })
+  );
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
