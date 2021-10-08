@@ -148,8 +148,13 @@ const isFragmentHeuristicallyMatching = (
   });
 };
 
+export type RequiredStatus = 'required' | 'optional' | 'unset';
+export interface ExtendedFieldNode extends FieldNode {
+  readonly required?: RequiredStatus;
+}
+
 interface SelectionIterator {
-  (): FieldNode | undefined;
+  (): ExtendedFieldNode | undefined;
 }
 
 export const makeSelectionIterator = (

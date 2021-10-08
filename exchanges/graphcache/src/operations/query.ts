@@ -306,7 +306,7 @@ const readSelection = (
   let hasFields = false;
   let hasPartials = false;
   let hasChanged = typename !== input.__typename;
-  let node: FieldNode | void;
+  let node: ReturnType<typeof iterate>;
   const output = makeData(input);
   while ((node = iterate()) !== undefined) {
     // Derive the needed data from our node.
@@ -314,6 +314,7 @@ const readSelection = (
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldAlias = getFieldAlias(node);
     const fieldKey = keyOfField(fieldName, fieldArgs);
+    const fieldRequired = node.required || 'unset';
     const key = joinKeys(entityKey, fieldKey);
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result ? result[fieldName] : undefined;
@@ -430,13 +431,17 @@ const readSelection = (
       hasFields = true;
     } else if (
       dataFieldValue === undefined &&
-      ((store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
+      (fieldRequired === 'optional' ||
+        (store.schema && isFieldNullable(store.schema, typename, fieldName)) ||
         !!getFieldError(ctx))
     ) {
-      // The field is uncached or has errored, so it'll be set to null and skipped
+      // The field is skipped since it's nullable & uncached, marked as optional, or has errored
       hasPartials = true;
       dataFieldValue = null;
-    } else if (dataFieldValue === undefined) {
+    } else if (
+      (fieldRequired === 'required' && dataFieldValue == null) ||
+      dataFieldValue === undefined
+    ) {
       // If the field isn't deferred or partial then we have to abort
       ctx.__internal.path.pop();
       return undefined;
