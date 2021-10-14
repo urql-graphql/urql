@@ -10,10 +10,12 @@ const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
 
 type ChunkData = { done: false; value: Buffer | Uint8Array } | { done: true };
 
+// NOTE: We're avoiding referencing the `Buffer` global here to prevent
+// auto-polyfilling in Webpack
 const toString = (input: Buffer | ArrayBuffer): string =>
-  typeof Buffer !== 'undefined' && Buffer.isBuffer(input)
-    ? input.toString()
-    : decoder!.decode(input);
+  input.constructor.name === 'Buffer'
+    ? (input as Buffer).toString()
+    : decoder!.decode(input as ArrayBuffer);
 
 // DERIVATIVE: Copyright (c) 2021 Marais Rossouw <hi@marais.io>
 // See: https://github.com/maraisr/meros/blob/219fe95/src/browser.ts
