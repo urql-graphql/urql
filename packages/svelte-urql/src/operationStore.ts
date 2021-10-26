@@ -48,7 +48,7 @@ export function operationStore<Data = any, Vars = object, Result = Data>(
 
   const state = {
     stale: false,
-    fetching: true,
+    fetching: false,
     data: undefined,
     error: undefined,
     extensions: undefined,
