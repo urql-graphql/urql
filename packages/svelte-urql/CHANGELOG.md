@@ -1,5 +1,14 @@
 # @urql/svelte
 
+## 1.3.2
+
+### Patch Changes
+
+- ⚠️ Fix initialize `operationStore` with `fetching: false`, the invocation of `query` or any other operation will mark it as `true`
+  when deemed appropriate, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2048](https://github.com/FormidableLabs/urql/pull/2048))
+- Updated dependencies (See [#2027](https://github.com/FormidableLabs/urql/pull/2027) and [#1998](https://github.com/FormidableLabs/urql/pull/1998))
+  - @urql/core@2.3.4
+
 ## 1.3.1
 
 ### Patch Changes

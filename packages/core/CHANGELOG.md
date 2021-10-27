@@ -1,5 +1,12 @@
 # @urql/core
 
+## 2.3.4
+
+### Patch Changes
+
+- Prevent `Buffer` from being polyfilled by an automatic detection in Webpack. Instead of referencing the `Buffer` global we now simply check the constructor name, by [@kitten](https://github.com/kitten) (See [#2027](https://github.com/FormidableLabs/urql/pull/2027))
+- ⚠️ Fix error-type of an `ExecutionResult` to line up with subscription-libs, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#1998](https://github.com/FormidableLabs/urql/pull/1998))
+
 ## 2.3.3
 
 ### Patch Changes

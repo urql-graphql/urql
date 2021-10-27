@@ -1,5 +1,17 @@
 # @urql/vue
 
+## 0.6.0
+
+### Minor Changes
+
+- Provide the client as a ref so it can observe changes. This change is potentially breaking for
+  anyone using the `useClient` import as it will now return a `Ref<Client>` rather than a `Client`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2047](https://github.com/FormidableLabs/urql/pull/2047))
+
+### Patch Changes
+
+- Updated dependencies (See [#2027](https://github.com/FormidableLabs/urql/pull/2027) and [#1998](https://github.com/FormidableLabs/urql/pull/1998))
+  - @urql/core@2.3.4
+
 ## 0.5.0
 
 ### Minor Changes
