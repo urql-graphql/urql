@@ -23,7 +23,7 @@ export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
   app.provide('$urql', client);
 }
 
-export function useClient(): Client {
+export function useClient(): Ref<Client> {
   if (process.env.NODE_ENV !== 'production' && !getCurrentInstance()) {
     throw new Error(
       'use* functions may only be called during the `setup()` or other lifecycle hooks.'
@@ -37,5 +37,5 @@ export function useClient(): Client {
     );
   }
 
-  return client.value;
+  return client;
 }

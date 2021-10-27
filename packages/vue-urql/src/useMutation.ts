@@ -40,7 +40,7 @@ export function useMutation<T = any, V = any>(
 
 export function callUseMutation<T = any, V = any>(
   query: TypedDocumentNode<T, V> | DocumentNode | string,
-  client: Client = useClient()
+  client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
   const data: Ref<T | undefined> = ref();
   const stale: Ref<boolean> = ref(false);
@@ -63,7 +63,7 @@ export function callUseMutation<T = any, V = any>(
       fetching.value = true;
 
       return pipe(
-        client.executeMutation<T, V>(
+        client.value.executeMutation<T, V>(
           createRequest<T, V>(query, unwrapPossibleProxy<V>(variables)),
           context || {}
         ),

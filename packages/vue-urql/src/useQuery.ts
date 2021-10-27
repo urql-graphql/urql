@@ -63,7 +63,7 @@ export function useQuery<T = any, V = object>(
 
 export function callUseQuery<T = any, V = object>(
   _args: UseQueryArgs<T, V>,
-  client: Client = useClient(),
+  client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
 ): UseQueryResponse<T, V> {
   const args = reactive(_args);
@@ -103,7 +103,7 @@ export function callUseQuery<T = any, V = object>(
   stops.push(
     watchEffect(() => {
       source.value = !isPaused.value
-        ? client.executeQuery<T, V>(request.value, {
+        ? client.value.executeQuery<T, V>(request.value, {
             requestPolicy: args.requestPolicy,
             ...args.context,
           })
@@ -120,7 +120,7 @@ export function callUseQuery<T = any, V = object>(
     fetching,
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      source.value = client.executeQuery<T, V>(request.value, {
+      source.value = client.value.executeQuery<T, V>(request.value, {
         requestPolicy: args.requestPolicy,
         ...args.context,
         ...opts,
