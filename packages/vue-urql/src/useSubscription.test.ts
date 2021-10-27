@@ -1,13 +1,14 @@
+import { nextTick, reactive, ref } from 'vue';
+
 jest.mock('./useClient.ts', () => ({
   __esModule: true,
   ...jest.requireActual('./useClient.ts'),
-  useClient: () => client,
+  useClient: () => ref(client),
 }));
 
 import { makeSubject } from 'wonka';
 import { createClient } from '@urql/core';
 import { useSubscription } from './useSubscription';
-import { nextTick, reactive, ref } from 'vue';
 
 const client = createClient({ url: '/graphql', exchanges: [] });
 

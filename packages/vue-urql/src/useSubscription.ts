@@ -64,7 +64,7 @@ export function useSubscription<T = any, R = T, V = object>(
 export function callUseSubscription<T = any, R = T, V = object>(
   _args: UseSubscriptionArgs<T, V>,
   handler?: SubscriptionHandlerArg<T, R>,
-  client: Client = useClient(),
+  client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
 ): UseSubscriptionResponse<T, R, V> {
   const args = reactive(_args);
@@ -106,7 +106,9 @@ export function callUseSubscription<T = any, R = T, V = object>(
   stops.push(
     watchEffect(() => {
       source.value = !isPaused.value
-        ? client.executeSubscription<T, V>(request.value, { ...args.context })
+        ? client.value.executeSubscription<T, V>(request.value, {
+            ...args.context,
+          })
         : undefined;
     }, watchOptions)
   );
@@ -154,7 +156,7 @@ export function callUseSubscription<T = any, R = T, V = object>(
     executeSubscription(
       opts?: Partial<OperationContext>
     ): UseSubscriptionState<T, R, V> {
-      source.value = client.executeSubscription<T, V>(request.value, {
+      source.value = client.value.executeSubscription<T, V>(request.value, {
         ...args.context,
         ...opts,
       });

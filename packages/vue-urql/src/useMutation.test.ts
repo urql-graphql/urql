@@ -1,13 +1,14 @@
+import { reactive, ref } from 'vue';
+
 jest.mock('./useClient.ts', () => ({
   __esModule: true,
   ...jest.requireActual('./useClient.ts'),
-  useClient: () => client,
+  useClient: () => ref(client),
 }));
 
 import { makeSubject } from 'wonka';
 import { createClient, gql } from '@urql/core';
 import { useMutation } from './useMutation';
-import { reactive } from 'vue';
 
 const client = createClient({ url: '/graphql', exchanges: [] });
 

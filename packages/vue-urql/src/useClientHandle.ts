@@ -47,7 +47,7 @@ export function useClientHandle(): ClientHandle {
   });
 
   const handle: ClientHandle = {
-    client,
+    client: client.value,
 
     useQuery<T = any, V = object>(
       args: UseQueryArgs<T, V>
