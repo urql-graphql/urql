@@ -6,12 +6,13 @@ jest.mock('graphql', () => {
     ...graphql,
     print: jest.fn(() => '{ placeholder }'),
     execute: jest.fn(() => ({ key: 'value' })),
+    subscribe: jest.fn(),
   };
 });
 
 import { fetchExchange } from 'urql';
 import { executeExchange } from './execute';
-import { execute, print } from 'graphql';
+import { execute, print, subscribe } from 'graphql';
 import {
   pipe,
   fromValue,
@@ -21,7 +22,7 @@ import {
   empty,
   Source,
 } from 'wonka';
-import { queryOperation } from '@urql/core/test-utils';
+import { queryOperation, subscriptionOperation } from '@urql/core/test-utils';
 import {
   makeErrorResult,
   makeOperation,
@@ -38,7 +39,10 @@ const exchangeArgs = {
   client: {},
 } as any;
 
-const expectedOperationName = getOperationName(queryOperation.query);
+const expectedQueryOperationName = getOperationName(queryOperation.query);
+const expectedSubscribeOperationName = getOperationName(
+  subscriptionOperation.query
+);
 
 const fetchMock = (global as any).fetch as jest.Mock;
 const mockHttpResponseData = { key: 'value' };
@@ -47,6 +51,11 @@ beforeEach(() => {
   jest.clearAllMocks();
   mocked(print).mockImplementation(a => a as any);
   mocked(execute).mockResolvedValue({ data: mockHttpResponseData });
+  mocked(subscribe).mockImplementation(async function* x(this: any) {
+    yield { data: { key: 'value1' } };
+    yield { data: { key: 'value2' } };
+    yield { data: { key: 'value3' } };
+  });
 });
 
 afterEach(() => {
@@ -65,16 +74,41 @@ describe('on operation', () => {
     );
 
     expect(mocked(execute)).toBeCalledTimes(1);
-    expect(mocked(execute)).toBeCalledWith(
+    expect(mocked(execute)).toBeCalledWith({
       schema,
-      queryOperation.query,
-      undefined,
-      context,
-      queryOperation.variables,
-      expectedOperationName,
-      undefined,
-      undefined
+      document: queryOperation.query,
+      rootValue: undefined,
+      contextValue: context,
+      variableValues: queryOperation.variables,
+      operationName: expectedQueryOperationName,
+      fieldResolver: undefined,
+      typeResolver: undefined,
+      subscribeFieldResolver: undefined,
+    });
+  });
+
+  it('calls subscribe with args', async () => {
+    const context = 'USER_ID=123';
+
+    await pipe(
+      fromValue(subscriptionOperation),
+      executeExchange({ schema, context })(exchangeArgs),
+      take(3),
+      toPromise
     );
+
+    expect(mocked(subscribe)).toBeCalledTimes(1);
+    expect(mocked(subscribe)).toBeCalledWith({
+      schema,
+      document: subscriptionOperation.query,
+      rootValue: undefined,
+      contextValue: context,
+      variableValues: subscriptionOperation.variables,
+      operationName: expectedSubscribeOperationName,
+      fieldResolver: undefined,
+      typeResolver: undefined,
+      subscribeFieldResolver: undefined,
+    });
   });
 
   it('calls execute after executing context as a function', async () => {
@@ -91,16 +125,30 @@ describe('on operation', () => {
     );
 
     expect(mocked(execute)).toBeCalledTimes(1);
-    expect(mocked(execute)).toBeCalledWith(
+    expect(mocked(execute)).toBeCalledWith({
       schema,
-      queryOperation.query,
-      undefined,
-      'CALCULATED_USER_ID=80',
-      queryOperation.variables,
-      expectedOperationName,
-      undefined,
-      undefined
+      document: queryOperation.query,
+      rootValue: undefined,
+      contextValue: 'CALCULATED_USER_ID=80',
+      variableValues: queryOperation.variables,
+      operationName: expectedQueryOperationName,
+      fieldResolver: undefined,
+      typeResolver: undefined,
+      subscribeFieldResolver: undefined,
+    });
+  });
+
+  it('should return data from subscribe', async () => {
+    const context = 'USER_ID=123';
+
+    const responseFromExecuteExchange = await pipe(
+      fromValue(subscriptionOperation),
+      executeExchange({ schema, context })(exchangeArgs),
+      take(3),
+      toPromise
     );
+
+    expect(responseFromExecuteExchange.data).toEqual({ key: 'value3' });
   });
 
   it('should return the same data as the fetch exchange', async () => {

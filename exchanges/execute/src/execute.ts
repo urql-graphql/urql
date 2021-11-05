@@ -14,6 +14,9 @@ import {
   GraphQLFieldResolver,
   GraphQLTypeResolver,
   execute,
+  subscribe,
+  ExecutionArgs,
+  SubscriptionArgs,
 } from 'graphql';
 
 import {
@@ -33,9 +36,10 @@ export interface ExecuteExchangeArgs {
   context?: ((op: Operation) => void) | any;
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
+  subscribeFieldResolver?: GraphQLFieldResolver<any, any>;
 }
 
-type ExecuteParams = Parameters<typeof execute>;
+type ExecuteParams = ExecutionArgs | SubscriptionArgs;
 
 const asyncIterator =
   typeof Symbol !== 'undefined' ? Symbol.asyncIterator : null;
@@ -50,7 +54,10 @@ const makeExecuteSource = (
     Promise.resolve()
       .then(() => {
         if (ended) return;
-        return execute(...args) as any;
+        if (operation.kind === 'subscription') {
+          return subscribe(args) as any;
+        }
+        return execute(args) as any;
       })
       .then((result: ExecutionResult | AsyncIterable<ExecutionResult>) => {
         if (ended || !result) {
@@ -83,6 +90,9 @@ const makeExecuteSource = (
           if (!done && !ended) {
             return iterator.next().then(next);
           }
+          if (ended) {
+            iterator.return && iterator.return();
+          }
         }
 
         return iterator.next().then(next);
@@ -108,6 +118,7 @@ export const executeExchange = ({
   context,
   fieldResolver,
   typeResolver,
+  subscribeFieldResolver,
 }: ExecuteExchangeArgs): Exchange => ({ forward }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);
@@ -115,7 +126,11 @@ export const executeExchange = ({
     const executedOps$ = pipe(
       sharedOps$,
       filter((operation: Operation) => {
-        return operation.kind === 'query' || operation.kind === 'mutation';
+        return (
+          operation.kind === 'query' ||
+          operation.kind === 'mutation' ||
+          operation.kind === 'subscription'
+        );
       }),
       mergeMap((operation: Operation) => {
         const { key } = operation;
@@ -124,19 +139,20 @@ export const executeExchange = ({
           filter(op => op.kind === 'teardown' && op.key === key)
         );
 
-        const calculatedContext =
+        const contextValue =
           typeof context === 'function' ? context(operation) : context;
         return pipe(
-          makeExecuteSource(operation, [
+          makeExecuteSource(operation, {
             schema,
-            operation.query,
+            document: operation.query,
             rootValue,
-            calculatedContext,
-            operation.variables,
-            getOperationName(operation.query),
+            contextValue,
+            variableValues: operation.variables,
+            operationName: getOperationName(operation.query),
             fieldResolver,
             typeResolver,
-          ]),
+            subscribeFieldResolver,
+          }),
           takeUntil(teardown$)
         );
       })

@@ -60,6 +60,7 @@ module.exports = {
         '*.spec.tsx',
       ],
       rules: {
+        'es5/no-generators': 'off',
         'es5/no-es6-methods': 'off',
         'es5/no-es6-static-methods': 'off',
 
