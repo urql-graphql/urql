@@ -10,7 +10,7 @@ Here we'll be tackling a set of common UI-patterns and how we tackle them in
 
 ## Infinite scrolling
 
-There are a few ways of going about this, in our [normalized caching chapter](https://formidable.com/open-source/urql/docs/graphcache/local-resolvers/#pagination)
+There are a few ways of going about this, in our [normalized caching chapter](../graphcache/local-resolvers/#pagination)
 you'll see an approach with urql, in the default cache we'd say to manually hold it inside of a hook but here
 we'll see a general approach that works.
 
@@ -58,7 +58,7 @@ const ListPage = ({ variables, isLastPage }) => {
         </>
       )}
     </div>
-  )
+  );
 }
 
 const Search = () => {
@@ -113,11 +113,17 @@ const Component = () => {
   const router = useRouter();
 
   const transitionPage = React.useCallback(async (id) => {
-    const loadJSBundle = import('./page.js')
-    const loadData = client.query(TodoQuery, { id }).toPromise()
-    await Promise.all([loadJSBundle, loadData])
+    const loadJSBundle = import('./page.js');
+    const loadData = client.query(TodoQuery, { id }).toPromise();
+    await Promise.all([loadJSBundle, loadData]);
     router.push(`/todo/${id}`);
-  }, [])
+  }, []);
+
+  return (
+    <button onClick={() => transitionPage('1')}>
+      Go to todo 1
+    </button>
+  )
 }
 ```
 
@@ -126,7 +132,34 @@ this will then be saved in cache and available to the next utility querying this
 
 ## Lazy query
 
-## Show previous data while loading
+When we look at the concept of a `lazy query` we can leverage the concept of [`pause`](./react-preact.md#pausing-usequery)
+
+```js
+import React from 'react';
+import { useQuery, gql } from 'urql';
+
+const TodoQuery = gql`
+  query Todos {
+    todos {
+      id
+      name
+    }
+  }
+`;
+
+const Component = () => {
+  const [result, fetch] = useQuery({ query: TodoQuery });
+  const router = useRouter();
+
+  return (
+    <button onClick={fetch}>
+      Load todos
+    </button>
+  )
+}
+```
+
+Now when we click the butotn the data will start loading
 
 ## Reacting to focus
 
