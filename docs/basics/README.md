@@ -20,3 +20,4 @@ this section of the documentation:
 - [**Document Caching**](./document-caching.md) explains the default cache mechanism of `urql`, as opposed to the opt-in
   [Normalized Cache](../graphcache/normalized-caching.md).
 - [**Errors**](../basics/errors.md) contains information on error handling in `urql`.
+- [**UI-Patterns**](../basics/ui-patterns.md) presents some common UI-patterns with `urql`.
