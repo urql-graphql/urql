@@ -161,6 +161,32 @@ const Component = () => {
 
 Now when we click the butotn the data will start loading
 
-## Reacting to focus
+## Reacting to focus and stale time
 
-## Refresh a query after a given period of time
+In urql we leverage our extensability pattern named `exchanges` to manipulate the way
+data comes in and goes out of our client.
+
+- [Stale time](https://github.com/FormidableLabs/urql/tree/main/exchanges/request-policy)
+- [Focus](https://github.com/FormidableLabs/urql/tree/main/exchanges/refocus)
+
+When we want to introduce one of these patterns we add the package and add it to the `exchanges`
+property of our `urql-client`. In the case of these two we'll have to add it before the cache
+else our requests will never get upgraded.
+
+```js
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';
+import { refocusExchange } from '@urql/exchange-refocus';
+
+const client = createClient({
+  url: 'some-url',
+  exchanges: [
+    dedupExchange,
+    refocusExchange(),
+    cacheExchange,
+    fetchExchange,
+  ]
+})
+```
+
+That's all we need to do to react to these patterns.
+
