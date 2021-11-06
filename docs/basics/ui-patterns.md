@@ -7,14 +7,17 @@ order: 6
 
 > This page is incomplete. You can help us expanding it by suggesting more patterns or asking us about common problems you're facing on [GitHub Discussions](https://github.com/FormidableLabs/urql/discussions).
 
-Here we'll be tackling a set of common UI-patterns and how we tackle them in
+Generally, `urql`'s API surface is small and compact. Some common problems that we're facing when building apps may look like they're not a built-in feature, however, there are several patterns that even a lean UI can support.
+This page is a collection of common UI patterns and problems we may face with GraphQL and how we can tackle them in
 `urql`. These examples will be written in React but apply to any other framework.
 
 ## Infinite scrolling
 
-There are a few ways of going about this, in our [normalized caching chapter](../graphcache/local-resolvers/#pagination)
-you'll see an approach with urql, in the default cache we'd say to manually hold it inside of a hook but here
-we'll see a general approach that works.
+"Infinite Scrolling" is the approach of loading more data into a page's list without splitting that list up across multiple pages.
+
+There are a few ways of going about this. In our [normalized caching chapter on the topic](../graphcache/local-resolvers.md#pagination)
+we see an approach with `urql`'s normalized cache, which is suitable to get started quickly. However, this approach also requires some UI code as well to keep track of pages.
+Let's have a look at how we can create a UI implementation that makes use of this normalized caching feature.
 
 ```js
 import React from 'react';
@@ -90,12 +93,14 @@ const Search = () => {
 
 Here we keep an array of all `variables` we've encountered and use them to render their
 respective `result` page. This only rerenders the additional page rather than having a long
-list that constantly changes.
+list that constantly changes. [You can find a full code example of this pattern in our example folder on the topic of Graphcache pagination.](https://github.com/FormidableLabs/urql/tree/main/examples/with-graphcache-pagination)
+
+We also do not need to use our normalized cache to achieve this. As long as we're able to split individual lists up into chunks across components, we can also solve this problem entirely in UI code. [Read our example code on how to achieve this.](https://github.com/FormidableLabs/urql/tree/main/examples/with-pagination)
 
 ## Prefetching data
 
-Let's say we want to load data for a new page while the JS-bundle is loading, we can
-do this with help of the `urql-client`.
+We sometimes find it necessary to load data for a new page before that page is opened, for instance while a JS bundle is still loading. We may
+do this with help of the `Client`, by calling methods without using the React bindings directly.
 
 ```js
 import React from 'react';
@@ -129,12 +134,14 @@ const Component = () => {
 }
 ```
 
-So basically what goes on here is that when we transition we'll prepare the data by calling `.query`
-this will then be saved in cache and available to the next utility querying this data, so no more loading!
+Here we're calling `client.query` to prepare a query when the transition begins.
+We then call `toPromise()` on this query which activates it. Our `Client` and its cache share results, which means that we've already kicked off or even completed the query before we're on the new page.
 
 ## Lazy query
 
-When we look at the concept of a `lazy query` we can leverage the concept of [`pause`](./react-preact.md#pausing-usequery)
+It's often required to "lazily" start a query, either at a later point or imperatively. This means that we don't start a query when a new component is mounted immediately.
+
+Parts of `urql` that automatically start, like the `useQuery` hook, have a concept of a [`pause` option.](./react-preact.md#pausing-usequery) This option is used to prevent the hook from automatically starting a new query.
 
 ```js
 import React from 'react';
@@ -161,18 +168,18 @@ const Component = () => {
 }
 ```
 
-Now when we click the butotn the data will start loading
+We can unpause the hook to start fetching, or, like in this example, call its returned function to manually kick off the query.
 
 ## Reacting to focus and stale time
 
-In urql we leverage our extensability pattern named `exchanges` to manipulate the way
+In urql we leverage our extensibility pattern named "Exchanges" to manipulate the way
 data comes in and goes out of our client.
 
 - [Stale time](https://github.com/FormidableLabs/urql/tree/main/exchanges/request-policy)
 - [Focus](https://github.com/FormidableLabs/urql/tree/main/exchanges/refocus)
 
 When we want to introduce one of these patterns we add the package and add it to the `exchanges`
-property of our `urql-client`. In the case of these two we'll have to add it before the cache
+property of our `Client`. In the case of these two we'll have to add it before the cache
 else our requests will never get upgraded.
 
 ```js
