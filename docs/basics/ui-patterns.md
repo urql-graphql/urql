@@ -5,6 +5,8 @@ order: 6
 
 # UI Patterns
 
+> This page is incomplete. You can help us expanding it by suggesting more patterns or asking us about common problems you're facing on [GitHub Discussions](https://github.com/FormidableLabs/urql/discussions).
+
 Here we'll be tackling a set of common UI-patterns and how we tackle them in
 `urql`. These examples will be written in React but apply to any other framework.
 
