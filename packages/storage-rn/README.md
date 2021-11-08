@@ -11,9 +11,9 @@ Install NetInfo ([RN](https://github.com/react-native-netinfo/react-native-netin
 Install `@urql/storage-rn` alongside `urql` and `@urql/exchange-graphcache`:
 
 ```sh
-yarn add @urql/graphcache-rn-async-storage
+yarn add @urql/storage-rn
 # or
-npm install --save @urql/graphcache-rn-async-storage
+npm install --save @urql/storage-rn
 ```
 
 Then add it to the offline exchange:
