@@ -1,4 +1,11 @@
-import { createElement, useCallback, useReducer, useMemo } from 'react';
+import {
+  createElement,
+  useCallback,
+  useReducer,
+  useMemo,
+  ReactNode,
+  ReactElement,
+} from 'react';
 import ssrPrepass from 'react-ssr-prepass';
 import { NextComponentType, NextPage, NextPageContext } from 'next';
 import NextApp, { AppContext } from 'next/app';
@@ -22,6 +29,9 @@ import {
 } from './types';
 
 let ssr: SSRExchange;
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 export function withUrqlClient(
   getClientConfig: NextUrqlClientConfig,
@@ -100,6 +110,10 @@ export function withUrqlClient(
     const displayName =
       (AppOrPage as any).displayName || AppOrPage.name || 'Component';
     WithUrql.displayName = `withUrqlClient(${displayName})`;
+
+    if ((AppOrPage as NextPageWithLayout).getLayout) {
+      WithUrql.getLayout = (AppOrPage as NextPageWithLayout).getLayout;
+    }
 
     if (AppOrPage.getInitialProps || options!.ssr) {
       WithUrql.getInitialProps = async (appOrPageCtx: NextUrqlContext) => {
