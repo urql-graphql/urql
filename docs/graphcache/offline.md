@@ -91,7 +91,9 @@ const client = createClient({
 
 For React Native, we can use the async storage package `@urql/storage-rn`.
 
-Before installing the [library](https://github.com/FormidableLabs/urql/tree/main/packages/storage-rn), ensure you have installed the necessary peer dependencies: NetInfo ([RN](https://github.com/react-native-netinfo/react-native-netinfo) | [Expo](https://docs.expo.dev/versions/latest/sdk/netinfo/)) and AsyncStorage ([RN](https://react-native-async-storage.github.io/async-storage/docs/install) | [Expo](https://docs.expo.dev/versions/v42.0.0/sdk/async-storage/)).
+Before installing the [library](https://github.com/FormidableLabs/urql/tree/main/packages/storage-rn), ensure you have installed the necessary peer dependencies:
+- NetInfo ([RN](https://github.com/react-native-netinfo/react-native-netinfo) | [Expo](https://docs.expo.dev/versions/latest/sdk/netinfo/)) and
+- AsyncStorage ([RN](https://react-native-async-storage.github.io/async-storage/docs/install) | [Expo](https://docs.expo.dev/versions/v42.0.0/sdk/async-storage/)).
 
 ```sh
 yarn add @urql/storage-rn
@@ -99,7 +101,7 @@ yarn add @urql/storage-rn
 npm install --save @urql/storage-rn
 ```
 
-Then you can create the custom storage to use in the offline exchange:
+You can then create the custom storage and use it in the offline exchange:
 
 
 ```js
