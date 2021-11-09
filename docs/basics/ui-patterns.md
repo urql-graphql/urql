@@ -157,7 +157,7 @@ const TodoQuery = gql`
 `;
 
 const Component = () => {
-  const [result, fetch] = useQuery({ query: TodoQuery });
+  const [result, fetch] = useQuery({ query: TodoQuery, pause: true });
   const router = useRouter();
 
   return (
