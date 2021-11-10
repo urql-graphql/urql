@@ -1,4 +1,4 @@
-export const maskTypename = (data: any, isArray?: boolean): any => {
+export const maskTypename = (data: any): any => {
   if (!data || typeof data !== 'object') return data;
 
   return Object.keys(data).reduce(
@@ -10,7 +10,7 @@ export const maskTypename = (data: any, isArray?: boolean): any => {
           value,
         });
       } else if (Array.isArray(value)) {
-        acc[key] = value.map(x => maskTypename(x, true));
+        acc[key] = value.map(maskTypename);
       } else if (value && typeof value === 'object' && '__typename' in value) {
         acc[key] = maskTypename(value);
       } else {
@@ -19,6 +19,6 @@ export const maskTypename = (data: any, isArray?: boolean): any => {
 
       return acc;
     },
-    isArray ? [] : {}
+    Array.isArray(data) ? [] : {}
   );
 };
