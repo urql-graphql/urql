@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.0
+
+### Minor Changes
+
+- Support forwarding the getLayout function from pages, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2065](https://github.com/FormidableLabs/urql/pull/2065))
+
 ## 3.2.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.3.5
+
+### Patch Changes
+
+- ⚠️ Fix issue where `maskTypename` would ignore array shapes, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2074](https://github.com/FormidableLabs/urql/pull/2074))
+
 ## 2.3.4
 
 ### Patch Changes

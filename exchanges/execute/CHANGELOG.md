@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- Add subscription support, by [@Tigge](https://github.com/Tigge) (See [#2061](https://github.com/FormidableLabs/urql/pull/2061))
+
+### Patch Changes
+
+- Updated dependencies (See [#2074](https://github.com/FormidableLabs/urql/pull/2074))
+  - @urql/core@2.3.5
+
 ## 1.1.0
 
 ### Minor Changes
