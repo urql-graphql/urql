@@ -1,4 +1,4 @@
-export const maskTypename = (data: any, isArray: boolean): any => {
+export const maskTypename = (data: any, isArray?: boolean): any => {
   if (!data || typeof data !== 'object') return data;
 
   return Object.keys(data).reduce(
