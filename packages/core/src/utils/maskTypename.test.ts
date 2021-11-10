@@ -25,6 +25,20 @@ it('strips typename from nested objects', () => {
   ).toEqual({ id: 1, author: { id: 2 } });
 });
 
+it('works with nested arrays', () => {
+  expect(
+    maskTypename({
+      __typename: 'Todo',
+      id: 1,
+      nodes: [[4, 5]],
+      author: {
+        id: 2,
+        __typename: 'Author',
+      },
+    })
+  ).toEqual({ id: 1, nodes: [[4, 5]], author: { id: 2 } });
+});
+
 it('strips typename from nested objects with arrays', () => {
   expect(
     maskTypename({
