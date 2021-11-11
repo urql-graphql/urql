@@ -1138,7 +1138,7 @@ describe('plain usage', () => {
     ]);
   });
 
-  it('should update a query without an operation', () => {
+  it('should update/read a query without an operation', () => {
     const store = new Store();
     const cache = store as Cache;
     let called = false;
@@ -1167,5 +1167,52 @@ describe('plain usage', () => {
     expect(called).toBeTruthy();
 
     expect(cache.readQuery({ query: TodosWithoutTypename })).toEqual(newData);
+  });
+
+  it('should update/read a fragment without an operation', () => {
+    const store = new Store();
+    const cache = store as Cache;
+
+    const TodoFragment = gql`
+      fragment todoFields on Todo {
+        id
+        text
+        complete
+        __typename
+        author {
+          id
+          name
+          __typename
+        }
+      }
+    `;
+    const newData = {
+      id: '0',
+      text: 'I am new',
+      complete: true,
+      __typename: 'Todo',
+      author: { id: '0', name: 'Jovi', __typename: 'Author' },
+    };
+
+    write(store, { query: TodosWithoutTypename }, todosData);
+
+    let result = cache.readFragment(TodoFragment, newData, { id: '1' });
+    expect(result).toEqual({
+      author: {
+        __typename: 'Author',
+        id: '0',
+        name: 'Jovi',
+      },
+      complete: false,
+      id: '0',
+      text: 'Go to the shops',
+      __typename: 'Todo',
+    });
+
+    cache.writeFragment(TodoFragment, newData, { id: '1' });
+
+    result = cache.readFragment(TodoFragment, newData, { id: '1' });
+
+    expect(result).toEqual(newData);
   });
 });
