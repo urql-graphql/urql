@@ -39,7 +39,7 @@ type Operations = Set<number>;
 type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
 
-type CExchange = Exchange & { cache: Cache };
+type CExchange = Exchange & { store: Cache };
 
 export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C
@@ -432,7 +432,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     };
   };
 
-  exchange.cache = store;
+  exchange.store = store;
 
   return exchange;
 };
