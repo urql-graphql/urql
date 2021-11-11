@@ -3,12 +3,10 @@ import path from 'path';
 
 const distTypes = path.resolve(process.cwd(), 'dist', 'types');
 
-const contents = `
-import { Client as BaseClient } from '@urql/core';
-import { Cache } from './types';
+const contents = `import { Cache } from './types';
 
 declare module '@urql/core' {
-  export interface Client extends BaseClient {
+  export interface Client {
     cache: Cache;
   }
 }
