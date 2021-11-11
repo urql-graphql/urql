@@ -43,7 +43,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C
 ): Exchange => ({ forward, client, dispatchDebug }) => {
   const store = new Store<C>(opts);
-  client.cache = store;
+  (client as any).cache = store;
   store.client = client;
 
   let hydration: void | Promise<void>;
