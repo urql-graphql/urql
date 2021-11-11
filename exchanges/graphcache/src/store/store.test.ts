@@ -10,7 +10,7 @@ import {
   parse,
 } from 'graphql';
 
-import { Data, StorageAdapter } from '../types';
+import { Data, StorageAdapter, Cache } from '../types';
 import { makeContext, updateContext } from '../operations/shared';
 import { query } from '../operations/query';
 import { write, writeOptimistic } from '../operations/write';
@@ -1092,5 +1092,80 @@ it('should link up entities', () => {
       id: '1',
       name: 'Formidable',
     },
+  });
+});
+
+describe('plain usage', () => {
+  it('should resolve and invalidate data without an operation', () => {
+    const store = new Store();
+    const cache = store as Cache;
+
+    write(store, { query: TodosWithoutTypename }, todosData);
+
+    let todoText = cache.resolve('Todo:0', 'text');
+    let author = cache.resolve('Todo:0', 'author');
+    let authorName = cache.resolve('Author:0', 'name');
+
+    expect(todoText).toBe('Go to the shops');
+    expect(author).toBe('Author:0');
+    expect(authorName).toBe('Jovi');
+
+    cache.invalidate('Todo:0', 'author');
+
+    todoText = cache.resolve('Todo:0', 'text');
+    author = cache.resolve('Todo:0', 'author');
+    authorName = cache.resolve('Author:0', 'name');
+
+    expect(todoText).toBe('Go to the shops');
+    expect(author).toBe(null);
+    expect(authorName).toBe('Jovi');
+  });
+
+  it('should inspect fields without an operation', () => {
+    const store = new Store();
+    const cache = store as Cache;
+
+    write(store, { query: TodosWithoutTypename }, todosData);
+
+    const fields = cache.inspectFields('Query');
+
+    expect(fields).toEqual([
+      {
+        arguments: null,
+        fieldKey: 'todos',
+        fieldName: 'todos',
+      },
+    ]);
+  });
+
+  it('should update a query without an operation', () => {
+    const store = new Store();
+    const cache = store as Cache;
+    let called = false;
+
+    const newData = {
+      __typename: 'Query',
+      todos: [
+        {
+          id: '0',
+          text: 'I am new',
+          complete: true,
+          __typename: 'Todo',
+          author: { id: '0', name: 'Jovi', __typename: 'Author' },
+        },
+      ],
+    };
+
+    write(store, { query: TodosWithoutTypename }, todosData);
+
+    cache.updateQuery({ query: TodosWithoutTypename }, data => {
+      called = true;
+      expect(data).toEqual(todosData);
+      return newData;
+    });
+
+    expect(called).toBeTruthy();
+
+    expect(cache.readQuery({ query: TodosWithoutTypename })).toEqual(newData);
   });
 });

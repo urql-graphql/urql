@@ -1,5 +1,12 @@
 import { DocumentNode } from 'graphql';
-import { TypedDocumentNode, formatDocument, createRequest } from '@urql/core';
+import {
+  TypedDocumentNode,
+  formatDocument,
+  createRequest,
+  Client,
+  RequestPolicy,
+  Operation,
+} from '@urql/core';
 
 import {
   Cache,
@@ -16,8 +23,10 @@ import {
   KeyingConfig,
   Entity,
   CacheExchangeOpts,
+  OperationType,
 } from '../types';
 
+import { toRequestPolicy } from '../helpers/operation';
 import { invariant } from '../helpers/help';
 import { contextRef, ensureLink } from '../operations/shared';
 import { read, readFragment } from '../operations/query';
@@ -34,13 +43,27 @@ import {
   expectValidResolversConfig,
   expectValidOptimisticMutationsConfig,
 } from '../ast';
+import {
+  clearDataState,
+  getCurrentDependencies,
+  getCurrentOperation,
+  initDataState,
+} from './data';
+import { makeDict } from '../helpers/dict';
 
 type RootField = 'query' | 'mutation' | 'subscription';
+type DependentOperations = Record<string, number[]>;
+type Operations = Set<number>;
+type OperationMap = Map<number, Operation>;
 
 export class Store<
   C extends Partial<CacheExchangeOpts> = Partial<CacheExchangeOpts>
 > implements Cache {
   data: InMemoryData.InMemoryData;
+  client?: Client;
+  deps: DependentOperations = makeDict();
+  requestedRefetch: Operations = new Set();
+  operations: OperationMap = new Map();
 
   resolvers: ResolverConfig;
   updates: Record<string, Record<string, UpdateResolver | undefined>>;
@@ -125,13 +148,63 @@ export class Store<
     return key ? `${data.__typename}:${key}` : null;
   }
 
+  prepareCache(type: OperationType): null | (() => void) {
+    const op = getCurrentOperation();
+    if (!op) {
+      initDataState(type, this.data);
+      return () => {
+        if (type === 'write') {
+          const deps = getCurrentDependencies();
+          const pendingOperations: Set<number> = new Set();
+
+          if (deps) {
+            // Collect operations that will be updated due to cache changes
+            for (const dep in deps) {
+              const keys = this.deps[dep];
+              if (keys) {
+                this.deps[dep] = [];
+                for (let i = 0, l = keys.length; i < l; i++) {
+                  pendingOperations.add(keys[i]);
+                }
+              }
+            }
+          }
+
+          pendingOperations.forEach(key => {
+            const op = this.operations.get(key);
+            if (op) {
+              this.operations.delete(key);
+              let policy: RequestPolicy = 'cache-first';
+              if (this.requestedRefetch.has(key)) {
+                this.requestedRefetch.delete(key);
+                policy = 'cache-and-network';
+              }
+              this.client!.reexecuteOperation(toRequestPolicy(op, policy));
+            }
+          });
+        }
+        clearDataState();
+      };
+    }
+
+    return null;
+  }
+
   resolve(entity: Entity, field: string, args?: FieldArgs): DataField {
+    const cleanup = this.prepareCache('read');
+
     const fieldKey = keyOfField(field, args);
     const entityKey = this.keyOfEntity(entity);
     if (!entityKey) return null;
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
-    if (fieldValue !== undefined) return fieldValue;
+
+    if (fieldValue !== undefined) {
+      if (cleanup) cleanup();
+      return fieldValue;
+    }
+
     const link = InMemoryData.readLink(entityKey, fieldKey);
+    if (cleanup) cleanup();
     return link || null;
   }
 
@@ -151,12 +224,20 @@ export class Store<
       19
     );
 
+    const cleanup = this.prepareCache('write');
     invalidateEntity(entityKey, field, args);
+    if (cleanup) cleanup();
   }
 
   inspectFields(entity: Entity): FieldInfo[] {
     const entityKey = this.keyOfEntity(entity);
-    return entityKey ? InMemoryData.inspectFields(entityKey) : [];
+    if (entityKey) {
+      const cleanup = this.prepareCache('read');
+      const result = InMemoryData.inspectFields(entityKey);
+      if (cleanup) cleanup();
+      return result;
+    }
+    return [];
   }
 
   updateQuery<T = Data, V = Variables>(
@@ -167,14 +248,19 @@ export class Store<
     request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
+      const cleanup = this.prepareCache('write');
       startWrite(this, request, output as any);
+      if (cleanup) cleanup();
     }
   }
 
   readQuery<T = Data, V = Variables>(input: QueryInput<T, V>): T | null {
+    const cleanup = this.prepareCache('read');
     const request = createRequest(input.query, input.variables!);
     request.query = formatDocument(request.query);
-    return read(this, request).data as T | null;
+    const result = read(this, request).data as T | null;
+    if (cleanup) cleanup();
+    return result;
   }
 
   readFragment<T = Data, V = Variables>(
@@ -182,12 +268,15 @@ export class Store<
     entity: string | Data | T,
     variables?: V
   ): T | null {
-    return readFragment(
+    const cleanup = this.prepareCache('read');
+    const result = readFragment(
       this,
       formatDocument(fragment),
       entity,
       variables as any
     ) as T | null;
+    if (cleanup) cleanup();
+    return result;
   }
 
   writeFragment<T = Data, V = Variables>(
@@ -195,7 +284,9 @@ export class Store<
     data: T,
     variables?: V
   ): void {
+    const cleanup = this.prepareCache('write');
     writeFragment(this, formatDocument(fragment), data, variables as any);
+    if (cleanup) cleanup();
   }
 
   link(
@@ -219,11 +310,13 @@ export class Store<
       : argsOrLink) as Link<Entity>;
     const entityKey = ensureLink(this, entity);
     if (typeof entityKey === 'string') {
+      const cleanup = this.prepareCache('write');
       InMemoryData.writeLink(
         entityKey,
         keyOfField(field, args),
         ensureLink(this, link)
       );
+      if (cleanup) cleanup();
     }
   }
 }

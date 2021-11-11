@@ -1,6 +1,7 @@
 import { TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { IntrospectionData } from './ast';
+import './core.d.ts';
 
 // Helper types
 export type NullArray<T> = Array<null | T | NullArray<T>>;

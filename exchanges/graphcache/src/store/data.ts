@@ -192,17 +192,7 @@ export const noopDataState = (
   clearDataState();
 };
 
-export const getCurrentOperation = (): OperationType => {
-  invariant(
-    currentOperation !== null,
-    'Invalid Cache call: The cache may only be accessed or mutated during' +
-      'operations like write or query, or as part of its resolvers, updaters, ' +
-      'or optimistic configs.',
-    2
-  );
-
-  return currentOperation;
-};
+export const getCurrentOperation = (): OperationType | null => currentOperation;
 
 /** As we're writing, we keep around all the records and links we've read or have written to */
 export const getCurrentDependencies = (): Dependencies => {
@@ -414,8 +404,8 @@ export const gc = () => {
 };
 
 const updateDependencies = (entityKey: string, fieldKey?: string) => {
-  if (fieldKey !== '__typename') {
-    if (entityKey !== currentData!.queryRootKey) {
+  if (fieldKey !== '__typename' && currentData) {
+    if (entityKey !== currentData.queryRootKey) {
       currentDependencies![entityKey] = true;
     } else if (fieldKey !== undefined) {
       currentDependencies![joinKeys(entityKey, fieldKey)] = true;

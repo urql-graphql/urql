@@ -36,15 +36,15 @@ type OperationResultWithMeta = OperationResult & {
 };
 
 type Operations = Set<number>;
-type OperationMap = Map<number, Operation>;
 type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
-type DependentOperations = Record<string, number[]>;
 
 export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C
 ): Exchange => ({ forward, client, dispatchDebug }) => {
   const store = new Store<C>(opts);
+  client.cache = store;
+  store.client = client;
 
   let hydration: void | Promise<void>;
   if (opts && opts.storage) {
@@ -55,11 +55,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
   const optimisticKeysToDependencies: OptimisticDependencies = new Map();
   const mutationResultBuffer: OperationResult[] = [];
-  const operations: OperationMap = new Map();
   const results: ResultMap = new Map();
   const blockedDependencies: Dependencies = makeDict();
-  const requestedRefetch: Operations = new Set();
-  const deps: DependentOperations = makeDict();
 
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
     for (const dep in dependencies) if (blockedDependencies[dep]) return true;
@@ -73,9 +70,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     if (dependencies) {
       // Collect operations that will be updated due to cache changes
       for (const dep in dependencies) {
-        const keys = deps[dep];
+        const keys = store.deps[dep];
         if (keys) {
-          deps[dep] = [];
+          store.deps[dep] = [];
           for (let i = 0, l = keys.length; i < l; i++) {
             pendingOperations.add(keys[i]);
           }
@@ -91,12 +88,12 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     // Reexecute collected operations and delete them from the mapping
     pendingOperations.forEach(key => {
       if (key !== operation.key) {
-        const op = operations.get(key);
+        const op = store.operations.get(key);
         if (op) {
-          operations.delete(key);
+          store.operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
-          if (requestedRefetch.has(key)) {
-            requestedRefetch.delete(key);
+          if (store.requestedRefetch.has(key)) {
+            store.requestedRefetch.delete(key);
             policy = 'cache-and-network';
           }
           client.reexecuteOperation(toRequestPolicy(op, policy));
@@ -112,7 +109,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       reserveLayer(store.data, operation.key);
     } else if (operation.kind === 'teardown') {
       // Delete reference to operation if any exists to release it
-      operations.delete(operation.key);
+      store.operations.delete(operation.key);
       results.delete(operation.key);
       // Mark operation layer as done
       noopDataState(store.data, operation.key);
@@ -157,8 +154,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   // This updates the known dependencies for the passed operation
   const updateDependencies = (op: Operation, dependencies: Dependencies) => {
     for (const dep in dependencies) {
-      (deps[dep] || (deps[dep] = [])).push(op.key);
-      operations.set(op.key, op);
+      (store.deps[dep] || (store.deps[dep] = [])).push(op.key);
+      store.operations.set(op.key, op);
     }
   };
 
@@ -329,7 +326,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
             } else if (
               operation.context.requestPolicy === 'cache-and-network'
             ) {
-              requestedRefetch.add(operation.key);
+              store.requestedRefetch.add(operation.key);
             }
           }
 
