@@ -10,5 +10,6 @@ export {
   hydrateData,
 } from './data';
 
+export * from './dependencies';
 export * from './keys';
 export * from './store';

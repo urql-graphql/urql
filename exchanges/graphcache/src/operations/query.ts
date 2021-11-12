@@ -13,17 +13,11 @@ import {
   getFieldArguments,
 } from '../ast';
 
-import {
-  Variables,
-  Data,
-  DataField,
-  Link,
-  OperationRequest,
-  Dependencies,
-} from '../types';
+import { Variables, Data, DataField, Link, OperationRequest } from '../types';
 
 import {
   Store,
+  Dependencies,
   getCurrentOperation,
   getCurrentDependencies,
   initDataState,

@@ -22,12 +22,12 @@ import {
   Data,
   Link,
   OperationRequest,
-  Dependencies,
   EntityField,
 } from '../types';
 
 import {
   Store,
+  Dependencies,
   getCurrentDependencies,
   initDataState,
   clearDataState,
