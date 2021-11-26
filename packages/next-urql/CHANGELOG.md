@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.1
+
+### Patch Changes
+
+- ⚠️ Fix bail when the `getInitialProps` call indicates we've finished the response, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2101](https://github.com/FormidableLabs/urql/pull/2101))
+
 ## 3.3.0
 
 ### Minor Changes
