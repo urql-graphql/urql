@@ -147,7 +147,7 @@ export function withUrqlClient(
         let pageProps = {} as any;
         if (AppOrPage.getInitialProps) {
           pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
-          if (ctx.res?.writableEnded || ctx.res?.finished) {
+          if (ctx.res && (ctx.res.writableEnded || ctx.res.finished)) {
             return { ...pageProps, urqlClient };
           }
         }
