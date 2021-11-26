@@ -147,6 +147,9 @@ export function withUrqlClient(
         let pageProps = {} as any;
         if (AppOrPage.getInitialProps) {
           pageProps = await AppOrPage.getInitialProps(appOrPageCtx as any);
+          if (ctx.res && (ctx.res.writableEnded || ctx.res.finished)) {
+            return { ...pageProps, urqlClient };
+          }
         }
 
         // Check the window object to determine whether or not we are on the server.
