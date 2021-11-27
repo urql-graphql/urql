@@ -1611,6 +1611,7 @@ describe('schema awareness', () => {
           author: {
             id: '1',
             name: 'Jovi',
+            __typename: 'Author',
           },
         },
         {
@@ -1633,7 +1634,6 @@ describe('schema awareness', () => {
 
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
-
     pipe(
       cacheExchange({
         schema: minifyIntrospectionQuery(
@@ -1658,6 +1658,7 @@ describe('schema awareness', () => {
           author: {
             id: '1',
             name: 'Jovi',
+            __typename: 'Author',
           },
         },
         {
@@ -1688,6 +1689,7 @@ describe('schema awareness', () => {
           author: {
             id: '1',
             name: 'Jovi',
+            __typename: 'Author',
           },
         },
         {
