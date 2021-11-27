@@ -1555,6 +1555,156 @@ describe('schema awareness', () => {
     );
   });
 
+  it('follows partial results with nested fragments', () => {
+    jest.useFakeTimers();
+    const client = createClient({ url: 'http://0.0.0.0' });
+    const { source: ops$, next } = makeSubject<Operation>();
+    const reexec = jest
+      .spyOn(client, 'reexecuteOperation')
+      // Empty mock to avoid going in an endless loop, since we would again return
+      // partial data.
+      .mockImplementation(() => undefined);
+
+    const frag2 = gql`
+      fragment AuthorFields on Author {
+        id
+        name
+        __typename
+      }
+    `;
+
+    const frag1 = gql`
+      fragment TodoFields on Todo {
+        id
+        text
+        __typename
+        author {
+          ...AuthorFields
+        }
+      }
+
+      ${frag2}
+    `;
+
+    const query = gql`
+      query {
+        todos {
+          ...TodoFields
+        }
+      }
+
+      ${frag1}
+    `;
+
+    const queryOperation = client.createRequestOperation('query', {
+      key: 1,
+      query,
+    });
+
+    const queryData = {
+      __typename: 'Query',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+          text: 'Learn',
+          author: {
+            id: '1',
+            name: 'Jovi',
+          },
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+          text: 'Teach',
+        },
+      ],
+    };
+
+    const response = jest.fn(
+      (forwardOp: Operation): OperationResult => {
+        if (forwardOp.key === 1) {
+          return { operation: queryOperation, data: queryData };
+        }
+
+        return undefined as any;
+      }
+    );
+
+    const result = jest.fn();
+    const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
+
+    pipe(
+      cacheExchange({
+        schema: minifyIntrospectionQuery(
+          // eslint-disable-next-line
+          require('./test-utils/simple_schema.json')
+        ),
+      })({ forward, client, dispatchDebug })(ops$),
+      tap(result),
+      publish
+    );
+
+    next(queryOperation);
+    jest.runAllTimers();
+    expect(response).toHaveBeenCalledTimes(1);
+    expect(reexec).toHaveBeenCalledTimes(0);
+    expect(result.mock.calls[0][0].data).toMatchObject({
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+          text: 'Learn',
+          author: {
+            id: '1',
+            name: 'Jovi',
+          },
+        },
+        {
+          __typename: 'Todo',
+          id: '456',
+          text: 'Teach',
+        },
+      ],
+    });
+
+    expect(result.mock.calls[0][0]).toHaveProperty(
+      'operation.context.meta',
+      undefined
+    );
+
+    next(queryOperation);
+    jest.runAllTimers();
+    expect(result).toHaveBeenCalledTimes(2);
+    expect(reexec).toHaveBeenCalledTimes(1);
+    expect(result.mock.calls[1][0].stale).toBe(true);
+    expect(result.mock.calls[1][0].data).toEqual({
+      __typename: 'Query',
+      todos: [
+        {
+          __typename: 'Todo',
+          id: '123',
+          text: 'Learn',
+          author: {
+            id: '1',
+            name: 'Jovi',
+          },
+        },
+        {
+          __typename: 'Todo',
+          author: null,
+          id: '456',
+          text: 'Teach',
+        },
+      ],
+    });
+
+    expect(result.mock.calls[1][0]).toHaveProperty(
+      'operation.context.meta.cacheOutcome',
+      'partial'
+    );
+  });
+
   it('reexecutes query and returns data on partial results for nullable lists', () => {
     jest.useFakeTimers();
     const client = createClient({ url: 'http://0.0.0.0' });
