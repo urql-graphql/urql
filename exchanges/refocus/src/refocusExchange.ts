@@ -18,6 +18,7 @@ export const refocusExchange = (): Exchange => {
         watchedOperations.forEach(op => {
           client.reexecuteOperation(
             client.createRequestOperation('query', op, {
+              ...op.context,
               requestPolicy: 'cache-and-network',
             })
           );
