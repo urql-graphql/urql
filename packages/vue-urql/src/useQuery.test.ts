@@ -1,4 +1,4 @@
-import { nextTick, reactive, ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue-demi';
 
 jest.mock('./useClient.ts', () => ({
   __esModule: true,

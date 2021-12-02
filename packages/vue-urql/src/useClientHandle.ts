@@ -5,7 +5,7 @@ import {
   getCurrentInstance,
   onMounted,
   onBeforeUnmount,
-} from 'vue';
+} from 'vue-demi';
 
 import { useClient } from './useClient';
 

@@ -3,7 +3,14 @@
 import { DocumentNode } from 'graphql';
 import { Source, pipe, subscribe, onEnd } from 'wonka';
 
-import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
+import {
+  WatchStopHandle,
+  Ref,
+  ref,
+  watchEffect,
+  reactive,
+  isRef,
+} from 'vue-demi';
 
 import {
   Client,

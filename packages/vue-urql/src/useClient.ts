@@ -1,4 +1,13 @@
-import { App, getCurrentInstance, inject, provide, Ref, isRef, ref } from 'vue';
+import {
+  App,
+  getCurrentInstance,
+  inject,
+  provide,
+  Ref,
+  isRef,
+  ref,
+  isVue2,
+} from 'vue-demi';
 import { Client, ClientOptions } from '@urql/core';
 
 export function provideClient(opts: ClientOptions | Client | Ref<Client>) {
@@ -20,7 +29,16 @@ export function install(app: App, opts: ClientOptions | Client | Ref<Client>) {
   } else {
     client = opts;
   }
-  app.provide('$urql', client);
+
+  if (isVue2) {
+    app.mixin({
+      setup() {
+        provide('$urql', client);
+      },
+    });
+  } else {
+    app.provide('$urql', client);
+  }
 }
 
 export function useClient(): Ref<Client> {

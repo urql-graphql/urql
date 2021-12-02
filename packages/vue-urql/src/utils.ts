@@ -1,4 +1,4 @@
-import { Ref, isRef } from 'vue';
+import { Ref, isRef } from 'vue-demi';
 
 export function unwrapPossibleProxy<V>(
   possibleProxy: V | Ref<V> | undefined

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { ref, Ref } from 'vue';
+import { ref, Ref } from 'vue-demi';
 import { DocumentNode } from 'graphql';
 import { pipe, toPromise, take } from 'wonka';
 

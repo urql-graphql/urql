@@ -39,7 +39,9 @@
     "dist/"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "yarn test:2 && yarn test:3",
+    "test:2": "vue-demi-switch 2 vue2 && jest",
+    "test:3": "vue-demi-switch 3 && jest",
     "clean": "rimraf dist",
     "check": "tsc --noEmit",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
@@ -52,14 +54,23 @@
   },
   "devDependencies": {
     "graphql": "^15.1.0",
-    "vue": "^3.0.11"
+    "vue": "^3.0.11",
+    "vue2": "npm:vue@2"
   },
   "peerDependencies": {
+    "@vue/composition-api": "^1.4.1",
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0",
-    "vue": "^3.0.0"
+    "vue": "^2.0.0 || ^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@urql/core": "^2.3.4",
+    "@vue/composition-api": "^1.4.1",
+    "vue-demi": "^0.12.1",
     "wonka": "^4.0.14"
   },
   "publishConfig": {
