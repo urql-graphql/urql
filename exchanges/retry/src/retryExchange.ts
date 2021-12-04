@@ -5,7 +5,7 @@ import {
   merge,
   filter,
   fromValue,
-  delay,
+  debounce,
   mergeMap,
   takeUntil,
 } from 'wonka';
@@ -96,7 +96,7 @@ export const retryExchange = ({
               retryCount,
             })
           ),
-          delay(delayAmount),
+          debounce(() => delayAmount),
           // Stop retry if a teardown comes in
           takeUntil(teardown$)
         );
