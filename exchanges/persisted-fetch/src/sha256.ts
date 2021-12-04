@@ -35,7 +35,7 @@ if (typeof window === 'undefined') {
   try {
     // Indirect eval/require to guarantee no side-effects in module scope
     // (optimization for minifiers)
-    nodeCrypto = new Function('require', 'return require("crypto")')(require);
+    nodeCrypto = new Function('return require("crypto")')();
   } catch (e) {}
 }
 
