@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+### Patch Changes
+
+- ⚠️ Fix use context of the reexecuting operation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2104](https://github.com/FormidableLabs/urql/pull/2104))
+
 ## 0.2.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+### Patch Changes
+
+- ⚠️ Fix operations sometimes not being executed after a retry is supposed to be triggered, due to a `setTimeout` reordering issue when the timer isn't as predictable as it should be, by [@kitten](https://github.com/kitten) (See [#2124](https://github.com/FormidableLabs/urql/pull/2124))
+
 ## 0.3.0
 
 ### Minor Changes

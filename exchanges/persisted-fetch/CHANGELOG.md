@@ -1,5 +1,11 @@
 # @urql/exchange-persisted-fetch
 
+## 1.3.3
+
+### Patch Changes
+
+- ⚠️ Fix Crypto API support for Web Workers and Node Crypto in ESM mode. Previously, when Node Crypto was required in Node ESM mode it would result in an error instead, since we didn't try a dynamic import fallback, by [@kitten](https://github.com/kitten) (See [#2123](https://github.com/FormidableLabs/urql/pull/2123))
+
 ## 1.3.2
 
 ### Patch Changes
