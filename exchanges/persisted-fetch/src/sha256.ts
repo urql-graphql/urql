@@ -35,11 +35,12 @@ if (typeof window === 'undefined' && !webCrypto) {
   // Indirect eval'd require/import to guarantee no side-effects in module scope
   // (optimization for minifiers)
   try {
-    nodeCrypto = Promise.resolve(new Function('return require("crypto")')());
+    nodeCrypto = Promise.resolve(
+      new Function('require', 'return require("crypto")')(require)
+    );
   } catch (_error) {
-    // @ts-expect-error
     try {
-      nodeCrypto = import('crypto');
+      nodeCrypto = new Function('return import("crypto")')();
     } catch (_error) {}
   }
 }
