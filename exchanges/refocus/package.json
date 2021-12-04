@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-refocus",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "An exchange that dispatches active operations when the window regains focus",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
