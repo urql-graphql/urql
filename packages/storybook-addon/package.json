@@ -45,7 +45,7 @@
     "@types/webpack-env": "^1.15.3",
     "@urql/devtools": "^2.0.2",
     "@urql/preact": ">=2.0.2",
-    "graphql": "^15.4.0",
+    "graphql": "^16.0.0",
     "preact": "^10.5.5",
     "react": "^17.0.1",
     "urql": ">=2.0.3",

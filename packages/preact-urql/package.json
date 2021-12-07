@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@testing-library/preact": "^2.0.0",
-    "graphql": "^15.4.0",
+    "graphql": "^16.0.0",
     "preact": "^10.5.5"
   },
   "peerDependencies": {

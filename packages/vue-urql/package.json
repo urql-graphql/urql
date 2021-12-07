@@ -51,7 +51,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
-    "graphql": "^15.1.0",
+    "graphql": "^16.0.0",
     "vue": "^3.0.11"
   },
   "peerDependencies": {

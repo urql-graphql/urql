@@ -93,7 +93,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "execa": "^5.0.0",
     "glob": "^7.1.6",
-    "graphql": "^15.5.0",
+    "graphql": "^16.0.0",
     "husky-v4": "^4.3.8",
     "invariant": "^2.2.4",
     "jest": "^26.6.3",
