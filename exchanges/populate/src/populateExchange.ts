@@ -1,4 +1,5 @@
 import {
+  ASTNode,
   DocumentNode,
   buildClientSchema,
   FragmentDefinitionNode,
@@ -248,7 +249,7 @@ export const addFragmentsToQuery = (
 
   return traverse(
     query,
-    node => {
+    (node: ASTNode): ASTNode | void => {
       if (node.kind === Kind.DOCUMENT) {
         node.definitions.reduce((set, definition) => {
           if (definition.kind === Kind.FRAGMENT_DEFINITION) {
@@ -332,7 +333,7 @@ export const addFragmentsToQuery = (
           selectionSet: {
             kind: Kind.SELECTION_SET,
             selections,
-          },
+          } as SelectionSetNode,
         };
       }
     },
