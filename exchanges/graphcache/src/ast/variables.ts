@@ -50,7 +50,7 @@ export const filterVariables = (
 /** Returns a normalized form of variables with defaulted values */
 export const normalizeVariables = (
   node: OperationDefinitionNode,
-  input: void | object
+  input: void | Record<string, unknown>
 ): Variables => {
   const vars = {};
   if (!input) return vars;

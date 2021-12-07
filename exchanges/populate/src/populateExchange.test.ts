@@ -5,6 +5,7 @@ import {
   visit,
   DocumentNode,
   ASTKindToNode,
+  Kind,
 } from 'graphql';
 
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
@@ -142,8 +143,7 @@ describe('on mutation', () => {
           addTodo {
             __typename
           }
-        }
-        "
+        }"
       `);
     });
   });
@@ -215,8 +215,7 @@ describe('on query -> mutation', () => {
 
         fragment Todo_PopulateFragment_1 on Todo {
           text
-        }
-        "
+        }"
       `);
     });
   });
@@ -302,8 +301,7 @@ describe('on (query w/ fragment) -> mutation', () => {
         fragment CreatorFragment on User {
           id
           name
-        }
-        "
+        }"
       `);
     });
 
@@ -314,9 +312,12 @@ describe('on (query w/ fragment) -> mutation', () => {
         toArray
       );
 
-      const fragments = getNodesByType(response[1].query, 'FragmentDefinition');
+      const fragments = getNodesByType(
+        response[1].query,
+        Kind.FRAGMENT_DEFINITION
+      );
       expect(
-        fragments.filter(f => f.name.value === 'TodoFragment')
+        fragments.filter(f => 'name' in f && f.name.value === 'TodoFragment')
       ).toHaveLength(1);
     });
   });
@@ -378,8 +379,7 @@ describe('on (query w/ unused fragment) -> mutation', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           text
-        }
-        "
+        }"
       `);
     });
 
@@ -390,9 +390,12 @@ describe('on (query w/ unused fragment) -> mutation', () => {
         toArray
       );
 
-      const fragments = getNodesByType(response[1].query, 'FragmentDefinition');
+      const fragments = getNodesByType(
+        response[1].query,
+        Kind.FRAGMENT_DEFINITION
+      );
       expect(
-        fragments.filter(f => f.name.value === 'UserFragment')
+        fragments.filter(f => 'name' in f && f.name.value === 'UserFragment')
       ).toHaveLength(0);
     });
   });
@@ -456,8 +459,7 @@ describe('on query -> (mutation w/ interface return type)', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           name
-        }
-        "
+        }"
       `);
     });
   });
@@ -521,8 +523,7 @@ describe('on query -> (mutation w/ union return type)', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           name
-        }
-        "
+        }"
       `);
     });
   });
@@ -573,8 +574,7 @@ describe('on query -> teardown -> mutation', () => {
           addTodo {
             __typename
           }
-        }
-        "
+        }"
       `);
     });
 
@@ -584,8 +584,8 @@ describe('on query -> teardown -> mutation', () => {
         populateExchange({ schema })(exchangeArgs),
         toArray
       );
-      getNodesByType(response[2].query, 'Field').forEach(field => {
-        expect(field.name.value).toMatch(/addTodo|__typename/);
+      getNodesByType(response[2].query, Kind.FIELD).forEach(field => {
+        expect((field as any).name.value).toMatch(/addTodo|__typename/);
       });
     });
   });
@@ -647,8 +647,7 @@ describe('interface returned in mutation', () => {
         id
         price
         tax
-      }
-      "
+      }"
     `);
   });
 });
@@ -725,8 +724,7 @@ describe('nested interfaces', () => {
           name
           website
         }
-      }
-      "
+      }"
     `);
   });
 });

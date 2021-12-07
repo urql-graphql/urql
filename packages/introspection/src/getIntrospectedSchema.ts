@@ -22,7 +22,7 @@ export const getIntrospectedSchema = (
     return input;
   }
 
-  const initialIntrospection = executeSync({
+  const initialIntrospection: any = executeSync({
     document: parse(getIntrospectionQuery({ descriptions: false })),
     schema: input as GraphQLSchema,
   });

@@ -51,7 +51,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "peerDependencies": {
-    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0",
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",
     "svelte": "^3.0.0"
   },
   "dependencies": {
@@ -59,7 +59,7 @@
     "wonka": "^4.0.14"
   },
   "devDependencies": {
-    "graphql": "^15.4.0",
+    "graphql": "^16.0.0",
     "svelte": "^3.20.0"
   },
   "publishConfig": {

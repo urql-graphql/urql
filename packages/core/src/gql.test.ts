@@ -97,8 +97,7 @@ it('interpolates nested GraphQL Documents', () => {
 
     fragment Query on Query {
       field
-    }
-    "
+    }"
   `);
 });
 
@@ -114,7 +113,6 @@ it('interpolates strings', () => {
   ).toMatchInlineSnapshot(`
     "{
       field
-    }
-    "
+    }"
   `);
 });

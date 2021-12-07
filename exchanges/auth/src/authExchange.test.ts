@@ -121,7 +121,7 @@ it('supports calls to the mutate() method in getAuth()', async () => {
     authExchange<{ token: string }>({
       getAuth: async ({ mutate }) => {
         const result = await mutate('mutation { auth }');
-        expect(print(result.operation.query)).toBe('mutation {\n  auth\n}\n');
+        expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
         return { token: 'async-token' };
       },
       willAuthError: () => false,

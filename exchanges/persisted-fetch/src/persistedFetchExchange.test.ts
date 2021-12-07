@@ -171,7 +171,7 @@ it('correctly generates an SHA256 hash', async () => {
   const body = JSON.parse(fetch.mock.calls[0][1].body);
 
   expect(queryHash).toBe(
-    'bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4'
+    'b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8'
   );
 
   expect(body).toMatchObject({
@@ -223,8 +223,7 @@ it('supports a custom hash function', async () => {
     firstName
     lastName
   }
-}
-`;
+}`;
   expect(hashFn).toBeCalledWith(queryString, queryOperation.query);
 });
 
@@ -259,7 +258,7 @@ it('falls back to a non-persisted query if the hash is falsy', async () => {
       '    firstName\n' +
       '    lastName\n' +
       '  }\n' +
-      '}\n',
+      '}',
     operationName: 'getUser',
     variables: { name: 'Clara' },
   });
