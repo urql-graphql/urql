@@ -87,8 +87,5 @@ it('should remove comments', () => {
     }
   `;
   const val = createRequest(doc);
-  expect(print(val.query)).toBe(`{
-  test
-}
-`);
+  expect(print(val.query)).toBe(`{\n  test\n}`);
 });

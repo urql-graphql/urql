@@ -181,8 +181,7 @@ describe('offline', () => {
     name
     __typename
   }
-}
-`,
+}`,
         variables: {},
       },
     ]);
@@ -311,8 +310,7 @@ describe('offline', () => {
     name
     __typename
   }
-}
-`,
+}`,
         variables: {},
       },
     ]);

@@ -109,7 +109,13 @@ it('caches errored query results correctly', () => {
     [queryOperation.key]: {
       data: 'null',
       error: {
-        graphQLErrors: ['Oh no!'],
+        graphQLErrors: [
+          {
+            extensions: {},
+            message: 'Oh no!',
+            path: undefined,
+          },
+        ],
         networkError: undefined,
       },
     },

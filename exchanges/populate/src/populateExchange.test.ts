@@ -143,8 +143,7 @@ describe('on mutation', () => {
           addTodo {
             __typename
           }
-        }
-        "
+        }"
       `);
     });
   });
@@ -216,8 +215,7 @@ describe('on query -> mutation', () => {
 
         fragment Todo_PopulateFragment_1 on Todo {
           text
-        }
-        "
+        }"
       `);
     });
   });
@@ -303,8 +301,7 @@ describe('on (query w/ fragment) -> mutation', () => {
         fragment CreatorFragment on User {
           id
           name
-        }
-        "
+        }"
       `);
     });
 
@@ -382,8 +379,7 @@ describe('on (query w/ unused fragment) -> mutation', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           text
-        }
-        "
+        }"
       `);
     });
 
@@ -463,8 +459,7 @@ describe('on query -> (mutation w/ interface return type)', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           name
-        }
-        "
+        }"
       `);
     });
   });
@@ -528,8 +523,7 @@ describe('on query -> (mutation w/ union return type)', () => {
         fragment Todo_PopulateFragment_0 on Todo {
           id
           name
-        }
-        "
+        }"
       `);
     });
   });
@@ -580,8 +574,7 @@ describe('on query -> teardown -> mutation', () => {
           addTodo {
             __typename
           }
-        }
-        "
+        }"
       `);
     });
 
@@ -654,8 +647,7 @@ describe('interface returned in mutation', () => {
         id
         price
         tax
-      }
-      "
+      }"
     `);
   });
 });
@@ -732,8 +724,7 @@ describe('nested interfaces', () => {
           name
           website
         }
-      }
-      "
+      }"
     `);
   });
 });
