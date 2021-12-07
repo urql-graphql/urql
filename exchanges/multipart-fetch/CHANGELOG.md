@@ -1,5 +1,14 @@
 # @urql/exchange-multipart-fetch
 
+## 0.1.14
+
+### Patch Changes
+
+- Extend peer dependency range of `graphql` to include `^16.0.0`.
+  As always when upgrading across many packages of `urql`, especially including `@urql/core` we recommend you to deduplicate dependencies after upgrading, using `npm dedupe` or `npx yarn-deduplicate`, by [@kitten](https://github.com/kitten) (See [#2133](https://github.com/FormidableLabs/urql/pull/2133))
+- Updated dependencies (See [#2133](https://github.com/FormidableLabs/urql/pull/2133))
+  - @urql/core@2.3.6
+
 ## 0.1.13
 
 ### Patch Changes

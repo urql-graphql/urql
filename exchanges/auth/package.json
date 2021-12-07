@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-auth",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "An exchange for managing authentication and token refresh in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -51,7 +51,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "dependencies": {
-    "@urql/core": ">=2.2.0",
+    "@urql/core": ">=2.3.6",
     "wonka": "^4.0.14"
   },
   "peerDependencies": {
