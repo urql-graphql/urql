@@ -71,8 +71,7 @@ describe('formatTypeNames', () => {
           id
           __typename
         }
-      }
-      "
+      }"
     `);
   });
 
@@ -85,14 +84,13 @@ describe('formatTypeNames', () => {
       }
     }`)
     ).toMatchInlineSnapshot(`
-                  "{
-                    todos {
-                      id
-                      __typename
-                    }
-                  }
-                  "
-            `);
+      "{
+        todos {
+          id
+          __typename
+        }
+      }"
+    `);
   });
 
   it('does add typenames when it is aliased', () => {
@@ -104,15 +102,14 @@ describe('formatTypeNames', () => {
       }
     }`)
     ).toMatchInlineSnapshot(`
-                  "{
-                    todos {
-                      id
-                      typename: __typename
-                      __typename
-                    }
-                  }
-                  "
-            `);
+      "{
+        todos {
+          id
+          typename: __typename
+          __typename
+        }
+      }"
+    `);
   });
 });
 

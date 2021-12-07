@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`accepts successful persisted query responses 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4\\"}}}"`;
+exports[`accepts successful persisted query responses 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\"}}}"`;
 
-exports[`supports cache-miss persisted query errors 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4\\"}}}"`;
+exports[`supports cache-miss persisted query errors 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\"}}}"`;
 
-exports[`supports cache-miss persisted query errors 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\\\n\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4\\"}}}"`;
+exports[`supports cache-miss persisted query errors 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\"}}}"`;
 
-exports[`supports unsupported persisted query errors 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"bfa84414672fe625d36f2d2a52e1d3c1e71c5a01e79599c320db7656d6f014d4\\"}}}"`;
+exports[`supports unsupported persisted query errors 1`] = `"{\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"},\\"extensions\\":{\\"persistedQuery\\":{\\"version\\":1,\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\"}}}"`;
