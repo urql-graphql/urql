@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A highly customizable and versatile GraphQL client for React",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
@@ -59,7 +59,7 @@
     "react": ">= 16.8.0"
   },
   "dependencies": {
-    "@urql/core": "^2.3.2",
+    "@urql/core": "^2.3.6",
     "wonka": "^4.0.14"
   }
 }

@@ -1,5 +1,12 @@
 # @urql/storybook-addon
 
+## 1.0.8
+
+### Patch Changes
+
+- Extend peer dependency range of `graphql` to include `^16.0.0`.
+  As always when upgrading across many packages of `urql`, especially including `@urql/core` we recommend you to deduplicate dependencies after upgrading, using `npm dedupe` or `npx yarn-deduplicate`, by [@kitten](https://github.com/kitten) (See [#2133](https://github.com/FormidableLabs/urql/pull/2133))
+
 ## 1.0.7
 
 ### Patch Changes
