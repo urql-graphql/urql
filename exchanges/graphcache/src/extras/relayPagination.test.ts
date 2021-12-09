@@ -95,6 +95,92 @@ it('works with forward pagination', () => {
   });
 });
 
+it('can query totalCount', () => {
+  const Pagination = gql`
+    query {
+      __typename
+      items(first: 2) {
+        __typename
+        edges {
+          __typename
+          node {
+            __typename
+            id
+          }
+        }
+        nodes {
+          __typename
+          id
+        }
+        totalCount
+        pageInfo {
+          __typename
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      edges: [itemEdge(1), itemEdge(2)],
+      nodes: [itemNode(1), itemNode(2)],
+      totalCount: 2,
+      pageInfo: {
+        __typename: 'PageInfo',
+        hasNextPage: true,
+        endCursor: '2',
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { cursor: null } }, pageOne);
+
+  let res = query(store, { query: Pagination });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual({
+    ...pageOne,
+    items: {
+      ...pageOne.items,
+      edges: [pageOne.items.edges[0], pageOne.items.edges[1]],
+      nodes: [pageOne.items.nodes[0], pageOne.items.nodes[1]],
+    },
+  });
+
+  const totalCountQuery = gql`
+    query {
+      __typename
+      items {
+        __typename
+        totalCount
+      }
+    }
+  `;
+
+  res = query(store, { query: totalCountQuery });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual({
+    ...pageOne,
+    items: {
+      __typename: 'ItemsConnection',
+      totalCount: 2,
+    },
+  });
+});
+
 it('works with backwards pagination', () => {
   const Pagination = gql`
     query($cursor: String) {
