@@ -2,4 +2,4 @@
 '@urql/exchange-graphcache': patch
 ---
 
-Return `totalCount` when available
+Return additional available fields on a `Connection` when using relay-pagination
