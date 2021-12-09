@@ -124,6 +124,8 @@ const compareArgs = (
   return true;
 };
 
+const reserved = ['__typename', 'edges', 'nodes', 'pageInfo'];
+
 const getPage = (
   cache: Cache,
   entityKey: string,
@@ -147,6 +149,16 @@ const getPage = (
     totalCount,
     pageInfo: defaultPageInfo,
   };
+
+  const extraFields = cache.inspectFields(link);
+  if (extraFields && extraFields.length) {
+    const additional = extraFields.filter(
+      x => reserved.indexOf(x.fieldKey) !== -1
+    );
+    additional.forEach(x => {
+      page[x.fieldKey] = cache.resolve(link, x.fieldKey);
+    });
+  }
 
   const pageInfoKey = cache.resolve(link, 'pageInfo');
   if (typeof pageInfoKey === 'string') {
@@ -206,8 +218,7 @@ export const relayPagination = (
     let startNodes: NullArray<string> = [];
     let endNodes: NullArray<string> = [];
     let pageInfo: PageInfo = { ...defaultPageInfo };
-    let totalCount: string | undefined = undefined;
-
+    let aPage: Page | null = null;
     for (let i = 0; i < size; i++) {
       const { fieldKey, arguments: args } = fieldInfos[i];
       if (args === null || !compareArgs(fieldArgs, args)) {
@@ -219,6 +230,7 @@ export const relayPagination = (
         continue;
       }
 
+      aPage = page;
       if (
         mergeMode === 'inwards' &&
         typeof args.last === 'number' &&
@@ -240,23 +252,19 @@ export const relayPagination = (
         startNodes = concatNodes(startNodes, page.nodes);
         pageInfo.endCursor = page.pageInfo.endCursor;
         pageInfo.hasNextPage = page.pageInfo.hasNextPage;
-        totalCount = page.totalCount;
       } else if (args.before) {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
-        totalCount = page.totalCount;
       } else if (typeof args.last === 'number') {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo = page.pageInfo;
-        totalCount = page.totalCount;
       } else {
         startEdges = concatEdges(cache, startEdges, page.edges);
         startNodes = concatNodes(startNodes, page.nodes);
         pageInfo = page.pageInfo;
-        totalCount = page.totalCount;
       }
 
       if (page.pageInfo.__typename !== pageInfo.__typename)
@@ -281,8 +289,8 @@ export const relayPagination = (
     }
 
     return {
+      ...aPage,
       __typename: typename,
-      totalCount,
       edges:
         mergeMode === 'inwards'
           ? concatEdges(cache, startEdges, endEdges)

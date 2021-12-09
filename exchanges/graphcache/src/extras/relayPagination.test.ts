@@ -180,7 +180,6 @@ it('can query totalCount', () => {
     },
   });
 });
-
 it('works with backwards pagination', () => {
   const Pagination = gql`
     query($cursor: String) {
