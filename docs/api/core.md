@@ -400,7 +400,7 @@ Since the [`client.executeQuery`](#clientexecutequery) and other execute methods
 [`client.query`](#clientquery) and [`client.mutation`](#clientmutation) methods use this helper as
 well to create requests.
 
-The helper takes are of creating a unique `key` for the `GraphQLRequest`. This is a hash of the
+The helper takes care of creating a unique `key` for the `GraphQLRequest`. This is a hash of the
 `query` and `variables` if they're passed. The `variables` will be stringified using
 [`stringifyVariables`](#stringifyvariables), which outputs a stable JSON string.
 
