@@ -80,7 +80,7 @@
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "babel-plugin-modular-graphql": "1.0.1",
+    "babel-plugin-modular-graphql": "^1.1.0",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "dotenv": "^8.2.0",
     "eslint": "^7.25.0",

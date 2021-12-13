@@ -3966,10 +3966,10 @@ babel-plugin-macros@^3.0.1:
     cosmiconfig "^7.0.0"
     resolve "^1.19.0"
 
-babel-plugin-modular-graphql@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-modular-graphql/-/babel-plugin-modular-graphql-1.0.1.tgz#ea78f23fab06e5436f52c8cebe7bbe5fe01b7337"
-  integrity sha512-ZFS/dDv0If6QAmwET5aqIx0lO3JdRRvcdL/nD+AiEGfAKpc68rzvtxQcJ2HNTBp8LnwqGA40HEEaAeY9ty3ZMA==
+babel-plugin-modular-graphql@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-modular-graphql/-/babel-plugin-modular-graphql-1.1.0.tgz#d1d509913295f0320cc1ce38361b229ca04480ba"
+  integrity sha512-U9QXdxvJhxLU4YYrF7646bB4muLXWdW0sXXKrI9FkGDErqjw0utVn+Zk5W0nNXP82rAmg5vl+cv2nAyZ1dnbxg==
 
 babel-plugin-named-asset-import@^0.3.1:
   version "0.3.7"
