@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+### Patch Changes
+
+- Upgrade modular imports for graphql package, which fixes an issue in `@urql/exchange-execute`, where `graphql@16` files wouldn't resolve the old `subscribe` import from the correct file, by [@kitten](https://github.com/kitten) (See [#2149](https://github.com/FormidableLabs/urql/pull/2149))
+
 ## 1.2.1
 
 ### Patch Changes
