@@ -27,25 +27,14 @@ Your queries must always contain a main operation, one of: query, mutation, or
 subscription. This error occurs when this is missing, because the `DocumentNode`
 is maybe empty or only contains fragments.
 
-## (2) Invalid Cache call
+## (2) Missing client
 
-> Invalid Cache call: The cache may only be accessed or mutated during
-> operations like write or query, or as part of its resolvers, updaters,
-> or optimistic configs.
+> You are missing a "client", you should not call cache methods before urql has initialized
 
-If you're somehow accessing the `Cache` (an instance of `Store`) outside any
-of the usual operations then this error will be thrown.
+Before you call `createClient` we don't have a valid "client" reference in graphcache so updating
+the cache isn't safe yet.
 
-Please make sure that you're only calling methods on the `cache` as part of
-configs that you pass to your `cacheExchange`. Outside these functions the cache
-must not be changed.
-
-However when you're not using the `cacheExchange` and are trying to use the
-`Store` on its own, then you may run into issues where its global state wasn't
-initialised correctly.
-
-This is a safe-guard to prevent any asynchronous work to take place, or to
-avoid mutating the cache outside any normal operation.
+Only update the cache _after_ you've called `createClient` with "graphcache" as an exchange.
 
 ## (3) Invalid Object type
 
