@@ -183,7 +183,7 @@ export function mutation<Data = any, Variables = object>(
     store.set(update);
     return pipe(
       client.executeMutation(
-        createRequest(store.query, store.variables || {}),
+        createRequest(store.query, store.variables || ({} as Variables)),
         store.context
       ),
       take(1),
