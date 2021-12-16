@@ -78,7 +78,7 @@ export function operationStore<Data = any, Vars = object, Result = Data>(
     if ('query' in value! || 'variables' in value!) {
       const prev = createRequest(
         internal.query,
-        internal.variables || undefined
+        internal.variables || ({} as Vars)
       );
       const next = createRequest(
         value.query || internal.query,
