@@ -70,6 +70,7 @@ export function useMutation<Data = any, Variables = object>(
   );
 
   useEffect(() => {
+    isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
