@@ -57,7 +57,7 @@ export function useQuery<Data = any, Variables = object>(
   // We need to keep the source in state for 'executeQuery'
   const [sourcyboi, setSource] = useState<{
     source: Source<OperationResult<Data, Variables>> | null;
-    prevValue: any;
+    prevValue: UseQueryState<Data, Variables>;
     deps: Array<any>;
   }>({
     source: null,
@@ -85,9 +85,11 @@ export function useQuery<Data = any, Variables = object>(
           })
         );
         if (result == null && suspense) {
-          throw (result = new Promise(_resolve => {
+          const promise = (result = new Promise(_resolve => {
             resolve = _resolve;
           }));
+          cache.set(request.key, promise);
+          throw promise;
         } else {
           subscription.unsubscribe();
         }
@@ -120,7 +122,7 @@ export function useQuery<Data = any, Variables = object>(
     };
 
     return [getSnapshot, sub];
-  }, [source]);
+  }, [source, args.pause]);
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
@@ -159,7 +161,7 @@ export function useQuery<Data = any, Variables = object>(
     args.requestPolicy,
     args.context,
   ];
-  if (hasDepsChanged(deps, currDeps)) {
+  if (hasDepsChanged(deps, currDeps) && !args.pause) {
     const fetchSource = client.executeQuery(request, {
       requestPolicy: args.requestPolicy,
       ...args.context,
