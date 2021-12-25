@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DocumentNode } from 'graphql';
-import { onPush, pipe, subscribe, takeWhile } from 'wonka';
+import { Source, pipe, subscribe, onPush, takeWhile } from 'wonka';
 import { useCallback, useMemo, useState } from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import {
@@ -13,10 +13,9 @@ import {
   Operation,
 } from '@urql/core';
 
-import { useRequest } from './useRequest';
 import { useClient } from '../context';
+import { useRequest } from './useRequest';
 import { hasDepsChanged, computeNextState, initialState } from './state';
-import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 import { getCacheForClient } from './cache';
 
 export interface UseQueryArgs<Variables = object, Data = any> {
@@ -57,8 +56,8 @@ export function useQuery<Data = any, Variables = object>(
 
   // We need to keep the source in state for 'executeQuery'
   const [sourcyboi, setSource] = useState<{
-    source: sourceT<OperationResult<Data, Variables>> | null;
-    prevValue: OperationResult<Data, Variables>;
+    source: Source<OperationResult<Data, Variables>> | null;
+    prevValue: any;
     deps: Array<any>;
   }>({
     source: null,
@@ -147,11 +146,11 @@ export function useQuery<Data = any, Variables = object>(
     [suspense, client, request, args.requestPolicy, args.context]
   );
 
-  let result = useSyncExternalStore(sub, getSnapshot, getSnapshot);
-  sourcyboi.prevValue = result = computeNextState(
-    sourcyboi.prevValue as any,
-    result
+  let result = useSyncExternalStore<UseQueryState<Data, Variables>>(
+    sub,
+    getSnapshot as any
   );
+  sourcyboi.prevValue = result = computeNextState(sourcyboi.prevValue, result);
 
   const currDeps = [
     client,
@@ -174,11 +173,11 @@ export function useQuery<Data = any, Variables = object>(
         )
       : fetchSource;
     setSource({
-      prevValue: result as any,
+      prevValue: result,
       source: args.pause ? null : source,
       deps: currDeps,
     });
   }
 
-  return [result as any, executeQuery];
+  return [result, executeQuery];
 }
