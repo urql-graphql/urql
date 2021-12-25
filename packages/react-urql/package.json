@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@urql/core": "^2.3.6",
-    "use-sync-external-store": "^0.0.0-experimental-45898dacb2-20210828",
+    "use-sync-external-store": "^1.0.0-rc.0",
     "wonka": "^4.0.14"
   }
 }
