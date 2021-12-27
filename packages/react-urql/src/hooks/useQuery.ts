@@ -77,7 +77,10 @@ export function useQuery<Data = any, Variables = object>(
         const subscription = pipe(
           source,
           takeWhile(
-            () => (suspense && (!resolve || (result && result.then))) || !result
+            () =>
+              (suspense &&
+                (!resolve || (result && (result as Promise<unknown>).then))) ||
+              !result
           ),
           subscribe(_result => {
             result = _result;
