@@ -60,7 +60,7 @@ export function useQuery<Data = any, Variables = object>(
     deps: Array<any>;
   }>({
     source: null,
-    prevValue: notFetching as any,
+    prevValue: notFetching,
     deps: [],
   });
 
