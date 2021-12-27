@@ -78,8 +78,7 @@ export function useQuery<Data = any, Variables = object>(
           source,
           takeWhile(
             () =>
-              (suspense &&
-                (!resolve || (result && (result as Promise<unknown>).then))) ||
+              (suspense && (!resolve || (result && (result as any).then))) ||
               !result
           ),
           subscribe(_result => {
