@@ -68,7 +68,9 @@ export function useQuery<Data = any, Variables = object>(
 
   const [getSnapshot, sub] = useMemo(() => {
     let result = cache.get(request.key);
-    const getSnapshot = () => {
+    const getSnapshot = ():
+      | OperationResult<Data, Variables>
+      | UseQueryState<Data, Variables> => {
       if (!source) {
         return notFetching;
       } else if (!result) {
@@ -103,7 +105,9 @@ export function useQuery<Data = any, Variables = object>(
         throw result;
       }
 
-      return result || fetching;
+      return (result || fetching) as
+        | OperationResult<Data, Variables>
+        | UseQueryState<Data, Variables>;
     };
 
     const sub = notify => {
@@ -156,11 +160,9 @@ export function useQuery<Data = any, Variables = object>(
     [suspense, client, request, args.requestPolicy, args.context]
   );
 
-  let result = useSyncExternalStore<UseQueryState<Data, Variables>>(
-    sub,
-    getSnapshot as any,
-    getSnapshot as any
-  );
+  let result = useSyncExternalStore<
+    UseQueryState<Data, Variables> | OperationResult<Data, Variables>
+  >(sub, getSnapshot, getSnapshot);
 
   meta.prevValue = result = computeNextState(meta.prevValue, result);
 
