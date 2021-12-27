@@ -84,7 +84,8 @@ describe('server-side rendering', () => {
       return pipe(
         ops$,
         filter(x => x.kind === 'query'),
-        delay(100),
+        // TODO; when this delay is removed this works as expected
+        delay(50),
         map(operation => ({ ...queryResponse, operation }))
       );
     };

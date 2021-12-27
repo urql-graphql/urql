@@ -54,8 +54,7 @@ export function useQuery<Data = any, Variables = object>(
   const suspense = isSuspense(client, args.context);
   const cache = getCacheForClient(client);
 
-  // We need to keep the source in state for 'executeQuery'
-  const [sourcyboi, setSource] = useState<{
+  const [meta, setMeta] = useState<{
     source: Source<OperationResult<Data, Variables>> | null;
     prevValue: UseQueryState<Data, Variables>;
     deps: Array<any>;
@@ -65,11 +64,10 @@ export function useQuery<Data = any, Variables = object>(
     deps: [],
   });
 
-  const { source, deps } = sourcyboi;
+  const { source, deps } = meta;
 
   const [getSnapshot, sub] = useMemo(() => {
     let result = cache.get(request.key);
-
     const getSnapshot = () => {
       if (!source) {
         return notFetching;
@@ -84,6 +82,7 @@ export function useQuery<Data = any, Variables = object>(
             if (resolve) resolve(result);
           })
         );
+
         if (result == null && suspense) {
           const promise = (result = new Promise(_resolve => {
             resolve = _resolve;
@@ -131,6 +130,7 @@ export function useQuery<Data = any, Variables = object>(
         ...args.context,
         ...opts,
       });
+
       const source = suspense
         ? pipe(
             fetchSource,
@@ -139,7 +139,8 @@ export function useQuery<Data = any, Variables = object>(
             })
           )
         : fetchSource;
-      setSource(prev => ({
+
+      setMeta(prev => ({
         prevValue: prev.prevValue,
         deps: prev.deps,
         source,
@@ -150,9 +151,11 @@ export function useQuery<Data = any, Variables = object>(
 
   let result = useSyncExternalStore<UseQueryState<Data, Variables>>(
     sub,
+    getSnapshot as any,
     getSnapshot as any
   );
-  sourcyboi.prevValue = result = computeNextState(sourcyboi.prevValue, result);
+
+  meta.prevValue = result = computeNextState(meta.prevValue, result);
 
   const currDeps = [
     client,
@@ -161,11 +164,13 @@ export function useQuery<Data = any, Variables = object>(
     args.requestPolicy,
     args.context,
   ];
+
   if (hasDepsChanged(deps, currDeps) && !args.pause) {
     const fetchSource = client.executeQuery(request, {
       requestPolicy: args.requestPolicy,
       ...args.context,
     });
+
     const source = suspense
       ? pipe(
           fetchSource,
@@ -174,7 +179,8 @@ export function useQuery<Data = any, Variables = object>(
           })
         )
       : fetchSource;
-    setSource({
+
+    setMeta({
       prevValue: result,
       source: args.pause ? null : source,
       deps: currDeps,
