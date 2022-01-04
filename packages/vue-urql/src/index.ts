@@ -5,6 +5,7 @@ export { install, provideClient } from './useClient';
 
 export {
   useQuery,
+  callUseQuery,
   UseQueryArgs,
   UseQueryResponse,
   UseQueryState,
