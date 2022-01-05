@@ -183,7 +183,7 @@ means that we'll need to create an updater that automatically adds the `Todo` to
 cacheExchange({
   updates: {
     Mutation: {
-      updateTodoDate(result, _args, cache, _info) {
+      createTodo(result, _args, cache, _info) {
         const TodoList = gql`
           {
             todos {
@@ -229,7 +229,7 @@ rewritten to use `cache.link` and `cache.resolve` rather than `cache.updateQuery
 cacheExchange({
   updates: {
     Mutation: {
-      updateTodoDate(result, _args, cache, _info) {
+      createTodo(result, _args, cache, _info) {
         const todos = cache.resolve('Query', 'todos');
         if (Array.isArray(todos)) {
           todos.push(result.createTodo);
