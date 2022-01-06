@@ -34,6 +34,19 @@ export function createApp() {
   });
   app.provide('$anotherApi', anotherApi);
 
+  const apiResult = callUseQuery(
+    {
+      query: 'some query',
+    },
+    myApi
+  );
+
+  apiResult.then(() => {
+    // well, now we can execute requests right here before components are rendered
+    // and at the same time leverage the goodies in callUseQuery that
+    // and we don't need to parse a string query ourselves, and then call client.executeQuery
+  });
+
   return app;
 }
 
