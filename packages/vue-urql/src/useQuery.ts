@@ -18,7 +18,7 @@ import {
   GraphQLRequest,
 } from '@urql/core';
 
-import { useClient } from './useClient';
+import { defaultClientId, useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
@@ -56,9 +56,10 @@ const watchOptions = {
 };
 
 export function useQuery<T = any, V = object>(
-  args: UseQueryArgs<T, V>
+  args: UseQueryArgs<T, V>,
+  clientId: string = defaultClientId
 ): UseQueryResponse<T, V> {
-  return callUseQuery(args);
+  return callUseQuery(args, useClient(clientId));
 }
 
 export function callUseQuery<T = any, V = object>(
