@@ -117,7 +117,8 @@ import {
   dedupExchange,
   cacheExchange,
   fetchExchange,
-  ssrExchange
+  ssrExchange,
+  Provider,
 } from 'urql';
 
 const handleRequest = async (req, res) => {

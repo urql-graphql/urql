@@ -62,6 +62,10 @@ it('renders', () => {
 Once you have your mock setup, calls to the client can be tested.
 
 ```tsx
+import { mount } from 'enzyme';
+import { Provider } from 'urql';
+import { MyComponent } from './MyComponent';
+
 it('skips the query', () => {
   mount(
     <Provider value={mockClient}>
@@ -75,6 +79,10 @@ it('skips the query', () => {
 Testing mutations and subscriptions also work in a similar fashion.
 
 ```tsx
+import { mount } from 'enzyme';
+import { Provider } from 'urql';
+import { MyComponent } from './MyComponent';
+
 it('triggers a mutation', () => {
   const wrapper = mount(
     <Provider value={mockClient}>
@@ -125,6 +133,10 @@ Response states are simulated by providing a stream, which contains a network re
 **Example snapshot test of response state**
 
 ```tsx
+import { mount } from 'enzyme';
+import { Provider } from 'urql';
+import { MyComponent } from './MyComponent';
+
 it('matches snapshot', () => {
   const responseState = {
     executeQuery: () =>
@@ -153,6 +165,7 @@ Error responses are similar to success responses, only the value in the stream i
 
 ```tsx
 import { Provider, CombinedError } from 'urql';
+import { fromValue } from 'wonka';
 
 const errorState = {
   executeQuery: () =>
@@ -169,6 +182,8 @@ const errorState = {
 Returning different values for many `useQuery` calls can be done by introducing conditionals into the mocked client functions.
 
 ```tsx
+import { fromValue } from 'wonka';
+
 let mockClient;
 beforeEach(() => {
   mockClient = () => {

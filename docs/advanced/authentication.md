@@ -363,7 +363,9 @@ from, and the user should be logged out.
 
 If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of how we may do this in React if necessary:
 
-```js
+```jsx
+import { createClient, Provider } from 'urql';
+
 const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
   const client = useMemo(() => {
     if (isLoggedIn === null) {
@@ -378,9 +380,9 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
   }
 
   return {
-    <GraphQLProvider value={client}>
+    <Provider value={client}>
       {/* app content  */}
-    <GraphQLProvider>
+    <Provider>
   }
 }
 ```
