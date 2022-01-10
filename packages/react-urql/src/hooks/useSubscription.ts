@@ -40,9 +40,6 @@ export type UseSubscriptionResponse<Data = any, Variables = object> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-const notFetching = initialState;
-const fetching = { ...initialState, fetching: true };
-
 export function useSubscription<Data = any, Result = Data, Variables = object>(
   args: UseSubscriptionArgs<Variables, Data>,
   handler?: SubscriptionHandler<Data, Result>
@@ -66,9 +63,10 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
 
   const { source, deps } = meta;
 
-  const state = useRef(args.pause ? notFetching : fetching);
+  const state = useRef(initialState);
 
   const [getSnapshot, sub] = useMemo(() => {
+    state.current.fetching = !args.pause;
     const getSnapshot = () => state.current;
 
     const sub = notify => {
@@ -113,7 +111,6 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
       ...args.context,
     });
 
-    state.current.fetching = !args.pause;
     setMeta({
       source: args.pause ? null : fetchSource,
       deps: currDeps,
