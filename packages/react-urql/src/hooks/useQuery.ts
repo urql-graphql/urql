@@ -69,13 +69,14 @@ export function useQuery<Data = any, Variables = object>(
 
   const [getSnapshot, sub] = useMemo(() => {
     let result = cache.get(request.key);
-    const getSnapshot = ():
-      | OperationResult<Data, Variables>
-      | UseQueryState<Data, Variables> => {
+
+    const getSnapshot = (): Partial<UseQueryState<Data, Variables>> => {
       if (!source) {
         return notFetching;
       } else if (!result) {
-        let resolve;
+        let resolve:
+          | ((result: OperationResult<Data, Variables>) => void)
+          | undefined;
 
         const subscription = pipe(
           source,
@@ -109,12 +110,10 @@ export function useQuery<Data = any, Variables = object>(
         throw result;
       }
 
-      return (result || fetching) as
-        | OperationResult<Data, Variables>
-        | UseQueryState<Data, Variables>;
+      return (result as OperationResult<Data, Variables>) || fetching;
     };
 
-    const sub = notify => {
+    const sub = (notify: () => void) => {
       if (!source) {
         return () => {
           /*noop*/
@@ -143,25 +142,27 @@ export function useQuery<Data = any, Variables = object>(
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
-      const fetchSource = client.executeQuery(request, {
+      const context = {
         requestPolicy: args.requestPolicy,
         ...args.context,
         ...opts,
-      });
+      };
 
       setMeta(prev => ({
         prevValue: prev.prevValue,
         deps: prev.deps,
-        source: fetchSource,
-        suspense: isSuspense(client, args.context),
+        source: client.executeQuery(request, context),
+        suspense: isSuspense(client, context),
       }));
     },
     [client, request, args.requestPolicy, args.context]
   );
 
-  let result = useSyncExternalStore<
-    UseQueryState<Data, Variables> | OperationResult<Data, Variables>
-  >(sub, getSnapshot, getSnapshot);
+  let result = useSyncExternalStore<Partial<UseQueryState<Data, Variables>>>(
+    sub,
+    getSnapshot,
+    getSnapshot
+  );
 
   meta.prevValue = result = computeNextState(meta.prevValue, result);
 
