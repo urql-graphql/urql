@@ -173,11 +173,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const makeResultSource = (operation: Operation) => {
     let result$ = pipe(
       results$,
-      filter(
-        (res: OperationResult) =>
-          res.operation.kind === operation.kind &&
-          res.operation.key === operation.key
-      )
+      filter((res: OperationResult) => {
+        if (res.operation.kind === 'mutation') {
+          return res.operation === operation;
+        } else {
+          return (
+            res.operation.kind === operation.kind &&
+            res.operation.key === operation.key
+          );
+        }
+      })
     );
 
     // Mask typename properties if the option for it is turned on
