@@ -1,19 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { DocumentNode } from 'graphql';
-import { pipe, subscribe, onEnd } from 'wonka';
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { pipe, subscribe, onEnd, Source } from 'wonka';
+import { useState, useCallback, useMemo, useRef } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import {
   TypedDocumentNode,
   CombinedError,
   OperationContext,
   Operation,
+  OperationResult,
 } from '@urql/core';
 
-import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { initialState, computeNextState, hasDepsChanged } from './state';
+import { useClient } from '../context';
 
 export interface UseSubscriptionArgs<Variables = object, Data = any> {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
@@ -38,82 +40,100 @@ export type UseSubscriptionResponse<Data = any, Variables = object> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
+const notFetching = initialState;
+const fetching = { ...initialState, fetching: true };
+
 export function useSubscription<Data = any, Result = Data, Variables = object>(
   args: UseSubscriptionArgs<Variables, Data>,
   handler?: SubscriptionHandler<Data, Result>
 ): UseSubscriptionResponse<Result, Variables> {
   const client = useClient();
-  const request = useRequest<Data, Variables>(args.query, args.variables);
+  const request = useRequest(args.query, args.variables);
 
   const handlerRef = useRef<SubscriptionHandler<Data, Result> | undefined>(
     handler
   );
+
   handlerRef.current = handler;
 
-  const source = useMemo(
-    () =>
-      !args.pause ? client.executeSubscription(request, args.context) : null,
-    [client, request, args.pause, args.context]
-  );
+  const [meta, setMeta] = useState<{
+    source: Source<OperationResult<Data, Variables>> | null;
+    deps: Array<any>;
+  }>({
+    source: null,
+    deps: [],
+  });
 
-  const deps = [client, request, args.context, args.pause] as const;
+  const { source, deps } = meta;
 
-  const [state, setState] = useState(
-    () => [source, { ...initialState, fetching: !!source }, deps] as const
-  );
+  const state = useRef(args.pause ? notFetching : fetching);
 
-  let currentResult = state[1];
-  if (source !== state[0] && hasDepsChanged(state[2], deps)) {
-    setState([
-      source,
-      (currentResult = computeNextState(state[1], { fetching: !!source })),
-      deps,
-    ]);
-  }
+  const [getSnapshot, sub] = useMemo(() => {
+    const getSnapshot = () => state.current;
 
-  useEffect(() => {
-    const updateResult = (
-      result: Partial<UseSubscriptionState<Data, Variables>>
-    ) => {
-      setState(state => {
-        const nextResult = computeNextState(state[1], result);
-        if (state[1] === nextResult) return state;
-        if (handlerRef.current && state[1].data !== nextResult.data) {
-          nextResult.data = handlerRef.current(
-            state[1].data,
+    const sub = notify => {
+      const updateResult = (
+        result: Partial<UseSubscriptionState<Data, Variables>>
+      ) => {
+        const nextResult = computeNextState(state.current, result);
+        if (state.current === nextResult) return;
+        if (handlerRef.current && state.current.data !== nextResult.data) {
+          state.current.data = handlerRef.current(
+            state.current.data,
             nextResult.data!
           ) as any;
         }
+        notify();
+      };
 
-        return [state[0], nextResult as any, state[2]];
-      });
+      if (source) {
+        return pipe(
+          source,
+          onEnd(() => {
+            updateResult({ fetching: false });
+          }),
+          subscribe(updateResult)
+        ).unsubscribe;
+      } else {
+        updateResult({ fetching: false });
+        return () => {
+          /*noop*/
+        };
+      }
     };
 
-    if (state[0]) {
-      return pipe(
-        state[0],
-        onEnd(() => {
-          updateResult({ fetching: false });
-        }),
-        subscribe(updateResult)
-      ).unsubscribe;
-    } else {
-      updateResult({ fetching: false });
-    }
-  }, [state[0]]);
+    return [getSnapshot, sub];
+  }, [source]);
 
-  // This is the imperative execute function passed to the user
+  const result = useSyncExternalStore(sub, getSnapshot, getSnapshot);
+
+  const currDeps = [client, request, args.pause, args.context];
+  if (hasDepsChanged(deps, currDeps) && !args.pause) {
+    const fetchSource = client.executeSubscription(request, {
+      ...args.context,
+    });
+
+    state.current.fetching = !args.pause;
+    setMeta({
+      source: args.pause ? null : fetchSource,
+      deps: currDeps,
+    });
+  }
+
   const executeSubscription = useCallback(
     (opts?: Partial<OperationContext>) => {
-      const source = client.executeSubscription(request, {
+      const s = client.executeSubscription(request, {
         ...args.context,
         ...opts,
       });
 
-      setState(state => [source, state[1], state[2]]);
+      setMeta(prev => ({
+        deps: prev.deps,
+        source: s,
+      }));
     },
-    [client, args.context, request]
+    [client, request, args.context]
   );
 
-  return [currentResult, executeSubscription];
+  return [result, executeSubscription];
 }
