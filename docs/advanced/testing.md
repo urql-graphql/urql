@@ -216,6 +216,9 @@ Here's an example of testing a list component, which uses a subscription.
 
 ```tsx
 import { OperationContext, makeOperation } from '@urql/core';
+import { mount } from 'enzyme';
+import { Provider } from 'urql';
+import { MyComponent } from './MyComponent';
 
 it('should update the list', done => {
   const mockClient = {
