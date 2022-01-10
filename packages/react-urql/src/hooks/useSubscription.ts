@@ -127,6 +127,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
         ...opts,
       });
 
+      state.current.fetching = true;
       setMeta(prev => ({
         deps: prev.deps,
         source: s,

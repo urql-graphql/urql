@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DocumentNode } from 'graphql';
-import { Source, pipe, subscribe, onPush, takeWhile } from 'wonka';
+import { Source, pipe, subscribe, takeWhile } from 'wonka';
 import { useCallback, useMemo, useState } from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import {
@@ -84,6 +84,9 @@ export function useQuery<Data = any, Variables = object>(
               !result
           ),
           subscribe(_result => {
+            if (suspense) {
+              cache.set(request.key, result);
+            }
             result = _result;
             if (resolve) {
               resolve(result);
@@ -120,6 +123,9 @@ export function useQuery<Data = any, Variables = object>(
       const unsub = pipe(
         source,
         subscribe(_result => {
+          if (suspense) {
+            cache.set(request.key, result);
+          }
           result = _result;
           notify();
         })
@@ -142,19 +148,10 @@ export function useQuery<Data = any, Variables = object>(
         ...opts,
       });
 
-      const source = suspense
-        ? pipe(
-            fetchSource,
-            onPush(result => {
-              cache.set(request.key, result);
-            })
-          )
-        : fetchSource;
-
       setMeta(prev => ({
         prevValue: prev.prevValue,
         deps: prev.deps,
-        source,
+        source: fetchSource,
       }));
     },
     [suspense, client, request, args.requestPolicy, args.context]
@@ -180,18 +177,9 @@ export function useQuery<Data = any, Variables = object>(
       ...args.context,
     });
 
-    const source = suspense
-      ? pipe(
-          fetchSource,
-          onPush(result => {
-            cache.set(request.key, result);
-          })
-        )
-      : fetchSource;
-
     setMeta({
       prevValue: result,
-      source: args.pause ? null : source,
+      source: args.pause ? null : fetchSource,
       deps: currDeps,
     });
   }
