@@ -16355,10 +16355,10 @@ use-subscription@1.5.1:
   dependencies:
     object-assign "^4.1.1"
 
-use-sync-external-store@^1.0.0-rc.0:
-  version "1.0.0-rc.0-next-f2a59df48-20211208"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-rc.0-next-f2a59df48-20211208.tgz#37722e217cbc981989ce94af39db7a0d22ae895b"
-  integrity sha512-VEt6i7C9wGmfI7GNsIdaTALazrgOSvWc+tFZRDOGzh6AugKx7HtKNGV0eS8Axwg+GlvvHv9ILbsmPX55JT630Q==
+"use-sync-external-store@^1.0.0-rc.0 || ^1.0.0":
+  version "1.0.0-rc.0-next-fe905f152-20220107"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-rc.0-next-fe905f152-20220107.tgz#1a244bd9c97f6853552df1f5a29fca726e7a3e96"
+  integrity sha512-1kK4h4Qubjnkmk6UObQKkYv+XwGTd5SuH6/hx1dfzEEvIWLkVd326Lg7Y1EOxfMUxJ5binWXndYX8ZrXFKHGuw==
 
 use@^3.1.0:
   version "3.1.1"
