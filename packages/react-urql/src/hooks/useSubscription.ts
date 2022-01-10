@@ -66,6 +66,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
   const state = useRef(initialState);
 
   const [getSnapshot, sub] = useMemo(() => {
+    state.current = initialState;
     state.current.fetching = !args.pause;
     const getSnapshot = () => state.current;
 
