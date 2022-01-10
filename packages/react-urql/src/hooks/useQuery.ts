@@ -51,20 +51,21 @@ export function useQuery<Data = any, Variables = object>(
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
   const request = useRequest<Data, Variables>(args.query, args.variables);
-  const suspense = isSuspense(client, args.context);
   const cache = getCacheForClient(client);
 
   const [meta, setMeta] = useState<{
     source: Source<OperationResult<Data, Variables>> | null;
     prevValue: UseQueryState<Data, Variables>;
     deps: Array<any>;
+    suspense: boolean;
   }>({
     source: null,
     prevValue: notFetching,
     deps: [],
+    suspense: isSuspense(client, args.context),
   });
 
-  const { source, deps } = meta;
+  const { source, deps, suspense } = meta;
 
   const [getSnapshot, sub] = useMemo(() => {
     let result = cache.get(request.key);
@@ -152,9 +153,10 @@ export function useQuery<Data = any, Variables = object>(
         prevValue: prev.prevValue,
         deps: prev.deps,
         source: fetchSource,
+        suspense: isSuspense(client, args.context),
       }));
     },
-    [suspense, client, request, args.requestPolicy, args.context]
+    [client, request, args.requestPolicy, args.context]
   );
 
   let result = useSyncExternalStore<
@@ -181,6 +183,7 @@ export function useQuery<Data = any, Variables = object>(
       prevValue: result,
       source: args.pause ? null : fetchSource,
       deps: currDeps,
+      suspense: isSuspense(client, args.context),
     });
   }
 
