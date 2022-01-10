@@ -103,7 +103,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
     };
 
     return [getSnapshot, sub];
-  }, [source]);
+  }, [source, args.pause]);
 
   const result = useSyncExternalStore(sub, getSnapshot, getSnapshot);
 
