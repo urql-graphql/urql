@@ -158,13 +158,14 @@ export function useQuery<Data = any, Variables = object>(
     [client, request, args.requestPolicy, args.context]
   );
 
-  let result = useSyncExternalStore<Partial<UseQueryState<Data, Variables>>>(
-    sub,
-    getSnapshot,
-    getSnapshot
-  );
-
-  meta.prevValue = result = computeNextState(meta.prevValue, result);
+  const result = (meta.prevValue = computeNextState(
+    meta.prevValue,
+    useSyncExternalStore<Partial<UseQueryState<Data, Variables>>>(
+      sub,
+      getSnapshot,
+      getSnapshot
+    )
+  ));
 
   const currDeps = [
     client,
