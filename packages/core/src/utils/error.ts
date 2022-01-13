@@ -43,15 +43,18 @@ export class CombinedError extends Error {
   public graphQLErrors: GraphQLError[];
   public networkError?: Error;
   public response?: any;
+  public executionResult?: any;
 
   constructor({
     networkError,
     graphQLErrors,
     response,
+    executionResult,
   }: {
     networkError?: Error;
     graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
     response?: any;
+    executionResult?: any;
   }) {
     const normalizedGraphQLErrors = (graphQLErrors || []).map(
       rehydrateGraphQlError
@@ -65,6 +68,33 @@ export class CombinedError extends Error {
     this.graphQLErrors = normalizedGraphQLErrors;
     this.networkError = networkError;
     this.response = response;
+    this.executionResult = executionResult;
+  }
+
+  toString() {
+    return this.message;
+  }
+}
+
+export class NoContentError extends Error {
+  public name: string;
+  public message: string;
+  response?: any;
+  executionResult?: any;
+
+  constructor({
+    response,
+    executionResult,
+  }: {
+    response?: any;
+    executionResult?: any;
+  }) {
+    super('No Content');
+
+    this.name = 'NoContentError';
+    this.message = 'No Content';
+    this.response = response;
+    this.executionResult = executionResult;
   }
 
   toString() {

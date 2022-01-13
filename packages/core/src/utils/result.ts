@@ -1,5 +1,5 @@
 import { ExecutionResult, Operation, OperationResult } from '../types';
-import { CombinedError } from './error';
+import { CombinedError, NoContentError } from './error';
 
 export const makeResult = (
   operation: Operation,
@@ -7,7 +7,10 @@ export const makeResult = (
   response?: any
 ): OperationResult => {
   if ((!('data' in result) && !('errors' in result)) || 'path' in result) {
-    throw new Error('No Content');
+    throw new NoContentError({
+      response,
+      executionResult: result,
+    });
   }
 
   return {
@@ -17,6 +20,7 @@ export const makeResult = (
       ? new CombinedError({
           graphQLErrors: result.errors,
           response,
+          executionResult: result,
         })
       : undefined,
     extensions:
@@ -67,13 +71,15 @@ export const mergeResultPatch = (
 export const makeErrorResult = (
   operation: Operation,
   error: Error,
-  response?: any
+  response?: any,
+  executionResult?: any
 ): OperationResult => ({
   operation,
   data: undefined,
   error: new CombinedError({
     networkError: error,
     response,
+    executionResult,
   }),
   extensions: undefined,
 });
