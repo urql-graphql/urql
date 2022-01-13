@@ -181,7 +181,7 @@ If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of wo
 `next-urql`. The `next-urql` package includes setup for `react-ssr-prepass` already, which automates
 a lot of the complexity of setting up server-side rendering with `urql`.
 
-We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/FormidableLabs/next-urql)
+We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/FormidableLabs/urql/tree/main/packages/next-urql)
 this integration contains convenience methods specifically for `Next.js`.
 These will simplify the above setup for SSR.
 
