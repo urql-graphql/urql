@@ -135,7 +135,11 @@ export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
     // it once, cachedOps$ needs to be merged after forwardedOps$
     let cachedOps$ = pipe(
       sharedOps$,
-      filter(operation => !!data[operation.key] && operation.context.requestPolicy !== 'network-only'),
+      filter(
+        operation =>
+          !!data[operation.key] &&
+          operation.context.requestPolicy !== 'network-only'
+      ),
       map(op => {
         const serialized = data[op.key]!;
         const result = deserializeResult(op, serialized, includeExtensions);
