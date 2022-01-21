@@ -153,7 +153,7 @@ export const makeFetchSource = (
         ) {
           const e = new Error(error.message);
           e.stack =
-            e.stack?.split('\n').slice(0, 2).join('\n') + '\n' + error.stack;
+            e.stack!.split('\n').slice(0, 2).join('\n') + '\n' + error.stack;
           e.constructor = error.constructor;
           throw e;
         }
