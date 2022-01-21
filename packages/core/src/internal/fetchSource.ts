@@ -147,7 +147,6 @@ export const makeFetchSource = (
       .then(complete)
       .catch((error: Error) => {
         if (
-          error.constructor === Error ||
           error.name === 'SyntaxError' ||
           error.name === 'TypeError'
         ) {
