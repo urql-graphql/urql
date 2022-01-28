@@ -26,7 +26,7 @@ import { makeAsyncStorage } from '@urql/storage-rn';
 const storage = makeAsyncStorage({
   dataKey: 'graphcache-data', // tTe AsyncStorage key used for the data (defaults to graphcache-data)
   metadataKey: 'graphcache-metadata', // The AsyncStorage key used for the metadata (defaults to graphcache-metadata)
-  maxAge: 7 // How long to persist the data in storage (defaults to 7 days)
+  maxAge: 7, // How long to persist the data in storage (defaults to 7 days)
 });
 
 const cache = offlineExchange({

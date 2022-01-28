@@ -34,7 +34,7 @@ export const makeAsyncStorage: (
   const todayDayStamp = Math.floor(
     new Date().valueOf() / (1000 * 60 * 60 * 24)
   );
-  const allData = {};
+  let allData = {};
 
   return {
     readData: async () => {
@@ -129,6 +129,7 @@ export const makeAsyncStorage: (
 
     clear: async () => {
       try {
+        allData = {}
         await AsyncStorage.removeItem(dataKey);
         await AsyncStorage.removeItem(metadataKey);
       } catch (_err) {}
