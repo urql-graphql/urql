@@ -1,5 +1,11 @@
 # urql
 
+## 2.1.1
+
+### Patch Changes
+
+- pin version for `use-sync-external-store`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2223](https://github.com/FormidableLabs/urql/pull/2223))
+
 ## 2.1.0
 
 ### Minor Changes
