@@ -129,7 +129,7 @@ export const makeAsyncStorage: (
 
     clear: async () => {
       try {
-        allData = {}
+        allData = {};
         await AsyncStorage.removeItem(dataKey);
         await AsyncStorage.removeItem(metadataKey);
       } catch (_err) {}
