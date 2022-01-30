@@ -1,5 +1,17 @@
 # @urql/core
 
+## 2.4.0
+
+### Minor Changes
+
+- Allow for repeated mutations that have similar inputs which results in the same key, this is for instance the case with file uploads, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2189](https://github.com/FormidableLabs/urql/pull/2189))
+
+### Patch Changes
+
+- Bump `@graphql-typed-document-node/core` to 3.1.1 for `graphql@16` support, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2153](https://github.com/FormidableLabs/urql/pull/2153))
+- ⚠️ Fix error bubbling, when an error happened in the exchange-pipeline we would treat it as a GraphQL-error, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2210](https://github.com/FormidableLabs/urql/pull/2210))
+- Filter `network-only` requests from the `ssrExchange`, this is to enable `staleWhileRevalidated` queries to successfully dispatch their queries, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2198](https://github.com/FormidableLabs/urql/pull/2198))
+
 ## 2.3.6
 
 ### Patch Changes

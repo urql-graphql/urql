@@ -1,5 +1,17 @@
 # urql
 
+## 2.1.0
+
+### Minor Changes
+
+- Leverage the new `use-sync-external-store` package and `useSyncExternalStore` hook in `useQuery` implementation to bring the state synchronisation in React in line with React v18. While the current implementation works already with React Suspense and React Concurrent this will reduce the maintenance burden of our implementation and ensure certain guarantees so that React doesn't break us, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2164](https://github.com/FormidableLabs/urql/pull/2164))
+
+### Patch Changes
+
+- ⚠️ Fix `useMutation` not working correctly with React 18, by [@Dremora](https://github.com/Dremora) (See [#2158](https://github.com/FormidableLabs/urql/pull/2158))
+- Updated dependencies (See [#2189](https://github.com/FormidableLabs/urql/pull/2189), [#2153](https://github.com/FormidableLabs/urql/pull/2153), [#2210](https://github.com/FormidableLabs/urql/pull/2210), and [#2198](https://github.com/FormidableLabs/urql/pull/2198))
+  - @urql/core@2.4.0
+
 ## 2.0.6
 
 ### Patch Changes
