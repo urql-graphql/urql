@@ -6,6 +6,7 @@ config();
 const REPO = 'FormidableLabs/urql';
 const SEE_LINE = /^See:\s*(.*)/i;
 const TRAILING_CHAR = /[.;:]$/g;
+const listFormatter = new Intl.ListFormat('en-US');
 
 const getSummaryLines = cs => {
   const lines = cs.summary
@@ -34,9 +35,7 @@ const templateSeeRef = links => {
   const size = humanReadableLinks.length;
   if (size === 0) return '';
 
-  const str = size > 2
-    ? humanReadableLinks.map((x, i) => i === size - 1 ? `and ${x}` : x).join(', ')
-    : humanReadableLinks.join(' and ');
+  const str = listFormatter.format(humanReadableLinks);
   return `(See ${str})`;
 };
 
