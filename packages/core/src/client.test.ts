@@ -157,7 +157,7 @@ describe('promisified methods', () => {
     expect(received.key).toBeDefined();
     expect(received.variables).toEqual({ example: 1234 });
     expect(received.kind).toEqual('mutation');
-    expect(received.context).toEqual({
+    expect(received.context).toMatchObject({
       url: 'https://hostname.com',
       requestPolicy: 'cache-and-network',
       fetchOptions: undefined,

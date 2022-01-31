@@ -58,6 +58,7 @@ export interface OperationDebugMeta {
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
   [key: string]: any;
+  readonly _instance?: [] | undefined;
   additionalTypenames?: string[];
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
