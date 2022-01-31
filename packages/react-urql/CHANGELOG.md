@@ -1,5 +1,13 @@
 # urql
 
+## 2.1.2
+
+### Patch Changes
+
+- Update `useQuery` implementation to avoid an aborted render on initial mount. We abort a render-on-update once when the state needs to be updated according to the `OperationResult` source we need to listen to and execute. However, we can avoid this on the initial mount as we've done in a prior version. This fix **does not** change any of the current behaviour, but simply avoids the confusing state transition on mount, by [@kitten](https://github.com/kitten) (See [#2227](https://github.com/FormidableLabs/urql/pull/2227))
+- Updated dependencies (See [#2228](https://github.com/FormidableLabs/urql/pull/2228))
+  - @urql/core@2.4.1
+
 ## 2.1.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.4.1
+
+### Patch Changes
+
+- ⚠️ Fix mutation operation being used as compared identity and instead add a stand-in comparison, by [@kitten](https://github.com/kitten) (See [#2228](https://github.com/FormidableLabs/urql/pull/2228))
+
 ## 2.4.0
 
 ### Minor Changes
