@@ -179,7 +179,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         } else {
           return (
             res.operation.kind === operation.kind &&
-            res.operation.key === operation.key
+            res.operation.key === operation.key &&
+            (!res.operation.context._instance ||
+              res.operation.context._instance === operation.context._instance)
           );
         }
       })
@@ -281,6 +283,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       if (!opts) opts = {};
 
       return {
+        _instance: undefined,
         url: client.url,
         fetchOptions: client.fetchOptions,
         fetch: client.fetch,
@@ -302,7 +305,9 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           `Expected operation of type "${kind}" but found "${requestOperationType}"`
         );
       }
-      return makeOperation(kind, request, client.createOperationContext(opts));
+      const context = client.createOperationContext(opts);
+      if (kind === 'mutation') (context as any)._instance = [];
+      return makeOperation(kind, request, context);
     },
 
     executeRequestOperation(operation) {
