@@ -53,17 +53,30 @@ export function useQuery<Data = any, Variables = object>(
   const request = useRequest<Data, Variables>(args.query, args.variables);
   const cache = getCacheForClient(client);
 
+  const currDeps: unknown[] = [
+    client,
+    request,
+    args.pause,
+    args.requestPolicy,
+    args.context,
+  ];
+
   const [meta, setMeta] = useState<{
     source: Source<OperationResult<Data, Variables>> | null;
     prevValue: UseQueryState<Data, Variables>;
-    deps: Array<any>;
+    deps: unknown[];
     suspense: boolean;
-  }>({
-    source: null,
+  }>(() => ({
+    source: args.pause
+      ? null
+      : client.executeQuery(request, {
+          requestPolicy: args.requestPolicy,
+          ...args.context,
+        }),
     prevValue: notFetching,
-    deps: [],
+    deps: currDeps,
     suspense: isSuspense(client, args.context),
-  });
+  }));
 
   const { source, deps, suspense } = meta;
 
@@ -167,23 +180,15 @@ export function useQuery<Data = any, Variables = object>(
     )
   ));
 
-  const currDeps = [
-    client,
-    request,
-    args.pause,
-    args.requestPolicy,
-    args.context,
-  ];
-
   if (hasDepsChanged(deps, currDeps) && !args.pause) {
-    const fetchSource = client.executeQuery(request, {
-      requestPolicy: args.requestPolicy,
-      ...args.context,
-    });
-
     setMeta({
       prevValue: result,
-      source: args.pause ? null : fetchSource,
+      source: args.pause
+        ? null
+        : client.executeQuery(request, {
+            requestPolicy: args.requestPolicy,
+            ...args.context,
+          }),
       deps: currDeps,
       suspense: isSuspense(client, args.context),
     });
