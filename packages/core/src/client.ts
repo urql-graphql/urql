@@ -174,16 +174,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     let result$ = pipe(
       results$,
       filter((res: OperationResult) => {
-        if (res.operation.kind === 'mutation') {
-          return res.operation === operation;
-        } else {
-          return (
-            res.operation.kind === operation.kind &&
-            res.operation.key === operation.key &&
-            (!res.operation.context._instance ||
-              res.operation.context._instance === operation.context._instance)
-          );
-        }
+        return (
+          res.operation.kind === operation.kind &&
+          res.operation.key === operation.key &&
+          (!res.operation.context._instance ||
+            res.operation.context._instance === operation.context._instance)
+        );
       })
     );
 
