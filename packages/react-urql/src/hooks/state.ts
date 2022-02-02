@@ -4,11 +4,11 @@ export const initialState = {
   error: undefined,
   data: undefined,
   extensions: undefined,
-  operation: undefined,
+  operation: undefined
 };
 
 const isShallowDifferent = (a: any, b: any) => {
-  if (typeof a != 'object' || typeof b != 'object') return a !== b;
+  if (typeof a != "object" || typeof b != "object") return a !== b;
   for (const x in a) if (!(x in b)) return true;
   for (const x in b) if (a[x] !== b[x]) return true;
   return false;
@@ -16,6 +16,7 @@ const isShallowDifferent = (a: any, b: any) => {
 
 interface Stateish {
   data?: any;
+  error?: any;
   fetching: boolean;
   stale: boolean;
 }
@@ -27,9 +28,10 @@ export const computeNextState = <T extends Stateish>(
   const newState = {
     ...prevState,
     ...result,
-    data: result.data !== undefined || result.error ? result.data : prevState.data,
+    data:
+      result.data !== undefined || result.error ? result.data : prevState.data,
     fetching: !!result.fetching,
-    stale: !!result.stale,
+    stale: !!result.stale
   };
 
   return isShallowDifferent(prevState, newState) ? newState : prevState;
