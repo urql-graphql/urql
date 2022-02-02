@@ -99,10 +99,11 @@ export function useQuery<Data = any, Variables = object>(
               !result
           ),
           subscribe(_result => {
+            result = _result;
             if (suspense) {
               cache.set(request.key, result);
             }
-            result = _result;
+
             if (resolve) {
               resolve(result);
               resolve = undefined;
@@ -136,10 +137,10 @@ export function useQuery<Data = any, Variables = object>(
       const unsub = pipe(
         source,
         subscribe(_result => {
+          result = _result;
           if (suspense) {
             cache.set(request.key, result);
           }
-          result = _result;
           notify();
         })
       ).unsubscribe;
