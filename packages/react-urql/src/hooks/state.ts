@@ -15,6 +15,7 @@ const isShallowDifferent = (a: any, b: any) => {
 };
 
 interface Stateish {
+  data: any;
   fetching: boolean;
   stale: boolean;
 }
@@ -26,6 +27,7 @@ export const computeNextState = <T extends Stateish>(
   const newState = {
     ...prevState,
     ...result,
+    data: result.data || prevState.data,
     fetching: !!result.fetching,
     stale: !!result.stale,
   };
