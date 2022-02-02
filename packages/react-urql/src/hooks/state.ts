@@ -27,7 +27,7 @@ export const computeNextState = <T extends Stateish>(
   const newState = {
     ...prevState,
     ...result,
-    data: result.data || prevState.data,
+    data: result.data !== undefined ? result.data : prevState.data,
     fetching: !!result.fetching,
     stale: !!result.stale,
   };
