@@ -15,7 +15,7 @@ const isShallowDifferent = (a: any, b: any) => {
 };
 
 interface Stateish {
-  data: any;
+  data?: any;
   fetching: boolean;
   stale: boolean;
 }
