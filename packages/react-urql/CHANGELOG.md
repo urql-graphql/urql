@@ -1,5 +1,12 @@
 # urql
 
+## 2.1.3
+
+### Patch Changes
+
+- ⚠️ fix diff data correctly for the next state computing, this avoids having UI-flashes due to undefined data, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2238](https://github.com/FormidableLabs/urql/pull/2238))
+- ⚠️ fix issue where the cache infinitely loops, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2237](https://github.com/FormidableLabs/urql/pull/2237))
+
 ## 2.1.2
 
 ### Patch Changes
