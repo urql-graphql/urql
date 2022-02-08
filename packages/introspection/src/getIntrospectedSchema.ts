@@ -3,7 +3,7 @@ import {
   GraphQLSchema,
   parse,
   buildSchema,
-  executeSync,
+  execute,
   getIntrospectionQuery,
 } from 'graphql';
 
@@ -22,7 +22,7 @@ export const getIntrospectedSchema = (
     return input;
   }
 
-  const initialIntrospection: any = executeSync({
+  const initialIntrospection: any = execute({
     document: parse(getIntrospectionQuery({ descriptions: false })),
     schema: input as GraphQLSchema,
   });
