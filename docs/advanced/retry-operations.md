@@ -89,3 +89,27 @@ const client = createClient({
 
 In the above example we'll retry when we have `graphQLErrors` or a `networkError`, we can go
 more granular and check for certain errors in `graphQLErrors`.
+
+## Failover / Fallback
+
+In case of a network error, e.g., when part the infrastructure is down, but a fallback GraphQL endpoint is available, e.g., from a different provider on a different domain, the `retryWith` option allows for client-side failover. This could also be used in case of a `graphQLError`, for example, when APIs are deployed via a windowing strategy, i.e., a newer version at URL X, while an older one remains at Y.
+
+Note that finer granularity depending on custom requirements may be applicable, and that this does not allow for balancing load.
+
+```js
+const fallbackUrl = 'http://localhost:1337/anotherGraphql';
+
+const options = {
+  initialDelayMs: 1000,
+  maxDelayMs: 15000,
+  randomDelay: true,
+  maxNumberAttempts: 2,
+  retryWith: (error, operation) => {
+    if (error.networkError) {
+      const context = { ...operation.context, url: fallbackUrl };
+      return { ...operation, context };
+    }
+    return null;
+  },
+};
+```
