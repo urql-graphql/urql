@@ -32,7 +32,7 @@ export const makeFetchSource = (
       fetchOptions.signal = abortController.signal;
     }
 
-    let hasFinalResult = false;
+    let hasResults = false;
     // DERIVATIVE: Copyright (c) 2021 Marais Rossouw <hi@marais.io>
     // See: https://github.com/maraisr/meros/blob/219fe95/src/browser.ts
     const executeIncrementalFetch = (
@@ -46,7 +46,7 @@ export const makeFetchSource = (
       if (!/multipart\/mixed/i.test(contentType)) {
         return response.json().then(payload => {
           const result = makeResult(operation, payload, response);
-          hasFinalResult = true;
+          hasResults = true;
           onResult(result);
         });
       }
@@ -121,7 +121,7 @@ export const makeFetchSource = (
             boundaryIndex = buffer.indexOf(boundary);
           }
         } else {
-          hasFinalResult = true;
+          hasResults = true;
         }
 
         if (nextResult) {
@@ -154,7 +154,7 @@ export const makeFetchSource = (
       })
       .then(complete)
       .catch((error: Error) => {
-        if (hasFinalResult) {
+        if (hasResults) {
           throw error;
         }
 
