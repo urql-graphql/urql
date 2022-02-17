@@ -1,5 +1,11 @@
 # @urql/introspection
 
+## 0.3.2
+
+### Patch Changes
+
+- ⚠️ Fix import of `executeSync` rather than `execute` causing an incompatibility when several `.mjs` imports and a main `import { executeSync } from 'graphql'` are causing two different modules to be instantiated, by [@kitten](https://github.com/kitten) (See [#2251](https://github.com/FormidableLabs/urql/pull/2251))
+
 ## 0.3.1
 
 ### Patch Changes
