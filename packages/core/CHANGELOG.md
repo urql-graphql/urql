@@ -1,5 +1,12 @@
 # @urql/core
 
+## 2.4.2
+
+### Patch Changes
+
+- Undo logic to catch errors from incremental fetching and forking the response stream, introduce logic
+  to detect results, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2287](https://github.com/FormidableLabs/urql/pull/2287))
+
 ## 2.4.1
 
 ### Patch Changes
