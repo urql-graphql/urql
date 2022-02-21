@@ -36,8 +36,7 @@ export const stringifyDocument = (
   )
     .split(GRAPHQL_STRING_RE)
     .map(replaceOutsideStrings)
-    .join('')
-    .trim();
+    .join('');
 
   if (typeof node !== 'string') {
     const operationName = 'definitions' in node && getOperationName(node);
