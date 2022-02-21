@@ -1,6 +1,6 @@
 import { parse, print } from 'graphql';
 import { gql } from '../gql';
-import { createRequest } from './request';
+import { createRequest, stringifyDocument } from './request';
 
 jest.mock('./hash', () => ({
   hash: jest.requireActual('./hash').hash,
@@ -79,13 +79,50 @@ it('should return a valid query object with variables', () => {
   });
 });
 
-it('should remove comments', () => {
-  const doc = `
-    { #query
-      # broken
-      test
-    }
-  `;
-  const val = createRequest(doc);
-  expect(print(val.query)).toBe(`{\n  test\n}`);
+describe('stringifyDocument (internal API)', () => {
+  it('should remove comments', () => {
+    const doc = `
+      { #query
+        # broken
+        test
+      }
+    `;
+    expect(stringifyDocument(createRequest(doc).query)).toBe('{ test }');
+  });
+
+  it('should remove duplicate spaces', () => {
+    const doc = `
+      {
+        abc          ,, test
+      }
+    `;
+    expect(stringifyDocument(createRequest(doc).query)).toBe('{ abc test }');
+  });
+
+  it('should not sanitize within strings', () => {
+    const doc = `
+      {
+        field(arg: "test #1")
+      }
+    `;
+    expect(stringifyDocument(createRequest(doc).query)).toBe(
+      '{ field(arg:"test #1") }'
+    );
+  });
+
+  it('should not sanitize within block strings', () => {
+    const doc = `
+      {
+        field(
+          arg: """
+          hello
+          hello
+          """
+        )
+      }
+    `;
+    expect(stringifyDocument(createRequest(doc).query)).toBe(
+      '{ field(arg:"""\n  hello\n  hello\n  """) }'
+    );
+  });
 });
