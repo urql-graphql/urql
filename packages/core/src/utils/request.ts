@@ -21,6 +21,12 @@ export interface KeyedDocumentNode extends DocumentNode {
   __key: number;
 }
 
+const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
+const REPLACE_CHAR_RE = /([\s,]|#[^\n\r]+)+/g;
+
+const replaceOutsideStrings = (str: string, idx: number) =>
+  idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, ' ').trim() : str;
+
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
@@ -28,8 +34,9 @@ export const stringifyDocument = (
     ? (node.loc && node.loc.source.body) || print(node)
     : node
   )
-    .replace(/([\s,]|#[^\n\r]+)+/g, ' ')
-    .trim();
+    .split(GRAPHQL_STRING_RE)
+    .map(replaceOutsideStrings)
+    .join('');
 
   if (typeof node !== 'string') {
     const operationName = 'definitions' in node && getOperationName(node);
