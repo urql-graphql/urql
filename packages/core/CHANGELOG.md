@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.4.3
+
+### Patch Changes
+
+- Prevent ignored characters in GraphQL queries from being replaced inside strings and block strings. Previously we accepted sanitizing strings via regular expressions causing duplicate hashes as acceptable, since it'd only be caused when a string wasn't extracted into variables. This is fixed now however, by [@kitten](https://github.com/kitten) (See [#2295](https://github.com/FormidableLabs/urql/pull/2295))
+
 ## 2.4.2
 
 ### Patch Changes
