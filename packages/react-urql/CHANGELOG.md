@@ -1,5 +1,16 @@
 # urql
 
+## 2.2.0
+
+### Minor Changes
+
+- Revert to the previous `useQuery` implementation, `use-sync-external-store` seems to be causing some unexpected timing issues, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2308](https://github.com/FormidableLabs/urql/pull/2308))
+
+### Patch Changes
+
+- Updated dependencies (See [#2295](https://github.com/FormidableLabs/urql/pull/2295))
+  - @urql/core@2.4.3
+
 ## 2.1.3
 
 ### Patch Changes
