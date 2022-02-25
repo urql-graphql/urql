@@ -82,8 +82,8 @@ export function useQuery<Data = any, Variables = object>(
 
   const [getSnapshot, sub] = useMemo(() => {
     let result = cache.get(request.key);
-
     const getSnapshot = (): Partial<UseQueryState<Data, Variables>> => {
+      result = cache.get(request.key);
       if (!source) {
         return notFetching;
       } else if (!result) {
