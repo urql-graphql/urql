@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+
 import { DocumentNode } from 'graphql';
-import { Source, pipe, subscribe, takeWhile } from 'wonka';
-import { useCallback, useMemo, useState } from 'react';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
+import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+
 import {
   Client,
   TypedDocumentNode,
@@ -15,8 +16,8 @@ import {
 
 import { useClient } from '../context';
 import { useRequest } from './useRequest';
-import { hasDepsChanged, computeNextState, initialState } from './state';
 import { getCacheForClient } from './cache';
+import { initialState, computeNextState, hasDepsChanged } from './state';
 
 export interface UseQueryArgs<Variables = object, Data = any> {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
@@ -40,81 +41,70 @@ export type UseQueryResponse<Data = any, Variables = object> = [
   (opts?: Partial<OperationContext>) => void
 ];
 
-const notFetching = initialState;
-const fetching = { ...initialState, fetching: true };
-
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
+
+let currentInit = false;
 
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
   const client = useClient();
-  const request = useRequest<Data, Variables>(args.query, args.variables);
   const cache = getCacheForClient(client);
+  const suspense = isSuspense(client, args.context);
+  const request = useRequest<Data, Variables>(args.query, args.variables);
 
-  const currDeps: unknown[] = [
+  const source = useMemo(() => {
+    if (args.pause) return null;
+
+    const source = client.executeQuery(request, {
+      requestPolicy: args.requestPolicy,
+      ...args.context,
+    });
+
+    return suspense
+      ? pipe(
+          source,
+          onPush(result => {
+            cache.set(request.key, result);
+          })
+        )
+      : source;
+  }, [
+    cache,
     client,
     request,
+    suspense,
     args.pause,
     args.requestPolicy,
     args.context,
-  ];
+  ]);
 
-  const [meta, setMeta] = useState<{
-    source: Source<OperationResult<Data, Variables>> | null;
-    prevValue: UseQueryState<Data, Variables>;
-    deps: unknown[];
-    suspense: boolean;
-  }>(() => ({
-    source: args.pause
-      ? null
-      : client.executeQuery(request, {
-          requestPolicy: args.requestPolicy,
-          ...args.context,
-        }),
-    prevValue: notFetching,
-    deps: currDeps,
-    suspense: isSuspense(client, args.context),
-  }));
+  const getSnapshot = useCallback(
+    (
+      source: Source<OperationResult<Data, Variables>> | null,
+      suspense: boolean
+    ): Partial<UseQueryState<Data, Variables>> => {
+      if (!source) return { fetching: false };
 
-  const { source, deps, suspense } = meta;
-
-  const [getSnapshot, sub] = useMemo(() => {
-    let result = cache.get(request.key);
-    const getSnapshot = (): Partial<UseQueryState<Data, Variables>> => {
-      result = cache.get(request.key);
-      if (!source) {
-        return notFetching;
-      } else if (!result) {
-        let resolve:
-          | ((result: OperationResult<Data, Variables>) => void)
-          | undefined;
+      let result = cache.get(request.key);
+      if (!result) {
+        let resolve: (value: unknown) => void;
 
         const subscription = pipe(
           source,
-          takeWhile(
-            () =>
-              (suspense && (!resolve || (result && (result as any).then))) ||
-              !result
-          ),
+          takeWhile(() => (suspense && !resolve) || !result),
           subscribe(_result => {
             result = _result;
-            if (suspense) {
-              cache.set(request.key, result);
-            }
-
-            if (resolve) {
-              resolve(result);
-              resolve = undefined;
-            }
+            if (resolve) resolve(result);
           })
         );
 
         if (result == null && suspense) {
-          const promise = (result = new Promise(_resolve => {
+          const promise = new Promise(_resolve => {
             resolve = _resolve;
-          }));
+          });
+
           cache.set(request.key, promise);
           throw promise;
         } else {
@@ -124,35 +114,81 @@ export function useQuery<Data = any, Variables = object>(
         throw result;
       }
 
-      return (result as OperationResult<Data, Variables>) || fetching;
+      return (result as OperationResult<Data, Variables>) || { fetching: true };
+    },
+    [cache, request]
+  );
+
+  const deps = [
+    client,
+    request,
+    args.requestPolicy,
+    args.context,
+    args.pause,
+  ] as const;
+
+  const [state, setState] = useState(() => {
+    currentInit = true;
+    try {
+      return [
+        source,
+        computeNextState(initialState, getSnapshot(source, suspense)),
+        deps,
+      ] as const;
+    } finally {
+      currentInit = false;
+    }
+  });
+
+  let currentResult = state[1];
+  if (source !== state[0] && hasDepsChanged(state[2], deps)) {
+    setState([
+      source,
+      (currentResult = computeNextState(
+        state[1],
+        getSnapshot(source, suspense)
+      )),
+      deps,
+    ]);
+  }
+
+  useEffect(() => {
+    const source = state[0];
+    const request = state[2][1];
+
+    let hasResult = false;
+
+    const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
+      hasResult = true;
+      if (!currentInit) {
+        setState(state => {
+          const nextResult = computeNextState(state[1], result);
+          return state[1] !== nextResult
+            ? [state[0], nextResult, state[2]]
+            : state;
+        });
+      }
     };
 
-    const sub = (notify: () => void) => {
-      if (!source) {
-        return () => {
-          /*noop*/
-        };
-      }
-
-      const unsub = pipe(
+    if (source) {
+      const subscription = pipe(
         source,
-        subscribe(_result => {
-          result = _result;
-          if (suspense) {
-            cache.set(request.key, result);
-          }
-          notify();
-        })
-      ).unsubscribe;
+        onEnd(() => {
+          updateResult({ fetching: false });
+        }),
+        subscribe(updateResult)
+      );
+
+      if (!hasResult) updateResult({ fetching: true });
 
       return () => {
         cache.dispose(request.key);
-        unsub();
+        subscription.unsubscribe();
       };
-    };
-
-    return [getSnapshot, sub];
-  }, [source, args.pause]);
+    } else {
+      updateResult({ fetching: false });
+    }
+  }, [cache, state[0], state[2][1]]);
 
   const executeQuery = useCallback(
     (opts?: Partial<OperationContext>) => {
@@ -162,38 +198,28 @@ export function useQuery<Data = any, Variables = object>(
         ...opts,
       };
 
-      setMeta(prev => ({
-        prevValue: prev.prevValue,
-        deps: prev.deps,
-        source: client.executeQuery(request, context),
-        suspense: isSuspense(client, context),
-      }));
+      setState(state => {
+        const source = suspense
+          ? pipe(
+              client.executeQuery(request, context),
+              onPush(result => {
+                cache.set(request.key, result);
+              })
+            )
+          : client.executeQuery(request, context);
+        return [source, state[1], deps];
+      });
     },
-    [client, request, args.requestPolicy, args.context]
+    [
+      client,
+      cache,
+      request,
+      suspense,
+      getSnapshot,
+      args.requestPolicy,
+      args.context,
+    ]
   );
 
-  const result = (meta.prevValue = computeNextState(
-    meta.prevValue,
-    useSyncExternalStore<Partial<UseQueryState<Data, Variables>>>(
-      sub,
-      getSnapshot,
-      getSnapshot
-    )
-  ));
-
-  if (hasDepsChanged(deps, currDeps) && !args.pause) {
-    setMeta({
-      prevValue: result,
-      source: args.pause
-        ? null
-        : client.executeQuery(request, {
-            requestPolicy: args.requestPolicy,
-            ...args.context,
-          }),
-      deps: currDeps,
-      suspense: isSuspense(client, args.context),
-    });
-  }
-
-  return [result, executeQuery];
+  return [currentResult, executeQuery];
 }
