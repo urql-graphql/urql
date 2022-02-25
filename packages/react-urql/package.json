@@ -47,7 +47,6 @@
     "@testing-library/react-hooks": "^5.1.2",
     "@types/react": "^17.0.4",
     "@types/react-test-renderer": "^17.0.1",
-    "@types/use-sync-external-store": "^0.0.3",
     "graphql": "^16.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -61,7 +60,6 @@
   },
   "dependencies": {
     "@urql/core": "^2.4.1",
-    "use-sync-external-store": "1.0.0-rc.0 || ^1.0.0",
     "wonka": "^4.0.14"
   }
 }
