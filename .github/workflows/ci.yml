@@ -47,6 +47,10 @@ jobs:
         run: yarn run lint
       - name: Unit Tests
         run: yarn run test --maxWorkers=2
+      - name: e2e tests 🧪
+        uses: cypress-io/github-action@v2
+        with:
+          command: yarn cypress run-ct
 
   build:
     name: Build
