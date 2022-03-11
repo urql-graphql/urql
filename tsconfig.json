@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
+    "types": ["node", "jest"],
     "paths": {
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],

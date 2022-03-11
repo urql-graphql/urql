@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 import * as React from 'react';
 import { mount } from '@cypress/react';
 import { Provider, createClient, gql, useQuery } from '../src';
