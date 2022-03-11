@@ -60,7 +60,7 @@ describe('Suspense', () => {
     };
   });
 
-  it('Suspends for a basic pokemon list', () => {
+  it('Suspends for a basic query', () => {
     mount(
       <UrqlProvider>
         <Boundary>
@@ -120,6 +120,23 @@ describe('Suspense', () => {
     cy.get('#suspense').should('not.exist');
     cy.get('#pokemon-list > li').then(items => {
       expect(items.length).to.equal(10);
+    });
+  });
+
+  it('does not cause an infinite loop with multiple components querying the same thing', () => {
+    mount(
+      <UrqlProvider>
+        <Boundary>
+          <Pokemons />
+          <Pokemons />
+          <Pokemons />
+        </Boundary>
+      </UrqlProvider>
+    );
+
+    cy.get('#suspense').contains('Loading...');
+    cy.get('ul').then(items => {
+      expect(items.length).to.equal(3);
     });
   });
 });
