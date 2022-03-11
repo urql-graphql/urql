@@ -25,6 +25,10 @@
   },
   "include": ["packages", "exchanges"],
   "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
     "scripts",
     "examples",
     "packages/*/examples",
