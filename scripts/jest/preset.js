@@ -17,5 +17,5 @@ module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json'],
   collectCoverageFrom: ['<rootDir>/src/**/*.{ts,tsx}'],
   coveragePathIgnorePatterns: ['<rootDir>/src/test-utils'],
-  testPathIgnorePatterns: ["<rootDir>/**/e2e-tests/*"],
+  testPathIgnorePatterns: ["<rootDir>/e2e-tests/*"],
 };
