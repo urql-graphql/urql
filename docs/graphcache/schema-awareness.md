@@ -62,7 +62,7 @@ each entity, which means that sometimes it can maybe even execute a query agains
 hasn't sent to the API before.
 
 [On the "Local Resolvers" page](./local-resolvers.md#resolving-entities) we've seen how to write
-resolvers that resolver entities without having to have seen a link from an API result before. If
+resolvers that resolve entities without having to have seen a link from an API result before. If
 Graphcache uses these resolvers and previously cached data we often run into situations where a
 "partial result" could already be generated, which is what Graphcache does when it has `schema`
 information.
