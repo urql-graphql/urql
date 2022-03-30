@@ -31,7 +31,7 @@ export function mutationStore<Data, Variables extends object = {}>(props: {
     ...props.context,
   };
 
-  // combine default with any placeholderData provided
+  // combine default with operation details
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
     operation: props.client.createRequestOperation('mutation', request),
