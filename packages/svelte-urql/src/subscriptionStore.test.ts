@@ -2,7 +2,7 @@ import { createClient } from '@urql/core';
 import { get } from 'svelte/store';
 import { subscriptionStore } from './subscriptionStore';
 
-describe('mutationStore', () => {
+describe('subscriptionStore', () => {
   const client = createClient({ url: 'https://example.com' });
   const variables = {};
   const context = {};
