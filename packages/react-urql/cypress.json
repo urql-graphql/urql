@@ -1,7 +1,7 @@
 {
   "video": false,
   "component": {
-    "componentFolder": "./packages/react-urql",
+    "componentFolder": ".",
     "testFiles": "**/e2e-tests/*spec.tsx"
   }
 }

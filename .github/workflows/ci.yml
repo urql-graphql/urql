@@ -53,6 +53,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           command: yarn cypress run-ct
+          working-directory: packages/react-urql
 
   build:
     name: Build
