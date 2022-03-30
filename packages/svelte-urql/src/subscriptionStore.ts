@@ -1,5 +1,5 @@
 import { pipe, subscribe } from 'wonka';
-import type { OperationContext, Client } from '@urql/core';
+import type { OperationContext, Client, RequestPolicy } from '@urql/core';
 import { derived, writable } from 'svelte/store';
 import type { DocumentNode } from 'graphql';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
@@ -19,9 +19,17 @@ export function subscriptionStore<Data, Variables extends object = {}>(props: {
   variables?: Variables;
   /** Urql fetching options */
   context?: Partial<OperationContext>;
+  /** Convenience input.  Ignored if conext.requestPolicy is provided */
+  requestPolicy: RequestPolicy;
 }) {
   // create the graphql request
   const request = createRequest(props.subscription, props.variables);
+
+  // `props.context.requestPolicy` beats `props.requestPolcy`
+  const context: Partial<OperationContext> = {
+    requestPolicy: props.requestPolicy,
+    ...props.context,
+  };
 
   // combine default with any placeholderData provided
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
@@ -38,7 +46,7 @@ export function subscriptionStore<Data, Variables extends object = {}>(props: {
   // make the store reactive (ex: change when we receive a response)
   pipe(
     fetchProcess(
-      props.client.executeSubscription<Data, Variables>(request, props.context),
+      props.client.executeSubscription<Data, Variables>(request, context),
       baseResult
     ),
 
