@@ -19,8 +19,8 @@ export function subscriptionStore<Data, Variables extends object = {}>(props: {
   variables?: Variables;
   /** Urql fetching options */
   context?: Partial<OperationContext>;
-  /** Convenience input.  Ignored if conext.requestPolicy is provided */
-  requestPolicy: RequestPolicy;
+  /** Convenience input.  Ignored if context.requestPolicy is provided */
+  requestPolicy?: RequestPolicy;
 }) {
   // create the graphql request
   const request = createRequest(props.subscription, props.variables);

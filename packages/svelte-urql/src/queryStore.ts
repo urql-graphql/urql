@@ -24,8 +24,8 @@ export function queryStore<Data, Variables extends object = {}>(props: {
   variables: Variables;
   /** Urql fetching options */
   context?: Partial<OperationContext>;
-  /** Convenience input.  Ignored if conext.requestPolicy is provided */
-  requestPolicy: RequestPolicy;
+  /** Convenience input.  Ignored if context.requestPolicy is provided */
+  requestPolicy?: RequestPolicy;
   /** initial value for `isPaused$` (default is `false`) */
   isPaused?: boolean;
 }) {
