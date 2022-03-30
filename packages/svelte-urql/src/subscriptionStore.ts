@@ -19,8 +19,6 @@ export function subscriptionStore<Data, Variables extends object = {}>(props: {
   variables?: Variables;
   /** Urql fetching options */
   context?: Partial<OperationContext>;
-  /** the initial result value (prior to fetch) */
-  placeholderData?: Partial<AnnotatedOperationResult<Data, Variables>>;
 }) {
   // create the graphql request
   const request = createRequest(props.subscription, props.variables);
@@ -28,7 +26,6 @@ export function subscriptionStore<Data, Variables extends object = {}>(props: {
   // combine default with any placeholderData provided
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    ...props.placeholderData,
     operation: props.client.createRequestOperation('subscription', request),
   };
 

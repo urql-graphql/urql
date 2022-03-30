@@ -1,5 +1,5 @@
 import { pipe, concatMap, subscribe, filter } from 'wonka';
-import type { OperationContext, OperationResult, Client } from '@urql/core';
+import type { OperationContext, Client } from '@urql/core';
 import { derived, writable } from 'svelte/store';
 import type { DocumentNode } from 'graphql';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
@@ -24,8 +24,6 @@ export function queryStore<Data, Variables extends object = {}>(props: {
   variables: Variables;
   /** Urql fetching options */
   context?: Partial<OperationContext>;
-  /** the initial result value (prior to fetch) */
-  placeholderData?: Partial<OperationResult<Data, Variables>>;
   /** initial value for `isPaused$` (default is `false`) */
   isPaused?: boolean;
 }) {
@@ -35,7 +33,6 @@ export function queryStore<Data, Variables extends object = {}>(props: {
   // combine default with any placeholderData provided
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    ...props.placeholderData,
     operation: props.client.createRequestOperation('query', request),
   };
 
