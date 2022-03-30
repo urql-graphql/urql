@@ -1,7 +1,14 @@
 import type { Readable, Writable } from 'svelte/store';
-import type { OperationResult } from '@urql/core';
+import type {
+  OperationResult,
+  RequestPolicy,
+  OperationContext,
+  Client,
+} from '@urql/core';
 import { pipe, fromValue, concat, map, makeSubject, onPush } from 'wonka';
 import type { Source } from 'wonka';
+import type { DocumentNode } from 'graphql';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 /**
  * An OperationResult annotated with convenience properties
@@ -25,6 +32,20 @@ export interface AnnotatedOperationResult<Data, Variables>
   extends OperationResult<Data, Variables> {
   /** `true`: awaiting fetch response (no error, no data), otherwise `false` */
   fetching: boolean;
+}
+
+/** Options passed to `queryStore`, `mutationStore`, and `subscriptionStore` */
+export interface UrqlStoreArgs<Data, Variables extends object = {}> {
+  /** an [Urql client](https://formidable.com/open-source/urql/docs/api/core/#client)  */
+  client: Client;
+  /** a graphql tag */
+  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
+  /** the variables to be used in the fetch operation */
+  variables: Variables;
+  /** Urql fetching options */
+  context?: Partial<OperationContext>;
+  /** Convenience input.  Ignored if context.requestPolicy is provided */
+  requestPolicy?: RequestPolicy;
 }
 
 /**
@@ -63,7 +84,7 @@ export const defaultBaseResult = {
  * 1. EMIT: set fetching:true
  * 2. fetch response(s)
  * 3. EMIT: build a result from response (fetching:false)
- * 4. mark the process complete (if isComplete is provided)
+ * 4. mark the process complete (if complete() is provided)
  */
 export function fetchProcess<Data, Variables>(
   executeOperation: Source<OperationResult<Data, Variables>>,

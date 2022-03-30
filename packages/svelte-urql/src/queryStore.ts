@@ -1,10 +1,13 @@
 import { pipe, concatMap, subscribe, filter } from 'wonka';
-import type { OperationContext, Client, RequestPolicy } from '@urql/core';
+import type { OperationContext } from '@urql/core';
 import { derived, writable } from 'svelte/store';
-import type { DocumentNode } from 'graphql';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { createRequest } from '@urql/core';
-import type { AnnotatedOperationResult, UrqlStore, Pausable } from './common';
+import type {
+  AnnotatedOperationResult,
+  UrqlStore,
+  Pausable,
+  UrqlStoreArgs,
+} from './common';
 import {
   defaultBaseResult,
   createPausable,
@@ -15,33 +18,25 @@ import {
 /**
  * Creates a Svelte store for an [Urql query](https://formidable.com/open-source/urql/docs/api/core/#clientexecutequery) using [Wonka](https://wonka.kitten.sh/)
  */
-export function queryStore<Data, Variables extends object = {}>(props: {
-  /** an [Urql client](https://formidable.com/open-source/urql/docs/api/core/#client)  */
-  client: Client;
-  /** a graphql tag */
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
-  /** the variables to be used in the fetch operation */
-  variables: Variables;
-  /** Urql fetching options */
-  context?: Partial<OperationContext>;
-  /** Convenience input.  Ignored if context.requestPolicy is provided */
-  requestPolicy?: RequestPolicy;
-  /** initial value for `isPaused$` (default is `false`) */
-  isPaused?: boolean;
-}) {
+export function queryStore<Data, Variables extends object = {}>(
+  args: UrqlStoreArgs<Data, Variables> & {
+    /** initial value for `isPaused$` (default is `false`) */
+    isPaused?: boolean;
+  }
+) {
   // create the graphql request
-  const request = createRequest(props.query, props.variables);
+  const request = createRequest(args.query, args.variables);
 
-  // `props.context.requestPolicy` beats `props.requestPolcy`
+  // `args.context.requestPolicy` beats `args.requestPolcy`
   const context: Partial<OperationContext> = {
-    requestPolicy: props.requestPolicy,
-    ...props.context,
+    requestPolicy: args.requestPolicy,
+    ...args.context,
   };
 
   // combine default with operation details
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    operation: props.client.createRequestOperation('query', request),
+    operation: args.client.createRequestOperation('query', request),
   };
 
   // create a store for fetch results (uses any placeholderData provided)
@@ -49,7 +44,7 @@ export function queryStore<Data, Variables extends object = {}>(props: {
 
   // create a store for `Pausable` interface (defaults to false)
   // package es2015 doesn't support nullish coalescing operator (??)
-  const isPaused$ = writable(props.isPaused ? true : false);
+  const isPaused$ = writable(args.isPaused ? true : false);
 
   // record when the fetch is complete
   let isComplete = false;
@@ -65,7 +60,7 @@ export function queryStore<Data, Variables extends object = {}>(props: {
     // now we want to fetch a different type, so we must concatMap
     concatMap(() =>
       fetchProcess(
-        props.client.executeQuery<Data, Variables>(request, context),
+        args.client.executeQuery<Data, Variables>(request, context),
         baseResult,
         () => (isComplete = true)
       )

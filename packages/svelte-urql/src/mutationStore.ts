@@ -1,40 +1,33 @@
 import { pipe, subscribe } from 'wonka';
-import type { OperationContext, Client, RequestPolicy } from '@urql/core';
+import type { OperationContext } from '@urql/core';
 import { derived, writable } from 'svelte/store';
-import type { DocumentNode } from 'graphql';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { createRequest } from '@urql/core';
-import type { AnnotatedOperationResult, UrqlStore } from './common';
+import type {
+  AnnotatedOperationResult,
+  UrqlStore,
+  UrqlStoreArgs,
+} from './common';
 import { defaultBaseResult, fetchProcess } from './common';
 
 /**
  * Create a Svelte store for an [Urql mutation](https://formidable.com/open-source/urql/docs/api/core/#clientexecutemutation) using [Wonka](https://wonka.kitten.sh/)
  */
-export function mutationStore<Data, Variables extends object = {}>(props: {
-  /** an [Urql client](https://formidable.com/open-source/urql/docs/api/core/#client)  */
-  client: Client;
-  /** a graphql tag */
-  mutation: DocumentNode | TypedDocumentNode<Data, Variables> | string;
-  /** the variables to be used in the fetch operation */
-  variables?: Variables;
-  /** Urql fetching options */
-  context?: Partial<OperationContext>;
-  /** Convenience input.  Ignored if context.requestPolicy is provided */
-  requestPolicy?: RequestPolicy;
-}) {
+export function mutationStore<Data, Variables extends object = {}>(
+  args: UrqlStoreArgs<Data, Variables>
+) {
   // create the graphql request
-  const request = createRequest(props.mutation, props.variables);
+  const request = createRequest(args.query, args.variables);
 
-  // `props.context.requestPolicy` beats `props.requestPolcy`
+  // `args.context.requestPolicy` beats `args.requestPolcy`
   const context: Partial<OperationContext> = {
-    requestPolicy: props.requestPolicy,
-    ...props.context,
+    requestPolicy: args.requestPolicy,
+    ...args.context,
   };
 
   // combine default with operation details
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    operation: props.client.createRequestOperation('mutation', request),
+    operation: args.client.createRequestOperation('mutation', request),
   };
 
   // create a store for fetch results (uses any placeholderData provided)
@@ -48,7 +41,7 @@ export function mutationStore<Data, Variables extends object = {}>(props: {
   // make the store reactive (ex: change when we receive a response)
   const wonkaSubscription = pipe(
     fetchProcess(
-      props.client.executeMutation<Data, Variables>(request, context),
+      args.client.executeMutation<Data, Variables>(request, context),
       baseResult,
       () => (isComplete = true)
     ),
