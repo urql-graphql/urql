@@ -26,4 +26,14 @@ describe('subscriptionStore', () => {
     expect(get(store).operation.query.loc?.source.body).toBe(query);
     expect(get(store).operation.variables).toBe(variables);
   });
+
+  it('adds pause handles', () => {
+    expect(get(store.isPaused$)).toBe(false);
+
+    store.pause();
+    expect(get(store.isPaused$)).toBe(true);
+
+    store.unpause();
+    expect(get(store.isPaused$)).toBe(false);
+  });
 });

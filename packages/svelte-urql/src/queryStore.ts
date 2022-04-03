@@ -57,7 +57,7 @@ export function queryStore<Data, Variables extends object = {}>(
     // don't continue if paused
     filter(isPaused => !isPaused),
 
-    // now we want to fetch a different type, so we must concatMap
+    // now we want to fetch the return type, so we must concatMap
     concatMap(() =>
       fetchProcess(
         args.client.executeQuery<Data, Variables>(request, context),
