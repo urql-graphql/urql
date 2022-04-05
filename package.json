@@ -69,7 +69,6 @@
     "@babel/plugin-transform-react-jsx": "^7.13.12",
     "@changesets/cli": "^2.16.0",
     "@changesets/get-github-info": "0.5.0",
-    "@cypress/react": "^5.12.4",
     "@cypress/vite-dev-server": "^2.2.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-buble": "^0.21.3",

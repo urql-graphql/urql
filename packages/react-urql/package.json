@@ -43,6 +43,7 @@
     "preset": "../../scripts/jest/preset"
   },
   "devDependencies": {
+    "@cypress/react": "^5.12.4",
     "@testing-library/react": "^11.1.1",
     "@testing-library/react-hooks": "^5.1.2",
     "@types/react": "^17.0.4",
