@@ -106,24 +106,12 @@ export function useQuery<Data = any, Variables = object>(
           });
 
           cache.set(request.key, promise);
-          const res = {};
-          Object.defineProperty(res, 'data', {
-            get: () => {
-              throw promise;
-            },
-          });
-          return res;
+          throw promise;
         } else {
           subscription.unsubscribe();
         }
       } else if (suspense && result != null && 'then' in result) {
-        const res = {};
-        Object.defineProperty(res, 'data', {
-          get: () => {
-            throw result;
-          },
-        });
-        return res;
+        throw result;
       }
 
       return (result as OperationResult<Data, Variables>) || { fetching: true };
