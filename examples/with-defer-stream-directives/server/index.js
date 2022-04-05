@@ -84,7 +84,7 @@ polka()
     if (result.type === 'RESPONSE') {
       result.headers.forEach(({ name, value }) => res.setHeader(name, value));
       res.writeHead(result.status, {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/graphql+json',
       });
       res.end(JSON.stringify(result.payload));
     } else if (result.type === 'MULTIPART_RESPONSE') {
@@ -104,7 +104,7 @@ polka()
         const chunk = Buffer.from(JSON.stringify(result), 'utf8');
         const data = [
           '',
-          'Content-Type: application/json; charset=utf-8',
+          'Content-Type: application/graphql+json; charset=utf-8',
           '',
           chunk,
         ];

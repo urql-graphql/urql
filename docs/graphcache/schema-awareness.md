@@ -19,9 +19,9 @@ on `cacheExchange` allows us to pass an introspected schema to Graphcache:
 ```js
 const introspectedSchema = {
   __schema: {
-    queryType: { name: 'Query', },
-    mutationType: { name: 'Mutation', },
-    subscriptionType: { name: 'Subscription', },
+    queryType: { name: 'Query' },
+    mutationType: { name: 'Mutation' },
+    subscriptionType: { name: 'Subscription' },
   },
 };
 
@@ -97,7 +97,7 @@ import * as fs from 'fs';
 
 fetch('http://localhost:3000/graphql', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/graphql+json' },
   body: JSON.stringify({
     variables: {},
     query: getIntrospectionQuery({ descriptions: false }),
@@ -161,7 +161,7 @@ import { getIntrospectedSchema, minifyIntrospectionQuery } from '@urql/introspec
 
 fetch('http://localhost:3000/graphql', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/graphql+json' },
   body: JSON.stringify({
     variables: {},
     query: getIntrospectionQuery({ descriptions: false }),

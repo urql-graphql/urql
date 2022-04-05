@@ -202,7 +202,7 @@ external withUrqlClient:
 Which can then be used like so:
 
 ```reason
-let headers = Fetch.HeadersInit.make({ "Content-Type": "application/json" });
+let headers = Fetch.HeadersInit.make({ "Content-Type": "application/graphql+json" });
 let client = {
   url: "https://mygraphqlapi.com/graphql",
   fetchOptions: Fetch.RequestInit.make(~headers, ~method_=POST, ())

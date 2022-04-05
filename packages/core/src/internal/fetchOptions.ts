@@ -76,6 +76,6 @@ export const makeFetchOptions = (
     method: useGETMethod ? 'GET' : 'POST',
     headers: useGETMethod
       ? extraOptions.headers
-      : { 'content-type': 'application/json', ...extraOptions.headers },
+      : { 'content-type': 'application/graphql+json', ...extraOptions.headers },
   };
 };

@@ -36,7 +36,10 @@ export const multipartFetchExchange: Exchange = ({
       if (files.size) {
         url = makeFetchURL(operation);
         fetchOptions = makeFetchOptions(operation);
-        if (fetchOptions.headers!['content-type'] === 'application/json') {
+        if (
+          fetchOptions.headers!['content-type'] === 'application/json' ||
+          fetchOptions.headers!['content-type'] === 'application/graphql+json'
+        ) {
           delete fetchOptions.headers!['content-type'];
         }
 

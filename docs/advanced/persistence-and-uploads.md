@@ -131,7 +131,7 @@ support file uploads, which is a drop-in replacement for the default
 
 It works by using the [`extract-files` package](https://www.npmjs.com/package/extract-files). When
 the `multipartFetchExchange` sees at least one `File` in the variables it receives for a mutation,
-then it will send a `multipart/form-data` POST request instead of a standard `application/json`
+then it will send a `multipart/form-data` POST request instead of a standard `application/graphql+json`
 one. This is basically the same kind of request that we'd expect to send for regular HTML forms.
 
 ### Installation & Setup
