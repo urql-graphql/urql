@@ -56,7 +56,14 @@ export const makeFetchURL = (
     );
   }
 
-  return `${url}?${search.join('&')}`;
+  const finalUrl = `${url}?${search.join('&')}`;
+
+  if (finalUrl.length > 2047) {
+    operation.context.preferGetMethod = false;
+    return url;
+  }
+
+  return finalUrl;
 };
 
 export const makeFetchOptions = (
