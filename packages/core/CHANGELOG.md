@@ -1,5 +1,12 @@
 # @urql/core
 
+## 2.4.4
+
+### Patch Changes
+
+- cut off `url` when using the GET method at 2048 characters (lowest url-size coming from chromium), by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2384](https://github.com/FormidableLabs/urql/pull/2384))
+- ⚠️ Fix issue where a synchronous `toPromise()` return would not result in the stream tearing down, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2386](https://github.com/FormidableLabs/urql/pull/2386))
+
 ## 2.4.3
 
 ### Patch Changes
