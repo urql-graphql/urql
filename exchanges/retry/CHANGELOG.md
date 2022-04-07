@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3
+
+### Patch Changes
+
+- Export `RetryExchangeOption` type from top level export, by [@KoltonG](https://github.com/KoltonG) (See [#2351](https://github.com/FormidableLabs/urql/pull/2351))
+- Updated dependencies (See [#2384](https://github.com/FormidableLabs/urql/pull/2384) and [#2386](https://github.com/FormidableLabs/urql/pull/2386))
+  - @urql/core@2.4.4
+
 ## 0.3.2
 
 ### Patch Changes
