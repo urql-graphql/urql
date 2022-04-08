@@ -20,8 +20,8 @@ import {
  */
 export function subscriptionStore<Data, Variables extends object = {}>(
   args: UrqlStoreArgs<Data, Variables> & {
-    /** initial value for `isPaused$` (default is `false`) */
-    isPaused?: boolean;
+    /** initial value for `isPaused$` return (default is `false`) */
+    pause?: boolean;
   }
 ) {
   // create the graphql request
@@ -46,7 +46,7 @@ export function subscriptionStore<Data, Variables extends object = {}>(
 
   // create a store for `Pausable` interface (defaults to false)
   // package es2015 doesn't support nullish coalescing operator (??)
-  const isPaused$ = writable(args.isPaused ? true : false);
+  const isPaused$ = writable(args.pause ? true : false);
 
   // make the store reactive (ex: change when we receive a response)
   pipe(
