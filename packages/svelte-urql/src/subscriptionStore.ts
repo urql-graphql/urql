@@ -39,7 +39,7 @@ export function subscriptionStore<Data, Variables extends object = {}>(
     operation: args.client.createRequestOperation('subscription', request),
   };
 
-  // create a store for fetch results (uses any placeholderData provided)
+  // create a store for fetch results
   const writableResult$ = writable<AnnotatedOperationResult<Data, Variables>>(
     baseResult
   );

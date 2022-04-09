@@ -39,7 +39,7 @@ export function queryStore<Data, Variables extends object = {}>(
     operation: args.client.createRequestOperation('query', request),
   };
 
-  // create a store for fetch results (uses any placeholderData provided)
+  // create a store for fetch results
   const writableResult$ = writable(baseResult);
 
   // create a store for `Pausable` interface (defaults to false)

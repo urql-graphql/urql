@@ -30,7 +30,7 @@ export function mutationStore<Data, Variables extends object = {}>(
     operation: args.client.createRequestOperation('mutation', request),
   };
 
-  // create a store for fetch results (uses any placeholderData provided)
+  // create a store for fetch results
   const writableResult$ = writable<AnnotatedOperationResult<Data, Variables>>(
     baseResult
   );
