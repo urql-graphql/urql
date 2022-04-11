@@ -125,7 +125,7 @@ todo items. Let's dive right into it!
   </div>
   <div v-else>
     <ul v-if="data">
-      <li v-for="todo in data.todos">{{ todo.title }}</li>
+      <li v-for="todo in data.todos" :key="todo.id">{{ todo.title }}</li>
     </ul>
   </div>
 </template>
@@ -213,7 +213,7 @@ outputs of `useQuery` are reactive and may change over time.
 ```jsx
 <template>
   <ul v-if="data">
-    <li v-for="todo in data.todos">{{ todo.title }}</li>
+    <li v-for="todo in data.todos" :key="todo.id">{{ todo.title }}</li>
   </ul>
   <button @click="from += 10">Next Page</button>
 </template>
@@ -464,7 +464,7 @@ our examples to have a suspending component by changing our usage of `useQuery`:
 ```jsx
 <template>
   <ul>
-    <li v-for="todo in data.todos">{{ todo.title }}</li>
+    <li v-for="todo in data.todos" :key="todo.id">{{ todo.title }}</li>
   </ul>
 </template>
 
