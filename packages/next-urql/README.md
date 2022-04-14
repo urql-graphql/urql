@@ -222,12 +222,12 @@ The great part about writing thin bindings like this is that they are zero cost 
 
 If you want to use a `Client` in Next.js' newer methods like `getServerSideProps` you may use the `initUrqlClient` function to create a client on the fly. This will need to be done per request.
 
-```
-import { initUrqlClient, NextUrqlPageContext } from 'next-urql';
+```javascript
+import { initUrqlClient } from 'next-urql';
 
 export const getServerSideProps = async (ctx) => {
   const client = initUrqlClient({
-    url: /graphql',
+    url: '/graphql',
   }, false /* set to false to disable suspense */);
 
   const result = await client.query(QUERY, {}).toPromise();
