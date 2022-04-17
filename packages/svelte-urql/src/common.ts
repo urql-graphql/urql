@@ -4,11 +4,11 @@ import type {
   RequestPolicy,
   OperationContext,
   Client,
+  TypedDocumentNode,
 } from '@urql/core';
 import { pipe, fromValue, concat, map, makeSubject, onPush } from 'wonka';
 import type { Source } from 'wonka';
 import type { DocumentNode } from 'graphql';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 /**
  * An OperationResult annotated with convenience properties
