@@ -21,7 +21,7 @@ import {
 export function queryStore<Data, Variables extends object = {}>(
   args: UrqlStoreArgs<Data, Variables> & {
     /** initial value for `isPaused$` return (default is `false`) */
-    pause?: boolean;
+    isPaused?: boolean;
   }
 ) {
   // create the graphql request
@@ -44,7 +44,7 @@ export function queryStore<Data, Variables extends object = {}>(
 
   // create a store for `Pausable` interface (defaults to false)
   // package es2015 doesn't support nullish coalescing operator (??)
-  const isPaused$ = writable(args.pause ? true : false);
+  const isPaused$ = writable(args.isPaused ? true : false);
 
   const wonkaSubscription = pipe(
     // have wonka subscribe to the pauseStore
