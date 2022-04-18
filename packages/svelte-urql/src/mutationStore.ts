@@ -35,15 +35,11 @@ export function mutationStore<Data, Variables extends object = {}>(
     baseResult
   );
 
-  // record when the fetch is complete
-  let isComplete = false;
-
   // make the store reactive (ex: change when we receive a response)
   const wonkaSubscription = pipe(
     fetchProcess(
       args.client.executeMutation<Data, Variables>(request, context),
-      baseResult,
-      () => (isComplete = true)
+      baseResult
     ),
 
     // update the store whenever a result is emitted
@@ -51,10 +47,10 @@ export function mutationStore<Data, Variables extends object = {}>(
   );
 
   // derive a `Readable` store (only Urql can set the fetch result)
-  const result$ = derived(writableResult$, result => {
-    // stop listening when the fetch `isComplete`
-    if (isComplete) wonkaSubscription.unsubscribe();
-    return result;
+  const result$ = derived(writableResult$, (result, set) => {
+    set(result);
+    // stop wonka when last svelte subscriber unsubscribes
+    return wonkaSubscription.unsubscribe;
   });
 
   // return UrqlStore

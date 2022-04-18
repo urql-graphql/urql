@@ -46,10 +46,6 @@ export function queryStore<Data, Variables extends object = {}>(
   // package es2015 doesn't support nullish coalescing operator (??)
   const isPaused$ = writable(args.pause ? true : false);
 
-  // record when the fetch is complete
-  let isComplete = false;
-
-  // make the store reactive (ex: change when we receive a response)
   const wonkaSubscription = pipe(
     // have wonka subscribe to the pauseStore
     fromStore(isPaused$),
@@ -61,8 +57,7 @@ export function queryStore<Data, Variables extends object = {}>(
     concatMap(() =>
       fetchProcess(
         args.client.executeQuery<Data, Variables>(request, context),
-        baseResult,
-        () => (isComplete = true)
+        baseResult
       )
     ),
 
@@ -71,15 +66,18 @@ export function queryStore<Data, Variables extends object = {}>(
   );
 
   // derive a `Readable` store (only Urql can set the fetch result)
-  const result$ = derived(writableResult$, result => {
-    // stop listening when the fetch `isComplete`
-    if (isComplete) wonkaSubscription.unsubscribe();
-    return result;
+  const result$ = derived(writableResult$, (result, set) => {
+    set(result);
+    // stop wonka when last svelte subscriber unsubscribes
+    return wonkaSubscription.unsubscribe;
   });
 
   // combine and return UrqlStore & Pausable
   return {
     ...result$,
     ...createPausable(isPaused$),
-  } as UrqlStore<Data, Variables> & Pausable;
+  } as UrqlStore<Data, Variables> &
+    Pausable & {
+      reexecute: (context?: UrqlStoreArgs<Data, Variables>['context']) => void;
+    };
 }

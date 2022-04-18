@@ -6,7 +6,7 @@ import type {
   Client,
   TypedDocumentNode,
 } from '@urql/core';
-import { pipe, fromValue, concat, map, makeSubject, onPush } from 'wonka';
+import { pipe, fromValue, concat, map, makeSubject } from 'wonka';
 import type { Source } from 'wonka';
 import type { DocumentNode } from 'graphql';
 
@@ -84,12 +84,10 @@ export const defaultBaseResult = {
  * 1. EMIT: set fetching:true
  * 2. fetch response(s)
  * 3. EMIT: build a result from response (fetching:false)
- * 4. mark the process complete (if complete() is provided)
  */
 export function fetchProcess<Data, Variables>(
   executeOperation: Source<OperationResult<Data, Variables>>,
-  baseResult: AnnotatedOperationResult<Data, Variables>,
-  complete?: () => void
+  baseResult: AnnotatedOperationResult<Data, Variables>
 ) {
   // concat emits the items sequentially
   return concat([
@@ -102,10 +100,7 @@ export function fetchProcess<Data, Variables>(
       executeOperation,
 
       // build annotated result from base (set fetching:false)
-      map(response => ({ ...baseResult, ...response })),
-
-      // mark the fetch as complete
-      onPush(() => complete && complete())
+      map(response => ({ ...baseResult, ...response }))
     ),
   ]);
 }
