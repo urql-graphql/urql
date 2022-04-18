@@ -76,8 +76,5 @@ export function queryStore<Data, Variables extends object = {}>(
   return {
     ...result$,
     ...createPausable(isPaused$),
-  } as UrqlStore<Data, Variables> &
-    Pausable & {
-      reexecute: (context?: UrqlStoreArgs<Data, Variables>['context']) => void;
-    };
+  } as UrqlStore<Data, Variables> & Pausable;
 }
