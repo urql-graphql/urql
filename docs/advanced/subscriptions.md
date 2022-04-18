@@ -306,7 +306,7 @@ use subscriptions in a Node.js environment.
 ```js
 import { pipe, subscribe } from 'wonka';
 
-const newMessages = `
+const MessageSub = `
   subscription MessageSub {
     newMessages {
       id
