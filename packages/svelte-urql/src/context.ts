@@ -2,7 +2,7 @@ import { setContext, getContext } from 'svelte';
 import { Client, ClientOptions } from '@urql/core';
 const _contextKey = '$$_urql';
 
-/** retrieve your client to svelte context */
+/** retrieve your client from svelte context */
 export const getContextClient = (): Client => getContext(_contextKey);
 
 /** save your client to svelte context  */
