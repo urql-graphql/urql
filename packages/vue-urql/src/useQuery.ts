@@ -4,7 +4,7 @@ import { DocumentNode } from 'graphql';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
-import { Source, map, pipe, take, subscribe, onEnd, toPromise } from 'wonka';
+import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import {
   Client,
@@ -120,13 +120,31 @@ export function callUseQuery<T = any, V = object>(
     fetching,
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      source.value = client.value.executeQuery<T, V>(request.value, {
+      const s = (source.value = client.value.executeQuery<T, V>(request.value, {
         requestPolicy: args.requestPolicy,
         ...args.context,
         ...opts,
-      });
+      }));
 
-      return response;
+      return {
+        ...response,
+        then(onFulfilled, onRejected) {
+          return new Promise<UseQueryState<T, V>>(resolve => {
+            let hasResult = false;
+            const sub = pipe(
+              s,
+              subscribe(() => {
+                if (!state.fetching.value && !state.stale.value) {
+                  if (sub) sub.unsubscribe();
+                  hasResult = true;
+                  resolve(state);
+                }
+              })
+            );
+            if (hasResult) sub.unsubscribe();
+          }).then(onFulfilled, onRejected);
+        },
+      };
     },
     pause() {
       isPaused.value = true;
@@ -176,15 +194,23 @@ export function callUseQuery<T = any, V = object>(
   const response: UseQueryResponse<T, V> = {
     ...state,
     then(onFulfilled, onRejected) {
-      return (source.value
-        ? pipe(
-            source.value,
-            take(1),
-            map(() => state),
-            toPromise
-          )
-        : Promise.resolve(state)
-      ).then(onFulfilled, onRejected);
+      const promise = new Promise<UseQueryState<T, V>>(resolve => {
+        if (!source.value) return resolve(state);
+        let hasResult = false;
+        const sub = pipe(
+          source.value,
+          subscribe(() => {
+            if (!state.fetching.value && !state.stale.value) {
+              if (sub) sub.unsubscribe();
+              hasResult = true;
+              resolve(state);
+            }
+          })
+        );
+        if (hasResult) sub.unsubscribe();
+      });
+
+      return promise.then(onFulfilled, onRejected);
     },
   };
 
