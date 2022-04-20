@@ -4,7 +4,7 @@ import { DocumentNode } from 'graphql';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
-import { Source, map, pipe, take, subscribe, onEnd, toPromise } from 'wonka';
+import { Source, pipe, subscribe, onEnd, map } from 'wonka';
 
 import {
   Client,
@@ -120,13 +120,37 @@ export function callUseQuery<T = any, V = object>(
     fetching,
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
-      source.value = client.value.executeQuery<T, V>(request.value, {
+      const s = (source.value = client.value.executeQuery<T, V>(request.value, {
         requestPolicy: args.requestPolicy,
         ...args.context,
         ...opts,
-      });
+      }));
 
-      return response;
+      return {
+        ...response,
+        // @ts-ignore
+        then(onFulfilled, onRejected) {
+          const promise = new Promise(resolve => {
+            const sub = pipe(
+              s,
+              map(() => state),
+              subscribe(result => {
+                if (
+                  !unwrapPossibleProxy(result.fetching) &&
+                  !unwrapPossibleProxy(result.stale)
+                ) {
+                  if (sub && sub.unsubscribe) sub.unsubscribe();
+                  resolve(result);
+                }
+              })
+            );
+          });
+          return promise.then(res => {
+            // @ts-ignore
+            onFulfilled(res);
+          }, onRejected);
+        },
+      };
     },
     pause() {
       isPaused.value = true;
@@ -175,16 +199,28 @@ export function callUseQuery<T = any, V = object>(
 
   const response: UseQueryResponse<T, V> = {
     ...state,
+    // @ts-ignore
     then(onFulfilled, onRejected) {
-      return (source.value
-        ? pipe(
-            source.value,
-            take(1),
-            map(() => state),
-            toPromise
-          )
-        : Promise.resolve(state)
-      ).then(onFulfilled, onRejected);
+      const promise = new Promise(resolve => {
+        if (!source.value) return resolve(state);
+        const sub = pipe(
+          source.value,
+          map(() => state),
+          subscribe(result => {
+            if (
+              !unwrapPossibleProxy(result.fetching) &&
+              !unwrapPossibleProxy(result.stale)
+            ) {
+              if (sub && sub.unsubscribe) sub.unsubscribe();
+              resolve(result);
+            }
+          })
+        );
+      });
+      return promise.then(res => {
+        // @ts-ignore
+        onFulfilled(res);
+      }, onRejected);
     },
   };
 
