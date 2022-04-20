@@ -135,10 +135,7 @@ export function callUseQuery<T = any, V = object>(
               s,
               map(() => state),
               subscribe(result => {
-                if (
-                  !result.fetching.value &&
-                  !result.stale.value
-                ) {
+                if (!result.fetching.value && !result.stale.value) {
                   if (sub) sub.unsubscribe();
                   hasResult = true;
                   resolve(result);
@@ -198,27 +195,24 @@ export function callUseQuery<T = any, V = object>(
   const response: UseQueryResponse<T, V> = {
     ...state,
     then(onFulfilled, onRejected) {
-      const promise = new Promise(resolve => {
+      const promise = new Promise<UseQueryState<T, V>>(resolve => {
         if (!source.value) return resolve(state);
+        let hasResult = false;
         const sub = pipe(
           source.value,
           map(() => state),
           subscribe(result => {
-            if (
-              !unwrapPossibleProxy(result.fetching) &&
-              !unwrapPossibleProxy(result.stale)
-            ) {
-              if (sub && sub.unsubscribe) sub.unsubscribe();
+            if (!result.fetching.value && !result.stale.value) {
+              if (sub) sub.unsubscribe();
+              hasResult = true;
               resolve(result);
             }
           })
         );
+        if (hasResult) sub.unsubscribe();
       });
 
-      return promise.then(
-        x => onFulfilled!(x as UseQueryState<T, V>),
-        onRejected
-      );
+      return promise.then(onFulfilled, onRejected);
     },
   };
 
