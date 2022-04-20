@@ -128,7 +128,6 @@ export function callUseQuery<T = any, V = object>(
 
       return {
         ...response,
-        // @ts-ignore
         then(onFulfilled, onRejected) {
           const promise = new Promise(resolve => {
             const sub = pipe(
@@ -145,10 +144,10 @@ export function callUseQuery<T = any, V = object>(
               })
             );
           });
-          return promise.then(res => {
-            // @ts-ignore
-            onFulfilled(res);
-          }, onRejected);
+          return promise.then(
+            x => onFulfilled!(x as UseQueryState<T, V>),
+            onRejected
+          );
         },
       };
     },
@@ -199,7 +198,6 @@ export function callUseQuery<T = any, V = object>(
 
   const response: UseQueryResponse<T, V> = {
     ...state,
-    // @ts-ignore
     then(onFulfilled, onRejected) {
       const promise = new Promise(resolve => {
         if (!source.value) return resolve(state);
@@ -217,10 +215,11 @@ export function callUseQuery<T = any, V = object>(
           })
         );
       });
-      return promise.then(res => {
-        // @ts-ignore
-        onFulfilled(res);
-      }, onRejected);
+
+      return promise.then(
+        x => onFulfilled!(x as UseQueryState<T, V>),
+        onRejected
+      );
     },
   };
 
