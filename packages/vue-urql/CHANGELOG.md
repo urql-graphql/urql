@@ -1,5 +1,11 @@
 # @urql/vue
 
+## 0.6.2
+
+### Patch Changes
+
+- ⚠️ Fix wait for the first non-stale result when using `await executeQuery`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2410](https://github.com/FormidableLabs/urql/pull/2410))
+
 ## 0.6.1
 
 ### Patch Changes
