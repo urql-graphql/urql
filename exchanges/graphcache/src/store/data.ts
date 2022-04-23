@@ -107,6 +107,10 @@ export const initDataState = (
 
   if (!layerKey) {
     currentOptimisticKey = null;
+  } else if (currentOperation === 'read') {
+    // We don't create new layers for read operations and instead simply
+    // apply the currently available layer, if any
+    currentOptimisticKey = layerKey;
   } else if (isOptimistic || data.optimisticOrder.length > 0) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
@@ -188,7 +192,7 @@ export const noopDataState = (
   isOptimistic?: boolean
 ) => {
   if (layerKey && !isOptimistic) data.deferredKeys.delete(layerKey);
-  initDataState('read', data, layerKey, isOptimistic);
+  initDataState('write', data, layerKey, isOptimistic);
   clearDataState();
 };
 
