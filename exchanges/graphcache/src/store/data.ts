@@ -111,7 +111,7 @@ export const initDataState = (
     // We don't create new layers for read operations and instead simply
     // apply the currently available layer, if any
     currentOptimisticKey = layerKey;
-  } else if (isOptimistic || data.optimisticOrder.length > 0) {
+  } else if (isOptimistic || data.optimisticOrder.length > 1) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
     // clear the optimistic data before writing
@@ -131,6 +131,8 @@ export const initDataState = (
   } else {
     // Otherwise we don't create an optimistic layer and clear the
     // operation's one if it already exists
+    // We also do this when only one layer exists to avoid having to squash
+    // any layers at the end of writing this layer
     currentOptimisticKey = null;
     deleteLayer(data, layerKey);
   }

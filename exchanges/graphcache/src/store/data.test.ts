@@ -529,13 +529,9 @@ describe('deferred changes', () => {
     InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
-
-    InMemoryData.initDataState('write', data, 3);
-    InMemoryData.writeRecord('Query', 'index', 3);
-    InMemoryData.clearDataState();
+    expect(data.optimisticOrder).toEqual([3]);
 
     // The layers must then be squashed
-    expect(data.optimisticOrder).toEqual([3]);
     InMemoryData.noopDataState(data, 3, false);
     expect(data.optimisticOrder).toEqual([]);
   });
