@@ -204,6 +204,7 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
     InMemoryData.clearDataState();
 
     InMemoryData.initDataState('read', data, null);
@@ -211,6 +212,7 @@ describe('commutative changes', () => {
 
     InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
     InMemoryData.clearDataState();
 
     InMemoryData.initDataState('read', data, null);
@@ -256,7 +258,7 @@ describe('commutative changes', () => {
     InMemoryData.writeRecord('Query', 'optimistic', true);
     InMemoryData.clearDataState();
 
-    InMemoryData.initDataState('read', data, 3);
+    InMemoryData.initDataState('write', data, 3);
     InMemoryData.writeRecord('Query', 'index', 3);
     InMemoryData.clearDataState();
 
@@ -479,17 +481,12 @@ describe('commutative changes', () => {
 describe('deferred changes', () => {
   it('keeps a deferred layer around until completion', () => {
     // initially it's unknown whether a layer is deferred
-    InMemoryData.reserveLayer(data, 1);
+    InMemoryData.reserveLayer(data, 1, true);
     InMemoryData.reserveLayer(data, 2);
 
     InMemoryData.reserveLayer(data, 2);
     InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
-    InMemoryData.clearDataState();
-
-    // The layer is marked as deferred via re-reserving it
-    InMemoryData.reserveLayer(data, 1, true);
-    InMemoryData.initDataState('write', data, 1);
     InMemoryData.clearDataState();
 
     InMemoryData.initDataState('read', data, null);
@@ -512,27 +509,34 @@ describe('deferred changes', () => {
     // initially it's unknown whether a layer is deferred
     InMemoryData.reserveLayer(data, 1);
     InMemoryData.reserveLayer(data, 2);
+    InMemoryData.reserveLayer(data, 3);
 
-    InMemoryData.reserveLayer(data, 2, true);
     InMemoryData.initDataState('write', data, 2);
     InMemoryData.writeRecord('Query', 'index', 2);
     InMemoryData.clearDataState();
 
+    // Mark layer 3 as deferred
+    InMemoryData.reserveLayer(data, 3, true);
+
+    // The value is unchanged
     InMemoryData.initDataState('read', data, null);
     expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
 
     // The layers must not be squashed
-    expect(data.optimisticOrder).toEqual([2, 1]);
+    expect(data.optimisticOrder).toEqual([3, 2, 1]);
 
     // A future response may not clear the layer
-    InMemoryData.reserveLayer(data, 1);
     InMemoryData.initDataState('write', data, 1);
     InMemoryData.writeRecord('Query', 'index', 1);
     InMemoryData.clearDataState();
 
+    InMemoryData.initDataState('write', data, 3);
+    InMemoryData.writeRecord('Query', 'index', 3);
+    InMemoryData.clearDataState();
+
     // The layers must then be squashed
-    expect(data.optimisticOrder).toEqual([2]);
-    InMemoryData.noopDataState(data, 2, false);
+    expect(data.optimisticOrder).toEqual([3]);
+    InMemoryData.noopDataState(data, 3, false);
     expect(data.optimisticOrder).toEqual([]);
   });
 
