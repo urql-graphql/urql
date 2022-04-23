@@ -513,27 +513,37 @@ export const reserveLayer = (
   layerKey: number,
   hasNext?: boolean
 ) => {
-  const index = data.optimisticOrder.indexOf(layerKey);
-  if (index === -1) {
-    // The new layer needs to be reserved in front of all other commutative
-    // keys but after all non-commutative keys (which are added by `forceUpdate`)
-    data.optimisticOrder.unshift(layerKey);
-  } else if (!data.commutativeKeys.has(layerKey)) {
-    // Protect optimistic layers from being turned into non-optimistic layers
-    // while preserving optimistic data
-    clearLayer(data, layerKey);
-    // If the layer was an optimistic layer prior to this call, it'll be converted
-    // to a new non-optimistic layer and shifted ahead
-    data.optimisticOrder.splice(index, 1);
-    data.optimisticOrder.unshift(layerKey);
-  }
-
   if (hasNext) {
     data.deferredKeys.add(layerKey);
   } else {
     data.deferredKeys.delete(layerKey);
   }
 
+  let index = data.optimisticOrder.indexOf(layerKey);
+  if (index > -1) {
+    if (hasNext || !data.commutativeKeys.has(layerKey)) {
+      data.optimisticOrder.splice(index, 1);
+      // Protect optimistic layers from being turned into non-optimistic layers
+      // while preserving optimistic data
+      clearLayer(data, layerKey);
+    } else {
+      return;
+    }
+  }
+
+  // If the layer has future results then we'll move it past any layer that's
+  // still empty, so currently pending operations will take precedence over it
+  for (
+    index = 0;
+    hasNext &&
+    index < data.optimisticOrder.length &&
+    !data.deferredKeys.has(data.optimisticOrder[index]) &&
+    (!data.refLock[data.optimisticOrder[index]] ||
+      !data.commutativeKeys.has(data.optimisticOrder[index]));
+    index++
+  );
+
+  data.optimisticOrder.splice(index, 0, layerKey);
   data.commutativeKeys.add(layerKey);
 };
 
