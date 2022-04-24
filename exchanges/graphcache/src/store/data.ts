@@ -107,7 +107,11 @@ export const initDataState = (
 
   if (!layerKey) {
     currentOptimisticKey = null;
-  } else if (isOptimistic || data.optimisticOrder.length > 0) {
+  } else if (currentOperation === 'read') {
+    // We don't create new layers for read operations and instead simply
+    // apply the currently available layer, if any
+    currentOptimisticKey = layerKey;
+  } else if (isOptimistic || data.optimisticOrder.length > 1) {
     // If this operation isn't optimistic and we see it for the first time,
     // then it must've been optimistic in the past, so we can proactively
     // clear the optimistic data before writing
@@ -127,6 +131,8 @@ export const initDataState = (
   } else {
     // Otherwise we don't create an optimistic layer and clear the
     // operation's one if it already exists
+    // We also do this when only one layer exists to avoid having to squash
+    // any layers at the end of writing this layer
     currentOptimisticKey = null;
     deleteLayer(data, layerKey);
   }
@@ -188,7 +194,7 @@ export const noopDataState = (
   isOptimistic?: boolean
 ) => {
   if (layerKey && !isOptimistic) data.deferredKeys.delete(layerKey);
-  initDataState('read', data, layerKey, isOptimistic);
+  initDataState('write', data, layerKey, isOptimistic);
   clearDataState();
 };
 
@@ -509,27 +515,37 @@ export const reserveLayer = (
   layerKey: number,
   hasNext?: boolean
 ) => {
-  const index = data.optimisticOrder.indexOf(layerKey);
-  if (index === -1) {
-    // The new layer needs to be reserved in front of all other commutative
-    // keys but after all non-commutative keys (which are added by `forceUpdate`)
-    data.optimisticOrder.unshift(layerKey);
-  } else if (!data.commutativeKeys.has(layerKey)) {
-    // Protect optimistic layers from being turned into non-optimistic layers
-    // while preserving optimistic data
-    clearLayer(data, layerKey);
-    // If the layer was an optimistic layer prior to this call, it'll be converted
-    // to a new non-optimistic layer and shifted ahead
-    data.optimisticOrder.splice(index, 1);
-    data.optimisticOrder.unshift(layerKey);
-  }
-
   if (hasNext) {
     data.deferredKeys.add(layerKey);
   } else {
     data.deferredKeys.delete(layerKey);
   }
 
+  let index = data.optimisticOrder.indexOf(layerKey);
+  if (index > -1) {
+    if (hasNext || !data.commutativeKeys.has(layerKey)) {
+      data.optimisticOrder.splice(index, 1);
+      // Protect optimistic layers from being turned into non-optimistic layers
+      // while preserving optimistic data
+      clearLayer(data, layerKey);
+    } else {
+      return;
+    }
+  }
+
+  // If the layer has future results then we'll move it past any layer that's
+  // still empty, so currently pending operations will take precedence over it
+  for (
+    index = 0;
+    hasNext &&
+    index < data.optimisticOrder.length &&
+    !data.deferredKeys.has(data.optimisticOrder[index]) &&
+    (!data.refLock[data.optimisticOrder[index]] ||
+      !data.commutativeKeys.has(data.optimisticOrder[index]));
+    index++
+  );
+
+  data.optimisticOrder.splice(index, 0, layerKey);
   data.commutativeKeys.add(layerKey);
 };
 
