@@ -1321,7 +1321,7 @@ it('handles subsequent queries with larger first values', () => {
 });
 
 it('ignores empty pages when paginating', () => {
-  const PaginatingForward = gql`
+  const PaginationForward = gql`
     query($first: Int!, $after: String) {
       __typename
       items(first: $first, after: $after) {
@@ -1338,7 +1338,7 @@ it('ignores empty pages when paginating', () => {
       }
     }
   `;
-  const PaginatingBackward = gql`
+  const PaginationBackward = gql`
     query($last: Int!, $before: String) {
       __typename
       items(last: $last, before: $before) {
@@ -1403,17 +1403,17 @@ it('ignores empty pages when paginating', () => {
 
   write(
     store,
-    { query: PaginatingForward, variables: { first: 2 } },
+    { query: PaginationForward, variables: { first: 2 } },
     forwardOne
   );
   write(
     store,
-    { query: PaginatingBackward, variables: { last: 1, before: '1' } },
+    { query: PaginationBackward, variables: { last: 1, before: '1' } },
     backwardBefore
   );
 
   const res = query(store, {
-    query: PaginatingForward,
+    query: PaginationForward,
     variables: { first: 2 },
   });
 
@@ -1421,10 +1421,60 @@ it('ignores empty pages when paginating', () => {
   expect(res.data).toEqual(forwardOne);
   write(
     store,
-    { query: PaginatingForward, variables: { first: 1, after: '2' } },
+    { query: PaginationForward, variables: { first: 1, after: '2' } },
     forwardAfter
   );
 
   expect(res.partial).toBe(false);
   expect(res.data).toEqual(forwardOne);
+});
+
+it('allows for an empty page when this is the only result', () => {
+  const Pagination = gql`
+    query($first: Int!, $after: String) {
+      __typename
+      items(first: $first, after: $after) {
+        __typename
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const pageOne = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      nodes: [],
+      pageInfo: {
+        __typename: 'PageInfo',
+        startCursor: null,
+        endCursor: null,
+      },
+    },
+  };
+
+  write(store, { query: Pagination, variables: { first: 2 } }, pageOne);
+  const res = query(store, {
+    query: Pagination,
+    variables: { first: 2 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(pageOne);
 });
