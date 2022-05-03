@@ -1319,3 +1319,112 @@ it('handles subsequent queries with larger first values', () => {
   expect(res.partial).toBe(false);
   expect(res.data).toEqual(pageTwo);
 });
+
+it('ignores empty pages when paginating', () => {
+  const PaginatingForward = gql`
+    query($first: Int!, $after: String) {
+      __typename
+      items(first: $first, after: $after) {
+        __typename
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+  const PaginatingBackward = gql`
+    query($last: Int!, $before: String) {
+      __typename
+      items(last: $last, before: $before) {
+        __typename
+        nodes {
+          __typename
+          id
+        }
+        pageInfo {
+          __typename
+          startCursor
+          endCursor
+        }
+      }
+    }
+  `;
+
+  const store = new Store({
+    resolvers: {
+      Query: {
+        items: relayPagination(),
+      },
+    },
+  });
+
+  const forwardOne = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      nodes: [itemNode(1), itemNode(2)],
+      pageInfo: {
+        __typename: 'PageInfo',
+        startCursor: '1',
+        endCursor: '2',
+      },
+    },
+  };
+  const forwardAfter = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      nodes: [],
+      pageInfo: {
+        __typename: 'PageInfo',
+        startCursor: null,
+        endCursor: null,
+      },
+    },
+  };
+  const backwardBefore = {
+    __typename: 'Query',
+    items: {
+      __typename: 'ItemsConnection',
+      nodes: [],
+      pageInfo: {
+        __typename: 'PageInfo',
+        startCursor: null,
+        endCursor: null,
+      },
+    },
+  };
+
+  write(
+    store,
+    { query: PaginatingForward, variables: { first: 2 } },
+    forwardOne
+  );
+  write(
+    store,
+    { query: PaginatingBackward, variables: { last: 1, before: '1' } },
+    backwardBefore
+  );
+
+  const res = query(store, {
+    query: PaginatingForward,
+    variables: { first: 2 },
+  });
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(forwardOne);
+  write(
+    store,
+    { query: PaginatingForward, variables: { first: 1, after: '2' } },
+    forwardAfter
+  );
+
+  expect(res.partial).toBe(false);
+  expect(res.data).toEqual(forwardOne);
+});
