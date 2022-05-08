@@ -142,16 +142,15 @@ export const executeExchange = ({
         const contextValue =
           typeof context === 'function' ? context(operation) : context;
 
-        const variableValues = operation.variables
-          ? { ...operation.variables }
-          : operation.variables;
-
-        if (variableValues) {
-          Object.keys(variableValues).forEach(key => {
-            if (typeof variableValues[key] === 'undefined') {
-              delete variableValues[key];
+        // Filter undefined values from variables before calling execute()
+        // to support default values within directives.
+        const variableValues = Object.create(null);
+        if (operation.variables) {
+          for (const key in operation.variables) {
+            if (operation.variables[key] !== undefined) {
+              variableValues[key] = operation.variables[key];
             }
-          });
+          }
         }
 
         return pipe(
