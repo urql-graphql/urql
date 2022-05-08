@@ -141,13 +141,26 @@ export const executeExchange = ({
 
         const contextValue =
           typeof context === 'function' ? context(operation) : context;
+
+        const variableValues = operation.variables
+          ? { ...operation.variables }
+          : operation.variables;
+
+        if (variableValues) {
+          Object.keys(variableValues).forEach(key => {
+            if (typeof variableValues[key] === 'undefined') {
+              delete variableValues[key];
+            }
+          });
+        }
+
         return pipe(
           makeExecuteSource(operation, {
             schema,
             document: operation.query,
             rootValue,
             contextValue,
-            variableValues: operation.variables,
+            variableValues,
             operationName: getOperationName(operation.query),
             fieldResolver,
             typeResolver,
