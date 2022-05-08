@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.3
+
+### Patch Changes
+
+- Support using default values with directives. Previously, using a variables with a default value within a directive would fail the validation if it is empty, by [@fathyb](https://github.com/fathyb) (See [#2435](https://github.com/FormidableLabs/urql/pull/2435))
+
 ## 1.2.2
 
 ### Patch Changes
