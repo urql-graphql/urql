@@ -214,6 +214,9 @@ export const relayPagination = (
       if (page === null) {
         continue;
       }
+      if (page.nodes.length === 0 && page.edges.length === 0 && typename) {
+        continue;
+      }
 
       if (
         mergeMode === 'inwards' &&
