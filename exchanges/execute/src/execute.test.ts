@@ -187,7 +187,7 @@ describe('on operation', () => {
     expect(fetchMock).toBeCalledTimes(1);
   });
 
-  it('should correctly validade variable default values with directives', async () => {
+  it('should trim undefined values before calling execute()', async () => {
     const contextValue = 'USER_ID=123';
 
     const operation = makeOperation(
@@ -220,6 +220,12 @@ describe('on operation', () => {
       typeResolver: undefined,
       subscribeFieldResolver: undefined,
     });
+
+    const variables = mocked(execute).mock.calls[0][0].variableValues;
+
+    for (const key in variables) {
+      expect(variables[key]).not.toBeUndefined();
+    }
   });
 });
 
