@@ -199,8 +199,6 @@ describe('on operation', () => {
       context
     );
 
-    mocked(execute).mockClear();
-
     await pipe(
       fromValue(operation),
       executeExchange({ schema, context: contextValue })(exchangeArgs),
