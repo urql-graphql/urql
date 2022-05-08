@@ -141,13 +141,25 @@ export const executeExchange = ({
 
         const contextValue =
           typeof context === 'function' ? context(operation) : context;
+
+        // Filter undefined values from variables before calling execute()
+        // to support default values within directives.
+        const variableValues = Object.create(null);
+        if (operation.variables) {
+          for (const key in operation.variables) {
+            if (operation.variables[key] !== undefined) {
+              variableValues[key] = operation.variables[key];
+            }
+          }
+        }
+
         return pipe(
           makeExecuteSource(operation, {
             schema,
             document: operation.query,
             rootValue,
             contextValue,
-            variableValues: operation.variables,
+            variableValues,
             operationName: getOperationName(operation.query),
             fieldResolver,
             typeResolver,

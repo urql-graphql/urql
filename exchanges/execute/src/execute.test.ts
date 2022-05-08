@@ -22,7 +22,11 @@ import {
   empty,
   Source,
 } from 'wonka';
-import { queryOperation, subscriptionOperation } from '@urql/core/test-utils';
+import {
+  context,
+  queryOperation,
+  subscriptionOperation,
+} from '@urql/core/test-utils';
 import {
   makeErrorResult,
   makeOperation,
@@ -181,6 +185,45 @@ describe('on operation', () => {
     );
     expect(mocked(execute)).toBeCalledTimes(1);
     expect(fetchMock).toBeCalledTimes(1);
+  });
+
+  it('should trim undefined values before calling execute()', async () => {
+    const contextValue = 'USER_ID=123';
+
+    const operation = makeOperation(
+      'query',
+      {
+        ...queryOperation,
+        variables: { ...queryOperation.variables, withLastName: undefined },
+      },
+      context
+    );
+
+    await pipe(
+      fromValue(operation),
+      executeExchange({ schema, context: contextValue })(exchangeArgs),
+      take(1),
+      toPromise
+    );
+
+    expect(mocked(execute)).toBeCalledTimes(1);
+    expect(mocked(execute)).toBeCalledWith({
+      schema,
+      document: queryOperation.query,
+      rootValue: undefined,
+      contextValue: contextValue,
+      variableValues: queryOperation.variables,
+      operationName: expectedQueryOperationName,
+      fieldResolver: undefined,
+      typeResolver: undefined,
+      subscribeFieldResolver: undefined,
+    });
+
+    const variables = mocked(execute).mock.calls[0][0].variableValues;
+
+    for (const key in variables) {
+      expect(variables[key]).not.toBeUndefined();
+    }
   });
 });
 
