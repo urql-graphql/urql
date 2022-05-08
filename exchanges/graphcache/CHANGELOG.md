@@ -1,5 +1,16 @@
 # @urql/exchange-graphcache
 
+## 4.4.0
+
+### Minor Changes
+
+- Fix issues with continuously updating operations (i.e. subscriptions and `hasNext: true` queries) by shifting their layers in Graphcache behind those that are still awaiting a result. This causes continuous updates to not overwrite one-off query results while still keeping continuously updating operations at the highest possible layer, by [@kitten](https://github.com/kitten) (See [#2419](https://github.com/FormidableLabs/urql/pull/2419))
+
+### Patch Changes
+
+- ⚠️ Fix ignore empty relay edges when using the `relayPagination` resolver, by [@tgriesser](https://github.com/tgriesser) (See [#2431](https://github.com/FormidableLabs/urql/pull/2431))
+- Prevent creating unnecessary layers, which should improve performance slightly, by [@kitten](https://github.com/kitten) (See [#2419](https://github.com/FormidableLabs/urql/pull/2419))
+
 ## 4.3.6
 
 ### Patch Changes
