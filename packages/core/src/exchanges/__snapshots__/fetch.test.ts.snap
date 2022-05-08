@@ -16,7 +16,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3558036631,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -81,31 +81,7 @@ Object {
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
-                      "directives": Array [
-                        Object {
-                          "arguments": Array [
-                            Object {
-                              "kind": "Argument",
-                              "name": Object {
-                                "kind": "Name",
-                                "value": "if",
-                              },
-                              "value": Object {
-                                "kind": "Variable",
-                                "name": Object {
-                                  "kind": "Name",
-                                  "value": "withLastName",
-                                },
-                              },
-                            },
-                          ],
-                          "kind": "Directive",
-                          "name": Object {
-                            "kind": "Name",
-                            "value": "include",
-                          },
-                        },
-                      ],
+                      "directives": Array [],
                       "kind": "Field",
                       "name": Object {
                         "kind": "Name",
@@ -138,37 +114,15 @@ Object {
                 },
               },
             },
-            Object {
-              "defaultValue": Object {
-                "kind": "BooleanValue",
-                "value": true,
-              },
-              "directives": Array [],
-              "kind": "VariableDefinition",
-              "type": Object {
-                "kind": "NamedType",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "Boolean",
-                },
-              },
-              "variable": Object {
-                "kind": "Variable",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "withLastName",
-                },
-              },
-            },
           ],
         },
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 144,
+        "end": 86,
         "source": Object {
           "body": "# getUser
-query getUser($name: String $withLastName: Boolean = true) { user(name: $name) { id firstName lastName @include(if: $withLastName) } }",
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -211,7 +165,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3558036631,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -276,31 +230,7 @@ Object {
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
-                      "directives": Array [
-                        Object {
-                          "arguments": Array [
-                            Object {
-                              "kind": "Argument",
-                              "name": Object {
-                                "kind": "Name",
-                                "value": "if",
-                              },
-                              "value": Object {
-                                "kind": "Variable",
-                                "name": Object {
-                                  "kind": "Name",
-                                  "value": "withLastName",
-                                },
-                              },
-                            },
-                          ],
-                          "kind": "Directive",
-                          "name": Object {
-                            "kind": "Name",
-                            "value": "include",
-                          },
-                        },
-                      ],
+                      "directives": Array [],
                       "kind": "Field",
                       "name": Object {
                         "kind": "Name",
@@ -333,37 +263,15 @@ Object {
                 },
               },
             },
-            Object {
-              "defaultValue": Object {
-                "kind": "BooleanValue",
-                "value": true,
-              },
-              "directives": Array [],
-              "kind": "VariableDefinition",
-              "type": Object {
-                "kind": "NamedType",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "Boolean",
-                },
-              },
-              "variable": Object {
-                "kind": "Variable",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "withLastName",
-                },
-              },
-            },
           ],
         },
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 144,
+        "end": 86,
         "source": Object {
           "body": "# getUser
-query getUser($name: String $withLastName: Boolean = true) { user(name: $name) { id firstName lastName @include(if: $withLastName) } }",
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -409,7 +317,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3558036631,
+      "__key": 3521976120,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -474,31 +382,7 @@ Object {
                     Object {
                       "alias": undefined,
                       "arguments": Array [],
-                      "directives": Array [
-                        Object {
-                          "arguments": Array [
-                            Object {
-                              "kind": "Argument",
-                              "name": Object {
-                                "kind": "Name",
-                                "value": "if",
-                              },
-                              "value": Object {
-                                "kind": "Variable",
-                                "name": Object {
-                                  "kind": "Name",
-                                  "value": "withLastName",
-                                },
-                              },
-                            },
-                          ],
-                          "kind": "Directive",
-                          "name": Object {
-                            "kind": "Name",
-                            "value": "include",
-                          },
-                        },
-                      ],
+                      "directives": Array [],
                       "kind": "Field",
                       "name": Object {
                         "kind": "Name",
@@ -531,37 +415,15 @@ Object {
                 },
               },
             },
-            Object {
-              "defaultValue": Object {
-                "kind": "BooleanValue",
-                "value": true,
-              },
-              "directives": Array [],
-              "kind": "VariableDefinition",
-              "type": Object {
-                "kind": "NamedType",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "Boolean",
-                },
-              },
-              "variable": Object {
-                "kind": "Variable",
-                "name": Object {
-                  "kind": "Name",
-                  "value": "withLastName",
-                },
-              },
-            },
           ],
         },
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 144,
+        "end": 86,
         "source": Object {
           "body": "# getUser
-query getUser($name: String $withLastName: Boolean = true) { user(name: $name) { id firstName lastName @include(if: $withLastName) } }",
+query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -578,4 +440,4 @@ query getUser($name: String $withLastName: Boolean = true) { user(name: $name) {
 }
 `;
 
-exports[`on success returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String, $withLastName: Boolean = true) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName @include(if: $withLastName)\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
+exports[`on success returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;

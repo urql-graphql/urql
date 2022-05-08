@@ -20,11 +20,11 @@ export const context: OperationContext = {
 export const queryGql: GraphQLRequest = {
   key: 2,
   query: gql`
-    query getUser($name: String, $withLastName: Boolean = true) {
+    query getUser($name: String) {
       user(name: $name) {
         id
         firstName
-        lastName @include(if: $withLastName)
+        lastName
       }
     }
   `,
