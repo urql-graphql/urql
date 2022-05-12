@@ -168,6 +168,15 @@ export const makeFetchSource = (
           next(result);
           complete();
         }
+
+        const result = makeErrorResult(
+          operation,
+          statusNotOk ? new Error(response.statusText) : error,
+          response
+        );
+
+        next(result);
+        complete();
       });
 
     return () => {
