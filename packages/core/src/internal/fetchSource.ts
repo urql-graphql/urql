@@ -158,17 +158,6 @@ export const makeFetchSource = (
           throw error;
         }
 
-        if (error.name !== 'AbortError') {
-          const result = makeErrorResult(
-            operation,
-            statusNotOk ? new Error(response.statusText) : error,
-            response
-          );
-
-          next(result);
-          complete();
-        }
-
         const result = makeErrorResult(
           operation,
           statusNotOk ? new Error(response.statusText) : error,
