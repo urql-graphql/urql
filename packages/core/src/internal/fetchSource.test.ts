@@ -28,20 +28,20 @@ afterAll(() => {
   (global as any).AbortController = undefined;
 });
 
-const response = {
+const response = JSON.stringify({
   status: 200,
   data: {
     data: {
       user: 1200,
     },
   },
-};
+});
 
 describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
-      json: jest.fn().mockResolvedValue(response),
+      text: jest.fn().mockResolvedValue(response),
     });
   });
 
@@ -63,7 +63,7 @@ describe('on success', () => {
     const fetchOptions = {};
     const fetcher = jest.fn().mockResolvedValue({
       status: 200,
-      json: jest.fn().mockResolvedValue(response),
+      text: jest.fn().mockResolvedValue(response),
     });
 
     const data = await pipe(
@@ -91,7 +91,7 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
-      json: jest.fn().mockResolvedValue({}),
+      text: jest.fn().mockResolvedValue({}),
     });
   });
 
