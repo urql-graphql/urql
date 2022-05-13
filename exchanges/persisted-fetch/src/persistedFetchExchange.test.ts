@@ -28,14 +28,14 @@ afterEach(() => {
 });
 
 it('accepts successful persisted query responses', async () => {
-  const expected = {
+  const expected = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch.mockResolvedValueOnce({
-    json: () => Promise.resolve(expected),
+    text: () => Promise.resolve(expected),
   });
 
   const actual = await pipe(
@@ -50,22 +50,22 @@ it('accepts successful persisted query responses', async () => {
 });
 
 it('supports cache-miss persisted query errors', async () => {
-  const expectedMiss = {
+  const expectedMiss = JSON.stringify({
     errors: [{ message: 'PersistedQueryNotFound' }],
-  };
+  });
 
-  const expectedRetry = {
+  const expectedRetry = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedMiss),
+      text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedRetry),
+      text: () => Promise.resolve(expectedRetry),
     });
 
   const actual = await pipe(
@@ -81,22 +81,22 @@ it('supports cache-miss persisted query errors', async () => {
 });
 
 it('supports GET exclusively for persisted queries', async () => {
-  const expectedMiss = {
+  const expectedMiss = JSON.stringify({
     errors: [{ message: 'PersistedQueryNotFound' }],
-  };
+  });
 
-  const expectedRetry = {
+  const expectedRetry = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedMiss),
+      text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedRetry),
+      text: () => Promise.resolve(expectedRetry),
     });
 
   const actual = await pipe(
@@ -114,25 +114,25 @@ it('supports GET exclusively for persisted queries', async () => {
 });
 
 it('supports unsupported persisted query errors', async () => {
-  const expectedMiss = {
+  const expectedMiss = JSON.stringify({
     errors: [{ message: 'PersistedQueryNotSupported' }],
-  };
+  });
 
-  const expectedRetry = {
+  const expectedRetry = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedMiss),
+      text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedRetry),
+      text: () => Promise.resolve(expectedRetry),
     })
     .mockResolvedValueOnce({
-      json: () => Promise.resolve(expectedRetry),
+      text: () => Promise.resolve(expectedRetry),
     });
 
   const actual = await pipe(
@@ -148,14 +148,14 @@ it('supports unsupported persisted query errors', async () => {
 });
 
 it('correctly generates an SHA256 hash', async () => {
-  const expected = {
+  const expected = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch.mockResolvedValue({
-    json: () => Promise.resolve(expected),
+    text: () => Promise.resolve(expected),
   });
 
   const queryHash = await hash(print(queryOperation.query));
@@ -185,14 +185,14 @@ it('correctly generates an SHA256 hash', async () => {
 });
 
 it('supports a custom hash function', async () => {
-  const expected = {
+  const expected = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch.mockResolvedValueOnce({
-    json: () => Promise.resolve(expected),
+    text: () => Promise.resolve(expected),
   });
 
   const hashFn = jest.fn((_input: string, _doc: DocumentNode) => {
@@ -228,14 +228,14 @@ it('supports a custom hash function', async () => {
 });
 
 it('falls back to a non-persisted query if the hash is falsy', async () => {
-  const expected = {
+  const expected = JSON.stringify({
     data: {
       test: true,
     },
-  };
+  });
 
   fetch.mockResolvedValueOnce({
-    json: () => Promise.resolve(expected),
+    text: () => Promise.resolve(expected),
   });
 
   const hashFn = jest.fn(() => Promise.resolve(''));

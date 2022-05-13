@@ -51,7 +51,12 @@ export const makeFetchSource = (
             const result = makeResult(operation, payload, response);
             onResult(result);
           } catch (e) {
-            throw new Error(text);
+            const result = makeErrorResult(
+              operation,
+              new Error(text),
+              response
+            );
+            onResult(result);
           }
         });
       }
