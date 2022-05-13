@@ -44,10 +44,15 @@ export const makeFetchSource = (
       const contentType =
         (response.headers && response.headers.get('Content-Type')) || '';
       if (!/multipart\/mixed/i.test(contentType)) {
-        return response.json().then(payload => {
-          const result = makeResult(operation, payload, response);
-          hasResults = true;
-          onResult(result);
+        return response.text().then(text => {
+          try {
+            const payload = JSON.parse(text);
+            hasResults = true;
+            const result = makeResult(operation, payload, response);
+            onResult(result);
+          } catch (e) {
+            throw new Error(text);
+          }
         });
       }
 
