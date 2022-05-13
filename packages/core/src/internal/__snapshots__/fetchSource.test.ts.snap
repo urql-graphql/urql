@@ -3,7 +3,7 @@
 exports[`on error ignores the error when a result is available 1`] = `
 Object {
   "data": undefined,
-  "error": [CombinedError: [Network] ],
+  "error": [CombinedError: [Network] [object Object]],
   "extensions": undefined,
   "operation": Object {
     "context": Object {
@@ -142,7 +142,7 @@ query getUser($name: String) { user(name: $name) { id firstName lastName } }",
 exports[`on error returns error data 1`] = `
 Object {
   "data": undefined,
-  "error": [CombinedError: [Network] ],
+  "error": [CombinedError: [Network] [object Object]],
   "extensions": undefined,
   "operation": Object {
     "context": Object {
@@ -281,7 +281,7 @@ query getUser($name: String) { user(name: $name) { id firstName lastName } }",
 exports[`on error returns error data with status 400 and manual redirect mode 1`] = `
 Object {
   "data": undefined,
-  "error": [CombinedError: [Network] ],
+  "error": [CombinedError: [Network] [object Object]],
   "extensions": undefined,
   "operation": Object {
     "context": Object {
