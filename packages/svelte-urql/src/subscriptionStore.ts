@@ -36,7 +36,11 @@ export function subscriptionStore<Data, Variables extends object = {}>(
   // combine default with operation details
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    operation: args.client.createRequestOperation('subscription', request),
+    operation: args.client.createRequestOperation(
+      'subscription',
+      request,
+      context
+    ),
   };
 
   // create a store for fetch results

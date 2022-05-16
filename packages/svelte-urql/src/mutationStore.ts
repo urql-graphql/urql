@@ -27,7 +27,7 @@ export function mutationStore<Data, Variables extends object = {}>(
   // combine default with operation details
   const baseResult: AnnotatedOperationResult<Data, Variables> = {
     ...defaultBaseResult,
-    operation: args.client.createRequestOperation('mutation', request),
+    operation: args.client.createRequestOperation('mutation', request, context),
   };
 
   // create a store for fetch results
