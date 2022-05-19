@@ -61,12 +61,7 @@ export function subscriptionStore<Data, Variables extends object = {}>(
     filter(isPaused => !isPaused),
 
     // now we want to fetch the return type, so we must concatMap
-    concatMap(() =>
-      fetchProcess(
-        args.client.executeSubscription<Data, Variables>(request, context),
-        baseResult
-      )
-    ),
+    concatMap(() => fetchProcess(baseResult, args.client)),
 
     // update the store whenever a result is emitted
     subscribe(annotatedResult => writableResult$.set(annotatedResult))

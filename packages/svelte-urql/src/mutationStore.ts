@@ -37,10 +37,7 @@ export function mutationStore<Data, Variables extends object = {}>(
 
   // make the store reactive (ex: change when we receive a response)
   const wonkaSubscription = pipe(
-    fetchProcess(
-      args.client.executeMutation<Data, Variables>(request, context),
-      baseResult
-    ),
+    fetchProcess(baseResult, args.client),
 
     // update the store whenever a result is emitted
     subscribe(annotatedResult => writableResult$.set(annotatedResult))

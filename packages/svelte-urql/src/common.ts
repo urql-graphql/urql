@@ -6,8 +6,7 @@ import type {
   Client,
   TypedDocumentNode,
 } from '@urql/core';
-import { pipe, fromValue, concat, map, makeSubject } from 'wonka';
-import type { Source } from 'wonka';
+import { pipe, fromValue, concat, map, makeSubject, share } from 'wonka';
 import type { DocumentNode } from 'graphql';
 
 /**
@@ -86,23 +85,25 @@ export const defaultBaseResult = {
  * 3. EMIT: build a result from response (fetching:false)
  */
 export function fetchProcess<Data, Variables>(
-  executeOperation: Source<OperationResult<Data, Variables>>,
-  baseResult: AnnotatedOperationResult<Data, Variables>
+  baseResult: AnnotatedOperationResult<Data, Variables>,
+  client: Client
 ) {
-  // concat emits the items sequentially
-  return concat([
-    // start with fetching:true
-    fromValue({ ...baseResult, fetching: true }),
+  /** fetching:true when starting */
+  const baseSource = pipe(fromValue({ ...baseResult, fetching: true }), share);
 
-    // react to response
-    pipe(
-      // fetch
-      executeOperation,
+  /** fetch via urql */
+  const urqlSource = pipe(
+    client.executeRequestOperation(baseResult.operation),
 
-      // build annotated result from base (set fetching:false)
-      map(response => ({ ...baseResult, ...response }))
-    ),
-  ]);
+    // build annotated result from base (set fetching:false)
+    map(response => ({ ...baseResult, ...response })),
+    share
+  );
+
+  // concat combines sources into a sequential source
+  const source = pipe(concat([baseSource, urqlSource]), share);
+
+  return source;
 }
 
 /**
