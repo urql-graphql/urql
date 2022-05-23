@@ -69,7 +69,6 @@
     "@babel/plugin-transform-react-jsx": "^7.13.12",
     "@changesets/cli": "^2.16.0",
     "@changesets/get-github-info": "0.5.0",
-    "@cypress/vite-dev-server": "^2.2.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^18.0.0",
@@ -115,7 +114,6 @@
     "rollup-plugin-visualizer": "^5.4.1",
     "tar": "^6.1.0",
     "terser": "^5.7.0",
-    "typescript": "^4.2.4",
-    "vite": "^2.8.6"
+    "typescript": "^4.2.4"
   }
 }
