@@ -88,7 +88,7 @@ const client = createClient({
         // if your refresh logic is in graphQL, you must use this mutate function to call it
         // if your refresh logic is a separate RESTful endpoint, use fetch or similar
         const result = await mutate(refreshMutation, {
-          token: authState!.refreshToken,
+          token: authState?.refreshToken,
         });
 
         if (result.data?.refreshLogin) {
