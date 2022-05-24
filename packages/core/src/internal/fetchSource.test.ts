@@ -28,20 +28,20 @@ afterAll(() => {
   (global as any).AbortController = undefined;
 });
 
-const response = {
+const response = JSON.stringify({
   status: 200,
   data: {
     data: {
       user: 1200,
     },
   },
-};
+});
 
 describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
-      json: jest.fn().mockResolvedValue(response),
+      text: jest.fn().mockResolvedValue(response),
     });
   });
 
@@ -63,7 +63,7 @@ describe('on success', () => {
     const fetchOptions = {};
     const fetcher = jest.fn().mockResolvedValue({
       status: 200,
-      json: jest.fn().mockResolvedValue(response),
+      text: jest.fn().mockResolvedValue(response),
     });
 
     const data = await pipe(
@@ -91,7 +91,8 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
-      json: jest.fn().mockResolvedValue({}),
+      statusText: 'Forbidden',
+      text: jest.fn().mockResolvedValue('{}'),
     });
   });
 
@@ -123,6 +124,28 @@ describe('on error', () => {
     );
 
     expect(data).toMatchSnapshot();
+  });
+});
+
+describe('on unexpected plain text responses', () => {
+  beforeEach(() => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: new Map([['Content-Type', 'text/plain']]),
+      text: jest.fn().mockResolvedValue('Some Error Message'),
+    });
+  });
+
+  it('returns error data', async () => {
+    const fetchOptions = {};
+    const result = await pipe(
+      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
+      toPromise
+    );
+
+    expect(result.error).toMatchObject({
+      message: '[Network] Some Error Message',
+    });
   });
 });
 

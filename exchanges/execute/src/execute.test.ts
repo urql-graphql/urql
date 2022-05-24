@@ -167,7 +167,9 @@ describe('on operation', () => {
 
     fetchMock.mockResolvedValue({
       status: 200,
-      json: jest.fn().mockResolvedValue({ data: mockHttpResponseData }),
+      text: jest
+        .fn()
+        .mockResolvedValue(JSON.stringify({ data: mockHttpResponseData })),
     });
 
     const responseFromFetchExchange = await pipe(
