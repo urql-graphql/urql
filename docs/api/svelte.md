@@ -5,72 +5,43 @@ order: 3
 
 # Svelte API
 
-## operationStore
+## queryStore
 
-Accepts three arguments as inputs, where only the first one — `query` — is required.
+The `queryStore` factory accepts properties as inputs and returns a Svelte pausable, readable store
+of results, with type `OperationResultStore & Pausable`.
 
-| Argument    | Type                     | Description                                                                        |
-| ----------- | ------------------------ | ---------------------------------------------------------------------------------- |
-| `query`     | `string \| DocumentNode` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
-| `variables` | `?object`                | The variables to be used with the GraphQL request.                                 |
-| `context`   | `?object`                | Holds the contextual information for the query.                                    |
+| Argument        | Type                       | Description                                                                                              |
+| --------------- | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `client`        | `Client`                   | The [`Client`](./core.md#Client) to use for the operation.                                               |
+| `query`         | `string \| DocumentNode \` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode.                       |
+| `variables`     | `?object`                  | The variables to be used with the GraphQL request.                                                       |
+| `requestPolicy` | `?RequestPolicy`           | An optional [request policy](./core.md#requestpolicy) that should be used specifying the cache strategy. |
+| `pause`         | `?boolean`                 | A boolean flag instructing [execution to be paused](../basics/vue.md#pausing-usequery).                  |
+| `context`       | `?object`                  | Holds the contextual information for the query.                                                          |
 
-This is a [Svelte Writable Store](https://svelte.dev/docs#writable) that is used by other utilities
-listed in these docs to read [`Operation` inputs](./core.md#operation) from and write
-[`OperationResult` outputs](./core.md#operationresult) to.
+This store is pausable, which means that the result has methods on it to `pause()` or `resume()`
+the subscription of the operation.
 
-The store has several properties on its value. The **writable properties** of it are inputs that are
-used by either [`query`](#query), [`mutation`](#mutation), or [`subscription`](#subscription) to
-create an [`Operation`](./core.md#operation) to execute. These are `query`, `variables`, and
-`context`; the same properties that the `operationStore` accepts as arguments on creation.
+[Read more about how to use the `queryStore` API on the "Queries" page.](../basics/svelte.md#queries)
 
-Additionally the `context` may have a `pause: boolean` property that instructs the `query` and
-`subscription` operations to pause execution and freeze the result.
+## mutationStore
 
-Furthermore the store exposes some **readonly properties** which represent the operation's progress
-and [result](./core.md#operationresult).
+The `mutationStore` factory accepts properties as inputs and returns a Svelte readable store of a result.
 
-| Prop         | Type                   | Description                                                                                                                                        |
-| ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`       | `?any`                 | Data returned by the specified query                                                                                                               |
-| `error`      | `?CombinedError`       | A [`CombinedError`](./core.md#combinederror) instances that wraps network or `GraphQLError`s (if any)                                              |
-| `extensions` | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                              |
-| `stale`      | `boolean`              | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon.  |
-| `fetching`   | `boolean`              | A flag that indicates whether the operation is currently in progress, which means that the `data` and `error` is out-of-date for the given inputs. |
+| Argument    | Type                       | Description                                                                        |
+| ----------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| `client`    | `Client`                   | The [`Client`](./core.md#Client) to use for the operation.                         |
+| `query`     | `string \| DocumentNode \` | The query to be executed. Accepts as a plain string query or GraphQL DocumentNode. |
+| `variables` | `?object`                  | The variables to be used with the GraphQL request.                                 |
+| `context`   | `?object`                  | Holds the contextual information for the query.                                    |
 
-All of the writable properties are updatable either via the common Svelte Writable's `set` or
-`update` methods or directly. The `operationStore` exposes setters for the writable properties which
-will automatically update the store and notify reactive subscribers.
+[Read more about how to use the `mutation` API on the "Mutations"
+page.](../basics/svelte.md#mutations)
 
-In development, trying to update the _readonly_ properties directly or via the `set` or `update`
-method will result in a `TypeError` being thrown.
+## subscriptionStore
 
-An additional non-standard method on the store is `reexecute`, which does _almost_ the same as
-assigning a new context to the operation. It is syntactic sugar to ensure that an operation may be
-reexecuted at any point in time:
-
-```js
-operationStore(...).reexecute();
-operationStore(...).reexecute({ requestPolicy: 'network-only' });
-```
-
-[Read more about `writable` stores on the Svelte API docs.](https://svelte.dev/docs#writable)
-
-## query
-
-The `query` utility function only accepts an `operationStore` as its only argument. Per
-`operationStore` it should only be called once per component as it lives alongside the component and
-hooks into its `onDestroy` lifecycle method. This means that we must avoid passing a reactive
-variable to it, and instead must pass the raw `operationStore`.
-
-This function will return the `operationStore` itself that has been passed.
-
-[Read more about how to use the `query` API on the "Queries" page.](../basics/svelte.md#queries)
-
-## subscription
-
-The `subscription` utility function accepts an `operationStore` as its first argument, like the
-[`query` function](#query). It should also per `operationStore` be called once per component.
+The `subscriptionStore` utility function accepts the same inputs as `queryStore` does as its first
+argument, [see above](#querystore).
 
 The function also optionally accepts a second argument, a `handler` function. This function has the
 following type signature:
@@ -83,35 +54,43 @@ This function will be called with the previous data (or `undefined`) and the new
 incoming from a subscription event, and may be used to "reduce" the data over time, altering the
 value of `result.data`.
 
-`subscription` itself will return the `operationStore` that has been passed when called.
-
 [Read more about how to use the `subscription` API on the "Subscriptions"
 page.](../advanced/subscriptions.md#svelte)
 
-## mutation
+## OperationResultStore
 
-The `mutation` utility function either accepts an `operationStore` as its only argument or an object
-containing `query`, `variables`, and `context` properties. When it receives the latter it will
-create an `operationStore` automatically.
+A Svelte Readble store of an [`OperationResult`](./core.md#operationresult).
+This store will be updated as the incoming data changes.
 
-The function will return an `executeMutation` callback, which can be used to trigger the mutation.
-This callback optionally accepts a `variables` argument and a `context` argument of type
-[`Partial<OperationContext>`](./core.md#operationcontext). If these arguments are passed, they will
-automatically update the `operationStore` before starting the mutation.
+| Prop         | Type                   | Description                                                                                                                                        |
+| ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`       | `?any`                 | Data returned by the specified query                                                                                                               |
+| `error`      | `?CombinedError`       | A [`CombinedError`](./core.md#combinederror) instances that wraps network or `GraphQLError`s (if any)                                              |
+| `extensions` | `?Record<string, any>` | Extensions that the GraphQL server may have returned.                                                                                              |
+| `stale`      | `boolean`              | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon.  |
+| `fetching`   | `boolean`              | A flag that indicates whether the operation is currently in progress, which means that the `data` and `error` is out-of-date for the given inputs. |
 
-The `executeMutation` callback will return a promise which resolves to the `operationStore` once the
-mutation has been completed.
+## Pausable
 
-[Read more about how to use the `mutation` API on the "Mutations"
-page.](../basics/svelte.md#mutations)
+The `queryStore` and `subscriptionStore`'s stores are pausable. This means they inherit the
+following properties from the `Pausable` store.
+
+| Prop        | Type                | Description                                                                                                                  |
+| ----------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `isPaused$` | `Readable<boolean>` | A Svelte readable store indicating whether the operation is currently paused. Essentially, this is equivalent to `!fetching` |
+| `pause()`   | `pause(): void`     | This method pauses the ongoing operation.                                                                                    |
+| `resume()`  | `resume(): void`    | This method resumes the previously paused operation.                                                                         |
 
 ## Context API
 
-In Svelte the [`Client`](./core.md#client) is passed around using [Svelte's Context
-API](https://svelte.dev/tutorial/context-api). `@urql/svelte` wraps around Svelte's
-[`setContext`](https://svelte.dev/docs#setContext) and
-[`getContext`](https://svelte.dev/docs#getContext) functions and exposes:
+In `urql`'s Svelte bindings, the [`Client`](./core.md#client) is passed into the factories for
+stores above manually. This is to cater to greater flexibility. However, for convenience's sake,
+instead of keeping a `Client` singleton, we may also use [Svelte's Context
+API](https://svelte.dev/tutorial/context-api).
 
-- `setClient`
-- `getClient`
-- `initClient` (a shortcut for `createClient` + `setClient`)
+`@urql/svelte` provides wrapper functions around Svelte's [`setContext`](https://svelte.dev/docs#setContext) and
+[`getContext`](https://svelte.dev/docs#getContext) functions:
+
+- `setContextClient`
+- `getContextClient`
+- `initContextClient` (a shortcut for `createClient` + `setContextClient`)
