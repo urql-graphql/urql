@@ -1,4 +1,5 @@
 export * from '@urql/core';
-export * from './operationStore';
+export * from './queryStore';
+export * from './mutationStore';
+export * from './subscriptionStore';
 export * from './context';
-export * from './operations';
