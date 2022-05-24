@@ -5,7 +5,7 @@ import {
   TypedDocumentNode,
   createRequest,
 } from '@urql/core';
-import { pipe, map, fromValue, scan, subscribe, concat } from 'wonka';
+import { pipe, map, scan, subscribe } from 'wonka';
 import { derived, writable } from 'svelte/store';
 
 import {
@@ -41,20 +41,17 @@ export function mutationStore<Data = any, Result = Data, Variables = object>(
   const result$ = writable(initialState);
 
   const subscription = pipe(
-    concat<Partial<OperationResultState<Data, Variables>>>([
-      pipe(
-        args.client.executeRequestOperation(operation),
-        map(({ stale, data, error, extensions, operation }) => ({
-          fetching: false,
-          stale: !!stale,
-          data,
-          error,
-          operation,
-          extensions,
-        }))
-      ),
-      fromValue({ fetching: false }),
-    ]),
+    pipe(
+      args.client.executeRequestOperation(operation),
+      map(({ stale, data, error, extensions, operation }) => ({
+        fetching: false,
+        stale: !!stale,
+        data,
+        error,
+        operation,
+        extensions,
+      }))
+    ),
     scan((result: OperationResultState<Result, Variables>, partial: any) => {
       // If a handler has been passed, it's used to merge new data in
       const data =
