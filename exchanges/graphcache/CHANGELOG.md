@@ -1,5 +1,14 @@
 # @urql/exchange-graphcache
 
+## 4.4.1
+
+### Patch Changes
+
+- Switch `isFragmentHeuristicallyMatching()` to always return `true` for writes, so that we give every fragment a chance to be applied and to write to the cache, by [@kitten](https://github.com/kitten) (See [#2455](https://github.com/FormidableLabs/urql/pull/2455))
+- ⚠️ Fix default storage persisting data after `clear()` was called on it, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2458](https://github.com/FormidableLabs/urql/pull/2458))
+- Updated dependencies (See [#2446](https://github.com/FormidableLabs/urql/pull/2446), [#2456](https://github.com/FormidableLabs/urql/pull/2456), and [#2457](https://github.com/FormidableLabs/urql/pull/2457))
+  - @urql/core@2.5.0
+
 ## 4.4.0
 
 ### Minor Changes
