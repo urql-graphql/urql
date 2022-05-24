@@ -40,7 +40,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
   const ENTRIES_STORE_NAME = 'entries';
   const METADATA_STORE_NAME = 'metadata';
 
-  const batch: Record<string, string | undefined> = Object.create(null);
+  let batch: Record<string, string | undefined> = Object.create(null);
   const timestamp = Math.floor(new Date().valueOf() / (1000 * 60 * 60 * 24));
   const maxAge = timestamp - (opts.maxAge || 7);
 
@@ -105,6 +105,7 @@ export const makeDefaultStorage = (opts?: StorageOptions): DefaultStorage => {
         );
         transaction.objectStore(METADATA_STORE_NAME).clear();
         transaction.objectStore(ENTRIES_STORE_NAME).clear();
+        batch = Object.create(null);
         return getTransactionPromise(transaction);
       });
     },
