@@ -2,4 +2,4 @@
 '@urql/core': patch
 ---
 
-Handle text responses correctly
+Passthrough responses with content type of `text/*` as error messages.

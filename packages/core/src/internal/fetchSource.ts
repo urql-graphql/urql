@@ -43,21 +43,13 @@ export const makeFetchSource = (
       // NOTE: Guarding against fetch polyfills here
       const contentType =
         (response.headers && response.headers.get('Content-Type')) || '';
-      if (!/multipart\/mixed/i.test(contentType)) {
+      if (/text\//i.test(contentType)) {
         return response.text().then(text => {
-          try {
-            const payload = JSON.parse(text);
-            hasResults = true;
-            const result = makeResult(operation, payload, response);
-            onResult(result);
-          } catch (e) {
-            const result = makeErrorResult(
-              operation,
-              new Error(text),
-              response
-            );
-            onResult(result);
-          }
+          onResult(makeErrorResult(operation, new Error(text), response));
+        });
+      } else if (!/multipart\/mixed/i.test(contentType)) {
+        return response.text().then(payload => {
+          onResult(makeResult(operation, JSON.parse(payload), response));
         });
       }
 
@@ -170,7 +162,11 @@ export const makeFetchSource = (
 
         const result = makeErrorResult(
           operation,
-          statusNotOk ? new Error(response.statusText) : error,
+          statusNotOk
+            ? response.statusText
+              ? new Error(response.statusText)
+              : error
+            : error,
           response
         );
 

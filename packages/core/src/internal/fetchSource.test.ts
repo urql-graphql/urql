@@ -91,7 +91,8 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
-      text: jest.fn().mockResolvedValue({}),
+      statusText: 'Forbidden',
+      text: jest.fn().mockResolvedValue('{}'),
     });
   });
 
@@ -123,6 +124,28 @@ describe('on error', () => {
     );
 
     expect(data).toMatchSnapshot();
+  });
+});
+
+describe('on unexpected plain text responses', () => {
+  beforeEach(() => {
+    fetch.mockResolvedValue({
+      status: 200,
+      headers: new Map([['Content-Type', 'text/plain']]),
+      text: jest.fn().mockResolvedValue('Some Error Message'),
+    });
+  });
+
+  it('returns error data', async () => {
+    const fetchOptions = {};
+    const result = await pipe(
+      makeFetchSource(queryOperation, 'https://test.com/graphql', fetchOptions),
+      toPromise
+    );
+
+    expect(result.error).toMatchObject({
+      message: '[Network] Some Error Message',
+    });
   });
 });
 
