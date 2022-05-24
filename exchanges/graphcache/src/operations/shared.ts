@@ -17,7 +17,7 @@ import {
 } from '../ast';
 
 import { warn, pushDebugNode, popDebugNode } from '../helpers/help';
-import { hasField } from '../store/data';
+import { hasField, isWriting } from '../store/data';
 import { Store, keyOfField } from '../store';
 
 import { getFieldArguments, shouldInclude, isInterfaceOfType } from '../ast';
@@ -141,11 +141,14 @@ const isFragmentHeuristicallyMatching = (
     16
   );
 
-  return !getSelectionSet(node).some(node => {
-    if (!isFieldNode(node)) return false;
-    const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
-    return !hasField(entityKey, fieldKey);
-  });
+  return (
+    isWriting() ||
+    !getSelectionSet(node).some(node => {
+      if (!isFieldNode(node)) return false;
+      const fieldKey = keyOfField(getName(node), getFieldArguments(node, vars));
+      return !hasField(entityKey, fieldKey);
+    })
+  );
 };
 
 interface SelectionIterator {
