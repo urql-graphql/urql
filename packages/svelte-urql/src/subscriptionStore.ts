@@ -1,82 +1,99 @@
-import { pipe, subscribe, filter, concatMap } from 'wonka';
-import type { OperationContext } from '@urql/core';
-import { derived, writable } from 'svelte/store';
-import { createRequest } from '@urql/core';
-import type {
-  AnnotatedOperationResult,
-  UrqlStore,
-  UrqlStoreArgs,
-  Pausable,
-} from './common';
+import type { DocumentNode } from 'graphql';
 import {
-  defaultBaseResult,
-  fetchProcess,
-  fromStore,
+  Client,
+  OperationContext,
+  TypedDocumentNode,
+  createRequest,
+} from '@urql/core';
+import {
+  Source,
+  pipe,
+  map,
+  fromValue,
+  switchMap,
+  subscribe,
+  concat,
+  scan,
+  never,
+} from 'wonka';
+import { derived, writable } from 'svelte/store';
+
+import {
+  OperationResultState,
+  OperationResultStore,
+  Pausable,
+  initialResult,
   createPausable,
+  fromStore,
 } from './common';
 
-/**
- * Create a Svelte store for an [Urql subscription](https://formidable.com/open-source/urql/docs/api/core/#clientexecutemutation) using [Wonka](https://wonka.kitten.sh/)
- */
+export interface SubscriptionArgs<Data = any, Variables = object> {
+  client: Client;
+  query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+  variables: Variables;
+  context?: Partial<OperationContext>;
+  pause?: boolean;
+}
+
 export function subscriptionStore<Data, Variables extends object = {}>(
-  args: UrqlStoreArgs<Data, Variables> & {
-    /** initial value for `isPaused$` return (default is `false`) */
-    isPaused?: boolean;
-  }
-) {
-  // create the graphql request
+  args: SubscriptionArgs<Data, Variables>
+): OperationResultStore<Data, Variables> & Pausable {
   const request = createRequest(args.query, args.variables);
 
-  // `args.context.requestPolicy` beats `args.requestPolcy`
-  const context: Partial<OperationContext> = {
-    requestPolicy: args.requestPolicy,
-    ...args.context,
-  };
-
-  // combine default with operation details
-  const baseResult: AnnotatedOperationResult<Data, Variables> = {
-    ...defaultBaseResult,
-    operation: args.client.createRequestOperation(
-      'subscription',
-      request,
-      context
-    ),
-  };
-
-  // create a store for fetch results
-  const writableResult$ = writable<AnnotatedOperationResult<Data, Variables>>(
-    baseResult
+  const operation = args.client.createRequestOperation(
+    'subscription',
+    request,
+    args.context
   );
+  const initialState: OperationResultState<Data, Variables> = {
+    ...initialResult,
+    operation,
+  };
+  const result$ = writable(initialState);
+  const isPaused$ = writable(!!args.pause);
 
-  // create a store for `Pausable` interface (defaults to false)
-  // package es2015 doesn't support nullish coalescing operator (??)
-  const isPaused$ = writable(args.isPaused ? true : false);
-
-  // make the store reactive (ex: change when we receive a response)
-  const wonkaSubscription = pipe(
-    // have wonka subscribe to the pauseStore
+  const subscription = pipe(
     fromStore(isPaused$),
+    switchMap(
+      (isPaused): Source<Partial<OperationResultState<Data, Variables>>> => {
+        if (isPaused) {
+          return never as any;
+        }
 
-    // don't continue if paused
-    filter(isPaused => !isPaused),
-
-    // now we want to fetch the return type, so we must concatMap
-    concatMap(() => fetchProcess(baseResult, args.client)),
-
-    // update the store whenever a result is emitted
-    subscribe(annotatedResult => writableResult$.set(annotatedResult))
+        return concat<Partial<OperationResultState<Data, Variables>>>([
+          fromValue({ fetching: true, stale: false }),
+          pipe(
+            args.client.executeRequestOperation(operation),
+            map(({ stale, data, error, extensions, operation }) => ({
+              fetching: true,
+              stale: !!stale,
+              data,
+              error,
+              operation,
+              extensions,
+            }))
+          ),
+          fromValue({ fetching: false }),
+        ]);
+      }
+    ),
+    scan(
+      (result: OperationResultState<Data, Variables>, partial) => ({
+        ...result,
+        ...partial,
+      }),
+      initialState
+    ),
+    subscribe(result => {
+      result$.set(result);
+    })
   );
 
-  // derive a `Readable` store (only Urql can set the fetch result)
-  const result$ = derived(writableResult$, (result, set) => {
-    set(result);
-    // stop wonka when last svelte subscriber unsubscribes
-    return wonkaSubscription.unsubscribe;
-  });
-
-  // combine and return UrqlStore & Pausable
   return {
-    ...result$,
+    ...derived(result$, (result, set) => {
+      set(result);
+      return subscription.unsubscribe;
+    }),
     ...createPausable(isPaused$),
-  } as UrqlStore<Data, Variables> & Pausable;
+  };
 }

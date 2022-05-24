@@ -28,7 +28,7 @@ describe('queryStore', () => {
     store.pause();
     expect(get(store.isPaused$)).toBe(true);
 
-    store.unpause();
+    store.resume();
     expect(get(store.isPaused$)).toBe(false);
   });
 });

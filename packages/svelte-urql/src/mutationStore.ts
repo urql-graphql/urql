@@ -1,55 +1,71 @@
-import { pipe, subscribe } from 'wonka';
-import type { OperationContext } from '@urql/core';
+import type { DocumentNode } from 'graphql';
+import {
+  Client,
+  OperationContext,
+  TypedDocumentNode,
+  createRequest,
+} from '@urql/core';
+import { pipe, map, fromValue, scan, subscribe, concat } from 'wonka';
 import { derived, writable } from 'svelte/store';
-import { createRequest } from '@urql/core';
-import type {
-  AnnotatedOperationResult,
-  UrqlStore,
-  UrqlStoreArgs,
+
+import {
+  OperationResultState,
+  OperationResultStore,
+  initialResult,
 } from './common';
-import { defaultBaseResult, fetchProcess } from './common';
 
-/**
- * Create a Svelte store for an [Urql mutation](https://formidable.com/open-source/urql/docs/api/core/#clientexecutemutation) using [Wonka](https://wonka.kitten.sh/)
- */
-export function mutationStore<Data, Variables extends object = {}>(
-  args: UrqlStoreArgs<Data, Variables>
-) {
-  // create the graphql request
+export interface MutationArgs<Data = any, Variables = object> {
+  client: Client;
+  query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+  variables: Variables;
+  context?: Partial<OperationContext>;
+}
+
+export function mutationStore<Data = any, Variables = object>(
+  args: MutationArgs<Data, Variables>
+): OperationResultStore<Data, Variables> {
   const request = createRequest(args.query, args.variables);
-
-  // `args.context.requestPolicy` beats `args.requestPolcy`
-  const context: Partial<OperationContext> = {
-    requestPolicy: args.requestPolicy,
-    ...args.context,
+  const operation = args.client.createRequestOperation(
+    'mutation',
+    request,
+    args.context
+  );
+  const initialState: OperationResultState<Data, Variables> = {
+    ...initialResult,
+    operation,
+    fetching: true,
   };
+  const result$ = writable(initialState);
 
-  // combine default with operation details
-  const baseResult: AnnotatedOperationResult<Data, Variables> = {
-    ...defaultBaseResult,
-    operation: args.client.createRequestOperation('mutation', request, context),
-  };
-
-  // create a store for fetch results
-  const writableResult$ = writable<AnnotatedOperationResult<Data, Variables>>(
-    baseResult
+  const subscription = pipe(
+    concat<Partial<OperationResultState<Data, Variables>>>([
+      pipe(
+        args.client.executeRequestOperation(operation),
+        map(({ stale, data, error, extensions, operation }) => ({
+          fetching: false,
+          stale: !!stale,
+          data,
+          error,
+          operation,
+          extensions,
+        }))
+      ),
+      fromValue({ fetching: false }),
+    ]),
+    scan(
+      (result: OperationResultState<Data, Variables>, partial) => ({
+        ...result,
+        ...partial,
+      }),
+      initialState
+    ),
+    subscribe(result => {
+      result$.set(result);
+    })
   );
 
-  // make the store reactive (ex: change when we receive a response)
-  const wonkaSubscription = pipe(
-    fetchProcess(baseResult, args.client),
-
-    // update the store whenever a result is emitted
-    subscribe(annotatedResult => writableResult$.set(annotatedResult))
-  );
-
-  // derive a `Readable` store (only Urql can set the fetch result)
-  const result$ = derived(writableResult$, (result, set) => {
+  return derived(result$, (result, set) => {
     set(result);
-    // stop wonka when last svelte subscriber unsubscribes
-    return wonkaSubscription.unsubscribe;
+    return subscription.unsubscribe;
   });
-
-  // return UrqlStore
-  return result$ as UrqlStore<Data, Variables>;
 }
