@@ -47,6 +47,13 @@ jobs:
         run: yarn run lint
       - name: Unit Tests
         run: yarn run test --maxWorkers=2
+      - name: Build
+        run: yarn run build
+      - name: e2e tests 🧪
+        uses: cypress-io/github-action@v2
+        with:
+          command: yarn cypress run-ct
+          working-directory: packages/react-urql
 
   build:
     name: Build
