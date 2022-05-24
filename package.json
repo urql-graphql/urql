@@ -65,7 +65,6 @@
   "devDependencies": {
     "@actions/artifact": "^0.5.1",
     "@babel/core": "^7.13.16",
-    "@babel/plugin-transform-object-assign": "^7.12.13",
     "@babel/plugin-transform-react-jsx": "^7.13.12",
     "@changesets/cli": "^2.16.0",
     "@changesets/get-github-info": "0.5.0",
@@ -80,7 +79,6 @@
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "babel-plugin-transform-async-to-promises": "^0.8.15",
     "cjs-module-lexer": "^1.2.2",
     "cypress": "^9.5.1",
     "dotenv": "^8.2.0",

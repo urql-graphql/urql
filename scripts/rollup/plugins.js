@@ -61,8 +61,12 @@ export const makePlugins = () => [
       dangerousForOf: true,
       dangerousTaggedTemplateString: true,
       asyncAwait: false,
+      arrow: false,
+      classes: false,
+      conciseMethodProperty: false,
+      templateString: false,
+      objectRestSpread: false,
     },
-    objectAssign: 'Object.assign',
     exclude: 'node_modules/**'
   }),
   babel({
@@ -76,7 +80,6 @@ export const makePlugins = () => [
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
       babelPluginTransformFunctionExpressions,
-      '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
         pragmaFrag: 'React.Fragment',
@@ -86,10 +89,6 @@ export const makePlugins = () => [
         pragma: 'h',
         useBuiltIns: true
       }],
-      ['babel-plugin-transform-async-to-promises', {
-        inlineHelpers: true,
-        externalHelpers: true
-      }]
     ].filter(Boolean)
   }),
 ];
@@ -116,7 +115,7 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
 
 const terserPretty = terser({
   warnings: true,
-  ecma: 5,
+  ecma: 2015,
   keep_fnames: true,
   ie8: false,
   compress: {
@@ -145,7 +144,7 @@ const terserPretty = terser({
 
 const terserMinified = terser({
   warnings: true,
-  ecma: 5,
+  ecma: 2015,
   ie8: false,
   toplevel: true,
   compress: {
