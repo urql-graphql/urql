@@ -2,4 +2,4 @@
 '@urql/exchange-graphcache': patch
 ---
 
-Fix issue where our default-storage would persist data after it has been cleared
+Fix default storage persisting data after `clear()` was called on it
