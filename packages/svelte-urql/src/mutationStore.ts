@@ -14,6 +14,8 @@ import {
   initialResult,
 } from './common';
 
+export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
+
 export interface MutationArgs<Data = any, Variables = object> {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
@@ -21,16 +23,17 @@ export interface MutationArgs<Data = any, Variables = object> {
   context?: Partial<OperationContext>;
 }
 
-export function mutationStore<Data = any, Variables = object>(
-  args: MutationArgs<Data, Variables>
-): OperationResultStore<Data, Variables> {
+export function mutationStore<Data = any, Result = Data, Variables = object>(
+  args: MutationArgs<Data, Variables>,
+  handler?: SubscriptionHandler<Data, Result>
+): OperationResultStore<Result, Variables> {
   const request = createRequest(args.query, args.variables);
   const operation = args.client.createRequestOperation(
     'mutation',
     request,
     args.context
   );
-  const initialState: OperationResultState<Data, Variables> = {
+  const initialState: OperationResultState<Result, Variables> = {
     ...initialResult,
     operation,
     fetching: true,
@@ -52,13 +55,16 @@ export function mutationStore<Data = any, Variables = object>(
       ),
       fromValue({ fetching: false }),
     ]),
-    scan(
-      (result: OperationResultState<Data, Variables>, partial) => ({
-        ...result,
-        ...partial,
-      }),
-      initialState
-    ),
+    scan((result: OperationResultState<Result, Variables>, partial: any) => {
+      // If a handler has been passed, it's used to merge new data in
+      const data =
+        partial.data !== undefined
+          ? typeof handler === 'function'
+            ? handler(result.data, partial.data)
+            : partial.data
+          : result.data;
+      return { ...result, ...partial, data };
+    }, initialState),
     subscribe(result => {
       result$.set(result);
     })
