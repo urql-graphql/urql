@@ -5,6 +5,9 @@ order: 2
 
 # Svelte
 
+> **NOTE:** These API docs are for the v1 version of `@urql/svelte` rather than v2.
+> [In the meantime, please check out our API docs for our Svelte bindings instead!](../api/svelte.md)
+
 ## Getting started
 
 This "Getting Started" guide covers how to install and set up `urql` and provide a `Client` for
