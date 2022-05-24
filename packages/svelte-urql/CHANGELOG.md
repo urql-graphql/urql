@@ -1,5 +1,22 @@
 # @urql/svelte
 
+## 2.0.0
+
+### Major Changes
+
+- Reimplement Svelte with functional-only API.
+  We've gotten plenty of feedback and issues from the Svelte community about our prior
+  Svelte bindings. These bindings favoured a Store singleton to read and write to,
+  and a separate signal to start an operation.
+  Svelte usually however calls for a lot more flexibility, so we're returning the
+  API to a functional-only API again that serves to only create stores, which is more
+  similar to the original implementation, by [@jonathanstanley](https://github.com/jonathanstanley) (See [#2370](https://github.com/FormidableLabs/urql/pull/2370))
+
+### Patch Changes
+
+- Updated dependencies (See [#2446](https://github.com/FormidableLabs/urql/pull/2446), [#2456](https://github.com/FormidableLabs/urql/pull/2456), and [#2457](https://github.com/FormidableLabs/urql/pull/2457))
+  - @urql/core@2.5.0
+
 ## 1.3.3
 
 ### Patch Changes

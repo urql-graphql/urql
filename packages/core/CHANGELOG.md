@@ -1,5 +1,17 @@
 # @urql/core
 
+## 2.5.0
+
+### Minor Changes
+
+- Add `Accept` header to GraphQL HTTP requests. This complies to the specification but doesn't go as far as sending `Content-Type` which would throw a lot of APIs off. Instead, we'll now be sending an accept header for `application/graphql+json, application/json` to indicate that we comply with the GraphQL over HTTP protocol.
+  This also fixes headers merging to allow overriding `Accept` and `Content-Type` regardless of the user options' casing, by [@kitten](https://github.com/kitten) (See [#2457](https://github.com/FormidableLabs/urql/pull/2457))
+
+### Patch Changes
+
+- Support aborting in `withPromise` cases, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2446](https://github.com/FormidableLabs/urql/pull/2446))
+- Passthrough responses with content type of `text/*` as error messages, by [@kitten](https://github.com/kitten) (See [#2456](https://github.com/FormidableLabs/urql/pull/2456))
+
 ## 2.4.4
 
 ### Patch Changes
