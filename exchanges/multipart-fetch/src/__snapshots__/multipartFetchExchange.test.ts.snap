@@ -572,7 +572,11 @@ mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $p
 }
 `;
 
-exports[`on success uses a file when given 2`] = `Object {}`;
+exports[`on success uses a file when given 2`] = `
+Object {
+  "accept": "application/graphql+json, application/json",
+}
+`;
 
 exports[`on success uses a file when given 3`] = `FormData {}`;
 
@@ -712,6 +716,10 @@ mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(picture
 }
 `;
 
-exports[`on success uses multiple files when given 2`] = `Object {}`;
+exports[`on success uses multiple files when given 2`] = `
+Object {
+  "accept": "application/graphql+json, application/json",
+}
+`;
 
 exports[`on success uses multiple files when given 3`] = `FormData {}`;

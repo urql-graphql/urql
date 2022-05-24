@@ -71,18 +71,21 @@ export const makeFetchOptions = (
   body?: FetchBody
 ): RequestInit => {
   const useGETMethod = shouldUseGet(operation);
-
+  const headers: HeadersInit = {
+    accept: 'application/graphql+json, application/json',
+  };
+  if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =
-    typeof operation.context.fetchOptions === 'function'
+    (typeof operation.context.fetchOptions === 'function'
       ? operation.context.fetchOptions()
-      : operation.context.fetchOptions || {};
-
+      : operation.context.fetchOptions) || {};
+  if (extraOptions.headers)
+    for (const key in extraOptions.headers)
+      headers[key.toLowerCase()] = extraOptions.headers[key];
   return {
     ...extraOptions,
     body: !useGETMethod && body ? JSON.stringify(body) : undefined,
     method: useGETMethod ? 'GET' : 'POST',
-    headers: useGETMethod
-      ? extraOptions.headers
-      : { 'content-type': 'application/json', ...extraOptions.headers },
+    headers,
   };
 };
