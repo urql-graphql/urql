@@ -135,6 +135,7 @@ Response states are simulated by providing a stream, which contains a network re
 ```tsx
 import { mount } from 'enzyme';
 import { Provider } from 'urql';
+import { fromValue } from 'wonka';
 import { MyComponent } from './MyComponent';
 
 it('matches snapshot', () => {
