@@ -70,7 +70,7 @@ This store will be updated as the incoming data changes.
 | `stale`      | `boolean`              | A flag that may be set to `true` by exchanges to indicate that the `data` is incomplete or out-of-date, and that the result will be updated soon.  |
 | `fetching`   | `boolean`              | A flag that indicates whether the operation is currently in progress, which means that the `data` and `error` is out-of-date for the given inputs. |
 
-## Pausable
+## Pausable
 
 The `queryStore` and `subscriptionStore`'s stores are pausable. This means they inherit the
 following properties from the `Pausable` store.
@@ -88,8 +88,8 @@ stores above manually. This is to cater to greater flexibility. However, for con
 instead of keeping a `Client` singleton, we may also use [Svelte's Context
 API](https://svelte.dev/tutorial/context-api).
 
-`@urql/svelte` provides wrapper functions around Svelte's [`setContext`](https://svelte.dev/docs#setContext) and
-[`getContext`](https://svelte.dev/docs#getContext) functions:
+`@urql/svelte` provides wrapper functions around Svelte's [`setContext`](https://svelte.dev/docs#run-time-svelte-setcontext) and
+[`getContext`](https://svelte.dev/docs#run-time-svelte-getcontext) functions:
 
 - `setContextClient`
 - `getContextClient`
