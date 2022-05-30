@@ -99,8 +99,8 @@ components. This will share one `Client` with the rest of our app, if we for ins
 ```
 
 The `setClient` method internally calls [Svelte's `setContext`
-function](https://svelte.dev/docs#setContext). The `@urql/svelte` package also exposes a `getClient`
-function that uses [`getContext`](https://svelte.dev/docs#getContext) to retrieve the `Client` in
+function](https://svelte.dev/docs#run-time-svelte-setcontext). The `@urql/svelte` package also exposes a `getClient`
+function that uses [`getContext`](https://svelte.dev/docs#run-time-svelte-getcontext) to retrieve the `Client` in
 child components. This is used throughout `@urql/svelte`'s API.
 
 We can also use a convenience function, `initClient`. This function combines the `createClient` and
