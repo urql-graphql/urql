@@ -303,7 +303,13 @@ describe('offline', () => {
     expect(storage.writeMetadata).toBeCalledTimes(1);
     expect(storage.writeMetadata).toHaveBeenCalledWith([
       {
-        query: mutationOne,
+        query: `mutation {
+  updateAuthor {
+    id
+    name
+    __typename
+  }
+}`,
         variables: {},
       },
     ]);
