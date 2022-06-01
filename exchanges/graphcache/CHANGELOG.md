@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.4.2
+
+### Patch Changes
+
+- Keep track of mutations in the offline exchange so we can accurately recreate the original variables, there could be more variables for use in updater functions which we strip away in graphCache before sending to the API, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2472](https://github.com/FormidableLabs/urql/pull/2472))
+
 ## 4.4.1
 
 ### Patch Changes

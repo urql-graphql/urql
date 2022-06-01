@@ -1,5 +1,11 @@
 # urql
 
+## 2.2.1
+
+### Patch Changes
+
+- ⚠️ Fix issue where a paused subscription would execute with stale variables, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2463](https://github.com/FormidableLabs/urql/pull/2463))
+
 ## 2.2.0
 
 ### Minor Changes
