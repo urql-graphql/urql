@@ -307,7 +307,6 @@ describe('offline', () => {
   updateAuthor {
     id
     name
-    __typename
   }
 }`,
         variables: {},
