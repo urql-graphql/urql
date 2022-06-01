@@ -126,11 +126,15 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
             failedQueue.push(
-              incomingMutations.get(res.operation.context._identity) ||
+              incomingMutations.get(res.operation.context._instance as []) ||
                 res.operation
             );
             updateMetadata();
             return false;
+          }
+
+          if (res.operation.kind === 'mutation' && !res.error) {
+            incomingMutations.delete(res.operation.context._instance as []);
           }
 
           return true;
@@ -160,13 +164,13 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
       forward,
     });
 
-    const incomingMutations = new WeakMap<object, Operation>();
+    const incomingMutations = new WeakMap<[], Operation>();
     return ops$ => {
       const sharedOps$ = pipe(
         ops$,
         tap(operation => {
           if (operation.kind === 'mutation') {
-            incomingMutations.set(operation.context._identity, operation);
+            incomingMutations.set(operation.context._instance as [], operation);
           }
         }),
         share
