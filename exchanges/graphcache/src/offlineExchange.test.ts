@@ -179,7 +179,6 @@ describe('offline', () => {
   updateAuthor {
     id
     name
-    __typename
   }
 }`,
         variables: {},
@@ -304,13 +303,7 @@ describe('offline', () => {
     expect(storage.writeMetadata).toBeCalledTimes(1);
     expect(storage.writeMetadata).toHaveBeenCalledWith([
       {
-        query: `mutation {
-  updateAuthor {
-    id
-    name
-    __typename
-  }
-}`,
+        query: mutationOne,
         variables: {},
       },
     ]);
@@ -319,7 +312,7 @@ describe('offline', () => {
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
     expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
     expect((reexecuteOperation.mock.calls[0][0] as any).query).toEqual(
-      formatDocument(mutationOp.query)
+      formatDocument(mutationOne)
     );
   });
 });
