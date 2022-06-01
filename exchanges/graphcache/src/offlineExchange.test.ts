@@ -4,7 +4,6 @@ import {
   ExchangeIO,
   Operation,
   OperationResult,
-  formatDocument,
 } from '@urql/core';
 
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
@@ -179,7 +178,6 @@ describe('offline', () => {
   updateAuthor {
     id
     name
-    __typename
   }
 }`,
         variables: {},
@@ -308,7 +306,6 @@ describe('offline', () => {
   updateAuthor {
     id
     name
-    __typename
   }
 }`,
         variables: {},
@@ -318,8 +315,13 @@ describe('offline', () => {
     flush!();
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
     expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
-    expect((reexecuteOperation.mock.calls[0][0] as any).query).toEqual(
-      formatDocument(mutationOp.query)
-    );
+    expect((reexecuteOperation.mock.calls[0][0] as any).query).toEqual(gql`
+      mutation {
+        updateAuthor {
+          id
+          name
+        }
+      }
+    `);
   });
 });

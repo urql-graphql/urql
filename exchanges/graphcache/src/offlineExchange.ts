@@ -1,4 +1,4 @@
-import { pipe, merge, makeSubject, share, filter } from 'wonka';
+import { pipe, merge, makeSubject, share, filter, tap } from 'wonka';
 import { print, SelectionNode } from 'graphql';
 
 import {
@@ -70,7 +70,6 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
   opts: C
 ): Exchange => input => {
   const { storage } = opts;
-
   if (
     storage &&
     storage.onOnline &&
@@ -126,9 +125,16 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
             isOfflineError(res.error) &&
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
-            failedQueue.push(res.operation);
+            failedQueue.push(
+              incomingMutations.get(res.operation.context._instance as []) ||
+                res.operation
+            );
             updateMetadata();
             return false;
+          }
+
+          if (res.operation.kind === 'mutation' && !res.error) {
+            incomingMutations.delete(res.operation.context._instance as []);
           }
 
           return true;
@@ -158,8 +164,18 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
       forward,
     });
 
+    const incomingMutations = new WeakMap<[], Operation>();
     return ops$ => {
-      const sharedOps$ = share(ops$);
+      const sharedOps$ = pipe(
+        ops$,
+        tap(operation => {
+          if (operation.kind === 'mutation') {
+            incomingMutations.set(operation.context._instance as [], operation);
+          }
+        }),
+        share
+      );
+
       const opsAndRebound$ = merge([reboundOps$, sharedOps$]);
 
       return pipe(
