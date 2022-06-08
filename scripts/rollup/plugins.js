@@ -34,28 +34,27 @@ export const makePlugins = () => [
       react: Object.keys(require('react'))
     } : {},
   }),
-  settings.isCI
-    ? sucrase({
-      exclude: ['node_modules/**'],
-      transforms: ['jsx', 'typescript']
-    })
-    : typescript({
-      useTsconfigDeclarationDir: true,
-      tsconfigOverride: {
-        exclude: [
-          'src/**/*.test.ts',
-          'src/**/*.test.tsx',
-          'src/**/test-utils/*'
-        ],
-        compilerOptions: {
-          sourceMap: true,
-          noEmit: false,
-          declaration: true,
-          declarationDir: settings.types,
-          target: 'esnext',
-        },
+  typescript({
+    useTsconfigDeclarationDir: true,
+    tsconfigOverride: {
+      exclude: [
+        'src/**/*.test.ts',
+        'src/**/*.test.tsx',
+        'src/**/test-utils/*'
+      ],
+      compilerOptions: {
+        sourceMap: true,
+        noEmit: false,
+        declaration: true,
+        declarationDir: settings.types,
+        target: 'esnext',
       },
-    }),
+    },
+  }),
+  sucrase({
+    exclude: ['node_modules/**'],
+    transforms: ['jsx', 'typescript']
+  }),
   buble({
     transforms: {
       unicodeRegExp: false,
