@@ -7,7 +7,7 @@ function cleanup(opts = {}) {
   });
 
   return {
-    name: "cleanup",
+    name: "cjs-check",
 
     renderChunk(code, chunk) {
       if (opts.extension !== '.js') {
