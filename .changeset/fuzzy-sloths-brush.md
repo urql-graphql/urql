@@ -1,6 +1,9 @@
 ---
 'next-urql': patch
 'urql': patch
+'@urql/preact': patch
+'@urql/svelte': patch
+'@urql/vue': patch
 '@urql/storybook-addon': patch
 ---
 
