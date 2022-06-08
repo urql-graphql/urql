@@ -11,6 +11,7 @@ import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
+import cjsCheck from './cjs-check-plugin.js'
 import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
@@ -33,28 +34,27 @@ export const makePlugins = () => [
       react: Object.keys(require('react'))
     } : {},
   }),
-  settings.isCI
-    ? sucrase({
-      exclude: ['node_modules/**'],
-      transforms: ['jsx', 'typescript']
-    })
-    : typescript({
-      useTsconfigDeclarationDir: true,
-      tsconfigOverride: {
-        exclude: [
-          'src/**/*.test.ts',
-          'src/**/*.test.tsx',
-          'src/**/test-utils/*'
-        ],
-        compilerOptions: {
-          sourceMap: true,
-          noEmit: false,
-          declaration: true,
-          declarationDir: settings.types,
-          target: 'esnext',
-        },
+  typescript({
+    useTsconfigDeclarationDir: true,
+    tsconfigOverride: {
+      exclude: [
+        'src/**/*.test.ts',
+        'src/**/*.test.tsx',
+        'src/**/test-utils/*'
+      ],
+      compilerOptions: {
+        sourceMap: true,
+        noEmit: false,
+        declaration: true,
+        declarationDir: settings.types,
+        target: 'esnext',
       },
-    }),
+    },
+  }),
+  sucrase({
+    exclude: ['node_modules/**'],
+    transforms: ['jsx', 'typescript']
+  }),
   buble({
     transforms: {
       unicodeRegExp: false,
@@ -104,8 +104,9 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
     isProduction && replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
+    cjsCheck({ extension }),
     cleanup({ extension }),
-    isProduction ? terserMinified : terserPretty,
+    isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
     isProduction && settings.isAnalyze && visualizer({
       filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
       sourcemap: true,

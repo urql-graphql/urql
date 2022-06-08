@@ -53,9 +53,7 @@ const output = ({ format, isProduction }) => {
     entryFileNames: '[name]' + extension,
     dir: './dist',
     exports: 'named',
-    externalLiveBindings: false,
     sourcemap: true,
-    esModule: false,
     indent: false,
     freeze: false,
     strict: false,
@@ -63,7 +61,17 @@ const output = ({ format, isProduction }) => {
     plugins: makeOutputPlugins({
       isProduction,
       extension: format === 'esm' ? '.mjs' : '.js',
-    })
+    }),
+    // NOTE: All below settings are important for cjs-module-lexer to detect the export
+    // When this changes (and terser mangles the output) this will interfere with Node.js ESM intercompatibility
+    esModule: format !== 'esm',
+    externalLiveBindings: format !== 'esm',
+    generatedCode: {
+      preset: 'es5',
+      reservedNamesAsProps: false,
+      objectShorthand: false,
+      constBindings: false,
+    },
   };
 };
 
