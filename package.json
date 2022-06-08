@@ -82,6 +82,7 @@
     "@typescript-eslint/parser": "^4.22.0",
     "babel-plugin-modular-graphql": "^1.1.0",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
+    "cjs-module-lexer": "^1.2.2",
     "cypress": "^9.5.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.25.0",

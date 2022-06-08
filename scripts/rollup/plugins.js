@@ -11,6 +11,7 @@ import visualizer from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
+import cjsCheck from './cjs-check-plugin.js'
 import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
@@ -104,6 +105,7 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
     isProduction && replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
+    cjsCheck({ extension }),
     cleanup({ extension }),
     isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
     isProduction && settings.isAnalyze && visualizer({
