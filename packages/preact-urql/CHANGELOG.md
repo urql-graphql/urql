@@ -1,5 +1,11 @@
 # @urql/preact
 
+## 2.0.4
+
+### Patch Changes
+
+- ⚠️ Fix Node.js ESM re-export detection for `@urql/core` in `urql` package and CommonJS output for all other CommonJS-first packages. This ensures that Node.js' `cjs-module-lexer` can correctly identify re-exports and report them properly. Otherwise, this will lead to a runtime error, by [@kitten](https://github.com/kitten) (See [#2485](https://github.com/FormidableLabs/urql/pull/2485))
+
 ## 2.0.3
 
 ### Patch Changes

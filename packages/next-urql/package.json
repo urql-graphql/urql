@@ -1,6 +1,6 @@
 {
   "name": "next-urql",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "Convenience wrappers for using urql with NextJS.",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
