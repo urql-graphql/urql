@@ -626,7 +626,7 @@ it('supports clearing a layer then reapplying optimistic updates', () => {
   });
 });
 
-it('supports updating an optimisticly updated entity', () => {
+it('supports seeing the same optimistic key multiple times (correctly reorders)', () => {
   const store = new Store({
     optimistic: {
       updateTodo: (args: any) => ({
@@ -687,4 +687,15 @@ it('supports updating an optimisticly updated entity', () => {
   queryRes = query(store, { query: Todos });
   expect(queryRes.partial).toBe(false);
   expect(queryRes.data.todos[0].complete).toEqual(true);
+
+  writeOptimistic(
+    store,
+    { query: updateTodo, variables: { id: '0', completed: false } },
+    2
+  );
+
+  queryRes = query(store, { query: Todos });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data.todos[0].complete).toEqual(false);
 });
