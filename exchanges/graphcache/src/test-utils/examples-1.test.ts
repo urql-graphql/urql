@@ -625,3 +625,66 @@ it('supports clearing a layer then reapplying optimistic updates', () => {
     ],
   });
 });
+
+it('supports updating an optimisticly updated entity', () => {
+  const store = new Store({
+    optimistic: {
+      updateTodo: (args: any) => ({
+        __typename: 'Todo',
+        id: args.id,
+        complete: args.completed,
+      }),
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '0', complete: false, text: '0', __typename: 'Todo' },
+      { id: '1', complete: false, text: '1', __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+
+  const updateTodo = gql`
+    mutation($id: ID!, $completed: Boolean!) {
+      __typename
+      updateTodo(id: $id, completed: $completed) {
+        __typename
+        complete
+        id
+      }
+    }
+  `;
+
+  writeOptimistic(
+    store,
+    { query: updateTodo, variables: { id: '0', completed: true } },
+    1
+  );
+
+  let queryRes = query(store, { query: Todos });
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data.todos[0].complete).toEqual(true);
+
+  writeOptimistic(
+    store,
+    { query: updateTodo, variables: { id: '0', completed: false } },
+    2
+  );
+
+  queryRes = query(store, { query: Todos });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data.todos[0].complete).toEqual(false);
+
+  writeOptimistic(
+    store,
+    { query: updateTodo, variables: { id: '0', completed: true } },
+    1
+  );
+  queryRes = query(store, { query: Todos });
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data.todos[0].complete).toEqual(true);
+});
