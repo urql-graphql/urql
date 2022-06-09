@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 4.4.3
+
+### Patch Changes
+
+- Correctly reorder optimistic layers when we see repeated keys coming in, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2489](https://github.com/FormidableLabs/urql/pull/2489))
+
 ## 4.4.2
 
 ### Patch Changes
