@@ -120,6 +120,12 @@ export const initDataState = (
     if (!isOptimistic && !data.commutativeKeys.has(layerKey)) {
       reserveLayer(data, layerKey);
     } else if (isOptimistic) {
+      if (
+        data.optimisticOrder.indexOf(layerKey) !== -1 &&
+        !data.commutativeKeys.has(layerKey)
+      ) {
+        data.optimisticOrder.splice(data.optimisticOrder.indexOf(layerKey), 1);
+      }
       // NOTE: This optimally shouldn't happen as it implies that an optimistic
       // write is being performed after a concrete write.
       data.commutativeKeys.delete(layerKey);

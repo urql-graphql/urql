@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-
 import { minifyIntrospectionQuery } from '@urql/introspection';
 import { formatDocument, gql, maskTypename } from '@urql/core';
 
