@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: yarn run build
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v3
         with:
           command: yarn cypress run-ct
           working-directory: packages/react-urql
