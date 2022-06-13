@@ -31,7 +31,7 @@ import {
 export interface QueryArgs<Data = any, Variables = object> {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables: Variables;
+  variables?: Variables;
   context?: Partial<OperationContext>;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
