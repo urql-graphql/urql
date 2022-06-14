@@ -19,7 +19,7 @@ export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 export interface MutationArgs<Data = any, Variables = object> {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables: Variables;
+  variables?: Variables;
   context?: Partial<OperationContext>;
 }
 
