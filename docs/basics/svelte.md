@@ -377,7 +377,7 @@ example! We'll set up a mutation that _updates_ a todo item's title.
 ```
 
 This small call to `mutationStore` accepts a `query` property (besides the `variables` property) and
-returns an execute function.
+returns the `OperationResult` as a store.
 
 Unlike the `query` function, we don't want the mutation to start automatically hence we enclose it in
 a function. The `result` will be updated with the `fetching`, `data`, ... as a normal query would which
