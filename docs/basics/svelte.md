@@ -358,9 +358,10 @@ example! We'll set up a mutation that _updates_ a todo item's title.
   export let id;
 
   let result;
+  let client = getContextClient();
   const updateTodo = ({ id, title }) => {
     result = mutationStore({
-      client: getContextClient(),
+      client,
       query: gql`
         mutation($id: ID!, $title: String!) {
           updateTodo(id: $id, title: $title) {
