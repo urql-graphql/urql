@@ -336,6 +336,41 @@ query is able to override them as needed.
 
 [You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)
 
+### Reexecuting queries
+
+Sometimes we'll need to arbitrarly reexecute a query to check for new data on the server, this can be done through:
+
+```jsx
+<script>
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
+
+  const client = getContextClient();
+  const query = gql`
+    query {
+      todos {
+        id
+        title
+      }
+    }
+  `
+  $: todos = queryStore({
+    client,
+    query,
+  });
+
+  function refresh() {
+    queryStore({
+      client,
+      query,
+      requestPolicy: 'network-only'
+    });
+  }
+</script>
+```
+
+We use the `requestPolicy` with value `network-only` so we don't hit our cache and dispatch a refresh,
+if it updates the data the `todos` will be updated due to our cache updating.
+
 ### Reading on
 
 There are some more tricks we can use with `queryStore`.
