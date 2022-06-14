@@ -1,0 +1,50 @@
+name: "\U0001F41E Bug report"
+description: Report an issue with urql
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Please describe your bug clearly and concisely.
+      placeholder: Bug description
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Please provide a link via [codesandbox](https://codesandbox.io/s/urql-issue-template-client-iui0o) or a link to a repo that can reproduce the problem you ran into. A [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) is required. If a report is vague (e.g. just a generic error message) and if no reproduction is providedit will be auto-closed.
+      placeholder: Reproduction
+    validations:
+      required: true
+  - type: textarea
+    id: urql-version
+    attributes:
+      label: Urql version
+      description: The versions of the relevant urql packages you are using
+      placeholder: urql v2.0.0
+    validations:
+      required: true
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/FormidableLabs/urql/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+        - label: Read the [Contributing Guidelines](https://github.com/FormidableLabs/urql/blob/main/CONTRIBUTING.md).
+          required: true
+        - label: Read the [docs](https://formidable.com/open-source/urql/docs/).
+          required: true
+        - label: Check that there isn't [already an issue](https://github.com/FormidableLabs/urql/issues) that reports the same bug to avoid creating a duplicate.
+          required: true
+        - label: Check that this is a concrete bug. For Q&A open a [GitHub Discussion](https://github.com/FormidableLabs/urql/discussions).
+          required: true
+        - label: The provided reproduction is a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example) of the bug.
+          required: true
