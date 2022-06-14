@@ -379,78 +379,16 @@ This small call to `mutationStore` accepts a `query` property (besides the `vari
 returns an execute function.
 
 Unlike the `query` function, we don't want the mutation to start automatically hence we enclose it in
-a function.
-
-### Using the mutation result
-
-When calling `mutateTodo` in our previous example, we start the mutation. To use the mutation's
-result we actually have two options instead of one.
-
-The first option is to use the promise that the `mutation`'s execute function returns. This promise
-will resolve to an `operationStore`, which is what we're used to from sending queries. Using this
-store we can then read the mutation's `data` or `error`.
-
-```html
-<script>
-  import { mutation } from '@urql/svelte';
-
-  export let id;
-
-  const mutateTodo = mutation({
-    query: `
-      mutation ($id: ID!, $title: String!) {
-        updateTodo (id: $id, title: $title) {
-          id
-          title
-        }
-      }
-    `,
-  });
-
-  function updateTodo(newTitle) {
-    mutateTodo({ id, title: newTitle }).then(result => {
-      // The result is an operationStore again, which will already carry the mutation's result
-      console.log(result.data, result.error);
-    });
-  }
-</script>
-```
-
-Alternatively, we can pass `mutation` an `operationStore` directly. This allows us to use a
-mutation's result in our component's UI more easily, without storing it ourselves.
-
-```html
-<script>
-  import { operationStore, mutation } from '@urql/svelte';
-
-  export let id;
-
-  const updateTodoStore = operationStore(`
-    mutation ($id: ID!, $title: String!) {
-      updateTodo (id: $id, title: $title) {
-        id
-        title
-      }
-    }
-  `);
-
-  const updateTodoMutation = mutation(updateTodoStore);
-
-  function updateTodo(newTitle) {
-    updateTodoMutation({ id, title: newTitle });
-  }
-</script>
-
-{#if $updateTodoStore.data} Todo was updated! {/if}
-```
+a function. The `result` will be updated with the `fetching`, `data`, ... as a normal query would which
+you can in-turn use in your UI.
 
 ### Handling mutation errors
 
 It's worth noting that the promise we receive when calling the execute function will never
-reject. Instead it will always return a promise that resolves to an `operationStore`, even if the
+reject. Instead it will always return a promise that resolves to an `mutationStore`, even if the
 mutation has failed.
 
-If you're checking for errors, you should use `operationStore.error` instead, which will be set
+If you're checking for errors, you should use `mutationStore.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
 [Read more about errors on our "Errors" page.](./errors.md)
 
