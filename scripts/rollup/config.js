@@ -67,7 +67,7 @@ const output = ({ format, isProduction }) => {
     esModule: format !== 'esm',
     externalLiveBindings: format !== 'esm',
     generatedCode: {
-      preset: 'es2015',
+      preset: 'es5',
       reservedNamesAsProps: false,
       objectShorthand: false,
       constBindings: false,
