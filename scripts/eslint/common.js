@@ -35,14 +35,9 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'prefer-arrow/prefer-arrow-functions': 'off',
 
-    'es5/no-for-of': 'error',
-    'es5/no-generators': 'error',
-    'es5/no-typeof-symbol': 'error',
-    'es5/no-es6-methods': 'error',
-
-    'es5/no-es6-static-methods': ['error', {
-      exceptMethods: ['Object.assign']
-    }],
+    'es5/no-for-of': 'warn',
+    'es5/no-generators': 'warn',
+    'es5/no-typeof-symbol': 'warn',
 
     'prettier/prettier': ['error', {
       singleQuote: true,
@@ -60,9 +55,9 @@ module.exports = {
         '*.spec.tsx',
       ],
       rules: {
+        'es5/no-for-of': 'off',
         'es5/no-generators': 'off',
-        'es5/no-es6-methods': 'off',
-        'es5/no-es6-static-methods': 'off',
+        'es5/no-typeof-symbol': 'off',
 
         'jest/no-disabled-tests': 'error',
         'jest/no-focused-tests': 'error',
