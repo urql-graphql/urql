@@ -1,5 +1,12 @@
 # @urql/svelte
 
+## 2.0.2
+
+### Patch Changes
+
+- Made variables optional for all operations, by [@mpiorowski](https://github.com/mpiorowski) (See [#2496](https://github.com/FormidableLabs/urql/pull/2496))
+- ⚠️ Fix issue with `subscriptionStore` and `queryStore` eagerly terminating the subscription due to `derived`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2514](https://github.com/FormidableLabs/urql/pull/2514))
+
 ## 2.0.1
 
 ### Patch Changes
