@@ -49,7 +49,9 @@ export function subscriptionStore<Data, Variables extends object = {}>(
     ...initialResult,
     operation,
   };
-  const result$ = writable(initialState);
+  const result$ = writable(initialState, () => {
+    return subscription.unsubscribe;
+  });
   const isPaused$ = writable(!!args.pause);
 
   const subscription = pipe(
@@ -92,7 +94,6 @@ export function subscriptionStore<Data, Variables extends object = {}>(
   return {
     ...derived(result$, (result, set) => {
       set(result);
-      return subscription.unsubscribe;
     }),
     ...createPausable(isPaused$),
   };
