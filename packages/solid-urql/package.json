@@ -1,0 +1,68 @@
+{
+  "name": "@urql/solid",
+  "version": "2.0.2",
+  "description": "A highly customizable and versatile GraphQL client for solidjs",
+  "sideEffects": false,
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormidableLabs/urql.git",
+    "directory": "packages/solid-urql"
+  },
+  "keywords": [
+    "graphql client",
+    "state management",
+    "cache",
+    "formidablelabs",
+    "exchanges",
+    "solid"
+  ],
+  "main": "dist/urql-solid",
+  "module": "dist/urql-solid.mjs",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-solid.mjs",
+      "require": "./dist/urql-solid.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.js",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "jest": {
+    "preset": "../../scripts/jest/preset"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",
+    "solid-js": "^1.4.4"
+  },
+  "dependencies": {
+    "@urql/core": "^2.5.0",
+    "wonka": "^4.0.14"
+  },
+  "devDependencies": {
+    "graphql": "^16.0.0",
+    "solid-js": "^1.4.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
