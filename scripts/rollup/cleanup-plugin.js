@@ -38,9 +38,9 @@ function cleanup(opts = {}) {
 
       return transform(code, {
         plugins: [
-          [babelPluginModularGraphQL, { extension: opts.extension }],
+          !opts.maintainImports && [babelPluginModularGraphQL, { extension: opts.extension }],
           removeEmptyImports
-        ],
+        ].filter(Boolean),
         babelrc: false
       });
     }
