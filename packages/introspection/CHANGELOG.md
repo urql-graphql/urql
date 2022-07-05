@@ -1,5 +1,11 @@
 # @urql/introspection
 
+## 0.3.3
+
+### Patch Changes
+
+- Avoid making the imports of `@urql/introspection` more specific than they need to be, this because we aren't optimizing for bundle size and in pure node usage this can confuse Node as `import x from 'graphql'` won't share the same module scope as `import x from 'graphql/x/y.mjs'`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2529](https://github.com/FormidableLabs/urql/pull/2529))
+
 ## 0.3.2
 
 ### Patch Changes
