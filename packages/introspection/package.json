@@ -1,6 +1,6 @@
 {
   "name": "@urql/introspection",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Utilities for dealing with Introspection Queries and Client Schemas",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
