@@ -55,11 +55,23 @@ export interface SubscriptionExchangeOpts {
 
   /** This flag may be turned on to allow your subscriptions-transport to handle all operation types */
   enableAllOperations?: boolean;
+  isSubscriptionOperation?: (operation: Operation) => boolean;
 }
+
+const makeIsSubscriptionOperation = (enableAllOperations?: boolean) => (
+  operation: Operation
+): boolean => {
+  const { kind } = operation;
+  return (
+    kind === 'subscription' ||
+    (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
+  );
+};
 
 export const subscriptionExchange = ({
   forwardSubscription,
   enableAllOperations,
+  isSubscriptionOperation = makeIsSubscriptionOperation(enableAllOperations),
 }: SubscriptionExchangeOpts): Exchange => ({ client, forward }) => {
   const createSubscriptionSource = (
     operation: Operation
@@ -102,14 +114,6 @@ export const subscriptionExchange = ({
         if (sub) sub.unsubscribe();
       };
     });
-  };
-
-  const isSubscriptionOperation = (operation: Operation): boolean => {
-    const { kind } = operation;
-    return (
-      kind === 'subscription' ||
-      (!!enableAllOperations && (kind === 'query' || kind === 'mutation'))
-    );
   };
 
   return ops$ => {

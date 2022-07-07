@@ -76,3 +76,31 @@ it('should tear down the operation if the source subscription ends', async () =>
   expect(unsubscribe).not.toHaveBeenCalled();
   expect(reexecuteOperation).toHaveBeenCalled();
 });
+
+it('should allow providing a custom isSubscriptionOperation implementation', async () => {
+  const exchangeArgs = {
+    dispatchDebug: jest.fn(),
+    forward: () => empty as Source<OperationResult>,
+    client: {} as Client,
+  };
+
+  const isSubscriptionOperation = jest.fn(() => true);
+
+  const forwardSubscription: SubscriptionForwarder = () => ({
+    subscribe(observer) {
+      observer.next(subscriptionResult);
+      return { unsubscribe: jest.fn() };
+    },
+  });
+
+  await pipe(
+    fromValue(subscriptionOperation),
+    subscriptionExchange({ forwardSubscription, isSubscriptionOperation })(
+      exchangeArgs
+    ),
+    take(1),
+    toPromise
+  );
+
+  expect(isSubscriptionOperation).toHaveBeenCalled();
+});
