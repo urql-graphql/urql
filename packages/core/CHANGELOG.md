@@ -1,5 +1,11 @@
 # @urql/core
 
+## 2.6.0
+
+### Minor Changes
+
+- Allow providing a custom `isSubscriptionOperation` implementation, by [@n1ru4l](https://github.com/n1ru4l) (See [#2534](https://github.com/FormidableLabs/urql/pull/2534))
+
 ## 2.5.0
 
 ### Minor Changes
