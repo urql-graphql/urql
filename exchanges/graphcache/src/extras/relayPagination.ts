@@ -237,17 +237,6 @@ export const relayPagination = (
       } else if (args.after) {
         startEdges = concatEdges(cache, startEdges, page.edges);
         startNodes = concatNodes(startNodes, page.nodes);
-
-        // TODO: not entirely sure about this one as it makes sense
-        // to set this when we are paginating as we would see the
-        // first x after y which has the first x before y as previous page.
-        // similar to the before part having an after.
-        if (page.pageInfo.hasPreviousPage) {
-          pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
-        }
-        if (page.pageInfo.startCursor != null) {
-          pageInfo.startCursor = page.pageInfo.startCursor;
-        }
         pageInfo.endCursor = page.pageInfo.endCursor;
         pageInfo.hasNextPage = page.pageInfo.hasNextPage;
       } else if (args.before) {
@@ -255,12 +244,6 @@ export const relayPagination = (
         endNodes = concatNodes(page.nodes, endNodes);
         pageInfo.startCursor = page.pageInfo.startCursor;
         pageInfo.hasPreviousPage = page.pageInfo.hasPreviousPage;
-        if (page.pageInfo.endCursor != null) {
-          pageInfo.endCursor = page.pageInfo.endCursor;
-        }
-        if (page.pageInfo.hasNextPage) {
-          pageInfo.hasNextPage = page.pageInfo.hasNextPage;
-        }
       } else if (typeof args.last === 'number') {
         endEdges = concatEdges(cache, page.edges, endEdges);
         endNodes = concatNodes(page.nodes, endNodes);
