@@ -1,15 +1,10 @@
 import { createClient, Client, ClientOptions } from 'urql';
 
-let urqlClient: Client | null = null;
-
-export function resetClient() {
-  urqlClient = null;
-}
-
 export function initUrqlClient(
   clientOptions: ClientOptions,
   canEnableSuspense: boolean
 ): Client | null {
+  let urqlClient: Client | null = null;
   // Create a new Client for every server-side rendered request.
   // This ensures we reset the state for each rendered page.
   // If there is an exising client instance on the client-side, use it.

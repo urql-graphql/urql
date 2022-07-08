@@ -18,7 +18,7 @@ import {
   fetchExchange,
 } from 'urql';
 
-import { initUrqlClient, resetClient } from './init-urql-client';
+import { initUrqlClient } from './init-urql-client';
 
 import {
   NextUrqlClientConfig,
@@ -89,7 +89,6 @@ export function withUrqlClient(
       }, [urqlClient, urqlServerState, version]);
 
       const resetUrqlClient = useCallback(() => {
-        resetClient();
         ssr = ssrExchange({ initialState: undefined });
         forceUpdate();
       }, []);
