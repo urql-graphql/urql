@@ -13897,10 +13897,15 @@ react-sizeme@^3.0.1:
     shallowequal "^1.1.0"
     throttle-debounce "^3.0.1"
 
-react-ssr-prepass@^1.1.2, react-ssr-prepass@^1.4.0:
+react-ssr-prepass@^1.1.2:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.4.0.tgz#33a3db19414f0f8f9f3f781c88f760ae366b4f51"
   integrity sha512-0SzdmiQUtHvhxCabHg9BI/pkJfijGkQ0jQL6fC4YFy7idaDOuaiQLsajIkkNxffFXtJFHIWFITlve2WB88e0Jw==
+
+react-ssr-prepass@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.5.0.tgz#bc4ca7fcb52365e6aea11cc254a3d1bdcbd030c5"
+  integrity sha512-yFNHrlVEReVYKsLI5lF05tZoHveA5pGzjFbFJY/3pOqqjGOmMmqx83N4hIjN2n6E1AOa+eQEUxs3CgRnPmT0RQ==
 
 react-static-plugin-md-pages@^0.3.2:
   version "0.3.2"
