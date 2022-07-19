@@ -249,7 +249,7 @@ You can see simple example projects using `next-urql` in the `examples` director
 
 Using `withUrqlClient` on a page that has `getInitialProps` will opt that component and it's children into a prepass that does a first pass of all queries, when that
 component has children using `getInitialProps` but that component itself is not and you want to opt in to this behavior you'll have to set the second argument of
-`withUrqlClient`, this means `withUrqlClient(() => clientOptiosn, { ssr:true })`.
+`withUrqlClient`, this means `withUrqlClient(() => clientOptions, { ssr:true })`.
 This measure is available so we can support `getStaticProps`, ...
 
 When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, you should opt-out of `Suspense` by setting the `neverSuspend` option to `true` in your `withUrqlClient` configuration.
