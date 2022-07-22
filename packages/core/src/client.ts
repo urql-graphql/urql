@@ -163,11 +163,13 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   // activated to allow `reexecuteOperation` to be trampoline-scheduled
   let isOperationBatchActive = false;
   function dispatchOperation(operation?: Operation | void) {
-    isOperationBatchActive = true;
     if (operation) nextOperation(operation);
-    while (isOperationBatchActive && (operation = queue.shift()))
-      nextOperation(operation);
-    isOperationBatchActive = false;
+    if (!isOperationBatchActive) {
+      isOperationBatchActive = true;
+      while (isOperationBatchActive && (operation = queue.shift()))
+        nextOperation(operation);
+      isOperationBatchActive = false;
+    }
   }
 
   /** Defines how result streams are created */
