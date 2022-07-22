@@ -165,7 +165,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   function dispatchOperation(operation?: Operation | void) {
     isOperationBatchActive = true;
     if (operation) nextOperation(operation);
-    while ((operation = queue.shift())) nextOperation(operation);
+    while (isOperationBatchActive && (operation = queue.shift()))
+      nextOperation(operation);
     isOperationBatchActive = false;
   }
 
@@ -195,7 +196,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     if (operation.kind === 'mutation') {
       return pipe(
         result$,
-        onStart(() => dispatchOperation(operation)),
+        onStart(() => nextOperation(operation)),
         take(1)
       );
     }
@@ -241,9 +242,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         for (let i = queue.length - 1; i >= 0; i--)
           if (queue[i].key === operation.key) queue.splice(i, 1);
         // Dispatch a teardown signal for the stopped operation
-        dispatchOperation(
-          makeOperation('teardown', operation, operation.context)
-        );
+        nextOperation(makeOperation('teardown', operation, operation.context));
       }),
       share
     );
@@ -269,9 +268,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       // operation's exchange results
       if (operation.kind === 'mutation' || active.has(operation.key)) {
         queue.push(operation);
-        if (!isOperationBatchActive) {
-          Promise.resolve().then(dispatchOperation);
-        }
+        Promise.resolve().then(dispatchOperation);
       }
     },
 
@@ -344,7 +341,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               dispatchOperation(operation);
             }
           }),
-          onEnd(observer.complete),
+          onEnd(() => {
+            isOperationBatchActive = false;
+            observer.complete();
+          }),
           subscribe(observer.next)
         ).unsubscribe;
       });
