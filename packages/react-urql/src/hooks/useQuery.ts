@@ -44,8 +44,6 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-let currentInit = false;
-
 export function useQuery<Data = any, Variables = object>(
   args: UseQueryArgs<Variables, Data>
 ): UseQueryResponse<Data, Variables> {
@@ -127,18 +125,14 @@ export function useQuery<Data = any, Variables = object>(
     args.pause,
   ] as const;
 
-  const [state, setState] = useState(() => {
-    currentInit = true;
-    try {
-      return [
+  const [state, setState] = useState(
+    () =>
+      [
         source,
         computeNextState(initialState, getSnapshot(source, suspense)),
         deps,
-      ] as const;
-    } finally {
-      currentInit = false;
-    }
-  });
+      ] as const
+  );
 
   let currentResult = state[1];
   if (source !== state[0] && hasDepsChanged(state[2], deps)) {
@@ -160,14 +154,12 @@ export function useQuery<Data = any, Variables = object>(
 
     const updateResult = (result: Partial<UseQueryState<Data, Variables>>) => {
       hasResult = true;
-      if (!currentInit) {
-        setState(state => {
-          const nextResult = computeNextState(state[1], result);
-          return state[1] !== nextResult
-            ? [state[0], nextResult, state[2]]
-            : state;
-        });
-      }
+      setState(state => {
+        const nextResult = computeNextState(state[1], result);
+        return state[1] !== nextResult
+          ? [state[0], nextResult, state[2]]
+          : state;
+      });
     };
 
     if (source) {
