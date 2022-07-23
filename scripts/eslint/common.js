@@ -35,7 +35,7 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'prefer-arrow/prefer-arrow-functions': 'off',
 
-    'es5/no-for-of': 'warn',
+    'es5/no-for-of': 'off',
     'es5/no-generators': 'warn',
     'es5/no-typeof-symbol': 'warn',
 
