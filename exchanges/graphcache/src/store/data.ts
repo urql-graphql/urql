@@ -23,10 +23,10 @@ import { invariant, currentDebugStack } from '../helpers/help';
 
 type Dict<T> = Record<string, T>;
 type KeyMap<T> = Map<string, T>;
-type OptimisticMap<T> = Record<number, T>;
+type OperationMap<T> = Map<number, T>;
 
 interface NodeMap<T> {
-  optimistic: OptimisticMap<KeyMap<Dict<T | undefined>>>;
+  optimistic: OperationMap<KeyMap<Dict<T | undefined>>>;
   base: KeyMap<Dict<T>>;
 }
 
@@ -40,9 +40,9 @@ export interface InMemoryData {
   /** The API's "Query" typename which is needed to filter dependencies */
   queryRootKey: string;
   /** Number of references to each entity (except "Query") */
-  refCount: Dict<number>;
+  refCount: KeyMap<number>;
   /** Number of references to each entity on optimistic layers */
-  refLock: OptimisticMap<Dict<number>>;
+  refLock: OperationMap<KeyMap<number>>;
   /** A map of entity fields (key-value entries per entity) */
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
@@ -64,11 +64,6 @@ let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
 let currentOptimisticKey: null | number = null;
 let currentOptimistic = false;
-
-const makeNodeMap = <T>(): NodeMap<T> => ({
-  optimistic: makeDict(),
-  base: new Map(),
-});
 
 /** Creates a new data object unless it's been created in this data run */
 export const makeData = (data?: Data): Data => {
@@ -165,7 +160,7 @@ export const clearDataState = () => {
     let i = data.optimisticOrder.length;
     while (
       --i >= 0 &&
-      data.refLock[data.optimisticOrder[i]] &&
+      data.refLock.has(data.optimisticOrder[i]) &&
       data.commutativeKeys.has(data.optimisticOrder[i]) &&
       !data.deferredKeys.has(data.optimisticOrder[i])
     ) {
@@ -236,10 +231,16 @@ export const make = (queryRootKey: string): InMemoryData => ({
   gc: new Set(),
   persist: new Set(),
   queryRootKey,
-  refCount: makeDict(),
-  refLock: makeDict(),
-  links: makeNodeMap(),
-  records: makeNodeMap(),
+  refCount: new Map(),
+  refLock: new Map(),
+  links: {
+    optimistic: new Map(),
+    base: new Map(),
+  },
+  records: {
+    optimistic: new Map(),
+    base: new Map(),
+  },
   deferredKeys: new Set(),
   commutativeKeys: new Set(),
   optimisticOrder: [],
@@ -256,7 +257,7 @@ const setNode = <T>(
   // Optimistic values are written to a map in the optimistic dict
   // All other values are written to the base map
   const keymap: KeyMap<Dict<T | undefined>> = currentOptimisticKey
-    ? map.optimistic[currentOptimisticKey]
+    ? map.optimistic.get(currentOptimisticKey)!
     : map.base;
 
   // On the map itself we get or create the entity as a dict
@@ -292,7 +293,7 @@ const getNode = <T>(
   // This first iterates over optimistic layers (in order)
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
     const layerKey = currentData!.optimisticOrder[i];
-    const optimistic = map.optimistic[layerKey];
+    const optimistic = map.optimistic.get(layerKey);
     // If we're reading starting from a specific layer, we skip until a match
     skip = skip && layerKey !== currentOptimisticKey;
     // If the node and node value exists it is returned, including undefined
@@ -316,18 +317,18 @@ const getNode = <T>(
 
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gc */
 const updateRCForEntity = (
-  gc: void | Set<string>,
-  refCount: Dict<number>,
+  gc: undefined | Set<string>,
+  refCount: KeyMap<number>,
   entityKey: string,
   by: number
 ): void => {
-  // Retrieve the reference count
-  const count = refCount[entityKey] !== undefined ? refCount[entityKey] : 0;
-  // Adjust it by the "by" value
-  const newCount = (refCount[entityKey] = (count + by) | 0);
+  // Retrieve the reference count and adjust it by "by"
+  const count = refCount.get(entityKey) || 0;
+  const newCount = count + by;
+  refCount.set(entityKey, newCount);
   // Add it to the garbage collection batch if it needs to be deleted or remove it
   // from the batch if it needs to be kept
-  if (gc !== undefined) {
+  if (gc) {
     if (newCount <= 0) gc.add(entityKey);
     else if (count <= 0 && newCount > 0) gc.delete(entityKey);
   }
@@ -335,8 +336,8 @@ const updateRCForEntity = (
 
 /** Adjusts the reference counts of all entities of a link on a refCount dict by "by" and updates the gc */
 const updateRCForLink = (
-  gc: void | Set<string>,
-  refCount: Dict<number>,
+  gc: undefined | Set<string>,
+  refCount: KeyMap<number>,
   link: Link | undefined,
   by: number
 ): void => {
@@ -383,7 +384,7 @@ const extractNodeMapFields = <T>(
 
   // Then extracts FieldInfo for the entity from the optimistic maps
   for (let i = 0, l = currentData!.optimisticOrder.length; i < l; i++) {
-    const optimistic = map.optimistic[currentData!.optimisticOrder[i]];
+    const optimistic = map.optimistic.get(currentData!.optimisticOrder[i]);
     if (optimistic !== undefined) {
       extractNodeFields(fieldInfos, seenFieldKeys, optimistic.get(entityKey));
     }
@@ -395,26 +396,29 @@ export const gc = () => {
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  currentData!.gc.forEach((entityKey: string, _, batch: Set<string>) => {
+  const { gc: batch } = currentData!;
+  for (const entityKey of batch.keys()) {
     // Check first whether the reference count is still 0
-    const rc = currentData!.refCount[entityKey] || 0;
+    const rc = currentData!.refCount.get(entityKey) || 0;
     if (rc > 0) {
       batch.delete(entityKey);
       return;
     }
 
     // Each optimistic layer may also still contain some references to marked entities
-    for (const layerKey in currentData!.refLock) {
-      const refCount = currentData!.refLock[layerKey];
-      const locks = refCount[entityKey] || 0;
-      // If the optimistic layer has any references to the entity, don't GC it,
-      // otherwise delete the reference count from the optimistic layer
-      if (locks > 0) return;
-      delete refCount[entityKey];
+    for (const layerKey of currentData!.refLock.keys()) {
+      const refCount = currentData!.refLock.get(layerKey);
+      if (refCount) {
+        const locks = refCount.get(entityKey) || 0;
+        // If the optimistic layer has any references to the entity, don't GC it,
+        // otherwise delete the reference count from the optimistic layer
+        if (locks > 0) return;
+        refCount.delete(entityKey);
+      }
     }
 
     // Delete the reference count, and delete the entity from the GC batch
-    delete currentData!.refCount[entityKey];
+    currentData!.refCount.delete(entityKey);
     batch.delete(entityKey);
     currentData!.records.base.delete(entityKey);
     const linkNode = currentData!.links.base.get(entityKey);
@@ -424,7 +428,7 @@ export const gc = () => {
         updateRCForLink(batch, currentData!.refCount, linkNode[fieldKey], -1);
       }
     }
-  });
+  }
 };
 
 const updateDependencies = (entityKey: string, fieldKey?: string) => {
@@ -484,18 +488,18 @@ export const writeLink = (
 ) => {
   const data = currentData!;
   // Retrieve the reference counting dict or the optimistic reference locking dict
-  let refCount: Dict<number>;
+  let refCount: KeyMap<number> | undefined;
   // Retrive the link NodeMap from either an optimistic or the base layer
   let links: KeyMap<Dict<Link | undefined>> | undefined;
   // Set the GC batch if we're not optimistically updating
-  let gc: void | Set<string>;
+  let gc: undefined | Set<string>;
   if (currentOptimisticKey) {
     // The refLock counters are also reference counters, but they prevent
     // garbage collection instead of being used to trigger it
-    refCount =
-      data.refLock[currentOptimisticKey] ||
-      (data.refLock[currentOptimisticKey] = makeDict());
-    links = data.links.optimistic[currentOptimisticKey];
+    refCount = data.refLock.get(currentOptimisticKey);
+    if (!refCount)
+      data.refLock.set(currentOptimisticKey, (refCount = new Map()));
+    links = data.links.optimistic.get(currentOptimisticKey);
   } else {
     refCount = data.refCount;
     links = data.links.base;
@@ -548,7 +552,7 @@ export const reserveLayer = (
     hasNext &&
     index < data.optimisticOrder.length &&
     !data.deferredKeys.has(data.optimisticOrder[index]) &&
-    (!data.refLock[data.optimisticOrder[index]] ||
+    (!data.refLock.has(data.optimisticOrder[index]) ||
       !data.commutativeKeys.has(data.optimisticOrder[index]));
     index++
   );
@@ -563,19 +567,19 @@ const createLayer = (data: InMemoryData, layerKey: number) => {
     data.optimisticOrder.unshift(layerKey);
   }
 
-  if (!data.refLock[layerKey]) {
-    data.refLock[layerKey] = makeDict();
-    data.links.optimistic[layerKey] = new Map();
-    data.records.optimistic[layerKey] = new Map();
+  if (!data.refLock.has(layerKey)) {
+    data.refLock.set(layerKey, new Map());
+    data.links.optimistic.set(layerKey, new Map());
+    data.records.optimistic.set(layerKey, new Map());
   }
 };
 
 /** Clears all links and records of an optimistic layer */
 const clearLayer = (data: InMemoryData, layerKey: number) => {
-  if (data.refLock[layerKey]) {
-    delete data.refLock[layerKey];
-    delete data.records.optimistic[layerKey];
-    delete data.links.optimistic[layerKey];
+  if (data.refLock.has(layerKey)) {
+    data.refLock.delete(layerKey);
+    data.records.optimistic.delete(layerKey);
+    data.links.optimistic.delete(layerKey);
     data.deferredKeys.delete(layerKey);
   }
 };
@@ -597,20 +601,24 @@ const squashLayer = (layerKey: number) => {
   const previousDependencies = currentDependencies;
   currentDependencies = new Set();
 
-  const links = currentData!.links.optimistic[layerKey];
+  const links = currentData!.links.optimistic.get(layerKey);
   if (links) {
-    links.forEach((keyMap, entityKey) => {
+    for (const entry of links.entries()) {
+      const entityKey = entry[0];
+      const keyMap = entry[1];
       for (const fieldKey in keyMap)
         writeLink(entityKey, fieldKey, keyMap[fieldKey]);
-    });
+    }
   }
 
-  const records = currentData!.records.optimistic[layerKey];
+  const records = currentData!.records.optimistic.get(layerKey);
   if (records) {
-    records.forEach((keyMap, entityKey) => {
+    for (const entry of records.entries()) {
+      const entityKey = entry[0];
+      const keyMap = entry[1];
       for (const fieldKey in keyMap)
         writeRecord(entityKey, fieldKey, keyMap[fieldKey]);
-    });
+    }
   }
 
   currentDependencies = previousDependencies;
@@ -636,7 +644,7 @@ export const persistData = () => {
     currentOptimistic = true;
     currentOperation = 'read';
     const entries: SerializedEntries = makeDict();
-    currentData!.persist.forEach(key => {
+    for (const key of currentData!.persist.keys()) {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
       let x: void | Link | EntityField;
       if ((x = readLink(entityKey, fieldKey)) !== undefined) {
@@ -646,7 +654,7 @@ export const persistData = () => {
       } else {
         entries[key] = undefined;
       }
-    });
+    }
 
     currentOptimistic = false;
     currentData!.storage.writeData(entries);
