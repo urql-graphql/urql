@@ -57,8 +57,8 @@ export interface InMemoryData {
   storage: StorageAdapter | null;
 }
 
-let currentOwnership: null | Set<Data> = null;
-let currentDataMapping: null | Map<Data, Data> = null;
+let currentOwnership: null | WeakSet<Data> = null;
+let currentDataMapping: null | WeakMap<Data, Data> = null;
 let currentOperation: null | OperationType = null;
 let currentData: null | InMemoryData = null;
 let currentDependencies: null | Dependencies = null;
@@ -92,8 +92,8 @@ export const initDataState = (
   layerKey?: number | null,
   isOptimistic?: boolean
 ) => {
-  currentOwnership = new Set();
-  currentDataMapping = new Map();
+  currentOwnership = new WeakSet();
+  currentDataMapping = new WeakMap();
   currentOperation = operationType;
   currentData = data;
   currentDependencies = new Set();
@@ -180,7 +180,7 @@ export const clearDataState = () => {
   // Schedule deferred tasks if we haven't already
   if (process.env.NODE_ENV !== 'test' && !data.defer) {
     data.defer = true;
-    Promise.resolve().then(() => {
+    setTimeout(() => {
       initDataState('read', data, null);
       gc();
       persistData();
