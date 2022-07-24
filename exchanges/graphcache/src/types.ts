@@ -222,7 +222,7 @@ export interface StorageAdapter {
   onOnline?(cb: () => void): any;
 }
 
-export type Dependencies = Record<string, true>;
+export type Dependencies = Set<string>;
 
 /** The type of cache operation being executed. */
 export type OperationType = 'read' | 'write';

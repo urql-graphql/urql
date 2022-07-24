@@ -101,7 +101,7 @@ export const initDataState = (
   currentDataMapping = new Map();
   currentOperation = operationType;
   currentData = data;
-  currentDependencies = makeDict();
+  currentDependencies = new Set();
   currentOptimistic = !!isOptimistic;
   if (process.env.NODE_ENV !== 'production') {
     currentDebugStack.length = 0;
@@ -430,9 +430,9 @@ export const gc = () => {
 const updateDependencies = (entityKey: string, fieldKey?: string) => {
   if (fieldKey !== '__typename') {
     if (entityKey !== currentData!.queryRootKey) {
-      currentDependencies![entityKey] = true;
+      currentDependencies!.add(entityKey);
     } else if (fieldKey !== undefined) {
-      currentDependencies![joinKeys(entityKey, fieldKey)] = true;
+      currentDependencies!.add(joinKeys(entityKey, fieldKey));
     }
   }
 };
@@ -595,7 +595,7 @@ const deleteLayer = (data: InMemoryData, layerKey: number) => {
 const squashLayer = (layerKey: number) => {
   // Hide current dependencies from squashing operations
   const previousDependencies = currentDependencies;
-  currentDependencies = makeDict();
+  currentDependencies = new Set();
 
   const links = currentData!.links.optimistic[layerKey];
   if (links) {

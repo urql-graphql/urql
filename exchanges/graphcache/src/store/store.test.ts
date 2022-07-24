@@ -401,7 +401,7 @@ describe('Store with OptimisticMutationConfig', () => {
     expect(result).toEqual('Go to the shops');
     // TODO: we have no way of asserting this to really be the case.
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true, 'Author:0': true });
+    expect(deps).toEqual(new Set(['Todo:0', 'Author:0']));
     InMemoryData.clearDataState();
   });
 
@@ -429,7 +429,7 @@ describe('Store with OptimisticMutationConfig', () => {
     const authorResult = store.resolve('Author:0', 'name');
     expect(authorResult).toBe('Jovi');
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Author:0': true });
+    expect(deps).toEqual(new Set(['Author:0']));
     InMemoryData.clearDataState();
   });
 
@@ -443,7 +443,7 @@ describe('Store with OptimisticMutationConfig', () => {
     const result = store.resolve(parent, 'author');
     expect(result).toEqual('Author:0');
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true });
+    expect(deps).toEqual(new Set(['Todo:0']));
     InMemoryData.clearDataState();
   });
 
@@ -500,7 +500,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
 
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true });
+    expect(deps).toEqual(new Set(['Todo:0']));
 
     const { data } = query(store, { query: Todos });
 
@@ -576,7 +576,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
 
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true });
+    expect(deps).toEqual(new Set(['Todo:0']));
 
     expect(result).toEqual({
       id: '0',
@@ -714,14 +714,16 @@ describe('Store with OptimisticMutationConfig', () => {
     const result = store.readQuery({ query: Todos });
 
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({
-      'Query.todos': true,
-      'Todo:0': true,
-      'Todo:1': true,
-      'Todo:2': true,
-      'Author:0': true,
-      'Author:1': true,
-    });
+    expect(deps).toEqual(
+      new Set([
+        'Query.todos',
+        'Todo:0',
+        'Todo:1',
+        'Todo:2',
+        'Author:0',
+        'Author:1',
+      ])
+    );
 
     expect(result).toEqual({
       __typename: 'Query',
@@ -752,7 +754,7 @@ describe('Store with OptimisticMutationConfig', () => {
       },
       1
     );
-    expect(dependencies).toEqual({ 'Todo:1': true });
+    expect(dependencies).toEqual(new Set(['Todo:1']));
     let { data } = query(store, { query: Todos });
     expect(data).toEqual({
       __typename: 'Query',

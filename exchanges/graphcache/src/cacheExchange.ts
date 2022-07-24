@@ -24,7 +24,6 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { makeDict, isDictEmpty } from './helpers/dict';
 import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
@@ -39,7 +38,7 @@ type Operations = Set<number>;
 type OperationMap = Map<number, Operation>;
 type ResultMap = Map<number, Data | null>;
 type OptimisticDependencies = Map<number, Dependencies>;
-type DependentOperations = Record<string, number[]>;
+type DependentOperations = Map<string, Operations>;
 
 export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   opts?: C
@@ -57,29 +56,25 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const mutationResultBuffer: OperationResult[] = [];
   const operations: OperationMap = new Map();
   const results: ResultMap = new Map();
-  const blockedDependencies: Dependencies = makeDict();
+  const blockedDependencies: Dependencies = new Set();
   const requestedRefetch: Operations = new Set();
-  const deps: DependentOperations = makeDict();
+  const deps: DependentOperations = new Map();
 
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
-    for (const dep in dependencies) if (blockedDependencies[dep]) return true;
+    for (const dep of dependencies.values())
+      if (blockedDependencies.has(dep)) return true;
     return false;
   };
 
   const collectPendingOperations = (
     pendingOperations: Operations,
-    dependencies: void | Dependencies
+    dependencies: undefined | Dependencies
   ) => {
     if (dependencies) {
       // Collect operations that will be updated due to cache changes
-      for (const dep in dependencies) {
-        const keys = deps[dep];
-        if (keys) {
-          deps[dep] = [];
-          for (let i = 0, l = keys.length; i < l; i++) {
-            pendingOperations.add(keys[i]);
-          }
-        }
+      for (const dep of dependencies.values()) {
+        const keys = deps.get(dep);
+        if (keys) for (const key of keys.values()) pendingOperations.add(key);
       }
     }
   };
@@ -89,7 +84,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     pendingOperations: Operations
   ) => {
     // Reexecute collected operations and delete them from the mapping
-    pendingOperations.forEach(key => {
+    for (const key of pendingOperations.values()) {
       if (key !== operation.key) {
         const op = operations.get(key);
         if (op) {
@@ -102,7 +97,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
           client.reexecuteOperation(toRequestPolicy(op, policy));
         }
       }
-    });
+    }
   };
 
   // This registers queries with the data layer to ensure commutativity
@@ -122,11 +117,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     ) {
       // This executes an optimistic update for mutations and registers it if necessary
       const { dependencies } = writeOptimistic(store, operation, operation.key);
-      if (!isDictEmpty(dependencies)) {
+      if (dependencies.size) {
         // Update blocked optimistic dependencies
-        for (const dep in dependencies) {
-          blockedDependencies[dep] = true;
-        }
+        for (const dep of dependencies.values()) blockedDependencies.add(dep);
 
         // Store optimistic dependencies for update
         optimisticKeysToDependencies.set(operation.key, dependencies);
@@ -156,8 +149,10 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
   // This updates the known dependencies for the passed operation
   const updateDependencies = (op: Operation, dependencies: Dependencies) => {
-    for (const dep in dependencies) {
-      (deps[dep] || (deps[dep] = [])).push(op.key);
+    for (const dep of dependencies.values()) {
+      let depOps = deps.get(dep);
+      if (!depOps) deps.set(dep, (depOps = new Set()));
+      depOps.add(op.key);
       operations.set(op.key, op);
     }
   };
@@ -390,9 +385,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
             reserveLayer(store.data, mutationResultBuffer[i].operation.key);
           }
 
-          for (const dep in blockedDependencies) {
-            delete blockedDependencies[dep];
-          }
+          blockedDependencies.clear();
 
           const results: OperationResult[] = [];
           const pendingOperations: Operations = new Set();
