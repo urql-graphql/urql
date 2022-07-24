@@ -53,8 +53,8 @@ export const isInterfaceOfType = (
   if (!typeCondition || typename === typeCondition) {
     return true;
   } else if (
-    schema.types![typeCondition] &&
-    schema.types![typeCondition].kind === 'OBJECT'
+    schema.types!.has(typeCondition) &&
+    schema.types!.get(typeCondition)!.kind === 'OBJECT'
   ) {
     return typeCondition === typename;
   }
@@ -76,7 +76,7 @@ const getField = (
     return;
 
   expectObjectType(schema, typename);
-  const object = schema.types![typename] as SchemaObject;
+  const object = schema.types!.get(typename) as SchemaObject;
   const field = object.fields[fieldName];
   if (!field) {
     warn(
@@ -96,7 +96,8 @@ const getField = (
 
 function expectObjectType(schema: SchemaIntrospector, typename: string) {
   invariant(
-    schema.types![typename] && schema.types![typename].kind === 'OBJECT',
+    schema.types!.has(typename) &&
+      schema.types!.get(typename)!.kind === 'OBJECT',
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
@@ -107,9 +108,9 @@ function expectObjectType(schema: SchemaIntrospector, typename: string) {
 
 function expectAbstractType(schema: SchemaIntrospector, typename: string) {
   invariant(
-    schema.types![typename] &&
-      (schema.types![typename].kind === 'INTERFACE' ||
-        schema.types![typename].kind === 'UNION'),
+    schema.types!.has(typename) &&
+      (schema.types!.get(typename)!.kind === 'INTERFACE' ||
+        schema.types!.get(typename)!.kind === 'UNION'),
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +
@@ -124,7 +125,7 @@ export function expectValidKeyingConfig(
 ): void {
   if (process.env.NODE_ENV !== 'production') {
     for (const key in keys) {
-      if (!schema.types![key]) {
+      if (!schema.types!.has(key)) {
         warn(
           'Invalid Object type: The type `' +
             key +
@@ -145,7 +146,7 @@ export function expectValidUpdatesConfig(
   }
 
   if (schema.mutation) {
-    const mutationFields = (schema.types![schema.mutation] as SchemaObject)
+    const mutationFields = (schema.types!.get(schema.mutation) as SchemaObject)
       .fields;
     const givenMutations = updates[schema.mutation] || {};
     for (const fieldName in givenMutations) {
@@ -161,9 +162,9 @@ export function expectValidUpdatesConfig(
   }
 
   if (schema.subscription) {
-    const subscriptionFields = (schema.types![
+    const subscriptionFields = (schema.types!.get(
       schema.subscription
-    ] as SchemaObject).fields;
+    ) as SchemaObject).fields;
     const givenSubscription = updates[schema.subscription] || {};
     for (const fieldName in givenSubscription) {
       if (subscriptionFields[fieldName] === undefined) {
@@ -208,7 +209,7 @@ export function expectValidResolversConfig(
   for (const key in resolvers) {
     if (key === 'Query') {
       if (schema.query) {
-        const validQueries = (schema.types![schema.query] as SchemaObject)
+        const validQueries = (schema.types!.get(schema.query) as SchemaObject)
           .fields;
         for (const resolverQuery in resolvers.Query) {
           if (!validQueries[resolverQuery]) {
@@ -219,18 +220,19 @@ export function expectValidResolversConfig(
         warnAboutResolver('Query');
       }
     } else {
-      if (!schema.types![key]) {
+      if (!schema.types!.has(key)) {
         warnAboutResolver(key);
       } else if (
-        schema.types![key].kind === 'INTERFACE' ||
-        schema.types![key].kind === 'UNION'
+        schema.types!.get(key)!.kind === 'INTERFACE' ||
+        schema.types!.get(key)!.kind === 'UNION'
       ) {
         warnAboutAbstractResolver(
           key,
-          schema.types![key].kind as 'INTERFACE' | 'UNION'
+          schema.types!.get(key)!.kind as 'INTERFACE' | 'UNION'
         );
       } else {
-        const validTypeProperties = (schema.types![key] as SchemaObject).fields;
+        const validTypeProperties = (schema.types!.get(key) as SchemaObject)
+          .fields;
         for (const resolverProperty in resolvers[key]) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
@@ -250,7 +252,7 @@ export function expectValidOptimisticMutationsConfig(
   }
 
   if (schema.mutation) {
-    const validMutations = (schema.types![schema.mutation] as SchemaObject)
+    const validMutations = (schema.types!.get(schema.mutation) as SchemaObject)
       .fields;
     for (const mutation in optimisticMutations) {
       if (!validMutations[mutation]) {

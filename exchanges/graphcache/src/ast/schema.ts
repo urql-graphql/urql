@@ -29,7 +29,7 @@ export interface SchemaIntrospector {
   query: string | null;
   mutation: string | null;
   subscription: string | null;
-  types?: Record<string, SchemaObject | SchemaUnion>;
+  types?: Map<string, SchemaObject | SchemaUnion>;
   isSubType(abstract: string, possible: string): boolean;
 }
 
@@ -47,7 +47,7 @@ export type IntrospectionData =
 export const buildClientSchema = ({
   __schema,
 }: IntrospectionData): SchemaIntrospector => {
-  const typemap: Record<string, SchemaObject | SchemaUnion> = {};
+  const typemap: Map<string, SchemaObject | SchemaUnion> = new Map();
 
   const buildNameMap = <T extends { name: string }>(
     arr: ReadonlyArray<T>
@@ -92,8 +92,8 @@ export const buildClientSchema = ({
       : null,
     types: undefined,
     isSubType(abstract: string, possible: string) {
-      const abstractType = typemap[abstract];
-      const possibleType = typemap[possible];
+      const abstractType = typemap.get(abstract);
+      const possibleType = typemap.get(possible);
       if (!abstractType || !possibleType) {
         return false;
       } else if (abstractType.kind === 'UNION') {
@@ -115,7 +115,7 @@ export const buildClientSchema = ({
       const type = __schema.types[i];
       if (type && type.name) {
         const out = buildType(type);
-        if (out) typemap[type.name] = out;
+        if (out) typemap.set(type.name, out);
       }
     }
   }
