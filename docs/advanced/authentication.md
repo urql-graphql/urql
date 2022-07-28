@@ -166,6 +166,7 @@ The GraphQL error looks like something like this:
       response: {
         status: 200
       }
+    }
   ]
 }
 ```
@@ -192,6 +193,7 @@ For some GraphQL APIs, the auth error is communicated via an 401 HTTP response a
       response: {
         status: 401
       }
+    }
   ]
 }
 ```
