@@ -1,5 +1,11 @@
 # @urql/vue
 
+## 0.6.4
+
+### Patch Changes
+
+- Allow Vue 2.7 as peer dependency to prevent peer dependency errors e.g. with pnpm, by [@dargmuesli](https://github.com/dargmuesli) (See [#2561](https://github.com/FormidableLabs/urql/pull/2561))
+
 ## 0.6.3
 
 ### Patch Changes
