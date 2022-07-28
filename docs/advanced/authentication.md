@@ -309,8 +309,6 @@ const willAuthError = ({ operation, authState }) => {
         );
       })
     );
-  } else if (false /* JWT is expired */) {
-    return true;
   }
 
   return false;
