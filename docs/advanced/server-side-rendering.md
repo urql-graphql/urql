@@ -279,10 +279,13 @@ function Todos() {
 
 export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
-  const client = initUrqlClient({
-    url: 'your-url',
+  const client = initUrqlClient(
+  {
+    url: "your-url",
     exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
-  });
+  },
+    false
+  );
 
   // This query is used to populate the cache for the query
   // used on this page.

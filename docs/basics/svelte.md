@@ -5,9 +5,6 @@ order: 2
 
 # Svelte
 
-> **NOTE:** These API docs are for the v1 version of `@urql/svelte` rather than v2.
-> [In the meantime, please check out our API docs for our Svelte bindings instead!](../api/svelte.md)
-
 ## Getting started
 
 This "Getting Started" guide covers how to install and set up `urql` and provide a `Client` for
@@ -88,39 +85,26 @@ components. This will share one `Client` with the rest of our app, if we for ins
 
 ```html
 <script>
-  import { createClient, setClient } from '@urql/svelte';
+  import { createClient, setContextClient } from '@urql/svelte';
 
   const client = createClient({
     url: 'http://localhost:3000/graphql',
   });
 
-  setClient(client);
+  setContextClient(client);
 </script>
 ```
 
-The `setClient` method internally calls [Svelte's `setContext`
-function](https://svelte.dev/docs#run-time-svelte-setcontext). The `@urql/svelte` package also exposes a `getClient`
+The `setContextClient` method internally calls [Svelte's `setContext`
+function](https://svelte.dev/docs#run-time-svelte-setcontext). The `@urql/svelte` package also exposes a `getContextClient`
 function that uses [`getContext`](https://svelte.dev/docs#run-time-svelte-getcontext) to retrieve the `Client` in
-child components. This is used throughout `@urql/svelte`'s API.
-
-We can also use a convenience function, `initClient`. This function combines the `createClient` and
-`setClient` calls into one.
-
-```html
-<script>
-  import { initClient } from '@urql/svelte';
-
-  initClient({
-    url: 'http://localhost:3000/graphql',
-  });
-</script>
-```
+child components. This is used to input the client into `@urql/svelte`'s API.
 
 ## Queries
 
-We'll implement queries using the `operationStore` and the `query` function from `@urql/svelte`.
+We'll implement queries using the `queryStore` function from `@urql/svelte`.
 
-The `operationStore` function creates a [Svelte Writable store](https://svelte.dev/docs#writable).
+The `queryStore` function creates a [Svelte Writable store](https://svelte.dev/docs#writable).
 You can use it to initialise a data container in `urql`. This store holds on to our query inputs,
 like the GraphQL query and variables, which we can change to launch new queries. It also exposes
 the query's eventual result, which we can then observe.
@@ -130,20 +114,21 @@ the query's eventual result, which we can then observe.
 For the following examples, we'll imagine that we're querying data from a GraphQL API that contains
 todo items. Let's dive right into it!
 
-```jsx
+```js
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query {
-      todos {
-        id
-        title
+  const todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query {
+        todos {
+          id
+          title
+        }
       }
-    }
-  `);
-
-  query(todos);
+    `,
+  });
 </script>
 
 {#if $todos.fetching}
@@ -159,112 +144,104 @@ todo items. Let's dive right into it!
 {/if}
 ```
 
-Here we have implemented our first GraphQL query to fetch todos. We're first creating an
-`operationStore` which holds on to our `query` and are then passing the store to the `query`
-function, which starts the GraphQL query.
+Here we have implemented our first GraphQL query to fetch todos. We're first creating a
+`queryStore` which will start our GraphQL query.
 
 The `todos` store can now be used like any other Svelte store using a
 [reactive auto-subscription](https://svelte.dev/tutorial/auto-subscriptions) in Svelte. This means
 that we prefix `$todos` with a dollar symbol, which automatically subscribes us to its changes.
 
-The `query` function accepts our store and starts using the `Client` to execute our query. It may
-only be called once for a store and lives alongside the component's lifecycle. It will automatically
-read changes on the `operationStore` and will update our query and results accordingly.
-
 ### Variables
 
 Typically we'll also need to pass variables to our queries, for instance, if we are dealing with
-pagination. For this purpose the `operationStore` also accepts a `variables` argument, which we can
+pagination. For this purpose the `queryStore` also accepts a `variables` argument, which we can
 use to supply variables to our query.
 
-```jsx
+```js
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, getContextClient, gql } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query ($from: Int!, $limit: Int!) {
-      todos(from: $from, limit: $limit) {
-        id
-        title
+  $: todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query ($from: Int!, $limit: Int!) {
+        todos(from: $from, limit: $limit) {
+          id
+          title
+        }
       }
-    }`,
-    { from, limit }
+    `,
+    variables: { from, limit }
   );
-
-  query(todos);
 </script>
-
 ...
 ```
+
+> Note that we prefix the variable with `$` so Svelte knows that this store is reactive
 
 As when we're sending GraphQL queries manually using `fetch`, the variables will be attached to the
 `POST` request body that is sent to our GraphQL API.
 
-The `operationStore` also supports being actively changed. This will hook into Svelte's reactivity
+The `queryStore` also supports being actively changed. This will hook into Svelte's reactivity
 model as well and cause the `query` utility to start a new operation.
 
-```jsx
+```js
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, getContextClient, gql } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query ($from: Int!, $limit: Int!) {
-      todos(from: $from, limit: $limit) {
-        id
-        title
+  let limit = 10;
+  let from = 0;
+  $: todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query ($from: Int!, $limit: Int!) {
+        todos(from: $from, limit: $limit) {
+          id
+          title
+        }
       }
-    }`,
-    { from, limit }
+    `,
+    variables: { from, limit }
   );
 
   query(todos);
 
   function nextPage() {
-    // it's important that we assign a new reference to variables.
-    $todos.variables = { ...$todos.variables, from: $todos.variables.from + $todos.variables.limit };
-    // OR
-    $todos.variables.from += $todos.variables.limit;
-    $todos.reexecute();
+    from = from + 10
   }
 </script>
 
 <button on:click={nextPage}>Next page<button></button></button>
 ```
 
-The `operationStore` provides getters as well, so it's also possible for us to pass `todos` around and
-update `todos.variables` or `todos.query` directly. Both, updating `todos.variables` and
-`$todos.variables` in a component for instance, will cause `query` to pick up the update and execute
-our changes.
-
 ### Pausing Queries
 
 In some cases we may want our queries to not execute until a pre-condition has been met. Since the
 `query` operation exists for the entire component lifecycle however, it can't just be stopped and
-started at will. Instead, the `query`'s third argument, the `context`, may have an added `pause`
-option that can be set to `true` to temporarily _freeze_ all changes and stop requests.
+started at will. Instead, the `queryStore` accepts a key named `pause` that will tell the store that
+is starts out as paused.
 
 For instance, we may start out with a paused store and then unpause it once a callback is invoked:
 
 ```html
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
 
-  const todo = operationStore(
-    `
-    query {
-      todo {
-        id
-        title
+  $: todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query {
+        todos {
+          id
+          title
+        }
       }
-    }`,
-    undefined,
-    { pause: true }
-  );
-
-  query(todo);
+    `,
+    pause: true,
+  });
 
   function unpause() {
-    $todo.context.pause = false;
+    $todos.resume();
   }
 </script>
 
@@ -273,9 +250,8 @@ For instance, we may start out with a paused store and then unpause it once a ca
 
 ### Request Policies
 
-The `operationStore` also accepts another argument apart from `query` and `variables`. Optionally
-you may pass a third argument, [the `context` object](../api/core.md#operationcontext). The arguably
-most interesting option the `context` may contain is `requestPolicy`.
+The `queryStore` also accepts another key apart from `query` and `variables`. Optionally
+you may pass a `requestPolicy`.
 
 The `requestPolicy` option determines how results are retrieved from our `Client`'s cache. By
 default, this is set to `cache-first`, which means that we prefer to get results from our cache, but
@@ -285,30 +261,29 @@ Request policies aren't specific to `urql`'s Svelte bindings, but are a common f
 [You can learn more about how the cache behaves given the four different policies on the "Document
 Caching" page.](../basics/document-caching.md)
 
-```jsx
+```js
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query ($from: Int!, $limit: Int!) {
-      todos(from: $from, limit: $limit) {
-        id
-        title
+  $: todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query {
+        todos {
+          id
+          title
+        }
       }
-    }`,
-    { from, limit },
-    { requestPolicy: 'cache-and-network' }
-  );
-
-  query(todos);
+    `,
+    requestPolicy: 'cache-and-network'
+  });
 </script>
 
 ...
 ```
 
 As we can see, the `requestPolicy` is easily changed by passing it directly as a "context option"
-when creating an `operationStore`. We can then read our `context` option back from `todos.context`,
-just as we can check `todos.query` and `todos.variables`.
+when creating a `queryStore`.
 
 Internally, the `requestPolicy` is just one of several "**context** options". The `context`
 provides metadata apart from the usual `query` and `variables` we may pass. This means that
@@ -327,94 +302,84 @@ const client = createClient({
 
 ### Context Options
 
-As mentioned, the `requestPolicy` option that we're passing to the `operationStore` is a part of
+As mentioned, the `requestPolicy` option that we're passing to the `queryStore` is a part of
 `urql`'s context options. In fact, there are several more built-in context options, and the
 `requestPolicy` option is one of them. Another option we've already seen is the `url` option, which
 determines our API's URL.
 
-```jsx
+```js
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query ($from: Int!, $limit: Int!) {
-      todos(from: $from, limit: $limit) {
-        id
-        title
+  $: todos = queryStore({
+    client: getContextClient(),
+    query: gql`
+      query {
+        todos {
+          id
+          title
+        }
       }
-    }`,
-    { from, limit },
-    {
-      requestPolicy: 'cache-and-network'
-      url: 'http://localhost:3000/graphql?debug=true',
-    }
-  );
-
-  query(todos);
+    `,
+    context: { url: 'http://localhost:3000/graphql?debug=true', }
+  });
 </script>
 
 ...
 ```
 
-As we can see, the `context` argument for `operationStore` accepts any known `context` option and
+As we can see, the `context` argument for `queryStore` accepts any known `context` option and
 can be used to alter them per query rather than globally. The `Client` accepts a subset of `context`
-options, while the `operationStore` argument does the same for a single query. They're then merged
+options, while the `queryStore` argument does the same for a single query. They're then merged
 for your operation and form a full `Context` object for each operation, which means that any given
 query is able to override them as needed.
 
 [You can find a list of all `Context` options in the API docs.](../api/core.md#operationcontext)
 
-### Reexecuting Queries
+### Reexecuting queries
 
-The default caching approach in `@urql/svelte` typically takes care of updating queries on the fly
-quite well and does so automatically. Sometimes it may be necessary though to refetch data and to
-execute a query with a different `context`. Triggering a query programmatically may be useful in a
-couple of cases. It can for instance be used to refresh data.
-
-We can trigger a new query update by changing out the `context` of our `operationStore`. While we
-can simply assign a new context value using `$todos.context = {}` we can also use the store's
-`reexecute` method as syntactic sugar for this:
+Sometimes we'll need to arbitrarly reexecute a query to check for new data on the server, this can be done through:
 
 ```jsx
 <script>
-  import { operationStore, query } from '@urql/svelte';
+  import { queryStore, gql, getContextClient } from '@urql/svelte';
 
-  const todos = operationStore(`
-    query ($from: Int!, $limit: Int!) {
-      todos(from: $from, limit: $limit) {
+  const client = getContextClient();
+  const query = gql`
+    query {
+      todos {
         id
         title
       }
-    }`,
-    { from, limit },
-    { requestPolicy: 'cache-first' }
-  );
-
-  query(todos);
+    }
+  `
+  $: todos = queryStore({
+    client,
+    query,
+  });
 
   function refresh() {
-    todos.reexecute({ requestPolicy: 'network-only' });
+    queryStore({
+      client,
+      query,
+      requestPolicy: 'network-only'
+    });
   }
 </script>
 ```
 
-Calling `refresh` in the above example will execute the query again forcefully, and will skip the
-cache, since we're passing `requestPolicy: 'network-only'`.
-
-Furthermore the `reexecute` function can also be used to programmatically start a query even
-when `pause` is set to `true`, which would usually stop all automatic queries. This can be used to
-perform one-off actions, or to set up polling.
+We use the `requestPolicy` with value `network-only` so we don't hit our cache and dispatch a refresh,
+if it updates the data the `todos` will be updated due to our cache updating.
 
 ### Reading on
 
-There are some more tricks we can use with `operationStore`.
-[Read more about its API in the API docs for it.](../api/svelte.md#operationStore)
+There are some more tricks we can use with `queryStore`.
+[Read more about its API in the API docs for it.](../api/svelte.md#queryStore)
 
 ## Mutations
 
-The `mutation` function isn't dissimilar from the `query` function but is triggered manually and
-can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest), while also supporting our
-trusty `operationStore`.
+The `mutationStore` function isn't dissimilar from the `queryStore` function but is triggered manually and
+can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest).
 
 ### Sending a mutation
 
@@ -423,104 +388,43 @@ example! We'll set up a mutation that _updates_ a todo item's title.
 
 ```html
 <script>
-  import { mutation } from '@urql/svelte';
+  import { mutationStore, gql, getContextClient } from '@urql/svelte';
 
   export let id;
 
-  const mutateTodo = mutation({
-    query: `
-      mutation ($id: ID!, $title: String!) {
-        updateTodo (id: $id, title: $title) {
-          id
-          title
+  let result;
+  let client = getContextClient();
+  const updateTodo = ({ id, title }) => {
+    result = mutationStore({
+      client,
+      query: gql`
+        mutation($id: ID!, $title: String!) {
+          updateTodo(id: $id, title: $title) {
+            id
+            title
+          }
         }
-      }
-    `,
-  });
-
-  function updateTodo(newTitle) {
-    mutateTodo({ id, title: newTitle });
-  }
-</script>
-```
-
-This small call to `mutation` accepts a `query` property (besides the `variables` property) and
-returns an execute function. We've wrapped it in an `updateTodo` function to illustrate its usage.
-
-Unlike the `query` function, the `mutation` function doesn't start our mutation automatically.
-Instead, mutations are started programmatically by calling the function they return. This function
-also returns a promise so that we can use the mutation's result.
-
-### Using the mutation result
-
-When calling `mutateTodo` in our previous example, we start the mutation. To use the mutation's
-result we actually have two options instead of one.
-
-The first option is to use the promise that the `mutation`'s execute function returns. This promise
-will resolve to an `operationStore`, which is what we're used to from sending queries. Using this
-store we can then read the mutation's `data` or `error`.
-
-```html
-<script>
-  import { mutation } from '@urql/svelte';
-
-  export let id;
-
-  const mutateTodo = mutation({
-    query: `
-      mutation ($id: ID!, $title: String!) {
-        updateTodo (id: $id, title: $title) {
-          id
-          title
-        }
-      }
-    `,
-  });
-
-  function updateTodo(newTitle) {
-    mutateTodo({ id, title: newTitle }).then(result => {
-      // The result is an operationStore again, which will already carry the mutation's result
-      console.log(result.data, result.error);
+      `,
+      variables: { id, title },
     });
-  }
+  };
 </script>
 ```
 
-Alternatively, we can pass `mutation` an `operationStore` directly. This allows us to use a
-mutation's result in our component's UI more easily, without storing it ourselves.
+This small call to `mutationStore` accepts a `query` property (besides the `variables` property) and
+returns the `OperationResult` as a store.
 
-```html
-<script>
-  import { operationStore, mutation } from '@urql/svelte';
-
-  export let id;
-
-  const updateTodoStore = operationStore(`
-    mutation ($id: ID!, $title: String!) {
-      updateTodo (id: $id, title: $title) {
-        id
-        title
-      }
-    }
-  `);
-
-  const updateTodoMutation = mutation(updateTodoStore);
-
-  function updateTodo(newTitle) {
-    updateTodoMutation({ id, title: newTitle });
-  }
-</script>
-
-{#if $updateTodoStore.data} Todo was updated! {/if}
-```
+Unlike the `query` function, we don't want the mutation to start automatically hence we enclose it in
+a function. The `result` will be updated with the `fetching`, `data`, ... as a normal query would which
+you can in-turn use in your UI.
 
 ### Handling mutation errors
 
 It's worth noting that the promise we receive when calling the execute function will never
-reject. Instead it will always return a promise that resolves to an `operationStore`, even if the
+reject. Instead it will always return a promise that resolves to an `mutationStore`, even if the
 mutation has failed.
 
-If you're checking for errors, you should use `operationStore.error` instead, which will be set
+If you're checking for errors, you should use `mutationStore.error` instead, which will be set
 to a `CombinedError` when any kind of errors occurred while executing your mutation.
 [Read more about errors on our "Errors" page.](./errors.md)
 
