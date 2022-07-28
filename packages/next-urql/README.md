@@ -146,6 +146,8 @@ The second argument for `withUrqlClient` is an options object, this contains one
 `withUrqlClient` that the wrapped component does not use `getInitialProps` but the children of this wrapped component do. This opts you into
 `ssr` for these children.
 
+If you use custom `App.getInitialProps` and use this App props in the App and have `ssr === true` you you can pass the props through `generateAppProps` so the prepass step has all the information needed to render.
+
 ### Different Client configurations on the client and the server
 
 There are use cases where you may need different configurations for your `urql` Client on the client-side and the server-side; for example, you may want to interact with one GraphQL endpoint on the server-side and another on the client-side. `next-urql` supports this as of v0.3.0. We recommend using `typeof window === 'undefined'` or a `process.browser` check.
@@ -225,15 +227,18 @@ If you want to use a `Client` in Next.js' newer methods like `getServerSideProps
 ```javascript
 import { initUrqlClient } from 'next-urql';
 
-export const getServerSideProps = async (ctx) => {
-  const client = initUrqlClient({
-    url: '/graphql',
-  }, false /* set to false to disable suspense */);
+export const getServerSideProps = async ctx => {
+  const client = initUrqlClient(
+    {
+      url: '/graphql',
+    },
+    false /* set to false to disable suspense */
+  );
 
   const result = await client.query(QUERY, {}).toPromise();
 
   return {
-    props: { data: result.data }
+    props: { data: result.data },
   };
 };
 ```

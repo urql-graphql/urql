@@ -160,7 +160,11 @@ export function withUrqlClient(
         }
 
         const props = { ...pageProps, urqlClient };
-        const appTreeProps = isApp ? props : { pageProps: props };
+
+        // Add an option to provide the custom App props when a custom `App.getInitialProps` is used.
+        const appProps = isApp ? {} : options?.getAppProps?.(ctx) ?? {};
+
+        const appTreeProps = isApp ? props : { ...appProps, pageProps: props };
 
         // Run the prepass step on AppTree. This will run all urql queries on the server.
         if (!options!.neverSuspend) {

@@ -55,4 +55,5 @@ export interface WithUrqlClientOptions {
   ssr?: boolean;
   neverSuspend?: boolean;
   staleWhileRevalidate?: boolean;
+  getAppProps?: (ctx?: NextPageContext) => any;
 }
