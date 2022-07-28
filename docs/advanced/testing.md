@@ -243,7 +243,7 @@ it('should update the list', done => {
     </Provider>
   );
 
-  setTimeout(() => {
+  setInterval(() => {
     expect(wrapper.find('.list').children()).toHaveLength(index + 1); // See how many items are in the list
     index++;
     if (index === 2) done();
