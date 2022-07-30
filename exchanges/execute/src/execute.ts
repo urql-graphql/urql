@@ -33,7 +33,7 @@ import {
 export interface ExecuteExchangeArgs {
   schema: GraphQLSchema;
   rootValue?: any;
-  context?: ((op: Operation) => void) | any;
+  context?: ((op: Operation) => any) | any;
   fieldResolver?: GraphQLFieldResolver<any, any>;
   typeResolver?: GraphQLTypeResolver<any, any>;
   subscribeFieldResolver?: GraphQLFieldResolver<any, any>;
