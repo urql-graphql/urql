@@ -378,7 +378,7 @@ There are some more tricks we can use with `queryStore`.
 
 ## Mutations
 
-The `mutationStore` function isn't dissimilar from the `queryStore` function but is triggered manually and
+The `mutationStore` function is similar to the `queryStore` function but is triggered manually and
 can accept a [`GraphQLRequest` object](../api/core.md#graphqlrequest).
 
 ### Sending a mutation

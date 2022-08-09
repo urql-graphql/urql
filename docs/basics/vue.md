@@ -567,7 +567,7 @@ it.](../api/vue.md#usequery)
 
 ## Mutations
 
-The `useMutation` function isn't dissimilar from `useQuery` but is triggered manually and accepts
+The `useMutation` function is similar to `useQuery` but is triggered manually and accepts
 only a `DocumentNode` or `string` as an input.
 
 ### Sending a mutation
