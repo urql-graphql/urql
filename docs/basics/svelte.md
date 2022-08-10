@@ -172,7 +172,7 @@ use to supply variables to our query.
       }
     `,
     variables: { from, limit }
-  );
+  });
 </script>
 ...
 ```
