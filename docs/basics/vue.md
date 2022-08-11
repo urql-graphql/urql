@@ -269,6 +269,8 @@ import { useQuery } from '@urql/vue';
 export default {
   props: ['from', 'limit'],
   setup({ from, limit }) {
+    const shouldPause = computed(() => from === undefined || from === null ||
+                                      limit === undefined || limit === null);
     return useQuery({
       query: `
         query ($from: Int!, $limit: Int!) {
@@ -279,7 +281,7 @@ export default {
         }
       `,
       variables: { from, limit },
-      pause: computed(() => !from.value || !limit.value)
+      pause: shouldPause
     });
   }
 };

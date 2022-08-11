@@ -195,10 +195,12 @@ executed. We can do this by setting the `pause` option to `true`:
 
 ```jsx
 const Todos = ({ from, limit }) => {
+  const shouldPause = from === undefined || from === null ||
+                      limit === undefined || limit === null;
   const [result, reexecuteQuery] = useQuery({
     query: TodosListQuery,
     variables: { from, limit },
-    pause: !from || !limit,
+    pause: shouldPause,
   });
 
   // ...
