@@ -542,7 +542,7 @@ Example series of requests:
 
 ```
 first: 1 => node 1, endCursor: a
-first: 1, after: 1 => node 2, endCursor: b
+first: 1, after: a => node 2, endCursor: b
 ...
 last: 1 => node 99, startCursor: c
 last: 1, before: c => node 89, startCursor: d
