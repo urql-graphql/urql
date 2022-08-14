@@ -29,38 +29,22 @@ export const makeFetchURL = (
   body?: FetchBody
 ): string => {
   const useGETMethod = shouldUseGet(operation);
-  const url = operation.context.url;
-  if (!useGETMethod || !body) return url;
+  if (!useGETMethod || !body) return operation.context.url;
 
-  const search: string[] = [];
-  if (body.operationName) {
-    search.push('operationName=' + encodeURIComponent(body.operationName));
-  }
+  const url = new URL(operation.context.url);
+  const search = url.searchParams;
+  if (body.operationName) search.set('operationName', body.operationName);
+  if (body.query)
+    search.set('query', body.query.replace(/#[^\n\r]+/g, ' ').trim());
+  if (body.variables)
+    search.set('variables', stringifyVariables(body.variables));
+  if (body.extensions)
+    search.set('extensions', stringifyVariables(body.extensions));
 
-  if (body.query) {
-    search.push(
-      'query=' +
-        encodeURIComponent(body.query.replace(/#[^\n\r]+/g, ' ').trim())
-    );
-  }
-
-  if (body.variables) {
-    search.push(
-      'variables=' + encodeURIComponent(stringifyVariables(body.variables))
-    );
-  }
-
-  if (body.extensions) {
-    search.push(
-      'extensions=' + encodeURIComponent(stringifyVariables(body.extensions))
-    );
-  }
-
-  const finalUrl = `${url}?${search.join('&')}`;
-
+  const finalUrl = url.toString();
   if (finalUrl.length > 2047) {
     operation.context.preferGetMethod = false;
-    return url;
+    return operation.context.url;
   }
 
   return finalUrl;
