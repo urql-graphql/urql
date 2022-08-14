@@ -6,6 +6,7 @@ import { pipe, toPromise, take } from 'wonka';
 
 import {
   Client,
+  AnyVariables,
   TypedDocumentNode,
   CombinedError,
   Operation,
@@ -32,13 +33,13 @@ export interface UseMutationState<T, V> {
 
 export type UseMutationResponse<T, V> = UseMutationState<T, V>;
 
-export function useMutation<T = any, V = any>(
+export function useMutation<T = any, V = AnyVariables>(
   query: TypedDocumentNode<T, V> | DocumentNode | string
 ): UseMutationResponse<T, V> {
   return callUseMutation(query);
 }
 
-export function callUseMutation<T = any, V = any>(
+export function callUseMutation<T = any, V = AnyVariables>(
   query: TypedDocumentNode<T, V> | DocumentNode | string,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {
@@ -64,12 +65,12 @@ export function callUseMutation<T = any, V = any>(
 
       return pipe(
         client.value.executeMutation<T, V>(
-          createRequest<T, V>(query, unwrapPossibleProxy<V>(variables)),
+          createRequest<T, V>(query, unwrapPossibleProxy(variables)),
           context || {}
         ),
         take(1),
         toPromise
-      ).then((res: OperationResult) => {
+      ).then((res: OperationResult<T, V>) => {
         data.value = res.data;
         stale.value = !!res.stale;
         fetching.value = false;
