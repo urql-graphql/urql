@@ -1,7 +1,6 @@
-import { DocumentNode, print } from 'graphql';
-
+import { print } from 'graphql';
 import { getOperationName, stringifyVariables } from '../utils';
-import { Operation } from '../types';
+import { AnyVariables, GraphQLRequest, Operation } from '../types';
 
 export interface FetchBody {
   query?: string;
@@ -14,15 +13,17 @@ const shouldUseGet = (operation: Operation): boolean => {
   return operation.kind === 'query' && !!operation.context.preferGetMethod;
 };
 
-export const makeFetchBody = (request: {
-  query: DocumentNode;
-  variables?: object;
-}): FetchBody => ({
-  query: print(request.query),
-  operationName: getOperationName(request.query),
-  variables: request.variables || undefined,
-  extensions: undefined,
-});
+export function makeFetchBody<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
+  return {
+    query: print(request.query),
+    operationName: getOperationName(request.query),
+    variables: request.variables || undefined,
+    extensions: undefined,
+  };
+}
 
 export const makeFetchURL = (
   operation: Operation,

@@ -39,12 +39,18 @@ export type RequestPolicy =
 /** How the operation has */
 export type CacheOutcome = 'miss' | 'partial' | 'hit';
 
+/** A default type for variables */
+export type AnyVariables = { [prop: string]: any } | void | undefined;
+
 /** A Graphql query, mutation, or subscription. */
-export interface GraphQLRequest<Data = any, Variables = object> {
+export interface GraphQLRequest<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   /** Unique identifier of the request. */
   key: number;
   query: DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
+  variables: Variables;
 }
 
 /** Metadata that is only available in development for devtools. */
@@ -70,14 +76,19 @@ export interface OperationContext {
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
-export interface Operation<Data = any, Variables = any>
-  extends GraphQLRequest<Data, Variables> {
+export interface Operation<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> extends GraphQLRequest<Data, Variables> {
   readonly kind: OperationType;
   context: OperationContext;
 }
 
 /** Resulting data from an [operation]{@link Operation}. */
-export interface OperationResult<Data = any, Variables = any> {
+export interface OperationResult<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   /** The [operation]{@link Operation} which has been executed. */
   operation: Operation<Data, Variables>;
   /** The data returned from the Graphql server. */
