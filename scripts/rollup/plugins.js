@@ -4,7 +4,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
 import sucrase from '@rollup/plugin-sucrase';
-import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
@@ -53,22 +52,6 @@ export const makePlugins = () => [
   sucrase({
     exclude: ['node_modules/**'],
     transforms: ['jsx', 'typescript']
-  }),
-  buble({
-    transforms: {
-      generator: false,
-      forOf: false,
-      unicodeRegExp: false,
-      dangerousForOf: false,
-      dangerousTaggedTemplateString: true,
-      asyncAwait: false,
-      arrow: false,
-      classes: false,
-      conciseMethodProperty: false,
-      templateString: false,
-      objectRestSpread: false,
-    },
-    exclude: 'node_modules/**'
   }),
   babel({
     babelrc: false,
