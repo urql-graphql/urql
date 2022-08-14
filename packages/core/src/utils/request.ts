@@ -81,7 +81,10 @@ export const keyDocument = (q: string | DocumentNode): KeyedDocumentNode => {
   return query as KeyedDocumentNode;
 };
 
-export const createRequest = <Data = any, Variables = AnyVariables>(
+export const createRequest = <
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
   vars: Variables
 ): GraphQLRequest<Data, Variables> => {
@@ -90,7 +93,7 @@ export const createRequest = <Data = any, Variables = AnyVariables>(
   return {
     key: phash(query.__key, stringifyVariables(vars)) >>> 0,
     query,
-    variables: vars,
+    variables: vars as Variables,
   };
 };
 

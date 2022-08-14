@@ -93,52 +93,61 @@ export interface Client {
     opts?: Partial<OperationContext> | undefined
   ): OperationContext;
 
-  createRequestOperation<Data = any, Variables = AnyVariables>(
+  createRequestOperation<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     kind: OperationType,
     request: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Operation<Data, Variables>;
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation<Data = any, Variables = AnyVariables>(
+  executeRequestOperation<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>>;
 
-  query<Data = any, Variables = AnyVariables>(
+  query<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
-  readQuery<Data = any, Variables = AnyVariables>(
+  readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResult<Data, Variables> | null;
 
-  executeQuery<Data = any, Variables = AnyVariables>(
+  executeQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
-  subscription<Data = any, Variables = AnyVariables>(
+  subscription<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): Source<OperationResult<Data, Variables>>;
 
-  executeSubscription<Data = any, Variables = AnyVariables>(
+  executeSubscription<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
-  mutation<Data = any, Variables = AnyVariables>(
+  mutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
-  executeMutation<Data = any, Variables = AnyVariables>(
+  executeMutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;

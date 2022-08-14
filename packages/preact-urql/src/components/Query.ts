@@ -1,14 +1,18 @@
 import { VNode } from 'preact';
-import { OperationContext } from '@urql/core';
+import { AnyVariables, OperationContext } from '@urql/core';
 import { useQuery, UseQueryArgs, UseQueryState } from '../hooks';
 
-export interface QueryProps<Data = any, Variables = object>
-  extends UseQueryArgs<Variables, Data> {
+export type QueryProps<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = UseQueryArgs<Variables, Data> & {
   children: (arg: QueryState<Data, Variables>) => VNode<any>;
-}
+};
 
-export interface QueryState<Data = any, Variables = object>
-  extends UseQueryState<Data, Variables> {
+export interface QueryState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> extends UseQueryState<Data, Variables> {
   executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 

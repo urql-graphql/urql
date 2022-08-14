@@ -1,21 +1,27 @@
 import { VNode } from 'preact';
 import { DocumentNode } from 'graphql';
 import {
+  AnyVariables,
   TypedDocumentNode,
   OperationResult,
   OperationContext,
 } from '@urql/core';
 import { useMutation, UseMutationState } from '../hooks';
 
-export interface MutationProps<Data = any, Variables = object> {
+export interface MutationProps<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
   children: (arg: MutationState<Data, Variables>) => VNode<any>;
 }
 
-export interface MutationState<Data = any, Variables = object>
-  extends UseMutationState<Data, Variables> {
+export interface MutationState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> extends UseMutationState<Data, Variables> {
   executeMutation: (
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ) => Promise<OperationResult<Data, Variables>>;
 }
