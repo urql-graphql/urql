@@ -16,7 +16,6 @@ import {
   CombinedError,
   OperationResult,
 } from '@urql/core';
-import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 
 export interface RetryExchangeOptions {
   initialDelayMs?: number;
