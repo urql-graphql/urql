@@ -36,7 +36,7 @@ module.exports = {
     'prefer-arrow/prefer-arrow-functions': 'off',
 
     'es5/no-for-of': 'off',
-    'es5/no-generators': 'warn',
+    'es5/no-generators': 'off',
     'es5/no-typeof-symbol': 'warn',
 
     'prettier/prettier': ['error', {

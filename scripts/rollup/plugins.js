@@ -56,8 +56,10 @@ export const makePlugins = () => [
   }),
   buble({
     transforms: {
+      generator: false,
+      forOf: false,
       unicodeRegExp: false,
-      dangerousForOf: true,
+      dangerousForOf: false,
       dangerousTaggedTemplateString: true,
       asyncAwait: false,
       arrow: false,
