@@ -25,7 +25,7 @@ type MaybeRef<T> = T | Ref<T>;
 
 export interface UseQueryArgs<T = any, V = object> {
   query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  variables?: MaybeRef<V>;
+  variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
   requestPolicy?: MaybeRef<RequestPolicy>;
   context?: MaybeRef<Partial<OperationContext>>;
   pause?: MaybeRef<boolean>;
