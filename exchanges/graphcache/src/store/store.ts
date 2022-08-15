@@ -180,22 +180,31 @@ export class Store<
   readFragment<T = Data, V = Variables>(
     fragment: DocumentNode | TypedDocumentNode<T, V>,
     entity: string | Data | T,
-    variables?: V
+    variables?: V,
+    fragmentName?: string
   ): T | null {
     return readFragment(
       this,
       formatDocument(fragment),
       entity,
-      variables as any
+      variables as any,
+      fragmentName
     ) as T | null;
   }
 
   writeFragment<T = Data, V = Variables>(
     fragment: DocumentNode | TypedDocumentNode<T, V>,
     data: T,
-    variables?: V
+    variables?: V,
+    fragmentName?: string
   ): void {
-    writeFragment(this, formatDocument(fragment), data, variables as any);
+    writeFragment(
+      this,
+      formatDocument(fragment),
+      data,
+      variables as any,
+      fragmentName
+    );
   }
 
   link(

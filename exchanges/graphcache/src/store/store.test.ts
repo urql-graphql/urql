@@ -545,6 +545,42 @@ describe('Store with OptimisticMutationConfig', () => {
     InMemoryData.clearDataState();
   });
 
+  it('should be able to read a fragment by name', () => {
+    InMemoryData.initDataState('read', store.data, null);
+    const result = store.readFragment(
+      gql`
+        fragment authorFields on Author {
+          id
+          text
+          complete
+          __typename
+        }
+
+        fragment todoFields on Todo {
+          id
+          text
+          complete
+          __typename
+        }
+      `,
+      { id: '0' },
+      undefined,
+      'todoFields'
+    );
+
+    const deps = InMemoryData.getCurrentDependencies();
+    expect(deps).toEqual({ 'Todo:0': true });
+
+    expect(result).toEqual({
+      id: '0',
+      text: 'Go to the shops',
+      complete: false,
+      __typename: 'Todo',
+    });
+
+    InMemoryData.clearDataState();
+  });
+
   it('should be able to update a query', () => {
     InMemoryData.initDataState('read', store.data, null);
     store.updateQuery({ query: Todos }, data => ({
