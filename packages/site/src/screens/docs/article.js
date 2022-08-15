@@ -47,6 +47,8 @@ const Legend = styled.aside`
     max-width: ${p => p.theme.layout.legend};
     padding: ${p => p.theme.spacing.lg} ${p => p.theme.spacing.md};
     margin: 0;
+    overflow: auto;
+    height: calc(100vh - ${p => p.theme.layout.header});
   }
 `;
 
