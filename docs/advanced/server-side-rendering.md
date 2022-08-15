@@ -200,9 +200,7 @@ Note that if you are using Next before v9.4 you'll need to polyfill fetch, this 
 done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch).
 
 We're now able to wrap any page or `_app.js` using the `withUrqlClient` higher-order component. If
-we wrap `_app.js` we won't have to wrap any individual page, but we also won't be able to make use
-of Next's ["Automatic Static
-Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimization).
+we wrap `_app.js` we won't have to wrap any individual page.
 
 ```js
 // pages/index.js
@@ -225,9 +223,9 @@ export default withUrqlClient((_ssrExchange, ctx) => ({
 }))(Index);
 ```
 
-This will automatically set up server-side rendering on the page. The `withUrqlClient` higher-order
-component function accepts the usual `Client` options as an argument. This may either just be an
-object, or a function that receives the Next.js' `getInitialProps` context.
+The `withUrqlClient` higher-order component function accepts the usual `Client` options as
+an argument. This may either just be an object, or a function that receives the Next.js'
+`getInitialProps` context.
 
 One added caveat is that these options may not include the `exchanges` option because `next-urql`
 injects the `ssrExchange` automatically at the right location. If you're setting up custom exchanges
@@ -251,10 +249,41 @@ When you are using `getStaticProps`, `getServerSideProps`, or `getStaticPaths`, 
 During the prepass of your component tree `next-urql` can't know how these functions will alter the props passed to your page component. This injection
 could change the `variables` used in your `useQuery`. This will lead to error being thrown during the subsequent `toString` pass, which isn't supported in React 16.
 
-### Using getStaticProps or getServerSideProps
+### SSR with { ssr: true }
 
-By default `withUrqlClient` will add `getInitialProps` to the component you're wrapping it in, this however excludes us from using
-`getStaticProps` and `getServerSideProps`. However we can enable this, let's look at an example:
+The `withUrqlClient` only wraps our component tree with the context provider by default.
+To enable SSR, the easiest way is specifying the `{ ssr: true }` option as a second
+argument to `withUrqlClient`:
+
+```js
+import { dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
+
+import { withUrqlClient } from 'next-urql';
+
+export default withUrqlClient(
+  ssrExchange => ({
+    url: 'http://localhost:3000/graphql',
+    exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
+  }),
+  { ssr: true }, // Enables server-side rendering using `getInitialProps`
+)(Index);
+```
+
+Be aware that wrapping the `_app` component using `withUrqlClient` with the `{ ssr: true }`
+option disables Next's ["Automatic Static
+Optimization"](https://nextjs.org/docs/advanced-features/automatic-static-optimization) for
+**all our pages**. It is thus preferred to enable server-side rendering on a per-page basis.
+
+### SSR with getStaticProps or getServerSideProps
+
+Enabling server-side rendering using `getStaticProps` and `getServerSideProps` is a little
+more involved, but has two major benefits:
+
+1. allows **direct schema execution** for performance optimisation
+2. allows performing extra operations in those functions
+
+To make the functions work with the `withUrqlClient` wrapper, return the `urqlState` prop
+with the extracted data from the `ssrExchange`:
 
 ```js
 import { withUrqlClient, initUrqlClient } from 'next-urql';
@@ -280,10 +309,10 @@ function Todos() {
 export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient(
-  {
-    url: "your-url",
-    exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
-  },
+    {
+      url: "your-url",
+      exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
+    },
     false
   );
 
@@ -304,13 +333,76 @@ export default withUrqlClient(
   ssr => ({
     url: 'your-url',
   }),
-  { ssr: false } // Important so we don't wrap our component in getInitialProps
+  // Cannot specify { ssr: true } here so we don't wrap our component in getInitialProps
 )(Todos);
 ```
 
-The above example will make sure the page is rendered as a static-page, it's important that you fully pre-populate your cache
-so in our case we were only interested in getting our todos, if there are child components relying on data you'll have to make
-sure these are fetched as well.
+The above example will make sure the page is rendered as a static-page, It's important that
+you fully pre-populate your cache so in our case we were only interested in getting our todos,
+if there are child components relying on data you'll have to make sure these are fetched as well.
+
+The `getServerSideProps` and `getStaticProps` functions only run on the **server-side** — any
+code used in them is automatically stripped away form the client-side bundle using the
+[next-code-elimination tool](https://next-code-elimination.vercel.app/). This allows **executing
+our schema directly** using `@urql/exchange-execute` if we have access to our GraphQL server:
+
+```js
+import { withUrqlClient, initUrqlClient } from 'next-urql';
+import { ssrExchange, dedupExchange, cacheExchange, fetchExchange, useQuery } from 'urql';
+import { executeExchange } from '@urql/exchange-execute';
+
+import { schema } from '@/server/graphql'; // our GraphQL server's executable schema
+
+const TODOS_QUERY = `
+  query { todos { id text } }
+`;
+
+function Todos() {
+  const [res] = useQuery({ query: TODOS_QUERY });
+  return (
+    <div>
+      {res.data.todos.map(todo => (
+        <div key={todo.id}>
+          {todo.id} - {todo.text}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export async function getServerSideProps(ctx) {
+  const ssrCache = ssrExchange({ isClient: false });
+  const client = initUrqlClient(
+    {
+      url: "", // not needed without `fetchExchange`
+      exchanges: [
+        dedupExchange,
+        cacheExchange,
+        ssrCache,
+        executeExchange({ schema }), // replaces `fetchExchange`
+      ],
+    },
+    false
+  );
+
+  await client.query(TODOS_QUERY).toPromise();
+
+  return {
+    props: {
+      urqlState: ssrCache.extractData(),
+    },
+  };
+}
+
+export default withUrqlClient(
+  ssr => ({
+    url: 'your-url',
+  }),
+)(Todos);
+```
+
+Direct schema execution skips one network round trip by accessing your resolvers directly
+instead of performing a `fetch` API call.
 
 ### Stale While Revalidate
 
