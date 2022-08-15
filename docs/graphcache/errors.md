@@ -107,6 +107,9 @@ is maybe empty or does not contain fragments.
 When you're calling a fragment method, please ensure that you're only passing fragments
 in your GraphQL document. The first fragment will be used to start writing data.
 
+This also occurs when you pass in a `fragmentName` but a fragment with the given name
+can't be found in the `DocumentNode`.
+
 ## (7) Can't generate a key for readFragment(...)
 
 > Can't generate a key for readFragment(...).
@@ -170,6 +173,9 @@ is maybe empty or does not contain fragments.
 
 When you're calling a fragment method, please ensure that you're only passing fragments
 in your GraphQL document. The first fragment will be used to start writing data.
+
+This also occurs when you pass in a `fragmentName` but a fragment with the given name
+can't be found in the `DocumentNode`.
 
 ## (12) Can't generate a key for writeFragment(...) or link(...)
 
