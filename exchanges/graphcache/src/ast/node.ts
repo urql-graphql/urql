@@ -19,16 +19,20 @@ export const getFragmentTypeName = (node: FragmentDefinitionNode): string =>
 
 /** Returns either the field's name or the field's alias */
 export const getFieldAlias = (node: FieldNode): string =>
-  node.alias ? node.alias.value : getName(node);
+  node.alias ? node.alias.value : node.name.value;
+
+const emptySelectionSet: SelectionSet = [];
 
 /** Returns the SelectionSet for a given inline or defined fragment node */
 export const getSelectionSet = (node: {
   selectionSet?: SelectionSetNode;
-}): SelectionSet => (node.selectionSet ? node.selectionSet.selections : []);
+}): SelectionSet =>
+  node.selectionSet ? node.selectionSet.selections : emptySelectionSet;
 
 export const getTypeCondition = (node: {
   typeCondition?: NamedTypeNode;
-}): string | null => (node.typeCondition ? getName(node.typeCondition) : null);
+}): string | null =>
+  node.typeCondition ? node.typeCondition.name.value : null;
 
 export const isFieldNode = (node: SelectionNode): node is FieldNode =>
   node.kind === Kind.FIELD;

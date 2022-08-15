@@ -5,14 +5,14 @@ const generateErrorMessage = (
   graphQlErrs?: GraphQLError[]
 ) => {
   let error = '';
-  if (networkErr !== undefined) {
+  if (networkErr) {
     return (error = `[Network] ${networkErr.message}`);
   }
 
-  if (graphQlErrs !== undefined) {
-    graphQlErrs.forEach(err => {
+  if (graphQlErrs) {
+    for (const err of graphQlErrs) {
       error += `[GraphQL] ${err.message}\n`;
-    });
+    }
   }
 
   return error.trim();

@@ -4,7 +4,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
 import sucrase from '@rollup/plugin-sucrase';
-import buble from '@rollup/plugin-buble';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
@@ -12,7 +11,6 @@ import { terser } from 'rollup-plugin-terser';
 
 import cleanup from './cleanup-plugin.js'
 import cjsCheck from './cjs-check-plugin.js'
-import babelPluginTransformFunctionExpressions from '../babel/transform-function-expressions';
 import babelPluginTransformPipe from '../babel/transform-pipe';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
@@ -55,16 +53,6 @@ export const makePlugins = () => [
     exclude: ['node_modules/**'],
     transforms: ['jsx', 'typescript']
   }),
-  buble({
-    transforms: {
-      unicodeRegExp: false,
-      dangerousForOf: true,
-      dangerousTaggedTemplateString: true,
-      asyncAwait: false,
-    },
-    objectAssign: 'Object.assign',
-    exclude: 'node_modules/**'
-  }),
   babel({
     babelrc: false,
     babelHelpers: 'bundled',
@@ -75,8 +63,6 @@ export const makePlugins = () => [
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
-      babelPluginTransformFunctionExpressions,
-      '@babel/plugin-transform-object-assign',
       settings.hasReact && ['@babel/plugin-transform-react-jsx', {
         pragma: 'React.createElement',
         pragmaFrag: 'React.Fragment',
@@ -86,10 +72,6 @@ export const makePlugins = () => [
         pragma: 'h',
         useBuiltIns: true
       }],
-      ['babel-plugin-transform-async-to-promises', {
-        inlineHelpers: true,
-        externalHelpers: true
-      }]
     ].filter(Boolean)
   }),
 ];
@@ -116,7 +98,7 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
 
 const terserPretty = terser({
   warnings: true,
-  ecma: 5,
+  ecma: 2015,
   keep_fnames: true,
   ie8: false,
   compress: {
@@ -145,7 +127,7 @@ const terserPretty = terser({
 
 const terserMinified = terser({
   warnings: true,
-  ecma: 5,
+  ecma: 2015,
   ie8: false,
   toplevel: true,
   compress: {

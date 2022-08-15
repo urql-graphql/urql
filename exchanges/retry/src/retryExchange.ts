@@ -1,4 +1,5 @@
 import {
+  Source,
   makeSubject,
   share,
   pipe,
@@ -9,6 +10,7 @@ import {
   mergeMap,
   takeUntil,
 } from 'wonka';
+
 import {
   makeOperation,
   Exchange,
@@ -16,7 +18,6 @@ import {
   CombinedError,
   OperationResult,
 } from '@urql/core';
-import { sourceT } from 'wonka/dist/types/src/Wonka_types.gen';
 
 export interface RetryExchangeOptions {
   initialDelayMs?: number;
@@ -143,7 +144,7 @@ export const retryExchange = ({
 
         return true;
       })
-    ) as sourceT<OperationResult>;
+    ) as Source<OperationResult>;
 
     return result$;
   };

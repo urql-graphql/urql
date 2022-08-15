@@ -12,17 +12,14 @@ import {
 } from '../utils';
 
 type ResultCache = Map<number, OperationResult>;
-
-interface OperationCache {
-  [key: string]: Set<number>;
-}
+type OperationCache = Map<string, Set<number>>;
 
 const shouldSkip = ({ kind }: Operation) =>
   kind !== 'mutation' && kind !== 'query';
 
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
-  const resultCache = new Map() as ResultCache;
-  const operationCache = Object.create(null) as OperationCache;
+  const resultCache: ResultCache = new Map();
+  const operationCache: OperationCache = new Map();
 
   // Adds unique typenames to query (for invalidating cache entries)
   const mapTypeNames = (operation: Operation): Operation => {
@@ -120,30 +117,27 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
 
           for (let i = 0; i < typenames.length; i++) {
             const typeName = typenames[i];
-            const operations =
-              operationCache[typeName] ||
-              (operationCache[typeName] = new Set());
-            operations.forEach(key => {
-              pendingOperations.add(key);
-            });
+            let operations = operationCache.get(typeName);
+            if (!operations)
+              operationCache.set(typeName, (operations = new Set()));
+            for (const key of operations.values()) pendingOperations.add(key);
             operations.clear();
           }
 
-          pendingOperations.forEach(key => {
+          for (const key of pendingOperations.values()) {
             if (resultCache.has(key)) {
               operation = (resultCache.get(key) as OperationResult).operation;
               resultCache.delete(key);
               reexecuteOperation(client, operation);
             }
-          });
-          // Mark typenames on typenameInvalidate for early invalidation
+          }
         } else if (operation.kind === 'query' && response.data) {
           resultCache.set(operation.key, response);
           for (let i = 0; i < typenames.length; i++) {
             const typeName = typenames[i];
-            const operations =
-              operationCache[typeName] ||
-              (operationCache[typeName] = new Set());
+            let operations = operationCache.get(typeName);
+            if (!operations)
+              operationCache.set(typeName, (operations = new Set()));
             operations.add(operation.key);
           }
         }

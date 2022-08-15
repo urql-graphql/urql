@@ -49,7 +49,7 @@
     "preact": "^10.5.5",
     "react": "^17.0.1",
     "urql": ">=2.2.2",
-    "wonka": "^4.0.14"
+    "wonka": "^6.0.0"
   },
   "optionalDependencies": {
     "@storybook/addons": ">=6.0.28",

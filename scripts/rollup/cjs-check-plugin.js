@@ -17,15 +17,19 @@ function cleanup(opts = {}) {
       }
 
       const output = parse(code);
-      const matches = chunk.exports.every(mod => {
-        if (mod[0] == '*') {
-          return output.reexports.indexOf(mod.slice(1)) > -1;
-        } else {
-          return output.exports.indexOf(mod) > -1;
-        }
-      });
 
-      if (!matches) {
+      let hasMissing = false;
+      for (const mod of chunk.exports) {
+        if (mod[0] == '*' && !output.reexports.includes(mod.slice(1))) {
+          hasMissing = true;
+          console.error(`Missing Module Re-Export: ${mod.slice(1)}`)
+        } else if (mod[0] != '*' && !output.exports.includes(mod)) {
+          hasMissing = true;
+          console.error(`Missing Module Export: ${mod}`)
+        }
+      }
+
+      if (hasMissing) {
         throw new Error('cjs-module-lexer did not agree with Rollup\'s exports.');
       }
 

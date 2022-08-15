@@ -80,12 +80,9 @@ it('passes the "getting-started" example', () => {
 
   const writeRes = write(store, { query: Todos }, todosData);
 
-  expect(writeRes.dependencies).toEqual({
-    'Query.todos': true,
-    'Todo:0': true,
-    'Todo:1': true,
-    'Todo:2': true,
-  });
+  expect(writeRes.dependencies).toEqual(
+    new Set(['Query.todos', 'Todo:0', 'Todo:1', 'Todo:2'])
+  );
 
   let queryRes = query(store, { query: Todos });
 
@@ -107,7 +104,7 @@ it('passes the "getting-started" example', () => {
     }
   );
 
-  expect(mutationRes.dependencies).toEqual({ 'Todo:2': true });
+  expect(mutationRes.dependencies).toEqual(new Set(['Todo:2']));
 
   queryRes = query(store, { query: Todos });
 
@@ -134,7 +131,7 @@ it('passes the "getting-started" example', () => {
     }
   );
 
-  expect(newMutationRes.dependencies).toEqual({ 'Todo:2': true });
+  expect(newMutationRes.dependencies).toEqual(new Set(['Todo:2']));
 
   queryRes = query(store, { query: Todos });
 
@@ -271,12 +268,9 @@ it('respects property-level resolvers when given', () => {
 
   const writeRes = write(store, { query: Todos }, todosData);
 
-  expect(writeRes.dependencies).toEqual({
-    'Query.todos': true,
-    'Todo:0': true,
-    'Todo:1': true,
-    'Todo:2': true,
-  });
+  expect(writeRes.dependencies).toEqual(
+    new Set(['Query.todos', 'Todo:0', 'Todo:1', 'Todo:2'])
+  );
 
   let queryRes = query(store, { query: Todos });
 
@@ -305,7 +299,7 @@ it('respects property-level resolvers when given', () => {
     }
   );
 
-  expect(mutationRes.dependencies).toEqual({ 'Todo:2': true });
+  expect(mutationRes.dependencies).toEqual(new Set(['Todo:2']));
 
   queryRes = query(store, { query: Todos });
 

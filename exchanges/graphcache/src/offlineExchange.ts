@@ -27,7 +27,6 @@ import {
   CacheExchangeOpts,
 } from './types';
 
-import { makeDict } from './helpers/dict';
 import { cacheExchange } from './cacheExchange';
 import { toRequestPolicy } from './helpers/operation';
 
@@ -36,7 +35,7 @@ const isOptimisticMutation = <T extends OptimisticMutationConfig>(
   config: T,
   operation: Operation
 ) => {
-  const vars: Variables = operation.variables || makeDict();
+  const vars: Variables = operation.variables || {};
   const fragments = getFragments(operation.query);
   const selections = [...getSelectionSet(getMainOperation(operation.query))];
 

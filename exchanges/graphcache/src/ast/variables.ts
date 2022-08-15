@@ -13,20 +13,18 @@ export const getFieldArguments = (
   node: FieldNode,
   vars: Variables
 ): null | Variables => {
-  const args = {};
-  let argsSize = 0;
-  if (node.arguments && node.arguments.length) {
+  let args: null | Variables = null;
+  if (node.arguments) {
     for (let i = 0, l = node.arguments.length; i < l; i++) {
       const arg = node.arguments[i];
       const value = valueFromASTUntyped(arg.value, vars);
       if (value !== undefined && value !== null) {
-        args[getName(arg)] = value;
-        argsSize++;
+        if (!args) args = {};
+        args[getName(arg)] = value as any;
       }
     }
   }
-
-  return argsSize > 0 ? args : null;
+  return args;
 };
 
 /** Returns a filtered form of variables with values missing that the query doesn't require */

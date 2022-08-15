@@ -212,7 +212,7 @@ export const makeSelectionIterator = (
             return (childIterator = makeSelectionIterator(
               typename,
               entityKey,
-              getSelectionSet(fragmentNode),
+              getSelectionSet(fragmentNode)!,
               ctx
             ))();
           }
