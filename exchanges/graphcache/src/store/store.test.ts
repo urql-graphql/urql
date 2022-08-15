@@ -543,7 +543,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
 
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true });
+    expect(deps).toEqual(new Set(['Todo:0']));
 
     const { data } = query(store, { query: Todos });
 
@@ -612,7 +612,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
 
     const deps = InMemoryData.getCurrentDependencies();
-    expect(deps).toEqual({ 'Todo:0': true });
+    expect(deps).toEqual(new Set(['Todo:0']));
 
     expect(result).toEqual({
       id: '0',
