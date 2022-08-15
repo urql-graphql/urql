@@ -7,6 +7,7 @@ import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import {
   Client,
+  AnyVariables,
   OperationResult,
   TypedDocumentNode,
   CombinedError,
@@ -21,17 +22,29 @@ import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
 
-export interface UseSubscriptionArgs<T = any, V = object> {
+export type UseSubscriptionArgs<
+  T = any,
+  V extends AnyVariables = AnyVariables
+> = {
   query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
   pause?: MaybeRef<boolean>;
   context?: MaybeRef<Partial<OperationContext>>;
-}
+} & (V extends void
+  ? {
+      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
+    }
+  : {
+      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
+    });
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
 
-export interface UseSubscriptionState<T = any, R = T, V = object> {
+export interface UseSubscriptionState<
+  T = any,
+  R = T,
+  V extends AnyVariables = AnyVariables
+> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
   data: Ref<R | undefined>;
@@ -54,14 +67,22 @@ const watchOptions = {
   flush: 'pre' as const,
 };
 
-export function useSubscription<T = any, R = T, V = object>(
+export function useSubscription<
+  T = any,
+  R = T,
+  V extends AnyVariables = AnyVariables
+>(
   args: UseSubscriptionArgs<T, V>,
   handler?: SubscriptionHandlerArg<T, R>
 ): UseSubscriptionResponse<T, R, V> {
   return callUseSubscription(args, handler);
 }
 
-export function callUseSubscription<T = any, R = T, V = object>(
+export function callUseSubscription<
+  T = any,
+  R = T,
+  V extends AnyVariables = AnyVariables
+>(
   _args: UseSubscriptionArgs<T, V>,
   handler?: SubscriptionHandlerArg<T, R>,
   client: Ref<Client> = useClient(),
@@ -73,7 +94,7 @@ export function callUseSubscription<T = any, R = T, V = object>(
   const stale: Ref<boolean> = ref(false);
   const fetching: Ref<boolean> = ref(false);
   const error: Ref<CombinedError | undefined> = ref();
-  const operation: Ref<Operation | undefined> = ref();
+  const operation: Ref<Operation<T, V> | undefined> = ref();
   const extensions: Ref<Record<string, any> | undefined> = ref();
 
   const scanHandler: Ref<SubscriptionHandler<T, R> | undefined> = ref(handler);

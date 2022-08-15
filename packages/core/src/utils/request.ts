@@ -11,7 +11,7 @@ import {
 
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
-import { GraphQLRequest } from '../types';
+import { AnyVariables, GraphQLRequest } from '../types';
 
 interface WritableLocation {
   loc: Location | undefined;
@@ -81,16 +81,19 @@ export const keyDocument = (q: string | DocumentNode): KeyedDocumentNode => {
   return query as KeyedDocumentNode;
 };
 
-export const createRequest = <Data = any, Variables = object>(
+export const createRequest = <
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
-  vars?: Variables
+  vars: Variables
 ): GraphQLRequest<Data, Variables> => {
   if (!vars) vars = {} as Variables;
   const query = keyDocument(q);
   return {
     key: phash(query.__key, stringifyVariables(vars)) >>> 0,
     query,
-    variables: vars,
+    variables: vars as Variables,
   };
 };
 

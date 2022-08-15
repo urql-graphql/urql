@@ -15,6 +15,7 @@ import {
 
 import {
   Client,
+  AnyVariables,
   TypedDocumentNode,
   CombinedError,
   OperationContext,
@@ -28,15 +29,26 @@ import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
-export interface UseQueryArgs<Variables = object, Data = any> {
+export type UseQueryArgs<
+  Variables extends AnyVariables = AnyVariables,
+  Data = any
+> = {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
   requestPolicy?: RequestPolicy;
   context?: Partial<OperationContext>;
   pause?: boolean;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
-export interface UseQueryState<Data = any, Variables = object> {
+export interface UseQueryState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   fetching: boolean;
   stale: boolean;
   data?: Data;
@@ -45,7 +57,10 @@ export interface UseQueryState<Data = any, Variables = object> {
   operation?: Operation<Data, Variables>;
 }
 
-export type UseQueryResponse<Data = any, Variables = object> = [
+export type UseQueryResponse<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = [
   UseQueryState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
@@ -91,13 +106,14 @@ const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
 
 const sources = new Map<number, Source<OperationResult>>();
 
-export function useQuery<Data = any, Variables = object>(
-  args: UseQueryArgs<Variables, Data>
-): UseQueryResponse<Data, Variables> {
+export function useQuery<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(args: UseQueryArgs<Variables, Data>): UseQueryResponse<Data, Variables> {
   const client = useClient();
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
-  const request = useRequest<Data, Variables>(args.query, args.variables);
+  const request = useRequest(args.query, args.variables as Variables);
 
   // Create a new query-source from client.executeQuery
   const makeQuery$ = useCallback(

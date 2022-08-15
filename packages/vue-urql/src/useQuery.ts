@@ -8,6 +8,7 @@ import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import {
   Client,
+  AnyVariables,
   OperationResult,
   TypedDocumentNode,
   CombinedError,
@@ -23,19 +24,25 @@ import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
 
-export interface UseQueryArgs<T = any, V = object> {
+export type UseQueryArgs<T = any, V extends AnyVariables = AnyVariables> = {
   query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
   requestPolicy?: MaybeRef<RequestPolicy>;
   context?: MaybeRef<Partial<OperationContext>>;
   pause?: MaybeRef<boolean>;
-}
+} & (V extends void
+  ? {
+      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
+    }
+  : {
+      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
+    });
 
-export type QueryPartialState<T = any, V = object> = Partial<
-  OperationResult<T, V>
-> & { fetching?: boolean };
+export type QueryPartialState<
+  T = any,
+  V extends AnyVariables = AnyVariables
+> = Partial<OperationResult<T, V>> & { fetching?: boolean };
 
-export interface UseQueryState<T = any, V = object> {
+export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
   data: Ref<T | undefined>;
@@ -55,13 +62,13 @@ const watchOptions = {
   flush: 'pre' as const,
 };
 
-export function useQuery<T = any, V = object>(
+export function useQuery<T = any, V extends AnyVariables = AnyVariables>(
   args: UseQueryArgs<T, V>
 ): UseQueryResponse<T, V> {
   return callUseQuery(args);
 }
 
-export function callUseQuery<T = any, V = object>(
+export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   _args: UseQueryArgs<T, V>,
   client: Ref<Client> = useClient(),
   stops: WatchStopHandle[] = []
@@ -86,7 +93,7 @@ export function callUseQuery<T = any, V = object>(
     ) as any
   );
 
-  const source: Ref<Source<OperationResult> | undefined> = ref();
+  const source: Ref<Source<OperationResult<T, V>> | undefined> = ref();
 
   stops.push(
     watchEffect(() => {

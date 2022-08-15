@@ -1,5 +1,6 @@
 import type { DocumentNode } from 'graphql';
 import {
+  AnyVariables,
   Client,
   OperationContext,
   TypedDocumentNode,
@@ -16,18 +17,26 @@ import {
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export interface MutationArgs<Data = any, Variables = object> {
+export type MutationArgs<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
   context?: Partial<OperationContext>;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
 export function mutationStore<Data = any, Result = Data, Variables = object>(
   args: MutationArgs<Data, Variables>,
   handler?: SubscriptionHandler<Data, Result>
 ): OperationResultStore<Result, Variables> {
-  const request = createRequest(args.query, args.variables);
+  const request = createRequest(args.query, args.variables as Variables);
   const operation = args.client.createRequestOperation(
     'mutation',
     request,

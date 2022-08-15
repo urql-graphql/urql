@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { pipe, toPromise } from 'wonka';
 
 import {
+  AnyVariables,
   TypedDocumentNode,
   OperationResult,
   OperationContext,
@@ -14,7 +15,10 @@ import {
 import { useClient } from '../context';
 import { initialState } from './constants';
 
-export interface UseMutationState<Data = any, Variables = object> {
+export interface UseMutationState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   fetching: boolean;
   stale: boolean;
   data?: Data;
@@ -23,15 +27,21 @@ export interface UseMutationState<Data = any, Variables = object> {
   operation?: Operation<Data, Variables>;
 }
 
-export type UseMutationResponse<Data = any, Variables = object> = [
+export type UseMutationResponse<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = [
   UseMutationState<Data, Variables>,
   (
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ) => Promise<OperationResult<Data, Variables>>
 ];
 
-export function useMutation<Data = any, Variables = object>(
+export function useMutation<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string
 ): UseMutationResponse<Data, Variables> {
   const isMounted = useRef(true);
@@ -42,7 +52,7 @@ export function useMutation<Data = any, Variables = object>(
   );
 
   const executeMutation = useCallback(
-    (variables?: Variables, context?: Partial<OperationContext>) => {
+    (variables: Variables, context?: Partial<OperationContext>) => {
       setState({ ...initialState, fetching: true });
 
       return pipe(

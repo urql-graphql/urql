@@ -38,7 +38,7 @@ export interface ObservableLike<T> {
 
 export interface SubscriptionOperation {
   query: string;
-  variables?: Record<string, unknown>;
+  variables: Record<string, unknown> | undefined;
   key: string;
   context: OperationContext;
 }
@@ -70,7 +70,7 @@ export const subscriptionExchange = ({
     const observableish = forwardSubscription({
       key: operation.key.toString(36),
       query: print(operation.query),
-      variables: operation.variables,
+      variables: operation.variables!,
       context: { ...operation.context },
     });
 

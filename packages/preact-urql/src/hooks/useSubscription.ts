@@ -3,6 +3,7 @@ import { useEffect, useCallback, useRef, useMemo } from 'preact/hooks';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import {
+  AnyVariables,
   TypedDocumentNode,
   CombinedError,
   OperationContext,
@@ -14,16 +15,27 @@ import { useSource } from './useSource';
 import { useRequest } from './useRequest';
 import { initialState } from './constants';
 
-export interface UseSubscriptionArgs<Variables = object, Data = any> {
+export type UseSubscriptionArgs<
+  Variables extends AnyVariables = AnyVariables,
+  Data = any
+> = {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
-  variables?: Variables;
   pause?: boolean;
   context?: Partial<OperationContext>;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export interface UseSubscriptionState<Data = any, Variables = object> {
+export interface UseSubscriptionState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   fetching: boolean;
   stale: boolean;
   data?: Data;
@@ -32,12 +44,19 @@ export interface UseSubscriptionState<Data = any, Variables = object> {
   operation?: Operation<Data, Variables>;
 }
 
-export type UseSubscriptionResponse<Data = any, Variables = object> = [
+export type UseSubscriptionResponse<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = [
   UseSubscriptionState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
 
-export function useSubscription<Data = any, Result = Data, Variables = object>(
+export function useSubscription<
+  Data = any,
+  Result = Data,
+  Variables extends AnyVariables = AnyVariables
+>(
   args: UseSubscriptionArgs<Variables, Data>,
   handler?: SubscriptionHandler<Data, Result>
 ): UseSubscriptionResponse<Result, Variables> {
@@ -50,7 +69,7 @@ export function useSubscription<Data = any, Result = Data, Variables = object>(
 
   // This creates a request which will keep a stable reference
   // if request.key doesn't change
-  const request = useRequest<Data, Variables>(args.query, args.variables);
+  const request = useRequest(args.query, args.variables as Variables);
 
   // Create a new subscription-source from client.executeSubscription
   const makeSubscription$ = useCallback(

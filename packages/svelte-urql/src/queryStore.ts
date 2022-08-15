@@ -1,6 +1,7 @@
 import type { DocumentNode } from 'graphql';
 import {
   Client,
+  AnyVariables,
   OperationContext,
   TypedDocumentNode,
   RequestPolicy,
@@ -28,19 +29,30 @@ import {
   fromStore,
 } from './common';
 
-export interface QueryArgs<Data = any, Variables = object> {
+export type QueryArgs<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
   context?: Partial<OperationContext>;
   requestPolicy?: RequestPolicy;
   pause?: boolean;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
-export function queryStore<Data = any, Variables = object>(
+export function queryStore<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   args: QueryArgs<Data, Variables>
 ): OperationResultStore<Data, Variables> & Pausable {
-  const request = createRequest(args.query, args.variables);
+  const request = createRequest(args.query, args.variables as Variables);
 
   const context: Partial<OperationContext> = {
     requestPolicy: args.requestPolicy,

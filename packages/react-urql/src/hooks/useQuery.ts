@@ -5,6 +5,7 @@ import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
+  AnyVariables,
   Client,
   TypedDocumentNode,
   CombinedError,
@@ -19,15 +20,26 @@ import { useRequest } from './useRequest';
 import { getCacheForClient } from './cache';
 import { initialState, computeNextState, hasDepsChanged } from './state';
 
-export interface UseQueryArgs<Variables = object, Data = any> {
+export type UseQueryArgs<
+  Variables extends AnyVariables = AnyVariables,
+  Data = any
+> = {
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
   requestPolicy?: RequestPolicy;
   context?: Partial<OperationContext>;
   pause?: boolean;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
-export interface UseQueryState<Data = any, Variables = object> {
+export interface UseQueryState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   fetching: boolean;
   stale: boolean;
   data?: Data;
@@ -36,7 +48,10 @@ export interface UseQueryState<Data = any, Variables = object> {
   operation?: Operation<Data, Variables>;
 }
 
-export type UseQueryResponse<Data = any, Variables = object> = [
+export type UseQueryResponse<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = [
   UseQueryState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
@@ -44,13 +59,14 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 const isSuspense = (client: Client, context?: Partial<OperationContext>) =>
   client.suspense && (!context || context.suspense !== false);
 
-export function useQuery<Data = any, Variables = object>(
-  args: UseQueryArgs<Variables, Data>
-): UseQueryResponse<Data, Variables> {
+export function useQuery<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(args: UseQueryArgs<Variables, Data>): UseQueryResponse<Data, Variables> {
   const client = useClient();
   const cache = getCacheForClient(client);
   const suspense = isSuspense(client, args.context);
-  const request = useRequest<Data, Variables>(args.query, args.variables);
+  const request = useRequest(args.query, args.variables as Variables);
 
   const source = useMemo(() => {
     if (args.pause) return null;

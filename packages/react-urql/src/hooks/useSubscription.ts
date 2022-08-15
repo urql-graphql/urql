@@ -5,6 +5,7 @@ import { pipe, subscribe, onEnd } from 'wonka';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import {
+  AnyVariables,
   TypedDocumentNode,
   CombinedError,
   OperationContext,
@@ -15,16 +16,27 @@ import { useClient } from '../context';
 import { useRequest } from './useRequest';
 import { initialState, computeNextState, hasDepsChanged } from './state';
 
-export interface UseSubscriptionArgs<Variables = object, Data = any> {
+export type UseSubscriptionArgs<
+  Variables extends AnyVariables = AnyVariables,
+  Data = any
+> = {
   query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
-  variables?: Variables;
   pause?: boolean;
   context?: Partial<OperationContext>;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
-export interface UseSubscriptionState<Data = any, Variables = object> {
+export interface UseSubscriptionState<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> {
   fetching: boolean;
   stale: boolean;
   data?: Data;
@@ -33,17 +45,24 @@ export interface UseSubscriptionState<Data = any, Variables = object> {
   operation?: Operation<Data, Variables>;
 }
 
-export type UseSubscriptionResponse<Data = any, Variables = object> = [
+export type UseSubscriptionResponse<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = [
   UseSubscriptionState<Data, Variables>,
   (opts?: Partial<OperationContext>) => void
 ];
 
-export function useSubscription<Data = any, Result = Data, Variables = object>(
+export function useSubscription<
+  Data = any,
+  Result = Data,
+  Variables extends AnyVariables = AnyVariables
+>(
   args: UseSubscriptionArgs<Variables, Data>,
   handler?: SubscriptionHandler<Data, Result>
 ): UseSubscriptionResponse<Result, Variables> {
   const client = useClient();
-  const request = useRequest<Data, Variables>(args.query, args.variables);
+  const request = useRequest(args.query, args.variables as Variables);
 
   const handlerRef = useRef<SubscriptionHandler<Data, Result> | undefined>(
     handler

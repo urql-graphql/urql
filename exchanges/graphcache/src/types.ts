@@ -1,4 +1,4 @@
-import { TypedDocumentNode } from '@urql/core';
+import { AnyVariables, TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { IntrospectionData } from './ast';
 
@@ -211,7 +211,7 @@ export interface SerializedEntries {
 
 export interface SerializedRequest {
   query: string;
-  variables?: object;
+  variables: AnyVariables;
 }
 
 export interface StorageAdapter {

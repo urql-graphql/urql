@@ -1,5 +1,6 @@
 import type { DocumentNode } from 'graphql';
 import {
+  AnyVariables,
   Client,
   OperationContext,
   TypedDocumentNode,
@@ -27,18 +28,29 @@ import {
   fromStore,
 } from './common';
 
-export interface SubscriptionArgs<Data = any, Variables = object> {
+export type SubscriptionArgs<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = {
   client: Client;
   query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
-  variables?: Variables;
   context?: Partial<OperationContext>;
   pause?: boolean;
-}
+} & (Variables extends void
+  ? {
+      variables?: Variables;
+    }
+  : {
+      variables: Variables;
+    });
 
-export function subscriptionStore<Data, Variables extends object = {}>(
+export function subscriptionStore<
+  Data,
+  Variables extends AnyVariables = AnyVariables
+>(
   args: SubscriptionArgs<Data, Variables>
 ): OperationResultStore<Data, Variables> & Pausable {
-  const request = createRequest(args.query, args.variables);
+  const request = createRequest(args.query, args.variables as Variables);
 
   const operation = args.client.createRequestOperation(
     'subscription',

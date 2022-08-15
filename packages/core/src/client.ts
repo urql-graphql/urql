@@ -28,6 +28,7 @@ import { composeExchanges, defaultExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
 import {
+  AnyVariables,
   Exchange,
   ExchangeInput,
   GraphQLRequest,
@@ -92,52 +93,61 @@ export interface Client {
     opts?: Partial<OperationContext> | undefined
   ): OperationContext;
 
-  createRequestOperation<Data = any, Variables = object>(
+  createRequestOperation<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     kind: OperationType,
     request: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Operation<Data, Variables>;
 
   /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
-  executeRequestOperation<Data = any, Variables = object>(
+  executeRequestOperation<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>>;
 
-  query<Data = any, Variables extends object = {}>(
+  query<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
-  readQuery<Data = any, Variables extends object = {}>(
+  readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResult<Data, Variables> | null;
 
-  executeQuery<Data = any, Variables = object>(
+  executeQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
-  subscription<Data = any, Variables extends object = {}>(
+  subscription<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ): Source<OperationResult<Data, Variables>>;
 
-  executeSubscription<Data = any, Variables = object>(
+  executeSubscription<
+    Data = any,
+    Variables extends AnyVariables = AnyVariables
+  >(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
-  mutation<Data = any, Variables extends object = {}>(
+  mutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
-    variables?: Variables,
+    variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
-  executeMutation<Data = any, Variables = object>(
+  executeMutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
@@ -310,7 +320,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         return makeResultSource(operation);
       }
 
-      return make(observer => {
+      return make<OperationResult>(observer => {
         let source = active.get(operation.key);
 
         if (!source) {
