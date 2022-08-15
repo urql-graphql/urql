@@ -343,6 +343,28 @@ cache.readFragment(
 );
 ```
 
+If you need a specific fragment in a document containing multiple you can leverage
+the fourth argument like this:
+
+```js
+import { gql } from '@urql/core';
+
+cache.readFragment(
+  gql`
+    fragment todoFields on User {
+      id
+    }
+
+    fragment userFields on User {
+      id
+    }
+  `,
+  { id: 1 }, // this identifies the fragment (User) entity
+  undefined,
+  'userFields' // if not passed we take the first fragment, in this case todoFields
+);
+```
+
 [Read more about using `readFragment` on the ["Local Resolvers"
 page.](../graphcache/local-resolvers.md#reading-a-fragment)
 
@@ -429,6 +451,30 @@ cache.writeFragment(
 In the example we can see that the `writeFragment` method returns `undefined`. Furthermore we pass
 `id` in our `data` object so that an entity key can be written, but the fragment itself doesn't have
 to include these fields.
+
+If you need a specific fragment in a document containing multiple you can leverage
+the fourth argument like this:
+
+```js
+import { gql } from '@urql/core';
+
+cache.writeFragment(
+  gql`
+    fragment todoFields on User {
+      id
+      text
+    }
+
+    fragment userFields on User {
+      id
+      name
+    }
+  `,
+  { id: 1, name: 'New Name' }
+  undefined,
+  'userFields' // if not passed we take the first fragment, in this case todoFields
+);
+```
 
 [Read more about using `writeFragment` on the ["Custom Updates"
 page.](../graphcache/cache-updates.md#cachewritefragment)
