@@ -23,7 +23,7 @@ type MaybeRef<T> = T | Ref<T>;
 
 export interface UseSubscriptionArgs<T = any, V = object> {
   query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  variables?: MaybeRef<V>;
+  variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
   pause?: MaybeRef<boolean>;
   context?: MaybeRef<Partial<OperationContext>>;
 }
