@@ -133,13 +133,13 @@ export const writeFragment = (
     fragment = fragments[fragmentName] as FragmentDefinitionNode;
     if (!fragment) {
       warn(
-        'readFragment(...) was called with a fragment name that does not exist.\n' +
+        'writeFragment(...) was called with a fragment name that does not exist.\n' +
           'You provided ' +
           fragmentName +
           ' but could only find ' +
           Object.keys(fragments).join(', ') +
           '.',
-        6
+        11
       );
 
       return null;
@@ -149,9 +149,9 @@ export const writeFragment = (
     fragment = fragments[names[0]] as FragmentDefinitionNode;
     if (!fragment) {
       warn(
-        'readFragment(...) was called with an empty fragment.\n' +
+        'writeFragment(...) was called with an empty fragment.\n' +
           'You have to call it with at least one fragment in your GraphQL document.',
-        6
+        11
       );
 
       return null;
