@@ -101,8 +101,7 @@ export const createRequest = <
  * Finds the Name value from the OperationDefinition of a Document
  */
 export const getOperationName = (query: DocumentNode): string | undefined => {
-  for (let i = 0, l = query.definitions.length; i < l; i++) {
-    const node = query.definitions[i];
+  for (const node of query.definitions) {
     if (node.kind === Kind.OPERATION_DEFINITION && node.name) {
       return node.name.value;
     }
@@ -113,8 +112,7 @@ export const getOperationName = (query: DocumentNode): string | undefined => {
  * Finds the operation-type
  */
 export const getOperationType = (query: DocumentNode): string | undefined => {
-  for (let i = 0, l = query.definitions.length; i < l; i++) {
-    const node = query.definitions[i];
+  for (const node of query.definitions) {
     if (node.kind === Kind.OPERATION_DEFINITION) {
       return node.operation;
     }

@@ -2,7 +2,6 @@ import {
   DocumentNode,
   FieldNode,
   InlineFragmentNode,
-  SelectionNode,
   Kind,
   visit,
 } from 'graphql';
@@ -14,16 +13,13 @@ interface EntityLike {
   __typename: string | null | void;
 }
 
-const collectTypes = (
-  obj: EntityLike | EntityLike[],
-  types: { [typename: string]: unknown }
-) => {
+const collectTypes = (obj: EntityLike | EntityLike[], types: Set<string>) => {
   if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) collectTypes(obj[i], types);
+    for (const item of obj) collectTypes(item, types);
   } else if (typeof obj === 'object' && obj !== null) {
     for (const key in obj) {
       if (key === '__typename' && typeof obj[key] === 'string') {
-        types[obj[key] as string] = 0;
+        types.add(obj[key] as string);
       } else {
         collectTypes(obj[key], types);
       }
@@ -33,36 +29,36 @@ const collectTypes = (
   return types;
 };
 
-export const collectTypesFromResponse = (response: object) =>
-  Object.keys(collectTypes(response as EntityLike, {}));
+export const collectTypesFromResponse = (response: object): string[] => [
+  ...collectTypes(response as EntityLike, new Set()),
+];
 
 const formatNode = (node: FieldNode | InlineFragmentNode) => {
-  if (
-    node.selectionSet &&
-    !node.selectionSet.selections.some(
-      node =>
-        node.kind === Kind.FIELD &&
-        node.name.value === '__typename' &&
-        !node.alias
+  if (!node.selectionSet) return node;
+  for (const selection of node.selectionSet.selections)
+    if (
+      selection.kind === Kind.FIELD &&
+      selection.name.value === '__typename' &&
+      !selection.alias
     )
-  ) {
-    return {
-      ...node,
-      selectionSet: {
-        ...node.selectionSet,
-        selections: [
-          ...(node.selectionSet.selections as SelectionNode[]),
-          {
-            kind: Kind.FIELD,
-            name: {
-              kind: Kind.NAME,
-              value: '__typename',
-            },
+      return node;
+
+  return {
+    ...node,
+    selectionSet: {
+      ...node.selectionSet,
+      selections: [
+        ...node.selectionSet.selections,
+        {
+          kind: Kind.FIELD,
+          name: {
+            kind: Kind.NAME,
+            value: '__typename',
           },
-        ],
-      },
-    };
-  }
+        },
+      ],
+    },
+  };
 };
 
 const formattedDocs = new Map<number, KeyedDocumentNode>();

@@ -10,9 +10,9 @@ const stringify = (x: any): string => {
     return stringify(x.toJSON());
   } else if (Array.isArray(x)) {
     let out = '[';
-    for (let i = 0, l = x.length; i < l; i++) {
-      if (i > 0) out += ',';
-      const value = stringify(x[i]);
+    for (let value of x) {
+      if (out !== '[') out += ',';
+      value = stringify(value);
       out += value.length > 0 ? value : 'null';
     }
 
@@ -29,8 +29,7 @@ const stringify = (x: any): string => {
 
   seen.add(x);
   let out = '{';
-  for (let i = 0, l = keys.length; i < l; i++) {
-    const key = keys[i];
+  for (const key of keys) {
     const value = stringify(x[key]);
     if (value) {
       if (out.length > 1) out += ',';

@@ -7,12 +7,8 @@ export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
 
   const filterIncomingOperation = (operation: Operation) => {
     const { key, kind } = operation;
-    if (kind === 'teardown') {
+    if (kind === 'teardown' || kind === 'mutation') {
       inFlightKeys.delete(key);
-      return true;
-    }
-
-    if (kind !== 'query' && kind !== 'subscription') {
       return true;
     }
 
