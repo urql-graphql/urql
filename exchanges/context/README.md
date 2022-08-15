@@ -25,7 +25,7 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    executeExchange({
+    contextExchange({
       getContext: async () => {
         return await getToken();
       },
