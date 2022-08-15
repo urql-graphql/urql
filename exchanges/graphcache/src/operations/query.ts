@@ -202,19 +202,39 @@ export const readFragment = (
   store: Store,
   query: DocumentNode,
   entity: Partial<Data> | string,
-  variables?: Variables
+  variables?: Variables,
+  fragmentName?: string
 ): Data | null => {
   const fragments = getFragments(query);
-  const names = Object.keys(fragments);
-  const fragment = fragments[names[0]] as FragmentDefinitionNode;
-  if (!fragment) {
-    warn(
-      'readFragment(...) was called with an empty fragment.\n' +
-        'You have to call it with at least one fragment in your GraphQL document.',
-      6
-    );
 
-    return null;
+  let fragment: FragmentDefinitionNode;
+  if (fragmentName) {
+    fragment = fragments[fragmentName] as FragmentDefinitionNode;
+    if (!fragment) {
+      warn(
+        'readFragment(...) was called with a fragment name that does not exist.\n' +
+          'You provided ' +
+          fragmentName +
+          ' but could only find ' +
+          Object.keys(fragments).join(', ') +
+          '.',
+        6
+      );
+
+      return null;
+    }
+  } else {
+    const names = Object.keys(fragments);
+    fragment = fragments[names[0]] as FragmentDefinitionNode;
+    if (!fragment) {
+      warn(
+        'readFragment(...) was called with an empty fragment.\n' +
+          'You have to call it with at least one fragment in your GraphQL document.',
+        6
+      );
+
+      return null;
+    }
   }
 
   const typename = getFragmentTypeName(fragment);

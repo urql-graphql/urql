@@ -518,6 +518,49 @@ describe('Store with OptimisticMutationConfig', () => {
     });
   });
 
+  it('should be able to write a fragment by name', () => {
+    InMemoryData.initDataState('read', store.data, null);
+
+    store.writeFragment(
+      gql`
+        fragment authorFields on Author {
+          id
+        }
+
+        fragment todoFields on Todo {
+          id
+          text
+          complete
+        }
+      `,
+      {
+        id: '0',
+        text: 'update',
+        complete: true,
+      },
+      undefined,
+      'todoFields'
+    );
+
+    const deps = InMemoryData.getCurrentDependencies();
+    expect(deps).toEqual({ 'Todo:0': true });
+
+    const { data } = query(store, { query: Todos });
+
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: [
+        {
+          ...todosData.todos[0],
+          text: 'update',
+          complete: true,
+        },
+        todosData.todos[1],
+        todosData.todos[2],
+      ],
+    });
+  });
+
   it('should be able to read a fragment', () => {
     InMemoryData.initDataState('read', store.data, null);
     const result = store.readFragment(
@@ -530,6 +573,42 @@ describe('Store with OptimisticMutationConfig', () => {
         }
       `,
       { id: '0' }
+    );
+
+    const deps = InMemoryData.getCurrentDependencies();
+    expect(deps).toEqual({ 'Todo:0': true });
+
+    expect(result).toEqual({
+      id: '0',
+      text: 'Go to the shops',
+      complete: false,
+      __typename: 'Todo',
+    });
+
+    InMemoryData.clearDataState();
+  });
+
+  it('should be able to read a fragment by name', () => {
+    InMemoryData.initDataState('read', store.data, null);
+    const result = store.readFragment(
+      gql`
+        fragment authorFields on Author {
+          id
+          text
+          complete
+          __typename
+        }
+
+        fragment todoFields on Todo {
+          id
+          text
+          complete
+          __typename
+        }
+      `,
+      { id: '0' },
+      undefined,
+      'todoFields'
     );
 
     const deps = InMemoryData.getCurrentDependencies();
