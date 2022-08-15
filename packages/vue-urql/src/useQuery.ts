@@ -31,7 +31,7 @@ export type UseQueryArgs<T = any, V extends AnyVariables = AnyVariables> = {
   pause?: MaybeRef<boolean>;
 } & (V extends void
   ? {
-      variables?: MaybeRef<V>;
+      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
     }
   : {
       variables: MaybeRef<V>;
