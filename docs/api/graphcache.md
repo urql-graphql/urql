@@ -351,7 +351,7 @@ import { gql } from '@urql/core';
 
 cache.readFragment(
   gql`
-    fragment todoFields on User {
+    fragment todoFields on Todo {
       id
     }
 
@@ -460,7 +460,7 @@ import { gql } from '@urql/core';
 
 cache.writeFragment(
   gql`
-    fragment todoFields on User {
+    fragment todoFields on Todo {
       id
       text
     }
