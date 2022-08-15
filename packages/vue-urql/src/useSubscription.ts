@@ -31,10 +31,10 @@ export type UseSubscriptionArgs<
   context?: MaybeRef<Partial<OperationContext>>;
 } & (V extends void
   ? {
-      variables?: MaybeRef<V>;
+      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
     }
   : {
-      variables: MaybeRef<V>;
+      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
     });
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
