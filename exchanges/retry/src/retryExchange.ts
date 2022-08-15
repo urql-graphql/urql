@@ -1,4 +1,5 @@
 import {
+  Source,
   makeSubject,
   share,
   pipe,
@@ -9,6 +10,7 @@ import {
   mergeMap,
   takeUntil,
 } from 'wonka';
+
 import {
   makeOperation,
   Exchange,
@@ -142,7 +144,7 @@ export const retryExchange = ({
 
         return true;
       })
-    ) as sourceT<OperationResult>;
+    ) as Source<OperationResult>;
 
     return result$;
   };
