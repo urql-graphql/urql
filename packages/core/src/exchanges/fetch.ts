@@ -39,26 +39,34 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
           },
         });
 
-        return pipe(
+        const source = pipe(
           makeFetchSource(operation, url, fetchOptions),
-          takeUntil(teardown$),
-          onPush(result => {
-            const error = !result.data ? result.error : undefined;
-
-            dispatchDebug({
-              type: error ? 'fetchError' : 'fetchSuccess',
-              message: `A ${
-                error ? 'failed' : 'successful'
-              } fetch response has been returned.`,
-              operation,
-              data: {
-                url,
-                fetchOptions,
-                value: error || result,
-              },
-            });
-          })
+          takeUntil(teardown$)
         );
+
+        if (process.env.NODE_ENV !== 'production') {
+          return pipe(
+            source,
+            onPush(result => {
+              const error = !result.data ? result.error : undefined;
+
+              dispatchDebug({
+                type: error ? 'fetchError' : 'fetchSuccess',
+                message: `A ${
+                  error ? 'failed' : 'successful'
+                } fetch response has been returned.`,
+                operation,
+                data: {
+                  url,
+                  fetchOptions,
+                  value: error || result,
+                },
+              });
+            })
+          );
+        }
+
+        return source;
       })
     );
 

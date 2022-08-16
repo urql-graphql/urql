@@ -7,6 +7,7 @@ import {
   mergeMap,
   pipe,
   share,
+  Subscription,
   Source,
   takeUntil,
 } from 'wonka';
@@ -76,7 +77,7 @@ export const subscriptionExchange = ({
 
     return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;
-      let sub;
+      let sub: Subscription | void;
 
       Promise.resolve().then(() => {
         if (isComplete) return;
