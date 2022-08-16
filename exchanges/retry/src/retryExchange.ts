@@ -44,7 +44,7 @@ export const retryExchange = ({
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
   const MAX_ATTEMPTS = maxNumberAttempts || 2;
-  const RANDOM_DELAY = randomDelay || true;
+  const RANDOM_DELAY = randomDelay !== undefined ? !!randomDelay : true;
 
   return ({ forward, dispatchDebug }) => ops$ => {
     const sharedOps$ = pipe(ops$, share);
