@@ -19,20 +19,17 @@ export const contextExchange = ({
     return pipe(
       ops$,
       mergeMap(operation => {
-        const isPromise = 'then' in getContext;
+        const result = getContext(operation);
+        const isPromise = 'then' in result;
         if (isPromise) {
           return fromPromise(
-            getContext(operation).then((ctx: OperationContext) =>
+            result.then((ctx: OperationContext) =>
               makeOperation(operation.kind, operation, ctx)
             )
           );
         } else {
           return fromValue(
-            makeOperation(
-              operation.kind,
-              operation,
-              getContext(operation) as OperationContext
-            )
+            makeOperation(operation.kind, operation, result as OperationContext)
           );
         }
       }),
