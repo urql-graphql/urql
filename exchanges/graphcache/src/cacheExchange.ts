@@ -14,13 +14,10 @@ import {
   merge,
   pipe,
   share,
-  fromPromise,
   fromArray,
   mergeMap,
   empty,
   Source,
-  skipUntil,
-  buffer,
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
@@ -45,9 +42,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 ): Exchange => ({ forward, client, dispatchDebug }) => {
   const store = new Store<C>(opts);
 
-  let hydration: void | Promise<void>;
   if (opts && opts.storage) {
-    hydration = opts.storage.readData().then(entries => {
+    opts.storage.readData().then(entries => {
       hydrateData(store.data, opts!.storage!, entries);
     });
   }
@@ -240,24 +236,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   return ops$ => {
     const sharedOps$ = pipe(ops$, share);
 
-    // Buffer operations while waiting on hydration to finish
-    // If no hydration takes place we replace this stream with an empty one
-    const inputOps$ = hydration
-      ? share(
-          merge([
-            pipe(
-              sharedOps$,
-              buffer(fromPromise(hydration)),
-              mergeMap(fromArray)
-            ),
-            pipe(sharedOps$, skipUntil(fromPromise(hydration))),
-          ])
-        )
-      : sharedOps$;
-
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cacheOps$ = pipe(
-      inputOps$,
+      sharedOps$,
       filter(op => {
         return (
           op.kind === 'query' && op.context.requestPolicy !== 'network-only'
@@ -268,7 +249,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     );
 
     const nonCacheOps$ = pipe(
-      inputOps$,
+      sharedOps$,
       filter(op => {
         return (
           op.kind !== 'query' || op.context.requestPolicy === 'network-only'
