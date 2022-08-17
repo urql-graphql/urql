@@ -674,9 +674,11 @@ export const hydrateData = (
     if (value !== undefined) {
       const { entityKey, fieldKey } = deserializeKeyInfo(key);
       if (value[0] === ':') {
-        writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
+        if (readLink(entityKey, fieldKey) === undefined)
+          writeLink(entityKey, fieldKey, JSON.parse(value.slice(1)));
       } else {
-        writeRecord(entityKey, fieldKey, JSON.parse(value));
+        if (readRecord(entityKey, fieldKey) === undefined)
+          writeRecord(entityKey, fieldKey, JSON.parse(value));
       }
     }
   }
