@@ -224,15 +224,16 @@ const writeSelection = (
     const fieldArgs = getFieldArguments(node, ctx.variables);
     const fieldKey = keyOfField(fieldName, fieldArgs);
     const fieldAlias = getFieldAlias(node);
-    let fieldValue = data[fieldAlias];
+    let fieldValue = data[ctx.optimistic ? fieldName : fieldAlias];
 
     // Development check of undefined fields
     if (process.env.NODE_ENV !== 'production') {
-      if (!isRoot && fieldValue === undefined && !deferRef.current) {
-        const advice = ctx.optimistic
-          ? '\nYour optimistic result may be missing a field!'
-          : '';
-
+      if (
+        !isRoot &&
+        fieldValue === undefined &&
+        !deferRef.current &&
+        !ctx.optimistic
+      ) {
         const expected =
           node.selectionSet === undefined
             ? 'scalar (number, boolean, etc)'
@@ -243,8 +244,7 @@ const writeSelection = (
             fieldKey +
             '` is `undefined`, but the GraphQL query expects a ' +
             expected +
-            ' for this field.' +
-            advice,
+            ' for this field.',
           13
         );
 
@@ -273,7 +273,7 @@ const writeSelection = (
       if (!resolver) continue;
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(ctx, data, typename, typename, fieldKey, fieldName);
-      fieldValue = data[fieldAlias] = ensureData(
+      fieldValue = data[fieldName] = ensureData(
         resolver(fieldArgs || {}, ctx.store, ctx)
       );
     }
