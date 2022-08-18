@@ -89,10 +89,6 @@ export interface Client {
   preferGetMethod: boolean;
   maskTypename: boolean;
 
-  createOperationContext(
-    opts?: Partial<OperationContext> | undefined
-  ): OperationContext;
-
   createRequestOperation<
     Data = any,
     Variables extends AnyVariables = AnyVariables
@@ -284,22 +280,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       }
     },
 
-    createOperationContext(opts) {
-      if (!opts) opts = {};
-
-      return {
-        _instance: undefined,
-        url: client.url,
-        fetchOptions: client.fetchOptions,
-        fetch: client.fetch,
-        preferGetMethod: client.preferGetMethod,
-        ...opts,
-        suspense: opts.suspense || (opts.suspense !== false && client.suspense),
-        requestPolicy: opts.requestPolicy || client.requestPolicy,
-      };
-    },
-
     createRequestOperation(kind, request, opts) {
+      if (!opts) opts = {};
       const requestOperationType = getOperationType(request.query);
       if (
         process.env.NODE_ENV !== 'production' &&
@@ -310,9 +292,16 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           `Expected operation of type "${kind}" but found "${requestOperationType}"`
         );
       }
-      const context = client.createOperationContext(opts);
-      if (kind === 'mutation') (context as any)._instance = [];
-      return makeOperation(kind, request, context);
+      return makeOperation(kind, request, {
+        _instance: kind === 'mutation' ? [] : undefined,
+        url: client.url,
+        fetchOptions: client.fetchOptions,
+        fetch: client.fetch,
+        preferGetMethod: client.preferGetMethod,
+        ...opts,
+        suspense: opts.suspense || (opts.suspense !== false && client.suspense),
+        requestPolicy: opts.requestPolicy || client.requestPolicy,
+      });
     },
 
     executeRequestOperation(operation) {
