@@ -5,17 +5,14 @@ const generateErrorMessage = (
   graphQlErrs?: GraphQLError[]
 ) => {
   let error = '';
-  if (networkErr) {
-    return (error = `[Network] ${networkErr.message}`);
-  }
-
+  if (networkErr) return `[Network] ${networkErr.message}`;
   if (graphQlErrs) {
     for (const err of graphQlErrs) {
-      error += `[GraphQL] ${err.message}\n`;
+      if (error) error += '\n';
+      error += `[GraphQL] ${err.message}`;
     }
   }
-
-  return error.trim();
+  return error;
 };
 
 const rehydrateGraphQlError = (error: any): GraphQLError => {
@@ -44,27 +41,26 @@ export class CombinedError extends Error {
   public networkError?: Error;
   public response?: any;
 
-  constructor({
-    networkError,
-    graphQLErrors,
-    response,
-  }: {
+  constructor(input: {
     networkError?: Error;
     graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
     response?: any;
   }) {
-    const normalizedGraphQLErrors = (graphQLErrors || []).map(
+    const normalizedGraphQLErrors = (input.graphQLErrors || []).map(
       rehydrateGraphQlError
     );
-    const message = generateErrorMessage(networkError, normalizedGraphQLErrors);
+    const message = generateErrorMessage(
+      input.networkError,
+      normalizedGraphQLErrors
+    );
 
     super(message);
 
     this.name = 'CombinedError';
     this.message = message;
     this.graphQLErrors = normalizedGraphQLErrors;
-    this.networkError = networkError;
-    this.response = response;
+    this.networkError = input.networkError;
+    this.response = input.response;
   }
 
   toString() {

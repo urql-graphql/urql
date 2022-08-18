@@ -74,24 +74,12 @@ export interface Client {
   new (options: ClientOptions): Client;
 
   operations$: Source<Operation>;
+  suspense: boolean;
 
   /** Start an operation from an exchange */
   reexecuteOperation: (operation: Operation) => void;
   /** Event target for monitoring, e.g. for @urql/devtools */
   subscribeToDebugTarget?: (onEvent: (e: DebugEvent) => void) => Subscription;
-
-  // These are variables derived from ClientOptions
-  url: string;
-  fetch?: typeof fetch;
-  fetchOptions?: RequestInit | (() => RequestInit);
-  suspense: boolean;
-  requestPolicy: RequestPolicy;
-  preferGetMethod: boolean;
-  maskTypename: boolean;
-
-  createOperationContext(
-    opts?: Partial<OperationContext> | undefined
-  ): OperationContext;
 
   createRequestOperation<
     Data = any,
@@ -165,6 +153,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const active: Map<number, Source<OperationResult>> = new Map();
   const queue: Operation[] = [];
 
+  const baseOpts = {
+    url: opts.url,
+    fetchOptions: opts.fetchOptions,
+    fetch: opts.fetch,
+    preferGetMethod: !!opts.preferGetMethod,
+    requestPolicy: opts.requestPolicy || 'cache-first',
+  };
+
   // This subject forms the input of operations; executeOperation may be
   // called to dispatch a new operation on the subject
   const { source: operations$, next: nextOperation } = makeSubject<Operation>();
@@ -197,7 +193,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     );
 
     // Mask typename properties if the option for it is turned on
-    if (client.maskTypename) {
+    if (opts.maskTypename) {
       result$ = pipe(
         result$,
         map(res => ({ ...res, data: maskTypename(res.data) }))
@@ -265,14 +261,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const instance: Client =
     this instanceof Client ? this : Object.create(Client.prototype);
   const client: Client = Object.assign(instance, {
-    url: opts.url,
-    fetchOptions: opts.fetchOptions,
-    fetch: opts.fetch,
     suspense: !!opts.suspense,
-    requestPolicy: opts.requestPolicy || 'cache-first',
-    preferGetMethod: !!opts.preferGetMethod,
-    maskTypename: !!opts.maskTypename,
-
     operations$,
 
     reexecuteOperation(operation: Operation) {
@@ -284,22 +273,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       }
     },
 
-    createOperationContext(opts) {
-      if (!opts) opts = {};
-
-      return {
-        _instance: undefined,
-        url: client.url,
-        fetchOptions: client.fetchOptions,
-        fetch: client.fetch,
-        preferGetMethod: client.preferGetMethod,
-        ...opts,
-        suspense: opts.suspense || (opts.suspense !== false && client.suspense),
-        requestPolicy: opts.requestPolicy || client.requestPolicy,
-      };
-    },
-
     createRequestOperation(kind, request, opts) {
+      if (!opts) opts = {};
       const requestOperationType = getOperationType(request.query);
       if (
         process.env.NODE_ENV !== 'production' &&
@@ -310,9 +285,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           `Expected operation of type "${kind}" but found "${requestOperationType}"`
         );
       }
-      const context = client.createOperationContext(opts);
-      if (kind === 'mutation') (context as any)._instance = [];
-      return makeOperation(kind, request, context);
+      return makeOperation(kind, request, {
+        _instance: kind === 'mutation' ? [] : undefined,
+        ...baseOpts,
+        ...opts,
+        suspense: opts.suspense || (opts.suspense !== false && client.suspense),
+      });
     },
 
     executeRequestOperation(operation) {

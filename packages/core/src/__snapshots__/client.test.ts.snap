@@ -2,25 +2,18 @@
 
 exports[`createClient / Client passes snapshot 1`] = `
 Client {
-  "createOperationContext": [Function],
   "createRequestOperation": [Function],
   "executeMutation": [Function],
   "executeQuery": [Function],
   "executeRequestOperation": [Function],
   "executeSubscription": [Function],
-  "fetch": undefined,
-  "fetchOptions": undefined,
-  "maskTypename": false,
   "mutation": [Function],
   "operations$": [Function],
-  "preferGetMethod": false,
   "query": [Function],
   "readQuery": [Function],
   "reexecuteOperation": [Function],
-  "requestPolicy": "cache-first",
   "subscribeToDebugTarget": [Function],
   "subscription": [Function],
   "suspense": false,
-  "url": "https://hostname.com",
 }
 `;

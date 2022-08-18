@@ -9,10 +9,6 @@ export interface FetchBody {
   extensions: undefined | Record<string, any>;
 }
 
-const shouldUseGet = (operation: Operation): boolean => {
-  return operation.kind === 'query' && !!operation.context.preferGetMethod;
-};
-
 export function makeFetchBody<
   Data = any,
   Variables extends AnyVariables = AnyVariables
@@ -29,7 +25,8 @@ export const makeFetchURL = (
   operation: Operation,
   body?: FetchBody
 ): string => {
-  const useGETMethod = shouldUseGet(operation);
+  const useGETMethod =
+    operation.kind === 'query' && !!operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
   const url = new URL(operation.context.url);
@@ -55,7 +52,8 @@ export const makeFetchOptions = (
   operation: Operation,
   body?: FetchBody
 ): RequestInit => {
-  const useGETMethod = shouldUseGet(operation);
+  const useGETMethod =
+    operation.kind === 'query' && !!operation.context.preferGetMethod;
   const headers: HeadersInit = {
     accept: 'application/graphql+json, application/json',
   };
