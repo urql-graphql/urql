@@ -1,3 +1,4 @@
+import { Client } from '@urql/core';
 import { initUrqlClient } from '../init-urql-client';
 
 describe('initUrqlClient', () => {
@@ -9,7 +10,7 @@ describe('initUrqlClient', () => {
       true
     );
 
-    expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
+    expect(urqlClient).toBeInstanceOf(Client);
     expect(urqlClient).toHaveProperty('suspense', true);
   });
 
@@ -21,7 +22,7 @@ describe('initUrqlClient', () => {
       false
     );
 
-    expect(urqlClient).toHaveProperty('url', 'http://localhost:3000');
+    expect(urqlClient).toBeInstanceOf(Client);
     expect(urqlClient).toHaveProperty('suspense', false);
   });
 });
