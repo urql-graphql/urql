@@ -38,7 +38,7 @@ const PageQuery = gql`
   }
 `;
 
-const ListPage = ({ variables, isLastPage }) => {
+const SearchResultPage = ({ variables, isLastPage, onLoadMore }) => {
   const [{ data, fetching, error }] = useQuery({ query: PageQuery, variables });
   const todos = data?.todos;
 
