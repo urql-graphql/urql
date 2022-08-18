@@ -91,9 +91,9 @@ const deserializeResult = (
 const revalidated = new Set<number>();
 
 /** The ssrExchange can be created to capture data during SSR and also to rehydrate it on the client */
-export const ssrExchange = (params?: SSRExchangeParams): SSRExchange => {
-  const staleWhileRevalidate = !!(params && params.staleWhileRevalidate);
-  const includeExtensions = !!(params && params.includeExtensions);
+export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
+  const staleWhileRevalidate = !!params.staleWhileRevalidate;
+  const includeExtensions = !!params.includeExtensions;
   const data: Record<string, SerializedResult | null> = {};
 
   // On the client-side, we delete results from the cache as they're resolved

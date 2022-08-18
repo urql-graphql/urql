@@ -1,13 +1,6 @@
 /* eslint-disable prefer-rest-params */
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-
-import {
-  DocumentNode,
-  DefinitionNode,
-  FragmentDefinitionNode,
-  Kind,
-} from 'graphql';
-
+import { DocumentNode, DefinitionNode, Kind } from 'graphql';
 import { keyDocument, stringifyDocument } from './utils';
 
 const applyDefinitions = (
@@ -15,14 +8,14 @@ const applyDefinitions = (
   target: DefinitionNode[],
   source: Array<DefinitionNode> | ReadonlyArray<DefinitionNode>
 ) => {
-  for (let i = 0; i < source.length; i++) {
-    if (source[i].kind === Kind.FRAGMENT_DEFINITION) {
-      const name = (source[i] as FragmentDefinitionNode).name.value;
-      const value = stringifyDocument(source[i]);
+  for (const definition of source) {
+    if (definition.kind === Kind.FRAGMENT_DEFINITION) {
+      const name = definition.name.value;
+      const value = stringifyDocument(definition);
       // Fragments will be deduplicated according to this Map
       if (!fragmentNames.has(name)) {
         fragmentNames.set(name, value);
-        target.push(source[i]);
+        target.push(definition);
       } else if (
         process.env.NODE_ENV !== 'production' &&
         fragmentNames.get(name) !== value
@@ -36,7 +29,7 @@ const applyDefinitions = (
         );
       }
     } else {
-      target.push(source[i]);
+      target.push(definition);
     }
   }
 };

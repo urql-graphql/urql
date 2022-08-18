@@ -2,8 +2,6 @@ import { Source, make } from 'wonka';
 import { Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
-const asyncIterator =
-  typeof Symbol !== 'undefined' ? Symbol.asyncIterator : null;
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const jsonHeaderRe = /content-type:[^\r\n]*application\/json/i;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
@@ -61,13 +59,13 @@ export const makeFetchSource = (
       let cancel = () => {
         /*noop*/
       };
-      if (asyncIterator && response[asyncIterator]) {
-        const iterator = response[asyncIterator]();
+      if (response[Symbol.asyncIterator]) {
+        const iterator = response[Symbol.asyncIterator]();
         read = iterator.next.bind(iterator);
       } else if ('body' in response && response.body) {
         const reader = response.body.getReader();
-        cancel = reader.cancel.bind(reader);
-        read = reader.read.bind(reader);
+        cancel = () => reader.cancel();
+        read = () => reader.read();
       } else {
         throw new TypeError('Streaming requests unsupported');
       }

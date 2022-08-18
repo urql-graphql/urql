@@ -20,11 +20,6 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
       }),
       mergeMap(operation => {
         const { key } = operation;
-        const teardown$ = pipe(
-          sharedOps$,
-          filter(op => op.kind === 'teardown' && op.key === key)
-        );
-
         const body = makeFetchBody(operation);
         const url = makeFetchURL(operation, body);
         const fetchOptions = makeFetchOptions(operation, body);
@@ -41,7 +36,12 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
 
         const source = pipe(
           makeFetchSource(operation, url, fetchOptions),
-          takeUntil(teardown$)
+          takeUntil(
+            pipe(
+              sharedOps$,
+              filter(op => op.kind === 'teardown' && op.key === key)
+            )
+          )
         );
 
         if (process.env.NODE_ENV !== 'production') {
