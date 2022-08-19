@@ -152,7 +152,7 @@ import { createClient, dedupExchange, cacheExchange } from 'urql';
 import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [dedupExchange, cacheExchange, multipartFetchExchange],
 });
 ```
