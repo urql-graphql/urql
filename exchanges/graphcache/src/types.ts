@@ -188,6 +188,7 @@ export type UpdatesConfig = {
   };
 };
 
+// TODO: Update "Result" return type to remap all `Data` fields to optional, recursive OptimisticMutationResolver values
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data> | Scalar
