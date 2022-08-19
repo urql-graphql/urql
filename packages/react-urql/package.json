@@ -1,6 +1,6 @@
 {
   "name": "urql",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A highly customizable and versatile GraphQL client for React",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",

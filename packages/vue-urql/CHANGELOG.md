@@ -1,5 +1,11 @@
 # @urql/vue
 
+## 1.0.1
+
+### Patch Changes
+
+- Tweak the variables type for when generics only contain nullable keys, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2623](https://github.com/FormidableLabs/urql/pull/2623))
+
 ## 1.0.0
 
 ### Major Changes
