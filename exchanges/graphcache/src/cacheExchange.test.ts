@@ -638,7 +638,9 @@ describe('optimistic updates', () => {
       concealAuthor: {
         __typename: 'Author',
         id: '123',
-        name: '[REDACTED OFFLINE]',
+        name() {
+          return '[REDACTED OFFLINE]';
+        },
       },
     };
 
@@ -701,6 +703,11 @@ describe('optimistic updates', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(optimistic.concealAuthor).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(1);
+
+    expect(result.mock.calls[1][0]?.data).toMatchObject({
+      __typename: 'Query',
+      author: { name: '[REDACTED OFFLINE]' },
+    });
 
     jest.runAllTimers();
     expect(response).toHaveBeenCalledTimes(2);
