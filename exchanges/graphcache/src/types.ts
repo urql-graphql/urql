@@ -188,12 +188,21 @@ export type UpdatesConfig = {
   };
 };
 
-// TODO: Update "Result" return type to remap all `Data` fields to optional, recursive OptimisticMutationResolver values
+export type MakeFunctional<T> = T extends { __typename: string }
+  ? {
+      [P in keyof T]: T[P] | (() => T[P]);
+    }
+  : T;
+
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data> | Scalar
 > = {
-  bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
+  bivarianceHack(
+    vars: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): MakeFunctional<Result>;
 }['bivarianceHack'];
 
 export type OptimisticMutationConfig = {
