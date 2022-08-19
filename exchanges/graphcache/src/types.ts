@@ -188,11 +188,23 @@ export type UpdatesConfig = {
   };
 };
 
+export type MakeFunctional<T> = T extends { __typename: string }
+  ? WithTypename<
+      {
+        [P in keyof T]?: MakeFunctional<T[P]>;
+      }
+    >
+  : OptimisticMutationResolver<Variables, T> | T;
+
 export type OptimisticMutationResolver<
   Args = Variables,
   Result = Link<Data> | Scalar
 > = {
-  bivarianceHack(vars: Args, cache: Cache, info: ResolveInfo): Result;
+  bivarianceHack(
+    vars: Args,
+    cache: Cache,
+    info: ResolveInfo
+  ): MakeFunctional<Result>;
 }['bivarianceHack'];
 
 export type OptimisticMutationConfig = {
@@ -226,3 +238,7 @@ export type Dependencies = Set<string>;
 
 /** The type of cache operation being executed. */
 export type OperationType = 'read' | 'write';
+
+export type WithTypename<T extends { __typename?: any }> = T & {
+  __typename: NonNullable<T['__typename']>;
+};

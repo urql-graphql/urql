@@ -145,11 +145,11 @@ interface OptimisticMutationConfig {
 A `OptimisticMutationResolver` receives three arguments when it's called: `variables`, `cache`, and
 `info`.
 
-| Argument    | Type     | Description                                                                                                 |
-| ----------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| `variables` | `object` | The variables that the given mutation received.                                                             |
-| `cache`     | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
-| `info`      | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
+| Argument | Type     | Description                                                                                                 |
+| -------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| `args`   | `object` | The arguments that the given mutation field received.                                                       |
+| `cache`  | `Cache`  | The cache using which data can be read or written. [See `Cache`.](#cache)                                   |
+| `info`   | `Info`   | Additional metadata and information about the current operation and the current field. [See `Info`.](#info) |
 
 [Read more about how to set up `optimistic` on the "Custom Updates"
 page.](../graphcache/cache-updates.md)
