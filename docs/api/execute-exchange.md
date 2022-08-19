@@ -28,7 +28,7 @@ import { createClient, dedupExchange, cacheExchange } from 'urql';
 import { executeExchange } from '@urql/exchange-execute';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [
     dedupExchange,
     cacheExchange,
