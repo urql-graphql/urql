@@ -157,19 +157,22 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
       }
     });
 
-    const oldReadData = storage.readData;
     let isFirstInvocation = true;
-    storage.readData = () => {
-      return oldReadData().then(data => {
-        if (isFirstInvocation) {
-          isFirstInvocation = false;
-          flushQueue();
-        }
-        return data;
-      });
-    };
-
-    const cacheResults$ = cacheExchange(opts)({
+    const cacheResults$ = cacheExchange({
+      ...opts,
+      storage: {
+        ...storage,
+        readData() {
+          return storage.readData().then(data => {
+            if (isFirstInvocation) {
+              isFirstInvocation = false;
+              flushQueue();
+            }
+            return data;
+          });
+        },
+      },
+    })({
       client,
       dispatchDebug,
       forward,
