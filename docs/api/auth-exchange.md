@@ -28,7 +28,7 @@ import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql'
 import { authExchange } from '@urql/exchange-auth';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [
     dedupExchange,
     cacheExchange,
