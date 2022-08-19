@@ -16,7 +16,7 @@ To add support for subscriptions we need to add the `subscriptionExchange` to ou
 import { Client, defaultExchanges, subscriptionExchange } from 'urql';
 
 const client = new Client({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
