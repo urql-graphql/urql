@@ -157,7 +157,15 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
       }
     });
 
-    const cacheResults$ = cacheExchange(opts)({
+    const cacheResults$ = cacheExchange({
+      ...opts,
+      storage: {
+        ...storage,
+        readData() {
+          return storage.readData().finally(flushQueue);
+        },
+      },
+    })({
       client,
       dispatchDebug,
       forward,

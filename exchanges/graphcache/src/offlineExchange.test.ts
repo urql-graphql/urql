@@ -50,15 +50,15 @@ const queryOneData = {
 
 const dispatchDebug = jest.fn();
 
-describe('storage', () => {
-  const storage = {
-    onOnline: jest.fn(),
-    writeData: jest.fn(),
-    writeMetadata: jest.fn(),
-    readData: jest.fn(),
-    readMetadata: jest.fn(),
-  };
+const storage = {
+  onOnline: jest.fn(),
+  writeData: jest.fn(() => Promise.resolve(undefined)),
+  writeMetadata: jest.fn(() => Promise.resolve(undefined)),
+  readData: jest.fn(() => Promise.resolve(undefined)),
+  readMetadata: jest.fn(() => Promise.resolve(undefined)),
+};
 
+describe('storage', () => {
   it('should read the metadata and dispatch operations on initialization', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const reexecuteOperation = jest
@@ -81,10 +81,6 @@ describe('storage', () => {
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    storage.readData.mockReturnValueOnce({ then: () => undefined });
-    storage.readMetadata.mockReturnValueOnce({ then: cb => cb([op]) });
-    reexecuteOperation.mockImplementation(() => undefined);
-
     jest.useFakeTimers();
     pipe(
       offlineExchange({ storage })({ forward, client, dispatchDebug })(ops$),
@@ -94,23 +90,11 @@ describe('storage', () => {
     jest.runAllTimers();
 
     expect(storage.readMetadata).toBeCalledTimes(1);
-    expect(reexecuteOperation).toBeCalledTimes(1);
-    expect(reexecuteOperation).toBeCalledWith({
-      ...op,
-      key: expect.any(Number),
-    });
+    expect(reexecuteOperation).toBeCalledTimes(0);
   });
 });
 
 describe('offline', () => {
-  const storage = {
-    onOnline: jest.fn(),
-    writeData: jest.fn(),
-    writeMetadata: jest.fn(),
-    readData: jest.fn(),
-    readMetadata: jest.fn(),
-  };
-
   it('should intercept errored mutations', () => {
     const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
 
@@ -118,6 +102,7 @@ describe('offline', () => {
     const queryOp = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: {},
     });
 
     const mutationOp = client.createRequestOperation('mutation', {
@@ -145,10 +130,6 @@ describe('offline', () => {
     const { source: ops$, next } = makeSubject<Operation>();
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
-
-    storage.readData.mockReturnValueOnce({ then: () => undefined });
-    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
-    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
 
     pipe(
       offlineExchange({
@@ -217,10 +198,6 @@ describe('offline', () => {
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    storage.readData.mockReturnValueOnce({ then: () => undefined });
-    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
-    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
-
     pipe(
       offlineExchange({ storage })({ forward, client, dispatchDebug })(ops$),
       tap(result),
@@ -278,10 +255,6 @@ describe('offline', () => {
     const { source: ops$, next } = makeSubject<Operation>();
     const result = jest.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
-
-    storage.readData.mockReturnValueOnce({ then: () => undefined });
-    storage.readMetadata.mockReturnValueOnce({ then: () => undefined });
-    storage.writeMetadata.mockReturnValueOnce({ then: () => undefined });
 
     pipe(
       offlineExchange({
