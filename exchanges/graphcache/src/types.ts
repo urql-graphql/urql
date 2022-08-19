@@ -189,10 +189,12 @@ export type UpdatesConfig = {
 };
 
 export type MakeFunctional<T> = T extends { __typename: string }
-  ? {
-      [P in keyof T]: T[P] | (() => T[P]);
-    }
-  : T;
+  ? WithTypename<
+      {
+        [P in keyof T]?: MakeFunctional<T[P]>;
+      }
+    >
+  : OptimisticMutationResolver<Variables, T> | T;
 
 export type OptimisticMutationResolver<
   Args = Variables,
@@ -236,3 +238,7 @@ export type Dependencies = Set<string>;
 
 /** The type of cache operation being executed. */
 export type OperationType = 'read' | 'write';
+
+export type WithTypename<T extends { __typename?: any }> = T & {
+  __typename: NonNullable<T['__typename']>;
+};
