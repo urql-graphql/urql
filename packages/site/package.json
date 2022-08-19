@@ -1,6 +1,6 @@
 {
   "name": "urql-docs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Documentation site for urql",
   "private": true,
   "scripts": {

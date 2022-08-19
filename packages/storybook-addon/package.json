@@ -1,6 +1,6 @@
 {
   "name": "@urql/storybook-addon",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "description": "Make stories in Storybook with urql",
   "sideEffects": false,
   "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
@@ -44,11 +44,11 @@
     "@storybook/react": ">=6.0.28",
     "@types/webpack-env": "^1.15.3",
     "@urql/devtools": "^2.0.2",
-    "@urql/preact": ">=2.0.4",
+    "@urql/preact": ">=3.0.0",
     "graphql": "^16.0.0",
     "preact": "^10.5.5",
     "react": "^17.0.1",
-    "urql": ">=2.2.2",
+    "urql": ">=3.0.0",
     "wonka": "^6.0.0"
   },
   "optionalDependencies": {

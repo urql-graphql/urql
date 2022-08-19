@@ -1,5 +1,30 @@
 # @urql/exchange-graphcache
 
+## 5.0.0
+
+### Major Changes
+
+- **Goodbye IE11!** 👋 This major release removes support for IE11. All code that is shipped will be transpiled much less and will _not_ be ES5-compatible anymore, by [@kitten](https://github.com/kitten) (See [#2504](https://github.com/FormidableLabs/urql/pull/2504))
+- Prevent cache-hydration from buffering operations, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2612](https://github.com/FormidableLabs/urql/pull/2612))
+- Implement stricter variables types, which require variables to always be passed and match TypeScript types when the generic is set or inferred. This is a breaking change for TypeScript users potentially, unless all types are adhered to, by [@kitten](https://github.com/kitten) (See [#2607](https://github.com/FormidableLabs/urql/pull/2607))
+- Upgrade to [Wonka v6](https://github.com/0no-co/wonka) (`wonka@^6.0.0`), which has no breaking changes but is built to target ES2015 and comes with other minor improvements.
+  The library has fully been migrated to TypeScript which will hopefully help with making contributions easier!, by [@kitten](https://github.com/kitten) (See [#2504](https://github.com/FormidableLabs/urql/pull/2504))
+
+### Minor Changes
+
+- Remove the `babel-plugin-modular-graphql` helper, this because the graphql package hasn't converted to ESM yet which gives issues in node environments, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2551](https://github.com/FormidableLabs/urql/pull/2551))
+- Allow passing in `fragmentName` for `write` and `read` operations, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2609](https://github.com/FormidableLabs/urql/pull/2609))
+
+### Patch Changes
+
+- Graphcache's `optimistic` option now accepts optimistic mutation resolvers that return fields by
+  name rather than alias. Previously, depending on which mutation was run, the optimistic resolvers
+  would read your optimistic data by field alias (i.e. "alias" for `alias: id` rather than "id").
+  Instead, optimistic updates now correctly use field names and allow you to also pass resolvers as
+  values on your optimistic config, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2616](https://github.com/FormidableLabs/urql/pull/2616))
+- Updated dependencies (See [#2551](https://github.com/FormidableLabs/urql/pull/2551), [#2504](https://github.com/FormidableLabs/urql/pull/2504), [#2619](https://github.com/FormidableLabs/urql/pull/2619), [#2607](https://github.com/FormidableLabs/urql/pull/2607), and [#2504](https://github.com/FormidableLabs/urql/pull/2504))
+  - @urql/core@3.0.0
+
 ## 4.4.3
 
 ### Patch Changes
