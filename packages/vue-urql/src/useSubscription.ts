@@ -33,6 +33,8 @@ export type UseSubscriptionArgs<
   ? {
       variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
     }
+  : V extends { [P in keyof V]: V[P] | null }
+  ? { variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }> }
   : {
       variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
     });

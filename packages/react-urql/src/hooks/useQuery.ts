@@ -32,6 +32,8 @@ export type UseQueryArgs<
   ? {
       variables?: Variables;
     }
+  : Variables extends { [P in keyof Variables]: Variables[P] | null }
+  ? { variables?: Variables }
   : {
       variables: Variables;
     });
