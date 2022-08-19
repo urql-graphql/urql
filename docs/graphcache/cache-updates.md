@@ -475,11 +475,13 @@ that imitates the result that the API is assumed to send back:
 ```js
 const cache = cacheExchange({
   optimistic: {
-    favoriteTodo: (variables, cache, info) => ({
-      __typename: 'Todo',
-      id: variables.id,
-      favorite: true,
-    }),
+    favoriteTodo(args, cache, info) {
+      return {
+        __typename: 'Todo',
+        id: variables.id,
+        favorite: true,
+      };
+    },
   },
 });
 ```
@@ -494,6 +496,29 @@ return. If our mutations request a field in their selection sets that our optimi
 doesn't contain then we'll see a warning, since this is a common mistake. To work around not having
 enough data we may use methods like `cache.readFragment` and `cache.resolve` to retrieve more data
 from our cache.
+
+If we'd like to make sure we don't compute more fields than we need, for instance because one
+mutation is run with several different selection sets, then we may pass nested optimistic resolver
+functions in our optimistic object, like so:
+
+```js
+const cache = cacheExchange({
+  optimistic: {
+    favoriteTodo(variables, cache, info) {
+      return {
+        __typename: 'Todo',
+        id: variables.id,
+        favorite(args, cache, info) {
+          return true;
+        },
+      },
+    },
+  },
+});
+```
+
+The function signature and arguments it receives is identical to the toplevel optimistic function
+you define.
 
 ### Variables for Optimistic Updates
 
