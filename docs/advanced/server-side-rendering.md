@@ -342,7 +342,7 @@ you fully pre-populate your cache so in our case we were only interested in gett
 if there are child components relying on data you'll have to make sure these are fetched as well.
 
 The `getServerSideProps` and `getStaticProps` functions only run on the **server-side** — any
-code used in them is automatically stripped away form the client-side bundle using the
+code used in them is automatically stripped away from the client-side bundle using the
 [next-code-elimination tool](https://next-code-elimination.vercel.app/). This allows **executing
 our schema directly** using `@urql/exchange-execute` if we have access to our GraphQL server:
 
