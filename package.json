@@ -66,6 +66,7 @@
   "devDependencies": {
     "@actions/artifact": "^0.5.1",
     "@babel/core": "^7.18.10",
+    "@babel/plugin-transform-block-scoping": "^7.18.9",
     "@babel/plugin-transform-react-jsx": "^7.18.10",
     "@changesets/cli": "^2.16.0",
     "@changesets/get-github-info": "0.5.0",
