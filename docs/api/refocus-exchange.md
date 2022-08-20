@@ -26,7 +26,7 @@ import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql'
 import { refocusExchange } from '@urql/exchange-refocus';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [dedupExchange, refocusExchange(), cacheExchange, fetchExchange],
 });
 ```

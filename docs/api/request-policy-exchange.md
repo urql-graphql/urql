@@ -35,7 +35,7 @@ import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql'
 import { requestPolicyExchange } from '@urql/exchange-request-policy';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [
     dedupExchange,
     requestPolicyExchange({

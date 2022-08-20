@@ -48,7 +48,7 @@ extra information on how the GraphQL requests are executed.
 import { Client } from '@urql/core';
 
 new Client({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   requestPolicy: 'cache-first',
 });
 ```

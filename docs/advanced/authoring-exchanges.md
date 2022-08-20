@@ -68,7 +68,7 @@ result.
 import { createClient, dedupExchange, fetchExchange, cacheExchange } from 'urql';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
@@ -80,7 +80,7 @@ global callback whenever it sees [a `CombinedError`](../basics/errors.md) on an 
 import { createClient, dedupExchange, fetchExchange, cacheExchange, errorExchange } from 'urql';
 
 const client = createClient({
-  url: '/graphql',
+  url: 'http://localhost:3000/graphql',
   exchanges: [
     dedupExchange,
     cacheExchange,
