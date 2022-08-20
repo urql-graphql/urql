@@ -60,6 +60,7 @@ export const makePlugins = () => [
     exclude: 'node_modules/**',
     presets: [],
     plugins: [
+      '@babel/plugin-transform-block-scoping',
       babelPluginTransformDebugTarget,
       babelPluginTransformPipe,
       babelPluginTransformInvariant,
