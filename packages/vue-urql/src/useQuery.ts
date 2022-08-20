@@ -4,7 +4,7 @@ import { DocumentNode } from 'graphql';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
-import { Source, pipe, subscribe, onEnd } from 'wonka';
+import { Subscription, Source, pipe, subscribe, onEnd } from 'wonka';
 
 import {
   Client,
@@ -138,9 +138,10 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
       return {
         ...response,
         then(onFulfilled, onRejected) {
+          let sub: Subscription | void;
           return new Promise<UseQueryState<T, V>>(resolve => {
             let hasResult = false;
-            const sub = pipe(
+            sub = pipe(
               s,
               subscribe(() => {
                 if (!state.fetching.value && !state.stale.value) {
@@ -203,10 +204,11 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   const response: UseQueryResponse<T, V> = {
     ...state,
     then(onFulfilled, onRejected) {
+      let sub: Subscription | void;
       const promise = new Promise<UseQueryState<T, V>>(resolve => {
         if (!source.value) return resolve(state);
         let hasResult = false;
-        const sub = pipe(
+        sub = pipe(
           source.value,
           subscribe(() => {
             if (!state.fetching.value && !state.stale.value) {
