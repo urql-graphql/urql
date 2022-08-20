@@ -1,5 +1,11 @@
 # @urql/vue
 
+## 1.0.2
+
+### Patch Changes
+
+- ⚠️ Fix an issue that caused `useQuery` to fail for promise-based access, if a result is delivered by the `Client` immediately, by [@kitten](https://github.com/kitten) (See [#2629](https://github.com/FormidableLabs/urql/pull/2629))
+
 ## 1.0.1
 
 ### Patch Changes
