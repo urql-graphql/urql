@@ -289,6 +289,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         _instance: kind === 'mutation' ? [] : undefined,
         ...baseOpts,
         ...opts,
+        requestPolicy: opts.requestPolicy || baseOpts.requestPolicy,
         suspense: opts.suspense || (opts.suspense !== false && client.suspense),
       });
     },
