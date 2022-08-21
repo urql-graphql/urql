@@ -1,5 +1,12 @@
 # @urql/core
 
+## 3.0.1
+
+### Patch Changes
+
+- ⚠️ fix setting a client default requestPolicy, we set `context.requestPolicy: undefined`
+  from our bindings which makes a spread override the client-set default, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2634](https://github.com/FormidableLabs/urql/pull/2634))
+
 ## 3.0.0
 
 ### Major Changes
