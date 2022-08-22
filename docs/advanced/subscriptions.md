@@ -168,42 +168,29 @@ messages.
 
 ## Svelte
 
-The `subscription` function in `@urql/svelte` comes with a similar API to `query`, which [we've
+The `subscriptionStore` function in `@urql/svelte` comes with a similar API to `query`, which [we've
 learned about in the "Queries" page in the "Basics" section.](../basics/svelte.md#queries)
 
 Its usage is extremely similar in that it accepts an `operationStore`, which will typically contain
-our GraphQL subscription query. However, `subscription` also accepts a second argument, which is
-a reducer function, similar to what you would pass to `Array.prototype.reduce`.
+our GraphQL subscription query.
 
-It receives the previous set of data that this function has returned or `undefined`.
-As the second argument, it receives the event that has come in from the subscription.
-You can use this to accumulate the data over time, which is useful for a
-list for example.
-
-In the following example, we create a subscription that informs us of
-new messages. We will concatenate the incoming messages so that we
-can display all messages that have come in over the subscription across
-events.
+In the following example, we create a subscription that informs us of new messages.
 
 ```js
 <script>
-  import { operationStore, subscription } from '@urql/svelte';
+  import { gql, getContextClient, subscriptionStore } from '@urql/svelte';
 
-  const messages = operationStore(`
-    subscription MessageSub {
-      newMessages {
-        id
-        from
-        text
-      }
-    }
-  `);
-
-  const handleSubscription = (messages = [], data) => {
-    return [data.newMessages, ...messages];
-  };
-
-  subscription(messages, handleSubscription);
+  const messages = subscriptionStore({
+    client: getContextClient(),
+    query: qgl`
+      subscription MessageSub {
+        newMessages {
+          id
+          from
+          text
+        }
+      }`
+    });
 </script>
 
 {#if !$messages.data}
