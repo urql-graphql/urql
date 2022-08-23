@@ -9,20 +9,20 @@ import {
 export interface SchemaField {
   name: string;
   type: IntrospectionTypeRef;
-  args: Record<string, IntrospectionInputValue>;
+  args(): Record<string, IntrospectionInputValue | void>;
 }
 
 export interface SchemaObject {
   name: string;
   kind: 'INTERFACE' | 'OBJECT';
-  interfaces: Record<string, unknown>;
-  fields: Record<string, SchemaField>;
+  interfaces(): Record<string, unknown>;
+  fields(): Record<string, SchemaField | void>;
 }
 
 export interface SchemaUnion {
   name: string;
   kind: 'UNION';
-  types: Record<string, unknown>;
+  types(): Record<string, unknown>;
 }
 
 export interface SchemaIntrospector {
@@ -51,10 +51,15 @@ export const buildClientSchema = ({
 
   const buildNameMap = <T extends { name: string }>(
     arr: ReadonlyArray<T>
-  ): { [name: string]: T } => {
-    const map: Record<string, T> = {};
-    for (let i = 0; i < arr.length; i++) map[arr[i].name] = arr[i];
-    return map;
+  ): (() => { [name: string]: T }) => {
+    let map: Record<string, T> | void;
+    return () => {
+      if (!map) {
+        map = {};
+        for (let i = 0; i < arr.length; i++) map[arr[i].name] = arr[i];
+      }
+      return map;
+    };
   };
 
   const buildType = (
@@ -97,12 +102,12 @@ export const buildClientSchema = ({
       if (!abstractType || !possibleType) {
         return false;
       } else if (abstractType.kind === 'UNION') {
-        return !!abstractType.types[possible];
+        return !!abstractType.types()[possible];
       } else if (
         abstractType.kind !== 'OBJECT' &&
         possibleType.kind === 'OBJECT'
       ) {
-        return !!possibleType.interfaces[abstract];
+        return !!possibleType.interfaces()[abstract];
       } else {
         return abstract === possible;
       }

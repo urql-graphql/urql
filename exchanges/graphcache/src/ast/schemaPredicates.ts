@@ -77,7 +77,7 @@ const getField = (
 
   expectObjectType(schema, typename);
   const object = schema.types!.get(typename) as SchemaObject;
-  const field = object.fields[fieldName];
+  const field = object.fields()[fieldName];
   if (!field) {
     warn(
       'Invalid field: The field `' +
@@ -146,8 +146,9 @@ export function expectValidUpdatesConfig(
   }
 
   if (schema.mutation) {
-    const mutationFields = (schema.types!.get(schema.mutation) as SchemaObject)
-      .fields;
+    const mutationFields = (schema.types!.get(
+      schema.mutation
+    ) as SchemaObject).fields();
     const givenMutations = updates[schema.mutation] || {};
     for (const fieldName in givenMutations) {
       if (mutationFields[fieldName] === undefined) {
@@ -164,7 +165,7 @@ export function expectValidUpdatesConfig(
   if (schema.subscription) {
     const subscriptionFields = (schema.types!.get(
       schema.subscription
-    ) as SchemaObject).fields;
+    ) as SchemaObject).fields();
     const givenSubscription = updates[schema.subscription] || {};
     for (const fieldName in givenSubscription) {
       if (subscriptionFields[fieldName] === undefined) {
@@ -209,8 +210,9 @@ export function expectValidResolversConfig(
   for (const key in resolvers) {
     if (key === 'Query') {
       if (schema.query) {
-        const validQueries = (schema.types!.get(schema.query) as SchemaObject)
-          .fields;
+        const validQueries = (schema.types!.get(
+          schema.query
+        ) as SchemaObject).fields();
         for (const resolverQuery in resolvers.Query) {
           if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
@@ -231,8 +233,9 @@ export function expectValidResolversConfig(
           schema.types!.get(key)!.kind as 'INTERFACE' | 'UNION'
         );
       } else {
-        const validTypeProperties = (schema.types!.get(key) as SchemaObject)
-          .fields;
+        const validTypeProperties = (schema.types!.get(
+          key
+        ) as SchemaObject).fields();
         for (const resolverProperty in resolvers[key]) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
@@ -252,8 +255,9 @@ export function expectValidOptimisticMutationsConfig(
   }
 
   if (schema.mutation) {
-    const validMutations = (schema.types!.get(schema.mutation) as SchemaObject)
-      .fields;
+    const validMutations = (schema.types!.get(
+      schema.mutation
+    ) as SchemaObject).fields();
     for (const mutation in optimisticMutations) {
       if (!validMutations[mutation]) {
         warn(
