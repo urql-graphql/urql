@@ -157,8 +157,7 @@ export default {
 ```
 
 Here we have implemented our first GraphQL query to fetch todos. We see that `useQuery` accepts
-options and returns a tuple. In this case we've set the `query` option to our GraphQL query. The
-tuple we then get in return is an array that contains a result object and a re-execute function.
+options and returns a result object. In this case we've set the `query` option to our GraphQL query.
 
 The result object contains several properties. The `fetching` field indicates whether we're currently
 loading data, `data` contains the actual `data` from the API's result, and `error` is set when either
