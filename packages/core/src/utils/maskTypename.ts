@@ -1,9 +1,13 @@
-export const maskTypename = (data: any): any => {
+export const maskTypename = (data: any, isRoot?: boolean): any => {
   if (!data || typeof data !== 'object') {
     return data;
   } else if (Array.isArray(data)) {
-    return data.map(maskTypename);
-  } else if (data && typeof data === 'object' && '__typename' in data) {
+    return data.map(d => maskTypename(d));
+  } else if (
+    data &&
+    typeof data === 'object' &&
+    (isRoot || '__typename' in data)
+  ) {
     const acc = {};
     for (const key in data) {
       if (key === '__typename') {
