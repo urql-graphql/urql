@@ -196,7 +196,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     if (opts.maskTypename) {
       result$ = pipe(
         result$,
-        map(res => ({ ...res, data: maskTypename(res.data) }))
+        map(res => ({ ...res, data: maskTypename(res.data, true) }))
       );
     }
 

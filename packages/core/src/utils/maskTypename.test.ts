@@ -66,3 +66,20 @@ it('strips typename from nested objects with arrays', () => {
     },
   });
 });
+
+it('strips typename in nested object from root', () => {
+  expect(maskTypename({ root: { __typename: 'Todo', id: 1 } }, true)).toEqual({
+    root: {
+      id: 1,
+    },
+  });
+});
+
+it('doesn’t strip typename in sub-object when there is no __typename field', () => {
+  expect(maskTypename({ subObject: { __typename: 'Todo', id: 1 } })).toEqual({
+    subObject: {
+      __typename: 'Todo',
+      id: 1,
+    },
+  });
+});
