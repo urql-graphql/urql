@@ -1,5 +1,11 @@
 # @urql/core
 
+## 3.0.2
+
+### Patch Changes
+
+- ⚠️ Fix case where `maskTypename` would not traverse down when the root query-field does not contain a `__typename`, by [@mlecoq](https://github.com/mlecoq) (See [#2643](https://github.com/FormidableLabs/urql/pull/2643))
+
 ## 3.0.1
 
 ### Patch Changes
