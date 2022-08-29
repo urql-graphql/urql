@@ -1,4 +1,4 @@
-import { Exchange, makeResult } from 'urql';
+import { Exchange, makeResult } from '@urql/core';
 import { pipe, map, mergeMap, fromPromise, fromValue } from 'wonka';
 
 export const getStorybookExchange = <T extends { parameters: any }>(
