@@ -1,5 +1,11 @@
 # @urql/storybook-addon
 
+## 2.0.1
+
+### Patch Changes
+
+- remove dependency on `react-urql` from storybook exchange, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2646](https://github.com/FormidableLabs/urql/pull/2646))
+
 ## 2.0.0
 
 ### Major Changes

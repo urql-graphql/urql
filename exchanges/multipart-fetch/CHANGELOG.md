@@ -1,5 +1,11 @@
 # @urql/exchange-multipart-fetch
 
+## 1.0.1
+
+### Patch Changes
+
+- ⚠️ Fix issue where we construct the fetchOptions before constructing the url resulting in our overflow fix not working, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2653](https://github.com/FormidableLabs/urql/pull/2653))
+
 ## 1.0.0
 
 ### Major Changes
