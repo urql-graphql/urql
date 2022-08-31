@@ -57,8 +57,8 @@ export const multipartFetchExchange: Exchange = ({
           (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
         });
       } else {
-        fetchOptions = makeFetchOptions(operation, body);
         url = makeFetchURL(operation, body);
+        fetchOptions = makeFetchOptions(operation, body);
       }
 
       dispatchDebug({
