@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 5.0.1
+
+### Patch Changes
+
+- Adjust timing of when an introspected schema will be processed into field maps, interface maps, and union type maps. By making this lazy we can avoid excessive work when these maps aren't actually ever used, by [@kitten](https://github.com/kitten) (See [#2640](https://github.com/FormidableLabs/urql/pull/2640))
+
 ## 5.0.0
 
 ### Major Changes
