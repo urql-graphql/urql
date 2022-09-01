@@ -28,7 +28,7 @@ npm install --save @urql/exchange-request-policy
 ```
 
 Then add it to your `Client`, preferably after the `dedupExchange` but in front of any asynchronous
-exchanges, like the `fetchExchang`:
+exchanges, like the `fetchExchange`:
 
 ```js
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql';

@@ -170,7 +170,7 @@ Generally we refer to _streams_ as abstractions that allow us to program with as
 over time. Within the context of JavaScript we're specifically thinking in terms of
 [Observables](https://github.com/tc39/proposal-observable)
 and [Reactive Programming with Observables.](http://reactivex.io/documentation/observable.html)
-These concepts may sound initimidating, but from a high-level view what we're talking about can be
+These concepts may sound intimidating, but from a high-level view what we're talking about can be
 thought of as a combination of promises and iterables (e.g. arrays). We're dealing with multiple
 events, but our callback is called over time. It's like calling `forEach` on an array but expecting
 the results to come in asynchronously.

@@ -49,7 +49,7 @@ we don't pass any information to this option:
   `Mutation` field's result.
 - We may write a lot of configuration for our `cacheExchange` but if we pass a `schema` then it'll
   start checking whether any of the configuration options actually don't exist, maybe because we've
-  typo'd them. This is a small detail but can make a large different in a longer configuration.
+  typo'd them. This is a small detail but can make a large difference in a longer configuration.
 - Lastly; a schema contains information on **which fields are optional or required**. When
   Graphcache has a schema it knows optional fields that may be left out, and it'll be able to generate
   "partial results".

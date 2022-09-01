@@ -230,7 +230,7 @@ In the previous example, where we've created a resolver for `Todo.updatedAt` and
 `parent.updatedAt` to transform its value the `parent.updatedAt` field is essentially a shortcut
 that allows us to get to the record quickly.
 
-Instead we can use the [the `cache.resolve` method](../api/graphcache.md#resolve). This method
+Instead we can use [the `cache.resolve` method](../api/graphcache.md#resolve). This method
 allows us to access Graphcache's cached data directly. It is used to resolve records or links on any
 given entity and accepts three arguments:
 
