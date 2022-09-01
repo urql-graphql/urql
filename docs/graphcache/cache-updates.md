@@ -333,7 +333,7 @@ To summarise, we filter the list of fields in our example down to only the `todo
 iterate over each of our `arguments` for the `todos` field to filter all lists to remove the `Todo`
 from them.
 
-### Inspecting arbitary entities
+### Inspecting arbitrary entities
 
 We're not required to only inspecting fields on the `Query` root entity. Instead, we can inspect
 fields on any entity by passing a different partial, keyable entity or key to `cache.inspectFields`.
