@@ -26,9 +26,10 @@ export interface MutationState<
   ) => Promise<OperationResult<Data, Variables>>;
 }
 
-export function Mutation<Data = any, Variables = any>(
-  props: MutationProps<Data, Variables>
-): VNode<any> {
+export function Mutation<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(props: MutationProps<Data, Variables>): VNode<any> {
   const mutation = useMutation<Data, Variables>(props.query);
   return props.children({ ...mutation[0], executeMutation: mutation[1] });
 }
