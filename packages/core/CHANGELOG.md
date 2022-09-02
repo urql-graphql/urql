@@ -1,5 +1,11 @@
 # @urql/core
 
+## 3.0.3
+
+### Patch Changes
+
+- ⚠️ Fix variable types in core makeOperation, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2665](https://github.com/FormidableLabs/urql/pull/2665))
+
 ## 3.0.2
 
 ### Patch Changes

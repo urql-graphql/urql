@@ -1,5 +1,13 @@
 # @urql/preact
 
+## 3.0.2
+
+### Patch Changes
+
+- Update generics for components, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2663](https://github.com/FormidableLabs/urql/pull/2663))
+- Updated dependencies (See [#2665](https://github.com/FormidableLabs/urql/pull/2665))
+  - @urql/core@3.0.3
+
 ## 3.0.1
 
 ### Patch Changes
