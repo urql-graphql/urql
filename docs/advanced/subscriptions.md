@@ -182,7 +182,7 @@ In the following example, we create a subscription that informs us of new messag
 
   const messages = subscriptionStore({
     client: getContextClient(),
-    query: qgl`
+    query: gql`
       subscription MessageSub {
         newMessages {
           id
