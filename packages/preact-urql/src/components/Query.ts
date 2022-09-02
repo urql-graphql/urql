@@ -16,9 +16,10 @@ export interface QueryState<
   executeQuery: (opts?: Partial<OperationContext>) => void;
 }
 
-export function Query<Data = any, Variables = any>(
-  props: QueryProps<Data, Variables>
-): VNode<any> {
+export function Query<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(props: QueryProps<Data, Variables>): VNode<any> {
   const query = useQuery<Data, Variables>(props);
   return props.children({ ...query[0], executeQuery: query[1] });
 }
