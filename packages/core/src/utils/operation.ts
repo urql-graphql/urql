@@ -1,17 +1,24 @@
 import {
+  AnyVariables,
   GraphQLRequest,
   Operation,
   OperationContext,
   OperationType,
 } from '../types';
 
-function makeOperation<Data = any, Variables = object>(
+function makeOperation<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   kind: OperationType,
   request: GraphQLRequest<Data, Variables>,
   context: OperationContext
 ): Operation<Data, Variables>;
 
-function makeOperation<Data = any, Variables = object>(
+function makeOperation<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+>(
   kind: OperationType,
   request: Operation<Data, Variables>,
   context?: OperationContext
