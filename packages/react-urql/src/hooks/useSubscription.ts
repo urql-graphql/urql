@@ -114,7 +114,7 @@ export function useSubscription<
       return pipe(
         state[0],
         onEnd(() => {
-          updateResult({ fetching: false });
+          updateResult({ fetching: !!source });
         }),
         subscribe(updateResult)
       ).unsubscribe;
