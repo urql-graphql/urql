@@ -1,5 +1,11 @@
 # urql
 
+## 3.0.3
+
+### Patch Changes
+
+- ⚠️ Fix `fetching` going to `false` after changing variables in a subscription, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2667](https://github.com/FormidableLabs/urql/pull/2667))
+
 ## 3.0.2
 
 ### Patch Changes
