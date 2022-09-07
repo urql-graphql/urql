@@ -139,7 +139,7 @@ writing your own logic for offline caching, which can be particularly successful
 guarantees that the cache makes.
 
 Relay does in fact have similar guarantees as [`urql`'s Commutativity
-Guarantees](./graphcache/under-the-hood.md),
+Guarantees](./graphcache/normalized-caching/#deterministic-cache-updates),
 which are more evident when applying list updates out of order under more complex network
 conditions.
 
