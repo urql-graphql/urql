@@ -66,13 +66,15 @@ MyStory.parameters = {
 Returning data for multiple queries (conditional response).
 
 ```tsx
+import { getOperationName } from 'urql';
+
 MyStory.parameters = {
   urql: op => {
-    if (getQueryName(op.query) === 'GetUser') {
+    if (getOperationName(op.query) === 'GetUser') {
       return { data: { user: { id: 1234, name: 'Steve' } } };
     }
 
-    if (getQueryName(op.query) === 'GetFeed') {
+    if (getOperationName(op.query) === 'GetFeed') {
       return { data: { feed: [{ id: 1, title: 'Fake news' }] } };
     }
   },
