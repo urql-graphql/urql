@@ -204,8 +204,6 @@ model as well and cause the `query` utility to start a new operation.
     variables: { from, limit }
   );
 
-  query(todos);
-
   function nextPage() {
     from = from + 10
   }
