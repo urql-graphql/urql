@@ -26,7 +26,7 @@ export const makeFetchURL = (
   body?: FetchBody
 ): string => {
   const useGETMethod =
-    operation.kind === 'query' && !!operation.context.preferGetMethod;
+    operation.kind === 'query' && operation.context.preferGetMethod;
   if (!useGETMethod || !body) return operation.context.url;
 
   const url = new URL(operation.context.url);
@@ -40,7 +40,7 @@ export const makeFetchURL = (
     search.set('extensions', stringifyVariables(body.extensions));
 
   const finalUrl = url.toString();
-  if (finalUrl.length > 2047) {
+  if (finalUrl.length > 2047 && useGETMethod !== 'force') {
     operation.context.preferGetMethod = false;
     return operation.context.url;
   }
