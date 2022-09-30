@@ -126,7 +126,10 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
     let forwardedOps$ = pipe(
       sharedOps$,
       filter(
-        operation => !data[operation.key] || !!data[operation.key]!.hasNext
+        operation =>
+          !data[operation.key] ||
+          !!data[operation.key]!.hasNext ||
+          operation.context.requestPolicy === 'network-only'
       ),
       forward
     );
