@@ -72,7 +72,9 @@ export interface OperationContext {
   url: string;
   meta?: OperationDebugMeta;
   suspense?: boolean;
-  preferGetMethod?: boolean;
+  /** Instructs fetch exchanges to use a GET request.
+   * When true or 'within-url-limit' is passed, GET won't be used when the resulting URL exceeds a length of 2048. */
+  preferGetMethod?: boolean | 'force' | 'within-url-limit';
 }
 
 /** A [query]{@link Query} or [mutation]{@link Mutation} with additional metadata for use during transmission. */
