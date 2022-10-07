@@ -25,6 +25,7 @@ import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 import { Data, Dependencies, CacheExchangeOpts } from './types';
+import { DocumentNode } from 'graphql';
 
 type OperationResultWithMeta = OperationResult & {
   outcome: CacheOutcome;
@@ -55,6 +56,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const blockedDependencies: Dependencies = new Set();
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = new Map();
+  const originalDocuments: Map<number, DocumentNode> = new Map();
 
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
     for (const dep of dependencies.values())
@@ -105,6 +107,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       // Delete reference to operation if any exists to release it
       operations.delete(operation.key);
       results.delete(operation.key);
+      originalDocuments.delete(operation.key);
       // Mark operation layer as done
       noopDataState(store.data, operation.key);
     } else if (
@@ -127,6 +130,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       }
     }
 
+    originalDocuments.set(operation.key, operation.query);
     return makeOperation(
       operation.kind,
       {
@@ -158,19 +162,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
-    const result = query(
-      store,
-      makeOperation(
-        operation.kind,
-        {
-          key: operation.key,
-          query: formatDocument(operation.query),
-          variables: operation.variables,
-        },
-        operation.context
-      ),
-      results.get(operation.key)
-    );
+    const result = query(store, operation, results.get(operation.key));
     const cacheOutcome: CacheOutcome = result.data
       ? !result.partial
         ? 'hit'
@@ -218,9 +210,13 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         .dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
+      const originalDocument = originalDocuments.get(operation.key);
       const queryResult = query(
         store,
-        operation,
+        {
+          ...operation,
+          query: originalDocument || operation.query,
+        },
         operation.kind === 'query' ? results.get(operation.key) || data : data,
         result.error,
         key
