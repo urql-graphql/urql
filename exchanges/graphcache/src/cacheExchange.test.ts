@@ -81,14 +81,26 @@ describe('data dependencies', () => {
     expect(response).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(2);
 
+    const expected = {
+      author: {
+        id: '123',
+        name: 'Author',
+      },
+      unrelated: {
+        id: 'unrelated',
+      },
+    };
+
     expect(result.mock.calls[0][0]).toHaveProperty(
       'operation.context.meta.cacheOutcome',
       'miss'
     );
+    expect(result.mock.calls[0][0].data).toEqual(expected);
     expect(result.mock.calls[1][0]).toHaveProperty(
       'operation.context.meta.cacheOutcome',
       'hit'
     );
+    expect(result.mock.calls[0][0].data).toEqual(expected);
   });
 
   it('respects cache-only operations', () => {
@@ -206,7 +218,7 @@ describe('data dependencies', () => {
     const firstDataTwo = result.mock.calls[1][0].data;
     expect(firstDataOne).not.toBe(firstDataTwo);
     expect(firstDataOne.author).not.toBe(firstDataTwo.author);
-    expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
+    //expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
   });
 
   it('updates related queries when a mutation update touches query data', () => {
@@ -705,7 +717,6 @@ describe('optimistic updates', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
 
     expect(result.mock.calls[1][0]?.data).toMatchObject({
-      __typename: 'Query',
       author: { name: '[REDACTED OFFLINE]' },
     });
 

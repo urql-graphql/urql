@@ -217,7 +217,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
           ...operation,
           query: originalDocument || operation.query,
         },
-        operation.kind === 'query' ? results.get(operation.key) || data : data,
+        operation.kind === 'query'
+          ? results.get(operation.key) || undefined
+          : data,
         result.error,
         key
       );
@@ -227,7 +229,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
         collectPendingOperations(pendingOperations, queryDependencies);
-        results.set(operation.key, result.data);
+        results.set(operation.key, queryResult.data);
       }
     } else {
       noopDataState(store.data, operation.key);
