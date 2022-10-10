@@ -61,10 +61,13 @@ export interface OperationDebugMeta {
   startTime?: number;
 }
 
+/** A unique marker that marks the operation's identity when multiple mutation operations with identical keys are issued. */
+export type OperationInstance = number & { readonly _opaque: unique symbol };
+
 /** Additional metadata passed to [exchange]{@link Exchange} functions. */
 export interface OperationContext {
   [key: string]: any;
-  readonly _instance?: [] | undefined;
+  readonly _instance?: OperationInstance | undefined;
   additionalTypenames?: string[];
   fetch?: typeof fetch;
   fetchOptions?: RequestInit | (() => RequestInit);
