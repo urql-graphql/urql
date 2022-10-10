@@ -162,7 +162,19 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const operationResultFromCache = (
     operation: Operation
   ): OperationResultWithMeta => {
-    const result = query(store, operation, results.get(operation.key));
+    const result = query(
+      store,
+      makeOperation(
+        operation.kind,
+        {
+          key: operation.key,
+          query: formatDocument(operation.query),
+          variables: operation.variables,
+        },
+        operation.context
+      ),
+      results.get(operation.key)
+    );
     const cacheOutcome: CacheOutcome = result.data
       ? !result.partial
         ? 'hit'
