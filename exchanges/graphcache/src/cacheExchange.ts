@@ -55,6 +55,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const blockedDependencies: Dependencies = new Set();
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = new Map();
+  let triggeringOperations = new Set();
+  let targetOperations = new Set();
 
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
     for (const dep of dependencies.values())
@@ -79,11 +81,13 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     operation: Operation,
     pendingOperations: Operations
   ) => {
+    triggeringOperations.add(operation.key);
     // Reexecute collected operations and delete them from the mapping
     for (const key of pendingOperations.values()) {
       if (key !== operation.key) {
+        targetOperations.add(key);
         const op = operations.get(key);
-        if (op) {
+        if (op && !triggeringOperations.has(key)) {
           operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
           if (requestedRefetch.has(key)) {
@@ -94,6 +98,13 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         }
       }
     }
+
+    const tempTriggeringOperations = triggeringOperations;
+    triggeringOperations = targetOperations;
+    for (const key of tempTriggeringOperations.values()) {
+      triggeringOperations.add(key);
+    }
+    targetOperations = new Set();
   };
 
   // This registers queries with the data layer to ensure commutativity
