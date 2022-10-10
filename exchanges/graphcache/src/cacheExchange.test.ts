@@ -82,12 +82,15 @@ describe('data dependencies', () => {
     expect(result).toHaveBeenCalledTimes(2);
 
     const expected = {
+      __typename: 'Query',
       author: {
         id: '123',
         name: 'Author',
+        __typename: 'Author',
       },
       unrelated: {
         id: 'unrelated',
+        __typename: 'Unrelated',
       },
     };
 
@@ -100,7 +103,7 @@ describe('data dependencies', () => {
       'operation.context.meta.cacheOutcome',
       'hit'
     );
-    expect(result.mock.calls[0][0].data).toEqual(expected);
+    expect(result.mock.calls[1][0].data).toEqual(expected);
   });
 
   it('respects cache-only operations', () => {
@@ -218,7 +221,7 @@ describe('data dependencies', () => {
     const firstDataTwo = result.mock.calls[1][0].data;
     expect(firstDataOne).not.toBe(firstDataTwo);
     expect(firstDataOne.author).not.toBe(firstDataTwo.author);
-    //expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
+    expect(firstDataOne.unrelated).toBe(firstDataTwo.unrelated);
   });
 
   it('updates related queries when a mutation update touches query data', () => {
