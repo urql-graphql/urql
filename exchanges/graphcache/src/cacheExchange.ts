@@ -97,7 +97,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
             requestedRefetch.delete(key);
             policy = 'cache-and-network';
           }
-          op.context = { ...op.context, reexectued: true };
+          if (operation.kind === 'query')
+            op.context = { ...op.context, reexectued: true };
           client.reexecuteOperation(toRequestPolicy(op, policy));
         }
       }
