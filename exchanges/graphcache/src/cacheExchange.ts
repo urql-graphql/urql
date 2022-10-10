@@ -87,6 +87,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       if (key !== operation.key) {
         targetOperations.add(key);
         const op = operations.get(key);
+        // When an operation has been triggered by the previous dispatched operation
+        // we should not reexecute it again
         if (op && !triggeringOperations.has(key)) {
           operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
@@ -99,12 +101,14 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       }
     }
 
-    const tempTriggeringOperations = triggeringOperations;
+    // We keep track of the previous operations that have been
+    // triggered and disallow us triggering them again
+    // Given two operations with shared data, we have a two-way relationship
+    // which means, that if both operations have a cache-miss they retrigger each other.
+    const _triggeringOperations = triggeringOperations;
     triggeringOperations = targetOperations;
-    for (const key of tempTriggeringOperations.values()) {
-      triggeringOperations.add(key);
-    }
-    targetOperations = new Set();
+    triggeringOperations.add(operation.key);
+    (targetOperations = _triggeringOperations).clear();
   };
 
   // This registers queries with the data layer to ensure commutativity
