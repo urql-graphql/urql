@@ -21,3 +21,4 @@ this section of the documentation:
   [Normalized Cache](../graphcache/normalized-caching.md).
 - [**Errors**](../basics/errors.md) contains information on error handling in `urql`.
 - [**UI-Patterns**](../basics/ui-patterns.md) presents some common UI-patterns with `urql`.
+- [**TypeScript integration**](../basics/typescript-integration.md) covers how to get the best of URQL, GraphQL, and TypeScript.

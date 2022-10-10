@@ -1,6 +1,6 @@
 ---
 title: UI-Patterns
-order: 6
+order: 7
 ---
 
 # UI Patterns
@@ -54,17 +54,13 @@ const SearchResultPage = ({ variables, isLastPage, onLoadMore }) => {
             </div>
           ))}
           {isLastPage && todos.pageInfo.hasNextPage && (
-            <button
-              onClick={() => onLoadMore(todos.pageInfo.endCursor)}
-            >
-              load more
-            </button>
+            <button onClick={() => onLoadMore(todos.pageInfo.endCursor)}>load more</button>
           )}
         </>
       )}
     </div>
   );
-}
+};
 
 const Search = () => {
   const [pageVariables, setPageVariables] = useState([
@@ -81,14 +77,12 @@ const Search = () => {
           key={'' + variables.after}
           variables={variables}
           isLastPage={i === pageVariables.length - 1}
-          onLoadMore={after =>
-            setPageVariables([...pageVariables, { after, first: 10 }])
-          }
+          onLoadMore={after => setPageVariables([...pageVariables, { after, first: 10 }])}
         />
       ))}
     </div>
   );
-}
+};
 ```
 
 Here we keep an array of all `variables` we've encountered and use them to render their
@@ -119,19 +113,15 @@ const Component = () => {
   const client = useClient();
   const router = useRouter();
 
-  const transitionPage = React.useCallback(async (id) => {
+  const transitionPage = React.useCallback(async id => {
     const loadJSBundle = import('./page.js');
     const loadData = client.query(TodoQuery, { id }).toPromise();
     await Promise.all([loadJSBundle, loadData]);
     router.push(`/todo/${id}`);
   }, []);
 
-  return (
-    <button onClick={() => transitionPage('1')}>
-      Go to todo 1
-    </button>
-  )
-}
+  return <button onClick={() => transitionPage('1')}>Go to todo 1</button>;
+};
 ```
 
 Here we're calling `client.query` to prepare a query when the transition begins.
@@ -160,12 +150,8 @@ const Component = () => {
   const [result, fetch] = useQuery({ query: TodoQuery, pause: true });
   const router = useRouter();
 
-  return (
-    <button onClick={fetch}>
-      Load todos
-    </button>
-  )
-}
+  return <button onClick={fetch}>Load todos</button>;
+};
 ```
 
 We can unpause the hook to start fetching, or, like in this example, call its returned function to manually kick off the query.
@@ -188,14 +174,8 @@ import { refocusExchange } from '@urql/exchange-refocus';
 
 const client = createClient({
   url: 'some-url',
-  exchanges: [
-    dedupExchange,
-    refocusExchange(),
-    cacheExchange,
-    fetchExchange,
-  ]
-})
+  exchanges: [dedupExchange, refocusExchange(), cacheExchange, fetchExchange],
+});
 ```
 
 That's all we need to do to react to these patterns.
-
