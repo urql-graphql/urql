@@ -55,8 +55,6 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const blockedDependencies: Dependencies = new Set();
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = new Map();
-  let triggeringOperations = new Set();
-  let targetOperations = new Set();
 
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
     for (const dep of dependencies.values())
@@ -81,34 +79,29 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     operation: Operation,
     pendingOperations: Operations
   ) => {
-    triggeringOperations.add(operation.key);
+    if (operation.context.reexecuted) {
+      operation.context.reexecuted = false;
+      return;
+    }
+
     // Reexecute collected operations and delete them from the mapping
     for (const key of pendingOperations.values()) {
       if (key !== operation.key) {
-        targetOperations.add(key);
         const op = operations.get(key);
         // When an operation has been triggered by the previous dispatched operation
         // we should not reexecute it again
-        if (op && !triggeringOperations.has(key)) {
+        if (op) {
           operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
           if (requestedRefetch.has(key)) {
             requestedRefetch.delete(key);
             policy = 'cache-and-network';
           }
+          op.context = { ...op.context, reexectued: true };
           client.reexecuteOperation(toRequestPolicy(op, policy));
         }
       }
     }
-
-    // We keep track of the previous operations that have been
-    // triggered and disallow us triggering them again
-    // Given two operations with shared data, we have a two-way relationship
-    // which means, that if both operations have a cache-miss they retrigger each other.
-    const _triggeringOperations = triggeringOperations;
-    triggeringOperations = targetOperations;
-    triggeringOperations.add(operation.key);
-    (targetOperations = _triggeringOperations).clear();
   };
 
   // This registers queries with the data layer to ensure commutativity
