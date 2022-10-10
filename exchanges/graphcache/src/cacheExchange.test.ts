@@ -720,6 +720,7 @@ describe('optimistic updates', () => {
     expect(reexec).toHaveBeenCalledTimes(1);
 
     expect(result.mock.calls[1][0]?.data).toMatchObject({
+      __typename: 'Query',
       author: { name: '[REDACTED OFFLINE]' },
     });
 
