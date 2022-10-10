@@ -159,6 +159,7 @@ describe('offline', () => {
   updateAuthor {
     id
     name
+    __typename
   }
 }`,
         variables: {},
@@ -279,6 +280,7 @@ describe('offline', () => {
   updateAuthor {
     id
     name
+    __typename
   }
 }`,
         variables: {},
@@ -288,13 +290,5 @@ describe('offline', () => {
     flush!();
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
     expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
-    expect((reexecuteOperation.mock.calls[0][0] as any).query).toEqual(gql`
-      mutation {
-        updateAuthor {
-          id
-          name
-        }
-      }
-    `);
   });
 });
