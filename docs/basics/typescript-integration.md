@@ -203,7 +203,7 @@ function App() {
 // ...
 ```
 
-GraphQL Code Generator will help you by exposing helps to retrieve the data required by your component's Fragment.
+GraphQL Code Generator generates type helpers to type your component props based on Fragments (for example, the `film=` prop) and retrieve your fragment's data (see example below).
 
 Again, here is an example with the React bindings:
 
