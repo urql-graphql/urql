@@ -1,6 +1,6 @@
 ---
 title: TypeScript integration
-order: 4
+order: 7
 ---
 
 # URQL and TypeScript

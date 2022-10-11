@@ -1,6 +1,6 @@
 ---
 title: UI-Patterns
-order: 7
+order: 6
 ---
 
 # UI Patterns
