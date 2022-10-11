@@ -51,7 +51,7 @@ All features are marked to indicate the following:
 | Persisted Queries                          | ✅ `@urql/exchange-persisted-fetch` | ✅ `apollo-link-persisted-queries`            | ✅                             |
 | Batched Queries                            | 🛑                                  | ✅ `apollo-link-batch-http`                   | 🟡 `react-relay-network-layer` |
 | Live Queries                               | 🛑                                  | 🛑                                            | ✅                             |
-| Defer & Stream Directives                  | ✅                                  | 🛑                                            | 🟡 (unreleased)                |
+| Defer & Stream Directives                  | ✅                                  | ✅ / 🛑 (`@defer` is supported in >=3.7.0, `@stream` is not yet supported)                                            | 🟡 (unreleased)                |
 | Switching to `GET` method                  | ✅                                  | ✅                                            | 🟡 `react-relay-network-layer` |
 | File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                     | 🛑                             |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                        | ✅ `DefaultNetworkLayer`       |
