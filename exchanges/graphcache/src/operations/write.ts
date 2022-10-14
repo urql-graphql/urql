@@ -259,7 +259,9 @@ const writeSelection = (
       // Skip typename fields and assume they've already been written above
       fieldName === '__typename' ||
       // Fields marked as deferred that aren't defined must be skipped
-      (fieldValue === undefined && deferRef.current)
+      // Otherwise, we also ignore undefined values in optimistic updaters
+      (fieldValue === undefined &&
+        (deferRef.current || (ctx.optimistic && !isRoot)))
     ) {
       continue;
     }

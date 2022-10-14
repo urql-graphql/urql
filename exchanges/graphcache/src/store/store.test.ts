@@ -784,6 +784,46 @@ describe('Store with OptimisticMutationConfig', () => {
     });
   });
 
+  it('should be able to optimistically mutate with partial data', () => {
+    const { dependencies } = writeOptimistic(
+      store,
+      {
+        query: gql`
+          mutation {
+            addTodo(id: "0", complete: true, __typename: "Todo") {
+              id
+              text
+              complete
+              __typename
+            }
+          }
+        `,
+      },
+      1
+    );
+    expect(dependencies).toEqual(new Set(['Todo:0']));
+    let { data } = query(store, { query: Todos });
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: [
+        {
+          ...todosData.todos[0],
+          complete: true,
+        },
+        todosData.todos[1],
+        todosData.todos[2],
+      ],
+    });
+
+    InMemoryData.noopDataState(store.data, 1);
+
+    ({ data } = query(store, { query: Todos }));
+    expect(data).toEqual({
+      __typename: 'Query',
+      todos: todosData.todos,
+    });
+  });
+
   describe('Invalidating an entity', () => {
     it('removes an entity from a list.', () => {
       store.invalidate(todosData.todos[1]);
