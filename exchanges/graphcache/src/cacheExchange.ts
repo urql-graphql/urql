@@ -149,7 +149,6 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       let depOps = deps.get(dep);
       if (!depOps) deps.set(dep, (depOps = new Set()));
       depOps.add(op.key);
-      operations.set(op.key, op);
     }
   };
 
@@ -166,6 +165,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       : 'miss';
 
     results.set(operation.key, result.data);
+    operations.set(operation.key, operation);
     updateDependencies(operation, result.dependencies);
 
     return {
@@ -181,14 +181,23 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     result: OperationResult,
     pendingOperations: Operations
   ): OperationResult => {
-    const { operation, error, extensions } = result;
-    const { key } = operation;
+    const { error, extensions } = result;
+
+    // Retrieve the original operation to remove changes made by formatDocument
+    const originalOperation = operations.get(result.operation.key);
+    const operation = originalOperation
+      ? makeOperation(
+          originalOperation.kind,
+          originalOperation,
+          result.operation.context
+        )
+      : result.operation;
 
     if (operation.kind === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
-      const dependencies = optimisticKeysToDependencies.get(key);
+      const dependencies = optimisticKeysToDependencies.get(operation.key);
       collectPendingOperations(pendingOperations, dependencies);
-      optimisticKeysToDependencies.delete(key);
+      optimisticKeysToDependencies.delete(operation.key);
     }
 
     reserveLayer(
@@ -202,8 +211,13 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     if (data) {
       // Write the result to cache and collect all dependencies that need to be
       // updated
-      const writeDependencies = write(store, operation, data, result.error, key)
-        .dependencies;
+      const writeDependencies = write(
+        store,
+        operation,
+        data,
+        result.error,
+        operation.key
+      ).dependencies;
       collectPendingOperations(pendingOperations, writeDependencies);
 
       const queryResult = query(
@@ -211,7 +225,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         operation,
         operation.kind === 'query' ? results.get(operation.key) || data : data,
         result.error,
-        key
+        operation.key
       );
 
       data = queryResult.data;

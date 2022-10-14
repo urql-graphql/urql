@@ -59,10 +59,23 @@ describe('data dependencies', () => {
       query: queryOne,
     });
 
+    const expected = {
+      __typename: 'Query',
+      author: {
+        id: '123',
+        name: 'Author',
+        __typename: 'Author',
+      },
+      unrelated: {
+        id: 'unrelated',
+        __typename: 'Unrelated',
+      },
+    };
+
     const response = jest.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
-        return { operation: forwardOp, data: queryOneData };
+        return { operation: forwardOp, data: expected };
       }
     );
 
@@ -85,10 +98,14 @@ describe('data dependencies', () => {
       'operation.context.meta.cacheOutcome',
       'miss'
     );
+    expect(result.mock.calls[0][0].data).toEqual(expected);
     expect(result.mock.calls[1][0]).toHaveProperty(
       'operation.context.meta.cacheOutcome',
       'hit'
     );
+    expect(result.mock.calls[1][0].data).toEqual(expected);
+
+    expect(result.mock.calls[1][0].data).toBe(result.mock.calls[0][0].data);
   });
 
   it('respects cache-only operations', () => {
