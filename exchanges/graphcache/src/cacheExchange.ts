@@ -233,7 +233,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         // Collect the query's dependencies for future pending operation updates
         queryDependencies = queryResult.dependencies;
         collectPendingOperations(pendingOperations, queryDependencies);
-        results.set(operation.key, result.data);
+        results.set(operation.key, data);
       }
     } else {
       noopDataState(store.data, operation.key);
