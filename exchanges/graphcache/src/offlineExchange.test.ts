@@ -5,6 +5,7 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
+import { print } from 'graphql';
 
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
 import { offlineExchange } from './offlineExchange';
@@ -290,5 +291,16 @@ describe('offline', () => {
     flush!();
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
     expect((reexecuteOperation.mock.calls[0][0] as any).key).toEqual(1);
+    expect(print((reexecuteOperation.mock.calls[0][0] as any).query)).toEqual(
+      print(gql`
+        mutation {
+          updateAuthor {
+            id
+            name
+            __typename
+          }
+        }
+      `)
+    );
   });
 });
