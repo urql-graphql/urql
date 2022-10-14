@@ -56,6 +56,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
   const requestedRefetch: Operations = new Set();
   const deps: DependentOperations = new Map();
 
+  let reexecutingOperations: Operations = new Set();
+  let dependentOperations: Operations = new Set();
+
   const isBlockedByOptimisticUpdate = (dependencies: Dependencies): boolean => {
     for (const dep of dependencies.values())
       if (blockedDependencies.has(dep)) return true;
@@ -84,6 +87,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       if (key !== operation.key) {
         const op = operations.get(key);
         if (op) {
+          // Collect all dependent operations if the reexecuting operation is a query
+          if (operation.kind === 'query') dependentOperations.add(key);
           operations.delete(key);
           let policy: RequestPolicy = 'cache-first';
           if (requestedRefetch.has(key)) {
@@ -94,6 +99,12 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         }
       }
     }
+
+    // Upon completion, all dependent operations become reexecuting operations, preventing
+    // them from reexecuting prior operations again, causing infinite loops
+    const _reexecutingOperations = reexecutingOperations;
+    (reexecutingOperations = dependentOperations).add(operation.key);
+    (dependentOperations = _reexecutingOperations).clear();
   };
 
   // This registers queries with the data layer to ensure commutativity
@@ -278,7 +289,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         return (
           res.outcome === 'miss' &&
           res.operation.context.requestPolicy !== 'cache-only' &&
-          !isBlockedByOptimisticUpdate(res.dependencies)
+          !isBlockedByOptimisticUpdate(res.dependencies) &&
+          !reexecutingOperations.has(res.operation.key)
         );
       }),
       map(res => {
