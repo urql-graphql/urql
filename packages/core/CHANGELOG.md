@@ -1,5 +1,14 @@
 # @urql/core
 
+## 3.0.4
+
+### Patch Changes
+
+- ⚠️ Fix `ssrExchange` bug which prevented `staleWhileRevalidate` from sending off requests as network-only requests, and caused unrelated `network-only` operations to be dropped, by [@kitten](https://github.com/kitten) (See [#2691](https://github.com/FormidableLabs/urql/pull/2691))
+- Allow URL limit for GET requests to be bypassed using `preferGetMethod: 'force'` rather than the default `true` or `'within-url-limit'` value, by [@kitten](https://github.com/kitten) (See [#2692](https://github.com/FormidableLabs/urql/pull/2692))
+- ⚠️ Fix operation identities preventing users from deeply cloning operation contexts. Instead, we now use a client-wide counter (rolling over as needed).
+  While this changes an internal data structure in `@urql/core` only, this change also affects the `offlineExchange` in `@urql/exchange-graphcache` due to it relying on the identity being previously an object rather than an integer, by [@kitten](https://github.com/kitten) (See [#2732](https://github.com/FormidableLabs/urql/pull/2732))
+
 ## 3.0.3
 
 ### Patch Changes

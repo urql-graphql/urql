@@ -1,5 +1,18 @@
 # @urql/exchange-graphcache
 
+## 5.0.2
+
+### Patch Changes
+
+- Preserve the original `DocumentNode` AST when updating the cache, to prevent results after a network request from differing and breaking referential equality due to added `__typename` fields, by [@kitten](https://github.com/kitten) (See [#2736](https://github.com/FormidableLabs/urql/pull/2736))
+- ⚠️ Fix optimistic mutations containing partial results (`undefined` fields), which previously actually caused a hidden cache miss, which may then affect a subsequent non-optimistic mutation result, by [@kitten](https://github.com/kitten) (See [#2740](https://github.com/FormidableLabs/urql/pull/2740))
+- Prevent cache misses from causing infinite network requests from being issued, when two operations manipulate each other while experiencing cache misses or are partially uncacheable, by [@kitten](https://github.com/kitten) (See [#2737](https://github.com/FormidableLabs/urql/pull/2737))
+- ⚠️ Fix operation identities preventing users from deeply cloning operation contexts. Instead, we now use a client-wide counter (rolling over as needed).
+  While this changes an internal data structure in `@urql/core` only, this change also affects the `offlineExchange` in `@urql/exchange-graphcache` due to it relying on the identity being previously an object rather than an integer, by [@kitten](https://github.com/kitten) (See [#2732](https://github.com/FormidableLabs/urql/pull/2732))
+- ⚠️ Fix referential equality preservation in Graphcache failing after API results, due to a typo writing the API result rather than the updated cache result, by [@kitten](https://github.com/kitten) (See [#2741](https://github.com/FormidableLabs/urql/pull/2741))
+- Updated dependencies (See [#2691](https://github.com/FormidableLabs/urql/pull/2691), [#2692](https://github.com/FormidableLabs/urql/pull/2692), and [#2732](https://github.com/FormidableLabs/urql/pull/2732))
+  - @urql/core@3.0.4
+
 ## 5.0.1
 
 ### Patch Changes
