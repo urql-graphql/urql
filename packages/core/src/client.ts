@@ -33,6 +33,7 @@ import {
   ExchangeInput,
   GraphQLRequest,
   Operation,
+  OperationInstance,
   OperationContext,
   OperationResult,
   OperationType,
@@ -148,6 +149,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   if (process.env.NODE_ENV !== 'production' && !opts.url) {
     throw new Error('You are creating an urql-client without a url.');
   }
+
+  let ids = 0;
 
   const replays = new Map<number, OperationResult>();
   const active: Map<number, Source<OperationResult>> = new Map();
@@ -286,7 +289,10 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         );
       }
       return makeOperation(kind, request, {
-        _instance: kind === 'mutation' ? [] : undefined,
+        _instance:
+          kind === 'mutation'
+            ? ((ids = (ids + 1) | 0) as OperationInstance)
+            : undefined,
         ...baseOpts,
         ...opts,
         requestPolicy: opts.requestPolicy || baseOpts.requestPolicy,
