@@ -12,23 +12,11 @@ import {
   fetchExchange,
   Exchange,
 } from '../src';
-import { mergeMap, pipe, fromPromise } from 'wonka';
+import { delay, pipe } from 'wonka';
 
 const delayExchange: Exchange = ({ forward }) => {
   return ops$ => {
-    return pipe(
-      ops$,
-      mergeMap(op => {
-        return fromPromise(
-          new Promise(res => {
-            setTimeout(() => {
-              res(op);
-            }, 250);
-          })
-        );
-      }),
-      forward
-    );
+    return pipe(ops$, forward, delay(250));
   };
 };
 
