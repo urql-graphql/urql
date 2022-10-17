@@ -2,7 +2,35 @@
 
 import * as React from 'react';
 import { mount } from '@cypress/react';
-import { Provider, createClient, gql, useQuery } from '../src';
+import {
+  Provider,
+  createClient,
+  gql,
+  useQuery,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
+  Exchange,
+} from '../src';
+import { mergeMap, pipe, fromPromise } from 'wonka';
+
+const delayExchange: Exchange = ({ forward }) => {
+  return ops$ => {
+    return pipe(
+      ops$,
+      mergeMap(op => {
+        return fromPromise(
+          new Promise(res => {
+            setTimeout(() => {
+              res(op);
+            }, 250);
+          })
+        );
+      }),
+      forward
+    );
+  };
+};
 
 const Boundary = props => {
   return (
@@ -52,6 +80,7 @@ describe('Suspense', () => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
       suspense: true,
+      exchanges: [dedupExchange, cacheExchange, delayExchange, fetchExchange],
     });
 
     // eslint-disable-next-line
