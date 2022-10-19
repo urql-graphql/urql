@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@actions/artifact": "^1.1.0",
+    "@actions/core": "^1.10.0",
     "@babel/core": "^7.18.10",
     "@babel/plugin-transform-block-scoping": "^7.18.9",
     "@babel/plugin-transform-react-jsx": "^7.18.10",
