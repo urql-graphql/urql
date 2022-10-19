@@ -5,5 +5,5 @@ inputs:
     description: 'Command'
     default: 'help'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'action.js'

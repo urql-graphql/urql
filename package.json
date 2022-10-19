@@ -64,7 +64,7 @@
     "wonka": "^6.0.0"
   },
   "devDependencies": {
-    "@actions/artifact": "^0.5.1",
+    "@actions/artifact": "^1.1.0",
     "@babel/core": "^7.18.10",
     "@babel/plugin-transform-block-scoping": "^7.18.9",
     "@babel/plugin-transform-react-jsx": "^7.18.10",
