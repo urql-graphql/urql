@@ -53,7 +53,7 @@ jobs:
       - name: Build
         run: yarn workspace @urql/core build
       - name: e2e tests 🧪
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           command: yarn cypress run-ct
           working-directory: packages/react-urql
