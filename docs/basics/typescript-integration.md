@@ -120,7 +120,7 @@ Here, an example with the React bindings, however, the usage remains the same fo
 
 ```tsx
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from 'urql';
 
 import './App.css';
 import Film from './Film';
