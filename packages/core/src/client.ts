@@ -66,7 +66,7 @@ export interface ClientOptions {
   /** The default request policy for requests. */
   requestPolicy?: RequestPolicy;
   /** Use HTTP GET for queries. */
-  preferGetMethod?: boolean;
+  preferGetMethod?: boolean | 'force' | 'within-url-limit';
   /** Mask __typename from results. */
   maskTypename?: boolean;
 }
