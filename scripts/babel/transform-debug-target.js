@@ -21,14 +21,14 @@ const plugin = ({ template, types: t }) => {
           if (/Exchange$/i.test(exportName)) name = exportName;
         }
       },
-      CallExpression(path) {
+      CallExpression(path, meta) {
         if (
           !path.node[visited] &&
           path.node.callee &&
           path.node.callee.name === dispatchProperty
         ) {
           path.node[visited] = true;
-          if (t.isObjectExpression(path.node.arguments[0])) {
+          if (t.isObjectExpression(path.node.arguments[0]) && !meta.filename.endsWith('compose.ts')) {
             path.node.arguments[0].properties.push(
               t.objectProperty(
                 t.stringLiteral('source'),
