@@ -103,7 +103,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     // Upon completion, all dependent operations become reexecuting operations, preventing
     // them from reexecuting prior operations again, causing infinite loops
     const _reexecutingOperations = reexecutingOperations;
-    (reexecutingOperations = dependentOperations).add(operation.key);
+    if (operation.kind === 'query') {
+      (reexecutingOperations = dependentOperations).add(operation.key);
+    }
     (dependentOperations = _reexecutingOperations).clear();
   };
 
