@@ -1,5 +1,13 @@
 # @urql/exchange-graphcache
 
+## 5.0.3
+
+### Patch Changes
+
+- ⚠️ Fix case where a mutation would also be counted in the loop-protection, this prevented partial queries from initiating refetches, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2761](https://github.com/FormidableLabs/urql/pull/2761))
+- Updated dependencies (See [#2758](https://github.com/FormidableLabs/urql/pull/2758) and [#2762](https://github.com/FormidableLabs/urql/pull/2762))
+  - @urql/core@3.0.5
+
 ## 5.0.2
 
 ### Patch Changes
