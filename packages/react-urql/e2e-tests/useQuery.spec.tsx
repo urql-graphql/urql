@@ -29,42 +29,43 @@ const Boundary = props => {
   );
 };
 
-const PokemonsQuery = gql`
-  query($skip: Int!) {
-    pokemons(limit: 10, skip: $skip) {
-      id
-      name
-    }
-  }
-`;
-
-const Pokemons = () => {
-  const [skip, setSkip] = React.useState(0);
-  const [result] = useQuery({ query: PokemonsQuery, variables: { skip } });
-
-  return (
-    <main>
-      <ul id="pokemon-list">
-        {result.data.pokemons.map(pokemon => (
-          <li key={pokemon.id}>
-            {pokemon.id}. {pokemon.name}
-          </li>
-        ))}
-      </ul>
-      {skip > 0 && (
-        <button id="previous-page" onClick={() => setSkip(skip - 10)}>
-          Previous Page
-        </button>
-      )}
-      <button id="next-page" onClick={() => setSkip(skip + 10)}>
-        Next Page
-      </button>
-    </main>
-  );
-};
-
 describe('Suspense', () => {
-  let UrqlProvider: React.FC;
+  let UrqlProvider;
+
+  const PokemonsQuery = gql`
+    query($skip: Int!) {
+      pokemons(limit: 10, skip: $skip) {
+        id
+        name
+      }
+    }
+  `;
+
+  const Pokemons = () => {
+    const [skip, setSkip] = React.useState(0);
+    const [result] = useQuery({ query: PokemonsQuery, variables: { skip } });
+
+    return (
+      <main>
+        <ul id="pokemon-list">
+          {result.data.pokemons.map(pokemon => (
+            <li key={pokemon.id}>
+              {pokemon.id}. {pokemon.name}
+            </li>
+          ))}
+        </ul>
+        {skip > 0 && (
+          <button id="previous-page" onClick={() => setSkip(skip - 10)}>
+            Previous Page
+          </button>
+        )}
+        <button id="next-page" onClick={() => setSkip(skip + 10)}>
+          Next Page
+        </button>
+      </main>
+    );
+  };
+
   beforeEach(() => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
@@ -155,6 +156,75 @@ describe('Suspense', () => {
     cy.get('#suspense').contains('Loading...');
     cy.get('ul').then(items => {
       expect(items.length).to.equal(3);
+    });
+  });
+});
+
+describe('executeQuery', () => {
+  let UrqlProvider;
+
+  const PokemonsQuery = gql`
+    query {
+      pokemons(limit: 10) {
+        id
+        name
+      }
+    }
+  `;
+
+  const Pokemons = () => {
+    const [result, excuteQuery] = useQuery({ query: PokemonsQuery });
+
+    if (result.fetching) return <p id="loading">Loading...</p>;
+
+    return (
+      <main>
+        <ul id="pokemon-list">
+          {result.data.pokemons.map(pokemon => (
+            <li key={pokemon.id}>
+              {pokemon.id}. {pokemon.name}
+            </li>
+          ))}
+        </ul>
+        <button
+          id="refetch"
+          onClick={() => excuteQuery({ requestPolicy: 'network-only' })}
+        >
+          Refetch
+        </button>
+      </main>
+    );
+  };
+
+  beforeEach(() => {
+    const client = createClient({
+      url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+      suspense: false,
+      exchanges: [dedupExchange, cacheExchange, delayExchange, fetchExchange],
+    });
+
+    // eslint-disable-next-line
+    UrqlProvider = props => {
+      return <Provider value={client}>{props.children}</Provider>;
+    };
+  });
+
+  it('should set "fetching" to true when reexecuting', () => {
+    mount(
+      <UrqlProvider>
+        <Pokemons />
+      </UrqlProvider>
+    );
+
+    cy.get('#loading').contains('Loading...');
+    cy.get('#pokemon-list > li').then(items => {
+      expect(items.length).to.equal(10);
+    });
+
+    cy.get('#refetch').click();
+    cy.get('#loading').contains('Loading...');
+    cy.get('#pokemon-list > li').then(items => {
+      expect(items.length).to.equal(10);
     });
   });
 });
