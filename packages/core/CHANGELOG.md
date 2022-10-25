@@ -1,5 +1,12 @@
 # @urql/core
 
+## 3.0.5
+
+### Patch Changes
+
+- Update typings of the client to encompass the changes of https://github.com/FormidableLabs/urql/pull/2692, by [@c-schwan](https://github.com/c-schwan) (See [#2758](https://github.com/FormidableLabs/urql/pull/2758))
+- ⚠️ Fix case where our transform-debug-target babel plugin would override the root dispatchDebug in `compose.ts` with the latest found exchange, in this case `fetchExchange`, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2762](https://github.com/FormidableLabs/urql/pull/2762))
+
 ## 3.0.4
 
 ### Patch Changes
