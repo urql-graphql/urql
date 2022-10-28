@@ -499,6 +499,27 @@ describe('deferred changes', () => {
     expect(data.optimisticOrder).toEqual([]);
   });
 
+  it('does not erase data from a prior deferred layer when updating it', () => {
+    // initially it's unknown whether a layer is deferred
+    InMemoryData.reserveLayer(data, 1, true);
+    InMemoryData.reserveLayer(data, 2, true);
+
+    InMemoryData.initDataState('write', data, 2);
+    InMemoryData.writeRecord('Query', 'index', 2);
+    InMemoryData.clearDataState();
+
+    InMemoryData.initDataState('read', data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    // A subsequent reserve layer call should not erase the layer
+    InMemoryData.reserveLayer(data, 2, true);
+    InMemoryData.initDataState('read', data, null);
+    expect(InMemoryData.readRecord('Query', 'index')).toBe(2);
+
+    // The layers must not be squashed
+    expect(data.optimisticOrder).toEqual([2, 1]);
+  });
+
   it('keeps a deferred layer around even if it is the lowest', () => {
     // initially it's unknown whether a layer is deferred
     InMemoryData.reserveLayer(data, 1);
