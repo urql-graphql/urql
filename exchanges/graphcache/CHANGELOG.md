@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 5.0.4
+
+### Patch Changes
+
+- Ensure we aren't eagerly removing layers that are caused by subscriptions, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2771](https://github.com/FormidableLabs/urql/pull/2771))
+
 ## 5.0.3
 
 ### Patch Changes
