@@ -535,7 +535,7 @@ export const reserveLayer = (
 
   let index = data.optimisticOrder.indexOf(layerKey);
   if (index > -1) {
-    if (hasNext || !data.commutativeKeys.has(layerKey)) {
+    if (!data.commutativeKeys.has(layerKey) && !hasNext) {
       data.optimisticOrder.splice(index, 1);
       // Protect optimistic layers from being turned into non-optimistic layers
       // while preserving optimistic data
