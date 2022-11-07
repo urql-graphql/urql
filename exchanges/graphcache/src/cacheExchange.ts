@@ -254,6 +254,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
     // Update this operation's dependencies if it's a query
     if (queryDependencies) {
+      operations.set(operation.key, operation);
       updateDependencies(result.operation, queryDependencies);
     }
 
