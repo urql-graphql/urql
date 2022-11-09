@@ -17,7 +17,7 @@ Object {
     "key": 4,
     "kind": "subscription",
     "query": Object {
-      "__key": 2088253569,
+      "__key": 2616620656,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -98,10 +98,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 92,
+        "end": 74,
         "source": Object {
-          "body": "# subscribeToUser
-subscription subscribeToUser($user: String) { user(user: $user) { name } }",
+          "body": "subscription subscribeToUser($user: String) { user(user: $user) { name } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,

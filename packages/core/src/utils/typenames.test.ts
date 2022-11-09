@@ -58,6 +58,14 @@ describe('formatTypeNames', () => {
     expect(reformattedDoc).not.toBe(doc);
   });
 
+  it('prevents duplicate work', () => {
+    const { query } = createRequest(`{ id todos { id } }`);
+    const formattedDoc = formatDocument(query);
+    expect(formattedDoc).not.toBe(query);
+    // This reference remains the same
+    expect(formattedDoc).toBe(formatDocument(query));
+  });
+
   it('preserves custom properties', () => {
     const doc = parse(`{ todos { id } }`) as any;
     doc.documentId = '123';

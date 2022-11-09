@@ -16,7 +16,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3521976120,
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -119,10 +119,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 86,
+        "end": 76,
         "source": Object {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -155,7 +154,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3521976120,
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -258,10 +257,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 86,
+        "end": 76,
         "source": Object {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -294,7 +292,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3521976120,
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -397,10 +395,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 86,
+        "end": 76,
         "source": Object {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -438,7 +435,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3521976120,
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -541,10 +538,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 86,
+        "end": 76,
         "source": Object {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
@@ -598,7 +594,7 @@ Object {
     "key": 2,
     "kind": "query",
     "query": Object {
-      "__key": 3521976120,
+      "__key": 3044551916,
       "definitions": Array [
         Object {
           "directives": Array [],
@@ -701,10 +697,9 @@ Object {
       ],
       "kind": "Document",
       "loc": Object {
-        "end": 86,
+        "end": 76,
         "source": Object {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) { user(name: $name) { id firstName lastName } }",
           "locationOffset": Object {
             "column": 1,
             "line": 1,
