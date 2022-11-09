@@ -1,5 +1,8 @@
-import { print } from 'graphql';
-import { getOperationName, stringifyVariables } from '../utils';
+import {
+  getOperationName,
+  stringifyVariables,
+  stringifyDocument,
+} from '../utils';
 import { AnyVariables, GraphQLRequest, Operation } from '../types';
 
 export interface FetchBody {
@@ -14,7 +17,7 @@ export function makeFetchBody<
   Variables extends AnyVariables = AnyVariables
 >(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
   return {
-    query: print(request.query),
+    query: stringifyDocument(request.query),
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
     extensions: undefined,
