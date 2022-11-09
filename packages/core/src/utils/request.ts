@@ -23,6 +23,7 @@ export interface KeyedDocumentNode extends DocumentNode {
 
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
 const REPLACE_CHAR_RE = /([\s,]|#[^\n\r]+)+/g;
+const NAME = 'gql';
 
 const replaceOutsideStrings = (str: string, idx: number) =>
   idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, ' ').trim() : str;
@@ -30,8 +31,9 @@ const replaceOutsideStrings = (str: string, idx: number) =>
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
-  let str = (typeof node !== 'string'
-    ? (node.loc && node.loc.source.body) || print(node)
+  const str = (typeof node !== 'string'
+    ? (node.loc && node.loc.source.name === NAME && node.loc.source.body) ||
+      print(node)
     : node
   )
     .split(GRAPHQL_STRING_RE)
@@ -39,18 +41,13 @@ export const stringifyDocument = (
     .join('');
 
   if (typeof node !== 'string') {
-    const operationName = 'definitions' in node && getOperationName(node);
-    if (operationName) {
-      str = `# ${operationName}\n${str}`;
-    }
-
     if (!node.loc) {
       (node as WritableLocation).loc = {
         start: 0,
         end: str.length,
         source: {
           body: str,
-          name: 'gql',
+          name: NAME,
           locationOffset: { line: 1, column: 1 },
         },
       } as Location;
