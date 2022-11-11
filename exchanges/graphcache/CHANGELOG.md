@@ -1,5 +1,11 @@
 # @urql/exchange-graphcache
 
+## 5.0.5
+
+### Patch Changes
+
+- Set operations when updating the cache with a result, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2782](https://github.com/FormidableLabs/urql/pull/2782))
+
 ## 5.0.4
 
 ### Patch Changes
