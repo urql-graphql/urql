@@ -46,14 +46,15 @@ const asyncIterator =
 
 const makeExecuteSource = (
   operation: Operation,
-  args: ExecuteParams
+  _args: ExecuteParams
 ): Source<OperationResult> => {
   return make<OperationResult>(observer => {
     let iterator: AsyncIterator<ExecutionResult>;
     let ended = false;
 
     Promise.resolve()
-      .then(() => {
+      .then(async () => ({ ..._args, contextValue: await _args.contextValue }))
+      .then(args => {
         if (ended) return;
         if (operation.kind === 'subscription') {
           return subscribe(args) as any;
