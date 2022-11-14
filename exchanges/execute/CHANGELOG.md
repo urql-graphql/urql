@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+### Patch Changes
+
+- End iterator when teardown functions runs, previously it waited for one extra call to next, then ended the iterator, by [@danielkaxis](https://github.com/danielkaxis) (See [#2803](https://github.com/FormidableLabs/urql/pull/2803))
+
 ## 2.0.0
 
 ### Major Changes
