@@ -59,6 +59,7 @@ reported by contacting the project team:
 
 - phil@0no.co
 - grant.sander@formidable.com
+- jovi@preact.dev
 
 All complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
