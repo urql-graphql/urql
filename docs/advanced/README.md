@@ -15,7 +15,7 @@ chapter.](../architecture.md)
   Persisted Queries and File Uploads using the two respective packages.
 - [**Server-side Rendering**](./server-side-rendering.md) guides us through how to set up server-side rendering and rehydration.
 - [**Debugging**](./debugging.md) shows us the [`urql`
-  devtools](https://github.com/FormidableLabs/urql-devtools/) and how to add our own debug events
+  devtools](https://github.com/urql-graphql/urql-devtools/) and how to add our own debug events
   for its event view.
 - [**Retrying operations**](./retry-operations.md) shows the `retryExchange` which allows you to retry operations when they've failed.
 - [**Authentication**](./authentication.md) describes how to implement authentication using the `authExchange`

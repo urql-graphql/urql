@@ -17,10 +17,10 @@ If you have an idea for a feature or want to fix a bug, consider opening an issu
 first. We're also happy to discuss and help you open a PR and get your changes
 in!
 
-- If you have a question, try [creating a GitHub Discussions thread.](https://github.com/FormidableLabs/urql/discussions/new)
-- If you think you've found a bug, [open a new issue.](https://github.com/FormidableLabs/urql/issues/new/choose)
-- or, if you found a bug you'd like to fix, [open a PR.](https://github.com/FormidableLabs/urql/compare)
-- If you'd like to propose a change [open an RFC issue.](https://github.com/FormidableLabs/urql/issues/new?labels=future+%F0%9F%94%AE&template=RFC.md&title=RFC%3A+Your+Proposal) You can read more about the RFC process [below](#how-do-i-propose-changes).
+- If you have a question, try [creating a GitHub Discussions thread.](https://github.com/urql-graphql/urql/discussions/new)
+- If you think you've found a bug, [open a new issue.](https://github.com/urql-graphql/urql/issues/new/choose)
+- or, if you found a bug you'd like to fix, [open a PR.](https://github.com/urql-graphql/urql/compare)
+- If you'd like to propose a change [open an RFC issue.](https://github.com/urql-graphql/urql/issues/new?labels=future+%F0%9F%94%AE&template=RFC.md&title=RFC%3A+Your+Proposal) You can read more about the RFC process [below](#how-do-i-propose-changes).
 
 ### What are the issue conventions?
 
@@ -35,9 +35,9 @@ or an undocumented quirk.
 We follow an **RFC proposal process**. This allows anyone to propose a new feature or a change, and
 allows us to communicate our current planned features or changes, so any technical discussion,
 progress, or upcoming changes are always **documented transparently.** You can [find the RFC
-template](https://github.com/FormidableLabs/urql/issues/new/choose) in our issue creator.
+template](https://github.com/urql-graphql/urql/issues/new/choose) in our issue creator.
 
-All RFCs are added to the [RFC Lifecycle board.](https://github.com/FormidableLabs/urql/projects/3)
+All RFCs are added to the [RFC Lifecycle board.](https://github.com/urql-graphql/urql/projects/3)
 This board tracks where an RFC stands and who's working on it until it's completed. Bugs and PRs may
 end up on there too if no corresponding RFC exists or was necessary. RFCs are typically first added
 to "In Discussion" until we believe they're ready to be worked on. This step may either be short,
@@ -248,5 +248,4 @@ Typically what we do is:
 
 ```sh
 npm access grant read-write urql:developers [package]
-npm access grant read-write formidable:formidable [package]
 ```

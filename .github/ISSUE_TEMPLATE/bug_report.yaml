@@ -40,9 +40,9 @@ body:
       label: Validations
       description: Before submitting the issue, please make sure you do the following
       options:
-        - label: I can confirm that this is a bug report, and not a feature request, RFC, question, or discussion, for which [GitHub Discussions](https://github.com/FormidableLabs/urql/discussions) should be used
+        - label: I can confirm that this is a bug report, and not a feature request, RFC, question, or discussion, for which [GitHub Discussions](https://github.com/urql-graphql/urql/discussions) should be used
           required: true
         - label: Read the [docs](https://formidable.com/open-source/urql/docs/).
           required: true
-        - label: Follow our [Code of Conduct](https://github.com/FormidableLabs/urql/blob/main/CODE_OF_CONDUCT.md)
+        - label: Follow our [Code of Conduct](https://github.com/urql-graphql/urql/blob/main/CODE_OF_CONDUCT.md)
           required: true

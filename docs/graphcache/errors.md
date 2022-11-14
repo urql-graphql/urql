@@ -370,7 +370,7 @@ When your schema treats `Mutation` or `Subscription` like regular entity types y
 warning. This may happen because you've used the default reserved names `Mutation` or `Subscription`
 for entities rather than as special Operation Root Types, and haven't specified this in the schema.
 Hence this issue can often be fixed by either enabling
-[Schema Awareness](https://formidable.com/open-source/urql/docs/graphcache/schema-awareness/) or by
+[Schema Awareness](./schema-awareness.md) or by
 adding a `schema` definition to your GraphQL Schema like so:
 
 ```graphql

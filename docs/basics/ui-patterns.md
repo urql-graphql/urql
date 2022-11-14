@@ -5,7 +5,7 @@ order: 6
 
 # UI Patterns
 
-> This page is incomplete. You can help us expanding it by suggesting more patterns or asking us about common problems you're facing on [GitHub Discussions](https://github.com/FormidableLabs/urql/discussions).
+> This page is incomplete. You can help us expanding it by suggesting more patterns or asking us about common problems you're facing on [GitHub Discussions](https://github.com/urql-graphql/urql/discussions).
 
 Generally, `urql`'s API surface is small and compact. Some common problems that we're facing when building apps may look like they're not a built-in feature, however, there are several patterns that even a lean UI can support.
 This page is a collection of common UI patterns and problems we may face with GraphQL and how we can tackle them in
@@ -87,9 +87,9 @@ const Search = () => {
 
 Here we keep an array of all `variables` we've encountered and use them to render their
 respective `result` page. This only rerenders the additional page rather than having a long
-list that constantly changes. [You can find a full code example of this pattern in our example folder on the topic of Graphcache pagination.](https://github.com/FormidableLabs/urql/tree/main/examples/with-graphcache-pagination)
+list that constantly changes. [You can find a full code example of this pattern in our example folder on the topic of Graphcache pagination.](https://github.com/urql-graphql/urql/tree/main/examples/with-graphcache-pagination)
 
-We also do not need to use our normalized cache to achieve this. As long as we're able to split individual lists up into chunks across components, we can also solve this problem entirely in UI code. [Read our example code on how to achieve this.](https://github.com/FormidableLabs/urql/tree/main/examples/with-pagination)
+We also do not need to use our normalized cache to achieve this. As long as we're able to split individual lists up into chunks across components, we can also solve this problem entirely in UI code. [Read our example code on how to achieve this.](https://github.com/urql-graphql/urql/tree/main/examples/with-pagination)
 
 ## Prefetching data
 
@@ -161,8 +161,8 @@ We can unpause the hook to start fetching, or, like in this example, call its re
 In urql we leverage our extensibility pattern named "Exchanges" to manipulate the way
 data comes in and goes out of our client.
 
-- [Stale time](https://github.com/FormidableLabs/urql/tree/main/exchanges/request-policy)
-- [Focus](https://github.com/FormidableLabs/urql/tree/main/exchanges/refocus)
+- [Stale time](https://github.com/urql-graphql/urql/tree/main/exchanges/request-policy)
+- [Focus](https://github.com/urql-graphql/urql/tree/main/exchanges/refocus)
 
 When we want to introduce one of these patterns we add the package and add it to the `exchanges`
 property of our `Client`. In the case of these two we'll have to add it before the cache

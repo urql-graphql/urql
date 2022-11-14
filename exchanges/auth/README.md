@@ -2,7 +2,7 @@
 
 <p align="center"><strong>An exchange for managing authentication in <code>urql</code></strong></p>
 
-`@urql/exchange-auth` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client which helps handle auth headers and token refresh
+`@urql/exchange-auth` is an exchange for the [`urql`](https://github.com/urql-graphql/urql) GraphQL client which helps handle auth headers and token refresh
 
 ## Quick Start Guide
 
@@ -27,10 +27,7 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     authExchange({
-      addAuthToOperation: ({
-        authState,
-        operation,
-      }) => {
+      addAuthToOperation: ({ authState, operation }) => {
         // the token isn't in the auth state, return the operation without changes
         if (!authState || !authState.token) {
           return operation;
@@ -42,20 +39,16 @@ const client = createClient({
             ? operation.context.fetchOptions()
             : operation.context.fetchOptions || {};
 
-        return makeOperation(
-          operation.kind,
-          operation,
-          {
-            ...operation.context,
-            fetchOptions: {
-              ...fetchOptions,
-              headers: {
-                ...fetchOptions.headers,
-                "Authorization": authState.token,
-              },
+        return makeOperation(operation.kind, operation, {
+          ...operation.context,
+          fetchOptions: {
+            ...fetchOptions,
+            headers: {
+              ...fetchOptions.headers,
+              Authorization: authState.token,
             },
           },
-        );
+        });
       },
       willAuthError: ({ authState }) => {
         if (!authState) return true;
@@ -64,9 +57,7 @@ const client = createClient({
       },
       didAuthError: ({ error }) => {
         // check if the error was an auth error (this can be implemented in various ways, e.g. 401 or a special error code)
-        return error.graphQLErrors.some(
-          e => e.extensions?.code === 'FORBIDDEN',
-        );
+        return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
       },
       getAuth: async ({ authState, mutate }) => {
         // for initial launch, fetch the auth state from storage (local storage, async storage etc)
@@ -112,7 +103,7 @@ const client = createClient({
         return null;
       },
     }),
-    fetchExchange
+    fetchExchange,
   ],
 });
 ```

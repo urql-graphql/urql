@@ -3,19 +3,19 @@
   "version": "2.0.1",
   "description": "Make stories in Storybook with urql",
   "sideEffects": false,
-  "homepage": "https://github.com/FormidableLabs/urql/tree/main/packages/storybook-addon",
-  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "homepage": "https://github.com/urql-graphql/urql/tree/main/packages/storybook-addon",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FormidableLabs/urql.git",
+    "url": "https://github.com/urql-graphql/urql.git",
     "directory": "packages/storybook-addon"
   },
   "keywords": [
     "addon",
     "storybook",
     "urql",
-    "formidablelabs",
+    "graphql",
     "preact",
     "react",
     "storybook-addon",

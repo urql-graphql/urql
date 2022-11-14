@@ -4,18 +4,18 @@
   "description": "Utilities for dealing with Introspection Queries and Client Schemas",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
-  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FormidableLabs/urql.git",
+    "url": "https://github.com/urql-graphql/urql.git",
     "directory": "packages/introspection"
   },
   "keywords": [
+    "graphql",
     "graphql client",
     "graphql schema",
-    "schema",
-    "formidablelabs"
+    "schema"
   ],
   "main": "dist/urql-introspection",
   "module": "dist/urql-introspection.mjs",

@@ -2,7 +2,7 @@
 
 <p align="center"><strong>An exchange for executing queries against a local schema in <code>urql</code></strong></p>
 
-`@urql/exchange-execute` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client which executes queries against a local schema.
+`@urql/exchange-execute` is an exchange for the [`urql`](https://github.com/urql-graphql/urql) GraphQL client which executes queries against a local schema.
 This is a replacement for the default _fetchExchange_ which sends queries over HTTP/S to be executed remotely.
 
 ## Quick Start Guide

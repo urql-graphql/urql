@@ -1,6 +1,6 @@
-/.github/ @ryan-roemer @boygirl
-/.changeset/config.json @ryan-roemer @boygirl
-/scripts/actions/* @ryan-roemer @boygirl
-/scripts/prepare/* @ryan-roemer @boygirl
-/scripts/rollup/* @ryan-roemer @boygirl
-/scripts/changesets/* @ryan-roemer @boygirl
+/.github/ @urql-graphql/core
+/.changeset/config.json @urql-graphql/core
+/scripts/actions/* @urql-graphql/core
+/scripts/prepare/* @urql-graphql/core
+/scripts/rollup/* @urql-graphql/core
+/scripts/changesets/* @urql-graphql/core
