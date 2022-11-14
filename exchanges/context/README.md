@@ -2,7 +2,7 @@
 
 <p align="center"><strong>An exchange for setting operation context in <code>urql</code></strong></p>
 
-`@urql/exchange-context` is an exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client which can set the operation context both synchronously as well as asynchronously
+`@urql/exchange-context` is an exchange for the [`urql`](https://github.com/urql-graphql/urql) GraphQL client which can set the operation context both synchronously as well as asynchronously
 
 ## Quick Start Guide
 
@@ -26,9 +26,9 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     contextExchange({
-      getContext: async (operation) => {
+      getContext: async operation => {
         const token = await getToken();
-        return { ...operation.context, headers: { authorization: token } }
+        return { ...operation.context, headers: { authorization: token } };
       },
     }),
     fetchExchange,

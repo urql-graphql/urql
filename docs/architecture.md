@@ -150,7 +150,7 @@ Some of the exchanges that are available to us are:
 - [`requestPolicyExchange`](./api/request-policy-exchange.md): Automatically upgrades `cache-only` and `cache-first` operations to `cache-and-network` after a given amount of time.
 - [`refocusExchange`](./api/refocus-exchange.md): Tracks open queries and refetches them
   when the window regains focus.
-- `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/FormidableLabs/urql-devtools)
+- `devtoolsExchange`: Provides the ability to use the [urql-devtools](https://github.com/urql-graphql/urql-devtools)
 
 We can even swap out our [document cache](./basics/document-caching.md), which is implemented by
 `@urql/core`'s `cacheExchange`, with `urql`'s [normalized cache,

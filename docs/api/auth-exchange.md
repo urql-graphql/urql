@@ -101,4 +101,4 @@ function addAuthToOperation: ({
 }
 ```
 
-[Read more examples in the documentation given here.](https://github.com/FormidableLabs/urql/tree/main/exchanges/auth#quick-start-guide)
+[Read more examples in the documentation given here.](https://github.com/urql-graphql/urql/tree/main/exchanges/auth#quick-start-guide)

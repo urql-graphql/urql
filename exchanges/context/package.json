@@ -4,18 +4,18 @@
   "description": "An exchange for setting (a)synchronous operation-context in urql",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
-  "bugs": "https://github.com/FormidableLabs/urql/issues",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FormidableLabs/urql.git",
+    "url": "https://github.com/urql-graphql/urql.git",
     "directory": "exchanges/context"
   },
   "keywords": [
     "urql",
     "exchange",
     "context",
-    "formidablelabs",
+    "graphql",
     "exchanges"
   ],
   "main": "dist/urql-exchange-context",

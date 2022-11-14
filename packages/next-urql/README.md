@@ -5,9 +5,6 @@
   <a href="https://npmjs.com/package/next-urql">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/next-urql.svg" />
   </a>
-  <a href="https://travis-ci.com/FormidableLabs/next-urql">
-    <img alt="Test Status" src="https://api.travis-ci.com/FormidableLabs/next-urql.svg?branch=master" />
-  </a>
 </div>
 
 ## `next-urql`
@@ -30,7 +27,7 @@ yarn add next-urql react-is urql
 npm install --save next-urql react-is urql
 ```
 
-`react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/FormidableLabs/urql#installation).
+`react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/urql-graphql/urql#installation).
 
 Note that if you are using Next before v9.4 you'll need to polyfill fetch, this can be
 done through [`isomorphic-unfetch`](https://www.npmjs.com/package/isomorphic-unfetch).
@@ -225,15 +222,18 @@ If you want to use a `Client` in Next.js' newer methods like `getServerSideProps
 ```javascript
 import { initUrqlClient } from 'next-urql';
 
-export const getServerSideProps = async (ctx) => {
-  const client = initUrqlClient({
-    url: '/graphql',
-  }, false /* set to false to disable suspense */);
+export const getServerSideProps = async ctx => {
+  const client = initUrqlClient(
+    {
+      url: '/graphql',
+    },
+    false /* set to false to disable suspense */
+  );
 
   const result = await client.query(QUERY, {}).toPromise();
 
   return {
-    props: { data: result.data }
+    props: { data: result.data },
   };
 };
 ```
