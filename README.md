@@ -34,9 +34,10 @@
 - 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://formidable.com/open-source/urql/docs/graphcache)
 - 🔬 Easy debugging with the [`urql` devtools browser extensions](https://formidable.com/open-source/urql/docs/advanced/debugging/)
 
-`urql` is a GraphQL client that exposes a set of helpers for several frameworks. It's built to be highly customisable and versatile so you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
+`urql` is a GraphQL client that exposes a set of helpers for several frameworks. It's built to be highly customisable and versatile so
+you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
-While GraphQL is an elegant protocol and schema language, client libraries today typically come with large API footprints. We aim to create something more lightweight instead.
+**📃 For more information, [check out the docs](https://formidable.com/open-source/urql/docs/).**
 
 ## Installation
 
@@ -45,6 +46,13 @@ yarn add urql graphql
 # or
 npm install --save urql graphql
 ```
+
+## 🙌 Contributing
+
+**The urql project was founded by [Formidable](https://formidable.com/) and is actively developed
+by the urql GraphQL team.**
+
+If you'd like to get involved, [check out our Contributor's guide.](https://github.com/urql-graphql/urql/blob/main/CONTRIBUTING.md)
 
 ## 📃 [Documentation](https://formidable.com/open-source/urql/docs/)
 
