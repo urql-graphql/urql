@@ -142,6 +142,33 @@ describe('on operation', () => {
     });
   });
 
+  it('calls execute after executing context as a function returning a Promise', async () => {
+    const context = async operation => {
+      expect(operation).toBe(queryOperation);
+      return 'CALCULATED_USER_ID=' + 8 * 10;
+    };
+
+    await pipe(
+      fromValue(queryOperation),
+      executeExchange({ schema, context })(exchangeArgs),
+      take(1),
+      toPromise
+    );
+
+    expect(mocked(execute)).toBeCalledTimes(1);
+    expect(mocked(execute)).toBeCalledWith({
+      schema,
+      document: queryOperation.query,
+      rootValue: undefined,
+      contextValue: 'CALCULATED_USER_ID=80',
+      variableValues: queryOperation.variables,
+      operationName: expectedQueryOperationName,
+      fieldResolver: undefined,
+      typeResolver: undefined,
+      subscribeFieldResolver: undefined,
+    });
+  });
+
   it('should return data from subscribe', async () => {
     const context = 'USER_ID=123';
 
