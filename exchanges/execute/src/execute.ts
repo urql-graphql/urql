@@ -49,6 +49,7 @@ const makeExecuteSource = (
   args: ExecuteParams
 ): Source<OperationResult> => {
   return make<OperationResult>(observer => {
+    let iterator: AsyncIterator<ExecutionResult>;
     let ended = false;
 
     Promise.resolve()
@@ -66,10 +67,7 @@ const makeExecuteSource = (
           observer.next(makeResult(operation, result as ExecutionResult));
           return;
         }
-
-        const iterator: AsyncIterator<ExecutionResult> = result[
-          asyncIterator!
-        ]();
+        iterator = result[asyncIterator!]();
         let prevResult: OperationResult | null = null;
 
         function next({
@@ -90,9 +88,6 @@ const makeExecuteSource = (
           if (!done && !ended) {
             return iterator.next().then(next);
           }
-          if (ended) {
-            iterator.return && iterator.return();
-          }
         }
 
         return iterator.next().then(next);
@@ -106,6 +101,7 @@ const makeExecuteSource = (
       });
 
     return () => {
+      if (iterator && iterator.return) iterator.return();
       ended = true;
     };
   });
