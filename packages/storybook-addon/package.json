@@ -63,7 +63,7 @@
     "access": "public"
   },
   "storybook": {
-    "icon": "https://github.com/FormidableLabs/urql/raw/main/packages/site/src/assets/sidebar-badge.svg",
+    "icon": "https://github.com/urql-graphql/urql/raw/main/packages/site/src/assets/sidebar-badge.svg",
     "displayName": "urql"
   }
 }

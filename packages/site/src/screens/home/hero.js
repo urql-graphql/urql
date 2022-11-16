@@ -238,13 +238,13 @@ const Hero = props => {
         <li>
           <a
             title="Issues"
-            href="https://www.github.com/FormidableLabs/urql/issues"
+            href="https://www.github.com/urql-graphql/urql/issues"
           >
             Issues
           </a>
         </li>
         <li>
-          <a title="GitHub" href="https://github.com/FormidableLabs/urql">
+          <a title="GitHub" href="https://github.com/urql-graphql/urql">
             GitHub
           </a>
         </li>

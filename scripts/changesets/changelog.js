@@ -3,7 +3,7 @@ const { getInfo } = require('@changesets/get-github-info');
 
 config();
 
-const REPO = 'FormidableLabs/urql';
+const REPO = 'urql-graphql/urql';
 const SEE_LINE = /^See:\s*(.*)/i;
 const TRAILING_CHAR = /[.;:]$/g;
 const listFormatter = new Intl.ListFormat('en-US');
