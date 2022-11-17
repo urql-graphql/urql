@@ -7,7 +7,7 @@
   <a href="https://bundlephobia.com/result?p=@urql/preact">
     <img alt="Minified gzip size" src="https://img.shields.io/bundlephobia/minzip/@urql/preact.svg?label=gzip%20size" />
   </a>
-  <a href="https://github.com/FormidableLabs/urql/discussions">
+  <a href="https://github.com/urql-graphql/urql/discussions">
     <img alt="GitHub Discussions: Chat With Us" src="https://badgen.net/badge/discussions/chat%20with%20us/purple" />
   </a>
   <br />

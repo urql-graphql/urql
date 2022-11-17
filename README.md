@@ -13,7 +13,7 @@
   <a href="https://github.com/urql-graphql/urql/actions/workflows/ci.yml">
     <img alt="CI Status" src="https://github.com/urql-graphql/urql/actions/workflows/ci.yml/badge.svg?branch=main" />
   </a>
-  <a href="https://www.npmjs.com/package/urql">
+  <a href="https://www.npmjs.com/package/@urql/core">
     <img alt="Weekly downloads" src="https://badgen.net/npm/dw/urql?color=blue" />
   </a>
   <a href="https://formidable.com/open-source/urql/docs/">
@@ -28,7 +28,7 @@
 
 ## ✨ Features
 
-- 📦 **One package** to get a working GraphQL client in React, Preact, and Svelte
+- 📦 **One package** to get a working GraphQL client in React, Preact, Vue, and Svelte
 - ⚙️ Fully **customisable** behaviour [via "exchanges"](https://formidable.com/open-source/urql/docs/advanced/authoring-exchanges/)
 - 🗂 Logical but simple default behaviour and document caching
 - 🌱 Normalized caching via [`@urql/exchange-graphcache`](https://formidable.com/open-source/urql/docs/graphcache)
@@ -38,14 +38,6 @@
 you can take it from getting started with your first GraphQL project all the way to building complex apps and experimenting with GraphQL clients.
 
 **📃 For more information, [check out the docs](https://formidable.com/open-source/urql/docs/).**
-
-## Installation
-
-```sh
-yarn add urql graphql
-# or
-npm install --save urql graphql
-```
 
 ## 🙌 Contributing
 

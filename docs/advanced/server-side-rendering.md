@@ -181,7 +181,7 @@ If you're using [Next.js](https://nextjs.org/) you can save yourself a lot of wo
 `next-urql`. The `next-urql` package includes setup for `react-ssr-prepass` already, which automates
 a lot of the complexity of setting up server-side rendering with `urql`.
 
-We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/FormidableLabs/urql/tree/main/packages/next-urql)
+We have a custom integration with [`Next.js`](https://nextjs.org/), being [`next-urql`](https://github.com/urql-graphql/urql/tree/main/packages/next-urql)
 this integration contains convenience methods specifically for `Next.js`.
 These will simplify the above setup for SSR.
 
@@ -265,7 +265,7 @@ export default withUrqlClient(
     url: 'http://localhost:3000/graphql',
     exchanges: [dedupExchange, cacheExchange, ssrExchange, fetchExchange],
   }),
-  { ssr: true }, // Enables server-side rendering using `getInitialProps`
+  { ssr: true } // Enables server-side rendering using `getInitialProps`
 )(Index);
 ```
 
@@ -310,7 +310,7 @@ export async function getStaticProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient(
     {
-      url: "your-url",
+      url: 'your-url',
       exchanges: [dedupExchange, cacheExchange, ssrCache, fetchExchange],
     },
     false
@@ -332,7 +332,7 @@ export async function getStaticProps(ctx) {
 export default withUrqlClient(
   ssr => ({
     url: 'your-url',
-  }),
+  })
   // Cannot specify { ssr: true } here so we don't wrap our component in getInitialProps
 )(Todos);
 ```
@@ -374,7 +374,7 @@ export async function getServerSideProps(ctx) {
   const ssrCache = ssrExchange({ isClient: false });
   const client = initUrqlClient(
     {
-      url: "", // not needed without `fetchExchange`
+      url: '', // not needed without `fetchExchange`
       exchanges: [
         dedupExchange,
         cacheExchange,
@@ -394,11 +394,9 @@ export async function getServerSideProps(ctx) {
   };
 }
 
-export default withUrqlClient(
-  ssr => ({
-    url: 'your-url',
-  }),
-)(Todos);
+export default withUrqlClient(ssr => ({
+  url: 'your-url',
+}))(Todos);
 ```
 
 Direct schema execution skips one network round trip by accessing your resolvers directly

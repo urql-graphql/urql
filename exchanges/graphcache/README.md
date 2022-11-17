@@ -2,7 +2,7 @@
 
 <p align="center"><strong>An exchange for normalized caching support in <code>urql</code></strong></p>
 
-`@urql/exchange-graphcache` is a normalized cache exchange for the [`urql`](https://github.com/FormidableLabs/urql) GraphQL client.
+`@urql/exchange-graphcache` is a normalized cache exchange for the [`urql`](https://github.com/urql-graphql/urql) GraphQL client.
 This is a drop-in replacement for the default `cacheExchange` that, instead of document
 caching, caches normalized data by keys and connections between data.
 
@@ -44,7 +44,3 @@ const client = createClient({
   ],
 });
 ```
-
-## Maintenance Status
-
-**Active:** Formidable is actively working on this project, and we expect to continue for work for the foreseeable future. Bug reports, feature requests and pull requests are welcome.
