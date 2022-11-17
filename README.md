@@ -14,7 +14,7 @@
     <img alt="CI Status" src="https://github.com/urql-graphql/urql/actions/workflows/ci.yml/badge.svg?branch=main" />
   </a>
   <a href="https://www.npmjs.com/package/@urql/core">
-    <img alt="Weekly downloads" src="https://badgen.net/npm/dw/urql?color=blue" />
+    <img alt="Weekly downloads" src="https://badgen.net/npm/dw/@urql/core?color=blue" />
   </a>
   <a href="https://formidable.com/open-source/urql/docs/">
     <img alt="Visit docs" src="https://badgen.net/badge/docs/visit site/orange" />
