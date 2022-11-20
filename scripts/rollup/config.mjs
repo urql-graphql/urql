@@ -1,7 +1,7 @@
 import genPackageJson from 'rollup-plugin-generate-package-json';
 import { relative, join, dirname, basename } from 'path';
-import { makePlugins, makeOutputPlugins } from './plugins';
-import * as settings from './settings';
+import { makePlugins, makeOutputPlugins } from './plugins.mjs';
+import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
 
