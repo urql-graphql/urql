@@ -1,7 +1,8 @@
-const path = require('path');
+import { readFileSync } from 'fs';
+import path  from 'path';
 
 export const cwd = process.cwd();
-export const pkg = require(path.resolve(cwd, './package.json'));
+export const pkg = JSON.parse(readFileSync(path.resolve(cwd, './package.json'), 'utf-8'));
 export const types = path.resolve(cwd, 'dist/types/');
 
 const normalize = name => name

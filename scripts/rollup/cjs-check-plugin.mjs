@@ -1,4 +1,4 @@
-import { parse } from 'cjs-module-lexer';
+import { parse, init } from 'cjs-module-lexer';
 import { createFilter } from '@rollup/pluginutils';
 
 function cleanup(opts = {}) {
@@ -9,13 +9,14 @@ function cleanup(opts = {}) {
   return {
     name: "cjs-check",
 
-    renderChunk(code, chunk) {
+    async renderChunk(code, chunk) {
       if (opts.extension !== '.js') {
         return null;
       } else if (!filter(chunk.fileName)) {
         return null;
       }
 
+      await init()
       const output = parse(code);
 
       let hasMissing = false;

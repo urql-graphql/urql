@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as React from 'react';
 
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -7,15 +8,15 @@ import sucrase from '@rollup/plugin-sucrase';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 
-import cleanup from './cleanup-plugin.js'
-import cjsCheck from './cjs-check-plugin.js'
-import babelPluginTransformPipe from '../babel/transform-pipe';
-import babelPluginTransformInvariant from '../babel/transform-invariant-warning';
-import babelPluginTransformDebugTarget from '../babel/transform-debug-target';
+import cleanup from './cleanup-plugin.mjs'
+import cjsCheck from './cjs-check-plugin.mjs'
+import babelPluginTransformPipe from '../babel/transform-pipe.mjs';
+import babelPluginTransformInvariant from '../babel/transform-invariant-warning.mjs';
+import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs';
 
-import * as settings from './settings';
+import * as settings from './settings.mjs';
 
 export const makePlugins = () => [
   resolve({
@@ -29,7 +30,7 @@ export const makePlugins = () => [
     ignoreGlobal: true,
     include: /\/node_modules\//,
     namedExports: settings.hasReact ? {
-      react: Object.keys(require('react'))
+      react: Object.keys(React)
     } : {},
   }),
   typescript({
