@@ -44,8 +44,18 @@ export interface AuthConfig<T> {
     operation: Operation;
   }): boolean;
 
-  /** getAuth() handles how the application refreshes or reauthenticates given a stale `authState` and should return a new `authState` or `null`. */
-  getAuth(params: {
+  /** is called when the exchange first runs. This is where you'd fetch any initial auth state (from cookies, storage) */
+  getInitialAuth(params: {
+    authState: T | null;
+    /** The mutate() method may be used to send one-off mutations to the GraphQL API for the purpose of authentication. */
+    mutate<Data = any, Variables extends object = {}>(
+      query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+      variables?: Variables,
+      context?: Partial<OperationContext>
+    ): Promise<OperationResult<Data>>;
+  }): Promise<T | null>;
+
+  refreshAuth(params: {
     authState: T | null;
     /** The mutate() method may be used to send one-off mutations to the GraphQL API for the purpose of authentication. */
     mutate<Data = any, Variables extends object = {}>(
@@ -67,7 +77,8 @@ const addAuthAttemptToOperation = (
 
 export function authExchange<T>({
   addAuthToOperation,
-  getAuth,
+  getInitialAuth,
+  refreshAuth,
   didAuthError,
   willAuthError,
 }: AuthConfig<T>): Exchange {
@@ -79,6 +90,7 @@ export function authExchange<T>({
     } = makeSubject<Operation>();
 
     let authState: T | null = null;
+    let hasInitialAuth = false;
 
     return operations$ => {
       function mutate<Data = any, Variables extends object = {}>(
@@ -109,17 +121,24 @@ export function authExchange<T>({
       };
 
       let authPromise: Promise<any> | void = Promise.resolve()
-        .then(() => getAuth({ authState, mutate }))
+        .then(() => {
+          if (!hasInitialAuth) {
+            hasInitialAuth = true;
+            return getInitialAuth({ authState, mutate });
+          } else {
+            return refreshAuth({ authState, mutate });
+          }
+        })
         .then(updateAuthState);
 
-      const refreshAuth = (operation: Operation): void => {
+      const doRefreshAuth = (operation: Operation): void => {
         // add to retry queue to try again later
         operation = addAuthAttemptToOperation(operation, true);
         retryQueue.set(operation.key, operation);
 
         // check that another operation isn't already doing refresh
         if (!authPromise) {
-          authPromise = getAuth({ authState, mutate })
+          authPromise = refreshAuth({ authState, mutate })
             .then(updateAuthState)
             .catch(() => updateAuthState(null));
         }
@@ -156,7 +175,7 @@ export function authExchange<T>({
                 willAuthError &&
                 willAuthError({ operation, authState })
               ) {
-                refreshAuth(operation);
+                doRefreshAuth(operation);
                 return empty;
               } else if (!authPromise) {
                 return fromValue(addAuthAttemptToOperation(operation, false));
@@ -187,7 +206,7 @@ export function authExchange<T>({
         filter(({ error, operation }) => {
           if (error && didAuthError && didAuthError({ error, authState })) {
             if (!operation.context.authAttempt) {
-              refreshAuth(operation);
+              doRefreshAuth(operation);
               return false;
             }
           }
