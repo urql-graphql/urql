@@ -69,27 +69,22 @@ const client = createClient({
 
 Let's discuss each of the [configuration options](../api/auth-exchange.md#options) and how to use them in turn.
 
-### Configuring `getAuth` (initial load, fetch from storage)
+### Configuring `getInitialAuth`
 
-The `getAuth` option is used to fetch the auth state. This is how to configure it for fetching the tokens at initial launch in React:
+The `getInitialAuth` option is used to fetch the initial auth state. This may be null if there is no existing auth state, or you may return a token from a cookie, local storage, etc:
 
 ```js
-const getAuth = async ({ authState }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
+const getInitialAuth = async ({ authState }) => {
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (token && refreshToken) {
+    return { token, refreshToken };
   }
-
   return null;
 };
 ```
 
-We check that the `authState` doesn't already exist (this indicates that it is the first time this exchange is executed and not an auth failure) and fetch the auth state from
-storage. The structure of this particular `authState` is an object with keys for `token` and
+The structure of this particular `authState` is an object with keys for `token` and
 `refreshToken`, but this format is not required. We can use different keys or store any additional
 auth related information here. For example, we could decode and store the token expiry date, which
 would save us from decoding the JWT every time we want to check whether it has expired.
@@ -97,16 +92,12 @@ would save us from decoding the JWT every time we want to check whether it has e
 In React Native, this is very similar, but because persisted storage in React Native is always asynchronous, so is this function:
 
 ```js
-const getAuth = async ({ authState, mutate }) => {
-  if (!authState) {
-    const token = await AsyncStorage.getItem(TOKEN_KEY, {});
-    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY, {});
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
+const getInitialAuth = async ({ authState, mutate }) => {
+  const token = await AsyncStorage.getItem(TOKEN_KEY, {});
+  const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY, {});
+  if (token && refreshToken) {
+    return { token, refreshToken };
   }
-
   return null;
 };
 ```
@@ -114,7 +105,7 @@ const getAuth = async ({ authState, mutate }) => {
 ### Configuring `addAuthToOperation`
 
 The purpose of `addAuthToOperation` is to apply an auth state to each request. Note that the format
-of the `authState` will be whatever we've returned from `getAuth` and not constrained by the exchange:
+of the `authState` will be whatever we've returned from `getInitialAuth` and not constrained by the exchange:
 
 ```js
 import { makeOperation } from '@urql/core';
@@ -210,23 +201,13 @@ const didAuthError = ({ error }) => {
 
 If `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for re-authentication via `getAuth`.
 
-### Configuring `getAuth` (triggered after an auth error has occurred)
+### Configuring `refreshAuth` (triggered after an auth error has occurred)
 
 If the API doesn't support any sort of token refresh, this is where we could simply log the user out.
 
 ```js
-const getAuth = async ({ authState }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
-
+const refreshAuth = async ({ authState }) => {
   logout();
-
   return null;
 };
 ```
@@ -238,16 +219,7 @@ If we had a way to refresh our token using a refresh token, we can attempt to ge
 user first:
 
 ```js
-const getAuth = async ({ authState, mutate }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
-
+const refreshAuth = async ({ authState, mutate }) => {
   const result = await mutate(refreshMutation, {
     token: authState!.refreshToken,
   });
