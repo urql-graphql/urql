@@ -66,7 +66,8 @@ it('adds the auth header correctly', async () => {
   const res = await pipe(
     fromValue(queryOperation),
     authExchange({
-      getAuth: async () => ({ token: 'my-token' }),
+      getInitialAuth: async () => ({ token: 'my-token' }),
+      refreshAuth: async () => ({ token: 'another-token' }),
       willAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
         return withAuthHeader(operation, authState!.token);
@@ -91,10 +92,11 @@ it('adds the auth header correctly when it is fetched asynchronously', async () 
   const res = await pipe(
     fromValue(queryOperation),
     authExchange<{ token: string }>({
-      getAuth: async () => {
+      getInitialAuth: async () => {
         await Promise.resolve();
         return { token: 'async-token' };
       },
+      refreshAuth: async () => ({ token: 'another-token' }),
       willAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
         return withAuthHeader(operation, authState!.token);
@@ -119,11 +121,12 @@ it('supports calls to the mutate() method in getAuth()', async () => {
   const res = await pipe(
     fromValue(queryOperation),
     authExchange<{ token: string }>({
-      getAuth: async ({ mutate }) => {
+      getInitialAuth: async ({ mutate }) => {
         const result = await mutate('mutation { auth }');
         expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
         return { token: 'async-token' };
       },
+      refreshAuth: async () => ({ token: 'another-token' }),
       willAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
         return withAuthHeader(operation, authState?.token);
@@ -150,10 +153,11 @@ it('adds the same token to subsequent operations', async () => {
   const auth$ = pipe(
     source,
     authExchange({
-      getAuth: async () => {
+      getInitialAuth: async () => {
         await Promise.resolve();
         return { token: 'my-token' };
       },
+      refreshAuth: async () => ({ token: 'another-token' }),
       willAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
         return withAuthHeader(operation, authState!.token);
@@ -202,21 +206,21 @@ it('triggers authentication when an operation did error', async () => {
 
   const didAuthError = jest.fn().mockReturnValueOnce(true);
 
-  const getAuth = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      initialAuth = Promise.resolve({ token: 'initial-token' });
-      return initialAuth;
-    })
-    .mockImplementationOnce(() => {
-      afterErrorAuth = Promise.resolve({ token: 'final-token' });
-      return afterErrorAuth;
-    });
+  const getInitialAuth = jest.fn().mockImplementationOnce(() => {
+    initialAuth = Promise.resolve({ token: 'initial-token' });
+    return initialAuth;
+  });
+
+  const refreshAuth = jest.fn().mockImplementationOnce(() => {
+    initialAuth = Promise.resolve({ token: 'final-token' });
+    return initialAuth;
+  });
 
   pipe(
     source,
     authExchange<{ token: string }>({
-      getAuth,
+      getInitialAuth,
+      refreshAuth,
       didAuthError,
       willAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
@@ -227,7 +231,7 @@ it('triggers authentication when an operation did error', async () => {
   );
 
   await Promise.resolve();
-  expect(getAuth).toHaveBeenCalledTimes(1);
+  expect(getInitialAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
   await Promise.resolve();
   await Promise.resolve();
@@ -242,7 +246,8 @@ it('triggers authentication when an operation did error', async () => {
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(1);
   expect(didAuthError).toHaveBeenCalledTimes(1);
-  expect(getAuth).toHaveBeenCalledTimes(2);
+  expect(getInitialAuth).toHaveBeenCalledTimes(1);
+  expect(refreshAuth).toHaveBeenCalledTimes(1);
 
   await afterErrorAuth;
 
@@ -270,21 +275,21 @@ it('triggers authentication when an operation will error', async () => {
     .mockReturnValueOnce(true)
     .mockReturnValue(false);
 
-  const getAuth = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      initialAuth = Promise.resolve({ token: 'initial-token' });
-      return initialAuth;
-    })
-    .mockImplementationOnce(() => {
-      afterErrorAuth = Promise.resolve({ token: 'final-token' });
-      return afterErrorAuth;
-    });
+  const getInitialAuth = jest.fn().mockImplementationOnce(() => {
+    initialAuth = Promise.resolve({ token: 'initial-token' });
+    return initialAuth;
+  });
+
+  const refreshAuth = jest.fn().mockImplementationOnce(() => {
+    afterErrorAuth = Promise.resolve({ token: 'final-token' });
+    return afterErrorAuth;
+  });
 
   pipe(
     source,
     authExchange<{ token: string }>({
-      getAuth,
+      getInitialAuth,
+      refreshAuth,
       willAuthError,
       didAuthError: () => false,
       addAuthToOperation: ({ authState, operation }) => {
@@ -295,7 +300,7 @@ it('triggers authentication when an operation will error', async () => {
   );
 
   await Promise.resolve();
-  expect(getAuth).toHaveBeenCalledTimes(1);
+  expect(getInitialAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
   await Promise.resolve();
   await Promise.resolve();
@@ -303,7 +308,8 @@ it('triggers authentication when an operation will error', async () => {
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(0);
   expect(willAuthError).toHaveBeenCalledTimes(1);
-  expect(getAuth).toHaveBeenCalledTimes(2);
+  expect(getInitialAuth).toHaveBeenCalledTimes(1);
+  expect(refreshAuth).toHaveBeenCalledTimes(1);
 
   await afterErrorAuth;
 
