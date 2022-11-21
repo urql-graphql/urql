@@ -59,17 +59,16 @@ const client = createClient({
         // check if the error was an auth error (this can be implemented in various ways, e.g. 401 or a special error code)
         return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
       },
-      getAuth: async ({ authState, mutate }) => {
+      getInitialAuth: async ({ authState, mutate }) => {
         // for initial launch, fetch the auth state from storage (local storage, async storage etc)
-        if (!authState) {
-          const token = localStorage.getItem('token');
-          const refreshToken = localStorage.getItem('refreshToken');
-          if (token && refreshToken) {
-            return { token, refreshToken };
-          }
-          return null;
+        const token = localStorage.getItem('token');
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (token && refreshToken) {
+          return { token, refreshToken };
         }
-
+        return null;
+      },
+      refreshAuth: async ({ authState, mutate }) => {
         /**
          * the following code gets executed when an auth error has occurred
          * we should refresh the token if possible and return a new auth state
@@ -101,7 +100,7 @@ const client = createClient({
         logout();
 
         return null;
-      },
+      }
     }),
     fetchExchange,
   ],
