@@ -10,7 +10,7 @@ import {
 
 import { refocusExchange } from './refocusExchange';
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 
 const queryOne = gql`
   {
@@ -42,7 +42,7 @@ beforeEach(() => {
 });
 
 it(`attaches a listener and redispatches queries on call`, () => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -52,16 +52,16 @@ it(`attaches a listener and redispatches queries on call`, () => {
   );
 
   let listener;
-  const spy = jest
+  const spy = vi
     .spyOn(window, 'addEventListener')
     .mockImplementation((_keyword, fn) => {
       listener = fn;
     });
-  const reexecuteSpy = jest
+  const reexecuteSpy = vi
     .spyOn(client, 'reexecuteOperation')
     .mockImplementation(() => ({}));
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };

@@ -2,8 +2,9 @@ import { parse, print } from 'graphql';
 import { gql } from '../gql';
 import { createRequest, stringifyDocument } from './request';
 
-jest.mock('./hash', () => ({
-  hash: jest.requireActual('./hash').hash,
+vi.mock('./hash', () => ({
+  // eslint-disable-next-line
+  hash: require('./hash').hash,
   phash: (x: number) => x,
 }));
 

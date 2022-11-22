@@ -10,7 +10,7 @@ const variables = {
 };
 
 const client = {
-  executeQuery: jest.fn(() =>
+  executeQuery: vi.fn(() =>
     pipe(
       interval(200),
       map((i: number) => ({ data: i, error: i + 1 }))
@@ -20,7 +20,7 @@ const client = {
 
 describe('Query', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   afterEach(() => {

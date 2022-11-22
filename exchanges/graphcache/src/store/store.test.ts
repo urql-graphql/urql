@@ -851,8 +851,8 @@ describe('Store with storage', () => {
 
   it('should be able to store and rehydrate data', () => {
     const storage: StorageAdapter = {
-      readData: jest.fn(),
-      writeData: jest.fn(),
+      readData: vi.fn(),
+      writeData: vi.fn(),
     };
 
     store.data.storage = storage;
@@ -906,8 +906,8 @@ describe('Store with storage', () => {
     } as any;
 
     const storage: StorageAdapter = {
-      readData: jest.fn(),
-      writeData: jest.fn(),
+      readData: vi.fn(),
+      writeData: vi.fn(),
     };
 
     store.data.storage = storage;
@@ -943,8 +943,8 @@ describe('Store with storage', () => {
 
   it('persists commutative layers and ignores optimistic layers', () => {
     const storage: StorageAdapter = {
-      readData: jest.fn(),
-      writeData: jest.fn(),
+      readData: vi.fn(),
+      writeData: vi.fn(),
     };
 
     store.data.storage = storage;
@@ -1005,7 +1005,7 @@ describe('Store with storage', () => {
   });
 
   it('should use different rootConfigs', function () {
-    const fakeUpdater = jest.fn();
+    const fakeUpdater = vi.fn();
 
     const store = new Store({
       schema: {

@@ -5,16 +5,16 @@ import { Provider } from '../context';
 import { Mutation } from './Mutation';
 
 const mock = {
-  executeMutation: jest.fn(() =>
+  executeMutation: vi.fn(() =>
     pipe(fromValue({ data: 1, error: 2, extensions: { i: 1 } }), delay(200))
   ),
 };
-const client = mock as { executeMutation: jest.Mock };
+const client = mock as { executeMutation: vi.Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   afterEach(() => {

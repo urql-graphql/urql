@@ -19,7 +19,7 @@ const serializedQueryResponse = {
 
 beforeEach(() => {
   input = makeSubject<Operation>();
-  output = jest.fn(operation => ({ operation }));
+  output = vi.fn(operation => ({ operation }));
   forward = ops$ => pipe(ops$, map(output));
   client = { suspense: true } as any;
   exchangeInput = { forward, client };
@@ -180,7 +180,7 @@ it('caches complex GraphQLErrors in query results correctly', () => {
 });
 
 it('resolves cached query results correctly', () => {
-  const onPush = jest.fn();
+  const onPush = vi.fn();
 
   const ssr = ssrExchange({
     initialState: { [queryOperation.key]: serializedQueryResponse as any },
@@ -199,7 +199,7 @@ it('resolves cached query results correctly', () => {
 });
 
 it('resolves deferred, cached query results correctly', () => {
-  const onPush = jest.fn();
+  const onPush = vi.fn();
 
   const ssr = ssrExchange({
     isClient: true,
@@ -226,7 +226,7 @@ it('resolves deferred, cached query results correctly', () => {
 
 it('deletes cached results in non-suspense environments', async () => {
   client.suspense = false;
-  const onPush = jest.fn();
+  const onPush = vi.fn();
   const ssr = ssrExchange();
 
   ssr.restoreData({ [queryOperation.key]: serializedQueryResponse as any });
@@ -250,7 +250,7 @@ it('deletes cached results in non-suspense environments', async () => {
 it('never allows restoration of invalidated results', async () => {
   client.suspense = false;
 
-  const onPush = jest.fn();
+  const onPush = vi.fn();
   const initialState = { [queryOperation.key]: serializedQueryResponse as any };
 
   const ssr = ssrExchange({

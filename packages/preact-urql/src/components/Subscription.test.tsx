@@ -6,7 +6,7 @@ import { Subscription } from './Subscription';
 
 const query = 'subscription Example { example }';
 const client = {
-  executeSubscription: jest.fn(() =>
+  executeSubscription: vi.fn(() =>
     pipe(
       interval(200),
       map((i: number) => ({ data: i, error: i + 1 }))
@@ -16,7 +16,7 @@ const client = {
 
 describe('Subscription', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   afterEach(() => {

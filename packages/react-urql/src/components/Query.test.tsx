@@ -1,8 +1,8 @@
-jest.mock('../context', () => {
+vi.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
-    executeQuery: jest.fn(() =>
+    executeQuery: vi.fn(() =>
       pipe(
         interval(200),
         map((i: number) => ({ data: i, error: i + 1 }))
@@ -28,7 +28,7 @@ const variables = {
 describe('Query', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   afterEach(() => {

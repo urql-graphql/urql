@@ -1,12 +1,13 @@
-jest.mock('graphql', () => {
-  const graphql = jest.requireActual('graphql');
+vi.mock('graphql', () => {
+  // eslint-disable-next-line
+  const graphql = require('graphql');
 
   return {
     __esModule: true,
     ...graphql,
-    print: jest.fn(() => '{ placeholder }'),
-    execute: jest.fn(() => ({ key: 'value' })),
-    subscribe: jest.fn(),
+    print: vi.fn(() => '{ placeholder }'),
+    execute: vi.fn(() => ({ key: 'value' })),
+    subscribe: vi.fn(),
   };
 });
 
@@ -48,11 +49,11 @@ const expectedSubscribeOperationName = getOperationName(
   subscriptionOperation.query
 );
 
-const fetchMock = (global as any).fetch as jest.Mock;
+const fetchMock = (global as any).fetch as vi.Mock;
 const mockHttpResponseData = { key: 'value' };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mocked(print).mockImplementation(a => a as any);
   mocked(execute).mockResolvedValue({ data: mockHttpResponseData });
   mocked(subscribe).mockImplementation(async function* x(this: any) {
@@ -167,7 +168,7 @@ describe('on operation', () => {
 
     fetchMock.mockResolvedValue({
       status: 200,
-      text: jest
+      text: vi
         .fn()
         .mockResolvedValue(JSON.stringify({ data: mockHttpResponseData })),
     });
@@ -175,7 +176,7 @@ describe('on operation', () => {
     const responseFromFetchExchange = await pipe(
       fromValue(queryOperation),
       fetchExchange({
-        dispatchDebug: jest.fn(),
+        dispatchDebug: vi.fn(),
         forward: () => empty as Source<OperationResult>,
         client: {} as Client,
       }),

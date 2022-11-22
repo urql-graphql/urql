@@ -6,7 +6,7 @@ import { Client } from 'urql';
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
 
-beforeEach(jest.clearAllMocks);
+beforeEach(vi.clearAllMocks);
 
 const MockApp: React.FC<any> = () => {
   return h('div');
@@ -17,7 +17,7 @@ const MockAppTree: React.FC<any> = () => {
 };
 
 describe('withUrqlClient', () => {
-  const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
+  const spyInitUrqlClient = vi.spyOn(init, 'initUrqlClient');
   let Component: any;
 
   beforeAll(() => {
@@ -136,7 +136,7 @@ describe('withUrqlClient', () => {
   });
 
   describe('with exchanges provided', () => {
-    const exchange = jest.fn(() => op => op);
+    const exchange = vi.fn(() => op => op);
 
     beforeEach(() => {
       Component = withUrqlClient(() => ({

@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`on initial useEffect initialises default state 1`] = `
-Object {
+exports[`on initial useEffect > initialises default state 1`] = `
+{
   "data": undefined,
   "error": undefined,
   "extensions": undefined,

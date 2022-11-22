@@ -6,8 +6,8 @@ import { gql } from '../gql';
 import { OperationResult, Operation } from '../types';
 import { makeOperation } from '../utils';
 
-const fetch = (global as any).fetch as jest.Mock;
-const abort = jest.fn();
+const fetch = (global as any).fetch as vi.Mock;
+const abort = vi.fn();
 
 const abortError = new Error();
 abortError.name = 'AbortError';
@@ -41,7 +41,7 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
-      text: jest.fn().mockResolvedValue(response),
+      text: vi.fn().mockResolvedValue(response),
     });
   });
 
@@ -61,9 +61,9 @@ describe('on success', () => {
 
   it('uses the mock fetch if given', async () => {
     const fetchOptions = {};
-    const fetcher = jest.fn().mockResolvedValue({
+    const fetcher = vi.fn().mockResolvedValue({
       status: 200,
-      text: jest.fn().mockResolvedValue(response),
+      text: vi.fn().mockResolvedValue(response),
     });
 
     const data = await pipe(
@@ -92,7 +92,7 @@ describe('on error', () => {
     fetch.mockResolvedValue({
       status: 400,
       statusText: 'Forbidden',
-      text: jest.fn().mockResolvedValue('{}'),
+      text: vi.fn().mockResolvedValue('{}'),
     });
   });
 
@@ -132,7 +132,7 @@ describe('on unexpected plain text responses', () => {
     fetch.mockResolvedValue({
       status: 200,
       headers: new Map([['Content-Type', 'text/plain']]),
-      text: jest.fn().mockResolvedValue('Some Error Message'),
+      text: vi.fn().mockResolvedValue('Some Error Message'),
     });
   });
 
@@ -150,6 +150,10 @@ describe('on unexpected plain text responses', () => {
 });
 
 describe('on teardown', () => {
+  const fail = () => {
+    expect(true).toEqual(false);
+  };
+
   it('does not start the outgoing request on immediate teardowns', () => {
     fetch.mockRejectedValue(abortError);
 

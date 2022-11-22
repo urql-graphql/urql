@@ -6,7 +6,7 @@ import { map, interval, pipe, never, onStart, onEnd, empty } from 'wonka';
 import { Provider } from '../context';
 
 const mock = {
-  executeQuery: jest.fn(() =>
+  executeQuery: vi.fn(() =>
     pipe(
       interval(400),
       map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
@@ -14,7 +14,7 @@ const mock = {
   ),
 };
 
-const client = mock as { executeQuery: jest.Mock };
+const client = mock as { executeQuery: vi.Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -36,7 +36,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 };
 
 beforeAll(() => {
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation();
 });
 
 describe('useQuery', () => {
@@ -241,8 +241,8 @@ describe('useQuery', () => {
   });
 
   describe('on unmount', () => {
-    const start = jest.fn();
-    const unsubscribe = jest.fn();
+    const start = vi.fn();
+    const unsubscribe = vi.fn();
 
     beforeEach(() => {
       client.executeQuery.mockReturnValue(

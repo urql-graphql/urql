@@ -10,7 +10,7 @@ describe('queryStore', () => {
   const store = queryStore({ client, query, variables, context });
 
   it('creates a svelte store', () => {
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     store.subscribe(subscriber);
     expect(subscriber).toHaveBeenCalledTimes(1);
   });

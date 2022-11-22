@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 it('does not trigger when there are no errors', async () => {
-  const onError = jest.fn();
+  const onError = vi.fn();
   const { source: ops$, next, complete } = input;
   const exchangeArgs = {
     forward: op$ =>
@@ -33,7 +33,7 @@ it('does not trigger when there are no errors', async () => {
 });
 
 it('triggers correctly when the operations has an error', async () => {
-  const onError = jest.fn();
+  const onError = vi.fn();
   const { source: ops$, next, complete } = input;
   const exchangeArgs = {
     forward: op$ =>
@@ -57,7 +57,7 @@ it('triggers correctly when the operations has an error', async () => {
 });
 
 it('triggers correctly multiple times the operations has an error', async () => {
-  const onError = jest.fn();
+  const onError = vi.fn();
   const { source: ops$, next, complete } = input;
 
   const firstQuery = {

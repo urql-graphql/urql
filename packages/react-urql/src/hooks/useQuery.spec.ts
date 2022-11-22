@@ -7,9 +7,9 @@ import { RequestPolicy } from '@urql/core';
 import { useClient } from '../context';
 import { useQuery } from './useQuery';
 
-jest.mock('../context', () => {
+vi.mock('../context', () => {
   const mock = {
-    executeQuery: jest.fn(() =>
+    executeQuery: vi.fn(() =>
       pipe(
         interval(1000 / 60),
         map(i => ({ data: i, error: i + 1 }))
@@ -23,7 +23,7 @@ jest.mock('../context', () => {
 });
 
 // @ts-ignore
-const client = useClient() as { executeQuery: jest.Mock };
+const client = useClient() as { executeQuery: vi.Mock };
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -42,7 +42,7 @@ const mockVariables = {
 describe('useQuery', () => {
   beforeAll(() => {
     // TODO: Fix use of act()
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   beforeEach(() => {

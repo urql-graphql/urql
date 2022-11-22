@@ -10,7 +10,7 @@ import {
 
 import { requestPolicyExchange } from './requestPolicyExchange';
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 
 const mockOptions = {
   ttl: 5,
@@ -46,7 +46,7 @@ beforeEach(() => {
 });
 
 it(`upgrades to cache-and-network`, done => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -55,7 +55,7 @@ it(`upgrades to cache-and-network`, done => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };
@@ -90,7 +90,7 @@ it(`upgrades to cache-and-network`, done => {
 });
 
 it(`doesn't upgrade when shouldUpgrade returns false`, done => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -99,12 +99,12 @@ it(`doesn't upgrade when shouldUpgrade returns false`, done => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };
 
-  const shouldUpgrade = jest.fn(() => false);
+  const shouldUpgrade = vi.fn(() => false);
   pipe(
     requestPolicyExchange({ ...mockOptions, shouldUpgrade })({
       forward,

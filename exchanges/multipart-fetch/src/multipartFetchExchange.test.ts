@@ -9,8 +9,8 @@ import {
   multipleUploadOperation,
 } from './test-utils';
 
-const fetch = (global as any).fetch as jest.Mock;
-const abort = jest.fn();
+const fetch = (global as any).fetch as vi.Mock;
+const abort = vi.fn();
 
 const abortError = new Error();
 abortError.name = 'AbortError';
@@ -43,19 +43,19 @@ const response = JSON.stringify({
 const exchangeArgs = {
   forward: () => empty as Source<OperationResult>,
   client: {} as Client,
-  dispatchDebug: jest.fn(),
+  dispatchDebug: vi.fn(),
 };
 
 describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
-      text: jest.fn().mockResolvedValue(response),
+      text: vi.fn().mockResolvedValue(response),
     });
   });
 
   it('uses a file when given', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({});
+    const fetchOptions = vi.fn().mockReturnValue({});
 
     const data = await pipe(
       fromValue({
@@ -76,7 +76,7 @@ describe('on success', () => {
   });
 
   it('uses multiple files when given', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({});
+    const fetchOptions = vi.fn().mockReturnValue({});
 
     const data = await pipe(
       fromValue({
@@ -97,7 +97,7 @@ describe('on success', () => {
   });
 
   it('returns response data', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({});
+    const fetchOptions = vi.fn().mockReturnValue({});
 
     const data = await pipe(
       fromValue({
@@ -121,7 +121,7 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
-      text: jest.fn().mockResolvedValue('{}'),
+      text: vi.fn().mockResolvedValue('{}'),
     });
   });
 
@@ -136,7 +136,7 @@ describe('on error', () => {
   });
 
   it('returns error data with status 400 and manual redirect mode', async () => {
-    const fetchOptions = jest.fn().mockReturnValue({ redirect: 'manual' });
+    const fetchOptions = vi.fn().mockReturnValue({ redirect: 'manual' });
 
     const data = await pipe(
       fromValue({
@@ -156,7 +156,7 @@ describe('on error', () => {
   it('ignores the error when a result is available', async () => {
     fetch.mockResolvedValue({
       status: 400,
-      text: jest.fn().mockResolvedValue(response),
+      text: vi.fn().mockResolvedValue(response),
     });
 
     const data = await pipe(
@@ -170,6 +170,10 @@ describe('on error', () => {
 });
 
 describe('on teardown', () => {
+  const fail = () => {
+    expect(true).toEqual(false);
+  };
+
   it('does not start the outgoing request on immediate teardowns', () => {
     fetch.mockRejectedValueOnce(abortError);
 

@@ -4,10 +4,10 @@ import { fallbackExchange } from './fallback';
 
 const consoleWarn = console.warn;
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 
 beforeEach(() => {
-  console.warn = jest.fn();
+  console.warn = vi.fn();
 });
 
 afterAll(() => {

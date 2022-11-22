@@ -15,7 +15,7 @@ describe('subscriptionStore', () => {
   });
 
   it('creates a svelte store', () => {
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     store.subscribe(subscriber);
     expect(subscriber).toHaveBeenCalledTimes(1);
   });

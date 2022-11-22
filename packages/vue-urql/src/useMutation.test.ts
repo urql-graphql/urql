@@ -1,8 +1,8 @@
 import { reactive, ref } from 'vue';
 
-jest.mock('./useClient.ts', () => ({
+vi.mock('./useClient.ts', () => ({
   __esModule: true,
-  ...jest.requireActual('./useClient.ts'),
+  ...require('./useClient.ts'),
   useClient: () => ref(client),
 }));
 
@@ -13,13 +13,13 @@ import { useMutation } from './useMutation';
 const client = createClient({ url: '/graphql', exchanges: [] });
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 describe('useMutation', () => {
   it('provides an execute method that resolves a promise', done => {
     const subject = makeSubject<any>();
-    const clientMutation = jest
+    const clientMutation = vi
       .spyOn(client, 'executeMutation')
       .mockImplementation(() => subject.source);
 

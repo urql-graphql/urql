@@ -2,10 +2,10 @@ import { parse, print } from 'graphql';
 import { gql } from './gql';
 import { keyDocument } from './utils';
 
-let warn: jest.SpyInstance;
+let warn: vi.SpyInstance;
 
 beforeEach(() => {
-  warn = jest.spyOn(console, 'warn');
+  warn = vi.spyOn(console, 'warn');
   warn.mockClear();
 });
 

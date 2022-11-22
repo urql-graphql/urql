@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-jest.mock('../context', () => {
+vi.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
-    executeMutation: jest.fn(() =>
+    executeMutation: vi.fn(() =>
       pipe(fromValue({ data: 1, error: 2 }), delay(200))
     ),
   };
@@ -20,13 +20,13 @@ import { Mutation } from './Mutation';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeMutation: jest.Mock };
+const client = useClient() as { executeMutation: vi.Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation();
   });
 
   afterEach(() => {

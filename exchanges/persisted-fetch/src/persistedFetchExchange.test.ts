@@ -1,5 +1,5 @@
 /**
- * @jest-environment node
+ * @vitest-environment node
  */
 
 import { empty, fromValue, fromArray, pipe, Source, toPromise } from 'wonka';
@@ -11,14 +11,14 @@ import { queryOperation } from './test-utils';
 import { hash } from './sha256';
 import { persistedFetchExchange } from './persistedFetchExchange';
 
-const fetch = (global as any).fetch as jest.Mock;
+const fetch = (global as any).fetch as vi.Mock;
 
 const exchangeArgs = {
-  dispatchDebug: jest.fn(),
+  dispatchDebug: vi.fn(),
   forward: () => empty as Source<OperationResult>,
   client: ({
     debugTarget: {
-      dispatchEvent: jest.fn(),
+      dispatchEvent: vi.fn(),
     },
   } as any) as Client,
 };
@@ -195,7 +195,7 @@ it('supports a custom hash function', async () => {
     text: () => Promise.resolve(expected),
   });
 
-  const hashFn = jest.fn((_input: string, _doc: DocumentNode) => {
+  const hashFn = vi.fn((_input: string, _doc: DocumentNode) => {
     return Promise.resolve('hello');
   });
 
@@ -238,7 +238,7 @@ it('falls back to a non-persisted query if the hash is falsy', async () => {
     text: () => Promise.resolve(expected),
   });
 
-  const hashFn = jest.fn(() => Promise.resolve(''));
+  const hashFn = vi.fn(() => Promise.resolve(''));
 
   await pipe(
     fromValue(queryOperation),

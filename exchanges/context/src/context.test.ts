@@ -28,7 +28,7 @@ const queryOneData = {
   },
 };
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 let client, op, ops$, next;
 beforeEach(() => {
   client = createClient({ url: 'http://0.0.0.0' });
@@ -41,7 +41,7 @@ beforeEach(() => {
 });
 
 it(`calls getContext`, () => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -50,7 +50,7 @@ it(`calls getContext`, () => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };
@@ -76,7 +76,7 @@ it(`calls getContext`, () => {
 });
 
 it(`calls getContext async`, done => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -85,7 +85,7 @@ it(`calls getContext async`, done => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };

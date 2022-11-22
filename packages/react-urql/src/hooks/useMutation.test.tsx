@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../context', () => {
+vi.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { delay, fromValue, pipe } = require('wonka');
   const mock = {
-    executeMutation: jest.fn(() =>
+    executeMutation: vi.fn(() =>
       pipe(fromValue({ data: 1, error: 2, extensions: { i: 1 } }), delay(200))
     ),
   };
@@ -24,7 +24,7 @@ import { useClient } from '../context';
 import { useMutation } from './useMutation';
 
 // @ts-ignore
-const client = useClient() as { executeMutation: jest.Mock };
+const client = useClient() as { executeMutation: vi.Mock };
 
 const props = {
   query: 'mutation Example { example }',
@@ -42,7 +42,7 @@ const MutationUser = ({ query }: { query: any }) => {
 
 beforeAll(() => {
   // TODO: Fix use of act()
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation();
 });
 
 beforeEach(() => {

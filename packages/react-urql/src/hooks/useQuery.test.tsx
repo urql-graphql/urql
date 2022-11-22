@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../context', () => {
+vi.mock('../context', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { map, interval, pipe } = require('wonka');
   const mock = {
-    executeQuery: jest.fn(() =>
+    executeQuery: vi.fn(() =>
       pipe(
         interval(400),
         map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
@@ -27,7 +27,7 @@ import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeQuery: jest.Mock };
+const client = useClient() as { executeQuery: vi.Mock };
 
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
@@ -53,7 +53,7 @@ const QueryUser = ({
 
 beforeAll(() => {
   // TODO: Fix use of act()
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation();
 });
 
 beforeEach(() => {
@@ -178,8 +178,8 @@ describe('on change', () => {
 });
 
 describe('on unmount', () => {
-  const start = jest.fn();
-  const unsubscribe = jest.fn();
+  const start = vi.fn();
+  const unsubscribe = vi.fn();
 
   beforeEach(() => {
     client.executeQuery.mockReturnValue(

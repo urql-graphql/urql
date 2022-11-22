@@ -16,7 +16,7 @@ import { Operation } from '../types';
 import { dedupExchange } from './dedup';
 import { makeOperation } from '../utils';
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 let shouldRespond = false;
 let exchangeArgs;
 let forwardedOperations: Operation[];

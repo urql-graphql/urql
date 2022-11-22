@@ -49,7 +49,7 @@ const queryOneData = {
   },
 };
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 
 describe('data dependencies', () => {
   it('writes queries to the cache', () => {
@@ -72,7 +72,7 @@ describe('data dependencies', () => {
       },
     };
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
         return { operation: forwardOp, data: expected };
@@ -80,7 +80,7 @@ describe('data dependencies', () => {
     );
 
     const { source: ops$, next } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(
@@ -121,7 +121,7 @@ describe('data dependencies', () => {
       }
     );
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
         return { operation: forwardOp, data: queryOneData };
@@ -129,7 +129,7 @@ describe('data dependencies', () => {
     );
 
     const { source: ops$, next } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(
@@ -174,7 +174,7 @@ describe('data dependencies', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -188,7 +188,7 @@ describe('data dependencies', () => {
       query: queryMultiple,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -201,7 +201,7 @@ describe('data dependencies', () => {
     );
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
-    const result = jest.fn();
+    const result = vi.fn();
 
     pipe(
       cacheExchange({})({ forward, client, dispatchDebug })(ops$),
@@ -227,7 +227,7 @@ describe('data dependencies', () => {
   });
 
   it('updates related queries when a mutation update touches query data', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const balanceFragment = gql`
       fragment BalanceFragment on Author {
@@ -302,7 +302,7 @@ describe('data dependencies', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -324,7 +324,7 @@ describe('data dependencies', () => {
       variables: { userId: '1', amount: 1000 },
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryByIdDataA };
@@ -338,12 +338,12 @@ describe('data dependencies', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     const updates = {
       Mutation: {
-        updateBalance: jest.fn((result, _args, cache) => {
+        updateBalance: vi.fn((result, _args, cache) => {
           const {
             updateBalance: { userId, balance },
           } = result;
@@ -365,15 +365,15 @@ describe('data dependencies', () => {
     );
 
     next(opTwo);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(2);
 
     next(opMutation);
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(response).toHaveBeenCalledTimes(3);
     expect(updates.Mutation.updateBalance).toHaveBeenCalledTimes(1);
@@ -408,7 +408,7 @@ describe('data dependencies', () => {
 
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -421,7 +421,7 @@ describe('data dependencies', () => {
       query: queryUnrelated,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -434,7 +434,7 @@ describe('data dependencies', () => {
     );
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
-    const result = jest.fn();
+    const result = vi.fn();
 
     pipe(
       cacheExchange({})({ forward, client, dispatchDebug })(ops$),
@@ -453,7 +453,7 @@ describe('data dependencies', () => {
   });
 
   it('does not reach updater when mutation has no selectionset in optimistic phase', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -469,14 +469,14 @@ describe('data dependencies', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(next);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 1,
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opMutation, data: mutationData };
@@ -486,12 +486,12 @@ describe('data dependencies', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     const updates = {
       Mutation: {
-        concealAuthor: jest.fn(),
+        concealAuthor: vi.fn(),
       },
     };
 
@@ -504,12 +504,12 @@ describe('data dependencies', () => {
     next(opMutation);
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(0);
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(1);
   });
 
   it('does reach updater when mutation has no selectionset in optimistic phase with optimistic update', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -525,14 +525,14 @@ describe('data dependencies', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(next);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 1,
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opMutation, data: mutationData };
@@ -542,17 +542,17 @@ describe('data dependencies', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     const updates = {
       Mutation: {
-        concealAuthor: jest.fn(),
+        concealAuthor: vi.fn(),
       },
     };
 
     const optimistic = {
-      concealAuthor: jest.fn(() => true) as any,
+      concealAuthor: vi.fn(() => true) as any,
     };
 
     pipe(
@@ -569,7 +569,7 @@ describe('data dependencies', () => {
     expect(optimistic.concealAuthor).toHaveBeenCalledTimes(1);
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(1);
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(updates.Mutation.concealAuthor).toHaveBeenCalledTimes(2);
   });
 
@@ -608,18 +608,18 @@ describe('data dependencies', () => {
       }),
     };
 
-    const reexecuteOperation = jest
+    const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) return queryResult;
         return undefined as any;
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(
@@ -639,7 +639,7 @@ describe('data dependencies', () => {
 
 describe('optimistic updates', () => {
   it('writes optimistic mutations to the cache', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -673,7 +673,7 @@ describe('optimistic updates', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -687,7 +687,7 @@ describe('optimistic updates', () => {
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -699,11 +699,11 @@ describe('optimistic updates', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     const optimistic = {
-      concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
+      concealAuthor: vi.fn(() => optimisticMutationData.concealAuthor) as any,
     };
 
     pipe(
@@ -713,7 +713,7 @@ describe('optimistic updates', () => {
     );
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opMutation);
@@ -726,13 +726,13 @@ describe('optimistic updates', () => {
       author: { name: '[REDACTED OFFLINE]' },
     });
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(4);
   });
 
   it('batches optimistic mutation result application', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -764,7 +764,7 @@ describe('optimistic updates', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -783,7 +783,7 @@ describe('optimistic updates', () => {
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -797,11 +797,11 @@ describe('optimistic updates', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(3), map(response));
 
     const optimistic = {
-      concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
+      concealAuthor: vi.fn(() => optimisticMutationData.concealAuthor) as any,
     };
 
     pipe(
@@ -812,12 +812,12 @@ describe('optimistic updates', () => {
     );
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(result).toHaveBeenCalledTimes(0);
 
     next(opMutationOne);
-    jest.advanceTimersByTime(1);
+    vi.advanceTimersByTime(1);
     next(opMutationTwo);
 
     expect(response).toHaveBeenCalledTimes(1);
@@ -825,17 +825,17 @@ describe('optimistic updates', () => {
     expect(reexec).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(0);
 
-    jest.advanceTimersByTime(2);
+    vi.advanceTimersByTime(2);
     expect(response).toHaveBeenCalledTimes(2);
     expect(result).toHaveBeenCalledTimes(0);
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(3);
     expect(result).toHaveBeenCalledTimes(2);
   });
 
   it('blocks refetches of overlapping queries', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -858,7 +858,7 @@ describe('optimistic updates', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -878,7 +878,7 @@ describe('optimistic updates', () => {
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -888,7 +888,7 @@ describe('optimistic updates', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ =>
       pipe(
         ops$,
@@ -898,7 +898,7 @@ describe('optimistic updates', () => {
       );
 
     const optimistic = {
-      concealAuthor: jest.fn(() => optimisticMutationData.concealAuthor) as any,
+      concealAuthor: vi.fn(() => optimisticMutationData.concealAuthor) as any,
     };
 
     pipe(
@@ -908,7 +908,7 @@ describe('optimistic updates', () => {
     );
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opMutation);
@@ -921,7 +921,7 @@ describe('optimistic updates', () => {
       'cache-first'
     );
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opOne);
@@ -930,7 +930,7 @@ describe('optimistic updates', () => {
   });
 
   it('correctly clears on error', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const authorsQuery = gql`
       query {
@@ -973,7 +973,7 @@ describe('optimistic updates', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(next);
 
@@ -987,7 +987,7 @@ describe('optimistic updates', () => {
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: authorsQueryData };
@@ -1003,16 +1003,16 @@ describe('optimistic updates', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     const optimistic = {
-      addAuthor: jest.fn(() => optimisticMutationData.addAuthor) as any,
+      addAuthor: vi.fn(() => optimisticMutationData.addAuthor) as any,
     };
 
     const updates = {
       Mutation: {
-        addAuthor: jest.fn((data, _, cache) => {
+        addAuthor: vi.fn((data, _, cache) => {
           cache.updateQuery({ query: authorsQuery }, (prevData: any) => ({
             ...prevData,
             authors: [...prevData.authors, data.addAuthor],
@@ -1032,7 +1032,7 @@ describe('optimistic updates', () => {
     );
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opMutation);
@@ -1041,7 +1041,7 @@ describe('optimistic updates', () => {
     expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(1);
 
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(updates.Mutation.addAuthor).toHaveBeenCalledTimes(2);
     expect(response).toHaveBeenCalledTimes(2);
@@ -1059,7 +1059,7 @@ describe('custom resolvers', () => {
       query: queryOne,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -1071,8 +1071,8 @@ describe('custom resolvers', () => {
 
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    const result = jest.fn();
-    const fakeResolver = jest.fn();
+    const result = vi.fn();
+    const fakeResolver = vi.fn();
 
     pipe(
       cacheExchange({
@@ -1102,7 +1102,7 @@ describe('custom resolvers', () => {
   });
 
   it('follows resolvers for mutations', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -1136,7 +1136,7 @@ describe('custom resolvers', () => {
       query: mutation,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: opOne, data: queryOneData };
@@ -1148,10 +1148,10 @@ describe('custom resolvers', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
-    const fakeResolver = jest.fn();
+    const fakeResolver = vi.fn();
 
     pipe(
       cacheExchange({
@@ -1169,14 +1169,14 @@ describe('custom resolvers', () => {
     );
 
     next(opOne);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
 
     next(opMutation);
     expect(response).toHaveBeenCalledTimes(1);
     expect(fakeResolver).toHaveBeenCalledTimes(1);
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(result.mock.calls[1][0].data).toEqual({
       __typename: 'Mutation',
       concealAuthor: {
@@ -1188,7 +1188,7 @@ describe('custom resolvers', () => {
   });
 
   it('follows nested resolvers for mutations', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const mutation = gql`
       mutation {
@@ -1277,7 +1277,7 @@ describe('custom resolvers', () => {
       ],
     };
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: queryOperation, data: queryData };
@@ -1289,10 +1289,10 @@ describe('custom resolvers', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
-    const fakeResolver = jest.fn();
+    const fakeResolver = vi.fn();
     const called: any[] = [];
 
     pipe(
@@ -1323,12 +1323,12 @@ describe('custom resolvers', () => {
     );
 
     next(queryOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(fakeResolver).toHaveBeenCalledTimes(3);
 
     next(mutationOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(2);
     expect(fakeResolver).toHaveBeenCalledTimes(6);
     expect(result.mock.calls[1][0].data).toEqual({
@@ -1368,10 +1368,10 @@ describe('custom resolvers', () => {
 
 describe('schema awareness', () => {
   it('reexecutes query and returns data on partial result', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       // Empty mock to avoid going in an endless loop, since we would again return
       // partial data.
@@ -1429,7 +1429,7 @@ describe('schema awareness', () => {
       ],
     };
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: initialQueryOperation, data: queryData };
@@ -1441,7 +1441,7 @@ describe('schema awareness', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     pipe(
@@ -1456,7 +1456,7 @@ describe('schema awareness', () => {
     );
 
     next(initialQueryOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0].data).toMatchObject({
@@ -1480,7 +1480,7 @@ describe('schema awareness', () => {
     );
 
     next(queryOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(result).toHaveBeenCalledTimes(2);
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(result.mock.calls[1][0].stale).toBe(true);
@@ -1510,10 +1510,10 @@ describe('schema awareness', () => {
   });
 
   it('reexecutes query and returns data on partial results for nullable lists', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const client = createClient({ url: 'http://0.0.0.0' });
     const { source: ops$, next } = makeSubject<Operation>();
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       // Empty mock to avoid going in an endless loop, since we would again return
       // partial data.
@@ -1562,7 +1562,7 @@ describe('schema awareness', () => {
       ],
     };
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === 1) {
           return { operation: initialQueryOperation, data: queryData };
@@ -1574,7 +1574,7 @@ describe('schema awareness', () => {
       }
     );
 
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, delay(1), map(response));
 
     pipe(
@@ -1589,7 +1589,7 @@ describe('schema awareness', () => {
     );
 
     next(initialQueryOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(response).toHaveBeenCalledTimes(1);
     expect(reexec).toHaveBeenCalledTimes(0);
     expect(result.mock.calls[0][0].data).toMatchObject({
@@ -1611,7 +1611,7 @@ describe('schema awareness', () => {
     );
 
     next(queryOperation);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(result).toHaveBeenCalledTimes(2);
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(result.mock.calls[1][0].stale).toBe(true);
@@ -1628,7 +1628,7 @@ describe('schema awareness', () => {
 
 describe('commutativity', () => {
   it('applies results that come in out-of-order commutatively and consistently', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     let data: any;
 
@@ -1655,7 +1655,7 @@ describe('commutativity', () => {
         delay(operation.key === 2 ? 5 : operation.key * 10)
       );
 
-    const output = jest.fn(result => {
+    const output = vi.fn(result => {
       data = result.data;
     });
 
@@ -1680,15 +1680,15 @@ describe('commutativity', () => {
 
     next(client.createRequestOperation('query', { key: 3, query }));
 
-    jest.advanceTimersByTime(5);
+    vi.advanceTimersByTime(5);
     expect(output).toHaveBeenCalledTimes(1);
     expect(data.index).toBe(2);
 
-    jest.advanceTimersByTime(10);
+    vi.advanceTimersByTime(10);
     expect(output).toHaveBeenCalledTimes(2);
     expect(data.index).toBe(2);
 
-    jest.advanceTimersByTime(30);
+    vi.advanceTimersByTime(30);
     expect(output).toHaveBeenCalledTimes(3);
     expect(data.index).toBe(3);
   });
@@ -1699,7 +1699,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(nextOp);
 
@@ -1801,7 +1801,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    const reexec = jest
+    const reexec = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(nextOp);
 
@@ -1906,7 +1906,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const query = gql`
       {
@@ -2000,7 +2000,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const query = gql`
       {
@@ -2082,7 +2082,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const query = gql`
       {
@@ -2206,7 +2206,7 @@ describe('commutativity', () => {
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
-    jest.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
+    vi.spyOn(client, 'reexecuteOperation').mockImplementation(nextOp);
 
     const normalQuery = gql`
       {

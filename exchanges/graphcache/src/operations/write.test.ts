@@ -47,7 +47,7 @@ describe('Query', () => {
       }
     );
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not crash for valid writes', async () => {

@@ -23,7 +23,7 @@ import { queryOperation } from '@urql/core/test-utils';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
-  const result = jest.fn(
+  const result = vi.fn(
     (operation: Operation): OperationResult => ({ operation })
   );
 
@@ -146,7 +146,7 @@ it('adds the same token to subsequent operations', async () => {
   const { exchangeArgs } = makeExchangeArgs();
   const { source, next } = makeSubject<any>();
 
-  const result = jest.fn();
+  const result = vi.fn();
   const auth$ = pipe(
     source,
     authExchange({
@@ -200,9 +200,9 @@ it('triggers authentication when an operation did error', async () => {
   let initialAuth;
   let afterErrorAuth;
 
-  const didAuthError = jest.fn().mockReturnValueOnce(true);
+  const didAuthError = vi.fn().mockReturnValueOnce(true);
 
-  const getAuth = jest
+  const getAuth = vi
     .fn()
     .mockImplementationOnce(() => {
       initialAuth = Promise.resolve({ token: 'initial-token' });
@@ -265,12 +265,12 @@ it('triggers authentication when an operation will error', async () => {
   let initialAuth;
   let afterErrorAuth;
 
-  const willAuthError = jest
+  const willAuthError = vi
     .fn()
     .mockReturnValueOnce(true)
     .mockReturnValue(false);
 
-  const getAuth = jest
+  const getAuth = vi
     .fn()
     .mockImplementationOnce(() => {
       initialAuth = Promise.resolve({ token: 'initial-token' });

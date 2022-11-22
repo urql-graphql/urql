@@ -109,12 +109,12 @@ const getNodesByType = <T extends keyof ASTKindToNode, N = ASTKindToNode[T]>(
 
 const schema = introspectionFromSchema(buildSchema(schemaDef));
 
-beforeEach(jest.clearAllMocks);
+beforeEach(vi.clearAllMocks);
 
 const exchangeArgs = {
   forward: a => a as any,
   client: {} as Client,
-  dispatchDebug: jest.fn(),
+  dispatchDebug: vi.fn(),
 };
 
 describe('on mutation', () => {

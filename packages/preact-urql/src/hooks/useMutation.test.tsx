@@ -7,12 +7,12 @@ import { fromValue, delay, pipe } from 'wonka';
 import { Provider } from '../context';
 
 const mock = {
-  executeMutation: jest.fn(() =>
+  executeMutation: vi.fn(() =>
     pipe(fromValue({ data: 1, error: 2, extensions: { i: 1 } }), delay(200))
   ),
 };
 
-const client = mock as { executeMutation: jest.Mock };
+const client = mock as { executeMutation: vi.Mock };
 const props = {
   query: 'mutation Example { example }',
 };
@@ -26,7 +26,7 @@ const MutationUser: FC<typeof props> = ({ query }) => {
 };
 
 beforeAll(() => {
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation();
 });
 
 describe('useMutation', () => {

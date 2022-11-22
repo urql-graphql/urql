@@ -3,7 +3,7 @@
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node", "vue", "jest"],
+    "types": ["node", "vue", "vitest/globals"],
     "paths": {
       "urql": ["../../node_modules/urql/src"],
       "*-urql": ["../../node_modules/*-urql/src"],
