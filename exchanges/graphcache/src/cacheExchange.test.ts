@@ -1474,9 +1474,8 @@ describe('schema awareness', () => {
       ],
     });
 
-    expect(result.mock.calls[0][0]).toHaveProperty(
-      'operation.context.meta',
-      undefined
+    expect(result.mock.calls[0][0]).not.toHaveProperty(
+      'operation.context.meta'
     );
 
     next(queryOperation);
@@ -1605,9 +1604,8 @@ describe('schema awareness', () => {
       ],
     });
 
-    expect(result.mock.calls[0][0]).toHaveProperty(
-      'operation.context.meta',
-      undefined
+    expect(result.mock.calls[0][0]).not.toHaveProperty(
+      'operation.context.meta'
     );
 
     next(queryOperation);
@@ -2293,7 +2291,7 @@ describe('commutativity', () => {
       hasNext: true,
     });
 
-    expect(deferredData).toHaveProperty('deferred', undefined);
+    expect(deferredData).not.toHaveProperty('deferred');
 
     nextRes({
       operation: normalOp,
@@ -2308,7 +2306,7 @@ describe('commutativity', () => {
     });
 
     expect(normalData).toHaveProperty('node.id', 2);
-    expect(combinedData).toHaveProperty('deferred', undefined);
+    expect(combinedData).not.toHaveProperty('deferred');
     expect(combinedData).toHaveProperty('node.id', 2);
 
     nextRes({

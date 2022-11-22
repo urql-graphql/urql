@@ -135,32 +135,6 @@ describe('withUrqlClient', () => {
     expect(Component.getInitialProps).toBeUndefined();
   });
 
-  describe('with exchanges provided', () => {
-    const exchange = vi.fn(() => op => op);
-
-    beforeEach(() => {
-      Component = withUrqlClient(() => ({
-        url: 'http://localhost:3000',
-        exchanges: [exchange] as any[],
-      }))(MockApp);
-    });
-
-    it('uses exchanges defined in the client config', () => {
-      const tree = shallow(h(Component));
-      const app = tree.find(MockApp);
-
-      const client = app.props().urqlClient;
-      client.query(`
-        {
-          users {
-            id
-          }
-        }
-      `);
-      expect(exchange).toBeCalledTimes(1);
-    });
-  });
-
   describe('never-suspend', () => {
     // Simulate a token that might be passed in a request to the server-rendered application.
     const token = Math.random().toString(36).slice(-10);

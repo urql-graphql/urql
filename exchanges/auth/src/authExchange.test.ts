@@ -229,8 +229,11 @@ it('triggers authentication when an operation did error', async () => {
   await Promise.resolve();
   expect(getAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise(res => {
+    setTimeout(() => {
+      res();
+    });
+  });
 
   result.mockReturnValueOnce({
     operation: queryOperation,
@@ -245,6 +248,11 @@ it('triggers authentication when an operation did error', async () => {
   expect(getAuth).toHaveBeenCalledTimes(2);
 
   await afterErrorAuth;
+  await new Promise(res => {
+    setTimeout(() => {
+      res();
+    });
+  });
 
   expect(result).toHaveBeenCalledTimes(2);
   expect(operations.length).toBe(2);
@@ -265,6 +273,7 @@ it('triggers authentication when an operation will error', async () => {
   let initialAuth;
   let afterErrorAuth;
 
+  vi.useRealTimers();
   const willAuthError = vi
     .fn()
     .mockReturnValueOnce(true)
@@ -272,9 +281,9 @@ it('triggers authentication when an operation will error', async () => {
 
   const getAuth = vi
     .fn()
-    .mockImplementationOnce(() => {
+    .mockImplementationOnce(async () => {
       initialAuth = Promise.resolve({ token: 'initial-token' });
-      return initialAuth;
+      return await initialAuth;
     })
     .mockImplementationOnce(() => {
       afterErrorAuth = Promise.resolve({ token: 'final-token' });
@@ -297,8 +306,11 @@ it('triggers authentication when an operation will error', async () => {
   await Promise.resolve();
   expect(getAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise(res => {
+    setTimeout(() => {
+      res();
+    });
+  });
 
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(0);
@@ -306,6 +318,12 @@ it('triggers authentication when an operation will error', async () => {
   expect(getAuth).toHaveBeenCalledTimes(2);
 
   await afterErrorAuth;
+
+  await new Promise(res => {
+    setTimeout(() => {
+      res();
+    });
+  });
 
   expect(result).toHaveBeenCalledTimes(1);
   expect(operations.length).toBe(1);

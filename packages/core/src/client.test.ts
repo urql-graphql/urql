@@ -478,7 +478,7 @@ describe('queuing behavior', () => {
 
     expect(output.length).toBe(3);
     expect(output[2]).toHaveProperty('data', 2);
-    expect(output[2]).toHaveProperty('stale', undefined);
+    expect(output[2]).not.toHaveProperty('stale');
     expect(output[2]).toHaveProperty('operation.key', queryOperation.key);
     expect(output[2]).toHaveProperty(
       'operation.context.requestPolicy',
