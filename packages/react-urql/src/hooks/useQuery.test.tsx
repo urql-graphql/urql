@@ -97,7 +97,7 @@ describe('on subscription', () => {
 });
 
 describe('on subscription update', () => {
-  it('forwards data response', done => {
+  it('forwards data response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -105,14 +105,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('data', 0);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('data', 0);
+        res();
+      }, 400);
+    });
   });
 
-  it('forwards error response', done => {
+  it('forwards error response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -120,14 +122,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('error', 1);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('error', 1);
+        res();
+      }, 400);
+    });
   });
 
-  it('forwards extensions response', done => {
+  it('forwards extensions response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -135,14 +139,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('extensions', { i: 1 });
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('extensions', { i: 1 });
+        res(null);
+      }, 400);
+    });
   });
 
-  it('sets fetching to false', done => {
+  it('sets fetching to false', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -150,11 +156,13 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('fetching', false);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('fetching', false);
+        res(null);
+      }, 400);
+    });
   });
 });
 

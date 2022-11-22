@@ -1,7 +1,10 @@
-vi.mock('./hash', async () => ({
-  hash: await vi.importActual('./hash').hash,
-  phash: (x: number) => x,
-}));
+vi.mock('./hash', async () => {
+  const hash = await vi.importActual('./hash');
+  return {
+    ...hash,
+    phash: (x: number) => x,
+  };
+});
 
 import { parse, print } from 'graphql';
 import { gql } from '../gql';

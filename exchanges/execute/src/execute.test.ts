@@ -26,7 +26,7 @@ import {
   context,
   queryOperation,
   subscriptionOperation,
-} from '@urql/core/src/test-utils';
+} from '../../../packages/core/src/test-utils';
 import {
   makeErrorResult,
   makeOperation,

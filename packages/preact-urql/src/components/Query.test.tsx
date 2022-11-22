@@ -27,7 +27,7 @@ describe('Query', () => {
     cleanup();
   });
 
-  it('Should execute the query', done => {
+  it('Should execute the query', async () => {
     let props = {};
     const Test = () => h('p', {}, 'hi');
     const App = () => {
@@ -50,9 +50,12 @@ describe('Query', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
-      done();
-    }, 250);
+
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
+        res();
+      }, 250);
+    });
   });
 });

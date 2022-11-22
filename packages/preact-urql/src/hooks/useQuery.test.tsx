@@ -95,7 +95,7 @@ describe('useQuery', () => {
     expect(state).toHaveProperty('fetching', true);
   });
 
-  it('forwards data response', done => {
+  it('forwards data response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -110,19 +110,21 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('data', 0);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('data', 0);
+        res();
+      }, 400);
+    });
   });
 
-  it('forwards error response', done => {
+  it('forwards error response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -137,19 +139,21 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('error', 1);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('error', 1);
+        res();
+      }, 400);
+    });
   });
 
-  it('forwards extensions response', done => {
+  it('forwards extensions response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -167,20 +171,22 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
 
-      expect(state).toHaveProperty('extensions', { i: 1 });
-      done();
-    }, 400);
+        expect(state).toHaveProperty('extensions', { i: 1 });
+        res();
+      }, 400);
+    });
   });
 
-  it('sets fetching to false', done => {
+  it('sets fetching to false', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -195,16 +201,18 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('fetching', false);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('fetching', false);
+        res();
+      }, 400);
+    });
   });
 
   describe('on change', () => {

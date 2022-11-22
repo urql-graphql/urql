@@ -21,7 +21,7 @@ describe('Mutation', () => {
     cleanup();
   });
 
-  it('Should execute the mutation', done => {
+  it('Should execute the mutation', async () => {
     // eslint-disable-next-line
     let execute = () => {},
       props = {};
@@ -60,9 +60,12 @@ describe('Mutation', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
-      done();
-    }, 400);
+
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
+        res();
+      }, 400);
+    });
   });
 });

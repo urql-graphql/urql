@@ -19,7 +19,7 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { queryOperation } from '@urql/core/test-utils';
+import { queryOperation } from '../../../packages/core/src/test-utils';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];

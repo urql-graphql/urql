@@ -20,7 +20,7 @@ beforeEach(() => {
 });
 
 describe('useMutation', () => {
-  it('provides an execute method that resolves a promise', done => {
+  it('provides an execute method that resolves a promise', async () => {
     const subject = makeSubject<any>();
     const clientMutation = vi
       .spyOn(client, 'executeMutation')
@@ -55,12 +55,11 @@ describe('useMutation', () => {
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
     subject.next({ data: { test: true } });
-    promise.then(function () {
+    await promise.then(function () {
       expect(mutation.fetching).toBe(false);
       expect(mutation.stale).toBe(false);
       expect(mutation.error).toBe(undefined);
       expect(mutation.data).toEqual({ test: true });
-      done();
     });
   });
 });

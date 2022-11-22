@@ -45,7 +45,7 @@ beforeEach(() => {
   ({ source: ops$, next } = makeSubject<Operation>());
 });
 
-it(`upgrades to cache-and-network`, done => {
+it(`upgrades to cache-and-network`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
@@ -78,18 +78,20 @@ it(`upgrades to cache-and-network`, done => {
   );
   expect(result).toHaveBeenCalledTimes(1);
 
-  setTimeout(() => {
-    next(op);
-    expect(response).toHaveBeenCalledTimes(2);
-    expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
-      'cache-and-network'
-    );
-    expect(result).toHaveBeenCalledTimes(2);
-    done();
-  }, 10);
+  await new Promise(res => {
+    setTimeout(() => {
+      next(op);
+      expect(response).toHaveBeenCalledTimes(2);
+      expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
+        'cache-and-network'
+      );
+      expect(result).toHaveBeenCalledTimes(2);
+      res();
+    }, 10);
+  });
 });
 
-it(`doesn't upgrade when shouldUpgrade returns false`, done => {
+it(`doesn't upgrade when shouldUpgrade returns false`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
@@ -123,14 +125,16 @@ it(`doesn't upgrade when shouldUpgrade returns false`, done => {
   );
   expect(result).toHaveBeenCalledTimes(1);
 
-  setTimeout(() => {
-    next(op);
-    expect(response).toHaveBeenCalledTimes(2);
-    expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
-      'cache-first'
-    );
-    expect(result).toHaveBeenCalledTimes(2);
-    expect(shouldUpgrade).toBeCalledTimes(2);
-    done();
-  }, 10);
+  await new Promise(res => {
+    setTimeout(() => {
+      next(op);
+      expect(response).toHaveBeenCalledTimes(2);
+      expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
+        'cache-first'
+      );
+      expect(result).toHaveBeenCalledTimes(2);
+      expect(shouldUpgrade).toBeCalledTimes(2);
+      res();
+    }, 10);
+  });
 });

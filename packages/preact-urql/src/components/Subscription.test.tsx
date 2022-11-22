@@ -23,7 +23,7 @@ describe('Subscription', () => {
     cleanup();
   });
 
-  it('Should execute the subscription', done => {
+  it('Should execute the subscription', async () => {
     let props = {};
     const Test = () => h('p', {}, 'hi');
     const App = () => {
@@ -46,9 +46,12 @@ describe('Subscription', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
-      done();
-    }, 300);
+
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
+        res();
+      }, 300);
+    });
   });
 });

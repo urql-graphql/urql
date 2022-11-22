@@ -75,7 +75,7 @@ it(`calls getContext`, () => {
   expect(result).toHaveBeenCalledTimes(1);
 });
 
-it(`calls getContext async`, done => {
+it(`calls getContext async`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
@@ -108,10 +108,12 @@ it(`calls getContext async`, done => {
 
   next(op);
 
-  setTimeout(() => {
-    expect(response).toHaveBeenCalledTimes(1);
-    expect(response.mock.calls[0][0].context.headers).toEqual(headers);
-    expect(result).toHaveBeenCalledTimes(1);
-    done();
-  }, 10);
+  await new Promise(res => {
+    setTimeout(() => {
+      expect(response).toHaveBeenCalledTimes(1);
+      expect(response.mock.calls[0][0].context.headers).toEqual(headers);
+      expect(result).toHaveBeenCalledTimes(1);
+      res();
+    }, 10);
+  });
 });

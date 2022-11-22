@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-vi.mock('../context', () => {
+vi.mock('../context', async () => {
   const d = { data: 1234, error: 5678 };
-  const { merge, fromValue, never } = vi.importActual('wonka');
+  const { merge, fromValue, never } = await vi.importActual('wonka');
   const mock = {
     executeSubscription: vi.fn(() => merge([fromValue(d), never])),
   };
