@@ -1,7 +1,0 @@
-{
-  "video": false,
-  "component": {
-    "componentFolder": ".",
-    "testFiles": "**/e2e-tests/*spec.tsx"
-  }
-}
