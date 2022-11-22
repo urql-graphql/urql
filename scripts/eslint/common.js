@@ -22,7 +22,6 @@ module.exports = {
   plugins: [
     'react-hooks',
     'prettier',
-    'jest',
     'es5',
   ],
   rules: {
@@ -58,11 +57,6 @@ module.exports = {
         'es5/no-for-of': 'off',
         'es5/no-generators': 'off',
         'es5/no-typeof-symbol': 'off',
-
-        'jest/no-disabled-tests': 'error',
-        'jest/no-focused-tests': 'error',
-        'jest/no-identical-title': 'warn',
-        'jest/consistent-test-it': ['warn', { fn: 'it' }],
       }
     }
   ],
