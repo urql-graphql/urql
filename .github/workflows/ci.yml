@@ -94,7 +94,7 @@ jobs:
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4
         with:
-          command: yarn cypress open --component
+          command: yarn cypress run --component
           working-directory: packages/react-urql
 
   graphcache-e2e:
@@ -140,7 +140,7 @@ jobs:
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4
         with:
-          command: yarn cypress open --component
+          command: yarn cypress run --component
           working-directory: exchanges/graphcache
 
   build:
