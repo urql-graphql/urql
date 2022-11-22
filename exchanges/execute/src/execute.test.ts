@@ -1,6 +1,5 @@
-vi.mock('graphql', () => {
-  // eslint-disable-next-line
-  const graphql = require('graphql');
+vi.mock('graphql', async () => {
+  const graphql = await vi.importActual('graphql');
 
   return {
     __esModule: true,
@@ -27,7 +26,7 @@ import {
   context,
   queryOperation,
   subscriptionOperation,
-} from '@urql/core/test-utils';
+} from '@urql/core/src/test-utils';
 import {
   makeErrorResult,
   makeOperation,

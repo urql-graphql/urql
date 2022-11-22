@@ -1,12 +1,11 @@
+vi.mock('./hash', async () => ({
+  hash: await vi.importActual('./hash').hash,
+  phash: (x: number) => x,
+}));
+
 import { parse, print } from 'graphql';
 import { gql } from '../gql';
 import { createRequest, stringifyDocument } from './request';
-
-vi.mock('./hash', () => ({
-  // eslint-disable-next-line
-  hash: require('./hash').hash,
-  phash: (x: number) => x,
-}));
 
 it('should hash identical queries identically', () => {
   const reqA = createRequest('{ test }');

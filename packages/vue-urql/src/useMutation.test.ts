@@ -1,10 +1,13 @@
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 
-vi.mock('./useClient.ts', () => ({
-  __esModule: true,
-  ...require('./useClient.ts'),
-  useClient: () => ref(client),
-}));
+vi.mock('./useClient.ts', async () => {
+  const { ref } = await vi.importActual('vue');
+  return {
+    __esModule: true,
+    ...(await vi.importActual('./useClient.ts')),
+    useClient: () => ref(client),
+  };
+});
 
 import { makeSubject } from 'wonka';
 import { createClient, gql } from '@urql/core';

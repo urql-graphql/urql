@@ -2,7 +2,7 @@ import { nextTick, reactive, ref } from 'vue';
 
 vi.mock('./useClient.ts', () => ({
   __esModule: true,
-  ...require('./useClient.ts'),
+  ...(await vi.importActual('./useClient.ts')),
   useClient: () => ref(client),
 }));
 

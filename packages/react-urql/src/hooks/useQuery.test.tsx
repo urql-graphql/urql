@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-vi.mock('../context', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { map, interval, pipe } = require('wonka');
+vi.mock('../context', async () => {
+  const { map, interval, pipe } = await vi.importActual('wonka');
   const mock = {
     executeQuery: vi.fn(() =>
       pipe(

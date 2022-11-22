@@ -3,8 +3,7 @@
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', () => {
   const d = { data: 1234, error: 5678 };
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { merge, fromValue, never } = require('wonka');
+  const { merge, fromValue, never } = vi.importActual('wonka');
   const mock = {
     executeSubscription: vi.fn(() => merge([fromValue(d), never])),
   };

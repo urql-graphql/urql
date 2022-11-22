@@ -1,17 +1,26 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { makeAsyncStorage } from './makeAsyncStorage';
-
 vi.mock('@react-native-community/netinfo', () => ({
   addEventListener: () => 'addEventListener',
+  default: {
+    addEventListener: () => 'addEventListener',
+  },
 }));
 
 vi.mock('@react-native-async-storage/async-storage', () => ({
+  default: {
+    setItem: () => 'setItem',
+    getItem: () => 'getItem',
+    getAllKeys: () => 'getAllKeys',
+    removeItem: () => 'removeItem',
+  },
   setItem: () => 'setItem',
   getItem: () => 'getItem',
   getAllKeys: () => 'getAllKeys',
   removeItem: () => 'removeItem',
 }));
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { makeAsyncStorage } from './makeAsyncStorage';
 
 const request = [
   {
