@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node", "vitest", "vitest/globals"],
+    "types": ["node", "vitest/globals"],
     "paths": {
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],

@@ -49,7 +49,7 @@ jobs:
       - name: Linting
         run: yarn run lint
       - name: Unit Tests
-        run: yarn run test --maxWorkers=2
+        run: yarn run test
 
   react-e2e:
     name: React end-to-end tests
