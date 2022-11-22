@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -9,6 +10,14 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./scripts/vitest/setup.js'],
     clearMocks: true,
+    alias: {
+      urql: path.resolve(__dirname, 'node_modules/urql/src'),
+      '@urql/core': path.resolve(__dirname, 'node_modules/@urql/core/src'),
+      '@urql/introspection': path.resolve(
+        __dirname,
+        'node_modules/@urql/introspection/src'
+      ),
+    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
