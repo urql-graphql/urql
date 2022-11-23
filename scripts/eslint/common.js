@@ -44,7 +44,9 @@ module.exports = {
       trailingComma: 'es5',
     }],
   },
-
+  globals: {
+    "vi": true
+  },
   overrides: [
     {
       files: [

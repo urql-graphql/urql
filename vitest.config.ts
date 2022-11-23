@@ -8,7 +8,7 @@ export default defineConfig({
       fallbackCJS: true,
     },
     globals: true,
-    setupFiles: ['./scripts/vitest/setup.js'],
+    setupFiles: [path.resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
     alias: {
       urql: path.resolve(__dirname, 'node_modules/urql/src'),
