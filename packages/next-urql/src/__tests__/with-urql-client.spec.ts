@@ -6,8 +6,6 @@ import { Client } from 'urql';
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
 
-beforeEach(vi.clearAllMocks);
-
 const MockApp: React.FC<any> = () => {
   return h('div');
 };
@@ -45,6 +43,7 @@ describe('withUrqlClient', () => {
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
+      // @ts-ignore
       expect(spyInitUrqlClient.mock.calls[0][0].exchanges).toHaveLength(4);
     });
 
