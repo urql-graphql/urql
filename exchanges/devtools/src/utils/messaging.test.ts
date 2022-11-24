@@ -1,3 +1,7 @@
+(window.location as any) = { origin: 'http://localhost' };
+const version = '200.0.0';
+(global as any).__pkg_version__ = version;
+
 import { createBrowserMessenger, createNativeMessenger } from './messaging';
 import { beforeAll, vi, describe, it, expect } from 'vitest';
 
@@ -6,9 +10,7 @@ const WebSocket = vi.fn(function () {
   instance = {};
   return instance;
 });
-
 (global as any).WebSocket = vi.fn(WebSocket);
-(window.location as any) = { origin: 'http://localhost' };
 
 beforeAll(() => {
   vi.useFakeTimers();

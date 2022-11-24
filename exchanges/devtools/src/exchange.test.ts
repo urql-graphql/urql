@@ -14,7 +14,7 @@ vi.mock('./utils/messaging', () => {
 });
 import { makeSubject, pipe, publish, map } from 'wonka';
 import { devtoolsExchange } from './exchange';
-import { createBrowserMessenger } from './utils';
+import { createBrowserMessenger } from './utils/messaging';
 
 const {
   addMessageListener,
