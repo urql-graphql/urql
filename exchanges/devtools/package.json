@@ -15,6 +15,12 @@
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
   "sideEffects": false,
   "scripts": {
     "test": "vitest --config ../../vitest.config.ts",
