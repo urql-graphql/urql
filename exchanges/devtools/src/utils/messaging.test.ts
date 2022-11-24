@@ -8,6 +8,7 @@ const WebSocket = vi.fn(function () {
 });
 
 (global as any).WebSocket = vi.fn(WebSocket);
+(window.location as any) = { origin: 'http://localhost' };
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -97,8 +98,8 @@ describe('on create browser messenger', () => {
 
       expect(postMessage).toBeCalledTimes(1);
       expect(postMessage.mock.calls[0]).toMatchInlineSnapshot(`
-        Array [
-          Object {
+        [
+          {
             "source": "exchange",
             "type": "connection-init",
             "version": "200.0.0",
@@ -160,7 +161,7 @@ describe('on create browser messenger', () => {
       m.sendMessage(data as any);
       expect(postMessage).toBeCalledTimes(2);
       expect(postMessage.mock.calls[1][0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "arg": 1234,
           "someString": "hello",
         }
