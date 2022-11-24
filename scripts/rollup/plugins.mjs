@@ -82,8 +82,12 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
     throw new Error('Missing option `extension` on makeOutputPlugins({ ... })');
 
   return [
-    isProduction && replace({
-      'process.env.NODE_ENV': JSON.stringify('production')
+    replace(isProduction ? {
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      '__pkg_version__': JSON.stringify(settings.pkg.version),
+    } : {
+      // TODO:  this is currently not applying
+      '__pkg_version__': JSON.stringify(settings.pkg.version),
     }),
     cjsCheck({ extension }),
     cleanup(),

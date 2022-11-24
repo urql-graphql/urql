@@ -1,0 +1,46 @@
+{
+  "name": "@urql/devtools",
+  "version": "2.0.3",
+  "description": "The official exchange for use with Urql Devtools",
+  "main": "dist/urql-devtools-exchange.js",
+  "module": "dist/urql-devtools-exchange.es.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest --config ../../vitest.config.ts",
+    "clean": "rimraf dist extras",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.mjs",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "keywords": [
+    "devtools",
+    "urql",
+    "graphql",
+    "exchange"
+  ],
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urql-graphql/urql.git",
+    "directory": "exchanges/devtools"
+  },
+  "dependencies": {
+    "@urql/core": ">=3.0.0",
+    "wonka": "^6.0.0"
+  },
+  "peerDependencies": {
+    "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
+  },
+  "devDependencies": {
+    "graphql": "^16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

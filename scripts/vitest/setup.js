@@ -18,3 +18,10 @@ global.console = {
 vi.spyOn(console, 'log');
 vi.spyOn(console, 'warn');
 vi.spyOn(console, 'error');
+
+global.window = {
+  addEventListener: vi.fn(),
+  postMessage: vi.fn(),
+};
+global.__pkg_version__ = '200.0.0';
+global.location = { origin: 'http://localhost:3000' }
