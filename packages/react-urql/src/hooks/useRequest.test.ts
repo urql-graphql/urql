@@ -1,5 +1,6 @@
 import { gql } from '@urql/core';
 import { renderHook } from '@testing-library/react-hooks';
+import { it, expect } from 'vitest';
 import { useRequest } from './useRequest';
 
 it('preserves instance of request when key has not changed', () => {

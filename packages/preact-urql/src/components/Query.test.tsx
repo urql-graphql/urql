@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
 import { Query } from './Query';
 import { Provider } from '../context';
 
@@ -20,7 +22,9 @@ const client = {
 
 describe('Query', () => {
   beforeEach(() => {
-    vi.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
@@ -54,7 +58,7 @@ describe('Query', () => {
     await new Promise(res => {
       setTimeout(() => {
         expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
-        res();
+        res(null);
       }, 250);
     });
   });

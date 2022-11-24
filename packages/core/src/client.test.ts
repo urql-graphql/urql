@@ -1,4 +1,5 @@
 import { print } from 'graphql';
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
 
 /** NOTE: Testing in this file is designed to test both the client and its interaction with default Exchanges */
 

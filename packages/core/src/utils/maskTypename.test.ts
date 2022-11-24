@@ -1,3 +1,4 @@
+import { it, expect } from 'vitest';
 import { maskTypename } from './maskTypename';
 
 it('strips typename from flat objects', () => {

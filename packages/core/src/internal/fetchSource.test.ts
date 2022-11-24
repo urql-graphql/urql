@@ -1,4 +1,14 @@
 import { pipe, scan, subscribe, toPromise } from 'wonka';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  Mock,
+  afterAll,
+} from 'vitest';
 
 import { queryOperation, context } from '../test-utils';
 import { makeFetchSource } from './fetchSource';
@@ -6,7 +16,7 @@ import { gql } from '../gql';
 import { OperationResult, Operation } from '../types';
 import { makeOperation } from '../utils';
 
-const fetch = (global as any).fetch as vi.Mock;
+const fetch = (global as any).fetch as Mock;
 const abort = vi.fn();
 
 const abortError = new Error();

@@ -1,10 +1,11 @@
 import { reactive } from 'vue';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => {
   const { ref } = await vi.importActual('vue');
   return {
     __esModule: true,
-    ...(await vi.importActual('./useClient.ts')),
+    ...((await vi.importActual('./useClient.ts')) as object),
     useClient: () => ref(client),
   };
 });

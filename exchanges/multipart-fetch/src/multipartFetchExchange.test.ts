@@ -1,5 +1,16 @@
 import { Client, OperationResult, makeOperation } from '@urql/core';
 import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  Mock,
+  afterEach,
+  afterAll,
+} from 'vitest';
 
 import { multipartFetchExchange } from './multipartFetchExchange';
 
@@ -9,7 +20,7 @@ import {
   multipleUploadOperation,
 } from './test-utils';
 
-const fetch = (global as any).fetch as vi.Mock;
+const fetch = (global as any).fetch as Mock;
 const abort = vi.fn();
 
 const abortError = new Error();

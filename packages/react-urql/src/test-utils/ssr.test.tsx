@@ -1,6 +1,7 @@
 import React from 'react';
 import prepass from 'react-ssr-prepass';
 import { never, publish, filter, delay, pipe, map } from 'wonka';
+import { describe, it, beforeEach, expect } from 'vitest';
 
 import {
   gql,

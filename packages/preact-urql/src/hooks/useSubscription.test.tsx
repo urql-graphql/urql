@@ -1,8 +1,19 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { OperationContext } from '@urql/core';
-import { useSubscription, UseSubscriptionState } from './useSubscription';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  Mock,
+  afterEach,
+} from 'vitest';
 import { merge, fromValue, never, empty } from 'wonka';
+
+import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { Provider } from '../context';
 
 const data = { data: 1234, error: 5678 };
@@ -11,7 +22,7 @@ const mock = {
   executeSubscription: vi.fn(() => merge([fromValue(data), never])),
 };
 
-const client = mock as { executeSubscription: vi.Mock };
+const client = mock as { executeSubscription: Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;
@@ -28,7 +39,9 @@ const SubscriptionUser: FC<{
 };
 
 beforeAll(() => {
-  vi.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation(() => {
+    // do nothing
+  });
 });
 
 describe('useSubscription', () => {

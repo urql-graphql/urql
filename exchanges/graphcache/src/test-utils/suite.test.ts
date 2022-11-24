@@ -1,5 +1,6 @@
 import { DocumentNode } from 'graphql';
 import { gql } from '@urql/core';
+import { it, expect } from 'vitest';
 import { query, write } from '../operations';
 import { Store } from '../store';
 

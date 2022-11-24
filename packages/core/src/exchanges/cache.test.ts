@@ -9,6 +9,8 @@ import {
   scan,
   toPromise,
 } from 'wonka';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
+
 import { Client } from '../client';
 import {
   mutationOperation,
@@ -29,8 +31,6 @@ let response;
 let exchangeArgs: ExchangeInput;
 let forwardedOperations: Operation[];
 let input: Subject<Operation>;
-
-beforeEach(vi.clearAllMocks);
 
 beforeEach(() => {
   response = queryResponse;

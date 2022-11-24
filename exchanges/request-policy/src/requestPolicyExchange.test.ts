@@ -1,4 +1,5 @@
 import { pipe, map, makeSubject, publish, tap } from 'wonka';
+import { vi, expect, it, beforeEach } from 'vitest';
 
 import {
   gql,
@@ -86,7 +87,7 @@ it(`upgrades to cache-and-network`, async () => {
         'cache-and-network'
       );
       expect(result).toHaveBeenCalledTimes(2);
-      res();
+      res(null);
     }, 10);
   });
 });
@@ -134,7 +135,7 @@ it(`doesn't upgrade when shouldUpgrade returns false`, async () => {
       );
       expect(result).toHaveBeenCalledTimes(2);
       expect(shouldUpgrade).toBeCalledTimes(2);
-      res();
+      res(null);
     }, 10);
   });
 });

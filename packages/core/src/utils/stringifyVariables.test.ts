@@ -1,4 +1,5 @@
 import { stringifyVariables } from './stringifyVariables';
+import { it, expect } from 'vitest';
 
 it('stringifies objects stabily', () => {
   expect(stringifyVariables({ b: 'b', a: 'a' })).toBe('{"a":"a","b":"b"}');

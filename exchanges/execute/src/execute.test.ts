@@ -1,9 +1,11 @@
+import { vi, expect, it, beforeEach, afterEach, describe, Mock } from 'vitest';
+
 vi.mock('graphql', async () => {
   const graphql = await vi.importActual('graphql');
 
   return {
     __esModule: true,
-    ...graphql,
+    ...(graphql as object),
     print: vi.fn(() => '{ placeholder }'),
     execute: vi.fn(() => ({ key: 'value' })),
     subscribe: vi.fn(),
@@ -48,7 +50,7 @@ const expectedSubscribeOperationName = getOperationName(
   subscriptionOperation.query
 );
 
-const fetchMock = (global as any).fetch as vi.Mock;
+const fetchMock = (global as any).fetch as Mock;
 const mockHttpResponseData = { key: 'value' };
 
 beforeEach(() => {

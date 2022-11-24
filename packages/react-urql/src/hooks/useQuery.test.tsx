@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
@@ -26,7 +27,7 @@ import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeQuery: vi.Mock };
+const client = useClient() as { executeQuery: Mock };
 
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
@@ -52,7 +53,9 @@ const QueryUser = ({
 
 beforeAll(() => {
   // TODO: Fix use of act()
-  vi.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation(() => {
+    // do nothings
+  });
 });
 
 beforeEach(() => {
@@ -109,7 +112,7 @@ describe('on subscription update', () => {
       setTimeout(() => {
         wrapper.update(<QueryUser {...props} />);
         expect(state).toHaveProperty('data', 0);
-        res();
+        res(null);
       }, 400);
     });
   });
@@ -126,7 +129,7 @@ describe('on subscription update', () => {
       setTimeout(() => {
         wrapper.update(<QueryUser {...props} />);
         expect(state).toHaveProperty('error', 1);
-        res();
+        res(null);
       }, 400);
     });
   });

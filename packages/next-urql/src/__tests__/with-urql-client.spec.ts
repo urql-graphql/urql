@@ -2,6 +2,7 @@ import React, { createElement as h } from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
+import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';

@@ -7,6 +7,7 @@ import {
   ASTKindToNode,
   Kind,
 } from 'graphql';
+import { vi, expect, it, describe } from 'vitest';
 
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
 import {
@@ -108,8 +109,6 @@ const getNodesByType = <T extends keyof ASTKindToNode, N = ASTKindToNode[T]>(
 };
 
 const schema = introspectionFromSchema(buildSchema(schemaDef));
-
-beforeEach(vi.clearAllMocks);
 
 const exchangeArgs = {
   forward: a => a as any,

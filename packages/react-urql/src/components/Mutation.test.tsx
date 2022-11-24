@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, Mock, afterEach } from 'vitest';
 
 vi.mock('../context', async () => {
   const { delay, fromValue, pipe } = await vi.importActual('wonka');
@@ -19,13 +20,15 @@ import { Mutation } from './Mutation';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeMutation: vi.Mock };
+const client = useClient() as { executeMutation: Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    vi.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
@@ -68,7 +71,7 @@ describe('Mutation', () => {
     await new Promise(res => {
       setTimeout(() => {
         expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
-        res();
+        res(null);
       }, 400);
     });
   });

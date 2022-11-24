@@ -4,7 +4,7 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    globals: true,
+    globals: false,
     maxConcurrency: 20,
     setupFiles: [path.resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,

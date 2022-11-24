@@ -1,6 +1,8 @@
 import { createClient } from '@urql/core';
-import { queryStore } from './queryStore';
+import { vi, expect, it, describe } from 'vitest';
 import { get } from 'svelte/store';
+
+import { queryStore } from './queryStore';
 
 describe('queryStore', () => {
   const client = createClient({ url: 'https://example.com' });

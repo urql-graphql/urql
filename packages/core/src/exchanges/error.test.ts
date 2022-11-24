@@ -1,4 +1,6 @@
 import { makeSubject, map, pipe, publish, Subject } from 'wonka';
+import { vi, expect, it, beforeEach } from 'vitest';
+
 import { Client } from '../client';
 import { queryOperation } from '../test-utils';
 import { makeErrorResult, CombinedError } from '../utils';

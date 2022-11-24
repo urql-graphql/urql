@@ -1,4 +1,5 @@
 // This script is run before each `.test.ts` file.
+import { vi } from 'vitest';
 
 global.AbortController = undefined;
 global.fetch = vi.fn();

@@ -6,6 +6,7 @@ import {
   OperationResult,
   CombinedError,
 } from '@urql/core';
+import { vi, expect, it, describe } from 'vitest';
 
 import {
   Source,

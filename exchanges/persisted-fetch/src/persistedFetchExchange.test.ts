@@ -3,6 +3,7 @@
  */
 
 import { empty, fromValue, fromArray, pipe, Source, toPromise } from 'wonka';
+import { vi, expect, it, afterEach, Mock } from 'vitest';
 
 import { DocumentNode, print } from 'graphql';
 import { Client, OperationResult } from '@urql/core';
@@ -11,7 +12,7 @@ import { queryOperation } from './test-utils';
 import { hash } from './sha256';
 import { persistedFetchExchange } from './persistedFetchExchange';
 
-const fetch = (global as any).fetch as vi.Mock;
+const fetch = (global as any).fetch as Mock;
 
 const exchangeArgs = {
   dispatchDebug: vi.fn(),

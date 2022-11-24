@@ -3,6 +3,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 import { RequestPolicy } from '@urql/core';
+import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
 
 import { useClient } from '../context';
 import { useQuery } from './useQuery';
@@ -23,7 +24,7 @@ vi.mock('../context', () => {
 });
 
 // @ts-ignore
-const client = useClient() as { executeQuery: vi.Mock };
+const client = useClient() as { executeQuery: Mock };
 
 const mockQuery = `
   query todo($id: ID!) {
@@ -42,7 +43,9 @@ const mockVariables = {
 describe('useQuery', () => {
   beforeAll(() => {
     // TODO: Fix use of act()
-    vi.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   beforeEach(() => {

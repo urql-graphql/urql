@@ -1,4 +1,5 @@
 import { print } from 'graphql';
+import { vi, expect, it } from 'vitest';
 import {
   empty,
   publish,
@@ -8,6 +9,7 @@ import {
   take,
   toPromise,
 } from 'wonka';
+
 import { Client } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
 import { OperationResult } from '../types';

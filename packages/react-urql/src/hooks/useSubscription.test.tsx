@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
@@ -21,7 +22,7 @@ import { useSubscription, UseSubscriptionState } from './useSubscription';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeSubscription: vi.Mock };
+const client = useClient() as { executeSubscription: Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;

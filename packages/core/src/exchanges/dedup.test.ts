@@ -7,6 +7,8 @@ import {
   Source,
   Subject,
 } from 'wonka';
+import { vi, expect, it, beforeEach } from 'vitest';
+
 import {
   mutationOperation,
   queryOperation,

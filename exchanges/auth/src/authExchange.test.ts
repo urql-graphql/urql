@@ -9,6 +9,7 @@ import {
   tap,
   map,
 } from 'wonka';
+import { vi, expect, it } from 'vitest';
 
 import { print } from 'graphql';
 import { authExchange } from './authExchange';
@@ -231,7 +232,7 @@ it('triggers authentication when an operation did error', async () => {
   await initialAuth;
   await new Promise(res => {
     setTimeout(() => {
-      res();
+      res(null);
     });
   });
 
@@ -250,7 +251,7 @@ it('triggers authentication when an operation did error', async () => {
   await afterErrorAuth;
   await new Promise(res => {
     setTimeout(() => {
-      res();
+      res(null);
     });
   });
 
@@ -308,7 +309,7 @@ it('triggers authentication when an operation will error', async () => {
   await initialAuth;
   await new Promise(res => {
     setTimeout(() => {
-      res();
+      res(null);
     });
   });
 
@@ -321,7 +322,7 @@ it('triggers authentication when an operation will error', async () => {
 
   await new Promise(res => {
     setTimeout(() => {
-      res();
+      res(null);
     });
   });
 

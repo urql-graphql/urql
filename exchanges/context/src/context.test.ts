@@ -1,4 +1,5 @@
 import { pipe, map, makeSubject, publish, tap } from 'wonka';
+import { vi, expect, it, beforeEach } from 'vitest';
 
 import {
   gql,
@@ -113,7 +114,7 @@ it(`calls getContext async`, async () => {
       expect(response).toHaveBeenCalledTimes(1);
       expect(response.mock.calls[0][0].context.headers).toEqual(headers);
       expect(result).toHaveBeenCalledTimes(1);
-      res();
+      res(null);
     }, 10);
   });
 });

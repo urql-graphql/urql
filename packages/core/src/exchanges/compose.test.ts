@@ -1,4 +1,6 @@
 import { empty, Source } from 'wonka';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
+
 import { Exchange } from '../types';
 import { composeExchanges } from './compose';
 import { noop } from '../utils';

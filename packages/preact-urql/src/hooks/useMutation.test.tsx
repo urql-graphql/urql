@@ -2,8 +2,19 @@ import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { print } from 'graphql';
 import { gql } from '@urql/core';
-import { useMutation } from './useMutation';
 import { fromValue, delay, pipe } from 'wonka';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  afterEach,
+  Mock,
+} from 'vitest';
+
+import { useMutation } from './useMutation';
 import { Provider } from '../context';
 
 const mock = {
@@ -12,7 +23,7 @@ const mock = {
   ),
 };
 
-const client = mock as { executeMutation: vi.Mock };
+const client = mock as { executeMutation: Mock };
 const props = {
   query: 'mutation Example { example }',
 };
@@ -26,7 +37,9 @@ const MutationUser: FC<typeof props> = ({ query }) => {
 };
 
 beforeAll(() => {
-  vi.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation(() => {
+    // do nothing
+  });
 });
 
 describe('useMutation', () => {

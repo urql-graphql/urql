@@ -1,4 +1,5 @@
 import { gql } from '@urql/core';
+import { describe, it, expect } from 'vitest';
 import { getMainOperation } from './traversal';
 import { normalizeVariables, filterVariables } from './variables';
 

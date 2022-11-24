@@ -1,3 +1,5 @@
+import { vi, expect, it, describe } from 'vitest';
+
 vi.mock('@react-native-community/netinfo', () => ({
   addEventListener: () => 'addEventListener',
   default: {

@@ -1,8 +1,9 @@
 import { nextTick, reactive, ref } from 'vue';
+import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => ({
   __esModule: true,
-  ...(await vi.importActual('./useClient.ts')),
+  ...((await vi.importActual('./useClient.ts')) as object),
   useClient: () => ref(client),
 }));
 

@@ -1,3 +1,5 @@
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
 vi.mock('../context', async () => {
   const { map, interval, pipe } = await vi.importActual('wonka');
   const mock = {
@@ -27,7 +29,9 @@ const variables = {
 describe('Query', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    vi.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
@@ -57,7 +61,7 @@ describe('Query', () => {
     await new Promise(res => {
       setTimeout(() => {
         expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
-        res();
+        res(null);
       }, 200);
     });
   });

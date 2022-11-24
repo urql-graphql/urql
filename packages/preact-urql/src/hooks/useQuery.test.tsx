@@ -1,8 +1,19 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { OperationContext } from '@urql/core';
-import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { map, interval, pipe, never, onStart, onEnd, empty } from 'wonka';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  Mock,
+  afterEach,
+} from 'vitest';
+
+import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { Provider } from '../context';
 
 const mock = {
@@ -14,7 +25,7 @@ const mock = {
   ),
 };
 
-const client = mock as { executeQuery: vi.Mock };
+const client = mock as { executeQuery: Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -119,7 +130,7 @@ describe('useQuery', () => {
           })
         );
         expect(state).toHaveProperty('data', 0);
-        res();
+        res(null);
       }, 400);
     });
   });
@@ -148,7 +159,7 @@ describe('useQuery', () => {
           })
         );
         expect(state).toHaveProperty('error', 1);
-        res();
+        res(null);
       }, 400);
     });
   });
@@ -181,7 +192,7 @@ describe('useQuery', () => {
         );
 
         expect(state).toHaveProperty('extensions', { i: 1 });
-        res();
+        res(null);
       }, 400);
     });
   });
@@ -210,7 +221,7 @@ describe('useQuery', () => {
           })
         );
         expect(state).toHaveProperty('fetching', false);
-        res();
+        res(null);
       }, 400);
     });
   });

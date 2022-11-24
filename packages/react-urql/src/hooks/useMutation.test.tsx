@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
@@ -23,7 +24,7 @@ import { useClient } from '../context';
 import { useMutation } from './useMutation';
 
 // @ts-ignore
-const client = useClient() as { executeMutation: vi.Mock };
+const client = useClient() as { executeMutation: Mock };
 
 const props = {
   query: 'mutation Example { example }',
@@ -41,7 +42,9 @@ const MutationUser = ({ query }: { query: any }) => {
 
 beforeAll(() => {
   // TODO: Fix use of act()
-  vi.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation(() => {
+    // do nothing
+  });
 });
 
 beforeEach(() => {

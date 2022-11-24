@@ -1,4 +1,6 @@
 import { forEach, fromValue, pipe } from 'wonka';
+import { vi, expect, it, beforeEach, afterAll } from 'vitest';
+
 import { queryOperation, teardownOperation } from '../test-utils';
 import { fallbackExchange } from './fallback';
 

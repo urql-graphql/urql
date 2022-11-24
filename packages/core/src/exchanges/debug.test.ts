@@ -1,4 +1,6 @@
 import { makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { Operation } from '../types';
@@ -27,7 +29,9 @@ beforeEach(() => {
 });
 
 it('forwards query operations correctly', async () => {
-  vi.spyOn(global.console, 'log').mockImplementation();
+  vi.spyOn(global.console, 'log').mockImplementation(() => {
+    /** Do NOthing */
+  });
   const { source: ops$, next, complete } = input;
   const exchange = debugExchange(exchangeArgs)(ops$);
 

@@ -6,6 +6,7 @@ import {
   OperationResult,
 } from '@urql/core';
 import { print } from 'graphql';
+import { vi, expect, it, describe } from 'vitest';
 
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
 import { offlineExchange } from './offlineExchange';
