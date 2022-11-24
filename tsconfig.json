@@ -9,7 +9,7 @@
         "exchanges/*/src"
       ],
       "@urql/core/*": ["node_modules/@urql/core/src/*", "packages/core/src/*"],
-      "@urql/devtools": ["node_modules/@urql/devtools"],
+      "@urql/devtools": ["node_modules/@urql/devtools", "exchanges/devtools/src"],
       "@urql/*": [
         "node_modules/@urql/*/src",
         "packages/*-urql/src",
