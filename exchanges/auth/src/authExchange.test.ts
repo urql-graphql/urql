@@ -9,6 +9,7 @@ import {
   tap,
   map,
 } from 'wonka';
+import { vi, expect, it } from 'vitest';
 
 import { print } from 'graphql';
 import { authExchange } from './authExchange';
@@ -19,11 +20,11 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
-import { queryOperation } from '@urql/core/test-utils';
+import { queryOperation } from '../../../packages/core/src/test-utils';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
-  const result = jest.fn(
+  const result = vi.fn(
     (operation: Operation): OperationResult => ({ operation })
   );
 
@@ -146,7 +147,7 @@ it('adds the same token to subsequent operations', async () => {
   const { exchangeArgs } = makeExchangeArgs();
   const { source, next } = makeSubject<any>();
 
-  const result = jest.fn();
+  const result = vi.fn();
   const auth$ = pipe(
     source,
     authExchange({
@@ -200,9 +201,9 @@ it('triggers authentication when an operation did error', async () => {
   let initialAuth;
   let afterErrorAuth;
 
-  const didAuthError = jest.fn().mockReturnValueOnce(true);
+  const didAuthError = vi.fn().mockReturnValueOnce(true);
 
-  const getAuth = jest
+  const getAuth = vi
     .fn()
     .mockImplementationOnce(() => {
       initialAuth = Promise.resolve({ token: 'initial-token' });
@@ -229,8 +230,11 @@ it('triggers authentication when an operation did error', async () => {
   await Promise.resolve();
   expect(getAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    });
+  });
 
   result.mockReturnValueOnce({
     operation: queryOperation,
@@ -245,6 +249,11 @@ it('triggers authentication when an operation did error', async () => {
   expect(getAuth).toHaveBeenCalledTimes(2);
 
   await afterErrorAuth;
+  await new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    });
+  });
 
   expect(result).toHaveBeenCalledTimes(2);
   expect(operations.length).toBe(2);
@@ -265,16 +274,17 @@ it('triggers authentication when an operation will error', async () => {
   let initialAuth;
   let afterErrorAuth;
 
-  const willAuthError = jest
+  vi.useRealTimers();
+  const willAuthError = vi
     .fn()
     .mockReturnValueOnce(true)
     .mockReturnValue(false);
 
-  const getAuth = jest
+  const getAuth = vi
     .fn()
-    .mockImplementationOnce(() => {
+    .mockImplementationOnce(async () => {
       initialAuth = Promise.resolve({ token: 'initial-token' });
-      return initialAuth;
+      return await initialAuth;
     })
     .mockImplementationOnce(() => {
       afterErrorAuth = Promise.resolve({ token: 'final-token' });
@@ -297,8 +307,11 @@ it('triggers authentication when an operation will error', async () => {
   await Promise.resolve();
   expect(getAuth).toHaveBeenCalledTimes(1);
   await initialAuth;
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    });
+  });
 
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(0);
@@ -306,6 +319,12 @@ it('triggers authentication when an operation will error', async () => {
   expect(getAuth).toHaveBeenCalledTimes(2);
 
   await afterErrorAuth;
+
+  await new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    });
+  });
 
   expect(result).toHaveBeenCalledTimes(1);
   expect(operations.length).toBe(1);

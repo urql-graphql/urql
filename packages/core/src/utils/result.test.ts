@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { queryOperation } from '../test-utils';
 import { makeResult } from './result';
 

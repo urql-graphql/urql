@@ -1,8 +1,9 @@
 import { nextTick, reactive, ref } from 'vue';
+import { vi, expect, it, describe } from 'vitest';
 
-jest.mock('./useClient.ts', () => ({
+vi.mock('./useClient.ts', async () => ({
   __esModule: true,
-  ...jest.requireActual('./useClient.ts'),
+  ...((await vi.importActual('./useClient.ts')) as object),
   useClient: () => ref(client),
 }));
 
@@ -15,7 +16,7 @@ const client = createClient({ url: '/graphql', exchanges: [] });
 describe('useQuery', () => {
   it('runs a query and updates data', async () => {
     const subject = makeSubject<any>();
-    const executeQuery = jest
+    const executeQuery = vi
       .spyOn(client, 'executeQuery')
       .mockImplementation(() => subject.source);
 
@@ -59,7 +60,7 @@ describe('useQuery', () => {
   });
 
   it('runs queries as a promise-like that resolves when used', async () => {
-    const executeQuery = jest
+    const executeQuery = vi
       .spyOn(client, 'executeQuery')
       .mockImplementation(() => {
         return pipe(fromValue({ data: { test: true } }), delay(1)) as any;
@@ -75,7 +76,7 @@ describe('useQuery', () => {
   });
 
   it('runs queries as a promise-like that resolves even when the query changes', async () => {
-    const executeQuery = jest
+    const executeQuery = vi
       .spyOn(client, 'executeQuery')
       .mockImplementation(request => {
         return pipe(
@@ -106,7 +107,7 @@ describe('useQuery', () => {
 
   it('pauses query when asked to do so', async () => {
     const subject = makeSubject<any>();
-    const executeQuery = jest
+    const executeQuery = vi
       .spyOn(client, 'executeQuery')
       .mockImplementation(() => subject.source);
 

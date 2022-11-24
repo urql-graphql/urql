@@ -1,4 +1,5 @@
 import { pipe, map, makeSubject, publish, tap } from 'wonka';
+import { vi, expect, it, beforeEach } from 'vitest';
 
 import {
   gql,
@@ -28,7 +29,7 @@ const queryOneData = {
   },
 };
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 let client, op, ops$, next;
 beforeEach(() => {
   client = createClient({ url: 'http://0.0.0.0' });
@@ -41,7 +42,7 @@ beforeEach(() => {
 });
 
 it(`calls getContext`, () => {
-  const response = jest.fn(
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -50,7 +51,7 @@ it(`calls getContext`, () => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };
@@ -75,8 +76,8 @@ it(`calls getContext`, () => {
   expect(result).toHaveBeenCalledTimes(1);
 });
 
-it(`calls getContext async`, done => {
-  const response = jest.fn(
+it(`calls getContext async`, async () => {
+  const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
         operation: forwardOp,
@@ -85,7 +86,7 @@ it(`calls getContext async`, done => {
     }
   );
 
-  const result = jest.fn();
+  const result = vi.fn();
   const forward: ExchangeIO = ops$ => {
     return pipe(ops$, map(response));
   };
@@ -108,10 +109,12 @@ it(`calls getContext async`, done => {
 
   next(op);
 
-  setTimeout(() => {
-    expect(response).toHaveBeenCalledTimes(1);
-    expect(response.mock.calls[0][0].context.headers).toEqual(headers);
-    expect(result).toHaveBeenCalledTimes(1);
-    done();
-  }, 10);
+  await new Promise(res => {
+    setTimeout(() => {
+      expect(response).toHaveBeenCalledTimes(1);
+      expect(response.mock.calls[0][0].context.headers).toEqual(headers);
+      expect(result).toHaveBeenCalledTimes(1);
+      res(null);
+    }, 10);
+  });
 });

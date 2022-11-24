@@ -1,4 +1,5 @@
 import { parse, print } from 'graphql';
+import { describe, it, expect } from 'vitest';
 import { collectTypesFromResponse, formatDocument } from './typenames';
 import { createRequest } from './request';
 

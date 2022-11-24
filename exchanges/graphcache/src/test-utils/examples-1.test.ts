@@ -1,4 +1,5 @@
 import { gql } from '@urql/core';
+import { it, expect, afterEach } from 'vitest';
 import { query, write, writeOptimistic } from '../operations';
 import * as InMemoryData from '../store/data';
 import { Store } from '../store';

@@ -6,6 +6,7 @@ import {
   OperationResult,
 } from '@urql/core';
 import { print } from 'graphql';
+import { vi, expect, it, describe } from 'vitest';
 
 import { pipe, map, makeSubject, tap, publish } from 'wonka';
 import { offlineExchange } from './offlineExchange';
@@ -49,20 +50,20 @@ const queryOneData = {
   ],
 };
 
-const dispatchDebug = jest.fn();
+const dispatchDebug = vi.fn();
 
 const storage = {
-  onOnline: jest.fn(),
-  writeData: jest.fn(() => Promise.resolve(undefined)),
-  writeMetadata: jest.fn(() => Promise.resolve(undefined)),
-  readData: jest.fn(() => Promise.resolve(undefined)),
-  readMetadata: jest.fn(() => Promise.resolve(undefined)),
+  onOnline: vi.fn(),
+  writeData: vi.fn(() => Promise.resolve(undefined)),
+  writeMetadata: vi.fn(() => Promise.resolve(undefined)),
+  readData: vi.fn(() => Promise.resolve(undefined)),
+  readMetadata: vi.fn(() => Promise.resolve(undefined)),
 };
 
 describe('storage', () => {
   it('should read the metadata and dispatch operations on initialization', () => {
     const client = createClient({ url: 'http://0.0.0.0' });
-    const reexecuteOperation = jest
+    const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(() => undefined);
     const op = client.createRequestOperation('mutation', {
@@ -71,7 +72,7 @@ describe('storage', () => {
       variables: {},
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         expect(forwardOp.key).toBe(op.key);
         return { operation: forwardOp, data: mutationOneData };
@@ -79,16 +80,16 @@ describe('storage', () => {
     );
 
     const { source: ops$ } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     pipe(
       offlineExchange({ storage })({ forward, client, dispatchDebug })(ops$),
       tap(result),
       publish
     );
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(storage.readMetadata).toBeCalledTimes(1);
     expect(reexecuteOperation).toBeCalledTimes(0);
@@ -97,7 +98,7 @@ describe('storage', () => {
 
 describe('offline', () => {
   it('should intercept errored mutations', () => {
-    const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
+    const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
 
     const client = createClient({ url: 'http://0.0.0.0' });
     const queryOp = client.createRequestOperation('query', {
@@ -112,7 +113,7 @@ describe('offline', () => {
       variables: {},
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         if (forwardOp.key === queryOp.key) {
           onlineSpy.mockReturnValueOnce(true);
@@ -129,7 +130,7 @@ describe('offline', () => {
     );
 
     const { source: ops$, next } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(
@@ -176,7 +177,7 @@ describe('offline', () => {
 
   it('should intercept errored queries', async () => {
     const client = createClient({ url: 'http://0.0.0.0' });
-    const onlineSpy = jest
+    const onlineSpy = vi
       .spyOn(navigator, 'onLine', 'get')
       .mockReturnValueOnce(false);
 
@@ -185,7 +186,7 @@ describe('offline', () => {
       query: queryOne,
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         onlineSpy.mockReturnValueOnce(false);
         return {
@@ -197,7 +198,7 @@ describe('offline', () => {
     );
 
     const { source: ops$, next } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(
@@ -230,10 +231,10 @@ describe('offline', () => {
       flush = cb;
     });
 
-    const onlineSpy = jest.spyOn(navigator, 'onLine', 'get');
+    const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
 
     const client = createClient({ url: 'http://0.0.0.0' });
-    const reexecuteOperation = jest
+    const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(() => undefined);
 
@@ -243,7 +244,7 @@ describe('offline', () => {
       variables: {},
     });
 
-    const response = jest.fn(
+    const response = vi.fn(
       (forwardOp: Operation): OperationResult => {
         onlineSpy.mockReturnValueOnce(false);
         return {
@@ -255,7 +256,7 @@ describe('offline', () => {
     );
 
     const { source: ops$, next } = makeSubject<Operation>();
-    const result = jest.fn();
+    const result = vi.fn();
     const forward: ExchangeIO = ops$ => pipe(ops$, map(response));
 
     pipe(

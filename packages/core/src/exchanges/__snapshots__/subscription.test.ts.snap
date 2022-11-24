@@ -1,14 +1,14 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
 exports[`should return response data from forwardSubscription observable 1`] = `
-Object {
-  "data": Object {},
+{
+  "data": {},
   "error": undefined,
   "extensions": undefined,
   "hasNext": false,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": Object {
+  "operation": {
+    "context": {
+      "fetchOptions": {
         "method": "POST",
       },
       "requestPolicy": "cache-first",
@@ -16,53 +16,53 @@ Object {
     },
     "key": 4,
     "kind": "subscription",
-    "query": Object {
+    "query": {
       "__key": 2088253569,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "subscribeToUser",
           },
           "operation": "subscription",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "user",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "user",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "user",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "name",
                       },
@@ -73,21 +73,21 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "NamedType",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "String",
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "user",
                 },
@@ -97,12 +97,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 92,
-        "source": Object {
+        "source": {
           "body": "# subscribeToUser
 subscription subscribeToUser($user: String) { user(user: $user) { name } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -111,7 +111,7 @@ subscription subscribeToUser($user: String) { user(user: $user) { name } }",
         "start": 0,
       },
     },
-    "variables": Object {
+    "variables": {
       "user": "colin",
     },
   },

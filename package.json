@@ -5,18 +5,12 @@
     "exchanges/*"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "vitest",
     "check": "tsc",
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "node ./scripts/actions/build-all.js",
     "postinstall": "node ./scripts/prepare/postinstall.js",
     "pack": "node ./scripts/actions/pack-all.js"
-  },
-  "jest": {
-    "projects": [
-      "<rootDir>/packages/*",
-      "<rootDir>/exchanges/*"
-    ]
   },
   "eslintConfig": {
     "root": true,
@@ -78,8 +72,6 @@
     "@rollup/plugin-sucrase": "^5.0.0",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/pluginutils": "^5.0.0",
-    "@sucrase/jest-plugin": "^2.2.1",
-    "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "cjs-module-lexer": "^1.2.2",
@@ -89,7 +81,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-es5": "^1.5.0",
     "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
@@ -98,8 +89,7 @@
     "graphql": "^16.0.0",
     "husky-v4": "^4.3.8",
     "invariant": "^2.2.4",
-    "jest": "^26.6.3",
-    "jest-watch-yarn-workspaces": "^1.1.0",
+    "jsdom": "^20.0.3",
     "lint-staged": "^10.5.4",
     "npm-packlist": "^2.1.5",
     "npm-run-all": "^4.1.5",
@@ -114,6 +104,7 @@
     "rollup-plugin-visualizer": "^5.8.0",
     "tar": "^6.1.0",
     "terser": "^5.14.1",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "vitest": "^0.25.3"
   }
 }

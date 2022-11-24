@@ -1,10 +1,14 @@
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
 
-jest.mock('./useClient.ts', () => ({
-  __esModule: true,
-  ...jest.requireActual('./useClient.ts'),
-  useClient: () => ref(client),
-}));
+vi.mock('./useClient.ts', async () => {
+  const { ref } = await vi.importActual('vue');
+  return {
+    __esModule: true,
+    ...((await vi.importActual('./useClient.ts')) as object),
+    useClient: () => ref(client),
+  };
+});
 
 import { makeSubject } from 'wonka';
 import { createClient, gql } from '@urql/core';
@@ -13,13 +17,13 @@ import { useMutation } from './useMutation';
 const client = createClient({ url: '/graphql', exchanges: [] });
 
 beforeEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
 describe('useMutation', () => {
-  it('provides an execute method that resolves a promise', done => {
+  it('provides an execute method that resolves a promise', async () => {
     const subject = makeSubject<any>();
-    const clientMutation = jest
+    const clientMutation = vi
       .spyOn(client, 'executeMutation')
       .mockImplementation(() => subject.source);
 
@@ -52,12 +56,11 @@ describe('useMutation', () => {
     expect(clientMutation).toHaveBeenCalledTimes(1);
 
     subject.next({ data: { test: true } });
-    promise.then(function () {
+    await promise.then(function () {
       expect(mutation.fetching).toBe(false);
       expect(mutation.stale).toBe(false);
       expect(mutation.error).toBe(undefined);
       expect(mutation.data).toEqual({ test: true });
-      done();
     });
   });
 });

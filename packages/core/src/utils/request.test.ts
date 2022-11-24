@@ -1,11 +1,16 @@
+import { vi, expect, it, describe } from 'vitest';
+
+vi.mock('./hash', async () => {
+  const hash = await vi.importActual('./hash');
+  return {
+    ...hash,
+    phash: (x: number) => x,
+  };
+});
+
 import { parse, print } from 'graphql';
 import { gql } from '../gql';
 import { createRequest, stringifyDocument } from './request';
-
-jest.mock('./hash', () => ({
-  hash: jest.requireActual('./hash').hash,
-  phash: (x: number) => x,
-}));
 
 it('should hash identical queries identically', () => {
   const reqA = createRequest('{ test }');

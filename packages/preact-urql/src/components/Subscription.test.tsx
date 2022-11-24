@@ -1,12 +1,14 @@
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
 import { Provider } from '../context';
 import { Subscription } from './Subscription';
 
 const query = 'subscription Example { example }';
 const client = {
-  executeSubscription: jest.fn(() =>
+  executeSubscription: vi.fn(() =>
     pipe(
       interval(200),
       map((i: number) => ({ data: i, error: i + 1 }))
@@ -16,14 +18,16 @@ const client = {
 
 describe('Subscription', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('Should execute the subscription', done => {
+  it('Should execute the subscription', async () => {
     let props = {};
     const Test = () => h('p', {}, 'hi');
     const App = () => {
@@ -46,9 +50,12 @@ describe('Subscription', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
-      done();
-    }, 300);
+
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 0, fetching: true, error: 1 });
+        res(null);
+      }, 300);
+    });
   });
 });

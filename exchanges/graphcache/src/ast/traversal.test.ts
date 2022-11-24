@@ -1,6 +1,7 @@
 import { gql } from '@urql/core';
-import { getSelectionSet } from './node';
+import { describe, it, expect } from 'vitest';
 
+import { getSelectionSet } from './node';
 import { getMainOperation, shouldInclude } from './traversal';
 
 describe('getMainOperation', () => {

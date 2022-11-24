@@ -1,15 +1,17 @@
 import { empty, Source } from 'wonka';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
+
 import { Exchange } from '../types';
 import { composeExchanges } from './compose';
 import { noop } from '../utils';
 
 const mockClient = {} as any;
 
-const forward = jest.fn();
+const forward = vi.fn();
 const noopExchange: Exchange = ({ forward }) => ops$ => forward(ops$);
 
 beforeEach(() => {
-  jest.spyOn(Date, 'now').mockReturnValue(1234);
+  vi.spyOn(Date, 'now').mockReturnValue(1234);
 });
 
 it('composes exchanges correctly', () => {
@@ -36,7 +38,7 @@ it('composes exchanges correctly', () => {
   };
 
   const exchange = composeExchanges([firstExchange, secondExchange]);
-  const outerFw = jest.fn(() => noopExchange) as any;
+  const outerFw = vi.fn(() => noopExchange) as any;
 
   exchange({ client: mockClient, forward: outerFw, dispatchDebug: noop })(
     empty as Source<any>
@@ -47,7 +49,7 @@ it('composes exchanges correctly', () => {
 
 describe('on dispatchDebug', () => {
   it('dispatches debug event with exchange source name', () => {
-    const dispatchDebug = jest.fn();
+    const dispatchDebug = vi.fn();
     const debugArgs = {
       type: 'test',
       message: 'Hello',

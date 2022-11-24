@@ -1,4 +1,6 @@
 import { Kind, InlineFragmentNode } from 'graphql';
+import { describe, it, expect } from 'vitest';
+
 import { buildClientSchema } from './schema';
 import * as SchemaPredicates from './schemaPredicates';
 import { minifyIntrospectionQuery } from '@urql/introspection';

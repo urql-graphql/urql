@@ -1,6 +1,8 @@
 import { createClient } from '@urql/core';
-import { queryStore } from './queryStore';
+import { vi, expect, it, describe } from 'vitest';
 import { get } from 'svelte/store';
+
+import { queryStore } from './queryStore';
 
 describe('queryStore', () => {
   const client = createClient({ url: 'https://example.com' });
@@ -10,7 +12,7 @@ describe('queryStore', () => {
   const store = queryStore({ client, query, variables, context });
 
   it('creates a svelte store', () => {
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     store.subscribe(subscriber);
     expect(subscriber).toHaveBeenCalledTimes(1);
   });

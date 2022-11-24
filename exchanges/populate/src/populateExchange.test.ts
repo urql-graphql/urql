@@ -7,6 +7,7 @@ import {
   ASTKindToNode,
   Kind,
 } from 'graphql';
+import { vi, expect, it, describe } from 'vitest';
 
 import { fromValue, pipe, fromArray, toArray } from 'wonka';
 import {
@@ -109,12 +110,10 @@ const getNodesByType = <T extends keyof ASTKindToNode, N = ASTKindToNode[T]>(
 
 const schema = introspectionFromSchema(buildSchema(schemaDef));
 
-beforeEach(jest.clearAllMocks);
-
 const exchangeArgs = {
   forward: a => a as any,
   client: {} as Client,
-  dispatchDebug: jest.fn(),
+  dispatchDebug: vi.fn(),
 };
 
 describe('on mutation', () => {

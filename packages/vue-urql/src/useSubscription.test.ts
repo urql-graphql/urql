@@ -1,8 +1,9 @@
 import { nextTick, reactive, ref } from 'vue';
+import { vi, expect, it, describe } from 'vitest';
 
-jest.mock('./useClient.ts', () => ({
+vi.mock('./useClient.ts', async () => ({
   __esModule: true,
-  ...jest.requireActual('./useClient.ts'),
+  ...((await vi.importActual('./useClient.ts')) as object),
   useClient: () => ref(client),
 }));
 
@@ -15,7 +16,7 @@ const client = createClient({ url: '/graphql', exchanges: [] });
 describe('useSubscription', () => {
   it('subscribes to a subscription and updates data', async () => {
     const subject = makeSubject<any>();
-    const executeQuery = jest
+    const executeQuery = vi
       .spyOn(client, 'executeSubscription')
       .mockImplementation(() => subject.source);
 
@@ -57,7 +58,7 @@ describe('useSubscription', () => {
 
   it('updates the executed subscription when inputs change', async () => {
     const subject = makeSubject<any>();
-    const executeSubscription = jest
+    const executeSubscription = vi
       .spyOn(client, 'executeSubscription')
       .mockImplementation(() => subject.source);
 
@@ -98,7 +99,7 @@ describe('useSubscription', () => {
   });
   it('supports a custom scanning handler', async () => {
     const subject = makeSubject<any>();
-    const executeSubscription = jest
+    const executeSubscription = vi
       .spyOn(client, 'executeSubscription')
       .mockImplementation(() => subject.source);
 

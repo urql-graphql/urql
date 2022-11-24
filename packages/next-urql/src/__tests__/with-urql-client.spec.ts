@@ -2,11 +2,10 @@ import React, { createElement as h } from 'react';
 import { shallow, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
+import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
 import { withUrqlClient, NextUrqlPageContext } from '..';
 import * as init from '../init-urql-client';
-
-beforeEach(jest.clearAllMocks);
 
 const MockApp: React.FC<any> = () => {
   return h('div');
@@ -17,7 +16,7 @@ const MockAppTree: React.FC<any> = () => {
 };
 
 describe('withUrqlClient', () => {
-  const spyInitUrqlClient = jest.spyOn(init, 'initUrqlClient');
+  const spyInitUrqlClient = vi.spyOn(init, 'initUrqlClient');
   let Component: any;
 
   beforeAll(() => {
@@ -45,6 +44,7 @@ describe('withUrqlClient', () => {
 
       expect(app.props().urqlClient).toBeInstanceOf(Client);
       expect(spyInitUrqlClient).toHaveBeenCalledTimes(1);
+      // @ts-ignore
       expect(spyInitUrqlClient.mock.calls[0][0].exchanges).toHaveLength(4);
     });
 
@@ -133,32 +133,6 @@ describe('withUrqlClient', () => {
     Component.getInitialProps && (await Component.getInitialProps(mockContext));
     expect(spyInitUrqlClient).toHaveBeenCalledTimes(0);
     expect(Component.getInitialProps).toBeUndefined();
-  });
-
-  describe('with exchanges provided', () => {
-    const exchange = jest.fn(() => op => op);
-
-    beforeEach(() => {
-      Component = withUrqlClient(() => ({
-        url: 'http://localhost:3000',
-        exchanges: [exchange] as any[],
-      }))(MockApp);
-    });
-
-    it('uses exchanges defined in the client config', () => {
-      const tree = shallow(h(Component));
-      const app = tree.find(MockApp);
-
-      const client = app.props().urqlClient;
-      client.query(`
-        {
-          users {
-            id
-          }
-        }
-      `);
-      expect(exchange).toBeCalledTimes(1);
-    });
   });
 
   describe('never-suspend', () => {

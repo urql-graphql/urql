@@ -1,17 +1,28 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { makeAsyncStorage } from './makeAsyncStorage';
+import { vi, expect, it, describe } from 'vitest';
 
-jest.mock('@react-native-community/netinfo', () => ({
+vi.mock('@react-native-community/netinfo', () => ({
   addEventListener: () => 'addEventListener',
+  default: {
+    addEventListener: () => 'addEventListener',
+  },
 }));
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
+vi.mock('@react-native-async-storage/async-storage', () => ({
+  default: {
+    setItem: () => 'setItem',
+    getItem: () => 'getItem',
+    getAllKeys: () => 'getAllKeys',
+    removeItem: () => 'removeItem',
+  },
   setItem: () => 'setItem',
   getItem: () => 'getItem',
   getAllKeys: () => 'getAllKeys',
   removeItem: () => 'removeItem',
 }));
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { makeAsyncStorage } from './makeAsyncStorage';
 
 const request = [
   {
@@ -31,8 +42,8 @@ const serializedEntries = '{"hello":"world"}';
 describe('makeAsyncStorage', () => {
   describe('writeMetadata', () => {
     it('writes metadata to async storage', async () => {
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -47,8 +58,8 @@ describe('makeAsyncStorage', () => {
     });
 
     it('writes metadata using a custom key', async () => {
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage({ metadataKey: 'my-custom-key' });
 
@@ -65,8 +76,8 @@ describe('makeAsyncStorage', () => {
 
   describe('readMetadata', () => {
     it('returns an empty array if no metadata is found', async () => {
-      const getItemSpy = jest.fn().mockResolvedValue(null);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(null);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -78,8 +89,8 @@ describe('makeAsyncStorage', () => {
     });
 
     it('returns the parsed JSON correctly', async () => {
-      const getItemSpy = jest.fn().mockResolvedValue(serializedRequest);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(serializedRequest);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -91,8 +102,8 @@ describe('makeAsyncStorage', () => {
     });
 
     it('reads metadata using a custom key', async () => {
-      const getItemSpy = jest.fn().mockResolvedValue(serializedRequest);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(serializedRequest);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage({ metadataKey: 'my-custom-key' });
 
@@ -104,8 +115,8 @@ describe('makeAsyncStorage', () => {
     });
 
     it('returns an empty array if json.parse errors', async () => {
-      const getItemSpy = jest.fn().mockResolvedValue('surprise!');
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue('surprise!');
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
       const storage = makeAsyncStorage();
 
       if (storage && storage.readMetadata) {
@@ -118,11 +129,11 @@ describe('makeAsyncStorage', () => {
 
   describe('writeData', () => {
     it('writes data to async storage', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -137,11 +148,11 @@ describe('makeAsyncStorage', () => {
     });
 
     it('writes data to async storage using custom key', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage({ dataKey: 'my-custom-key' });
 
@@ -156,11 +167,11 @@ describe('makeAsyncStorage', () => {
     });
 
     it('merges previous writes', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
 
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -175,10 +186,10 @@ describe('makeAsyncStorage', () => {
       );
 
       // write twice
-      const secondSetItemSpy = jest.fn();
-      jest
-        .spyOn(AsyncStorage, 'setItem')
-        .mockImplementationOnce(secondSetItemSpy);
+      const secondSetItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(
+        secondSetItemSpy
+      );
 
       if (storage && storage.writeData) {
         storage.writeData({ foo: 'bar' });
@@ -190,17 +201,15 @@ describe('makeAsyncStorage', () => {
     });
 
     it('keeps items from previous days', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
       const oldDayStamp = 18857;
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockResolvedValueOnce(
-          JSON.stringify({ [oldDayStamp]: { foo: 'bar' } })
-        );
+      vi.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(
+        JSON.stringify({ [oldDayStamp]: { foo: 'bar' } })
+      );
 
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -215,9 +224,9 @@ describe('makeAsyncStorage', () => {
     });
 
     it('propagates deleted keys to previous days', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
-      jest.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(
+      vi.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(
         JSON.stringify({
           [dayStamp]: { foo: 'bar', hello: 'world' },
           [dayStamp - 1]: { foo: 'bar', hello: 'world' },
@@ -225,8 +234,8 @@ describe('makeAsyncStorage', () => {
         })
       );
 
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -247,8 +256,8 @@ describe('makeAsyncStorage', () => {
 
   describe('readData', () => {
     it('returns an empty object if no data is found', async () => {
-      const getItemSpy = jest.fn().mockResolvedValue(null);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(null);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -260,11 +269,11 @@ describe('makeAsyncStorage', () => {
     });
 
     it("returns today's data correctly", async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
       const mockData = JSON.stringify({ [dayStamp]: entires });
-      const getItemSpy = jest.fn().mockResolvedValue(mockData);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(mockData);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -276,7 +285,7 @@ describe('makeAsyncStorage', () => {
     });
 
     it('merges data from past days correctly', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
       const mockData = JSON.stringify({
         [dayStamp]: { one: 'one' },
@@ -284,8 +293,8 @@ describe('makeAsyncStorage', () => {
         [dayStamp - 3]: { three: 'three' },
         [dayStamp - 4]: { two: 'old' },
       });
-      const getItemSpy = jest.fn().mockResolvedValue(mockData);
-      jest.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
+      const getItemSpy = vi.fn().mockResolvedValue(mockData);
+      vi.spyOn(AsyncStorage, 'getItem').mockImplementationOnce(getItemSpy);
 
       const storage = makeAsyncStorage();
 
@@ -301,7 +310,7 @@ describe('makeAsyncStorage', () => {
     });
 
     it('cleans up old data', async () => {
-      jest.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
+      vi.spyOn(Date.prototype, 'valueOf').mockReturnValueOnce(1632209690641);
       const dayStamp = 18891;
       const maxAge = 5;
       const mockData = JSON.stringify({
@@ -309,9 +318,9 @@ describe('makeAsyncStorage', () => {
         [dayStamp - maxAge + 1]: entires, // should be kept
         [dayStamp - maxAge - 1]: { old: 'data' }, // should get deleted
       });
-      jest.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(mockData);
-      const setItemSpy = jest.fn();
-      jest.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
+      vi.spyOn(AsyncStorage, 'getItem').mockResolvedValueOnce(mockData);
+      const setItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'setItem').mockImplementationOnce(setItemSpy);
 
       const storage = makeAsyncStorage({ maxAge });
 
@@ -331,10 +340,10 @@ describe('makeAsyncStorage', () => {
 
   describe('onOnline', () => {
     it('sets up an event listener for the network change event', () => {
-      const addEventListenerSpy = jest.fn();
-      jest
-        .spyOn(NetInfo, 'addEventListener')
-        .mockImplementationOnce(addEventListenerSpy);
+      const addEventListenerSpy = vi.fn();
+      vi.spyOn(NetInfo, 'addEventListener').mockImplementationOnce(
+        addEventListenerSpy
+      );
 
       const storage = makeAsyncStorage();
 
@@ -346,14 +355,12 @@ describe('makeAsyncStorage', () => {
     });
 
     it('calls the callback when the device comes online', () => {
-      const callbackSpy = jest.fn();
+      const callbackSpy = vi.fn();
       let networkCallback;
-      jest
-        .spyOn(NetInfo, 'addEventListener')
-        .mockImplementationOnce(callback => {
-          networkCallback = callback;
-          return () => null;
-        });
+      vi.spyOn(NetInfo, 'addEventListener').mockImplementationOnce(callback => {
+        networkCallback = callback;
+        return () => null;
+      });
 
       const storage = makeAsyncStorage();
 
@@ -367,14 +374,12 @@ describe('makeAsyncStorage', () => {
     });
 
     it('does not call the callback when the device is offline', () => {
-      const callbackSpy = jest.fn();
+      const callbackSpy = vi.fn();
       let networkCallback;
-      jest
-        .spyOn(NetInfo, 'addEventListener')
-        .mockImplementationOnce(callback => {
-          networkCallback = callback;
-          return () => null;
-        });
+      vi.spyOn(NetInfo, 'addEventListener').mockImplementationOnce(callback => {
+        networkCallback = callback;
+        return () => null;
+      });
 
       const storage = makeAsyncStorage();
 
@@ -390,10 +395,9 @@ describe('makeAsyncStorage', () => {
 
   describe('clear', () => {
     it('clears all data and metadata', async () => {
-      const removeItemSpy = jest.fn();
-      const secondRemoveItemSpy = jest.fn();
-      jest
-        .spyOn(AsyncStorage, 'removeItem')
+      const removeItemSpy = vi.fn();
+      const secondRemoveItemSpy = vi.fn();
+      vi.spyOn(AsyncStorage, 'removeItem')
         .mockImplementationOnce(removeItemSpy)
         .mockImplementationOnce(secondRemoveItemSpy);
 

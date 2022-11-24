@@ -1,4 +1,5 @@
 import { gql } from '@urql/core';
+import { it, expect } from 'vitest';
 import { query, write } from '../operations';
 import { Store } from '../store';
 import { simplePagination } from './simplePagination';
@@ -425,10 +426,10 @@ it('prevents overlapping of pagination on different arguments', () => {
     variables: { filter: 'three', skip: 2, limit: 1 },
   });
 
-  expect(resOne.data).toHaveProperty(['persons', 0, 'id'], 'one');
+  expect(resOne.data).toHaveProperty('persons[0].id', 'one');
   expect(resOne.data).toHaveProperty('persons.length', 1);
 
-  expect(resTwo.data).toHaveProperty(['persons', 0, 'id'], 'two');
+  expect(resTwo.data).toHaveProperty('persons[0].id', 'two');
   expect(resTwo.data).toHaveProperty('persons.length', 1);
 
   expect(resThree.data).toEqual(null);

@@ -9,6 +9,8 @@ import {
   scan,
   toPromise,
 } from 'wonka';
+import { vi, expect, it, beforeEach, describe } from 'vitest';
+
 import { Client } from '../client';
 import {
   mutationOperation,
@@ -22,15 +24,13 @@ import {
 import { Operation, OperationResult, ExchangeInput } from '../types';
 import { cacheExchange } from './cache';
 
-const reexecuteOperation = jest.fn();
-const dispatchDebug = jest.fn();
+const reexecuteOperation = vi.fn();
+const dispatchDebug = vi.fn();
 
 let response;
 let exchangeArgs: ExchangeInput;
 let forwardedOperations: Operation[];
 let input: Subject<Operation>;
-
-beforeEach(jest.clearAllMocks);
 
 beforeEach(() => {
   response = queryResponse;
@@ -81,7 +81,7 @@ describe('on query', () => {
 
   it('respects cache-and-network', () => {
     const { source: ops$, next, complete } = input;
-    const result = jest.fn();
+    const result = vi.fn();
     const exchange = cacheExchange(exchangeArgs)(ops$);
 
     pipe(exchange, forEach(result));

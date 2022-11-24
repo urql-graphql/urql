@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, Mock, afterEach } from 'vitest';
 
-jest.mock('../context', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { delay, fromValue, pipe } = require('wonka');
+vi.mock('../context', async () => {
+  const { delay, fromValue, pipe } = await vi.importActual('wonka');
   const mock = {
-    executeMutation: jest.fn(() =>
+    executeMutation: vi.fn(() =>
       pipe(fromValue({ data: 1, error: 2 }), delay(200))
     ),
   };
@@ -20,20 +20,22 @@ import { Mutation } from './Mutation';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeMutation: jest.Mock };
+const client = useClient() as { executeMutation: Mock };
 const query = 'mutation Example { example }';
 
 describe('Mutation', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('Should execute the mutation', done => {
+  it('Should execute the mutation', async () => {
     let execute = () => {
         /* noop */
       },
@@ -66,9 +68,11 @@ describe('Mutation', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 1, fetching: false, error: 2 });
+        res(null);
+      }, 400);
+    });
   });
 });

@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { cleanup, render } from '@testing-library/preact';
 import { map, interval, pipe } from 'wonka';
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
 import { Query } from './Query';
 import { Provider } from '../context';
 
@@ -10,7 +12,7 @@ const variables = {
 };
 
 const client = {
-  executeQuery: jest.fn(() =>
+  executeQuery: vi.fn(() =>
     pipe(
       interval(200),
       map((i: number) => ({ data: i, error: i + 1 }))
@@ -20,14 +22,16 @@ const client = {
 
 describe('Query', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('Should execute the query', done => {
+  it('Should execute the query', async () => {
     let props = {};
     const Test = () => h('p', {}, 'hi');
     const App = () => {
@@ -50,9 +54,12 @@ describe('Query', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
-      done();
-    }, 250);
+
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
+        res(null);
+      }, 250);
+    });
   });
 });

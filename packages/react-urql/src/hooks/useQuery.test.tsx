@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
-jest.mock('../context', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { map, interval, pipe } = require('wonka');
+vi.mock('../context', async () => {
+  const { map, interval, pipe } = await vi.importActual('wonka');
   const mock = {
-    executeQuery: jest.fn(() =>
+    executeQuery: vi.fn(() =>
       pipe(
         interval(400),
         map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
@@ -27,7 +27,7 @@ import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { useClient } from '../context';
 
 // @ts-ignore
-const client = useClient() as { executeQuery: jest.Mock };
+const client = useClient() as { executeQuery: Mock };
 
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
@@ -53,7 +53,9 @@ const QueryUser = ({
 
 beforeAll(() => {
   // TODO: Fix use of act()
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation(() => {
+    // do nothings
+  });
 });
 
 beforeEach(() => {
@@ -98,7 +100,7 @@ describe('on subscription', () => {
 });
 
 describe('on subscription update', () => {
-  it('forwards data response', done => {
+  it('forwards data response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -106,14 +108,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('data', 0);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('data', 0);
+        res(null);
+      }, 400);
+    });
   });
 
-  it('forwards error response', done => {
+  it('forwards error response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -121,14 +125,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('error', 1);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('error', 1);
+        res(null);
+      }, 400);
+    });
   });
 
-  it('forwards extensions response', done => {
+  it('forwards extensions response', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -136,14 +142,16 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('extensions', { i: 1 });
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('extensions', { i: 1 });
+        res(null);
+      }, 400);
+    });
   });
 
-  it('sets fetching to false', done => {
+  it('sets fetching to false', async () => {
     const wrapper = renderer.create(<QueryUser {...props} />);
     /**
      * Have to call update (without changes) in order to see the
@@ -151,11 +159,13 @@ describe('on subscription update', () => {
      */
     wrapper.update(<QueryUser {...props} />);
 
-    setTimeout(() => {
-      wrapper.update(<QueryUser {...props} />);
-      expect(state).toHaveProperty('fetching', false);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        wrapper.update(<QueryUser {...props} />);
+        expect(state).toHaveProperty('fetching', false);
+        res(null);
+      }, 400);
+    });
   });
 });
 
@@ -178,8 +188,8 @@ describe('on change', () => {
 });
 
 describe('on unmount', () => {
-  const start = jest.fn();
-  const unsubscribe = jest.fn();
+  const start = vi.fn();
+  const unsubscribe = vi.fn();
 
   beforeEach(() => {
     client.executeQuery.mockReturnValue(

@@ -1,8 +1,9 @@
-jest.mock('../context', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { map, interval, pipe } = require('wonka');
+import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
+
+vi.mock('../context', async () => {
+  const { map, interval, pipe } = await vi.importActual('wonka');
   const mock = {
-    executeQuery: jest.fn(() =>
+    executeQuery: vi.fn(() =>
       pipe(
         interval(200),
         map((i: number) => ({ data: i, error: i + 1 }))
@@ -28,14 +29,16 @@ const variables = {
 describe('Query', () => {
   beforeEach(() => {
     // TODO: Fix use of act()
-    jest.spyOn(global.console, 'error').mockImplementation();
+    vi.spyOn(global.console, 'error').mockImplementation(() => {
+      // do nothing
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it('Should execute the query', done => {
+  it('Should execute the query', async () => {
     let props = {};
     const Test = () => <p>Hi</p>;
     const App = () => {
@@ -55,9 +58,11 @@ describe('Query', () => {
       fetching: true,
       error: undefined,
     });
-    setTimeout(() => {
-      expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
-      done();
-    }, 200);
+    await new Promise(res => {
+      setTimeout(() => {
+        expect(props).toStrictEqual({ data: 0, fetching: false, error: 1 });
+        res(null);
+      }, 200);
+    });
   });
 });

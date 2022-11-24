@@ -1,5 +1,7 @@
 import { createClient } from '@urql/core';
 import { get } from 'svelte/store';
+import { vi, expect, it, describe } from 'vitest';
+
 import { subscriptionStore } from './subscriptionStore';
 
 describe('subscriptionStore', () => {
@@ -15,7 +17,7 @@ describe('subscriptionStore', () => {
   });
 
   it('creates a svelte store', () => {
-    const subscriber = jest.fn();
+    const subscriber = vi.fn();
     store.subscribe(subscriber);
     expect(subscriber).toHaveBeenCalledTimes(1);
   });

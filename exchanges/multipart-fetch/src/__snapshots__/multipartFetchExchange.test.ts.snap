@@ -1,13 +1,13 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`on error returns error data 1`] = `
-Object {
+exports[`on error > returns error data 1`] = `
+{
   "data": undefined,
   "error": [CombinedError: [Network] No Content],
   "extensions": undefined,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": Object {
+  "operation": {
+    "context": {
+      "fetchOptions": {
         "method": "POST",
       },
       "requestPolicy": "cache-first",
@@ -15,75 +15,75 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "query": Object {
+    "query": {
       "__key": 3521976120,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "getUser",
           },
           "operation": "query",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "name",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "name",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "user",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "id",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "lastName",
                       },
@@ -94,21 +94,21 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "NamedType",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "String",
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "name",
                 },
@@ -118,12 +118,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 86,
-        "source": Object {
+        "source": {
           "body": "# getUser
 query getUser($name: String) { user(name: $name) { id firstName lastName } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -132,28 +132,28 @@ query getUser($name: String) { user(name: $name) { id firstName lastName } }",
         "start": 0,
       },
     },
-    "variables": Object {
+    "variables": {
       "name": "Clara",
     },
   },
 }
 `;
 
-exports[`on error returns error data with status 400 and manual redirect mode 1`] = `
-Object {
+exports[`on error > returns error data with status 400 and manual redirect mode 1`] = `
+{
   "data": undefined,
   "error": [CombinedError: [Network] No Content],
   "extensions": undefined,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": [MockFunction] {
-        "calls": Array [
-          Array [],
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
-            "value": Object {
+            "value": {
               "redirect": "manual",
             },
           },
@@ -164,75 +164,75 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "query": Object {
+    "query": {
       "__key": 3521976120,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "getUser",
           },
           "operation": "query",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "name",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "name",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "user",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "id",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "lastName",
                       },
@@ -243,21 +243,21 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "NamedType",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "String",
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "name",
                 },
@@ -267,12 +267,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 86,
-        "source": Object {
+        "source": {
           "body": "# getUser
 query getUser($name: String) { user(name: $name) { id firstName lastName } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -281,33 +281,33 @@ query getUser($name: String) { user(name: $name) { id firstName lastName } }",
         "start": 0,
       },
     },
-    "variables": Object {
+    "variables": {
       "name": "Clara",
     },
   },
 }
 `;
 
-exports[`on success returns response data 1`] = `
-Object {
-  "data": Object {
-    "data": Object {
+exports[`on success > returns response data 1`] = `
+{
+  "data": {
+    "data": {
       "user": 1200,
     },
   },
   "error": undefined,
   "extensions": undefined,
   "hasNext": false,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": [MockFunction] {
-        "calls": Array [
-          Array [],
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
-            "value": Object {},
+            "value": {},
           },
         ],
       },
@@ -316,75 +316,75 @@ Object {
     },
     "key": 2,
     "kind": "query",
-    "query": Object {
+    "query": {
       "__key": 3521976120,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "getUser",
           },
           "operation": "query",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "name",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "name",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "user",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "id",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "firstName",
                       },
                       "selectionSet": undefined,
                     },
-                    Object {
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "lastName",
                       },
@@ -395,21 +395,21 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "NamedType",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "String",
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "name",
                 },
@@ -419,12 +419,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 86,
-        "source": Object {
+        "source": {
           "body": "# getUser
 query getUser($name: String) { user(name: $name) { id firstName lastName } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -433,35 +433,35 @@ query getUser($name: String) { user(name: $name) { id firstName lastName } }",
         "start": 0,
       },
     },
-    "variables": Object {
+    "variables": {
       "name": "Clara",
     },
   },
 }
 `;
 
-exports[`on success returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
+exports[`on success > returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
 
-exports[`on success uses a file when given 1`] = `
-Object {
-  "data": Object {
-    "data": Object {
+exports[`on success > uses a file when given 1`] = `
+{
+  "data": {
+    "data": {
       "user": 1200,
     },
   },
   "error": undefined,
   "extensions": undefined,
   "hasNext": false,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": [MockFunction] {
-        "calls": Array [
-          Array [],
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
-            "value": Object {},
+            "value": {},
           },
         ],
       },
@@ -470,53 +470,53 @@ Object {
     },
     "key": 3,
     "kind": "mutation",
-    "query": Object {
+    "query": {
       "__key": 4034972436,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "uploadProfilePicture",
           },
           "operation": "mutation",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "picture",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "picture",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "uploadProfilePicture",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "location",
                       },
@@ -527,21 +527,21 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "NamedType",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "File",
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "picture",
                 },
@@ -551,12 +551,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 125,
-        "source": Object {
+        "source": {
           "body": "# uploadProfilePicture
 mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $picture) { location } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -565,41 +565,41 @@ mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $p
         "start": 0,
       },
     },
-    "variables": Object {
+    "variables": {
       "picture": File {},
     },
   },
 }
 `;
 
-exports[`on success uses a file when given 2`] = `
-Object {
+exports[`on success > uses a file when given 2`] = `
+{
   "accept": "application/graphql+json, application/json",
 }
 `;
 
-exports[`on success uses a file when given 3`] = `FormData {}`;
+exports[`on success > uses a file when given 3`] = `FormData {}`;
 
-exports[`on success uses multiple files when given 1`] = `
-Object {
-  "data": Object {
-    "data": Object {
+exports[`on success > uses multiple files when given 1`] = `
+{
+  "data": {
+    "data": {
       "user": 1200,
     },
   },
   "error": undefined,
   "extensions": undefined,
   "hasNext": false,
-  "operation": Object {
-    "context": Object {
-      "fetchOptions": [MockFunction] {
-        "calls": Array [
-          Array [],
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
-            "value": Object {},
+            "value": {},
           },
         ],
       },
@@ -608,53 +608,53 @@ Object {
     },
     "key": 3,
     "kind": "mutation",
-    "query": Object {
+    "query": {
       "__key": 2033658603,
-      "definitions": Array [
-        Object {
-          "directives": Array [],
+      "definitions": [
+        {
+          "directives": [],
           "kind": "OperationDefinition",
-          "name": Object {
+          "name": {
             "kind": "Name",
             "value": "uploadProfilePictures",
           },
           "operation": "mutation",
-          "selectionSet": Object {
+          "selectionSet": {
             "kind": "SelectionSet",
-            "selections": Array [
-              Object {
+            "selections": [
+              {
                 "alias": undefined,
-                "arguments": Array [
-                  Object {
+                "arguments": [
+                  {
                     "kind": "Argument",
-                    "name": Object {
+                    "name": {
                       "kind": "Name",
                       "value": "pictures",
                     },
-                    "value": Object {
+                    "value": {
                       "kind": "Variable",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "pictures",
                       },
                     },
                   },
                 ],
-                "directives": Array [],
+                "directives": [],
                 "kind": "Field",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "uploadProfilePicture",
                 },
-                "selectionSet": Object {
+                "selectionSet": {
                   "kind": "SelectionSet",
-                  "selections": Array [
-                    Object {
+                  "selections": [
+                    {
                       "alias": undefined,
-                      "arguments": Array [],
-                      "directives": Array [],
+                      "arguments": [],
+                      "directives": [],
                       "kind": "Field",
-                      "name": Object {
+                      "name": {
                         "kind": "Name",
                         "value": "location",
                       },
@@ -665,24 +665,24 @@ Object {
               },
             ],
           },
-          "variableDefinitions": Array [
-            Object {
+          "variableDefinitions": [
+            {
               "defaultValue": undefined,
-              "directives": Array [],
+              "directives": [],
               "kind": "VariableDefinition",
-              "type": Object {
+              "type": {
                 "kind": "ListType",
-                "type": Object {
+                "type": {
                   "kind": "NamedType",
-                  "name": Object {
+                  "name": {
                     "kind": "Name",
                     "value": "File",
                   },
                 },
               },
-              "variable": Object {
+              "variable": {
                 "kind": "Variable",
-                "name": Object {
+                "name": {
                   "kind": "Name",
                   "value": "pictures",
                 },
@@ -692,12 +692,12 @@ Object {
         },
       ],
       "kind": "Document",
-      "loc": Object {
+      "loc": {
         "end": 132,
-        "source": Object {
+        "source": {
           "body": "# uploadProfilePictures
 mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(pictures: $pictures) { location } }",
-          "locationOffset": Object {
+          "locationOffset": {
             "column": 1,
             "line": 1,
           },
@@ -706,8 +706,8 @@ mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(picture
         "start": 0,
       },
     },
-    "variables": Object {
-      "picture": Array [
+    "variables": {
+      "picture": [
         File {},
         File {},
       ],
@@ -716,10 +716,10 @@ mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(picture
 }
 `;
 
-exports[`on success uses multiple files when given 2`] = `
-Object {
+exports[`on success > uses multiple files when given 2`] = `
+{
   "accept": "application/graphql+json, application/json",
 }
 `;
 
-exports[`on success uses multiple files when given 3`] = `FormData {}`;
+exports[`on success > uses multiple files when given 3`] = `FormData {}`;

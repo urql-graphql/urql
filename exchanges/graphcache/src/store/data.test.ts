@@ -1,3 +1,4 @@
+import { describe, it, beforeEach, expect } from 'vitest';
 import * as InMemoryData from './data';
 import { keyOfField } from './keys';
 
@@ -121,26 +122,26 @@ describe('inspectFields', () => {
     InMemoryData.writeLink('Query', 'randomTodo', 'Todo:1');
 
     expect(InMemoryData.inspectFields('Query')).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "arguments": Object {
+      [
+        {
+          "arguments": {
             "id": "1",
           },
           "fieldKey": "todo({\\"id\\":\\"1\\"})",
           "fieldName": "todo",
         },
-        Object {
+        {
           "arguments": null,
           "fieldKey": "randomTodo",
           "fieldName": "randomTodo",
         },
-        Object {
+        {
           "arguments": null,
           "fieldKey": "__typename",
           "fieldName": "__typename",
         },
-        Object {
-          "arguments": Object {
+        {
+          "arguments": {
             "id": "1",
           },
           "fieldKey": "hasTodo({\\"id\\":\\"1\\"})",
@@ -168,9 +169,7 @@ describe('inspectFields', () => {
     InMemoryData.initDataState('write', data, 1, true);
     InMemoryData.writeLink('Query', 'todo', 'Todo:1');
 
-    expect(InMemoryData.inspectFields('Random')).toMatchInlineSnapshot(
-      `Array []`
-    );
+    expect(InMemoryData.inspectFields('Random')).toMatchInlineSnapshot('[]');
   });
 
   it('avoids duplicate field infos', () => {
@@ -180,8 +179,8 @@ describe('inspectFields', () => {
     InMemoryData.writeLink('Query', 'todo', 'Todo:2');
 
     expect(InMemoryData.inspectFields('Query')).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "arguments": null,
           "fieldKey": "todo",
           "fieldName": "todo",

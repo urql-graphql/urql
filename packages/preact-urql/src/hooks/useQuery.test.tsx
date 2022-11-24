@@ -1,12 +1,23 @@
 import { FunctionalComponent as FC, h } from 'preact';
 import { render, cleanup, act } from '@testing-library/preact';
 import { OperationContext } from '@urql/core';
-import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { map, interval, pipe, never, onStart, onEnd, empty } from 'wonka';
+import {
+  vi,
+  expect,
+  it,
+  beforeEach,
+  describe,
+  beforeAll,
+  Mock,
+  afterEach,
+} from 'vitest';
+
+import { useQuery, UseQueryArgs, UseQueryState } from './useQuery';
 import { Provider } from '../context';
 
 const mock = {
-  executeQuery: jest.fn(() =>
+  executeQuery: vi.fn(() =>
     pipe(
       interval(400),
       map((i: number) => ({ data: i, error: i + 1, extensions: { i: 1 } }))
@@ -14,7 +25,7 @@ const mock = {
   ),
 };
 
-const client = mock as { executeQuery: jest.Mock };
+const client = mock as { executeQuery: Mock };
 const props: UseQueryArgs<{ myVar: number }> = {
   query: '{ example }',
   variables: {
@@ -36,7 +47,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 };
 
 beforeAll(() => {
-  jest.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error').mockImplementation();
 });
 
 describe('useQuery', () => {
@@ -95,7 +106,7 @@ describe('useQuery', () => {
     expect(state).toHaveProperty('fetching', true);
   });
 
-  it('forwards data response', done => {
+  it('forwards data response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -110,19 +121,21 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('data', 0);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('data', 0);
+        res(null);
+      }, 400);
+    });
   });
 
-  it('forwards error response', done => {
+  it('forwards error response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -137,19 +150,21 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('error', 1);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('error', 1);
+        res(null);
+      }, 400);
+    });
   });
 
-  it('forwards extensions response', done => {
+  it('forwards extensions response', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -167,20 +182,22 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
 
-      expect(state).toHaveProperty('extensions', { i: 1 });
-      done();
-    }, 400);
+        expect(state).toHaveProperty('extensions', { i: 1 });
+        res(null);
+      }, 400);
+    });
   });
 
-  it('sets fetching to false', done => {
+  it('sets fetching to false', async () => {
     const { rerender } = render(
       h(Provider, {
         value: client as any,
@@ -195,16 +212,18 @@ describe('useQuery', () => {
       })
     );
 
-    setTimeout(() => {
-      rerender(
-        h(Provider, {
-          value: client as any,
-          children: [h(QueryUser, { ...props })],
-        })
-      );
-      expect(state).toHaveProperty('fetching', false);
-      done();
-    }, 400);
+    await new Promise(res => {
+      setTimeout(() => {
+        rerender(
+          h(Provider, {
+            value: client as any,
+            children: [h(QueryUser, { ...props })],
+          })
+        );
+        expect(state).toHaveProperty('fetching', false);
+        res(null);
+      }, 400);
+    });
   });
 
   describe('on change', () => {
@@ -241,8 +260,8 @@ describe('useQuery', () => {
   });
 
   describe('on unmount', () => {
-    const start = jest.fn();
-    const unsubscribe = jest.fn();
+    const start = vi.fn();
+    const unsubscribe = vi.fn();
 
     beforeEach(() => {
       client.executeQuery.mockReturnValue(
