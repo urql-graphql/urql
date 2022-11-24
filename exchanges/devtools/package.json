@@ -2,10 +2,19 @@
   "name": "@urql/devtools",
   "version": "2.0.3",
   "description": "The official exchange for use with Urql Devtools",
-  "main": "dist/urql-devtools-exchange.js",
-  "module": "dist/urql-devtools-exchange.es.js",
+  "main": "dist/urql-devtools",
+  "module": "dist/urql-devtools.mjs",
   "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/urql-devtools.mjs",
+      "require": "./dist/urql-devtools.js",
+      "types": "./dist/types/index.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "scripts": {
     "test": "vitest --config ../../vitest.config.ts",
