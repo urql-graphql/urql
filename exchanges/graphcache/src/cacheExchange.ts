@@ -328,7 +328,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
           if (
             operation.context.requestPolicy === 'cache-and-network' ||
             (operation.context.requestPolicy === 'cache-first' &&
-              outcome === 'partial')
+              outcome === 'partial' &&
+              !reexecutingOperations.has(res.operation.key))
           ) {
             result.stale = true;
             if (!isBlockedByOptimisticUpdate(dependencies)) {
