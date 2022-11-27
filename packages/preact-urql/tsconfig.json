@@ -3,7 +3,7 @@
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node", "react", "vitest"],
+    "types": ["node", "vitest"],
     "jsx": "react",
     "paths": {
       "urql": ["../../packages/react-urql/src"],
