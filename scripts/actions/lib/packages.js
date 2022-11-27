@@ -1,7 +1,7 @@
 const path = require('path');
 const glob = require('util').promisify(require('glob'));
 
-const { workspaceRoot, workspaceManifest } = require('./constants');
+const { workspaceRoot, workspaces } = require('./constants');
 
 const getPackageManifest = (cwd) =>
   require(path.resolve(cwd, 'package.json'));
@@ -17,7 +17,7 @@ const getPackageArtifact = (cwd) => {
 
 const listPackages = async () => {
   let manifests = await Promise.all(
-    workspaceManifest.workspaces.map(dir => glob(`${dir}/package.json`))
+    workspaces.map(dir => glob(`${dir}/package.json`))
   );
 
   manifests = manifests.reduce((acc, manifests) => {

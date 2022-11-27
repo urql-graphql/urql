@@ -1,0 +1,9 @@
+name: 'Run a pnpm command'
+description: 'Locally run a forked pnpm command as an action.'
+inputs:
+  command:
+    description: 'Command'
+    default: 'help'
+runs:
+  using: 'node18'
+  main: 'action.js'
