@@ -56,8 +56,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
+    "@octokit/plugin-request-log": "1.0.0",
     "@mdx-js/mdx": "^1.5.7",
-    "formideploy": "^0.4.1",
+    "formideploy": "^0.4.2",
     "lodash": "^4.17.19",
     "react-hot-loader": "^4.12.20",
     "react-static-plugin-sitemap": "7.2.2",
