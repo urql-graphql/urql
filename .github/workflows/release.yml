@@ -14,16 +14,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
           run_install: false
-      - name: Setup Node
-        uses: actions/setup-node@v3
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - name: Use pnpm store
+        uses: actions/cache@v3
+        id: pnpm-cache
         with:
-          node-version: 18
-          cache: 'pnpm'
+          path: |
+            ~/.cache/Cypress
+            ${{ steps.pnpm-store.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
