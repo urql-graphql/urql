@@ -53,11 +53,14 @@ importers:
       rimraf: ^3.0.2
       rollup: ^3.3.0
       rollup-plugin-generate-package-json: ^3.2.0
-      rollup-plugin-typescript2: 0.32.1
+      rollup-plugin-tsconfig-paths: ^1.4.0
+      rollup-plugin-typescript2: 0.34.1
       rollup-plugin-visualizer: ^5.8.0
       tar: ^6.1.0
       terser: ^5.14.1
       typescript: ^4.7.3
+      vite: ^3.0.0
+      vite-tsconfig-paths: ^4.0.0-alpha.3
       vitest: ^0.25.3
     devDependencies:
       '@actions/artifact': 1.1.0
@@ -102,11 +105,14 @@ importers:
       rimraf: 3.0.2
       rollup: 3.3.0
       rollup-plugin-generate-package-json: 3.2.0_rollup@3.3.0
-      rollup-plugin-typescript2: 0.32.1_j3jyrn745s3ywckigofog2iyqm
+      rollup-plugin-tsconfig-paths: 1.4.0_j3jyrn745s3ywckigofog2iyqm
+      rollup-plugin-typescript2: 0.34.1_j3jyrn745s3ywckigofog2iyqm
       rollup-plugin-visualizer: 5.8.3_rollup@3.3.0
       tar: 6.1.0
       terser: 5.15.1
       typescript: 4.7.3
+      vite: 3.2.4_vt5mbdnyaskrzqlb5l6kjsnhi4
+      vite-tsconfig-paths: 4.0.0-alpha.3_lzlnd4rfzhsevpbr27cjpflydq
       vitest: 0.25.3_jsdom@20.0.3+terser@5.15.1
 
   exchanges/auth:
@@ -145,12 +151,14 @@ importers:
   exchanges/graphcache:
     specifiers:
       '@urql/core': '>=3.0.5'
+      '@urql/introspection': '*'
       graphql: ^16.0.0
       wonka: ^6.0.0
     dependencies:
       '@urql/core': link:../../packages/core
       wonka: 6.0.0
     devDependencies:
+      '@urql/introspection': link:../../packages/introspection
       graphql: 16.0.1
 
   exchanges/multipart-fetch:
@@ -8787,6 +8795,10 @@ packages:
       - supports-color
     dev: true
 
+  /globrex/0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+    dev: true
+
   /good-listener/1.2.2:
     resolution: {integrity: sha512-goW1b+d9q/HIwbVYZzZ6SsTr4IgE+WA44A0GmPIQstuOrgsFcT7VEJ48nmr9GaRtNu0XTKacFLGnBPAM6Afouw==}
     dependencies:
@@ -13901,8 +13913,19 @@ packages:
       write-pkg: 4.0.0
     dev: true
 
-  /rollup-plugin-typescript2/0.32.1_j3jyrn745s3ywckigofog2iyqm:
-    resolution: {integrity: sha512-RanO8bp1WbeMv0bVlgcbsFNCn+Y3rX7wF97SQLDxf0fMLsg0B/QFF005t4AsGUcDgF3aKJHoqt4JF2xVaABeKw==}
+  /rollup-plugin-tsconfig-paths/1.4.0_j3jyrn745s3ywckigofog2iyqm:
+    resolution: {integrity: sha512-mZm3up1di2s6aveD05WViY3IYnY6aAerKAq3XVUyxfE+So8dUUHSZ++7LOLUe5De4zsR46mxV/A3lMg81CRuPw==}
+    peerDependencies:
+      rollup: ^2 || ^3
+    dependencies:
+      rollup: 3.3.0
+      typescript-paths: 1.4.0_typescript@4.7.3
+    transitivePeerDependencies:
+      - typescript
+    dev: true
+
+  /rollup-plugin-typescript2/0.34.1_j3jyrn745s3ywckigofog2iyqm:
+    resolution: {integrity: sha512-P4cHLtGikESmqi1CA+tdMDUv8WbQV48mzPYt77TSTOPJpERyZ9TXdDgjSDix8Fkqce6soYz3+fa4lrC93IEkcw==}
     peerDependencies:
       rollup: '>=1.26.3'
       typescript: '>=2.4.0'
@@ -13910,8 +13933,8 @@ packages:
       '@rollup/pluginutils': 4.2.1
       find-cache-dir: 3.3.2
       fs-extra: 10.1.0
-      resolve: 1.22.1
       rollup: 3.3.0
+      semver: 7.3.8
       tslib: 2.4.0
       typescript: 4.7.3
     dev: true
@@ -15527,6 +15550,19 @@ packages:
       typescript: 4.7.3
     dev: true
 
+  /tsconfck/2.0.1_typescript@4.7.3:
+    resolution: {integrity: sha512-/ipap2eecmVBmBlsQLBRbUmUNFwNJV/z2E+X0FPtHNjPwroMZQ7m39RMaCywlCulBheYXgMdUlWDd9rzxwMA0Q==}
+    engines: {node: ^14.13.1 || ^16 || >=18, pnpm: ^7.0.1}
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.3.5
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 4.7.3
+    dev: true
+
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
@@ -15640,6 +15676,14 @@ packages:
 
   /typedarray/0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
+
+  /typescript-paths/1.4.0_typescript@4.7.3:
+    resolution: {integrity: sha512-olt3yKj5d4ON5MpQgxvqpiN24ApsrdlRnIQFwqlbzuTjRZFQNoTOzzTJ13vyDRt7VW0cuO+g8HA+eoYfBLWWMA==}
+    peerDependencies:
+      typescript: ^4.7.2
+    dependencies:
+      typescript: 4.7.3
+    dev: true
 
   /typescript/4.7.3:
     resolution: {integrity: sha512-WOkT3XYvrpXx4vMMqlD+8R8R37fZkjyLGlxavMc4iB8lrl8L0DeTcHbYgw/v0N/z9wAFsgBhcsF0ruoySS22mA==}
@@ -16127,6 +16171,20 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 2.0.3
       vfile-message: 2.0.4
+
+  /vite-tsconfig-paths/4.0.0-alpha.3_lzlnd4rfzhsevpbr27cjpflydq:
+    resolution: {integrity: sha512-zugyhZ6LpITxBQmoDM+V8NL94OgbHTeRaHdR3J3sk58uvWnHsJPbIwqpuJ/sV/TXD+fX1F4YbkigTmLxEX2oYA==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 2.0.1_typescript@4.7.3
+      vite: 3.2.4_vt5mbdnyaskrzqlb5l6kjsnhi4
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+    dev: true
 
   /vite/3.2.4:
     resolution: {integrity: sha512-Z2X6SRAffOUYTa+sLy3NQ7nlHFU100xwanq1WDwqaiFiCe+25zdxP1TfCS5ojPV2oDDcXudHIoPnI1Z/66B7Yw==}

@@ -4,7 +4,8 @@ import Adapter from 'enzyme-adapter-react-16';
 import { Client } from 'urql';
 import { vi, expect, it, beforeEach, describe, beforeAll } from 'vitest';
 
-import { withUrqlClient, NextUrqlPageContext } from '..';
+import { withUrqlClient } from '../with-urql-client';
+import type { NextUrqlPageContext } from '../types';
 import * as init from '../init-urql-client';
 
 const MockApp: React.FC<any> = () => {
