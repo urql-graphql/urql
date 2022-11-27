@@ -82,6 +82,7 @@
     "@rollup/plugin-sucrase": "^5.0.0",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/pluginutils": "^5.0.0",
+    "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "cjs-module-lexer": "^1.2.2",
