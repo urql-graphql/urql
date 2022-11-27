@@ -1,5 +1,7 @@
 // eslint-disable-next-line
 const { defineConfig } = require('cypress');
+// eslint-disable-next-line
+const tsconfigPaths = require('vite-tsconfig-paths').default;
 
 module.exports = defineConfig({
   video: false,
@@ -16,6 +18,7 @@ module.exports = defineConfig({
       framework: 'react',
       bundler: 'vite',
       viteConfig: {
+        plugins: [tsconfigPaths()],
         server: {
           fs: {
             allow: ['../..'],
