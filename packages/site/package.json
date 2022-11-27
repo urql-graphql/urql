@@ -5,12 +5,12 @@
   "private": true,
   "scripts": {
     "start": "react-static start",
-    "build": "react-static build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-static build",
     "lint": "eslint --ext=js,jsx .",
     "clean": "rimraf dist",
     "prepublishOnly": "run-s clean build",
-    "stage:build": "react-static build --staging",
-    "prod:build": "react-static build",
+    "stage:build": "pnpm build --staging",
+    "prod:build": "pnpm build",
     "prod:serve": "formideploy serve",
     "deploy": "formideploy deploy"
   },
@@ -56,13 +56,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
-    "@octokit/plugin-request-log": "1.0.0",
     "@mdx-js/mdx": "^1.5.7",
+    "@octokit/plugin-request-log": "1.0.0",
     "formideploy": "^0.4.2",
     "lodash": "^4.17.19",
     "react-hot-loader": "^4.12.20",
     "react-static-plugin-sitemap": "7.2.2",
     "react-static-plugin-styled-components": "7.2.2",
+    "resolve-from": "^3.0.0",
     "surge": "^0.21.3"
   }
 }

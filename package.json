@@ -21,10 +21,7 @@
       ],
       "extends": [
         "./scripts/eslint/js-preset.js"
-      ],
-      "rules": {
-        "import/no-unresolved": "off"
-      }
+      ]
     }
   ],
   "eslintIgnore": [
@@ -91,7 +88,6 @@
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-es5": "^1.5.0",
-    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
