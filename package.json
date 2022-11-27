@@ -1,9 +1,5 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "exchanges/*"
-  ],
   "scripts": {
     "test": "vitest",
     "check": "tsc",
@@ -11,6 +7,13 @@
     "build": "node ./scripts/actions/build-all.js",
     "postinstall": "node ./scripts/prepare/postinstall.js",
     "pack": "node ./scripts/actions/pack-all.js"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "react-is": "^17.0.2"
+    }
   },
   "eslintConfig": {
     "root": true,
