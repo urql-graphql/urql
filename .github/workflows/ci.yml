@@ -69,6 +69,7 @@ jobs:
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4
         with:
+          install: false
           command: pnpm cypress run --component
           working-directory: packages/react-urql
 
@@ -102,6 +103,7 @@ jobs:
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4
         with:
+          install: false
           command: yarn cypress run --component
           working-directory: exchanges/graphcache
 
