@@ -5,10 +5,11 @@
     "baseUrl": "./",
     "target": "es2019",
     "paths": {
-      "urql": ["../../node_modules/urql/src"],
-      "*-urql": ["../../node_modules/*-urql/src"],
-      "@urql/core/*": ["../../node_modules/@urql/core/src/*"],
-      "@urql/*": ["../../node_modules/@urql/*/src"]
+      "urql": ["../../packages/react-urql/src"],
+      "*-urql": ["../../packages/*-urql/src"],
+      "@urql/exchange-*": ["../../exchanges/*/src"],
+      "@urql/core/*": ["../../packages/core/src/*"],
+      "@urql/*": ["../../packages/*-urql/src", "../../packages/*/src"]
     }
   }
 }
