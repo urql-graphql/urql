@@ -10,7 +10,7 @@ import {
   ExchangeIO,
 } from '@urql/core';
 
-import { retryExchange, RetryExchangeOptions } from './retryExchange';
+import { retryExchange } from './retryExchange';
 
 const dispatchDebug = vi.fn();
 
@@ -101,7 +101,7 @@ it(`retries if it hits an error and works for multiple concurrent operations`, (
     return pipe(ops$, map(response));
   };
 
-  const mockRetryIf = vi.fn((() => true) as RetryExchangeOptions['retryIf']);
+  const mockRetryIf = vi.fn(() => true);
 
   pipe(
     retryExchange({
@@ -161,7 +161,7 @@ it('should retry x number of times and then return the successful result', () =>
     return pipe(ops$, map(response));
   };
 
-  const mockRetryIf = vi.fn((() => true) as RetryExchangeOptions['retryIf']);
+  const mockRetryIf = vi.fn(() => true);
 
   pipe(
     retryExchange({

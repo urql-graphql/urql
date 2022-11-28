@@ -56,8 +56,8 @@ const storage = {
   onOnline: vi.fn(),
   writeData: vi.fn(() => Promise.resolve(undefined)),
   writeMetadata: vi.fn(() => Promise.resolve(undefined)),
-  readData: vi.fn(() => Promise.resolve(undefined)),
-  readMetadata: vi.fn(() => Promise.resolve(undefined)),
+  readData: vi.fn(() => Promise.resolve({})),
+  readMetadata: vi.fn(() => Promise.resolve([])),
 };
 
 describe('storage', () => {

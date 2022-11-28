@@ -661,7 +661,7 @@ it('supports seeing the same optimistic key multiple times (correctly reorders)'
 
   let queryRes = query(store, { query: Todos });
   expect(queryRes.partial).toBe(false);
-  expect(queryRes.data.todos[0].complete).toEqual(true);
+  expect(queryRes.data?.todos?.[0]?.complete).toEqual(true);
 
   writeOptimistic(
     store,
@@ -672,7 +672,7 @@ it('supports seeing the same optimistic key multiple times (correctly reorders)'
   queryRes = query(store, { query: Todos });
 
   expect(queryRes.partial).toBe(false);
-  expect(queryRes.data.todos[0].complete).toEqual(false);
+  expect(queryRes.data?.todos?.[0]?.complete).toEqual(false);
 
   writeOptimistic(
     store,
@@ -681,7 +681,7 @@ it('supports seeing the same optimistic key multiple times (correctly reorders)'
   );
   queryRes = query(store, { query: Todos });
   expect(queryRes.partial).toBe(false);
-  expect(queryRes.data.todos[0].complete).toEqual(true);
+  expect(queryRes.data?.todos?.[0]?.complete).toEqual(true);
 
   writeOptimistic(
     store,
@@ -692,5 +692,5 @@ it('supports seeing the same optimistic key multiple times (correctly reorders)'
   queryRes = query(store, { query: Todos });
 
   expect(queryRes.partial).toBe(false);
-  expect(queryRes.data.todos[0].complete).toEqual(false);
+  expect(queryRes.data?.todos?.[0]?.complete).toEqual(false);
 });
