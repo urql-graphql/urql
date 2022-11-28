@@ -344,6 +344,7 @@ importers:
       '@mdx-js/mdx': ^1.5.7
       '@mdx-js/react': ^1.6.22
       '@octokit/plugin-request-log': 1.0.0
+      babel-plugin-universal-import: ^3.1.3
       formidable-oss-badges: 0.3.5
       formideploy: ^0.4.2
       fuse.js: ^6.4.6
@@ -364,13 +365,14 @@ importers:
       react-router-dom: ^5.2.0
       react-router-ga: ^1.2.3
       react-scroll: ^1.8.1
-      react-static: 7.2.2
-      react-static-plugin-md-pages: ^0.3.2
+      react-static: 7.3.0
+      react-static-plugin-md-pages: ^0.3.3
       react-static-plugin-sitemap: 7.2.2
       react-static-plugin-styled-components: 7.2.2
       resolve-from: ^3.0.0
       styled-components: ^5.2.3
       surge: ^0.21.3
+      webpack: '>=4.4.6'
     dependencies:
       '@babel/runtime': 7.20.1
       '@mdx-js/react': 1.6.22_react@17.0.2
@@ -391,20 +393,22 @@ importers:
       react-router-dom: 5.2.0_react@17.0.2
       react-router-ga: 1.2.3_kif4pc2luqdf47h6j7sqnbsxne
       react-scroll: 1.8.2_sfoxds7t5ydpegc3knd667wn6m
-      react-static: 7.2.2_react-hot-loader@4.13.0
-      react-static-plugin-md-pages: 0.3.2_7yzzpf7opgc42idftna3psjbru
+      react-static: 7.3.0_react-hot-loader@4.13.0
+      react-static-plugin-md-pages: 0.3.3_xgkhbco6atghv75bh5wsakkl2e
       styled-components: 5.2.3_fane7jikarojcev26y27hpbhu4
     devDependencies:
       '@babel/core': 7.20.2
       '@mdx-js/mdx': 1.6.22
       '@octokit/plugin-request-log': 1.0.0
+      babel-plugin-universal-import: 3.1.3_webpack@4.46.0
       formideploy: 0.4.2
       lodash: 4.17.21
       react-hot-loader: 4.13.0_sfoxds7t5ydpegc3knd667wn6m
-      react-static-plugin-sitemap: 7.2.2_react-static@7.2.2
+      react-static-plugin-sitemap: 7.2.2_react-static@7.3.0
       react-static-plugin-styled-components: 7.2.2_fayjhbjxuiggpd6pbyt74m547u
       resolve-from: 3.0.0
       surge: 0.21.7
+      webpack: 4.46.0
 
   packages/storage-rn:
     specifiers:
@@ -1940,7 +1944,7 @@ packages:
       prettier: 1.19.1
     dev: true
 
-  /@cypress/react/7.0.1_cypress@11.1.0:
+  /@cypress/react/7.0.1_ddmelm2ieimfs7lfnlxmtlhrry:
     resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
     peerDependencies:
       '@types/react': ^16.9.16 || ^17.0.0
@@ -4612,6 +4616,15 @@ packages:
 
   /babel-plugin-transform-react-remove-prop-types/0.4.24:
     resolution: {integrity: sha512-eqj0hVcJUR57/Ug2zE1Yswsw4LhuqqHhD+8v120T1cl3kjg76QwtyBrdIk4WVwK+lAhBJVYCd/v+4nc4y+8JsA==}
+
+  /babel-plugin-universal-import/3.1.3_webpack@4.46.0:
+    resolution: {integrity: sha512-bb4snq4HzVhBVxugbWpWw4J+LLDaJ1mT3QPmbi3zpcsHLEXdCKLGQFGO2Xjwk4F+d76XwQ0xYa8PzZjogDldfQ==}
+    peerDependencies:
+      webpack: ^4.4.0
+    dependencies:
+      '@babel/helper-module-imports': 7.18.6
+      webpack: 4.46.0
+    dev: true
 
   /babel-plugin-universal-import/4.0.2_webpack@4.46.0:
     resolution: {integrity: sha512-VTtHsmvwRBkX3yLK4e+pFwk88BC6iNFqS2J8CCx2ddQc7RjXoRhuXXIgYCng21DYNty9IicCwDdTDjdr+TM7eg==}
@@ -13252,8 +13265,8 @@ packages:
     dependencies:
       react: 17.0.2
 
-  /react-static-plugin-md-pages/0.3.2_7yzzpf7opgc42idftna3psjbru:
-    resolution: {integrity: sha512-YvZ2MrO9TfkLsXu/lIMKB11ziuRDReT1mGrpOUV6CIYgXHOSACzU7e0VtwWaHq7e5Hz5/J9ACEBrEt24UG/VUg==}
+  /react-static-plugin-md-pages/0.3.3_xgkhbco6atghv75bh5wsakkl2e:
+    resolution: {integrity: sha512-2vJO2g62zKf5avSsT/5IEbDPhAoWjP4tH+nyMLKta1G4AixlqPYagS7aCpDXRpzgs9ot8LN/aewrd5Vi1oWqew==}
     peerDependencies:
       react-static: '>=7.0.0'
     dependencies:
@@ -13263,7 +13276,7 @@ packages:
       glob: 7.1.6
       loader-utils: 1.4.0
       mdast-util-to-string: 1.1.0
-      react-static: 7.2.2_react-hot-loader@4.13.0
+      react-static: 7.3.0_react-hot-loader@4.13.0
       remark: 11.0.2
       remark-frontmatter: 1.3.3
       remark-squeeze-paragraphs: 3.0.4
@@ -13277,14 +13290,14 @@ packages:
       - supports-color
     dev: false
 
-  /react-static-plugin-sitemap/7.2.2_react-static@7.2.2:
+  /react-static-plugin-sitemap/7.2.2_react-static@7.3.0:
     resolution: {integrity: sha512-uBnsjJBC/IIH+/FJXBUuMvxUPgZNe5KMPuVJPxaRhXFv9HBgYe9H1tCYnlrkZHRjF5aln399cvKyxrJs1CYhiQ==}
     peerDependencies:
       react-static: ^7.1.0
     dependencies:
       chalk: 2.4.2
       fs-extra: 8.1.0
-      react-static: 7.2.2_react-hot-loader@4.13.0
+      react-static: 7.3.0_react-hot-loader@4.13.0
     dev: true
 
   /react-static-plugin-styled-components/7.2.2_fayjhbjxuiggpd6pbyt74m547u:
@@ -13297,8 +13310,8 @@ packages:
       styled-components: 5.2.3_fane7jikarojcev26y27hpbhu4
     dev: true
 
-  /react-static/7.2.2_react-hot-loader@4.13.0:
-    resolution: {integrity: sha512-+ebhBhRnAT/pPqwJBF1gqqxJOZWpV57fklxm5yM7zRU6xa+CNG3wnYj8VgYI4asjI+WSLnWx92Z+Yk2bWSKd9w==}
+  /react-static/7.3.0_react-hot-loader@4.13.0:
+    resolution: {integrity: sha512-oOEXADtXhaCaVGOOwQcIRf9TDnVMFEBZ9+23Yu34KHdnMHZ4okyuMITbsd/G83aw4uVIsr/0s+rfPxAQakVvtg==}
     engines: {node: '>=8.9.0'}
     hasBin: true
     peerDependencies:
