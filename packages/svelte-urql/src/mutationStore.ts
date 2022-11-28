@@ -34,7 +34,11 @@ export type MutationArgs<
       variables: Variables;
     });
 
-export function mutationStore<Data = any, Result = Data, Variables = object>(
+export function mutationStore<
+  Data = any,
+  Result = Data,
+  Variables extends AnyVariables = AnyVariables
+>(
   args: MutationArgs<Data, Variables>,
   handler?: SubscriptionHandler<Data, Result>
 ): OperationResultStore<Result, Variables> {
