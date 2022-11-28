@@ -14,28 +14,13 @@
       "./scripts/eslint/preset.js"
     ]
   },
-  "overrides": [
-    {
-      "files": [
-        "examples/**/*"
-      ],
-      "extends": [
-        "./scripts/eslint/js-preset.js"
-      ]
-    }
-  ],
-  "eslintIgnore": [
-    "packages/site/dist-prod",
-    "docs"
-  ],
   "prettier": {
     "singleQuote": true,
     "arrowParens": "avoid",
     "trailingComma": "es5"
   },
   "lint-staged": {
-    "*.{ts,tsx}": "eslint -c scripts/eslint/preset.js --fix",
-    "*.{js,jsx}": "eslint -c scripts/eslint/js-preset.js --fix",
+    "*.{js,jsx,ts,tsx}": "eslint -c scripts/eslint/preset.js --fix",
     "*.json": "prettier --write",
     "*.md": "prettier --write"
   },

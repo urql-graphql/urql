@@ -22,15 +22,6 @@
       "babel-plugin-styled-components"
     ]
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "../../scripts/eslint/js-preset.js"
-    ]
-  },
-  "eslintIgnore": [
-    "dist-prod"
-  ],
   "dependencies": {
     "@babel/runtime": "^7.20.1",
     "@mdx-js/react": "^1.6.22",
