@@ -1,1 +1,2 @@
-export { retryExchange, RetryExchangeOptions } from './retryExchange';
+export { retryExchange } from './retryExchange';
+export type { RetryExchangeOptions } from './retryExchange';
