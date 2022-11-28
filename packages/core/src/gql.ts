@@ -1,6 +1,6 @@
 /* eslint-disable prefer-rest-params */
 import { DocumentNode, DefinitionNode, Kind } from 'graphql';
-import { TypedDocumentNode } from './types';
+import { AnyVariables, TypedDocumentNode } from './types';
 import { keyDocument, stringifyDocument } from './utils';
 
 const applyDefinitions = (
@@ -34,12 +34,12 @@ const applyDefinitions = (
   }
 };
 
-function gql<Data = any, Variables = object>(
+function gql<Data = any, Variables extends AnyVariables = AnyVariables>(
   strings: TemplateStringsArray,
   ...interpolations: Array<TypedDocumentNode | DocumentNode | string>
 ): TypedDocumentNode<Data, Variables>;
 
-function gql<Data = any, Variables = object>(
+function gql<Data = any, Variables extends AnyVariables = AnyVariables>(
   string: string
 ): TypedDocumentNode<Data, Variables>;
 
