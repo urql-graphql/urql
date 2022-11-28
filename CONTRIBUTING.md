@@ -63,44 +63,45 @@ description, e.g. "Update X" or "Refactor Y."
 
 ## How do I set up the project?
 
-Luckily it's not hard to get started. You can install dependencies using yarn.
-Please don't use `npm` to respect the lockfile.
+Luckily it's not hard to get started. You can install dependencie
+[using `pnpm`](https://pnpm.io/installation#using-corepack).
+Please don't use `npm` or `yarn` to respect the lockfile.
 
 ```sh
-yarn
+pnpm install
 ```
 
 There are multiple commands you can run in the root folder to test your changes:
 
 ```sh
 # TypeScript checks:
-yarn run check
+pnpnm run check
 
 # Linting (prettier & eslint):
-yarn run lint
+pnpm run lint
 
-# Jest Tests (for all packages):
-yarn run test
+# Unit Tests (for all packages):
+pnpm run test
 
 # Builds (for all packages):
-yarn run build
+pnpm run build
 ```
 
 You can find the main packages in `packages/*` and the addon exchanges in `exchanges/*`.
 Each package also has its own scripts that are common and shared between all packages.
 
 ```sh
-# Jest Tests for the current package:
-yarn run test
+# Unit Tests for the current package:
+pnpm run test
 
 # Linting (prettier & eslint):
-yarn run lint
+pnpm run lint
 
-# Builds for the current package:
-yarn run build
+# Build the current package:
+pnpm run build
 
 # TypeScript checks for the current package:
-yarn run check
+pnpm run check
 ```
 
 While you can run `build` globally in the interest of time it's advisable to only run it
@@ -110,15 +111,16 @@ to be built.
 ## How do I test my changes?
 
 It's always good practice to run the tests when making changes. If you're unsure which packages
-may be affected by your new tests or changes you may run `yarn test --watch` in the root of
+may be affected by your new tests or changes you may run `pnpm test` in the root of
 the repository.
 
-If your editor is not set up with type checks you may also want to run `yarn run check` on your
+If your editor is not set up with type checks you may also want to run `pnpm run check` on your
 changes.
 
 Additionally you can head to any example in the `examples/` folder
-and run them. There you'll also need to run `yarn` to install their
-dependencies. All examples are started using `yarn start`.
+and run them. There you'll also need to install their dependencies as they're isolated projects,
+without a lockfile and without linking to packages in the monorepos.
+All examples are started using the `package.json`'s `start` script.
 
 ## How do I lint my code?
 
@@ -139,7 +141,7 @@ a change entry as markdown.
 
 ```sh
 # In the root of the urql repository call:
-yarn changeset
+pnpm changeset
 ```
 
 This will create a new "changeset file" in the `.changeset` folder, which you should commit and
@@ -147,7 +149,7 @@ push, so that it's added to your PR.
 This will eventually end up in the package's `CHANGELOG.md` file when we do a release.
 
 You won't need to add a changeset if you're simply making "non-visible" changes to the docs or other
-files that aren't published to `npm`.
+files that aren't published to the npm registry.
 
 [Read more about adding a `changeset` here.](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md#i-am-in-a-multi-package-repository-a-mono-repo)
 
@@ -155,7 +157,7 @@ files that aren't published to `npm`.
 
 Hold up, that's **automated**! Since we use `changeset` to document our changes, which determines what
 goes into the changelog and what kind of version bump a change should make, you can also use the
-tool to check what's currently posed to change after a release batch using: `yarn changeset status`.
+tool to check what's currently posed to change after a release batch using: `pnpm changeset status`.
 
 We have a [GitHub Actions workflow](./.github/workflow/release.yml) which is triggered whenever new
 changes are merged. It will always open a **"Version Packages" PR** which is kept up-to-date. This PR
@@ -163,7 +165,7 @@ documents all changes that are made and will show in its description what all ne
 going to contain for their new entries.
 
 Once a "Version Packages" PR is approved by a contributor and merged, the action will automatically
-take care of creating the release, publishing all updated packages to `npm`, and creating
+take care of creating the release, publishing all updated packages to the npm registry, and creating
 appropriate tags on GitHub too.
 
 This process is automated, but the changelog should be checked for errors.
@@ -178,20 +180,20 @@ fatigue as low as possible for downstream maintainers.
 ## How do I upgrade all dependencies?
 
 It may be a good idea to keep all dependencies on the `urql` repository **up-to-date** every now and
-then. Typically we do this by running `yarn upgrade-interactive --latest` and checking one-by-one
+then. Typically we do this by running `pnpm update --interactive --latest` and checking one-by-one
 which dependencies will need to be bumped. In case of any security issues it may make sense to
-just run `yarn upgrade [package]`.
+just run `pnpm update [package]`.
 
-Afterwards `yarn` may accidentally introduce duplicate packages due to some transitive dependencies
-having been upgraded separately. This can be fixed by running:
+While this is rare with `pnpm`, upgrading some transitive dependencies may accidentally duplicate
+them if two packages depend on different compatible version ranges. This can be fixed by running:
 
 ```sh
-npx yarn-deduplicate yarn.lock
-yarn
+npx pnpm-deduplicate
+pnpm install
 ```
 
-It's common to then **create a PR** (with a changeset documenting the packages that need to reflect new
-changes if any `dependencies` have changed) with the name of
+It's common to then **create a PR** (with a changeset documenting the packages that need to reflect
+new changes if any `dependencies` have changed) with the name of
 "(chore) - Upgrade direct and transitive dependencies" or something similar.
 
 ## How do I add a new package?
@@ -232,14 +234,14 @@ When setting up your package make sure to create a `src/index.ts` file
 copy over the `tsconfig.json` from another package (You won't need to change it).
 
 The `scripts.prepare` task is set up to check your new `package.json` file for correctness. So in
-case you get anything wrong, you'll get a short error when running `yarn` after setting your new
+case you get anything wrong, you'll get a short error when running `pnpm` after setting your new
 project up. Just in case! 😄
 
 Afterwards you can check whether everything is working correctly by running:
 
 ```sh
-yarn
-yarn run check
+pnpm install
+pnpm run check
 ```
 
 At this point, **don't publish** the package or a prerelease yourself if you can avoid it. If you can't
