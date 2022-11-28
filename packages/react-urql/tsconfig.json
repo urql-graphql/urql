@@ -3,8 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node", "react"],
-    "jsx": "react",
     "paths": {
       "urql": ["../../packages/react-urql/src"],
       "*-urql": ["../../packages/*-urql/src"],

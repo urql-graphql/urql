@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node"],
     "paths": {
       "urql": ["packages/react-urql/src"],
       "*-urql": ["packages/*-urql/src"],
@@ -26,16 +25,10 @@
   },
   "include": ["packages", "exchanges"],
   "exclude": [
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
+    "**/e2e-tests",
+    "**/examples",
+    "**/dist",
     "scripts",
-    "examples",
-    "packages/*/examples",
-    "packages/*/dist",
-    "exchanges/*/examples",
-    "exchanges/*/dist",
     "node_modules"
   ]
 }

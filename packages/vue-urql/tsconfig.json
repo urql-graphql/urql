@@ -3,7 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "./",
-    "types": ["node", "vue"],
     "paths": {
       "urql": ["../../packages/react-urql/src"],
       "*-urql": ["../../packages/*-urql/src"],

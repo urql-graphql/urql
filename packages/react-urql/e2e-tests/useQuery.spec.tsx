@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { mount } from '@cypress/react';
+import { delay, pipe } from 'wonka';
+
 import {
   Provider,
   createClient,
@@ -12,7 +14,6 @@ import {
   fetchExchange,
   Exchange,
 } from '../src';
-import { delay, pipe } from 'wonka';
 
 const delayExchange: Exchange = ({ forward }) => {
   return ops$ => {
@@ -63,7 +64,7 @@ const Pokemons = () => {
 };
 
 describe('Suspense', () => {
-  let UrqlProvider;
+  let UrqlProvider: React.FC;
   beforeEach(() => {
     const client = createClient({
       url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
