@@ -1,5 +1,5 @@
 const run = require('execa')(
-  'yarn',
+  'pnpm',
   ['run', process.env.INPUT_COMMAND],
   { cwd: process.cwd(), }
 );

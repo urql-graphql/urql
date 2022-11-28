@@ -67,21 +67,5 @@ module.exports = {
     react: {
       version: 'detect',
     },
-    'import/extensions': [
-      '.js',
-      '.jsx',
-      '.ts',
-      '.tsx',
-    ],
-    'import/resolver': {
-      node: {
-        extensions: [
-          '.js',
-          '.jsx',
-          '.ts',
-          '.tsx',
-        ]
-      },
-    },
   },
 };

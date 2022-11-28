@@ -1,9 +1,5 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "exchanges/*"
-  ],
   "scripts": {
     "test": "vitest",
     "check": "tsc",
@@ -25,10 +21,7 @@
       ],
       "extends": [
         "./scripts/eslint/js-preset.js"
-      ],
-      "rules": {
-        "import/no-unresolved": "off"
-      }
+      ]
     }
   ],
   "eslintIgnore": [
@@ -51,11 +44,25 @@
       "pre-commit": "lint-staged --quiet --relative"
     }
   },
-  "resolutions": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-is": "^17.0.2",
-    "wonka": "^6.0.0"
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "react-native"
+      ],
+      "allowedVersions": {
+        "react": "17",
+        "react-dom": "17",
+        "react-is": "17",
+        "styled-components": "5"
+      }
+    },
+    "overrides": {
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "react-is": "^17.0.2",
+      "styled-components": "^5.2.3",
+      "wonka": "^6.0.0"
+    }
   },
   "devDependencies": {
     "@actions/artifact": "^1.1.0",
@@ -72,6 +79,7 @@
     "@rollup/plugin-sucrase": "^5.0.0",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/pluginutils": "^5.0.0",
+    "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "cjs-module-lexer": "^1.2.2",
@@ -80,7 +88,6 @@
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-es5": "^1.5.0",
-    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
@@ -100,11 +107,14 @@
     "rimraf": "^3.0.2",
     "rollup": "^3.3.0",
     "rollup-plugin-generate-package-json": "^3.2.0",
-    "rollup-plugin-typescript2": "0.32.1",
+    "rollup-plugin-tsconfig-paths": "^1.4.0",
+    "rollup-plugin-typescript2": "0.34.1",
     "rollup-plugin-visualizer": "^5.8.0",
     "tar": "^6.1.0",
     "terser": "^5.14.1",
     "typescript": "^4.7.3",
+    "vite": "^3.0.0",
+    "vite-tsconfig-paths": "^4.0.0-alpha.3",
     "vitest": "^0.25.3"
   }
 }

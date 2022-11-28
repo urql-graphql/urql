@@ -17,39 +17,37 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 18
 
-      - name: Get Yarn cache directory
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Use Yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - name: Use pnpm store
+        uses: actions/cache@v3
+        id: pnpm-cache
+        with:
+          path: |
+            ~/.cache/Cypress
+            ${{ steps.pnpm-store.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Use node_modules cache
-        id: node-modules-cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+            ${{ runner.os }}-pnpm-
 
       - name: Install Dependencies
-        if: |
-          steps.yarn-cache.outputs.cache-hit != 'true' ||
-          steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: yarn install --prefer-offline --frozen-lockfile --non-interactive --silent
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: PR or Publish
         id: changesets
         uses: changesets/action@b3300fad33b6ab794313da28d27424c0e2f78991
         with:
-          publish: yarn changeset publish
+          publish: pnpm changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

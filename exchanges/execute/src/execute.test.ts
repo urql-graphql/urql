@@ -12,7 +12,7 @@ vi.mock('graphql', async () => {
   };
 });
 
-import { fetchExchange } from 'urql';
+import { fetchExchange } from '@urql/core';
 import { executeExchange } from './execute';
 import { execute, print, subscribe } from 'graphql';
 import {

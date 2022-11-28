@@ -12,7 +12,6 @@ const hasReact = [
   'dependencies',
   'optionalDependencies',
   'peerDependencies',
-  'devDependencies'
 ].some((dep) => pkg[dep] && pkg[dep].react);
 
 const normalize = name => name

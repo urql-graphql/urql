@@ -1,21 +1,15 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import path from 'path';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     environment: 'jsdom',
     globals: false,
     maxConcurrency: 20,
-    setupFiles: [path.resolve(__dirname, 'scripts/vitest/setup.js')],
+    setupFiles: [resolve(__dirname, 'scripts/vitest/setup.js')],
     clearMocks: true,
-    alias: {
-      urql: path.resolve(__dirname, 'node_modules/urql/src'),
-      '@urql/core': path.resolve(__dirname, 'node_modules/@urql/core/src'),
-      '@urql/introspection': path.resolve(
-        __dirname,
-        'node_modules/@urql/introspection/src'
-      ),
-    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

@@ -47,10 +47,15 @@
     "prepare": "node ../../scripts/prepare/index.js",
     "prepublishOnly": "run-s clean build"
   },
-  "devDependencies": {
+  "peerDependencies": {
+    "@urql/exchange-graphcache": ">=5.0.0",
     "@react-native-async-storage/async-storage": "^1.15.5",
-    "@react-native-community/netinfo": "^6.0.0",
-    "@urql/exchange-graphcache": ">=5.0.0"
+    "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0"
+  },
+  "devDependencies": {
+    "@urql/exchange-graphcache": "*",
+    "@react-native-async-storage/async-storage": "^1.15.5",
+    "@react-native-community/netinfo": "^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0"
   },
   "publishConfig": {
     "access": "public"
