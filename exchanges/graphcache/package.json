@@ -69,8 +69,12 @@
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
   },
   "devDependencies": {
+    "@cypress/react": "^7.0.1",
+    "@urql/exchange-execute": "*",
     "@urql/introspection": "*",
-    "graphql": "^16.0.0"
+    "cypress": "^11.1.0",
+    "graphql": "^16.0.0",
+    "urql": "*"
   },
   "publishConfig": {
     "access": "public"

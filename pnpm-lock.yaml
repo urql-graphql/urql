@@ -150,16 +150,24 @@ importers:
 
   exchanges/graphcache:
     specifiers:
+      '@cypress/react': ^7.0.1
       '@urql/core': '>=3.0.5'
+      '@urql/exchange-execute': '*'
       '@urql/introspection': '*'
+      cypress: ^11.1.0
       graphql: ^16.0.0
+      urql: '*'
       wonka: ^6.0.0
     dependencies:
       '@urql/core': link:../../packages/core
       wonka: 6.0.0
     devDependencies:
+      '@cypress/react': 7.0.1_cypress@11.1.0
+      '@urql/exchange-execute': link:../execute
       '@urql/introspection': link:../../packages/introspection
+      cypress: 11.1.0
       graphql: 16.0.1
+      urql: link:../../packages/react-urql
 
   exchanges/multipart-fetch:
     specifiers:
@@ -233,11 +241,9 @@ importers:
 
   packages/core:
     specifiers:
-      '@graphql-typed-document-node/core': ^3.1.1
       graphql: ^16.0.0
       wonka: ^6.0.0
     dependencies:
-      '@graphql-typed-document-node/core': 3.1.1_graphql@16.0.1
       wonka: 6.0.0
     devDependencies:
       graphql: 16.0.1
@@ -1926,6 +1932,20 @@ packages:
       prettier: 1.19.1
     dev: true
 
+  /@cypress/react/7.0.1_cypress@11.1.0:
+    resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
+    peerDependencies:
+      '@types/react': ^16.9.16 || ^17.0.0
+      cypress: '*'
+      react: ^=16.x || ^=17.x || 17
+      react-dom: ^=16.x || ^=17.x || 17
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      cypress: 11.1.0
+    dev: true
+
   /@cypress/react/7.0.1_lw4gcyxdwtegyfzpw42cvz7cm4:
     resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
     peerDependencies:
@@ -2107,14 +2127,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@graphql-typed-document-node/core/3.1.1_graphql@16.0.1:
-    resolution: {integrity: sha512-NQ17ii0rK1b34VZonlmT2QMJFI70m0TRwbknO/ihlbatXyaktDhN/98vBiUU6kNBPljqGqyIrl2T4nY2RpFANg==}
-    peerDependencies:
-      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      graphql: 16.0.1
-    dev: false
 
   /@hapi/accept/5.0.2:
     resolution: {integrity: sha512-CmzBx/bXUR8451fnZRuZAJRlzgm0Jgu5dltTX/bszmR2lheb9BpyN47Q1RbaGTsvFzn0PXAEs+lXDKfshccYZw==}
@@ -3448,7 +3460,7 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 18.11.9
 
   /@types/markdown-to-jsx/6.11.3:
     resolution: {integrity: sha512-30nFYpceM/ZEvhGiqWjm5quLUxNeld0HCzJEXMZZDpq53FPkS85mTwkWtCXzCqq8s5JYLgM5W392a02xn8Bdaw==}
@@ -3494,7 +3506,6 @@ packages:
 
   /@types/node/18.11.9:
     resolution: {integrity: sha512-CRpX21/kGdzjOpFsZSkcrXMGIBWMGNIHXXBVFSH+ggkftxg+XYP20TESbh+zFvFj3EQOl5byk0HTRn1IL6hbqg==}
-    dev: true
 
   /@types/normalize-package-data/2.4.0:
     resolution: {integrity: sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==}
@@ -3565,7 +3576,7 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 18.11.9
 
   /@types/scheduler/0.16.1:
     resolution: {integrity: sha512-EaCxbanVeyxDRTQBkdLb3Bvl/HK7PBK6UJjsSixB0iHKoWxE5uu2Q/DgtpOhPIojN0Zl1whvOd7PoHs2P0s5eA==}
@@ -3606,7 +3617,7 @@ packages:
   /@types/webpack-sources/2.1.0:
     resolution: {integrity: sha512-LXn/oYIpBeucgP1EIJbKQ2/4ZmpvRl+dlrFdX7+94SKRUV3Evy3FsfMZY318vGhkWUS5MPhtOM3w1/hCOAOXcg==}
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 18.11.9
       '@types/source-list-map': 0.1.2
       source-map: 0.7.4
     dev: true
@@ -10029,7 +10040,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 18.11.9
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true

@@ -21,13 +21,13 @@ import {
   Subscription,
 } from 'wonka';
 
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode } from 'graphql';
 
 import { composeExchanges, defaultExchanges } from './exchanges';
 import { fallbackExchange } from './exchanges/fallback';
 
 import {
+  TypedDocumentNode,
   AnyVariables,
   Exchange,
   ExchangeInput,

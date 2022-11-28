@@ -1,8 +1,22 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { GraphQLError, DocumentNode } from 'graphql';
 import { Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
+
+// NOTE: This is mirrored from @graphql-typed-document-node/core and must match this type exactly.
+// It has been copied here to avoid tooling problems where build systems get confused about the type-only nature of this package.
+// See for original: https://github.com/dotansimha/graphql-typed-document-node/blob/3711b12/packages/core/src/index.ts#L3-L10
+export interface TypedDocumentNode<
+  Result = { [key: string]: any },
+  Variables = { [key: string]: any }
+> extends DocumentNode {
+  /**
+   * This type is used to ensure that the variables you pass in to the query are assignable to Variables
+   * and that the Result is assignable to whatever you pass your result to. The method is never actually
+   * implemented, but the type is valid because we list it as optional
+   */
+  __apiType?: (variables: Variables) => Result;
+}
 
 export type ExecutionResult =
   | {

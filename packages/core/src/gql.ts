@@ -1,6 +1,6 @@
 /* eslint-disable prefer-rest-params */
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { DocumentNode, DefinitionNode, Kind } from 'graphql';
+import { TypedDocumentNode } from './types';
 import { keyDocument, stringifyDocument } from './utils';
 
 const applyDefinitions = (

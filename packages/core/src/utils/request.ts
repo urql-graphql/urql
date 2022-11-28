@@ -1,5 +1,3 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-
 import {
   Location,
   DefinitionNode,
@@ -11,7 +9,7 @@ import {
 
 import { hash, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
-import { AnyVariables, GraphQLRequest } from '../types';
+import { TypedDocumentNode, AnyVariables, GraphQLRequest } from '../types';
 
 interface WritableLocation {
   loc: Location | undefined;
