@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { Client, TypedDocumentNode } from '@urql/core';
+import { AnyVariables, Client, TypedDocumentNode } from '@urql/core';
 import {
   WatchStopHandle,
   getCurrentInstance,
@@ -23,16 +23,16 @@ import {
 export interface ClientHandle {
   client: Client;
 
-  useQuery<T = any, V = object>(
+  useQuery<T = any, V extends AnyVariables = AnyVariables>(
     args: UseQueryArgs<T, V>
   ): UseQueryResponse<T, V>;
 
-  useSubscription<T = any, R = T, V = object>(
+  useSubscription<T = any, R = T, V extends AnyVariables = AnyVariables>(
     args: UseSubscriptionArgs<T, V>,
     handler?: SubscriptionHandlerArg<T, R>
   ): UseSubscriptionResponse<T, R, V>;
 
-  useMutation<T = any, V = any>(
+  useMutation<T = any, V extends AnyVariables = AnyVariables>(
     query: TypedDocumentNode<T, V> | DocumentNode | string
   ): UseMutationResponse<T, V>;
 }
@@ -49,20 +49,20 @@ export function useClientHandle(): ClientHandle {
   const handle: ClientHandle = {
     client: client.value,
 
-    useQuery<T = any, V = object>(
+    useQuery<T = any, V extends AnyVariables = AnyVariables>(
       args: UseQueryArgs<T, V>
     ): UseQueryResponse<T, V> {
       return callUseQuery(args, client, stops);
     },
 
-    useSubscription<T = any, R = T, V = object>(
+    useSubscription<T = any, R = T, V extends AnyVariables = AnyVariables>(
       args: UseSubscriptionArgs<T, V>,
       handler?: SubscriptionHandlerArg<T, R>
     ): UseSubscriptionResponse<T, R, V> {
       return callUseSubscription(args, handler, client, stops);
     },
 
-    useMutation<T = any, V = any>(
+    useMutation<T = any, V extends AnyVariables = AnyVariables>(
       query: TypedDocumentNode<T, V> | DocumentNode | string
     ): UseMutationResponse<T, V> {
       return callUseMutation(query, client);
@@ -72,7 +72,7 @@ export function useClientHandle(): ClientHandle {
   if (process.env.NODE_ENV !== 'production') {
     onMounted(() => {
       Object.assign(handle, {
-        useQuery<T = any, V = object>(
+        useQuery<T = any, V extends AnyVariables = AnyVariables>(
           args: UseQueryArgs<T, V>
         ): UseQueryResponse<T, V> {
           if (process.env.NODE_ENV !== 'production' && !getCurrentInstance()) {
@@ -84,7 +84,7 @@ export function useClientHandle(): ClientHandle {
           return callUseQuery(args, client, stops);
         },
 
-        useSubscription<T = any, R = T, V = object>(
+        useSubscription<T = any, R = T, V extends AnyVariables = AnyVariables>(
           args: UseSubscriptionArgs<T, V>,
           handler?: SubscriptionHandlerArg<T, R>
         ): UseSubscriptionResponse<T, R, V> {

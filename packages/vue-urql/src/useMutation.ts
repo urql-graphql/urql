@@ -18,7 +18,7 @@ import {
 import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
-export interface UseMutationState<T, V> {
+export interface UseMutationState<T, V extends AnyVariables = AnyVariables> {
   fetching: Ref<boolean>;
   stale: Ref<boolean>;
   data: Ref<T | undefined>;
@@ -31,15 +31,18 @@ export interface UseMutationState<T, V> {
   ) => Promise<OperationResult<T>>;
 }
 
-export type UseMutationResponse<T, V> = UseMutationState<T, V>;
+export type UseMutationResponse<
+  T,
+  V extends AnyVariables = AnyVariables
+> = UseMutationState<T, V>;
 
-export function useMutation<T = any, V = AnyVariables>(
+export function useMutation<T = any, V extends AnyVariables = AnyVariables>(
   query: TypedDocumentNode<T, V> | DocumentNode | string
 ): UseMutationResponse<T, V> {
   return callUseMutation(query);
 }
 
-export function callUseMutation<T = any, V = AnyVariables>(
+export function callUseMutation<T = any, V extends AnyVariables = AnyVariables>(
   query: TypedDocumentNode<T, V> | DocumentNode | string,
   client: Ref<Client> = useClient()
 ): UseMutationResponse<T, V> {

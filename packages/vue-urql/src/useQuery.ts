@@ -57,8 +57,10 @@ export interface UseQueryState<T = any, V extends AnyVariables = AnyVariables> {
   executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V>;
 }
 
-export type UseQueryResponse<T, V> = UseQueryState<T, V> &
-  PromiseLike<UseQueryState<T, V>>;
+export type UseQueryResponse<
+  T,
+  V extends AnyVariables = AnyVariables
+> = UseQueryState<T, V> & PromiseLike<UseQueryState<T, V>>;
 
 const watchOptions = {
   flush: 'pre' as const,
