@@ -1,1 +1,2 @@
-export { executeExchange, ExecuteExchangeArgs } from './execute';
+export { executeExchange } from './execute';
+export type { ExecuteExchangeArgs } from './execute';

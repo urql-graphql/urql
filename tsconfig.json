@@ -10,6 +10,7 @@
       "@urql/*": ["packages/*-urql/src", "packages/*/src"]
     },
     "esModuleInterop": true,
+    "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "noEmit": true,
