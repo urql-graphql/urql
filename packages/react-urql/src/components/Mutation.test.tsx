@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { vi, expect, it, beforeEach, describe, Mock, afterEach } from 'vitest';
 
 vi.mock('../context', async () => {
