@@ -7,7 +7,6 @@ import { Link } from '../../components/link';
 import { PanelSectionWrapper } from '../../components/panel';
 import { SectionTitle } from '../../components/section-title';
 import { SecondaryTitle } from '../../components/secondary-title';
-import { Wrapper } from '../../components/wrapper';
 
 const OSSCardContainer = styled.div`
   display: grid;

@@ -26,7 +26,7 @@ const client = useClient() as { executeSubscription: Mock };
 const query = 'subscription Example { example }';
 
 let state: UseSubscriptionState<any> | undefined;
-let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
+let execute: ((_opts?: Partial<OperationContext>) => void) | undefined;
 
 const SubscriptionUser = ({
   q,
@@ -35,7 +35,7 @@ const SubscriptionUser = ({
   pause = false,
 }: {
   q: string;
-  handler?: (prev: any, data: any) => any;
+  handler?: (_prev: any, _data: any) => any;
   context?: Partial<OperationContext>;
   pause?: boolean;
 }) => {
