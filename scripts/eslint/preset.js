@@ -26,10 +26,7 @@ module.exports = {
     },
   },
 
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-  ],
+  extends: ['prettier'],
 
   plugins: [
     'prettier',
@@ -54,7 +51,8 @@ module.exports = {
 
   overrides: [
     {
-      files: ['**/*.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      files: ['*.ts'],
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
@@ -78,7 +76,8 @@ module.exports = {
     },
 
     {
-      files: ['**/*.tsx'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      files: ['*.tsx'],
       extends: ['plugin:react/recommended'],
       plugins: ['react-hooks'],
       rules: {
@@ -94,6 +93,7 @@ module.exports = {
       files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
       globals: { vi: true },
       rules: {
+        '@typescript-eslint/ban-ts-comment': 'off',
         'es5/no-for-of': 'off',
         'es5/no-generators': 'off',
         'es5/no-typeof-symbol': 'off',
@@ -103,6 +103,7 @@ module.exports = {
     {
       files: ['*.js'],
       rules: {
+        '@typescript-eslint/no-var-requires': 'off',
         'consistent-return': 'warn',
         'no-magic-numbers': 'off',
         'es5/no-es6-methods': 'off',
@@ -118,6 +119,13 @@ module.exports = {
         'react/jsx-key': 'off',
         'react/jsx-handler-names': 'off',
         'es5/no-es6-methods': 'off',
+      },
+    },
+
+    {
+      files: ['examples/**/*.jsx'],
+      rules: {
+        'react/prop-types': 'off',
       },
     },
   ],
