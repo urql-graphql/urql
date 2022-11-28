@@ -26,14 +26,17 @@ module.exports = {
     },
   },
 
-  extends: ['prettier'],
+  extends: ['eslint:recommended', 'prettier'],
 
   plugins: [
+    '@typescript-eslint',
     'prettier',
     'es5',
   ],
 
   rules: {
+    'no-undef': 'off',
+    'no-empty': 'off',
     'sort-keys': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'prefer-arrow/prefer-arrow-functions': 'off',
@@ -41,6 +44,10 @@ module.exports = {
     'es5/no-for-of': 'off',
     'es5/no-generators': 'off',
     'es5/no-typeof-symbol': 'warn',
+
+    'no-unused-vars': ['warn', {
+      argsIgnorePattern: '^_',
+    }],
 
     'prettier/prettier': ['error', {
       singleQuote: true,
