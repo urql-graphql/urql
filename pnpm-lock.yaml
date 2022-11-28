@@ -156,17 +156,21 @@ importers:
       '@urql/introspection': '*'
       cypress: ^11.1.0
       graphql: ^16.0.0
+      react: ^17.0.2
+      react-dom: ^17.0.2
       urql: '*'
       wonka: ^6.0.0
     dependencies:
       '@urql/core': link:../../packages/core
       wonka: 6.0.0
     devDependencies:
-      '@cypress/react': 7.0.1_cypress@11.1.0
+      '@cypress/react': 7.0.1_ddmelm2ieimfs7lfnlxmtlhrry
       '@urql/exchange-execute': link:../execute
       '@urql/introspection': link:../../packages/introspection
       cypress: 11.1.0
       graphql: 16.0.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
       urql: link:../../packages/react-urql
 
   exchanges/multipart-fetch:
@@ -445,6 +449,7 @@ importers:
     optionalDependencies:
       '@storybook/addons': 6.2.9_sfoxds7t5ydpegc3knd667wn6m
       '@urql/devtools': 2.0.3_6datu6bk5t3os3oamu6of3ptzi
+      react: 17.0.2
     devDependencies:
       '@babel/core': 7.20.2
       '@storybook/preact': 6.2.9_dphrbitsrjttkip7d5yfxmh6ii
@@ -453,7 +458,6 @@ importers:
       '@urql/preact': link:../preact-urql
       graphql: 16.0.1
       preact: 10.5.13
-      react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
       typescript: 4.7.3
@@ -1956,6 +1960,8 @@ packages:
         optional: true
     dependencies:
       cypress: 11.1.0
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
     dev: true
 
   /@cypress/react/7.0.1_lw4gcyxdwtegyfzpw42cvz7cm4:

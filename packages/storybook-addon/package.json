@@ -62,7 +62,8 @@
   },
   "optionalDependencies": {
     "@storybook/addons": ">=6.0.28",
-    "@urql/devtools": ">=2.0.0"
+    "@urql/devtools": ">=2.0.0",
+    "react": ">= 16.8.0"
   },
   "publishConfig": {
     "access": "public"
