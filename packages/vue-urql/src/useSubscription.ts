@@ -62,7 +62,7 @@ export interface UseSubscriptionState<
 export type UseSubscriptionResponse<
   T = any,
   R = T,
-  V = object
+  V extends AnyVariables = AnyVariables
 > = UseSubscriptionState<T, R, V>;
 
 const watchOptions = {

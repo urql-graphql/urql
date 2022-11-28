@@ -163,7 +163,7 @@ export class Store<
     input: QueryInput<T, V>,
     updater: (data: T | null) => T | null
   ): void {
-    const request = createRequest<T, V>(input.query, input.variables as any);
+    const request = createRequest(input.query, input.variables!);
     request.query = formatDocument(request.query);
     const output = updater(this.readQuery(request));
     if (output !== null) {
@@ -186,7 +186,7 @@ export class Store<
     return readFragment(
       this,
       formatDocument(fragment),
-      entity,
+      entity as Data,
       variables as any,
       fragmentName
     ) as T | null;
@@ -201,7 +201,7 @@ export class Store<
     writeFragment(
       this,
       formatDocument(fragment),
-      data,
+      data as Data,
       variables as any,
       fragmentName
     );
