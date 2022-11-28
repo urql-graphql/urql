@@ -1,7 +1,7 @@
 import { vi, expect, it, beforeEach, afterEach, describe, Mock } from 'vitest';
 
 vi.mock('graphql', async () => {
-  const graphql = await vi.importActual('graphql');
+  const graphql = await vi.importActual<typeof import('graphql')>('graphql');
 
   return {
     __esModule: true,

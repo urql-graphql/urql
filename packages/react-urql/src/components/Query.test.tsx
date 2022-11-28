@@ -1,7 +1,10 @@
 import { vi, expect, it, beforeEach, describe, afterEach } from 'vitest';
 
 vi.mock('../context', async () => {
-  const { map, interval, pipe } = await vi.importActual('wonka');
+  const { map, interval, pipe } = await vi.importActual<typeof import('wonka')>(
+    'wonka'
+  );
+
   const mock = {
     executeQuery: vi.fn(() =>
       pipe(

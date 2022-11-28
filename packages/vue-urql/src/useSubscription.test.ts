@@ -3,7 +3,7 @@ import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => ({
   __esModule: true,
-  ...((await vi.importActual('./useClient.ts')) as object),
+  ...(await vi.importActual<typeof import('./useClient')>('./useClient.ts')),
   useClient: () => ref(client),
 }));
 

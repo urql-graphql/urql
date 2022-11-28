@@ -1,7 +1,7 @@
 import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./hash', async () => {
-  const hash = await vi.importActual('./hash');
+  const hash = await vi.importActual<typeof import('./hash')>('./hash');
   return {
     ...hash,
     phash: (x: number) => x,
