@@ -184,6 +184,7 @@ describe('offline', () => {
     const queryOp = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const response = vi.fn(
