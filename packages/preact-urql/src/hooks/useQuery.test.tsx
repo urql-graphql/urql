@@ -35,7 +35,7 @@ const props: UseQueryArgs<{ myVar: number }> = {
 };
 
 let state: UseQueryState<any> | undefined;
-let execute: ((opts?: Partial<OperationContext>) => void) | undefined;
+let execute: ((_opts?: Partial<OperationContext>) => void) | undefined;
 
 const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
   query,

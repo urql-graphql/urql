@@ -15,7 +15,7 @@ export const FullWidthContainer = styled.div`
   color: #e3eef8;
   display: flex;
   justify-content: center;
-  ${p => (!!p.isLight ? light : dark)};
+  ${p => (p.isLight ? light : dark)};
   ${p => p.background && `background: ${p.background}`}
 `;
 

@@ -15,9 +15,8 @@ describe('CombinedError', () => {
       networkError: new Error('test'),
     });
 
-    expect(err instanceof CombinedError).toBe(true);
-    expect(err instanceof Error).toBe(true);
-    expect(Error.prototype.isPrototypeOf(err)).toBe(true);
+    expect(err).toBeInstanceOf(CombinedError);
+    expect(err).toBeInstanceOf(Error);
     expect('' + err).toMatchSnapshot();
   });
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 import { Wrapper } from '../../components/wrapper';
@@ -196,9 +196,6 @@ const copyFallBack = copyText => {
 };
 
 const Hero = props => {
-  const [animating, setAnimating] = useState(false);
-  const [copied, setCopied] = useState(false);
-
   const handleCopy = useCallback(
     e => {
       if (!navigator.clipboard) {

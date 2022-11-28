@@ -9,7 +9,7 @@ export default () => ({
       config.externals = [
         ...config.externals,
         (context, request, callback) => {
-          if (/^[.\/]/.test(request)) {
+          if (/^[./]/.test(request)) {
             return callback();
           }
 

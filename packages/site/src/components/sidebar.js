@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Fuse from 'fuse.js';
 import { Link, useLocation } from 'react-router-dom';
 
-import { useMarkdownPage, useMarkdownTree } from 'react-static-plugin-md-pages';
+import { useMarkdownTree } from 'react-static-plugin-md-pages';
 
 import {
   SidebarNavItem,
@@ -171,7 +171,6 @@ const Sidebar = ({ closeSidebar, ...props }) => {
   const [filterTerm, setFilterTerm] = useState('');
   const location = useLocation();
   const tree = useMarkdownTree();
-  const page = useMarkdownPage();
 
   const sidebarItems = useMemo(() => {
     let pathname = location.pathname.match(/docs\/?(.+)?/);
