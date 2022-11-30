@@ -58,6 +58,7 @@ describe('data dependencies', () => {
     const op = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const expected = {
@@ -116,6 +117,7 @@ describe('data dependencies', () => {
       {
         key: 1,
         query: queryOne,
+        variables: undefined,
       },
       {
         requestPolicy: 'cache-only',
@@ -182,11 +184,13 @@ describe('data dependencies', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const opMultiple = client.createRequestOperation('query', {
       key: 2,
       query: queryMultiple,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -416,10 +420,12 @@ describe('data dependencies', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
     const opUnrelated = client.createRequestOperation('query', {
       key: 2,
       query: queryUnrelated,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -475,6 +481,7 @@ describe('data dependencies', () => {
     const opMutation = client.createRequestOperation('mutation', {
       key: 1,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -531,6 +538,7 @@ describe('data dependencies', () => {
     const opMutation = client.createRequestOperation('mutation', {
       key: 1,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -590,6 +598,7 @@ describe('data dependencies', () => {
     const operation = client.createRequestOperation('query', {
       key: 1,
       query,
+      variables: undefined,
     });
 
     const queryResult: OperationResult = {
@@ -681,11 +690,13 @@ describe('optimistic updates', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -772,16 +783,19 @@ describe('optimistic updates', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const opMutationOne = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const opMutationTwo = client.createRequestOperation('mutation', {
       key: 3,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -868,6 +882,7 @@ describe('optimistic updates', () => {
       {
         key: 1,
         query: queryOne,
+        variables: undefined,
       },
       {
         requestPolicy: 'cache-and-network',
@@ -877,6 +892,7 @@ describe('optimistic updates', () => {
     const opMutation = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -981,11 +997,13 @@ describe('optimistic updates', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: authorsQuery,
+      variables: undefined,
     });
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -1058,6 +1076,7 @@ describe('custom resolvers', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -1130,11 +1149,13 @@ describe('custom resolvers', () => {
     const opOne = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const opMutation = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const response = vi.fn(
@@ -1227,11 +1248,13 @@ describe('custom resolvers', () => {
     const queryOperation = client.createRequestOperation('query', {
       key: 1,
       query,
+      variables: undefined,
     });
 
     const mutationOperation = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     const mutationData = {
@@ -1407,11 +1430,13 @@ describe('schema awareness', () => {
     const initialQueryOperation = client.createRequestOperation('query', {
       key: 1,
       query: initialQuery,
+      variables: undefined,
     });
 
     const queryOperation = client.createRequestOperation('query', {
       key: 2,
       query,
+      variables: undefined,
     });
 
     const queryData = {
@@ -1541,11 +1566,13 @@ describe('schema awareness', () => {
     const initialQueryOperation = client.createRequestOperation('query', {
       key: 1,
       query: initialQuery,
+      variables: undefined,
     });
 
     const queryOperation = client.createRequestOperation('query', {
       key: 2,
       query,
+      variables: undefined,
     });
 
     const queryData = {
@@ -1671,13 +1698,38 @@ describe('commutativity', () => {
       publish
     );
 
-    next(client.createRequestOperation('query', { key: 1, query }));
-    next(client.createRequestOperation('query', { key: 2, query }));
+    next(
+      client.createRequestOperation('query', {
+        key: 1,
+        query,
+        variables: undefined,
+      })
+    );
+
+    next(
+      client.createRequestOperation('query', {
+        key: 2,
+        query,
+        variables: undefined,
+      })
+    );
 
     // This shouldn't have any effect:
-    next(client.createRequestOperation('teardown', { key: 2, query }));
+    next(
+      client.createRequestOperation('teardown', {
+        key: 2,
+        query,
+        variables: undefined,
+      })
+    );
 
-    next(client.createRequestOperation('query', { key: 3, query }));
+    next(
+      client.createRequestOperation('query', {
+        key: 3,
+        query,
+        variables: undefined,
+      })
+    );
 
     vi.advanceTimersByTime(5);
     expect(output).toHaveBeenCalledTimes(1);
@@ -1747,12 +1799,23 @@ describe('commutativity', () => {
       publish
     );
 
-    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const queryOpA = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
     const mutationOp = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
-    const queryOpB = client.createRequestOperation('query', { key: 3, query });
+
+    const queryOpB = client.createRequestOperation('query', {
+      key: 3,
+      query,
+      variables: undefined,
+    });
 
     expect(data).toBe(undefined);
 
@@ -1841,12 +1904,23 @@ describe('commutativity', () => {
       publish
     );
 
-    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const queryOpA = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
     const mutationOp = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
-    const queryOpB = client.createRequestOperation('query', { key: 3, query });
+
+    const queryOpB = client.createRequestOperation('query', {
+      key: 3,
+      query,
+      variables: undefined,
+    });
 
     expect(data).toBe(undefined);
 
@@ -1953,10 +2027,15 @@ describe('commutativity', () => {
       publish
     );
 
-    const queryOp = client.createRequestOperation('query', { key: 1, query });
+    const queryOp = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
     const mutationOp = client.createRequestOperation('mutation', {
       key: 2,
       query: mutation,
+      variables: undefined,
     });
 
     expect(data).toBe(undefined);
@@ -2038,15 +2117,28 @@ describe('commutativity', () => {
       publish
     );
 
-    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const queryOpA = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
+
     const subscriptionOp = client.createRequestOperation('subscription', {
       key: 3,
       query: subscription,
+      variables: undefined,
     });
 
     nextOp(queryOpA);
     // Force commutative layers to be created:
-    nextOp(client.createRequestOperation('query', { key: 2, query }));
+    nextOp(
+      client.createRequestOperation('query', {
+        key: 2,
+        query,
+        variables: undefined,
+      })
+    );
+
     nextOp(subscriptionOp);
 
     nextRes({
@@ -2129,21 +2221,34 @@ describe('commutativity', () => {
       publish
     );
 
-    const queryOpA = client.createRequestOperation('query', { key: 1, query });
+    const queryOpA = client.createRequestOperation('query', {
+      key: 1,
+      query,
+      variables: undefined,
+    });
 
     const subscriptionOp = client.createRequestOperation('subscription', {
       key: 2,
       query: subscription,
+      variables: undefined,
     });
 
     const mutationOp = client.createRequestOperation('mutation', {
       key: 3,
       query: mutation,
+      variables: undefined,
     });
 
     nextOp(queryOpA);
     // Force commutative layers to be created:
-    nextOp(client.createRequestOperation('query', { key: 2, query }));
+    nextOp(
+      client.createRequestOperation('query', {
+        key: 2,
+        query,
+        variables: undefined,
+      })
+    );
+
     nextOp(subscriptionOp);
 
     nextRes({
@@ -2270,14 +2375,17 @@ describe('commutativity', () => {
     const combinedOp = client.createRequestOperation('query', {
       key: 42,
       query: combinedQuery,
+      variables: undefined,
     });
     const deferredOp = client.createRequestOperation('query', {
       key: 1,
       query: deferredQuery,
+      variables: undefined,
     });
     const normalOp = client.createRequestOperation('query', {
       key: 2,
       query: normalQuery,
+      variables: undefined,
     });
 
     nextOp(combinedOp);

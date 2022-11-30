@@ -101,6 +101,8 @@ module.exports = {
       globals: { vi: true },
       rules: {
         '@typescript-eslint/ban-ts-comment': 'off',
+        'react-hooks/rules-of-hooks': 'off',
+        'react-hooks/exhaustive-deps': 'off',
         'es5/no-for-of': 'off',
         'es5/no-generators': 'off',
         'es5/no-typeof-symbol': 'off',

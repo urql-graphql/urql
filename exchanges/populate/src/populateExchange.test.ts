@@ -121,6 +121,7 @@ describe('on mutation', () => {
     'mutation',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addTodo @populate
@@ -153,6 +154,7 @@ describe('on query -> mutation', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -178,6 +180,7 @@ describe('on query -> mutation', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addTodo @populate
@@ -225,6 +228,7 @@ describe('on (query w/ fragment) -> mutation', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -253,6 +257,7 @@ describe('on (query w/ fragment) -> mutation', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addTodo @populate {
@@ -327,6 +332,7 @@ describe('on (query w/ unused fragment) -> mutation', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -351,6 +357,7 @@ describe('on (query w/ unused fragment) -> mutation', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addTodo @populate
@@ -405,6 +412,7 @@ describe('on query -> (mutation w/ interface return type)', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -425,6 +433,7 @@ describe('on query -> (mutation w/ interface return type)', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           removeTodo @populate
@@ -469,6 +478,7 @@ describe('on query -> (mutation w/ union return type)', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -489,6 +499,7 @@ describe('on query -> (mutation w/ union return type)', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           updateTodo @populate
@@ -533,6 +544,7 @@ describe('on query -> teardown -> mutation', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           todos {
@@ -551,6 +563,7 @@ describe('on query -> teardown -> mutation', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addTodo @populate
@@ -595,6 +608,7 @@ describe('interface returned in mutation', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           products {
@@ -613,6 +627,7 @@ describe('interface returned in mutation', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addProduct @populate
@@ -656,6 +671,7 @@ describe('nested interfaces', () => {
     'query',
     {
       key: 1234,
+      variables: undefined,
       query: gql`
         query {
           products {
@@ -680,6 +696,7 @@ describe('nested interfaces', () => {
     'mutation',
     {
       key: 5678,
+      variables: undefined,
       query: gql`
         mutation MyMutation {
           addProduct @populate

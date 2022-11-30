@@ -1,7 +1,7 @@
 import { vi, expect, it, describe } from 'vitest';
 
 vi.mock('./hash', async () => {
-  const hash = await vi.importActual('./hash');
+  const hash = await vi.importActual<typeof import('./hash')>('./hash');
   return {
     ...hash,
     phash: (x: number) => x,
@@ -13,14 +13,14 @@ import { gql } from '../gql';
 import { createRequest, stringifyDocument } from './request';
 
 it('should hash identical queries identically', () => {
-  const reqA = createRequest('{ test }');
-  const reqB = createRequest('{ test }');
+  const reqA = createRequest('{ test }', undefined);
+  const reqB = createRequest('{ test }', undefined);
   expect(reqA.key).toBe(reqB.key);
 });
 
 it('should hash identical DocumentNodes identically', () => {
-  const reqA = createRequest(parse('{ testB }'));
-  const reqB = createRequest(parse('{ testB }'));
+  const reqA = createRequest(parse('{ testB }'), undefined);
+  const reqB = createRequest(parse('{ testB }'), undefined);
   expect(reqA.key).toBe(reqB.key);
   expect(reqA.query).toBe(reqB.query);
 });
@@ -28,15 +28,15 @@ it('should hash identical DocumentNodes identically', () => {
 it('should use the hash from a key if available', () => {
   const doc = parse('{ testC }');
   (doc as any).__key = 1234;
-  const req = createRequest(doc);
+  const req = createRequest(doc, undefined);
   expect(req.key).toBe(1234);
 });
 
 it('should hash DocumentNodes and strings identically', () => {
   const docA = parse('{ field }');
   const docB = print(docA).replace(/\s/g, ' ');
-  const reqA = createRequest(docA);
-  const reqB = createRequest(docB);
+  const reqA = createRequest(docA, undefined);
+  const reqB = createRequest(docB, undefined);
   expect(reqA.key).toBe(reqB.key);
   expect(reqA.query).toBe(reqB.query);
 });
@@ -47,7 +47,7 @@ it('should hash graphql-tag documents correctly', () => {
       testD
     }
   `;
-  createRequest(doc);
+  createRequest(doc, undefined);
   expect((doc as any).__key).not.toBe(undefined);
 });
 
@@ -57,7 +57,7 @@ it('should return a valid query object', () => {
       testE
     }
   `;
-  const val = createRequest(doc);
+  const val = createRequest(doc, undefined);
 
   expect(val).toMatchObject({
     key: expect.any(Number),
@@ -92,7 +92,9 @@ describe('stringifyDocument (internal API)', () => {
         test
       }
     `;
-    expect(stringifyDocument(createRequest(doc).query)).toBe('{ test }');
+    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
+      '{ test }'
+    );
   });
 
   it('should remove duplicate spaces', () => {
@@ -101,7 +103,9 @@ describe('stringifyDocument (internal API)', () => {
         abc          ,, test
       }
     `;
-    expect(stringifyDocument(createRequest(doc).query)).toBe('{ abc test }');
+    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
+      '{ abc test }'
+    );
   });
 
   it('should not sanitize within strings', () => {
@@ -110,7 +114,7 @@ describe('stringifyDocument (internal API)', () => {
         field(arg: "test #1")
       }
     `;
-    expect(stringifyDocument(createRequest(doc).query)).toBe(
+    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
       '{ field(arg:"test #1") }'
     );
   });
@@ -126,7 +130,7 @@ describe('stringifyDocument (internal API)', () => {
         )
       }
     `;
-    expect(stringifyDocument(createRequest(doc).query)).toBe(
+    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
       '{ field(arg:"""\n  hello\n  hello\n  """) }'
     );
   });

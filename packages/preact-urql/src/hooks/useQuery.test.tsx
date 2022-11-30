@@ -47,7 +47,7 @@ const QueryUser: FC<UseQueryArgs<{ myVar: number }>> = ({
 };
 
 beforeAll(() => {
-  vi.spyOn(global.console, 'error').mockImplementation();
+  vi.spyOn(global.console, 'error');
 });
 
 describe('useQuery', () => {

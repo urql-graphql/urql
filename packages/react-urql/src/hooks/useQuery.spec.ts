@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-
 import { renderHook, act } from '@testing-library/react-hooks';
 import { interval, map, pipe } from 'wonka';
 import { RequestPolicy } from '@urql/core';

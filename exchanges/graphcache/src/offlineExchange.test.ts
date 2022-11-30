@@ -56,8 +56,8 @@ const storage = {
   onOnline: vi.fn(),
   writeData: vi.fn(() => Promise.resolve(undefined)),
   writeMetadata: vi.fn(() => Promise.resolve(undefined)),
-  readData: vi.fn(() => Promise.resolve(undefined)),
-  readMetadata: vi.fn(() => Promise.resolve(undefined)),
+  readData: vi.fn(() => Promise.resolve({})),
+  readMetadata: vi.fn(() => Promise.resolve([])),
 };
 
 describe('storage', () => {
@@ -184,6 +184,7 @@ describe('offline', () => {
     const queryOp = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
+      variables: undefined,
     });
 
     const response = vi.fn(

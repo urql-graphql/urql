@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 overrides:
+  '@types/react': ^17.0.39
   react: ^17.0.2
   react-dom: ^17.0.2
   react-is: ^17.0.2
@@ -210,7 +211,7 @@ importers:
 
   exchanges/refocus:
     specifiers:
-      '@types/react': ^17.0.4
+      '@types/react': ^17.0.39
       '@urql/core': '>=3.0.0'
       graphql: ^16.0.0
       wonka: ^6.0.0
@@ -218,7 +219,7 @@ importers:
       '@urql/core': link:../../packages/core
       wonka: 6.0.0
     devDependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
       graphql: 16.0.1
 
   exchanges/request-policy:
@@ -263,7 +264,7 @@ importers:
       '@types/enzyme': ^3.10.3
       '@types/enzyme-adapter-react-16': ^1.0.5
       '@types/node-fetch': ^2.5.4
-      '@types/react': ^17.0.4
+      '@types/react': ^17.0.39
       '@types/react-dom': ^17.0.3
       enzyme: ^3.11.0
       enzyme-adapter-react-16: ^1.15.2
@@ -279,8 +280,8 @@ importers:
       '@types/enzyme': 3.10.8
       '@types/enzyme-adapter-react-16': 1.0.6
       '@types/node-fetch': 2.5.10
-      '@types/react': 17.0.4
-      '@types/react-dom': 17.0.3
+      '@types/react': 17.0.52
+      '@types/react-dom': 17.0.18
       enzyme: 3.11.0
       enzyme-adapter-react-16: 1.15.6_7ltvq4e2railvf5uya4ffxpe2a
       graphql: 16.0.1
@@ -310,7 +311,7 @@ importers:
       '@cypress/vite-dev-server': ^4.0.1
       '@testing-library/react': ^11.1.1
       '@testing-library/react-hooks': ^5.1.2
-      '@types/react': ^17.0.4
+      '@types/react': ^17.0.39
       '@types/react-test-renderer': ^17.0.1
       '@urql/core': ^3.0.3
       cypress: ^11.1.0
@@ -326,11 +327,11 @@ importers:
       '@urql/core': link:../core
       wonka: 6.0.0
     devDependencies:
-      '@cypress/react': 7.0.1_lw4gcyxdwtegyfzpw42cvz7cm4
+      '@cypress/react': 7.0.1_afg4ncukyuyevrurg5xxicvqy4
       '@cypress/vite-dev-server': 4.0.1
       '@testing-library/react': 11.2.6_sfoxds7t5ydpegc3knd667wn6m
       '@testing-library/react-hooks': 5.1.2_7qv3rjnqa3j7exc7qtvho7thru
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
       '@types/react-test-renderer': 17.0.1
       cypress: 11.1.0
       graphql: 16.0.1
@@ -1943,6 +1944,23 @@ packages:
       prettier: 1.19.1
     dev: true
 
+  /@cypress/react/7.0.1_afg4ncukyuyevrurg5xxicvqy4:
+    resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
+    peerDependencies:
+      '@types/react': ^16.9.16 || ^17.0.0
+      cypress: '*'
+      react: ^=16.x || ^=17.x || 17
+      react-dom: ^=16.x || ^=17.x || 17
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@types/react': 17.0.52
+      cypress: 11.1.0
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: true
+
   /@cypress/react/7.0.1_ddmelm2ieimfs7lfnlxmtlhrry:
     resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
     peerDependencies:
@@ -1954,23 +1972,6 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      cypress: 11.1.0
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-    dev: true
-
-  /@cypress/react/7.0.1_lw4gcyxdwtegyfzpw42cvz7cm4:
-    resolution: {integrity: sha512-kDTHt2A4kpnGsot7fh+86G5lSS+gSH2NQypQVtfLOolit99rdTOuEY9zit7fIlSvxcNsGzNQ27sE1vre7CsywA==}
-    peerDependencies:
-      '@types/react': ^16.9.16 || ^17.0.0
-      cypress: '*'
-      react: ^=16.x || ^=17.x || 17
-      react-dom: ^=16.x || ^=17.x || 17
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@types/react': 17.0.4
       cypress: 11.1.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -3366,8 +3367,8 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.20.1
-      '@types/react': 17.0.4
-      '@types/react-dom': 17.0.3
+      '@types/react': 17.0.52
+      '@types/react-dom': 18.0.9
       '@types/react-test-renderer': 17.0.1
       filter-console: 0.1.1
       react: 17.0.2
@@ -3442,7 +3443,7 @@ packages:
     resolution: {integrity: sha512-vlOuzqsTHxog6PV79+tvOHFb6hq4QZKMq1lLD9MaWD1oec2lHTKndn76XOpSwCA0oFTaIbKVPrgM3k78Jjd16g==}
     dependencies:
       '@types/cheerio': 0.22.28
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
     dev: true
 
   /@types/estree/1.0.0:
@@ -3498,7 +3499,7 @@ packages:
   /@types/markdown-to-jsx/6.11.3:
     resolution: {integrity: sha512-30nFYpceM/ZEvhGiqWjm5quLUxNeld0HCzJEXMZZDpq53FPkS85mTwkWtCXzCqq8s5JYLgM5W392a02xn8Bdaw==}
     dependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
     dev: true
 
   /@types/mdast/3.0.3:
@@ -3572,28 +3573,34 @@ packages:
   /@types/reach__router/1.3.7:
     resolution: {integrity: sha512-cyBEb8Ef3SJNH5NYEIDGPoMMmYUxROatuxbICusVRQIqZUB85UCt6R2Ok60tKS/TABJsJYaHyNTW3kqbpxlMjg==}
     dependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
 
-  /@types/react-dom/17.0.3:
-    resolution: {integrity: sha512-4NnJbCeWE+8YBzupn/YrJxZ8VnjcJq5iR1laqQ1vkpQgBiA7bwk0Rp24fxsdNinzJY2U+HHS4dJJDPdoMjdJ7w==}
+  /@types/react-dom/17.0.18:
+    resolution: {integrity: sha512-rLVtIfbwyur2iFKykP2w0pl/1unw26b5td16d5xMgp7/yjTHomkyxPYChFoCr/FtEX1lN9wY6lFj1qvKdS5kDw==}
     dependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
+    dev: true
+
+  /@types/react-dom/18.0.9:
+    resolution: {integrity: sha512-qnVvHxASt/H7i+XG1U1xMiY5t+IHcPGUK7TDMDzom08xa7e86eCeKOiLZezwCKVxJn6NEiiy2ekgX8aQssjIKg==}
+    dependencies:
+      '@types/react': 17.0.52
     dev: true
 
   /@types/react-syntax-highlighter/11.0.5:
     resolution: {integrity: sha512-VIOi9i2Oj5XsmWWoB72p3KlZoEbdRAcechJa8Ztebw7bDl2YmR+odxIqhtJGp1q2EozHs02US+gzxJ9nuf56qg==}
     dependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
     dev: true
 
   /@types/react-test-renderer/17.0.1:
     resolution: {integrity: sha512-3Fi2O6Zzq/f3QR9dRnlnHso9bMl7weKCviFmfF6B4LS1Uat6Hkm15k0ZAQuDz+UBq6B3+g+NM6IT2nr5QgPzCw==}
     dependencies:
-      '@types/react': 17.0.4
+      '@types/react': 17.0.52
     dev: true
 
-  /@types/react/17.0.4:
-    resolution: {integrity: sha512-onz2BqScSFMoTRdJUZUDD/7xrusM8hBA2Fktk2qgaTYPCgPvWnDEgkrOs8hhPUf2jfcIXkJ5yK6VfYormJS3Jw==}
+  /@types/react/17.0.52:
+    resolution: {integrity: sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==}
     dependencies:
       '@types/prop-types': 15.7.3
       '@types/scheduler': 0.16.1

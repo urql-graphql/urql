@@ -43,10 +43,10 @@ describe('formatTypeNames', () => {
 
   it('preserves the hashed key of the resulting query', () => {
     const doc = parse(`{ id todos { id } }`) as any;
-    const expectedKey = createRequest(doc).key;
+    const expectedKey = createRequest(doc, undefined).key;
     const formattedDoc = formatDocument(doc);
     expect(formattedDoc).not.toBe(doc);
-    const actualKey = createRequest(formattedDoc).key;
+    const actualKey = createRequest(formattedDoc, undefined).key;
     expect(expectedKey).toBe(actualKey);
   });
 

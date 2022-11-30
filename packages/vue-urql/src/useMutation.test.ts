@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 import { vi, expect, it, beforeEach, describe } from 'vitest';
 
 vi.mock('./useClient.ts', async () => {
-  const { ref } = await vi.importActual('vue');
+  const { ref } = await vi.importActual<typeof import('vue')>('vue');
   return {
     __esModule: true,
     ...((await vi.importActual('./useClient.ts')) as object),

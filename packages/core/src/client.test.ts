@@ -212,7 +212,7 @@ describe('executeQuery', () => {
     try {
       client.executeQuery(mutation);
       expect(true).toBeFalsy();
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toMatchInlineSnapshot(
         `"Expected operation of type \\"query\\" but found \\"mutation\\""`
       );

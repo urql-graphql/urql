@@ -1,9 +1,10 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { vi, expect, it, beforeEach, describe, beforeAll, Mock } from 'vitest';
 
 // Note: Testing for hooks is not yet supported in Enzyme - https://github.com/airbnb/enzyme/issues/2011
 vi.mock('../context', async () => {
-  const { map, interval, pipe } = await vi.importActual('wonka');
+  const { map, interval, pipe } = await vi.importActual<typeof import('wonka')>(
+    'wonka'
+  );
   const mock = {
     executeQuery: vi.fn(() =>
       pipe(
