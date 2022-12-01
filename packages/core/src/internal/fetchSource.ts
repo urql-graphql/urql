@@ -33,6 +33,10 @@ async function* fetchOperation(
       fetchOptions.signal = (abortController = new AbortController()).signal;
     }
 
+    // Delay for a tick to give the Client a chance to cancel the request
+    // if a teardown comes in immediately
+    await Promise.resolve();
+
     response = await (fetcher || fetch)(url, fetchOptions);
     statusNotOk = response.status < 200 || response.status >= maxStatus;
 
@@ -59,10 +63,6 @@ async function* fetchOperation(
         next() {
           return reader.read() as Promise<IteratorResult<ChunkData>>;
         },
-        async return() {
-          await reader.cancel();
-          return { done: true } as IteratorReturnResult<any>;
-        },
         [Symbol.asyncIterator]() {
           return iterator;
         },
@@ -71,61 +71,57 @@ async function* fetchOperation(
       throw new TypeError('Streaming requests unsupported');
     }
 
-    try {
-      let buffer = '';
-      let isPreamble = true;
-      let nextResult: OperationResult | null = null;
-      let prevResult: OperationResult | null = null;
-      for await (const data of iterator) {
-        hasResults = true;
+    let buffer = '';
+    let isPreamble = true;
+    let nextResult: OperationResult | null = null;
+    let prevResult: OperationResult | null = null;
+    for await (const data of iterator) {
+      hasResults = true;
 
-        const chunk = toString(data);
-        let boundaryIndex = chunk.indexOf(boundary);
-        if (boundaryIndex > -1) {
-          boundaryIndex += buffer.length;
+      const chunk = toString(data);
+      let boundaryIndex = chunk.indexOf(boundary);
+      if (boundaryIndex > -1) {
+        boundaryIndex += buffer.length;
+      } else {
+        boundaryIndex = buffer.indexOf(boundary);
+      }
+
+      buffer += chunk;
+      while (boundaryIndex > -1) {
+        const current = buffer.slice(0, boundaryIndex);
+        const next = buffer.slice(boundaryIndex + boundary.length);
+
+        if (isPreamble) {
+          isPreamble = false;
         } else {
-          boundaryIndex = buffer.indexOf(boundary);
-        }
+          const headersEnd = current.indexOf('\r\n\r\n') + 4;
+          const headers = current.slice(0, headersEnd);
+          const body = current.slice(headersEnd, current.lastIndexOf('\r\n'));
 
-        buffer += chunk;
-        while (boundaryIndex > -1) {
-          const current = buffer.slice(0, boundaryIndex);
-          const next = buffer.slice(boundaryIndex + boundary.length);
-
-          if (isPreamble) {
-            isPreamble = false;
-          } else {
-            const headersEnd = current.indexOf('\r\n\r\n') + 4;
-            const headers = current.slice(0, headersEnd);
-            const body = current.slice(headersEnd, current.lastIndexOf('\r\n'));
-
-            let payload: any;
-            if (jsonHeaderRe.test(headers)) {
-              try {
-                payload = JSON.parse(body);
-                nextResult = prevResult = prevResult
-                  ? mergeResultPatch(prevResult, payload, response)
-                  : makeResult(operation, payload, response);
-              } catch (_error) {}
-            }
-
-            if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
-              if (!prevResult) yield makeResult(operation, {}, response);
-              break;
-            }
+          let payload: any;
+          if (jsonHeaderRe.test(headers)) {
+            try {
+              payload = JSON.parse(body);
+              nextResult = prevResult = prevResult
+                ? mergeResultPatch(prevResult, payload, response)
+                : makeResult(operation, payload, response);
+            } catch (_error) {}
           }
 
-          buffer = next;
-          boundaryIndex = buffer.indexOf(boundary);
+          if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
+            if (!prevResult) yield makeResult(operation, {}, response);
+            break;
+          }
         }
 
-        if (nextResult) {
-          yield nextResult;
-          nextResult = null;
-        }
+        buffer = next;
+        boundaryIndex = buffer.indexOf(boundary);
       }
-    } finally {
-      iterator.return?.();
+
+      if (nextResult) {
+        yield nextResult;
+        nextResult = null;
+      }
     }
   } catch (error: any) {
     if (hasResults) {
@@ -142,9 +138,7 @@ async function* fetchOperation(
       response!
     );
   } finally {
-    if (abortController) {
-      abortController.abort();
-    }
+    abortController?.abort();
   }
 }
 
