@@ -325,10 +325,11 @@ actions, it's a good idea for us to return `false` when `!authState` applies.
 
 [Read more about `@urql/exchange-auth`'s API in our API docs.](../api/auth-exchange.md)
 
-## Handling Logout with the Error Exchange
+## Handling Logout by reacting to Errors
 
-We can also handle authentication errors in an `errorExchange` instead of the `authExchange`. To do this, we'll need to add the
-`errorExchange` to the exchanges array, _before_ the `authExchange`. The order is very important here:
+We can also handle authentication errors in a `mapExchange` instead of the `authExchange`.
+To do this, we'll need to add the `mapExchange` to the exchanges array, _before_ the `authExchange`.
+The order is very important here:
 
 ```js
 import { createClient, dedupExchange, cacheExchange, fetchExchange, errorExchange } from 'urql';
@@ -339,10 +340,9 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    errorExchange({
-      onError: error => {
+    mapExchange({
+      onError(error, _operation) {
         const isAuthError = error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
-
         if (isAuthError) {
           logout();
         }
@@ -356,10 +356,12 @@ const client = createClient({
 });
 ```
 
-The `errorExchange` will only receive an auth error when the auth exchange has already tried and failed to handle it. This means we have
-either failed to refresh the token, or there is no token refresh functionality. If we receive an auth error in the `errorExchange` (as defined in
-the `didAuthError` configuration section above), then we can be confident that it is an auth error that the `authExchange` isn't able to recover
-from, and the user should be logged out.
+The `mapExchange` will only receive an auth error when the auth exchange has already tried and failed
+to handle it. This means we have either failed to refresh the token, or there is no token refresh
+functionality. If we receive an auth error in the `mapExchange`'s `onError` function
+(as defined in the `didAuthError` configuration section above), then we can be confident that it is
+an authentication error that the `authExchange` isn't able to recover from, and the user should be
+logged out.
 
 ## Cache Invalidation on Logout
 
