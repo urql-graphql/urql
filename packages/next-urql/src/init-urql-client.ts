@@ -1,4 +1,4 @@
-import { createClient, Client, ClientOptions } from 'urql';
+import { Client, ClientOptions, createClient } from '@urql/core';
 
 let urqlClient: Client | null = null;
 
