@@ -16,20 +16,18 @@ export const mapExchange = ({
   onError,
 }: MapExchangeOpts): Exchange => {
   return ({ forward }) => ops$ => {
-    if (onOperation) {
-      ops$ = pipe(
+    return pipe(
+      pipe(
         ops$,
         mergeMap(operation => {
-          const newOperation = onOperation(operation) || operation;
+          const newOperation =
+            (onOperation && onOperation(operation)) || operation;
           return 'then' in newOperation
             ? fromPromise(newOperation)
             : fromValue(newOperation);
         })
-      );
-    }
-
-    return pipe(
-      forward(ops$),
+      ),
+      forward,
       mergeMap(result => {
         if (onError && result.error) onError(result.error, result.operation);
         const newResult = (onResult && onResult(result)) || result;
