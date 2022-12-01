@@ -19,6 +19,7 @@ export interface KeyedDocumentNode extends DocumentNode {
   __key: HashValue;
 }
 
+const SOURCE_NAME = 'gql';
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
 const REPLACE_CHAR_RE = /(#[^\n\r]+)?(?:\n|\r\n?|$)+/g;
 
@@ -32,9 +33,11 @@ export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
   const printed = sanitizeDocument(
-    typeof node !== 'string'
-      ? (node.loc && node.loc.source.body) || print(node)
-      : node
+    typeof node === 'string'
+      ? node
+      : node.loc && node.loc.source.name === SOURCE_NAME
+      ? node.loc.source.body
+      : print(node)
   );
 
   if (typeof node !== 'string' && !node.loc) {
@@ -43,7 +46,7 @@ export const stringifyDocument = (
       end: printed.length,
       source: {
         body: printed,
-        name: 'gql',
+        name: SOURCE_NAME,
         locationOffset: { line: 1, column: 1 },
       },
     } as Location;
