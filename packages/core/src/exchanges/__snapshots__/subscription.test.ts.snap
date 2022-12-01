@@ -17,7 +17,7 @@ exports[`should return response data from forwardSubscription observable 1`] = `
     "key": 4,
     "kind": "subscription",
     "query": {
-      "__key": 2088253569,
+      "__key": 7623921801,
       "definitions": [
         {
           "directives": [],
@@ -98,10 +98,13 @@ exports[`should return response data from forwardSubscription observable 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 92,
+        "end": 82,
         "source": {
-          "body": "# subscribeToUser
-subscription subscribeToUser($user: String) { user(user: $user) { name } }",
+          "body": "subscription subscribeToUser($user: String) {
+  user(user: $user) {
+    name
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,

@@ -16,7 +16,7 @@ exports[`on error > ignores the error when a result is available 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -119,10 +119,15 @@ exports[`on error > ignores the error when a result is available 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -155,7 +160,7 @@ exports[`on error > returns error data 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -258,10 +263,15 @@ exports[`on error > returns error data 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -294,7 +304,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -397,10 +407,15 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -438,7 +453,7 @@ exports[`on success > returns response data 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -541,10 +556,15 @@ exports[`on success > returns response data 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -611,7 +631,7 @@ exports[`on success > uses the mock fetch if given 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -714,10 +734,15 @@ exports[`on success > uses the mock fetch if given 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,

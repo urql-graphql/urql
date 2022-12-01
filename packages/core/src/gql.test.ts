@@ -23,10 +23,10 @@ it('parses GraphQL Documents', () => {
     parse('{ gql testing }', { noLocation: true }).definitions
   );
 
-  expect(doc).toBe(keyDocument('{ gql testing }'));
+  expect(doc).toBe(keyDocument('{\n  gql\n  testing\n}'));
   expect(doc.loc).toEqual({
     start: 0,
-    end: 15,
+    end: 19,
     source: expect.anything(),
   });
 });

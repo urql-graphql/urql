@@ -115,12 +115,12 @@ describe('stringifyDocument (internal API)', () => {
     `;
     expect(stringifyDocument(createRequest(doc, undefined).query))
       .toMatchInlineSnapshot(`
-      "{
-        field(arg:
+        "{
+          field(arg: 
 
-      \\"test #1\\")
-      }"
-    `);
+        \\"test #1\\")
+        }"
+      `);
   });
 
   it('should not sanitize within block strings', () => {
@@ -136,14 +136,14 @@ describe('stringifyDocument (internal API)', () => {
     `;
     expect(stringifyDocument(createRequest(doc, undefined).query))
       .toMatchInlineSnapshot(`
-      "{
-        field(arg:
+        "{
+          field(arg: 
 
-      \\"\\"\\"
-        hello
-        #hello
-        \\"\\"\\")
-      }"
-    `);
+        \\"\\"\\"
+          hello
+          #hello
+          \\"\\"\\")
+        }"
+      `);
   });
 });
