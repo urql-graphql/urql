@@ -28,20 +28,15 @@ export const mapExchange = ({
       );
     }
 
-    let res$ = forward(ops$);
-    if (onResult) {
-      res$ = pipe(
-        res$,
-        mergeMap(result => {
-          if (onError && result.error) onError(result.error, result.operation);
-          const newResult = onResult(result) || result;
-          return 'then' in newResult
-            ? fromPromise(newResult)
-            : fromValue(newResult);
-        })
-      );
-    }
-
-    return res$;
+    return pipe(
+      forward(ops$),
+      mergeMap(result => {
+        if (onError && result.error) onError(result.error, result.operation);
+        const newResult = (onResult && onResult(result)) || result;
+        return 'then' in newResult
+          ? fromPromise(newResult)
+          : fromValue(newResult);
+      })
+    );
   };
 };
