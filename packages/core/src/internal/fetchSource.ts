@@ -20,9 +20,6 @@ async function* fetchOperation(
   url: string,
   fetchOptions: RequestInit
 ) {
-  const maxStatus = fetchOptions.redirect === 'manual' ? 400 : 300;
-  const fetcher = operation.context.fetch;
-
   let abortController: AbortController | void;
   let response: Response;
   let hasResults = false;
@@ -37,8 +34,10 @@ async function* fetchOperation(
     // if a teardown comes in immediately
     await Promise.resolve();
 
-    response = await (fetcher || fetch)(url, fetchOptions);
-    statusNotOk = response.status < 200 || response.status >= maxStatus;
+    response = await (operation.context.fetch || fetch)(url, fetchOptions);
+    statusNotOk =
+      response.status < 200 ||
+      response.status >= (fetchOptions.redirect === 'manual' ? 400 : 300);
 
     const contentType =
       (response.headers && response.headers.get('Content-Type')) || '';
