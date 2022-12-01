@@ -322,6 +322,9 @@ the `fetchExchange`.
 An exchange that writes incoming `Operation`s to `console.log` and
 writes completed `OperationResult`s to `console.log`.
 
+This exchange is disabled in production and is based on the `mapExchange`.
+If you'd like to customise it, you can replace it with a custom `mapExchange`.
+
 ### dedupExchange
 
 An exchange that keeps track of ongoing `Operation`s that haven't returned had
@@ -334,18 +337,67 @@ and is still waiting for a result.
 The `fetchExchange` of type `Exchange` is responsible for sending operations of type `'query'` and
 `'mutation'` to a GraphQL API using `fetch`.
 
-### errorExchange
+### mapExchange
+
+The `mapExchange` allows you to:
+
+- react to or replace operations with `onOperation`,
+- react to or replace results with `onResult`,
+- and; react to errors in results with `onError`.
+
+It can therefore be used to quickly react to the core events in the `Client` without writing a custom
+exchange, effectively allowing you to ship your own `debugExchange`.
+
+```ts
+mapExchange({
+  onOperation(operation) {
+    console.log('operation', operation);
+  },
+  onResult(result) {
+    console.log('result', result);
+  },
+});
+```
+
+It can also be used to react only to errors, which is the same as checking for `result.error`:
+
+```ts
+mapExchange({
+  onError(error, operation) {
+    console.log(`The operation ${operation.key} has errored with:`, error);
+  },
+});
+```
+
+Lastly, it can be used to map operations and results, which may be useful to update the
+`OperationContext` or perform other standard tasks that require you to wait for a result:
+
+```ts
+import { mapExchange, makeOperation } from '@urql/core';
+
+mapExchange({
+  async onOperation(operation) {
+    // NOTE: This is only for illustration purposes
+    return makeOperation(operation.kind, operation, {
+      ...operation.context,
+      test: true,
+    });
+  },
+  async onResult(result) {
+    // NOTE: This is only for illustration purposes
+    if (result.data === undefined) result.data = null;
+    return result;
+  },
+});
+```
+
+### errorExchange (deprecated)
 
 An exchange that lets you inspect errors. This can be useful for logging, or reacting to
 different types of errors (e.g. logging the user out in case of a permission error).
 
-```ts
-errorExchange({
-  onError: (error: CombinedError, operation: Operation) => {
-    console.log('An error!', error);
-  },
-});
-```
+In newer versions of `@urql/core`, it's identical to the `mapExchange` and its export has been
+replaced as the `mapExchange` also allows you to pass an `onError` function.
 
 ## Utilities
 

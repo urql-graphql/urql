@@ -138,7 +138,7 @@ sending requests to our API.
 
 Some of the exchanges that are available to us are:
 
-- [`errorExchange`](./api/core.md#errorexchange): Allows a global callback to be called when any error occurs
+- [`mapExchange`](./api/core.md#mapexchange): Allows reacting to operations, results, and errors
 - [`ssrExchange`](./advanced/server-side-rendering.md): Allows for a server-side renderer to
   collect results for client-side rehydration.
 - [`retryExchange`](./advanced/retry-operations.md): Allows operations to be retried
