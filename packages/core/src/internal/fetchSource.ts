@@ -56,8 +56,8 @@ async function* fetchOperation(
     let iterator: AsyncIterableIterator<ChunkData>;
     if (response[Symbol.asyncIterator]) {
       iterator = response[Symbol.asyncIterator]();
-    } else if (response.body) {
-      const reader = response.body.getReader();
+    } else {
+      const reader = response.body!.getReader();
       iterator = {
         next() {
           return reader.read() as Promise<IteratorResult<ChunkData>>;
@@ -66,8 +66,6 @@ async function* fetchOperation(
           return iterator;
         },
       };
-    } else {
-      throw new TypeError('Streaming requests unsupported');
     }
 
     let buffer = '';
@@ -129,11 +127,10 @@ async function* fetchOperation(
 
     yield makeErrorResult(
       operation,
-      statusNotOk
-        ? response!.statusText
-          ? new Error(response!.statusText)
-          : error
-        : error,
+      (statusNotOk &&
+        response!.statusText &&
+        new Error(response!.statusText)) ||
+        error,
       response!
     );
   } finally {
