@@ -1,12 +1,4 @@
-import { vi, expect, it, describe } from 'vitest';
-
-vi.mock('./hash', async () => {
-  const hash = await vi.importActual<typeof import('./hash')>('./hash');
-  return {
-    ...hash,
-    phash: (x: number) => x,
-  };
-});
+import { expect, it, describe } from 'vitest';
 
 import { parse, print } from 'graphql';
 import { gql } from '../gql';
@@ -34,7 +26,7 @@ it('should use the hash from a key if available', () => {
 
 it('should hash DocumentNodes and strings identically', () => {
   const docA = parse('{ field }');
-  const docB = print(docA).replace(/\s/g, ' ');
+  const docB = print(docA);
   const reqA = createRequest(docA, undefined);
   const reqB = createRequest(docB, undefined);
   expect(reqA.key).toBe(reqB.key);
@@ -92,9 +84,12 @@ describe('stringifyDocument (internal API)', () => {
         test
       }
     `;
-    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
-      '{ test }'
-    );
+    expect(stringifyDocument(createRequest(doc, undefined).query))
+      .toMatchInlineSnapshot(`
+      "{
+        test
+      }"
+    `);
   });
 
   it('should remove duplicate spaces', () => {
@@ -103,9 +98,13 @@ describe('stringifyDocument (internal API)', () => {
         abc          ,, test
       }
     `;
-    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
-      '{ abc test }'
-    );
+    expect(stringifyDocument(createRequest(doc, undefined).query))
+      .toMatchInlineSnapshot(`
+      "{
+        abc
+        test
+      }"
+    `);
   });
 
   it('should not sanitize within strings', () => {
@@ -114,9 +113,14 @@ describe('stringifyDocument (internal API)', () => {
         field(arg: "test #1")
       }
     `;
-    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
-      '{ field(arg:"test #1") }'
-    );
+    expect(stringifyDocument(createRequest(doc, undefined).query))
+      .toMatchInlineSnapshot(`
+      "{
+        field(arg:
+
+      \\"test #1\\")
+      }"
+    `);
   });
 
   it('should not sanitize within block strings', () => {
@@ -125,13 +129,21 @@ describe('stringifyDocument (internal API)', () => {
         field(
           arg: """
           hello
-          hello
+          #hello
           """
         )
       }
     `;
-    expect(stringifyDocument(createRequest(doc, undefined).query)).toBe(
-      '{ field(arg:"""\n  hello\n  hello\n  """) }'
-    );
+    expect(stringifyDocument(createRequest(doc, undefined).query))
+      .toMatchInlineSnapshot(`
+      "{
+        field(arg:
+
+      \\"\\"\\"
+        hello
+        #hello
+        \\"\\"\\")
+      }"
+    `);
   });
 });

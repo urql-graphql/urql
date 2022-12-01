@@ -7,7 +7,7 @@ import {
   print,
 } from 'graphql';
 
-import { hash, phash } from './hash';
+import { HashValue, phash } from './hash';
 import { stringifyVariables } from './stringifyVariables';
 import { TypedDocumentNode, AnyVariables, GraphQLRequest } from '../types';
 
@@ -16,59 +16,65 @@ interface WritableLocation {
 }
 
 export interface KeyedDocumentNode extends DocumentNode {
-  __key: number;
+  __key: HashValue;
 }
 
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
-const REPLACE_CHAR_RE = /([\s,]|#[^\n\r]+)+/g;
+const REPLACE_CHAR_RE = /(#[^\n\r]+)?(?:\n|\r\n?|$)+/g;
 
 const replaceOutsideStrings = (str: string, idx: number) =>
-  idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, ' ').trim() : str;
+  idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, '\n') : str;
+
+const sanitizeDocument = (node: string): string =>
+  node.split(GRAPHQL_STRING_RE).map(replaceOutsideStrings).join('').trim();
 
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
-  let str = (typeof node !== 'string'
-    ? (node.loc && node.loc.source.body) || print(node)
-    : node
-  )
-    .split(GRAPHQL_STRING_RE)
-    .map(replaceOutsideStrings)
-    .join('');
+  const printed = sanitizeDocument(
+    typeof node !== 'string'
+      ? (node.loc && node.loc.source.body) || print(node)
+      : node
+  );
 
-  if (typeof node !== 'string') {
-    const operationName = 'definitions' in node && getOperationName(node);
-    if (operationName) {
-      str = `# ${operationName}\n${str}`;
-    }
-
-    if (!node.loc) {
-      (node as WritableLocation).loc = {
-        start: 0,
-        end: str.length,
-        source: {
-          body: str,
-          name: 'gql',
-          locationOffset: { line: 1, column: 1 },
-        },
-      } as Location;
-    }
+  if (typeof node !== 'string' && !node.loc) {
+    (node as WritableLocation).loc = {
+      start: 0,
+      end: printed.length,
+      source: {
+        body: printed,
+        name: 'gql',
+        locationOffset: { line: 1, column: 1 },
+      },
+    } as Location;
   }
 
-  return str;
+  return printed;
 };
 
-const docs = new Map<number, KeyedDocumentNode>();
+const hashDocument = (
+  node: string | DefinitionNode | DocumentNode
+): HashValue => {
+  let key = phash(stringifyDocument(node));
+  // Add the operation name to the produced hash
+  if (typeof node === 'object' && 'definitions' in node) {
+    const operationName = getOperationName(node);
+    if (operationName) key = phash(`\n# ${operationName}`, key);
+  }
+  return key;
+};
 
-export const keyDocument = (q: string | DocumentNode): KeyedDocumentNode => {
-  let key: number;
+const docs = new Map<HashValue, KeyedDocumentNode>();
+
+export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
+  let key: HashValue;
   let query: DocumentNode;
-  if (typeof q === 'string') {
-    key = hash(stringifyDocument(q));
-    query = docs.get(key) || parse(q, { noLocation: true });
+  if (typeof node === 'string') {
+    key = hashDocument(node);
+    query = docs.get(key) || parse(node, { noLocation: true });
   } else {
-    key = (q as KeyedDocumentNode).__key || hash(stringifyDocument(q));
-    query = docs.get(key) || q;
+    key = (node as KeyedDocumentNode).__key || hashDocument(node);
+    query = docs.get(key) || node;
   }
 
   // Add location information if it's missing
@@ -84,15 +90,14 @@ export const createRequest = <
   Variables extends AnyVariables = AnyVariables
 >(
   q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
-  vars: Variables
+  variables: Variables
 ): GraphQLRequest<Data, Variables> => {
-  if (!vars) vars = {} as Variables;
+  if (!variables) variables = {} as Variables;
   const query = keyDocument(q);
-  return {
-    key: phash(query.__key, stringifyVariables(vars)) >>> 0,
-    query,
-    variables: vars as Variables,
-  };
+  const printedVars = stringifyVariables(variables);
+  let key = query.__key;
+  if (printedVars !== '{}') key = phash(printedVars, key);
+  return { key, query, variables };
 };
 
 /**
