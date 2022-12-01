@@ -1,5 +1,3 @@
-import { print } from 'graphql';
-
 import {
   filter,
   make,
@@ -12,7 +10,12 @@ import {
   takeUntil,
 } from 'wonka';
 
-import { makeResult, makeErrorResult, makeOperation } from '../utils';
+import {
+  stringifyDocument,
+  makeResult,
+  makeErrorResult,
+  makeOperation,
+} from '../utils';
 
 import {
   Exchange,
@@ -70,7 +73,7 @@ export const subscriptionExchange = ({
     // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
     const observableish = forwardSubscription({
       key: operation.key.toString(36),
-      query: print(operation.query),
+      query: stringifyDocument(operation.query),
       variables: operation.variables!,
       context: { ...operation.context },
     });

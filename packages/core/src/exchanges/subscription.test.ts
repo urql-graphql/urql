@@ -1,5 +1,5 @@
-import { print } from 'graphql';
 import { vi, expect, it } from 'vitest';
+
 import {
   empty,
   publish,
@@ -12,6 +12,7 @@ import {
 
 import { Client } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
+import { stringifyDocument } from '../utils';
 import { OperationResult } from '../types';
 import { subscriptionExchange, SubscriptionForwarder } from './subscription';
 
@@ -24,7 +25,9 @@ it('should return response data from forwardSubscription observable', async () =
 
   const unsubscribe = vi.fn();
   const forwardSubscription: SubscriptionForwarder = operation => {
-    expect(operation.query).toBe(print(subscriptionOperation.query));
+    expect(operation.query).toBe(
+      stringifyDocument(subscriptionOperation.query)
+    );
     expect(operation.variables).toBe(subscriptionOperation.variables);
     expect(operation.context).toEqual(subscriptionOperation.context);
 
