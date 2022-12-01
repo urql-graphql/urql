@@ -2,4 +2,4 @@
 '@urql/exchange-execute': minor
 ---
 
-Functions that return a Promise in contextValue are now handled correctly.
+The `context` option, which may be set to a context value or a function returning a context, can now return a `Promise` and will be correctly resolved and awaited.
