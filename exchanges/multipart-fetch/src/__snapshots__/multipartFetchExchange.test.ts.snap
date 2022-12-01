@@ -16,7 +16,7 @@ exports[`on error > returns error data 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -119,10 +119,15 @@ exports[`on error > returns error data 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -165,7 +170,7 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -268,10 +273,15 @@ exports[`on error > returns error data with status 400 and manual redirect mode 
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -317,7 +327,7 @@ exports[`on success > returns response data 1`] = `
     "key": 2,
     "kind": "query",
     "query": {
-      "__key": 3521976120,
+      "__key": -2395444236,
       "definitions": [
         {
           "directives": [],
@@ -420,10 +430,15 @@ exports[`on success > returns response data 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 86,
+        "end": 92,
         "source": {
-          "body": "# getUser
-query getUser($name: String) { user(name: $name) { id firstName lastName } }",
+          "body": "query getUser($name: String) {
+  user(name: $name) {
+    id
+    firstName
+    lastName
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -471,7 +486,7 @@ exports[`on success > uses a file when given 1`] = `
     "key": 3,
     "kind": "mutation",
     "query": {
-      "__key": 4034972436,
+      "__key": 8029062428,
       "definitions": [
         {
           "directives": [],
@@ -552,10 +567,13 @@ exports[`on success > uses a file when given 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 125,
+        "end": 110,
         "source": {
-          "body": "# uploadProfilePicture
-mutation uploadProfilePicture($picture: File) { uploadProfilePicture(picture: $picture) { location } }",
+          "body": "mutation uploadProfilePicture($picture: File) {
+  uploadProfilePicture(picture: $picture) {
+    location
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,
@@ -609,7 +627,7 @@ exports[`on success > uses multiple files when given 1`] = `
     "key": 3,
     "kind": "mutation",
     "query": {
-      "__key": 2033658603,
+      "__key": -6039055341,
       "definitions": [
         {
           "directives": [],
@@ -693,10 +711,13 @@ exports[`on success > uses multiple files when given 1`] = `
       ],
       "kind": "Document",
       "loc": {
-        "end": 132,
+        "end": 116,
         "source": {
-          "body": "# uploadProfilePictures
-mutation uploadProfilePictures($pictures: [File]) { uploadProfilePicture(pictures: $pictures) { location } }",
+          "body": "mutation uploadProfilePictures($pictures: [File]) {
+  uploadProfilePicture(pictures: $pictures) {
+    location
+  }
+}",
           "locationOffset": {
             "column": 1,
             "line": 1,

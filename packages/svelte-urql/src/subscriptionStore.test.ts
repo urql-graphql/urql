@@ -25,8 +25,15 @@ describe('subscriptionStore', () => {
   it('fills the store with correct values', () => {
     expect(get(store).operation.kind).toBe('subscription');
     expect(get(store).operation.context.url).toBe('https://example.com');
-    expect(get(store).operation.query.loc?.source.body).toBe(query);
     expect(get(store).operation.variables).toBe(variables);
+
+    expect(get(store).operation.query.loc?.source.body).toMatchInlineSnapshot(`
+      "subscription ($input: ExampleInput) {
+        exampleSubscribe(input: $input) {
+          data
+        }
+      }"
+    `);
   });
 
   it('adds pause handles', () => {
