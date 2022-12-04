@@ -10,9 +10,9 @@ import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import visualizer from 'rollup-plugin-visualizer';
 import terser from '@rollup/plugin-terser';
+import cjsCheck from 'rollup-plugin-cjs-check';
 
 import cleanup from './cleanup-plugin.mjs'
-import cjsCheck from './cjs-check-plugin.mjs'
 import babelPluginTransformPipe from '../babel/transform-pipe.mjs';
 import babelPluginTransformInvariant from '../babel/transform-invariant-warning.mjs';
 import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs';

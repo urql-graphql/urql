@@ -92,6 +92,7 @@
     "react-is": "^17.0.2",
     "rimraf": "^3.0.2",
     "rollup": "^3.3.0",
+    "rollup-plugin-cjs-check": "^1.0.2",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-tsconfig-paths": "^1.4.0",
     "rollup-plugin-typescript2": "0.34.1",

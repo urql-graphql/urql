@@ -53,6 +53,7 @@ importers:
       react-is: ^17.0.2
       rimraf: ^3.0.2
       rollup: ^3.3.0
+      rollup-plugin-cjs-check: ^1.0.2
       rollup-plugin-generate-package-json: ^3.2.0
       rollup-plugin-tsconfig-paths: ^1.4.0
       rollup-plugin-typescript2: 0.34.1
@@ -105,6 +106,7 @@ importers:
       react-is: 17.0.2
       rimraf: 3.0.2
       rollup: 3.3.0
+      rollup-plugin-cjs-check: 1.0.2_rollup@3.3.0
       rollup-plugin-generate-package-json: 3.2.0_rollup@3.3.0
       rollup-plugin-tsconfig-paths: 1.4.0_6annma2bj33shm6er7hwi5u4z4
       rollup-plugin-typescript2: 0.34.1_6annma2bj33shm6er7hwi5u4z4
@@ -3684,8 +3686,8 @@ packages:
       '@types/yargs-parser': 20.2.0
     dev: true
 
-  /@types/yauzl/2.9.2:
-    resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
+  /@types/yauzl/2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
       '@types/node': 18.11.9
@@ -5684,6 +5686,7 @@ packages:
   /colors/1.4.0:
     resolution: {integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==}
     engines: {node: '>=0.1.90'}
+    requiresBuild: true
     dev: true
 
   /combined-stream/1.0.8:
@@ -8018,7 +8021,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.9.2
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -14064,6 +14067,17 @@ packages:
     dependencies:
       hash-base: 3.1.0
       inherits: 2.0.4
+
+  /rollup-plugin-cjs-check/1.0.2_rollup@3.3.0:
+    resolution: {integrity: sha512-q5DuMiYTXoMlLIHeTDdTYQrN+v/AdjEyVZnfkdvX1NnS4jQP1fwSuOr29WS4pB/4lnF1D7Annp62/27aZUyTyQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0 || ^2.0.0 || ^3.0.0
+    dependencies:
+      '@rollup/pluginutils': 5.0.2_rollup@3.3.0
+      cjs-module-lexer: 1.2.2
+      rollup: 3.3.0
+    dev: true
 
   /rollup-plugin-generate-package-json/3.2.0_rollup@3.3.0:
     resolution: {integrity: sha512-+Kq1kFVr+maxW/mZB+E+XuaieCXVZqjl2tNU9k3TtAMs3NOaeREa5sRHy67qKDmcnFtZZukIQ3dFCcnV+r0xyw==}
