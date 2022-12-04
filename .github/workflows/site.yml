@@ -44,7 +44,7 @@ jobs:
         with:
           path: |
             ~/.cache/Cypress
-            ${{ steps.pnpm-store.outputs.dir }}
+            ${{ steps.pnpm-store.outputs.pnpm_cache_dir }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
