@@ -43,7 +43,7 @@ if (pkg.optionalDependencies)
 
 const prodDependencies = new Set([
   ...Object.keys(pkg.peerDependencies || {}),
-  ...Object.keys(pkg.dependencies),
+  ...Object.keys(pkg.dependencies || {}),
 ]);
 
 const externalPredicate = new RegExp(`^(${externalModules.join('|')})($|/)`);
