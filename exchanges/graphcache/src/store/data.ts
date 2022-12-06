@@ -161,11 +161,9 @@ export const clearDataState = () => {
     while (
       --i >= 0 &&
       data.refLock.has(data.optimisticOrder[i]) &&
-      data.commutativeKeys.has(data.optimisticOrder[i]) &&
-      !data.deferredKeys.has(data.optimisticOrder[i])
-    ) {
+      data.commutativeKeys.has(data.optimisticOrder[i])
+    )
       squashLayer(data.optimisticOrder[i]);
-    }
   }
 
   currentOwnership = null;
@@ -535,20 +533,17 @@ export const reserveLayer = (
 
   let index = data.optimisticOrder.indexOf(layerKey);
   if (index > -1) {
-    if (!data.commutativeKeys.has(layerKey) && !hasNext) {
-      data.optimisticOrder.splice(index, 1);
-      // Protect optimistic layers from being turned into non-optimistic layers
-      // while preserving optimistic data
+    data.optimisticOrder.splice(index, 1);
+    // Protect optimistic layers from being turned into non-optimistic layers
+    // while preserving optimistic data
+    if (!data.commutativeKeys.has(layerKey) && !hasNext)
       clearLayer(data, layerKey);
-    } else {
-      return;
-    }
   }
 
   // If the layer has future results then we'll move it past any layer that's
   // still empty, so currently pending operations will take precedence over it
   for (
-    index = 0;
+    index = index > -1 ? index : 0;
     hasNext &&
     index < data.optimisticOrder.length &&
     !data.deferredKeys.has(data.optimisticOrder[index]) &&
