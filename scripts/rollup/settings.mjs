@@ -42,7 +42,7 @@ if (pkg.optionalDependencies)
   externalModules.push(...Object.keys(pkg.optionalDependencies));
 
 const prodDependencies = new Set([
-  ...Object.keys(pkg.peerDependencies),
+  ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.dependencies),
 ]);
 
