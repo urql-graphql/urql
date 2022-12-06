@@ -41,8 +41,6 @@ export interface InMemoryData {
   queryRootKey: string;
   /** Number of references to each entity (except "Query") */
   refCount: KeyMap<number>;
-  /** Number of references to each entity on optimistic layers */
-  refLock: OperationMap<KeyMap<number>>;
   /** A map of entity fields (key-value entries per entity) */
   records: NodeMap<EntityField>;
   /** A map of entity links which are connections from one entity to another (key-value entries per entity) */
@@ -51,6 +49,8 @@ export interface InMemoryData {
   deferredKeys: Set<number>;
   /** A set of Query operation keys that are in-flight and awaiting a result */
   commutativeKeys: Set<number>;
+  /** A set of Query operation keys that have been written to */
+  dirtyKeys: Set<number>;
   /** The order of optimistic layers */
   optimisticOrder: number[];
   /** This may be a persistence adapter that will receive changes in a batch */
@@ -160,7 +160,7 @@ export const clearDataState = () => {
     let i = data.optimisticOrder.length;
     while (
       --i >= 0 &&
-      data.refLock.has(data.optimisticOrder[i]) &&
+      data.dirtyKeys.has(data.optimisticOrder[i]) &&
       data.commutativeKeys.has(data.optimisticOrder[i])
     )
       squashLayer(data.optimisticOrder[i]);
@@ -175,16 +175,19 @@ export const clearDataState = () => {
     currentDebugStack.length = 0;
   }
 
-  // Schedule deferred tasks if we haven't already
-  if (process.env.NODE_ENV !== 'test' && !data.defer) {
-    data.defer = true;
-    setTimeout(() => {
-      initDataState('read', data, null);
-      gc();
-      persistData();
-      clearDataState();
-      data.defer = false;
-    });
+  if (process.env.NODE_ENV !== 'test') {
+    // Schedule deferred tasks if we haven't already, and if either a persist or GC run
+    // are likely to be needed
+    if (!data.defer && (data.storage || !data.optimisticOrder.length)) {
+      data.defer = true;
+      setTimeout(() => {
+        initDataState('read', data, null);
+        gc();
+        persistData();
+        clearDataState();
+        data.defer = false;
+      });
+    }
   }
 };
 
@@ -230,7 +233,6 @@ export const make = (queryRootKey: string): InMemoryData => ({
   persist: new Set(),
   queryRootKey,
   refCount: new Map(),
-  refLock: new Map(),
   links: {
     optimistic: new Map(),
     base: new Map(),
@@ -241,6 +243,7 @@ export const make = (queryRootKey: string): InMemoryData => ({
   },
   deferredKeys: new Set(),
   commutativeKeys: new Set(),
+  dirtyKeys: new Set(),
   optimisticOrder: [],
   storage: null,
 });
@@ -314,41 +317,23 @@ const getNode = <T>(
 };
 
 /** Adjusts the reference count of an entity on a refCount dict by "by" and updates the gc */
-const updateRCForEntity = (
-  gc: undefined | Set<string>,
-  refCount: KeyMap<number>,
-  entityKey: string,
-  by: number
-): void => {
+const updateRCForEntity = (entityKey: string, by: number): void => {
   // Retrieve the reference count and adjust it by "by"
-  const count = refCount.get(entityKey) || 0;
-  const newCount = count + by;
-  refCount.set(entityKey, newCount);
+  const count = currentData!.refCount.get(entityKey) || 0;
+  const newCount = count + by > 0 ? count + by : 0;
+  currentData!.refCount.set(entityKey, newCount);
   // Add it to the garbage collection batch if it needs to be deleted or remove it
   // from the batch if it needs to be kept
-  if (gc) {
-    if (newCount <= 0) gc.add(entityKey);
-    else if (count <= 0 && newCount > 0) gc.delete(entityKey);
-  }
+  if (!newCount) currentData!.gc.add(entityKey);
+  else if (!count && newCount) currentData!.gc.delete(entityKey);
 };
 
 /** Adjusts the reference counts of all entities of a link on a refCount dict by "by" and updates the gc */
-const updateRCForLink = (
-  gc: undefined | Set<string>,
-  refCount: KeyMap<number>,
-  link: Link | undefined,
-  by: number
-): void => {
-  if (typeof link === 'string') {
-    updateRCForEntity(gc, refCount, link, by);
-  } else if (Array.isArray(link)) {
-    for (let i = 0, l = link.length; i < l; i++) {
-      if (Array.isArray(link[i])) {
-        updateRCForLink(gc, refCount, link[i], by);
-      } else if (link[i]) {
-        updateRCForEntity(gc, refCount, link[i] as string, by);
-      }
-    }
+const updateRCForLink = (link: Link | undefined, by: number): void => {
+  if (Array.isArray(link)) {
+    for (let i = 0, l = link.length; i < l; i++) updateRCForLink(link[i], by);
+  } else if (typeof link === 'string') {
+    updateRCForEntity(link, by);
   }
 };
 
@@ -391,40 +376,28 @@ const extractNodeMapFields = <T>(
 
 /** Garbage collects all entities that have been marked as having no references */
 export const gc = () => {
+  // If we're currently awaiting deferred results, abort GC run
+  if (currentData!.optimisticOrder.length) return;
+
   // Iterate over all entities that have been marked for deletion
   // Entities have been marked for deletion in `updateRCForEntity` if
   // their reference count dropped to 0
-  const { gc: batch } = currentData!;
-  for (const entityKey of batch.keys()) {
-    // Check first whether the reference count is still 0
-    const rc = currentData!.refCount.get(entityKey) || 0;
-    if (rc > 0) {
-      batch.delete(entityKey);
-      return;
-    }
+  for (const entityKey of currentData!.gc.keys()) {
+    // Remove the current key from the GC batch
+    currentData!.gc.delete(entityKey);
 
-    // Each optimistic layer may also still contain some references to marked entities
-    for (const layerKey of currentData!.refLock.keys()) {
-      const refCount = currentData!.refLock.get(layerKey);
-      if (refCount) {
-        const locks = refCount.get(entityKey) || 0;
-        // If the optimistic layer has any references to the entity, don't GC it,
-        // otherwise delete the reference count from the optimistic layer
-        if (locks > 0) return;
-        refCount.delete(entityKey);
-      }
-    }
+    // Check first whether the entity has any references,
+    // if so, we skip it from the GC run
+    const rc = currentData!.refCount.get(entityKey) || 0;
+    if (rc > 0) continue;
 
     // Delete the reference count, and delete the entity from the GC batch
     currentData!.refCount.delete(entityKey);
-    batch.delete(entityKey);
     currentData!.records.base.delete(entityKey);
     const linkNode = currentData!.links.base.get(entityKey);
     if (linkNode) {
       currentData!.links.base.delete(entityKey);
-      for (const fieldKey in linkNode) {
-        updateRCForLink(batch, currentData!.refCount, linkNode[fieldKey], -1);
-      }
+      for (const fieldKey in linkNode) updateRCForLink(linkNode[fieldKey], -1);
     }
   }
 };
@@ -484,39 +457,20 @@ export const writeLink = (
   fieldKey: string,
   link?: Link | undefined
 ) => {
-  const data = currentData!;
-  // Retrieve the reference counting dict or the optimistic reference locking dict
-  let refCount: KeyMap<number> | undefined;
-  // Retrive the link NodeMap from either an optimistic or the base layer
-  let links: KeyMap<Dict<Link | undefined>> | undefined;
-  // Set the GC batch if we're not optimistically updating
-  let gc: undefined | Set<string>;
-  if (currentOptimisticKey) {
-    // The refLock counters are also reference counters, but they prevent
-    // garbage collection instead of being used to trigger it
-    refCount = data.refLock.get(currentOptimisticKey);
-    if (!refCount)
-      data.refLock.set(currentOptimisticKey, (refCount = new Map()));
-    links = data.links.optimistic.get(currentOptimisticKey);
-  } else {
-    refCount = data.refCount;
-    links = data.links.base;
-    gc = data.gc;
+  // Retrieve the link NodeMap from either an optimistic or the base layer
+  const links = currentOptimisticKey
+    ? currentData!.links.optimistic.get(currentOptimisticKey)
+    : currentData!.links.base;
+  // Update the reference count for the link
+  if (!currentOptimisticKey) {
+    updateRCForLink(links?.get(entityKey)?.[fieldKey], -1);
+    updateRCForLink(link, 1);
   }
-
-  // Retrieve the previous link for this field
-  const prevLinkNode = links && links.get(entityKey);
-  const prevLink = prevLinkNode && prevLinkNode[fieldKey];
-
   // Update persistence batch and dependencies
   updateDependencies(entityKey, fieldKey);
   updatePersist(entityKey, fieldKey);
   // Update the link
-  setNode(data.links, entityKey, fieldKey, link);
-  // First decrease the reference count for the previous link
-  updateRCForLink(gc, refCount, prevLink, -1);
-  // Then increase the reference count for the new link
-  updateRCForLink(gc, refCount, link, 1);
+  setNode(currentData!.links, entityKey, fieldKey, link);
 };
 
 /** Reserves an optimistic layer and preorders it */
@@ -538,7 +492,7 @@ export const reserveLayer = (
       index = index > -1 ? index : 0;
       index < data.optimisticOrder.length &&
       !data.deferredKeys.has(data.optimisticOrder[index]) &&
-      (!data.refLock.has(data.optimisticOrder[index]) ||
+      (!data.dirtyKeys.has(data.optimisticOrder[index]) ||
         !data.commutativeKeys.has(data.optimisticOrder[index]));
       index++
     );
@@ -563,8 +517,8 @@ const createLayer = (data: InMemoryData, layerKey: number) => {
     data.optimisticOrder.unshift(layerKey);
   }
 
-  if (!data.refLock.has(layerKey)) {
-    data.refLock.set(layerKey, new Map());
+  if (!data.dirtyKeys.has(layerKey)) {
+    data.dirtyKeys.add(layerKey);
     data.links.optimistic.set(layerKey, new Map());
     data.records.optimistic.set(layerKey, new Map());
   }
@@ -572,8 +526,8 @@ const createLayer = (data: InMemoryData, layerKey: number) => {
 
 /** Clears all links and records of an optimistic layer */
 const clearLayer = (data: InMemoryData, layerKey: number) => {
-  if (data.refLock.has(layerKey)) {
-    data.refLock.delete(layerKey);
+  if (data.dirtyKeys.has(layerKey)) {
+    data.dirtyKeys.delete(layerKey);
     data.records.optimistic.delete(layerKey);
     data.links.optimistic.delete(layerKey);
     data.deferredKeys.delete(layerKey);
