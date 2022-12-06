@@ -41,6 +41,11 @@ if (pkg.dependencies)
 if (pkg.optionalDependencies)
   externalModules.push(...Object.keys(pkg.optionalDependencies));
 
+const prodDependencies = new Set([
+  ...Object.keys(pkg.peerDependencies),
+  ...Object.keys(pkg.dependencies),
+]);
+
 const externalPredicate = new RegExp(`^(${externalModules.join('|')})($|/)`);
 
 export const isExternal = id => {
@@ -49,10 +54,10 @@ export const isExternal = id => {
   return externalPredicate.test(id);
 };
 
-export const hasReact = externalModules.includes('react');
-export const hasPreact = externalModules.includes('preact');
-export const hasSvelte = externalModules.includes('svelte');
-export const hasVue = externalModules.includes('vue');
+export const hasReact = prodDependencies.has('react');
+export const hasPreact = prodDependencies.has('preact');
+export const hasSvelte = prodDependencies.has('svelte');
+export const hasVue = prodDependencies.has('vue');
 export const mayReexport = hasReact || hasPreact || hasSvelte || hasVue;
 export const isCI = !!process.env.CIRCLECI;
 export const isAnalyze = !!process.env.ANALYZE;
