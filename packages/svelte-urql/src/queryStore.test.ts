@@ -20,8 +20,13 @@ describe('queryStore', () => {
   it('fills the store with correct values', () => {
     expect(get(store).operation.kind).toBe('query');
     expect(get(store).operation.context.url).toBe('https://example.com');
-    expect(get(store).operation.query.loc?.source.body).toBe(query);
     expect(get(store).operation.variables).toBe(variables);
+
+    expect(get(store).operation.query.loc?.source.body).toMatchInlineSnapshot(`
+      "{
+        test
+      }"
+    `);
   });
 
   it('adds pause handles', () => {
