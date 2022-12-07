@@ -161,11 +161,9 @@ export const clearDataState = () => {
     while (
       --i >= 0 &&
       data.refLock.has(data.optimisticOrder[i]) &&
-      data.commutativeKeys.has(data.optimisticOrder[i]) &&
-      !data.deferredKeys.has(data.optimisticOrder[i])
-    ) {
+      data.commutativeKeys.has(data.optimisticOrder[i])
+    )
       squashLayer(data.optimisticOrder[i]);
-    }
   }
 
   currentOwnership = null;
@@ -527,36 +525,34 @@ export const reserveLayer = (
   layerKey: number,
   hasNext?: boolean
 ) => {
+  // Find the current index for the layer, and remove it from
+  // the order if it exists already
+  let index = data.optimisticOrder.indexOf(layerKey);
+  if (index > -1) data.optimisticOrder.splice(index, 1);
+
   if (hasNext) {
     data.deferredKeys.add(layerKey);
+    // If the layer has future results then we'll move it past any layer that's
+    // still empty, so currently pending operations will take precedence over it
+    for (
+      index = index > -1 ? index : 0;
+      index < data.optimisticOrder.length &&
+      !data.deferredKeys.has(data.optimisticOrder[index]) &&
+      (!data.refLock.has(data.optimisticOrder[index]) ||
+        !data.commutativeKeys.has(data.optimisticOrder[index]));
+      index++
+    );
   } else {
     data.deferredKeys.delete(layerKey);
-  }
-
-  let index = data.optimisticOrder.indexOf(layerKey);
-  if (index > -1) {
-    if (!data.commutativeKeys.has(layerKey) && !hasNext) {
-      data.optimisticOrder.splice(index, 1);
-      // Protect optimistic layers from being turned into non-optimistic layers
-      // while preserving optimistic data
+    // Protect optimistic layers from being turned into non-optimistic layers
+    // while preserving optimistic data
+    if (index > -1 && !data.commutativeKeys.has(layerKey))
       clearLayer(data, layerKey);
-    } else {
-      return;
-    }
+    index = 0;
   }
 
-  // If the layer has future results then we'll move it past any layer that's
-  // still empty, so currently pending operations will take precedence over it
-  for (
-    index = 0;
-    hasNext &&
-    index < data.optimisticOrder.length &&
-    !data.deferredKeys.has(data.optimisticOrder[index]) &&
-    (!data.refLock.has(data.optimisticOrder[index]) ||
-      !data.commutativeKeys.has(data.optimisticOrder[index]));
-    index++
-  );
-
+  // Register the layer with the deferred or "top" index and
+  // mark it as commutative
   data.optimisticOrder.splice(index, 0, layerKey);
   data.commutativeKeys.add(layerKey);
 };

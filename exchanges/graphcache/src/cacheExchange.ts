@@ -213,11 +213,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       optimisticKeysToDependencies.delete(operation.key);
     }
 
-    reserveLayer(
-      store.data,
-      operation.key,
-      operation.kind === 'subscription' || result.hasNext
-    );
+    if (operation.kind === 'subscription' || result.hasNext)
+      reserveLayer(store.data, operation.key, true);
 
     let queryDependencies: void | Dependencies;
     let data: Data | null = result.data;

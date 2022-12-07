@@ -1811,12 +1811,6 @@ describe('commutativity', () => {
       variables: undefined,
     });
 
-    const queryOpB = client.createRequestOperation('query', {
-      key: 3,
-      query,
-      variables: undefined,
-    });
-
     expect(data).toBe(undefined);
 
     nextOp(queryOpA);
@@ -1838,23 +1832,6 @@ describe('commutativity', () => {
     nextOp(mutationOp);
     expect(reexec).toHaveBeenCalledTimes(1);
     expect(data).toHaveProperty('node.name', 'optimistic');
-
-    // NOTE: We purposefully skip the following:
-    // nextOp(queryOpB);
-
-    nextRes({
-      operation: queryOpB,
-      data: {
-        __typename: 'Query',
-        node: {
-          __typename: 'Node',
-          id: 'node',
-          name: 'query b',
-        },
-      },
-    });
-
-    expect(data).toHaveProperty('node.name', 'query b');
   });
 
   it('applies mutation results on top of commutative queries', () => {
