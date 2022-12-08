@@ -1,5 +1,15 @@
 # @urql/exchange-graphcache
 
+## 5.0.6
+
+### Patch Changes
+
+- Solve issue where partial data could cause loops between related queries, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2831](https://github.com/urql-graphql/urql/pull/2831))
+- Add skipping of garbage collection runs when the cache is waiting for optimistic, deferred or other results in layers. This means that we only take an opportunity to run garbage collection after results have settled and are hence decreasing the chance of hogging the event loop when a run isn't needed, by [@kitten](https://github.com/kitten) (See [#2862](https://github.com/urql-graphql/urql/pull/2862))
+- ⚠️ Fix a deadlock condition in Graphcache's layers, which is caused by subscriptions (or other deferred layers) starting before one-off mutation layers. This causes the mutation to not be completed, which keeps its data preferred above the deferred layer. That in turn means that layers stop squashing, which causes new results to be missing indefinitely, when they overlap, by [@kitten](https://github.com/kitten) (See [#2861](https://github.com/urql-graphql/urql/pull/2861))
+- Updated dependencies (See [#2843](https://github.com/urql-graphql/urql/pull/2843), [#2847](https://github.com/urql-graphql/urql/pull/2847), [#2850](https://github.com/urql-graphql/urql/pull/2850), and [#2846](https://github.com/urql-graphql/urql/pull/2846))
+  - @urql/core@3.1.0
+
 ## 5.0.5
 
 ### Patch Changes

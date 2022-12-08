@@ -1,5 +1,13 @@
 # @urql/svelte
 
+## 3.0.2
+
+### Patch Changes
+
+- Move remaining `Variables` generics over from `object` default to `Variables extends AnyVariables = AnyVariables`. This has been introduced previously in [#2607](https://github.com/urql-graphql/urql/pull/2607) but some missing ports have been missed due to TypeScript not catching them previously. Depending on your TypeScript version the `object` default is incompatible with `AnyVariables`, by [@kitten](https://github.com/kitten) (See [#2843](https://github.com/urql-graphql/urql/pull/2843))
+- Updated dependencies (See [#2843](https://github.com/urql-graphql/urql/pull/2843), [#2847](https://github.com/urql-graphql/urql/pull/2847), [#2850](https://github.com/urql-graphql/urql/pull/2850), and [#2846](https://github.com/urql-graphql/urql/pull/2846))
+  - @urql/core@3.1.0
+
 ## 3.0.1
 
 ### Patch Changes

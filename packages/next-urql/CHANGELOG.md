@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.1
+
+### Patch Changes
+
+- Change import for `createClient` to `@urql/core`, which helps Next not depend on `urql` and hence not cause `createContext` to be called when the import is treeshaken away, by [@SleeplessOne1917](https://github.com/SleeplessOne1917) (See [#2833](https://github.com/urql-graphql/urql/pull/2833))
+
 ## 4.0.0
 
 ### Major Changes

@@ -1,5 +1,19 @@
 # @urql/core
 
+## 3.1.0
+
+### Minor Changes
+
+- Implement `mapExchange`, which replaces `errorExchange`, allowing `onOperation` and `onResult` to be called to either react to or replace operations and results. For backwards compatibility, this exchange is also exported as `errorExchange` and supports `onError`, by [@kitten](https://github.com/kitten) (See [#2846](https://github.com/urql-graphql/urql/pull/2846))
+
+### Patch Changes
+
+- Move remaining `Variables` generics over from `object` default to `Variables extends AnyVariables = AnyVariables`. This has been introduced previously in [#2607](https://github.com/urql-graphql/urql/pull/2607) but some missing ports have been missed due to TypeScript not catching them previously. Depending on your TypeScript version the `object` default is incompatible with `AnyVariables`, by [@kitten](https://github.com/kitten) (See [#2843](https://github.com/urql-graphql/urql/pull/2843))
+- Reuse output of `stringifyDocument` in place of repeated `print`. This will mean that we now prevent calling `print` repeatedly for identical operations and are instead only reusing the result once.
+  This change has a subtle consequence of our internals. Operation keys will change due to this
+  refactor and we will no longer sanitise strip newlines from queries that `@urql/core` has printed, by [@kitten](https://github.com/kitten) (See [#2847](https://github.com/urql-graphql/urql/pull/2847))
+- Update to `wonka@^6.1.2` to fix memory leak in `fetch` caused in Node.js by a lack of clean up after initiating a request, by [@kitten](https://github.com/kitten) (See [#2850](https://github.com/urql-graphql/urql/pull/2850))
+
 ## 3.0.5
 
 ### Patch Changes

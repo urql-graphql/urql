@@ -142,7 +142,7 @@ importers:
 
   exchanges/execute:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.0'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -154,7 +154,7 @@ importers:
   exchanges/graphcache:
     specifiers:
       '@cypress/react': ^7.0.1
-      '@urql/core': '>=3.0.5'
+      '@urql/core': '>=3.1.0'
       '@urql/exchange-execute': '*'
       '@urql/introspection': '*'
       cypress: ^11.1.0
@@ -469,7 +469,7 @@ importers:
 
   packages/svelte-urql:
     specifiers:
-      '@urql/core': ^3.0.0
+      '@urql/core': ^3.1.0
       graphql: ^16.0.0
       svelte: ^3.20.0
       wonka: ^6.1.2
@@ -482,7 +482,7 @@ importers:
 
   packages/vue-urql:
     specifiers:
-      '@urql/core': ^3.0.0
+      '@urql/core': ^3.1.0
       graphql: ^16.0.0
       vue: ^3.0.11
       wonka: ^6.1.2
