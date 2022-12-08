@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.0
+
+### Minor Changes
+
+- The `context` option, which may be set to a context value or a function returning a context, can now return a `Promise` and will be correctly resolved and awaited, by [@YutaUra](https://github.com/YutaUra) (See [#2806](https://github.com/urql-graphql/urql/pull/2806))
+
+### Patch Changes
+
+- End iterator when teardown functions runs, previously it waited for one extra call to next, then ended the iterator, by [@danielkaxis](https://github.com/danielkaxis) (See [#2803](https://github.com/urql-graphql/urql/pull/2803))
+- Updated dependencies (See [#2843](https://github.com/urql-graphql/urql/pull/2843), [#2847](https://github.com/urql-graphql/urql/pull/2847), [#2850](https://github.com/urql-graphql/urql/pull/2850), and [#2846](https://github.com/urql-graphql/urql/pull/2846))
+  - @urql/core@3.1.0
+
 ## 2.0.0
 
 ### Major Changes
