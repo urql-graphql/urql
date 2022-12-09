@@ -111,7 +111,6 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
   // This registers queries with the data layer to ensure commutativity
   const prepareForwardedOperation = (operation: Operation) => {
-    operation.context.bakka + {};
     if (operation.kind === 'query') {
       // Pre-reserve the position of the result layer
       reserveLayer(store.data, operation.key);
@@ -119,6 +118,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       // Delete reference to operation if any exists to release it
       operations.delete(operation.key);
       results.delete(operation.key);
+      reexecutingOperations.delete(operation.key);
       // Mark operation layer as done
       noopDataState(store.data, operation.key);
     } else if (
