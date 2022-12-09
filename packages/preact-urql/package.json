@@ -48,7 +48,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@urql/core": "workspace:@urql/core@*",
+    "@urql/core": "workspace:*",
     "@testing-library/preact": "^2.0.0",
     "graphql": "^16.0.0",
     "preact": "^10.5.5"
