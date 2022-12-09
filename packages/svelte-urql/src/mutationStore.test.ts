@@ -32,6 +32,7 @@ describe('mutationStore', () => {
       "mutation ($input: Example!) {
         doExample(input: $input) {
           id
+          __typename
         }
       }"
     `);
