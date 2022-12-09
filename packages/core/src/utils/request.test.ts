@@ -106,7 +106,7 @@ describe('stringifyDocument ', () => {
     expect(stringifyDocument(formatted)).toBe(print(formatted));
   });
 
-  it.only('should reprint gql documents', () => {
+  it('should reprint gql documents', () => {
     const request = createRequest(
       gql`
         query {
@@ -168,7 +168,7 @@ describe('stringifyDocument ', () => {
     expect(stringifyDocument(createRequest(doc, undefined).query))
       .toMatchInlineSnapshot(`
         "{
-          field(arg:
+          field(arg: 
 
         \\"test #1\\")
         }"
@@ -189,7 +189,7 @@ describe('stringifyDocument ', () => {
     expect(stringifyDocument(createRequest(doc, undefined).query))
       .toMatchInlineSnapshot(`
         "{
-          field(arg:
+          field(arg: 
 
         \\"\\"\\"
           hello
