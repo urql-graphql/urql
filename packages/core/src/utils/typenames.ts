@@ -4,6 +4,7 @@ import {
   InlineFragmentNode,
   Kind,
   visit,
+  print,
 } from 'graphql';
 
 import { KeyedDocumentNode, keyDocument } from './request';
@@ -83,6 +84,11 @@ export const formatDocument = <T extends DocumentNode>(node: T): T => {
     });
 
     formattedDocs.set(query.__key, result);
+    if (typeof node !== 'string' && node.loc?.source.name === 'gql') {
+      const printed = print(result);
+      node.loc.source.body = printed;
+      (node.loc as any).end = printed.length;
+    }
   }
 
   return (result as unknown) as T;
