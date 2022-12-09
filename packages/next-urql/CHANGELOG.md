@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.2
+
+### Patch Changes
+
+- ⚠️ Fix type-generation, with a change in TS/Rollup the type generation took the paths as src and resolved them into the types dir, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2870](https://github.com/urql-graphql/urql/pull/2870))
+
 ## 4.0.1
 
 ### Patch Changes
