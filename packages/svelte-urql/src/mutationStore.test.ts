@@ -1,3 +1,4 @@
+import { print } from 'graphql';
 import { createClient } from '@urql/core';
 import { get } from 'svelte/store';
 import { vi, expect, it, describe } from 'vitest';
@@ -28,11 +29,10 @@ describe('mutationStore', () => {
     expect(get(store).operation.context.url).toBe('https://example.com');
     expect(get(store).operation.variables).toBe(variables);
 
-    expect(get(store).operation.query.loc?.source.body).toMatchInlineSnapshot(`
+    expect(print(get(store).operation.query)).toMatchInlineSnapshot(`
       "mutation ($input: Example!) {
         doExample(input: $input) {
           id
-          __typename
         }
       }"
     `);
