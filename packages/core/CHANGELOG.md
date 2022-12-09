@@ -1,5 +1,13 @@
 # @urql/core
 
+## 3.1.1
+
+### Patch Changes
+
+- Correctly mark cache-hits from the ssr-exchange, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2872](https://github.com/urql-graphql/urql/pull/2872))
+- ⚠️ Fix type-generation, with a change in TS/Rollup the type generation took the paths as src and resolved them into the types dir, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2870](https://github.com/urql-graphql/urql/pull/2870))
+- ⚠️ Fix regression in `@urql/core`'s `stringifyDocument` that caused some formatted documents to not be reprinted, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2871](https://github.com/urql-graphql/urql/pull/2871))
+
 ## 3.1.0
 
 ### Minor Changes
