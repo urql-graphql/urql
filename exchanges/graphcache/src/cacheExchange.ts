@@ -111,6 +111,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
 
   // This registers queries with the data layer to ensure commutativity
   const prepareForwardedOperation = (operation: Operation) => {
+    operation.context.bakka + {};
     if (operation.kind === 'query') {
       // Pre-reserve the position of the result layer
       reserveLayer(store.data, operation.key);

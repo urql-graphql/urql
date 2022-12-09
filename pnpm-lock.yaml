@@ -155,13 +155,13 @@ importers:
     specifiers:
       '@cypress/react': ^7.0.1
       '@urql/core': '>=3.1.0'
-      '@urql/exchange-execute': '*'
-      '@urql/introspection': '*'
+      '@urql/exchange-execute': workspace:@urql/exchange-execute@*
+      '@urql/introspection': workspace:@urql/introspection@*
       cypress: ^11.1.0
       graphql: ^16.0.0
       react: ^17.0.2
       react-dom: ^17.0.2
-      urql: '*'
+      urql: workspace:urql@*
       wonka: ^6.1.2
     dependencies:
       '@urql/core': link:../../packages/core
@@ -268,6 +268,7 @@ importers:
       '@types/node-fetch': ^2.5.4
       '@types/react': ^17.0.39
       '@types/react-dom': ^17.0.3
+      '@urql/core': workspace:@urql/core@*
       enzyme: ^3.11.0
       enzyme-adapter-react-16: ^1.15.2
       graphql: ^16.0.0
@@ -276,6 +277,7 @@ importers:
       react-dom: ^17.0.2
       react-is: ^17.0.2
       react-ssr-prepass: ^1.4.0
+      urql: workspace:urql@*
     dependencies:
       react-ssr-prepass: 1.4.0_react@17.0.2
     devDependencies:
@@ -284,6 +286,7 @@ importers:
       '@types/node-fetch': 2.5.10
       '@types/react': 17.0.52
       '@types/react-dom': 17.0.18
+      '@urql/core': link:../core
       enzyme: 3.11.0
       enzyme-adapter-react-16: 1.15.6_7ltvq4e2railvf5uya4ffxpe2a
       graphql: 16.0.1
@@ -291,6 +294,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+      urql: link:../react-urql
 
   packages/preact-urql:
     specifiers:
@@ -421,10 +425,12 @@ importers:
     specifiers:
       '@react-native-async-storage/async-storage': ^1.15.5
       '@react-native-community/netinfo': ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
-      '@urql/exchange-graphcache': '*'
+      '@urql/core': workspace:@urql/core@*
+      '@urql/exchange-graphcache': workspace:@urql/exchange-graphcache@*
     devDependencies:
       '@react-native-async-storage/async-storage': 1.15.5
       '@react-native-community/netinfo': 6.0.0
+      '@urql/core': link:../core
       '@urql/exchange-graphcache': link:../../exchanges/graphcache
 
   packages/storybook-addon:
@@ -436,14 +442,14 @@ importers:
       '@types/webpack-env': ^1.15.3
       '@urql/core': ^3.0.0
       '@urql/devtools': '>=2.0.0'
-      '@urql/preact': '>=3.0.0'
+      '@urql/preact': workspace:@urql/preact@*
       graphql: ^16.0.0
       preact: ^10.5.5
       react: ^17.0.2
       react-dom: ^17.0.2
       react-is: ^17.0.2
       typescript: '>=4.7.3'
-      urql: '>=3.0.0'
+      urql: workspace:urql@*
       webpack: '>=4.4.6'
       wonka: ^6.1.2
     dependencies:

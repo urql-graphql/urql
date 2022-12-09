@@ -36,6 +36,7 @@ export const makePlugins = () => [
     } : {},
   }),
   typescript({
+    clean: true,
     useTsconfigDeclarationDir: true,
     tsconfigOverride: {
       exclude: [
@@ -44,12 +45,13 @@ export const makePlugins = () => [
         'src/**/test-utils/*'
       ],
       compilerOptions: {
+        rootDir: path.resolve(settings.cwd, '../..'),
         sourceMap: true,
         noEmit: false,
+        noResolve: true,
         declaration: true,
         declarationDir: settings.types,
         target: 'esnext',
-        paths: process.env.USE_PATHS ? undefined : [],
       },
     },
   }),

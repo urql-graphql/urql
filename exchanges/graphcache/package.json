@@ -70,13 +70,14 @@
   },
   "devDependencies": {
     "@cypress/react": "^7.0.1",
-    "@urql/exchange-execute": "*",
-    "@urql/introspection": "*",
+    "@urql/core": "workspace:@urql/core@*",
+    "@urql/exchange-execute": "workspace:@urql/exchange-execute@*",
+    "@urql/introspection": "workspace:@urql/introspection@*",
     "cypress": "^11.1.0",
     "graphql": "^16.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "urql": "*"
+    "urql": "workspace:urql@*"
   },
   "publishConfig": {
     "access": "public"
