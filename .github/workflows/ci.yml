@@ -162,7 +162,6 @@ jobs:
     env:
       NODE_TOTAL: 3
       NODE_INDEX: ${{matrix.node}}
-      USE_PATHS: true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
