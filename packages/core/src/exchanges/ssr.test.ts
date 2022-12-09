@@ -196,7 +196,18 @@ it('resolves cached query results correctly', () => {
   const data = ssr.extractData();
   expect(Object.keys(data).length).toBe(1);
   expect(output).not.toHaveBeenCalled();
-  expect(onPush).toHaveBeenCalledWith(queryResponse);
+  expect(onPush).toHaveBeenCalledWith({
+    ...queryResponse,
+    operation: {
+      ...queryResponse.operation,
+      context: {
+        ...queryResponse.operation.context,
+        meta: {
+          cacheOutcome: 'hit',
+        },
+      },
+    },
+  });
 });
 
 it('resolves deferred, cached query results correctly', () => {
@@ -222,7 +233,19 @@ it('resolves deferred, cached query results correctly', () => {
   expect(Object.keys(data).length).toBe(1);
   expect(output).toHaveBeenCalledTimes(1);
   expect(onPush).toHaveBeenCalledTimes(2);
-  expect(onPush.mock.calls[1][0]).toEqual({ hasNext: true, ...queryResponse });
+  expect(onPush.mock.calls[1][0]).toEqual({
+    hasNext: true,
+    ...queryResponse,
+    operation: {
+      ...queryResponse.operation,
+      context: {
+        ...queryResponse.operation.context,
+        meta: {
+          cacheOutcome: 'hit',
+        },
+      },
+    },
+  });
 });
 
 it('deletes cached results in non-suspense environments', async () => {
@@ -242,7 +265,18 @@ it('deletes cached results in non-suspense environments', async () => {
   await Promise.resolve();
 
   expect(Object.keys(ssr.extractData()).length).toBe(0);
-  expect(onPush).toHaveBeenCalledWith(queryResponse);
+  expect(onPush).toHaveBeenCalledWith({
+    ...queryResponse,
+    operation: {
+      ...queryResponse.operation,
+      context: {
+        ...queryResponse.operation.context,
+        meta: {
+          cacheOutcome: 'hit',
+        },
+      },
+    },
+  });
 
   // NOTE: The operation should not be duplicated
   expect(output).not.toHaveBeenCalled();
