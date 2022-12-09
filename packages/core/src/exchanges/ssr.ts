@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { pipe, share, filter, merge, map, tap } from 'wonka';
 import { Exchange, OperationResult, Operation } from '../types';
-import { CombinedError } from '../utils';
+import { addMetadata, CombinedError } from '../utils';
 import { reexecuteOperation } from './cache';
 
 export interface SerializedResult {
@@ -145,13 +145,24 @@ export const ssrExchange = (params: SSRExchangeParams = {}): SSRExchange => {
       ),
       map(op => {
         const serialized = data[op.key]!;
-        const result = deserializeResult(op, serialized, includeExtensions);
+        const cachedResult = deserializeResult(
+          op,
+          serialized,
+          includeExtensions
+        );
+
         if (staleWhileRevalidate && !revalidated.has(op.key)) {
-          result.stale = true;
+          cachedResult.stale = true;
           revalidated.add(op.key);
           reexecuteOperation(client, op);
         }
 
+        const result: OperationResult = {
+          ...cachedResult,
+          operation: addMetadata(op, {
+            cacheOutcome: 'hit',
+          }),
+        };
         return result;
       })
     );
