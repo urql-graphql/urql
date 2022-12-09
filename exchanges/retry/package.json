@@ -47,7 +47,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "devDependencies": {
-    "@urql/core": "workspace:^3.1.0",
+    "@urql/core": "workspace:*",
     "graphql": "^16.0.0"
   },
   "peerDependencies": {

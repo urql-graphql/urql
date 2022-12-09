@@ -46,7 +46,7 @@
     "@testing-library/react-hooks": "^5.1.2",
     "@types/react": "^17.0.4",
     "@types/react-test-renderer": "^17.0.1",
-    "@urql/core": "workspace:^3.1.0",
+    "@urql/core": "workspace:*",
     "cypress": "^11.1.0",
     "graphql": "^16.0.0",
     "react": "^17.0.1",

@@ -155,13 +155,13 @@ importers:
     specifiers:
       '@cypress/react': ^7.0.1
       '@urql/core': '>=3.1.0'
-      '@urql/exchange-execute': workspace:@urql/exchange-execute@*
-      '@urql/introspection': workspace:@urql/introspection@*
+      '@urql/exchange-execute': workspace:*
+      '@urql/introspection': workspace:*
       cypress: ^11.1.0
       graphql: ^16.0.0
       react: ^17.0.2
       react-dom: ^17.0.2
-      urql: workspace:urql@*
+      urql: workspace:*
       wonka: ^6.1.2
     dependencies:
       '@urql/core': link:../../packages/core
@@ -268,7 +268,7 @@ importers:
       '@types/node-fetch': ^2.5.4
       '@types/react': ^17.0.39
       '@types/react-dom': ^17.0.3
-      '@urql/core': workspace:@urql/core@*
+      '@urql/core': workspace:*
       enzyme: ^3.11.0
       enzyme-adapter-react-16: ^1.15.2
       graphql: ^16.0.0
@@ -277,7 +277,7 @@ importers:
       react-dom: ^17.0.2
       react-is: ^17.0.2
       react-ssr-prepass: ^1.4.0
-      urql: workspace:urql@*
+      urql: workspace:*
     dependencies:
       react-ssr-prepass: 1.4.0_react@17.0.2
     devDependencies:
@@ -425,8 +425,8 @@ importers:
     specifiers:
       '@react-native-async-storage/async-storage': ^1.15.5
       '@react-native-community/netinfo': ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
-      '@urql/core': workspace:@urql/core@*
-      '@urql/exchange-graphcache': workspace:@urql/exchange-graphcache@*
+      '@urql/core': workspace:*
+      '@urql/exchange-graphcache': workspace:*
     devDependencies:
       '@react-native-async-storage/async-storage': 1.15.5
       '@react-native-community/netinfo': 6.0.0
@@ -442,14 +442,14 @@ importers:
       '@types/webpack-env': ^1.15.3
       '@urql/core': ^3.0.0
       '@urql/devtools': '>=2.0.0'
-      '@urql/preact': workspace:@urql/preact@*
+      '@urql/preact': workspace:*
       graphql: ^16.0.0
       preact: ^10.5.5
       react: ^17.0.2
       react-dom: ^17.0.2
       react-is: ^17.0.2
       typescript: '>=4.7.3'
-      urql: workspace:urql@*
+      urql: workspace:*
       webpack: '>=4.4.6'
       wonka: ^6.1.2
     dependencies:
@@ -3836,7 +3836,7 @@ packages:
       '@urql/core': '>= 1.14.0'
       graphql: '>= 0.11.0'
     dependencies:
-      '@urql/core': link:packages/core
+      '@urql/core': link:packages\core
       graphql: 16.0.1
       wonka: 6.1.2
     dev: false
@@ -4793,6 +4793,7 @@ packages:
 
   /bindings/1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
+    requiresBuild: true
     dependencies:
       file-uri-to-path: 1.0.0
     optional: true
@@ -8187,6 +8188,7 @@ packages:
 
   /file-uri-to-path/1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
+    requiresBuild: true
     optional: true
 
   /filename-reserved-regex/2.0.0:
@@ -11235,6 +11237,7 @@ packages:
 
   /nan/2.14.2:
     resolution: {integrity: sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==}
+    requiresBuild: true
     optional: true
 
   /nanoid/3.3.4:
