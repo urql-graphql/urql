@@ -49,6 +49,7 @@ export const makePlugins = () => [
         declaration: true,
         declarationDir: settings.types,
         target: 'esnext',
+        paths: [],
       },
     },
   }),
@@ -81,6 +82,7 @@ export const makePlugins = () => [
 ];
 
 export const makeOutputPlugins = ({ isProduction, extension }) => {
+  console.log(settings.cwd)
   if (typeof isProduction !== 'boolean')
     throw new Error('Missing option `isProduction` on makeOutputPlugins({ ... })');
   if (extension !== '.mjs' && extension !== '.js')
