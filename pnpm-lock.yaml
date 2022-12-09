@@ -120,7 +120,7 @@ importers:
 
   exchanges/auth:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -131,7 +131,7 @@ importers:
 
   exchanges/context:
     specifiers:
-      '@urql/core': '>=2.3.6'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -142,7 +142,7 @@ importers:
 
   exchanges/execute:
     specifiers:
-      '@urql/core': '>=3.1.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -154,7 +154,7 @@ importers:
   exchanges/graphcache:
     specifiers:
       '@cypress/react': ^7.0.1
-      '@urql/core': '>=3.1.0'
+      '@urql/core': '>=3.1.1'
       '@urql/exchange-execute': workspace:*
       '@urql/introspection': workspace:*
       cypress: ^11.1.0
@@ -178,7 +178,7 @@ importers:
 
   exchanges/multipart-fetch:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       extract-files: ^11.0.0
       graphql: ^16.0.0
       wonka: ^6.1.2
@@ -191,7 +191,7 @@ importers:
 
   exchanges/persisted-fetch:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -202,7 +202,7 @@ importers:
 
   exchanges/populate:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -214,7 +214,7 @@ importers:
   exchanges/refocus:
     specifiers:
       '@types/react': ^17.0.39
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -226,7 +226,7 @@ importers:
 
   exchanges/request-policy:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -237,7 +237,7 @@ importers:
 
   exchanges/retry:
     specifiers:
-      '@urql/core': '>=3.0.0'
+      '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
       wonka: ^6.1.2
     dependencies:
@@ -299,7 +299,7 @@ importers:
   packages/preact-urql:
     specifiers:
       '@testing-library/preact': ^2.0.0
-      '@urql/core': ^3.0.3
+      '@urql/core': ^3.1.1
       graphql: ^16.0.0
       preact: ^10.5.5
       wonka: ^6.1.2
@@ -319,7 +319,7 @@ importers:
       '@testing-library/react-hooks': ^5.1.2
       '@types/react': ^17.0.39
       '@types/react-test-renderer': ^17.0.1
-      '@urql/core': ^3.0.3
+      '@urql/core': ^3.1.1
       cypress: ^11.1.0
       graphql: ^16.0.0
       react: ^17.0.2
@@ -440,7 +440,7 @@ importers:
       '@storybook/preact': '>=6.0.28'
       '@storybook/react': '>=6.0.28'
       '@types/webpack-env': ^1.15.3
-      '@urql/core': ^3.0.0
+      '@urql/core': ^3.1.1
       '@urql/devtools': '>=2.0.0'
       '@urql/preact': workspace:*
       graphql: ^16.0.0
@@ -475,7 +475,7 @@ importers:
 
   packages/svelte-urql:
     specifiers:
-      '@urql/core': ^3.1.0
+      '@urql/core': ^3.1.1
       graphql: ^16.0.0
       svelte: ^3.20.0
       wonka: ^6.1.2
@@ -488,7 +488,7 @@ importers:
 
   packages/vue-urql:
     specifiers:
-      '@urql/core': ^3.1.0
+      '@urql/core': ^3.1.1
       graphql: ^16.0.0
       vue: ^3.0.11
       wonka: ^6.1.2
