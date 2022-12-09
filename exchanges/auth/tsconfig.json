@@ -1,15 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src"],
-  "compilerOptions": {
-    "baseUrl": "./",
-    "target": "es2019",
-    "paths": {
-      "urql": ["../../packages/react-urql/src"],
-      "*-urql": ["../../packages/*-urql/src"],
-      "@urql/exchange-*": ["../../exchanges/*/src"],
-      "@urql/core/*": ["../../packages/core/src/*"],
-      "@urql/*": ["../../packages/*-urql/src", "../../packages/*/src"]
-    }
-  }
+  "include": ["src"]
 }

@@ -56,6 +56,7 @@
     "wonka": "^6.0.0"
   },
   "devDependencies": {
+    "@urql/core": "workspace:@urql/core@*",
     "graphql": "^16.0.0",
     "svelte": "^3.20.0"
   },

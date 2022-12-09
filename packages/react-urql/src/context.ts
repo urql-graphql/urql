@@ -5,9 +5,12 @@ import { Client, createClient } from '@urql/core';
 // but not to error catastrophically if someone is just playing around
 const defaultClient = createClient({ url: '/graphql' });
 
-export const Context = createContext<Client>(defaultClient);
-export const Provider = Context.Provider;
-export const Consumer = Context.Consumer;
+export const Context: import('react').Context<Client> = createContext(
+  defaultClient
+);
+export const Provider: import('react').Provider<Client> = Context.Provider;
+export const Consumer: import('react').Consumer<Client> = Context.Consumer;
+
 Context.displayName = 'UrqlContext';
 
 let hasWarnedAboutDefault = false;

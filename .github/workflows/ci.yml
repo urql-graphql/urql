@@ -94,7 +94,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Build
-        run: pnpm -F urql build
+        run: pnpm -F @urql/core build && pnpm -F urql build
 
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4

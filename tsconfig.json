@@ -2,11 +2,19 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "urql": ["packages/react-urql/src"],
-      "*-urql": ["packages/*-urql/src"],
-      "@urql/exchange-*": ["exchanges/*/src"],
-      "@urql/core/*": ["packages/core/src/*"],
-      "@urql/*": ["packages/*-urql/src", "packages/*/src"]
+      "urql": ["node_modules/urql/src", "packages/react-urql/src"],
+      "*-urql": ["node_modules/*-urql/src", "packages/*-urql/src"],
+      "@urql/exchange-*": [
+        "node_modules/@urql/exchange-*/src",
+        "exchanges/*/src"
+      ],
+      "@urql/core/*": ["node_modules/@urql/core/src/*", "packages/core/src/*"],
+      "@urql/devtools": ["node_modules/@urql/devtools"],
+      "@urql/*": [
+        "node_modules/@urql/*/src",
+        "packages/*-urql/src",
+        "packages/*/src"
+      ]
     },
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -28,7 +36,8 @@
     "**/e2e-tests",
     "**/examples",
     "**/dist",
-    "scripts",
-    "node_modules"
+    "**/node_modules",
+    "node_modules",
+    "scripts"
   ]
 }

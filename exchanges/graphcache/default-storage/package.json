@@ -16,7 +16,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@urql/core": ">=3.0.5",
+    "@urql/core": ">=3.1.0",
     "wonka": "^6.0.0"
   }
 }
