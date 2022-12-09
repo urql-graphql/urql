@@ -9,6 +9,7 @@
         "exchanges/*/src"
       ],
       "@urql/core/*": ["node_modules/@urql/core/src/*", "packages/core/src/*"],
+      "@urql/devtools": ["node_modules/@urql/devtools"],
       "@urql/*": [
         "node_modules/@urql/*/src",
         "packages/*-urql/src",
@@ -23,7 +24,7 @@
     "lib": ["dom", "esnext"],
     "jsx": "preserve",
     "module": "es2015",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "target": "esnext",
     "strict": true,
     "noImplicitAny": false,

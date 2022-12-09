@@ -37,9 +37,10 @@ export const makePlugins = () => [
   }),
   typescript({
     clean: true,
-    useTsconfigDeclarationDir: true,
     tsconfigOverride: {
       exclude: [
+        'src/**/*.spec.ts',
+        'src/**/*.spec.tsx',
         'src/**/*.test.ts',
         'src/**/*.test.tsx',
         'src/**/test-utils/*'
@@ -94,7 +95,7 @@ export const makeOutputPlugins = ({ isProduction, extension }) => {
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
     cjsCheck({ extension }),
-    cleanup({ extension, maintainImports: settings.name === 'urql-introspection' }),
+    cleanup(),
     isProduction ? terserMinified : (extension !== '.js' ? terserPretty : null),
     isProduction && settings.isAnalyze && visualizer({
       filename: path.resolve(settings.cwd, 'node_modules/.cache/analyze.html'),
