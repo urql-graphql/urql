@@ -49,7 +49,7 @@ export const makePlugins = () => [
         declaration: true,
         declarationDir: settings.types,
         target: 'esnext',
-        paths: [],
+        paths: process.env.USE_PATHS ? undefined : [],
       },
     },
   }),

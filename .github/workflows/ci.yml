@@ -156,12 +156,13 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # strategy:
-    #   matrix:
-    #     node: [0, 1, 2]
-    # env:
-    #   NODE_TOTAL: 3
-    #   NODE_INDEX: ${{matrix.node}}
+    strategy:
+      matrix:
+        node: [0, 1, 2]
+    env:
+      NODE_TOTAL: 3
+      NODE_INDEX: ${{matrix.node}}
+      USE_PATHS: true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
