@@ -92,6 +92,43 @@ describe('stringifyDocument ', () => {
     expect(stringifyDocument(formatted)).toBe(print(formatted));
   });
 
+  it('should reprint request documents', () => {
+    const request = createRequest(`query { test { field } }`, {});
+    const formatted = formatDocument(request.query);
+    expect(print(formatted)).toMatchInlineSnapshot(`
+      "{
+        test {
+          field
+          __typename
+        }
+      }"
+    `);
+    expect(stringifyDocument(formatted)).toBe(print(formatted));
+  });
+
+  it('should reprint gql documents', () => {
+    const request = createRequest(
+      gql`
+        query {
+          test {
+            field
+          }
+        }
+      `,
+      {}
+    );
+    const formatted = formatDocument(request.query);
+    expect(print(formatted)).toMatchInlineSnapshot(`
+      "{
+        test {
+          field
+          __typename
+        }
+      }"
+    `);
+    expect(stringifyDocument(formatted)).toBe(print(formatted));
+  });
+
   it('should remove comments', () => {
     const doc = `
       { #query
@@ -132,7 +169,6 @@ describe('stringifyDocument ', () => {
       .toMatchInlineSnapshot(`
         "{
           field(arg: 
-
         \\"test #1\\")
         }"
       `);
@@ -153,7 +189,6 @@ describe('stringifyDocument ', () => {
       .toMatchInlineSnapshot(`
         "{
           field(arg: 
-
         \\"\\"\\"
           hello
           #hello

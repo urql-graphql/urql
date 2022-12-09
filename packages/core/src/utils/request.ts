@@ -29,16 +29,21 @@ const replaceOutsideStrings = (str: string, idx: number) =>
 const sanitizeDocument = (node: string): string =>
   node.split(GRAPHQL_STRING_RE).map(replaceOutsideStrings).join('').trim();
 
+const prints = new Map<DocumentNode | DefinitionNode, string>();
+const docs = new Map<HashValue, KeyedDocumentNode>();
+
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
-  const printed = sanitizeDocument(
-    typeof node === 'string'
-      ? node
-      : node.loc && node.loc.source.name === SOURCE_NAME
-      ? node.loc.source.body
-      : print(node)
-  );
+  let printed: string;
+  if (typeof node === 'string') {
+    printed = sanitizeDocument(node);
+  } else if (node.loc && docs.get((node as KeyedDocumentNode).__key) === node) {
+    printed = node.loc.source.body;
+  } else {
+    printed = prints.get(node) || sanitizeDocument(print(node));
+    prints.set(node, printed);
+  }
 
   if (typeof node !== 'string' && !node.loc) {
     (node as WritableLocation).loc = {
@@ -66,8 +71,6 @@ const hashDocument = (
   }
   return key;
 };
-
-const docs = new Map<HashValue, KeyedDocumentNode>();
 
 export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
   let key: HashValue;
