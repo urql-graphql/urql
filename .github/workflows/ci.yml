@@ -94,7 +94,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Build
-        run: pnpm -F urql build
+        run: pnpm -F @urql/core build && pnpm -F urql build
 
       - name: e2e tests 🧪
         uses: cypress-io/github-action@v4
@@ -156,12 +156,12 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      matrix:
-        node: [0, 1, 2]
-    env:
-      NODE_TOTAL: 3
-      NODE_INDEX: ${{matrix.node}}
+    # strategy:
+    #   matrix:
+    #     node: [0, 1, 2]
+    # env:
+    #   NODE_TOTAL: 3
+    #   NODE_INDEX: ${{matrix.node}}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
