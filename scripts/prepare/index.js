@@ -66,6 +66,7 @@ if (hasReact) {
   );
 }
 
+console.log(pkg.types, name)
 invariant(
   is(pkg.types, path.join('dist', `${name}.d.ts`)),
   'package.json:types path must be valid'

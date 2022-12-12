@@ -138,6 +138,17 @@ importers:
     devDependencies:
       graphql: 16.0.1
 
+  exchanges/devtools:
+    specifiers:
+      '@urql/core': '>=3.0.0'
+      graphql: ^16.0.0
+      wonka: ^6.2.3
+    dependencies:
+      '@urql/core': link:../../packages/core
+      wonka: 6.2.3
+    devDependencies:
+      graphql: 16.0.1
+
   exchanges/execute:
     specifiers:
       '@urql/core': '>=3.1.1'
@@ -455,7 +466,7 @@ importers:
       wonka: 6.2.3
     optionalDependencies:
       '@storybook/addons': 6.2.9_sfoxds7t5ydpegc3knd667wn6m
-      '@urql/devtools': 2.0.3_6datu6bk5t3os3oamu6of3ptzi
+      '@urql/devtools': link:../../exchanges/devtools
       react: 17.0.2
     devDependencies:
       '@babel/core': 7.20.2
@@ -3854,19 +3865,6 @@ packages:
       '@typescript-eslint/types': 5.44.0
       eslint-visitor-keys: 3.3.0
     dev: true
-
-  /@urql/devtools/2.0.3_6datu6bk5t3os3oamu6of3ptzi:
-    resolution: {integrity: sha512-TktPLiBS9LcBPHD6qcnb8wqOVcg3Bx0iCtvQ80uPpfofwwBGJmqnQTjUdEFU6kwaLOFZULQ9+Uo4831G823mQw==}
-    requiresBuild: true
-    peerDependencies:
-      '@urql/core': '>= 1.14.0'
-      graphql: '>= 0.11.0'
-    dependencies:
-      '@urql/core': link:packages/core
-      graphql: 16.0.1
-      wonka: 6.2.3
-    dev: false
-    optional: true
 
   /@vue/compiler-core/3.2.47:
     resolution: {integrity: sha512-p4D7FDnQb7+YJmO2iPEv0SQNeNzcbHdGByJDsT4lynf63AFkOTFN07HsiRSvjGo0QrxR/o3d0hUyNCUnBU2Tig==}
@@ -9038,6 +9036,7 @@ packages:
   /graphql/16.0.1:
     resolution: {integrity: sha512-oPvCuu6dlLdiz8gZupJ47o1clgb72r1u8NDBcQYjcV6G/iEdmE11B1bBlkhXRvV0LisP/SXRFP7tT6AgaTjpzg==}
     engines: {node: ^12.22.0 || ^14.16.0 || >=16.0.0}
+    dev: true
 
   /gud/1.0.0:
     resolution: {integrity: sha512-zGEOVKFM5sVPPrYs7J5/hYEw2Pof8KCyOwyhG8sAF26mCAeUFAcYPu1mwB7hhpIP29zOIBaDqwuHdLp0jvZXjw==}

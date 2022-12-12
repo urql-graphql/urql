@@ -4,13 +4,13 @@
   "description": "The official exchange for use with Urql Devtools",
   "main": "dist/urql-devtools",
   "module": "dist/urql-devtools.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-devtools.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-devtools.mjs",
       "require": "./dist/urql-devtools.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-devtools.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
