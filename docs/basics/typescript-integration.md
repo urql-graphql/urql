@@ -140,7 +140,7 @@ const allFilmsWithVariablesQueryDocument = graphql(/* GraphQL */ `
 
 function App() {
   // `data` is typed!
-  const { data } = useQuery(allFilmsWithVariablesQueryDocument, { variables: { first: 10 } });
+  const [{ data }] = useQuery(allFilmsWithVariablesQueryDocument, { variables: { first: 10 } });
   return (
     <div className="App">
       {data && (
