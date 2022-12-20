@@ -38,13 +38,13 @@ import {
   OperationResult,
   OperationType,
   RequestPolicy,
-  PromisifiedSource,
+  SourceExtensions,
   DebugEvent,
 } from './types';
 
 import {
   createRequest,
-  withPromise,
+  extendSource,
   maskTypename,
   noop,
   makeOperation,
@@ -103,7 +103,7 @@ export interface Client {
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>>;
+  ): SourceExtensions<OperationResult<Data, Variables>>;
 
   readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
@@ -134,7 +134,7 @@ export interface Client {
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
-  ): PromisifiedSource<OperationResult<Data, Variables>>;
+  ): SourceExtensions<OperationResult<Data, Variables>>;
 
   executeMutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
@@ -371,7 +371,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         context = { ...context, suspense: false };
       }
 
-      return withPromise(
+      return extendSource(
         client.executeQuery(createRequest(query, variables), context)
       );
     },
@@ -397,7 +397,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
     },
 
     mutation(query, variables, context) {
-      return withPromise(
+      return extendSource(
         client.executeMutation(createRequest(query, variables), context)
       );
     },

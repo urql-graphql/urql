@@ -1,5 +1,5 @@
 import type { GraphQLError, DocumentNode } from 'graphql';
-import { Source } from 'wonka';
+import { toObservable, Source } from 'wonka';
 import { Client } from './client';
 import { CombinedError } from './utils/error';
 
@@ -39,6 +39,10 @@ export type ExecutionResult =
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
 };
+
+export type SourceExtensions<T = any> = PromisifiedSource<T> &
+  PromiseLike<T> &
+  ReturnType<typeof toObservable>;
 
 /** The type of GraphQL operation being executed. */
 export type OperationType = 'subscription' | 'query' | 'mutation' | 'teardown';

@@ -1,24 +1,20 @@
-import { Source, subscribe, pipe } from 'wonka';
-import { OperationResult, PromisifiedSource } from '../types';
+import { Source, filter, take, pipe, toPromise, toObservable } from 'wonka';
+import { OperationResult, SourceExtensions } from '../types';
 
-export function withPromise<T extends OperationResult>(
+export function extendSource<T extends OperationResult>(
   source$: Source<T>
-): PromisifiedSource<T> {
-  (source$ as PromisifiedSource<T>).toPromise = () => {
-    return new Promise(resolve => {
-      const subscription = pipe(
-        source$,
-        subscribe(result => {
-          if (!result.stale && !result.hasNext) {
-            Promise.resolve().then(() => {
-              subscription.unsubscribe();
-              resolve(result);
-            });
-          }
-        })
-      );
-    });
-  };
+): SourceExtensions<T> {
+  const result$ = pipe(
+    source$,
+    filter(result => !result.stale && !result.hasNext),
+    take(1)
+  );
 
-  return source$ as PromisifiedSource<T>;
+  const then: PromiseLike<T>['then'] = (onResolve, onReject) =>
+    toPromise(result$).then(onResolve, onReject);
+
+  return Object.assign(source$ as SourceExtensions<T>, toObservable(source$), {
+    toPromise: then,
+    then,
+  });
 }
