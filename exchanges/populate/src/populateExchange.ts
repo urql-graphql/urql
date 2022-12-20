@@ -1,39 +1,43 @@
 import {
-  ASTNode,
-  DocumentNode,
   buildClientSchema,
   FragmentDefinitionNode,
-  GraphQLSchema,
   IntrospectionQuery,
-  FragmentSpreadNode,
-  isCompositeType,
   isAbstractType,
   Kind,
-  SelectionSetNode,
   GraphQLObjectType,
   SelectionNode,
+  GraphQLInterfaceType,
+  valueFromASTUntyped,
+  GraphQLScalarType,
+  FieldNode,
+  InlineFragmentNode,
+  FragmentSpreadNode,
 } from 'graphql';
 import { pipe, tap, map } from 'wonka';
-import { makeOperation, Exchange, Operation } from '@urql/core';
+import { Exchange, Operation, stringifyVariables } from '@urql/core';
 
-import { warn } from './helpers/help';
-import {
-  getName,
-  getSelectionSet,
-  unwrapType,
-  createNameNode,
-} from './helpers/node';
-import {
-  traverse,
-  resolveFields,
-  getUsedFragmentNames,
-} from './helpers/traverse';
+import { getName, GraphQLFlatType, unwrapType } from './helpers/node';
+import { traverse } from './helpers/traverse';
 
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
 }
 
 const makeDict = (): any => Object.create(null);
+
+/** stores information per each type it finds */
+type TypeKey = GraphQLObjectType | GraphQLInterfaceType;
+/** stores all known fields per each type key */
+type FieldValue = Record<string, FieldUsage>;
+type TypeFields = Map<String, FieldValue>;
+/** Describes information about a given field, i.e. type (owner), arguments, how many operations use this field */
+interface FieldUsage {
+  type: TypeKey;
+  args: null | object;
+  fieldName: string;
+}
+
+type FragmentMap<T extends string = string> = Record<T, FragmentDefinitionNode>;
 
 /** An exchange for auto-populating mutations with a required response body. */
 export const populateExchange = ({
@@ -45,9 +49,11 @@ export const populateExchange = ({
   /** List of operation keys that have not been torn down. */
   const activeOperations = new Set<number>();
   /** Collection of fragments used by the user. */
-  const userFragments: UserFragmentMap = makeDict();
-  /** Collection of actively in use type fragments. */
-  const activeTypeFragments: TypeFragmentMap = makeDict();
+  const userFragments: FragmentMap = makeDict();
+
+  // State of the global types & their fields
+  const typeFields: TypeFields = new Map();
+  let currentVariables: object = {};
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
@@ -55,26 +61,252 @@ export const populateExchange = ({
       return op;
     }
 
-    const activeSelections: TypeFragmentMap = makeDict();
-    for (const name in activeTypeFragments) {
-      activeSelections[name] = activeTypeFragments[name].filter(s =>
-        activeOperations.has(s.key)
-      );
+    const document = traverse(op.query, node => {
+      if (node.kind === Kind.FIELD) {
+        if (!node.directives) return;
+
+        const directives = node.directives.filter(
+          d => getName(d) !== 'populate'
+        );
+
+        if (directives.length === node.directives.length) return;
+
+        const field = schema.getMutationType()!.getFields()[node.name.value];
+
+        if (!field) return;
+
+        const type = unwrapType(field.type);
+
+        if (!type) {
+          return {
+            ...node,
+            selectionSet: {
+              kind: Kind.SELECTION_SET,
+              selections: [
+                {
+                  kind: Kind.FIELD,
+                  name: {
+                    kind: Kind.NAME,
+                    value: '__typename',
+                  },
+                },
+              ],
+            },
+            directives,
+          };
+        }
+
+        const visited = new Set();
+        const populateSelections = (
+          type: GraphQLFlatType,
+          selections: Array<FieldNode | InlineFragmentNode | FragmentSpreadNode>
+        ) => {
+          let possibleTypes: readonly string[] = [];
+          let isAbstract = false;
+          if (isAbstractType(type)) {
+            isAbstract = true;
+            possibleTypes = schema.getPossibleTypes(type).map(x => x.name);
+          } else {
+            possibleTypes = [type.name];
+          }
+
+          possibleTypes.forEach(typeName => {
+            const fieldsForType = typeFields.get(typeName);
+            if (!fieldsForType) {
+              if (possibleTypes.length === 1) {
+                selections.push({
+                  kind: Kind.FIELD,
+                  name: {
+                    kind: Kind.NAME,
+                    value: '__typename',
+                  },
+                });
+              }
+              return;
+            }
+
+            let typeSelections: Array<
+              FieldNode | InlineFragmentNode | FragmentSpreadNode
+            > = selections;
+
+            if (isAbstract) {
+              typeSelections = [
+                {
+                  kind: Kind.FIELD,
+                  name: {
+                    kind: Kind.NAME,
+                    value: '__typename',
+                  },
+                },
+              ];
+              selections.push({
+                kind: Kind.INLINE_FRAGMENT,
+                typeCondition: {
+                  kind: Kind.NAMED_TYPE,
+                  name: {
+                    kind: Kind.NAME,
+                    value: typeName,
+                  },
+                },
+                selectionSet: {
+                  kind: Kind.SELECTION_SET,
+                  selections: typeSelections,
+                },
+              });
+            } else {
+              typeSelections.push({
+                kind: Kind.FIELD,
+                name: {
+                  kind: Kind.NAME,
+                  value: '__typename',
+                },
+              });
+            }
+
+            Object.keys(fieldsForType).forEach(key => {
+              const value = fieldsForType[key];
+              if (value.type instanceof GraphQLScalarType) {
+                const field: FieldNode = {
+                  kind: Kind.FIELD,
+                  name: {
+                    kind: Kind.NAME,
+                    value: value.fieldName,
+                  },
+                };
+
+                typeSelections.push(field);
+              } else if (
+                value.type instanceof GraphQLObjectType &&
+                !visited.has(value.type.name)
+              ) {
+                visited.add(value.type.name);
+                const fieldSelections: Array<FieldNode> = [];
+
+                populateSelections(value.type, fieldSelections);
+
+                const field: FieldNode = {
+                  kind: Kind.FIELD,
+                  selectionSet: {
+                    kind: Kind.SELECTION_SET,
+                    selections: fieldSelections,
+                  },
+                  name: {
+                    kind: Kind.NAME,
+                    value: value.fieldName,
+                  },
+                };
+
+                typeSelections.push(field);
+              }
+            });
+          });
+        };
+
+        visited.add(type.name);
+        const selections: Array<
+          FieldNode | InlineFragmentNode | FragmentSpreadNode
+        > = node.selectionSet ? [...node.selectionSet.selections] : [];
+        populateSelections(type, selections);
+
+        return {
+          ...node,
+          selectionSet: {
+            kind: Kind.SELECTION_SET,
+            selections,
+          },
+          directives,
+        };
+      }
+    });
+
+    return {
+      ...op,
+      query: document,
+    };
+  };
+
+  const readFromSelectionSet = (
+    type: GraphQLObjectType | GraphQLInterfaceType,
+    selections: readonly SelectionNode[],
+    seenFields: Record<string, TypeKey> = {}
+  ) => {
+    if (isAbstractType(type)) {
+      // TODO: should we add this to typeParents/typeFields as well?
+      schema.getPossibleTypes(type).forEach(t => {
+        readFromSelectionSet(t, selections);
+      });
+    } else {
+      const fieldMap = type.getFields();
+
+      let args: null | Record<string, any> = null;
+      for (let i = 0; i < selections.length; i++) {
+        const selection = selections[i];
+
+        if (selection.kind === Kind.FRAGMENT_SPREAD) {
+          const fragmentName = getName(selection);
+
+          const fragment = userFragments[fragmentName];
+
+          if (fragment) {
+            readFromSelectionSet(type, fragment.selectionSet.selections);
+          }
+
+          continue;
+        }
+
+        if (selection.kind === Kind.INLINE_FRAGMENT) {
+          readFromSelectionSet(type, selection.selectionSet.selections);
+
+          continue;
+        }
+
+        if (selection.kind !== Kind.FIELD) continue;
+
+        const fieldName = selection.name.value;
+        if (!fieldMap[fieldName]) continue;
+
+        const ownerType =
+          seenFields[fieldName] || (seenFields[fieldName] = type);
+
+        let fields = typeFields.get(ownerType.name);
+        if (!fields) typeFields.set(type.name, (fields = {}));
+
+        const childType = unwrapType(
+          fieldMap[fieldName].type
+        ) as GraphQLObjectType;
+
+        if (selection.arguments && selection.arguments.length) {
+          args = {};
+          for (let j = 0; j < selection.arguments.length; j++) {
+            const argNode = selection.arguments[j];
+            args[argNode.name.value] = valueFromASTUntyped(
+              argNode.value,
+              currentVariables as any
+            );
+          }
+        }
+
+        const fieldKey = args
+          ? `${fieldName}:${stringifyVariables(args)}`
+          : fieldName;
+
+        if (!fields[fieldKey]) {
+          fields[fieldKey] = {
+            type: childType,
+            args,
+            fieldName,
+          };
+        }
+
+        if (selection.selectionSet) {
+          readFromSelectionSet(childType, selection.selectionSet.selections);
+        }
+      }
     }
-
-    const newOperation = makeOperation(op.kind, op);
-    newOperation.query = addFragmentsToQuery(
-      schema,
-      op.query,
-      activeSelections,
-      userFragments
-    );
-
-    return newOperation;
   };
 
   /** Handle query and extract fragments. */
-  const handleIncomingQuery = ({ key, kind, query }: Operation) => {
+  const handleIncomingQuery = ({ key, kind, query, variables }: Operation) => {
     if (kind !== 'query') {
       return;
     }
@@ -85,29 +317,26 @@ export const populateExchange = ({
     }
 
     parsedOperations.add(key);
+    currentVariables = variables || {};
 
-    const [extractedFragments, newFragments] = extractSelectionsFromQuery(
-      schema,
-      query
-    );
+    for (let i = query.definitions.length; i--; ) {
+      const definition = query.definitions[i];
 
-    for (let i = 0, l = extractedFragments.length; i < l; i++) {
-      const fragment = extractedFragments[i];
-      userFragments[getName(fragment)] = fragment;
-    }
-
-    for (let i = 0, l = newFragments.length; i < l; i++) {
-      const fragment = newFragments[i];
-      const type = getName(fragment.typeCondition);
-      const current =
-        activeTypeFragments[type] || (activeTypeFragments[type] = []);
-
-      (fragment as any).name.value += current.length;
-      current.push({ key, fragment });
+      if (definition.kind === Kind.FRAGMENT_DEFINITION) {
+        userFragments[getName(definition)] = definition;
+      } else if (definition.kind === Kind.OPERATION_DEFINITION) {
+        const type = schema.getQueryType()!;
+        readFromSelectionSet(
+          unwrapType(type) as GraphQLObjectType,
+          definition.selectionSet.selections!
+        );
+      }
     }
   };
 
   const handleIncomingTeardown = ({ key, kind }: Operation) => {
+    // TODO: we might want to remove fields here, the risk becomes
+    // that data in the cache would become stale potentially
     if (kind === 'teardown') {
       activeOperations.delete(key);
     }
@@ -122,236 +351,4 @@ export const populateExchange = ({
       forward
     );
   };
-};
-
-type UserFragmentMap<T extends string = string> = Record<
-  T,
-  FragmentDefinitionNode
->;
-
-type TypeFragmentMap<T extends string = string> = Record<T, TypeFragment[]>;
-
-interface TypeFragment {
-  /** Operation key where selection set is being used. */
-  key: number;
-  /** Selection set. */
-  fragment: FragmentDefinitionNode;
-}
-
-/** Gets typed selection sets and fragments from query */
-export const extractSelectionsFromQuery = (
-  schema: GraphQLSchema,
-  query: DocumentNode
-) => {
-  const extractedFragments: FragmentDefinitionNode[] = [];
-  const newFragments: FragmentDefinitionNode[] = [];
-
-  const sanitizeSelectionSet = (
-    selectionSet: SelectionSetNode,
-    type: string
-  ) => {
-    const selections: SelectionNode[] = [];
-    const validTypes = (schema.getType(type) as GraphQLObjectType).getFields();
-
-    selectionSet.selections.forEach(selection => {
-      if (selection.kind === Kind.FIELD) {
-        if (validTypes[selection.name.value]) {
-          if (selection.selectionSet) {
-            selections.push({
-              ...selection,
-              selectionSet: sanitizeSelectionSet(
-                selection.selectionSet,
-                unwrapType(validTypes[selection.name.value].type)!.toString()
-              ),
-            });
-          } else {
-            selections.push(selection);
-          }
-        }
-      } else {
-        selections.push(selection);
-      }
-    });
-
-    return { ...selectionSet, selections };
-  };
-
-  const visits: string[] = [];
-
-  traverse(
-    query,
-    node => {
-      if (node.kind === Kind.FRAGMENT_DEFINITION) {
-        extractedFragments.push(node);
-      } else if (node.kind === Kind.FIELD && node.selectionSet) {
-        const type = unwrapType(
-          resolveFields(schema, visits)[node.name.value].type
-        );
-
-        visits.push(node.name.value);
-
-        if (isAbstractType(type)) {
-          const types = schema.getPossibleTypes(type);
-          types.forEach(t => {
-            newFragments.push({
-              kind: Kind.FRAGMENT_DEFINITION,
-              typeCondition: {
-                kind: Kind.NAMED_TYPE,
-                name: createNameNode(t.toString()),
-              },
-              name: createNameNode(`${t.toString()}_PopulateFragment_`),
-              selectionSet: sanitizeSelectionSet(
-                node.selectionSet as SelectionSetNode,
-                t.toString()
-              ),
-            });
-          });
-        } else if (type) {
-          newFragments.push({
-            kind: Kind.FRAGMENT_DEFINITION,
-            typeCondition: {
-              kind: Kind.NAMED_TYPE,
-              name: createNameNode(type.toString()),
-            },
-            name: createNameNode(`${type.toString()}_PopulateFragment_`),
-            selectionSet: node.selectionSet,
-          });
-        }
-      }
-    },
-    node => {
-      if (node.kind === Kind.FIELD && node.selectionSet) visits.pop();
-    }
-  );
-
-  return [extractedFragments, newFragments];
-};
-
-/** Replaces populate decorator with fragment spreads + fragments. */
-export const addFragmentsToQuery = (
-  schema: GraphQLSchema,
-  query: DocumentNode,
-  activeTypeFragments: TypeFragmentMap,
-  userFragments: UserFragmentMap
-): DocumentNode => {
-  const requiredUserFragments: Record<
-    string,
-    FragmentDefinitionNode
-  > = makeDict();
-
-  const additionalFragments: Record<
-    string,
-    FragmentDefinitionNode
-  > = makeDict();
-
-  /** Fragments provided and used by the current query */
-  const existingFragmentsForQuery: Set<string> = new Set();
-
-  return traverse(
-    query,
-    (node: ASTNode): ASTNode | void => {
-      if (node.kind === Kind.DOCUMENT) {
-        node.definitions.reduce((set, definition) => {
-          if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-            set.add(definition.name.value);
-          }
-
-          return set;
-        }, existingFragmentsForQuery);
-      } else if (node.kind === Kind.FIELD) {
-        if (!node.directives) return;
-
-        const directives = node.directives.filter(
-          d => getName(d) !== 'populate'
-        );
-        if (directives.length === node.directives.length) return;
-
-        const type = unwrapType(
-          schema.getMutationType()!.getFields()[node.name.value].type
-        );
-
-        let possibleTypes: readonly GraphQLObjectType<any, any>[] = [];
-        if (!isCompositeType(type)) {
-          warn(
-            'Invalid type: The type `' +
-              type +
-              '` is used with @populate but does not exist.',
-            17
-          );
-        } else {
-          possibleTypes = isAbstractType(type)
-            ? schema.getPossibleTypes(type)
-            : [type];
-        }
-
-        const newSelections = possibleTypes.reduce((p, possibleType) => {
-          const typeFrags = activeTypeFragments[possibleType.name];
-          if (!typeFrags) {
-            return p;
-          }
-
-          for (let i = 0, l = typeFrags.length; i < l; i++) {
-            const { fragment } = typeFrags[i];
-            const fragmentName = getName(fragment);
-            const usedFragments = getUsedFragmentNames(fragment);
-
-            // Add used fragment for insertion at Document node
-            for (let j = 0, l = usedFragments.length; j < l; j++) {
-              const name = usedFragments[j];
-              if (!existingFragmentsForQuery.has(name)) {
-                requiredUserFragments[name] = userFragments[name];
-              }
-            }
-
-            // Add fragment for insertion at Document node
-            additionalFragments[fragmentName] = fragment;
-
-            p.push({
-              kind: Kind.FRAGMENT_SPREAD,
-              name: createNameNode(fragmentName),
-            });
-          }
-
-          return p;
-        }, [] as FragmentSpreadNode[]);
-
-        const existingSelections = getSelectionSet(node);
-
-        const selections =
-          existingSelections.length || newSelections.length
-            ? [...newSelections, ...existingSelections]
-            : [
-                {
-                  kind: Kind.FIELD,
-                  name: createNameNode('__typename'),
-                },
-              ];
-
-        return {
-          ...node,
-          directives,
-          selectionSet: {
-            kind: Kind.SELECTION_SET,
-            selections,
-          } as SelectionSetNode,
-        };
-      }
-    },
-    node => {
-      if (node.kind === Kind.DOCUMENT) {
-        return {
-          ...node,
-          definitions: [
-            ...node.definitions,
-            ...Object.keys(additionalFragments).map(
-              key => additionalFragments[key]
-            ),
-            ...Object.keys(requiredUserFragments).map(
-              key => requiredUserFragments[key]
-            ),
-          ],
-        };
-      }
-    }
-  );
 };
