@@ -12,6 +12,7 @@ import {
   FieldNode,
   InlineFragmentNode,
   FragmentSpreadNode,
+  ArgumentNode,
 } from 'graphql';
 import { pipe, tap, map } from 'wonka';
 import { Exchange, Operation, stringifyVariables } from '@urql/core';
@@ -166,8 +167,26 @@ export const populateExchange = ({
             Object.keys(fieldsForType).forEach(key => {
               const value = fieldsForType[key];
               if (value.type instanceof GraphQLScalarType) {
+                const args = value.args
+                  ? Object.keys(value.args).map(k => {
+                      const v = value.args![k];
+                      return {
+                        kind: Kind.ARGUMENT,
+                        value: {
+                          // TODO: define kind granularly
+                          kind: Kind.STRING,
+                          value: v,
+                        },
+                        name: {
+                          kind: Kind.NAME,
+                          value: k,
+                        },
+                      } as ArgumentNode;
+                    })
+                  : [];
                 const field: FieldNode = {
                   kind: Kind.FIELD,
+                  arguments: args,
                   name: {
                     kind: Kind.NAME,
                     value: value.fieldName,
@@ -184,12 +203,31 @@ export const populateExchange = ({
 
                 populateSelections(value.type, fieldSelections);
 
+                const args = value.args
+                  ? Object.keys(value.args).map(k => {
+                      const v = value.args![k];
+                      return {
+                        kind: Kind.ARGUMENT,
+                        value: {
+                          // TODO: define kind granularly
+                          kind: Kind.STRING,
+                          value: v,
+                        },
+                        name: {
+                          kind: Kind.NAME,
+                          value: k,
+                        },
+                      } as ArgumentNode;
+                    })
+                  : [];
+
                 const field: FieldNode = {
                   kind: Kind.FIELD,
                   selectionSet: {
                     kind: Kind.SELECTION_SET,
                     selections: fieldSelections,
                   },
+                  arguments: args,
                   name: {
                     kind: Kind.NAME,
                     value: value.fieldName,
