@@ -34,7 +34,7 @@ type TypeFields = Map<String, FieldValue>;
 /** Describes information about a given field, i.e. type (owner), arguments, how many operations use this field */
 interface FieldUsage {
   type: TypeKey;
-  args: null | object;
+  args: null | { [key: string]: { value: any; kind: any } };
   fieldName: string;
 }
 
@@ -173,9 +173,8 @@ export const populateExchange = ({
                       return {
                         kind: Kind.ARGUMENT,
                         value: {
-                          // TODO: define kind granularly
-                          kind: Kind.STRING,
-                          value: v,
+                          kind: v.kind,
+                          value: v.value,
                         },
                         name: {
                           kind: Kind.NAME,
@@ -209,9 +208,8 @@ export const populateExchange = ({
                       return {
                         kind: Kind.ARGUMENT,
                         value: {
-                          // TODO: define kind granularly
-                          kind: Kind.STRING,
-                          value: v,
+                          kind: v.kind,
+                          value: v.value,
                         },
                         name: {
                           kind: Kind.NAME,
@@ -317,10 +315,13 @@ export const populateExchange = ({
           args = {};
           for (let j = 0; j < selection.arguments.length; j++) {
             const argNode = selection.arguments[j];
-            args[argNode.name.value] = valueFromASTUntyped(
-              argNode.value,
-              currentVariables as any
-            );
+            args[argNode.name.value] = {
+              value: valueFromASTUntyped(
+                argNode.value,
+                currentVariables as any
+              ),
+              kind: argNode.value.kind,
+            };
           }
         }
 
