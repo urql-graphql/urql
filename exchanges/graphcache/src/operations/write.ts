@@ -253,6 +253,13 @@ const writeSelection = (
       } else if (ctx.store.schema && typename && fieldName !== '__typename') {
         isFieldAvailableOnType(ctx.store.schema, typename, fieldName);
       }
+    } else if (
+      !isRoot &&
+      fieldValue === undefined &&
+      !deferRef.current &&
+      !ctx.optimistic
+    ) {
+      continue;
     }
 
     if (
