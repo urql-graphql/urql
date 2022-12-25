@@ -206,6 +206,7 @@ import { pipe, filter, merge, share } from 'wonka';
       } else {
         /* ... */
       }
+      return op;
     }),
     forward
   );
