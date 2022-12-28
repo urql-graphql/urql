@@ -46,7 +46,7 @@ beforeEach(() => {
   ({ source: ops$, next } = makeSubject<Operation>());
 });
 
-it(`upgrades to cache-and-network`, async () => {
+it(`upgrades to cache-and-network by default`, async () => {
   const response = vi.fn(
     (forwardOp: Operation): OperationResult => {
       return {
@@ -85,6 +85,52 @@ it(`upgrades to cache-and-network`, async () => {
       expect(response).toHaveBeenCalledTimes(2);
       expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
         'cache-and-network'
+      );
+      expect(result).toHaveBeenCalledTimes(2);
+      res(null);
+    }, 10);
+  });
+});
+
+it(`upgrades to configured policy`, async () => {
+  const response = vi.fn(
+    (forwardOp: Operation): OperationResult => {
+      return {
+        operation: forwardOp,
+        data: queryOneData,
+      };
+    }
+  );
+
+  const result = vi.fn();
+  const forward: ExchangeIO = ops$ => {
+    return pipe(ops$, map(response));
+  };
+
+  pipe(
+    requestPolicyExchange({ ...mockOptions, upgradePolicy: 'network-only' })({
+      forward,
+      client,
+      dispatchDebug,
+    })(ops$),
+    tap(result),
+    publish
+  );
+
+  next(op);
+
+  expect(response).toHaveBeenCalledTimes(1);
+  expect(response.mock.calls[0][0].context.requestPolicy).toEqual(
+    'network-only'
+  );
+  expect(result).toHaveBeenCalledTimes(1);
+
+  await new Promise(res => {
+    setTimeout(() => {
+      next(op);
+      expect(response).toHaveBeenCalledTimes(2);
+      expect(response.mock.calls[1][0].context.requestPolicy).toEqual(
+        'network-only'
       );
       expect(result).toHaveBeenCalledTimes(2);
       res(null);
