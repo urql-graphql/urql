@@ -16,13 +16,13 @@ export interface Options {
 }
 
 export const requestPolicyExchange = (options: Options): Exchange => {
-  return ({ forward }) => {
-    const operations = new Map();
-    const {
-      ttl: TTL = defaultTTL,
-      upgradePolicy: upgradedPolicy = 'cache-and-network',
-    } = options ?? {};
+  const operations = new Map();
+  const {
+    ttl: TTL = defaultTTL,
+    upgradePolicy: upgradedPolicy = 'cache-and-network',
+  } = options ?? {};
 
+  return ({ forward }) => {
     const processIncomingOperation = (operation: Operation): Operation => {
       if (
         operation.kind !== 'query' ||
