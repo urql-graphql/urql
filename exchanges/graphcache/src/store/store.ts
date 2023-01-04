@@ -144,10 +144,9 @@ export class Store<
       entityKey,
       "Can't generate a key for invalidate(...).\n" +
         'You have to pass an id or _id field or create a custom `keys` field for `' +
-        typeof entity ===
-        'object'
-        ? (entity as Data).__typename
-        : entity + '`.',
+        (typeof entity === 'object'
+          ? (entity as Data).__typename
+          : entity + '`.'),
       19
     );
 
