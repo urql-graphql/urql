@@ -121,7 +121,9 @@ Once you need the same features that you'll find in Relay and Apollo, it's possi
 Graphcache. Graphcache is also slightly different from Apollo's cache and more opinionated as it
 doesn't allow arbitrary cache updates to be made.
 
-`urql` is also the only library that provides [Offline Support](./graphcache/offline.md) out of the
+Local state management is not provided by choice, but could be implemented as an exchange. For more details, [see discussion here](https://github.com/urql-graphql/urql/issues/323#issuecomment-756226783).
+
+`urql` is the only library that provides [Offline Support](./graphcache/offline.md) out of the
 box as part of Graphcache's feature set. There are a number of options for Apollo and Relay including
 writing your own logic for offline caching, which can be particularly successful in Relay, but for
 `@urql/exchange-graphcache` we chose to include it as a feature since it also strengthened other
