@@ -126,7 +126,7 @@ goes wrong during a GraphQL request.
 | --------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
 | `networkError`  | `?Error`                         | An unexpected error that might've occurred when trying to send the GraphQL request |
 | `graphQLErrors` | `?Array<string \| GraphQLError>` | GraphQL Errors (if any) that were returned by the GraphQL API                      |
-| `response`      | `?any`                           | The raw response object (if any) from the `fetch` call                             |
+| `response`      | `?Response`                      | The raw response object (if any) from the `fetch` call                             |
 
 [Read more about errors in `urql` on the "Error" page.](../basics/errors.md)
 

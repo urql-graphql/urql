@@ -4,7 +4,7 @@ import { makeResult } from './result';
 
 describe('makeResult', () => {
   it('adds extensions and errors correctly', () => {
-    const response = {};
+    const response = {} as Response;
     const origResult = {
       data: undefined,
       errors: ['error message'],

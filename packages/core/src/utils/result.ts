@@ -4,7 +4,7 @@ import { CombinedError } from './error';
 export const makeResult = (
   operation: Operation,
   result: ExecutionResult,
-  response?: any
+  response?: Response
 ): OperationResult => {
   if ((!('data' in result) && !('errors' in result)) || 'path' in result) {
     throw new Error('No Content');
@@ -28,7 +28,7 @@ export const makeResult = (
 export const mergeResultPatch = (
   prevResult: OperationResult,
   patch: ExecutionResult,
-  response?: any
+  response?: Response
 ): OperationResult => {
   const result = { ...prevResult };
   result.hasNext = !!patch.hasNext;
@@ -67,7 +67,7 @@ export const mergeResultPatch = (
 export const makeErrorResult = (
   operation: Operation,
   error: Error,
-  response?: any
+  response?: Response
 ): OperationResult => ({
   operation,
   data: undefined,

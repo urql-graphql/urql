@@ -39,12 +39,12 @@ export class CombinedError extends Error {
   public message: string;
   public graphQLErrors: GraphQLError[];
   public networkError?: Error;
-  public response?: any;
+  public response?: Response;
 
   constructor(input: {
     networkError?: Error;
     graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
-    response?: any;
+    response?: Response;
   }) {
     const normalizedGraphQLErrors = (input.graphQLErrors || []).map(
       rehydrateGraphQlError

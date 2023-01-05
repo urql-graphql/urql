@@ -68,7 +68,7 @@ describe('CombinedError', () => {
   });
 
   it('accepts a response that is attached to the resulting error', () => {
-    const response = {};
+    const response = {} as Response;
     const err = new CombinedError({
       graphQLErrors: [],
       response,
