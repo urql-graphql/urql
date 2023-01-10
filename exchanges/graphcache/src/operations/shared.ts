@@ -135,7 +135,7 @@ const isFragmentHeuristicallyMatching = (
       typeCondition +
       '`. Since GraphQL allows for interfaces `' +
       typeCondition +
-      '` may be an' +
+      '` may be an ' +
       'interface.\nA schema needs to be defined for this match to be deterministic, ' +
       'otherwise the fragment will be matched heuristically!',
     16
