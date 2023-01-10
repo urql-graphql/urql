@@ -2,4 +2,4 @@
 'next-urql': patch
 ---
 
-Add empty pageProps object
+Add `pageProps: {}` entry to props on app components
