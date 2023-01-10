@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="../../docs/assets/next-logo.png" alt="NextJS" height="200" width="200">
+  <img src="../../docs/assets/next-logo.png" alt="Next.js" height="200" width="200">
   <img src="../../packages/site/src/assets/sidebar-badge.svg" alt="urql" height="200" width="200">
   <br />
   <a href="https://npmjs.com/package/next-urql">
@@ -9,13 +9,13 @@
 
 ## `next-urql`
 
-A set of convenience utilities for using `urql` with NextJS.
+A set of convenience utilities for using `urql` with Next.js.
 
 ### Motivation
 
 Using GraphQL with server-side rendering in React is a challenging problem. Currently, React has no support for `Suspense` for data fetching on the server. To get around this, a prepass step can be used to walk the tree (or a subsection of the tree) of your React application and suspend when it encounters thrown `Promise`s. For more information, check out [`react-ssr-prepass`](https://github.com/FormidableLabs/react-ssr-prepass).
 
-`next-urql` handles integrating this prepass step for you, such that your NextJS application using `urql` will prefetch your GraphQL queries on the server before sending down markup to the Client.
+`next-urql` handles integrating this prepass step for you, such that your Next.js application using `urql` will prefetch your GraphQL queries on the server before sending down markup to the Client.
 
 ### Installation
 
