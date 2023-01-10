@@ -160,7 +160,9 @@ export function withUrqlClient(
         }
 
         const props = { ...pageProps, urqlClient };
-        const appTreeProps = isApp ? props : { pageProps: props };
+        const appTreeProps = isApp
+          ? { pageProps: {}, ...props }
+          : { pageProps: props };
 
         // Run the prepass step on AppTree. This will run all urql queries on the server.
         if (!options!.neverSuspend) {
