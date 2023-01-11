@@ -185,7 +185,7 @@ $id) { id }` will be used with a selection set, querying fields on the entity.
 
 Resolvers can also directly return keys. We've previously learned [on the "Normalized Caching"
 page](./normalized-caching.md#custom-keys-and-non-keyable-entities) that the key for our example above
-would look something like `"Todo:1"` for `todo(id: 1)`. While it isn't adivsable to create keys
+would look something like `"Todo:1"` for `todo(id: 1)`. While it isn't advisable to create keys
 manually in your resolvers, if you returned a key directly this would still work.
 
 Essentially, returning `{ __typename, id }` may sometimes be the same as returning the key manually.
