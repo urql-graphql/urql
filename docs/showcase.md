@@ -64,3 +64,4 @@ maintainers and supporters. This page is specifically dedicated to all of you!
   that helps you make typesafe hooks/components with urql.
 - [`urql-custom-scalars-exchange`](https://github.com/clentfort/urql-custom-scalars-exchange): An exchange
   to automatically convert scalars.
+- [`@grafbase/urql-exchange`](https://github.com/grafbase/playground/tree/main/packages/grafbase-urql-exchange): URQL-exchange for handling Server Sent Events (SSE) with Grafbase GraphQL Live Queries.
