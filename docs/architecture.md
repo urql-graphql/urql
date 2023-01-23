@@ -58,7 +58,7 @@ The bindings that we've seen in [the "Basics" section](./basics/README.md) inter
 page](./basics/core.md#one-off-queries-and-mutations).
 
 When we send our queries or mutations to the `Client`, internally they will be managed as
-[`Operation`s.](./api/core.md#operation). An "Operation" is an extension of `GraphQLRequest`s. Not
+[`Operation`](./api/core.md#operation)s. An "Operation" is an extension of `GraphQLRequest`s. Not
 only do they carry the `query`, `variables`, and a `key` property, they will also identify the
 `kind` of operation that is executed, like `"query"` or `"mutation"`. We can also find the
 `Client`'s options on `operation.context` which carries an operation's metadata.
