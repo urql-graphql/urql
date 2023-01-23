@@ -1,5 +1,12 @@
 # @urql/exchange-graphcache
 
+## 5.0.9
+
+### Patch Changes
+
+- Patch message for `(16) Heuristic Fragment Matching`, by [@inokawa](https://github.com/inokawa) (See [#2923](https://github.com/urql-graphql/urql/pull/2923))
+- Patch message for (19) Can't generate a key for invalidate(...) error, by [@inokawa](https://github.com/inokawa) (See [#2918](https://github.com/urql-graphql/urql/pull/2918))
+
 ## 5.0.8
 
 ### Patch Changes
