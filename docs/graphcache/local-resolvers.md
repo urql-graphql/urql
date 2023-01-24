@@ -525,6 +525,10 @@ const cache = cacheExchange({
     Query: {
       todos: relayPagination(),
     },
+    // Or if the pagination happens in a nested field:
+    User: {
+      todos: relayPagination(),
+    }
   },
 });
 ```
