@@ -134,21 +134,23 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
       );
     };
 
-    storage.onOnline(flushQueue);
-    storage.readMetadata().then(mutations => {
-      if (mutations) {
-        for (let i = 0; i < mutations.length; i++) {
-          failedQueue.push(
-            client.createRequestOperation(
-              'mutation',
-              createRequest(mutations[i].query, mutations[i].variables)
-            )
-          );
-        }
+    storage
+      .readMetadata()
+      .then(mutations => {
+        if (mutations) {
+          for (let i = 0; i < mutations.length; i++) {
+            failedQueue.push(
+              client.createRequestOperation(
+                'mutation',
+                createRequest(mutations[i].query, mutations[i].variables)
+              )
+            );
+          }
 
-        flushQueue();
-      }
-    });
+          flushQueue();
+        }
+      })
+      .finally(() => storage?.onOnline?.(flushQueue));
 
     const cacheResults$ = cacheExchange({
       ...opts,
