@@ -22,9 +22,9 @@ Using GraphQL with server-side rendering in React is a challenging problem. Curr
 Install `next-urql` along with its `peerDependencies`.
 
 ```sh
-yarn add next-urql react-is urql
+yarn add next-urql react-is urql graphql
 # or
-npm install --save next-urql react-is urql
+npm install --save next-urql react-is urql graphql
 ```
 
 `react-is` helps to support server-side `Suspense` with `react-ssr-prepass`. This assumes you have followed the basic installation steps for `urql` [here](https://github.com/urql-graphql/urql#installation).
