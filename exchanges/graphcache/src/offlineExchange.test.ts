@@ -226,10 +226,16 @@ describe('offline', () => {
     );
   });
 
-  it('should flush the queue when we become online', () => {
+  it('should flush the queue when we become online', async () => {
+    let resolveOnOnlineCalled: () => void;
+    const onOnlineCalled = new Promise<void>(
+      resolve => (resolveOnOnlineCalled = resolve)
+    );
+
     let flush: () => {};
     storage.onOnline.mockImplementation(cb => {
       flush = cb;
+      resolveOnOnlineCalled!();
     });
 
     const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
@@ -289,6 +295,8 @@ describe('offline', () => {
         variables: {},
       },
     ]);
+
+    await onOnlineCalled;
 
     flush!();
     expect(reexecuteOperation).toHaveBeenCalledTimes(1);
