@@ -36,6 +36,7 @@ interface PersistedFetchExchangeOptions {
   preferGetForPersistedQueries?: boolean;
   enforcePersistedQueries?: boolean;
   generateHash?: (query: string, document: DocumentNode) => Promise<string>;
+  enableForMutation?: boolean;
 }
 
 export const persistedFetchExchange = (
@@ -46,13 +47,14 @@ export const persistedFetchExchange = (
   const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
   const enforcePersistedQueries = !!options.enforcePersistedQueries;
   const hashFn = options.generateHash || hash;
+  const enableForMutation = options.enableForMutation || false;
   let supportsPersistedQueries = true;
 
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(operation => operation.kind === 'query'),
+      filter(operation => enableForMutation || operation.kind === 'query'),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
@@ -128,7 +130,7 @@ export const persistedFetchExchange = (
 
     const forward$ = pipe(
       sharedOps$,
-      filter(operation => operation.kind !== 'query'),
+      filter(operation => !enableForMutation && operation.kind !== 'query'),
       forward
     );
 
