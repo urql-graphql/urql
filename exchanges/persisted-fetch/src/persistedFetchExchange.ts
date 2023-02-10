@@ -36,6 +36,7 @@ interface PersistedFetchExchangeOptions {
   preferGetForPersistedQueries?: boolean;
   enforcePersistedQueries?: boolean;
   generateHash?: (query: string, document: DocumentNode) => Promise<string>;
+  enableForMutation?: boolean;
 }
 
 export const persistedFetchExchange = (
@@ -46,13 +47,18 @@ export const persistedFetchExchange = (
   const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
   const enforcePersistedQueries = !!options.enforcePersistedQueries;
   const hashFn = options.generateHash || hash;
+  const enableForMutation = !!options.enableForMutation;
   let supportsPersistedQueries = true;
+
+  const operationFilter = (operation: Operation) =>
+    (enableForMutation && operation.kind === 'mutation') ||
+    operation.kind === 'query';
 
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(operation => operation.kind === 'query'),
+      filter(operationFilter),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
@@ -86,11 +92,15 @@ export const persistedFetchExchange = (
                 },
               };
             }
+            const useGet =
+              operation.kind === 'query' &&
+              preferGetForPersistedQueries &&
+              !!sha256Hash;
             return makePersistedFetchSource(
               operation,
               body,
               dispatchDebug,
-              !!(preferGetForPersistedQueries && sha256Hash)
+              useGet
             );
           }),
           mergeMap(result => {
@@ -128,7 +138,7 @@ export const persistedFetchExchange = (
 
     const forward$ = pipe(
       sharedOps$,
-      filter(operation => operation.kind !== 'query'),
+      filter(operation => !operationFilter(operation)),
       forward
     );
 
