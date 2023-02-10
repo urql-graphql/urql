@@ -92,11 +92,15 @@ export const persistedFetchExchange = (
                 },
               };
             }
+            const useGet =
+              operation.kind === 'query' &&
+              preferGetForPersistedQueries &&
+              !!sha256Hash;
             return makePersistedFetchSource(
               operation,
               body,
               dispatchDebug,
-              !!(preferGetForPersistedQueries && sha256Hash)
+              useGet
             );
           }),
           mergeMap(result => {
