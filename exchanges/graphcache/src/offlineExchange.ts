@@ -150,7 +150,7 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
           flushQueue();
         }
       })
-      .finally(() => storage?.onOnline?.(flushQueue));
+      .finally(() => storage.onOnline!(flushQueue));
 
     const cacheResults$ = cacheExchange({
       ...opts,
