@@ -50,11 +50,15 @@ export const persistedFetchExchange = (
   const enableForMutation = options.enableForMutation || false;
   let supportsPersistedQueries = true;
 
+  const operationFilter = (operation: Operation) =>
+    (enableForMutation && operation.kind === 'mutation') ||
+    operation.kind === 'query';
+
   return ops$ => {
     const sharedOps$ = share(ops$);
     const fetchResults$ = pipe(
       sharedOps$,
-      filter(operation => enableForMutation || operation.kind === 'query'),
+      filter(operationFilter),
       mergeMap(operation => {
         const { key } = operation;
         const teardown$ = pipe(
@@ -130,7 +134,7 @@ export const persistedFetchExchange = (
 
     const forward$ = pipe(
       sharedOps$,
-      filter(operation => !enableForMutation && operation.kind !== 'query'),
+      filter(operation => !operationFilter(operation)),
       forward
     );
 
