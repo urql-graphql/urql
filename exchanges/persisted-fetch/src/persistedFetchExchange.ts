@@ -47,7 +47,7 @@ export const persistedFetchExchange = (
   const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
   const enforcePersistedQueries = !!options.enforcePersistedQueries;
   const hashFn = options.generateHash || hash;
-  const enableForMutation = options.enableForMutation || false;
+  const enableForMutation = !!options.enableForMutation;
   let supportsPersistedQueries = true;
 
   const operationFilter = (operation: Operation) =>
