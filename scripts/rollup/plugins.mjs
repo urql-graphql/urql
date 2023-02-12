@@ -4,7 +4,7 @@ import * as React from 'react';
 import tsConfigPaths from 'rollup-plugin-tsconfig-paths';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import sucrase from '@rollup/plugin-sucrase';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
@@ -19,7 +19,7 @@ import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs
 
 import * as settings from './settings.mjs';
 
-export const makePlugins = () => [
+export const makeTSPlugins = () => [
   tsConfigPaths(),
   resolve({
     dedupe: settings.externalModules,
@@ -36,26 +36,21 @@ export const makePlugins = () => [
     } : {},
   }),
   typescript({
-    clean: true,
-    tsconfigOverride: {
-      exclude: [
-        'src/**/*.spec.ts',
-        'src/**/*.spec.tsx',
-        'src/**/*.test.ts',
-        'src/**/*.test.tsx',
-        'src/**/test-utils/*'
-      ],
-      compilerOptions: {
-        rootDir: path.resolve(settings.cwd, '../..'),
-        sourceMap: true,
-        noEmit: false,
-        noResolve: true,
-        declaration: true,
-        declarationDir: settings.types,
-        target: 'esnext',
-      },
+    exclude: ['src/**/*.test.ts', '**/__tests__/*'],
+    compilerOptions: {
+      rootDir: path.resolve(settings.cwd, '../..'),
+      sourceMap: true,
+      sourceRoot: './',
+      noEmit: false,
+      noResolve: true,
+      declaration: false,
+      target: 'esnext',
     },
   }),
+];
+
+export const makePlugins = () => [
+  ...makeTSPlugins(),
   sucrase({
     exclude: ['node_modules/**'],
     transforms: ['jsx', 'typescript']
@@ -150,5 +145,3 @@ const terserMinified = terser({
     comments: false
   }
 });
-
-

@@ -1,6 +1,9 @@
 import genPackageJson from 'rollup-plugin-generate-package-json';
+import dts from 'rollup-plugin-dts';
+
 import { relative, join, dirname, basename } from 'path';
-import { makePlugins, makeOutputPlugins } from './plugins.mjs';
+import { makePlugins, makeTSPlugins, makeOutputPlugins } from './plugins.mjs';
+import cleanup from './cleanup-plugin.mjs'
 import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
@@ -75,20 +78,40 @@ const output = ({ format, isProduction }) => {
   };
 };
 
-export default {
+const commonConfig = {
   input,
   external: settings.isExternal,
   onwarn() {},
-  plugins,
-  output: [
-    output({ format: 'cjs', isProduction: false }),
-    output({ format: 'esm', isProduction: false }),
-    !settings.isCI && output({ format: 'cjs', isProduction: true }),
-    !settings.isCI && output({ format: 'esm', isProduction: true }),
-  ].filter(Boolean),
   treeshake: {
     unknownGlobalSideEffects: false,
     tryCatchDeoptimization: false,
     moduleSideEffects: false
-  }
+  },
 };
+
+export default [
+  {
+    ...commonConfig,
+    plugins,
+    output: [
+      output({ format: 'cjs', isProduction: false }),
+      output({ format: 'esm', isProduction: false }),
+      !settings.isCI && output({ format: 'cjs', isProduction: true }),
+      !settings.isCI && output({ format: 'esm', isProduction: true }),
+    ].filter(Boolean),
+  },
+  {
+    ...commonConfig,
+    plugins: [
+      makeTSPlugins(),
+      dts(),
+    ],
+    output: {
+      minifyInternalExports: false,
+      entryFileNames: '[name].d.ts',
+      chunkFileNames: '[hash].d.ts',
+      dir: './dist',
+      plugins: [cleanup()],
+    },
+  }
+];
