@@ -6,7 +6,7 @@ overrides:
   react-dom: ^17.0.2
   react-is: ^17.0.2
   styled-components: ^5.2.3
-  wonka: ^6.1.2
+  wonka: ^6.2.3
 
 importers:
 
@@ -60,7 +60,7 @@ importers:
       rollup-plugin-visualizer: ^5.8.0
       tar: ^6.1.0
       terser: ^5.14.1
-      typescript: ^4.9.3
+      typescript: ^4.9.5
       vite: ^3.0.0
       vite-tsconfig-paths: ^4.0.0-alpha.3
       vitest: ^0.25.3
@@ -80,8 +80,8 @@ importers:
       '@rollup/plugin-terser': 0.1.0_rollup@3.3.0
       '@rollup/pluginutils': 5.0.2_rollup@3.3.0
       '@types/node': 18.11.9
-      '@typescript-eslint/eslint-plugin': 5.44.0_fnsv2sbzcckq65bwfk7a5xwslu
-      '@typescript-eslint/parser': 5.44.0_hsf322ms6xhhd4b5ne6lb74y4a
+      '@typescript-eslint/eslint-plugin': 5.44.0_4kbswhbwl5syvdj4jodacfm2ou
+      '@typescript-eslint/parser': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
       cjs-module-lexer: 1.2.2
       cypress: 11.1.0
       dotenv: 8.2.0
@@ -108,24 +108,24 @@ importers:
       rollup: 3.3.0
       rollup-plugin-cjs-check: 1.0.2_rollup@3.3.0
       rollup-plugin-generate-package-json: 3.2.0_rollup@3.3.0
-      rollup-plugin-tsconfig-paths: 1.4.0_6annma2bj33shm6er7hwi5u4z4
-      rollup-plugin-typescript2: 0.34.1_6annma2bj33shm6er7hwi5u4z4
+      rollup-plugin-tsconfig-paths: 1.4.0_lujeqy6bzwp6tzatzlt6dm6hvu
+      rollup-plugin-typescript2: 0.34.1_lujeqy6bzwp6tzatzlt6dm6hvu
       rollup-plugin-visualizer: 5.8.3_rollup@3.3.0
       tar: 6.1.0
       terser: 5.15.1
-      typescript: 4.9.3
+      typescript: 4.9.5
       vite: 3.2.4_vt5mbdnyaskrzqlb5l6kjsnhi4
-      vite-tsconfig-paths: 4.0.0-alpha.3_vf3nqk3ewnpqc5dulqzhw4xcru
+      vite-tsconfig-paths: 4.0.0-alpha.3_oyg7s5x5awhbeaywtnsr2habru
       vitest: 0.25.3_jsdom@20.0.3+terser@5.15.1
 
   exchanges/auth:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -133,10 +133,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -144,10 +144,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -162,10 +162,10 @@ importers:
       react: ^17.0.2
       react-dom: ^17.0.2
       urql: workspace:*
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       '@cypress/react': 7.0.1_ddmelm2ieimfs7lfnlxmtlhrry
       '@urql/exchange-execute': link:../execute
@@ -181,11 +181,11 @@ importers:
       '@urql/core': '>=3.1.1'
       extract-files: ^11.0.0
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
       extract-files: 11.0.0
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -193,10 +193,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -204,10 +204,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -216,10 +216,10 @@ importers:
       '@types/react': ^17.0.39
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       '@types/react': 17.0.52
       graphql: 16.0.1
@@ -228,10 +228,10 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -239,19 +239,19 @@ importers:
     specifiers:
       '@urql/core': '>=3.1.1'
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../../packages/core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
   packages/core:
     specifiers:
       graphql: ^16.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
 
@@ -302,10 +302,10 @@ importers:
       '@urql/core': ^3.1.1
       graphql: ^16.0.0
       preact: ^10.5.5
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       '@testing-library/preact': 2.0.1_preact@10.5.13
       graphql: 16.0.1
@@ -328,10 +328,10 @@ importers:
       react-ssr-prepass: ^1.1.2
       react-test-renderer: ^17.0.1
       vite: ^3.0.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       '@cypress/react': 7.0.1_afg4ncukyuyevrurg5xxicvqy4
       '@cypress/vite-dev-server': 4.0.1
@@ -451,10 +451,10 @@ importers:
       typescript: '>=4.7.3'
       urql: workspace:*
       webpack: '>=4.4.6'
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.1.2
+      wonka: 6.2.3
     optionalDependencies:
       '@storybook/addons': 6.2.9_sfoxds7t5ydpegc3knd667wn6m
       '@urql/devtools': 2.0.3_6datu6bk5t3os3oamu6of3ptzi
@@ -478,10 +478,10 @@ importers:
       '@urql/core': ^3.1.1
       graphql: ^16.0.0
       svelte: ^3.20.0
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
       svelte: 3.37.0
@@ -491,10 +491,10 @@ importers:
       '@urql/core': ^3.1.1
       graphql: ^16.0.0
       vue: ^3.0.11
-      wonka: ^6.1.2
+      wonka: ^6.2.3
     dependencies:
       '@urql/core': link:../core
-      wonka: 6.1.2
+      wonka: 6.2.3
     devDependencies:
       graphql: 16.0.1
       vue: 3.0.11
@@ -3700,7 +3700,7 @@ packages:
     dev: true
     optional: true
 
-  /@typescript-eslint/eslint-plugin/5.44.0_fnsv2sbzcckq65bwfk7a5xwslu:
+  /@typescript-eslint/eslint-plugin/5.44.0_4kbswhbwl5syvdj4jodacfm2ou:
     resolution: {integrity: sha512-j5ULd7FmmekcyWeArx+i8x7sdRHzAtXTkmDPthE4amxZOWKFK7bomoJ4r7PJ8K7PoMzD16U8MmuZFAonr1ERvw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -3711,23 +3711,23 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.44.0_hsf322ms6xhhd4b5ne6lb74y4a
+      '@typescript-eslint/parser': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
       '@typescript-eslint/scope-manager': 5.44.0
-      '@typescript-eslint/type-utils': 5.44.0_hsf322ms6xhhd4b5ne6lb74y4a
-      '@typescript-eslint/utils': 5.44.0_hsf322ms6xhhd4b5ne6lb74y4a
+      '@typescript-eslint/type-utils': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
+      '@typescript-eslint/utils': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
       debug: 4.3.4
       eslint: 8.28.0
       ignore: 5.2.1
       natural-compare-lite: 1.4.0
       regexpp: 3.2.0
       semver: 7.3.8
-      tsutils: 3.21.0_typescript@4.9.3
-      typescript: 4.9.3
+      tsutils: 3.21.0_typescript@4.9.5
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser/5.44.0_hsf322ms6xhhd4b5ne6lb74y4a:
+  /@typescript-eslint/parser/5.44.0_pku7h6lsbnh7tcsfjudlqd5qce:
     resolution: {integrity: sha512-H7LCqbZnKqkkgQHaKLGC6KUjt3pjJDx8ETDqmwncyb6PuoigYajyAwBGz08VU/l86dZWZgI4zm5k2VaKqayYyA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -3739,10 +3739,10 @@ packages:
     dependencies:
       '@typescript-eslint/scope-manager': 5.44.0
       '@typescript-eslint/types': 5.44.0
-      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.3
+      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.5
       debug: 4.3.4
       eslint: 8.28.0
-      typescript: 4.9.3
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3755,7 +3755,7 @@ packages:
       '@typescript-eslint/visitor-keys': 5.44.0
     dev: true
 
-  /@typescript-eslint/type-utils/5.44.0_hsf322ms6xhhd4b5ne6lb74y4a:
+  /@typescript-eslint/type-utils/5.44.0_pku7h6lsbnh7tcsfjudlqd5qce:
     resolution: {integrity: sha512-A1u0Yo5wZxkXPQ7/noGkRhV4J9opcymcr31XQtOzcc5nO/IHN2E2TPMECKWYpM3e6olWEM63fq/BaL1wEYnt/w==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -3765,12 +3765,12 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.3
-      '@typescript-eslint/utils': 5.44.0_hsf322ms6xhhd4b5ne6lb74y4a
+      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.5
+      '@typescript-eslint/utils': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
       debug: 4.3.4
       eslint: 8.28.0
-      tsutils: 3.21.0_typescript@4.9.3
-      typescript: 4.9.3
+      tsutils: 3.21.0_typescript@4.9.5
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3780,7 +3780,7 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@typescript-eslint/typescript-estree/5.44.0_typescript@4.9.3:
+  /@typescript-eslint/typescript-estree/5.44.0_typescript@4.9.5:
     resolution: {integrity: sha512-M6Jr+RM7M5zeRj2maSfsZK2660HKAJawv4Ud0xT+yauyvgrsHu276VtXlKDFnEmhG+nVEd0fYZNXGoAgxwDWJw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -3795,13 +3795,13 @@ packages:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.3.8
-      tsutils: 3.21.0_typescript@4.9.3
-      typescript: 4.9.3
+      tsutils: 3.21.0_typescript@4.9.5
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/utils/5.44.0_hsf322ms6xhhd4b5ne6lb74y4a:
+  /@typescript-eslint/utils/5.44.0_pku7h6lsbnh7tcsfjudlqd5qce:
     resolution: {integrity: sha512-fMzA8LLQ189gaBjS0MZszw5HBdZgVwxVFShCO3QN+ws3GlPkcy9YuS3U4wkT6su0w+Byjq3mS3uamy9HE4Yfjw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
@@ -3811,7 +3811,7 @@ packages:
       '@types/semver': 7.3.13
       '@typescript-eslint/scope-manager': 5.44.0
       '@typescript-eslint/types': 5.44.0
-      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.3
+      '@typescript-eslint/typescript-estree': 5.44.0_typescript@4.9.5
       eslint: 8.28.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0_eslint@8.28.0
@@ -3836,9 +3836,9 @@ packages:
       '@urql/core': '>= 1.14.0'
       graphql: '>= 0.11.0'
     dependencies:
-      '@urql/core': link:packages\core
+      '@urql/core': link:packages/core
       graphql: 16.0.1
-      wonka: 6.1.2
+      wonka: 6.2.3
     dev: false
     optional: true
 
@@ -14099,18 +14099,18 @@ packages:
       write-pkg: 4.0.0
     dev: true
 
-  /rollup-plugin-tsconfig-paths/1.4.0_6annma2bj33shm6er7hwi5u4z4:
+  /rollup-plugin-tsconfig-paths/1.4.0_lujeqy6bzwp6tzatzlt6dm6hvu:
     resolution: {integrity: sha512-mZm3up1di2s6aveD05WViY3IYnY6aAerKAq3XVUyxfE+So8dUUHSZ++7LOLUe5De4zsR46mxV/A3lMg81CRuPw==}
     peerDependencies:
       rollup: ^2 || ^3
     dependencies:
       rollup: 3.3.0
-      typescript-paths: 1.4.0_typescript@4.9.3
+      typescript-paths: 1.4.0_typescript@4.9.5
     transitivePeerDependencies:
       - typescript
     dev: true
 
-  /rollup-plugin-typescript2/0.34.1_6annma2bj33shm6er7hwi5u4z4:
+  /rollup-plugin-typescript2/0.34.1_lujeqy6bzwp6tzatzlt6dm6hvu:
     resolution: {integrity: sha512-P4cHLtGikESmqi1CA+tdMDUv8WbQV48mzPYt77TSTOPJpERyZ9TXdDgjSDix8Fkqce6soYz3+fa4lrC93IEkcw==}
     peerDependencies:
       rollup: '>=1.26.3'
@@ -14122,7 +14122,7 @@ packages:
       rollup: 3.3.0
       semver: 7.3.8
       tslib: 2.4.0
-      typescript: 4.9.3
+      typescript: 4.9.5
     dev: true
 
   /rollup-plugin-visualizer/5.8.3_rollup@3.3.0:
@@ -15733,7 +15733,7 @@ packages:
       typescript: 4.9.3
     dev: true
 
-  /tsconfck/2.0.1_typescript@4.9.3:
+  /tsconfck/2.0.1_typescript@4.9.5:
     resolution: {integrity: sha512-/ipap2eecmVBmBlsQLBRbUmUNFwNJV/z2E+X0FPtHNjPwroMZQ7m39RMaCywlCulBheYXgMdUlWDd9rzxwMA0Q==}
     engines: {node: ^14.13.1 || ^16 || >=18, pnpm: ^7.0.1}
     hasBin: true
@@ -15743,7 +15743,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      typescript: 4.9.3
+      typescript: 4.9.5
     dev: true
 
   /tslib/1.14.1:
@@ -15753,14 +15753,14 @@ packages:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
     dev: true
 
-  /tsutils/3.21.0_typescript@4.9.3:
+  /tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
     engines: {node: '>= 6'}
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
     dependencies:
       tslib: 1.14.1
-      typescript: 4.9.3
+      typescript: 4.9.5
     dev: true
 
   /tty-browserify/0.0.0:
@@ -15860,16 +15860,22 @@ packages:
   /typedarray/0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  /typescript-paths/1.4.0_typescript@4.9.3:
+  /typescript-paths/1.4.0_typescript@4.9.5:
     resolution: {integrity: sha512-olt3yKj5d4ON5MpQgxvqpiN24ApsrdlRnIQFwqlbzuTjRZFQNoTOzzTJ13vyDRt7VW0cuO+g8HA+eoYfBLWWMA==}
     peerDependencies:
       typescript: ^4.7.2
     dependencies:
-      typescript: 4.9.3
+      typescript: 4.9.5
     dev: true
 
   /typescript/4.9.3:
     resolution: {integrity: sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
+  /typescript/4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
@@ -16351,14 +16357,14 @@ packages:
       unist-util-stringify-position: 2.0.3
       vfile-message: 2.0.4
 
-  /vite-tsconfig-paths/4.0.0-alpha.3_vf3nqk3ewnpqc5dulqzhw4xcru:
+  /vite-tsconfig-paths/4.0.0-alpha.3_oyg7s5x5awhbeaywtnsr2habru:
     resolution: {integrity: sha512-zugyhZ6LpITxBQmoDM+V8NL94OgbHTeRaHdR3J3sk58uvWnHsJPbIwqpuJ/sV/TXD+fX1F4YbkigTmLxEX2oYA==}
     peerDependencies:
       vite: '>2.0.0-0'
     dependencies:
       debug: 4.3.4
       globrex: 0.1.2
-      tsconfck: 2.0.1_typescript@4.9.3
+      tsconfck: 2.0.1_typescript@4.9.5
       vite: 3.2.4_vt5mbdnyaskrzqlb5l6kjsnhi4
     transitivePeerDependencies:
       - supports-color
@@ -16843,8 +16849,8 @@ packages:
       execa: 1.0.0
     dev: true
 
-  /wonka/6.1.2:
-    resolution: {integrity: sha512-zNrXPMccg/7OEp9tSfFkMgTvhhowqasiSHdJ3eCZolXxVTV/aT6HUTofoZk9gwRbGoFey/Nss3JaZKUMKMbofg==}
+  /wonka/6.2.3:
+    resolution: {integrity: sha512-EFOYiqDeYLXSzGYt2X3aVe9Hq1XJG+Hz/HjTRRT4dZE9q95khHl5+7pzUSXI19dbMO1/2UMrTf7JT7/7JrSQSQ==}
     dev: false
 
   /word-wrap/1.2.3:
