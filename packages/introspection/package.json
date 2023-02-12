@@ -19,13 +19,13 @@
   ],
   "main": "dist/urql-introspection",
   "module": "dist/urql-introspection.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-introspection.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-introspection.mjs",
       "require": "./dist/urql-introspection.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-introspection.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

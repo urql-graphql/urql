@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-exchange-execute",
   "module": "dist/urql-exchange-execute.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-execute.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-execute.mjs",
       "require": "./dist/urql-exchange-execute.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-execute.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

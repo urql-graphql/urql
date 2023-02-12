@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-vue",
   "module": "dist/urql-vue.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-vue.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-vue.mjs",
       "require": "./dist/urql-vue.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-vue.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

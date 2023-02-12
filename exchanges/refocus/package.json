@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-exchange-refocus",
   "module": "dist/urql-exchange-refocus.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-refocus.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-refocus.mjs",
       "require": "./dist/urql-exchange-refocus.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-refocus.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

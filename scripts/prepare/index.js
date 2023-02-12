@@ -67,12 +67,7 @@ if (hasReact) {
 }
 
 invariant(
-  is(
-    pkg.types,
-    path.join('dist', 'types',
-      path.relative('src', pkg.source || path.join('src', 'index.ts'))
-        .replace(/\.ts$/, '.d.ts'))
-  ),
+  is(pkg.types, path.join('dist', `${name}.d.ts`)),
   'package.json:types path must be valid'
 );
 
@@ -130,11 +125,7 @@ if (hasReact) {
     );
 
     invariant(
-      is(
-        entry.types,
-        path.join('./dist/types/',
-          path.relative('src', entry.source).replace(/\.ts$/, '.d.ts'))
-      ),
+      is(entry.types, `./dist/${bundleName}.d.ts`),
       'package.json:types path must be valid'
     );
   }

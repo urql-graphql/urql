@@ -21,7 +21,7 @@
   ],
   "main": "dist/urql.js",
   "module": "dist/urql.es.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",

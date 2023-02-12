@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-exchange-auth",
   "module": "dist/urql-exchange-auth.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-auth.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-auth.mjs",
       "require": "./dist/urql-exchange-auth.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-auth.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
