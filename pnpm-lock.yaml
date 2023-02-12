@@ -25,11 +25,11 @@ importers:
       '@rollup/plugin-replace': ^5.0.0
       '@rollup/plugin-sucrase': ^5.0.0
       '@rollup/plugin-terser': ^0.1.0
+      '@rollup/plugin-typescript': ^11.0.0
       '@rollup/pluginutils': ^5.0.0
       '@types/node': ^18.11.9
       '@typescript-eslint/eslint-plugin': ^5.44.0
       '@typescript-eslint/parser': ^5.44.0
-      cjs-module-lexer: ^1.2.2
       cypress: ^11.0.0
       dotenv: ^8.2.0
       eslint: ^8.28.0
@@ -54,9 +54,9 @@ importers:
       rimraf: ^3.0.2
       rollup: ^3.3.0
       rollup-plugin-cjs-check: ^1.0.2
+      rollup-plugin-dts: ^5.1.1
       rollup-plugin-generate-package-json: ^3.2.0
       rollup-plugin-tsconfig-paths: ^1.4.0
-      rollup-plugin-typescript2: 0.34.1
       rollup-plugin-visualizer: ^5.8.0
       tar: ^6.1.0
       terser: ^5.14.1
@@ -78,11 +78,11 @@ importers:
       '@rollup/plugin-replace': 5.0.1_rollup@3.3.0
       '@rollup/plugin-sucrase': 5.0.1_rollup@3.3.0
       '@rollup/plugin-terser': 0.1.0_rollup@3.3.0
+      '@rollup/plugin-typescript': 11.0.0_lujeqy6bzwp6tzatzlt6dm6hvu
       '@rollup/pluginutils': 5.0.2_rollup@3.3.0
       '@types/node': 18.11.9
       '@typescript-eslint/eslint-plugin': 5.44.0_4kbswhbwl5syvdj4jodacfm2ou
       '@typescript-eslint/parser': 5.44.0_pku7h6lsbnh7tcsfjudlqd5qce
-      cjs-module-lexer: 1.2.2
       cypress: 11.1.0
       dotenv: 8.2.0
       eslint: 8.28.0
@@ -107,9 +107,9 @@ importers:
       rimraf: 3.0.2
       rollup: 3.3.0
       rollup-plugin-cjs-check: 1.0.2_rollup@3.3.0
+      rollup-plugin-dts: 5.1.1_lujeqy6bzwp6tzatzlt6dm6hvu
       rollup-plugin-generate-package-json: 3.2.0_rollup@3.3.0
       rollup-plugin-tsconfig-paths: 1.4.0_lujeqy6bzwp6tzatzlt6dm6hvu
-      rollup-plugin-typescript2: 0.34.1_lujeqy6bzwp6tzatzlt6dm6hvu
       rollup-plugin-visualizer: 5.8.3_rollup@3.3.0
       tar: 6.1.0
       terser: 5.15.1
@@ -2667,12 +2667,23 @@ packages:
       terser: 5.15.1
     dev: true
 
-  /@rollup/pluginutils/4.2.1:
-    resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
-    engines: {node: '>= 8.0.0'}
+  /@rollup/plugin-typescript/11.0.0_lujeqy6bzwp6tzatzlt6dm6hvu:
+    resolution: {integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^2.14.0||^3.0.0
+      tslib: '*'
+      typescript: '>=3.7.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      tslib:
+        optional: true
     dependencies:
-      estree-walker: 2.0.2
-      picomatch: 2.3.1
+      '@rollup/pluginutils': 5.0.2_rollup@3.3.0
+      resolve: 1.22.1
+      rollup: 3.3.0
+      typescript: 4.9.5
     dev: true
 
   /@rollup/pluginutils/5.0.2_rollup@3.3.0:
@@ -8530,15 +8541,6 @@ packages:
       rimraf: 2.7.1
     dev: true
 
-  /fs-extra/10.1.0:
-    resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
-    engines: {node: '>=12'}
-    dependencies:
-      graceful-fs: 4.2.6
-      jsonfile: 6.1.0
-      universalify: 2.0.0
-    dev: true
-
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -10730,6 +10732,13 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       sourcemap-codec: 1.4.8
+    dev: true
+
+  /magic-string/0.27.0:
+    resolution: {integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.4.13
     dev: true
 
   /make-dir/1.3.0:
@@ -14088,6 +14097,20 @@ packages:
       rollup: 3.3.0
     dev: true
 
+  /rollup-plugin-dts/5.1.1_lujeqy6bzwp6tzatzlt6dm6hvu:
+    resolution: {integrity: sha512-zpgo52XmnLg8w4k3MScinFHZK1+ro6r7uVe34fJ0Ee8AM45FvgvTuvfWWaRgIpA4pQ1BHJuu2ospncZhkcJVeA==}
+    engines: {node: '>=v14'}
+    peerDependencies:
+      rollup: ^3.0.0
+      typescript: ^4.1
+    dependencies:
+      magic-string: 0.27.0
+      rollup: 3.3.0
+      typescript: 4.9.5
+    optionalDependencies:
+      '@babel/code-frame': 7.18.6
+    dev: true
+
   /rollup-plugin-generate-package-json/3.2.0_rollup@3.3.0:
     resolution: {integrity: sha512-+Kq1kFVr+maxW/mZB+E+XuaieCXVZqjl2tNU9k3TtAMs3NOaeREa5sRHy67qKDmcnFtZZukIQ3dFCcnV+r0xyw==}
     engines: {node: '>=8.3'}
@@ -14108,21 +14131,6 @@ packages:
       typescript-paths: 1.4.0_typescript@4.9.5
     transitivePeerDependencies:
       - typescript
-    dev: true
-
-  /rollup-plugin-typescript2/0.34.1_lujeqy6bzwp6tzatzlt6dm6hvu:
-    resolution: {integrity: sha512-P4cHLtGikESmqi1CA+tdMDUv8WbQV48mzPYt77TSTOPJpERyZ9TXdDgjSDix8Fkqce6soYz3+fa4lrC93IEkcw==}
-    peerDependencies:
-      rollup: '>=1.26.3'
-      typescript: '>=2.4.0'
-    dependencies:
-      '@rollup/pluginutils': 4.2.1
-      find-cache-dir: 3.3.2
-      fs-extra: 10.1.0
-      rollup: 3.3.0
-      semver: 7.3.8
-      tslib: 2.4.0
-      typescript: 4.9.5
     dev: true
 
   /rollup-plugin-visualizer/5.8.3_rollup@3.3.0:
