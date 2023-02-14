@@ -1,6 +1,6 @@
 {
   "name": "@urql/exchange-persisted-fetch",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "An exchange that allows for persisted queries support when fetching queries",
   "sideEffects": false,
   "homepage": "https://formidable.com/open-source/urql/docs/",
