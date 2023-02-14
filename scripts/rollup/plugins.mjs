@@ -38,7 +38,6 @@ export const makeTSPlugins = () => [
   typescript({
     exclude: ['src/**/*.test.ts', '**/__tests__/*'],
     compilerOptions: {
-      rootDir: path.resolve(settings.cwd, '../..'),
       sourceMap: true,
       sourceRoot: './',
       noEmit: false,
