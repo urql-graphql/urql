@@ -1,5 +1,11 @@
 # @urql/exchange-persisted-fetch
 
+## 2.1.0
+
+### Minor Changes
+
+- Adds enableForMutation option for exchange-persisted-fetch to enable persisted operations for mutations, by [@geekuillaume](https://github.com/geekuillaume) (See [#2951](https://github.com/urql-graphql/urql/pull/2951))
+
 ## 2.0.0
 
 ### Major Changes

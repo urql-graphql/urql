@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.3
+
+### Patch Changes
+
+- Add `pageProps: {}` entry to props on app components, by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#2909](https://github.com/urql-graphql/urql/pull/2909))
+
 ## 4.0.2
 
 ### Patch Changes
