@@ -1,11 +1,14 @@
-name: Release
+name: Prerelease
 on:
   push:
     branches:
       - main
+concurrency:
+  group: prerelease
+  cancel-in-progress: true
 jobs:
-  release:
-    name: Release
+  prerelease:
+    name: Prerelease
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
@@ -43,11 +46,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: PR or Publish
-        id: changesets
-        uses: changesets/action@595655c3eae7136ff5ba18200406898904362926
-        with:
-          publish: pnpm changeset publish
+      - name: Build
+        run: pnpm build
+
+      - name: Publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "\n//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n" > $HOME/.npmrc
+          pnpm changeset version --no-git-tag --snapshot canary
+          pnpm changeset publish --no-git-tag --snapshot canary --tag canary
