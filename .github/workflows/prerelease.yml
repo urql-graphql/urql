@@ -1,9 +1,8 @@
 name: Prerelease
 on:
-  pull_request:
-    branches: changeset-release/main
   push:
-    branches: changeset-release/main
+    branches:
+      - main
 jobs:
   prerelease:
     name: Prerelease
@@ -48,6 +47,9 @@ jobs:
         run: pnpm build
 
       - name: Publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "\n//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n" > $HOME/.npmrc
           pnpm changeset version --no-git-tag --snapshot canary
