@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as React from 'react';
 
-import tsConfigPaths from 'rollup-plugin-tsconfig-paths';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
@@ -20,7 +19,6 @@ import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs
 import * as settings from './settings.mjs';
 
 export const makeTSPlugins = () => [
-  tsConfigPaths(),
   resolve({
     dedupe: settings.externalModules,
     extensions: ['.js', '.jsx', '.ts', '.tsx'],

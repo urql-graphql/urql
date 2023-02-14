@@ -95,7 +95,6 @@
     "rollup-plugin-cjs-check": "^1.0.2",
     "rollup-plugin-dts": "^5.1.1",
     "rollup-plugin-generate-package-json": "^3.2.0",
-    "rollup-plugin-tsconfig-paths": "^1.4.0",
     "rollup-plugin-visualizer": "^5.8.0",
     "tar": "^6.1.0",
     "terser": "^5.14.1",
