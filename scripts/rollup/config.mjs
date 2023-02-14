@@ -52,8 +52,8 @@ const output = ({ format, isProduction }) => {
   }
 
   return {
-    chunkFileNames: '[hash]' + extension,
-    entryFileNames: '[name]' + extension,
+    entryFileNames: `[name]${extension}`,
+    chunkFileNames: `${settings.name}-chunk-[hash]${extension}`,
     dir: './dist',
     exports: 'named',
     sourcemap: true,
@@ -109,7 +109,7 @@ export default [
     output: {
       minifyInternalExports: false,
       entryFileNames: '[name].d.ts',
-      chunkFileNames: '[hash].d.ts',
+      chunkFileNames: `${settings.name}-chunk-[hash].d.ts`,
       dir: './dist',
       plugins: [cleanup()],
     },
