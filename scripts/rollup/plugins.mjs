@@ -38,10 +38,9 @@ export const makeTSPlugins = () => [
     compilerOptions: {
       sourceMap: true,
       sourceRoot: './',
-      noEmit: false,
-      noResolve: true,
       declaration: false,
       target: 'esnext',
+      preserveSymlinks: false,
     },
   }),
 ];

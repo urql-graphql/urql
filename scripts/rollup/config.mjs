@@ -118,7 +118,11 @@ export default [
     ...commonConfig,
     plugins: [
       makeTSPlugins(),
-      dts(),
+      dts({
+        compilerOptions: {
+          preserveSymlinks: false,
+        },
+      }),
     ],
     output: {
       minifyInternalExports: false,
