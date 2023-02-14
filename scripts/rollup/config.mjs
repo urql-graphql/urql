@@ -8,6 +8,20 @@ import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
 
+const chunkFileNames = (extension) => {
+  let hasDynamicChunk = false;
+  return (chunkInfo) => {
+    if (chunkInfo.isDynamicEntry || chunkInfo.isEntry || chunkInfo.isImplicitEntry) {
+      return `[name]${extension}`;
+    } else if (!hasDynamicChunk) {
+      hasDynamicChunk = true;
+      return `${settings.name}-chunk${extension}`;
+    } else {
+      return `[name]-chunk${extension}`;
+    }
+  };
+};
+
 const input = settings.sources.reduce((acc, source) => {
   acc[source.name] = source.source;
   if (source.name !== settings.name) {
@@ -53,7 +67,7 @@ const output = ({ format, isProduction }) => {
 
   return {
     entryFileNames: `[name]${extension}`,
-    chunkFileNames: `${settings.name}-chunk-[hash]${extension}`,
+    chunkFileNames: chunkFileNames(extension),
     dir: './dist',
     exports: 'named',
     sourcemap: true,
@@ -109,7 +123,7 @@ export default [
     output: {
       minifyInternalExports: false,
       entryFileNames: '[name].d.ts',
-      chunkFileNames: `${settings.name}-chunk-[hash].d.ts`,
+      chunkFileNames: chunkFileNames('.d.ts'),
       dir: './dist',
       plugins: [cleanup()],
     },
