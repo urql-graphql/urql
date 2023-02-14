@@ -45,7 +45,7 @@ jobs:
 
       - name: PR or Publish
         id: changesets
-        uses: changesets/action@595655c3eae7136ff5ba18200406898904362926
+        uses: changesets/action@v1.4.1
         with:
           publish: pnpm changeset publish
         env:

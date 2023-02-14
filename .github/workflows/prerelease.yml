@@ -46,14 +46,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build
-        run: pnpm build
+      - name: TypeScript
+        run: pnpm run check
 
       - name: Publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "\n//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n" > $HOME/.npmrc
+          npm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
           pnpm changeset version --no-git-tag --snapshot canary
           pnpm changeset publish --no-git-tag --snapshot canary --tag canary
