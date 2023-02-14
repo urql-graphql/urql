@@ -96,15 +96,15 @@ export default [
     output: [
       output({ format: 'cjs', isProduction: false }),
       output({ format: 'esm', isProduction: false }),
-      !settings.isCI && output({ format: 'cjs', isProduction: true }),
-      !settings.isCI && output({ format: 'esm', isProduction: true }),
+      output({ format: 'cjs', isProduction: true }),
+      output({ format: 'esm', isProduction: true }),
     ].filter(Boolean),
   },
   {
     ...commonConfig,
     plugins: [
       makeTSPlugins(),
-      dts(),
+      dts({ respectExternal: true }),
     ],
     output: {
       minifyInternalExports: false,
