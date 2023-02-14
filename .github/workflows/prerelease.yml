@@ -44,12 +44,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
+      - name: Build
+        run: pnpm build
+
       - name: Publish
-        id: changesets
-        uses: changesets/action@595655c3eae7136ff5ba18200406898904362926
-        with:
-          version: pnpm changeset version --no-git-tag --snapshot canary
-          publish: pnpm changeset publish --no-git-tag --snapshot canary --tag canary
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: "__none__"
+        run: |
+          echo "\n//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}\n" > $HOME/.npmrc
+          pnpm changeset version --no-git-tag --snapshot canary
+          pnpm changeset publish --no-git-tag --snapshot canary --tag canary
