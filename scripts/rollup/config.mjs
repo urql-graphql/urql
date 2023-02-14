@@ -118,7 +118,7 @@ export default [
     ...commonConfig,
     plugins: [
       makeTSPlugins(),
-      dts({ respectExternal: true }),
+      dts(),
     ],
     output: {
       minifyInternalExports: false,
