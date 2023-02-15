@@ -157,7 +157,7 @@ function App() {
 export default App;
 ```
 
-_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/front-end/vue/urql)_.
+_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/vue/urql)_.
 
 Using the generated `graphql()` function to write your GraphQL document results in instantly typed result and variables for queries, mutations and subscriptions!
 
@@ -238,7 +238,7 @@ const Film = (props: {
 export default Film;
 ```
 
-_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/front-end/vue/urql)_.
+_Examples with Vue are available [in the GraphQL Code Generator repository](https://github.com/dotansimha/graphql-code-generator/tree/master/examples/vue/urql)_.
 
 You will notice that our `<Film>` component leverages 2 imports from our generated code (from `../src/gql`): the `FragmentType<T>` type helper and the `useFragment()` function.
 
