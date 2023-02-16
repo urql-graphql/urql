@@ -4,19 +4,19 @@
   "version": "0.0.0",
   "main": "../dist/urql-exchange-graphcache-default-storage",
   "module": "../dist/urql-exchange-graphcache-default-storage.mjs",
-  "types": "../dist/types/default-storage/index.d.ts",
+  "types": "../dist/urql-exchange-graphcache-default-storage.d.ts",
   "source": "../src/default-storage/index.ts",
   "exports": {
     ".": {
       "import": "../dist/urql-exchange-graphcache-default-storage.mjs",
       "require": "../dist/urql-exchange-graphcache-default-storage.js",
-      "types": "../dist/types/default-storage/index.d.ts",
+      "types": "../dist/urql-exchange-graphcache-default-storage.d.ts",
       "source": "../src/default-storage/index.ts"
     },
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@urql/core": ">=3.1.0",
+    "@urql/core": ">=3.1.1",
     "wonka": "^6.0.0"
   }
 }

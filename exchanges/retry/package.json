@@ -20,13 +20,13 @@
   ],
   "main": "dist/urql-exchange-retry",
   "module": "dist/urql-exchange-retry.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-retry.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-retry.mjs",
       "require": "./dist/urql-exchange-retry.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-retry.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

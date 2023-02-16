@@ -19,13 +19,13 @@
   ],
   "main": "dist/urql-exchange-persisted-fetch",
   "module": "dist/urql-exchange-persisted-fetch.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-persisted-fetch.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-persisted-fetch.mjs",
       "require": "./dist/urql-exchange-persisted-fetch.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-persisted-fetch.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-vue",
   "module": "dist/urql-vue.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-vue.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-vue.mjs",
       "require": "./dist/urql-vue.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-vue.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@urql/core": "workspace:*",
     "graphql": "^16.0.0",
-    "vue": "^3.0.11"
+    "vue": "^3.2.47"
   },
   "peerDependencies": {
     "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",

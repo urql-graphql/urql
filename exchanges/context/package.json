@@ -20,13 +20,13 @@
   ],
   "main": "dist/urql-exchange-context",
   "module": "dist/urql-exchange-context.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-context.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-context.mjs",
       "require": "./dist/urql-exchange-context.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-context.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

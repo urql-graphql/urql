@@ -13,7 +13,7 @@
   },
   "main": "dist/next-urql.js",
   "module": "dist/next-urql.es.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/next-urql.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",

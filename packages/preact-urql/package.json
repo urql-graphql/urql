@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-preact",
   "module": "dist/urql-preact.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-preact.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-preact.mjs",
       "require": "./dist/urql-preact.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-preact.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

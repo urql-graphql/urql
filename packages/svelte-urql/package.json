@@ -21,13 +21,13 @@
   ],
   "main": "dist/urql-svelte",
   "module": "dist/urql-svelte.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-svelte.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-svelte.mjs",
       "require": "./dist/urql-svelte.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-svelte.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

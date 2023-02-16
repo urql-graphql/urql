@@ -22,7 +22,7 @@
   ],
   "main": "dist/urql-storage-rn",
   "module": "dist/urql-storage-rn.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-storage-rn.d.ts",
   "source": "src/index.ts",
   "files": [
     "LICENSE",
@@ -34,7 +34,7 @@
     ".": {
       "import": "./dist/urql-storage-rn.mjs",
       "require": "./dist/urql-storage-rn.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-storage-rn.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json"

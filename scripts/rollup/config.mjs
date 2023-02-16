@@ -1,9 +1,26 @@
 import genPackageJson from 'rollup-plugin-generate-package-json';
+import dts from 'rollup-plugin-dts';
+
 import { relative, join, dirname, basename } from 'path';
-import { makePlugins, makeOutputPlugins } from './plugins.mjs';
+import { makePlugins, makeTSPlugins, makeOutputPlugins } from './plugins.mjs';
+import cleanup from './cleanup-plugin.mjs'
 import * as settings from './settings.mjs';
 
 const plugins = makePlugins();
+
+const chunkFileNames = (extension) => {
+  let hasDynamicChunk = false;
+  return (chunkInfo) => {
+    if (chunkInfo.isDynamicEntry || chunkInfo.isEntry || chunkInfo.isImplicitEntry) {
+      return `[name]${extension}`;
+    } else if (!hasDynamicChunk) {
+      hasDynamicChunk = true;
+      return `${settings.name}-chunk${extension}`;
+    } else {
+      return `[name]-chunk${extension}`;
+    }
+  };
+};
 
 const input = settings.sources.reduce((acc, source) => {
   acc[source.name] = source.source;
@@ -49,8 +66,8 @@ const output = ({ format, isProduction }) => {
   }
 
   return {
-    chunkFileNames: '[hash]' + extension,
-    entryFileNames: '[name]' + extension,
+    entryFileNames: `[name]${extension}`,
+    chunkFileNames: chunkFileNames(extension),
     dir: './dist',
     exports: 'named',
     sourcemap: true,
@@ -75,20 +92,44 @@ const output = ({ format, isProduction }) => {
   };
 };
 
-export default {
+const commonConfig = {
   input,
   external: settings.isExternal,
   onwarn() {},
-  plugins,
-  output: [
-    output({ format: 'cjs', isProduction: false }),
-    output({ format: 'esm', isProduction: false }),
-    !settings.isCI && output({ format: 'cjs', isProduction: true }),
-    !settings.isCI && output({ format: 'esm', isProduction: true }),
-  ].filter(Boolean),
   treeshake: {
     unknownGlobalSideEffects: false,
     tryCatchDeoptimization: false,
     moduleSideEffects: false
-  }
+  },
 };
+
+export default [
+  {
+    ...commonConfig,
+    plugins,
+    output: [
+      output({ format: 'cjs', isProduction: false }),
+      output({ format: 'esm', isProduction: false }),
+      output({ format: 'cjs', isProduction: true }),
+      output({ format: 'esm', isProduction: true }),
+    ].filter(Boolean),
+  },
+  {
+    ...commonConfig,
+    plugins: [
+      makeTSPlugins(),
+      dts({
+        compilerOptions: {
+          preserveSymlinks: false,
+        },
+      }),
+    ],
+    output: {
+      minifyInternalExports: false,
+      entryFileNames: '[name].d.ts',
+      chunkFileNames: chunkFileNames('.d.ts'),
+      dir: './dist',
+      plugins: [cleanup()],
+    },
+  }
+];

@@ -59,5 +59,4 @@ export const hasPreact = prodDependencies.has('preact');
 export const hasSvelte = prodDependencies.has('svelte');
 export const hasVue = prodDependencies.has('vue');
 export const mayReexport = hasReact || hasPreact || hasSvelte || hasVue;
-export const isCI = !!process.env.CIRCLECI;
 export const isAnalyze = !!process.env.ANALYZE;

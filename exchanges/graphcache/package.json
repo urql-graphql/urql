@@ -21,26 +21,26 @@
   ],
   "main": "dist/urql-exchange-graphcache",
   "module": "dist/urql-exchange-graphcache.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/urql-exchange-graphcache.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
       "import": "./dist/urql-exchange-graphcache.mjs",
       "require": "./dist/urql-exchange-graphcache.js",
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/urql-exchange-graphcache.d.ts",
       "source": "./src/index.ts"
     },
     "./package.json": "./package.json",
     "./extras": {
       "import": "./dist/urql-exchange-graphcache-extras.mjs",
       "require": "./dist/urql-exchange-graphcache-extras.js",
-      "types": "./dist/types/extras/index.d.ts",
+      "types": "./dist/urql-exchange-graphcache-extras.d.ts",
       "source": "./src/extras/index.ts"
     },
     "./default-storage": {
       "import": "./dist/urql-exchange-graphcache-default-storage.mjs",
       "require": "./dist/urql-exchange-graphcache-default-storage.js",
-      "types": "./dist/types/default-storage/index.d.ts",
+      "types": "./dist/urql-exchange-graphcache-default-storage.d.ts",
       "source": "./src/default-storage/index.ts"
     }
   },

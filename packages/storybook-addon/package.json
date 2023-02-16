@@ -23,7 +23,7 @@
   ],
   "main": "dist/urql-storybook-addon.js",
   "module": "dist/urql-storybook-addon.es.js",
-  "types": "dist/types/decorator/react.d.ts",
+  "types": "dist/urql-storybook-addon.d.ts",
   "source": "src/decorator/react.ts",
   "files": [
     "LICENSE",

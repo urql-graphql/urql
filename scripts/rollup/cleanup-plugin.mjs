@@ -1,8 +1,5 @@
 import { transformSync as transform } from '@babel/core';
 import { createFilter } from '@rollup/pluginutils';
-import { posix as path } from 'path';
-
-import * as settings from './settings.mjs';
 
 function removeEmptyImports({ types: t }) {
   return {
@@ -26,6 +23,7 @@ function removeEmptyImports({ types: t }) {
 }
 
 function cleanup() {
+  const emptyImportRe = /import\s+(?:'[^']+'|"[^"]+")\s*;?/g;
   const jsFilter = createFilter(/.m?js$/, null, { resolve: false });
   const dtsFilter = createFilter(/\.d\.ts(\.map)?$/, null, { resolve: false });
 
@@ -38,24 +36,8 @@ function cleanup() {
           plugins: [removeEmptyImports],
           babelrc: false
         });
-      }
-    },
-
-    generateBundle(_options, bundle) {
-      const basePath = path.relative(
-        path.resolve(settings.cwd, '../..'),
-        path.join(settings.cwd, 'src'),
-      );
-
-      for (const fileName in bundle) {
-        if (!dtsFilter(fileName)) {
-          continue;
-        } else if (fileName.startsWith(basePath)) {
-          const targetPath = fileName.slice(basePath.length + 1);
-          bundle[fileName].fileName = path.join('types', targetPath);;
-        } else {
-          delete bundle[fileName];
-        }
+      } else if (dtsFilter(chunk.fileName)) {
+        return code.replace(emptyImportRe, '');
       }
     },
   };
