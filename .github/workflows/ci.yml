@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline --force
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: TypeScript
         run: pnpm run check
