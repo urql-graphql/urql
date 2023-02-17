@@ -179,7 +179,12 @@ export type RequestPolicy =
  */
 export type CacheOutcome = 'miss' | 'partial' | 'hit';
 
-/** A default type for variables */
+/** A default type for variables.
+ *
+ * @remarks
+ * While {@link TypedDocumentNode} can be used by generators to add TypeScript types for a GraphQL operation’s
+ * variables and result, when this isn’t the case this type is used as a fallback for the `Variables` generic.
+ */
 export type AnyVariables = { [prop: string]: any } | void | undefined;
 
 /** A GraphQL request representing a single execution in GraphQL.
