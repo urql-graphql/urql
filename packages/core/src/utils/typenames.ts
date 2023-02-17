@@ -29,6 +29,12 @@ const collectTypes = (obj: EntityLike | EntityLike[], types: Set<string>) => {
   return types;
 };
 
+/** Finds and returns a list of `__typename` fields found in response data.
+ *
+ * @privateRemarks
+ * This is used by `@urql/core`’s document `cacheExchange` to find typenames
+ * in a given GraphQL response’s data.
+ */
 export const collectTypesFromResponse = (response: object): string[] => [
   ...collectTypes(response as EntityLike, new Set()),
 ];
@@ -63,6 +69,24 @@ const formatNode = (node: FieldNode | InlineFragmentNode) => {
 
 const formattedDocs = new Map<number, KeyedDocumentNode>();
 
+/** Adds `__typename` fields to a GraphQL `DocumentNode`.
+ *
+ * @param node - a {@link DocumentNode}.
+ * @returns a copy of the passed {@link DocumentNode} with added `__typename` introspection fields.
+ *
+ * @remarks
+ * Cache {@link Exchange | Exchanges} will require typename introspection to
+ * recognize types in a GraphQL response. To retrieve these typenames,
+ * this function is used to add the `__typename` fields to non-root
+ * selection sets of a GraphQL document.
+ *
+ * This utility also preserves the internally computed key of the
+ * document as created by {@link createRequest} to avoid any
+ * formatting from being duplicated.
+ *
+ * @see {@link https://spec.graphql.org/October2021/#sec-Type-Name-Introspection} for more information
+ * on typename introspection via the `__typename` field.
+ */
 export const formatDocument = <T extends DocumentNode>(node: T): T => {
   const query = keyDocument(node);
 
