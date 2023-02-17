@@ -34,6 +34,52 @@ const applyDefinitions = (
   }
 };
 
+/** A GraphQL parse function, which may be called as a tagged template literal, returning a parsed {@link DocumentNode}.
+ *
+ * @remarks
+ * The `gql` tag or function is used to parse a GraphQL query document into a {@link DocumentNode}.
+ *
+ * When used as a tagged template, `gql` will automatically merge fragment definitions into the resulting
+ * document and deduplicate them.
+ *
+ * It enforces that all fragments have a unique name. When fragments with different definitions share a name,
+ * it will log a warning in development.
+ *
+ * Hint: It’s recommended to use this `gql` function over other GraphQL parse functions, since it puts the parsed
+ * results directly into `@urql/core`’s internal caches and prevents further unnecessary work.
+ *
+ * @example
+ * ```ts
+ * const AuthorFragment = gql`
+ *   fragment AuthorDisplayComponent on Author {
+ *     id
+ *     name
+ *   }
+ * `;
+ *
+ * const BookFragment = gql`
+ *   fragment ListBookComponent on Book {
+ *     id
+ *     title
+ *     author {
+ *       ...AuthorDisplayComponent
+ *     }
+ *   }
+ *
+ *   ${AuthorFragment}
+ * `;
+ *
+ * const BookQuery = gql`
+ *   query Book($id: ID!) {
+ *     book(id: $id) {
+ *       ...BookFragment
+ *     }
+ *   }
+ *
+ *   ${BookFragment}
+ * `;
+ * ```
+ */
 function gql<Data = any, Variables extends AnyVariables = AnyVariables>(
   strings: TemplateStringsArray,
   ...interpolations: Array<TypedDocumentNode | DocumentNode | string>
