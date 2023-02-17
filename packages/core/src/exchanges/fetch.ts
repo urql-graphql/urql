@@ -9,7 +9,23 @@ import {
   makeFetchSource,
 } from '../internal';
 
-/** A default exchange for fetching GraphQL requests. */
+/** Default GraphQL over HTTP fetch exchange.
+ *
+ * @remarks
+ * The default fetch exchange in `urql` supports sending GraphQL over HTTP
+ * requests, can optionally send GraphQL queries as GET requests, and
+ * handles incremental multipart responses.
+ *
+ * This exchange does not handle persisted queries or multipart uploads.
+ * Support for the former can be added using `@urql/exchange-persisted-fetch`
+ * and the latter using `@urql/exchange-multipart-fetch`.
+ *
+ * Hint: The `fetchExchange` and the two other exchanges all use the built-in fetch
+ * utilities in `@urql/core/internal`, which you can also use to implement
+ * a customized fetch exchange.
+ *
+ * @see {@link makeFetchSource} for the shared utility calling the Fetch API.
+ */
 export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
   return ops$ => {
     const sharedOps$ = share(ops$);

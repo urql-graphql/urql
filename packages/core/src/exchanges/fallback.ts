@@ -1,7 +1,15 @@
 import { filter, pipe, tap } from 'wonka';
 import { Operation, ExchangeIO, ExchangeInput } from '../types';
 
-/** This is always the last exchange in the chain; No operation should ever reach it */
+/** Used by the `Client` as the last exchange to warn about unhandled operations.
+ *
+ * @remarks
+ * In a normal setup, some operations may go unhandled when a {@link Client} isn’t set up
+ * with the right exchanges.
+ * For instance, a `Client` may be missing a fetch exchange, or an exchange handling subscriptions.
+ * This {@link Exchange} is added by the `Client` automatically to log warnings about unhandled
+ * {@link Operaiton | Operations} in development.
+ */
 export const fallbackExchange: ({
   dispatchDebug,
 }: Pick<ExchangeInput, 'dispatchDebug'>) => ExchangeIO = ({
@@ -24,6 +32,6 @@ export const fallbackExchange: ({
         console.warn(message);
       }
     }),
-    /* All operations that skipped through the entire exchange chain should be filtered from the output */
+    // All operations that skipped through the entire exchange chain should be filtered from the output
     filter<any>(() => false)
   );
