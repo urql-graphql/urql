@@ -475,7 +475,7 @@ that imitates the result that the API is assumed to send back:
 ```js
 const cache = cacheExchange({
   optimistic: {
-    favoriteTodo(args, cache, info) {
+    favoriteTodo(variables, cache, info) {
       return {
         __typename: 'Todo',
         id: variables.id,
