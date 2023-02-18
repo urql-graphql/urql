@@ -478,7 +478,7 @@ const cache = cacheExchange({
     favoriteTodo(args, cache, info) {
       return {
         __typename: 'Todo',
-        id: variables.id,
+        id: args.id,
         favorite: true,
       };
     },
@@ -504,11 +504,11 @@ functions in our optimistic object, like so:
 ```js
 const cache = cacheExchange({
   optimistic: {
-    favoriteTodo(variables, cache, info) {
+    favoriteTodo(args, cache, info) {
       return {
         __typename: 'Todo',
-        id: variables.id,
-        favorite(args, cache, info) {
+        id: args.id,
+        favorite(_args, cache, info) {
           return true;
         },
       },
