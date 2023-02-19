@@ -43,7 +43,7 @@ export const retryExchange = ({
 }: RetryExchangeOptions): Exchange => {
   const MIN_DELAY = initialDelayMs || 1000;
   const MAX_DELAY = maxDelayMs || 15000;
-  const MAX_ATTEMPTS = maxNumberAttempts || 2;
+  const MAX_ATTEMPTS = maxNumberAttempts;
   const RANDOM_DELAY = randomDelay !== undefined ? !!randomDelay : true;
 
   return ({ forward, dispatchDebug }) => ops$ => {
@@ -120,7 +120,7 @@ export const retryExchange = ({
           return true;
         }
 
-        const maxNumberAttemptsExceeded =
+        const maxNumberAttemptsExceeded = Boolean(MAX_ATTEMPTS) &&
           (res.operation.context.retryCount || 0) >= MAX_ATTEMPTS - 1;
 
         if (!maxNumberAttemptsExceeded) {
