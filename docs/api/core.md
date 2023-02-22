@@ -199,16 +199,16 @@ data that can be passed from almost all API methods in `urql` that deal with
 Some of these options are set when the `Client` is initialised, so in the following list of
 properties you'll likely see some options that exist on the `Client` as well.
 
-| Prop                  | Type                                  | Description                                                                                                                     |
-| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `fetchOptions`        | `?RequestInit \| (() => RequestInit)` | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                                         |
-| `fetch`               | `typeof fetch`                        | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                     |
-| `requestPolicy`       | `RequestPolicy`                       | An optional [request policy](../basics/document-caching.md#request-policies) that should be used specifying the cache strategy. |
-| `url`                 | `string`                              | The GraphQL endpoint, when using GET you should use absolute url's                                                              |
-| `meta`                | `?OperationDebugMeta`                 | Metadata that is only available in development for devtools.                                                                    |
-| `suspense`            | `?boolean`                            | Whether suspense is enabled.                                                                                                    |
-| `preferGetMethod`     | `?boolean`                            | Instructs the `fetchExchange` to use HTTP GET for queries.                                                                      |
-| `additionalTypenames` | `?string[]`                           | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                                 |
+| Prop                  | Type                                        | Description                                                                                                                     |
+| --------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `fetchOptions`        | `?RequestInit \| (() => RequestInit)`       | Additional `fetchOptions` that `fetch` in `fetchExchange` should use to make a request.                                         |
+| `fetch`               | `typeof fetch`                              | An alternative implementation of `fetch` that will be used by the `fetchExchange` instead of `window.fetch`                     |
+| `requestPolicy`       | `RequestPolicy`                             | An optional [request policy](../basics/document-caching.md#request-policies) that should be used specifying the cache strategy. |
+| `url`                 | `string`                                    | The GraphQL endpoint, when using GET you should use absolute url's                                                              |
+| `meta`                | `?OperationDebugMeta`                       | Metadata that is only available in development for devtools.                                                                    |
+| `suspense`            | `?boolean`                                  | Whether suspense is enabled.                                                                                                    |
+| `preferGetMethod`     | `?boolean \| 'force' \| 'within-url-limit'` | Instructs the `fetchExchange` to use HTTP GET for queries.                                                                      |
+| `additionalTypenames` | `?string[]`                                 | Allows you to tell the operation that it depends on certain typenames (used in document-cache.)                                 |
 
 It also accepts additional, untyped parameters that can be used to send more
 information to custom exchanges.
