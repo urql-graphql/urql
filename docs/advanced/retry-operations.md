@@ -59,7 +59,7 @@ Next up is the `maxDelayMs`, our `retryExchange` will keep increasing the time b
 
 Talking about increasing the `delay` randomly, `randomDelay` allows us to disable this. When this option is set to `false` we'll only increase the time between attempts with the `initialDelayMs`. This means if we fail the first time we'll have 1 second wait, next fail we'll have 2 seconds and so on.
 
-We don't want to infinitely attempt an `operation`, we can declare how many times it should attempt the `operation` with `maxNumberAttempts`.
+We can declare how many times it should attempt the `operation` with `maxNumberAttempts`, otherwise, it defaults to 2. If you want it to retry indefinitely, you can simply pass in `Number.POSITIVE_INFINITY`.
 
 [For more information on the available options check out the API Docs.](../api/retry-exchange.md)
 
