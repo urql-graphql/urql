@@ -395,3 +395,17 @@ This error occurs when you are using an `interface` or `union` rather than an
 implemented type for these.
 
 Check the type mentioned and change it to one of the specific types.
+
+## (27) Invalid Cache write
+
+> Invalid Cache write: You may not write to the cache during cache reads.
+> Accesses to `cache.writeFragment`, `cache.updateQuery`, and `cache.link` may
+> not be made inside `resolvers` for instance.
+
+If you're using the `Cache` inside your `cacheExchange` config you receive it
+either inside callbacks that are called when the cache is queried (e.g.
+`resolvers`) or when data is written to the cache (e.g. `updates`). You may not
+write to the cache when it's being queried.
+
+Please make sure that you're not calling `cache.updateQuery`,
+`cache.writeFragment`, or `cache.link` inside `resolvers`.

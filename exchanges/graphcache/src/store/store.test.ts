@@ -468,7 +468,7 @@ describe('Store with OptimisticMutationConfig', () => {
     );
     let { data } = query(store, { query: connection });
 
-    InMemoryData.initDataState('read', store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     expect((data as any).exercisesConnection).toEqual(null);
     const fields = store.inspectFields({ __typename: 'Query' });
     fields.forEach(({ fieldName, arguments: args }) => {
@@ -483,7 +483,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to write a fragment', () => {
-    InMemoryData.initDataState('read', store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
 
     store.writeFragment(
       gql`
@@ -520,7 +520,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to write a fragment by name', () => {
-    InMemoryData.initDataState('read', store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
 
     store.writeFragment(
       gql`
@@ -626,7 +626,7 @@ describe('Store with OptimisticMutationConfig', () => {
   });
 
   it('should be able to update a query', () => {
-    InMemoryData.initDataState('read', store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     store.updateQuery({ query: Todos }, data => ({
       ...data,
       todos: [
@@ -686,7 +686,7 @@ describe('Store with OptimisticMutationConfig', () => {
       }
     );
 
-    InMemoryData.initDataState('read', store.data, null);
+    InMemoryData.initDataState('write', store.data, null);
     store.updateQuery({ query: Appointment, variables: { id: '1' } }, data => ({
       ...data,
       appointment: {
@@ -827,6 +827,7 @@ describe('Store with OptimisticMutationConfig', () => {
 
   describe('Invalidating an entity', () => {
     it('removes an entity from a list.', () => {
+      InMemoryData.initDataState('write', store.data, null);
       store.invalidate(todosData.todos[1]);
       const { data } = query(store, { query: Todos });
       expect(data).toBe(null);

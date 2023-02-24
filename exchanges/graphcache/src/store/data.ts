@@ -255,6 +255,16 @@ const setNode = <T>(
   fieldKey: string,
   value: T
 ) => {
+  if (process.env.NODE_ENV !== 'production') {
+    invariant(
+      currentOperation !== 'read',
+      'Invalid Cache write: You may not write to the cache during cache reads. ' +
+        ' Accesses to `cache.writeFragment`, `cache.updateQuery`, and `cache.link` may ' +
+        ' not be made inside `resolvers` for instance.',
+      27
+    );
+  }
+
   // Optimistic values are written to a map in the optimistic dict
   // All other values are written to the base map
   const keymap: KeyMap<Dict<T | undefined>> = currentOptimisticKey
@@ -550,6 +560,7 @@ const squashLayer = (layerKey: number) => {
   // Hide current dependencies from squashing operations
   const previousDependencies = currentDependencies;
   currentDependencies = new Set();
+  currentOperation = 'write';
 
   const links = currentData!.links.optimistic.get(layerKey);
   if (links) {
