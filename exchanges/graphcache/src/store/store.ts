@@ -11,7 +11,7 @@ import {
   Link,
   Data,
   QueryInput,
-  UpdateResolver,
+  UpdatesConfig,
   OptimisticMutationConfig,
   KeyingConfig,
   Entity,
@@ -43,7 +43,7 @@ export class Store<
   data: InMemoryData.InMemoryData;
 
   resolvers: ResolverConfig;
-  updates: Record<string, Record<string, UpdateResolver | undefined>>;
+  updates: UpdatesConfig;
   optimisticMutations: OptimisticMutationConfig;
   keys: KeyingConfig;
   schema?: SchemaIntrospector;
@@ -70,10 +70,7 @@ export class Store<
       if (schema.types) this.schema = schema;
     }
 
-    this.updates = {
-      [mutationName]: (opts.updates && opts.updates.Mutation) || {},
-      [subscriptionName]: (opts.updates && opts.updates.Subscription) || {},
-    };
+    this.updates = opts.updates || {};
 
     this.rootFields = {
       query: queryName,

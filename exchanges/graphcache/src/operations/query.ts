@@ -358,7 +358,7 @@ const readSelection = (
     } else if (
       getCurrentOperation() === 'read' &&
       resolvers &&
-      typeof resolvers[fieldName] === 'function'
+      resolvers[fieldName]
     ) {
       // We have to update the information in context to reflect the info
       // that the resolver will receive
@@ -370,7 +370,7 @@ const readSelection = (
         output[fieldAlias] = fieldValue;
       }
 
-      dataFieldValue = resolvers[fieldName](
+      dataFieldValue = resolvers[fieldName]!(
         output,
         fieldArgs || ({} as Variables),
         store,

@@ -138,7 +138,7 @@ type ResolverResult =
   | undefined;
 
 export type CacheExchangeOpts = {
-  updates?: Partial<UpdatesConfig>;
+  updates?: UpdatesConfig;
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
@@ -180,8 +180,8 @@ export type KeyGenerator = {
 }['bivarianceHack'];
 
 export type UpdatesConfig = {
-  [typeName: string | 'Query' | 'Mutation']: {
-    [fieldName: string]: UpdateResolver;
+  [typeName: string | 'Query' | 'Mutation' | 'Subscription']: {
+    [fieldName: string]: UpdateResolver | void;
   } | void;
 };
 
