@@ -162,8 +162,8 @@ export type Resolver<
 
 export type ResolverConfig = {
   [typeName: string]: {
-    [fieldName: string]: Resolver;
-  };
+    [fieldName: string]: Resolver | void;
+  } | void;
 };
 
 export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
@@ -180,12 +180,9 @@ export type KeyGenerator = {
 }['bivarianceHack'];
 
 export type UpdatesConfig = {
-  Mutation: {
+  [typeName: string | 'Query' | 'Mutation']: {
     [fieldName: string]: UpdateResolver;
-  };
-  Subscription: {
-    [fieldName: string]: UpdateResolver;
-  };
+  } | void;
 };
 
 export type MakeFunctional<T> = T extends { __typename: string }
