@@ -11,8 +11,8 @@ const Todos = gql`
     todos {
       __typename
       id
-      text
       complete
+      text
     }
   }
 `;
@@ -401,6 +401,54 @@ it('respects Mutation update functions', () => {
         __typename: 'Todo',
       },
       { id: '2', text: 'Install urql', complete: true, __typename: 'Todo' },
+    ],
+  });
+});
+
+it('respects arbitrary type update functions', () => {
+  const store = new Store({
+    updates: {
+      Todo: {
+        text(result, _, cache) {
+          const fragment = gql`
+            fragment _ on Todo {
+              id
+              complete
+            }
+          `;
+
+          cache.writeFragment(fragment, {
+            id: result.id,
+            complete: true,
+          });
+        },
+      },
+    },
+  });
+
+  const todosData = {
+    __typename: 'Query',
+    todos: [
+      { id: '1', text: 'First', complete: false, __typename: 'Todo' },
+      { id: '2', text: 'Second', complete: false, __typename: 'Todo' },
+    ],
+  };
+
+  write(store, { query: Todos }, todosData);
+  const queryRes = query(store, { query: Todos });
+
+  expect(queryRes.partial).toBe(false);
+  expect(queryRes.data).toEqual({
+    ...todosData,
+    todos: [
+      {
+        ...todosData.todos[0],
+        complete: true,
+      },
+      {
+        ...todosData.todos[1],
+        complete: true,
+      },
     ],
   });
 });

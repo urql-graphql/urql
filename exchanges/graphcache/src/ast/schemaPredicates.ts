@@ -146,6 +146,8 @@ export function expectValidUpdatesConfig(
   }
 
   for (const updateName in updates) {
+    if (!updates[updateName]) continue;
+
     let typename: string;
     if (updateName === 'Query') {
       typename = schema.query || updateName;
@@ -167,14 +169,14 @@ export function expectValidUpdatesConfig(
     }
 
     const fields = (schema.types!.get(typename)! as SchemaObject).fields();
-    for (const fieldName in fields) {
-      if (fields[fieldName] === undefined) {
+    for (const fieldName in updates[updateName]!) {
+      if (!fields[fieldName]) {
         warn(
           'Invalid updates field: `' +
             fieldName +
             '` on `' +
             typename +
-            ' ` is not in the defined schema, but the `updates` config is referencing it.',
+            '` is not in the defined schema, but the `updates` config is referencing it.',
           22
         );
       }
