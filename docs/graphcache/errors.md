@@ -308,26 +308,28 @@ This error occurs when an unknown type is found in `opts.keys`.
 Check whether your schema is up-to-date, or whether you're using an invalid
 typename in `opts.keys`, maybe due to a typo.
 
-## (21) Invalid mutation
+## (21) Invalid updates type
 
-> Invalid mutation field `???` is not in the defined schema, but the `updates` option is referencing it.
-
-When you're passing an introspected schema to the cache exchange, it is
-able to check whether your `opts.updates.Mutation` is valid.
-This error occurs when an unknown mutation field is found in `opts.updates.Mutation`.
-
-Check whether your schema is up-to-date, or whether you've got a typo in `opts.updates.Mutation`.
-
-## (22) Invalid subscription
-
-> Invalid subscription field: `???` is not in the defined schema, but the `updates` option is referencing it.
+> Invalid updates field: The type `???` is not an object in the defined schema,
+> but the `updates` config is referencing it.
 
 When you're passing an introspected schema to the cache exchange, it is
-able to check whether your `opts.updates.Subscription` is valid.
-This error occurs when an unknown subscription field is found in `opts.updates.Subscription`.
+able to check whether your `opts.updates` config is valid.
+This error occurs when an unknown type is found in the `opts.updates` config.
+
+Check whether your schema is up-to-date, or whether you've got a typo in `opts.updates`.
+
+## (22) Invalid updates field
+
+> Invalid updates field: `???` on `???` is not in the defined schema,
+> but the `updates` config is referencing it.
+
+When you're passing an introspected schema to the cache exchange, it is
+able to check whether your `opts.updates` config is valid.
+This error occurs when an unknown field is found in `opts.updates[typename]`.
 
 Check whether your schema is up-to-date, or whether you're using an invalid
-subscription name in `opts.updates.Subscription`, maybe due to a typo.
+field name in `opts.updates`, maybe due to a typo.
 
 ## (23) Invalid resolver
 
