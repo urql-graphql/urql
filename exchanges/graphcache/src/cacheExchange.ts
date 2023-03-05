@@ -315,30 +315,38 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
       ),
       map(
         (res: OperationResultWithMeta): OperationResult => {
-          const { operation, outcome, dependencies } = res;
+          const { requestPolicy } = res.operation.context;
+
+          // We don't mark cache-only responses as partial, as this would indicate
+          // that we expect a new result to come from the network, which cannot
+          // happen
+          const isPartial =
+            res.outcome === 'partial' && requestPolicy !== 'cache-only';
+
+          // We reexecute requests marked as `cache-and-network`, and partial responses,
+          // if we wouldn't cause a request loop
+          const shouldReexecute =
+            requestPolicy === 'cache-and-network' ||
+            (requestPolicy === 'cache-first' &&
+              isPartial &&
+              !reexecutingOperations.has(res.operation.key));
+
           const result: OperationResult = {
-            operation: addCacheOutcome(operation, outcome),
+            operation: addCacheOutcome(res.operation, res.outcome),
             data: res.data,
             error: res.error,
             extensions: res.extensions,
+            stale: shouldReexecute || isPartial,
           };
 
-          if (
-            operation.context.requestPolicy === 'cache-and-network' ||
-            (operation.context.requestPolicy === 'cache-first' &&
-              outcome === 'partial' &&
-              !reexecutingOperations.has(res.operation.key))
-          ) {
-            result.stale = true;
-            if (!isBlockedByOptimisticUpdate(dependencies)) {
-              client.reexecuteOperation(
-                toRequestPolicy(operation, 'network-only')
-              );
-            } else if (
-              operation.context.requestPolicy === 'cache-and-network'
-            ) {
-              requestedRefetch.add(operation.key);
-            }
+          if (!shouldReexecute) {
+            /*noop*/
+          } else if (!isBlockedByOptimisticUpdate(res.dependencies)) {
+            client.reexecuteOperation(
+              toRequestPolicy(res.operation, 'network-only')
+            );
+          } else if (requestPolicy === 'cache-and-network') {
+            requestedRefetch.add(res.operation.key);
           }
 
           dispatchDebug({

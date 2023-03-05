@@ -128,7 +128,7 @@ describe('Graphcache Queries', () => {
     });
 
     const FirstComponent = () => {
-      const [{ fetching, data, error }] = useQuery({
+      const [{ fetching, data, error, stale }] = useQuery({
         query: `{
           movie {
             id
@@ -149,6 +149,7 @@ describe('Graphcache Queries', () => {
               <div>First Component</div>
               <div id="first-data">{`Data: ${data.movie?.title}`}</div>
               <div id="first-error">{`Error: ${error?.message}`}</div>
+              <div id="first-stale">{`Stale: ${!!stale}`}</div>
             </div>
           )}
         </div>
@@ -156,7 +157,7 @@ describe('Graphcache Queries', () => {
     };
 
     const SecondComponent = () => {
-      const [{ error, data, fetching }] = useQuery({
+      const [{ error, data, fetching, stale }] = useQuery({
         query: `{
           movie {
             id
@@ -176,6 +177,7 @@ describe('Graphcache Queries', () => {
           <div>Second Component</div>
           <div id="second-data">{`Data: ${data.movie.id}`}</div>
           <div id="second-error">{`Error: ${error?.message}`}</div>
+          <div id="second-stale">{`Stale: ${!!stale}`}</div>
         </div>
       );
     };
@@ -189,6 +191,7 @@ describe('Graphcache Queries', () => {
 
     cy.get('#first-data').should('have.text', 'Data: title');
     cy.get('#second-data').should('have.text', 'Data: foo');
+    cy.get('#second-stale').should('have.text', 'Stale: true');
     // TODO: ideally we would be able to keep the error here but...
     // cy.get('#first-error').should('have.text', 'Error: [GraphQL] Test');
     // cy.get('#second-error').should('have.text', 'Error: [GraphQL] Test');
