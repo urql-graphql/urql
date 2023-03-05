@@ -9,7 +9,13 @@ import {
   makeFetchSource,
 } from '@urql/core/internal';
 
-export const multipartFetchExchange: Exchange = ({
+export interface MultipartFetchExchangeOpts {
+  customFileCheck?: (maybeFile: unknown | undefined) => boolean;
+}
+
+export const multipartFetchExchangeWithOptions = ({
+  customFileCheck,
+}: MultipartFetchExchangeOpts = {}): Exchange => ({
   forward,
   dispatchDebug,
 }) => ops$ => {
@@ -26,9 +32,13 @@ export const multipartFetchExchange: Exchange = ({
       );
 
       // Spreading operation.variables here in case someone made a variables with Object.create(null).
-      const { files, clone: variables } = extractFiles({
-        ...operation.variables,
-      });
+      const { files, clone: variables } = extractFiles(
+        {
+          ...operation.variables,
+        },
+        '',
+        customFileCheck
+      );
       const body = makeFetchBody({ query: operation.query, variables });
 
       let url: string;
@@ -104,3 +114,5 @@ export const multipartFetchExchange: Exchange = ({
 
   return merge([fetchResults$, forward$]);
 };
+
+export const multipartFetchExchange: Exchange = multipartFetchExchangeWithOptions();

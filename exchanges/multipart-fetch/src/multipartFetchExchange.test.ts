@@ -12,12 +12,18 @@ import {
   afterAll,
 } from 'vitest';
 
-import { multipartFetchExchange } from './multipartFetchExchange';
+import {
+  multipartFetchExchange,
+  multipartFetchExchangeWithOptions,
+} from './multipartFetchExchange';
 
 import {
   uploadOperation,
   queryOperation,
   multipleUploadOperation,
+  uploadCustomOperation,
+  multipleUploadCustomOperation,
+  isCustomFile,
 } from './test-utils';
 
 const fetch = (global as any).fetch as Mock;
@@ -84,6 +90,31 @@ describe('on success', () => {
     expect(fetchOptions).toHaveBeenCalled();
     expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
     expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toBeInstanceOf(FormData);
+  });
+
+  it('uses a custom file when given', async () => {
+    const fetchOptions = vi.fn().mockReturnValue({});
+
+    const data = await pipe(
+      fromValue({
+        ...uploadCustomOperation,
+        context: {
+          ...uploadCustomOperation.context,
+          fetchOptions,
+        },
+      }),
+      multipartFetchExchangeWithOptions({ customFileCheck: isCustomFile })(
+        exchangeArgs
+      ),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(fetchOptions).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toBeInstanceOf(FormData);
   });
 
   it('uses multiple files when given', async () => {
@@ -105,6 +136,31 @@ describe('on success', () => {
     expect(fetchOptions).toHaveBeenCalled();
     expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
     expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toBeInstanceOf(FormData);
+  });
+
+  it('uses multiple custom files when given', async () => {
+    const fetchOptions = vi.fn().mockReturnValue({});
+
+    const data = await pipe(
+      fromValue({
+        ...multipleUploadCustomOperation,
+        context: {
+          ...multipleUploadCustomOperation.context,
+          fetchOptions,
+        },
+      }),
+      multipartFetchExchangeWithOptions({ customFileCheck: isCustomFile })(
+        exchangeArgs
+      ),
+      toPromise
+    );
+
+    expect(data).toMatchSnapshot();
+    expect(fetchOptions).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][1].headers).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toMatchSnapshot();
+    expect(fetch.mock.calls[0][1].body).toBeInstanceOf(FormData);
   });
 
   it('returns response data', async () => {

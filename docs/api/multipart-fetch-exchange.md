@@ -17,6 +17,7 @@ This exchange uses the same fetch logic as the [`fetchExchange`](./core.md#fetch
 The `multipartFetchExchange` is a drop-in replacement for the default
 [`fetchExchange`](./core.md#fetchexchange) and will act exactly like the `fetchExchange` unless the
 `variables` that it receives for mutations contain any `File`s as detected by the `extract-files` package.
+If the files are stored in anoy other type, such as a polyfill `File` or node `Blob` object then use `multipartFetchExchangeWithOptions()` instead, passing in a function to the `customFileCheck` option that returns a boolean if the given value is one of those custom file objects. Note that the `FormData` polyfill used must also support these file types.
 
 ## Installation and Setup
 
@@ -38,5 +39,29 @@ import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
 const client = createClient({
   url: 'http://localhost:3000/graphql',
   exchanges: [dedupExchange, cacheExchange, multipartFetchExchange],
+});
+```
+
+Or when using a custom `File` polyfill or ponyfill:
+
+```typescript
+import { createClient, dedupExchange, cacheExchange } from 'urql';
+import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
+
+export class CustomFile extends Blob {
+  constructor(sources: Array<Blob>, public readonly name: string) {
+    super(sources);
+  }
+}
+export const isCustomFile = (value: unknown | undefined) =>
+  value instanceof CustomFile;
+
+const client = createClient({
+  url: 'http://localhost:3000/graphql',
+  exchanges: [
+    dedupExchange, 
+    cacheExchange, 
+    multipartFetchExchangeWithOptions({ customFileCheck: isCustomFile })
+  ],
 });
 ```

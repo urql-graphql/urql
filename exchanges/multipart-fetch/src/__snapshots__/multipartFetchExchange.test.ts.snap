@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`on error > returns error data 1`] = `
 {
@@ -457,6 +457,149 @@ exports[`on success > returns response data 1`] = `
 
 exports[`on success > returns response data 2`] = `"{\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
 
+exports[`on success > uses a custom file when given 1`] = `
+{
+  "data": {
+    "data": {
+      "user": 1200,
+    },
+  },
+  "error": undefined,
+  "extensions": undefined,
+  "hasNext": false,
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
+        ],
+        "results": [
+          {
+            "type": "return",
+            "value": {},
+          },
+        ],
+      },
+      "requestPolicy": "cache-first",
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": 3,
+    "kind": "mutation",
+    "query": {
+      "__key": 8029062428,
+      "definitions": [
+        {
+          "directives": [],
+          "kind": "OperationDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "uploadProfilePicture",
+          },
+          "operation": "mutation",
+          "selectionSet": {
+            "kind": "SelectionSet",
+            "selections": [
+              {
+                "alias": undefined,
+                "arguments": [
+                  {
+                    "kind": "Argument",
+                    "name": {
+                      "kind": "Name",
+                      "value": "picture",
+                    },
+                    "value": {
+                      "kind": "Variable",
+                      "name": {
+                        "kind": "Name",
+                        "value": "picture",
+                      },
+                    },
+                  },
+                ],
+                "directives": [],
+                "kind": "Field",
+                "name": {
+                  "kind": "Name",
+                  "value": "uploadProfilePicture",
+                },
+                "selectionSet": {
+                  "kind": "SelectionSet",
+                  "selections": [
+                    {
+                      "alias": undefined,
+                      "arguments": [],
+                      "directives": [],
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "location",
+                      },
+                      "selectionSet": undefined,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+          "variableDefinitions": [
+            {
+              "defaultValue": undefined,
+              "directives": [],
+              "kind": "VariableDefinition",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "File",
+                },
+              },
+              "variable": {
+                "kind": "Variable",
+                "name": {
+                  "kind": "Name",
+                  "value": "picture",
+                },
+              },
+            },
+          ],
+        },
+      ],
+      "kind": "Document",
+      "loc": {
+        "end": 110,
+        "source": {
+          "body": "mutation uploadProfilePicture($picture: File) {
+  uploadProfilePicture(picture: $picture) {
+    location
+  }
+}",
+          "locationOffset": {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
+        "start": 0,
+      },
+    },
+    "variables": {
+      "picture": CustomFile {
+        "name": "index.ts",
+      },
+    },
+  },
+}
+`;
+
+exports[`on success > uses a custom file when given 2`] = `
+{
+  "accept": "application/graphql+json, application/json",
+}
+`;
+
+exports[`on success > uses a custom file when given 3`] = `FormData {}`;
+
 exports[`on success > uses a file when given 1`] = `
 {
   "data": {
@@ -597,6 +740,157 @@ exports[`on success > uses a file when given 2`] = `
 `;
 
 exports[`on success > uses a file when given 3`] = `FormData {}`;
+
+exports[`on success > uses multiple custom files when given 1`] = `
+{
+  "data": {
+    "data": {
+      "user": 1200,
+    },
+  },
+  "error": undefined,
+  "extensions": undefined,
+  "hasNext": false,
+  "operation": {
+    "context": {
+      "fetchOptions": [MockFunction spy] {
+        "calls": [
+          [],
+        ],
+        "results": [
+          {
+            "type": "return",
+            "value": {},
+          },
+        ],
+      },
+      "requestPolicy": "cache-first",
+      "url": "http://localhost:3000/graphql",
+    },
+    "key": 3,
+    "kind": "mutation",
+    "query": {
+      "__key": -6039055341,
+      "definitions": [
+        {
+          "directives": [],
+          "kind": "OperationDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "uploadProfilePictures",
+          },
+          "operation": "mutation",
+          "selectionSet": {
+            "kind": "SelectionSet",
+            "selections": [
+              {
+                "alias": undefined,
+                "arguments": [
+                  {
+                    "kind": "Argument",
+                    "name": {
+                      "kind": "Name",
+                      "value": "pictures",
+                    },
+                    "value": {
+                      "kind": "Variable",
+                      "name": {
+                        "kind": "Name",
+                        "value": "pictures",
+                      },
+                    },
+                  },
+                ],
+                "directives": [],
+                "kind": "Field",
+                "name": {
+                  "kind": "Name",
+                  "value": "uploadProfilePicture",
+                },
+                "selectionSet": {
+                  "kind": "SelectionSet",
+                  "selections": [
+                    {
+                      "alias": undefined,
+                      "arguments": [],
+                      "directives": [],
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "location",
+                      },
+                      "selectionSet": undefined,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+          "variableDefinitions": [
+            {
+              "defaultValue": undefined,
+              "directives": [],
+              "kind": "VariableDefinition",
+              "type": {
+                "kind": "ListType",
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "File",
+                  },
+                },
+              },
+              "variable": {
+                "kind": "Variable",
+                "name": {
+                  "kind": "Name",
+                  "value": "pictures",
+                },
+              },
+            },
+          ],
+        },
+      ],
+      "kind": "Document",
+      "loc": {
+        "end": 116,
+        "source": {
+          "body": "mutation uploadProfilePictures($pictures: [File]) {
+  uploadProfilePicture(pictures: $pictures) {
+    location
+  }
+}",
+          "locationOffset": {
+            "column": 1,
+            "line": 1,
+          },
+          "name": "gql",
+        },
+        "start": 0,
+      },
+    },
+    "variables": {
+      "picture": [
+        CustomFile {
+          "name": "index.ts",
+        },
+        CustomFile {
+          "name": "index.ts",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`on success > uses multiple custom files when given 2`] = `
+{
+  "accept": "application/graphql+json, application/json",
+}
+`;
+
+exports[`on success > uses multiple custom files when given 3`] = `FormData {}`;
 
 exports[`on success > uses multiple files when given 1`] = `
 {

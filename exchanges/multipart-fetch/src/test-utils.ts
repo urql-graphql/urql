@@ -37,6 +37,20 @@ const file = new File(
 );
 const files = [file, file];
 
+export class CustomFile extends Blob {
+  constructor(sources: Array<Blob>, public readonly name: string) {
+    super(sources);
+  }
+}
+export const isCustomFile = (value: unknown | undefined) =>
+  value instanceof CustomFile;
+
+const customFile = new CustomFile(
+  [new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })],
+  'index.ts'
+);
+const customFiles = [customFile, customFile];
+
 const upload: GraphQLRequest = {
   key: 3,
   query: gql`
@@ -48,6 +62,20 @@ const upload: GraphQLRequest = {
   `,
   variables: {
     picture: file,
+  },
+};
+
+const uploadCustom: GraphQLRequest = {
+  key: 3,
+  query: gql`
+    mutation uploadProfilePicture($picture: File) {
+      uploadProfilePicture(picture: $picture) {
+        location
+      }
+    }
+  `,
+  variables: {
+    picture: customFile,
   },
 };
 
@@ -65,15 +93,41 @@ const uploads: GraphQLRequest = {
   },
 };
 
+const uploadsCustom: GraphQLRequest = {
+  key: 3,
+  query: gql`
+    mutation uploadProfilePictures($pictures: [File]) {
+      uploadProfilePicture(pictures: $pictures) {
+        location
+      }
+    }
+  `,
+  variables: {
+    picture: customFiles,
+  },
+};
+
 export const uploadOperation: Operation = makeOperation(
   'mutation',
   upload,
   context
 );
 
+export const uploadCustomOperation: Operation = makeOperation(
+  'mutation',
+  uploadCustom,
+  context
+);
+
 export const multipleUploadOperation: Operation = makeOperation(
   'mutation',
   uploads,
+  context
+);
+
+export const multipleUploadCustomOperation: Operation = makeOperation(
+  'mutation',
+  uploadsCustom,
   context
 );
 
