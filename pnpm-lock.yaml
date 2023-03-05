@@ -419,6 +419,18 @@ importers:
       surge: 0.21.7
       webpack: 4.46.0
 
+  packages/storage-capacitor:
+    specifiers:
+      '@capacitor/network': ^4.1.0
+      '@capacitor/preferences': ^4.0.2
+      '@urql/core': workspace:*
+      '@urql/exchange-graphcache': workspace:*
+    devDependencies:
+      '@capacitor/network': 4.1.0
+      '@capacitor/preferences': 4.0.2
+      '@urql/core': link:../core
+      '@urql/exchange-graphcache': link:../../exchanges/graphcache
+
   packages/storage-rn:
     specifiers:
       '@react-native-async-storage/async-storage': ^1.15.5
@@ -1788,6 +1800,18 @@ packages:
       esutils: 2.0.3
       lodash: 4.17.21
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@capacitor/network/4.1.0:
+    resolution: {integrity: sha512-GMJ6LmxmrFA55rAaYxgm4tKSZyUmuLRreQz5Gdu0P09Ja8abSjmXa/DX16gOu1I1+wqHWm2rRI6nPkeUH55Ibw==}
+    peerDependencies:
+      '@capacitor/core': ^4.0.0
+    dev: true
+
+  /@capacitor/preferences/4.0.2:
+    resolution: {integrity: sha512-HgcRkMdVHSIV3TeQLZFmCaCeMWQ25wLyZZ7dA2f8Rw81Q1Nroxsi7HxTEGNqrWKSN9PNKBJD8vChr6eB2GNtZg==}
+    peerDependencies:
+      '@capacitor/core': ^4.0.0
     dev: true
 
   /@changesets/apply-release-plan/5.0.0:

@@ -1,0 +1,65 @@
+{
+  "name": "@urql/storage-capacitor",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "description": "Graphcache offline storage for Capacitor",
+  "homepage": "https://formidable.com/open-source/urql/docs/",
+  "bugs": "https://github.com/urql-graphql/urql/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urql-graphql/urql.git",
+    "directory": "packages/storage-capacitor"
+  },
+  "keywords": [
+    "urql",
+    "graphql client",
+    "graphql",
+    "exchanges",
+    "capacitor",
+    "offline",
+    "storage"
+  ],
+  "main": "dist/urql-storage-capacitor",
+  "module": "dist/urql-storage-capacitor.mjs",
+  "types": "dist/urql-storage-capacitor.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "dist/"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/urql-storage-capacitor.mjs",
+      "require": "./dist/urql-storage-capacitor.js",
+      "types": "./dist/urql-storage-capacitor.d.ts",
+      "source": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "check": "tsc --noEmit",
+    "lint": "eslint --ext=js,jsx,ts,tsx .",
+    "build": "rollup -c ../../scripts/rollup/config.mjs",
+    "prepare": "node ../../scripts/prepare/index.js",
+    "prepublishOnly": "run-s clean build"
+  },
+  "peerDependencies": {
+    "@capacitor/core": ">=4.0.0",
+    "@capacitor/network": ">=4.0.0",
+    "@capacitor/preferences": ">=4.0.0",
+    "@urql/exchange-graphcache": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/network": "^4.1.0",
+    "@capacitor/preferences": "^4.0.2",
+    "@urql/core": "workspace:*",
+    "@urql/exchange-graphcache": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
