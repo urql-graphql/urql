@@ -20,6 +20,11 @@ const cache = cacheExchange({
 
 const client = createClient({
   url: 'http://localhost:3004/graphql',
+  fetchOptions: {
+    headers: {
+      Accept: 'multipart/mixed, application/graphql+json, application/json',
+    },
+  },
   exchanges: [dedupExchange, cache, debugExchange, fetchExchange],
 });
 
