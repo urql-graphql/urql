@@ -445,6 +445,10 @@ As we can see, we may perform manual changes inside of `updates` functions, whic
 affect other parts of the cache (like `Query.todos` here) beyond the automatic updates that a
 normalized cache is expected to perform.
 
+We get methods like `cache.updateQuery`, `cache.writeFragment`, and `cache.link` in our updater
+functions, which aren't available to us in local resolvers, and can only be used in these `updates`
+entries to change the data that the cache holds.
+
 [Read more about writing cache updates on the "Cache Updates" page.](./cache-updates.md)
 
 ## Deterministic Cache Updates

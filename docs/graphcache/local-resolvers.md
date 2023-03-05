@@ -65,6 +65,11 @@ record field into a link, i.e. replace a scalar with an entity. Instead, local r
 to transform records, like dates in our previous example, or to imitate server-side logic to allow
 Graphcache to retrieve more data from its cache without sending a query to our API.
 
+Furthermore, while we see on this page that we get access to methods like `cache.resolve` and other
+methods to read from our cache, only ["Cache Updates"](./cache-updates.md) get to write and change
+the cache. If you call `cache.updateQuery`, `cache.writeFragment`, or `cache.link` in resolvers,
+you‘ll get an error, since it‘s not possible to update the cache while reading from it.
+
 ## Transforming Records
 
 As we've explored in the ["Normalized Caching" page's section on
@@ -101,8 +106,7 @@ current query traversal, and the part of the query document the cache is process
 operating on. Hence, we can create a reusable resolver like so:
 
 ```js
-const transformToDate = (parent, _args, _cache, info) =>
-  new Date(parent[info.fieldName]);
+const transformToDate = (parent, _args, _cache, info) => new Date(parent[info.fieldName]);
 
 cacheExchange({
   resolvers: {
@@ -124,9 +128,7 @@ cacheExchange({
   resolvers: {
     Todo: {
       text: (parent, args) => {
-        return args.capitalize && parent.text
-          ? parent.text.toUpperCase()
-          : parent.text;
+        return args.capitalize && parent.text ? parent.text.toUpperCase() : parent.text;
       },
     },
   },
@@ -178,8 +180,7 @@ cacheExchange({
 The `__typename` field is required. Graphcache will [use its keying
 logic](./normalized-caching.md#custom-keys-and-non-keyable-entities), and your custom `keys`
 configuration to generate a key for this entity and will then be able to look this entity up in its
-local cache. As with regular queries, the resolver is known to return a link since the `todo(id:
-$id) { id }` will be used with a selection set, querying fields on the entity.
+local cache. As with regular queries, the resolver is known to return a link since the `todo(id: $id) { id }` will be used with a selection set, querying fields on the entity.
 
 ### Resolving by keys
 
@@ -198,8 +199,7 @@ While it doesn't make much sense in this case, our example can be rewritten as:
 cacheExchange({
   resolvers: {
     Query: {
-      todo: (_, args, cache) =>
-        cache.keyOfEntity({ __typename: 'Todo', id: args.id }),
+      todo: (_, args, cache) => cache.keyOfEntity({ __typename: 'Todo', id: args.id }),
     },
   },
 });
@@ -253,8 +253,7 @@ avoid using the `parent[fieldName]` shortcut:
 cacheExchange({
   resolvers: {
     Todo: {
-      updatedAt: (parent, _args, cache) =>
-        new Date(cache.resolve(parent, "updatedAt")),
+      updatedAt: (parent, _args, cache) => new Date(cache.resolve(parent, 'updatedAt')),
     },
   },
 });
@@ -279,8 +278,7 @@ case we could write a resolver like so:
 cacheExchange({
   resolvers: {
     Todo: {
-      updatedAt: (parent, _args, cache) =>
-        parent.updatedAt || cache.resolve(parent, "createdAt")
+      updatedAt: (parent, _args, cache) => parent.updatedAt || cache.resolve(parent, 'createdAt'),
     },
   },
 });
@@ -299,10 +297,7 @@ cacheExchange({
   resolvers: {
     Todo: {
       createdAt: (parent, _args, cache) =>
-        cache.resolve(
-          cache.resolve(parent, "author"), /* "Author:1" */
-          "createdAt"
-        )
+        cache.resolve(cache.resolve(parent, 'author') /* "Author:1" */, 'createdAt'),
     },
   },
 });
@@ -387,17 +382,17 @@ variables we can execute an entirely new GraphQL query against our cached data:
 
 ```js
 import { gql } from '@urql/core';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange } from '@urql/exchange-graphcache';
 
 const cache = cacheExchange({
   updates: {
     Mutation: {
       addTodo: (result, args, cache) => {
         const data = cache.readQuery({ query: Todos, variables: { from: 0, limit: 10 } });
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});
 ```
 
 This way we'll get the stored data for the `TodosQuery` for the given `variables`.
@@ -411,7 +406,7 @@ accepts a `fragment` and an `id`. This looks like the following.
 
 ```js
 import { gql } from '@urql/core';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange } from '@urql/exchange-graphcache';
 
 const cache = cacheExchange({
   resolvers: {
@@ -426,10 +421,10 @@ const cache = cacheExchange({
           `,
           { id: 1 }
         );
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});
 ```
 
 > **Note:** In the above example, we've used
@@ -528,7 +523,7 @@ const cache = cacheExchange({
     // Or if the pagination happens in a nested field:
     User: {
       todos: relayPagination(),
-    }
+    },
   },
 });
 ```
