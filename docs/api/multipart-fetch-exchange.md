@@ -17,7 +17,7 @@ This exchange uses the same fetch logic as the [`fetchExchange`](./core.md#fetch
 The `multipartFetchExchange` is a drop-in replacement for the default
 [`fetchExchange`](./core.md#fetchexchange) and will act exactly like the `fetchExchange` unless the
 `variables` that it receives for mutations contain any `File`s as detected by the `extract-files` package.
-If the files are stored in anoy other type, such as a polyfill `File` or node `Blob` object then use `multipartFetchExchangeWithOptions()` instead, passing in a function to the `customFileCheck` option that returns a boolean if the given value is one of those custom file objects. Note that the `FormData` polyfill used must also support these file types.
+If the files are stored in any other type, such as a polyfill `File` or Node `Blob` object then use `multipartFetchExchangeWithOptions()` instead, passing in a function to the `customFileCheck` option that returns a boolean if the given value is one of those custom file objects. Note that the `FormData` polyfill used must also support these file types.
 
 ## Installation and Setup
 
