@@ -328,17 +328,19 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
             (operation.context.requestPolicy === 'cache-first' &&
               outcome === 'partial')
           ) {
-            result.stale = true;
             if (reexecutingOperations.has(res.operation.key)) {
-              /*noop*/
-            } else if (!isBlockedByOptimisticUpdate(dependencies)) {
-              client.reexecuteOperation(
-                toRequestPolicy(operation, 'network-only')
-              );
-            } else if (
-              operation.context.requestPolicy === 'cache-and-network'
-            ) {
-              requestedRefetch.add(operation.key);
+              result.stale = outcome === 'partial';
+            } else {
+              result.stale = true;
+              if (!isBlockedByOptimisticUpdate(dependencies)) {
+                client.reexecuteOperation(
+                  toRequestPolicy(operation, 'network-only')
+                );
+              } else if (
+                operation.context.requestPolicy === 'cache-and-network'
+              ) {
+                requestedRefetch.add(operation.key);
+              }
             }
           }
 
