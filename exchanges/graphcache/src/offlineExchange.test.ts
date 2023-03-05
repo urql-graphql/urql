@@ -218,6 +218,7 @@ describe('offline', () => {
       error: undefined,
       extensions: undefined,
       operation: expect.any(Object),
+      stale: false,
     });
 
     expect(result.mock.calls[0][0]).toHaveProperty(
