@@ -326,11 +326,12 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
           if (
             operation.context.requestPolicy === 'cache-and-network' ||
             (operation.context.requestPolicy === 'cache-first' &&
-              outcome === 'partial' &&
-              !reexecutingOperations.has(res.operation.key))
+              outcome === 'partial')
           ) {
             result.stale = true;
-            if (!isBlockedByOptimisticUpdate(dependencies)) {
+            if (reexecutingOperations.has(res.operation.key)) {
+              /*noop*/
+            } else if (!isBlockedByOptimisticUpdate(dependencies)) {
               client.reexecuteOperation(
                 toRequestPolicy(operation, 'network-only')
               );
