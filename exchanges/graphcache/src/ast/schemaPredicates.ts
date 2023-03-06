@@ -6,7 +6,7 @@ import { SchemaIntrospector, SchemaObject } from './schema';
 
 import {
   KeyingConfig,
-  UpdateResolver,
+  UpdatesConfig,
   ResolverConfig,
   OptimisticMutationConfig,
 } from '../types';
@@ -139,40 +139,52 @@ export function expectValidKeyingConfig(
 
 export function expectValidUpdatesConfig(
   schema: SchemaIntrospector,
-  updates: Record<string, Record<string, UpdateResolver | undefined>>
+  updates: UpdatesConfig
 ): void {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
 
-  if (schema.mutation) {
-    const mutationFields = (schema.types!.get(
-      schema.mutation
-    ) as SchemaObject).fields();
-    const givenMutations = updates[schema.mutation] || {};
-    for (const fieldName in givenMutations) {
-      if (mutationFields[fieldName] === undefined) {
-        warn(
-          'Invalid mutation field: `' +
-            fieldName +
-            '` is not in the defined schema, but the `updates.Mutation` option is referencing it.',
-          21
-        );
-      }
-    }
-  }
+  for (const typename in updates) {
+    if (!updates[typename]) {
+      continue;
+    } else if (!schema.types!.has(typename)) {
+      let addition = '';
 
-  if (schema.subscription) {
-    const subscriptionFields = (schema.types!.get(
-      schema.subscription
-    ) as SchemaObject).fields();
-    const givenSubscription = updates[schema.subscription] || {};
-    for (const fieldName in givenSubscription) {
-      if (subscriptionFields[fieldName] === undefined) {
+      if (
+        typename === 'Mutation' &&
+        schema.mutation &&
+        schema.mutation !== 'Mutation'
+      ) {
+        addition +=
+          '\nMaybe your config should reference `' + schema.mutation + '`?';
+      } else if (
+        typename === 'Subscription' &&
+        schema.subscription &&
+        schema.subscription !== 'Subscription'
+      ) {
+        addition +=
+          '\nMaybe your config should reference `' + schema.subscription + '`?';
+      }
+
+      return warn(
+        'Invalid updates type: The type `' +
+          typename +
+          '` is not an object in the defined schema, but the `updates` config is referencing it.' +
+          addition,
+        21
+      );
+    }
+
+    const fields = (schema.types!.get(typename)! as SchemaObject).fields();
+    for (const fieldName in updates[typename]!) {
+      if (!fields[fieldName]) {
         warn(
-          'Invalid subscription field: `' +
+          'Invalid updates field: `' +
             fieldName +
-            '` is not in the defined schema, but the `updates.Subscription` option is referencing it.',
+            '` on `' +
+            typename +
+            '` is not in the defined schema, but the `updates` config is referencing it.',
           22
         );
       }
@@ -213,7 +225,7 @@ export function expectValidResolversConfig(
         const validQueries = (schema.types!.get(
           schema.query
         ) as SchemaObject).fields();
-        for (const resolverQuery in resolvers.Query) {
+        for (const resolverQuery in resolvers.Query || {}) {
           if (!validQueries[resolverQuery]) {
             warnAboutResolver('Query.' + resolverQuery);
           }
@@ -236,7 +248,7 @@ export function expectValidResolversConfig(
         const validTypeProperties = (schema.types!.get(
           key
         ) as SchemaObject).fields();
-        for (const resolverProperty in resolvers[key]) {
+        for (const resolverProperty in resolvers[key] || {}) {
           if (!validTypeProperties[resolverProperty]) {
             warnAboutResolver(key + '.' + resolverProperty);
           }

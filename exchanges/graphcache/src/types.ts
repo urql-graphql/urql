@@ -138,7 +138,7 @@ type ResolverResult =
   | undefined;
 
 export type CacheExchangeOpts = {
-  updates?: Partial<UpdatesConfig>;
+  updates?: UpdatesConfig;
   resolvers?: ResolverConfig;
   optimistic?: OptimisticMutationConfig;
   keys?: KeyingConfig;
@@ -162,8 +162,8 @@ export type Resolver<
 
 export type ResolverConfig = {
   [typeName: string]: {
-    [fieldName: string]: Resolver;
-  };
+    [fieldName: string]: Resolver | void;
+  } | void;
 };
 
 export type UpdateResolver<ParentData = DataFields, Args = Variables> = {
@@ -180,12 +180,9 @@ export type KeyGenerator = {
 }['bivarianceHack'];
 
 export type UpdatesConfig = {
-  Mutation: {
-    [fieldName: string]: UpdateResolver;
-  };
-  Subscription: {
-    [fieldName: string]: UpdateResolver;
-  };
+  [typeName: string | 'Query' | 'Mutation' | 'Subscription']: {
+    [fieldName: string]: UpdateResolver | void;
+  } | void;
 };
 
 export type MakeFunctional<T> = T extends { __typename: string }

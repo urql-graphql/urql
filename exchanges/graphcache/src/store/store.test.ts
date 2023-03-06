@@ -123,13 +123,6 @@ describe('Store with UpdatesConfig', () => {
     expect(store.updates.Subscription).toBe(updatesOption.Subscription);
   });
 
-  it("sets the store's updates field to an empty default if not provided", () => {
-    const store = new Store({});
-
-    expect(store.updates.Mutation).toEqual({});
-    expect(store.updates.Subscription).toEqual({});
-  });
-
   it('should not warn if Mutation/Subscription operations do exist in the schema', function () {
     new Store({
       schema: minifyIntrospectionQuery(
@@ -163,9 +156,9 @@ describe('Store with UpdatesConfig', () => {
     expect(console.warn).toBeCalledTimes(1);
     const warnMessage = mocked(console.warn).mock.calls[0][0];
     expect(warnMessage).toContain(
-      'Invalid mutation field: `doTheChaChaSlide` is not in the defined schema, but the `updates.Mutation` option is referencing it.'
+      'Invalid updates field: `doTheChaChaSlide` on `Mutation` is not in the defined schema'
     );
-    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#21');
+    expect(warnMessage).toContain('https://bit.ly/2XbVrpR#22');
   });
 
   it("should warn if Subscription operations don't exist in the schema", function () {
@@ -183,7 +176,7 @@ describe('Store with UpdatesConfig', () => {
     expect(console.warn).toBeCalledTimes(1);
     const warnMessage = mocked(console.warn).mock.calls[0][0];
     expect(warnMessage).toContain(
-      'Invalid subscription field: `someoneDidTheChaChaSlide` is not in the defined schema, but the `updates.Subscription` option is referencing it.'
+      'Invalid updates field: `someoneDidTheChaChaSlide` on `Subscription` is not in the defined schema'
     );
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#22');
   });
@@ -1006,7 +999,7 @@ describe('Store with storage', () => {
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
   });
 
-  it('should use different rootConfigs', function () {
+  it('should use different rootConfigs', () => {
     const fakeUpdater = vi.fn();
 
     const store = new Store({
@@ -1024,14 +1017,13 @@ describe('Store with storage', () => {
         },
       },
       updates: {
-        Mutation: {
+        mutation_root: {
           toggleTodo: fakeUpdater,
         },
       },
     });
 
     const mutationData = {
-      __typename: 'mutation_root',
       toggleTodo: {
         __typename: 'Todo',
         id: 1,
@@ -1049,7 +1041,7 @@ describe('Store with storage', () => {
           }
         `,
       },
-      mutationData
+      mutationData as any
     );
 
     expect(fakeUpdater).toBeCalledTimes(1);
