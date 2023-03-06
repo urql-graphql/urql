@@ -284,7 +284,7 @@ const readSelection = (
   result?: Data
 ): Data | undefined => {
   const { store } = ctx;
-  const isQuery = key === store.rootFields['query'];
+  const isQuery = key === store.rootFields.query;
 
   const entityKey = (result && store.keyOfEntity(result)) || key;
   if (!isQuery && !!ctx.store.rootNames[entityKey]) {
@@ -321,6 +321,7 @@ const readSelection = (
     return;
   }
 
+  const resolvers = store.resolvers[typename];
   const iterate = makeSelectionIterator(typename, entityKey, select, ctx);
 
   let hasFields = false;
@@ -337,7 +338,6 @@ const readSelection = (
     const key = joinKeys(entityKey, fieldKey);
     const fieldValue = InMemoryData.readRecord(entityKey, fieldKey);
     const resultValue = result ? result[fieldName] : undefined;
-    const resolvers = store.resolvers[typename];
 
     if (process.env.NODE_ENV !== 'production' && store.schema && typename) {
       isFieldAvailableOnType(store.schema, typename, fieldName);

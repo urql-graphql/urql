@@ -198,8 +198,9 @@ const writeSelection = (
   select: SelectionSet,
   data: Data
 ) => {
-  const isRoot = !!ctx.store.rootNames[entityKey!];
-  const typename = isRoot ? entityKey : data.__typename;
+  const isQuery = ctx.store.rootFields.query === entityKey;
+  const isRoot = !isQuery && !!ctx.store.rootNames[entityKey!];
+  const typename = isRoot || isQuery ? entityKey : data.__typename;
   if (!typename) {
     warn(
       "Couldn't find __typename when writing.\n" +
@@ -207,10 +208,11 @@ const writeSelection = (
       14
     );
     return;
-  } else if (!isRoot && entityKey) {
+  } else if (!isRoot && !isQuery && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
+  const updates = ctx.store.updates[typename];
   const iterate = makeSelectionIterator(
     typename,
     entityKey || typename,
@@ -312,8 +314,7 @@ const writeSelection = (
 
     // We run side-effect updates after the default, normalized updates
     // so that the data is already available in-store if necessary
-    const updater =
-      ctx.store.updates[typename] && ctx.store.updates[typename][fieldName];
+    const updater = updates && updates[fieldName];
     if (updater) {
       // We have to update the context to reflect up-to-date ResolveInfo
       updateContext(

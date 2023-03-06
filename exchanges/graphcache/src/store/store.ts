@@ -49,7 +49,7 @@ export class Store<
   schema?: SchemaIntrospector;
 
   rootFields: { query: string; mutation: string; subscription: string };
-  rootNames: { [name: string]: RootField };
+  rootNames: { [name: string]: RootField | void };
 
   constructor(opts?: C) {
     if (!opts) opts = {} as C;
