@@ -1016,7 +1016,7 @@ describe('Store with storage', () => {
         },
       },
       updates: {
-        Mutation: {
+        mutation_root: {
           toggleTodo: fakeUpdater,
         },
       },
