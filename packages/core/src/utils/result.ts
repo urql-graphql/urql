@@ -44,10 +44,15 @@ export const mergeResultPatch = (
   const errors = prevResult.error ? prevResult.error.graphQLErrors : [];
 
   let incremental = nextResult.incremental;
+
   // NOTE: We handle the old version of the incremental delivery payloads as well
   if ('path' in nextResult) {
-    errors.length = 0;
-    incremental = [nextResult as IncrementalPayload];
+    incremental = [
+      {
+        data: nextResult.data,
+        path: nextResult.path,
+      } as IncrementalPayload,
+    ];
   }
 
   if (incremental) {
@@ -71,7 +76,7 @@ export const mergeResultPatch = (
       }
 
       if (Array.isArray(patch.items)) {
-        const startIndex = typeof prop == 'number' && prop >= 0 ? prop : 0;
+        const startIndex = +prop >= 0 ? (prop as number) : 0;
         for (let i = 0, l = patch.items.length; i < l; i++)
           part[startIndex + i] = patch.items[i];
       } else if (patch.data !== undefined) {
