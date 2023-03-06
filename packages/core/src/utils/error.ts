@@ -1,7 +1,9 @@
 import { GraphQLError } from 'graphql';
 
 export const rehydrateGraphQlError = (error: any): GraphQLError => {
-  if (typeof error === 'string') {
+  if (error instanceof GraphQLError) {
+    return error;
+  } else if (typeof error === 'string') {
     return new GraphQLError(error);
   } else if (typeof error === 'object' && error.message) {
     return new GraphQLError(
@@ -25,6 +27,9 @@ export class CombinedError extends Error {
   public networkError?: Error;
   public response?: any;
 
+  // @ts-ignore
+  public message: string;
+
   constructor(input: {
     networkError?: Error;
     graphQLErrors?: Array<string | Partial<GraphQLError> | Error>;
@@ -39,18 +44,20 @@ export class CombinedError extends Error {
     this.graphQLErrors = normalizedGraphQLErrors;
     this.networkError = input.networkError;
     this.response = input.response;
-  }
 
-  get message(): string {
-    let error = '';
-    if (this.networkError) return `[Network] ${this.networkError.message}`;
-    if (this.graphQLErrors) {
-      for (const err of this.graphQLErrors) {
-        if (error) error += '\n';
-        error += `[GraphQL] ${err.message}`;
-      }
-    }
-    return error;
+    Object.defineProperty(this, 'message', {
+      get() {
+        let error = '';
+        if (this.networkError) return `[Network] ${this.networkError.message}`;
+        if (this.graphQLErrors) {
+          for (const err of this.graphQLErrors) {
+            if (error) error += '\n';
+            error += `[GraphQL] ${err.message}`;
+          }
+        }
+        return error;
+      },
+    });
   }
 
   toString() {
