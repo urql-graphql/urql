@@ -1,4 +1,9 @@
-import { ExecutionResult, Operation, OperationResult } from '../types';
+import {
+  ExecutionResult,
+  Operation,
+  OperationResult,
+  IncrementalPayload,
+} from '../types';
 import { CombinedError, rehydrateGraphQlError } from './error';
 
 export const makeResult = (
@@ -38,9 +43,16 @@ export const mergeResultPatch = (
   const extensions = { ...prevResult.extensions, ...nextResult.extensions };
   const errors = prevResult.error ? prevResult.error.graphQLErrors : [];
 
-  if (nextResult.incremental) {
+  let incremental = nextResult.incremental;
+  // NOTE: We handle the old version of the incremental delivery payloads as well
+  if ('path' in nextResult) {
+    errors.length = 0;
+    incremental = [nextResult as IncrementalPayload];
+  }
+
+  if (incremental) {
     data = { ...prevResult.data };
-    for (const patch of nextResult.incremental) {
+    for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
         errors.push(...patch.errors.map(rehydrateGraphQlError));
       }

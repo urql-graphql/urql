@@ -250,4 +250,40 @@ describe('mergeResultPatch', () => {
       __typename: 'Query',
     });
   });
+
+  it('handles the old version of the incremental payload spec (DEPRECATED)', () => {
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+        items: [
+          {
+            __typename: 'Item',
+            id: 'id',
+            child: undefined,
+          },
+        ],
+      },
+    };
+
+    const patch = { __typename: 'Child' };
+
+    const merged = mergeResultPatch(prevResult, {
+      data: patch,
+      path: ['items', 0, 'child'],
+    } as any);
+
+    expect(merged.data.items[0]).not.toBe(prevResult.data.items[0]);
+    expect(merged.data.items[0].child).toBe(patch);
+    expect(merged.data).toStrictEqual({
+      __typename: 'Query',
+      items: [
+        {
+          __typename: 'Item',
+          id: 'id',
+          child: patch,
+        },
+      ],
+    });
+  });
 });

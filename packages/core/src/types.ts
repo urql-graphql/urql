@@ -21,7 +21,7 @@ export interface TypedDocumentNode<
 type ErrorLike = Partial<GraphQLError> | Error | string;
 type Extensions = Record<string, any>;
 
-interface IncrementalPayload {
+export interface IncrementalPayload {
   label?: string | null;
   path: readonly (string | number)[];
   data?: Record<string, unknown> | null;
