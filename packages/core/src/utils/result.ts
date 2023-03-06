@@ -4,7 +4,7 @@ import {
   OperationResult,
   IncrementalPayload,
 } from '../types';
-import { CombinedError, rehydrateGraphQlError } from './error';
+import { CombinedError } from './error';
 
 export const makeResult = (
   operation: Operation,
@@ -59,7 +59,7 @@ export const mergeResultPatch = (
     data = { ...prevResult.data };
     for (const patch of incremental) {
       if (Array.isArray(patch.errors)) {
-        errors.push(...patch.errors.map(rehydrateGraphQlError));
+        errors.push(...(patch.errors as any));
       }
 
       if (patch.extensions) {

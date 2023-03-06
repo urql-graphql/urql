@@ -1,9 +1,22 @@
 import { GraphQLError } from 'graphql';
 
-export const rehydrateGraphQlError = (error: any): GraphQLError => {
-  if (error instanceof GraphQLError) {
-    return error;
-  } else if (typeof error === 'string') {
+const generateErrorMessage = (
+  networkErr?: Error,
+  graphQlErrs?: GraphQLError[]
+) => {
+  let error = '';
+  if (networkErr) return `[Network] ${networkErr.message}`;
+  if (graphQlErrs) {
+    for (const err of graphQlErrs) {
+      if (error) error += '\n';
+      error += `[GraphQL] ${err.message}`;
+    }
+  }
+  return error;
+};
+
+const rehydrateGraphQlError = (error: any): GraphQLError => {
+  if (typeof error === 'string') {
     return new GraphQLError(error);
   } else if (typeof error === 'object' && error.message) {
     return new GraphQLError(
@@ -23,12 +36,10 @@ export const rehydrateGraphQlError = (error: any): GraphQLError => {
 /** An error which can consist of GraphQL errors and Network errors. */
 export class CombinedError extends Error {
   public name: string;
+  public message: string;
   public graphQLErrors: GraphQLError[];
   public networkError?: Error;
   public response?: any;
-
-  // @ts-ignore
-  public message: string;
 
   constructor(input: {
     networkError?: Error;
@@ -38,26 +49,18 @@ export class CombinedError extends Error {
     const normalizedGraphQLErrors = (input.graphQLErrors || []).map(
       rehydrateGraphQlError
     );
+    const message = generateErrorMessage(
+      input.networkError,
+      normalizedGraphQLErrors
+    );
 
-    super('[CombinedError]');
+    super(message);
+
     this.name = 'CombinedError';
+    this.message = message;
     this.graphQLErrors = normalizedGraphQLErrors;
     this.networkError = input.networkError;
     this.response = input.response;
-
-    Object.defineProperty(this, 'message', {
-      get() {
-        let error = '';
-        if (this.networkError) return `[Network] ${this.networkError.message}`;
-        if (this.graphQLErrors) {
-          for (const err of this.graphQLErrors) {
-            if (error) error += '\n';
-            error += `[GraphQL] ${err.message}`;
-          }
-        }
-        return error;
-      },
-    });
   }
 
   toString() {
