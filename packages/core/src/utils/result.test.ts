@@ -230,4 +230,24 @@ describe('mergeResultPatch', () => {
       [GraphQL] patch]
     `);
   });
+
+  it('should preserve all data for noop patches', () => {
+    const prevResult: OperationResult = {
+      operation: queryOperation,
+      data: {
+        __typename: 'Query',
+      },
+      extensions: {
+        base: true,
+      },
+    };
+
+    const merged = mergeResultPatch(prevResult, {
+      hasNext: false,
+    });
+
+    expect(merged.data).toStrictEqual({
+      __typename: 'Query',
+    });
+  });
 });

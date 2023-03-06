@@ -70,7 +70,7 @@ export const mergeResultPatch = (
       }
     }
   } else {
-    data = nextResult.data;
+    data = nextResult.data || prevResult.data;
   }
 
   return {
