@@ -13,7 +13,7 @@ const SONGS_QUERY = gql`
       firstVerse
       ...secondVerseFields @defer
     }
-    alphabet @stream(initial_count: 3) {
+    alphabet @stream(initialCount: 3) {
       char
     }
   }
