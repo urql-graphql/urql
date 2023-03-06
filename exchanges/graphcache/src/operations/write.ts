@@ -198,9 +198,14 @@ const writeSelection = (
   select: SelectionSet,
   data: Data
 ) => {
-  const isQuery = ctx.store.rootFields.query === entityKey;
-  const isRoot = !isQuery && !!ctx.store.rootNames[entityKey!];
-  const typename = isRoot || isQuery ? entityKey : data.__typename;
+  // These fields determine how we write. The `Query` root type is written
+  // like a normal entity, hence, we use `rootField` with a default to determine
+  // this. All other root names (Subscription & Mutation) are in a different
+  // write mode
+  const rootField = ctx.store.rootNames[entityKey!] || 'query';
+  const isRoot = !!ctx.store.rootNames[entityKey!];
+
+  const typename = isRoot ? entityKey : data.__typename;
   if (!typename) {
     warn(
       "Couldn't find __typename when writing.\n" +
@@ -208,7 +213,7 @@ const writeSelection = (
       14
     );
     return;
-  } else if (!isRoot && !isQuery && entityKey) {
+  } else if (!isRoot && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
@@ -231,7 +236,7 @@ const writeSelection = (
     // Development check of undefined fields
     if (process.env.NODE_ENV !== 'production') {
       if (
-        !isRoot &&
+        rootField === 'query' &&
         fieldValue === undefined &&
         !deferRef.current &&
         !ctx.optimistic
@@ -262,7 +267,7 @@ const writeSelection = (
       // Fields marked as deferred that aren't defined must be skipped
       // Otherwise, we also ignore undefined values in optimistic updaters
       (fieldValue === undefined &&
-        (deferRef.current || (ctx.optimistic && !isRoot)))
+        (deferRef.current || (ctx.optimistic && rootField === 'query')))
     ) {
       continue;
     }
@@ -273,7 +278,7 @@ const writeSelection = (
     // Execute optimistic mutation functions on root fields, or execute recursive functions
     // that have been returned on optimistic objects
     let resolver: OptimisticMutationResolver | void;
-    if (ctx.optimistic && isRoot) {
+    if (ctx.optimistic && rootField === 'mutation') {
       resolver = ctx.store.optimisticMutations[fieldName];
       if (!resolver) continue;
     } else if (ctx.optimistic && typeof fieldValue === 'function') {
@@ -289,7 +294,7 @@ const writeSelection = (
 
     if (node.selectionSet) {
       // Process the field and write links for the child entities that have been written
-      if (entityKey && !isRoot) {
+      if (entityKey && rootField === 'query') {
         const key = joinKeys(entityKey, fieldKey);
         const link = writeField(
           ctx,
@@ -301,7 +306,7 @@ const writeSelection = (
       } else {
         writeField(ctx, getSelectionSet(node), ensureData(fieldValue));
       }
-    } else if (entityKey && !isRoot) {
+    } else if (entityKey && rootField === 'query') {
       // This is a leaf node, so we're setting the field's value directly
       InMemoryData.writeRecord(
         entityKey || typename,
