@@ -1,12 +1,15 @@
 import { ExecutionResult, Operation, OperationResult } from '../types';
-import { CombinedError } from './error';
+import { CombinedError, rehydrateGraphQlError } from './error';
 
 export const makeResult = (
   operation: Operation,
   result: ExecutionResult,
   response?: any
 ): OperationResult => {
-  if ((!('data' in result) && !('errors' in result)) || 'path' in result) {
+  if (
+    (!('data' in result) && !('errors' in result)) ||
+    'incremental' in result
+  ) {
     throw new Error('No Content');
   }
 
@@ -27,41 +30,58 @@ export const makeResult = (
 
 export const mergeResultPatch = (
   prevResult: OperationResult,
-  patch: ExecutionResult,
+  nextResult: ExecutionResult,
   response?: any
 ): OperationResult => {
-  const result = { ...prevResult };
-  result.hasNext = !!patch.hasNext;
+  let data: ExecutionResult['data'];
+  let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
+  const extensions = { ...prevResult.extensions, ...nextResult.extensions };
+  const errors = prevResult.error ? prevResult.error.graphQLErrors : [];
 
-  if (!('path' in patch)) {
-    if ('data' in patch) result.data = patch.data;
-    return result;
+  if (nextResult.incremental) {
+    data = { ...prevResult.data };
+    for (const patch of nextResult.incremental) {
+      if (Array.isArray(patch.errors)) {
+        errors.push(...patch.errors.map(rehydrateGraphQlError));
+      }
+
+      if (patch.extensions) {
+        Object.assign(extensions, patch.extensions);
+        hasExtensions = true;
+      }
+
+      let prop: string | number = patch.path[0];
+      let part: Record<string, any> | Array<any> = data as object;
+      for (let i = 1, l = patch.path.length; i < l; prop = patch.path[i++]) {
+        part = part[prop] = Array.isArray(part[prop])
+          ? [...part[prop]]
+          : { ...part[prop] };
+      }
+
+      if (Array.isArray(patch.items)) {
+        const startIndex = typeof prop == 'number' && prop >= 0 ? prop : 0;
+        for (let i = 0, l = patch.items.length; i < l; i++)
+          part[startIndex + i] = patch.items[i];
+      } else if (patch.data !== undefined) {
+        part[prop] =
+          part[prop] && patch.data
+            ? { ...part[prop], ...patch.data }
+            : patch.data;
+      }
+    }
+  } else {
+    data = nextResult.data;
   }
 
-  if (Array.isArray(patch.errors)) {
-    result.error = new CombinedError({
-      graphQLErrors: result.error
-        ? [...result.error.graphQLErrors, ...patch.errors]
-        : patch.errors,
-      response,
-    });
-  }
-
-  let part: Record<string, any> | Array<any> = (result.data = {
-    ...result.data,
-  });
-
-  let i = 0;
-  let prop: string | number;
-  while (i < patch.path.length) {
-    prop = patch.path[i++];
-    part = part[prop] = Array.isArray(part[prop])
-      ? [...part[prop]]
-      : { ...part[prop] };
-  }
-
-  Object.assign(part, patch.data);
-  return result;
+  return {
+    operation: prevResult.operation,
+    data,
+    error: errors.length
+      ? new CombinedError({ graphQLErrors: errors, response })
+      : undefined,
+    extensions: hasExtensions ? extensions : undefined,
+    hasNext: !!nextResult.hasNext,
+  };
 };
 
 export const makeErrorResult = (
