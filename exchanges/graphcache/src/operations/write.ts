@@ -198,9 +198,8 @@ const writeSelection = (
   select: SelectionSet,
   data: Data
 ) => {
-  const isQuery = entityKey === ctx.store.rootFields['query'];
-  const isRoot = !isQuery && !!ctx.store.rootNames[entityKey!];
-  const typename = isRoot || isQuery ? entityKey : data.__typename;
+  const isRoot = !!ctx.store.rootNames[entityKey!];
+  const typename = isRoot ? entityKey : data.__typename;
   if (!typename) {
     warn(
       "Couldn't find __typename when writing.\n" +
@@ -208,7 +207,7 @@ const writeSelection = (
       14
     );
     return;
-  } else if (!isRoot && !isQuery && entityKey) {
+  } else if (!isRoot && entityKey) {
     InMemoryData.writeRecord(entityKey, '__typename', typename);
   }
 
