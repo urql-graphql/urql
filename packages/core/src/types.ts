@@ -18,7 +18,7 @@ export interface TypedDocumentNode<
   __apiType?: (variables: Variables) => Result;
 }
 
-type ErrorLike = Partial<GraphQLError> | Error | string;
+type ErrorLike = Partial<GraphQLError> | Error;
 type Extensions = Record<string, any>;
 
 export interface IncrementalPayload {

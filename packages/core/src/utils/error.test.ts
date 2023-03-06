@@ -60,13 +60,6 @@ describe('CombinedError', () => {
     expect(err.graphQLErrors).toEqual(graphQLErrors);
   });
 
-  it('passes graphQLErrors through as a last resort', () => {
-    const graphQLErrors = [{ x: 'y' }] as any;
-    const err = new CombinedError({ graphQLErrors });
-
-    expect(err.graphQLErrors).toEqual(graphQLErrors);
-  });
-
   it('accepts a response that is attached to the resulting error', () => {
     const response = {};
     const err = new CombinedError({
