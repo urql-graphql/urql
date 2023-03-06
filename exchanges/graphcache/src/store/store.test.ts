@@ -998,7 +998,7 @@ describe('Store with storage', () => {
     expect(warnMessage).toContain('https://bit.ly/2XbVrpR#24');
   });
 
-  it('should use different rootConfigs', function () {
+  it('should use different rootConfigs', () => {
     const fakeUpdater = vi.fn();
 
     const store = new Store({
@@ -1040,7 +1040,7 @@ describe('Store with storage', () => {
           }
         `,
       },
-      mutationData
+      mutationData as any
     );
 
     expect(fakeUpdater).toBeCalledTimes(1);

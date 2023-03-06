@@ -145,31 +145,39 @@ export function expectValidUpdatesConfig(
     return;
   }
 
-  for (const updateName in updates) {
-    if (!updates[updateName]) continue;
+  for (const typename in updates) {
+    if (!updates[typename]) {
+      continue;
+    } else if (!schema.types!.has(typename)) {
+      let addition = '';
 
-    let typename: string;
-    if (updateName === 'Query') {
-      typename = schema.query || updateName;
-    } else if (updateName === 'Subscription') {
-      typename = schema.subscription || updateName;
-    } else if (updateName === 'Mutation') {
-      typename = schema.mutation || updateName;
-    } else {
-      typename = updateName;
-    }
+      if (
+        typename === 'Mutation' &&
+        schema.mutation &&
+        schema.mutation !== 'Mutation'
+      ) {
+        addition +=
+          '\nMaybe your config should reference `' + schema.mutation + '`?';
+      } else if (
+        typename === 'Subscription' &&
+        schema.subscription &&
+        schema.subscription !== 'Subscription'
+      ) {
+        addition +=
+          '\nMaybe your config should reference `' + schema.subscription + '`?';
+      }
 
-    if (!schema.types!.has(typename)) {
       return warn(
         'Invalid updates type: The type `' +
           typename +
-          '` is not an object in the defined schema, but the `updates` config is referencing it.',
+          '` is not an object in the defined schema, but the `updates` config is referencing it.' +
+          addition,
         21
       );
     }
 
     const fields = (schema.types!.get(typename)! as SchemaObject).fields();
-    for (const fieldName in updates[updateName]!) {
+    for (const fieldName in updates[typename]!) {
       if (!fields[fieldName]) {
         warn(
           'Invalid updates field: `' +
