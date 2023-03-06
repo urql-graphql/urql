@@ -236,8 +236,12 @@ describe('on multipart/mixed', () => {
               done: false,
               value: Buffer.from(
                 wrap({
-                  path: ['author', 'todos', 1],
-                  data: { id: '2', text: 'defer', __typename: 'Todo' },
+                  incremental: [
+                    {
+                      path: ['author', 'todos', 1],
+                      data: { id: '2', text: 'defer', __typename: 'Todo' },
+                    },
+                  ],
                   hasNext: true,
                 })
               ),
@@ -360,8 +364,12 @@ describe('on multipart/mixed', () => {
               done: false,
               value: Buffer.from(
                 wrap({
-                  path: ['author'],
-                  data: { name: 'Steve' },
+                  incremental: [
+                    {
+                      path: ['author'],
+                      data: { name: 'Steve' },
+                    },
+                  ],
                   hasNext: true,
                 })
               ),
@@ -483,8 +491,12 @@ describe('on multipart/mixed', () => {
               done: false,
               value: Buffer.from(
                 wrap({
-                  path: ['author', 'address'],
-                  data: { street: 'home' },
+                  incremental: [
+                    {
+                      path: ['author', 'address'],
+                      data: { street: 'home' },
+                    },
+                  ],
                   hasNext: true,
                 })
               ),
