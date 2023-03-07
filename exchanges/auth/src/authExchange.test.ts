@@ -311,19 +311,24 @@ it('calls willAuthError on queued operations', async () => {
 
   pipe(
     source,
-    authExchange<{ token: string }>({
-      async getAuth() {
-        await new Promise(resolve => {
-          initialAuthResolve = resolve;
-        });
+    authExchange(async utils => {
+      await new Promise(resolve => {
+        initialAuthResolve = resolve;
+      });
 
-        return { token: 'token' };
-      },
-      willAuthError,
-      didAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState?.token);
-      },
+      let token = 'token';
+      return {
+        willAuthError,
+        didAuthError: () => false,
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        async refreshAuth() {
+          token = 'final-token';
+        },
+      };
     })(exchangeArgs),
     publish
   );

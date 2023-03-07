@@ -202,15 +202,15 @@ export function authExchange(
   init: (utilities: AuthUtilities) => Promise<AuthConfig>
 ): Exchange {
   return ({ client, forward }) => {
-    const bypassQueue: WeakSet<Operation> = new WeakSet();
+    const bypassQueue = new WeakSet<Operation>();
     const retryQueue = new Map<number, Operation>();
     const retries = makeSubject<Operation>();
 
     function flushQueue(_config?: AuthConfig | undefined) {
+      if (_config) config = _config;
       authPromise = undefined;
       retryQueue.forEach(retries.next);
       retryQueue.clear();
-      if (_config) config = _config;
     }
 
     let authPromise: Promise<void> | void;
@@ -276,8 +276,8 @@ export function authExchange(
 
       function willAuthError(operation: Operation) {
         return (
+          !operation.context.authAttempt &&
           config &&
-          !authPromise &&
           config.willAuthError &&
           config.willAuthError(operation)
         );
@@ -286,32 +286,25 @@ export function authExchange(
       function didAuthError(result: OperationResult) {
         return (
           config &&
-          !authPromise &&
           config.didAuthError &&
           config.didAuthError(result.error!, result.operation)
         );
       }
 
       function addAuthToOperation(operation: Operation) {
-        return config && !authPromise
-          ? config.addAuthToOperation(operation)
-          : operation;
+        return config ? config.addAuthToOperation(operation) : operation;
       }
 
       const sharedOps$ = pipe(operations$, share);
 
       const teardownOps$ = pipe(
         sharedOps$,
-        filter((operation: Operation) => {
-          return operation.kind === 'teardown';
-        })
+        filter(operation => operation.kind === 'teardown')
       );
 
       const pendingOps$ = pipe(
         sharedOps$,
-        filter((operation: Operation) => {
-          return operation.kind !== 'teardown';
-        })
+        filter(operation => operation.kind !== 'teardown')
       );
 
       const opsWithAuth$ = pipe(
@@ -320,17 +313,21 @@ export function authExchange(
           if (bypassQueue.has(operation)) {
             return operation;
           } else if (authPromise) {
-            retryQueue.set(
-              operation.key,
-              addAuthAttemptToOperation(operation, false)
-            );
+            if (!retryQueue.has(operation.key)) {
+              retryQueue.set(
+                operation.key,
+                addAuthAttemptToOperation(operation, false)
+              );
+            }
             return null;
-          } else if (!operation.context.authAttempt && willAuthError(operation)) {
+          } else if (willAuthError(operation)) {
             refreshAuth(operation);
             return null;
           }
 
-          return addAuthToOperation(addAuthAttemptToOperation(operation, false));
+          return addAuthToOperation(
+            addAuthAttemptToOperation(operation, false)
+          );
         }),
         filter(Boolean)
       ) as Source<Operation>;
