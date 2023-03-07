@@ -335,3 +335,51 @@ it('triggers authentication when an operation will error', async () => {
     'final-token'
   );
 });
+
+it('calls willAuthError on queued operations', async () => {
+  const { exchangeArgs, result, operations } = makeExchangeArgs();
+  const { source, next } = makeSubject<any>();
+
+  let initialAuthResolve: ((_?: any) => void) | undefined;
+
+  const willAuthError = vi.fn().mockReturnValue(false);
+
+  pipe(
+    source,
+    authExchange<{ token: string }>({
+      async getAuth() {
+        await new Promise(resolve => {
+          initialAuthResolve = resolve;
+        });
+
+        return { token: 'token' };
+      },
+      willAuthError,
+      didAuthError: () => false,
+      addAuthToOperation: ({ authState, operation }) => {
+        return withAuthHeader(operation, authState?.token);
+      },
+    })(exchangeArgs),
+    publish
+  );
+
+  await Promise.resolve();
+
+  next(queryOperation);
+  expect(result).toHaveBeenCalledTimes(0);
+  expect(willAuthError).toHaveBeenCalledTimes(0);
+
+  expect(initialAuthResolve).toBeDefined();
+  initialAuthResolve!();
+
+  await new Promise(resolve => setTimeout(resolve));
+
+  expect(willAuthError).toHaveBeenCalledTimes(1);
+  expect(result).toHaveBeenCalledTimes(1);
+
+  expect(operations.length).toBe(1);
+  expect(operations[0]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'token'
+  );
+});
