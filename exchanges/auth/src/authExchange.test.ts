@@ -9,10 +9,7 @@ import {
   tap,
   map,
 } from 'wonka';
-import { vi, expect, it } from 'vitest';
 
-import { print } from 'graphql';
-import { authExchange } from './authExchange';
 import {
   makeOperation,
   CombinedError,
@@ -20,7 +17,11 @@ import {
   Operation,
   OperationResult,
 } from '@urql/core';
+
+import { vi, expect, it } from 'vitest';
+import { print } from 'graphql';
 import { queryOperation } from '../../../packages/core/src/test-utils';
+import { authExchange } from './authExchange';
 
 const makeExchangeArgs = () => {
   const operations: Operation[] = [];
@@ -43,35 +44,24 @@ const makeExchangeArgs = () => {
   };
 };
 
-const withAuthHeader = (operation, token) => {
-  const fetchOptions =
-    typeof operation.context.fetchOptions === 'function'
-      ? operation.context.fetchOptions()
-      : operation.context.fetchOptions || {};
-
-  return makeOperation(operation.kind, operation, {
-    ...operation.context,
-    fetchOptions: {
-      ...fetchOptions,
-      headers: {
-        ...fetchOptions.headers,
-        Authorization: token,
-      },
-    },
-  });
-};
-
 it('adds the auth header correctly', async () => {
   const { exchangeArgs } = makeExchangeArgs();
 
   const res = await pipe(
     fromValue(queryOperation),
-    authExchange({
-      getAuth: async () => ({ token: 'my-token' }),
-      willAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState!.token);
-      },
+    authExchange(async utils => {
+      const token = 'my-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError: () => false,
+        async refreshAuth() {
+          /*noop*/
+        },
+      };
     })(exchangeArgs),
     take(1),
     toPromise
@@ -86,20 +76,27 @@ it('adds the auth header correctly', async () => {
   });
 });
 
-it('adds the auth header correctly when it is fetched asynchronously', async () => {
+it('adds the auth header correctly when intialized asynchronously', async () => {
   const { exchangeArgs } = makeExchangeArgs();
 
   const res = await pipe(
     fromValue(queryOperation),
-    authExchange<{ token: string }>({
-      getAuth: async () => {
-        await Promise.resolve();
-        return { token: 'async-token' };
-      },
-      willAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState!.token);
-      },
+    authExchange(async utils => {
+      // delayed initial auth
+      await Promise.resolve();
+      const token = 'async-token';
+
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError: () => false,
+        async refreshAuth() {
+          /*noop*/
+        },
+      };
     })(exchangeArgs),
     take(1),
     toPromise
@@ -119,16 +116,23 @@ it('supports calls to the mutate() method in getAuth()', async () => {
 
   const res = await pipe(
     fromValue(queryOperation),
-    authExchange<{ token: string }>({
-      getAuth: async ({ mutate }) => {
-        const result = await mutate('mutation { auth }');
-        expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
-        return { token: 'async-token' };
-      },
-      willAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState?.token);
-      },
+    authExchange(async utils => {
+      const result = await utils.mutate('mutation { auth }', undefined);
+      expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
+
+      const token = 'async-token';
+
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError: () => false,
+        async refreshAuth() {
+          /*noop*/
+        },
+      };
     })(exchangeArgs),
     take(2),
     toPromise
@@ -150,15 +154,19 @@ it('adds the same token to subsequent operations', async () => {
   const result = vi.fn();
   const auth$ = pipe(
     source,
-    authExchange({
-      getAuth: async () => {
-        await Promise.resolve();
-        return { token: 'my-token' };
-      },
-      willAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState!.token);
-      },
+    authExchange(async utils => {
+      const token = 'my-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError: () => false,
+        async refreshAuth() {
+          /*noop*/
+        },
+      };
     })(exchangeArgs),
     tap(result),
     take(2),
@@ -200,43 +208,28 @@ it('triggers authentication when an operation did error', async () => {
   const { exchangeArgs, result, operations } = makeExchangeArgs();
   const { source, next } = makeSubject<any>();
 
-  let initialAuth;
-  let afterErrorAuth;
-
   const didAuthError = vi.fn().mockReturnValueOnce(true);
-
-  const getAuth = vi
-    .fn()
-    .mockImplementationOnce(() => {
-      initialAuth = Promise.resolve({ token: 'initial-token' });
-      return initialAuth;
-    })
-    .mockImplementationOnce(() => {
-      afterErrorAuth = Promise.resolve({ token: 'final-token' });
-      return afterErrorAuth;
-    });
 
   pipe(
     source,
-    authExchange<{ token: string }>({
-      getAuth,
-      didAuthError,
-      willAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState?.token);
-      },
+    authExchange(async utils => {
+      let token = 'initial-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        didAuthError,
+        async refreshAuth() {
+          token = 'final-token';
+        },
+      };
     })(exchangeArgs),
     publish
   );
 
-  await Promise.resolve();
-  expect(getAuth).toHaveBeenCalledTimes(1);
-  await initialAuth;
-  await new Promise(res => {
-    setTimeout(() => {
-      res(null);
-    });
-  });
+  await new Promise(resolve => setTimeout(resolve));
 
   result.mockReturnValueOnce({
     operation: queryOperation,
@@ -248,14 +241,8 @@ it('triggers authentication when an operation did error', async () => {
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(1);
   expect(didAuthError).toHaveBeenCalledTimes(1);
-  expect(getAuth).toHaveBeenCalledTimes(2);
 
-  await afterErrorAuth;
-  await new Promise(res => {
-    setTimeout(() => {
-      res(null);
-    });
-  });
+  await new Promise(resolve => setTimeout(resolve));
 
   expect(result).toHaveBeenCalledTimes(2);
   expect(operations.length).toBe(2);
@@ -273,60 +260,38 @@ it('triggers authentication when an operation will error', async () => {
   const { exchangeArgs, result, operations } = makeExchangeArgs();
   const { source, next } = makeSubject<any>();
 
-  let initialAuth;
-  let afterErrorAuth;
-
-  vi.useRealTimers();
   const willAuthError = vi
     .fn()
     .mockReturnValueOnce(true)
     .mockReturnValue(false);
 
-  const getAuth = vi
-    .fn()
-    .mockImplementationOnce(async () => {
-      initialAuth = Promise.resolve({ token: 'initial-token' });
-      return await initialAuth;
-    })
-    .mockImplementationOnce(() => {
-      afterErrorAuth = Promise.resolve({ token: 'final-token' });
-      return afterErrorAuth;
-    });
-
   pipe(
     source,
-    authExchange<{ token: string }>({
-      getAuth,
-      willAuthError,
-      didAuthError: () => false,
-      addAuthToOperation: ({ authState, operation }) => {
-        return withAuthHeader(operation, authState?.token);
-      },
+    authExchange(async utils => {
+      let token = 'initial-token';
+      return {
+        addAuthToOperation(operation) {
+          return utils.appendHeaders(operation, {
+            Authorization: token,
+          });
+        },
+        willAuthError,
+        didAuthError: () => false,
+        async refreshAuth() {
+          token = 'final-token';
+        },
+      };
     })(exchangeArgs),
     publish
   );
 
-  await Promise.resolve();
-  expect(getAuth).toHaveBeenCalledTimes(1);
-  await initialAuth;
-  await new Promise(res => {
-    setTimeout(() => {
-      res(null);
-    });
-  });
+  await new Promise(resolve => setTimeout(resolve));
 
   next(queryOperation);
   expect(result).toHaveBeenCalledTimes(0);
   expect(willAuthError).toHaveBeenCalledTimes(1);
-  expect(getAuth).toHaveBeenCalledTimes(2);
 
-  await afterErrorAuth;
-
-  await new Promise(res => {
-    setTimeout(() => {
-      res(null);
-    });
-  });
+  await new Promise(resolve => setTimeout(resolve));
 
   expect(result).toHaveBeenCalledTimes(1);
   expect(operations.length).toBe(1);
