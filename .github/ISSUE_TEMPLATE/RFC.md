@@ -9,9 +9,9 @@ labels: "future \U0001F52E"
   🚨 RFCs are for proposed changes (not bugs or questions)
   Specifically they are whenever you'd like to see new features
   being added to urql, or enable new use-cases.
-  They're also relevant whenever @urql/core is changed, since
-  changes to e.g. the `Client` or `Exchange` types are kept rare
-  and lean.
+
+  Please open a Bug Report for issues/bugs, and use GitHub Discussions
+  or the Discord channel for questions instead.
 -->
 
 ## Summary

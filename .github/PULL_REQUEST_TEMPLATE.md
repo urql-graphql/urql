@@ -2,8 +2,8 @@
   Thanks for opening a pull request! We appreciate your dedication and help!
   Before submitting your pull request, please make sure to read our CONTRIBUTING guide.
 
-  The best contribution is always a PR! However, if you're starting to work on a large
-  change, it's best to make sure to open an issue first.
+  The best contribution is always a PR, but please make sure to open an issue or discuss
+  your changes first, if you’re looking to submit a larger PR.
 
   If this PR is already related to an issue, please reference it like so:
   Resolves #123

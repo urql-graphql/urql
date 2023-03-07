@@ -3,4 +3,6 @@ contact_links:
   - name: Ask a question
     url: https://github.com/urql-graphql/urql/discussions
     about: Ask questions and discuss with other community members
-
+  - name: Join the Discord
+    url: https://discord.gg/NzUrbgz2dP
+    about: Chat with maintainers and other community members
