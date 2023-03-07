@@ -48,6 +48,23 @@ export interface AuthUtilities {
     variables: Variables,
     context?: Partial<OperationContext>
   ): Promise<OperationResult<Data>>;
+
+  /** Adds additional HTTP headers to an `Operation`.
+   *
+   * @param operation - An {@link Operation} to add headers to.
+   * @param headers - The HTTP headers to add to the `Operation`.
+   * @returns The passed {@link Operation} with the headers added to it.
+   *
+   * @remarks
+   * The `appendHeaders()` utility method is useful to add additional HTTP headers
+   * to an {@link Operation}. It’s a simple convenience function that takes
+   * `operation.context.fetchOptions` into account, since adding headers for
+   * authentication is common.
+   */
+  appendHeaders(
+    operation: Operation,
+    headers: Record<string, string>
+  ): Operation;
 }
 
 /** Configuration for the `authExchange` returned by the initializer function you write. */
@@ -195,6 +212,22 @@ export function authExchange(
             take(1),
             toPromise
           );
+        },
+        appendHeaders(operation: Operation, headers: Record<string, string>) {
+          const fetchOptions =
+            typeof operation.context.fetchOptions === 'function'
+              ? operation.context.fetchOptions()
+              : operation.context.fetchOptions || {};
+          return makeOperation(operation.kind, operation, {
+            ...operation.context,
+            fetchOptions: {
+              ...fetchOptions,
+              headers: {
+                ...fetchOptions.headers,
+                ...headers,
+              },
+            },
+          });
         },
       }).then(flushQueue);
 
