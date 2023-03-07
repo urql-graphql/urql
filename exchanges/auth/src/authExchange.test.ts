@@ -165,6 +165,8 @@ it('adds the same token to subsequent operations', async () => {
     toPromise
   );
 
+  await new Promise(resolve => setTimeout(resolve));
+
   next(queryOperation);
 
   next(
