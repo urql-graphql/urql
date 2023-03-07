@@ -1,18 +1,14 @@
 import {
+  Source,
   pipe,
   map,
-  mergeMap,
-  fromPromise,
-  fromValue,
   filter,
   onStart,
-  empty,
   take,
   makeSubject,
   toPromise,
   merge,
   share,
-  takeUntil,
 } from 'wonka';
 
 import {
@@ -72,7 +68,9 @@ export function authExchange<T>({
   willAuthError,
 }: AuthConfig<T>): Exchange {
   return ({ client, forward }) => {
+    const bypassQueue: WeakSet<Operation> = new WeakSet();
     const retryQueue: Map<number, Operation> = new Map();
+
     const {
       source: retrySource$,
       next: retryOperation,
@@ -94,7 +92,10 @@ export function authExchange<T>({
 
         return pipe(
           result$,
-          onStart(() => retryOperation(operation)),
+          onStart(() => {
+            bypassQueue.add(operation);
+            retryOperation(operation);
+          }),
           filter(result => result.operation.key === operation.key),
           take(1),
           toPromise
@@ -142,43 +143,31 @@ export function authExchange<T>({
       );
 
       const opsWithAuth$ = pipe(
-        merge([
-          retrySource$,
-          pipe(
-            pendingOps$,
-            mergeMap(operation => {
-              if (retryQueue.has(operation.key)) {
-                return empty;
-              }
+        merge([retrySource$, pendingOps$]),
+        map(operation => {
+          if (bypassQueue.has(operation)) {
+            return operation;
+          } else if (authPromise) {
+            operation = addAuthAttemptToOperation(operation, false);
+            retryQueue.set(
+              operation.key,
+              addAuthAttemptToOperation(operation, false)
+            );
+            return null;
+          } else if (
+            !operation.context.authAttempt &&
+            willAuthError &&
+            willAuthError({ operation, authState })
+          ) {
+            refreshAuth(operation);
+            return null;
+          }
 
-              if (
-                !authPromise &&
-                willAuthError &&
-                willAuthError({ operation, authState })
-              ) {
-                refreshAuth(operation);
-                return empty;
-              } else if (!authPromise) {
-                return fromValue(addAuthAttemptToOperation(operation, false));
-              }
-
-              const teardown$ = pipe(
-                sharedOps$,
-                filter(op => {
-                  return op.kind === 'teardown' && op.key === operation.key;
-                })
-              );
-
-              return pipe(
-                fromPromise(authPromise),
-                map(() => addAuthAttemptToOperation(operation, false)),
-                takeUntil(teardown$)
-              );
-            })
-          ),
-        ]),
-        map(operation => addAuthToOperation({ operation, authState }))
-      );
+          operation = addAuthAttemptToOperation(operation, false);
+          return addAuthToOperation({ operation, authState });
+        }),
+        filter(Boolean)
+      ) as Source<Operation>;
 
       const result$ = pipe(merge([opsWithAuth$, teardownOps$]), forward, share);
 
