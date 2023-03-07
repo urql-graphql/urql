@@ -15,6 +15,9 @@ interface WritableLocation {
   loc: Location | undefined;
 }
 
+/** A `DocumentNode` annotated with its hashed key.
+ * @internal
+ */
 export interface KeyedDocumentNode extends DocumentNode {
   __key: HashValue;
 }
@@ -26,12 +29,27 @@ const REPLACE_CHAR_RE = /(#[^\n\r]+)?(?:\n|\r\n?|$)+/g;
 const replaceOutsideStrings = (str: string, idx: number) =>
   idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, '\n') : str;
 
+/** Sanitizes a GraphQL document string by replacing comments and redundant newlines in it. */
 const sanitizeDocument = (node: string): string =>
   node.split(GRAPHQL_STRING_RE).map(replaceOutsideStrings).join('').trim();
 
 const prints = new Map<DocumentNode | DefinitionNode, string>();
 const docs = new Map<HashValue, KeyedDocumentNode>();
 
+/** A cached printing function for GraphQL documents.
+ *
+ * @param node - A string of a document or a {@link DocumentNode}
+ * @returns A normalized printed string of the passed GraphQL document.
+ *
+ * @remarks
+ * This function accepts a GraphQL query string or {@link DocumentNode},
+ * then prints and sanitizes it. The sanitizer takes care of removing
+ * comments, which otherwise alter the key of the document although the
+ * document is otherwise equivalent to another.
+ *
+ * When a {@link DocumentNode} is passed to this function, it caches its
+ * output by modifying the `loc.source.body` property on the GraphQL node.
+ */
 export const stringifyDocument = (
   node: string | DefinitionNode | DocumentNode
 ): string => {
@@ -60,6 +78,18 @@ export const stringifyDocument = (
   return printed;
 };
 
+/** Computes the hash for a document's string using {@link stringifyDocument}'s output.
+ *
+ * @param node - A string of a document or a {@link DocumentNode}
+ * @returns A {@link HashValue}
+ *
+ * @privateRemarks
+ * This function adds the operation name of the document to the hash, since sometimes
+ * a merged document with multiple operations may be used. Although `urql` requires a
+ * `DocumentNode` to only contain a single operation, when the cached `loc.source.body`
+ * of a `DocumentNode` is used, this string may still contain multiple operations and
+ * the resulting hash should account for only one at a time.
+ */
 const hashDocument = (
   node: string | DefinitionNode | DocumentNode
 ): HashValue => {
@@ -72,6 +102,18 @@ const hashDocument = (
   return key;
 };
 
+/** Returns a canonical version of the passed `DocumentNode` with an added hash key.
+ *
+ * @param node - A string of a document or a {@link DocumentNode}
+ * @returns A {@link KeyedDocumentNode}
+ *
+ * @remarks
+ * `urql` will always avoid unnecessary work, no matter whether a user passes `DocumentNode`s
+ * or strings of GraphQL documents to its APIs.
+ *
+ * This function will return a canonical version of a {@link KeyedDocumentNode} no matter
+ * which kind of input is passed, avoiding parsing or hashing of passed data as needed.
+ */
 export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
   let key: HashValue;
   let query: DocumentNode;
@@ -91,6 +133,20 @@ export const keyDocument = (node: string | DocumentNode): KeyedDocumentNode => {
   return query as KeyedDocumentNode;
 };
 
+/** Creates a `GraphQLRequest` from the passed parameters.
+ *
+ * @param q - A string of a document or a {@link DocumentNode}
+ * @param variables - A variables object for the defined GraphQL operation.
+ * @returns A {@link GraphQLRequest}
+ *
+ * @remarks
+ * `createRequest` creates a {@link GraphQLRequest} from the passed parameters,
+ * while replacing the document as needed with a canonical version of itself,
+ * to avoid parsing, printing, or hashing the same input multiple times.
+ *
+ * If no variables are passed, canonically it'll default to an empty object,
+ * which is removed from the resulting hash key.
+ */
 export const createRequest = <
   Data = any,
   Variables extends AnyVariables = AnyVariables
@@ -106,8 +162,9 @@ export const createRequest = <
   return { key, query, variables };
 };
 
-/**
- * Finds the Name value from the OperationDefinition of a Document
+/** Returns the name of the `DocumentNode`'s operation, if any.
+ * @param query - A {@link DocumentNode}
+ * @returns the operation's name contained within the document, or `undefined`
  */
 export const getOperationName = (query: DocumentNode): string | undefined => {
   for (const node of query.definitions) {
@@ -117,8 +174,9 @@ export const getOperationName = (query: DocumentNode): string | undefined => {
   }
 };
 
-/**
- * Finds the operation-type
+/** Returns the type of the `DocumentNode`'s operation, if any.
+ * @param query - A {@link DocumentNode}
+ * @returns the operation's type contained within the document, or `undefined`
  */
 export const getOperationType = (query: DocumentNode): string | undefined => {
   for (const node of query.definitions) {

@@ -1,8 +1,34 @@
-export type HashValue = number & { readonly _opaque: unique symbol };
+/** A hash value as computed by {@link phash}.
+ *
+ * @remarks
+ * Typically `HashValue`s are used as hashes and keys of GraphQL documents,
+ * variables, and combined, for GraphQL requests.
+ */
+export type HashValue = number & {
+  /** Marker to indicate that a `HashValue` may not be created by a user.
+   *
+   * @remarks
+   * `HashValue`s are created by {@link phash} and are marked as such to not mix them
+   * up with other numbers and prevent them from being created or used outside of this
+   * hashing function.
+   *
+   * @internal
+   */
+  readonly _opaque: unique symbol;
+};
 
-// When we have separate strings it's useful to run a progressive
-// version of djb2 where we pretend that we're still looping over
-// the same string
+/** Computes a djb2 hash of the given string.
+ *
+ * @param x - the string to be hashed
+ * @param seed - optionally a prior hash for progressive hashing
+ * @returns a hash value, i.e. a number
+ *
+ * @remark
+ * This is the hashing function used throughout `urql`, primarily to compute
+ * {@link Operation.key}.
+ *
+ * @see {@link http://www.cse.yorku.ca/~oz/hash.html#djb2} for a further description of djb2.
+ */
 export const phash = (x: string, seed?: HashValue): HashValue => {
   let h = typeof seed === 'number' ? seed | 0 : 5381;
   for (let i = 0, l = x.length | 0; i < l; i++)

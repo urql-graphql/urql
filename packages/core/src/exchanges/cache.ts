@@ -17,6 +17,26 @@ type OperationCache = Map<string, Set<number>>;
 const shouldSkip = ({ kind }: Operation) =>
   kind !== 'mutation' && kind !== 'query';
 
+/** Default document cache exchange.
+ *
+ * @remarks
+ * The default document cache in `urql` avoids sending the same GraphQL request
+ * multiple times by caching it using the {@link Operation.key}. It will invalidate
+ * query results automatically whenever it sees a mutation responses with matching
+ * `__typename`s in their responses.
+ *
+ * The document cache will get the introspected `__typename` fields by modifying
+ * your GraphQL operation documents using the {@link formatDocument} utility.
+ *
+ * This automatic invalidation strategy can fail if your query or mutation don’t
+ * contain matching typenames, for instance, because the query contained an
+ * empty list.
+ * You can manually add hints for this exchange by specifying a list of
+ * {@link OperationContext.additionalTypenames} for queries and mutations that
+ * should invalidate one another.
+ *
+ * @see {@link https://formidable.com/open-source/urql/docs/basics/document-caching/} for more information on this cache.
+ */
 export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   const resultCache: ResultCache = new Map();
   const operationCache: OperationCache = new Map();
@@ -148,7 +168,9 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
   };
 };
 
-// Reexecutes a given operation with the default requestPolicy
+/** Reexecutes an `Operation` with the `network-only` request policy.
+ * @internal
+ */
 export const reexecuteOperation = (client: Client, operation: Operation) => {
   return client.reexecuteOperation(
     makeOperation(operation.kind, operation, {

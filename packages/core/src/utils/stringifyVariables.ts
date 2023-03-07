@@ -42,6 +42,20 @@ const stringify = (x: any): string => {
   return out;
 };
 
+/** A stable stringifier for GraphQL variables objects.
+ *
+ * @param x - any JSON-like data.
+ * @return A JSON string.
+ *
+ * @remarks
+ * This utility creates a stable JSON string from any passed data,
+ * and protects itself from throwing.
+ *
+ * The JSON string is stable insofar as objects’ keys are sorted,
+ * and instances of non-plain objects are replaced with random keys
+ * replacing their values, which remain stable for the objects’
+ * instance.
+ */
 export const stringifyVariables = (x: any): string => {
   seen.clear();
   return stringify(x);

@@ -51,37 +51,230 @@ import {
   getOperationType,
 } from './utils';
 
-/** Options for configuring the URQL [client]{@link Client}. */
+/** Configuration options passed when creating a new {@link Client}.
+ *
+ * @remarks
+ * The `ClientOptions` are passed when creating a new {@link Client}, and
+ * are used to instantiate the pipeline of {@link Exchange | Exchanges}, configure
+ * options used to initialize {@link OperationContext | OperationContexts}, or to
+ * change the general behaviour of the {@link Client}.
+ */
 export interface ClientOptions {
-  /** Target endpoint URL such as `https://my-target:8080/graphql`. */
+  /** Target URL used by fetch exchanges to make GraphQL API requests to.
+   *
+   * @remarks
+   * This is the URL that fetch exchanges will call to make GraphQL API requests.
+   * This value is copied to {@link OperationContext.url}.
+   */
   url: string;
-  /** Any additional options to pass to fetch. */
+  /** Additional options used by fetch exchanges that'll be passed to the `fetch` call on API requests.
+   *
+   * @remarks
+   * The options in this object or an object returned by a callback function will be merged into the
+   * {@link RequestInit} options passed to the `fetch` call.
+   *
+   * Hint: If you're trying to implement more complex changes per {@link Operation}, it's worth considering
+   * to use the {@link mapExchange} instead, which allows you to change `Operation`s and `OperationResult`s.
+   *
+   * Hint: If you're trying to use this as a function for authentication, consider checking out
+   * `@urql/exchange-auth` instead, which allows you to handle refresh auth flows, and more
+   * complex auth flows.
+   *
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/fetch} for a description of this object.
+   */
   fetchOptions?: RequestInit | (() => RequestInit);
-  /** An alternative fetch implementation. */
+  /** A `fetch` function polyfill used by fetch exchanges to make API calls.
+   *
+   * @remarks
+   * This is the fetch polyfill used by any fetch exchange to make an API request. By default, when this
+   * option isn't set, any fetch exchange will attempt to use the globally available `fetch` function
+   * to make a request instead.
+   *
+   * It's recommended to only pass a polyfill, if any of the environments you're running the {@link Client}
+   * in don't support the Fetch API natively.
+   *
+   * Hint: If you're using the "Incremental Delivery" multipart spec, for instance with `@defer` directives,
+   * you're better off using the native `fetch` function, or must ensure that your polyfill supports streamed
+   * results. However, a "Streaming requests unsupported" error will be thrown, to let you know that your `fetch`
+   * API doesn't support incrementally streamed responses, if this mode is used.
+   *
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API} for the Fetch API spec.
+   */
   fetch?: typeof fetch;
-  /** An ordered array of Exchanges. */
+  /** A list of `Exchange`s that will be used to create the `Client`'s execution pipeline.
+   *
+   * @remarks
+   * The {@link Client} accepts and composes a list of {@link Exchange | Exchanges} into an “exchange pipeline”
+   * which receive a stream of {@link Operation | Operations} the `Client` wishes to execute, and return a stream
+   * of {@link OperationResult | OperationResults}.
+   *
+   * This is the basis for how `urql` handles GraphQL operations, and exchanges handle the creation, execution,
+   * and control flow of exchanges for the `Client`.
+   *
+   * When this option is left out, the `Client` defaults to a list of {@link defaultExchanges}. By default, these
+   * will implement deduping, caching (via a document cache), and fetching (GraphQL over HTTP).
+   *
+   * @see {@link https://formidable.com/open-source/urql/docs/architecture/#the-client-and-exchanges} for more information
+   * on what `Exchange`s are and how they work.
+   */
   exchanges?: Exchange[];
-  /** Activates support for Suspense. */
+  /** A configuration flag indicating whether support for "Suspense" is activated.
+   *
+   * @remarks
+   * This configuration flag is only relevant for using `urql` with the React or Preact bindings.
+   * When activated it allows `useQuery` to "suspend" instead of returning a loading state, which
+   * will stop updates in a querying component and instead cascade
+   * to a higher suspense boundary for a loading state.
+   *
+   * Hint: While, when this option is enabled, by default all `useQuery` hooks will suspense, you can
+   * disable Suspense selectively for each hook.
+   *
+   * @see {@link https://beta.reactjs.org/blog/2022/03/29/react-v18#new-suspense-features} for more information on React Suspense.
+   */
   suspense?: boolean;
-  /** The default request policy for requests. */
+  /** The request and caching strategy that all `Operation`s on this `Client` will use by default.
+   *
+   * @remarks
+   * The {@link RequestPolicy} instructs cache exchanges how to use and treat their cached results.
+   * By default `cache-first` is set and used, which will use cache results, and only make an API request
+   * on a cache miss.
+   *
+   * The `requestPolicy` can be overriden per operation, since it's added to the {@link OperationContext},
+   * which allows you to change the policy per `Operation`, rather than changing it by default here.
+   *
+   * Hint: We don’t recommend changing this from the default `cache-first` option, unless you know what
+   * you‘re doing. Setting this to `cache-and-network` is not recommend and may not lead to the behaviour
+   * you expect. If you’re looking to always update your cache frequently, use `@urql/exchange-request-policy`
+   * instead.
+   */
   requestPolicy?: RequestPolicy;
-  /** Use HTTP GET for queries. */
+  /** Instructs fetch exchanges to use a GET request.
+   *
+   * @remarks
+   * This changes the {@link OperationContext.preferGetMethod} option, which tells fetch exchanges
+   * to use GET requests for queries instead of POST requests.
+   *
+   * When set to `true` or `'within-url-limit'`, built-in fetch exchanges will always attempt to send query
+   * operations as GET requests, unless the resulting URL exceeds a length of 2,048 characters.
+   * If you want to bypass this restriction, set this option to `'force'` instead, to always send GET.
+   * requests for queries.
+   */
   preferGetMethod?: boolean | 'force' | 'within-url-limit';
-  /** Mask __typename from results. */
+  /** Instructs the `Client` to remove `__typename` properties on all results.
+   *
+   * @remarks
+   * By default, cache exchanges will alter your GraphQL documents to request `__typename` fields
+   * for all selections. However, this means that your GraphQL data will now contain `__typename` fields you
+   * didn't ask for. This is why the {@link Client} supports “masking” this field by marking it
+   * as non-enumerable via this option.
+   *
+   * Only use this option if you absolutely have to. It's popular to model mutation inputs in
+   * GraphQL schemas after the object types they modify, and if you're using this option to make
+   * it possible to directly pass objects from results as inputs to your mutation variables, it's
+   * more performant and idomatic to instead create a new input object.
+   *
+   * Hint: With `@urql/exchange-graphcache` you will never need this option, as it selects fields on
+   * the client-side according to which fields you specified, rather than the fields it modified.
+   *
+   * @see {@link https://spec.graphql.org/October2021/#sec-Type-Name-Introspection} for more information
+   * on typename introspection via the `__typename` field.
+   */
   maskTypename?: boolean;
 }
 
+/** The `Client` is the central hub for your GraphQL operations and holds `urql`'s state.
+ *
+ * @remarks
+ * The `Client` manages your active GraphQL operations and their state, and contains the
+ * {@link Exchange} pipeline to execute your GraphQL operations.
+ *
+ * It contains methods that allow you to execute GraphQL operations manually, but the `Client`
+ * is also interacted with by bindings (for React, Preact, Vue, Svelte, etc) to execute GraphQL
+ * operations.
+ *
+ * While {@link Exchange | Exchanges} are ultimately responsible for the control flow of operations,
+ * sending API requests, and caching, the `Client` still has the important responsibility for
+ * creating operations, managing consumers of active operations, sharing results for operations,
+ * and more tasks as a “central hub”.
+ *
+ * @see {@link https://formidable.com/open-source/urql/docs/architecture/#requests-and-operations-on-the-client} for more information
+ * on what the `Client` is and does.
+ */
 export interface Client {
   new (options: ClientOptions): Client;
 
+  /** Exposes the stream of `Operation`s that is passed to the `Exchange` pipeline.
+   *
+   * @remarks
+   * This is a Wonka {@link Source} that issues the {@link Operation | Operations} going into
+   * the exchange pipeline.
+   * @internal
+   */
   operations$: Source<Operation>;
+
+  /** Flag indicating whether support for “Suspense” is activated.
+   *
+   * @remarks
+   * This flag indicates whether support for “Suspense” has been activated via the
+   * {@link ClientOptions.suspense} flag.
+   *
+   * When this is enabled, the {@link Client} itself doesn’t function any differently, and the flag
+   * only serves as an instructions for the React/Preact bindings to change their behaviour.
+   *
+   * @see {@link ClientOptions.suspense} for more information.
+   * @internal
+   */
   suspense: boolean;
 
-  /** Start an operation from an exchange */
-  reexecuteOperation: (operation: Operation) => void;
-  /** Event target for monitoring, e.g. for @urql/devtools */
-  subscribeToDebugTarget?: (onEvent: (e: DebugEvent) => void) => Subscription;
+  /** Dispatches an `Operation` to the `Exchange` pipeline, if this `Operation` is active.
+   *
+   * @remarks
+   * This method is frequently used in {@link Exchange | Exchanges}, for instance caches, to reexecute
+   * an operation. It’s often either called because an `Operation` will need to be queried against the
+   * cache again, if a cache result has changed or been invalidated, or it’s called with an {@link Operation}'s
+   * {@link RequestPolicy} set to `network-only` to issue a network request.
+   *
+   * This method will only dispatch an {@link Operation} if it has active consumers, meaning,
+   * active subscribers to the sources of {@link OperationResult}. For instance, if no bindings
+   * (e.g. `useQuery`) is subscribed to the `Operation`, then `reexecuteOperation` will do nothing.
+   *
+   * All operations are put onto a queue and executed after a micro-tick. The queue of operations is
+   * emptied eagerly and synchronously, similar to a trampoline scheduler.
+   */
+  reexecuteOperation(operation: Operation): void;
 
+  /** Subscribe method to add an event listener to debug events.
+   *
+   * @param onEvent - A callback called with new debug events, each time an `Exchange` issues them.
+   * @returns A Wonka {@link Subscription} which is used to optionally terminate the event listener.
+   *
+   * @remarks
+   * This is a method that's only available in development, and allows the `urql-devtools` to receive
+   * to debug events that are issued by exchanges, giving the devtools more information about the flow
+   * and execution of {@link Operation | Operations}.
+   *
+   * @see {@link DebugEventTypes} for a description of all debug events.
+   * @internal
+   */
+  subscribeToDebugTarget?(onEvent: (event: DebugEvent) => void): Subscription;
+
+  /** Creates an `Operation` from a `GraphQLRequest` and optionally, overriding `OperationContext` options.
+   *
+   * @param kind - The {@link OperationType} of GraphQL operation, i.e. `query`, `mutation`, or `subscription`.
+   * @param request - A {@link GraphQLRequest} created prior to calling this method.
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns An {@link Operation} created from the parameters.
+   *
+   * @remarks
+   * This method is expected to be called with a `kind` set to the `OperationType` of the GraphQL operation.
+   * In development, this is enforced by checking that the GraphQL document's operation matches this `kind`.
+   *
+   * Hint: While bindings will use this method combined with {@link Client.executeRequestOperation}, if
+   * you’re executing operations manually, you can use one of the other convenience methods instead.
+   *
+   * @see {@link Client.executeRequestOperation} for the method used to execute operations.
+   * @see {@link createRequest} which creates a `GraphQLRequest` from a `DocumentNode` and variables.
+   */
   createRequestOperation<
     Data = any,
     Variables extends AnyVariables = AnyVariables
@@ -91,7 +284,29 @@ export interface Client {
     opts?: Partial<OperationContext> | undefined
   ): Operation<Data, Variables>;
 
-  /** Executes an Operation by sending it through the exchange pipeline It returns an observable that emits all related exchange results and keeps track of this observable's subscribers. A teardown signal will be emitted when no subscribers are listening anymore. */
+  /** Creates a `Source` that executes the `Operation` and issues `OperationResult`s for this `Operation`.
+   *
+   * @param operation - {@link Operation} that will be executed.
+   * @returns A Wonka {@link Source} of {@link OperationResult | OperationResults} for the passed `Operation`.
+   *
+   * @remarks
+   * The {@link Operation} will be dispatched to the pipeline of {@link Exchange | Exchanges} when
+   * subscribing to the returned {@link Source}, which issues {@link OperationResult | OperationResults}
+   * belonging to this `Operation`.
+   *
+   * Internally, {@link OperationResult | OperationResults} are filtered and deliverd to this source by
+   * comparing the {@link Operation.key} on the operation and the {@link OperationResult.operation}.
+   * For mutations, the {@link OperationContext._instance | `OperationContext._instance`} will additionally be compared, since two mutations
+   * with, even given the same variables, will have two distinct results and will be executed separately.
+   *
+   * The {@link Client} dispatches the {@link Operation} when we subscribe to the returned {@link Source}
+   * and will from then on consider the `Operation` as “active” until we unsubscribe. When all consumers unsubscribe
+   * from an `Operation` and it becomes “inactive” a `teardown` signal will be dispatched to the
+   * {@link Exchange | Exchanges}.
+   *
+   * Hint: While bindings will use this method, if you’re executing operations manually, you can use one
+   * of the other convenience methods instead, like {@link Client.executeQuery} et al.
+   */
   executeRequestOperation<
     Data = any,
     Variables extends AnyVariables = AnyVariables
@@ -99,29 +314,159 @@ export interface Client {
     operation: Operation<Data, Variables>
   ): Source<OperationResult<Data, Variables>>;
 
+  /** Creates a `Source` that executes the GraphQL query operation created from the passed parameters.
+   *
+   * @param query - a GraphQL document containing the query operation that will be executed.
+   * @param variables - the variables used to execute the operation.
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.query` method is useful to programmatically create and issue a GraphQL query operation.
+   * It automatically calls {@link createRequest}, {@link client.createRequestOperation}, and
+   * {@link client.executeRequestOperation} for you, and is a convenience method.
+   *
+   * Since it returns a {@link PromisifiedSource} it may be chained with a `toPromise()` call to only
+   * await a single result in an async function.
+   *
+   * Hint: This is the recommended way to create queries programmatically when not using the bindings,
+   * or when you’re trying to get a single, promisified result.
+   *
+   * @example
+   * ```ts
+   * const getBookQuery = gql`
+   *   query GetBook($id: ID!) {
+   *     book(id: $id) {
+   *       id
+   *       name
+   *       author {
+   *         name
+   *       }
+   *     }
+   *   }
+   * `;
+   *
+   * async function getBook(id) {
+   *   const result = await client.query(getBookQuery, { id }).toPromise();
+   *   if (result.error) {
+   *     throw result.error;
+   *   }
+   *
+   *   return result.data.book;
+   * }
+   * ```
+   */
   query<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
+  /** Returns the first synchronous result a `Client` provides for a given operation.
+   *
+   * @param query - a GraphQL document containing the query operation that will be executed.
+   * @param variables - the variables used to execute the operation.
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns An {@link OperationResult} if one became available synchronously or `null`.
+   *
+   * @remarks
+   * The `Client.readQuery` method returns a result synchronously or defaults to `null`. This is useful
+   * as it limits the result for a query operation to whatever the cache {@link Exchange} of a {@link Client}
+   * had stored and available at that moment.
+   *
+   * In `urql`, it's expected that cache exchanges return their results synchronously. The bindings
+   * and this method exploit this by using synchronous results, like these, to check what data is already
+   * in the cache.
+   *
+   * This method is similar to what all bindings do to synchronously provide the initial state for queries,
+   * regardless of whether effects afterwards that subscribe to the query operation update this state synchronously
+   * or asynchronously.
+   */
   readQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): OperationResult<Data, Variables> | null;
 
+  /** Creates a `Source` that executes the GraphQL query operation for the passed `GraphQLRequest`.
+   *
+   * @param query - a {@link GraphQLRequest}
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.executeQuery` method is used to programmatically issue a GraphQL query operation.
+   * It automatically calls {@link client.createRequestOperation} and {@link client.executeRequestOperation} for you,
+   * but requires you to create a {@link GraphQLRequest} using {@link createRequest} yourself first.
+   *
+   * @see {@link Client.query} for a method that doesn't require calling {@link createRequest} yourself.
+   */
   executeQuery<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
+  /** Creates a `Source` that executes the GraphQL subscription operation created from the passed parameters.
+   *
+   * @param query - a GraphQL document containing the subscription operation that will be executed.
+   * @param variables - the variables used to execute the operation.
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A Wonka {@link Source} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.subscription` method is useful to programmatically create and issue a GraphQL subscription operation.
+   * It automatically calls {@link createRequest}, {@link client.createRequestOperation}, and
+   * {@link client.executeRequestOperation} for you, and is a convenience method.
+   *
+   * Hint: This is the recommended way to create subscriptions programmatically when not using the bindings.
+   *
+   * @example
+   * ```ts
+   * import { pipe, subscribe } from 'wonka';
+   *
+   * const getNewsSubscription = gql`
+   *   subscription GetNews {
+   *     breakingNews {
+   *       id
+   *       text
+   *       createdAt
+   *     }
+   *   }
+   * `;
+   *
+   * function subscribeToBreakingNews() {
+   *   const subscription = pipe(
+   *     client.subscription(getNewsSubscription, {}),
+   *     subscribe(result => {
+   *       if (result.data) {
+   *         console.log(result.data.breakingNews.text);
+   *       }
+   *     })
+   *   );
+   *
+   *   return subscription.unsubscribe;
+   * }
+   * ```
+   */
   subscription<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): Source<OperationResult<Data, Variables>>;
 
+  /** Creates a `Source` that executes the GraphQL subscription operation for the passed `GraphQLRequest`.
+   *
+   * @param query - a {@link GraphQLRequest}
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.executeSubscription` method is used to programmatically issue a GraphQL subscription operation.
+   * It automatically calls {@link client.createRequestOperation} and {@link client.executeRequestOperation} for you,
+   * but requires you to create a {@link GraphQLRequest} using {@link createRequest} yourself first.
+   *
+   * @see {@link Client.subscription} for a method that doesn't require calling {@link createRequest} yourself.
+   */
   executeSubscription<
     Data = any,
     Variables extends AnyVariables = AnyVariables
@@ -130,12 +475,67 @@ export interface Client {
     opts?: Partial<OperationContext> | undefined
   ): Source<OperationResult<Data, Variables>>;
 
+  /** Creates a `Source` that executes the GraphQL mutation operation created from the passed parameters.
+   *
+   * @param query - a GraphQL document containing the mutation operation that will be executed.
+   * @param variables - the variables used to execute the operation.
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.mutation` method is useful to programmatically create and issue a GraphQL mutation operation.
+   * It automatically calls {@link createRequest}, {@link client.createRequestOperation}, and
+   * {@link client.executeRequestOperation} for you, and is a convenience method.
+   *
+   * Since it returns a {@link PromisifiedSource} it may be chained with a `toPromise()` call to only
+   * await a single result in an async function. Since mutations will only typically issue one result,
+   * using this method is recommended.
+   *
+   * Hint: This is the recommended way to create mutations programmatically when not using the bindings,
+   * or when you’re trying to get a single, promisified result.
+   *
+   * @example
+   * ```ts
+   * const createPostMutation = gql`
+   *   mutation CreatePost($text: String!) {
+   *     createPost(text: $text) {
+   *       id
+   *       text
+   *     }
+   *   }
+   * `;
+   *
+   * async function createPost(text) {
+   *   const result = await client.mutation(createPostMutation, {
+   *     text,
+   *   }).toPromise();
+   *   if (result.error) {
+   *     throw result.error;
+   *   }
+   *
+   *   return result.data.createPost;
+   * }
+   * ```
+   */
   mutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
     variables: Variables,
     context?: Partial<OperationContext>
   ): PromisifiedSource<OperationResult<Data, Variables>>;
 
+  /** Creates a `Source` that executes the GraphQL mutation operation for the passed `GraphQLRequest`.
+   *
+   * @param query - a {@link GraphQLRequest}
+   * @param opts - {@link OperationContext} options that'll override and be merged with options from the {@link ClientOptions}.
+   * @returns A {@link PromisifiedSource} issuing the {@link OperationResult | OperationResults} for the GraphQL operation.
+   *
+   * @remarks
+   * The `Client.executeMutation` method is used to programmatically issue a GraphQL mutation operation.
+   * It automatically calls {@link client.createRequestOperation} and {@link client.executeRequestOperation} for you,
+   * but requires you to create a {@link GraphQLRequest} using {@link createRequest} yourself first.
+   *
+   * @see {@link Client.mutation} for a method that doesn't require calling {@link createRequest} yourself.
+   */
   executeMutation<Data = any, Variables extends AnyVariables = AnyVariables>(
     query: GraphQLRequest<Data, Variables>,
     opts?: Partial<OperationContext> | undefined
@@ -278,16 +678,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
     createRequestOperation(kind, request, opts) {
       if (!opts) opts = {};
-      const requestOperationType = getOperationType(request.query);
+
+      let requestOperationType: string | undefined;
       if (
         process.env.NODE_ENV !== 'production' &&
         kind !== 'teardown' &&
-        requestOperationType !== kind
+        (requestOperationType = getOperationType(request.query)) !== kind
       ) {
         throw new Error(
           `Expected operation of type "${kind}" but found "${requestOperationType}"`
         );
       }
+
       return makeOperation(kind, request, {
         _instance:
           kind === 'mutation'
@@ -436,4 +838,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   return client;
 } as any;
 
+/** Accepts `ClientOptions` and creates a `Client`.
+ * @param opts - A {@link ClientOptions} objects with options for the `Client`.
+ * @returns A {@link Client} instantiated with `opts`.
+ */
 export const createClient = (Client as any) as (opts: ClientOptions) => Client;
