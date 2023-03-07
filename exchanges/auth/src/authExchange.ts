@@ -170,6 +170,33 @@ const addAuthAttemptToOperation = (
  * This configuration defines how you add authentication state to {@link Operation | Operations},
  * when your authentication state expires, when an {@link OperationResult} has errored
  * with an authentication error, and how to refresh your authentication state.
+ *
+ * @example
+ * ```ts
+ * authExchange(async (utils) => {
+ *   let token = localStorage.getItem('token');
+ *   let refreshToken = localStorage.getItem('refreshToken');
+ *   return {
+ *     addAuthToOperation(operation) {
+ *       return utils.appendHeaders(operation, {
+ *         Authorization: `Bearer ${token}`,
+ *       });
+ *     },
+ *     didAuthError(error) {
+ *       return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
+ *     },
+ *     async refreshAuth() {
+ *       const result = await utils.mutate(REFRESH, { token });
+ *       if (result.data?.refreshLogin) {
+ *         token = result.data.refreshLogin.token;
+ *         refreshToken = result.data.refreshLogin.refreshToken;
+ *         localStorage.setItem('token', token);
+ *         localStorage.setItem('refreshToken', refreshToken);
+ *       }
+ *     },
+ *   };
+ * });
+ * ```
  */
 export function authExchange(
   init: (utilities: AuthUtilities) => Promise<AuthConfig>
