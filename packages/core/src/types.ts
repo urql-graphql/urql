@@ -18,23 +18,25 @@ export interface TypedDocumentNode<
   __apiType?: (variables: Variables) => Result;
 }
 
-export type ExecutionResult =
-  | {
-      errors?:
-        | Array<Partial<GraphQLError> | string | Error>
-        | readonly GraphQLError[];
-      data?: null | Record<string, any>;
-      extensions?: Record<string, any>;
-      hasNext?: boolean;
-    }
-  | {
-      errors?:
-        | Array<Partial<GraphQLError> | string | Error>
-        | readonly GraphQLError[];
-      data: any;
-      path: (string | number)[];
-      hasNext?: boolean;
-    };
+type ErrorLike = Partial<GraphQLError> | Error;
+type Extensions = Record<string, any>;
+
+export interface IncrementalPayload {
+  label?: string | null;
+  path: readonly (string | number)[];
+  data?: Record<string, unknown> | null;
+  items?: readonly unknown[] | null;
+  errors?: ErrorLike[] | readonly ErrorLike[];
+  extensions?: Extensions;
+}
+
+export interface ExecutionResult {
+  incremental?: IncrementalPayload[];
+  data?: null | Record<string, any>;
+  errors?: ErrorLike[] | readonly ErrorLike[];
+  extensions?: Extensions;
+  hasNext?: boolean;
+}
 
 export type PromisifiedSource<T = any> = Source<T> & {
   toPromise: () => Promise<T>;
