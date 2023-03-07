@@ -18,6 +18,7 @@ export const makeResult = (
     throw new Error('No Content');
   }
 
+  const defaultHasNext = operation.kind === 'subscription';
   return {
     operation,
     data: result.data,
@@ -29,7 +30,7 @@ export const makeResult = (
       : undefined,
     extensions:
       (typeof result.extensions === 'object' && result.extensions) || undefined,
-    hasNext: !!result.hasNext,
+    hasNext: result.hasNext == null ? defaultHasNext : result.hasNext,
   };
 };
 
