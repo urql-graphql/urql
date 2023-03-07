@@ -309,6 +309,37 @@ cacheExchange({
 });
 ```
 
+### Flexible Key Generation
+
+In some cases, you may want to create a pattern for your key generation. For instance, you may want
+to say "create a special key for every type ending in `'Node'`. In such a case we recommend creating
+a small JS `Proxy` to take care of key generation for you and making the keys functional.
+
+```js
+cacheExchange({
+  keys: new Proxy(
+    {
+      Image: () => null,
+    },
+    {
+      get(target, prop, receiver) {
+        if (prop.endsWith('Node')) {
+          return data => data.uid;
+        }
+        const fallback = data => data.uuid;
+        return target[prop] || fallback;
+      },
+    }
+  ),
+});
+```
+
+In the above example, we dynamically change the key generator depending on the typename. When
+a typename ends in `'Node'`, we return a key generator that uses the `uid` field. We still fall back
+to an object of manual key generation functions however. Lastly though, when a type doesn't have
+a predefined key generator, we change the default behavior from using `id` and `_id` fields to using
+`uuid` fields.
+
 ## Non-Automatic Relations and Updates
 
 While _Graphcache_ is able to store and update our entities in an in-memory relational data
