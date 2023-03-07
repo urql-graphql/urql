@@ -42,13 +42,13 @@ type ErrorLike = Partial<GraphQLError> | Error;
 type Extensions = Record<string, any>;
 
 /** Incremental Payloads sent as part of "Incremental Delivery" patching prior result data.
-  *
-  * @remarks
-  * "Incremental Delivery" works by allowing APIs to stream patches to the client, whih update
-  * prior results at the specified `path`.
-  *
-  * @see {@link https://github.com/graphql/graphql-spec/blob/94363c9/spec/Section%207%20--%20Response.md#incremental} for the incremental payload spec
-  */
+ *
+ * @remarks
+ * "Incremental Delivery" works by allowing APIs to stream patches to the client, whih update
+ * prior results at the specified `path`.
+ *
+ * @see {@link https://github.com/graphql/graphql-spec/blob/94363c9/spec/Section%207%20--%20Response.md#incremental} for the incremental payload spec
+ */
 export interface IncrementalPayload {
   /** Optional label for the incremental payload that corresponds to directives' labels.
    *
@@ -58,31 +58,31 @@ export interface IncrementalPayload {
    */
   label?: string | null;
   /** JSON patch at which to apply the `data` patch or append the `items`.
-    *
-    * @remarks
-    * The `path` indicates the JSON path of a prior result’s `data` structure at which
-    * to insert the patch’s data.
-    * When `items` is set instead, which represents a list of items to insert, the last
-    * entry of the `path` will be an index number at which to start setting the range of
-    * items.
-    */
+   *
+   * @remarks
+   * The `path` indicates the JSON path of a prior result’s `data` structure at which
+   * to insert the patch’s data.
+   * When `items` is set instead, which represents a list of items to insert, the last
+   * entry of the `path` will be an index number at which to start setting the range of
+   * items.
+   */
   path: readonly (string | number)[];
   /** Data to patch into the result data at the given `path`.
-    *
-    * @remarks
-    * This `data`, when set, is merged into the object at the given `path` of the last
-    * result that has been delivered.
-    * This isn't set when `items` is set.
-    */
+   *
+   * @remarks
+   * This `data`, when set, is merged into the object at the given `path` of the last
+   * result that has been delivered.
+   * This isn't set when `items` is set.
+   */
   data?: Record<string, unknown> | null;
   /** List of items to patch into the result data at the given `path`.
-    *
-    * @remarks
-    * The `items`, when provided, is set onto a range in an array, at the given JSON
-    * `path`. The start index is the last entry of the `path` and the end index is
-    * the length of the `items` list added to this index.
-    * This isn't set when `data` is set.
-    */
+   *
+   * @remarks
+   * The `items`, when provided, is set onto a range in an array, at the given JSON
+   * `path`. The start index is the last entry of the `path` and the end index is
+   * the length of the `items` list added to this index.
+   * This isn't set when `data` is set.
+   */
   items?: readonly unknown[] | null;
   /** Contains a list of errors raised by incremental payloads.
    *
