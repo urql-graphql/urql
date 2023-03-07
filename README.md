@@ -16,11 +16,8 @@
   <a href="https://www.npmjs.com/package/@urql/core">
     <img alt="Weekly downloads" src="https://badgen.net/npm/dw/@urql/core?color=blue" />
   </a>
-  <a href="https://formidable.com/open-source/urql/docs/">
-    <img alt="Visit docs" src="https://badgen.net/badge/docs/visit site/orange" />
-  </a>
-  <a href="https://github.com/urql-graphql/urql/discussions">
-    <img alt="GitHub Discussions: Chat With Us" src="https://badgen.net/badge/discussions/chat%20with%20us/purple" />
+  <a href="https://urql.dev/discord">
+    <img alt="Discord" src="https://img.shields.io/discord/1082378892523864074?color=7389D8&label&logo=discord&logoColor=ffffff" />
   </a>
   <br />
   <br />
