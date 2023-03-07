@@ -70,6 +70,8 @@ export const subscriptionExchange = ({
   const createSubscriptionSource = (
     operation: Operation
   ): Source<OperationResult> => {
+    const defaultHasNext = operation.kind === 'subscription';
+
     // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
     const observableish = forwardSubscription({
       key: operation.key.toString(36),
@@ -86,7 +88,11 @@ export const subscriptionExchange = ({
         if (isComplete) return;
 
         sub = observableish.subscribe({
-          next: result => next(makeResult(operation, result)),
+          next: result => {
+            // If `hasNext` isn't set, we assume it should be set to true
+            if (result.hasNext == null) result.hasNext = defaultHasNext;
+            return next(makeResult(operation, result));
+          },
           error: err => next(makeErrorResult(operation, err)),
           complete: () => {
             if (!isComplete) {
