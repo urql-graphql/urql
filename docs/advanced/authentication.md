@@ -59,100 +59,104 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    authExchange({
-      /* config */
+    authExchange(async utils => {
+      return {
+        /* config... */
+      };
     }),
     fetchExchange,
   ],
 });
 ```
 
+You pass an initialization function to the `authExchange`. This function is called by the exchange
+when it first initializes. It'll let you receive an object of utilities and you must return
+a (promisified) object of configuration options.
+
 Let's discuss each of the [configuration options](../api/auth-exchange.md#options) and how to use them in turn.
 
-### Configuring `getAuth` (initial load, fetch from storage)
+### Configuring the initializer function (initial load)
 
-The `getAuth` option is used to fetch the auth state. This is how to configure it for fetching the tokens at initial launch in React:
+The initializer function must return a promise of a configuration object and hence also gives you an
+opportunity to fetch your authentication state from storage.
 
 ```js
-const getAuth = async ({ authState }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
+authExchange(async utils => {
+  let token = localStorage.getItem('token');
+  let refreshToken = localStorage.getItem('refreshToken');
 
-  return null;
-};
+  return {
+    /* config... */
+  };
+});
 ```
 
-We check that the `authState` doesn't already exist (this indicates that it is the first time this exchange is executed and not an auth failure) and fetch the auth state from
-storage. The structure of this particular `authState` is an object with keys for `token` and
-`refreshToken`, but this format is not required. We can use different keys or store any additional
-auth related information here. For example, we could decode and store the token expiry date, which
-would save us from decoding the JWT every time we want to check whether it has expired.
+The first step here is to retrieve our tokens from a kind of storage, which may be asynchronous as
+well.
 
-In React Native, this is very similar, but because persisted storage in React Native is always asynchronous, so is this function:
+In React Native, this is very similar, but because persisted storage in React Native is always
+asynchronous and promisified, we'll need to await our tokens:
 
 ```js
-const getAuth = async ({ authState, mutate }) => {
-  if (!authState) {
-    const token = await AsyncStorage.getItem(TOKEN_KEY, {});
-    const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY, {});
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
+authExchange(async utils => {
+  let token = await AsyncStorage.getItem(TOKEN_KEY);
+  let refreshToken = await AyncStorage.getItem(REFRESH_KEY);
 
-  return null;
-};
+  return {
+    /* config... */
+  };
+});
 ```
 
 ### Configuring `addAuthToOperation`
 
-The purpose of `addAuthToOperation` is to apply an auth state to each request. Note that the format
-of the `authState` will be whatever we've returned from `getAuth` and not constrained by the exchange:
+The purpose of `addAuthToOperation` is to apply an auth state to each request. Here, we'll use the
+tokens we retrieved from storage and add them to our operations.
+
+In this example, we're using a utility we're passed, `appendHeaders`. This utility is a simply
+shortcut to quickly add HTTP headers via `fetchOptions` to an `Operation`, however, we may as well
+be editing the `Operation` context here using `makeOperation`.
+
+```js
+authExchange(async utils => {
+  let token = await AsyncStorage.getItem(TOKEN_KEY);
+  let refreshToken = await AyncStorage.getItem(REFRESH_KEY);
+
+  return {
+    addAuthToOperation(operation) {
+      if (!token) return operation;
+      return utils.appendHeaders(operation, {
+        Authorization: `Bearer ${token}`,
+      });
+    },
+    // ...
+  };
+});
+```
+
+First, we check that we have a non-null `token`. Then we apply it to the request using the
+`appendHeaders` utility as an `Authorization` header.
+
+We could also be using `makeOperation` here to update the context in any other way, such as:
 
 ```js
 import { makeOperation } from '@urql/core';
 
-const addAuthToOperation = ({ authState, operation }) => {
-  if (!authState || !authState.token) {
-    return operation;
-  }
-
-  const fetchOptions =
-    typeof operation.context.fetchOptions === 'function'
-      ? operation.context.fetchOptions()
-      : operation.context.fetchOptions || {};
-
-  return makeOperation(operation.kind, operation, {
-    ...operation.context,
-    fetchOptions: {
-      ...fetchOptions,
-      headers: {
-        ...fetchOptions.headers,
-        Authorization: authState.token,
-      },
-    },
-  });
-};
+makeOperation(operation.kind, operation, {
+  ...operation.context,
+  someAuthThing: token,
+});
 ```
-
-First, we check that we have an `authState` and a `token`. Then we apply it to the request
-`fetchOptions` as an `Authorization` header. The header format can vary based on the API (e.g. using
-`Bearer ${token}` instead of just `token`) which is why it'll be up to us to add the header
-in the expected format for our API.
 
 ### Configuring `didAuthError`
 
-This function lets the exchange know what is defined to be an API error for your API. `didAuthError` receives an `error` which is of type
-[`CombinedError`](../api/core.md#combinederror), and we can use the `graphQLErrors` array in `CombinedError` to determine if an auth error has occurred.
+This function lets the `authExchange` know what is defined to be an API error for your API.
+`didAuthError` is called by `authExchange` when it receives an `error` on an `OperationResult`, which
+is of type [`CombinedError`](../api/core.md#combinederror).
 
-The GraphQL error looks like something like this:
+We can for example check the error's `graphQLErrors` array in `CombinedError` to determine if an auth
+error has occurred. While your API may implement this differently, an authentication error on an
+execution result may look a little like this if your API uses `extensions.code` on errors:
 
 ```js
 {
@@ -163,72 +167,59 @@ The GraphQL error looks like something like this:
       extensions: {
         code: 'FORBIDDEN'
       },
-      response: {
-        status: 200
-      }
     }
   ]
 }
 ```
 
-Most GraphQL APIs will communicate auth errors via the [error code
-extension](https://www.apollographql.com/docs/apollo-server/data/errors/#codes), which
-is the recommended approach. We'll be able to determine whether any of the GraphQL errors were due
+If you're building a new API, using `extensions` on errors is the recommended approach to add
+metadata to your errors. We'll be able to determine whether any of the GraphQL errors were due
 to an unauthorized error code, which would indicate an auth failure:
 
 ```js
-const didAuthError = ({ error }) => {
-  return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
-};
+authExchange(async utils => {
+  // ...
+  return {
+    // ...
+    didAuthError(error, _operation) {
+      return error.graphQLErrors.some(e => e.extensions?.code === 'FORBIDDEN');
+    },
+  };
+});
 ```
 
-For some GraphQL APIs, the auth error is communicated via an 401 HTTP response as is common in RESTful APIs:
+For some GraphQL APIs, the authentication error is only communicated via a 401 HTTP status as is
+common in RESTful APIs, which is suboptimal, but which we can still write a check for.
 
 ```js
-{
-  data: null,
-  errors: [
-    {
-      message: 'Unauthorized: Token has expired',
-      response: {
-        status: 401
-      }
-    }
-  ]
-}
+authExchange(async utils => {
+  // ...
+  return {
+    // ...
+    didAuthError(error, _operation) {
+      return error.response.status === 401;
+    },
+  };
+});
 ```
 
-In this case we can determine the auth error based on the status code of the request:
+If `didAuthError` returns `true`, it will trigger the `authExchange` to trigger the logic for asking
+for re-authentication via `refreshAuth`.
 
-```js
-const didAuthError = ({ error }) => {
-  return error.graphQLErrors.some(
-    e => e.response.status === 401,
-  );
-},
-```
-
-If `didAuthError` returns `true`, it will trigger the exchange to trigger the logic for asking for re-authentication via `getAuth`.
-
-### Configuring `getAuth` (triggered after an auth error has occurred)
+### Configuring `refershAuth` (triggered after an auth error has occurred)
 
 If the API doesn't support any sort of token refresh, this is where we could simply log the user out.
 
 ```js
-const getAuth = async ({ authState }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
-
-  logout();
-
-  return null;
-};
+authExchange(async utils => {
+  // ...
+  return {
+    // ...
+    async refreshAuth() {
+      logout();
+    },
+  };
+});
 ```
 
 Here, `logout()` is a placeholder that is called when we got an error, so that we can redirect to a
@@ -238,92 +229,105 @@ If we had a way to refresh our token using a refresh token, we can attempt to ge
 user first:
 
 ```js
-const getAuth = async ({ authState, mutate }) => {
-  if (!authState) {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token && refreshToken) {
-      return { token, refreshToken };
-    }
-    return null;
-  }
+authExchange(async utils => {
+  let token = localStorage.getItem('token');
+  let refreshToken = localStorage.getItem('refreshToken');
 
-  const result = await mutate(refreshMutation, {
-    token: authState!.refreshToken,
-  });
+  return {
+    // ...
+    async refreshAuth() {
+      const result = await utils.mutate(REFRESH, { refreshToken });
 
-  if (result.data?.refreshLogin) {
-    localStorage.setItem('token', result.data.refreshLogin.token);
-    localStorage.setItem('refreshToken', result.data.refreshLogin.refreshToken);
-
-    return {
-      token: result.data.refreshLogin.token,
-      refreshToken: result.data.refreshLogin.refreshToken,
-    };
-  }
-
-  // This is where auth has gone wrong and we need to clean up and redirect to a login page
-  localStorage.clear();
-  logout();
-
-  return null;
-}
+      if (result.data?.refreshLogin) {
+        // Update our local variables and write to our storage
+        token = result.data.refreshLogin.token;
+        refreshToken = result.data.refreshLogin.refreshToken;
+        localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
+      } else {
+        // This is where auth has gone wrong and we need to clean up and redirect to a login page
+        localStorage.clear();
+        logout();
+      }
+    },
+  };
+});
 ```
 
-Here we use the special mutate function provided by the auth exchange to do the token refresh. If your auth is not handled via GraphQL but a REST endpoint, you can
-use `fetch` in this function instead of a mutation. All other requests will be paused while `getAuth` returns, so we never have to handle multiple auth failures
-at the same time.
+Here we use the special `mutate` utility method provided by the `authExchange` to do the token
+refresh. This is a useful method to use if your GraphQL API expects you to make a GraphQL mutation
+to update your authentication state. It will send the mutation and bypass all authentication and
+prior exchanges.
+
+If your authentication is not handled via GraphQL but a REST endpoint, you can use the `fetch` API
+here however instead of a mutation.
+
+All other requests will be paused while `refreshAuth` runs, so we won't have to deal with multiple
+authentication errors or refreshes at once.
 
 ### Configuring `willAuthError`
 
-`willAuthError` is an optional parameter and is run _before_ a network request is made. We can use it to trigger the logic in
-`getAuth` without the need to send a request and get a GraphQL Error back. For example, we can use this to predict that the authentication will fail because our JWT is invalid already:
+`willAuthError` is an optional parameter and is run _before_ a request is made.
+
+We can use it to trigger an authentication error and let the `authExchange` run our `refreshAuth`
+function without the need to first let a request fail with an authentication error. For example, we
+can use this to predict an authentication error, for instance, because of expired JWT tokens.
 
 ```js
-const willAuthError = ({ authState }) => {
-  if (!authState || /* JWT is expired */) return true;
-  return false;
-}
+authExchange(async utils => {
+  // ...
+  return {
+    // ...
+    willAuthError(_operation) {
+      // Check whether `token` JWT is expired
+      return false;
+    },
+  };
+});
 ```
 
 This can be really useful when we know when our authentication state is invalid and want to prevent
-even sending any operation that we know will fail with an authentication error. However, if we were
-to use this and are logging in our users with a login _mutation_ then the above code will
-unfortunately never let this login mutation through to our GraphQL API.
+even sending any operation that we know will fail with an authentication error.
 
-If we have such a mutation we may need to write a more sophisticated `willAuthError` function like
-the following:
+However, we have to be careful on how we define this function, if some queries or login mutations
+are sent to our API without being logged in. In these cases, it's better to either detect the
+mutations we'd like to allow or return `false` when a token isn't set in storage yet.
+
+If we'd like to detect a mutation that will never fail with an authentication error, we could for
+instance write the following logic:
 
 ```js
-const willAuthError = ({ operation, authState }) => {
-  if (!authState) {
-    // Detect our login mutation and let this operation through:
-    return !(
-      operation.kind === 'mutation' &&
-      // Here we find any mutation definition with the "login" field
-      operation.query.definitions.some(definition => {
-        return (
-          definition.kind === 'OperationDefinition' &&
-          definition.selectionSet.selections.some(node => {
-            // The field name is just an example, since signup may also be an exception
-            return node.kind === 'Field' && node.name.value === 'login';
-          })
-        );
-      })
-    );
-  } else if (false /* JWT is expired */) {
-    return true;
-  }
-
-  return false;
-};
+authExchange(async utils => {
+  // ...
+  return {
+    // ...
+    willAuthError(operation) {
+      if (
+        operation.kind === 'mutation' &&
+        // Here we find any mutation definition with the "login" field
+        operation.query.definitions.some(definition => {
+          return (
+            definition.kind === 'OperationDefinition' &&
+            definition.selectionSet.selections.some(node => {
+              // The field name is just an example, since signup may also be an exception
+              return node.kind === 'Field' && node.name.value === 'login';
+            })
+          );
+        })
+      ) {
+        return false;
+      } else if (false /* is JWT expired? */) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  };
+});
 ```
 
-Alternatively, you may decide to let all operations through if `authState` isn't defined or to allow
-all mutations through. In an application that allows unauthenticated users to perform various
-actions, it's a good idea for us to return `false` when `!authState` applies.
-
-[Read more about `@urql/exchange-auth`'s API in our API docs.](../api/auth-exchange.md)
+Alternatively, you may decide to let all operations through if your token isn't set in storage, i.e.
+if you have no prior authentication state.
 
 ## Handling Logout by reacting to Errors
 
@@ -348,8 +352,10 @@ const client = createClient({
         }
       },
     }),
-    authExchange({
-      /* config */
+    authExchange(async utils => {
+      return {
+        /* config */
+      };
     }),
     fetchExchange,
   ],
@@ -365,7 +371,9 @@ logged out.
 
 ## Cache Invalidation on Logout
 
-If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to ensure that the `Client` is reinitialized whenever the authentication state changes. Here's an example of how we may do this in React if necessary:
+If we're dealing with multiple authentication states at the same time, e.g. logouts, we need to
+ensure that the `Client` is reinitialized whenever the authentication state changes.
+Here's an example of how we may do this in React if necessary:
 
 ```jsx
 import { createClient, Provider } from 'urql';
@@ -391,11 +399,14 @@ const App = ({ isLoggedIn }: { isLoggedIn: boolean | null }) => {
 }
 ```
 
-When the application launches, the first thing we do is check whether the user has any auth tokens in persisted storage. This will tell us
-whether to show the user the logged in or logged out view.
+When the application launches, the first thing we do is check whether the user has any authentication
+tokens in persisted storage. This will tell us whether to show the user the logged in or logged out view.
 
 The `isLoggedIn` prop should always be updated based on authentication state change. For instance, we may set it to
 `true` after the user has authenticated and their tokens have been added to storage, and set it to
 `false` once the user has been logged out and their tokens have been cleared. It's important to clear
 or add tokens to a storage _before_ updating the prop in order for the auth exchange to work
 correctly.
+
+This pattern of creating a new `Client` when changing authentication states is especially useful
+since it will also recreate our client-side cache and invalidate all cached data.
