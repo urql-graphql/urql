@@ -12,119 +12,128 @@ import {
 } from 'wonka';
 
 import {
+  createRequest,
+  makeOperation,
   Operation,
   OperationContext,
   OperationResult,
   CombinedError,
   Exchange,
-  createRequest,
-  makeOperation,
   TypedDocumentNode,
+  AnyVariables,
 } from '@urql/core';
 
 import { DocumentNode } from 'graphql';
 
-export interface AuthConfig<T> {
+export interface AuthUtilities {
+  /** The mutate() method may be used to send one-off mutations to the GraphQL API for the purpose of authentication. */
+  mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
+    query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
+    variables: Variables,
+    context?: Partial<OperationContext>
+  ): Promise<OperationResult<Data>>;
+}
+
+export interface AuthConfig {
   /** addAuthToOperation() must be provided to add the custom `authState` to an Operation's context, so that it may be picked up by the `fetchExchange`. */
-  addAuthToOperation(params: {
-    authState: T | null;
-    operation: Operation;
-  }): Operation;
+  addAuthToOperation(operation: Operation): Operation;
 
   /** didAuthError() may be provided to tweak the detection of an authentication error that this exchange should handle. */
-  didAuthError?(params: { error: CombinedError; authState: T | null }): boolean;
+  didAuthError?(error: CombinedError, operation: Operation): boolean;
 
   /** willAuthError() may be provided to detect a potential operation that'll receive authentication error so that getAuth() can be run proactively. */
-  willAuthError?(params: {
-    authState: T | null;
-    operation: Operation;
-  }): boolean;
+  willAuthError?(operation: Operation): boolean;
 
   /** getAuth() handles how the application refreshes or reauthenticates given a stale `authState` and should return a new `authState` or `null`. */
-  getAuth(params: {
-    authState: T | null;
-    /** The mutate() method may be used to send one-off mutations to the GraphQL API for the purpose of authentication. */
-    mutate<Data = any, Variables extends object = {}>(
-      query: DocumentNode | TypedDocumentNode<Data, Variables> | string,
-      variables?: Variables,
-      context?: Partial<OperationContext>
-    ): Promise<OperationResult<Data>>;
-  }): Promise<T | null>;
+  refreshAuth(): Promise<void>;
 }
 
 const addAuthAttemptToOperation = (
   operation: Operation,
-  hasAttempted: boolean
+  authAttempt: boolean
 ) =>
   makeOperation(operation.kind, operation, {
     ...operation.context,
-    authAttempt: hasAttempted,
+    authAttempt,
   });
 
-export function authExchange<T>({
-  addAuthToOperation,
-  getAuth,
-  didAuthError,
-  willAuthError,
-}: AuthConfig<T>): Exchange {
+export function authExchange(
+  init: (utilities: AuthUtilities) => Promise<AuthConfig>
+): Exchange {
   return ({ client, forward }) => {
     const bypassQueue: WeakSet<Operation> = new WeakSet();
-    const retryQueue: Map<number, Operation> = new Map();
+    const retryQueue = new Map<number, Operation>();
+    const retries = makeSubject<Operation>();
 
-    const {
-      source: retrySource$,
-      next: retryOperation,
-    } = makeSubject<Operation>();
+    function flushQueue(_config?: AuthConfig | undefined) {
+      authPromise = undefined;
+      retryQueue.forEach(retries.next);
+      retryQueue.clear();
+      if (_config) config = _config;
+    }
 
-    let authState: T | null = null;
+    let authPromise: Promise<void> | void;
+    let config: AuthConfig | null = null;
 
     return operations$ => {
-      function mutate<Data = any, Variables extends object = {}>(
-        query: DocumentNode | string,
-        variables?: Variables,
-        context?: Partial<OperationContext>
-      ): Promise<OperationResult<Data>> {
-        const operation = client.createRequestOperation(
-          'mutation',
-          createRequest(query, variables),
-          context
-        );
+      authPromise = init({
+        mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
+          query: DocumentNode | string,
+          variables: Variables,
+          context?: Partial<OperationContext>
+        ): Promise<OperationResult<Data>> {
+          const operation = client.createRequestOperation(
+            'mutation',
+            createRequest(query, variables),
+            context
+          );
 
-        return pipe(
-          result$,
-          onStart(() => {
-            bypassQueue.add(operation);
-            retryOperation(operation);
-          }),
-          filter(result => result.operation.key === operation.key),
-          take(1),
-          toPromise
-        );
-      }
+          return pipe(
+            result$,
+            onStart(() => {
+              bypassQueue.add(operation);
+              retries.next(operation);
+            }),
+            filter(result => result.operation.key === operation.key),
+            take(1),
+            toPromise
+          );
+        },
+      }).then(flushQueue);
 
-      const updateAuthState = (newAuthState: T | null) => {
-        authState = newAuthState;
-        authPromise = undefined;
-        retryQueue.forEach(retryOperation);
-        retryQueue.clear();
-      };
-
-      let authPromise: Promise<any> | void = Promise.resolve()
-        .then(() => getAuth({ authState, mutate }))
-        .then(updateAuthState);
-
-      const refreshAuth = (operation: Operation): void => {
+      function refreshAuth(operation: Operation) {
         // add to retry queue to try again later
         operation = addAuthAttemptToOperation(operation, true);
         retryQueue.set(operation.key, operation);
-
         // check that another operation isn't already doing refresh
-        if (!authPromise) {
-          authPromise = getAuth({ authState, mutate })
-            .then(updateAuthState)
-            .catch(() => updateAuthState(null));
+        if (config && !authPromise) {
+          authPromise = config.refreshAuth().finally(flushQueue);
         }
-      };
+      }
+
+      function willAuthError(operation: Operation) {
+        return (
+          config &&
+          !authPromise &&
+          config.willAuthError &&
+          config.willAuthError(operation)
+        );
+      }
+
+      function didAuthError(result: OperationResult) {
+        return (
+          config &&
+          !authPromise &&
+          config.didAuthError &&
+          config.didAuthError(result.error!, result.operation)
+        );
+      }
+
+      function addAuthToOperation(operation: Operation) {
+        return config && !authPromise
+          ? config.addAuthToOperation(operation)
+          : operation;
+      }
 
       const sharedOps$ = pipe(operations$, share);
 
@@ -143,28 +152,22 @@ export function authExchange<T>({
       );
 
       const opsWithAuth$ = pipe(
-        merge([retrySource$, pendingOps$]),
+        merge([retries.source, pendingOps$]),
         map(operation => {
           if (bypassQueue.has(operation)) {
             return operation;
           } else if (authPromise) {
-            operation = addAuthAttemptToOperation(operation, false);
             retryQueue.set(
               operation.key,
               addAuthAttemptToOperation(operation, false)
             );
             return null;
-          } else if (
-            !operation.context.authAttempt &&
-            willAuthError &&
-            willAuthError({ operation, authState })
-          ) {
+          } else if (!operation.context.authAttempt && willAuthError(operation)) {
             refreshAuth(operation);
             return null;
           }
 
-          operation = addAuthAttemptToOperation(operation, false);
-          return addAuthToOperation({ operation, authState });
+          return addAuthToOperation(addAuthAttemptToOperation(operation, false));
         }),
         filter(Boolean)
       ) as Source<Operation>;
@@ -173,12 +176,14 @@ export function authExchange<T>({
 
       return pipe(
         result$,
-        filter(({ error, operation }) => {
-          if (error && didAuthError && didAuthError({ error, authState })) {
-            if (!operation.context.authAttempt) {
-              refreshAuth(operation);
-              return false;
-            }
+        filter(result => {
+          if (
+            result.error &&
+            didAuthError(result) &&
+            !result.operation.context.authAttempt
+          ) {
+            refreshAuth(result.operation);
+            return false;
           }
 
           return true;
