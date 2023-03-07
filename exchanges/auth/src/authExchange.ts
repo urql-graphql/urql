@@ -217,46 +217,52 @@ export function authExchange(
     let config: AuthConfig | null = null;
 
     return operations$ => {
-      authPromise = init({
-        mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
-          query: DocumentNode | string,
-          variables: Variables,
-          context?: Partial<OperationContext>
-        ): Promise<OperationResult<Data>> {
-          const operation = client.createRequestOperation(
-            'mutation',
-            createRequest(query, variables),
-            context
-          );
-
-          return pipe(
-            result$,
-            onStart(() => {
-              bypassQueue.add(operation);
-              retries.next(operation);
-            }),
-            filter(result => result.operation.key === operation.key),
-            take(1),
-            toPromise
-          );
-        },
-        appendHeaders(operation: Operation, headers: Record<string, string>) {
-          const fetchOptions =
-            typeof operation.context.fetchOptions === 'function'
-              ? operation.context.fetchOptions()
-              : operation.context.fetchOptions || {};
-          return makeOperation(operation.kind, operation, {
-            ...operation.context,
-            fetchOptions: {
-              ...fetchOptions,
-              headers: {
-                ...fetchOptions.headers,
-                ...headers,
-              },
+      authPromise = Promise.resolve()
+        .then(() =>
+          init({
+            mutate<Data = any, Variables extends AnyVariables = AnyVariables>(
+              query: DocumentNode | string,
+              variables: Variables,
+              context?: Partial<OperationContext>
+            ): Promise<OperationResult<Data>> {
+              const operation = client.createRequestOperation(
+                'mutation',
+                createRequest(query, variables),
+                context
+              );
+              return pipe(
+                result$,
+                onStart(() => {
+                  bypassQueue.add(operation);
+                  retries.next(operation);
+                }),
+                filter(result => result.operation.key === operation.key),
+                take(1),
+                toPromise
+              );
             },
-          });
-        },
-      }).then(flushQueue);
+            appendHeaders(
+              operation: Operation,
+              headers: Record<string, string>
+            ) {
+              const fetchOptions =
+                typeof operation.context.fetchOptions === 'function'
+                  ? operation.context.fetchOptions()
+                  : operation.context.fetchOptions || {};
+              return makeOperation(operation.kind, operation, {
+                ...operation.context,
+                fetchOptions: {
+                  ...fetchOptions,
+                  headers: {
+                    ...fetchOptions.headers,
+                    ...headers,
+                  },
+                },
+              });
+            },
+          })
+        )
+        .then(flushQueue);
 
       function refreshAuth(operation: Operation) {
         // add to retry queue to try again later
