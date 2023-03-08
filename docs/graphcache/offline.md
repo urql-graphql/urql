@@ -125,8 +125,7 @@ While the client is offline, _Graphcache_ will also apply some opinionated mecha
 mutations.
 
 When a query fails with a Network Error, which indicates that the client is
-offline — either because `navigator.onLine` is `false` or because the error message indicates an
-offline error — the `offlineExchange` won't deliver the error for this query to avoid it from being
+offline the `offlineExchange` won't deliver the error for this query to avoid it from being
 surfaced to the user. This works particularly well in combination with ["Schema
 Awareness"](./schema-awareness.md) which will deliver as much of a partial query result as possible.
 In combination with the [`cache-and-network` request policy](../basics/document-caching.md#request-policies)
@@ -137,6 +136,22 @@ A similar mechanism is applied to optimistic mutations when the user is offline.
 non-optimistic mutations are executed as usual and may fail with a network error. Optimistic
 mutations however will be queued up and may be retried when the app is restarted or when the user
 comes back online.
+
+If we wish to customize when an operation result from the API is deemed an operation that has failed
+because the device is offline, we can pass a custom `isOfflineError` function to the
+`offlineExchange`, like so:
+
+```js
+const cache = offlineExchange({
+  isOfflineError(error, _result) {
+    return !!error.networkError;
+  },
+  // ...
+});
+```
+
+However, this is optional, and the default function checks for common offline error messages and
+checks `navigator.onLine` for you.
 
 ## Custom Storages
 
