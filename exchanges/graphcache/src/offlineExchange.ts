@@ -185,7 +185,10 @@ export const offlineExchange = <C extends OfflineExchangeOpts>(
       return pipe(
         cacheResults$(opsAndRebound$),
         filter(res => {
-          if (res.operation.kind === 'query' && isOfflineError(res.error)) {
+          if (
+            res.operation.kind === 'query' &&
+            isOfflineError(res.error, res)
+          ) {
             next(toRequestPolicy(res.operation, 'cache-only'));
             failedQueue.push(res.operation);
             return false;
