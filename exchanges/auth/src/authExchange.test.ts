@@ -355,6 +355,11 @@ it('calls willAuthError on queued operations', async () => {
   expect(operations.length).toBe(2);
   expect(operations[0]).toHaveProperty(
     'context.fetchOptions.headers.Authorization',
-    'token'
+    'final-token'
+  );
+
+  expect(operations[1]).toHaveProperty(
+    'context.fetchOptions.headers.Authorization',
+    'final-token'
   );
 });
