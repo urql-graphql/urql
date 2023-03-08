@@ -225,7 +225,7 @@ export function authExchange(
               variables: Variables,
               context?: Partial<OperationContext>
             ): Promise<OperationResult<Data>> {
-              const operation = client.createRequestOperation(
+              const baseOperation = client.createRequestOperation(
                 'mutation',
                 createRequest(query, variables),
                 context
@@ -233,10 +233,11 @@ export function authExchange(
               return pipe(
                 result$,
                 onStart(() => {
+                  const operation = addAuthToOperation(baseOperation);
                   bypassQueue.add(operation);
                   retries.next(operation);
                 }),
-                filter(result => result.operation.key === operation.key),
+                filter(result => result.operation.key === baseOperation.key),
                 take(1),
                 toPromise
               );
