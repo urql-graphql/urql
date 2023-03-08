@@ -57,13 +57,7 @@ const isOptimisticMutation = <T extends OptimisticMutationConfig>(
 };
 
 const isOfflineError = (error: undefined | CombinedError) =>
-  error &&
-  error.networkError &&
-  !error.response &&
-  ((typeof navigator !== 'undefined' && navigator.onLine === false) ||
-    /request failed|failed to fetch|network\s?error/i.test(
-      error.networkError.message
-    ));
+  !!error?.networkError;
 
 export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
   opts: C
