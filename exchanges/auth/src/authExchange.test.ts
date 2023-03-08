@@ -6,6 +6,7 @@ import {
   take,
   makeSubject,
   publish,
+  scan,
   tap,
   map,
 } from 'wonka';
@@ -111,15 +112,17 @@ it('adds the auth header correctly when intialized asynchronously', async () => 
   });
 });
 
-it('supports calls to the mutate() method in getAuth()', async () => {
+it('supports calls to the mutate() method in refreshAuth()', async () => {
   const { exchangeArgs } = makeExchangeArgs();
 
-  const res = await pipe(
+  const willAuthError = vi
+    .fn()
+    .mockReturnValueOnce(true)
+    .mockReturnValue(false);
+
+  const [mutateRes, res] = await pipe(
     fromValue(queryOperation),
     authExchange(async utils => {
-      const result = await utils.mutate('mutation { auth }', undefined);
-      expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
-
       const token = 'async-token';
 
       return {
@@ -128,19 +131,28 @@ it('supports calls to the mutate() method in getAuth()', async () => {
             Authorization: token,
           });
         },
+        willAuthError,
         didAuthError: () => false,
         async refreshAuth() {
-          /*noop*/
+          const result = await utils.mutate('mutation { auth }', undefined);
+          expect(print(result.operation.query)).toBe('mutation {\n  auth\n}');
         },
       };
     })(exchangeArgs),
     take(2),
+    scan((acc, res) => [...acc, res], [] as OperationResult[]),
     toPromise
   );
 
+  expect(mutateRes.operation.context.fetchOptions).toEqual({
+    headers: {
+      Authorization: 'async-token',
+    },
+  });
+
   expect(res.operation.context.authAttempt).toBe(false);
   expect(res.operation.context.fetchOptions).toEqual({
-    ...(queryOperation.context.fetchOptions || {}),
+    method: 'POST',
     headers: {
       Authorization: 'async-token',
     },
