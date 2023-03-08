@@ -3,6 +3,7 @@ import { print, SelectionNode } from 'graphql';
 
 import {
   Operation,
+  OperationResult,
   Exchange,
   ExchangeIO,
   CombinedError,
@@ -56,13 +57,29 @@ const isOptimisticMutation = <T extends OptimisticMutationConfig>(
   return false;
 };
 
-const isOfflineError = (error: undefined | CombinedError) =>
-  !!error?.networkError;
+export interface OfflineExchangeOpts extends CacheExchangeOpts {
+  isOfflineError?(
+    error: undefined | CombinedError,
+    result: OperationResult
+  ): boolean;
+}
 
-export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
+export const offlineExchange = <C extends OfflineExchangeOpts>(
   opts: C
 ): Exchange => input => {
   const { storage } = opts;
+
+  const isOfflineError =
+    opts.isOfflineError ||
+    ((error: undefined | CombinedError) =>
+      error &&
+      error.networkError &&
+      !error.response &&
+      ((typeof navigator !== 'undefined' && navigator.onLine === false) ||
+        /request failed|failed to fetch|network\s?error/i.test(
+          error.networkError.message
+        )));
+
   if (
     storage &&
     storage.onOnline &&
@@ -115,7 +132,7 @@ export const offlineExchange = <C extends Partial<CacheExchangeOpts>>(
         filter(res => {
           if (
             res.operation.kind === 'mutation' &&
-            isOfflineError(res.error) &&
+            isOfflineError(res.error, res) &&
             isOptimisticMutation(optimisticMutations, res.operation)
           ) {
             failedQueue.push(res.operation);
