@@ -203,14 +203,16 @@ export function authExchange(
 ): Exchange {
   return ({ client, forward }) => {
     const bypassQueue = new WeakSet<Operation>();
-    const retryQueue = new Map<number, Operation>();
     const retries = makeSubject<Operation>();
+
+    let retryQueue = new Map<number, Operation>();
 
     function flushQueue(_config?: AuthConfig | undefined) {
       if (_config) config = _config;
       authPromise = undefined;
-      retryQueue.forEach(retries.next);
-      retryQueue.clear();
+      const queue = retryQueue;
+      retryQueue = new Map();
+      queue.forEach(retries.next);
     }
 
     let authPromise: Promise<void> | void;
@@ -267,8 +269,10 @@ export function authExchange(
 
       function refreshAuth(operation: Operation) {
         // add to retry queue to try again later
-        operation = addAuthAttemptToOperation(operation, true);
-        retryQueue.set(operation.key, operation);
+        retryQueue.set(
+          operation.key,
+          addAuthAttemptToOperation(operation, true)
+        );
         // check that another operation isn't already doing refresh
         if (config && !authPromise) {
           authPromise = config.refreshAuth().finally(flushQueue);
