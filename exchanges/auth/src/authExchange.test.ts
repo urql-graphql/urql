@@ -307,7 +307,10 @@ it('calls willAuthError on queued operations', async () => {
 
   let initialAuthResolve: ((_?: any) => void) | undefined;
 
-  const willAuthError = vi.fn().mockReturnValue(false);
+  const willAuthError = vi
+    .fn()
+    .mockReturnValueOnce(true)
+    .mockReturnValue(false);
 
   pipe(
     source,
@@ -335,7 +338,9 @@ it('calls willAuthError on queued operations', async () => {
 
   await Promise.resolve();
 
-  next(queryOperation);
+  next({ ...queryOperation, key: 1 });
+  next({ ...queryOperation, key: 2 });
+
   expect(result).toHaveBeenCalledTimes(0);
   expect(willAuthError).toHaveBeenCalledTimes(0);
 
@@ -344,10 +349,10 @@ it('calls willAuthError on queued operations', async () => {
 
   await new Promise(resolve => setTimeout(resolve));
 
-  expect(willAuthError).toHaveBeenCalledTimes(1);
-  expect(result).toHaveBeenCalledTimes(1);
+  expect(willAuthError).toHaveBeenCalledTimes(2);
+  expect(result).toHaveBeenCalledTimes(2);
 
-  expect(operations.length).toBe(1);
+  expect(operations.length).toBe(2);
   expect(operations[0]).toHaveProperty(
     'context.fetchOptions.headers.Authorization',
     'token'
