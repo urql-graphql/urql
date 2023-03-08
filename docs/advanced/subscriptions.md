@@ -200,7 +200,7 @@ In the following example, we create a subscription that informs us of new messag
   <p>No new messages</p>
 {:else}
   <ul>
-    {#each $messages.data as message}
+    {#each $messages.data.newMessages as message}
       <li>{message.from}: "{message.text}"</li>
     {/each}
   </ul>
@@ -208,11 +208,12 @@ In the following example, we create a subscription that informs us of new messag
 
 ```
 
-As we can see, the `$messages.data` is being updated and transformed by the `handleSubscription`
-function. This works over time, so as new messages come in, we will append them to
+As we can see, `$messages.data` is being updated and transformed by the `$messages` subscriptionStore. This works over time, so as new messages come in, we will append them to
 the list of previous messages.
 
-[Read more about the `subscription` API in the API docs for it.](../api/svelte.md#subscription)
+`subscriptionStore` optionally accepts a second argument, a handler function, allowing custom update behavior from the subscription.
+
+[Read more about the `subscription` API in the API docs for it.](../api/svelte.md#subscriptionstore)
 
 ## Vue
 
