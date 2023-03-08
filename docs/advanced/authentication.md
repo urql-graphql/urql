@@ -81,10 +81,14 @@ The initializer function must return a promise of a configuration object and hen
 opportunity to fetch your authentication state from storage.
 
 ```js
-authExchange(async utils => {
-  let token = localStorage.getItem('token');
-  let refreshToken = localStorage.getItem('refreshToken');
+async function initializeAuthState() {
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+  return { token, refreshToken };
+}
 
+authExchange(async utils => {
+  let { token, refreshToken } = initializeAuthState();
   return {
     /* config... */
   };
@@ -92,16 +96,21 @@ authExchange(async utils => {
 ```
 
 The first step here is to retrieve our tokens from a kind of storage, which may be asynchronous as
-well.
+well, as illustrated by `initializeAuthState`.
 
 In React Native, this is very similar, but because persisted storage in React Native is always
-asynchronous and promisified, we'll need to await our tokens:
+asynchronous and promisified, we would await our tokens. This works because the
+function that `authExchange` is async, i.e. must return a `Promise`.
 
 ```js
-authExchange(async utils => {
-  let token = await AsyncStorage.getItem(TOKEN_KEY);
-  let refreshToken = await AyncStorage.getItem(REFRESH_KEY);
+async function initializeAuthState() {
+  const token = await AsyncStorage.getItem(TOKEN_KEY);
+  const refreshToken = await AyncStorage.getItem(REFRESH_KEY);
+  return { token, refreshToken };
+}
 
+authExchange(async utils => {
+  let { token, refreshToken } = initializeAuthState();
   return {
     /* config... */
   };
