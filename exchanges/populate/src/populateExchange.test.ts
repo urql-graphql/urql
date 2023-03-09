@@ -79,10 +79,16 @@ const schemaDef = `
     store: OnlineStore
   }
 
+  type Company {
+    id: String
+    employees: [User]
+  }
+
   type Query {
     todos: [Todo!]
     users: [User!]!
     products: [Product]!
+    company: Company
   }
 
   type Mutation {
@@ -90,6 +96,7 @@ const schemaDef = `
     removeTodo: [Node]
     updateTodo: [UnionType]
     addProduct: Product
+    removeCompany: Company
   }
 `;
 
@@ -823,5 +830,94 @@ describe('nested fragment', () => {
       }
     }"
   `);
+  });
+});
+
+describe('respects max-depth', () => {
+  const queryOp = makeOperation(
+    'query',
+    {
+      key: 1234,
+      variables: undefined,
+      query: gql`
+        query {
+          company {
+            id
+            employees {
+              id
+              todos {
+                id
+              }
+            }
+          }
+        }
+      `,
+    },
+    context
+  );
+
+  const mutationOp = makeOperation(
+    'mutation',
+    {
+      key: 5678,
+      variables: undefined,
+      query: gql`
+        mutation MyMutation {
+          removeCompany @populate
+        }
+      `,
+    },
+    context
+  );
+
+  describe('mutation query', () => {
+    it('matches snapshot', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({ schema, options: { maxDepth: 1 } })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          removeCompany {
+            __typename
+            id
+            employees {
+              __typename
+              id
+            }
+          }
+        }"
+      `);
+    });
+
+    it('respects skip syntax', async () => {
+      const response = pipe<Operation, any, Operation[]>(
+        fromArray([queryOp, mutationOp]),
+        populateExchange({
+          schema,
+          options: { maxDepth: 1, skipType: /User/ },
+        })(exchangeArgs),
+        toArray
+      );
+
+      expect(print(response[1].query)).toMatchInlineSnapshot(`
+        "mutation MyMutation {
+          removeCompany {
+            __typename
+            id
+            employees {
+              __typename
+              id
+              todos {
+                __typename
+                id
+              }
+            }
+          }
+        }"
+      `);
+    });
   });
 });

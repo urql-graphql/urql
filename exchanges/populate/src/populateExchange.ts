@@ -20,8 +20,14 @@ import { Exchange, Operation, stringifyVariables } from '@urql/core';
 import { getName, GraphQLFlatType, unwrapType } from './helpers/node';
 import { traverse } from './helpers/traverse';
 
+interface Options {
+  skipType?: RegExp;
+  maxDepth?: number;
+}
+
 interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
+  options?: Options;
 }
 
 const makeDict = (): any => Object.create(null);
@@ -41,10 +47,35 @@ interface FieldUsage {
 type FragmentMap<T extends string = string> = Record<T, FragmentDefinitionNode>;
 const SKIP_COUNT_TYPE = /^PageInfo|(Connection|Edge)$/;
 
-/** An exchange for auto-populating mutations with a required response body. */
+/** Creates an `Exchange` handing automatic mutation selection-set population based on the
+ * query selection-sets seen.
+ *
+ *
+ * @remarks
+ * The `populateExchange` will create an exchange that monitors queries and
+ * extracts fields and types so it knows what is currently observed by your
+ * application.
+ * When a mutation comes in with the `@populate` directive it will fill the
+ * selection-set based on these prior queries.
+ *
+ * This Exchange can ease up the transition from documentCache to graphCache
+ *
+ * @example
+ * ```ts
+ * populateExchange({ schema, options: { maxDepth: 3, skipType: /Todo/ }})
+ *
+ * const query = gql`
+ *   mutation { addTodo @popualte }
+ * `
+ * ```
+ */
 export const populateExchange = ({
   schema: ogSchema,
+  options,
 }: PopulateExchangeOpts): Exchange => ({ forward }) => {
+  const maxDepth = (options && options.maxDepth) || 2;
+  const skipType = (options && options.skipType) || SKIP_COUNT_TYPE;
+
   const schema = buildClientSchema(ogSchema);
   /** List of operation keys that have already been parsed. */
   const parsedOperations = new Set<number>();
@@ -200,7 +231,7 @@ export const populateExchange = ({
               } else if (
                 value.type instanceof GraphQLObjectType &&
                 !visited.has(value.type.name) &&
-                depth <= 3
+                depth < maxDepth
               ) {
                 visited.add(value.type.name);
                 const fieldSelections: Array<FieldNode> = [];
@@ -208,7 +239,7 @@ export const populateExchange = ({
                 populateSelections(
                   value.type,
                   fieldSelections,
-                  SKIP_COUNT_TYPE.test(value.type.name) ? depth : depth + 1
+                  skipType.test(value.type.name) ? depth : depth + 1
                 );
 
                 const args = value.args
