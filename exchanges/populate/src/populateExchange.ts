@@ -39,6 +39,7 @@ interface FieldUsage {
 }
 
 type FragmentMap<T extends string = string> = Record<T, FragmentDefinitionNode>;
+const SKIP_COUNT_TYPE = /^PageInfo|(Connection|Edge)$/;
 
 /** An exchange for auto-populating mutations with a required response body. */
 export const populateExchange = ({
@@ -100,7 +101,10 @@ export const populateExchange = ({
         const visited = new Set();
         const populateSelections = (
           type: GraphQLFlatType,
-          selections: Array<FieldNode | InlineFragmentNode | FragmentSpreadNode>
+          selections: Array<
+            FieldNode | InlineFragmentNode | FragmentSpreadNode
+          >,
+          depth: number
         ) => {
           let possibleTypes: readonly string[] = [];
           let isAbstract = false;
@@ -195,12 +199,17 @@ export const populateExchange = ({
                 typeSelections.push(field);
               } else if (
                 value.type instanceof GraphQLObjectType &&
-                !visited.has(value.type.name)
+                !visited.has(value.type.name) &&
+                depth <= 3
               ) {
                 visited.add(value.type.name);
                 const fieldSelections: Array<FieldNode> = [];
 
-                populateSelections(value.type, fieldSelections);
+                populateSelections(
+                  value.type,
+                  fieldSelections,
+                  SKIP_COUNT_TYPE.test(value.type.name) ? depth : depth + 1
+                );
 
                 const args = value.args
                   ? Object.keys(value.args).map(k => {
@@ -242,7 +251,7 @@ export const populateExchange = ({
         const selections: Array<
           FieldNode | InlineFragmentNode | FragmentSpreadNode
         > = node.selectionSet ? [...node.selectionSet.selections] : [];
-        populateSelections(type, selections);
+        populateSelections(type, selections, 0);
 
         return {
           ...node,
