@@ -1,5 +1,52 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- Implement new `authExchange` API, which removes the need for an `authState` (i.e. an internal authentication state) and removes `getAuth`, replacing it with a separate `refreshAuth` flow.
+  The new API requires you to now pass an initializer function. This function receives a `utils`
+  object with `utils.mutate` and `utils.appendHeaders` utility methods.
+  It must return the configuration object, wrapped in a promise, and this configuration is similar to
+  what we had before, if you're migrating to this. Its `refreshAuth` method is now only called after
+  authentication errors occur and not on initialization. Instead, it's now recommended that you write
+  your initialization logic in-line.
+  ```js
+  authExchange(async utils => {
+    let token = localStorage.getItem('token');
+    let refreshToken = localStorage.getItem('refreshToken');
+    return {
+      addAuthToOperation(operation) {
+        return utils.appendHeaders(operation, {
+          Authorization: `Bearer ${token}`,
+        });
+      },
+      didAuthError(error) {
+        return error.graphQLErrors.some(
+          e => e.extensions?.code === 'FORBIDDEN'
+        );
+      },
+      async refreshAuth() {
+        const result = await utils.mutate(REFRESH, { token });
+        if (result.data?.refreshLogin) {
+          token = result.data.refreshLogin.token;
+          refreshToken = result.data.refreshLogin.refreshToken;
+          localStorage.setItem('token', token);
+          localStorage.setItem('refreshToken', refreshToken);
+        }
+      },
+    };
+  });
+  ```
+  Submitted by [@kitten](https://github.com/kitten) (See [#3012](https://github.com/urql-graphql/urql/pull/3012))
+
+### Patch Changes
+
+- ⚠️ Fix `willAuthError` not being called for operations that are waiting on the authentication state to update. This can actually lead to a common issue where operations that came in during the authentication initialization (on startup) will never have `willAuthError` called on them. This can cause an easy mistake where the initial authentication state is never checked to be valid
+  Submitted by [@kitten](https://github.com/kitten) (See [#3017](https://github.com/urql-graphql/urql/pull/3017))
+- Updated dependencies (See [#3007](https://github.com/urql-graphql/urql/pull/3007), [#2962](https://github.com/urql-graphql/urql/pull/2962), [#3007](https://github.com/urql-graphql/urql/pull/3007), [#3015](https://github.com/urql-graphql/urql/pull/3015), and [#3022](https://github.com/urql-graphql/urql/pull/3022))
+  - @urql/core@3.2.0
+
 ## 1.0.0
 
 ### Major Changes

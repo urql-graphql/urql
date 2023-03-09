@@ -1,5 +1,28 @@
 # @urql/exchange-graphcache
 
+## 5.2.0
+
+### Minor Changes
+
+- Add `isOfflineError` option to the `offlineExchange` to allow it to be customized to different conditions to determine whether an operation has failed because of a network error
+  Submitted by [@robertherber](https://github.com/robertherber) (See [#3020](https://github.com/urql-graphql/urql/pull/3020))
+- Allow `updates` config to react to arbitrary type updates other than just `Mutation` and `Subscription` fields.
+  You’ll now be able to write updaters that react to any entity field being written to the cache,
+  which allows for more granular invalidations. **Note:** If you’ve previously used `updates.Mutation`
+  and `updated.Subscription` with a custom schema with custom root names, you‘ll get a warning since
+  you’ll have to update your `updates` config to reflect this. This was a prior implementation
+  mistake!
+  Submitted by [@kitten](https://github.com/kitten) (See [#2979](https://github.com/urql-graphql/urql/pull/2979))
+
+### Patch Changes
+
+- ⚠️ Fix regression which caused partial results, whose refetches were blocked by the looping protection, to not have a `stale: true` flag added to them. This is a regression from https://github.com/urql-graphql/urql/pull/2831 and only applies to `cacheExchange`s that had the `schema` option set
+  Submitted by [@kitten](https://github.com/kitten) (See [#2999](https://github.com/urql-graphql/urql/pull/2999))
+- Add `invariant` to data layer that prevents cache writes during cache query operations. This prevents `cache.writeFragment`, `cache.updateQuery`, and `cache.link` from being called in `resolvers` for instance
+  Submitted by [@kitten](https://github.com/kitten) (See [#2978](https://github.com/urql-graphql/urql/pull/2978))
+- Updated dependencies (See [#3007](https://github.com/urql-graphql/urql/pull/3007), [#2962](https://github.com/urql-graphql/urql/pull/2962), [#3007](https://github.com/urql-graphql/urql/pull/3007), [#3015](https://github.com/urql-graphql/urql/pull/3015), and [#3022](https://github.com/urql-graphql/urql/pull/3022))
+  - @urql/core@3.2.0
+
 ## 5.0.9
 
 ### Patch Changes

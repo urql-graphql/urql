@@ -1,5 +1,19 @@
 # @urql/exchange-populate
 
+## 1.1.0
+
+### Minor Changes
+
+- Introduce `maxDepth` and `skipType` into the `populateExchange`, these options allow you to specify
+  the maximum depth a mutation should be populated as well as which types should not be counted towards
+  this depth
+  Submitted by [@JoviDeCroock](https://github.com/JoviDeCroock) (See [#3023](https://github.com/urql-graphql/urql/pull/3023))
+
+### Patch Changes
+
+- Updated dependencies (See [#3007](https://github.com/urql-graphql/urql/pull/3007), [#2962](https://github.com/urql-graphql/urql/pull/2962), [#3007](https://github.com/urql-graphql/urql/pull/3007), [#3015](https://github.com/urql-graphql/urql/pull/3015), and [#3022](https://github.com/urql-graphql/urql/pull/3022))
+  - @urql/core@3.2.0
+
 ## 1.0.0
 
 ### Major Changes
