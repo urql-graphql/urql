@@ -19,18 +19,16 @@ import {
 import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
-type MaybeRef<T> = T | Ref<T>;
+type MaybeRef<T> = Exclude<T, void> | Ref<Exclude<T, void>>;
 type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
 
 export type UseSubscriptionArgs<
   Data = any,
   Variables extends AnyVariables = AnyVariables
-> = MaybeRefObj<
-  {
-    pause?: boolean;
-    context?: Partial<OperationContext>;
-  } & GraphQLRequestParams<Data, Variables>
->;
+> = {
+  pause?: MaybeRef<boolean>;
+  context?: MaybeRef<Partial<OperationContext>>;
+} & MaybeRefObj<GraphQLRequestParams<Data, Variables>>;
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
@@ -100,7 +98,7 @@ export function callUseSubscription<
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
     createRequest<T, V>(
-      args.query,
+      unwrapPossibleProxy(args.query as any),
       unwrapPossibleProxy<V>(args.variables as V)
     ) as any
   );
@@ -110,7 +108,7 @@ export function callUseSubscription<
   stops.push(
     watchEffect(() => {
       const newRequest = createRequest<T, V>(
-        args.query,
+        unwrapPossibleProxy(args.query as any),
         unwrapPossibleProxy<V>(args.variables as V)
       );
       if (request.value.key !== newRequest.key) {
@@ -123,7 +121,7 @@ export function callUseSubscription<
     watchEffect(() => {
       source.value = !isPaused.value
         ? client.value.executeSubscription<T, V>(request.value, {
-            ...args.context,
+            ...(unwrapPossibleProxy(args.context) as Partial<OperationContext>),
           })
         : undefined;
     }, watchOptions)
@@ -173,7 +171,7 @@ export function callUseSubscription<
       opts?: Partial<OperationContext>
     ): UseSubscriptionState<T, R, V> {
       source.value = client.value.executeSubscription<T, V>(request.value, {
-        ...args.context,
+        ...unwrapPossibleProxy(args.context),
         ...opts,
       });
 
