@@ -1,5 +1,23 @@
 # @urql/core
 
+## 3.2.0
+
+### Minor Changes
+
+- Update support for the "Incremental Delivery" payload specification, accepting the new `incremental` property on execution results, as per the specification. This will expand support for newer APIs implementing the more up-to-date specification
+  Submitted by [@kitten](https://github.com/kitten) (See [#3007](https://github.com/urql-graphql/urql/pull/3007))
+- Update default `Accept` header to include `multipart/mixed` and `application/graphql-response+json`. The former seems to now be a defactor standard-accepted indication for support of the "Incremental Delivery" GraphQL over HTTP spec addition/RFC, and the latter is an updated form of the older `Content-Type` of GraphQL responses, so both the old and new one should now be included
+  Submitted by [@kitten](https://github.com/kitten) (See [#3007](https://github.com/urql-graphql/urql/pull/3007))
+
+### Patch Changes
+
+- Add TSDoc annotations to all external `@urql/core` APIs
+  Submitted by [@kitten](https://github.com/kitten) (See [#2962](https://github.com/urql-graphql/urql/pull/2962))
+- ⚠️ Fix subscriptions not being duplicated when `hasNext` isn't set. The `hasNext` field is an upcoming "Incremental Delivery" field. When a subscription result doesn't set it we now set it to `true` manually. This indicates to the `dedupExchange` that no duplicate subscription operations should be started
+  Submitted by [@kitten](https://github.com/kitten) (See [#3015](https://github.com/urql-graphql/urql/pull/3015))
+- Expose consistent `GraphQLRequestParams` utility type from which `GraphQLRequest`s are created in all bindings
+  Submitted by [@kitten](https://github.com/kitten) (See [#3022](https://github.com/urql-graphql/urql/pull/3022))
+
 ## 3.1.1
 
 ### Patch Changes
