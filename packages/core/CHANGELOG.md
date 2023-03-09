@@ -1,5 +1,12 @@
 # @urql/core
 
+## 3.2.1
+
+### Patch Changes
+
+- Bump to `@urql/core@3.2.1` due to invalid `3.2.0` release
+  Submitted by [@kitten](https://github.com/kitten) (See [`a84268db`](https://github.com/urql-graphql/urql/commit/a84268db98789b2fd23de009c7b5e1c09fca7103))
+
 ## 3.2.0
 
 ### Minor Changes

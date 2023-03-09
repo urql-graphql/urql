@@ -48,7 +48,7 @@
     "prepublishOnly": "run-s clean build"
   },
   "dependencies": {
-    "@urql/core": ">=3.2.0",
+    "@urql/core": ">=3.2.1",
     "wonka": "^6.0.0"
   },
   "peerDependencies": {
