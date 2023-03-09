@@ -6,7 +6,9 @@
     "lint": "eslint --ext=js,jsx,ts,tsx .",
     "build": "node ./scripts/actions/build-all.js",
     "postinstall": "node ./scripts/prepare/postinstall.js",
-    "pack": "node ./scripts/actions/pack-all.js"
+    "pack": "node ./scripts/actions/pack-all.js",
+    "changeset:version": "changeset version && pnpm install --lockfile-only",
+    "changeset:publish": "changeset publish"
   },
   "eslintConfig": {
     "root": true,
