@@ -47,6 +47,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1.4.1
         with:
+          version: pnpm changeset version && pnpm install --lockfile-only
           publish: pnpm changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
