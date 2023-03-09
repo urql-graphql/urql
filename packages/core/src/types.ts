@@ -238,6 +238,43 @@ export interface GraphQLRequest<
   variables: Variables;
 }
 
+/** Parameters from which {@link GraphQLRequest | GraphQLRequests} are created from.
+ *
+ * @remarks
+ * A `GraphQLRequest` is a single executable request with a generated `key` to identify
+ * their results, whereas `GraphQLRequestParams` is a utility type used to generate
+ * inputs for `urql` to create requests from, i.e. it only contains a `query` and
+ * `variables`. The type conditionally makes the `variables` property completely
+ * optional.
+ *
+ * @privateRemarks
+ * The wrapping union type is needed for passthrough or wrapper utilities that wrap
+ * functions like `useQuery` with generics.
+ */
+export type GraphQLRequestParams<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> =
+  | ({
+      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+    } & (Variables extends void
+      ? {
+          variables?: Variables;
+        }
+      : Variables extends {
+          [P in keyof Variables]: Exclude<Variables[P], null | void>;
+        }
+      ? {
+          variables: Variables;
+        }
+      : {
+          variables?: Variables;
+        }))
+  | {
+      query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
+      variables: Variables;
+    };
+
 /** Metadata used to annotate an `Operation` in development for the `urql-devtools`.
  *
  * @remarks
