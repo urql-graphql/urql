@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { DocumentNode } from 'graphql';
 import { Source, pipe, subscribe, onEnd, onPush, takeWhile } from 'wonka';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
+  GraphQLRequestParams,
   AnyVariables,
   Client,
-  TypedDocumentNode,
   CombinedError,
   OperationContext,
   RequestPolicy,
@@ -24,19 +23,10 @@ export type UseQueryArgs<
   Variables extends AnyVariables = AnyVariables,
   Data = any
 > = {
-  query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
   requestPolicy?: RequestPolicy;
   context?: Partial<OperationContext>;
   pause?: boolean;
-} & (Variables extends void
-  ? {
-      variables?: Variables;
-    }
-  : Variables extends { [P in keyof Variables]: Variables[P] | null }
-  ? { variables?: Variables }
-  : {
-      variables: Variables;
-    });
+} & GraphQLRequestParams<Data, Variables>;
 
 export interface UseQueryState<
   Data = any,

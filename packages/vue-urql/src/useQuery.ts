@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { DocumentNode } from 'graphql';
-
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import { Subscription, Source, pipe, subscribe, onEnd } from 'wonka';
@@ -10,7 +8,7 @@ import {
   Client,
   AnyVariables,
   OperationResult,
-  TypedDocumentNode,
+  GraphQLRequestParams,
   CombinedError,
   OperationContext,
   RequestPolicy,
@@ -23,21 +21,16 @@ import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
+type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
 
-export type UseQueryArgs<T = any, V extends AnyVariables = AnyVariables> = {
-  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
+export type UseQueryArgs<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = {
   requestPolicy?: MaybeRef<RequestPolicy>;
   context?: MaybeRef<Partial<OperationContext>>;
   pause?: MaybeRef<boolean>;
-} & (V extends void
-  ? {
-      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    }
-  : V extends { [P in keyof V]: V[P] | null }
-  ? { variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }> }
-  : {
-      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    });
+} & MaybeRefObj<GraphQLRequestParams<Data, Variables>>;
 
 export type QueryPartialState<
   T = any,
@@ -92,7 +85,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
     createRequest<T, V>(
-      args.query,
+      unwrapPossibleProxy(args.query as any),
       unwrapPossibleProxy<V>(args.variables as V)
     ) as any
   );
@@ -102,7 +95,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
   stops.push(
     watchEffect(() => {
       const newRequest = createRequest<T, V>(
-        args.query,
+        unwrapPossibleProxy(args.query as any),
         unwrapPossibleProxy<V>(args.variables as V)
       );
       if (request.value.key !== newRequest.key) {
@@ -115,8 +108,10 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     watchEffect(() => {
       source.value = !isPaused.value
         ? client.value.executeQuery<T, V>(request.value, {
-            requestPolicy: args.requestPolicy,
-            ...args.context,
+            requestPolicy: unwrapPossibleProxy(
+              args.requestPolicy
+            ) as RequestPolicy,
+            ...unwrapPossibleProxy(args.context),
           })
         : undefined;
     }, watchOptions)
@@ -132,7 +127,7 @@ export function callUseQuery<T = any, V extends AnyVariables = AnyVariables>(
     isPaused,
     executeQuery(opts?: Partial<OperationContext>): UseQueryResponse<T, V> {
       const s = (source.value = client.value.executeQuery<T, V>(request.value, {
-        requestPolicy: args.requestPolicy,
+        requestPolicy: unwrapPossibleProxy(args.requestPolicy) as RequestPolicy,
         ...args.context,
         ...opts,
       }));

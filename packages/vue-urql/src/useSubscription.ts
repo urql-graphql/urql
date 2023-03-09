@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { DocumentNode } from 'graphql';
 import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import {
   Client,
+  GraphQLRequestParams,
   AnyVariables,
   OperationResult,
-  TypedDocumentNode,
   CombinedError,
   OperationContext,
   Operation,
@@ -20,24 +19,16 @@ import {
 import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
-type MaybeRef<T> = T | Ref<T>;
+type MaybeRef<T> = Exclude<T, void> | Ref<Exclude<T, void>>;
+type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
 
 export type UseSubscriptionArgs<
-  T = any,
-  V extends AnyVariables = AnyVariables
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
 > = {
-  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
   pause?: MaybeRef<boolean>;
   context?: MaybeRef<Partial<OperationContext>>;
-} & (V extends void
-  ? {
-      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    }
-  : V extends { [P in keyof V]: V[P] | null }
-  ? { variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }> }
-  : {
-      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    });
+} & MaybeRefObj<GraphQLRequestParams<Data, Variables>>;
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;
@@ -107,7 +98,7 @@ export function callUseSubscription<
 
   const request: Ref<GraphQLRequest<T, V>> = ref(
     createRequest<T, V>(
-      args.query,
+      unwrapPossibleProxy(args.query as any),
       unwrapPossibleProxy<V>(args.variables as V)
     ) as any
   );
@@ -117,7 +108,7 @@ export function callUseSubscription<
   stops.push(
     watchEffect(() => {
       const newRequest = createRequest<T, V>(
-        args.query,
+        unwrapPossibleProxy(args.query as any),
         unwrapPossibleProxy<V>(args.variables as V)
       );
       if (request.value.key !== newRequest.key) {
@@ -130,7 +121,7 @@ export function callUseSubscription<
     watchEffect(() => {
       source.value = !isPaused.value
         ? client.value.executeSubscription<T, V>(request.value, {
-            ...args.context,
+            ...(unwrapPossibleProxy(args.context) as Partial<OperationContext>),
           })
         : undefined;
     }, watchOptions)
@@ -180,7 +171,7 @@ export function callUseSubscription<
       opts?: Partial<OperationContext>
     ): UseSubscriptionState<T, R, V> {
       source.value = client.value.executeSubscription<T, V>(request.value, {
-        ...args.context,
+        ...unwrapPossibleProxy(args.context),
         ...opts,
       });
 

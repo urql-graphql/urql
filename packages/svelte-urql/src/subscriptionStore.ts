@@ -1,11 +1,11 @@
-import type { DocumentNode } from 'graphql';
 import {
   AnyVariables,
+  GraphQLRequestParams,
   Client,
   OperationContext,
-  TypedDocumentNode,
   createRequest,
 } from '@urql/core';
+
 import {
   Source,
   pipe,
@@ -17,6 +17,7 @@ import {
   scan,
   never,
 } from 'wonka';
+
 import { derived, writable } from 'svelte/store';
 
 import {
@@ -33,18 +34,9 @@ export type SubscriptionArgs<
   Variables extends AnyVariables = AnyVariables
 > = {
   client: Client;
-  query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
   context?: Partial<OperationContext>;
   pause?: boolean;
-} & (Variables extends void
-  ? {
-      variables?: Variables;
-    }
-  : Variables extends { [P in keyof Variables]: Variables[P] | null }
-  ? { variables?: Variables }
-  : {
-      variables: Variables;
-    });
+} & GraphQLRequestParams<Data, Variables>;
 
 export function subscriptionStore<
   Data,

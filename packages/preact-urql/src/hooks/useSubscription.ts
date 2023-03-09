@@ -1,10 +1,9 @@
-import { DocumentNode } from 'graphql';
 import { useEffect, useCallback, useRef, useMemo } from 'preact/hooks';
 import { pipe, concat, fromValue, switchMap, map, scan } from 'wonka';
 
 import {
   AnyVariables,
-  TypedDocumentNode,
+  GraphQLRequestParams,
   CombinedError,
   OperationContext,
   Operation,
@@ -19,18 +18,9 @@ export type UseSubscriptionArgs<
   Variables extends AnyVariables = AnyVariables,
   Data = any
 > = {
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
   pause?: boolean;
   context?: Partial<OperationContext>;
-} & (Variables extends void
-  ? {
-      variables?: Variables;
-    }
-  : Variables extends { [P in keyof Variables]: Variables[P] | null }
-  ? { variables?: Variables }
-  : {
-      variables: Variables;
-    });
+} & GraphQLRequestParams<Data, Variables>;
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 
