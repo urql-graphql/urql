@@ -215,7 +215,7 @@ authExchange(async utils => {
 If `didAuthError` returns `true`, it will trigger the `authExchange` to trigger the logic for asking
 for re-authentication via `refreshAuth`.
 
-### Configuring `refershAuth` (triggered after an auth error has occurred)
+### Configuring `refreshAuth` (triggered after an auth error has occurred)
 
 If the API doesn't support any sort of token refresh, this is where we could simply log the user out.
 
