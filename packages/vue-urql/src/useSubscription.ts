@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { DocumentNode } from 'graphql';
 import { Source, pipe, subscribe, onEnd } from 'wonka';
 
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import {
   Client,
+  GraphQLRequestParams,
   AnyVariables,
   OperationResult,
-  TypedDocumentNode,
   CombinedError,
   OperationContext,
   Operation,
@@ -21,23 +20,17 @@ import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
 type MaybeRef<T> = T | Ref<T>;
+type MaybeRefObj<T extends {}> = { [K in keyof T]: MaybeRef<T[K]> };
 
 export type UseSubscriptionArgs<
-  T = any,
-  V extends AnyVariables = AnyVariables
-> = {
-  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  pause?: MaybeRef<boolean>;
-  context?: MaybeRef<Partial<OperationContext>>;
-} & (V extends void
-  ? {
-      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    }
-  : V extends { [P in keyof V]: V[P] | null }
-  ? { variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }> }
-  : {
-      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    });
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = MaybeRefObj<
+  {
+    pause?: boolean;
+    context?: Partial<OperationContext>;
+  } & GraphQLRequestParams<Data, Variables>
+>;
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 export type SubscriptionHandlerArg<T, R> = MaybeRef<SubscriptionHandler<T, R>>;

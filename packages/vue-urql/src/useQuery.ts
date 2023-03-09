@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { DocumentNode } from 'graphql';
-
 import { WatchStopHandle, Ref, ref, watchEffect, reactive, isRef } from 'vue';
 
 import { Subscription, Source, pipe, subscribe, onEnd } from 'wonka';
@@ -10,7 +8,7 @@ import {
   Client,
   AnyVariables,
   OperationResult,
-  TypedDocumentNode,
+  GraphQLRequestParams,
   CombinedError,
   OperationContext,
   RequestPolicy,
@@ -22,22 +20,20 @@ import {
 import { useClient } from './useClient';
 import { unwrapPossibleProxy } from './utils';
 
-type MaybeRef<T> = T | Ref<T>;
+type MaybeRefObj<T extends {}> = {
+  [K in keyof T]: T[K] | Ref<T[K]>;
+};
 
-export type UseQueryArgs<T = any, V extends AnyVariables = AnyVariables> = {
-  query: MaybeRef<TypedDocumentNode<T, V> | DocumentNode | string>;
-  requestPolicy?: MaybeRef<RequestPolicy>;
-  context?: MaybeRef<Partial<OperationContext>>;
-  pause?: MaybeRef<boolean>;
-} & (V extends void
-  ? {
-      variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    }
-  : V extends { [P in keyof V]: V[P] | null }
-  ? { variables?: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }> }
-  : {
-      variables: MaybeRef<{ [K in keyof V]: MaybeRef<V[K]> }>;
-    });
+export type UseQueryArgs<
+  Data = any,
+  Variables extends AnyVariables = AnyVariables
+> = MaybeRefObj<
+  {
+    requestPolicy?: RequestPolicy;
+    context?: Partial<OperationContext>;
+    pause?: boolean;
+  } & GraphQLRequestParams<Data, Variables>
+>;
 
 export type QueryPartialState<
   T = any,

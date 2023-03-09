@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { DocumentNode } from 'graphql';
 import { pipe, subscribe, onEnd } from 'wonka';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import {
+  GraphQLRequestParams,
   AnyVariables,
-  TypedDocumentNode,
   CombinedError,
   OperationContext,
   Operation,
@@ -20,18 +19,9 @@ export type UseSubscriptionArgs<
   Variables extends AnyVariables = AnyVariables,
   Data = any
 > = {
-  query: DocumentNode | TypedDocumentNode<Data, Variables> | string;
   pause?: boolean;
   context?: Partial<OperationContext>;
-} & (Variables extends void
-  ? {
-      variables?: Variables;
-    }
-  : Variables extends { [P in keyof Variables]: Variables[P] | null }
-  ? { variables?: Variables }
-  : {
-      variables: Variables;
-    });
+} & GraphQLRequestParams<Data, Variables>;
 
 export type SubscriptionHandler<T, R> = (prev: R | undefined, data: T) => R;
 

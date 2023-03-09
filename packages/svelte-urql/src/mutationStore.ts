@@ -1,13 +1,13 @@
-import type { DocumentNode } from 'graphql';
-import {
-  AnyVariables,
-  Client,
-  OperationContext,
-  TypedDocumentNode,
-  createRequest,
-} from '@urql/core';
 import { pipe, map, scan, subscribe } from 'wonka';
 import { derived, writable } from 'svelte/store';
+
+import {
+  AnyVariables,
+  GraphQLRequestParams,
+  Client,
+  OperationContext,
+  createRequest,
+} from '@urql/core';
 
 import {
   OperationResultState,
@@ -22,17 +22,8 @@ export type MutationArgs<
   Variables extends AnyVariables = AnyVariables
 > = {
   client: Client;
-  query: string | DocumentNode | TypedDocumentNode<Data, Variables>;
   context?: Partial<OperationContext>;
-} & (Variables extends void
-  ? {
-      variables?: Variables;
-    }
-  : Variables extends { [P in keyof Variables]: Variables[P] | null }
-  ? { variables?: Variables }
-  : {
-      variables: Variables;
-    });
+} & GraphQLRequestParams<Data, Variables>;
 
 export function mutationStore<
   Data = any,
