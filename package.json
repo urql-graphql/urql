@@ -104,5 +104,9 @@
     "vite": "^3.0.0",
     "vite-tsconfig-paths": "^4.0.0-alpha.3",
     "vitest": "^0.29.0"
+  },
+  "dependencies": {
+    "@actions/github": "^5.1.1",
+    "node-fetch": "^3.3.0"
   }
 }
