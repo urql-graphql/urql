@@ -6,4 +6,4 @@ inputs:
       A JSON array to present the published packages. The format is `[{"name": "@xx/xx", "version": "1.2.0"}, {"name": "@xx/xy", "version": "0.8.9"}]`
 runs:
   using: 'node16'
-  main: 'action.js'
+  main: 'action.mjs'
