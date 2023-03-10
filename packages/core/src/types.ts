@@ -264,9 +264,15 @@ export type GraphQLRequestParams<
       : Variables extends {
           [P in keyof Variables]: Exclude<Variables[P], null | void>;
         }
-      ? {
-          variables: Variables;
+      ? Variables extends {
+          [P in keyof Variables]: never;
         }
+        ? {
+            variables?: Variables;
+          }
+        : {
+            variables: Variables;
+          }
       : {
           variables?: Variables;
         }))
