@@ -50,13 +50,15 @@ export const makeFetchURL = (
   if (!useGETMethod || !body) return operation.context.url;
 
   const url = new URL(operation.context.url);
-  const search = url.searchParams;
-  if (body.operationName) search.set('operationName', body.operationName);
-  if (body.query) search.set('query', body.query);
-  if (body.variables)
-    search.set('variables', stringifyVariables(body.variables));
-  if (body.extensions)
-    search.set('extensions', stringifyVariables(body.extensions));
+  for (const key in body) {
+    const value = body[key];
+    if (value) {
+      url.searchParams.set(
+        key,
+        typeof value === 'object' ? stringifyVariables(value) : value
+      );
+    }
+  }
 
   const finalUrl = url.toString();
   if (finalUrl.length > 2047 && useGETMethod !== 'force') {
