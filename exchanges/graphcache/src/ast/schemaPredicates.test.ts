@@ -8,8 +8,8 @@ import { minifyIntrospectionQuery } from '@urql/introspection';
 const mocked = (x: any): any => x;
 
 describe('SchemaPredicates', () => {
-  // eslint-disable-next-line
   const schema = buildClientSchema(
+    // eslint-disable-next-line
     minifyIntrospectionQuery(require('../test-utils/simple_schema.json'))
   );
 
