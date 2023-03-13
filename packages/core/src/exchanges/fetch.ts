@@ -35,7 +35,6 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
         return operation.kind === 'query' || operation.kind === 'mutation';
       }),
       mergeMap(operation => {
-        const { key } = operation;
         const body = makeFetchBody(operation);
         const url = makeFetchURL(operation, body);
         const fetchOptions = makeFetchOptions(operation, body);
@@ -55,7 +54,7 @@ export const fetchExchange: Exchange = ({ forward, dispatchDebug }) => {
           takeUntil(
             pipe(
               sharedOps$,
-              filter(op => op.kind === 'teardown' && op.key === key)
+              filter(op => op.kind === 'teardown' && op.key === operation.key)
             )
           )
         );

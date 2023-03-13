@@ -585,14 +585,13 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   const makeResultSource = (operation: Operation) => {
     let result$ = pipe(
       results$,
-      filter((res: OperationResult) => {
-        return (
+      filter(
+        (res: OperationResult) =>
           res.operation.kind === operation.kind &&
           res.operation.key === operation.key &&
           (!res.operation.context._instance ||
             res.operation.context._instance === operation.context._instance)
-        );
-      })
+      )
     );
 
     // Mask typename properties if the option for it is turned on

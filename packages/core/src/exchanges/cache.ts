@@ -48,18 +48,11 @@ export const cacheExchange: Exchange = ({ forward, client, dispatchDebug }) => {
     return formattedOperation;
   };
 
-  const isOperationCached = (operation: Operation) => {
-    const {
-      key,
-      kind,
-      context: { requestPolicy },
-    } = operation;
-    return (
-      kind === 'query' &&
-      requestPolicy !== 'network-only' &&
-      (requestPolicy === 'cache-only' || resultCache.has(key))
-    );
-  };
+  const isOperationCached = (operation: Operation) =>
+    operation.kind === 'query' &&
+    operation.context.requestPolicy !== 'network-only' &&
+    (operation.context.requestPolicy === 'cache-only' ||
+      resultCache.has(operation.key));
 
   return ops$ => {
     const sharedOps$ = share(ops$);

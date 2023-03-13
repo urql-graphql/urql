@@ -1,5 +1,5 @@
 import { filter, pipe, tap } from 'wonka';
-import { Exchange, Operation, OperationResult } from '../types';
+import { Exchange } from '../types';
 
 /** Default deduplication exchange.
  *
@@ -19,36 +19,39 @@ import { Exchange, Operation, OperationResult } from '../types';
  */
 export const dedupExchange: Exchange = ({ forward, dispatchDebug }) => {
   const inFlightKeys = new Set<number>();
+  return ops$ =>
+    pipe(
+      forward(
+        pipe(
+          ops$,
+          filter(operation => {
+            if (
+              operation.kind === 'teardown' ||
+              operation.kind === 'mutation'
+            ) {
+              inFlightKeys.delete(operation.key);
+              return true;
+            }
 
-  const filterIncomingOperation = (operation: Operation) => {
-    const { key, kind } = operation;
-    if (kind === 'teardown' || kind === 'mutation') {
-      inFlightKeys.delete(key);
-      return true;
-    }
+            const isInFlight = inFlightKeys.has(operation.key);
+            inFlightKeys.add(operation.key);
 
-    const isInFlight = inFlightKeys.has(key);
-    inFlightKeys.add(key);
+            if (isInFlight) {
+              dispatchDebug({
+                type: 'dedup',
+                message: 'An operation has been deduped.',
+                operation,
+              });
+            }
 
-    if (isInFlight) {
-      dispatchDebug({
-        type: 'dedup',
-        message: 'An operation has been deduped.',
-        operation,
-      });
-    }
-
-    return !isInFlight;
-  };
-
-  const afterOperationResult = ({ operation, hasNext }: OperationResult) => {
-    if (!hasNext) {
-      inFlightKeys.delete(operation.key);
-    }
-  };
-
-  return ops$ => {
-    const forward$ = pipe(ops$, filter(filterIncomingOperation));
-    return pipe(forward(forward$), tap(afterOperationResult));
-  };
+            return !isInFlight;
+          })
+        )
+      ),
+      tap(result => {
+        if (!result.hasNext) {
+          inFlightKeys.delete(result.operation.key);
+        }
+      })
+    );
 };

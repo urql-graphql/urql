@@ -265,35 +265,30 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
     // Filter by operations that are cacheable and attempt to query them from the cache
     const cacheOps$ = pipe(
       sharedOps$,
-      filter(op => {
-        return (
-          op.kind === 'query' && op.context.requestPolicy !== 'network-only'
-        );
-      }),
+      filter(
+        op => op.kind === 'query' && op.context.requestPolicy !== 'network-only'
+      ),
       map(operationResultFromCache),
       share
     );
 
     const nonCacheOps$ = pipe(
       sharedOps$,
-      filter(op => {
-        return (
-          op.kind !== 'query' || op.context.requestPolicy === 'network-only'
-        );
-      })
+      filter(
+        op => op.kind !== 'query' || op.context.requestPolicy === 'network-only'
+      )
     );
 
     // Rebound operations that are incomplete, i.e. couldn't be queried just from the cache
     const cacheMissOps$ = pipe(
       cacheOps$,
-      filter(res => {
-        return (
+      filter(
+        res =>
           res.outcome === 'miss' &&
           res.operation.context.requestPolicy !== 'cache-only' &&
           !isBlockedByOptimisticUpdate(res.dependencies) &&
           !reexecutingOperations.has(res.operation.key)
-        );
-      }),
+      ),
       map(res => {
         dispatchDebug({
           type: 'cacheMiss',
