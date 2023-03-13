@@ -32,9 +32,9 @@ describe('withUrqlClient', () => {
   describe('with client options', () => {
     beforeEach(() => {
       Component = withUrqlClient(
-        () => ({
+        ssr => ({
           url: 'http://localhost:3000',
-          exchanges: [dedupExchange, cacheExchange, fetchExchange],
+          exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
         }),
         {
           ssr: true,
