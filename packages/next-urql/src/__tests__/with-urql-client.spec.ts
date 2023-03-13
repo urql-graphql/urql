@@ -26,9 +26,15 @@ describe('withUrqlClient', () => {
 
   describe('with client options', () => {
     beforeEach(() => {
-      Component = withUrqlClient(() => ({ url: 'http://localhost:3000' }), {
-        ssr: true,
-      })(MockApp);
+      Component = withUrqlClient(
+        () => ({
+          url: 'http://localhost:3000',
+          exchanges: [dedupExchange, cacheExchange, fetchExchange],
+        }),
+        {
+          ssr: true,
+        }
+      )(MockApp);
     });
 
     const mockContext: NextUrqlPageContext = {
