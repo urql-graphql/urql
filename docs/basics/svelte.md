@@ -48,10 +48,11 @@ The `@urql/svelte` package exports a method called `createClient` which we can u
 the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from '@urql/svelte';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/svelte';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -67,6 +68,7 @@ GraphQL API.
 ```js
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -85,10 +87,11 @@ components. This will share one `Client` with the rest of our app, if we for ins
 
 ```html
 <script>
-  import { createClient, setContextClient } from '@urql/svelte';
+  import { createClient, setContextClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/svelte';
 
   const client = createClient({
     url: 'http://localhost:3000/graphql',
+    exchanges: [dedupExchange, cacheExchange, fetchExchange],
   });
 
   setContextClient(client);
@@ -292,6 +295,7 @@ import { createClient } from '@urql/svelte';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+    exchanges: [dedupExchange, cacheExchange, fetchExchange],
   // every operation will by default use cache-and-network rather
   // than cache-first now:
   requestPolicy: 'cache-and-network',

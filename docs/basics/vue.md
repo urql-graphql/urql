@@ -37,10 +37,11 @@ The `@urql/vue` package exports a method called `createClient` which we can use 
 the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from '@urql/vue';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/vue';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -56,6 +57,7 @@ GraphQL API.
 ```js
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -77,10 +79,11 @@ your parent components and accepts either a `Client` directly or just the option
 
 ```html
 <script>
-  import { createClient, provideClient } from '@urql/vue';
+  import { createClient, provideClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/vue';
 
   const client = createClient({
     url: 'http://localhost:3000/graphql',
+    exchanges: [dedupExchange, cacheExchange, fetchExchange],
   });
 
   provideClient(client);
@@ -361,10 +364,11 @@ provides metadata apart from the usual `query` and `variables` we may pass. This
 we may also change the `Client`'s default `requestPolicy` by passing it there.
 
 ```js
-import { createClient } from '@urql/vue';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/vue';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   // every operation will by default use cache-and-network rather
   // than cache-first now:
   requestPolicy: 'cache-and-network',

@@ -134,10 +134,11 @@ The `@urql/core` package exports a function called `createClient` which we can u
 create the GraphQL client. This central `Client` manages all of our GraphQL requests and results.
 
 ```js
-import { createClient } from '@urql/core';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
 
@@ -153,6 +154,7 @@ GraphQL API.
 ```js
 const client = createClient({
   url: 'http://localhost:3000/graphql',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
   fetchOptions: () => {
     const token = getToken();
     return {
@@ -168,17 +170,13 @@ As we've seen above, the most important option for the `Client` is `url`, since 
 without it. However, another important option on the `Client` is the `exchanges` option.
 
 This option passes a list of exchanges to the `Client`, which tell it how to execute our requests
-and how to cache data in a certain order. By default, this will be populated with the list of
-`defaultExchanges`.
+and how to cache data in a certain order.
 
 ```js
-import { createClient, defaultExchanges } from '@urql/core';
+import { createClient, dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
 
 const client = createClient({
   url: 'http://localhost:3000/graphql',
-  // the default:
-  exchanges: defaultExchanges,
-  // the same as:
   exchanges: [dedupExchange, cacheExchange, fetchExchange],
 });
 ```
