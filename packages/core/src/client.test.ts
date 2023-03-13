@@ -26,17 +26,18 @@ import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { Client, createClient } from './client';
 import { queryOperation, subscriptionOperation } from './test-utils';
+import { cacheExchange, dedupExchange, fetchExchange } from '.';
 
 const url = 'https://hostname.com';
 
 describe('createClient / Client', () => {
   it('creates an instance of Client', () => {
-    expect(createClient({ url }) instanceof Client).toBeTruthy();
-    expect(new Client({ url }) instanceof Client).toBeTruthy();
+    expect(createClient({ url, exchanges: [] }) instanceof Client).toBeTruthy();
+    expect(new Client({ url, exchanges: [] }) instanceof Client).toBeTruthy();
   });
 
   it('passes snapshot', () => {
-    const client = createClient({ url });
+    const client = createClient({ url, exchanges: [] });
     expect(client).toMatchSnapshot();
   });
 });
@@ -78,7 +79,7 @@ const subscription = {
 };
 
 let receivedOps: Operation[] = [];
-let client = createClient({ url: '1234' });
+let client = createClient({ url: '1234', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
 const receiveMock = vi.fn((s: Source<Operation>) =>
   pipe(
     s,

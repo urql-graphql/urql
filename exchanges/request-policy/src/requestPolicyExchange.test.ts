@@ -7,6 +7,9 @@ import {
   Operation,
   OperationResult,
   ExchangeIO,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
 } from '@urql/core';
 
 import { requestPolicyExchange } from './requestPolicyExchange';
@@ -37,7 +40,7 @@ const queryOneData = {
 
 let client, op, ops$, next;
 beforeEach(() => {
-  client = createClient({ url: 'http://0.0.0.0' });
+  client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
   op = client.createRequestOperation('query', {
     key: 1,
     query: queryOne,

@@ -4,7 +4,7 @@ import { Client, createClient } from '@urql/core';
 
 // We assume some default options here; mainly not to actually be used
 // but not to error catastrophically if someone is just playing around
-const defaultClient = createClient({ url: '/graphql' });
+const defaultClient = createClient({ url: '/graphql', exchanges: [] });
 
 export const Context = createContext<Client>(defaultClient);
 export const Provider = Context.Provider;

@@ -8,6 +8,9 @@ import {
   Operation,
   OperationResult,
   ExchangeIO,
+  dedupExchange,
+  cacheExchange,
+  fetchExchange,
 } from '@urql/core';
 
 import { retryExchange } from './retryExchange';
@@ -55,7 +58,7 @@ const queryOneError = {
 
 let client, op, ops$, next;
 beforeEach(() => {
-  client = createClient({ url: 'http://0.0.0.0' });
+  client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
   op = client.createRequestOperation('query', {
     key: 1,
     query: queryOne,
