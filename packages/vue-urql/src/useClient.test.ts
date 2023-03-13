@@ -1,7 +1,12 @@
 import { expect, it, describe } from 'vitest';
 import { defineComponent } from 'vue';
 import { mount } from '@vue/test-utils';
-import { cacheExchange, Client, dedupExchange, fetchExchange } from '@urql/core';
+import {
+  cacheExchange,
+  Client,
+  dedupExchange,
+  fetchExchange,
+} from '@urql/core';
 import { useClient, provideClient } from './useClient';
 
 describe('provideClient', () => {
@@ -11,7 +16,7 @@ describe('provideClient', () => {
         provideClient(
           new Client({
             url: 'test',
-            exchanges: [dedupExchange, cacheExchange, fetchExchange]
+            exchanges: [dedupExchange, cacheExchange, fetchExchange],
           })
         );
 

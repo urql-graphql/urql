@@ -9,7 +9,9 @@ const mocked = (x: any): any => x;
 
 describe('SchemaPredicates', () => {
   // eslint-disable-next-line
-  const schema = buildClientSchema(minifyIntrospectionQuery(require('../test-utils/simple_schema.json')));
+  const schema = buildClientSchema(
+    minifyIntrospectionQuery(require('../test-utils/simple_schema.json'))
+  );
 
   const frag = (value: string): InlineFragmentNode => ({
     kind: Kind.INLINE_FRAGMENT,

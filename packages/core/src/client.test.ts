@@ -79,7 +79,10 @@ const subscription = {
 };
 
 let receivedOps: Operation[] = [];
-let client = createClient({ url: '1234', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+let client = createClient({
+  url: '1234',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+});
 const receiveMock = vi.fn((s: Source<Operation>) =>
   pipe(
     s,

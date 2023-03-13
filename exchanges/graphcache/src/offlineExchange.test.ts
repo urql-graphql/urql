@@ -187,7 +187,10 @@ describe('offline', () => {
   });
 
   it('should intercept errored queries', async () => {
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const onlineSpy = vi
       .spyOn(navigator, 'onLine', 'get')
       .mockReturnValueOnce(false);
@@ -252,7 +255,10 @@ describe('offline', () => {
 
     const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(() => undefined);

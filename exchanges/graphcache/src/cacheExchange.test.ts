@@ -56,7 +56,10 @@ const dispatchDebug = vi.fn();
 
 describe('data dependencies', () => {
   it('writes queries to the cache', () => {
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const op = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,
@@ -113,7 +116,10 @@ describe('data dependencies', () => {
   });
 
   it('respects cache-only operations', () => {
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const op = client.createRequestOperation(
       'query',
       {
@@ -176,7 +182,10 @@ describe('data dependencies', () => {
       ],
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -306,7 +315,10 @@ describe('data dependencies', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -413,7 +425,10 @@ describe('data dependencies', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
     const reexec = vi
       .spyOn(client, 'reexecuteOperation')
@@ -475,7 +490,10 @@ describe('data dependencies', () => {
       concealAuthor: true,
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
@@ -532,7 +550,10 @@ describe('data dependencies', () => {
       concealAuthor: true,
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     vi.spyOn(client, 'reexecuteOperation').mockImplementation(next);
@@ -585,7 +606,10 @@ describe('data dependencies', () => {
   });
 
   it('marks errored null fields as uncached but delivers them as expected', () => {
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const query = gql`
@@ -682,7 +706,10 @@ describe('optimistic updates', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -775,7 +802,10 @@ describe('optimistic updates', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -872,7 +902,10 @@ describe('optimistic updates', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -989,7 +1022,10 @@ describe('optimistic updates', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const reexec = vi
@@ -1072,7 +1108,10 @@ describe('optimistic updates', () => {
 
 describe('custom resolvers', () => {
   it('follows resolvers on initial write', () => {
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const opOne = client.createRequestOperation('query', {
@@ -1145,7 +1184,10 @@ describe('custom resolvers', () => {
       },
     };
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const opOne = client.createRequestOperation('query', {
@@ -1229,7 +1271,10 @@ describe('custom resolvers', () => {
       }
     `;
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
 
     const query = gql`
@@ -1395,7 +1440,10 @@ describe('custom resolvers', () => {
 describe('schema awareness', () => {
   it('reexecutes query and returns data on partial result', () => {
     vi.useFakeTimers();
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
     const reexec = vi
       .spyOn(client, 'reexecuteOperation')
@@ -1538,7 +1586,10 @@ describe('schema awareness', () => {
 
   it('reexecutes query and returns data on partial results for nullable lists', () => {
     vi.useFakeTimers();
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next } = makeSubject<Operation>();
     const reexec = vi
       .spyOn(client, 'reexecuteOperation')
@@ -1663,7 +1714,7 @@ describe('commutativity', () => {
     const client = createClient({
       url: 'http://0.0.0.0',
       requestPolicy: 'cache-and-network',
-      exchanges: [dedupExchange, cacheExchange, fetchExchange]
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
     });
     const { source: ops$, next: next } = makeSubject<Operation>();
     const query = gql`
@@ -1749,7 +1800,10 @@ describe('commutativity', () => {
 
   it('applies optimistic updates on top of commutative queries as query result comes in', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -1839,7 +1893,10 @@ describe('commutativity', () => {
 
   it('applies mutation results on top of commutative queries', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -1955,7 +2012,10 @@ describe('commutativity', () => {
 
   it('applies optimistic updates on top of commutative queries until mutation resolves', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -2054,7 +2114,10 @@ describe('commutativity', () => {
 
   it('allows subscription results to be commutative when necessary', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -2149,7 +2212,10 @@ describe('commutativity', () => {
 
   it('allows subscription results to be commutative above mutations', () => {
     let data: any;
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 
@@ -2286,7 +2352,10 @@ describe('commutativity', () => {
     let deferredData: any;
     let combinedData: any;
 
-    const client = createClient({ url: 'http://0.0.0.0', exchanges: [dedupExchange, cacheExchange, fetchExchange] });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    });
     const { source: ops$, next: nextOp } = makeSubject<Operation>();
     const { source: res$, next: nextRes } = makeSubject<OperationResult>();
 

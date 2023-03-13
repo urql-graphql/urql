@@ -43,7 +43,10 @@ const makeExchangeArgs = () => {
           tap(op => operations.push(op)),
           map(result)
         ),
-      client: new Client({ url: '/api', exchanges: [dedupExchange, cacheExchange, fetchExchange] }),
+      client: new Client({
+        url: '/api',
+        exchanges: [dedupExchange, cacheExchange, fetchExchange],
+      }),
     } as any,
   };
 };
