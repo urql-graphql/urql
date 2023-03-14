@@ -89,15 +89,9 @@ export const makeFetchOptions = (
   const useGETMethod =
     operation.kind === 'query' && !!operation.context.preferGetMethod;
 
-  // Alternatively we could use visit() to see if we find any of the two
-  // directives
-  const hasStreamingDirective =
-    body?.query?.includes('@defer') || body?.query?.includes('@stream');
-
   const headers: HeadersInit = {
-    accept: `${
-      hasStreamingDirective ? 'multipart/mixed, ' : ''
-    }application/graphql-response+json, application/graphql+json, application/json`,
+    accept:
+      'application/graphql-response+json, application/graphql+json, application/json, multipart/mixed',
   };
   if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =

@@ -2,4 +2,5 @@
 '@urql/core': patch
 ---
 
-only add `multipart/mixed` when we see one of the streaming directives
+move `multipart/mixed` to the last `Accept` header to avoid breaking
+`react-native-fetch`
