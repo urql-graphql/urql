@@ -42,8 +42,7 @@ export const makeResult = (
           response,
         })
       : undefined,
-    extensions:
-      (typeof result.extensions === 'object' && result.extensions) || undefined,
+    extensions: result.extensions ? { ...result.extensions } : undefined,
     hasNext: result.hasNext == null ? defaultHasNext : result.hasNext,
   };
 };
