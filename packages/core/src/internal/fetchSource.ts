@@ -68,8 +68,7 @@ async function* fetchOperation(
 
     let buffer = '';
     let isPreamble = true;
-    let nextResult: OperationResult | null = null;
-    let prevResult: OperationResult | null = null;
+    let result: OperationResult | null = null;
     for await (const data of iterator) {
       hasResults = true;
       buffer += toString(data);
@@ -90,23 +89,19 @@ async function* fetchOperation(
           let payload: any;
           try {
             payload = JSON.parse(body);
-            nextResult = prevResult = prevResult
-              ? mergeResultPatch(prevResult, payload, response)
+            result = result
+              ? mergeResultPatch(result, payload, response)
               : makeResult(operation, payload, response);
+            yield result;
           } catch (_error) {}
 
           if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
-            if (!prevResult) yield makeResult(operation, {}, response);
+            if (!result) yield makeResult(operation, {}, response);
             break;
           }
         }
 
         buffer = next;
-      }
-
-      if (nextResult) {
-        yield nextResult;
-        nextResult = null;
       }
     }
   } catch (error: any) {
