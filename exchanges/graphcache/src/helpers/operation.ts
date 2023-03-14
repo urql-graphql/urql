@@ -1,20 +1,20 @@
 import {
   Operation,
   RequestPolicy,
-  CacheOutcome,
+  OperationDebugMeta,
   makeOperation,
 } from '@urql/core';
 
 // Returns the given operation result with added cacheOutcome meta field
-export const addCacheOutcome = (
+export const addMetadata = (
   operation: Operation,
-  outcome: CacheOutcome
+  meta: OperationDebugMeta
 ): Operation =>
   makeOperation(operation.kind, operation, {
     ...operation.context,
     meta: {
       ...operation.context.meta,
-      cacheOutcome: outcome,
+      ...meta,
     },
   });
 

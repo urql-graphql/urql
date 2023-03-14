@@ -28,10 +28,7 @@ export const makeResult = (
   result: ExecutionResult,
   response?: any
 ): OperationResult => {
-  if (
-    (!('data' in result) && !('errors' in result)) ||
-    'incremental' in result
-  ) {
+  if (!('data' in result) && !('errors' in result)) {
     throw new Error('No Content');
   }
 
@@ -45,8 +42,7 @@ export const makeResult = (
           response,
         })
       : undefined,
-    extensions:
-      (typeof result.extensions === 'object' && result.extensions) || undefined,
+    extensions: result.extensions ? { ...result.extensions } : undefined,
     hasNext: result.hasNext == null ? defaultHasNext : result.hasNext,
   };
 };
@@ -83,12 +79,7 @@ export const mergeResultPatch = (
 
   // NOTE: We handle the old version of the incremental delivery payloads as well
   if ('path' in nextResult) {
-    incremental = [
-      {
-        data: nextResult.data,
-        path: nextResult.path,
-      } as IncrementalPayload,
-    ];
+    incremental = [nextResult as IncrementalPayload];
   }
 
   if (incremental) {
