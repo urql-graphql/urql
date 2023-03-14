@@ -69,7 +69,7 @@ async function* fetchOperation(
     let buffer = '';
     let isPreamble = true;
     let result: OperationResult | null = null;
-    for await (const data of iterator) {
+    chunks: for await (const data of iterator) {
       hasResults = true;
       buffer += toString(data);
 
@@ -89,15 +89,14 @@ async function* fetchOperation(
           let payload: any;
           try {
             payload = JSON.parse(body);
-            result = result
+            yield (result = result
               ? mergeResultPatch(result, payload, response)
-              : makeResult(operation, payload, response);
-            yield result;
+              : makeResult(operation, payload, response));
           } catch (_error) {}
 
           if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
             if (!result) yield makeResult(operation, {}, response);
-            break;
+            break chunks;
           }
         }
 
