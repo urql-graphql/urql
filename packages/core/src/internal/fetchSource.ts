@@ -21,7 +21,11 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
-    while (!(result = await reader.read()).done) yield toString(result.value);
+    try {
+      while (!(result = await reader.read()).done) yield toString(result.value);
+    } finally {
+      reader.cancel();
+    }
   }
 }
 
