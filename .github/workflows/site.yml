@@ -71,12 +71,12 @@ jobs:
         if: github.ref != 'refs/heads/main'
         run: pnpm run build --staging
 
-      - name: Deploy Staging Site
-        working-directory: ./packages/site
-        if: github.ref != 'refs/heads/main'
-        run: pnpm run deploy --staging
-        env:
-          FORMIDEPLOY_GIT_SHA: ${{ github.event.pull_request.head.sha }}
-          GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
-          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+      #- name: Deploy Staging Site
+      #  working-directory: ./packages/site
+      #  if: github.ref != 'refs/heads/main'
+      #  run: pnpm run deploy --staging
+      #  env:
+      #    FORMIDEPLOY_GIT_SHA: ${{ github.event.pull_request.head.sha }}
+      #    GITHUB_DEPLOYMENT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #    SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+      #    SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
