@@ -8,6 +8,7 @@ import { pipe, tap, map } from 'wonka';
 
 const defaultTTL = 5 * 60 * 1000;
 
+/** Input parameters for the {@link requestPolicyExchange}. */
 export interface Options {
   /** Predicate allowing you to selectively not upgrade `Operation`s.
   
