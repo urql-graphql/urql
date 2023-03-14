@@ -207,7 +207,8 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
         )
       : result.operation;
 
-    operation.variables = result.operation.context?.originalVariables || operation.variables
+    operation.variables =
+      result.operation.context?.originalVariables || operation.variables;
     if (operation.kind === 'mutation') {
       // Collect previous dependencies that have been written for optimistic updates
       const dependencies = optimisticKeysToDependencies.get(operation.key);
