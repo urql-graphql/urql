@@ -326,7 +326,7 @@ describe('data dependencies', () => {
     const opMutation = client.createRequestOperation('mutation', {
       key: 3,
       query: mutation,
-      variables: { userId: '1', amount: 1000 },
+      variables: { userId: '1', amount: 1000, testExtra: true },
     });
 
     const response = vi.fn(
@@ -348,7 +348,8 @@ describe('data dependencies', () => {
 
     const updates = {
       Mutation: {
-        updateBalance: vi.fn((result, _args, cache) => {
+        updateBalance: vi.fn((result, _args, cache, info) => {
+          console.log(_args, info.variables);
           const {
             updateBalance: { userId, balance },
           } = result;
