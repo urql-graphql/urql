@@ -72,17 +72,10 @@ async function* fetchOperation(
     let prevResult: OperationResult | null = null;
     for await (const data of iterator) {
       hasResults = true;
+      buffer += toString(data);
 
-      const chunk = toString(data);
-      let boundaryIndex = chunk.indexOf(boundary);
-      if (boundaryIndex > -1) {
-        boundaryIndex += buffer.length;
-      } else {
-        boundaryIndex = buffer.indexOf(boundary);
-      }
-
-      buffer += chunk;
-      while (boundaryIndex > -1) {
+      let boundaryIndex: number;
+      while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
         const current = buffer.slice(0, boundaryIndex);
         const next = buffer.slice(boundaryIndex + boundary.length);
 
@@ -109,7 +102,6 @@ async function* fetchOperation(
         }
 
         buffer = next;
-        boundaryIndex = buffer.indexOf(boundary);
       }
 
       if (nextResult) {
