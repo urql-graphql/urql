@@ -17,6 +17,8 @@ export type HashValue = number & {
   readonly _opaque: unique symbol;
 };
 
+const BASE = 5381 as HashValue;
+
 /** Computes a djb2 hash of the given string.
  *
  * @param x - the string to be hashed
@@ -29,8 +31,8 @@ export type HashValue = number & {
  *
  * @see {@link http://www.cse.yorku.ca/~oz/hash.html#djb2} for a further description of djb2.
  */
-export const phash = (x: string, seed?: HashValue): HashValue => {
-  let h = typeof seed === 'number' ? seed | 0 : 5381;
+export const phash = (x: string, seed: HashValue = BASE): HashValue => {
+  let h = seed | 0;
   for (let i = 0, l = x.length | 0; i < l; i++)
     h = (h << 5) + h + x.charCodeAt(i);
   return h as HashValue;
