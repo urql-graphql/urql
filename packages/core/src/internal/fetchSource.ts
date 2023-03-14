@@ -34,8 +34,8 @@ async function* fetchOperation(
   fetchOptions: RequestInit
 ) {
   let abortController: AbortController | void;
+  let result: OperationResult | null = null;
   let response: Response;
-  let hasResults = false;
 
   try {
     if (typeof AbortController !== 'undefined') {
@@ -62,9 +62,7 @@ async function* fetchOperation(
 
     let buffer = '';
     let isPreamble = true;
-    let result: OperationResult | null = null;
     chunks: for await (const data of iterator) {
-      hasResults = true;
       buffer += toString(data);
 
       let boundaryIndex: number;
@@ -89,7 +87,8 @@ async function* fetchOperation(
           } catch (_error) {}
 
           if (next.startsWith('--') || (payload && !payload.hasNext)) {
-            if (!result) yield makeResult(operation, {}, response);
+            if (!result)
+              yield (result = makeResult(operation, {}, response));
             break chunks;
           }
         }
@@ -98,7 +97,7 @@ async function* fetchOperation(
       }
     }
   } catch (error: any) {
-    if (hasResults) {
+    if (result) {
       throw error;
     }
 
