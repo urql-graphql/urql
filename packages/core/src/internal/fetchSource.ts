@@ -47,9 +47,12 @@ async function* parseMultipartChunks(
           buffer.indexOf('\r\n\r\n') + 4,
           boundaryIndex
         );
+
         try {
           yield (payload = JSON.parse(chunk));
-        } catch (_error) {}
+        } catch (error) {
+          if (!payload) throw error;
+        }
 
         buffer = buffer.slice(boundaryIndex + boundary.length);
         if (buffer.startsWith('--') || (payload && !payload.hasNext))
