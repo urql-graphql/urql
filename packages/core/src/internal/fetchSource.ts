@@ -36,7 +36,6 @@ async function* fetchOperation(
   let abortController: AbortController | void;
   let response: Response;
   let hasResults = false;
-  let statusNotOk = false;
 
   try {
     if (typeof AbortController !== 'undefined') {
@@ -46,12 +45,7 @@ async function* fetchOperation(
     // Delay for a tick to give the Client a chance to cancel the request
     // if a teardown comes in immediately
     await Promise.resolve();
-
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
-    statusNotOk =
-      response.status < 200 ||
-      response.status >= (fetchOptions.redirect === 'manual' ? 400 : 300);
-
     const contentType =
       (response.headers && response.headers.get('Content-Type')) || '';
     if (/text\//i.test(contentType)) {
@@ -110,10 +104,9 @@ async function* fetchOperation(
 
     yield makeErrorResult(
       operation,
-      (statusNotOk &&
-        response!.statusText &&
-        new Error(response!.statusText)) ||
-        error,
+      (response!.status < 200 || response!.status >= 300) && response!.statusText
+        ? new Error(response!.statusText)
+        : error,
       response!
     );
   } finally {
