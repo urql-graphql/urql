@@ -3,7 +3,6 @@ import { Operation, OperationResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
-const jsonHeaderRe = /content-type:[^\r\n]*application\/json/i;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
 
 type ChunkData = Buffer | Uint8Array;
@@ -92,19 +91,18 @@ async function* fetchOperation(
         if (isPreamble) {
           isPreamble = false;
         } else {
-          const headersEnd = current.indexOf('\r\n\r\n') + 4;
-          const headers = current.slice(0, headersEnd);
-          const body = current.slice(headersEnd, current.lastIndexOf('\r\n'));
+          const body = current.slice(
+            current.indexOf('\r\n\r\n') + 4,
+            current.lastIndexOf('\r\n')
+          );
 
           let payload: any;
-          if (jsonHeaderRe.test(headers)) {
-            try {
-              payload = JSON.parse(body);
-              nextResult = prevResult = prevResult
-                ? mergeResultPatch(prevResult, payload, response)
-                : makeResult(operation, payload, response);
-            } catch (_error) {}
-          }
+          try {
+            payload = JSON.parse(body);
+            nextResult = prevResult = prevResult
+              ? mergeResultPatch(prevResult, payload, response)
+              : makeResult(operation, payload, response);
+          } catch (_error) {}
 
           if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
             if (!prevResult) yield makeResult(operation, {}, response);
