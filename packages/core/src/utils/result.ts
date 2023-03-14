@@ -28,10 +28,7 @@ export const makeResult = (
   result: ExecutionResult,
   response?: any
 ): OperationResult => {
-  if (
-    (!('data' in result) && !('errors' in result)) ||
-    'incremental' in result
-  ) {
+  if (!('data' in result) && !('errors' in result)) {
     throw new Error('No Content');
   }
 
