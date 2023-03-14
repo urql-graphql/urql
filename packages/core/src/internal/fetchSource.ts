@@ -4,7 +4,9 @@ import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
+const eventStreamRe = /\s*event:\s*([\w-_]+)(?:[ \r\n]+data:)?/g;
 
+type ContentMode = 'json' | 'multipart' | 'event-stream';
 type ChunkData = Buffer | Uint8Array;
 
 // NOTE: We're avoiding referencing the `Buffer` global here to prevent
@@ -13,6 +15,18 @@ const toString = (input: Buffer | ArrayBuffer): string =>
   input.constructor.name === 'Buffer'
     ? (input as Buffer).toString()
     : decoder!.decode(input as ArrayBuffer);
+
+const parseContentMode = (contentType: string): ContentMode | null => {
+  if (/multipart\/mixed/i.test(contentType)) {
+    return 'multipart';
+  } else if (/text\/event-stream/.test(contentType)) {
+    return 'event-stream';
+  } else if (/text\//.test(contentType)) {
+    return null;
+  } else {
+    return 'json';
+  }
+};
 
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
@@ -27,6 +41,33 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
       reader.cancel();
     }
   }
+}
+
+async function* parseEventStream(response: Response) {
+  let payload: any;
+
+  chunks: for await (const chunk of streamBody(response)) {
+    for (const message of chunk.split('\n\n')) {
+      const match = message.match(eventStreamRe);
+      if (match) {
+        const type = match[1];
+        if (type === 'complete') {
+          break chunks;
+        } else if (type === 'next') {
+          const chunk = message.slice(match[0].length);
+          try {
+            yield (payload = JSON.parse(chunk));
+          } catch (error) {
+            if (!payload) throw error;
+          }
+
+          if (payload && !payload.hasNext) break chunks;
+        }
+      }
+    }
+  }
+
+  if (payload && payload.hasNext) yield { hasNext: false };
 }
 
 async function* parseMultipartMixed(
@@ -85,17 +126,22 @@ async function* fetchOperation(
     // Delay for a tick to give the Client a chance to cancel the request
     // if a teardown comes in immediately
     await Promise.resolve();
+
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
     const contentType = response.headers.get('Content-Type') || '';
-    if (/text\//i.test(contentType)) {
+    const mode = parseContentMode(contentType);
+    if (!mode) {
       const text = await response.text();
       return yield makeErrorResult(operation, new Error(text), response);
-    } else if (!/multipart\/mixed/i.test(contentType)) {
+    } else if (mode === 'json') {
       const text = await response.text();
       return yield makeResult(operation, JSON.parse(text), response);
     }
 
-    const iterator = parseMultipartMixed(contentType, response);
+    const iterator =
+      mode === 'multipart'
+        ? parseMultipartMixed(contentType, response)
+        : parseEventStream(response);
     for await (const payload of iterator) {
       yield (result = result
         ? mergeResultPatch(result, payload, response)
