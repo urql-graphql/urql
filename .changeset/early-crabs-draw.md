@@ -2,5 +2,4 @@
 '@urql/core': patch
 ---
 
-move `multipart/mixed` to the last `Accept` header to avoid breaking
-`react-native-fetch`
+Move `multipart/mixed` to end of `Accept` header to avoid cauing Yoga to unnecessarily use it.
