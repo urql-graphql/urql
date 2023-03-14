@@ -62,10 +62,8 @@ async function* fetchOperation(
       return yield makeResult(operation, JSON.parse(text), response);
     }
 
-    let boundary = '---';
     const boundaryHeader = contentType.match(boundaryHeaderRe);
-    if (boundaryHeader) boundary = '--' + boundaryHeader[1];
-
+    const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
     const iterator = streamBody(response);
 
     let buffer = '';
