@@ -32,7 +32,7 @@ export interface Options {
   ttl?: number;
 }
 
-/** Creates an `Exchange` that can upgrade the request-policy to "cache-and-network" of an urql query operation.
+/** Exchange factory that upgrades request policies to `cache-and-network` for queries outside of a defined `ttl`.
  *
  * @param options - An {@link Options} configuration object.
  * @returns the created request-policy {@link Exchange}.
