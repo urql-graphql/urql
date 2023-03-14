@@ -57,11 +57,11 @@ async function* parseMultipartMixed(
         } catch (error) {
           if (!payload) throw error;
         }
-
-        buffer = buffer.slice(boundaryIndex + boundary.length);
-        if (buffer.startsWith('--') || (payload && !payload.hasNext))
-          break chunks;
       }
+
+      buffer = buffer.slice(boundaryIndex + boundary.length);
+      if (buffer.startsWith('--') || (payload && !payload.hasNext))
+        break chunks;
     }
   }
 
