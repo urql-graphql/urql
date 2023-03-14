@@ -29,7 +29,7 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   }
 }
 
-async function* parseMultipartChunks(
+async function* parseMultipartMixed(
   contentType: string,
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
@@ -95,7 +95,7 @@ async function* fetchOperation(
       return yield makeResult(operation, JSON.parse(text), response);
     }
 
-    const iterator = parseMultipartChunks(contentType, response);
+    const iterator = parseMultipartMixed(contentType, response);
     for await (const payload of iterator) {
       yield (result = result
         ? mergeResultPatch(result, payload, response)
