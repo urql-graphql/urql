@@ -22,7 +22,7 @@ const stringify = (x: any): string => {
   if (!keys.length && x.constructor && x.constructor !== Object) {
     const key = cache.get(x) || Math.random().toString(36).slice(2);
     cache.set(x, key);
-    return `{"__key":"${key}"}`;
+    return stringify({ __key: key });
   }
 
   seen.add(x);
