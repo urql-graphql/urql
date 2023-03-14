@@ -12,7 +12,15 @@ export interface Options {
   /** A function allowing you to return a boolean on whether or not to upgrade the
    * operation to "cache-and-network". */
   shouldUpgrade?: (op: Operation) => boolean;
-  /** The TTL in ms for which we should not upgrade an operation for. */
+  /** The time-to-live (TTL) for which a request policy won't be upgraded.
+  
+  @remarks
+  The `ttl` defines the time frame in which the `Operation` won't be updated
+  with a `cache-and-network` request policy. If an `Operation` is sent again
+  and the `ttl` time period has expired, the policy is upgraded.
+  
+  @defaultValue `300_000` - 5min
+  */
   ttl?: number;
 }
 
