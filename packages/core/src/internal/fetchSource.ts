@@ -15,6 +15,20 @@ const toString = (input: Buffer | ArrayBuffer): string =>
     ? (input as Buffer).toString()
     : decoder!.decode(input as ArrayBuffer);
 
+function streamBody(response: Response): AsyncIterableIterator<ChunkData> {
+  if (response.body![Symbol.asyncIterator])
+    return response.body![Symbol.asyncIterator]();
+  const reader = response.body!.getReader();
+  return {
+    next() {
+      return reader.read() as Promise<IteratorResult<ChunkData>>;
+    },
+    [Symbol.asyncIterator]() {
+      return this;
+    },
+  };
+}
+
 async function* fetchOperation(
   operation: Operation,
   url: string,
@@ -53,20 +67,7 @@ async function* fetchOperation(
     const boundaryHeader = contentType.match(boundaryHeaderRe);
     if (boundaryHeader) boundary = '--' + boundaryHeader[1];
 
-    let iterator: AsyncIterableIterator<ChunkData>;
-    if (response[Symbol.asyncIterator]) {
-      iterator = response[Symbol.asyncIterator]();
-    } else {
-      const reader = response.body!.getReader();
-      iterator = {
-        next() {
-          return reader.read() as Promise<IteratorResult<ChunkData>>;
-        },
-        [Symbol.asyncIterator]() {
-          return iterator;
-        },
-      };
-    }
+    const iterator = streamBody(response);
 
     let buffer = '';
     let isPreamble = true;
