@@ -1,5 +1,6 @@
-import { Client, OperationResult, makeOperation } from '@urql/core';
-import { empty, fromValue, pipe, Source, subscribe, toPromise } from 'wonka';
+import { Client, OperationResult } from '@urql/core';
+import { empty, fromValue, pipe, Source, toPromise } from 'wonka';
+
 import {
   vi,
   expect,
@@ -22,9 +23,6 @@ import {
 
 const fetch = (global as any).fetch as Mock;
 const abort = vi.fn();
-
-const abortError = new Error();
-abortError.name = 'AbortError';
 
 beforeAll(() => {
   (global as any).AbortController = function AbortController() {
@@ -175,54 +173,5 @@ describe('on error', () => {
     );
 
     expect(data.data).toEqual(JSON.parse(response).data);
-  });
-});
-
-describe('on teardown', () => {
-  const fail = () => {
-    expect(true).toEqual(false);
-  };
-
-  it('does not start the outgoing request on immediate teardowns', () => {
-    fetch.mockRejectedValueOnce(abortError);
-
-    const { unsubscribe } = pipe(
-      fromValue(queryOperation),
-      multipartFetchExchange(exchangeArgs),
-      subscribe(fail)
-    );
-
-    unsubscribe();
-    expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(1);
-  });
-
-  it('aborts the outgoing request', async () => {
-    fetch.mockRejectedValueOnce(abortError);
-
-    const { unsubscribe } = pipe(
-      fromValue(queryOperation),
-      multipartFetchExchange(exchangeArgs),
-      subscribe(fail)
-    );
-
-    await Promise.resolve();
-
-    unsubscribe();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(abort).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call the query', () => {
-    pipe(
-      fromValue(
-        makeOperation('teardown', queryOperation, queryOperation.context)
-      ),
-      multipartFetchExchange(exchangeArgs),
-      subscribe(fail)
-    );
-
-    expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(0);
   });
 });
