@@ -46,8 +46,7 @@ async function* fetchOperation(
     // if a teardown comes in immediately
     await Promise.resolve();
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
-    const contentType =
-      (response.headers && response.headers.get('Content-Type')) || '';
+    const contentType = response.headers.get('Content-Type') || '';
     if (/text\//i.test(contentType)) {
       const text = await response.text();
       return yield makeErrorResult(operation, new Error(text), response);
@@ -87,8 +86,7 @@ async function* fetchOperation(
           } catch (_error) {}
 
           if (next.startsWith('--') || (payload && !payload.hasNext)) {
-            if (!result)
-              yield (result = makeResult(operation, {}, response));
+            if (!result) yield (result = makeResult(operation, {}, response));
             break chunks;
           }
         }
@@ -103,7 +101,8 @@ async function* fetchOperation(
 
     yield makeErrorResult(
       operation,
-      (response!.status < 200 || response!.status >= 300) && response!.statusText
+      (response!.status < 200 || response!.status >= 300) &&
+        response!.statusText
         ? new Error(response!.statusText)
         : error,
       response!

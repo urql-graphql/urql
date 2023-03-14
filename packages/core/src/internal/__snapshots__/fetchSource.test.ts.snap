@@ -606,6 +606,9 @@ exports[`on success > uses the mock fetch if given 1`] = `
           {
             "type": "return",
             "value": {
+              "headers": {
+                "get": [Function],
+              },
               "status": 200,
               "text": [MockFunction spy] {
                 "calls": [

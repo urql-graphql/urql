@@ -48,6 +48,7 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
   });
@@ -70,6 +71,7 @@ describe('on success', () => {
     const fetchOptions = {};
     const fetcher = vi.fn().mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
 
@@ -99,6 +101,7 @@ describe('on error', () => {
     fetch.mockResolvedValue({
       status: 400,
       statusText: 'Forbidden',
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue('{}'),
     });
   });
