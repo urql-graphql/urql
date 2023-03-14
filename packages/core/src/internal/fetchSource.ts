@@ -1,5 +1,5 @@
 import { Source, fromAsyncIterable } from 'wonka';
-import { Operation, OperationResult } from '../types';
+import { Operation, OperationResult, ExecutionResult } from '../types';
 import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
@@ -25,7 +25,10 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   }
 }
 
-async function* parseMultipartChunks(response: Response, contentType: string) {
+async function* parseMultipartChunks(
+  contentType: string,
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
   const boundaryHeader = contentType.match(boundaryHeaderRe);
   const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
 
@@ -85,7 +88,7 @@ async function* fetchOperation(
       return yield makeResult(operation, JSON.parse(text), response);
     }
 
-    const iterator = parseMultipartChunks(response, contentType);
+    const iterator = parseMultipartChunks(contentType, response);
     for await (const payload of iterator) {
       yield (result = result
         ? mergeResultPatch(result, payload, response)
