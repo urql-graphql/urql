@@ -88,7 +88,7 @@ async function* fetchOperation(
               : makeResult(operation, payload, response));
           } catch (_error) {}
 
-          if (next.slice(0, 2) === '--' || (payload && !payload.hasNext)) {
+          if (next.startsWith('--') || (payload && !payload.hasNext)) {
             if (!result) yield makeResult(operation, {}, response);
             break chunks;
           }
