@@ -39,7 +39,7 @@ export interface Options {
  *
  * @remarks
  * The `requestPolicyExchange` upgrades query operations based on {@link Options.ttl}.
- * The `ttl` defines a timeframe outside of which a query's request policy is set to 
+ * The `ttl` defines a timeframe outside of which a query's request policy is set to
  * `cache-and-network` to refetch it in the background.
  *
  * You may define a {@link Options.shouldUpgrade} function to selectively ignore some
