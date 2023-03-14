@@ -88,9 +88,10 @@ export const makeFetchOptions = (
 ): RequestInit => {
   const useGETMethod =
     operation.kind === 'query' && !!operation.context.preferGetMethod;
+
   const headers: HeadersInit = {
     accept:
-      'multipart/mixed, application/graphql-response+json, application/graphql+json, application/json',
+      'application/graphql-response+json, application/graphql+json, application/json, multipart/mixed',
   };
   if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =
