@@ -25,6 +25,37 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   }
 }
 
+async function* parseMultipartChunks(response: Response, contentType: string) {
+  const boundaryHeader = contentType.match(boundaryHeaderRe);
+  const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
+
+  let buffer = '';
+  let isPreamble = true;
+  let boundaryIndex: number;
+
+  chunks: for await (const chunk of streamBody(response)) {
+    buffer += chunk;
+    while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
+      if (isPreamble) {
+        isPreamble = false;
+      } else {
+        const chunk = buffer.slice(
+          buffer.indexOf('\r\n\r\n') + 4,
+          boundaryIndex
+        );
+        let payload: any;
+        try {
+          yield (payload = JSON.parse(chunk));
+        } catch (_error) {}
+
+        buffer = buffer.slice(boundaryIndex + boundary.length);
+        if (buffer.startsWith('--') || (payload && !payload.hasNext))
+          break chunks;
+      }
+    }
+  }
+}
+
 async function* fetchOperation(
   operation: Operation,
   url: string,
@@ -52,44 +83,15 @@ async function* fetchOperation(
       return yield makeResult(operation, JSON.parse(text), response);
     }
 
-    const boundaryHeader = contentType.match(boundaryHeaderRe);
-    const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
-    const iterator = streamBody(response);
+    const iterator = parseMultipartChunks(response, contentType);
+    for await (const payload of iterator) {
+      yield (result = result
+        ? mergeResultPatch(result, payload, response)
+        : makeResult(operation, payload, response));
+    }
 
-    let buffer = '';
-    let isPreamble = true;
-    chunks: for await (const chunk of iterator) {
-      buffer += chunk;
-
-      let boundaryIndex: number;
-      while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
-        const current = buffer.slice(0, boundaryIndex);
-        const next = buffer.slice(boundaryIndex + boundary.length);
-
-        if (isPreamble) {
-          isPreamble = false;
-        } else {
-          const body = current.slice(
-            current.indexOf('\r\n\r\n') + 4,
-            current.lastIndexOf('\r\n')
-          );
-
-          let payload: any;
-          try {
-            payload = JSON.parse(body);
-            yield (result = result
-              ? mergeResultPatch(result, payload, response)
-              : makeResult(operation, payload, response));
-          } catch (_error) {}
-
-          if (next.startsWith('--') || (payload && !payload.hasNext)) {
-            if (!result) yield (result = makeResult(operation, {}, response));
-            break chunks;
-          }
-        }
-
-        buffer = next;
-      }
+    if (!result) {
+      yield (result = makeResult(operation, {}, response));
     }
   } catch (error: any) {
     if (result) {
