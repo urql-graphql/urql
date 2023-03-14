@@ -433,6 +433,7 @@ export interface OperationContext {
    * `OperationResult`s and is filled in by exchanges across the codebase in development.
    *
    * This data is not for production use and hence shouldn't be used or relied upon directly.
+   * In production, this may not be set by default exchanges.
    */
   meta?: OperationDebugMeta;
   /** Instructs fetch exchanges to use a GET request.

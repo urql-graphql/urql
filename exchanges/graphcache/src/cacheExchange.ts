@@ -21,7 +21,7 @@ import {
 } from 'wonka';
 
 import { query, write, writeOptimistic } from './operations';
-import { addCacheOutcome, toRequestPolicy } from './helpers/operation';
+import { addMetadata, toRequestPolicy } from './helpers/operation';
 import { filterVariables, getMainOperation } from './ast';
 import { Store, noopDataState, hydrateData, reserveLayer } from './store';
 import { Data, Dependencies, CacheExchangeOpts } from './types';
@@ -295,7 +295,7 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
           message: 'The result could not be retrieved from the cache',
           operation: res.operation,
         });
-        return addCacheOutcome(res.operation, 'miss');
+        return addMetadata(res.operation, { cacheOutcome: 'miss' });
       })
     );
 
@@ -327,7 +327,9 @@ export const cacheExchange = <C extends Partial<CacheExchangeOpts>>(
               !reexecutingOperations.has(res.operation.key));
 
           const result: OperationResult = {
-            operation: addCacheOutcome(res.operation, res.outcome),
+            operation: addMetadata(res.operation, {
+              cacheOutcome: res.outcome,
+            }),
             data: res.data,
             error: res.error,
             extensions: res.extensions,

@@ -1,14 +1,22 @@
-const dispatchProperty = 'dispatchDebug';
 const visited = 'visitedByDebugTargetTransformer';
 
 const warningDevCheckTemplate = `
   process.env.NODE_ENV !== 'production' ? NODE : undefined
 `.trim();
 
+const noopTransformTemplate = `
+  process.env.NODE_ENV !== 'production' ? NODE : FALLBACK
+`.trim();
+
 const plugin = ({ template, types: t }) => {
   const wrapWithDevCheck = template.expression(
     warningDevCheckTemplate,
     { placeholderPattern: /^NODE$/ }
+  );
+
+  const wrapWithNoopTransform = template.expression(
+    noopTransformTemplate,
+    { placeholderPattern: /^(NODE|FALLBACK)$/ }
   );
 
   let name = 'unknownExchange';
@@ -22,11 +30,9 @@ const plugin = ({ template, types: t }) => {
         }
       },
       CallExpression(path, meta) {
-        if (
-          !path.node[visited] &&
-          path.node.callee &&
-          path.node.callee.name === dispatchProperty
-        ) {
+        if (path.node[visited] || !path.node.callee) return;
+
+        if (path.node.callee.name === 'dispatchDebug') {
           path.node[visited] = true;
           if (t.isObjectExpression(path.node.arguments[0]) && !meta.filename.endsWith('compose.ts')) {
             path.node.arguments[0].properties.push(
@@ -38,6 +44,12 @@ const plugin = ({ template, types: t }) => {
           }
 
           path.replaceWith(wrapWithDevCheck({ NODE: path.node }));
+        } else if (path.node.callee.name === 'addMetadata') {
+          path.node[visited] = true;
+          path.replaceWith(wrapWithNoopTransform({
+            NODE: path.node,
+            FALLBACK: path.node.arguments[0],
+          }));
         }
       }
     }
