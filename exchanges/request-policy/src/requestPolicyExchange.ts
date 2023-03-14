@@ -9,7 +9,14 @@ import { pipe, tap, map } from 'wonka';
 const defaultTTL = 5 * 60 * 1000;
 
 export interface Options {
-  /** A function allowing you to return a boolean on whether or not to upgrade the
+  /** Predicate allowing you to selectively not upgrade `Operation`s.
+  
+  @remarks
+  When `shouldUpgrade` is set, it may be used to selectively return a boolean
+  per `Operation`. This allows certain `Operation`s to not be upgraded to a
+  `cache-and-network` policy, when `false` is returned.
+  
+  By default, all `Operation`s are subject to be upgraded.
    * operation to "cache-and-network". */
   shouldUpgrade?: (op: Operation) => boolean;
   /** The time-to-live (TTL) for which a request policy won't be upgraded.
