@@ -50,7 +50,7 @@ export interface Options {
  * requestPolicyExchange({
  *  // Upgrade when we haven't seen this operation for 1 second
  *  ttl: 1000,
- *  // or when it's a todos query, we always upgrade those
+ *  // and only upgrade operations that query the `todos` field.
  *  shouldUpgrade: op => op.kind === 'query' && op.query.definitions[0].name?.value === 'todos'
  * });
  * ```
