@@ -59,6 +59,7 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
   });
@@ -128,6 +129,7 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue('{}'),
     });
   });
@@ -163,6 +165,7 @@ describe('on error', () => {
   it('ignores the error when a result is available', async () => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
 

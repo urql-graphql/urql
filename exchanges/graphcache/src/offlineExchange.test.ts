@@ -62,7 +62,11 @@ const storage = {
 
 describe('storage', () => {
   it('should read the metadata and dispatch operations on initialization', () => {
-    const client = createClient({ url: 'http://0.0.0.0' });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
     const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')
       .mockImplementation(() => undefined);
@@ -100,7 +104,11 @@ describe('offline', () => {
   it('should intercept errored mutations', () => {
     const onlineSpy = vi.spyOn(navigator, 'onLine', 'get');
 
-    const client = createClient({ url: 'http://0.0.0.0' });
+    const client = createClient({
+      url: 'http://0.0.0.0',
+      exchanges: [],
+    });
+
     const queryOp = client.createRequestOperation('query', {
       key: 1,
       query: queryOne,

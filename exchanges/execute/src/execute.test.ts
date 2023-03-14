@@ -196,6 +196,7 @@ describe('on operation', () => {
 
     fetchMock.mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi
         .fn()
         .mockResolvedValue(JSON.stringify({ data: mockHttpResponseData })),
