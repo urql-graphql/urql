@@ -24,7 +24,7 @@ export interface KeyedDocumentNode extends DocumentNode {
 
 const SOURCE_NAME = 'gql';
 const GRAPHQL_STRING_RE = /("{3}[\s\S]*"{3}|"(?:\\.|[^"])*")/g;
-const REPLACE_CHAR_RE = /(#[^\n\r]+)?(?:\n|\r\n?|$)+/g;
+const REPLACE_CHAR_RE = /(?:#[^\n\r]+)?(?:[\r\n]+|$)/g;
 
 const replaceOutsideStrings = (str: string, idx: number) =>
   idx % 2 === 0 ? str.replace(REPLACE_CHAR_RE, '\n') : str;
@@ -95,8 +95,8 @@ const hashDocument = (
 ): HashValue => {
   let key = phash(stringifyDocument(node));
   // Add the operation name to the produced hash
-  if (typeof node === 'object' && 'definitions' in node) {
-    const operationName = getOperationName(node);
+  if ((node as DocumentNode).definitions) {
+    const operationName = getOperationName(node as DocumentNode);
     if (operationName) key = phash(`\n# ${operationName}`, key);
   }
   return key;
@@ -151,11 +151,11 @@ export const createRequest = <
   Data = any,
   Variables extends AnyVariables = AnyVariables
 >(
-  q: string | DocumentNode | TypedDocumentNode<Data, Variables>,
-  variables: Variables
+  _query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
+  _variables: Variables
 ): GraphQLRequest<Data, Variables> => {
-  if (!variables) variables = {} as Variables;
-  const query = keyDocument(q);
+  const variables = _variables || ({} as Variables);
+  const query = keyDocument(_query);
   const printedVars = stringifyVariables(variables);
   let key = query.__key;
   if (printedVars !== '{}') key = phash(printedVars, key);
