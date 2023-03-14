@@ -14,18 +14,15 @@ const toString = (input: Buffer | ArrayBuffer): string =>
     ? (input as Buffer).toString()
     : decoder!.decode(input as ArrayBuffer);
 
-function streamBody(response: Response): AsyncIterableIterator<ChunkData> {
-  if (response.body![Symbol.asyncIterator])
-    return response.body![Symbol.asyncIterator]();
-  const reader = response.body!.getReader();
-  return {
-    next() {
-      return reader.read() as Promise<IteratorResult<ChunkData>>;
-    },
-    [Symbol.asyncIterator]() {
-      return this;
-    },
-  };
+async function* streamBody(response: Response): AsyncIterableIterator<string> {
+  if (response.body![Symbol.asyncIterator]) {
+    for await (const chunk of response.body! as any)
+      yield toString(chunk as ChunkData);
+  } else {
+    const reader = response.body!.getReader();
+    let result: ReadableStreamReadResult<ChunkData>;
+    while (!(result = await reader.read()).done) yield toString(result.value);
+  }
 }
 
 async function* fetchOperation(
@@ -61,8 +58,8 @@ async function* fetchOperation(
 
     let buffer = '';
     let isPreamble = true;
-    chunks: for await (const data of iterator) {
-      buffer += toString(data);
+    chunks: for await (const chunk of iterator) {
+      buffer += chunk;
 
       let boundaryIndex: number;
       while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
