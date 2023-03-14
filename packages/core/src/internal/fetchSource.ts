@@ -32,6 +32,7 @@ async function* parseMultipartChunks(response: Response, contentType: string) {
   let buffer = '';
   let isPreamble = true;
   let boundaryIndex: number;
+  let payload: any;
 
   chunks: for await (const chunk of streamBody(response)) {
     buffer += chunk;
@@ -43,7 +44,6 @@ async function* parseMultipartChunks(response: Response, contentType: string) {
           buffer.indexOf('\r\n\r\n') + 4,
           boundaryIndex
         );
-        let payload: any;
         try {
           yield (payload = JSON.parse(chunk));
         } catch (_error) {}
@@ -54,6 +54,8 @@ async function* parseMultipartChunks(response: Response, contentType: string) {
       }
     }
   }
+
+  if (payload && payload.hasNext) yield { hasNext: false };
 }
 
 async function* fetchOperation(
