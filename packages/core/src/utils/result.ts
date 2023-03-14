@@ -79,12 +79,7 @@ export const mergeResultPatch = (
 
   // NOTE: We handle the old version of the incremental delivery payloads as well
   if ('path' in nextResult) {
-    incremental = [
-      {
-        data: nextResult.data,
-        path: nextResult.path,
-      } as IncrementalPayload,
-    ];
+    incremental = [nextResult as IncrementalPayload];
   }
 
   if (incremental) {
