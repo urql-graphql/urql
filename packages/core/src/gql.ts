@@ -3,37 +3,6 @@ import { DocumentNode, DefinitionNode, Kind } from 'graphql';
 import { AnyVariables, TypedDocumentNode } from './types';
 import { keyDocument, stringifyDocument } from './utils';
 
-const applyDefinitions = (
-  fragmentNames: Map<string, string>,
-  target: DefinitionNode[],
-  source: Array<DefinitionNode> | ReadonlyArray<DefinitionNode>
-) => {
-  for (const definition of source) {
-    if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-      const name = definition.name.value;
-      const value = stringifyDocument(definition);
-      // Fragments will be deduplicated according to this Map
-      if (!fragmentNames.has(name)) {
-        fragmentNames.set(name, value);
-        target.push(definition);
-      } else if (
-        process.env.NODE_ENV !== 'production' &&
-        fragmentNames.get(name) !== value
-      ) {
-        // Fragments with the same names is expected to have the same contents
-        console.warn(
-          '[WARNING: Duplicate Fragment] A fragment with name `' +
-            name +
-            '` already exists in this document.\n' +
-            'While fragment names may not be unique across your source, each name must be unique per document.'
-        );
-      }
-    } else {
-      target.push(definition);
-    }
-  }
-};
-
 /** A GraphQL parse function, which may be called as a tagged template literal, returning a parsed {@link DocumentNode}.
  *
  * @remarks
@@ -89,19 +58,17 @@ function gql<Data = any, Variables extends AnyVariables = AnyVariables>(
   string: string
 ): TypedDocumentNode<Data, Variables>;
 
-function gql(/* arguments */) {
+function gql(parts: string | TemplateStringsArray /* arguments */) {
   const fragmentNames = new Map<string, string>();
   const definitions: DefinitionNode[] = [];
-  const interpolations: DefinitionNode[] = [];
+  const source: DocumentNode[] = [];
 
   // Apply the entire tagged template body's definitions
-  let body: string = Array.isArray(arguments[0])
-    ? arguments[0][0]
-    : arguments[0] || '';
+  let body: string = Array.isArray(parts) ? parts[0] : parts || '';
   for (let i = 1; i < arguments.length; i++) {
     const value = arguments[i];
     if (value && value.definitions) {
-      interpolations.push(...value.definitions);
+      source.push(value);
     } else {
       body += value;
     }
@@ -109,10 +76,33 @@ function gql(/* arguments */) {
     body += arguments[0][i];
   }
 
-  // Apply the tag's body definitions
-  applyDefinitions(fragmentNames, definitions, keyDocument(body).definitions);
-  // Copy over each interpolated document's definitions
-  applyDefinitions(fragmentNames, definitions, interpolations);
+  source.unshift(keyDocument(body));
+  for (const document of source) {
+    for (const definition of document.definitions) {
+      if (definition.kind === Kind.FRAGMENT_DEFINITION) {
+        const name = definition.name.value;
+        const value = stringifyDocument(definition);
+        // Fragments will be deduplicated according to this Map
+        if (!fragmentNames.has(name)) {
+          fragmentNames.set(name, value);
+          definitions.push(definition);
+        } else if (
+          process.env.NODE_ENV !== 'production' &&
+          fragmentNames.get(name) !== value
+        ) {
+          // Fragments with the same names is expected to have the same contents
+          console.warn(
+            '[WARNING: Duplicate Fragment] A fragment with name `' +
+              name +
+              '` already exists in this document.\n' +
+              'While fragment names may not be unique across your source, each name must be unique per document.'
+          );
+        }
+      } else {
+        definitions.push(definition);
+      }
+    }
+  }
 
   return keyDocument({
     kind: Kind.DOCUMENT,
