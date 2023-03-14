@@ -38,8 +38,12 @@ export interface Options {
  * @returns the created request-policy {@link Exchange}.
  *
  * @remarks
- * The `requestPolicyExchange` observes all operations going through and allows you
- * to upgrade based on a "ttl" or "shouldUpgrade" function.
+ * The `requestPolicyExchange` upgrades query operations based on {@link Options.ttl}.
+ * The `ttl` defines a timeframe outside of which a query's request policy is set to 
+ * `cache-and-network` to refetch it in the background.
+ *
+ * You may define a {@link Options.shouldUpgrade} function to selectively ignore some
+ * operations by returning `false` there.
  *
  * @example
  * ```ts
