@@ -10,12 +10,10 @@ const stringify = (x: any): string => {
     return stringify(x.toJSON());
   } else if (Array.isArray(x)) {
     let out = '[';
-    for (let value of x) {
-      if (out !== '[') out += ',';
-      value = stringify(value);
-      out += value.length > 0 ? value : 'null';
+    for (const value of x) {
+      if (out.length > 1) out += ',';
+      out += stringify(value) || 'null';
     }
-
     out += ']';
     return out;
   }
