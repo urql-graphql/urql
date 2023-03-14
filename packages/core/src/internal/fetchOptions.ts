@@ -89,6 +89,8 @@ export const makeFetchOptions = (
   const useGETMethod =
     operation.kind === 'query' && !!operation.context.preferGetMethod;
 
+  // Alternatively we could use visit() to see if we find any of the two
+  // directives
   const hasStreamingDirective =
     body?.query?.includes('@defer') || body?.query?.includes('@stream');
 
