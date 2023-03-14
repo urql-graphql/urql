@@ -134,7 +134,7 @@ async function* fetchOperation(
       response!
     );
   } finally {
-    abortController?.abort();
+    if (abortController) abortController.abort();
   }
 }
 
