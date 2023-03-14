@@ -20,3 +20,7 @@ export type DocumentNode =
 export type DefinitionNode =
   | GraphQLWeb.DefinitionNode
   | OrNever<GraphQL.DefinitionNode>;
+
+export type SelectionNode =
+  | GraphQLWeb.SelectionNode
+  | OrNever<GraphQL.SelectionNode>;
