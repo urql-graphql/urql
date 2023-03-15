@@ -115,8 +115,8 @@ describe('makeFetchOptions', () => {
     });
 
     expect(form.get('map')).toMatchInlineSnapshot(
-      '"{\\"1\\":\\"variables.file\\"}"'
+      '"{\\"0\\":\\"variables.file\\"}"'
     );
-    expect(form.get('1')).toBeInstanceOf(Blob);
+    expect(form.get('0')).toBeInstanceOf(Blob);
   });
 });

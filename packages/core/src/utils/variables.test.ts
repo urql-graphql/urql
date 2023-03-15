@@ -54,14 +54,14 @@ describe('extractFiles', () => {
   it('extracts files from nested objects', () => {
     const file = new Blob();
     expect(extractFiles({ files: { a: file } })).toEqual(
-      new Map([['.files.a', file]])
+      new Map([['variables.files.a', file]])
     );
   });
 
   it('extracts files from nested arrays', () => {
     const file = new Blob();
     expect(extractFiles({ files: [file] })).toEqual(
-      new Map([['.files.0', file]])
+      new Map([['variables.files.0', file]])
     );
   });
 });
