@@ -3,7 +3,6 @@ import * as React from 'react';
 
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
 import sucrase from '@rollup/plugin-sucrase';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
@@ -18,10 +17,10 @@ import babelPluginTransformDebugTarget from '../babel/transform-debug-target.mjs
 
 import * as settings from './settings.mjs';
 
-export const makeTSPlugins = () => [
+export const makeBasePlugins = () => [
   resolve({
     dedupe: settings.externalModules,
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.js', '.ts'],
     mainFields: ['module', 'jsnext', 'main'],
     preferBuiltins: false,
     browser: true
@@ -33,23 +32,13 @@ export const makeTSPlugins = () => [
       react: Object.keys(React)
     } : {},
   }),
-  typescript({
-    exclude: ['src/**/*.test.ts', '**/__tests__/*'],
-    compilerOptions: {
-      sourceMap: true,
-      sourceRoot: './',
-      declaration: false,
-      target: 'esnext',
-      preserveSymlinks: false,
-    },
-  }),
 ];
 
 export const makePlugins = () => [
-  ...makeTSPlugins(),
+  ...makeBasePlugins(),
   sucrase({
     exclude: ['node_modules/**'],
-    transforms: ['jsx', 'typescript']
+    transforms: ['typescript']
   }),
   babel({
     babelrc: false,
