@@ -27,7 +27,7 @@ export function makeFetchBody<
   const isAPQ =
     request.extensions &&
     request.extensions.persistedQuery &&
-    request.extensions.persistedQuery.miss;
+    !request.extensions.persistedQuery.miss;
   return {
     query: isAPQ ? undefined : stringifyDocument(request.query),
     operationName: getOperationName(request.query),
