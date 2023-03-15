@@ -6,7 +6,6 @@ const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
 const eventStreamRe = /data: ?([^\n]+)/;
 
-type ContentMode = 'json' | 'multipart' | 'event-stream';
 type ChunkData = Buffer | Uint8Array;
 
 // NOTE: We're avoiding referencing the `Buffer` global here to prevent
@@ -16,17 +15,9 @@ const toString = (input: Buffer | ArrayBuffer): string =>
     ? (input as Buffer).toString()
     : decoder!.decode(input as ArrayBuffer);
 
-const parseContentMode = (contentType: string): ContentMode | null => {
-  if (/multipart\/mixed/i.test(contentType)) {
-    return 'multipart';
-  } else if (/text\/event-stream/.test(contentType)) {
-    return 'event-stream';
-  } else if (/text\//.test(contentType)) {
-    return null;
-  } else {
-    return 'json';
-  }
-};
+async function* emit(result: ExecutionResult | Promise<ExecutionResult>) {
+  yield await result;
+}
 
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
@@ -124,20 +115,19 @@ async function* fetchOperation(
 
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
     const contentType = response.headers.get('Content-Type') || '';
-    const mode = parseContentMode(contentType);
-    if (!mode) {
-      const text = await response.text();
-      return yield makeErrorResult(operation, new Error(text), response);
-    } else if (mode === 'json') {
-      const text = await response.text();
-      return yield makeResult(operation, JSON.parse(text), response);
+
+    let results: AsyncIterable<ExecutionResult>;
+    if (/multipart\/mixed/i.test(contentType)) {
+      results = parseMultipartMixed(contentType, response);
+    } else if (/text\/event-stream/i.test(contentType)) {
+      results = parseEventStream(response);
+    } else if (/text\//i.test(contentType)) {
+      throw new Error(await response.text());
+    } else {
+      results = emit(JSON.parse(await response.text()));
     }
 
-    const iterator =
-      mode === 'multipart'
-        ? parseMultipartMixed(contentType, response)
-        : parseEventStream(response);
-    for await (const payload of iterator) {
+    for await (const payload of results) {
       yield (result = result
         ? mergeResultPatch(result, payload, response)
         : makeResult(operation, payload, response));
