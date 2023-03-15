@@ -906,7 +906,7 @@ describe('shared sources behavior', () => {
       return merge([
         pipe(
           ops$,
-          map(op => ({ data: 1, operation: op })),
+          map(op => ({ hasNext: true, data: 1, operation: op })),
           take(1)
         ),
         never,
