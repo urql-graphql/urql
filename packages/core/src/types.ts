@@ -236,6 +236,10 @@ export interface GraphQLRequest<
    * generic, are sent to the GraphQL API to execute a request.
    */
   variables: Variables;
+  /** Additional metadata that a GraphQL API may accept for spec extensions.
+   * @see {@link https://github.com/graphql/graphql-over-http/blob/1928447/spec/GraphQLOverHTTP.md#request-parameters} for the GraphQL over HTTP spec
+   */
+  extensions?: Record<string, any> | undefined;
 }
 
 /** Parameters from which {@link GraphQLRequest | GraphQLRequests} are created from.

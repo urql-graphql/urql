@@ -57,12 +57,9 @@ const client = createClient({
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
-      forwardSubscription: (operation) => ({
-        subscribe: (sink) => ({
-          unsubscribe: wsClient.subscribe(
-            { query: operation.query, variables: operation.variables },
-            sink
-          ),
+      forwardSubscription: request => ({
+        subscribe: sink => ({
+          unsubscribe: wsClient.subscribe(request, sink),
         }),
       }),
     }),
@@ -94,7 +91,7 @@ const client = new Client({
   exchanges: [
     ...defaultExchanges,
     subscriptionExchange({
-      forwardSubscription: (operation) => subscriptionClient.request(operation)
+      forwardSubscription: request => subscriptionClient.request(request),
     }),
   ],
 });

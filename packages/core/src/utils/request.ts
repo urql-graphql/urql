@@ -152,14 +152,15 @@ export const createRequest = <
   Variables extends AnyVariables = AnyVariables
 >(
   _query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
-  _variables: Variables
+  _variables: Variables,
+  extensions?: Record<string, any> | undefined
 ): GraphQLRequest<Data, Variables> => {
   const variables = _variables || ({} as Variables);
   const query = keyDocument(_query);
   const printedVars = stringifyVariables(variables);
   let key = query.__key;
   if (printedVars !== '{}') key = phash(printedVars, key);
-  return { key, query, variables };
+  return { key, query, variables, extensions };
 };
 
 /** Returns the name of the `DocumentNode`'s operation, if any.

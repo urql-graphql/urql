@@ -29,7 +29,6 @@ it('should return response data from forwardSubscription observable', async () =
       stringifyDocument(subscriptionOperation.query)
     );
     expect(operation.variables).toBe(subscriptionOperation.variables);
-    expect(operation.context).toEqual(subscriptionOperation.context);
 
     return {
       subscribe(observer) {

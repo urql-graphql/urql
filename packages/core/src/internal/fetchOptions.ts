@@ -28,7 +28,7 @@ export function makeFetchBody<
     query: stringifyDocument(request.query),
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
-    extensions: undefined,
+    extensions: request.extensions,
   };
 }
 

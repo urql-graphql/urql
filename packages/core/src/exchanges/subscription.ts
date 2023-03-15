@@ -11,20 +11,20 @@ import {
 } from 'wonka';
 
 import {
-  stringifyDocument,
   makeResult,
+  mergeResultPatch,
   makeErrorResult,
   makeOperation,
-  mergeResultPatch,
 } from '../utils';
 
 import {
   Exchange,
   ExecutionResult,
   Operation,
-  OperationContext,
   OperationResult,
 } from '../types';
+
+import { FetchBody, makeFetchBody } from '../internal';
 
 /** An abstract observer-like interface.
  *
@@ -65,19 +65,10 @@ export interface ObservableLike<T> {
   };
 }
 
-/** A more cross-compatible version of the {@link Operation} structure.
- *
- * @remarks
- * When the `subscriptionExchange` was first created, some transports needed a specific shape
- * of {@link GraphQLRequest} objects to be passed to them. This is a shim that is as compatible
- * with most transports out of the box as possible.
+/** A more cross-compatible version of the {@link GraphQLRequest} structure.
+ * {@link FetchBody} for more details
  */
-export interface SubscriptionOperation {
-  query: string;
-  variables: Record<string, unknown> | undefined;
-  key: string;
-  context: OperationContext;
-}
+export type SubscriptionOperation = FetchBody;
 
 /** A subscription forwarding function, which must accept a {@link SubscriptionOperation}.
  *
@@ -85,7 +76,8 @@ export interface SubscriptionOperation {
  * @returns An {@link ObservableLike} object issuing {@link ExecutionResult | ExecutionResults}.
  */
 export type SubscriptionForwarder = (
-  operation: SubscriptionOperation
+  request: FetchBody,
+  operation: Operation
 ) => ObservableLike<ExecutionResult>;
 
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
@@ -148,13 +140,10 @@ export const subscriptionExchange = ({
   const createSubscriptionSource = (
     operation: Operation
   ): Source<OperationResult> => {
-    // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
-    const observableish = forwardSubscription({
-      key: operation.key.toString(36),
-      query: stringifyDocument(operation.query),
-      variables: operation.variables!,
-      context: { ...operation.context },
-    });
+    const observableish = forwardSubscription(
+      makeFetchBody(operation),
+      operation
+    );
 
     return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;

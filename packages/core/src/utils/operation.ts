@@ -49,11 +49,8 @@ function makeOperation<
 
 function makeOperation(kind, request, context) {
   if (!context) context = request.context;
-
   return {
-    key: request.key,
-    query: request.query,
-    variables: request.variables,
+    ...request,
     kind,
     context,
   };
