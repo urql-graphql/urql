@@ -17,9 +17,6 @@ import {
   Client,
   Operation,
   OperationResult,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
 } from '@urql/core';
 
 import { vi, expect, it } from 'vitest';
@@ -45,7 +42,7 @@ const makeExchangeArgs = () => {
         ),
       client: new Client({
         url: '/api',
-        exchanges: [dedupExchange, cacheExchange, fetchExchange],
+        exchanges: [],
       }),
     } as any,
   };

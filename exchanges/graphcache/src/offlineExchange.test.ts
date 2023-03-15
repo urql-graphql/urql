@@ -4,9 +4,6 @@ import {
   ExchangeIO,
   Operation,
   OperationResult,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
 } from '@urql/core';
 import { print } from 'graphql';
 import { vi, expect, it, describe } from 'vitest';
@@ -189,7 +186,7 @@ describe('offline', () => {
   it('should intercept errored queries', async () => {
     const client = createClient({
       url: 'http://0.0.0.0',
-      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+      exchanges: [],
     });
     const onlineSpy = vi
       .spyOn(navigator, 'onLine', 'get')
@@ -257,7 +254,7 @@ describe('offline', () => {
 
     const client = createClient({
       url: 'http://0.0.0.0',
-      exchanges: [dedupExchange, cacheExchange, fetchExchange],
+      exchanges: [],
     });
     const reexecuteOperation = vi
       .spyOn(client, 'reexecuteOperation')

@@ -45,11 +45,12 @@ Whenever we decide to send a request to our API we start by using `urql`'s
 extra information on how the GraphQL requests are executed.
 
 ```js
-import { Client } from '@urql/core';
+import { Client, dedupExchange, cacheExchange, fetchExchange } from '@urql/core';
 
 new Client({
   url: 'http://localhost:3000/graphql',
   requestPolicy: 'cache-first',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange]
 });
 ```
 

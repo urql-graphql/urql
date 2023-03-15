@@ -26,7 +26,6 @@ import { Exchange, Operation, OperationResult } from './types';
 import { makeOperation } from './utils';
 import { Client, createClient } from './client';
 import { queryOperation, subscriptionOperation } from './test-utils';
-import { cacheExchange, dedupExchange, fetchExchange } from '.';
 
 const url = 'https://hostname.com';
 
@@ -81,7 +80,7 @@ const subscription = {
 let receivedOps: Operation[] = [];
 let client = createClient({
   url: '1234',
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  exchanges: [],
 });
 const receiveMock = vi.fn((s: Source<Operation>) =>
   pipe(

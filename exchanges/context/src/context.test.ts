@@ -7,9 +7,6 @@ import {
   Operation,
   OperationResult,
   ExchangeIO,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
 } from '@urql/core';
 
 import { contextExchange } from './context';
@@ -37,7 +34,7 @@ let client, op, ops$, next;
 beforeEach(() => {
   client = createClient({
     url: 'http://0.0.0.0',
-    exchanges: [dedupExchange, cacheExchange, fetchExchange],
+    exchanges: [],
   });
   op = client.createRequestOperation('query', {
     key: 1,
