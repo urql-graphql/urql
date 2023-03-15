@@ -8,7 +8,7 @@ import {
 } from 'graphql';
 
 import { HashValue, phash } from './hash';
-import { stringifyVariables } from './stringifyVariables';
+import { stringifyVariables } from './variables';
 import { TypedDocumentNode, AnyVariables, GraphQLRequest } from '../types';
 
 interface WritableLocation {
