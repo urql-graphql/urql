@@ -80,7 +80,7 @@ const serializeBody = (
     operation.kind === 'query' && !!operation.context.preferGetMethod;
   if (body && !omitBody) {
     const json = stringifyVariables(body);
-    const files = extractFiles(body);
+    const files = extractFiles(body.variables);
     if (files.size) {
       const form = new FormData();
       form.append('operations', json);

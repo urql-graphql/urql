@@ -50,11 +50,10 @@ const extract = (map: FileMap, path: string, x: any) => {
       extract(map, `${path}.${i}`, x[i]);
   } else if (x instanceof FileConstructor || x instanceof BlobConstructor) {
     map.set(path, x as File | Blob);
+  } else {
+    seen.add(x);
+    for (const key of Object.keys(x)) extract(map, `${path}.${key}`, x[key]);
   }
-
-  seen.add(x);
-  for (const key of Object.keys(x))
-    if (x[key]) extract(map, `${path}.${key}`, x[key]);
 };
 
 /** A stable stringifier for GraphQL variables objects.
