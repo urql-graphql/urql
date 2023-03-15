@@ -53,7 +53,7 @@ All features are marked to indicate the following:
 | Live Queries                               | 🛑                                  | 🛑                                                                         | ✅                             |
 | Defer & Stream Directives                  | ✅                                  | ✅ / 🛑 (`@defer` is supported in >=3.7.0, `@stream` is not yet supported) | 🟡 (unreleased)                |
 | Switching to `GET` method                  | ✅                                  | ✅                                                                         | 🟡 `react-relay-network-layer` |
-| File Uploads                               | ✅ `@urql/exchange-multipart-fetch` | 🟡 `apollo-upload-client`                                                  | 🛑                             |
+| File Uploads                               | ✅                                  | 🟡 `apollo-upload-client`                                                  | 🛑                             |
 | Retrying Failed Queries                    | ✅ `@urql/exchange-retry`           | ✅ `apollo-link-retry`                                                     | ✅ `DefaultNetworkLayer`       |
 | Easy Authentication Flows                  | ✅ `@urql/exchange-auth`            | 🛑 (no docs for refresh-based authentication)                              | 🟡 `react-relay-network-layer` |
 | Automatic Refetch after Mutation           | ✅ (with document cache)            | 🛑                                                                         | ✅                             |

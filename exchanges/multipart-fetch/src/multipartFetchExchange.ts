@@ -9,6 +9,10 @@ import {
   makeFetchSource,
 } from '@urql/core/internal';
 
+/** An Exchange which creates a multipart request when File/Blobs are found in variables.
+ * @deprecated
+ * `@urql/core` now supports the GraphQL Multipart Request spec out-of-the-box.
+ */
 export const multipartFetchExchange: Exchange = ({
   forward,
   dispatchDebug,
@@ -36,26 +40,28 @@ export const multipartFetchExchange: Exchange = ({
       if (files.size) {
         url = makeFetchURL(operation);
         fetchOptions = makeFetchOptions(operation);
-        if (fetchOptions.headers!['content-type'] === 'application/json') {
-          delete fetchOptions.headers!['content-type'];
+        if (!(fetchOptions.body instanceof FormData)) {
+          if (fetchOptions.headers!['content-type'] === 'application/json') {
+            delete fetchOptions.headers!['content-type'];
+          }
+
+          fetchOptions.method = 'POST';
+          fetchOptions.body = new FormData();
+          fetchOptions.body.append('operations', JSON.stringify(body));
+
+          const map = {};
+          let i = 0;
+          files.forEach(paths => {
+            map[++i] = paths.map(path => `variables.${path}`);
+          });
+
+          fetchOptions.body.append('map', JSON.stringify(map));
+
+          i = 0;
+          files.forEach((_, file) => {
+            (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
+          });
         }
-
-        fetchOptions.method = 'POST';
-        fetchOptions.body = new FormData();
-        fetchOptions.body.append('operations', JSON.stringify(body));
-
-        const map = {};
-        let i = 0;
-        files.forEach(paths => {
-          map[++i] = paths.map(path => `variables.${path}`);
-        });
-
-        fetchOptions.body.append('map', JSON.stringify(map));
-
-        i = 0;
-        files.forEach((_, file) => {
-          (fetchOptions.body as FormData).append(`${++i}`, file, file.name);
-        });
       } else {
         url = makeFetchURL(operation, body);
         fetchOptions = makeFetchOptions(operation, body);

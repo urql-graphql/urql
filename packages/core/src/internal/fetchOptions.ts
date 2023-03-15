@@ -2,7 +2,9 @@ import {
   stringifyDocument,
   getOperationName,
   stringifyVariables,
+  extractFiles,
 } from '../utils';
+
 import { AnyVariables, GraphQLRequest, Operation } from '../types';
 
 /** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
@@ -69,6 +71,33 @@ export const makeFetchURL = (
   return finalUrl;
 };
 
+/** Serializes a {@link FetchBody} into a {@link RequestInit.body} format. */
+const serializeBody = (
+  operation: Operation,
+  body?: FetchBody
+): FormData | string | undefined => {
+  const omitBody =
+    operation.kind === 'query' && !!operation.context.preferGetMethod;
+  if (body && !omitBody) {
+    const json = stringifyVariables(body);
+    const files = extractFiles(body.variables);
+    if (files.size) {
+      const form = new FormData();
+
+      form.append('operations', json);
+      form.append('map', stringifyVariables({ ...[...files.keys()] }));
+
+      let index = 0;
+      for (const file of files.values()) {
+        form.append(`${index++}`, file);
+      }
+
+      return form;
+    }
+    return json;
+  }
+};
+
 /** Creates a `RequestInit` object for a given `Operation`.
  *
  * @param operation - An {@link Operation} for which to make the request.
@@ -86,15 +115,10 @@ export const makeFetchOptions = (
   operation: Operation,
   body?: FetchBody
 ): RequestInit => {
-  const useGETMethod =
-    operation.kind === 'query' && !!operation.context.preferGetMethod;
-
   const headers: HeadersInit = {
     accept:
       'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
   };
-
-  if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =
     (typeof operation.context.fetchOptions === 'function'
       ? operation.context.fetchOptions()
@@ -102,10 +126,13 @@ export const makeFetchOptions = (
   if (extraOptions.headers)
     for (const key in extraOptions.headers)
       headers[key.toLowerCase()] = extraOptions.headers[key];
+  const serializedBody = serializeBody(operation, body);
+  if (typeof serializedBody === 'string' && !headers['content-type'])
+    headers['content-type'] = 'application/json';
   return {
     ...extraOptions,
-    body: !useGETMethod && body ? JSON.stringify(body) : undefined,
-    method: useGETMethod ? 'GET' : 'POST',
+    method: serializedBody ? 'POST' : 'GET',
+    body: serializedBody,
     headers,
   };
 };
