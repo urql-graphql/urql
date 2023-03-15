@@ -30,7 +30,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -78,7 +78,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -127,7 +127,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
@@ -182,7 +182,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-store
-        run: echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Use pnpm store
         uses: actions/cache@v3
