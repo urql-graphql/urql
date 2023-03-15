@@ -24,8 +24,12 @@ export function makeFetchBody<
   Data = any,
   Variables extends AnyVariables = AnyVariables
 >(request: Omit<GraphQLRequest<Data, Variables>, 'key'>): FetchBody {
+  const isAPQ =
+    request.extensions &&
+    request.extensions.persistedQuery &&
+    request.extensions.persistedQuery.miss;
   return {
-    query: stringifyDocument(request.query),
+    query: isAPQ ? undefined : stringifyDocument(request.query),
     operationName: getOperationName(request.query),
     variables: request.variables || undefined,
     extensions: request.extensions,

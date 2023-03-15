@@ -41,6 +41,27 @@ type ErrorLike = Partial<GraphQLError> | Error;
  */
 type Extensions = Record<string, any>;
 
+/** Extensions sub-property on `persistedQuery` for Automatic Persisted Queries.
+ *
+ * @remarks
+ * This is part of the Automatic Persisted Query defacto standard and allows an API
+ * request to omit the `query`, instead sending this `sha256Hash`.
+ */
+export interface PersistedRequestExtensions {
+  version: 1;
+  sha256Hash: string;
+  /** Set when a `sha256Hash` previously experienced a miss which will force `query` to be sent. */
+  miss?: boolean;
+}
+
+/** Extensions which may be palced on {@link GraphQLRequest | GraphQLRequests}.
+ * @see {@link https://github.com/graphql/graphql-over-http/blob/1928447/spec/GraphQLOverHTTP.md#request-parameters} for the GraphQL over HTTP spec
+ */
+export interface RequestExtensions {
+  persistedQuery?: PersistedRequestExtensions;
+  [extension: string]: any;
+}
+
 /** Incremental Payloads sent as part of "Incremental Delivery" patching prior result data.
  *
  * @remarks
@@ -253,7 +274,7 @@ export interface GraphQLRequest<
   /** Additional metadata that a GraphQL API may accept for spec extensions.
    * @see {@link https://github.com/graphql/graphql-over-http/blob/1928447/spec/GraphQLOverHTTP.md#request-parameters} for the GraphQL over HTTP spec
    */
-  extensions?: Record<string, any> | undefined;
+  extensions?: RequestExtensions | undefined;
 }
 
 /** Parameters from which {@link GraphQLRequest | GraphQLRequests} are created from.

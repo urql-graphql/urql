@@ -9,7 +9,13 @@ import {
 
 import { HashValue, phash } from './hash';
 import { stringifyVariables } from './variables';
-import { TypedDocumentNode, AnyVariables, GraphQLRequest } from '../types';
+
+import type {
+  TypedDocumentNode,
+  AnyVariables,
+  GraphQLRequest,
+  RequestExtensions,
+} from '../types';
 
 interface WritableLocation {
   loc: Location | undefined;
@@ -153,7 +159,7 @@ export const createRequest = <
 >(
   _query: string | DocumentNode | TypedDocumentNode<Data, Variables>,
   _variables: Variables,
-  extensions?: Record<string, any> | undefined
+  extensions?: RequestExtensions | undefined
 ): GraphQLRequest<Data, Variables> => {
   const variables = _variables || ({} as Variables);
   const query = keyDocument(_query);
