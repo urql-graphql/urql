@@ -2,7 +2,7 @@ import genPackageJson from 'rollup-plugin-generate-package-json';
 import dts from 'rollup-plugin-dts';
 
 import { relative, join, dirname, basename } from 'path';
-import { makePlugins, makeTSPlugins, makeOutputPlugins } from './plugins.mjs';
+import { makePlugins, makeBasePlugins, makeOutputPlugins } from './plugins.mjs';
 import cleanup from './cleanup-plugin.mjs'
 import * as settings from './settings.mjs';
 
@@ -71,6 +71,7 @@ const output = ({ format, isProduction }) => {
     dir: './dist',
     exports: 'named',
     sourcemap: true,
+    sourcemapExcludeSources: false,
     indent: false,
     freeze: false,
     strict: false,
@@ -117,7 +118,7 @@ export default [
   {
     ...commonConfig,
     plugins: [
-      makeTSPlugins(),
+      ...makeBasePlugins(),
       dts({
         compilerOptions: {
           preserveSymlinks: false,
