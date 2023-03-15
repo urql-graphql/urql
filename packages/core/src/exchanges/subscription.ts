@@ -21,7 +21,6 @@ import {
   Exchange,
   ExecutionResult,
   Operation,
-  OperationContext,
   OperationResult,
 } from '../types';
 
@@ -66,20 +65,10 @@ export interface ObservableLike<T> {
   };
 }
 
-/** A more cross-compatible version of the {@link Operation} structure.
- *
- * @remarks
- * When the `subscriptionExchange` was first created, some transports needed a specific shape
- * of {@link GraphQLRequest} objects to be passed to them. This is a shim that is as compatible
- * with most transports out of the box as possible.
+/** A more cross-compatible version of the {@link GraphQLRequest} structure.
+ * {@link FetchBody} for more details
  */
-export interface SubscriptionOperation {
-  query: string;
-  variables: Record<string, unknown> | undefined;
-  key: string;
-  extensions: Record<string, any>;
-  context: OperationContext;
-}
+export type SubscriptionOperation = FetchBody;
 
 /** A subscription forwarding function, which must accept a {@link SubscriptionOperation}.
  *
