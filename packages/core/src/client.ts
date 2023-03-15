@@ -722,7 +722,8 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               operation.context.requestPolicy === 'network-only';
 
             if (operation.kind === 'subscription') {
-              return dispatchOperation(operation);
+              if (!hasNext) dispatchOperation(operation);
+              return;
             } else if (isNetworkOperation && !hasNext) {
               dispatchOperation(operation);
             }
