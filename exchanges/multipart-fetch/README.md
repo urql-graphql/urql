@@ -1,5 +1,10 @@
 # @urql/exchange-multipart-fetch
 
+> **DEPRECATION NOTICE**: The `multipartFetchExchange` has been deprecated, and
+> `@urql/core` now supports GraphQL Multipart Requests natively. This won't
+> break the behaviour of your existing apps, however, it's recommended to remove
+> the `multipartFetchExchange` from your apps.
+
 The `multipartFetchExchange` is an exchange that builds on the regular `fetchExchange`
 but adds the multipart file upload capability.
 
