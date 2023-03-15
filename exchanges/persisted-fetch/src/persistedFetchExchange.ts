@@ -86,6 +86,7 @@ export const persistedFetchExchange = (
               // Attach SHA256 hash and remove query from body
               body.query = undefined;
               body.extensions = {
+                ...body.extensions,
                 persistedQuery: {
                   version: 1,
                   sha256Hash,
@@ -108,7 +109,8 @@ export const persistedFetchExchange = (
               if (result.error && isPersistedUnsupported(result.error)) {
                 // Reset the body back to its non-persisted state
                 body.query = query;
-                body.extensions = undefined;
+                if (body.extensions && body.extensions.persistedQuery)
+                  body.extensions.persistedQuery = undefined;
                 // Disable future persisted queries if they're not enforced
                 supportsPersistedQueries = false;
                 return makePersistedFetchSource(
@@ -154,14 +156,10 @@ const makePersistedFetchSource = (
 ): Source<OperationResult> => {
   const newOperation = makeOperation(operation.kind, operation, {
     ...operation.context,
-    preferGetMethod: useGet || operation.context.preferGetMethod,
+    preferGetMethod: useGet ? 'force' : operation.context.preferGetMethod,
   });
 
-  const url = makeFetchURL(
-    newOperation,
-    body.query ? body : { ...body, query: '' }
-  );
-
+  const url = makeFetchURL(newOperation, body);
   const fetchOptions = makeFetchOptions(newOperation, body);
 
   dispatchDebug({
@@ -176,31 +174,38 @@ const makePersistedFetchSource = (
     },
   });
 
-  return pipe(
-    makeFetchSource(newOperation, url, fetchOptions),
-    onPush(result => {
-      const persistFail =
-        result.error &&
-        (isPersistedMiss(result.error) || isPersistedUnsupported(result.error));
-      const error = !result.data ? result.error : undefined;
+  let fetch$ = makeFetchSource(newOperation, url, fetchOptions);
 
-      dispatchDebug({
-        // TODO: Assign a new name to this once @urql/devtools supports it
-        type: persistFail || error ? 'fetchError' : 'fetchSuccess',
-        message: persistFail
-          ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
-          : `A ${
-              error ? 'failed' : 'successful'
-            } fetch response has been returned.`,
-        operation,
-        data: {
-          url,
-          fetchOptions,
-          value: persistFail ? result.error! : error || result,
-        },
-      });
-    })
-  );
+  if (process.env.NODE_ENV !== 'production') {
+    fetch$ = pipe(
+      fetch$,
+      onPush(result => {
+        const persistFail =
+          result.error &&
+          (isPersistedMiss(result.error) ||
+            isPersistedUnsupported(result.error));
+        const error = !result.data ? result.error : undefined;
+
+        dispatchDebug({
+          // TODO: Assign a new name to this once @urql/devtools supports it
+          type: persistFail || error ? 'fetchError' : 'fetchSuccess',
+          message: persistFail
+            ? 'A Persisted Query request has failed. A non-persisted GraphQL request will follow.'
+            : `A ${
+                error ? 'failed' : 'successful'
+              } fetch response has been returned.`,
+          operation,
+          data: {
+            url,
+            fetchOptions,
+            value: persistFail ? result.error! : error || result,
+          },
+        });
+      })
+    );
+  }
+
+  return fetch$;
 };
 
 const isPersistedMiss = (error: CombinedError): boolean =>
