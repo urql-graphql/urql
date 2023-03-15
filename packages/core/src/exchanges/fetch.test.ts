@@ -62,6 +62,7 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
   });
@@ -91,6 +92,7 @@ describe('on error', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(JSON.stringify({})),
     });
   });
@@ -126,6 +128,7 @@ describe('on error', () => {
   it('ignores the error when a result is available', async () => {
     fetch.mockResolvedValue({
       status: 400,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
 
@@ -143,8 +146,9 @@ describe('on teardown', () => {
   const fail = () => {
     expect(true).toEqual(false);
   };
+
   it('does not start the outgoing request on immediate teardowns', () => {
-    fetch.mockRejectedValueOnce(abortError);
+    fetch.mockResolvedValue(new Response('text', { status: 200 }));
 
     const { unsubscribe } = pipe(
       fromValue(queryOperation),
@@ -154,11 +158,11 @@ describe('on teardown', () => {
 
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(1);
+    expect(abort).toHaveBeenCalledTimes(0);
   });
 
   it('aborts the outgoing request', async () => {
-    fetch.mockRejectedValueOnce(abortError);
+    fetch.mockResolvedValue(new Response('text', { status: 200 }));
 
     const { unsubscribe } = pipe(
       fromValue(queryOperation),
@@ -169,11 +173,16 @@ describe('on teardown', () => {
     await Promise.resolve();
 
     unsubscribe();
+
+    // NOTE: We can only observe the async iterator's final run after a macro tick
+    await new Promise(resolve => setTimeout(resolve));
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(abort).toHaveBeenCalledTimes(1);
+    expect(abort).toHaveBeenCalled();
   });
 
   it('does not call the query', () => {
+    fetch.mockResolvedValue(new Response('text', { status: 200 }));
+
     pipe(
       fromValue(
         makeOperation('teardown', queryOperation, queryOperation.context)

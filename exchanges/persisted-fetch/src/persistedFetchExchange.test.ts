@@ -36,6 +36,8 @@ it('accepts successful persisted query responses', async () => {
   });
 
   fetch.mockResolvedValueOnce({
+    status: 200,
+    headers: { get: () => 'application/json' },
     text: () => Promise.resolve(expected),
   });
 
@@ -63,9 +65,13 @@ it('supports cache-miss persisted query errors', async () => {
 
   fetch
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedRetry),
     });
 
@@ -94,9 +100,13 @@ it('supports GET exclusively for persisted queries', async () => {
 
   fetch
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedRetry),
     });
 
@@ -127,12 +137,18 @@ it('supports unsupported persisted query errors', async () => {
 
   fetch
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedMiss),
     })
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedRetry),
     })
     .mockResolvedValueOnce({
+      status: 200,
+      headers: { get: () => 'application/json' },
       text: () => Promise.resolve(expectedRetry),
     });
 

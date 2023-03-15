@@ -5,7 +5,11 @@ import { vi, expect, it, describe } from 'vitest';
 import { subscriptionStore } from './subscriptionStore';
 
 describe('subscriptionStore', () => {
-  const client = createClient({ url: 'https://example.com' });
+  const client = createClient({
+    url: 'https://example.com',
+    exchanges: [],
+  });
+
   const variables = {};
   const context = {};
   const query = `subscription ($input: ExampleInput) { exampleSubscribe(input: $input) { data } }`;

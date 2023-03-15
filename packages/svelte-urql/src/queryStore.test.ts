@@ -5,7 +5,11 @@ import { get } from 'svelte/store';
 import { queryStore } from './queryStore';
 
 describe('queryStore', () => {
-  const client = createClient({ url: 'https://example.com' });
+  const client = createClient({
+    url: 'https://example.com',
+    exchanges: [],
+  });
+
   const variables = {};
   const context = {};
   const query = '{ test }';

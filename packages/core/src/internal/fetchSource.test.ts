@@ -19,9 +19,6 @@ import { makeOperation } from '../utils';
 const fetch = (global as any).fetch as Mock;
 const abort = vi.fn();
 
-const abortError = new Error();
-abortError.name = 'AbortError';
-
 beforeAll(() => {
   (global as any).AbortController = function AbortController() {
     this.signal = undefined;
@@ -51,6 +48,7 @@ describe('on success', () => {
   beforeEach(() => {
     fetch.mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
   });
@@ -73,6 +71,7 @@ describe('on success', () => {
     const fetchOptions = {};
     const fetcher = vi.fn().mockResolvedValue({
       status: 200,
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue(response),
     });
 
@@ -102,6 +101,7 @@ describe('on error', () => {
     fetch.mockResolvedValue({
       status: 400,
       statusText: 'Forbidden',
+      headers: { get: () => 'application/json' },
       text: vi.fn().mockResolvedValue('{}'),
     });
   });
@@ -165,7 +165,7 @@ describe('on teardown', () => {
   };
 
   it('does not start the outgoing request on immediate teardowns', () => {
-    fetch.mockRejectedValue(abortError);
+    fetch.mockResolvedValue(new Response('text', { status: 200 }));
 
     const { unsubscribe } = pipe(
       makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
@@ -174,11 +174,11 @@ describe('on teardown', () => {
 
     unsubscribe();
     expect(fetch).toHaveBeenCalledTimes(0);
-    expect(abort).toHaveBeenCalledTimes(1);
+    expect(abort).toHaveBeenCalledTimes(0);
   });
 
   it('aborts the outgoing request', async () => {
-    fetch.mockRejectedValue(abortError);
+    fetch.mockResolvedValue(new Response('text', { status: 200 }));
 
     const { unsubscribe } = pipe(
       makeFetchSource(queryOperation, 'https://test.com/graphql', {}),
@@ -186,8 +186,10 @@ describe('on teardown', () => {
     );
 
     await Promise.resolve();
-
     unsubscribe();
+
+    // NOTE: We can only observe the async iterator's final run after a macro tick
+    await new Promise(resolve => setTimeout(resolve));
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(abort).toHaveBeenCalledTimes(1);
   });
