@@ -41,8 +41,6 @@ export const persistedExchange = (
 ): Exchange => ({ forward }) => {
   if (!options) options = {};
 
-  const retries = makeSubject<Operation>();
-
   const preferGetForPersistedQueries = !!options.preferGetForPersistedQueries;
   const enforcePersistedQueries = !!options.enforcePersistedQueries;
   const hashFn = options.generateHash || hash;
@@ -56,6 +54,7 @@ export const persistedExchange = (
       operation.kind === 'query');
 
   return operations$ => {
+    const retries = makeSubject<Operation>();
     const sharedOps$ = share(operations$);
 
     const forwardedOps$ = pipe(
@@ -66,43 +65,46 @@ export const persistedExchange = (
     const persistedOps$ = pipe(
       sharedOps$,
       filter(operationFilter),
-      mergeMap(operation => {
+      map(async operation => {
         const persistedOperation = makeOperation(operation.kind, operation, {
           ...operation.context,
           persistAttempt: true,
         });
 
-        return pipe(
-          fromPromise(
-            hashFn(stringifyDocument(operation.query), operation.query)
-          ),
-          map(sha256Hash => {
-            if (sha256Hash) {
-              persistedOperation.extensions = {
-                ...persistedOperation.extensions,
-                persistedQuery: {
-                  version: 1,
-                  sha256Hash,
-                },
-              };
-              if (
-                persistedOperation.kind === 'query' &&
-                preferGetForPersistedQueries
-              ) {
-                persistedOperation.context.preferGetMethod = 'force';
-              }
-            }
-            return persistedOperation;
-          })
+        const sha256Hash = await hashFn(
+          stringifyDocument(operation.query),
+          operation.query
         );
-      })
+        if (sha256Hash) {
+          persistedOperation.extensions = {
+            ...persistedOperation.extensions,
+            persistedQuery: {
+              version: 1,
+              sha256Hash,
+            },
+          };
+          if (
+            persistedOperation.kind === 'query' &&
+            preferGetForPersistedQueries
+          ) {
+            persistedOperation.context.preferGetMethod = 'force';
+          }
+        }
+
+        return persistedOperation;
+      }),
+      mergeMap(fromPromise)
     );
 
     return pipe(
-      merge([forwardedOps$, persistedOps$, retries.source]),
+      merge([persistedOps$, forwardedOps$, retries.source]),
       forward,
       map(result => {
-        if (!enforcePersistedQueries) {
+        if (
+          !enforcePersistedQueries &&
+          result.operation.extensions &&
+          result.operation.extensions.persistedQuery
+        ) {
           if (result.error && isPersistedUnsupported(result.error)) {
             // Disable future persisted queries if they're not enforced
             supportsPersistedQueries = false;

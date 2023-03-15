@@ -22,7 +22,7 @@ const getNodeCrypto = async (): Promise<typeof import('crypto') | void> => {
 };
 
 export const hash = async (query: string): Promise<string> => {
-  if (webCrypto) {
+  if (webCrypto && webCrypto.subtle) {
     const digest = await webCrypto.subtle.digest(
       { name: 'SHA-256' },
       new TextEncoder().encode(query)
