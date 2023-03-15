@@ -71,6 +71,31 @@ export const makeFetchURL = (
   return finalUrl;
 };
 
+/** Serializes a {@link FetchBody} into a {@link RequestInit.body} format. */
+const serializeBody = (
+  operation: Operation,
+  body?: FetchBody
+): FormData | string | undefined => {
+  const omitBody =
+    operation.kind === 'query' && !!operation.context.preferGetMethod;
+  if (body && !omitBody) {
+    const json = stringifyVariables(body);
+    const files = extractFiles(body);
+    if (files.size) {
+      const form = new FormData();
+      form.append('operations', json);
+      const map: Record<number, string> = {};
+      let index = 0;
+      for (const path of files.keys()) map[++index] = 'variables' + path;
+      form.append('map', stringifyVariables(map));
+      index = 0;
+      for (const file of files.values()) form.append(`${++index}`, file);
+      return form;
+    }
+    return json;
+  }
+};
+
 /** Creates a `RequestInit` object for a given `Operation`.
  *
  * @param operation - An {@link Operation} for which to make the request.
@@ -88,9 +113,6 @@ export const makeFetchOptions = (
   operation: Operation,
   body?: FetchBody
 ): RequestInit => {
-  const useGETMethod =
-    operation.kind === 'query' && !!operation.context.preferGetMethod;
-
   const headers: HeadersInit = {
     accept:
       'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
@@ -102,31 +124,13 @@ export const makeFetchOptions = (
   if (extraOptions.headers)
     for (const key in extraOptions.headers)
       headers[key.toLowerCase()] = extraOptions.headers[key];
-
-  const options = {
+  const serializedBody = serializeBody(operation, body);
+  if (typeof serializedBody === 'string' && !headers['content-type'])
+    headers['content-type'] = 'application/json';
+  return {
     ...extraOptions,
-    method: useGETMethod ? 'GET' : 'POST',
+    method: serializedBody ? 'POST' : 'GET',
+    body: serializedBody,
     headers,
   };
-
-  if (operation.kind === 'mutation') {
-    const files = extractFiles(body);
-    if (files.size) {
-      const form = new FormData();
-      form.append('operations', stringifyVariables(body));
-      const map: Record<number, string> = {};
-      let index = 0;
-      for (const path of files.keys()) map[++index] = 'variables' + path;
-      form.append('map', stringifyVariables(map));
-      index = 0;
-      for (const file of files.values()) form.append(`${++index}`, file);
-      delete options.headers['content-type'];
-      options.method = 'POST';
-      options.body = form;
-    }
-  }
-
-  if (!useGETMethod) headers['content-type'] = 'application/json';
-  options.body = !useGETMethod && body ? JSON.stringify(body) : undefined;
-  return options;
 };
