@@ -15,10 +15,6 @@ const toString = (input: Buffer | ArrayBuffer): string =>
     ? (input as Buffer).toString()
     : decoder!.decode(input as ArrayBuffer);
 
-async function* emit(result: ExecutionResult | Promise<ExecutionResult>) {
-  yield await result;
-}
-
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
     for await (const chunk of response.body! as any)
@@ -49,7 +45,15 @@ async function* split(
   }
 }
 
-async function* parseEventStream(response: Response) {
+async function* parseJSON(
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
+  yield JSON.parse(await response.text());
+}
+
+async function* parseEventStream(
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
   let payload: any;
   for await (const chunk of split(streamBody(response), '\n\n')) {
     const match = chunk.match(eventStreamRe);
@@ -121,10 +125,10 @@ async function* fetchOperation(
       results = parseMultipartMixed(contentType, response);
     } else if (/text\/event-stream/i.test(contentType)) {
       results = parseEventStream(response);
-    } else if (/text\//i.test(contentType)) {
-      throw new Error(await response.text());
+    } else if (!/text\//i.test(contentType)) {
+      results = parseJSON(response);
     } else {
-      results = emit(JSON.parse(await response.text()));
+      throw new Error(await response.text());
     }
 
     for await (const payload of results) {
