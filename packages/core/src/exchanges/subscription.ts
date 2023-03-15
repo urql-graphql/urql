@@ -76,6 +76,7 @@ export interface SubscriptionOperation {
   query: string;
   variables: Record<string, unknown> | undefined;
   key: string;
+  extensions: Record<string, any>;
   context: OperationContext;
 }
 
@@ -153,6 +154,7 @@ export const subscriptionExchange = ({
       key: operation.key.toString(36),
       query: stringifyDocument(operation.query),
       variables: operation.variables!,
+      extensions: { ...operation.extensions },
       context: { ...operation.context },
     });
 
