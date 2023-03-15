@@ -1,3 +1,5 @@
+export type FileMap = Map<string, File | Blob>;
+
 const seen = new Set();
 const cache = new WeakMap();
 
@@ -40,6 +42,21 @@ const stringify = (x: any): string => {
   return out;
 };
 
+const extract = (map: FileMap, path: string, x: any) => {
+  if (x == null || typeof x !== 'object' || x.toJSON || seen.has(x)) {
+    /*noop*/
+  } else if (Array.isArray(x)) {
+    for (let i = 0, l = x.length; i < l; i++)
+      extract(map, `${path}.${i}`, x[i]);
+  } else if (x instanceof FileConstructor || x instanceof BlobConstructor) {
+    map.set(path, x as File | Blob);
+  }
+
+  seen.add(x);
+  for (const key of Object.keys(x))
+    if (x[key]) extract(map, `${path}.${key}`, x[key]);
+};
+
 /** A stable stringifier for GraphQL variables objects.
  *
  * @param x - any JSON-like data.
@@ -57,4 +74,20 @@ const stringify = (x: any): string => {
 export const stringifyVariables = (x: any): string => {
   seen.clear();
   return stringify(x);
+};
+
+class NoopConstructor {}
+const FileConstructor = typeof File !== 'undefined' ? File : NoopConstructor;
+const BlobConstructor = typeof Blob !== 'undefined' ? Blob : NoopConstructor;
+
+export const extractFiles = (x: any): FileMap => {
+  const map: FileMap = new Map();
+  if (
+    FileConstructor !== NoopConstructor ||
+    BlobConstructor !== NoopConstructor
+  ) {
+    seen.clear();
+    extract(map, x, '');
+  }
+  return map;
 };
