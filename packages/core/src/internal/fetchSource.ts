@@ -18,7 +18,7 @@ const toString = (input: Buffer | ArrayBuffer): string =>
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
     for await (const chunk of response.body! as any)
-      toString(chunk as ChunkData);
+      yield toString(chunk as ChunkData);
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
