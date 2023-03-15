@@ -708,21 +708,18 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
 
       return make<OperationResult>(observer => {
         let source = active.get(operation.key);
-
         if (!source) {
-          source = makeResultSource(operation);
-          if (operation.kind === 'subscription') source = share(source);
-          active.set(operation.key, source);
+          active.set(operation.key, (source = makeResultSource(operation)));
         }
 
         return pipe(
           source,
           onStart(() => {
             const prevReplay = replays.get(operation.key);
+            const hasNext = !!prevReplay && !!prevReplay.hasNext;
             const isNetworkOperation =
               operation.context.requestPolicy === 'cache-and-network' ||
               operation.context.requestPolicy === 'network-only';
-            const hasNext = !!prevReplay && !!prevReplay.hasNext;
 
             if (operation.kind === 'subscription') {
               return dispatchOperation(operation);
