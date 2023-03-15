@@ -572,7 +572,12 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
   // activated to allow `reexecuteOperation` to be trampoline-scheduled
   let isOperationBatchActive = false;
   function dispatchOperation(operation?: Operation | void) {
-    if (operation) nextOperation(operation);
+    if (operation) {
+      const prevReplay = replays.get(operation.key);
+      if (operation.kind === 'mutation' || !prevReplay || !prevReplay.hasNext)
+        nextOperation(operation);
+    }
+
     if (!isOperationBatchActive) {
       isOperationBatchActive = true;
       while (isOperationBatchActive && (operation = queue.shift()))
@@ -602,16 +607,19 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       );
     }
 
-    // A mutation is always limited to just a single result and is never shared
-    if (operation.kind === 'mutation') {
-      return pipe(
+    if (operation.kind !== 'query') {
+      result$ = pipe(
         result$,
-        onStart(() => nextOperation(operation)),
-        take(1)
+        onStart(() => dispatchOperation(operation))
       );
     }
 
-    const source = pipe(
+    // A mutation is always limited to just a single result and is never shared
+    if (operation.kind === 'mutation') {
+      return pipe(result$, take(1));
+    }
+
+    return pipe(
       result$,
       // End the results stream when an active teardown event is sent
       takeUntil(
@@ -656,8 +664,6 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
       }),
       share
     );
-
-    return source;
   };
 
   const instance: Client =
@@ -716,17 +722,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
           source,
           onStart(() => {
             const prevReplay = replays.get(operation.key);
-            const hasNext = !!prevReplay && !!prevReplay.hasNext;
             const isNetworkOperation =
               operation.context.requestPolicy === 'cache-and-network' ||
               operation.context.requestPolicy === 'network-only';
-
-            if (operation.kind === 'subscription') {
-              if (!hasNext) dispatchOperation(operation);
+            if (operation.kind !== 'query') {
               return;
-            } else if (isNetworkOperation && !hasNext) {
+            } else if (isNetworkOperation) {
               dispatchOperation(operation);
-              if (prevReplay) prevReplay.stale = true;
+              if (prevReplay && !prevReplay.hasNext) prevReplay.stale = true;
             }
 
             if (
@@ -734,7 +737,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               prevReplay === replays.get(operation.key)
             ) {
               observer.next(prevReplay);
-            } else if (!isNetworkOperation && !hasNext) {
+            } else if (!isNetworkOperation) {
               dispatchOperation(operation);
             }
           }),
