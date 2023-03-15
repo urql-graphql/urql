@@ -2,7 +2,9 @@ import {
   stringifyDocument,
   getOperationName,
   stringifyVariables,
+  extractFiles,
 } from '../utils';
+
 import { AnyVariables, GraphQLRequest, Operation } from '../types';
 
 /** Abstract definition of the JSON data sent during GraphQL HTTP POST requests. */
@@ -93,8 +95,6 @@ export const makeFetchOptions = (
     accept:
       'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
   };
-
-  if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =
     (typeof operation.context.fetchOptions === 'function'
       ? operation.context.fetchOptions()
@@ -102,10 +102,31 @@ export const makeFetchOptions = (
   if (extraOptions.headers)
     for (const key in extraOptions.headers)
       headers[key.toLowerCase()] = extraOptions.headers[key];
-  return {
+
+  const options = {
     ...extraOptions,
-    body: !useGETMethod && body ? JSON.stringify(body) : undefined,
     method: useGETMethod ? 'GET' : 'POST',
     headers,
   };
+
+  if (operation.kind === 'mutation') {
+    const files = extractFiles(body);
+    if (files.size) {
+      const form = new FormData();
+      form.append('operations', stringifyVariables(body));
+      const map: Record<number, string> = {};
+      let index = 0;
+      for (const path of files.keys()) map[++index] = 'variables' + path;
+      form.append('map', stringifyVariables(map));
+      index = 0;
+      for (const file of files.values()) form.append(`${++index}`, file);
+      delete options.headers['content-type'];
+      options.method = 'POST';
+      options.body = form;
+    }
+  }
+
+  if (!useGETMethod) headers['content-type'] = 'application/json';
+  options.body = !useGETMethod && body ? JSON.stringify(body) : undefined;
+  return options;
 };
