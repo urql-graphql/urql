@@ -71,9 +71,9 @@ export const mergeResultPatch = (
   response?: any
 ): OperationResult => {
   let data: ExecutionResult['data'];
+  let errors = prevResult.error ? prevResult.error.graphQLErrors : [];
   let hasExtensions = !!prevResult.extensions || !!nextResult.extensions;
   const extensions = { ...prevResult.extensions, ...nextResult.extensions };
-  const errors = prevResult.error ? prevResult.error.graphQLErrors : [];
 
   let incremental = nextResult.incremental;
 
@@ -115,6 +115,7 @@ export const mergeResultPatch = (
     }
   } else {
     data = nextResult.data || prevResult.data;
+    errors = (nextResult.errors as any[]) || errors;
   }
 
   return {

@@ -15,6 +15,7 @@ import {
   makeResult,
   makeErrorResult,
   makeOperation,
+  mergeResultPatch,
 } from '../utils';
 
 import {
@@ -158,14 +159,23 @@ export const subscriptionExchange = ({
     return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;
       let sub: Subscription | void;
+      let result: OperationResult | void;
 
       Promise.resolve().then(() => {
         if (isComplete) return;
 
         sub = observableish.subscribe({
-          next: result => next(makeResult(operation, result)),
-          error: err => next(makeErrorResult(operation, err)),
-          complete: () => {
+          next(nextResult) {
+            next(
+              (result = result
+                ? mergeResultPatch(result, nextResult)
+                : makeResult(operation, nextResult))
+            );
+          },
+          error(error) {
+            next(makeErrorResult(operation, error));
+          },
+          complete() {
             if (!isComplete) {
               isComplete = true;
               if (operation.kind === 'subscription') {
@@ -174,6 +184,8 @@ export const subscriptionExchange = ({
                 );
               }
 
+              if (result && result.hasNext)
+                next(mergeResultPatch(result, { hasNext: false }));
               complete();
             }
           },
