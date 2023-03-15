@@ -4,7 +4,7 @@ import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
-const eventStreamRe = /\s*event:\s*([\w-_]+)(?:[ \r\n]+data:)?/g;
+const eventStreamRe = /data: ?([^\n]+)/;
 
 type ContentMode = 'json' | 'multipart' | 'event-stream';
 type ChunkData = Buffer | Uint8Array;
@@ -50,19 +50,14 @@ async function* parseEventStream(response: Response) {
     for (const message of chunk.split('\n\n')) {
       const match = message.match(eventStreamRe);
       if (match) {
-        const type = match[1];
-        if (type === 'complete') {
-          break chunks;
-        } else if (type === 'next') {
-          const chunk = message.slice(match[0].length);
-          try {
-            yield (payload = JSON.parse(chunk));
-          } catch (error) {
-            if (!payload) throw error;
-          }
-
-          if (payload && !payload.hasNext) break chunks;
+        const chunk = match[1];
+        try {
+          yield (payload = JSON.parse(chunk));
+        } catch (error) {
+          if (!payload) throw error;
         }
+
+        if (payload && !payload.hasNext) break chunks;
       }
     }
   }
