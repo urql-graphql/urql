@@ -87,7 +87,7 @@ export const extractFiles = (x: any): FileMap => {
     BlobConstructor !== NoopConstructor
   ) {
     seen.clear();
-    extract(map, x, '');
+    extract(map, '', x);
   }
   return map;
 };

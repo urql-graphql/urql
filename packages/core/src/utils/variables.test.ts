@@ -1,4 +1,4 @@
-import { stringifyVariables } from './variables';
+import { stringifyVariables, extractFiles } from './variables';
 import { describe, it, expect } from 'vitest';
 
 describe('stringifyVariables', () => {
@@ -47,5 +47,21 @@ describe('stringifyVariables', () => {
     const otherFile = new File([0] as any, 'otherFile.js');
     Object.defineProperty(otherFile, 'lastModified', { value: 234 });
     expect(str).not.toBe(stringifyVariables(otherFile));
+  });
+});
+
+describe('extractFiles', () => {
+  it('extracts files from nested objects', () => {
+    const file = new Blob();
+    expect(extractFiles({ files: { a: file } })).toEqual(
+      new Map([['.files.a', file]])
+    );
+  });
+
+  it('extracts files from nested arrays', () => {
+    const file = new Blob();
+    expect(extractFiles({ files: [file] })).toEqual(
+      new Map([['.files.0', file]])
+    );
   });
 });
