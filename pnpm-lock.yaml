@@ -26,7 +26,6 @@ importers:
       '@rollup/plugin-replace': ^5.0.2
       '@rollup/plugin-sucrase': ^5.0.0
       '@rollup/plugin-terser': ^0.4.0
-      '@rollup/plugin-typescript': ^11.0.0
       '@rollup/pluginutils': ^5.0.0
       '@types/node': ^18.11.9
       '@typescript-eslint/eslint-plugin': ^5.44.0
@@ -82,7 +81,6 @@ importers:
       '@rollup/plugin-replace': 5.0.2_rollup@3.19.1
       '@rollup/plugin-sucrase': 5.0.1_rollup@3.19.1
       '@rollup/plugin-terser': 0.4.0_rollup@3.19.1
-      '@rollup/plugin-typescript': 11.0.0_h4kaxwm6ctjivrsm4cpxaz7nqu
       '@rollup/pluginutils': 5.0.2_rollup@3.19.1
       '@types/node': 18.11.9
       '@typescript-eslint/eslint-plugin': 5.44.0_4kbswhbwl5syvdj4jodacfm2ou
@@ -2943,25 +2941,6 @@ packages:
       serialize-javascript: 6.0.1
       smob: 0.0.6
       terser: 5.16.6
-    dev: true
-
-  /@rollup/plugin-typescript/11.0.0_h4kaxwm6ctjivrsm4cpxaz7nqu:
-    resolution: {integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
-        optional: true
-    dependencies:
-      '@rollup/pluginutils': 5.0.2_rollup@3.19.1
-      resolve: 1.22.1
-      rollup: 3.19.1
-      typescript: 4.9.5
     dev: true
 
   /@rollup/pluginutils/5.0.2_rollup@3.19.1:
