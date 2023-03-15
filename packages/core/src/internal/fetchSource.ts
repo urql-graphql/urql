@@ -31,7 +31,7 @@ const parseContentMode = (contentType: string): ContentMode | null => {
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
     for await (const chunk of response.body! as any)
-      yield toString(chunk as ChunkData);
+      toString(chunk as ChunkData);
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
@@ -43,26 +43,38 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   }
 }
 
-async function* parseEventStream(response: Response) {
-  let payload: any;
-
-  chunks: for await (const chunk of streamBody(response)) {
-    for (const message of chunk.split('\n\n')) {
-      const match = message.match(eventStreamRe);
-      if (match) {
-        const chunk = match[1];
-        try {
-          yield (payload = JSON.parse(chunk));
-        } catch (error) {
-          if (!payload) throw error;
-        }
-
-        if (payload && !payload.hasNext) break chunks;
-      }
+async function* split(
+  chunks: AsyncIterableIterator<string>,
+  boundary: string
+): AsyncIterableIterator<string> {
+  let buffer = '';
+  let boundaryIndex: number;
+  for await (const chunk of chunks) {
+    buffer += chunk;
+    while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
+      yield buffer.slice(0, boundaryIndex);
+      buffer = buffer.slice(boundaryIndex + boundary.length);
     }
   }
+}
 
-  if (payload && payload.hasNext) yield { hasNext: false };
+async function* parseEventStream(response: Response) {
+  let payload: any;
+  for await (const chunk of split(streamBody(response), '\n\n')) {
+    const match = chunk.match(eventStreamRe);
+    if (match) {
+      const chunk = match[1];
+      try {
+        yield (payload = JSON.parse(chunk));
+      } catch (error) {
+        if (!payload) throw error;
+      }
+      if (payload && !payload.hasNext) break;
+    }
+  }
+  if (payload && payload.hasNext) {
+    yield { hasNext: false };
+  }
 }
 
 async function* parseMultipartMixed(
@@ -71,37 +83,25 @@ async function* parseMultipartMixed(
 ): AsyncIterableIterator<ExecutionResult> {
   const boundaryHeader = contentType.match(boundaryHeaderRe);
   const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
-
-  let buffer = '';
   let isPreamble = true;
-  let boundaryIndex: number;
   let payload: any;
-
-  chunks: for await (const chunk of streamBody(response)) {
-    buffer += chunk;
-    while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
-      if (isPreamble) {
-        isPreamble = false;
-      } else {
-        const chunk = buffer.slice(
-          buffer.indexOf('\r\n\r\n') + 4,
-          boundaryIndex
-        );
-
-        try {
-          yield (payload = JSON.parse(chunk));
-        } catch (error) {
-          if (!payload) throw error;
-        }
+  for await (const chunk of split(streamBody(response), boundary)) {
+    if (isPreamble) {
+      isPreamble = false;
+    } else {
+      try {
+        yield (payload = JSON.parse(
+          chunk.slice(chunk.indexOf('\r\n\r\n') + 4)
+        ));
+      } catch (error) {
+        if (!payload) throw error;
       }
-
-      buffer = buffer.slice(boundaryIndex + boundary.length);
-      if (buffer.startsWith('--') || (payload && !payload.hasNext))
-        break chunks;
     }
+    if (payload && !payload.hasNext) break;
   }
-
-  if (payload && payload.hasNext) yield { hasNext: false };
+  if (payload && payload.hasNext) {
+    yield { hasNext: false };
+  }
 }
 
 async function* fetchOperation(
