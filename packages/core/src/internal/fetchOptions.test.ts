@@ -3,6 +3,45 @@ import { makeOperation } from '../utils/operation';
 import { queryOperation, mutationOperation } from '../test-utils';
 import { makeFetchBody, makeFetchURL, makeFetchOptions } from './fetchOptions';
 
+describe('makeFetchBody', () => {
+  it('creates a fetch body', () => {
+    const body = makeFetchBody(queryOperation);
+    expect(body).toMatchInlineSnapshot(`
+      {
+        "extensions": undefined,
+        "operationName": "getUser",
+        "query": "query getUser($name: String) {
+        user(name: $name) {
+          id
+          firstName
+          lastName
+        }
+      }",
+        "variables": {
+          "name": "Clara",
+        },
+      }
+    `);
+  });
+
+  it('omits the query property when APQ is set', () => {
+    const apqOperation = makeOperation(queryOperation.kind, queryOperation);
+
+    apqOperation.extensions = {
+      ...apqOperation.extensions,
+      persistedQuery: {
+        version: 1,
+        sha256Hash: '[test]',
+      },
+    };
+
+    expect(makeFetchBody(apqOperation).query).toBe(undefined);
+
+    apqOperation.extensions.persistedQuery!.miss = true;
+    expect(makeFetchBody(apqOperation).query).not.toBe(undefined);
+  });
+});
+
 describe('makeFetchURL', () => {
   it('returns the URL by default', () => {
     const body = makeFetchBody(queryOperation);
