@@ -726,15 +726,14 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               return;
             } else if (isNetworkOperation && !hasNext) {
               dispatchOperation(operation);
+              if (prevReplay) prevReplay.stale = true;
             }
 
             if (
               prevReplay != null &&
               prevReplay === replays.get(operation.key)
             ) {
-              observer.next(
-                isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
-              );
+              observer.next(prevReplay);
             } else if (!isNetworkOperation && !hasNext) {
               dispatchOperation(operation);
             }
