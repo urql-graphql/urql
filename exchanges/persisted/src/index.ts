@@ -1,1 +1,1 @@
-export * from './persistedFetchExchange';
+export * from './persistedExchange';

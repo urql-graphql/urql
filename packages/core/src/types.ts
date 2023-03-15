@@ -48,7 +48,7 @@ type Extensions = Record<string, any>;
  * request to omit the `query`, instead sending this `sha256Hash`.
  */
 export interface PersistedRequestExtensions {
-  version: 1;
+  version?: 1;
   sha256Hash: string;
   /** Set when a `sha256Hash` previously experienced a miss which will force `query` to be sent. */
   miss?: boolean;
