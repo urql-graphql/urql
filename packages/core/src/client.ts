@@ -710,21 +710,23 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
         let source = active.get(operation.key);
 
         if (!source) {
-          active.set(operation.key, (source = makeResultSource(operation)));
+          source = makeResultSource(operation);
+          if (operation.kind === 'subscription') source = share(source);
+          active.set(operation.key, source);
         }
-
-        const isNetworkOperation =
-          operation.context.requestPolicy === 'cache-and-network' ||
-          operation.context.requestPolicy === 'network-only';
 
         return pipe(
           source,
           onStart(() => {
             const prevReplay = replays.get(operation.key);
+            const isNetworkOperation =
+              operation.context.requestPolicy === 'cache-and-network' ||
+              operation.context.requestPolicy === 'network-only';
+            const hasNext = !!prevReplay && !!prevReplay.hasNext;
 
             if (operation.kind === 'subscription') {
               return dispatchOperation(operation);
-            } else if (isNetworkOperation) {
+            } else if (isNetworkOperation && !hasNext) {
               dispatchOperation(operation);
             }
 
@@ -735,7 +737,7 @@ export const Client: new (opts: ClientOptions) => Client = function Client(
               observer.next(
                 isNetworkOperation ? { ...prevReplay, stale: true } : prevReplay
               );
-            } else if (!isNetworkOperation) {
+            } else if (!isNetworkOperation && !hasNext) {
               dispatchOperation(operation);
             }
           }),
