@@ -202,137 +202,7 @@ describe('on multipart/mixed', () => {
     JSON.stringify(json) +
     '\r\n---';
 
-  it('listens for more responses (stream)', async () => {
-    fetch.mockResolvedValue({
-      status: 200,
-      headers: {
-        get() {
-          return 'multipart/mixed';
-        },
-      },
-      body: {
-        getReader: function () {
-          let cancelled = false;
-          const results = [
-            {
-              done: false,
-              value: Buffer.from('\r\n---'),
-            },
-            {
-              done: false,
-              value: Buffer.from(
-                wrap({
-                  hasNext: true,
-                  data: {
-                    author: {
-                      id: '1',
-                      name: 'Steve',
-                      __typename: 'Author',
-                      todos: [{ id: '1', text: 'stream', __typename: 'Todo' }],
-                    },
-                  },
-                })
-              ),
-            },
-            {
-              done: false,
-              value: Buffer.from(
-                wrap({
-                  incremental: [
-                    {
-                      path: ['author', 'todos', 1],
-                      data: { id: '2', text: 'defer', __typename: 'Todo' },
-                    },
-                  ],
-                  hasNext: true,
-                })
-              ),
-            },
-            {
-              done: false,
-              value: Buffer.from(wrap({ hasNext: false }) + '--'),
-            },
-            { done: true },
-          ];
-          let count = 0;
-          return {
-            cancel: function () {
-              cancelled = true;
-            },
-            read: function () {
-              if (cancelled) throw new Error('No');
-
-              return Promise.resolve(results[count++]);
-            },
-          };
-        },
-      },
-    });
-
-    const streamedQueryOperation: Operation = makeOperation(
-      'query',
-      {
-        query: gql`
-          query {
-            author {
-              id
-              name
-              todos @stream {
-                id
-                text
-              }
-            }
-          }
-        `,
-        variables: {},
-        key: 1,
-      },
-      context
-    );
-
-    const chunks: OperationResult[] = await pipe(
-      makeFetchSource(streamedQueryOperation, 'https://test.com/graphql', {}),
-      scan((prev: OperationResult[], item) => [...prev, item], []),
-      toPromise
-    );
-
-    expect(chunks.length).toEqual(3);
-
-    expect(chunks[0].data).toEqual({
-      author: {
-        id: '1',
-        name: 'Steve',
-        __typename: 'Author',
-        todos: [{ id: '1', text: 'stream', __typename: 'Todo' }],
-      },
-    });
-
-    expect(chunks[1].data).toEqual({
-      author: {
-        id: '1',
-        name: 'Steve',
-        __typename: 'Author',
-        todos: [
-          { id: '1', text: 'stream', __typename: 'Todo' },
-          { id: '2', text: 'defer', __typename: 'Todo' },
-        ],
-      },
-    });
-
-    expect(chunks[2].data).toEqual({
-      author: {
-        id: '1',
-        name: 'Steve',
-        __typename: 'Author',
-        todos: [
-          { id: '1', text: 'stream', __typename: 'Todo' },
-          { id: '2', text: 'defer', __typename: 'Todo' },
-        ],
-      },
-    });
-  });
-
-  it('listens for more responses (defer)', async () => {
+  it('listens for more streamed responses', async () => {
     fetch.mockResolvedValue({
       status: 200,
       headers: {
@@ -453,13 +323,17 @@ describe('on multipart/mixed', () => {
       },
     });
   });
+});
 
-  it('listens for more responses (defer-neted)', async () => {
+describe('on text/event-stream', () => {
+  const wrap = (json: object) => 'data: ' + JSON.stringify(json) + '\n\n';
+
+  it('listens for streamed responses', async () => {
     fetch.mockResolvedValue({
       status: 200,
       headers: {
         get() {
-          return 'multipart/mixed';
+          return 'text/event-stream';
         },
       },
       body: {
@@ -468,21 +342,12 @@ describe('on multipart/mixed', () => {
           const results = [
             {
               done: false,
-              value: Buffer.from('\r\n---'),
-            },
-            {
-              done: false,
               value: Buffer.from(
                 wrap({
                   hasNext: true,
                   data: {
                     author: {
                       id: '1',
-                      name: 'Steve',
-                      address: {
-                        country: 'UK',
-                        __typename: 'Address',
-                      },
                       __typename: 'Author',
                     },
                   },
@@ -495,8 +360,8 @@ describe('on multipart/mixed', () => {
                 wrap({
                   incremental: [
                     {
-                      path: ['author', 'address'],
-                      data: { street: 'home' },
+                      path: ['author'],
+                      data: { name: 'Steve' },
                     },
                   ],
                   hasNext: true,
@@ -505,7 +370,7 @@ describe('on multipart/mixed', () => {
             },
             {
               done: false,
-              value: Buffer.from(wrap({ hasNext: false }) + '--'),
+              value: Buffer.from(wrap({ hasNext: false })),
             },
             { done: true },
           ];
@@ -524,9 +389,9 @@ describe('on multipart/mixed', () => {
       },
     });
 
-    const AddressFragment = gql`
-      fragment addressFields on Address {
-        street
+    const AuthorFragment = gql`
+      fragment authorFields on Author {
+        name
       }
     `;
 
@@ -537,15 +402,11 @@ describe('on multipart/mixed', () => {
           query {
             author {
               id
-              address {
-                id
-                country
-                ...addressFields @defer
-              }
+              ...authorFields @defer
             }
           }
 
-          ${AddressFragment}
+          ${AuthorFragment}
         `,
         variables: {},
         key: 1,
@@ -564,11 +425,6 @@ describe('on multipart/mixed', () => {
     expect(chunks[0].data).toEqual({
       author: {
         id: '1',
-        name: 'Steve',
-        address: {
-          country: 'UK',
-          __typename: 'Address',
-        },
         __typename: 'Author',
       },
     });
@@ -577,11 +433,14 @@ describe('on multipart/mixed', () => {
       author: {
         id: '1',
         name: 'Steve',
-        address: {
-          country: 'UK',
-          street: 'home',
-          __typename: 'Address',
-        },
+        __typename: 'Author',
+      },
+    });
+
+    expect(chunks[2].data).toEqual({
+      author: {
+        id: '1',
+        name: 'Steve',
         __typename: 'Author',
       },
     });

@@ -91,8 +91,9 @@ export const makeFetchOptions = (
 
   const headers: HeadersInit = {
     accept:
-      'application/graphql-response+json, application/graphql+json, application/json, multipart/mixed',
+      'application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed',
   };
+
   if (!useGETMethod) headers['content-type'] = 'application/json';
   const extraOptions =
     (typeof operation.context.fetchOptions === 'function'

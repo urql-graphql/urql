@@ -4,6 +4,7 @@ import { makeResult, makeErrorResult, mergeResultPatch } from '../utils';
 
 const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
 const boundaryHeaderRe = /boundary="?([^=";]+)"?/i;
+const eventStreamRe = /data: ?([^\n]+)/;
 
 type ChunkData = Buffer | Uint8Array;
 
@@ -17,7 +18,7 @@ const toString = (input: Buffer | ArrayBuffer): string =>
 async function* streamBody(response: Response): AsyncIterableIterator<string> {
   if (response.body![Symbol.asyncIterator]) {
     for await (const chunk of response.body! as any)
-      yield toString(chunk as ChunkData);
+      toString(chunk as ChunkData);
   } else {
     const reader = response.body!.getReader();
     let result: ReadableStreamReadResult<ChunkData>;
@@ -29,43 +30,73 @@ async function* streamBody(response: Response): AsyncIterableIterator<string> {
   }
 }
 
+async function* split(
+  chunks: AsyncIterableIterator<string>,
+  boundary: string
+): AsyncIterableIterator<string> {
+  let buffer = '';
+  let boundaryIndex: number;
+  for await (const chunk of chunks) {
+    buffer += chunk;
+    while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
+      yield buffer.slice(0, boundaryIndex);
+      buffer = buffer.slice(boundaryIndex + boundary.length);
+    }
+  }
+}
+
+async function* parseJSON(
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
+  yield JSON.parse(await response.text());
+}
+
+async function* parseEventStream(
+  response: Response
+): AsyncIterableIterator<ExecutionResult> {
+  let payload: any;
+  for await (const chunk of split(streamBody(response), '\n\n')) {
+    const match = chunk.match(eventStreamRe);
+    if (match) {
+      const chunk = match[1];
+      try {
+        yield (payload = JSON.parse(chunk));
+      } catch (error) {
+        if (!payload) throw error;
+      }
+      if (payload && !payload.hasNext) break;
+    }
+  }
+  if (payload && payload.hasNext) {
+    yield { hasNext: false };
+  }
+}
+
 async function* parseMultipartMixed(
   contentType: string,
   response: Response
 ): AsyncIterableIterator<ExecutionResult> {
   const boundaryHeader = contentType.match(boundaryHeaderRe);
   const boundary = '--' + (boundaryHeader ? boundaryHeader[1] : '-');
-
-  let buffer = '';
   let isPreamble = true;
-  let boundaryIndex: number;
   let payload: any;
-
-  chunks: for await (const chunk of streamBody(response)) {
-    buffer += chunk;
-    while ((boundaryIndex = buffer.indexOf(boundary)) > -1) {
-      if (isPreamble) {
-        isPreamble = false;
-      } else {
-        const chunk = buffer.slice(
-          buffer.indexOf('\r\n\r\n') + 4,
-          boundaryIndex
-        );
-
-        try {
-          yield (payload = JSON.parse(chunk));
-        } catch (error) {
-          if (!payload) throw error;
-        }
+  for await (const chunk of split(streamBody(response), boundary)) {
+    if (isPreamble) {
+      isPreamble = false;
+    } else {
+      try {
+        yield (payload = JSON.parse(
+          chunk.slice(chunk.indexOf('\r\n\r\n') + 4)
+        ));
+      } catch (error) {
+        if (!payload) throw error;
       }
-
-      buffer = buffer.slice(boundaryIndex + boundary.length);
-      if (buffer.startsWith('--') || (payload && !payload.hasNext))
-        break chunks;
     }
+    if (payload && !payload.hasNext) break;
   }
-
-  if (payload && payload.hasNext) yield { hasNext: false };
+  if (payload && payload.hasNext) {
+    yield { hasNext: false };
+  }
 }
 
 async function* fetchOperation(
@@ -85,18 +116,22 @@ async function* fetchOperation(
     // Delay for a tick to give the Client a chance to cancel the request
     // if a teardown comes in immediately
     await Promise.resolve();
+
     response = await (operation.context.fetch || fetch)(url, fetchOptions);
     const contentType = response.headers.get('Content-Type') || '';
-    if (/text\//i.test(contentType)) {
-      const text = await response.text();
-      return yield makeErrorResult(operation, new Error(text), response);
-    } else if (!/multipart\/mixed/i.test(contentType)) {
-      const text = await response.text();
-      return yield makeResult(operation, JSON.parse(text), response);
+
+    let results: AsyncIterable<ExecutionResult>;
+    if (/multipart\/mixed/i.test(contentType)) {
+      results = parseMultipartMixed(contentType, response);
+    } else if (/text\/event-stream/i.test(contentType)) {
+      results = parseEventStream(response);
+    } else if (!/text\//i.test(contentType)) {
+      results = parseJSON(response);
+    } else {
+      throw new Error(await response.text());
     }
 
-    const iterator = parseMultipartMixed(contentType, response);
-    for await (const payload of iterator) {
+    for await (const payload of results) {
       yield (result = result
         ? mergeResultPatch(result, payload, response)
         : makeResult(operation, payload, response));
