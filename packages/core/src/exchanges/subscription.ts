@@ -11,11 +11,10 @@ import {
 } from 'wonka';
 
 import {
-  stringifyDocument,
   makeResult,
+  mergeResultPatch,
   makeErrorResult,
   makeOperation,
-  mergeResultPatch,
 } from '../utils';
 
 import {
@@ -25,6 +24,8 @@ import {
   OperationContext,
   OperationResult,
 } from '../types';
+
+import { FetchBody, makeFetchBody } from '../internal';
 
 /** An abstract observer-like interface.
  *
@@ -86,7 +87,8 @@ export interface SubscriptionOperation {
  * @returns An {@link ObservableLike} object issuing {@link ExecutionResult | ExecutionResults}.
  */
 export type SubscriptionForwarder = (
-  operation: SubscriptionOperation
+  request: FetchBody,
+  operation: Operation
 ) => ObservableLike<ExecutionResult>;
 
 /** This is called to create a subscription and needs to be hooked up to a transport client. */
@@ -149,14 +151,10 @@ export const subscriptionExchange = ({
   const createSubscriptionSource = (
     operation: Operation
   ): Source<OperationResult> => {
-    // This excludes the query's name as a field although subscription-transport-ws does accept it since it's optional
-    const observableish = forwardSubscription({
-      key: operation.key.toString(36),
-      query: stringifyDocument(operation.query),
-      variables: operation.variables!,
-      extensions: { ...operation.extensions },
-      context: { ...operation.context },
-    });
+    const observableish = forwardSubscription(
+      makeFetchBody(operation),
+      operation
+    );
 
     return make<OperationResult>(({ next, complete }) => {
       let isComplete = false;
