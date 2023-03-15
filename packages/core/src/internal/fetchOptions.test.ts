@@ -58,7 +58,7 @@ describe('makeFetchOptions', () => {
       {
         "body": "{\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}",
         "headers": {
-          "accept": "application/graphql-response+json, application/graphql+json, application/json, multipart/mixed",
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
           "content-type": "application/json",
         },
         "method": "POST",
@@ -77,7 +77,7 @@ describe('makeFetchOptions', () => {
       {
         "body": undefined,
         "headers": {
-          "accept": "application/graphql-response+json, application/graphql+json, application/json, multipart/mixed",
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
         },
         "method": "GET",
       }
@@ -97,7 +97,7 @@ describe('makeFetchOptions', () => {
       {
         "body": FormData {},
         "headers": {
-          "accept": "application/graphql-response+json, application/graphql+json, application/json, multipart/mixed",
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
         },
         "method": "POST",
       }
