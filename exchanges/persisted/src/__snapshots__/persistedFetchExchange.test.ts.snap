@@ -1,9 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`accepts successful persisted query responses 1`] = `"{\\"extensions\\":{\\"persistedQuery\\":{\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\",\\"version\\":1}},\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
-
-exports[`supports cache-miss persisted query errors 1`] = `"{\\"extensions\\":{\\"persistedQuery\\":{\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\",\\"version\\":1}},\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
-
-exports[`supports cache-miss persisted query errors 2`] = `"{\\"extensions\\":{\\"persistedQuery\\":{\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\",\\"version\\":1}},\\"operationName\\":\\"getUser\\",\\"query\\":\\"query getUser($name: String) {\\\\n  user(name: $name) {\\\\n    id\\\\n    firstName\\\\n    lastName\\\\n  }\\\\n}\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
-
-exports[`supports unsupported persisted query errors 1`] = `"{\\"extensions\\":{\\"persistedQuery\\":{\\"sha256Hash\\":\\"b4228e10e04c59def248546d305b710309c1b297423b38eb64f989a89a398cd8\\",\\"version\\":1}},\\"operationName\\":\\"getUser\\",\\"variables\\":{\\"name\\":\\"Clara\\"}}"`;
